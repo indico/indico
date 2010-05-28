@@ -38,6 +38,14 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.WebEx.fossils import IWebExWarningFossil, IWebExErrorFossil, \
     IChangesFromWebExErrorFossil, IParticipantFossil
 
+def sendXMLRequest(xml):  
+    conn = httplib.HTTPSConnection( getWebExOptionValueByName("WEhttpServerLocation") )
+    conn.request( "POST", "/WBXService/XMLService", xml )
+    r = conn.getresponse()
+    response_xml = r.read()
+#    Logger.get('WebEx').debug( "WebEx Response:\n\n\n\n%s" % ( response_xml ) )
+    return response_xml
+
 def getWebExOptionValueByName(optionName):
     return CollaborationTools.getOptionValue('WebEx', optionName)
 
@@ -83,15 +91,6 @@ def makeTime(the_dateTime):
     timezone functions like getAdjustedStartDate('UTC')
     """
     return datetime( *strptime( str(the_dateTime)[0:16], "%Y-%m-%d %H:%M" )[0:7]) 
-    
-    
-def sendXMLRequest(xml):  
-    conn = httplib.HTTPSConnection( getWebExOptionValueByName("WEhttpServerLocation") )
-    conn.request( "POST", "/WBXService/XMLService", xml )
-    r = conn.getresponse()
-    response_xml = r.read()
-#    Logger.get('WebEx').debug( "WebEx Response:\n\n%s" % ( response_xml ) )
-    return response_xml
    
 def getMinStartDate(conference):
     return conference.getAdjustedStartDate() - timedelta(0,0,0,0, getWebExOptionValueByName("allowedMinutes"))

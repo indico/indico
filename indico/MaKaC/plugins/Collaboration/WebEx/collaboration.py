@@ -30,12 +30,13 @@ from MaKaC.common.timezoneUtils import nowutc, utctimestamp2date, naive2local, d
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import WebExControlledException, WebExException,\
     getMinStartDate, getMaxEndDate, ChangesFromWebExError,\
-    WebExError, WebExWarning, getWebExOptionValueByName, sendXMLRequest, makeTime, findDuration, \
-    Participant, makeParticipantXML
+    WebExError, WebExWarning, getWebExOptionValueByName, makeTime, findDuration, \
+    Participant, makeParticipantXML, sendXMLRequest
 from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAdmin, \
     WebExMeetingModifiedNotificationAdmin, WebExMeetingRemovalNotificationAdmin, \
     NewWebExMeetingNotificationManager, WebExMeetingModifiedNotificationManager,\
     WebExMeetingRemovalNotificationManager, WebExParticipantNotification
+from MaKaC.plugins.Collaboration.WebEx.api.operations import WebExOperations
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import personMail, Mailer
 from MaKaC.common.logger import Logger
@@ -47,6 +48,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.plugins.Collaboration.WebEx.fossils import ICSBookingIndexingFossil, ICSBookingConfModifFossil
 from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseConfModifFossil
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 class CSBooking(CSBookingBase):
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
@@ -159,6 +161,9 @@ class CSBooking(CSBookingBase):
     def getWebExUser(self):
         return self._bookingParams['webExUser']
 
+    def getDuration(self):
+        return self._duration
+
     def getWebExKey(self):
         try:
             return self._webExKey
@@ -170,6 +175,12 @@ class CSBooking(CSBookingBase):
     
     def getChangesFromWebEx(self):
         return self._changesFromWebEx
+
+    def setWebExKey( self, webExKey ):
+        self._webExKey = webExKey
+
+    def getWebExKey( self ):
+        return self._webExKey
     
     def getLastCheck(self):
         if not hasattr(self, "_lastCheck"): #TODO: remove when safe
@@ -254,6 +265,10 @@ class CSBooking(CSBookingBase):
             return None
    
     def bookingOK(self):
+        """
+        This function is called after the booking parameters are 
+        checked and the booking appears to have been successful.
+        """
         self._statusMessage = _("Booking created")
         self._statusClass = "statusMessageOK"
         self._created = True
@@ -287,214 +302,32 @@ class CSBooking(CSBookingBase):
     def _create(self):
         """ Creates a booking in the EVO server if all conditions are met.
         """
-        try:
-            params = self.getBookingParams()
-            self.setAccessPassword( params['accessPassword'] )
-            
-            participant_xml = makeParticipantXML(self._participants)
-            
-            t1 = makeTime( self.getAdjustedStartDate('UTC') )
-            self._duration = findDuration( self.getAdjustedStartDate('UTC'), self.getAdjustedEndDate('UTC') )
-            start_date = t1.strftime( "%m/%d/%Y %H:%M" )
-            request_xml = """<?xml version="1.0\" encoding="UTF-8"?>
-<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:serv=\"http://www.webex.com/schemas/2002/06/service" >
-<header>
-  <securityContext>
-    <webExID>%(username)s</webExID>
-    <password>%(password)s</password>
-    <siteID>%(siteID)s</siteID>
-    <partnerID>%(partnerID)s</partnerID>
-  </securityContext>
-</header>
-<body>
-  <bodyContent xsi:type="java:com.webex.service.binding.meeting.CreateMeeting" xmlns:meet="http://www.webex.com/schemas/2002/06/service/meeting" >
-    <accessControl>
-      <meetingPassword>%(meetingPassword)s</meetingPassword>
-    </accessControl>
-    <metaData>
-      <confName>%(meetingName)s</confName>
-      <agenda>%(description)s</agenda>
-    </metaData>
-    %(participants)s
-    <enableOptions>
-      <chat>true</chat>
-      <poll>true</poll>
-      <audioVideo>true</audioVideo>
-    </enableOptions>
-    <schedule>
-      <startDate>%(startDate)s:00</startDate>
-      <joinTeleconfBeforeHost>false</joinTeleconfBeforeHost>
-      <duration>%(duration)s</duration>
-      <timeZoneID>20</timeZoneID><!--Zone 20 is Greenwich GMT/UTC-->
-    </schedule>
-    <telephony>
-      <telephonySupport>CALLIN</telephonySupport>
-    </telephony>
-  </bodyContent>
-</body>
-</serv:message>
+        params = self.getBookingParams()
+        self.setAccessPassword( params['accessPassword'] )
+        t1 = makeTime( self.getAdjustedStartDate('UTC') )
+        self._duration = findDuration( self.getAdjustedStartDate('UTC'), self.getAdjustedEndDate('UTC') )
 
-""" % ( { "username" : params['webExUser'], "password" : params['webExPass'], "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "meetingPassword": params['accessPassword'], "startDate" : start_date, "duration" : self._duration, "meetingName" : params['meetingTitle'], "description" : params['meetingDescription'], "participants": participant_xml } )
-            Logger.get('WebEx').debug( "WebEx Response:\n\n%s" % ( request_xml ) )
-            response_xml = sendXMLRequest( request_xml )
-            Logger.get('WebEx').debug( "WebEx Response:\n\n%s" % ( response_xml ) )
-            dom = xml.dom.minidom.parseString( response_xml )
-            status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
-            if status == "SUCCESS":
-                self._webExKey = dom.getElementsByTagName( "meet:meetingkey" )[0].firstChild.toxml('utf-8')
-                self._iCalURL = dom.getElementsByTagName( "serv:attendee" )[0].firstChild.toxml('utf-8')
-                #Check if they left the trialing slash in the base URL we need
-                if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
-                    self._url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=JM&MK=' + self._webExKey
-                else:  #Add in the slash for them
-                    self._url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=JM&MK=' + self._webExKey
-                #We do this because the call in number is not returned in create response
-                self.bookingOK()
-                self.checkCanStart()
-                self._checkStatus()
-                recipients = []
-                for k in self._participants.keys():
-                    recipients.append( self._participants[k]._email )
-                if len(recipients)>0:
-                    notification = WebExParticipantNotification( self, recipients, 'new' )
-                    GenericMailer.send( notification )
-            else:
-                self._url = ""
-                errorID = dom.getElementsByTagName( "serv:exceptionID" )[0].firstChild.toxml('utf-8')
-                errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
-                return WebExError( errorID, userMessage = errorReason )
-
-            if MailTools.needToSendEmails('WebEx'):
-                try:
-                    notification = NewWebExMeetingNotificationAdmin(self)
-                    GenericMailer.sendAndLog(notification, self.getConference(),
-                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                            self.getConference().getCreator())
-                except Exception,e:
-                    Logger.get('WebEx').error(
-        	               """Could not send NewWebExMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-        	               (self.getId(), self.getConference().getId(), str(e)))
-                    
-            if self._bookingParams["sendMailToManagers"]:
-                try:
-                    notification = NewWebExMeetingNotificationManager(self)
-                    GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                             self.getConference().getCreator())
-                except Exception,e:
-                    Logger.get('WebEx').error(
-                        """Could not send NewEVOMeetingNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
-        except WebExControlledException, e:
-            Logger.get('WebEx').debug( "caught exception in function _create" )
-            raise WebExException(_("The booking could not be created due to a problem with the WebEx Server\n.It sent the following message: ") + e.message, e)
+        result = ExternalOperationsManager.execute(self, "createBooking", WebExOperations.createBooking, self)
+        if isinstance(result, WebExError):
+            return result
+        #We do this because the call in number is not returned in create response
+        self.bookingOK()
+        self.checkCanStart()
+        self._checkStatus()
+        return None
 
     def _modify(self, oldBookingParams):
         """ Modifies a booking in the EVO server if all conditions are met.
         """
         Logger.get('WebEx').debug( "in _modify" )
         if self._created:
-            arguments = self.getCreateModifyArguments()
-            #we take care of the participants 
-
-            try:
-                params = self.getBookingParams()
-                self.setAccessPassword( params['accessPassword'] )
-                t1 = datetime( *strptime( str(self.getAdjustedStartDate('UTC'))[:-9], "%Y-%m-%d %H:%M" )[0:7])
-                t2 = datetime( *strptime( str(self.getAdjustedEndDate('UTC'))[:-9], "%Y-%m-%d %H:%M" )[0:7])
-                diff = t2 - t1
-                days = diff.days
-                minutes,seconds = divmod(diff.seconds, 60)
-                duration = minutes + diff.days * 1440
-                Logger.get('WebEx').debug( "Found duration %s" % str(duration) )
-#                self._startDate = getAdjustedDate(WE_time, tz=self._conf.getTimezone())
-#self.getAdjustedStartDate('UTC')
-#                self._endDate = getAdjustedDate(self._startDate, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )
-                start_date = t1.strftime( "%m/%d/%Y %H:%M" )
-                request_xml = """<?xml version="1.0\" encoding="UTF-8"?>
-<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:serv=\"http://www.webex.com/schemas/2002/06/service" >
-<header>
-  <securityContext>
-    <webExID>%(username)s</webExID>
-    <password>%(password)s</password>
-    <siteID>%(siteID)s</siteID>
-    <partnerID>%(partnerID)s</partnerID>
-  </securityContext>
-</header>
-<body>
-  <bodyContent xsi:type="java:com.webex.service.binding.meeting.SetMeeting" xmlns:meet="http://www.webex.com/schemas/2002/06/service/meeting" >
-    <meetingkey>%(meetingKey)s</meetingkey>
-    <accessControl>
-      <meetingPassword>%(meetingPassword)s</meetingPassword>
-    </accessControl>
-    <metaData>
-      <confName>%(meetingName)s</confName>
-      <agenda>%(description)s</agenda>
-    </metaData>
-    %(participants)s
-    <enableOptions>
-      <chat>true</chat>
-      <poll>true</poll>
-      <audioVideo>true</audioVideo>
-    </enableOptions>
-    
-    <schedule>
-      <startDate>%(startDate)s:00</startDate>
-      <joinTeleconfBeforeHost>false</joinTeleconfBeforeHost>
-      <duration>%(duration)s</duration>
-      <timeZoneID>20</timeZoneID><!--Zone 20 is Greenwich GMT/UTC-->
-    </schedule>
-    <telephony>
-      <telephonySupport>CALLIN</telephonySupport>
-    </telephony>
-  </bodyContent>
-</body>
-</serv:message>
-
-""" % ( { "username" : params['webExUser'], "password" : params['webExPass'], "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "meetingPassword": params['accessPassword'], "startDate" : start_date, "duration" : int(duration), "meetingName" : params['meetingTitle'], "meetingKey" : self._webExKey, "description": params["meetingDescription"], "participants": makeParticipantXML(self._participants) } )
-                Logger.get('WebEx').debug( "WebEx Modify Request:\n\n%s" % ( request_xml ) )
-                response_xml = sendXMLRequest( request_xml )
-                Logger.get('WebEx').debug( "WebEx Modify Response:\n\n%s" % ( response_xml ) )
-                dom = xml.dom.minidom.parseString( response_xml )
-                status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
-                if status != "SUCCESS":
-                    errorID = dom.getElementsByTagName( "serv:exceptionID" )[0].firstChild.toxml('utf-8')
-                    errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
-                    return WebExError( errorID, userMessage = errorReason )
-
-                self.bookingOK()
-                self.checkCanStart()
-                self._checkStatus()
-                recipients = []
-                for k in self._participants.keys():
-                    recipients.append( self._participants[k]._email )
-                if len(recipients)>0:
-                    notification = WebExParticipantNotification( self, recipients, 'modify' )
-                    GenericMailer.send( notification )
-
-                if MailTools.needToSendEmails('WebEx'):
-                    try:
-                        notification = WebExMeetingModifiedNotificationAdmin(self)
-                        GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                             self.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('WebEx').error(
-                            """Could not send WebExMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                            (self.getId(), self.getConference().getId(), str(e)))
-                if self._bookingParams["sendMailToManagers"]:
-                    try:
-                        notification = WebExMeetingModifiedNotificationManager(self)
-                        GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                             self.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('WebEx').error(
-                            """Could not send WebExMeetingModifiedNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
-                
-            except WebExControlledException, e:
-                raise WebExException(_("The booking could not be modified due to a problem with the WebEx Server.\n") )
+#            result = ExternalOperationsManager.execute(self, "modifyRoom", VidyoOperations.modifyRoom, self, oldBookingParams)
+            result = ExternalOperationsManager.execute(self, "modifyBooking", WebExOperations.modifyBooking, self)
+            if isinstance(result, WebExError):
+                return result
         else:
-            self._create()
+            return WebExError( errorType = None, userMessage = "The booking appears to have not been created according to the Indico system" )
+#            self._create()
         return None
 
     def _start(self):
@@ -572,82 +405,12 @@ class CSBooking(CSBookingBase):
             return None
 
     def _delete(self):
-        self._warning = WebExWarning( "a test of the warning system" )
-        params = self.getBookingParams()
-        request_xml = """<?xml version="1.0" encoding="ISO-8859-1"?>
-<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-   <header>
-      <securityContext>
-         <webExID>%(username)s</webExID>
-         <password>%(password)s</password>
-         <siteID>%(siteID)s</siteID>
-         <partnerID>%(partnerID)s</partnerID>
-      </securityContext>
-   </header>
-   <body>
-      <bodyContent xsi:type="java:com.webex.service.binding.meeting.DelMeeting">
-         <meetingKey>%(webex_key)s</meetingKey>
-      </bodyContent>
-   </body>
-</serv:message>
-""" % { "username" : params['webExUser'], "password" : params['webExPass'], "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "webex_key": self._webExKey }
-        Logger.get('WebEx').debug( "delete func. is self._created? %s XML:\n%s " % ( self._created, request_xml ) )
-        response_xml = sendXMLRequest( request_xml )
-        dom = xml.dom.minidom.parseString( response_xml )
-        status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
-        if status != "SUCCESS":
-            errorID = dom.getElementsByTagName( "serv:exceptionID" )[0].firstChild.toxml('utf-8')
-            errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
-            Logger.get('WebEx').info( "In delete function, appears to have failed: %s" % response_xml )
-            return WebExError( errorID, userMessage = errorReason )
-#            self._warning = WebExWarning( reason )
-        else:
-            Logger.get('WebEx').info( "In delete function, appears to have been successful" )
-
-        if self._created:
-            try:
-#                if MailTools.needToSendEmails('WebEx'):
-                if True:
-                    try:
-#                        notification = WebExParticipantNotification(self, [ "flannery@gmail.com", "flannery@fnal.gov", "flannery@imsa.edu" ])
-                        #send(addto, addcc, addfrom, subject, body):
-                        Logger.get('WebEx').info("I am in the mailer block")
-                        recipients = ""
-                        for k in participants.keys():
-                            recipients += participants[k]._email + " , "
-                        Logger.get('WebEx').info("Recipients: " + recipients )
-                        personMail.send(recipients, "", "Kevin O'Flannery", "A Subject", "Some body in here" )
-#notification, self.getConference(),
-#                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                                             self.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('WebEx').error(
-                            """Could not send WebExMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                            (self.getId(), self.getConference().getId(), str(e)))
-               
-#                if self._bookingParams["sendMailToManagers"]:
-#                    try:
-#                        notification = EVOMeetingRemovalNotificationManager(self)
-#                        GenericMailer.sendAndLog(notification, self.getConference(),
-#                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                                             self.getConference().getCreator())
-#                    except Exception,e:
-#                        Logger.get('EVO').error(
-#                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
-
-            except WebExControlledException, e:                
-                if e.message == "DELETE_MEETING_OVER":
-                    return WebExError('cannotDeleteOld', str(requestURL))
-                if e.message == "DELETE_MEETING_ONGOING":
-                    return WebExError('cannotDeleteOngoing', str(requestURL))
-                if e.message == "DELETE_MEETING_NO_ID":
-                    self._warning = EVOWarning('cannotDeleteNonExistant')
-                else:
-                    return WebExError( userMessage = "The booking could not be deleted due to a problem with the WebEx Server" )
-#                    raise WebExException(_("The booking could not be deleted due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
-                
-        self._error = False
-        return None
+        """
+        This function will delete the specified video booking from the WebEx server
+        """
+        result = ExternalOperationsManager.execute(self, "deleteBooking", WebExOperations.deleteBooking, self)
+        if isinstance(result, WebExError):
+            return result
         
         
     def _getLaunchDisplayInfo(self):
