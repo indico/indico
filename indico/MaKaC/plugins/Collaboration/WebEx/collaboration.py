@@ -45,7 +45,7 @@ from MaKaC.services.interface.rpc.common import ProcessError
 from MaKaC.common.Counter import Counter
 
 from MaKaC.plugins.Collaboration.WebEx.fossils import ICSBookingIndexingFossil, ICSBookingConfModifFossil
-from MaKaC.common.fossilize import fossilizes
+from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseConfModifFossil
 
 class CSBooking(CSBookingBase):
@@ -113,7 +113,7 @@ class CSBooking(CSBookingBase):
             
     def getParticipants(self):
         Logger.get('WebEx').debug( "In getParticipants" )
-        return self.getParticipantList(sorted = True)
+        return fossilize(self.getParticipantList(sorted = True))
         
     def setParticipants(self, participants):
         Logger.get('WebEx').debug( "In setParticipants" )
@@ -261,8 +261,8 @@ class CSBooking(CSBookingBase):
     def checkCanStart(self, changeMessage = True):
         if self._created:
 ###############
-            self._canBeStarted = True
-            return True 
+#            self._canBeStarted = True
+#            return True 
 ##########Remove above here; in for testing
             now = nowutc()
             self._canBeDeleted = True
@@ -569,6 +569,7 @@ class CSBooking(CSBookingBase):
 
             except WebExControlledException, e:                
                 raise WebExException(_("Information could not be retrieved due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
+            return None
 
     def _delete(self):
         self._warning = WebExWarning( "a test of the warning system" )
@@ -633,7 +634,7 @@ class CSBooking(CSBookingBase):
 #                    except Exception,e:
 #                        Logger.get('EVO').error(
 #                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (self._id, str(e)))
-                
+
             except WebExControlledException, e:                
                 if e.message == "DELETE_MEETING_OVER":
                     return WebExError('cannotDeleteOld', str(requestURL))
@@ -643,9 +644,10 @@ class CSBooking(CSBookingBase):
                     self._warning = EVOWarning('cannotDeleteNonExistant')
                 else:
                     return WebExError( userMessage = "The booking could not be deleted due to a problem with the WebEx Server" )
-                    raise WebExException(_("The booking could not be deleted due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
+#                    raise WebExException(_("The booking could not be deleted due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
                 
         self._error = False
+        return None
         
         
     def _getLaunchDisplayInfo(self):

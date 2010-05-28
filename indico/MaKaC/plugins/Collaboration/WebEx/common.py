@@ -166,7 +166,6 @@ class WebExError(CSErrorBase):
     def getLogMessage(self):
         return "WebEx Error: " + str(self._errorType) + " for request " + str(self._requestURL)
         
-#class Participant(Persistent, Fossilizable):
 class Participant(Persistent,Fossilizable):
     fossilizes(IParticipantFossil)
     def __init__(self, booking, participantIndicoId, data):
@@ -223,7 +222,7 @@ class Participant(Persistent,Fossilizable):
             result.append(' (')
             result.append(self._affiliation)
             result.append(')')
-        return ("".join(result))[:31] #31 is the max length accepted by the MCU
+        return ("".join(result))
     
 class OverlappedError(WebExError):
     def __init__(self, overlappedBooking):

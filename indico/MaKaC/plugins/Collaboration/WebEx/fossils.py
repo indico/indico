@@ -51,22 +51,10 @@ class ICSBookingIndexingFossil(ICSBookingBaseIndexingFossil):
 class IParticipantFossil(IFossil):
     def getId(self):
         pass
-    getId.name = "participantId"
+#    getId.name = "participantId"
 
     def getParticipantName(self):
         pass
-
-#    def getDisplayName(self):
-#        pass
-
-    def getParticipantType(self):
-        pass
-
-#    def getParticipantProtocol(self):
-#        pass
-
-#    def getCallState(self):
-#        pass
 
     def getTitle(self):
         pass
