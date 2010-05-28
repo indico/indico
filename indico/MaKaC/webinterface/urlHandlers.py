@@ -236,6 +236,17 @@ class UHConferencePerformCreation( URLHandler ):
 class UHConferenceDisplay( URLHandler ):
     _relativeURL = "conferenceDisplay.py"
 
+class UHConferenceOverview( URLHandler ):
+    _relativeURL = "conferenceDisplay.py"
+
+    @classmethod
+    def getURL( cls, target ):
+        url = cls._getURL()
+        if target is not None:
+            url.addParams( target.getLocator() )
+        url.addParam( 'ovw', True )
+        return url
+
 class UHConferenceEmail(URLHandler):
     _relativeURL = "EMail.py"
 
@@ -2795,8 +2806,6 @@ class UHSubContribModifMaterials( URLHandler ):
 
 class UHMaterialDisplay( URLHandler ):
     _relativeURL = "materialDisplay.py"
-
-UHConferenceOverview = UHConferenceDisplay
 
 class UHConferenceProgram( URLHandler ):
     _relativeURL = "conferenceProgram.py"
