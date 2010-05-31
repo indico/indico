@@ -11257,7 +11257,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
 
     @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -11669,6 +11668,7 @@ class Minutes(Material):
             return ""
         return self.file.readBin()
 
+    @Retrieves (['MaKaC.conference.Minutes'],'resources', isPicklableObject = True)
     def getResourceList( self ):
         res = Material.getResourceList( self )
         if self.file:
