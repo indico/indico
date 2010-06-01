@@ -4519,6 +4519,10 @@ div.collaborationDisplayInfoLine {
     padding-left: 20px;
 }
 
+div.collaborationDisplayInfoLine table {
+    border-spacing: 0px;
+}
+
 span.collShowHideBookingsText {
     font-style: italic;
 }

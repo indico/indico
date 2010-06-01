@@ -893,7 +893,7 @@
                   <!-- Start of a booking info line -->
                   <div id="collaborationInfoLine{./id}" style="visibility: hidden; overflow: hidden;">
                     <div class="collaborationDisplayInfoLine">
-                    <table cellpadding="0" cellspacing="0">
+                    <table>
                       <tbody>
                         <xsl:for-each select="./information/section">
                           <tr>
