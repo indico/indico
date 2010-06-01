@@ -145,16 +145,17 @@ class VidyoTools(object):
 
     @classmethod
     def getAvatarByAccountName(cls, accountName):
-        authenticatorsToUse = getVidyoOptionValue("authenticatorList")
+        """
+        Retrieves the first avatar found using the authenticators in the
+        authenticatorList option (order is respected)
+        """
+        availableAuths = getVidyoOptionValue("authenticatorList")
+        foundAvatarDict = AuthenticatorMgr().getAvatarByLogin(accountName, availableAuths)
 
-        foundAvatar = AuthenticatorMgr().getAvatarByLogin(accountName, authenticatorsToUse)
-        if foundAvatar:
-            if type(foundAvatar) is dict:
-                for authenticatorName in authenticatorsToUse:
-                    if authenticatorName in foundAvatar:
-                        foundAvatar = foundAvatar[authenticatorName]
-                        break
-            return foundAvatar
+        for authName in availableAuths:
+            foundAvatar = foundAvatarDict.get(authName, None)
+            if foundAvatar:
+                return foundAvatar
         else:
             return None
 
