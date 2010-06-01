@@ -570,7 +570,7 @@ type("ErrorPopup", ["ExclusivePopup"],
          draw: function() {
              var errorList = null;
              if (this.errors.length == 1) {
-                 errorList = Html.span({className:"errorList"}, this.errors[0]);
+                 errorList = Html.div({className:"errorList"}, this.errors[0]);
              }else{
                  errorList = Html.ul("errorList");
                  each(this.errors, function(e) {

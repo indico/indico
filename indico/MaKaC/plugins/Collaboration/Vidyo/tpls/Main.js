@@ -173,6 +173,26 @@
         vidyoDrawContextHelpIcons();
     },
 
+    beforeCreate: function(pluginName, conferenceId) {
+        var allowCreation = true;
+        each(bookings, function(booking) {
+            if (booking.type == 'Vidyo') {
+                allowCreation = false;
+            }
+        });
+
+        if (!allowCreation) {
+            CSErrorPopup($T("Whoops..."),
+                         [Html.unescaped.div({},
+                                   $T("There is already a Vidyo booking present. " +
+                                      "Right now it is only possible to create " +
+                                      "<strong>a single Vidyo booking per event</strong>. " +
+                                      "Please delete it if you want to create a new one."))]);
+        }
+
+        return allowCreation;
+    },
+
     postCreate: function(booking) {
     },
 
