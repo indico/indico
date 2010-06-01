@@ -1222,13 +1222,24 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
  * @param {string} conferenceId the conferenceId of the current event
  */
 var createBooking = function(pluginName, conferenceId) {
+    // Code that has to be executed before the dialog is presented
+    if (pluginHasFunction(pluginName, "beforeCreate")) {
+        // let the function define whether we're going to draw the
+        // dialog or not
+        if (!codes[pluginName].beforeCreate(pluginName, conferenceId)) {
+            return false;
+        }
+    }
 
     var popup = new BookingPopup('create', pluginName, null, conferenceId);
     popup.open();
+
     if (pluginHasFunction(pluginName, "onCreate")) {
         codes[pluginName].onCreate(popup);
     }
     popup.postDraw();
+
+    return true;
 }
 
 /**

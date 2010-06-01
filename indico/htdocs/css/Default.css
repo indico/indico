@@ -3815,7 +3815,7 @@ ul.errorList li {
 }
 
 .errorList {
-    color: #881122;
+    width: 400px;
 }
 
 ul.warningList {
