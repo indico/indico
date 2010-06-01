@@ -77,10 +77,10 @@ class AuthenticatorMgr:
                             return user
         return None
 
-    def getAvatarByLogin(self, login, authenticator = None):
+    def getAvatarByLogin(self, login, auth = None):
         """ Returns an Avatar object based on the person's login.
-            If authenticator is set, we will only look in the given authenticator.
-            If not set, we will look in all autheticators.
+            If authList is set, we will only look in the given authenticators.
+            If not set, we will look in all authenticators.
             If we find this login in more than one authenticator, and there is at least 2
             different Avatar objects, we will return a dictionary authenticatorName:Avatar object.
             If nothing is found, we will return None
@@ -88,49 +88,27 @@ class AuthenticatorMgr:
             :param login: the user login
             :type login: str
 
-            :param login: the name of an authenticator to use, or a list of authenticator names, or None
-            :type login: str, list or NoneType
+            :param auth: a list of names of the authenticators to use, or None
+            :type auth: str, list or NoneType
         """
 
-        if type(authenticator) is str:
-            #only one authenticator
-            auth = self.getById(authenticator)
-            try:
-                return auth.getAvatarByLogin(login)
-            except KeyError:
-                return None
-
+        if auth == None:
+            # search all authenticators
+            authList = self.AuthenticatorList
         else:
-            #multiple authenticators, we build a list of authenticators
-            if type(authenticator) is list:
-                authenticatorList = []
-                for authName in authenticator:
-                    authenticatorList.append(self.getById(authName))
-            else:
-                authenticatorList = self.AuthenticatorList
+            # get the actual Authenticator objects
+            authList = list(self.getById(a) for a in auth)
 
-            #we search for Avatars in each authenticator
-            foundAvatars = {}
-            avatarIdsFound = set()
-            for auth in authenticatorList:
-                try:
-                    avatar = auth.getAvatarByLogin(login)
-                    foundAvatars[auth.getId().strip()] = avatar
-                    avatarIdsFound.add(avatar.getId())
-                except KeyError:
-                    pass
+        # we search for Avatars in each authenticator
+        foundAvatars = {}
+        for auth in authList:
+            try:
+                avatar = auth.getAvatarByLogin(login)
+                foundAvatars[auth.getId().strip()] = avatar
+            except KeyError:
+                pass
 
-            if foundAvatars:
-                if len(foundAvatars) == 1 or len(avatarIdsFound) == 1:
-                    #there's only one different avatar
-                    return foundAvatars.values()[0]
-                else:
-                    #there's more than 1 avatar, we return a dictionary
-                    return foundAvatars
-            else:
-                #we found nothing, we return None
-                return None
-
+        return foundAvatars
 
     def isLoginFree( self, login):
         for au in self.AuthenticatorList:
