@@ -218,6 +218,14 @@ class Fossilizable:
                                       interface,
                                       useAttrCache,
                                       **kwargs) for elem in target)
+            # If the object is a wrapper for an iterable, by default we fossilize
+            # the iterable the object is wrapping. This behaviour is included in
+            # order to let objects like PersistentList to be fossilized
+            elif len(target.__dict__) == 1 and hasattr(target.__dict__.values()[0], '__iter__'):
+                return list(fossilize(elem,
+                                      interface,
+                                      useAttrCache,
+                                      **kwargs) for elem in target.__dict__.values()[0])
             else:
                 raise NonFossilizableException("Type %s is not fossilizable!" %
                                                ttype)
