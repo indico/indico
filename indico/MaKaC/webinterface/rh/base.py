@@ -254,6 +254,7 @@ class RH(RequestHandlerBase):
                 newURL - Target URL of the redirection
         """
         #check if there is no \r\n character to avoid http header injection
+
         if str(targetURL):
             if "\r" in str(targetURL) or "\n" in str(targetURL):
                 raise MaKaCError(_("http header CRLF injection detected"))

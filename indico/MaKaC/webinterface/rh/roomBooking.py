@@ -1139,9 +1139,20 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
     def _checkParams( self, params ):
 
-        resvID = params.get( "resvID" )
-        roomLocation = params.get( "roomLocation" )
+        self._roomLocation = params.get("roomLocation")
+        self._roomID       = params.get("roomID")
+        self._resvID             = params.get( "resvID" )
+        if self._resvID == 'None':
+            self._resvID = None
+
+        # if the user is not logged in it will be redirected
+        # to the login page by the _checkProtection, so we don't
+        # need to store info in the session or process the other params
+        if not self._getUser():
+            return
+
         self._answer = params.get( "answer", None )
+
         self._skipConflicting = False
 
         # forceAddition is set by the confirmation dialog, so that
@@ -1155,10 +1166,10 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             self._forceAddition = False
 
         candResv = None
-        if resvID:
+        if self._resvID:
             self._formMode = FormMode.MODIF
-            resvID = int( resvID )
-            _candResv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
+            self._resvID = int( self._resvID )
+            _candResv = CrossLocationQueries.getReservations( resvID = self._resvID, location = self._roomLocation )
             self._orig_candResv = _candResv
 
             # Creates a "snapshot" of the reservation's attributes before modification
@@ -1176,11 +1187,9 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             # Creates a "snapshot" of the reservation's attributes after modification
             self._resvAttrsAfter = candResv.createSnapshot()
 
-            self._resvID = resvID
-
         else:
             self._formMode = FormMode.NEW
-            candResv = Location.parse( roomLocation ).factory.newReservation()
+            candResv = Location.parse( self._roomLocation ).factory.newReservation()
             candResv.createdDT = datetime.now()
             candResv.createdBy = str( self._getUser().id )
             candResv.isRejected = False
@@ -1206,14 +1215,22 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
 
     def _checkProtection( self ):
-        RHRoomBookingBase._checkProtection(self)
+        # If the user is not logged in, we redirect the same reservation page
+        if not self._getUser():
+            self._redirect(urlHandlers.UHSignIn.getURL(
+                                    returnURL = urlHandlers.UHRoomBookingBookingForm.getURL(
+                                            roomID = self._roomID,
+                                            resvID = self._resvID,
+                                            roomLocation = self._roomLocation )))
+            self._doProcess = False
+        else:
+            RHRoomBookingBase._checkProtection(self)
+            if not self._candResv.room.isActive and not self._getUser().isAdmin():
+                raise MaKaCError( "You are not authorized to book this room." )
 
-        if not self._candResv.room.isActive and not self._getUser().isAdmin():
-            raise MaKaCError( "You are not authorized to book this room." )
-
-        if self._formMode == FormMode.MODIF:
-            if not self._candResv.canModify( self.getAW() ):
-                raise MaKaCError( "You are not authorized to take this action." )
+            if self._formMode == FormMode.MODIF:
+                if not self._candResv.canModify( self.getAW() ):
+                    raise MaKaCError( "You are not authorized to take this action." )
 
     def _businessLogic( self ):
 

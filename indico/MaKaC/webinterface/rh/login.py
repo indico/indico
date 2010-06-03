@@ -35,7 +35,7 @@ from MaKaC.errors import UserError
 import MaKaC.common.info as info
 
 class RHSignIn( base.RH ):
-    
+
     def _checkParams( self, params ):
         self._signIn = params.get("signIn", "").strip()
         self._login = params.get( "login", "" ).strip()
@@ -44,7 +44,7 @@ class RHSignIn( base.RH ):
         if self._returnURL == "":
             self._returnURL = urlHandlers.UHWelcome.getURL()
         self._userId = params.get( "userId", "").strip()
-    
+
     def _process( self ):
         self._tohttps = True
         #Check for automatic login
@@ -61,7 +61,7 @@ class RHSignIn( base.RH ):
             p = signIn.WPSignIn( self )
             return p.display( returnURL = self._returnURL )
         else:
-            li = LoginInfo( self._login, self._password )   
+            li = LoginInfo( self._login, self._password )
             av = auth.getAvatar(li)
             if not av:
                 p = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )
@@ -89,12 +89,12 @@ class RHSignIn( base.RH ):
 
 
 class RHSignOut( base.RH ):
-    
+
     def _checkParams( self, params ):
         self._returnURL = params.get( "returnURL", "").strip()
         if self._returnURL == "":
             self._returnURL = urlHandlers.UHWelcome.getURL()
-        
+
     def _process( self ):
         autoLogoutRedirect = None
         if self._getUser():
@@ -130,15 +130,15 @@ class RHLogoutSSOHook( base.RH):
 
 
 class RHActive( base.RH ):
-    
+
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
         self._userId = params.get( "userId", "" ).strip()
         self._key = params.get( "key", "" ).strip()
-       
-    
+
+
     def _process( self ):
-        
+
         av = AvatarHolder().getById(self._userId)
         if av.isActivated():
             p = signIn.WPAccountAlreadyActivated( self, av )
@@ -163,11 +163,11 @@ class RHActive( base.RH ):
 
 
 class RHSendLogin( base.RH ):
-    
+
     def _checkParams( self, params ):
         self._userId = params.get( "userId", "" ).strip()
         self._email = params.get("email", "").strip()
-    
+
     def _process( self ):
         av = None
         if self._userId:
@@ -178,7 +178,7 @@ class RHSendLogin( base.RH ):
             except:
                 pass
         if av:
-            sm = mail.sendLoginInfo(av) 
+            sm = mail.sendLoginInfo(av)
             sm.send()
         self._redirect(urlHandlers.UHSignIn.getURL() )
 
@@ -191,35 +191,35 @@ class RHSendActivation( base.RH ):
         if minfo.getModerateAccountCreation():
             raise UserError("Impossible to send activation email because the account creation is moderated")
 
-    
+
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
         self._userId = params.get( "userId", "" ).strip()
-    
+
     def _process( self ):
         av = AvatarHolder().getById(self._userId)
-        sm = mail.sendConfirmationRequest(av) 
+        sm = mail.sendConfirmationRequest(av)
         sm.send()
         self._redirect(urlHandlers.UHSignIn.getURL())
 
 
 class RHDisabledAccount( base.RH ):
-    
+
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
         self._userId = params.get( "userId", "" ).strip()
-    
+
     def _process( self ):
         av = AvatarHolder().getById(self._userId)
         p = signIn.WPAccountDisabled( self, av )
         return p.display()
 
 class RHUnactivatedAccount( base.RH ):
-    
+
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
         self._userId = params.get( "userId", "" ).strip()
-    
+
     def _process( self ):
         av = AvatarHolder().getById(self._userId)
         p = signIn.WPUnactivatedAccount( self, av )
