@@ -183,14 +183,6 @@ class Participant(Persistent,Fossilizable):
         self._affiliation = newData.get("affiliation", '')
         self._email = newData.get("email", '')
 
-
-    def getParticipantName(self):
-#         confId = self._booking.getConference().getId()
-#         bookingId = self._booking.getId()
-#         return "p%sb%sc%s"%(self._id, bookingId, confId)
-         return "Test Name"
-#         return "%s, %s" % ( self.getFamilyName(), self.getFirstName() )
-
     def getId(self):
         return self._id
 

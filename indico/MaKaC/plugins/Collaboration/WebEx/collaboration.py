@@ -18,43 +18,41 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+This file contains the bulk of the logic for the WebEx plugin. 
+The main functions like create, modify and delete are 
+defined in here. 
+"""
+
 import xml.dom.minidom
 import re
 import datetime
-#from MaKaC.common.PickleJar import DictPickler
 from datetime import timedelta, datetime
-from time import strftime, strptime
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.utils import formatDateTime
-from MaKaC.common.timezoneUtils import nowutc, utctimestamp2date, naive2local, datetimeToUnixTime, getAdjustedDate
+from MaKaC.common.timezoneUtils import nowutc, naive2local, getAdjustedDate
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import WebExControlledException, WebExException,\
-    getMinStartDate, getMaxEndDate, ChangesFromWebExError,\
-    WebExError, WebExWarning, getWebExOptionValueByName, makeTime, findDuration, \
-    Participant, makeParticipantXML, sendXMLRequest
-from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAdmin, \
-    WebExMeetingModifiedNotificationAdmin, WebExMeetingRemovalNotificationAdmin, \
-    NewWebExMeetingNotificationManager, WebExMeetingModifiedNotificationManager,\
-    WebExMeetingRemovalNotificationManager, WebExParticipantNotification
+    getMinStartDate, getMaxEndDate, Participant, sendXMLRequest, \
+    WebExError, getWebExOptionValueByName, makeTime, findDuration
+#from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationManager
 from MaKaC.plugins.Collaboration.WebEx.api.operations import WebExOperations
-from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.mail import personMail, Mailer
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
-from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.services.interface.rpc.common import ProcessError
 from MaKaC.common.Counter import Counter
 
 from MaKaC.plugins.Collaboration.WebEx.fossils import ICSBookingIndexingFossil, ICSBookingConfModifFossil
 from MaKaC.common.fossilize import fossilizes, fossilize
-from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseConfModifFossil
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 class CSBooking(CSBookingBase):
+    """
+    The class to hold the WebEx video bookings
+    """
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
 
     _hasTitle = True
-    _hasStart = True
+#    _hasStart = True
+    _hasStart = False
     _hasStop = False
     _hasCheckStatus = True
 
@@ -191,21 +189,27 @@ class CSBooking(CSBookingBase):
     ## overriding methods
     def _getTitle(self):
         return self._bookingParams["meetingTitle"]
-    
+
     def _getPluginDisplayName(self):
         return "WebEx"
-    
+
     def _checkBookingParams(self):
-        for p in self._participants.itervalues():
-            if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", p._email) == None:
-                raise WebExException("Participant email address (" + p._email + ") for " + p._firstName + " " + p._lastName +" is invalid. ")
+        for participant in self._participants.itervalues():
+            if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", participant._email) == None:
+                raise WebExException("Participant email address (" + participant._email + ") for " + participant._firstName + " " + participant._lastName +" is invalid. ")
                 
         if len(self._bookingParams["meetingTitle"].strip()) == 0:
             raise WebExException("meetingTitle parameter (" + str(self._bookingParams["meetingTitle"]) +" ) is empty for booking with id: " + str(self._id))
 
         if len(self._bookingParams["meetingDescription"].strip()) == 0:
             raise WebExException("meetingDescription parameter (" + str(self._bookingParams["meetingDescription"]) +" ) is empty for booking with id: " + str(self._id))
+
+        if len(self._bookingParams["webExUser"].strip()) == 0:
+            raise WebExException("WebEx username is empty.  The booking cannot continue without this.")
         
+        if len(self._bookingParams["webExPass"].strip()) == 0:
+            raise WebExException("WebEx password is empty.  The booking cannot continue without this.")
+
         if self._startDate > self._endDate:
             raise WebExException("Start date of booking cannot be after end date. Booking id: " + str(self._id))
         
@@ -214,10 +218,12 @@ class CSBooking(CSBookingBase):
             raise WebExException("Cannot create booking before the past %s minutes. Booking id: %s"% (allowedStartMinutes, str(self._id)))
         
         minStartDate = getMinStartDate(self.getConference())
+        Logger.get('WebEx').info( "Min start date: " + minStartDate.strftime("%m/%d/%Y %H:%M:%S") )
         if self.getAdjustedStartDate() < minStartDate:
             raise WebExException("Cannot create a booking %s minutes before the Indico event's start date. Please create it after %s"%(self._WebExOptions["allowedMinutes"].getValue(), formatDateTime(minStartDate)))
 
         maxEndDate = getMaxEndDate(self.getConference())
+        Logger.get('WebEx').info( "Max end date: " + minStartDate.strftime("%m/%d/%Y %H:%M:%S") )
         if self.getAdjustedEndDate() > maxEndDate:
             raise WebExException("Cannot create a booking %s minutes after before the Indico event's end date. Please create it before %s"%(self._WebExOptions["allowedMinutes"].getValue(), formatDateTime(maxEndDate)))
         
@@ -275,10 +281,6 @@ class CSBooking(CSBookingBase):
         
     def checkCanStart(self, changeMessage = True):
         if self._created:
-###############
-#            self._canBeStarted = True
-#            return True 
-##########Remove above here; in for testing
             now = nowutc()
             self._canBeDeleted = True
             self._canBeNotifiedOfEventDateChanges = CSBooking._canBeNotifiedOfEventDateChanges
@@ -304,7 +306,6 @@ class CSBooking(CSBookingBase):
         """
         params = self.getBookingParams()
         self.setAccessPassword( params['accessPassword'] )
-        t1 = makeTime( self.getAdjustedStartDate('UTC') )
         self._duration = findDuration( self.getAdjustedStartDate('UTC'), self.getAdjustedEndDate('UTC') )
 
         result = ExternalOperationsManager.execute(self, "createBooking", WebExOperations.createBooking, self)
@@ -336,11 +337,11 @@ class CSBooking(CSBookingBase):
         """
         Logger.get('WebEx').debug( "in _start" )
         #Check if they left the trialing slash in the base URL we need
-        if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
-            start_url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=HM&AS=WebTour&WL=http://www.aol.com&MK=' + self._webExKey
-        else:  #Add in the slash for them
-            start_url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=HM&MK=' + self._webExKey
-#        urllib.urllibopen( getWebExOptionValueByName("WEhttpServerLocation") )
+#        if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
+#            start_url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=HM&AS=WebTour&WL=http://www.aol.com&MK=' + self._webExKey
+#        else:  #Add in the slash for them
+#            start_url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=HM&MK=' + self._webExKey
+#        urllib.urllibopen( self._startURL )
         self._checkStatus()
         if self._canBeStarted:
             self._permissionToStart = True

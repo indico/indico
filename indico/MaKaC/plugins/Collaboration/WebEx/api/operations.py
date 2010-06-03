@@ -102,12 +102,13 @@ class WebExOperations(object):
             status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
             if status == "SUCCESS":
                 booking.setWebExKey( dom.getElementsByTagName( "meet:meetingkey" )[0].firstChild.toxml('utf-8') )
-                booking._iCalURL = dom.getElementsByTagName( "serv:attendee" )[0].firstChild.toxml('utf-8')
+                booking._url = dom.getElementsByTagName( "serv:attendee" )[0].firstChild.toxml('utf-8')
+                booking._startURL = dom.getElementsByTagName( "serv:host" )[0].firstChild.toxml('utf-8') 
                 #Check if they left the trialing slash in the base URL we need
-                if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
-                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=JM&MK=' + booking._webExKey
-                else:  #Add in the slash for them
-                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=JM&MK=' + booking._webExKey
+#                if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
+#                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=JM&MK=' + booking._webExKey
+#                else:  #Add in the slash for them
+#                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=JM&MK=' + booking._webExKey
 
                 recipients = []
                 for k in booking._participants.keys():
@@ -295,7 +296,7 @@ class WebExOperations(object):
 #                                             booking.getConference().getCreator())
                 except Exception, e:
                     Logger.get('WebEx').error(
-                        """Could not send WebExMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                        """Could not send notification emails for booking with id %s of event with id %s, exception: %s""" %
                         (booking.getId(), booking.getConference().getId(), str(e)))
                
 #                if booking._bookingParams["sendMailToManagers"]:

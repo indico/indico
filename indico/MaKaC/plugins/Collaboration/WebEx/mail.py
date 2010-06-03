@@ -164,6 +164,10 @@ class WebExParticipantNotification(WebExNotificationBase):
             self.setSubject("""[Indico] New WebEx meeting: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
             body_text = "A new WebEx meeting %s (event id: %s) has been created.  The new information is as follows. " % (self._conference.getTitle(), str(self._conference.getId()))
+        elif typeOfMail == 'delete':
+            self.setSubject("""[Indico] WebEx meeting deleted: %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+            body_text = "A new WebEx meeting %s (event id: %s) has been deleted.  The information is as follows. " % (self._conference.getTitle(), str(self._conference.getId()))
         if changes != None:
             body_text += "Changes to modification: <br/>" + self.listToStr( changes )
         body_text += self._getBookingDetails(typeOfMail)
