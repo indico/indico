@@ -27,6 +27,7 @@ defined in here.
 import xml.dom.minidom
 import re
 import datetime
+import httplib
 from datetime import timedelta, datetime
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, naive2local, getAdjustedDate
@@ -34,7 +35,6 @@ from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import WebExControlledException, WebExException,\
     getMinStartDate, getMaxEndDate, Participant, sendXMLRequest, \
     WebExError, getWebExOptionValueByName, makeTime, findDuration
-#from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationManager
 from MaKaC.plugins.Collaboration.WebEx.api.operations import WebExOperations
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
@@ -73,7 +73,7 @@ class CSBooking(CSBookingBase):
     _simpleParameters = {
             "meetingTitle": (str, ''),
             "meetingDescription": (str, None),
-            "sendMailToManagers": (bool, False),
+#            "sendMailToManagers": (bool, False),
             "webExUser":(str, None),
             "webExPass":(str, None),
             "webExKey":(str, None),  #The meeting key / ID number in the WebEx system
@@ -322,7 +322,6 @@ class CSBooking(CSBookingBase):
         """
         Logger.get('WebEx').debug( "in _modify" )
         if self._created:
-#            result = ExternalOperationsManager.execute(self, "modifyRoom", VidyoOperations.modifyRoom, self, oldBookingParams)
             result = ExternalOperationsManager.execute(self, "modifyBooking", WebExOperations.modifyBooking, self)
             if isinstance(result, WebExError):
                 return result
@@ -336,6 +335,26 @@ class CSBooking(CSBookingBase):
             A last check on the EVO server is performed.
         """
         Logger.get('WebEx').debug( "in _start" )
+##########################
+#        try:
+#            site_name = re.split( '.webex.com', getWebExOptionValueByName("WEhttpServerLocation").lower())[0]
+#        except:
+#            raise WebExException(_("Could not isolate the site name from the given site URL in the WebEx plugin configuration in the administration area.\n") )
+#        try:
+#####            urllib.urllibopen( "https://" + site_name + ".webex.com/" + site_name + "/m.php?AT=HM&MK=" + self._webExKey )
+#            conn = httplib.HTTPSConnection( getWebExOptionValueByName("WEhttpServerLocation") )
+#            values = {}
+#            conn.request( "POST", "/" + site_name + "/p.php?AT=LO", values )
+#            response = conn.getresponse()
+###################
+#print the_xml
+#print response.read()
+#           urllib.urllibopen( "https://" + site_name + ".webex.com/" + site_name + "/m.php?AT=HM&MK=" + self._webExKey )
+#        except:
+#            raise WebExException(_("Could not connect to site url and start the meeting.\n") )
+
+
+
         #Check if they left the trialing slash in the base URL we need
 #        if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
 #            start_url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=HM&AS=WebTour&WL=http://www.aol.com&MK=' + self._webExKey

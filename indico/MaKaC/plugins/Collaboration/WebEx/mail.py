@@ -306,14 +306,14 @@ class WebExMeetingRemovalNotificationAdmin(WebExAdminNotificationBase):
     """
     
     def __init__(self, booking):
-        EVOAdminNotificationBase.__init__(self, booking)
+        WebExAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[EVO] EVO meeting deleted: %s (event id: %s)"""
+        self.setSubject("""[Indico] WebEx meeting deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
-        self.setBody("""Dear EVO Responsible,<br />
+        self.setBody("""Dear WebEx Responsible,<br />
 <br />
-An EVO meeting <strong>was deleted</strong> in <a href="%s">%s</a><br />
+A WebEx meeting <strong>was deleted</strong> in <a href="%s">%s</a><br />
 <br />
 %s
 <br />

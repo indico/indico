@@ -150,7 +150,7 @@
             infoHTML +=
             '<tr><td colspan="2">'+
                 '<div class="collaborationWarning" style="display: inline;">' +
-                    $T('Changed by WebEx Staff:') + 
+                    $T('Changes to WebEx event:') + 
                     '<ul>'
             
             for (var i=0; i<booking.changesFromWebEx.length; i++) {

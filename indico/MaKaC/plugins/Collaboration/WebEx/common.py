@@ -186,6 +186,9 @@ class Participant(Persistent,Fossilizable):
     def getId(self):
         return self._id
 
+    def getParticipantName(self):
+         return "%s, %s" % ( self.getFamilyName(), self.getFirstName() )
+
     def getTitle(self):
         return self._title
     
