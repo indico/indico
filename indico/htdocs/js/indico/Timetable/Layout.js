@@ -45,14 +45,14 @@ type("TimetableLayoutManager", [],
                  else {
                      addCheckpoint(key, sTime, 'start', value.sessionId);
 
-                 if (eTime > sTime) {
-                     addCheckpoint(key, eTime, 'end');
-                 } else if (eTime == '000000') {
-                     addCheckpoint(key, '240000', 'end');
-                 }
-                 else {
-                     addCheckpoint(key, 'nextday', 'end');
-                 }
+                     if (eTime > sTime) {
+                         addCheckpoint(key, eTime, 'end');
+                     } else if (eTime == '000000') {
+                         addCheckpoint(key, '240000', 'end');
+                     }
+                     else {
+                         addCheckpoint(key, 'nextday', 'end');
+                     }
                  }
              });
 
@@ -204,6 +204,18 @@ type("TimetableLayoutManager", [],
 
          addWholeDayBlock: function(blocks, key) {
              block = blocks[key] = {id: key};
+         },
+
+         getNumColumnsForGroup: function(group) {
+             return group[1];
+         },
+
+         getHeader: function() {
+             return null;
+         },
+
+         shouldShowRoom: function() {
+             return true;
          }
      }
     );
@@ -214,6 +226,8 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
          drawDay: function(data, detailLevel, startTime, endTime) {
 
              var self = this;
+
+             this.eventData = data;
 
              this.detailLevel = any(detailLevel, 'session');
 
@@ -488,6 +502,86 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
              algData.topPx += pxStep;
          }
      });
+
+type("RoomLayoutManager", ["CompactLayoutManager"],
+    {
+
+        drawDay: function(data, detailLevel, startTime, endTime) {
+            this.roomsCols = {};
+            return this.CompactLayoutManager.prototype.drawDay.call(this, data, detailLevel, startTime, endTime);
+        },
+
+        assign: function(assigned, block) {
+            var roomName = this.eventData[block.id].room;
+            var col = 0;
+            if (! exists(this.roomsCols[roomName])) {
+                // If there is no room name, the block will be in the column 0 (and take all the available width)
+                if (trim(roomName) !== "") {
+                    col = this.roomsCols[roomName] = keys(this.roomsCols).length;
+                }
+            } else {
+                col = this.roomsCols[roomName];
+            }
+
+            block.assigned = col;
+            assigned[col] = block;
+        },
+
+        reorderAssigned: function(assigned, lastAssigned, currentGroup) {
+            var self = this;
+            var roomNames = keys(this.roomsCols);
+            roomNames.sort();
+
+            this.roomsCols = {};
+            var counter = 0;
+            each (roomNames, function(name) {
+                self.roomsCols[name] = counter;
+                counter++;
+            });
+
+            for (key in currentGroup) {
+                var block = currentGroup[key];
+                var roomName = this.eventData[block.id].room;
+             // If there is no room name, the block will be in the column 0 (and take all the available width)
+                var col = 0;
+                if (trim(roomName) !== "") {
+                    col =  this.roomsCols[roomName];
+                }
+                block.assigned = col;
+                assigned[col] = block;
+            }
+
+        },
+
+        getNumColumnsForGroup: function(group) {
+            if (group[0].length == 1 && this.eventData[group[0][0].id].room === "") {
+                return 1;
+            } else {
+                return keys(this.roomsCols).length;
+            }
+        },
+
+        getHeader: function(width) {
+            var roomNames = keys(this.roomsCols);
+            var cols = roomNames.length;
+            var borderPixels = 1; // this is because of the separators between the room names
+            return Html.div({style:{marginLeft:pixels(TimetableDefaults.leftMargin), paddingBottom:pixels(10), paddingTop:pixels(10)}},
+                    translate(roomNames, function(key){
+                        return Html.div({className: "headerRoomLayoutTimeTable",
+                                         style:{width:pixels(Math.floor((width-TimetableDefaults.leftMargin)/cols)-borderPixels)}
+                                        }, key);
+                    })
+                    );
+        },
+
+        shouldShowRoom: function() {
+            return false;
+        }
+    },
+
+    function() {
+        this.roomsCols = {};
+    });
 
 
 type("PosterLayoutManager", ["TimetableLayoutManager"],

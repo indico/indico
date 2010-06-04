@@ -6088,3 +6088,12 @@ div.dateField input {
 .widgetCheckboxOption input {
     vertical-align: middle;
 }
+
+.headerRoomLayoutTimeTable {
+    text-align: center;
+    float: left;
+    margin-top: 10px;
+    color: black;
+    font-weight: bold;
+    border-left: 1px solid #E8E8E8;
+}

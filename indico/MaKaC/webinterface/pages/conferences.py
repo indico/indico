@@ -1159,6 +1159,7 @@ class WConferenceTimeTable(wcomponents.WTemplated):
                                                                           tz, self._aw,
                                                                           useAttrCache = True))
         vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
+        vars['timetableLayout'] = vars.get('ttLyt','')
         return vars
 
 

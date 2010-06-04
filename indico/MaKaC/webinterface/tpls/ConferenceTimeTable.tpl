@@ -14,8 +14,11 @@ IndicoUI.executeOnLoad(function(){
   var eventInfo = <%= eventInfo %>;
 
   var historyBroker = new BrowserHistoryBroker();
-
-  var timetable = new TopLevelDisplayTimeTable(ttdata,eventInfo,710,$E('timetable'), 'session', historyBroker);
+  var timetableLayout = <%= "'%s'"%timetableLayout %>;
+  if (timetableLayout === '') {
+      timetableLayout = null;
+  }
+  var timetable = new TopLevelDisplayTimeTable(ttdata,eventInfo,710,$E('timetable'), 'session', historyBroker, timetableLayout);
   $E('timetable').set(timetable.draw());
   timetable.postDraw();
 

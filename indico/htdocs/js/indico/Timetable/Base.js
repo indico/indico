@@ -26,7 +26,11 @@ var TimetableDefaults = {
 
               'poster': {name: 'Poster',
                          manager: new PosterLayoutManager()
-                        }
+                        },
+
+              'room': {name: 'Room',
+                       manager: new RoomLayoutManager()
+                      }
              },
     filters: {'session': {name: $T('Session'),
                           filter: new SessionFilter()},
@@ -245,7 +249,7 @@ type("DisplayTimeTable", ["TimeTable"], {
 
             self.timetableDrawer.redraw(self.currentDay);
             var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
-            var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
+            var timetableDiv = Html.div({style: {width:pixels(self.timetableDrawer.width), paddingTop: pixels(20), position: 'relative'}}, timetableElements);
             $E(document.body).set(header, timetableDiv);
             $E(document.body).setStyle('padding', pixels(30));
         }, 50);
@@ -415,7 +419,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
     }
 
 },
-     function(data, width, wrappingElement, detailLevel, managementActions, historyBroker) {
+     function(data, width, wrappingElement, detailLevel, managementActions, historyBroker, timetableLayoutId) {
 
          var self = this;
 
@@ -431,7 +435,8 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                                                     this._functionButtons(),
                                                     this.loadingIndicator,
                                                     !!managementActions,
-                                                    managementActions);
+                                                    managementActions,
+                                                    timetableLayoutId);
 
          this.sortedKeys = keys(this.data);
          this.sortedKeys.sort();
@@ -783,10 +788,10 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
 
 
 },
-     function(data, contextInfo, width, wrappingElement, detailLevel, historyBroker) {
+     function(data, contextInfo, width, wrappingElement, detailLevel, historyBroker, timetableLayoutId) {
 
          this.DisplayTimeTable(data, width, wrappingElement, detailLevel);
-         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, null, historyBroker);
+         this.TopLevelTimeTableMixin(data, width, wrappingElement, detailLevel, null, historyBroker, timetableLayoutId);
 
          this.eventInfo = contextInfo;
 
