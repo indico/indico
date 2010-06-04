@@ -3185,8 +3185,11 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         return WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('Timetable')
 
+    def _getSchedule(self):
+        return WConfModifScheduleGraphic( self._conf )
+
     def _getTTPage( self, params ):
-        wc = WConfModifScheduleGraphic( self._conf)
+        wc = self._getSchedule()
         return wc.getHTML(params)
 
     def _getPageContent(self, params):

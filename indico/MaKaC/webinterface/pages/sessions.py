@@ -1471,31 +1471,21 @@ class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
         return timeTable
 
     def _getSchedule(self):
-        return WSessionModifSchedule(self._session, self._timetable, self._days)
+        return WSessionModifSchedule(self._session)
 
     def _getTabContent( self, params ):
         return self._getTTPage(params)
 
 class WSessionModifSchedule(wcomponents.WTemplated):
 
-    def __init__(self, session, timetable, dayList, **params):
+    def __init__(self, session, **params):
         wcomponents.WTemplated.__init__(self, **params)
         self._session = session
-        self._timetable = timetable
-        self._dayList = dayList
 
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars(self)
         tz = self._session.getTimezone()
         vars["timezone"]= tz
-        # the list of days specified by the user through the option box
-        vars["daysParam"] = self._dayList
-        # the list of days from the timetable
-        vars["dayList"]=self._timetable.getDayList()
-        # the first day of the list
-        vars["dayDate"]=self._dayList[0].getDate()
-
-        vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
         vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz,
                                                                            None, days = None, mgmtMode = True))
