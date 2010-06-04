@@ -309,7 +309,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                         locationMaxWidth -= this.timeDiv.dom.offsetWidth;
                     }
 
-                    this.locationDiv.dom.style.maxWidth = pixels(locationMaxWidth);
+                    this.locationDiv.dom.style.maxWidth = locationMaxWidth > 0 ?
+                        pixels(locationMaxWidth) : '0px';
 
                     // After modifying the location width, the content of the location might be expaneded
                     // on two lines. Therefore, we should re-check if there is enought space for the time.
