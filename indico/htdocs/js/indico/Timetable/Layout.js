@@ -216,6 +216,8 @@ type("TimetableLayoutManager", [],
 
          shouldShowRoom: function() {
              return true;
+         },
+         reorderColumns:function() {
          }
      }
     );
@@ -294,6 +296,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 
              var counter = 0;
              each(algData.groups, function(group) {
+                 self.reorderColumns(group[0]);
                  each(group[0], function(block) {
                      block.group = counter;
                  });
@@ -527,7 +530,7 @@ type("RoomLayoutManager", ["CompactLayoutManager"],
             assigned[col] = block;
         },
 
-        reorderAssigned: function(assigned, lastAssigned, currentGroup) {
+        reorderColumns: function(currentGroup) {
             var self = this;
             var roomNames = keys(this.roomsCols);
             roomNames.sort();
@@ -548,7 +551,6 @@ type("RoomLayoutManager", ["CompactLayoutManager"],
                     col =  this.roomsCols[roomName];
                 }
                 block.assigned = col;
-                assigned[col] = block;
             }
 
         },
