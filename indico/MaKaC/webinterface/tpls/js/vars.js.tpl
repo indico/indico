@@ -3,6 +3,7 @@
 <% import MaKaC.common.info as info %>
 <% from MaKaC.rb_location import Location %>
 <% import simplejson %>
+<% import MaKaC.webinterface.common.tools as securityTools %>
 <%!
 config = Config.getInstance()
 authenticators = config.getAuthenticatorList()
@@ -140,6 +141,17 @@ var Indico = {
         DefaultLocation: '<%= str(defaultLocation) %>',
         Locations: <%= jsonEncode(locationList) %>
     },
+
+    Security:{
+        allowedTags: "<%= ",".join(securityTools.allowedTags) %>",
+        allowedAttributes: "<%= ",".join(securityTools.allowedAttrs) %>",
+        allowedCssKeywords: "<%= ",".join(securityTools.allowedCssKeywords) %>",
+        allowedCssProperties: "<%= ",".join(securityTools.allowedCssProperties) %>",
+        allowedProtocols: "<%= ",".join(securityTools.allowedProtocols) %>",
+        urlProperties: "<%= ",".join(securityTools.urlProperties) %>",
+        sanitizationLevel: <%= Config.getInstance().getSanitizationLevel() %>
+    },
+
     Settings: {
         ExtAuthenticators: <%= extAuths %>,
         RoomBookingModuleActive: <%= jsBoolean(rbActive) %>

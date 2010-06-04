@@ -662,7 +662,7 @@ extend(IndicoUI.Dialogs,
                                    break;
                            }
 
-                           var popup = new ConfirmPopup("Warning!", Html.div({style: {width:pixels(300), textAlign:'justify'}},"Your minutes contains some potentially harmful " + security + ", which cannot be stored in the database. Clean the text manually or use the automatic Indico cleaner."), cleaningFunction);
+                           var popup = new ConfirmPopup($T("Warning!"), Html.div({style: {width:pixels(300), textAlign:'justify'}},$T("Your minutes contains some potentially harmful " + security + ", which cannot be stored in the database. Clean the text manually or use the automatic Indico cleaner.")), cleaningFunction);
                            popup.draw = function(){
                                var self = this;
 
@@ -690,7 +690,7 @@ extend(IndicoUI.Dialogs,
                    catch(error){
                        if(typeof error == "string" && error.indexOf("Parse Error") != -1){
                            closeMinutes = false;
-                           var popup = new WarningPopup("Warning!", "Format of your minutes is invalid. Please check the syntax.");
+                           var popup = new WarningPopup($T("Warning!"), $T("Format of your minutes is invalid. Please check the syntax."));
                            popup.open();
                        }
                        else

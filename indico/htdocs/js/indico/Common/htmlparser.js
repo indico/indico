@@ -13,7 +13,7 @@
  * });
  *
  * // or to escape harmful html and scripts
- * escapeHarmfulHTML(htmlString, params);
+ * escapeHarmfulHTML(htmlString, sanitizationLevel, params);
  *
  * // or to get an XML string:
  * HTMLtoXML(htmlString);
@@ -99,8 +99,7 @@ type("HTMLParser", [],
                             });
                         });
 
-                        if ( self.handler.start )
-                            self.handler.start( tagName, attrs, unary );
+                        self.handler.start( tagName, attrs, unary );
                     }
                 };
 
@@ -254,250 +253,179 @@ type("HTMLParser", [],
             this.special = params && params.special ? params.special : special;
         });
 
-//Regular Expressions for parsing properties and values
-var whitespaces = /\s*/;
-var propertyName = /[\w-]+/;
-var propertyPattern = new RegExp( whitespaces.source + propertyName.source + whitespaces.source + /:/.source );
-
-var valueElementName = /#?[\w\/\:\.]+%?/;
-var valueElementEnding = /(((\(?\)\s*;)|[)(,;\s]))?/;
-const valueElement = new RegExp(whitespaces.source + valueElementName.source + whitespaces.source + valueElementEnding.source);
-
-var singleValue = /\s*(\w+%?)\s*/
-var multipleValues = /((\s*[\w]+\s*%?,?)+)/;
-var link = /(\s*\w+:\/\/[\w\/\.]+\s*)/;
-var color = /(\s*#(\w){6}\s*)/;
-var valuePatternName = new RegExp(color.source + "|(" + singleValue.source + "(\\s*\\((" + multipleValues.source + "|" + link.source +")\\)\\s*)?)");
-var valuePatternLoop = new RegExp("(" + whitespaces.source + valuePatternName.source + whitespaces.source + ")+");
-var valuePattern = new RegExp(valuePatternLoop.source + /;?/.source);
-
 //Default parameters
 
 //Properties which can appear in a CSS
-var propertyWhitelist = makeMap("background-color,border-top-color,border-top-style,border-top-width," +
-                                "border-top,border-right-color,border-right-style,border-right-width," +
-                                "border-right,border-bottom-color,border-bottom-style,border-bottom-width," +
-                                "border-bottom,border-left-color,border-left-style,border-left-width," +
-                                "border-left,border-color,border-style,border-width,border,bottom," +
-                                "border-collapse,border-spacing," +
-                                "color,clear,clip,caption-side," +
-                                "display,direction," +
-                                "empty-cells," +
-                                "float,font-size,font-family,font-style,font,font-variant,font-weight," +
-                                "font-size-adjust,font-stretch," +
-                                "height," +
-                                "left,list-style-type,list-style-position,line-height,letter-spacing," +
-                                "marker-offset,margin,margin-left,margin-rigth,margin-top,margin-bottom,max-height," +
-                                "min-height,max-width,min-width,marks," +
-                                "overflow,outline-color,outline-style,outline-width,outline,orphans," +
-                                "position,padding-top,padding-right,padding-bottom,padding-left,padding," +
-                                "page,page-break-after,page-break-before,page-break-inside," +
-                                "quotes," +
-                                "right," +
-                                "size," +
-                                "text-align,top,table-layout,text-decoration,text-indent,text-shadow," +
-                                "text-transform," +
-                                "unicode-bidi," +
-                                "visibility,vertical-align," +
-                                "width,widows,white-space,word-spacing,word-wrap," +
-                                "z-index");
+var propertyWhitelist = makeMap( Indico.Security.allowedCssProperties );
 
-//Values which cannot appear in a CSS
-var valueBlacklist = makeMap("");
+//Keywords which can appear in a CSS
+var keywordWhitelist = makeMap( Indico.Security.allowedCssKeywords );
 
 type("inlineCSSParser",[],
         {
             parse: function(){
-
                 var result = "";
-                var property;
-                var values;
                 var security = 0;
 
-                while (this.css.replace(/\s+/g,"")){
+                // disallow urls
+                this.css = this.css.replace(/url\s*\(\s*[^\s)]+?\s*\)\s*/, ' ')
+                // gauntlet
+                if (!(/^([\-:,;#%.\sa-zA-Z0-9!]|\w-\w|'[\s\w]+'|"[\s\w]+"|\([\d,\s]+\))*$/).test(this.css))
+                    throw "Parse Error: " + this.css;
+                if (!(/^\s*([-\w]+\s*:[^:;]*(;\s*|$))*$/).test(this.css))
+                    throw "Parse Error: " + this.css;
 
-                    property = this.getProperty();
-                    values = this.getValues();
-
-                    if(this.propertyWhitelist[property])
-                    {
-                        result += property + ":";
-                        for(var i = 0; i < values.length; ++i)
-                            if(!this.valueBlacklist[values[i]])
-                                result += " " + values[i];
-                            else
-                                security = 1;
+                parts = this.css.split(/;/g);
+                for( i in parts){
+                    if( parts[i].replace(/\s/g,'') != ""){
+                        property = parts[i].split(/:/g)[0].replace(/\s/g,'');
+                        values = parts[i].split(/:/g)[1].split(/\s/g);
+                        value = ""
+                        for( j in values){
+                           if( values[j].replace(/\s/g,''))
+                               if((/^(#[0-9a-f]+|rgb\(\d+%?,\d*%?,?\d*%?\)?|\-?\d{0,2}\.?\d{0,2}(cm|em|ex|in|mm|pc|pt|px|%|,|\))?)$/).test(values[j].replace(/\s/g,'')) ||
+                               this.keywordWhitelist[values[j].replace(/\s/g,'')])
+                                   value += " " + values[j].replace(/\s/g,'')
+                               else
+                                   security = 1;
+                        }
+                        if (this.propertyWhitelist[property] && value){
+                            result += property + ':' + value + ';';
+                        }
+                        else{
+                            security = 1;
+                        }
                     }
-                    else
-                        security = 1;
                 }
+
                 return [result, security];
-            },
-
-            getProperty: function(){
-                var property = this.css.match(this.propertyPattern);
-                if(property){
-                    this.css = this.css.substring(property[0].length);
-                    return property[0].substring(0, property[0].length - 1).replace(/\s+/g,"");
                 }
-                throw "Parse Error: " + this.css;
-            },
 
-            getValues: function(){
-                var values = this.css.match(this.valuePattern);
-                var valuesTable = [];
-                var tmp;
-                if(values) {
-                    this.css = this.css.substring(values[0].length);
-                    while(values[0] != ""){
-                        tmp = values[0].match(this.valueElement);
-                        values[0] = values[0].substring(tmp[0].length);
-                        valuesTable.push(tmp[0].replace(/\s+/g,""));
-                    }
-                    return valuesTable;
-
-                }
-                throw "Parse Error: " + this.css;
-            }
         },
         /**Cleans text from not proper css properties and values.
          * @param (String) css Text to be parsed.
          * @param (dictionary) params Parser parameters. If not set defaults are used. Take a look at the beginning of the type.
          *                            params.propertyWhitelist - accepted list of properties.
-         *                            params.valueBlacklist - list of forbidden values.
+         *                            params.keywordWhitelistt - list of allowed css keywords.
          * @returns (tuple(string, security)) First element of the tuple is parsed text. Second one indicates which actions was done during parsing:
          *                                    0 - removing removing not necessary whitespace or empty values.
          *                                    1 - removing potentially dangerous values and properties.
          **/
         function(css, params){
             this.css = css;
-
-            // Regular Expressions for parsing properties and values
-            this.propertyPattern = propertyPattern;
-
-            this.valueElement = valueElement;
-
-            this.valuePattern = valuePattern;
-
-            //Properties which can appear in a CSS
             this.propertyWhitelist = params && params.propertyWhitelist ? params.propertyWhitelist : propertyWhitelist;
-            //Values which cannot appear in a CSS
-            this.valueBlacklist = params && params.valueBlacklist ? params.valueBlacklist : valueBlacklist;
+            this.keywordWhitelist = params && params.keywordWhitelist ? params.keywordWhitelist : keywordWhitelist;
         });
 
 
-var defaultTagWhitelist = makeMap(  "a,abbr,acronym,address,area," +
-                                    "b,bdo,big,blockquote,br," +
-                                    "caption,center,cite,code,col,colgroup," +
-                                    "dd,del,dir,div,dfn,dl,dt," +
-                                    "em," +
-                                    "fieldset,font," +
-                                    "h1,h2,h3,h4,h5,h6,hr," +
-                                    "i,img,ins," +
-                                    "kbd," +
-                                    "legend,li," +
-                                    "map,menu," +
-                                    "ol," +
-                                    "p,pre," +
-                                    "q," +
-                                    "s,samp,small,span,strike,strong,sub,sup," +
-                                    "table,tbody,td,tfoot,th,thead,tr,tt," +
-                                    "u,ul," +
-                                    "var");
+var defaultTagWhitelist = makeMap( Indico.Security.allowedTags );
 
-var defaultAttribWhitelist = makeMap("align,abbr,alt," +
-                                     "border,bgcolor," +
-                                     "class,cellpadding,color,char,charoff,cite,clear,colspan,compact," +
-                                     "dir,disabled,face," +
-                                     "href,height,headers,hreflang,hspace," +
-                                     "id,ismap," +
-                                     "lang," +
-                                      "name,noshade,nowrap," +
-                                     "rel,rev,rowspan,rules," +
-                                     "size,scope,shape,span,start,summary," +
-                                     "title,tabindex,type," +
-                                     "valign,value,vspace," +
-                                     "width");
+var defaultAttribWhitelist = makeMap( Indico.Security.allowedAttributes );
+
+var defaultAllowedProtocols = makeMap( Indico.Security.allowedProtocols );
+
+var urlProperties = makeMap( Indico.Security.urlProperties )
 
 /**Cleans text from scripts, styles and potentialy harmful html.
  * @param (String) html Text to be parsed.
+  * @param sanitizationLevel Current indico sanitization level. If 0 or 3 text is not parsed at all. If 1 inline css script are deleted. If 2 text is parsed normally.
  * @param (dictionary) params Parser parameters. For further description see 'params' in HTMLParser and inlineCSSParser types.
  *                     params.tagWhitelist String containing tags to be accepted by parser in lowercase separated by coma(without whitespace). If not defined defualts is used.
  *                     params.attribWhitelist String containing attributes to be accepted by parser in lowercase separated by coma(without whitespace). If not defined defualts is used.
+ *                     params.allowedProtocols String contains allowed protocols.
  *                     params.strict If true while parsing style fails exception is thrown. False by default.
  * @returns (tuple(string, security)) First element of the tuple is parsed text. Second one indicates which actions was done during parsing:
  *                                    0 - removing empty attibutes, closing not closed tags, removing whitespace.
  *                                    1 - removing potentially dangerous HTML tags and attributes.
  *                                    2 - removing scripts, objects, applets, embed etc.
  **/
-function escapeHarmfulHTML( html, params ) {
+function escapeHarmfulHTML( html, sanitizationLevel, params ) {
 
-    var self = this;
-    var strict = params && params.strict || false;
+    sanitizationLevel = sanitizationLevel == undefined ? Indico.Security.sanitizationLevel : sanitizationLevel;
 
-    //Result string
-    var results = "";
+    if( sanitizationLevel == 1 || sanitizationLevel == 2  )
+    {
+        var self = this;
+        var strict = params && params.strict || false;
 
-    //Tags which can occur in the string. Other tags are omitted.
-    var tagWhitelist = params && params.tagWhitelist ? params.tagWhitelist : defaultTagWhitelist;
+        //Result string
+        var results = "";
 
-    //Attributes allowed.
-    var attribWhitelist = params && params.attribWhitelist ? params.attribWhitelist : defaultAttribWhitelist;
+        //Tags which can occur in the string. Other tags are omitted.
+        var tagWhitelist = params && params.tagWhitelist ? params.tagWhitelist : defaultTagWhitelist;
 
-    var security = 0;
+        //Attributes allowed.
+        var attribWhitelist = params && params.attribWhitelist ? params.attribWhitelist : defaultAttribWhitelist;
 
-    parser = new HTMLParser(html, {
-        start: function( tag, attrs, unary ) {
-        if( tagWhitelist[tag] ) {
-            results += "<" + tag;
+        //Protocols allowed
+        var allowedProtocols = params && params.allowedProtocols ? params.allowedProtocols : defaultAllowedProtocols;
 
-            for ( var i = 0; i < attrs.length; i++ )
-                if(attribWhitelist[ attrs[i].name ] || unary && attrs[i].name == '/') {
-                    if(attrs[i].name == "style") {
+        var security = 0;
+
+        parser = new HTMLParser(html, {
+            start: function( tag, attrs, unary ) {
+            if( tagWhitelist[tag] ) {
+                results += "<" + tag;
+
+                for ( var i = 0; i < attrs.length; i++ )
+                    if(attrs[i].name == "style" && sanitizationLevel == 2) {
                         try{
                             var cssParser = new inlineCSSParser(attrs[i].escaped, params);
                             var tuple = cssParser.parse();
                         }
                         catch(error){
                             if(typeof error == "string" && error.indexOf("Parse Error") != -1 && !strict)
-                                var tuple = ["",-1];
+                                var tuple = ["",1];
                             else
                                 throw error;
                         }
-                        attrs[i].escaped = tuple[0];
+                        if(tuple[0] != '')
+                            results += " " + attrs[i].name + '="' + tuple[0] + '"';
                         security = max(security, tuple[1]);
                     }
-                    if(attrs[i].escaped)
-                        results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-                }
-                else
-                    security = max(security, 1);
+                    else if(attribWhitelist[ attrs[i].name ] || unary && attrs[i].name == '/') {
+                        if(urlProperties[attrs[i].name]){
+                            attrs[i].escaped = attrs[i].escaped.replace(/[`\000-\040\177-\240\s]+/g, '');
+                            attrs[i].escaped = attrs[i].escaped.replace(/\ufffd/g, "")
+                            if (/^[a-z0-9][-+.a-z0-9]*:/.test(attrs[i].escaped) && !allowedProtocols[attrs[i].escaped.split(':')[0]]) {
+                                security = 1;
+                                continue;
+                            }
+                        }
+                        if( attrs[i].escaped != '')
+                            results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
+                    }
+                    else
+                        security = max(security, 1);
 
-            results += (unary ? "/" : "") + ">";
+                results += (unary ? "/" : "") + ">";
+            }
+            else
+                security = max(1, security);
+        },
+        end: function( tag ) {
+            if(tagWhitelist[tag])
+                results += "</" + tag + ">";
+            else
+                security = max(1, security);
+        },
+        chars: function( text ) {
+            results += text;
+        },
+        comment: function( text ) {
+           // results += "<!--" + text + "-->";
+        },
+        escape: function(text, tag) {
+            security = max(2, security);
         }
-        else
-            security = max(1, security);
-    },
-    end: function( tag ) {
-        if(tagWhitelist[tag])
-            results += "</" + tag + ">";
-        else
-            security = max(1, security);
-    },
-    chars: function( text ) {
-        results += text;
-    },
-    comment: function( text ) {
-       // results += "<!--" + text + "-->";
-    },
-    escape: function(text, tag) {
-        security = max(2, security);
+        }, params);
+
+        parser.parse();
+
+        return [results, security];
     }
-    }, params);
-
-    parser.parse();
-
-    return [results, security];
+    else
+        return [html,0];
 };
 
 function HTMLtoXML( html ) {
