@@ -56,6 +56,12 @@ def addFossil(klazz, fossils):
     for fossil in fossils:
         zope.interface.classImplements(klazz, fossil)
 
+def clearCache():
+    """
+    Shortcut for Fossilizable.clearCache()
+    """
+    Fossilizable.clearCache()
+
 class NonFossilizableException(Exception):
     """
     Object is not fossilizable (doesn't implement Fossilizable)
@@ -181,6 +187,12 @@ class Fossilizable:
 
         return interface
 
+    @classmethod
+    def clearCache(cls):
+        """
+        Clears the fossil attribute cache
+        """
+        cls.__fossilAttrsCache = {}
 
     @classmethod
     def _fossilizeIterable(cls, target, interface, useAttrCache = False, **kwargs):
