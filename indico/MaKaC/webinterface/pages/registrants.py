@@ -1556,7 +1556,7 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
                 selected = "selected"
             html.append("""
                         <option value=%s %s>%s</option>
-                        """%(quoteattr(str(date.strftime("%d-%B-%Y"))), selected, date.strftime("%d-%B-%Y")))
+                        """%(quoteattr(str(date.strftime("%d-%m-%Y"))), selected, date.strftime("%d-%B-%Y")))
         html.append("</select>")
         return "".join(html)
 

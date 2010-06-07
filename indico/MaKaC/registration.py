@@ -3238,8 +3238,10 @@ class Registrant(Persistent):
             elif dd == "nodate":
                 raise FormValuesError( _("Departure date cannot be empty."))
             if ad is not None and dd is not None:
-                ad = stringToDate(ad)
-                dd = stringToDate(dd)
+                ad = map(lambda x: int(x), ad.split("-"))
+                ad = datetime(ad[2], ad[1], ad[0])
+                dd = map(lambda x: int(x), dd.split("-"))
+                dd = datetime(dd[2], dd[1], dd[0])
                 if ad > dd:
                     raise FormValuesError( _("Arrival date has to be earlier than departure date"))
             if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[] and data.get("accommodationType",None) is None:

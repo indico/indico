@@ -41,7 +41,7 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        
+
         self._tabRegFormSetup = self._tabCtrl.newTab( "regformsetup", _("Setup"), \
                 urlHandlers.UHConfModifRegForm.getURL( self._conf ) )
         self._tabRegistrants = self._tabCtrl.newTab( "registrants", _("Registrants"), \
@@ -50,9 +50,9 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
                 urlHandlers.UHConfModifRegistrationPreview.getURL( self._conf ) )
         self._tabEPay = self._tabCtrl.newTab( "epay", _("e-payment"), \
                 urlHandlers.UHConfModifEPayment.getURL( self._conf ) )
-        
+
         self._setActiveTab()
-        
+
         if not self._conf.hasEnabledSection("regForm"):
             self._tabRegFormSetup.disable()
             self._tabRegistrants.disable()
@@ -60,23 +60,23 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
             self._tabRegistrationPreview.disable()
         if not self._conf.hasEnabledSection("epay"):
             self._tabEPay.disable()
-            
+
     def _getPageContent(self, params):
         self._createTabCtrl()
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-    
+
     def _getTabContent(self, params):
         return "nothing"
-        
+
     def _setActiveSideMenuItem(self):
         self._regFormMenuItem.setActive()
-    
+
     def _setActiveTab(self):
         pass
-        
+
 class WPConfModifRegFormPreview( WPConfModifRegFormBase ):
     def _setActiveTab( self ):
-        self._tabRegistrationPreview.setActive()   
+        self._tabRegistrationPreview.setActive()
 
     def _getTabContent( self, params ):
         wc = WConfRegistrationFormPreview(self._conf, self._rh._getUser())
@@ -91,7 +91,7 @@ class WPConfModifRegForm( WPConfModifRegFormBase ):
         return wc.getHTML()
 
 class WConfModifRegForm( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -142,7 +142,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
                         <td></td><td>&nbsp;%s</td><td>&nbsp;%s</td>
                         </tr>
                         """%(pdfield.getName(), switch) )
-                
+
         html.insert(0, """<table>""")
         html.append("</table>")
         return "".join(html)
@@ -190,7 +190,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
 
     def _getStatusesHTML(self):
         regForm=self._conf.getRegistrationForm()
-        html=[]        
+        html=[]
         for st in regForm.getStatusesList():
             urlStatus = urlHandlers.UHConfModifRegFormStatusModif.getURL(self._conf)
             urlStatus.addParam("statusId", st.getId())
@@ -276,13 +276,13 @@ class WConfModifRegForm( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormDataModification( WPConfModifRegFormBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormDataModification(self._conf)
         return wc.getHTML()
 
 class WConfModifRegFormDataModification( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -329,7 +329,7 @@ class WConfModifRegFormDataModification( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormSectionsBase(WPConfModifRegFormBase):
-    
+
     def _setActiveSideMenuItem(self):
         self._regFormMenuItem.setActive(True)
 
@@ -338,12 +338,12 @@ class WPConfModifRegFormSectionsBase(WPConfModifRegFormBase):
         banner = wcomponents.WRegFormSectionBannerModif(self._targetSection, self._conf).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner+html
-    
+
 class WPConfModifRegFormSessionsBase(WPConfModifRegFormSectionsBase):
-    
+
     def __init__( self, rh, conference ):
         WPConfModifRegFormSectionsBase.__init__(self, rh, conference)
-        self._targetSection = self._conf.getRegistrationForm().getSessionsForm() 
+        self._targetSection = self._conf.getRegistrationForm().getSessionsForm()
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
@@ -353,7 +353,7 @@ class WPConfModifRegFormSessionsBase(WPConfModifRegFormSectionsBase):
 #        if wf:
 #            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
-        
+
 #    def _applyFrame( self, body ):
 #        frame = WRegFormSessionsModifFrame( self._conf, self._getAW() )
 #        p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
@@ -368,16 +368,16 @@ class WPConfModifRegFormSessionsBase(WPConfModifRegFormSectionsBase):
         return "nothing"
 
 #class WRegFormSessionsModifFrame(wcomponents.WTemplated):
-#    
+#
 #    def __init__(self, conf, aw):
 #        self._conf = conf
 #        self._aw = aw
 #        self._sessions = self._conf.getRegistrationForm().getSessionsForm()
-#    
+#
 #    def getHTML( self, body, **params ):
 #        params["body"] = body
 #        return wcomponents.WTemplated.getHTML( self, params )
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
@@ -390,21 +390,21 @@ class WPConfModifRegFormSessionsBase(WPConfModifRegFormSectionsBase):
 #    def getOwnerComponent( self ):
 #        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
 #        return wc
-#        
+#
 #    def getIntermediateVTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return 7 + wc.getIntermediateVTabPixels()
-#        
+#
 #    def getTitleTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return wc.getTitleTabPixels() - 7
-#    
+#
 #    def getCloseHeaderTags( self ):
 #        wc = self.getOwnerComponent()
 #        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormSessions( WPConfModifRegFormSessionsBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormSessions(self._conf)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormSessionsRemove.getURL( self._conf ))),
@@ -414,7 +414,7 @@ class WPConfModifRegFormSessions( WPConfModifRegFormSessionsBase ):
         return wc.getHTML(p)
 
 class WConfModifRegFormSessions( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -449,7 +449,7 @@ class WConfModifRegFormSessions( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormSessionsDataModif( WPConfModifRegFormSessionsBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormSessionsDataModif(self._conf)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormSessionsPerformDataModif.getURL( self._conf )))
@@ -457,7 +457,7 @@ class WPConfModifRegFormSessionsDataModif( WPConfModifRegFormSessionsBase ):
         return wc.getHTML(p)
 
 class WConfModifRegFormSessionsDataModif( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -484,7 +484,7 @@ class WConfModifRegFormSessionsDataModif( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormSessionsAdd( WPConfModifRegFormSessionsBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormSessionsAdd(self._conf)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormSessionsPerformAdd.getURL( self._conf )))
@@ -495,7 +495,7 @@ class WConfModifRegFormSessionsAdd( wcomponents.WTemplated ):
 
     def __init__( self, conference ):
         self._conf = conference
-    
+
     def _getSessionsHTML(self, sessions):
         html = []
         for ses in self._conf.getSessionList():
@@ -518,7 +518,7 @@ class WConfModifRegFormSessionsAdd( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormAccommodationBase(WPConfModifRegFormSectionsBase):
-    
+
     def __init__( self, rh, conference ):
         WPConfModifRegFormSectionsBase.__init__(self, rh, conference)
         self._targetSection = self._conf.getRegistrationForm().getAccommodationForm()
@@ -539,16 +539,16 @@ class WPConfModifRegFormAccommodationBase(WPConfModifRegFormSectionsBase):
         return  _("nothing")
 
 #class WRegFormAccommodationModifFrame(wcomponents.WTemplated):
-#    
+#
 #    def __init__(self, conf, aw):
 #        self._conf = conf
 #        self._aw = aw
 #        self._accommodation = self._conf.getRegistrationForm().getAccommodationForm()
-#    
+#
 #    def getHTML( self, body, **params ):
 #        params["body"] = body
 #        return wcomponents.WTemplated.getHTML( self, params )
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
@@ -561,21 +561,21 @@ class WPConfModifRegFormAccommodationBase(WPConfModifRegFormSectionsBase):
 #    def getOwnerComponent( self ):
 #        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
 #        return wc
-#        
+#
 #    def getIntermediateVTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return 7 + wc.getIntermediateVTabPixels()
-#        
+#
 #    def getTitleTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return wc.getTitleTabPixels() - 7
-#    
+#
 #    def getCloseHeaderTags( self ):
 #        wc = self.getOwnerComponent()
 #        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormAccommodation( WPConfModifRegFormAccommodationBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormAccommodation(self._conf)
         p = {
@@ -586,7 +586,7 @@ class WPConfModifRegFormAccommodation( WPConfModifRegFormAccommodationBase ):
         return wc.getHTML(p)
 
 class WConfModifRegFormAccommodation( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -620,7 +620,7 @@ class WConfModifRegFormAccommodation( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormAccommodationDataModif( WPConfModifRegFormAccommodationBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormAccommodationDataModif(self._conf)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormAccommodationPerformDataModif.getURL( self._conf )))
@@ -628,7 +628,7 @@ class WPConfModifRegFormAccommodationDataModif( WPConfModifRegFormAccommodationB
         return wc.getHTML(p)
 
 class WConfModifRegFormAccommodationDataModif( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -645,7 +645,7 @@ class WConfModifRegFormAccommodationDataModif( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormAccommodationTypeAdd( WPConfModifRegFormAccommodationBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormAccommodationTypeAdd()
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormAccommodationTypePerformAdd.getURL( self._conf )))
@@ -660,7 +660,7 @@ class WPConfModifRegFormAccommodationTypeModify( WPConfModifRegFormAccommodation
     def __init__(self, rh, conf, accoType):
         WPConfModifRegFormAccommodationBase.__init__(self, rh, conf)
         self._accoType = accoType
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormAccommodationTypeModify(self._accoType)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormAccommodationTypePerformModify.getURL( self._accoType )))
@@ -671,7 +671,7 @@ class WConfModifRegFormAccommodationTypeModify( wcomponents.WTemplated ):
 
     def __init__(self, accoType):
         self._accoType = accoType
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         vars["caption"] = quoteattr(self._accoType.getCaption())
@@ -682,26 +682,26 @@ class WConfModifRegFormAccommodationTypeModify( wcomponents.WTemplated ):
         return vars
 
 class WPConfRemoveAccommodationType(WPConfModifRegFormAccommodationBase):
-    
+
     def __init__(self, rh, conf, accoTypeIds, accommodationTypes):
         WPConfModifRegFormAccommodationBase.__init__(self, rh, conf)
         self._eventType="conference"
         if self._rh.getWebFactory() is not None:
             self._eventType=self._rh.getWebFactory().getId()
-        
+
         self._accoTypeIds = accoTypeIds
         self._accommodationTypes = []
         counter = 0
         for at in accommodationTypes :
             self._accommodationTypes.append("<li>%s</li>"%at)
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent( self, params ):
         msg =  _("""
         <font size="+2"> _("Are you sure that you want to DELETE this accomodation")? <br><table><tr><td align="left"><ul>%s</ul></td></tr></table></font><br>
-        ( _("Note that if you delete this accomodation, registrants who applied for it 
+        ( _("Note that if you delete this accomodation, registrants who applied for it
         will lose their accomodation info") )
               """)%("".join(self._accommodationTypes))
         wc = wcomponents.WConfirmation()
@@ -711,7 +711,7 @@ class WPConfRemoveAccommodationType(WPConfModifRegFormAccommodationBase):
                         confirmButtonCaption= _("Yes"), cancelButtonCaption=  _("No"))
 
 class WPConfModifRegFormFurtherInformationBase(WPConfModifRegFormSectionsBase):
-    
+
     def __init__( self, rh, conference ):
         WPConfModifRegFormSectionsBase.__init__(self, rh, conference)
         self._targetSection = self._conf.getRegistrationForm().getFurtherInformationForm()
@@ -732,16 +732,16 @@ class WPConfModifRegFormFurtherInformationBase(WPConfModifRegFormSectionsBase):
         return  _("nothing")
 
 #class WRegFormFurtherInformationModifFrame(wcomponents.WTemplated):
-#    
+#
 #    def __init__(self, conf, aw):
 #        self._conf = conf
 #        self._aw = aw
 #        self._furtherInformation = self._conf.getRegistrationForm().getFurtherInformationForm()
-#    
+#
 #    def getHTML( self, body, **params ):
 #        params["body"] = body
 #        return wcomponents.WTemplated.getHTML( self, params )
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
@@ -754,21 +754,21 @@ class WPConfModifRegFormFurtherInformationBase(WPConfModifRegFormSectionsBase):
 #    def getOwnerComponent( self ):
 #        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
 #        return wc
-#        
+#
 #    def getIntermediateVTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return 7 + wc.getIntermediateVTabPixels()
-#        
+#
 #    def getTitleTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return wc.getTitleTabPixels() - 7
-#    
+#
 #    def getCloseHeaderTags( self ):
 #        wc = self.getOwnerComponent()
 #        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormFurtherInformation( WPConfModifRegFormFurtherInformationBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormFurtherInformation(self._conf)
         p = {
@@ -777,7 +777,7 @@ class WPConfModifRegFormFurtherInformation( WPConfModifRegFormFurtherInformation
         return wc.getHTML(p)
 
 class WConfModifRegFormFurtherInformation( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -790,7 +790,7 @@ class WConfModifRegFormFurtherInformation( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormFurtherInformationDataModif( WPConfModifRegFormFurtherInformationBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormFurtherInformationDataModif(self._conf)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormFurtherInformationPerformDataModif.getURL( self._conf )))
@@ -798,7 +798,7 @@ class WPConfModifRegFormFurtherInformationDataModif( WPConfModifRegFormFurtherIn
         return wc.getHTML(p)
 
 class WConfModifRegFormFurtherInformationDataModif( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -811,7 +811,7 @@ class WConfModifRegFormFurtherInformationDataModif( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormReasonParticipationBase(WPConfModifRegFormSectionsBase):
-    
+
     def __init__( self, rh, conference ):
         WPConfModifRegFormSectionsBase.__init__(self, rh, conference)
         self._targetSection = self._conf.getRegistrationForm().getReasonParticipationForm()
@@ -832,16 +832,16 @@ class WPConfModifRegFormReasonParticipationBase(WPConfModifRegFormSectionsBase):
         return  _("nothing")
 
 #class WRegFormReasonParticipationModifFrame(wcomponents.WTemplated):
-#    
+#
 #    def __init__(self, conf, aw):
 #        self._conf = conf
 #        self._aw = aw
 #        self._reasonParticipation = self._conf.getRegistrationForm().getReasonParticipationForm()
-#    
+#
 #    def getHTML( self, body, **params ):
 #        params["body"] = body
 #        return wcomponents.WTemplated.getHTML( self, params )
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
@@ -854,21 +854,21 @@ class WPConfModifRegFormReasonParticipationBase(WPConfModifRegFormSectionsBase):
 #    def getOwnerComponent( self ):
 #        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
 #        return wc
-#        
+#
 #    def getIntermediateVTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return 7 + wc.getIntermediateVTabPixels()
-#        
+#
 #    def getTitleTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return wc.getTitleTabPixels() - 7
-#    
+#
 #    def getCloseHeaderTags( self ):
 #        wc = self.getOwnerComponent()
 #        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormReasonParticipation( WPConfModifRegFormReasonParticipationBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormReasonParticipation(self._conf)
         p = {
@@ -877,7 +877,7 @@ class WPConfModifRegFormReasonParticipation( WPConfModifRegFormReasonParticipati
         return wc.getHTML(p)
 
 class WConfModifRegFormReasonParticipation( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -890,7 +890,7 @@ class WConfModifRegFormReasonParticipation( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormReasonParticipationDataModif( WPConfModifRegFormReasonParticipationBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormReasonParticipationDataModif(self._conf)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormReasonParticipationPerformDataModif.getURL( self._conf )))
@@ -898,7 +898,7 @@ class WPConfModifRegFormReasonParticipationDataModif( WPConfModifRegFormReasonPa
         return wc.getHTML(p)
 
 class WConfModifRegFormReasonParticipationDataModif( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -911,7 +911,7 @@ class WConfModifRegFormReasonParticipationDataModif( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormSocialEventBase(WPConfModifRegFormSectionsBase):
-    
+
     def __init__( self, rh, conference ):
         WPConfModifRegFormSectionsBase.__init__(self, rh, conference)
         self._targetSection = self._conf.getRegistrationForm().getSocialEventForm()
@@ -932,16 +932,16 @@ class WPConfModifRegFormSocialEventBase(WPConfModifRegFormSectionsBase):
         return  _("nothing")
 
 #class WRegFormSocialEventModifFrame(wcomponents.WTemplated):
-#    
+#
 #    def __init__(self, conf, aw):
 #        self._conf = conf
 #        self._aw = aw
 #        self._socialEvent = self._conf.getRegistrationForm().getSocialEventForm()
-#    
+#
 #    def getHTML( self, body, **params ):
 #        params["body"] = body
 #        return wcomponents.WTemplated.getHTML( self, params )
-#    
+#
 #    def getVars( self ):
 #        vars = wcomponents.WTemplated.getVars( self )
 #        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
@@ -954,21 +954,21 @@ class WPConfModifRegFormSocialEventBase(WPConfModifRegFormSectionsBase):
 #    def getOwnerComponent( self ):
 #        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
 #        return wc
-#        
+#
 #    def getIntermediateVTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return 7 + wc.getIntermediateVTabPixels()
-#        
+#
 #    def getTitleTabPixels( self ):
 #        wc = self.getOwnerComponent()
 #        return wc.getTitleTabPixels() - 7
-#    
+#
 #    def getCloseHeaderTags( self ):
 #        wc = self.getOwnerComponent()
 #        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormSocialEvent( WPConfModifRegFormSocialEventBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormSocialEvent(self._conf)
         p = {
@@ -979,7 +979,7 @@ class WPConfModifRegFormSocialEvent( WPConfModifRegFormSocialEventBase ):
         return wc.getHTML(p)
 
 class WConfModifRegFormSocialEvent( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -1013,7 +1013,7 @@ class WConfModifRegFormSocialEvent( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormSocialEventDataModif( WPConfModifRegFormSocialEventBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormSocialEventDataModif(self._conf)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormSocialEventPerformDataModif.getURL( self._conf )))
@@ -1021,7 +1021,7 @@ class WPConfModifRegFormSocialEventDataModif( WPConfModifRegFormSocialEventBase 
         return wc.getHTML(p)
 
 class WConfModifRegFormSocialEventDataModif( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -1036,7 +1036,7 @@ class WConfModifRegFormSocialEventDataModif( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormSocialEventAdd( WPConfModifRegFormSocialEventBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormSocialEventAdd()
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormSocialEventPerformAdd.getURL( self._conf )))
@@ -1051,7 +1051,7 @@ class WPConfModifRegFormSocialEventItemModify( WPConfModifRegFormSocialEventBase
     def __init__(self, rh, conf, socialEventItem):
         WPConfModifRegFormSocialEventBase.__init__(self, rh, conf)
         self._socialEventItem = socialEventItem
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormSocialEventItemModify(self._socialEventItem)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormSocialEventItemPerformModify.getURL( self._socialEventItem )))
@@ -1062,7 +1062,7 @@ class WConfModifRegFormSocialEventItemModify( wcomponents.WTemplated ):
 
     def __init__(self, socialEventItem):
         self._socialEventItem = socialEventItem
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         vars["caption"] = quoteattr(self._socialEventItem.getCaption())
@@ -1077,7 +1077,7 @@ class WConfModifRegFormSocialEventItemModify( wcomponents.WTemplated ):
         return vars
 
 class WPConfRemoveSocialEvent(WPConfModifRegFormSocialEventBase):
-    
+
     def __init__(self, rh, conf, socialEventIds, eventNames):
         WPConfModifRegFormSocialEventBase.__init__(self, rh, conf)
         self._eventType="conference"
@@ -1087,14 +1087,14 @@ class WPConfRemoveSocialEvent(WPConfModifRegFormSocialEventBase):
             self._eventNames.append("<li>%s</li>"%n)
         if self._rh.getWebFactory() is not None:
             self._eventType=self._rh.getWebFactory().getId()
-    
+
     def _setActiveTab( self ):
         self._tabMain.setActive()
-    
+
     def _getTabContent( self, params ):
         msg =  _("""
         <font size="+2"> _("Are you sure that you want to DELETE this social event")? <br><table><tr><td align="left"><ul>%s</ul></td></tr></table></font><br>
-        ( _("Note that if you delete this social event, registrants who applied for it 
+        ( _("Note that if you delete this social event, registrants who applied for it
         will lose their social event info") )
               """)%("".join(self._eventNames))
         wc = wcomponents.WConfirmation()
@@ -1104,11 +1104,11 @@ class WPConfRemoveSocialEvent(WPConfModifRegFormSocialEventBase):
                         confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
 
 class WPConfModifRegFormStatusesRemConfirm(WPConfModifRegFormBase):
-    
+
     def __init__(self,rh,target, stids):
         WPConfModifRegFormBase.__init__(self, rh, target)
         self._statusesIds=stids
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         ssHTML=["<ul>"]
@@ -1126,11 +1126,11 @@ class WPConfModifRegFormStatusesRemConfirm(WPConfModifRegFormBase):
         return wc.getHTML(msg,url,{"statusesIds":self._statusesIds, "removeStatuses":"1"})
 
 class WPConfModifRegFormGeneralSectionRemConfirm(WPConfModifRegFormBase):
-    
+
     def __init__(self,rh,target, gss):
         WPConfModifRegFormBase.__init__(self, rh, target)
         self._generalSections=gss
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         ssHTML=["<ul>"]
@@ -1169,16 +1169,16 @@ class WPConfModifRegFormGeneralSectionBase(WPConfModifRegFormSectionsBase):
         return "nothing"
 
 class WRegFormGeneralSectionModifFrame(wcomponents.WTemplated):
-    
+
     def __init__(self, gs, aw):
         self._conf = gs.getConference()
         self._aw = aw
         self._generalSection = gs
-    
+
     def getHTML( self, body, **params ):
         params["body"] = body
         return wcomponents.WTemplated.getHTML( self, params )
-    
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
@@ -1191,21 +1191,21 @@ class WRegFormGeneralSectionModifFrame(wcomponents.WTemplated):
     def getOwnerComponent( self ):
         wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
         return wc
-        
+
     def getIntermediateVTabPixels( self ):
         wc = self.getOwnerComponent()
         return 7 + wc.getIntermediateVTabPixels()
-        
+
     def getTitleTabPixels( self ):
         wc = self.getOwnerComponent()
         return wc.getTitleTabPixels() - 7
-    
+
     def getCloseHeaderTags( self ):
         wc = self.getOwnerComponent()
         return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormGeneralSection( WPConfModifRegFormGeneralSectionBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormGeneralSection(self._generalSectionForm)
         p = {
@@ -1216,7 +1216,7 @@ class WPConfModifRegFormGeneralSection( WPConfModifRegFormGeneralSectionBase ):
         return wc.getHTML(p)
 
 class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
-    
+
     def __init__( self, gs ):
         self._conf = gs.getConference()
         self._generalSection=gs
@@ -1234,10 +1234,10 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
             if f.isMandatory():
                 spec =  _(""" %s, _("mandatory") """)%spec
             if f.isBillable():
-                spec =  _(""" %s , _("Billable") = %s """)%(spec,self.htmlText(f.getPrice()))            
-                
+                spec =  _(""" %s , _("Billable") = %s """)%(spec,self.htmlText(f.getPrice()))
+
             spec = " %s)</b>"%spec
-         
+
             #
             # add the selection box here for sorting...
             #
@@ -1250,7 +1250,7 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
                     selbox += "<option value='%s'>%s" % (i-1,i)
             selbox += """
                 </select>"""
-             
+
             html.append("""<tr>
                                 <td align="left" style="padding-left:10px">%s<input type="checkbox" name="fieldsIds" value="%s"><a href=%s>%s</a>%s</td>
                             </tr>
@@ -1268,7 +1268,7 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormGeneralSectionDataModif( WPConfModifRegFormGeneralSectionBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormGeneralSectionDataModif(self._generalSectionForm)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormGeneralSectionPerformDataModif.getURL( self._generalSectionForm )))
@@ -1276,7 +1276,7 @@ class WPConfModifRegFormGeneralSectionDataModif( WPConfModifRegFormGeneralSectio
         return wc.getHTML(p)
 
 class WConfModifRegFormGeneralSectionDataModif( wcomponents.WTemplated ):
-    
+
     def __init__( self, generalSectionForm ):
         self._generalSectionForm = generalSectionForm
 
@@ -1287,11 +1287,11 @@ class WConfModifRegFormGeneralSectionDataModif( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifRegFormGeneralSectionFieldAdd( WPConfModifRegFormGeneralSectionBase ):
-    
+
     def __init__(self, rh, section, tmpField):
         WPConfModifRegFormGeneralSectionBase.__init__(self, rh, section)
         self._tmpField=tmpField
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormGeneralSectionFieldEdit(self._tmpField)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormGeneralSectionFieldPerformAdd.getURL( self._generalSectionForm )))
@@ -1299,7 +1299,7 @@ class WPConfModifRegFormGeneralSectionFieldAdd( WPConfModifRegFormGeneralSection
         return wc.getHTML(p)
 
 class WConfModifRegFormGeneralSectionFieldEdit( wcomponents.WTemplated ):
-    
+
     def __init__( self, generalField=None):
         self._generalField = generalField
 
@@ -1323,14 +1323,14 @@ class WConfModifRegFormGeneralSectionFieldEdit( wcomponents.WTemplated ):
         vars["caption"] = ""
         vars["mandatory"] =  """ checked="checked" """
         #vars["billable"]= """ checked="checked" """
-        #vars["price"]=""                
+        #vars["price"]=""
         if self._generalField is not None:
             vars["caption"] = quoteattr(self._generalField.getCaption())
             #vars["price"]= quoteattr(self._generalField.getPrice())
             if not self._generalField.isMandatory():
                 vars["mandatory"] =  ""
             #if not self._generalField.isBillable():
-            #    vars["billable"] =  ""                       
+            #    vars["billable"] =  ""
         vars["inputtypes"]=self._getFieldTypesHTML()
         vars["specialOptions"]=""
         if self._generalField is not None:
@@ -1343,7 +1343,7 @@ class WPConfModifRegFormGeneralSectionFieldModif( WPConfModifRegFormGeneralSecti
         WPConfModifRegFormGeneralSectionBase.__init__(self, rh, field.getParent())
         self._sectionField=field
         self._tmpField=tmpField
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormGeneralSectionFieldEdit(self._tmpField)
         p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormGeneralSectionFieldPerformModif.getURL( self._sectionField )))
@@ -1351,11 +1351,11 @@ class WPConfModifRegFormGeneralSectionFieldModif( WPConfModifRegFormGeneralSecti
         return wc.getHTML(p)
 
 class WPConfModifRegFormGeneralSectionFieldRemConfirm(WPConfModifRegFormGeneralSectionBase):
-    
+
     def __init__(self,rh,gs, fields):
         WPConfModifRegFormGeneralSectionBase.__init__(self, rh, gs)
         self._fields=fields
-    
+
     def _getTabContent(self,params):
         wc=wcomponents.WConfirmation()
         fieldsHTML=["<ul>"]
@@ -1379,17 +1379,17 @@ class WPConfModifRegFormStatusModif( WPConfModifRegFormBase ):
         WPConfModifRegFormBase.__init__(self, rh, st.getConference())
         self._status=st
         self._tempStatus=tmpst
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifRegFormStatusModif(self._status, self._tempStatus)
         p = {
-             
+
              'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormStatusPerformModif.getURL( self._status )))
             }
         return wc.getHTML(p)
 
 class WConfModifRegFormStatusModif( wcomponents.WTemplated ):
-    
+
     def __init__( self, st, tmpst ):
         self._conf = st.getConference()
         self._status=st
@@ -1426,7 +1426,7 @@ class WPRegistrationForm( conferences.WPConferenceDefaultDisplayBase ):
         pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
         return wc.getHTML(pars)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
@@ -1467,7 +1467,7 @@ class WConfRegistrationForm(wcomponents.WTemplated):
         vars["actions"] = self._getActionsHTML(vars["menuStatus"] == "close")
         vars["announcement"] = regForm.getAnnouncement()
         vars["title"] = regForm.getTitle()
-        vars["usersLimit"] = "" 
+        vars["usersLimit"] = ""
         if regForm.getUsersLimit() > 0:
             vars["usersLimit"] =  _("""
                                 <tr>
@@ -1484,7 +1484,7 @@ class WConfRegistrationForm(wcomponents.WTemplated):
                                 </tr>
                                 """ )%regForm.getContactInfo()
         return vars
-    
+
 class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NERegistrationFormDisplay
 
@@ -1493,7 +1493,7 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
         pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
         return wc.getHTML(pars)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newRegFormOpt)
 
@@ -1502,7 +1502,7 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
     def __init__(self, conf, user):
         self._currentUser = user
         self._conf = conf
-    
+
     def _getWComp(self, sect):
         if sect == self._conf.getRegistrationForm().getReasonParticipationForm():
             return WConfRegFormReasonParticipationDisplay(self._conf, self._currentUser)
@@ -1518,7 +1518,7 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
         if sect == self._conf.getRegistrationForm().getSocialEventForm():
             return WConfRegFormSocialEventDisplay(self._conf, self._currentUser)
         return WConfRegFormGeneralSectionDisplay(sect, self._currentUser)
-    
+
     def _getOtherSectionsHTML(self):
         regForm=self._conf.getRegistrationForm()
         html=[]
@@ -1556,7 +1556,7 @@ class WConfRegistrationFormPreview( WConfRegistrationFormDisplay ):
         return WConfRegistrationFormDisplay.getHTML(self)
 
 class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, gs, currentUser):
         self._generalSection = gs
         self._currentUser = currentUser
@@ -1590,7 +1590,7 @@ class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
             miscGroup = registrant.getMiscellaneousGroupById(self._generalSection.getId())
         vars["fields"]=self._getFieldsHTML(miscGroup)
         return vars
-        
+
 class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
 
     def __init__(self, conf, user):
@@ -1622,7 +1622,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
                         selected = "selected"
                     inputHTML += """<option value="%s" %s>%s</option>"""%(ck, selected, CountryHolder().getCountryById(ck))
                 inputHTML = """<select name="%s">%s</select>"""%(item.getId(), inputHTML)
-                
+
         else:
             inputHTML = """<input type="%s" name="%s" size="40" value="%s">"""%(item.getInput(), item.getId(), value)
         mandatory="&nbsp; &nbsp;"
@@ -1653,7 +1653,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
         return vars
 
 class WConfRegFormReasonParticipationDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, currentUser):
         self._conf = conf
         self._currentUser = currentUser
@@ -1763,7 +1763,7 @@ class WConfRegFormSessionsAllDisplay(WConfRegFormSessionsBase):
         return vars
 
 class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, currentUser):
         self._conf = conf
         self._accommodation = self._conf.getRegistrationForm().getAccommodationForm()
@@ -1794,7 +1794,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                 selected = "selected"
             html.append("""
                         <option value=%s %s>%s</option>
-                        """%(quoteattr(str(date.strftime("%d-%B-%Y"))), selected, date.strftime("%d-%B-%Y")))
+                        """%(quoteattr(str(date.strftime("%d-%m-%Y"))), selected, date.strftime("%d-%B-%Y")))
         html.append("</select>")
         return "".join(html)
 
@@ -1812,7 +1812,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                     html.append("""<tr>
                                         <td align="left" style="padding-left:10px"><input type="radio" name="accommodationType" value="%s" %s>%s%s</td>
                                     </tr>
-                                """%(atype.getId(), selected, atype.getCaption(), placesLeft ) )  
+                                """%(atype.getId(), selected, atype.getCaption(), placesLeft ) )
                 else:
                     html.append("""<tr>
                                      <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">\
@@ -1830,7 +1830,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                             </tr>
                         """)%(currentAccoType.getCaption() ) )
         return "".join(html)
-        
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1855,7 +1855,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         return vars
 
 class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, conf, currentUser):
         self._conf = conf
         self._socialEvent = self._conf.getRegistrationForm().getSocialEventForm()
@@ -1885,12 +1885,12 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
                     seItem = se.getSocialEventItem()
                 placesLeft = ""
                 if seItem.getPlacesLimit() > 0:
-                    placesLeft = " <font color='green'><i>[%s place(s) left]</i></font>"%seItem.getNoPlacesLeft()    
+                    placesLeft = " <font color='green'><i>[%s place(s) left]</i></font>"%seItem.getNoPlacesLeft()
                 inputType="checkbox"
                 if self._socialEvent.getSelectionTypeId() == "unique":
                     inputType="radio"
                 html.append("""<tr>
-                                    <td align="left" nowrap style="padding-left:10px"><input type="%s" name="socialEvents" value="%s" %s>%s&nbsp;&nbsp; 
+                                    <td align="left" nowrap style="padding-left:10px"><input type="%s" name="socialEvents" value="%s" %s>%s&nbsp;&nbsp;
                                     </td>
                                     <td width="100%%" align="left">
                                        %s%s
@@ -1915,7 +1915,7 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
                                 </tr>
                             """%(se.getCaption(), cancelledReason ) )
         return "".join(html)
-        
+
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1930,7 +1930,7 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
         return vars
 
 class WConfRegFormFurtherInformationDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self, conf):
         self._conf = conf
 
@@ -1947,7 +1947,7 @@ class WPRegFormInactive( conferences.WPConferenceDefaultDisplayBase ):
         wc = WConfRegFormDeactivated()
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
@@ -1961,7 +1961,7 @@ class WPRegistrationFormAlreadyRegistered( conferences.WPConferenceDefaultDispla
         wc = WConfRegistrationFormAlreadyRegistered( self._conf )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
@@ -1981,12 +1981,12 @@ class WPRegistrationFormCreationDone( conferences.WPConferenceDefaultDisplayBase
         wc = WConfRegistrationFormCreationDone( self._registrant )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
-        
-        
+
+
 class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
 
     def __init__( self, registrant ):
@@ -2134,7 +2134,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             text =  _("""
                     <tr>
                       <td style="color:black"><b>%s</b></td>
-                      <td bgcolor="white" class="blacktext">%s</td> 
+                      <td bgcolor="white" class="blacktext">%s</td>
                     </tr>
                     <tr>
                       <td colspan="4" style="border-top:2px solid black">&nbsp;</td>
@@ -2200,8 +2200,8 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                         """))
         html.append("</table>")
         return "".join(html)
-        
-    def _getMiscInfoItemsHTMLBilllable(self, gsf,total):  
+
+    def _getMiscInfoItemsHTMLBilllable(self, gsf,total):
         regForm = self._conf.getRegistrationForm()
         miscGroup=self._registrant.getMiscellaneousGroupById(gsf.getId())
         html=[""""""]
@@ -2219,12 +2219,12 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                         _billlable=miscItem.isBillable()
                         #caption=miscItem.getValue()
                         value=miscItem.getValue()
-                        price=string.atof(miscItem.getPrice())   
+                        price=string.atof(miscItem.getPrice())
                         quantity=miscItem.getQuantity()
-                        total["value"]+=price*quantity            
+                        total["value"]+=price*quantity
                 if value != "":
                     value=":%s"%value
-                if(quantity>0):    
+                if(quantity>0):
                     html.append("""
                             <tr>
                                <td ><b>%i</b></td>
@@ -2233,8 +2233,8 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                                <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
                             </tr>
                             """%(quantity,gsf.getTitle(),caption,value,price,price*quantity,currency) )
-        return "".join(html)                
-        
+        return "".join(html)
+
 
     def _getMiscellaneousInfoHTML(self, gsf):
         html=[]
@@ -2265,15 +2265,15 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                                 <td style="color:black"><b> _("Item")</b></td>
                                 <td style="color:black;padding-right:10px" nowrap ><b>_("Unit Price")</b></td>
                                 <td style="color:black"><b> _("Cost")</b></td>
-                            </tr>                        
+                            </tr>
                         """))
             for gsf in self._registrant.getMiscellaneousGroupList():
-                    html.append("""<tr>%s</tr>"""%(self._getMiscInfoItemsHTMLBilllable(gsf,total))) 
-    
+                    html.append("""<tr>%s</tr>"""%(self._getMiscInfoItemsHTMLBilllable(gsf,total)))
+
             url=urlHandlers.UHConfRegistrationFormconfirmBooking.getURL(self._registrant)
-            url.addParam("registrantId", self._registrant.getId())              
-            url.addParam("confId", self._conf.getId())       
-    
+            url.addParam("registrantId", self._registrant.getId())
+            url.addParam("confId", self._conf.getId())
+
             condChecking=""
             if modPay.hasPaymentConditions():
                 condChecking="""<!--<tr><td>Please ensure that you have read the terms and conditions before continuing.</td></tr>
@@ -2284,7 +2284,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                                 <tr>
                                     <td><br></td>
                                 </tr>"""%str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf))
-    
+
             html.append( _("""
                             <tr>&nbsp;</tr>
                             <tr>
@@ -2296,7 +2296,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                             <form name="epay" action="%s" method="POST">
                             <tr>
                               <table width="100%%">
-                                
+
                                 <tr><td>&nbsp;</td></tr>
                                 %s
                                 <tr>
@@ -2308,7 +2308,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                             </table></td></tr>
                             """)%(total["value"],regForm.getCurrency(),url,condChecking))
         return "".join(html)
-            
+
     def _getPDInfoHTML(self):
         personalData = self._conf.getRegistrationForm().getPersonalData()
         sortedKeys = personalData.getSortedKeys()
@@ -2348,7 +2348,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                               <td bgcolor="white" class="blacktext">%s</td>
                             </tr>""" % (fieldTitle,fieldValue)
         return html
-    
+
     def _getFormSections(self):
         sects = []
         regForm = self._conf.getRegistrationForm()
@@ -2378,7 +2378,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         vars["otherSections"] = self._getFormSections()
         vars["paymentInfo"]  = self._getPaymentInfo()
         vars["epaymentAnnounce"] = ""
-        if self._conf.hasEnabledSection("epay") and self._conf.getModPay().isActivated() and self._registrant.doPay():         
+        if self._conf.hasEnabledSection("epay") and self._conf.getModPay().isActivated() and self._registrant.doPay():
             vars["epaymentAnnounce"] = """<br><font color="black">Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</font>"""
         return vars
 
@@ -2393,20 +2393,20 @@ class WPRegistrationFormconfirmBooking( conferences.WPConferenceDefaultDisplayBa
         wc = WRegistrationFormconfirmBooking( self._registrant )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)        
-        
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
+
 class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
     def __init__( self, registrant ):
         self._registrant = registrant
-        self._conf = self._registrant.getConference()  
+        self._conf = self._registrant.getConference()
         self.modPay = self._conf.getModPay()
-    
+
     def _getModPayHTML(self):
         forms=""
         html=[]
-        
+
         regForm = self._conf.getRegistrationForm()
         for m in self.modPay.getSortedModPay():
             if m.isEnabled():
@@ -2414,11 +2414,11 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
                 <tr>
                 <td></td>
                 <td><b>%s</b></td>
-                %s                   
+                %s
                 </tr>
                 """%(m.getTitle(),m.getFormHTML(self._registrant.getTotal(),regForm.getCurrency(),self._conf,self._registrant))
         #forms=forms+"</table>"
-            
+
         if forms:
             html.append( _("""
                     <tr>&nbsp;</tr>
@@ -2431,7 +2431,7 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
                     <tr><td  colspan="4" style="border-top:2px solid black">&nbsp;</td></tr>
                 """)%"".join(forms))
         return "".join(html)
-                
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["modPay"]=self._getModPayHTML()
@@ -2454,7 +2454,7 @@ class WPRegistrationFormSignIn( conferences.WPConferenceDefaultDisplayBase ):
         wc = WConfRegistrationFormSignIn( self._conf, p )
         return wc.getHTML(p)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newRegFormOpt)
 
@@ -2478,7 +2478,7 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
         pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
         return wc.getHTML(pars)
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._viewRegFormOpt)
 
@@ -2497,7 +2497,7 @@ class WPRegistrationFormFull( conferences.WPConferenceDefaultDisplayBase ):
         wc = WConfRegistrationFormFull( self._conf )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
@@ -2518,7 +2518,7 @@ class WPRegistrationFormClosed( conferences.WPConferenceDefaultDisplayBase ):
         wc = WConfRegistrationFormClosed( self._conf )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
@@ -2541,7 +2541,7 @@ class WConfRegistrationFormClosed(wcomponents.WTemplated):
         vars["startDate"] = self._conf.getRegistrationForm().getStartRegistrationDate().strftime("%A %d %B %Y")
         vars["endDate"] = self._conf.getRegistrationForm().getEndRegistrationDate().strftime("%A %d %B %Y")
         return vars
-    
+
 class WPRegistrationFormConditions(WPBase):
 
     def __init__(self, rh, conf):
