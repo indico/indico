@@ -4986,7 +4986,7 @@ class DefaultConference(Conference):
      default templates for posters and badges
     """
 
-    def notifyOAIModification(self, date=None):
+    def notifyOAIModification(self, date=None, updateChildren=False):
         pass
 
     def indexConf(self):

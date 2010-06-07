@@ -471,6 +471,34 @@ class WAdminPluginsMainTab(wcomponents.WTemplated):
 
         return vars
 
+class WPAdminPluginsActionResult(WPAdminPlugins):
+
+    def __init__(self, rh, pluginTypeId, initialPlugin, actionName, actionResult):
+        WPAdminPlugins.__init__(self, rh, pluginTypeId, initialPlugin)
+        self._actionName = actionName
+        self._actionResult = actionResult
+
+    def _getPageContent(self, params):
+        html = WAdminPluginsActionResult(self._pluginTypeId, self._initialPlugin, self._actionName, self._actionResult).getHTML(params)
+        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( html )
+
+class WAdminPluginsActionResult(wcomponents.WTemplated):
+
+    def __init__(self, pluginType, initialPlugin, actionName, actionResult):
+        self._pluginType = pluginType
+        self._initialPlugin = initialPlugin
+        self._actionName = actionName
+        self._actionResult = actionResult
+
+    def getVars(self):
+        variables = wcomponents.WTemplated.getVars( self )
+
+        variables["PluginType"] = PluginsHolder().getPluginType(self._pluginType)
+        variables["InitialPlugin"] = self._initialPlugin
+        variables["ActionName"] = self._actionName
+        variables["ActionResult"] = self._actionResult
+
+        return variables
 
 class WPServicesCommon( WPAdminsBase ):
 

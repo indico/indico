@@ -205,7 +205,7 @@ class CSBookingManager(Persistent, Observer):
 
             error = newBooking.setBookingParams(bookingParams)
 
-            if isinstance(error, CSSanitizationError):
+            if isinstance(error, CSErrorBase):
                 return error
             elif error:
                 raise CollaborationServiceException("Problem while creating a booking of type " + bookingType)
@@ -256,6 +256,8 @@ class CSBookingManager(Persistent, Observer):
             return error
         elif error:
             CSBookingManager._rollbackChanges(booking, oldBookingParams, oldModificationDate)
+            if isinstance(error, CSErrorBase):
+                return error
             raise CollaborationServiceException("Problem while modifying a booking of type " + booking.getType())
         else:
             modifyResult = booking._modify(oldBookingParams)
@@ -363,8 +365,11 @@ class CSBookingManager(Persistent, Observer):
     def checkBookingStatus(self, id):
         booking = self._bookings[id]
         if booking.hasCheckStatus():
-            booking._checkStatus()
-            return booking
+            result = booking._checkStatus()
+            if isinstance(result, CSErrorBase):
+                return result
+            else:
+                return booking
         else:
             raise ServiceError(_("Tried to check status of booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking does not support the check status service."))
 
@@ -536,7 +541,7 @@ class CSBookingManager(Persistent, Observer):
             try:
                 self._changeConfTitleInIndex(booking, oldTitle, newTitle)
             except Exception, e:
-                Logger.get('VideoServ').error("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
+                Logger.get('VideoServ').exception("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
 
 
     def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
@@ -595,6 +600,13 @@ class CSBookingManager(Persistent, Observer):
                             problems.append(CSBookingManager._booking2NotifyProblem(booking, modifyResult))
                         elif startDateChanged:
                             self._changeStartDateInIndex(booking, oldBookingStartDate, booking.getStartDate())
+
+                if hasattr(booking, "notifyEventDateChanges"):
+                    try:
+                        booking.notifyEventDateChanges(oldStartDate, newStartDate, oldEndDate, newEndDate)
+                    except Exception, e:
+                        Logger.get('VideoServ').exception("Exception while notifying a plugin of an event date changed: " + str(e))
+
             if problems:
                 ContextManager.get('dateChangeNotificationProblems')['Collaboration'] = [
                     'Some Video Services bookings could not be moved:',
@@ -642,7 +654,7 @@ class CSBookingManager(Persistent, Observer):
                     Logger.get('VideoServ').warning("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getLogMessage() ))
                 self._unindexBooking(booking)
             except Exception, e:
-                Logger.get('VideoServ').error("Exception while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), str(e) ))
+                Logger.get('VideoServ').exception("Exception while deleting a booking of type %s after deleting an event: %s" % (booking.getType(), str(e)))
 
 
     def getEventDisplayPlugins(self, sorted = False):
@@ -807,6 +819,12 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Sets the internal, per-conference id of the booking
         """
         self._id = id
+
+    def getUniqueId(self):
+        """ Returns an unique Id that identifies this booking server-wide.
+            Useful for ExternalOperationsManager
+        """
+        return "%scsbook%s" % (self.getConference().getUniqueId(), self.getId())
 
     def getType(self):
         """ Returns the type of the booking, as a string: "EVO", "DummyPlugin"

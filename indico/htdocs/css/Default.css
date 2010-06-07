@@ -3815,7 +3815,7 @@ ul.errorList li {
 }
 
 .errorList {
-    color: #881122;
+    width: 400px;
 }
 
 ul.warningList {
@@ -4385,6 +4385,10 @@ table.CAResultsTable {
     padding: 0;
 }
 
+table.CAResultsTable tr.ACBookingLine:hover {
+    background-color: #ECECEC;
+}
+
 table.CAResultsTable td.ACBookingGroupTitle {
     padding-top: 20px;
     color: #555555;
@@ -4515,6 +4519,10 @@ div.collaborationDisplayInfoLine {
     padding-left: 20px;
 }
 
+div.collaborationDisplayInfoLine table {
+    border-spacing: 0px;
+}
+
 span.collShowHideBookingsText {
     font-style: italic;
 }
@@ -4534,6 +4542,9 @@ span.collHideBookingsText {
 table.eventDetails td.collaborationDisplayInfoLeftCol {
     padding: 0px;
     padding-right: 10px;
+    padding-left: 5px;
+    padding-bottom: 1px;
+    padding-top: 1px;
     vertical-align: top;
     text-align: right;
     white-space: nowrap;
@@ -4546,6 +4557,9 @@ table.eventDetails td.collaborationDisplayInfoRightCol {
     padding: 0px;
     vertical-align: top;
     font-size: 10px;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    padding-right: 5px;
 }
 
 td.collaborationDisplayInfoRightCol a {

@@ -445,7 +445,7 @@ var confTitleGroupTemplate = function(group, isFirst){
 }
 
 var confTitleBookingTemplate = function(booking) {
-    var row = Html.tr();
+    var row = Html.tr("ACBookingLine");
 
     var cell = Html.td('ACBookingFirstCell', Html.span('', booking.type));
     row.append(cell);
@@ -465,16 +465,14 @@ var confTitleBookingTemplate = function(booking) {
 
     var cell = Html.td('ACBookingCellNoWrap', Html.a({href: booking.modificationURL}, 'Change'),
                                               Html.span('horizontalSeparator', '|'),
-                                              Html.a({href: buildVideoServicesDisplayUrl(booking.conference)}, 'Event Display'));
+                                              Html.a({href: buildVideoServicesDisplayUrl(booking.conference)}, $T('Event Display')));
     row.append(cell);
-
-    IndicoUI.Effect.mouseOver(row.dom);
 
     return row;
 }
 
 var dateBookingTemplate = function(booking, viewBy) {
-    var row = Html.tr();
+    var row = Html.tr("ACBookingLine");
 
     var time = null;
     if (viewBy === "creationDate") {
@@ -508,8 +506,6 @@ var dateBookingTemplate = function(booking, viewBy) {
             Html.span('horizontalSeparator', '|'),
             Html.a({href: buildVideoServicesDisplayUrl(booking.conference)}, $T('Event Display')));
     row.append(cell);
-
-    IndicoUI.Effect.mouseOver(row.dom);
 
     return row;
 }

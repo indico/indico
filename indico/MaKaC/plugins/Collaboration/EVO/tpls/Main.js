@@ -115,8 +115,9 @@
 
         if (event == 'checkStatus') {
             if (error.errorType == 'deletedByEVO') {
-                CSErrorPopup($T("Meeting removed by EVO"), $T("This meeting seems to have been deleted in EVO for some reason.<br />") +
-                        $T("Please delete it and try to create it again."));
+                CSErrorPopup($T("Meeting removed by EVO"),
+                        [$T("This meeting seems to have been deleted in EVO for some reason."),
+                         $T("Please delete it and try to create it again.")]);
             }
         }
 
@@ -220,10 +221,6 @@
             Html.td({}, booking.url? booking.url : $T("not assigned yet"))));
 
         infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('Indico booking ID:')),
-            Html.td({}, booking.id)));
-
-        infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Created on:')),
             Html.td({}, formatDateTimeCS(booking.creationDate))));
 
@@ -291,9 +288,10 @@
     postDelete: function(booking) {
         if (booking.warning) {
             if (booking.warning.message === 'cannotDeleteNonExistant') {
-                var popup = new AlertPopup("Booking deletion", Html.span({},"The booking was deleted successfully from Indico.",
-                        Html.br(),
-                        "However, please note that the booking had already been removed from the EVO system previously."));
+                var popup = new AlertPopup($T("Booking deletion"),
+                        Html.span({}, $T("The booking was deleted successfully from Indico."),
+                                      Html.br(),
+                                      $T("However, please note that the booking had already been removed from the EVO system previously.")));
                 popup.open();
             }
         }

@@ -115,6 +115,12 @@ class CollaborationTools(object):
         return cls.getModule(pluginName).services.__dict__.get(serviceName + "Service", None)
 
     @classmethod
+    def getGlobalData(cls, pluginName):
+        """ Returns the GlobalData object of a plugin
+        """
+        return cls.getPlugin(pluginName).getGlobalData()
+
+    @classmethod
     def getExtraCSS(cls, pluginName):
         """ Utility function that returns a string with the extra CSS declared by a plugin.
             Example: templateClass = CollaborationTools.getExtraCSS("EVO").
@@ -411,34 +417,27 @@ Event details:
 
     @classmethod
     def eventRoomDetails(cls, conf):
-        roomDetails = ""
         location = conf.getLocation()
-        if location:
-            roomDetails += """
+        room = conf.getRoom()
+        if location and location.getName() and location.getName().strip():
+            locationText = location.getName().strip()
+            if room and room.getName() and room.getName().strip():
+                locationText += ". Room: " + room.getName().strip()
+            else:
+                locationText += " (room not defined)"
+        else:
+            locationText = "location/room not defined"
+
+        return """
     <tr>
         <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event location:</strong>
+            <strong>Event location & room:</strong>
         </td>
         <td>
             %s
         </td>
     </tr>
-""" % location.getName()
-
-            room = conf.getRoom()
-            if room:
-                roomDetails += """
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Event room:</strong>
-        </td>
-        <td>
-            %s
-        </td>
-    </tr>
-""" % room.getName()
-
-        return roomDetails
+""" % locationText
 
 
     @classmethod

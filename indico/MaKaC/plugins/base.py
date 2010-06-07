@@ -642,7 +642,7 @@ class Plugin(PluginBase):
             return None
 
     def getGlobalData(self):
-        if not hasattr(self, "_globalData"):
+        if not hasattr(self, "_globalData") or self._globalData is None:
             self._globalData = self.initializeGlobalData()
         return self._globalData
 
@@ -874,7 +874,7 @@ class PluginAction(Persistent):
     def call(self):
         actionClassName = self.__name[0].upper() + self.__name[1:] + "Action"
         clazz = getattr(self.__owner.getModule().actions, actionClassName)
-        clazz(self).call()
+        return clazz(self).call()
 
 
 class ActionBase(object):

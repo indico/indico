@@ -782,6 +782,8 @@
                     <xsl:value-of select="./typeDisplayName"/>
                   </span>
 
+                  <xsl:if test="count(./startDate) != 0">
+
                   <xsl:choose>
                     <xsl:when test="./kind = 'scheduled' and substring(./startDate,0,11) = substring(./endDate,0,11)">
                       <!-- Starting and ending day is same, no need to print day twice -->
@@ -848,6 +850,7 @@
                     </xsl:otherwise>
                   </xsl:choose>
                   <xsl:text>. </xsl:text>
+                  </xsl:if>
 
                   <xsl:if test="count(child::firstLineInfo) = 1">
                     <xsl:value-of select="./firstLineInfo"/>
@@ -864,7 +867,7 @@
                   </xsl:if>
 
                   <xsl:if test="count(child::launchInfo) = 1">
-                    <a href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
+                    <a target="_blank" href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
                       <xsl:value-of select="./launchInfo/launchText"/>
                     </a>
                     <xsl:text disable-output-escaping="yes"><![CDATA[
