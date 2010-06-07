@@ -12,7 +12,28 @@ type("TimetableLayoutManager", [],
                  checkpoints[time].push([key, type, sessionId]);
              };
 
-             each(data, function(value, key){
+             // Enforce key ordering
+             // In case we are dealing with structures that are inside a session,
+             // and have a non-null sessionCode, use it for ordering
+             var orderedKeys = keys(data);
+
+             orderedKeys.sort(function(e1, e2) {
+                 // if there's a session code
+                 if (exists(data[e1].sessionCode) &&
+                     exists(data[e2].sessionCode)) {
+                     var byCode = SortCriteria.Integer(data[e1].sessionCode,
+                                                       data[e2].sessionCode);
+                     if (byCode != 0) {
+                         return byCode;
+                     }
+                 }
+
+                 // default behavior
+                 return SortCriteria.Integer(e1, e2);
+             });
+
+             each(orderedKeys, function(key){
+                 var value = data[key];
                  sTime =value.startDate.time.replace(/:/g,'');
                  eTime = value.endDate.time.replace(/:/g,'');
 
@@ -24,14 +45,14 @@ type("TimetableLayoutManager", [],
                  else {
                      addCheckpoint(key, sTime, 'start', value.sessionId);
 
-                 if (eTime > sTime) {
-                     addCheckpoint(key, eTime, 'end');
-                 } else if (eTime == '000000') {
-                     addCheckpoint(key, '240000', 'end');
-                 }
-                 else {
-                     addCheckpoint(key, 'nextday', 'end');
-                 }
+                     if (eTime > sTime) {
+                         addCheckpoint(key, eTime, 'end');
+                     } else if (eTime == '000000') {
+                         addCheckpoint(key, '240000', 'end');
+                     }
+                     else {
+                         addCheckpoint(key, 'nextday', 'end');
+                     }
                  }
              });
 
@@ -79,7 +100,7 @@ type("TimetableLayoutManager", [],
 
              // Returns number of previously processed session slots
              var numAssignedBlocks = function(sessionId) {
-                 var blocks = lastAssigned.sessionId.blocks;
+                 var blocks = lastAssigned[sessionId].blocks;
                  var keyss = keys(blocks);
                  var length = keyss.length;
                  return length;
@@ -87,11 +108,11 @@ type("TimetableLayoutManager", [],
 
              // Adds/updates a block in the lastAssigned dictionary
              var lastAssign = function(block, col) {
-                 col = any(col, null);
+
                  if (!exists(lastAssigned[block.sessionId])) {
                      lastAssigned[block.sessionId] = {'blocks': {}};
                  }
-                 if (col !== null) {
+                 if (col !== undefined) {
                      lastAssigned[block.sessionId].col = col;
                  }
                  lastAssigned[block.sessionId].blocks[block.id] = true;
@@ -183,6 +204,20 @@ type("TimetableLayoutManager", [],
 
          addWholeDayBlock: function(blocks, key) {
              block = blocks[key] = {id: key};
+         },
+
+         getNumColumnsForGroup: function(group) {
+             return group[1];
+         },
+
+         getHeader: function() {
+             return null;
+         },
+
+         shouldShowRoom: function() {
+             return true;
+         },
+         reorderColumns:function() {
          }
      }
     );
@@ -193,6 +228,8 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
          drawDay: function(data, detailLevel, startTime, endTime) {
 
              var self = this;
+
+             this.eventData = data;
 
              this.detailLevel = any(detailLevel, 'session');
 
@@ -259,6 +296,7 @@ type("IncrementalLayoutManager", ["TimetableLayoutManager"],
 
              var counter = 0;
              each(algData.groups, function(group) {
+                 self.reorderColumns(group[0]);
                  each(group[0], function(block) {
                      block.group = counter;
                  });
@@ -354,6 +392,7 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                      self.addWholeDayBlock(algData.wholeDayBlocks, point[0]);
                  }
              });
+
              // Try to reaorder the assigned blocks based on their previous position
              if (blockAdded) {
                  self.reorderAssigned(algData.assigned, algData.lastAssigned, algData.currentGroup);
@@ -466,6 +505,85 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
              algData.topPx += pxStep;
          }
      });
+
+type("RoomLayoutManager", ["CompactLayoutManager"],
+    {
+
+        drawDay: function(data, detailLevel, startTime, endTime) {
+            this.roomsCols = {};
+            return this.CompactLayoutManager.prototype.drawDay.call(this, data, detailLevel, startTime, endTime);
+        },
+
+        assign: function(assigned, block) {
+            var roomName = this.eventData[block.id].room;
+            var col = 0;
+            if (! exists(this.roomsCols[roomName])) {
+                // If there is no room name, the block will be in the column 0 (and take all the available width)
+                if (trim(roomName) !== "") {
+                    col = this.roomsCols[roomName] = keys(this.roomsCols).length;
+                }
+            } else {
+                col = this.roomsCols[roomName];
+            }
+
+            block.assigned = col;
+            assigned[col] = block;
+        },
+
+        reorderColumns: function(currentGroup) {
+            var self = this;
+            var roomNames = keys(this.roomsCols);
+            roomNames.sort();
+
+            this.roomsCols = {};
+            var counter = 0;
+            each (roomNames, function(name) {
+                self.roomsCols[name] = counter;
+                counter++;
+            });
+
+            for (key in currentGroup) {
+                var block = currentGroup[key];
+                var roomName = this.eventData[block.id].room;
+             // If there is no room name, the block will be in the column 0 (and take all the available width)
+                var col = 0;
+                if (trim(roomName) !== "") {
+                    col =  this.roomsCols[roomName];
+                }
+                block.assigned = col;
+            }
+
+        },
+
+        getNumColumnsForGroup: function(group) {
+            if (group[0].length == 1 && this.eventData[group[0][0].id].room === "") {
+                return 1;
+            } else {
+                return keys(this.roomsCols).length;
+            }
+        },
+
+        getHeader: function(width) {
+            var roomNames = keys(this.roomsCols);
+            var cols = roomNames.length;
+            var borderPixels = 1; // this is because of the separators between the room names
+            return Html.div({style:{marginLeft:pixels(TimetableDefaults.leftMargin), paddingBottom:pixels(10), paddingTop:pixels(10)}},
+                    translate(roomNames, function(key){
+                        return Html.div({className: "headerRoomLayoutTimeTable",
+                                         style:{width:pixels(Math.floor((width-TimetableDefaults.leftMargin)/cols)-borderPixels)}
+                                        }, key);
+                    })
+                    );
+        },
+
+        shouldShowRoom: function() {
+            return false;
+        }
+    },
+
+    function() {
+        this.roomsCols = {};
+    });
 
 
 type("PosterLayoutManager", ["TimetableLayoutManager"],

@@ -131,7 +131,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 
     def _buildFilteringCriteria(self, sessionData):
         """
-        Creates the Filtering Criteria object, without changint the existing
+        Creates the Filtering Criteria object, without changing the existing
         session data (sessionData is cloned, not directly changed)
         """
         sessionCopy = sessionData.copy()

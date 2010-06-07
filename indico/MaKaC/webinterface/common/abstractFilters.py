@@ -26,7 +26,7 @@ class ContribTypeSortingField(filters.SortingField):
     """Allows to determine the abstract order regarding its contribution type.
     """
     _id = "type"
-    
+
     def compare( self, a1, a2 ):
         """
         """
@@ -43,7 +43,7 @@ class SubmissionDateSortingField(filters.SortingField):
     """
     """
     _id = "date"
-    
+
     def compare( self, a1, a2 ):
         """
         """
@@ -52,34 +52,34 @@ class SubmissionDateSortingField(filters.SortingField):
 
 class TrackFilterField(filters.FilterField):
     """Contains the filtering criteria for the track of an abstract.
-        
+
         Implements the logic to determine whether abstracts have been submitted
-        for a certain list of tracks. Objects of this class will keep a list 
+        for a certain list of tracks. Objects of this class will keep a list
         of track identifiers; then an abstract will satisfy the filter if any
         of the tracks ids for which it is suggested is in the filter list of
         values.
-        
+
         Inherits from: AbstractFilterField
 
         Attributes:
-            _values -- (list) List of track identifiers; if an identifier of 
+            _values -- (list) List of track identifiers; if an identifier of
                 any track an abstract is suggested for is included in this
                 list, the abstract will satisfy the filter field.
-            _showNoValue -- (bool) Tells whether an abstract satisfies the 
+            _showNoValue -- (bool) Tells whether an abstract satisfies the
                 filter if it hasn't been suggested for any track.
-            _onlyMultiple -- (bool) In case of having to filter by track, 
+            _onlyMultiple -- (bool) In case of having to filter by track,
                 determines whether to accept only abstracts being proposed
                 for more than one track.
     """
     _id = "track"
     _onlyMultiple = False
-    
+
     def onlyMultiple( self ):
         return self._onlyMultiple
 
     def setOnlyMultiple( self, val ):
         self._onlyMultiple = val
-    
+
     def satisfies( self, abstract ):
         """
         """
@@ -104,23 +104,23 @@ class TrackFilterField(filters.FilterField):
 
 class ContribTypeFilterField(filters.FilterField):
     """Contains the filtering criteria for the contribution type of an abstract.
-        
-        Implements the logic to determine whether abstracts have been proposed 
-        to become a certain set of types. Objects of this class will keep a 
+
+        Implements the logic to determine whether abstracts have been proposed
+        to become a certain set of types. Objects of this class will keep a
         list of contribution types; then an abstract will satisfy the filter if
         its suggested contribution type is in the list of values.
-        
+
         Inherits from: AbstractFilterField
 
         Attributes:
-            _values -- (list) List of contribution types; if the contribution 
-                type of an abstract is included in this list, the abstract will 
+            _values -- (list) List of contribution types; if the contribution
+                type of an abstract is included in this list, the abstract will
                 satisfy the filter field.
-            _showNoValue -- (bool) Tells whether an abstract satisfies the 
+            _showNoValue -- (bool) Tells whether an abstract satisfies the
                 filter if any type hasn't been proposed.
     """
     _id = "type"
-    
+
     def satisfies( self, abstract ):
         if not abstract.getContribType():
             return self._showNoValue
@@ -137,7 +137,7 @@ class AccContribTypeFilterField(filters.FilterField):
     """
     """
     _id = "acc_type"
-    
+
     def satisfies(self,abstract):
         s=abstract.getCurrentStatus()
         if s.__class__ in [review.AbstractStatusAccepted,\
@@ -159,7 +159,7 @@ class AccTrackFilterField(filters.FilterField):
     """
     """
     _id = "acc_track"
-    
+
     def satisfies( self, abstract ):
         """
         """
@@ -180,7 +180,7 @@ class AccTrackFilterField(filters.FilterField):
 
 
 class CommentFilterField(filters.FilterField):
-    
+
     _id = "comment"
 
     def satisfies( self, abstract ):

@@ -897,7 +897,7 @@ a.confSubSection:hover {
     /* border-top: 1px solid #777777; */
 }
 
-.groupTitle, .groupTitleNoBorder {
+.groupTitle, .groupTitleNoBorder, .groupSubTitle {
    font-family: "Times New Roman", Verdana, Arial;
    font-size: 24px;
    color: #4E4C46;
@@ -909,6 +909,10 @@ a.confSubSection:hover {
 
 .groupTitleNoBorder {
    border-bottom: none;
+}
+
+.groupSubTitle {
+    font-size: 20px;
 }
 
 .groupTitleSmall, .groupTitleSmallNoBackground {
@@ -1035,6 +1039,14 @@ a.confSubSection:hover {
     font-size:12px;
     font-weight: bold;
     padding: 3px 20px 3px 0;
+}
+
+.calendarList {
+    z-index: 1;
+    visibility: hidden;
+    position: absolute;
+    max-height: 220px;
+    overflow-y: auto;
 }
 
 .calendar thead .title {
@@ -1326,6 +1338,12 @@ option.moderatedRoom, span.moderatedRoom, a.moderatedRoom {
 
 option.privateRoom, span.privateRoom, a.privateRoom, a.weekend {
     color: Red;
+}
+
+span.unavailable {
+    background-color: #881122;
+    color: white;
+    padding: 1px;
 }
 
 a.weekday {
@@ -2100,13 +2118,13 @@ div#UISearchBox #extraOptions table {
 div#UISearchBox #extraOptions input {
     margin-left: 8px;
     font-size: 12px;
-    width: 145px;
+    width: 119px;
 }
 
 div#UISearchBox #extraOptions select {
     margin-left: 8px;
     font-size: 12px;
-    width: 150px;
+    width: 148px;
 }
 
 div#UISearchBox #extraOptions td {
@@ -2114,7 +2132,7 @@ div#UISearchBox #extraOptions td {
     color: #444;
 }
 
-div#UISearchBox #extraOptions div {
+div#UISearchBox #advancedOptionsLabel {
     text-align: center;
     padding: 5px;
     background-color: #ECECEC;
@@ -3821,6 +3839,13 @@ span.warningTitle {
     font-size: medium;
     font-weight: bold;
 }
+
+div.warningExplanation {
+    margin-top: 10px;
+    color: #555;
+    text-align: left;
+}
+
 
 ul.warningLevel0 {
     margin: 0;
@@ -5777,7 +5802,7 @@ div.fitInnerTimetableDialog {
     margin-bottom: 5px;
 }
 
-div.flexibleSelect {
+div.flexibleSelect, input.roomTextField {
     border: 1px solid #AAAAAA;
     position: relative;
     width: 200px;
@@ -5869,7 +5894,7 @@ div.posterEntry:hover {
 .startEndDate td, .support td {
     color: #000;
 }
-td.startEndDateEntry, td.supportEntry {
+td.startEndDateEntry, td.supportEntry, span.innerWidgetLabel {
     color: #666;
     padding-right: 6px;
 }
@@ -6018,4 +6043,57 @@ div.cloneElements {
     -moz-border-radius-bottomleft: 5px;
     background-color: #fff;
     height: 24px;
+}
+
+/*
+    Date field widget
+*/
+
+div.dateField {
+    border: 1px solid #AAAAAA;
+    width: 140px;
+    display: inline;
+    padding: 3px;
+    background: white;
+}
+
+div.dateField img {
+    vertical-align: middle;
+    padding: 2px;
+    cursor: pointer;
+}
+
+div.dateField input {
+    border: none;
+    vertical-align: middle;
+    width: 115px;
+}
+
+/*
+    Widget checkbox options
+*/
+
+.widgetCheckboxOption {
+    margin-top: 5px;
+}
+
+
+.widgetCheckboxOption span {
+    vertical-align: middle;
+    font-size: 12px;
+    color: #555;
+    margin-left: 2px;
+}
+
+.widgetCheckboxOption input {
+    vertical-align: middle;
+}
+
+.headerRoomLayoutTimeTable {
+    text-align: center;
+    float: left;
+    margin-top: 10px;
+    color: black;
+    font-weight: bold;
+    border-left: 1px solid #E8E8E8;
 }

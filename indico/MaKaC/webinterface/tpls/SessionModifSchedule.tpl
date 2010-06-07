@@ -17,7 +17,6 @@ var timetable = new SessionManagementTimeTable(ttdata, eventInfo, 900,$E('timeta
 
 IndicoUI.executeOnLoad(function(){
 
-
   $E('timetableDiv').set(timetable.draw());
   timetable.postDraw();
 

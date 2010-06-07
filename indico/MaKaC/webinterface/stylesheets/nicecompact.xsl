@@ -37,6 +37,7 @@
         <xsl:with-param name="item" select="."/>
         <xsl:with-param name="confId" select="/iconf/ID"/>
         <xsl:with-param name="sessId" value=""/>
+        <xsl:with-param name="sessCode" value=""/>
         <xsl:with-param name="contId" value=""/>
         <xsl:with-param name="subContId" value=""/>
         <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.conference</xsl:with-param>
@@ -86,17 +87,17 @@
 			<td>
 
 			<table><tr><td bgcolor="#90c0f0"><font size="-2"><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text></font></td><td><font size="-2"><b>: Sessions</b></font></td></tr></table>
-			
+
 			</td>
 			<td>
 
 			<table cellspacing="0"><tr><td bgcolor="silver"><font size="-2"><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text></font></td><td><font size="-2">/</font></td><td bgcolor="#D2D2D2"><font size="-2"><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text></font></td><td><font size="-2"><b>: Talks</b></font></td></tr></table>
-			
+
 			</td>
 			<td>
 
 			<table><tr><td bgcolor="#FFcccc"><font size="-2"><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text><xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text></font></td><td><font size="-2"><b>: Breaks</b></font></td></tr></table>
-			
+
 			</td>
 		</tr>
 		</table>
@@ -203,6 +204,7 @@
         <xsl:with-param name="item" select="."/>
         <xsl:with-param name="confId" select="../ID"/>
         <xsl:with-param name="sessId" select="./ID"/>
+        <xsl:with-param name="sessCode" select="./code"/>
         <xsl:with-param name="contId">null</xsl:with-param>
         <xsl:with-param name="subContId">null</xsl:with-param>
         <xsl:with-param name="uploadURL">Indico.Urls.UploadAction.session</xsl:with-param>
@@ -267,7 +269,7 @@
       <font size="-2">
 
         <xsl:if test="name(..) = 'session'">
-        <xsl:call-template name="displayModifIcons">	    
+        <xsl:call-template name="displayModifIcons">
           <xsl:with-param name="item" select="."/>
           <xsl:with-param name="confId" select="../../ID"/>
           <xsl:with-param name="sessId" select="../ID"/>
@@ -277,7 +279,7 @@
         </xsl:call-template>
           </xsl:if>
           <xsl:if test="name(..) != 'session'">
-        <xsl:call-template name="displayModifIcons">	    
+        <xsl:call-template name="displayModifIcons">
           <xsl:with-param name="item" select="."/>
           <xsl:with-param name="confId" select="../ID"/>
           <xsl:with-param name="sessId">null</xsl:with-param>
@@ -313,7 +315,7 @@
 <xsl:template match="break">
   <tr>
     <td valign="top" bgcolor="#FFdcdc">
-      <font size="-2"><xsl:value-of select="substring(./startDate,12,5)"/></font>	
+      <font size="-2"><xsl:value-of select="substring(./startDate,12,5)"/></font>
     </td>
     <td valign="top" bgcolor="#FFcccc" align="center" colspan="1">
       <font size="-2">

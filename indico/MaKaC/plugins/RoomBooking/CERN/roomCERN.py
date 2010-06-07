@@ -24,9 +24,9 @@ from MaKaC.plugins.RoomBooking.default.room import Room
 _ROOMS = 'Rooms'
 
 class RoomCERN( Room ):
-    """ 
-    ZODB specific implementation. 
-    
+    """
+    ZODB specific implementation.
+
     For documentation of methods see base class.
     """
 
@@ -37,4 +37,18 @@ class RoomCERN( Room ):
               "H323 point2point",
               "Audio Conference",
               "I don't know"]
+
+    def __eq__( self, other ):
+        try:
+            if self.id != None  and  other.id != None:
+                return self.id == other.id
+            else:
+                return self.name == other.name and self.building == other.building \
+                    and self.floor == other.floor and self.locationName == other.locationName
+
+        except AttributeError:
+            if self is None and other is None:
+                return True
+            else:
+                return False
 

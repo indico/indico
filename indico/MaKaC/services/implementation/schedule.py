@@ -534,11 +534,14 @@ class ModifyStartEndDate(ScheduleOperation):
             self._schEntry.getSchedule().moveEntriesBelow(diff, entriesList)
 
             # retrieve results
-            pickledData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(), None, days = [self._schEntry.getAdjustedStartDate()])
+            pickledData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(),
+                                                          None, days = [self._schEntry.getAdjustedStartDate()],
+                                                          mgmtMode = True)
             entryId = pickledData.keys()[0]
             pickledData = pickledData.values()[0]
         else:
-            entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone(), None)
+            entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone(),
+                                                                        None, mgmtMode = True)
 
         return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': entryId,
@@ -662,7 +665,8 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
             schEntry = self._slot.getSessionSchEntry()
         else:
             schEntry = self._slot.getConfSchEntry()
-        entryId, pickledData = schedule.ScheduleToJson.processEntry(schEntry, self._conf.getTimezone(), None)
+        entryId, pickledData = schedule.ScheduleToJson.processEntry(schEntry, self._conf.getTimezone(),
+                                                                    None, mgmtMode = True)
 
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': pickledData['id'],
@@ -1049,7 +1053,9 @@ class MoveEntryUpDown(ScheduleOperation):
         else:
             sched.moveDownEntry(schEntry)
 
-        return schedule.ScheduleToJson.process(sched, self._conf.getTimezone(), None, days = [ schEntry.getAdjustedStartDate() ])
+        return schedule.ScheduleToJson.process(sched, self._conf.getTimezone(), None,
+                                               days = [ schEntry.getAdjustedStartDate() ],
+                                               mgmtMode = True)
 
 
 class ConferenceTimetableMoveEntryUpDown(MoveEntryUpDown, conferenceServices.ConferenceModifBase):

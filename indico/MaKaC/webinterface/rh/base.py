@@ -38,6 +38,8 @@ except ImportError:
 from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
 
+from MaKaC.common import fossilize
+
 import MaKaC.webinterface.session as session
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
@@ -443,6 +445,9 @@ class RH(RequestHandlerBase):
                 try:
                     Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), self.getHostIP()))
                     try:
+                        # clear the fossile cache at the start of each request
+                        fossilize.clearCache()
+
                         DBMgr.getInstance().sync()
                         # keep a link to the web session in the access wrapper
                         # this is used for checking access/modification key existence

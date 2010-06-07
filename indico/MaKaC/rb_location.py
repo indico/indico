@@ -405,8 +405,9 @@ class CrossLocationQueries( object ):
             myLocations = []
             if rooms:
                 for room in rooms:
-                    if Location.parse(room.locationName) not in myLocations:
-                        myLocations.append(Location.parse(room.locationName))
+                    loc = Location.parse(room.locationName)
+                    if loc not in myLocations:
+                        myLocations.append(loc)
             else:
                 # Return from all locations
                 myLocations = Location.allLocations

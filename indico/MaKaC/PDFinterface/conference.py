@@ -17,8 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.common import logger
-
+from MaKaC.common import logger, utils
 import string
 import types
 from copy import deepcopy
@@ -394,7 +393,7 @@ class AbstractsToPDF(PDFWithTOC):
         c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
         title = doc.getCurrentPart()
         if len(doc.getCurrentPart())>50:
-            title = doc.getCurrentPart()[:50] + "..."
+            title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
@@ -402,8 +401,9 @@ class AbstractsToPDF(PDFWithTOC):
 
 
     def getBody(self):
+        abMgr = self._conf.getAbstractMgr()
         for abstract in self._abstracts:
-            temp = AbstractToPDF(self._conf, abstract, tz=self._tz)
+            temp = AbstractToPDF(self._conf, abMgr.getAbstractById(abstract), tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
@@ -536,8 +536,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
     def getBody(self):
+        abMgr = self._conf.getAbstractMgr()
         for abstract in self._abstracts:
-            temp = ConfManagerAbstractToPDF(self._conf, abstract,tz=self._tz)
+            temp = ConfManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract),tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
@@ -668,8 +669,9 @@ class TrackManagerAbstractsToPDF(AbstractsToPDF):
         self._track = track
 
     def getBody(self):
+        abMgr = self._conf.getAbstractMgr()
         for abstract in self._abstracts:
-            temp = TrackManagerAbstractToPDF(self._conf, abstract, self._track, tz=self._tz)
+            temp = TrackManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract), self._track, tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
@@ -877,7 +879,7 @@ class ConfManagerContribToPDF(ContribToPDF):
 
 class ContributionBook(PDFBase):
 
-    def __init__(self,conf,contribList,aw,tz=None):
+    def __init__(self,conf,contribList,aw,tz=None, sortedBy=""):
         self._conf=conf
         if not tz:
             self._tz = self._conf.getTimezone()
@@ -887,6 +889,12 @@ class ContributionBook(PDFBase):
         self._aw=aw
         PDFBase.__init__(self)
         self._title=_("Book of abstracts")
+        self._sortedBy = sortedBy
+        if self._sortedBy == "boardNo":
+            try:
+                self._contribList = sorted(self._contribList, key=lambda x:int(x.getBoardNumber()))
+            except ValueError,e:
+                raise MaKaCError(_("In order to generate this PDF, all the contributions must contain a board number and it must only contain digits. There is a least one contribution with a wrong board number."))
         self._doc.leftMargin=1*cm
         self._doc.rightMargin=1*cm
         self._doc.topMargin=1.5*cm
@@ -980,7 +988,10 @@ class ContributionBook(PDFBase):
         for contrib in self._contribList:
             if not contrib.canAccess(self._aw):
                 continue
-            caption="%s - %s"%(contrib.getId(),contrib.getTitle())
+            if self._sortedBy == "boardNo":
+                caption="%s"%(contrib.getTitle())
+            else:
+                caption="%s - %s"%(contrib.getId(),contrib.getTitle())
             p1=Paragraph(escape(caption),self._styles["title"])
             lspk=[]
             for spk in contrib.getSpeakerList():
@@ -1376,6 +1387,8 @@ class TimeTablePlain(PDFWithTOC):
                 spkName = spk.getFullName()
                 if not self._ttPDFFormat.showSpeakerTitle():
                     spkName = self._getNameWithoutTitle(spk)
+                if self._showSpeakerAffiliation and spk.getAffiliation().strip() != "":
+                    spkName += " (" + spk.getAffiliation() + ")"
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
@@ -1399,6 +1412,8 @@ class TimeTablePlain(PDFWithTOC):
                 spkName = spk.getFullName()
                 if not self._ttPDFFormat.showSpeakerTitle():
                     spkName = self._getNameWithoutTitle(spk)
+                if self._showSpeakerAffiliation and spk.getAffiliation().strip() != "":
+                    spkName += " (" + spk.getAffiliation() + ")"
                 p=Paragraph(escape(spkName),self._styles["table_body"])
                 spkList.append([p])
             if len(spkList)==0:
@@ -1465,6 +1480,8 @@ class TimeTablePlain(PDFWithTOC):
                 spkName = spk.getFullName()
                 if not self._ttPDFFormat.showSpeakerTitle():
                     spkName = self._getNameWithoutTitle(spk)
+                if self._showSpeakerAffiliation and spk.getAffiliation().strip() != "":
+                    spkName += " (" + spk.getAffiliation() + ")"
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
@@ -1579,7 +1596,7 @@ class TimeTablePlain(PDFWithTOC):
                     sesCaption="%s: %s"%(sesCaption,sessionSlot.getTitle())
                 conv=[]
                 for c in sessionSlot.getConvenerList():
-                    if self._showSpeakerAffiliation:
+                    if self._showSpeakerAffiliation and c.getAffiliation().strip() != "":
                         conv.append("%s (%s)"%(escape(c.getFullName()), escape(c.getAffiliation())))
                     else:
                         conv.append(escape(c.getFullName()))
@@ -1725,7 +1742,7 @@ class TimeTablePlain(PDFWithTOC):
                 caption="%s"%contrib.getTitle()
                 spks=[]
                 for c in contrib.getSpeakerList():
-                    if self._showSpeakerAffiliation:
+                    if self._showSpeakerAffiliation and c.getAffiliation().strip() != "":
                         spks.append("%s (%s)"%(escape(c.getFullName()), escape(c.getAffiliation())))
                     else:
                         spks.append(escape(c.getFullName()))

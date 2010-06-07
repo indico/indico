@@ -82,11 +82,16 @@ class Reservation( Persistent, ReservationBase ):
         resvBTree = Reservation.getReservationsRoot()
         # Ensure ID
         if self.id == None:
-            # Maximum ID + 1
-            if len( resvBTree ) > 0:
+#            # Maximum ID + 1
+#            if len( resvBTree ) > 0:
+#                self.id = resvBTree.maxKey() + 1
+#            else:
+#                self.id = 1 # Can not use maxKey for 1st record in a tree
+            #Faster version of the code above
+            try:
                 self.id = resvBTree.maxKey() + 1
-            else:
-                self.id = 1 # Can not use maxKey for 1st record in a tree
+            except ValueError:
+                self.id = 1
         # Add self to the BTree
         resvBTree[self.id] = self
 

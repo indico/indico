@@ -44,12 +44,14 @@
                     <td width="100%%">
                             %(conditions)s
                     </td>
+                    <input type="hidden" value="" name="selCond">
+                    </form>
                     <td align="right" valign="bottom" nowrap>
-						</form>
                         <form action=%(newConditionURL)s method="POST">
                             <select name="condType">%(availableConditions)s</select><input type="submit" class="btn" value="<%= _("create new condition")%>">
+                       </form>
                     </td>
-					</form>
+
                 </tr>
             </table>
         </td>

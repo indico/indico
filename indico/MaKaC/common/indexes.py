@@ -47,6 +47,12 @@ class Index(Persistent):
         self._words = {}
 
     def getLength( self ):
+        """ Length of an index.
+
+        May be extremely slow for big indexes stored as persistent objects.
+        Do not use unless you really have to!
+
+        """
         return len(self._words.keys())
 
     def getKeys( self ):
@@ -758,50 +764,54 @@ class OAIDoubleIndex(DoubleIndex):
 
     def getElements(self, from_date, until_date):
         if not (from_date or until_date):
-            res = []
-            for key in self._words.keys():
-                res.extend(self._words[key])
-            return res
-        fd = self.firstDate
+            return self.getAllElements()
+
         if from_date:
             fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-#            fd = server2utc(datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10])))
-        ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+        else:
+            fd = self.firstDate
+
         if until_date:
-#            ud = server2utc(datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]))
             ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
+        else:
+            ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+
         res = []
         if fd > ud:
             return res
-        date = fd
         delta = timedelta(1)
-        while date <= ud:
-            if date.strftime("%Y-%m-%d") in self._words.keys():
-                res.extend(self._words[date.strftime("%Y-%m-%d")])
-            date = date + delta
+        while fd <= ud:
+            d = fd.strftime("%Y-%m-%d")
+            if d in self._words:
+                res.extend(self._words[d])
+            fd += delta
         return res
+
 
     def getElementIds(self, from_date, until_date):
         if not (from_date or until_date):
             return self.getAllElementIds()
 
-        fd = self.firstDate
         if from_date:
-#            fd = server2utc(datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10])))
             fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-        ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+        else:
+            fd = self.firstDate
+
         if until_date:
-#            ud = server2utc(datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10])))
             ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
+        else:
+            ud = nowutc().replace( hour=23, minute=59, second=59, microsecond=0 )
+
         res = []
         if fd > ud:
             return res
-        date = fd
+
         delta = timedelta(1)
-        while date <= ud:
-            if date.strftime("%Y-%m-%d") in self._ids.keys():
-                res.extend(self._ids[date.strftime("%Y-%m-%d")])
-            date = date + delta
+        while fd <= ud:
+            d = fd.strftime("%Y-%m-%d")
+            if d in self._ids:
+                res.extend(self._ids[d])
+            fd += delta
         return res
 
     def getAllElements(self):
@@ -925,26 +935,20 @@ class OAIDeletedContributionCategoryIndex( OAIContributionIndex ):
             self._withdrawItem( catId, cont )
 
     def getContributions(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._words[catId]
 
     def getContributionsIds(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._ids[catId]
 
     def getAllConferences(self):
-        res = []
-        for catId in self._words.keys():
-            res.extend(self._words[catId])
-        return res
+        return self.getAllElements()
 
     def getAllConferencesIds(self):
-        res = []
-        for catId in self._ids.keys():
-            res.extend(self._ids[catId])
-        return res
+        return self.getAllElementIds()
 
 class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
     _name = "OAIDeletedPrivateContributionCategory"
@@ -975,28 +979,28 @@ class OAIConferenceIndex( OAIDoubleIndex ):
 
     def getConferencesIds(self, from_date, until_date):
         if not (from_date or until_date):
-            res = []
-            for key in self._ids.keys():
-                res.extend(self._ids[key])
-            return res
+            return self.getAllConferencesIds()
 
-        fd = self.firstDate
         if from_date:
-            #fd = server2utc(datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10])))
             fd = datetime(int(from_date[0:4]), int(from_date[5:7]), int(from_date[8:10]), tzinfo=timezone('UTC'))
-        ud = nowutc().replace( hour=23, minute=59, second=29, microsecond=0 )
+        else:
+            fd = self.firstDate
+
         if until_date:
-            #ud = server2utc(datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10])))
             ud = datetime(int(until_date[0:4]), int(until_date[5:7]), int(until_date[8:10]), tzinfo=timezone('UTC'))
+        else:
+            ud = nowutc().replace( hour=23, minute=59, second=29, microsecond=0 )
+
         res = []
         if fd > ud:
             return res
-        date = fd
+
         delta = timedelta(1)
-        while date <= ud:
-            if date.strftime("%Y-%m-%d") in self._ids.keys():
-                res.extend(self._ids[date.strftime("%Y-%m-%d")])
-            date = date + delta
+        while fd <= ud:
+            d = fd.strftime("%Y-%m-%d")
+            if d in self._ids:
+                res.extend(self._ids[d])
+            fd += delta
 
         return res
 
@@ -1006,8 +1010,6 @@ class OAIConferenceIndex( OAIDoubleIndex ):
     def getAllConferencesIds(self):
         return OAIDoubleIndex.getAllElementIds(self)
 
-    def unindexConference( self, cont ):
-        return OAIDoubleIndex.unindexElement(self, cont)
 
 class OAIConferenceModificationDateIndex( OAIConferenceIndex ):
     _name = "OAIConferenceModificationDate"
@@ -1058,10 +1060,6 @@ class OAIDeletedPrivateConferenceModificationDateIndex( OAIPrivateConferenceModi
     _name = "OAIDeletedPrivateConferenceModificationDate"
 
 
-class OAIDeletedPrivateConferenceModificationDateIndex( OAIPrivateConferenceModificationDateIndex ):
-    _name = "OAIDeletedPrivateConferenceModificationDate"
-
-
 class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
     _name = "OAIDeletedConferenceCategory"
 
@@ -1077,33 +1075,18 @@ class OAIDeletedConferenceCategoryIndex( OAIConferenceIndex ):
             self._withdrawItem( catId, conf )
 
     def getConferences(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._words[catId]
 
     def getConferencesIds(self, catId):
-        if not catId in self._ids.keys():
+        if not catId in self._ids:
             return []
         return self._ids[catId]
 
-    def getAllConferences(self):
-        res = []
-        for catId in self._words.keys():
-            res.extend(self._words[catId])
-        return res
-
-    def getAllConferencesIds(self):
-        res = []
-        for catId in self._ids.keys():
-            res.extend(self._ids[catId])
-        return res
 
 class OAIDeletedPrivateConferenceCategoryIndex( OAIDeletedConferenceCategoryIndex ):
     _name = "OAIDeletedPrivateConferenceCategory"
-
-
-class OAIDeletedPrivateContributionCategoryIndex( OAIDeletedContributionCategoryIndex ):
-    _name = "OAIDeletedPrivateContributionCategory"
 
 
 class IndexException(Exception):
@@ -1234,7 +1217,7 @@ class IndexesHolder( ObjectHolder ):
         if id not in self.__allowedIdxs:
             raise MaKaCError( _("Unknown index: %s")%id)
         Idx = self._getIdx()
-        if id in Idx.keys():
+        if id in Idx:
             return Idx[id]
         else:
             if id=="email":

@@ -305,7 +305,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 if not result is True:
                     return result
 
-            self._statusMessage = _("Booking created")
+            self._statusMessage = "Booking created"
             self._statusClass = "statusMessageOK"
             self._bookingParams["id"] = numericId
             self._oldName = self._bookingParams["name"]
@@ -439,7 +439,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             for p in self.getParticipantList(returnSorted = True):
                 self._connectParticipant(p)
 
-            self._statusMessage = _("Conference started!")
+            self._statusMessage = "Conference started!"
             self.checkCanStart(changeMessage = False)
 
     def _connectParticipant(self, participant):
@@ -485,7 +485,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 self._disconnectParticipant(p)
 
             self.checkCanStart()
-            self._statusMessage = _("Conference stopped")
+            self._statusMessage = "Conference stopped"
             self._statusClass = "statusMessageOther"
 
     def _disconnectParticipant(self, participant):
@@ -670,13 +670,13 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 self._canBeStarted = self._numberOfDisconnectedParticipants > 0
                 self._canBeStopped = self._numberOfConnectedParticipants > 0
                 if changeMessage:
-                    self._statusMessage = _("Ready to start!")
+                    self._statusMessage = "Ready to start!"
                     self._statusClass = "statusMessageOK"
             else:
                 self._canBeStarted = False
                 self._canBeStopped = False
                 if now > self.getEndDate() and changeMessage:
-                    self._statusMessage = _("Already took place")
+                    self._statusMessage = "Already took place"
                     self._statusClass = "statusMessageOther"
                     self._needsToBeNotifiedOfDateChanges = False
                     self._canBeNotifiedOfEventDateChanges = False

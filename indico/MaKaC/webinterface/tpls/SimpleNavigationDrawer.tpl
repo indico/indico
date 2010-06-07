@@ -4,7 +4,7 @@
     <a href="<%= urlHandlers.UHWelcome.getURL() %>">
         <%= _("Home") %>
     </a>
-   <img src="<%= systemIcon( "breadcrumb_arrow.png" ) %>"></img>
+   <img src="<%= systemIcon( "breadcrumb_arrow.png" ) %>" />
 </span>
 
     <a href="<% if urlHandler: %><%= urlHandler(**pars) %><% end %><% else: %>#<%end%>">

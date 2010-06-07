@@ -21,6 +21,10 @@ if rbActive:
 else:
     locationList = None
 
+if Location.getDefaultLocation():
+    defaultLocation = Location.getDefaultLocation().friendlyName
+else:
+    defaultLocation = ""
 %>
 <% end %>
 
@@ -80,7 +84,8 @@ var Indico = {
         arrow_up: "<%= iconFileName("upArrow")%>",
         arrow_down: "<%= iconFileName("downArrow")%>",
         indico_small: "<%= iconFileName("indico_small")%>",
-        protected: "<%= iconFileName("protected")%>"
+        protected: "<%= iconFileName("protected")%>",
+        calendarWidget: "<%= iconFileName("calendarWidget") %>"
     },
     FileTypeIcons:
         <%= simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) %>
@@ -132,7 +137,7 @@ var Indico = {
         conference: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) %>,
         category: <%= simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) %>},
         WeekDays: <%= [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] %>,
-        DefaultLocation: '<%= str(Location.getDefaultLocation().friendlyName) %>',
+        DefaultLocation: '<%= str(defaultLocation) %>',
         Locations: <%= jsonEncode(locationList) %>
     },
     Settings: {

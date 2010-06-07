@@ -15,9 +15,6 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
           <a style="vertical-align: middle;" href="<%= urlHandlers.UHConferenceClose.getURL(conf) %>">
               <%= _("Lock") %><div class="leftCorner"></div>
           </a>
-          <a style="vertical-align: middle;" href="<%= urlHandlers.UHConfDeletion.getURL(conf) %>">
-              <%= _("Delete") %><div class="leftCorner"></div>
-          </a>
           <div class="separator"></div>
     <% end %>
 

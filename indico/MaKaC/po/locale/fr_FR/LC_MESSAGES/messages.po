@@ -5210,7 +5210,7 @@ msgid "Number of places"
 msgstr "Nombre de places"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RegistrantModifPrintBadges.tpl:10
-msgid "Print Badges"
+msgid "Print badges"
 msgstr "Afficher les badges"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:79
@@ -9216,7 +9216,7 @@ msgstr ""
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:171
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:194
-msgid "Add New"
+msgid "Add new"
 msgstr "Ajouter nouveau"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/pages/sessions.py:512

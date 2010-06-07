@@ -81,15 +81,22 @@ def main():
                   help="show the stats only for the date d (format dd-mm-yyyy)")
     parser.add_option("-a", "--days", dest="days", action="store", default="0", type="string",
                   help="show the stats only for the last 'a' days")
+    parser.add_option("-v", "--verbose", dest="verbose", action="store_false",
+                  help="show percentage and time remaining")
 
     (options, args) = parser.parse_args()
     objectsToDisplay = options.num
+
+    VERBOSE = False
 
     if options.filename:
         fname = options.filename
     else:
         print "You have to enter the filename, see --help for details"
         return 2
+
+    if options.verbose != None:
+        VERBOSE = True
 
     stats = {}
     start = time.time()
@@ -111,7 +118,7 @@ def main():
             delta = timedelta(days=int(options.days))
 
             if((not int(options.days)) or (now - then < delta)):
-                dateT = strftime("%d-%m-%Y", [int(ts.year()), int(ts.month()), int(ts.day()),0,0,0,0,0,0] )
+                dateT = strftime("%d-%m-%Y", [int(ts.year()), int(ts.month()), int(ts.day()),1,1,1,1,1,1] )
                 percent = float(it._file.tell())/float(size) * 100
                 #Check if we found the searched date
                 if options.date:
@@ -124,7 +131,8 @@ def main():
                 if(percent - lastPercent > interval):
                     spentTime = time.time() - start
                     remainingTime = spentTime / float(it._file.tell()) * (float(size)) - spentTime
-                    sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False), recordsCounter))
+                    if VERBOSE:
+                        sys.stderr.write("\r%f%% complete, time spent %s,  remaining time: %s, recordsCounter %d" % (percent,GetInHMS(time.time() - start, True),  GetInHMS(remainingTime, False), recordsCounter))
 
                     lastPercent = percent
 

@@ -328,7 +328,7 @@ extend(IndicoUI.Dialogs,
 
                        popup.draw = function() {
                            var self = this;
-                           var addButton = Html.input('button', {}, $T("Add"));
+                           var addButton = Html.input('button', {}, isEdit?$T("Save"):$T("Add"));
                            var cancelButton = Html.input('button', {}, $T("Cancel"));
                            cancelButton.dom.style.marginLeft = pixels(10);
 

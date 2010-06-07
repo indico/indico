@@ -28,7 +28,7 @@ from pytz import all_timezones
 from MaKaC.errors import MaKaCError
 
 class TimeTable(object):
-    
+
     def __init__( self, schedule, tz = 'UTC'):
         self.setSlotLengthInMin(5)
         sd, ed = schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz)
@@ -36,22 +36,22 @@ class TimeTable(object):
         self.setEndDate( ed )
         self._sch = schedule
         #self.listEntries = schedule.getEntries()
-        self._tz = tz         
+        self._tz = tz
         self.mapEntryList(self._sch.getEntries())
 
 
-        
 
-        
+
+
     def setStartDate( self, date):
         self.__startDate = date
 
     def getStartDate( self ):
         return self.__startDate
-    
+
     def setEndDate( self, date ):
         self.__endDate = date
-    
+
     def getEndDate( self ):
         return self.__endDate
 
@@ -63,21 +63,21 @@ class TimeTable(object):
 
     def setSlotLengthInMin( self, minutes ):
         self._slotLength = timedelta( minutes=int(minutes) )
-    
+
     def getSlotLength( self ):
         return self._slotLength
 
     def __initialise( self ):
         self._days = []
         iDate = self.getStartDate()
-        eDate = self.getEndDate() 
+        eDate = self.getEndDate()
         dayDict = {}
         dayList = []
-        
+
         while iDate.date()<=eDate.date():
             sTime = timedelta(hours=8)
             eTime = timedelta(hours=18, minutes=59)
-            if self._sch: 
+            if self._sch:
                 s = self._sch.calculateDayStartDate(iDate)
                 schSTime = timedelta(hours=s.hour)
                 e = self._sch.calculateDayEndDate(iDate)
@@ -94,7 +94,7 @@ class TimeTable(object):
 
     def reGenerate( self ):
         self.__initialise()
-    
+
     def getDayList( self ):
         return self._days
 
@@ -102,10 +102,7 @@ class TimeTable(object):
         self.__initialise()
         for day in self.getDayList():
             day.clean()
-        #to be optimised
-        for day in self.getDayList():
-            day.mapEntryList( entryList ) 
-
+            day.mapEntryList( entryList )
 
     def mapContainerList( self, containerList ):
         self.__initialise()
@@ -127,7 +124,7 @@ class TimeTable(object):
             day.compact()
 
 class Day(object):
-    
+
     # def __init__( self, date, startTime, endTime, slotLength):
         # self.__date = date.replace(hour=0,minute=0,second=0)
         # self._tz = date.tzinfo
@@ -149,14 +146,14 @@ class Day(object):
             # eDate = d + iTime_next
             # self.__slots.append( TimeSlot( sDate, eDate ) )
             # iTime = iTime + slotLength
-          
+
 
     # def getStartHour( self ):
         # try:
             # return self.__slots[0].getStartDate().hour
         # except:
             # return 23
-    
+
     # def getEndHour( self ):
         # try:
             # return self.__slots[-1].getEndDate().hour
@@ -185,14 +182,14 @@ class Day(object):
 
     # def mapContainerList( self, l ):
         ##to be MUCH optimised
-        
+
         # for sesSlot in l:
             # entryList = []
             # for contrib in sesSlot.getSchedule().getEntries():
                 # entryList.append(contrib)
             # container = Container(sesSlot)
             # container.setEntries(entryList)
-            # if entryList: 
+            # if entryList:
                 # for entry in entryList:
                     # for slot in self.getSlotList():
                         # slot.mapEntry(entry)
@@ -232,7 +229,7 @@ class Day(object):
                         # slot.mapEntry(entry)
                         # if slot.getEntryList() != []:
                             # slot.mapContainer(container)
-            # else: 
+            # else:
                 # for slot in self.getSlotList():
                     # slot.mapEntry(session)
 
@@ -269,7 +266,7 @@ class Day(object):
             # if i+1 < len(self.getSlotList()):
                 # return self.getSlotList()[i+1]
         # return None
-    
+
 
     # def hasEntryOverlaps(self,entry):
         # for slot in self.getSlotList():
@@ -366,7 +363,7 @@ class Day(object):
             # if max < num:
                 # max = num
         # return max
- 
+
     def __init__( self, date, startTime, endTime, slotLength):
         self.__date = date.replace(hour=0,minute=0,second=0)
         self._tz = date.tzinfo
@@ -391,14 +388,14 @@ class Day(object):
             eDate = self._tz.normalize(eDate)
             self.__slots.append( TimeSlot( sDate, eDate ) )
             iTime = iTime + slotLength
-          
+
 
     def getStartHour( self ):
         try:
             return self.__slots[0].getStartDate().hour
         except:
             return 23
-    
+
     def getEndHour( self ):
         try:
             return self.__slots[-1].getEndDate().hour
@@ -421,7 +418,7 @@ class Day(object):
 
     def getEntryList(self ):
         return self.__entries
-        
+
 
     def addEntry(self, entry):
         self.__entries.append(entry)
@@ -443,14 +440,14 @@ class Day(object):
 
     def mapContainerList( self, l ):
         # to be MUCH optimised
-        
+
         for sesSlot in l:
             entryList = []
             for contrib in sesSlot.getSchedule().getEntries():
                 entryList.append(contrib)
             container = Container(sesSlot)
             container.setEntries(entryList)
-            if entryList: 
+            if entryList:
                 for entry in entryList:
                     for slot in self.getSlotList():
                         slot.mapEntry(entry)
@@ -490,7 +487,7 @@ class Day(object):
                         slot.mapEntry(entry)
                         if slot.getEntryList() != []:
                             slot.mapContainer(container)
-            else: 
+            else:
                 for slot in self.getSlotList():
                     slot.mapEntry(session)
 
@@ -527,7 +524,7 @@ class Day(object):
             if i+1 < len(self.getSlotList()):
                 return self.getSlotList()[i+1]
         return None
-    
+
 
     def hasEntryOverlaps(self,entry):
         for slot in self.getSlotList():
@@ -623,29 +620,29 @@ class Day(object):
                     num+=1
             if max < num:
                 max = num
-        return max               
+        return max
 
 class TimeSlot(object):
-    
+
     def __init__( self, startDateTime, endDateTime ):
         self.__start = startDateTime
         self.__end = endDateTime
         self.__entries = []
         self._containers = []
         self._header = False
-        self._footer = False 
+        self._footer = False
         self._tz = startDateTime.tzinfo
 
     def getStartDate( self ):
         return self.__start
-    
+
     def getAdjustedStartDate( self, tz=None ):
         if not tz:
             tz = self._tz
         else:
             tz = timezone(tz)
         return self.__start.astimezone(tz)
-    
+
     def getEndDate( self ):
         return self.__end
 
@@ -655,7 +652,7 @@ class TimeSlot(object):
         else:
             tz = timezone(tz)
         return self.__end.astimezone(tz)
-    
+
     def getTZ( self ):
         return self._tz
 
@@ -695,7 +692,7 @@ class TimeSlot(object):
         for entry in self.getEntryList():
             l.append( entry.getTitle() )
         return "; ".join( l )
-    
+
     def getNumEntriesOverlaped(self):
         return len(self.__entries)
 
@@ -742,7 +739,7 @@ class TimeSlot(object):
 
     def hasHeaders(self):
         return self._header
-    
+
     def hasFooters(self):
         return self._footer
 
@@ -768,7 +765,7 @@ def sortEntries(x,y):
         return cmp(x.getTitle(),y.getTitle())
 
 class Container(object):
-    
+
     def __init__(self, sesSlot ):
         self._sesSlot = sesSlot
         self._entries = []
@@ -799,16 +796,16 @@ class Container(object):
 
     def getStartDate(self):
         return self._sesSlot.getStartDate()
-    
+
     def getAdjustedStartDate(self, tz=None):
         return self._sesSlot.getAdjustedStartDate(tz)
-    
+
     def getEndDate(self):
         return self._sesSlot.getEndDate()
 
     def getAdjustedEndDate(self, tz=None):
         return self._sesSlot.getAdjustedEndDate(tz)
-    
+
     def getRoom(self):
         return self._sesSlot.getRoom()
 
@@ -844,7 +841,7 @@ class Container(object):
     def isFinalEntry(self, entry, lastSlot, tz):
         # lastSlot is a day object which is not timezone aware.
         d = lastSlot.getStartDate().astimezone(timezone(tz))
-        lastSlotStartDate = d.astimezone(timezone(tz)) 
+        lastSlotStartDate = d.astimezone(timezone(tz))
         if lastSlot:
             return entry.getEndDate() > lastSlotStartDate
         return False
@@ -869,7 +866,7 @@ class Container(object):
 
 
 class PlainTimeTable(object):
-    
+
     def __init__( self, schedule=None, tz = 'UTC' ):
         self._tz = tz
         sd, ed = schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz)
@@ -878,16 +875,16 @@ class PlainTimeTable(object):
 
     def getTZ(self):
         return self._tz
- 
+
     def setStartDate( self, date):
         self._startDate = date
 
     def getStartDate( self ):
         return self._startDate
-    
+
     def setEndDate( self, date):
         self._endDate = date
-    
+
     def getEndDate( self ):
         return self._endDate
 
@@ -914,7 +911,7 @@ class PlainTimeTable(object):
 
 
 class PlainDay(object):
-    
+
     def __init__( self, date ):
         self._date = date
         self._initialise()
@@ -935,7 +932,7 @@ class PlainDay(object):
     def mapEntryList(self,l,aw,highDetail):
         # to be MUCH optimised
         addedSessions = []
-        lastIndex=-1 
+        lastIndex=-1
         tz = self.getTZ()
         for entry in l:
             if self.getDate().date()==entry.getStartDate().astimezone(tz).date():
@@ -954,7 +951,7 @@ class PlainDay(object):
         return self._date
 
 class SessionSlot(object):
-    
+
     def __init__(self,sesSlot,day):
         self._sesSlot=sesSlot
         self._entries=[]
@@ -1033,7 +1030,7 @@ class SessionSlot(object):
 
 
 class ConfEntry(object):
-    
+
     def __init__(self, entry):
         self._entry = entry
 

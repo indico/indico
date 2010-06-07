@@ -20,7 +20,7 @@
 
 # Most of the following imports are probably not necessary - to clean
 
-import os
+import os,time
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.locators as locators
@@ -39,8 +39,8 @@ from MaKaC.rb_room import RoomBase
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
-from MaKaC.rb_tools import intd, FormMode
-from MaKaC.errors import MaKaCError
+from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap
+from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.plugins.pluginLoader import PluginLoader
 
 class CandidateDataFrom( object ):
@@ -159,6 +159,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
     # Room
 
     def _saveRoomCandidateToSession( self, c ):
+        # TODO: is this method needed anymore??
         session = self._websession     # Just an alias
         if self._formMode == FormMode.MODIF:
             session.setVar( "roomID", c.id )
@@ -289,6 +290,11 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candRoom.division = params.get( "division" )
         candRoom.surfaceArea = intd( params.get( "surfaceArea" ) )
         candRoom.comments = params.get( "comments" )
+        #TODO: change this in order to support many periods
+        candRoom.clearNonBookableDates()
+        if params.get("startDateNonBookablePeriod0", "") and params.get("endDateNonBookablePeriod0",""):
+            candRoom.addNonBookableDateFromParams({"startDate": datetime(*(time.strptime(params.get("startDateNonBookablePeriod0"), '%d/%m/%Y')[0:6])),
+                                                   "endDate": datetime(*(time.strptime(params.get("endDateNonBookablePeriod0"), '%d/%m/%Y')[0:6]))})
 
         eqList = []
         vcList = []
@@ -440,10 +446,22 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
             now = now + timedelta( 7 - now.weekday() )
         else:
             now = now + timedelta( 1 )
-        if candResv.startDT == None:
-            candResv.startDT = datetime( now.year, now.month, now.day, 8, 30 )
-        if candResv.endDT == None:
-            candResv.endDT = datetime( now.year, now.month, now.day, 17, 30 )
+
+        # Sets the dates if needed
+        dayD = params.get("day")
+        monthM = params.get("month")
+        yearY = params.get("year")
+
+        if dayD != None and dayD.isdigit() and \
+           monthM != None and monthM.isdigit() and \
+           yearY != None and yearY.isdigit():
+            candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), 8, 30)
+            candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), 17, 30)
+        else:
+            if candResv.startDT == None:
+                candResv.startDT = datetime( now.year, now.month, now.day, 8, 30 )
+            if candResv.endDT == None:
+                candResv.endDT = datetime( now.year, now.month, now.day, 17, 30 )
         if self._getUser():
             if candResv.bookedForName == None:
                 candResv.bookedForName = self._getUser().getFullName()
@@ -866,7 +884,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                 # Prepare 'days' so .getReservations will use days index
                 if resvEx.repeatability == None:
                     resvEx.repeatability = RepeatabilityEnum.daily
-                periods = resvEx.splitToPeriods()
+                periods = resvEx.splitToPeriods(endDT = resvEx.endDT)
                 days = [ period.startDT.date() for period in periods ]
                 if len( days ) > 32:
                     days = None # Using day index won't help
@@ -1015,22 +1033,6 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
 
         self._errors = session.getVar( "errors" )
 
-        # Sets the dates if needed
-        dayD = params.get("day")
-        monthM = params.get("month")
-        yearY = params.get("year")
-
-        if dayD != None and dayD.isdigit() and \
-           monthM != None and monthM.isdigit() and \
-           yearY != None and yearY.isdigit():
-            # If the dates aren't set
-            if candResv.startDT == None:
-                candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), 8, 30)
-                candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), 17, 30)
-            else :
-                candResv.startDT = candResv.startDT.replace(year=int(yearY), month=int(monthM), day=int(dayD))
-                candResv.endDT = candResv.endDT.replace(year=int(yearY), month=int(monthM), day=int(dayD))
-
         self._candResv = candResv
 
         self._clearSessionState()
@@ -1148,6 +1150,10 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
 
         self._candResv = candResv
+
+        for nbd in self._candResv.room.getNonBookableDates():
+            if (doesPeriodsOverlap(nbd.getStartDate(),nbd.getEndDate(),self._candResv.startDT,self._candResv.endDT)):
+                raise FormValuesError("You cannot book this room during the following periods due to maintenance reasons: %s"%("; ".join(map(lambda x: "from %s to %s"%(x.getStartDate().strftime("%d/%m/%Y"),x.getEndDate().strftime("%d/%m/%Y")), self._candResv.room.getNonBookableDates()))))
 
         self._params = params
         self._clearSessionState()

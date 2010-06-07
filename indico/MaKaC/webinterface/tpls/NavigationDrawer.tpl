@@ -12,7 +12,7 @@ while target != None:
         name = target.getName()
     else:
         name = target.getTitle()
-    
+
     if isModif:
         url = UHHelper.getModifUH(type(target)).getURL(target)
     else:
@@ -23,7 +23,7 @@ while target != None:
         url = UHHelper.getDisplayUH(type(target), catType).getURL(target)
 
     l.append( (name, url) )
-    
+
     if type(target) != Abstract:
         target = target.getOwner()
     else:
@@ -34,9 +34,9 @@ while target != None:
                 url = UHHelper.getDisplayUH(Track).getURL(track)
             l.append( (track.getTitle(), url) )
         target = target.getOwner().getOwner()
-        
 
-l.reverse() 
+
+l.reverse()
 
 arrowImage = systemIcon( "breadcrumb_arrow.png" )
 
@@ -46,7 +46,7 @@ arrowImage = systemIcon( "breadcrumb_arrow.png" )
 <span class="path">
     <% for i in range (0, len(l)): %>
         <% if i > 0: %>
-            <img src="<%= arrowImage %>"></img>
+            <img src="<%= arrowImage %>" />
         <% end %>
         <% name, url = l[i] %>
         <a href="<%= url %>">
@@ -57,8 +57,8 @@ arrowImage = systemIcon( "breadcrumb_arrow.png" )
     <% for i in range(0, len(appendPath)): %>
         <% object = appendPath[i] %>
 
-        <img src="<%= arrowImage %>"></img>
-        
+        <img src="<%= arrowImage %>" />
+
         <a href="<%= object["url"] %>"><%= object["title"] %></a>
     <% end %>
 

@@ -21,6 +21,11 @@ type("DateTimeSelector", ["RealtimeTextBox"],
              }
          },
 
+         draw: function() {
+             this.enableEvent();
+             return this.IWidget.prototype.draw.call(this, this.tab);
+         },
+
          set: function(value, direct) {
              // let the programmer choose if for some reason
              // conversion should be bypassed
@@ -56,8 +61,9 @@ type("DateTimeSelector", ["RealtimeTextBox"],
          this.displayFormat = format || IndicoDateTimeFormats.Default;
          this.RealtimeTextBox(args);
 
-         this.input.dom.style.width = '140px';
-
+         this.input;
+         this.trigger = Html.img({src: imageSrc("calendarWidget")});
+         this.tab = Html.div("dateField", this.input, this.trigger);
          var self = this;
 
          this.observe(function() {
@@ -67,9 +73,12 @@ type("DateTimeSelector", ["RealtimeTextBox"],
          // set up the calendar widget to appear on click
          var cal = Calendar.setup({
              inputField: this.input.dom,
+             button: this.trigger.dom,
+             displayArea: this.input,
              eventName: "click",
              ifFormat: this.displayFormat,
              showsTime: true,
+             align: "",
              // notify the selector each time a new date/time is set
              // (since onkeydown/onkeyup won't be called)
              onUpdate: function() { self.notifyChange(); }
@@ -125,6 +134,8 @@ type("StartEndDateWidget", ["InlineEditWidget"],
 
          _handleEditMode: function(value) {
 
+             this.shiftTimes = Html.checkbox({});
+
              // create datefields
              this.startDate = new DateTimeSelector();
              this.endDate = new DateTimeSelector();
@@ -145,7 +156,12 @@ type("StartEndDateWidget", ["InlineEditWidget"],
              });
 
              // call buildStructure with modification widgets
-             return this.__buildStructure(this.startDate.draw(), this.endDate.draw());
+             return Html.div({},
+                             this.__buildStructure(this.startDate.draw(), this.endDate.draw()),
+                             Html.div("widgetCheckboxOption",
+                                      this.shiftTimes,
+                                      Html.span({},
+                                      $T("Move session/contribution times in the timetable accordingly"))));
          },
 
          _handleDisplayMode: function(value) {
@@ -156,8 +172,12 @@ type("StartEndDateWidget", ["InlineEditWidget"],
          },
 
          _getNewValue: function() {
-             return {startDate: Util.parseDateTime(this.startDate.get(), IndicoDateTimeFormats.Server),
-                     endDate: Util.parseDateTime(this.endDate.get(),IndicoDateTimeFormats.Server)};
+             return {startDate: Util.parseDateTime(this.startDate.get(),
+                                                   IndicoDateTimeFormats.Server),
+                     endDate: Util.parseDateTime(this.endDate.get(),
+                                                 IndicoDateTimeFormats.Server),
+                     shiftTimes: this.shiftTimes
+                     };
          },
 
          _verifyInput: function() {

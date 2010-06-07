@@ -1,8 +1,8 @@
-	/* 	
+	/*
 		Default Styles and layout for Conf-pages
 		Do not custom this CSS
 	*/
-	
+
 	/* 	------Wrapper------ */
 	/* 	this is the wrapper of whole conference page */
 
@@ -12,7 +12,7 @@
     margin: 0;
 }
 
-/* 
+/*
     Header
 */
 .confheader {
@@ -83,7 +83,7 @@
     font-family: verdana,arial,sans-serif;
     font-size: 12pt;
     padding-right: 250px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .date {
@@ -94,6 +94,11 @@
     display: inline;
     font-style: italic;
     padding-left: 5px;
+}
+
+div.datePlace > div.timezone {
+    font-size: 10px;
+    color: #777;
 }
 
 /* ------Main content------ */
@@ -144,9 +149,9 @@
 	float:left;
 	width:200px;
 	background:transparent none repeat scroll 0 0;
-}	
+}
 
-	
+
 .menuConfTitle {
 	text-align:left;
 	color:#0200C6;
@@ -164,7 +169,7 @@ a.confSection:link {
 }
 
 	/* sub menu item */
-	
+
 li.menuConfMiddleCell {
     font-weight: normal;
 }
@@ -235,7 +240,7 @@ a.confSupportEmail:link {
 
 .conf_leftMenu li {
 	border-top:none;
-}	
+}
 
 
 /* Fix IE. Hide from IE Mac \*/
@@ -243,19 +248,19 @@ a.confSupportEmail:link {
 * html ul li a { height: 1%; }
 /* End */
 
-		
-li ul.inner li a { 
+
+li ul.inner li a {
     padding: 3px 12px 3px 30px;
     background: transparent url(../images/conf/left_menu_bullet.png) scroll no-repeat 15px center;
 } /* Sub Menu Styles */
-		
+
 li:hover ul, li.over ul { display: block; } /* For dynamic */
 
 
 	/* ------Content------ */
 
 	/* wrapper of content and bradcrumps */
-	
+
 .confBodyBox {
 	margin-left:230px;
 	background:transparent none repeat scroll 0 0;
@@ -268,7 +273,7 @@ li:hover ul, li.over ul { display: block; } /* For dynamic */
 }
 
 	/* This is for if someday you have more than one column in content */
-	
+
 .mainContent {
 	width:100%;
 }
@@ -278,7 +283,7 @@ li:hover ul, li.over ul { display: block; } /* For dynamic */
 	width:100%;
 	float:left;
 	font-family: verdana,arial,sans-serif;;
-}	
+}
 
 
 	/* ------Misc------ */
@@ -294,7 +299,7 @@ table.conferenceDetails td {
 }
 
 table.conferenceDetails .displayField {
-	text-align:left; 
+	text-align:left;
 	font-weight: bold;
 	font-size: 10pt;
 	padding-right: 20px;

@@ -1,6 +1,6 @@
 <script type="text/javascript">
     isOver = false
-    function handleMouseOverResv( id ) { 
+    function handleMouseOverResv( id ) {
 	    if ( isOver ) return
 	    isOver = true
 	    resvTR = document.getElementById( id )
@@ -30,7 +30,7 @@
 					  <td class="dataCaptionFormat"><%= _("Room")%></td>
 					  <td class="dataCaptionFormat"><%= _("Reason")%> /<br /><%= _("For whom")%></td>
 	                  <td class="dataCaptionFormat">
-	                    <%= _("Next")%> / <%= _("Period")%> 
+	                    <%= _("Next")%> / <%= _("Period")%>
 	                    <% inlineContextHelp( _("First line shows date of the <b>next repetition</b>.<br /><br /> Next lines show booking period, or just booking date for non-repeating bookings.") ) %>
 	                  </td>
 					  <td class="dataCaptionFormat"><%= _("Hours")%></td>
@@ -39,9 +39,7 @@
 					<tr>
 						<td class="titleCellTD" colspan="10" style="height: 0px">&nbsp;</td>
 					</tr>
-					<% for r in reservations: %>
-					<%     includeTpl( 'RoomBookingListItem', reservation = r, occurrence = r, withPhoto = True ) %>
-					<% end %>
+					<%     includeTpl( 'RoomBookingListItem', unrolledReservations = reservations, withPhoto = True ) %>
 					<tr>
 						<td class="titleCellTD" colspan="10" style="height: 0px">&nbsp;</td>
 					</tr>

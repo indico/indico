@@ -276,7 +276,7 @@
                                                             <% contextHelp( 'availabilityHelp' ) %>
                                                         </td>
                                                     </tr>
-                                                    <% includeTpl( 'RoomBookingPeriodForm', form = 1 ) %>
+                                                    <% includeTpl( 'RoomBookingPeriodForm', form = 1, unavailableDates = [] ) %>
                                                     <tr id='includePrebookingsTR'>
                                                         <td class="subFieldWidth" align="right" ><small> <%= _("PRE-Bookings")%></small></td>
                                                         <td align="left" class="blacktext">

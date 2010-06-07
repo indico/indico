@@ -155,13 +155,15 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
 type("NoReportErrorDialog", ["AlertPopup"], {
 
     __getTitle: function() {
-        return Html.span('warningTitle', $T("Warning"));
+        var title = this.error.title;
+        return Html.span('warningTitle', title ? title : $T("Warning"));
     },
 
     __getContent: function() {
 
-        var content = Html.div({style: {textAlign: 'center'}});
-        content.append(Html.span({}, this.error.message));
+        var content = Html.div({style: {textAlign: 'left'}});
+        content.append(Html.div({}, this.error.message));
+        content.append(Html.unescaped.div("warningExplanation", this.error.explanation));
 
         if (this.error.code == 'ERR-P4') {
             content.append(Html.div({style:{marginTop:pixels(10)}},

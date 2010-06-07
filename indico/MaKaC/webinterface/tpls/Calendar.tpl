@@ -13,8 +13,8 @@ function checkwhere(e) {
 
     for(var menuKey in menudivs) {
         if (menudivs[menuKey].menuOn && !(menudivs[menuKey].onAnchor)) {
-        
-        if (!((mouseX >= menudivs[menuKey].anchorLeft) && (mouseX <= (menudivs[menuKey].anchorLeft+menudivs[menuKey].menuWidth)) 
+
+        if (!((mouseX >= menudivs[menuKey].anchorLeft) && (mouseX <= (menudivs[menuKey].anchorLeft+menudivs[menuKey].menuWidth))
             && (mouseY >= menudivs[menuKey].anchorTop) && (mouseY <= (menudivs[menuKey].anchorTop+menudivs[menuKey].anchorHeight+menudivs[menuKey].menuHeight)))
             ) {
             hideMenu(menudivs[menuKey].id);
@@ -36,7 +36,7 @@ function getMenuZone(menuId) {  // two rectangles in which the menu should be sh
     var anchor = $E(menudivs[menuId].anchorId).dom;
     menudivs[menuId].anchorWidth  = parseInt(anchor.offsetWidth);
     menudivs[menuId].anchorHeight = parseInt(anchor.offsetHeight);
-} 
+}
 
 function setOnAnchor(menuId) {
     closeAll();
@@ -45,11 +45,11 @@ function setOnAnchor(menuId) {
     menudivs[menuId].menuOn = true;
     menudivs[menuId].onAnchor = true;
     showMenu(menuId);
-}  
+}
 
 function clearOnAnchor(menuId) {
   menudivs[menuId].onAnchor = false;
-}  
+}
 
 function closeAll() {
     for(var menuKey in menudivs) {
@@ -62,7 +62,7 @@ function showMenu(menuId) {
     div.style.left = pixels(menudivs[menuId].anchorLeft);
     div.style.top  = pixels(menudivs[menuId].anchorTop + menudivs[menuId].anchorHeight);
     div.style.visibility = 'visible';
-    
+
     menudivs[menuId].menuOn = true;
 }
 
@@ -82,7 +82,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
 
 <div class="container">
     <div class="categoryHeader">
-        <ul>      
+        <ul>
             <li><a href="<%= categDisplayURL %>"><%= _("Go back to category page") %></a></li>
         </ul>
         <h1 class="categoryTitle">
@@ -90,15 +90,15 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
             <span style="font-style: italic; font-size: 0.8em;">(<%= _("calendar overview") %>)</span>
         </h1>
     </div>
-    
+
     <table width="100%%"><tbody>
     <tr><td width="330" valign="top">
-    
+
     <div class="sideBar clearfix" style="margin-top: 30px; float: none; width: 320px;">
         <div class="leftCorner"></div>
         <div class="rightCorner"></div>
         <div class="content clearfix">
-    
+
             <h1><%= _("Options") %></h1>
                 <form action="%(changeMonthsURL)s" method="GET" id="calendarOptionsForm">
                 <table style="margin: 10px 0 10px 20px; padding: 0; border: none;">
@@ -111,7 +111,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                                 <option>1</option>
                                 <option>2</option>
                                 <option>3</option>
-                                <option>4</option>  
+                                <option>4</option>
                                 <option>5</option>
                                 <option>6</option>
                                 <option>7</option>
@@ -125,7 +125,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                     </tr>
                     <tr>
                         <td><%= _("Starting month")%>:<td>
-                        <td>
+                        <td nowrap="nowrap">
                             <select name="month" style="min-width: 50px;">
                                 <option>1</option>
                                 <option>2</option>
@@ -162,7 +162,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                         </td>
                     </tr>
                     <tr>
-                        <td><%= _("Number of columns")%>:<td>
+                        <td nowrap="nowrap"><%= _("Number of columns")%>:<td>
                         <td>
                             <select name="columns" style="min-width: 50px;">
                                 <option>1</option>
@@ -176,7 +176,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                     </tr>
                   </tbody>
                 </table>
-                
+
                 <div style="text-align: center; margin-bottom: 20px;">
                     <input type="submit" class="btn" value="<%= _("apply")%>">
                 </div>
@@ -184,15 +184,15 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                 <script type="text/javascript">
 
                 var calendarOptionsForm = $E("calendarOptionsForm");
-                
+
                 calendarOptionsForm.dom.months.selectedIndex=%(selectedmonths)s-1;
                 calendarOptionsForm.dom.columns.selectedIndex=%(selectedcolumns)s-1;
                 calendarOptionsForm.dom.month.selectedIndex=%(selectedmonth)s-1;
                 calendarOptionsForm.dom.year.selectedIndex=2012-%(selectedyear)s;
-                
+
                 </script>
 
-            
+
             <h1><%= _("Color legend") %></h1>
             <div class="calendarColorLegend clearfix">
                 %(legend)s

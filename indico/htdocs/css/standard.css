@@ -33,3 +33,16 @@ div.meetingEventBody {
 
 div.meetingEventHeader {
 }
+
+div.meetingEventHeader > div.details,  div.meetingEventHeader a{
+    color: #CCC;
+}
+
+div.meetingEventHeader a:hover {
+    text-decoration: underline;
+    color: #CCC;
+}
+
+div.meetingEventHeader > span.chairedBy {
+    color: #CCC;
+}

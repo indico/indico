@@ -8,6 +8,10 @@
         <td>%(dateInterval)s</td>
     </tr>
     <tr>
+        <td align="right" valign="top" class="displayField"><b> <%= _("Timezone")%>:</b></td>
+        <td>%(timezone)s</td>
+    </tr>
+    <tr>
         <td align="right" valign="top" class="displayField"><b> <%= _("Location")%>:</b></td>
         <td>%(location)s</td>
     </tr>

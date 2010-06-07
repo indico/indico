@@ -18,27 +18,37 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""File containing MaKaC exception class hierarchy
 """
+Module containing the MaKaC exception class hierarchy
+"""
+
 from MaKaC.i18n import _
 
 class MaKaCError(Exception):
 
-    def __init__( self, msg="",area="" ):
+    def __init__( self, msg="",area="", explanation = None):
         self._msg = msg
         self._area = area
+        self._explanation = explanation
 
     def getMsg( self ):
         return self._msg
-    
+
     def __str__(self):
         if self._area != "":
-            return "%s - %s"%(self._area,self._msg)  
+            return "%s - %s"%(self._area,self._msg)
         else:
             return self._msg
 
     def getArea(self):
         return self._area
+
+    def getExplanation(self):
+        """
+        Some extra information, like actions that can be taken
+        """
+
+        return self._explanation
 
 
 class AccessControlError(MaKaCError):
@@ -49,7 +59,8 @@ class AccessControlError(MaKaCError):
 
     def __str__( self ):
         return _("you are not authorised to access this %s")%self.objType
-    
+
+
 class ConferenceClosedError(MaKaCError):
     """
     """
@@ -58,11 +69,10 @@ class ConferenceClosedError(MaKaCError):
 
     def __str__( self ):
         return _("the event has been closed")
-    
 
 
 class DomainNotAllowedError(AccessControlError):
-    
+
     def __str__( self ):
         return _("your domain is not allowed to acces this %s")%self.objType
 
@@ -72,10 +82,12 @@ class AccessError(AccessControlError):
     """
     pass
 
+
 class HostnameResolveError(MaKaCError):
     """
     Hostname resolution failed
     """
+
 
 class ModificationError(AccessControlError):
     """
@@ -83,46 +95,54 @@ class ModificationError(AccessControlError):
     def __str__( self ):
         return _("you are not authorised to modify this %s")%self.objType
 
+
 class AdminError(AccessControlError):
     """
     """
     def __str__(self):
         return _("only administrators can access this %s")%self.objType
 
+
 class WebcastAdminError(AccessControlError):
     """
     """
     def __str__(self):
         return "only webcast administrators can access this %s"%self.objType
-    
+
+
 class TimingError(MaKaCError):
     """
+    Timetable problems
     """
-    def __init__( self, msg="",area=""):
-        self._msg = msg
-        self._area = area
+
+    def __init__(self, msg = "", area = "", explanation = None):
+        MaKaCError.__init__(self, msg, area, explanation)
+
 
 class ParentTimingError(TimingError):
     """
     """
     pass
 
+
 class EntryTimingError(TimingError):
     """
     """
     pass
+
 
 class UserError(MaKaCError):
     """
     """
     def init(self, msg = ""):
         self._msg = msg
-    
+
     def __str__(self):
         if self._msg:
             return self._msg
         else:
             return _("Error creating user")
+
 
 class FormValuesError(MaKaCError):
     """
@@ -131,21 +151,24 @@ class FormValuesError(MaKaCError):
         self._msg = msg
         self._area = area
 
+
 class NoReportError(MaKaCError):
     """
     """
     def __init__( self, msg="", area=""):
         self._msg = msg
         self._area = area
-        
+
+
 class PluginError(MaKaCError):
     pass
-    
+
 
 class htmlScriptError(MaKaCError):
     """
     """
     pass
+
 
 class htmlForbiddenTag(MaKaCError):
     """

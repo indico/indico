@@ -33,7 +33,8 @@ div.calendar {
     z-index: 4;
     border: 1px solid #888888;
     padding: 1px;
-    width: 183px;
+    width: 182px;
+    margin: 0px;
 }
 
 .calendar, .calendar table {
@@ -251,6 +252,7 @@ div.calendar {
   border: 1px solid #889;
   font-weight: bold;
   background-color: #fff;
+  margin:0px;
 
 }
 

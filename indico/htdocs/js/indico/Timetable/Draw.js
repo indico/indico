@@ -152,7 +152,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
 
                     this.locationDiv  = Html.div('timetableBlockLocation');
                     var addComma = false;
-                    if (this.eventData.room) {
+                    if (this.eventData.room && this.timetable.getTimetableDrawer().layoutChooser.get().shouldShowRoom()) {
                         this.locationDiv.append(this.eventData.room);
                         addComma = true;
                     }
@@ -295,17 +295,29 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 if (!this.compactMode) {
                     var locationMaxWidth = parentDivWidth  - 20;
 
-                    // Hide the time if there are not enough space
+                    // Hide the time if there is not enough space
                     if (this.timeDiv.dom.offsetWidth + 8 >= parentDivWidth) {
                         this.timeDiv.dom.style.display = 'none';
                     }
-                    else if (contentWidth() >= parentDivWidth) {
+                    // If at this point the width of the content fits but the height of the content
+                    // is bigger than the height of the parent div, it is probably because the
+                    // location takes more than one line in the block. For this edge case we force
+                    // the hiding of the time div so that the location div takes only one line.
+                    else if (contentWidth() >= parentDivWidth || contentHeight() >= parentDivHeight) {
                         this.timeDiv.dom.style.display = 'none';
                     } else {
                         locationMaxWidth -= this.timeDiv.dom.offsetWidth;
                     }
 
-                    this.locationDiv.dom.style.maxWidth = pixels(locationMaxWidth);
+                    this.locationDiv.dom.style.maxWidth = locationMaxWidth > 0 ?
+                        pixels(locationMaxWidth) : '0px';
+
+                    // After modifying the location width, the content of the location might be expaneded
+                    // on two lines. Therefore, we should re-check if there is enought space for the time.
+                    if (contentWidth() >= parentDivWidth || contentHeight() >= parentDivHeight) {
+                        this.timeDiv.dom.style.display = 'none';
+                        this.locationDiv.dom.style.maxWidth = pixels(parentDivWidth  - 20);
+                    }
 
                     // Presenters information should not take more than half of the space of the block
                     if (this.presentersDiv && this.presentersDiv.dom.offsetWidth > parentDivWidth / 2) {
@@ -331,7 +343,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 }
 
                 // Try to remove the location info, and set title font weight to non bold,
-                // if this works then we're done otherwisestart to truncate the title as well.
+                // if this works, then we're done. Otherwise, start to truncate the title as well.
                 if (this.timeDiv.dom.style.display == 'none') {
                     this.locationDiv.dom.style.display = 'none';
                 }
@@ -358,7 +370,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 //String will be shorten by the value of 'step'
                 var step = 2;
                 //Truncating the title since it can be displayed in a single line
-                while (contentHeight() > parentDivHeight && topContentWidth() > parentDivWidth * 0.8) {
+                // title !== "..." avoids the endless loop
+                while (title !== "..." && contentHeight() > parentDivHeight && topContentWidth() > parentDivWidth * 0.8) {
                     title = this.truncateTitle(-step, title);
                     this.titleDiv.set(title);
                 }
@@ -1222,7 +1235,7 @@ type("TimetableDrawer", ["IWidget"],
                                                fontSize: '11px'}}, zeropad(hour)+':00'));
              }
 
-             return scaleDiv;
+             return Html.div({}, this.layoutChooser.get().getHeader(this.width), scaleDiv);
          },
 
          _drawWholeDayBlocks: function(data, blocks) {
@@ -1272,7 +1285,7 @@ type("TimetableDrawer", ["IWidget"],
 
              each(blocks, function(blockData) {
 
-                 var nCol = groups[blockData.group][1];
+                 var nCol = self.layoutChooser.get().getNumColumnsForGroup(groups[blockData.group]);
 
                  var colWidth = Math.floor((self.width-TimetableDefaults.leftMargin) / nCol);
 

@@ -86,16 +86,16 @@ class RHSearchBase:
         return md5.new(uniqueId).hexdigest()
 
     def _getStartingRecord(self, queryHash, page):
-        obj = SECache().loadObject([self._sessionHash, "%s_"%queryHash])
+        obj = SECache().loadObject('', self._sessionHash, queryHash)
 
         if page == 1:
             Logger.get("search").debug("first page")
             # first page, start with 0
             return 0, None
-        elif obj and obj.getData().has_key(page):
-            Logger.get("search").debug("hit! %s %s", (obj.getData()[page], obj))
+        elif obj and obj.getContent().has_key(page):
+            Logger.get("search").debug("hit! %s %s", (obj.getContent()[page], obj))
             # cache hit!
-            return obj.getData()[page], obj
+            return obj.getContent()[page], obj
         else:
             Logger.get("search").debug("miss")
             # cache miss, force first page to be loaded
@@ -103,14 +103,16 @@ class RHSearchBase:
             return 0, None
 
     def _cacheNextStartingRecord(self, queryHash, page, record, obj):
-        if not obj:
-            obj = SECacheEntry(self._sessionHash, queryHash)
-        
-        obj.setPage(self._page+1, record+1)
+        if obj:
+            data = obj.getContent()
+        else:
+            data = {}
 
-        Logger.get("search").debug("set page: %s" % obj._data)
-        
-        SECache().cacheObject(obj, "")
+        data[self._page+1] = record + 1
+
+        Logger.get("search").debug("set page: %s" % data)
+
+        SECache().cacheObject('', data, self._sessionHash, queryHash)
 
 
     def _loadBatchOfRecords(self, user, collection, number, start):

@@ -97,7 +97,7 @@ def run(path, days, notPacked):
         delta = timedelta(days=int(days))
 
         if(now - then < delta):
-            dateT = strftime("%Y-%m-%d", [int(ts.year()), int(ts.month()), int(ts.day()),0,0,0,0,0,0] )
+            dateT = strftime("%Y-%m-%d", [int(ts.year()), int(ts.month()), int(ts.day()),1,1,1,1,1,1] )
             try:
                 stats[dateT] = stats[dateT] + th.length
             except KeyError:

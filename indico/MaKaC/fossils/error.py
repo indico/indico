@@ -33,3 +33,15 @@ class ICausedErrorFossil(IFossil):
 
     def getType(self):
         pass
+
+class INoReportErrorFossil(ICausedErrorFossil):
+
+    def getTitle(self):
+        """
+        A title for the error message - will be shown on the client side
+        """
+
+    def getExplanation(self):
+        """
+        Additional error information (can be shown on the client side)
+        """

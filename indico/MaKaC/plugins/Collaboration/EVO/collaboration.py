@@ -24,7 +24,7 @@ from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException, \
-    getMinStartDate, getMaxEndDate, OverlappedError, EVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
+    getMinStartDate, getMaxEndDate, OverlappedError, EVOError, ChangesFromEVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
 #    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
 #    EVOMeetingRemovalNotificationManager
@@ -444,7 +444,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             return ChangesFromEVOError(changesFromEVO)
 
     def bookingOK(self):
-        self._statusMessage = _("Booking created")
+        self._statusMessage = "Booking created"
         self._statusClass = "statusMessageOK"
         self._created = True
 
@@ -457,13 +457,13 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 self._canBeStarted = True
                 self._canBeDeleted = False
                 if changeMessage:
-                    self._statusMessage = _("Ready to start!")
+                    self._statusMessage = "Ready to start!"
                     self._statusClass = "statusMessageOK"
             else:
                 self._canBeStarted = False
                 if now > self.getEndDate() and changeMessage:
                     self._canBeDeleted = False
-                    self._statusMessage = _("Already took place")
+                    self._statusMessage = "Already took place"
                     self._statusClass = "statusMessageOther"
                     self._needsToBeNotifiedOfDateChanges = False
                     self._canBeNotifiedOfEventDateChanges = False

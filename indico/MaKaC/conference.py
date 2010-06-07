@@ -24,9 +24,14 @@ from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContributionFossil, ISubContributionWithSpeakersFossil
 from MaKaC.fossils.contribution import IContributionParticipationFossil,\
-    IContributionFossil, IContributionWithSpeakersFossil,\
-    IContributionWithSubContribsFossil
-from MaKaC.fossils.conference import IConferenceMinimalFossil
+    IContributionFossil, IContributionWithSpeakersFossil, IContributionParticipationMinimalFossil, \
+    IContributionWithSubContribsFossil,\
+    IContributionParticipationTTDisplayFossil, \
+    IContributionParticipationTTMgmtFossil
+from MaKaC.fossils.conference import IConferenceMinimalFossil,\
+    ISessionFossil, ISessionSlotFossil, IMaterialFossil,\
+    IConferenceParticipationFossil, IResourceFossil, ILinkFossil,\
+    ILocalFileFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 import re, os
@@ -1504,7 +1509,9 @@ class CustomRoom(Persistent):
         return self.name
 
 
-class ConferenceParticipation(Persistent):
+class ConferenceParticipation(Persistent, Fossilizable):
+
+    fossilizes(IConferenceParticipationFossil)
 
     @Retrieves(['MaKaC.conference.ConferenceParticipation',
                  'MaKaC.conference.SessionChair',
@@ -2552,13 +2559,13 @@ class Conference(Persistent, Fossilizable):
     def getAbstractMgr(self):
         return self.abstractMgr
 
-    def notifyModification( self, date=None ):
+    def notifyModification( self, date=None, updateChildren=False):
         """Method called to notify the current conference has been modified.
         """
         if not date:
             date = nowutc()
         self._modificationDS = date
-        self.notifyOAIModification(date=date)
+        self.notifyOAIModification(date=date, updateChildren = updateChildren)
         self.cleanCache()
         self._p_changed=1
 
@@ -2794,21 +2801,63 @@ class Conference(Persistent, Fossilizable):
         self._p_changed=1
 
     def setDates( self, sDate, eDate=None, check=1, moveEntries=0 ):
-        if sDate>eDate:
+        """
+        Set the start/end date for a conference
+        """
+
+        oldStartDate = self.getStartDate()
+        oldEndDate = self.getEndDate()
+
+        # do some checks first
+        if sDate > eDate:
+            # obvious case
             raise MaKaCError( _("Start date cannot be after the end date"), _("Event"))
-        oldStartDate=copy.copy(self.getStartDate())
-        oldEndDate=copy.copy(self.getEndDate())
-        if sDate==oldStartDate and eDate==oldEndDate:
+
+        elif sDate == oldStartDate and eDate == oldEndDate:
+            # if there's nothing to do (yet another obvious case)
             return
+
+        # if we reached this point, it means either the start or
+        # the end date (or both) changed
+        # If only the end date was changed, moveEntries = 0
+        if sDate == oldStartDate:
+            moveEntries = 0
+
+        # Pre-check for moveEntries
+        if moveEntries == 1:
+            # in case the entries are to be simply shifted
+            # we should make sure the interval is big enough
+            # just store the old values for later
+
+            oldInterval = oldEndDate - oldStartDate
+            newInterval = eDate - sDate
+
+            if oldInterval > newInterval:
+                raise TimingError(
+                    _("The start/end dates were not changed since the selected "
+                      "timespan is not large enough to accomodate the contained "
+                      "timetable entries and spacings."),
+                    explanation =
+                    _("You should try using a larger timespan."))
+
+        # so, we really need to try changing something
+        # let's get to work and remove the conference from the date indexes
         self.unindexConf()
 
+        # set the dates
         self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
         self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
 
+        # sanity check
         self._checkInnerSchedule()
+
+        # reindex the conference
         self.indexConf()
+
+        # clear the category cache
         self.cleanCategoryCache()
 
+        # notify observers
         for observer in self.getObservers():
             try:
                 observer.notifyEventDateChanges(oldStartDate, self.getStartDate(), oldEndDate, self.getEndDate())
@@ -3120,7 +3169,7 @@ class Conference(Persistent, Fossilizable):
 
         self.title = title
         self.cleanCategoryCache()
-        self.notifyModification()
+        self.notifyModification(updateChildren = True)
 
         #we notify the observers that the conference's title has changed
         for observer in self.getObservers():
@@ -5313,7 +5362,7 @@ class SCIndex(Persistent):
         self._idx._p_changed=1
 
 
-class Session(Persistent):
+class Session(Persistent, Fossilizable):
     """This class implements a conference session, being the different parts
         in which the conference can be divided and the contributions can be
         organised in. The class contains necessary attributes to store session
@@ -5322,6 +5371,7 @@ class Session(Persistent):
         conference but it is allowed for flexibility.
     """
 
+    fossilizes(ISessionFossil)
 
     @Retrieves(['MaKaC.conference.Session'], 'numSlots', lambda x : len(x.getSlotList()))
 
@@ -6803,7 +6853,9 @@ class Session(Persistent):
         return cmp( s1, s2 )
     _cmpTitle=staticmethod(_cmpTitle)
 
-class SessionSlot(Persistent):
+class SessionSlot(Persistent, Fossilizable):
+
+    fossilizes(ISessionSlotFossil)
 
     def __init__(self,session,**sessionSlotData):
         self.session = session
@@ -7450,7 +7502,9 @@ class SessionSlot(Persistent):
 
 class ContributionParticipation(Persistent, Fossilizable):
 
-    fossilizes(IContributionParticipationFossil)
+    fossilizes(IContributionParticipationFossil, IContributionParticipationMinimalFossil,\
+               IContributionParticipationTTDisplayFossil,\
+               IContributionParticipationTTMgmtFossil)
 
     def __init__( self ):
         self._contrib = None
@@ -7864,7 +7918,8 @@ class Contribution(Persistent, Fossilizable):
         attached either to a session or to a conference.
     """
 
-    fossilizes(IContributionFossil, IContributionWithSpeakersFossil, IContributionWithSubContribsFossil)
+    fossilizes(IContributionFossil, IContributionWithSpeakersFossil,\
+                IContributionWithSubContribsFossil)
 
     def __init__(self,**contribData):
         self.parent = None
@@ -9761,6 +9816,19 @@ class Contribution(Persistent, Fossilizable):
         else:
             return maxDatetime()
 
+    @Retrieves(['MaKaC.conference.Contribution'], 'color')
+    def getColor(self):
+        res=""
+        if self.getSession() is not None:
+            res=self.getSession().getColor()
+        return res
+
+    @Retrieves(['MaKaC.conference.Contribution'], 'textColor')
+    def getTextColor(self):
+        res=""
+        if self.getSession() is not None:
+            res=self.getSession().getTextColor()
+        return res
 
 class AcceptedContribution( Contribution ):
     """This class represents a contribution which has been created from an
@@ -10802,7 +10870,7 @@ class SubContribution(Persistent, Fossilizable):
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
 
-class Material(Persistent):
+class Material(Persistent, Fossilizable):
     """This class represents a set of electronic documents (resources) which can
         be attached to a conference, a session or a contribution.
         A material can be of several types (achieved by specialising this class)
@@ -10822,6 +10890,8 @@ class Material(Persistent):
             material. Dictionary of references to Resource objects indexed
             by their unique relative id.
     """
+
+    fossilizes(IMaterialFossil)
 
     def __init__( self, materialData=None ):
         self.id = "not assigned"
@@ -11547,7 +11617,7 @@ class Minutes(Material):
             Material.recoverResource(self, recRes)
 
 
-class Resource(Persistent):
+class Resource(Persistent, Fossilizable):
     """This is the base class for representing individual resources which can
         be included in material containers for lately being attached to
         conference objects (i.e. conferences, sessions or contributions). This
@@ -11565,6 +11635,8 @@ class Resource(Persistent):
         __owner - (Material) reference to the material object in which the
             current resource is included.
     """
+
+    fossilizes(IResourceFossil)
 
     @Retrieves (['MaKaC.conference.Link',
                  'MaKaC.conference.LocalFile'], 'type', lambda r: if_else(type(r) == Link , 'external', 'stored'))
@@ -11907,6 +11979,8 @@ class Link(Resource):
         url -- (string) Contains the URL to the internet target resource.
     """
 
+    fossilizes(ILinkFossil)
+
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )
         self.url = ""
@@ -11943,6 +12017,8 @@ class LocalFile(Resource):
         __archivedId -- (string) It contains a unique identifier for the file
             inside the repository where it is archived.
     """
+
+    fossilizes(ILocalFileFossil)
 
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )

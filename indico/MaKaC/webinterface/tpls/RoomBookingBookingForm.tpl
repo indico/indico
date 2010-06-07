@@ -11,16 +11,16 @@
         var f1 = $('bookingForm')
         period_clean_redouts( f1 )
         f1.bookedForName.className = f1.contactEmail.className = f1.contactPhone.className = f1.reason.className = ''
-        
+
         var isValid = true
         isValid = validate_period( f1, true, <%= allowPast %>  ) && isValid
         isValid = required_fields( ['bookedForName', 'contactEmail', 'reason'] ) && isValid
-        
+
         if ( !valid_email( $F( 'contactEmail' ) ) )
         {
             isValid = false
             $('contactEmail').className = 'invalid'
-        } 
+        }
 
         // Holidays warning
         if ( isValid && !onSubmit )
@@ -28,7 +28,7 @@
             new Ajax.Updater(
                 'holidays-warning',
                 '<%= urlHandlers.UHRoomBookingGetDateWarning.getURL() %>',
-                { parameters: $(f1).serialize(true) } 
+                { parameters: $(f1).serialize(true) }
             );
         }
 
@@ -41,10 +41,10 @@
   	  var oneChecked = false;
 
 	  $$('input.videoConferenceOption').each(function(elem){
-	    if (elem.checked) 
+	    if (elem.checked)
 	    {
 	      oneChecked = true;
-	    }	  
+	    }
 	  });
 
 	  if (!oneChecked) {
@@ -58,21 +58,21 @@
 
         return isValid;
     }
-    
+
     function submit_booking()
     {
         $('bookingForm').action = "<%= saveBookingUH.getURL( conf ) %>"
         $('bookingForm').submit()
     }
-    
 
 
-    
+
+
 </script>
 
     <!-- CONTEXT HELP DIVS -->
 	<div id="tooltipPool" style="display: none">
-        <!-- Where is key? --> 
+        <!-- Where is key? -->
         <div id="whereIsKeyHelp" class="tip">
              <%= _("How to obtain a key? Often just a phone number.")%>
         </div>
@@ -125,7 +125,7 @@
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("When")%></span></td>
                                 <td>
                                     <table width="100%%">
-                                        <% includeTpl( "RoomBookingPeriodForm", repeatability = candResv.repeatability, form = 0 ) %>
+                                        <% includeTpl( "RoomBookingPeriodForm", repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates() ) %>
                                     </table>
                                 </td>
                             </tr>
@@ -169,8 +169,8 @@
                                                 <td align="left" class="blacktext">
                                                     <input id="usesAVC" name="usesAVC" type="checkbox" <% if candResv.usesAVC: %> checked="checked" <% end%> />
                                                     <% contextHelp( 'iWillUseVideoConferencing' ) %>
-                                                    
-                                                    
+
+
                                                 </td>
                                             </tr>
                                             <tr>
@@ -223,7 +223,7 @@
                         </td>
                     </tr>
                 </table>
-                
+
             </td>
         </tr>
     </table>
@@ -231,8 +231,8 @@
     <br />
     <!-- Just to initialize -->
     <script type="text/javascript">
-        Event.observe( window, 'load', 
-            function () 
+        Event.observe( window, 'load',
+            function ()
             {
                 if ( forms_are_valid() )
                     set_repeatition_comment();
@@ -240,7 +240,7 @@
             }
         );
         <% if candResv.room.needsAVCSetup: %>
-            alert("The conference room you have chosen is equiped\\nfor video-conferencing and video-projection.\\nIf you need this equipment, DO NOT FORGET to select it.\\nIf you don't need any of this equipment please choose\\nanother room, if a suitable one is free on a suitable\\nlocation for your meeting.\\n\\n\\n                    Thank you for your understanding.") 
+            alert("The conference room you have chosen is equiped\\nfor video-conferencing and video-projection.\\nIf you need this equipment, DO NOT FORGET to select it.\\nIf you don't need any of this equipment please choose\\nanother room, if a suitable one is free on a suitable\\nlocation for your meeting.\\n\\n\\n                    Thank you for your understanding.")
         <% end %>
 
     </script>

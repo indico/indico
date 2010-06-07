@@ -35,7 +35,6 @@ var files = [
 	"Data/DateTime.js",
 	"Data/Files.js",
 	"Data/Cookies.js",
-	"Data/Service.js",
 	"Ui/MimeTypes.js",
 	"Ui/Dom.js",
 	"Ui/XElement.js",

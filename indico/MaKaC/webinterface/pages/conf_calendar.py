@@ -37,18 +37,18 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 
 
 class WPCalendarBase( WPMainBase ):
-    
+
     def __init__( self, rh, calendar, categ=None ):
         main.WPMainBase.__init__( self, rh )
         self._cal  = calendar
         self._categ = categ
-        self._locTZ = timezoneUtils.DisplayTZ(self._getAW(),None,useServerTZ=1).getDisplayTZ() 
-        
+        self._locTZ = timezoneUtils.DisplayTZ(self._getAW(),None,useServerTZ=1).getDisplayTZ()
+
     def _getTitle(self):
-        return WPMainBase._getTitle(self) + " - " + _("Calendar Overview")    
+        return WPMainBase._getTitle(self) + " - " + _("Calendar Overview")
 
 class WPSimpleCalendarBase( WPNotDecorated ):
-    
+
     def __init__( self, rh, month, year, day, form ):
         # month/year indicates which month should be displayed in the calendar
         # day indicates if a day should be highlighted in the calendar
@@ -57,11 +57,11 @@ class WPSimpleCalendarBase( WPNotDecorated ):
         self._year = year
         self._day = day
         self._form = form
-    
+
 
 class CategColorList:
     _colorList = ["#f4dabe",  "#bcdff2", "#f7f4c0", "#CCFF99", "#e0baef", "#ecf409", "#FFFFCC" ]
-    
+
     def __init__( self, categList ):
         self._colorDict = {}
         self._colorIdx = 0
@@ -77,29 +77,29 @@ class CategColorList:
             #return "#CCCCCC"
         else:
             color = self._colorList[self._colorIdx]
-            self._colorIdx += 1    
+            self._colorIdx += 1
             return color
 
     def getColor( self, categ ):
         if not self._colorDict.has_key( categ.getId() ):
             return None
         return self._colorDict[ categ.getId() ]
-            
-            
+
+
 class WCalendarMonthItem:
-    
+
     def __init__( self, month, multipleColor, categColors, cal ):
         self._month = month
         self._cal = cal
         self._multipleColor = multipleColor
         self._categColors = categColors
 
-    def _getDiv( self, day ): 
+    def _getDiv( self, day ):
         fulldate = "%s%02d%02d" % (self._month.getYear(),self._month.getMonthNumber(),day.getDayNumber())
         res = [ """
-<div id=d%s style="Z-INDEX: 1; visibility: hidden; POSITION: absolute">
+<div id="d%s" class="calendarList">
   <table cellSpacing=0 cellPadding=1 bgcolor="#A0A0A0" border=0>
-    <tr> 
+    <tr>
       <td valign=top>
         <table cellSpacing=0 cellPadding=4 bgcolor="#FFFFFF" border=0>"""%fulldate ]
         for conf in day.getConferences():
@@ -119,7 +119,7 @@ class WCalendarMonthItem:
                 maincolor = self._categColors.getColor( categs[0] )
             title = conf.getTitle()
             res.append("""
-          <tr bgcolor="#ECECEC" %s> 
+          <tr bgcolor="#ECECEC" %s>
             <td valign=top>%s<a href="%s?confId=%s">%s</a></td>
           </tr>""" % (maincolor,"\n".join(colors),urlHandlers.UHConferenceDisplay.getURL(), conf.getId(),title))
         res.append("""
@@ -141,12 +141,12 @@ class WCalendarMonthItem:
 </script>
 """%(fulldate,fulldate,fulldate,fulldate,fulldate,fulldate,fulldate,fulldate,fulldate))
         return "\n".join(res)
-        
-        
+
+
     def getHTML( self ):
         res = []
         divs = []
-        
+
         for day in self._month.getDayList():
             fulldate = "%s%02d%02d" % (self._month.getYear(),self._month.getMonthNumber(),day.getDayNumber())
             if day.getDayNumber() == 1:
@@ -228,7 +228,7 @@ class WCalendar(wcomponents.WTemplated):
         for month in self._cal.getMonthList():
             if idx == self._cal.getNrColumns():
                 res.append("</tr>\n<tr>")
-                idx = 0 
+                idx = 0
             m = WCalendarMonthItem( month, self._multipleColor, cl, self._cal)
             res.append(""" <td valign="top">%s</td>"""%m.getHTML() )
             idx += 1
@@ -254,9 +254,9 @@ class WCalendar(wcomponents.WTemplated):
         vars["selectedyear"] = int(self._cal.getStartDate().strftime("%Y"))
         return vars
 
-   
+
 class WPCalendar( WPCalendarBase ):
-    
+
     def _getBody( self, params ):
         wc = WCalendar( self._getAW(), self._cal )
         cat = self._categ
@@ -275,7 +275,7 @@ class WPCalendar( WPCalendarBase ):
         for id in catList:
             params["selCategsURL"] += "&xs="+id
         return wc.getHTML( params )
-    
+
     def _getNavigationDrawer(self):
         link = [{"url": urlHandlers.UHCalendar.getURL([self._categ]), "title": _("Calendar overview"), "type": "Calendar"}]
         pars = {"target": self._categ, "isModif": False}
@@ -283,7 +283,7 @@ class WPCalendar( WPCalendarBase ):
 
 
 class MulSelectCategTree:
-    
+
     def __init__( self, aw ):
         self._aw = aw
         self._number = Counter()
@@ -318,8 +318,8 @@ class MulSelectCategTree:
                     cfg.getSystemIconURL("itemCollapsed"), \
                     title )
         return html
-        
-    
+
+
     def getHTML( self, selected, expanded, expandURLGen ):
         self._selCategs = selected
         self._expandedCategs = expanded
@@ -329,7 +329,7 @@ class MulSelectCategTree:
 
 
 class WCalendarSelectCategs( wcomponents.WTemplated ):
-    
+
     def __init__( self, aw, cal ):
         self._aw = aw
         self._cal = cal
@@ -354,7 +354,7 @@ class WCalendarSelectCategs( wcomponents.WTemplated ):
 
 
 class WPCalendarSelectCategories( WPCalendarBase ):
-    
+
     def _getExpandedCategURL( self, exList ):
         url = urlHandlers.UHCalendarSelectCategories.getURL( self._cal )
         ex = []
@@ -362,7 +362,7 @@ class WPCalendarSelectCategories( WPCalendarBase ):
             ex.append( categ.getId() )
         url.addParam( "xs", ex )
         return url
-    
+
     def _getBody( self, params ):
         wc = WCalendarSelectCategs( self._getAW(), self._cal )
         return wc.getHTML( params["expanded"], \
@@ -440,13 +440,13 @@ class WSimpleCalendar(wcomponents.WTemplated):
 
 
 class WPSimpleCalendar( WPSimpleCalendarBase):
-    
+
     def _getBody( self, params ):
         wc = WSimpleCalendar( self._getAW(), self._month, self._year, self._day )
-        pars = { "daystring": self._rh.getRequestParams().get('daystring',""), 
-                "monthstring": self._rh.getRequestParams().get('monthstring', ""), 
-                "yearstring": self._rh.getRequestParams().get('yearstring', ""), 
-                "month": self._rh.getRequestParams().get('month', str(datetime.now().strftime("%m"))), 
+        pars = { "daystring": self._rh.getRequestParams().get('daystring',""),
+                "monthstring": self._rh.getRequestParams().get('monthstring', ""),
+                "yearstring": self._rh.getRequestParams().get('yearstring', ""),
+                "month": self._rh.getRequestParams().get('month', str(datetime.now().strftime("%m"))),
                 "year": self._rh.getRequestParams().get('year', str(datetime.now().strftime("%Y"))),
                 "form": self._rh._form }
         return wc.getHTML( pars )
@@ -462,7 +462,7 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
         self._date = date
         self._type = type
         self._id = id
-        
+
     def _displayMonth( self):
         id=self._id
         type=self._type
@@ -470,28 +470,28 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
         year = self._year
         today = date.today()
         res = []
-        
-        
+
+
         url = urlHandlers.UHGetCalendarOverview.getURL()
         url.addParam("selCateg", id)
         url.addParam("period",type)
-        
+
         nextMonth= urlHandlers.UHGetCalendarOverview.getURL()
         previousMonth= urlHandlers.UHGetCalendarOverview.getURL()
         nextYear= urlHandlers.UHGetCalendarOverview.getURL()
         previousYear= urlHandlers.UHGetCalendarOverview.getURL()
-        
+
         nextMonth.addParam("selCateg", id)
         previousMonth.addParam("selCateg", id)
         nextYear.addParam("selCateg", id)
         previousYear.addParam("selCateg", id)
-       
+
         nextMonth.addParam("period",type)
         previousMonth.addParam("period",type)
         nextYear.addParam("period",type)
         previousYear.addParam("period",type)
-        
-        
+
+
         for day in range(1,calendar.monthrange(year,month)[1]+1):
             if day == 1:
                 for i in range(calendar.weekday(year,month,day)):
@@ -504,13 +504,13 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
                 #for highlight multiple dates
                 for date2 in self._date:
                     (d,m,y) = date2.split("-")
-                    
+
                     try:
                         if date(year,month,day) == date(int(y),int(m),int(d)):
                             bgcolor="#ffcccc"
                     except Exception,e:
                         raise "%s-%s-%s------%s-%s-%s\nself._date:%s\ndate2:%s"%(year,month,day,y,m,d, self._date,date2)
-                    
+
                     url.addParam("day", day)
                     url.addParam("month",month)
                     url.addParam("year", year)
@@ -520,11 +520,11 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
                 bgcolor="#ccffcc"
 
             res.append( """<td align="right" bgcolor="%s"><a href="%s">%s</a></td>"""%(bgcolor,strUrl,day ))
-            
+
             if calendar.weekday(year,month,day) == 6:
                 res.append("</tr><tr>")
 
-        if month >=12:            
+        if month >=12:
             nextMonth.addParam("year",year+1)
             nmonth = 1
         else:
@@ -538,7 +538,7 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
             nextMonth.addParam("day", mrange)
         else:
             nextMonth.addParam("day", d)
-             
+
         if month <= 1:
             pmonth = 12
             previousMonth.addParam("year", year-1)
@@ -559,7 +559,7 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
         previousYear.addParam("day",d)
         previousYear.addParam("month",month)
         previousYear.addParam("year",year-1)
-        
+
         strnm = "%s"%nextMonth
         strpm = "%s"%previousMonth
         strny = "%s"%nextYear
@@ -594,7 +594,7 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
                 </table>
               """) %(strpy,strpm,datetime(1900,month,1).strftime("%B"), year,strnm,strny, "\n".join(res))
         return html
-    
+
 
     #def getVars( self ):
     #    vars = wcomponents.WTemplated.getVars( self )

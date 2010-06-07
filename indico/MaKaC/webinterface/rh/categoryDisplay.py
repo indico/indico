@@ -391,6 +391,7 @@ class UtilsConference:
         c.setOrgText(confData.get("orgText",""))
         c.setComments(confData.get("comments",""))
         c.setKeywords( confData["keywords"] )
+        c.setChairmanText( confData.get("chairText", "") )
         if "shortURLTag" in confData.keys():
             tag = confData["shortURLTag"].strip()
             if c.getUrlTag() != tag:

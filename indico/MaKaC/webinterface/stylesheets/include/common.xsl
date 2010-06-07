@@ -30,6 +30,7 @@
     <xsl:param name="item"/>
     <xsl:param name="confId"/>
     <xsl:param name="sessId"/>
+    <xsl:param name="sessCode"/>
     <xsl:param name="contId"/>
     <xsl:param name="subContId"/>
     <xsl:param name="uploadURL"/>
@@ -40,7 +41,7 @@
         to the popup menu arrow.
     -->
     <xsl:param name="alignMenuRight">false</xsl:param>
-    <xsl:variable name="menuName">menu<xsl:value-of select="$confId"/><xsl:value-of select="$sessId"/><xsl:value-of select="$contId"/><xsl:value-of select="$subContId"/></xsl:variable>
+    <xsl:variable name="menuName">menu<xsl:value-of select="$confId"/><xsl:value-of select="translate($sessCode, '-','')"/><xsl:value-of select="$contId"/><xsl:value-of select="$subContId"/></xsl:variable>
 
     <xsl:if test="$item/modifyLink != '' or $item/materialLink != '' or $item/minutesLink != ''">
         <!-- script that creates a variable for a menu  -->
@@ -89,7 +90,7 @@
         ]]>
         </xsl:text>
         <xsl:choose>
-            <xsl:when test="$item/modifyLink != '' and $sessId = '' and $contId = '' and $subContId = ''">
+            <xsl:when test="$item/modifyLink != '' and $sessCode = '' and $contId = '' and $subContId = ''">
             'Edit event': '<xsl:value-of select="$item/modifyLink"/>',
             </xsl:when>
             <xsl:when test="$item/modifyLink != '' and $subContId != 'null'">
@@ -98,7 +99,7 @@
             <xsl:when test="$item/modifyLink != '' and $contId != 'null'">
             'Edit contribution': '<xsl:value-of select="$item/modifyLink"/>',
             </xsl:when>
-            <xsl:when test="$item/modifyLink != '' and $sessId != 'null'">
+            <xsl:when test="$item/modifyLink != '' and $sessCode != 'null'">
             'Edit session': '<xsl:value-of select="$item/modifyLink"/>',
             </xsl:when>
             <xsl:when test="$item/modifyLink != ''">
@@ -114,7 +115,7 @@
             '<xsl:value-of select="$contId"/>',
             '<xsl:value-of select="$subContId"/>');m.close();return false;},
         </xsl:if>
-        <xsl:if test="$sessId = '' and $contId = '' and $subContId = ''">
+        <xsl:if test="$sessCode = '' and $contId = '' and $subContId = ''">
             'Compile minutes': function(m){if (confirm('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.')) {
             IndicoUI.Dialogs.writeMinutes('<xsl:value-of select="$confId"/>',
             '<xsl:value-of select="$sessId"/>',
@@ -143,18 +144,6 @@
         <xsl:text disable-output-escaping="yes"><![CDATA[")],null, false, ]]></xsl:text>
         <xsl:value-of select="$alignMenuRight"/>
         <xsl:text disable-output-escaping="yes"><![CDATA[);</script>]]></xsl:text>
-
-        <!--
-        <xsl:if test="$item/modifyLink != ''">
-            <a href="{$item/modifyLink}"><img src="images/manage.png"  alt="modify this item" title="modify this item" style="vertical-align: middle;"/></a>
-        </xsl:if>
-        <xsl:if test="$item/minutesLink != ''">
-            <a href="#" onclick="IndicoUI.Dialogs.writeMinutes({$confId},{$sessId},{$contId},{$subContId});return false;"><img src="images/write_minutes.png" alt="write minutes" style="vertical-align: middle; margin-left:2px;margin-right:0px;" title="write minutes"/></a>
-        </xsl:if>
-        <xsl:if test="$item/materialLink != ''">
-            <a href="#" onclick="IndicoUI.Dialogs.Material.editor({$confId},{$sessId},{$contId},{$subContId},Indico.Data.MaterialTypes.meeting, {$uploadURL});return false;"><img src="images/file_shadow.png" border="0" alt="submit material" style="vertical-align: middle; margin-left:2px;margin-right:0px;" title="submit material"/></a>
-        </xsl:if>
-        -->
     </xsl:if>
 
 </xsl:template>
@@ -166,7 +155,7 @@
 	<span class="{$span}">
 	<xsl:apply-templates select="./name"/>
 	<xsl:if test="./organization != ''">
-		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<i><xsl:value-of select="./organization" disable-output-escaping="yes"/></i>)
+		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<xsl:value-of select="./organization" disable-output-escaping="yes"/>)
 	</xsl:if>
 	</span>
 </xsl:template>
@@ -177,7 +166,7 @@
 	<xsl:apply-templates select="./title"/>
 	<xsl:apply-templates select="./name"/>
 	<xsl:if test="./organization != ''">
-		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<i><xsl:value-of select="./organization" disable-output-escaping="yes"/></i>)
+		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<xsl:value-of select="./organization" disable-output-escaping="yes"/>)
 	</xsl:if>
 	</span>
 </xsl:template>

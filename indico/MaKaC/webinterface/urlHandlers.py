@@ -815,6 +815,14 @@ class UHAbstractManagmentAccept( URLHandler ):
     _relativeURL = "abstractManagment.py/accept"
 
 
+class UHAbstractManagmentAcceptMultiple( URLHandler ):
+    _relativeURL = "abstractManagment.py/acceptMultiple"
+
+
+class UHAbstractManagmentRejectMultiple( URLHandler ):
+    _relativeURL = "abstractManagment.py/rejectMultiple"
+
+
 class UHAbstractManagmentReject( URLHandler ):
     _relativeURL = "abstractManagment.py/reject"
 

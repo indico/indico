@@ -157,6 +157,14 @@
                                             <td align="left" class="blacktext"><%= linkify( verbose( room.comments ) ) %></td>
                                         </tr>
                                         <tr>
+                                            <td align="right" valign="top"><small> <%= _("Unavailable booking periods")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext">
+                                            <% if room.getNonBookableDates(): %>
+                                                <ul><li><%= "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), room.getNonBookableDates() )) %></li></ul>
+                                            <% end %>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td align="right" valign="top"><small>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
                                                 <% if not room.isReservable: %>

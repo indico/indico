@@ -42,8 +42,8 @@
     },
 
     customText : function(booking) {
-        if (booking.acceptRejectStatus === false && trim(booking.rejectionReason)) {
-            return $T("Rejection reason: ") + trim(booking.rejectionReason);
+        if (booking.acceptRejectStatus === false && trim(booking.rejectReason)) {
+            return $T("Rejection reason: ") + trim(booking.rejectReason);
         }
     },
 

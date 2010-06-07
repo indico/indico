@@ -6248,7 +6248,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             # (collision is just a helper object, it's not the best notion here)
 
             for r in rh._resvs:
-                for p in r.splitToPeriods(endDT=calendarEndDT):
+                for p in r.splitToPeriods(endDT=calendarEndDT, startDT=calendarStartDT):
                     if p.startDT >= calendarStartDT and p.endDT <= calendarEndDT:
                         collisionsOfResvs.append( Collision( ( p.startDT, p.endDT ), r ) )
 
@@ -6705,6 +6705,12 @@ class WRoomBookingRoomForm( WTemplated ):
         else:
             vars["responsibleName"] = ""
 
+        nbd = candRoom.getNonBookableDates()
+        if len(nbd) == 0:
+            from MaKaC.plugins.RoomBooking.default.room import NonBookableDate
+            nbd = [NonBookableDate(None, None)]
+        vars["nonBookableDates"] = nbd
+
         return vars
 
 
@@ -7075,4 +7081,31 @@ class WBeautifulHTMLDict(WTemplated):
         vars["DivClassName"] = self.__classNames.get("DivClassName", "")
         vars["KeyClassName"] = self.__classNames.get("KeyClassName", "")
         vars["Level"] = self.__level
+        return vars
+
+
+class WFilterCriteria(WTemplated):
+    """
+    Draws the options for a filter criteria object
+    This means rendering the actual table that contains
+    all the HTML for the several criteria
+    """
+
+    def __init__(self, options, filterCrit, extraInfo=""):
+        WTemplated.__init__(self, tpl_name = "FilterCriteria")
+        self._filterCrit = filterCrit
+        self._options = options
+        self._extraInfo = extraInfo
+
+    def _drawFieldOptions(self, formName, form):
+        raise Exception("Method WFilterCriteria._drawFieldOptions must be overwritten")
+
+    def getVars(self):
+
+        vars = WTemplated.getVars( self )
+
+        vars["extra"] = self._extraInfo
+
+        vars["content"] =  list((name, self._drawFieldOptions(name, form))
+                                for (name, form) in self._options)
         return vars
