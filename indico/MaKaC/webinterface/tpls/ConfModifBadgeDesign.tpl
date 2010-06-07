@@ -698,11 +698,11 @@
 
         <td colspan="2">
           <select id='font selector' onChange="changeFont()" name="Template Element Font">
-            <optgroup label="Normal Fonts">
+            <optgroup label="<%= _('Normal Fonts') %>">
               <option>Times New Roman</option>
               <option>Courier</option>
             </optgroup>
-            <optgroup label="Special Character Fonts">
+            <optgroup label="<%= _('Special Character Fonts') %>">
               <option>LinuxLibertine</option>
               <option>Kochi-Mincho</option>
               <option>Kochi-Gothic</option>
@@ -721,16 +721,16 @@
 
         <td width="100%%">
           <select id='color selector' name="Template Element Color" onchange="changeColor()">
-            <option> <%= _("black")%></option>
-            <option> <%= _("red")%></option>
-            <option> <%= _("blue")%></option>
-            <option> <%= _("green")%></option>
-            <option> <%= _("yellow")%></option>
-            <option> <%= _("brown")%></option>
-            <option> <%= _("gold")%></option>
-            <option> <%= _("pink")%></option>
-            <option> <%= _("gray")%></option>
-            <option> <%= _("white")%></option>
+            <option value="black"> <%= _("black")%></option>
+            <option value="red"> <%= _("red")%></option>
+            <option value="blue"> <%= _("blue")%></option>
+            <option value="green"> <%= _("green")%></option>
+            <option value="yellow"> <%= _("yellow")%></option>
+            <option value="brown"> <%= _("brown")%></option>
+            <option value="gold"> <%= _("gold")%></option>
+            <option value="pink"> <%= _("pink")%></option>
+            <option value="gray"> <%= _("gray")%></option>
+            <option value="white"> <%= _("white")%></option>
           </select>
         </td>
 
@@ -744,10 +744,10 @@
 
         <td colspan="2">
           <select id='style selector' name="Template Element Style" onchange="changeStyle()">
-            <option> <%= _("Normal")%></option>
-            <option> <%= _("Bold")%></option>
-            <option> <%= _("Italic")%></option>
-            <option> <%= _("Bold &amp; Italic")%></option>
+            <option value="Normal"> <%= _("Normal")%></option>
+            <option value="Bold"> <%= _("Bold")%></option>
+            <option value="Italic"> <%= _("Italic")%></option>
+            <option value="Bold &amp; Italic"> <%= _("Bold &amp; Italic")%></option>
           </select>
         </td>
 
@@ -757,13 +757,13 @@
 
         <td width="100%%">
           <select id='size selector' name="Template Element Size" onchange="changeSize()">
-            <option> <%= _("xx-small")%></option>
-            <option> <%= _("x-small")%></option>
-            <option> <%= _("small")%></option>
-            <option SELECTED> <%= _("medium")%></option>
-            <option> <%= _("large")%></option>
-            <option> <%= _("x-large")%></option>
-            <option> <%= _("xx-large")%></option>
+            <option value="xx-small"> <%= _("xx-small")%></option>
+            <option value="x-small"> <%= _("x-small")%></option>
+            <option value="small"> <%= _("small")%></option>
+            <option value="medium" SELECTED> <%= _("medium")%></option>
+            <option value="large"> <%= _("large")%></option>
+            <option value="x-large"> <%= _("x-large")%></option>
+            <option value="xx-large"> <%= _("xx-large")%></option>
           </select>
         </td>
       </tr>
@@ -775,10 +775,10 @@
         <td colspan="2">
           <select id='alignment selector' name="Template Element Alignment" onChange="changeAlignment()">
             <!-- Note: the text of the options is used directly in the style attribute of the items -->
-            <option> <%= _("Left")%></option>
-            <option> <%= _("Right")%></option>
-            <option> <%= _("Center")%></option><br>
-            <option> <%= _("Justified")%></option>
+            <option value="Left"> <%= _("Left")%></option>
+            <option value="Right"> <%= _("Right")%></option>
+            <option value="Center"> <%= _("Center")%></option><br>
+            <option value="Justified"> <%= _("Justified")%></option>
           </select>
         </td>
         <td class="titleCellTD">
