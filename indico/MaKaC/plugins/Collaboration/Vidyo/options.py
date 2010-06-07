@@ -67,13 +67,13 @@ globalOptions = [
                          "type": str,
                          "defaultValue": "http://vidyoportal2.cern.ch/services/"}),
 
-    ("adminAPISuffix", {"description" : _("Admin API suffix"),
+    ("adminAPIURL", {"description" : _("Admin API WSDL URL"),
                          "type": str,
-                         "defaultValue": "VidyoPortalAdminService?wsdl"}),
+                         "defaultValue": "http://vidyoportal2.cern.ch/services/VidyoPortalAdminService?wsdl"}),
 
-    ("userAPISuffix", {"description" : _("User API suffix"),
+    ("userAPIURL", {"description" : _("User API WSDL URL"),
                        "type": str,
-                       "defaultValue": "VidyoPortalUserService?wsdl"}),
+                       "defaultValue": "http://vidyoportal2.cern.ch/services/VidyoPortalUserService?wsdl"}),
 
     ("prefix", {"description": _("Prefix for rooms created by Indico"),
                        "type": str,
