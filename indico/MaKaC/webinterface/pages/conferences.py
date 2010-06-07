@@ -11254,7 +11254,7 @@ class WConfModifPendingQueues( wcomponents.WTemplated ):
 
             for key in keys:
                 list.append((key, self._pendingCoordinators[key][:]))
-                list.sort(conference.SessionCoordinator._cmpFamilyName)
+                list.sort(conference.ConferenceParticipation._cmpFamilyName)
 
         html = WConfModifPendingQueuesList(str(url), title, target, list, pType).getHTML()
         vars["pendingQueue"]=wcomponents.WTabControl(self._tabCtrl, self._aw).getHTML(html)
