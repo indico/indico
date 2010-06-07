@@ -19,7 +19,12 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Contains tests about some typical "call for abstracts" scenarios.
+# For now, disable Pylint
+# pylint: disable-all
+
+
+"""
+Contains tests about some typical "call for abstracts" scenarios.
 """
 
 import unittest

@@ -20,12 +20,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Modifies the location of indico.conf referenced inside makacconfigpy_path to
-point to indico_conf_path
+This module provides the functional tests that will be executed.
+It uses selenium rc and selenium grid.
 """
-import os
-import re
-fdata = open(os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py')).read()
-fdata = re.sub('indico_conf[ ]*=[ ]*[\'"]{1}([^\'"]*)[\'"]{1}',
-               "indico_conf = \"%s\"" % os.path.join('etc', 'indico.conf'), fdata)
-open(os.path.join('indico', 'MaKaC', 'common', 'MaKaCConfig.py'), 'w').write(fdata)

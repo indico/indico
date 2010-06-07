@@ -19,6 +19,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# For now, disable Pylint
+# pylint: disable-all
+
 """
 Contains tests regarding some scenarios related to submission and archiving
 of files.

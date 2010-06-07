@@ -34,11 +34,116 @@ import StringIO
 from indico.tests.util import TeeStringIO, colored
 from indico.tests.config import TestConfig
 
-class BaseTestRunner(object):
+
+class TestOptionException(Exception):
+    """
+    Raised when a particular runner doesn't support an option
+    """
+
+class IOMixin(object):
+    """
+    Mixin class that provides some simple utility functions
+    for error/info messages in the console
+    """
+
+    @classmethod
+    def _info(cls, message):
+        """
+        Prints an info message
+        """
+        print colored("** %s" % message, 'blue')
+
+    @classmethod
+    def _success(cls, message):
+        """
+        Prints an info message
+        """
+        print colored("** %s" % message, 'green')
+
+    @classmethod
+    def _error(cls, message):
+        """
+        Prints an error message
+        """
+        print colored("** %s" % message, 'red')
+
+
+class OptionProxy(object):
+    """
+    Encapsulates all the options present in a TestRunner,
+    providing a common access point, and controlling some
+    "hot spots" as well
+    """
+
+    def __init__(self, allowedOptions):
+        self._optionTable = allowedOptions
+        self._options = {}
+
+    def call(self, runner, event, *args):
+        """
+        Invoked from a code hot spot, so that the option can
+        perform operations
+        """
+
+        for option in self._options.values():
+            if hasattr(option, event) and option.shouldExecute():
+                getattr(option, event)(runner, *args)
+
+    def configure(self, **kwargs):
+        """
+        Initializes the options based on command line parameters
+        """
+
+        for optName, optClass  in self._optionTable.iteritems():
+            if optName in kwargs:
+                self._options[optName] = optClass(kwargs[optName])
+            else:
+                self._options[optName] = optClass(False)
+
+        for optName in kwargs:
+            if optName not in self._optionTable:
+                raise TestOptionException("Option '%s' not allowed here!" %
+                                          optName)
+
+
+    def valueOf(self, optName):
+        """
+        Returns the direct value of an option
+        """
+        if optName in self._options:
+            return self._options[optName].value
+        else:
+            return None
+
+
+class Option(IOMixin):
+    """
+    Represents an option for a TestRunner
+    """
+
+    def __init__(self, value):
+        self.value = value
+
+    def shouldExecute(self):
+        """
+        Determines if the Option should be taken into account (hot spots),
+        depending on the context
+        """
+        return True
+
+
+class BaseTestRunner(IOMixin):
     """
     Base class for all other TestRunners.
     A TestRunner runs a specific kind of test (i.e. UnitTestRunner)
     """
+
+    # overloaded for each runner, contains allowed options for each runner
+
+    # for this case:
+    #   * silent - True if the output shouldn't be redirected to the console
+
+    _runnerOptions = {'silent': Option}
 
     # path to this current file
     setupDir = os.path.dirname(__file__)
@@ -47,16 +152,17 @@ class BaseTestRunner(object):
         """
         Options can be passed as kwargs, currently the following is supported:
 
-         * verbose - if the output should be redirected to the console in
-        addition to the log file;
         """
 
-        self.options = kwargs
         self.err = None
         self.out = None
 
         # make a TestConfig instance available everywhere
         self.config = TestConfig.getInstance()
+
+        # initialize allowed options
+        self.options = OptionProxy(self._runnerOptions)
+        self.options.configure(**kwargs)
 
     def _run(self):
         """
@@ -74,15 +180,25 @@ class BaseTestRunner(object):
         # of the docstring
         description =  self.__doc__.strip().split('\n')[0]
 
-        print colored("** Running %s" % description, 'yellow', attrs = ['bold'])
+        self._startIOCapture()
 
-        return self._run()
+        self._info("Running %s" % description)
 
-    def info(self, message):
-        """
-        Prints an info message
-        """
-        print colored("** %s" % message, 'blue')
+        self._callOptions('pre_run')
+        result = self._run()
+        self._callOptions('post_run')
+
+        if result:
+            self._success("%s successful!" % description)
+        else:
+            self._error("%s failed!" % description)
+
+        # ask the option handlers to compute a final message
+        self._callOptions('final_message')
+        self._writeReport(self.__class__.__name__,
+                          self._finishIOCapture())
+
+        return result
 
     def _startIOCapture(self):
         """
@@ -91,16 +207,17 @@ class BaseTestRunner(object):
         stdout/stderr as well
         """
 
-        if self.options['verbose']:
-            # capture I/O but display it as well
-            self.err = TeeStringIO(sys.stderr)
-            self.out = TeeStringIO(sys.stdout)
-        else:
+        if self.options.valueOf('silent'):
             # just capture it
             self.err = StringIO.StringIO()
-            self.out = StringIO.StringIO()
+            self.out = self.err
+        else:
+            # capture I/O but display it as well
+            self.out = TeeStringIO(sys.stdout)
+            self.err = TeeStringIO(sys.stderr, targetStream = self.out)
         sys.stderr = self.err
         sys.stdout = self.out
+
 
 
     def _finishIOCapture(self):
@@ -110,8 +227,7 @@ class BaseTestRunner(object):
         sys.stderr = sys.__stderr__
         sys.stdout = sys.__stdout__
 
-        return (self.out.getvalue(),
-                self.err.getvalue())
+        return self.out.getvalue()
 
     @staticmethod
     def _redirectPipeToStdout(pipe):
@@ -124,18 +240,20 @@ class BaseTestRunner(object):
                 break
             print data,
 
-    def writeReport(self, filename, content):
+    def _writeReport(self, filename, content):
         """
         Write the test report, using the filename and content that are passed
         """
+        filePath = os.path.join(self.setupDir, 'report', filename + ".txt")
         try:
-            f = open(os.path.join(self.setupDir, 'report', filename + ".txt"), 'w')
+            f = open(filePath, 'w')
             f.write(content)
             f.close()
-            return ""
         except IOError:
             return "Unable to write in %s, check your file permissions." % \
                     os.path.join(self.setupDir, 'report', filename + ".txt")
+
+        self._info("report in %s" % filePath)
 
     @staticmethod
     def walkThroughFolders(rootPath, foldersPattern):
@@ -151,3 +269,14 @@ class BaseTestRunner(object):
                 foldersArray.append(root)
 
         return foldersArray
+
+    def _callOptions(self, method, *args):
+        """
+        Invokes the option proxy, providing the hot spot with name 'method',
+        that options should have extended
+        """
+
+        # invoke the option proxy
+        self.options.call(self, method, *args)
+
+

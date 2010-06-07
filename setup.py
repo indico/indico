@@ -315,7 +315,8 @@ class test_indico(Command):
                     ('grid', None, "Use Selenium Grid"),
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
-                    ('full-output', None, "Write the results to the console, in addition to the log file")]
+                    ('parallel', None, "Parallel test execution (for --functional)"),
+                    ('silent', None, "Don't output anything in the console, just generate the report")]
     boolean_options = []
 
     specify = None
@@ -328,9 +329,10 @@ class test_indico(Command):
     jscoverage = False
     jsspecify = None
     grid = None
-    full_output = False
+    silent = False
     html = False
     record = False
+    parallel = False
 
     def initialize_options(self):
         pass
@@ -340,12 +342,12 @@ class test_indico(Command):
 
     def run(self):
 
-        if not self.checkIndicopPackages():
+        if not self.checkTestPackages():
             print "Please install those missing packages before launching the tests again"
             sys.exit(-1)
 
         #missing jars will be downloaded automatically
-        if not self.checkIndicopJars():
+        if not self.checkTestJars():
             print "Some jars could not be downloaded. Please download the missing jars manually"
             sys.exit(-1)
 
@@ -360,27 +362,29 @@ class test_indico(Command):
 
         if self.jsspecify and 'jsunit' not in testsToRun:
             testsToRun.append('jsunit')
-        if self.specify != None and 'specify' not in testsToRun:
-            testsToRun.append('specify')
 
         if testsToRun == []:
             testsToRun = allTests
 
 
-        options = {'verbose': self.full_output,
+        options = {'silent': self.silent,
                    'html': self.html,
                    'specify': self.specify,
                    'coverage': self.coverage,
-                   'record': self.record}
+                   'record': self.record,
+                   'parallel': self.parallel}
+
+        # get only options that are active
+        options = dict((k,v) for (k,v) in options.iteritems() if v)
 
         #this variable will tell what to do with the databases
         fakeDBPolicy = self.checkDBStatus(testsToRun, self.specify)
 
         manager = TestManager()
+
         result = manager.main(fakeDBPolicy, testsToRun, options)
 
-        print result
-
+        sys.exit(result)
 
     def checkDBStatus(self, testsToRun, specify):
         from indico.tests import TestConfig
@@ -388,7 +392,7 @@ class test_indico(Command):
         from MaKaC.common.Configuration import Config
 
         fakeDBPolicy = 0
-        if ('functional' in testsToRun) or ('grid' in testsToRun) or ((specify != None) and (specify.find('unit/') < 0)):
+        if ('functional' in testsToRun) or ('grid' in testsToRun):
 
             params = Config.getInstance().getDBConnectionParams()
 
@@ -413,14 +417,15 @@ Do you want to stop it using this command '%s' and run the tests?
 
             else:
                 fakeDBPolicy = 2
-        elif 'unit' in testsToRun or 'specify' in testsToRun:
+        elif 'unit' in testsToRun:
             fakeDBPolicy = 1
 
         return fakeDBPolicy
 
-    def checkIndicopPackages(self):
+    def checkTestPackages(self):
         packagesList = ['figleaf',
                         'nose',
+                        'rednose',
                         'selenium',
                         'twill']
         validPackages = True
@@ -435,10 +440,14 @@ i.e. try 'easy_install %s'""" % (package, package)
                 validPackages = False
         return validPackages
 
-    def checkIndicopJars(self):
+    def checkTestJars(self):
+        """
+        check if needed jars are here, if not,
+        dowload them and unzip the file if necessary
+        """
+
         from indico.tests import TestConfig
 
-        """check if needed jars are here, if not, dowloading them and unzip a file if necessary"""
         jarsList = {}
         currentFilePath = os.path.dirname(__file__)
         testModPath = os.path.join(currentFilePath, 'indico', 'tests')
@@ -447,15 +456,15 @@ i.e. try 'easy_install %s'""" % (package, package)
             jarsList['jsunit'] = {'path':     os.path.join(testModPath,
                                                            'javascript',
                                                            'unit'),
-                                  'url':      TestConfig.getInstance().getJsunitURL(),
-                                  'filename': TestConfig.getInstance().getJsunitFilename()}
+                                  'url':      TestConfig.getInstance().getJSUnitURL(),
+                                  'filename': TestConfig.getInstance().getJSUnitFilename()}
 
             jarsList['jscoverage'] = {'path':     os.path.join(testModPath,
                                                                'javascript',
                                                                'unit',
                                                                'plugins'),
-                                      'url':      TestConfig.getInstance().getJscoverageURL(),
-                                      'filename': TestConfig.getInstance().getJscoverageFilename()}
+                                      'url':      TestConfig.getInstance().getJSCoverageURL(),
+                                      'filename': TestConfig.getInstance().getJSCoverageFilename()}
 
             jarsList['selenium'] = {'path':      os.path.join(testModPath,
                                                               'python',
@@ -474,7 +483,7 @@ i.e. try 'easy_install %s'""" % (package, package)
             jar = jarsList[name]
             #check if jar is already here
             if not os.path.exists(os.path.join(jar['path'], jar['filename'])):
-                print "Downloading %s..." % jar['filename']
+                print "Downloading %s to %s..." % (jar['url'], jar['path'])
                 try:
                     self.download(jar['url'], jar['path'])
 

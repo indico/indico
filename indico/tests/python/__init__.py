@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
+## $Id$
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -18,17 +19,6 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# For now, disable Pylint
-# pylint: disable-all
-
-
-from ZEO.runzeo import ZEOOptions, ZEOServer
-
-class TestZEOServer:
-    def __init__(self, port, file):
-        self.options = ZEOOptions();
-        self.options.realize(['-f',file,'-a','localhost:%d' % port])
-        self.server = ZEOServer(self.options)
-
-    def start(self):
-        self.server.main()
+"""
+Test suite for all the Indico Python code
+"""

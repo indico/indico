@@ -204,7 +204,7 @@ class Fossilizable:
         cls.__fossilAttrsCache = {}
 
     @classmethod
-    def _fossilizeIterable(cls, target, interface, useAttrCache = False, **kwargs):
+    def fossilizeIterable(cls, target, interface, useAttrCache = False, **kwargs):
         """
         Fossilizes an object, be it a 'direct' fossilizable
         object, or an iterable (dict, list, set);
@@ -219,10 +219,12 @@ class Fossilizable:
             elif ttype is dict:
                 container = {}
                 for key, value in target.iteritems():
-                    container[key] = fossilize(value, interface, useAttrCache, **kwargs)
+                    container[key] = fossilize(value, interface, useAttrCache,
+                                               **kwargs)
                 return container
             elif hasattr(target, '__iter__'):
-                #we turn sets and tuples into lists since JSON does not have sets / tuples
+                # we turn sets and tuples into lists since JSON does not
+                # have sets / tuples
                 return list(fossilize(elem,
                                       interface,
                                       useAttrCache,
@@ -284,7 +286,7 @@ class Fossilizable:
                 targetInterface = interface[method].getTaggedValue('result')
                 #targetInterface = globals()[targetInterfaceName]
 
-                methodResult = Fossilizable._fossilizeIterable(
+                methodResult = Fossilizable.fossilizeIterable(
                     methodResult, targetInterface, **kwargs)
 
             # Conversion function
@@ -350,4 +352,5 @@ def fossilize(target, interfaceArg = None, useAttrCache = False, **kwargs):
     :param useAttrCache: use the attribute caching
     :type useAttrCache: boolean
     """
-    return Fossilizable._fossilizeIterable(target, interfaceArg, useAttrCache, **kwargs)
+    return Fossilizable.fossilizeIterable(target, interfaceArg, useAttrCache,
+                                           **kwargs)

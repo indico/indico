@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
@@ -24,13 +25,13 @@ class VidyoTestSetup(object):
     @classmethod
     def setup(cls):
 
-        # lazy loading, as the plugin system imports everything, and we really
-        # don't need this, except for testing
-        from TestsConfig import TestsConfig
+        # lazy import because we don't want it to be imported by default
+        # (as the plugin system currently loads all submodules)
+        from indico.tests.config import TestConfig
 
         PluginsHolder().loadAllPlugins()
 
-        testConfig = TestsConfig.getInstance()
+        testConfig = TestConfig.getInstance()
         vidyoOptions = CollaborationTools.getPlugin("Vidyo").getOptions()
 
         vidyoOptions["indicoUsername"].setValue(testConfig.getCollaborationOptions()["Vidyo"]["indicoUsername"])

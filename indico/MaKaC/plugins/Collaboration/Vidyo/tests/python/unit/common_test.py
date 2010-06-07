@@ -19,7 +19,7 @@
 
 import unittest
 from MaKaC.common.db import DBMgr
-from MaKaC.plugins.Collaboration.Vidyo.common import AdminClient, UserClient
+from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient, UserClient
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.Vidyo.tests.python.unit.vidyoTestTools import VidyoTestSetup
 

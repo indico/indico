@@ -1,3 +1,27 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+# For now, disable Pylint
+# pylint: disable-all
+
+
 from MaKaC.common.fossilize import IFossil, Fossilizable, fossilizes, fossilize, \
     NonFossilizableException, WrongFossilTypeException, addFossil,\
     InvalidFossilException
@@ -279,7 +303,7 @@ class TestFossilize(unittest.TestCase):
 
         s1 = SimpleClass(10, 20, 'foo')
         d1 = DerivedClass(10, 50, 'bar')
-        self.assertEquals(fossilize([s1, d1], {"MaKaC_tests.common_tests.testFossilize.SimpleClass": ISimpleFossil2Fossil, "MaKaC_tests.common_tests.testFossilize.DerivedClass": ISimpleFossil1Fossil}),
+        self.assertEquals(fossilize([s1, d1], {"indico.tests.python.unit.MaKaC_tests.common_tests.fossilize_test.SimpleClass": ISimpleFossil2Fossil, "indico.tests.python.unit.MaKaC_tests.common_tests.fossilize_test.DerivedClass": ISimpleFossil1Fossil}),
                           [s1.fossilize(ISimpleFossil2Fossil), d1.fossilize(ISimpleFossil1Fossil)])
 
 

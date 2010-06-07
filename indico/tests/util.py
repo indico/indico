@@ -51,23 +51,101 @@ class TeeStringIO(StringIO):
     """
     Wrapper for StringIO that writes to an output stream as well
     """
-    def __init__(self, out):
+    def __init__(self, out, targetStream = None):
         self.__outStream =  out
+        self.__targetStream = targetStream
         StringIO.__init__(self)
 
-    def write(self, string):
-        self.__outStream.write(string)
-        StringIO.write(self, string)
+    def write(self, string, echo=True):
+
+        if echo:
+            self.__outStream.write(string)
+        if self.__targetStream:
+            self.__targetStream.write(string, echo=False)
+        else:
+            StringIO.write(self, string)
 
     def read(self, n=-1):
         self.seek(0)
-        self.__outStream.write(StringIO.read(self, n=n))
+        self.__outStream.write(StringIO.read(self.__targetStream or self, n=n))
+
 
 def openBrowser(browserPath, filePath):
     """
     Open a browser window with an HTML document
     """
     os.system("%s %s" % (browserPath, filePath))
+
+
+###
+# path manipulation functions
+# adapted from path.py (Jason Orendorff <jason at jorendorff com>)
+#
+# (Public Domain code)
+###
+
+def splitall(loc):
+    """
+    Return a list of the path components in this path.
+
+    The first item in the list will be a path.  Its value will be
+    either os.curdir, os.pardir, empty, or the root directory of
+    this path (for example, '/' or 'C:\\').  The other items in
+    the list will be strings.
+
+    path.path.joinpath(*result) will yield the original path.
+    """
+
+    parts = []
+    while loc != os.curdir and loc != os.pardir:
+        prev = loc
+        loc, child = os.path.split(prev)
+        if loc == prev:
+            break
+        parts.append(child)
+    parts.append(loc)
+    parts.reverse()
+    return parts
+
+
+def relpathto(origin, dest):
+    """
+    Return a relative path from self to dest.
+
+    If there is no relative path from self to dest, for example if
+    they reside on different drives in Windows, then this returns
+    dest.abspath().
+    """
+
+    orig_list = splitall(os.path.normcase(origin))
+    # Don't normcase dest!  We want to preserve the case.
+    dest_list = splitall(dest)
+
+    if orig_list[0] != os.path.normcase(dest_list[0]):
+        # Can't get here from there.
+        return dest
+
+    # Find the location where the two paths start to differ.
+    i = 0
+    for start_seg, dest_seg in zip(orig_list, dest_list):
+        if start_seg != os.path.normcase(dest_seg):
+            break
+        i += 1
+
+    # Now i is the point where the two paths diverge.
+    # Need a certain number of "os.pardir"s to work up
+    # from the origin to the point of divergence.
+    segments = [os.pardir] * (len(orig_list) - i)
+    # Need to add the diverging part of dest_list.
+    segments += dest_list[i:]
+    if len(segments) == 0:
+        # If they happen to be identical, use os.curdir.
+        relpath = os.curdir
+    else:
+        relpath = os.path.join(*segments)
+    return relpath
+
+### END ###
 
 # pylint: disable-msg=W0611
 

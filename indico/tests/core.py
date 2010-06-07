@@ -40,6 +40,7 @@ from MaKaC.common.Configuration import Config
 from indico.tests.util import colored
 from indico.tests.config import TestConfig
 from indico.tests.runners import *
+from indico.tests.base import TestOptionException
 
 TEST_RUNNERS = {'unit': UnitTestRunner,
                 'functional': FunctionalTestRunner,
@@ -67,11 +68,25 @@ class TestManager(object):
         self.dbFolder = None
 
     @staticmethod
+    def _title(text):
+        """
+        Prints an title
+        """
+        print colored("-- " + str(text), 'yellow', attrs=['bold'])
+
+    @staticmethod
     def _info(message):
         """
         Prints an info message
         """
         print colored("-- " + str(message), 'cyan')
+
+    @staticmethod
+    def _error(message):
+        """
+        Prints an info message
+        """
+        print colored("-- " + str(message), 'red')
 
     @staticmethod
     def _debug(message):
@@ -88,35 +103,35 @@ class TestManager(object):
          * testsToRun - a list of strings specifying which tests to run
          * options - test options (such as verbosity...)
         """
+        result = False
 
-        returnString = "\n\n%s\n\n" % colored('** Results', 'blue', attrs = ['bold'])
+        print
+        TestManager._title("Starting test framework\n")
 
         #To not pollute the installation of Indico
         self._configureTempFolders()
 
         self._startManageDB(fakeDBPolicy)
 
-        if options['coverage']:
-            CoverageTestRunner.instantiate()
-
-        #specified test can either be unit or functional.
-        if options['specify']:
-            returnString += SpecificFunctionalTestRunner(options['specify']).run()
-        else:
-            for test in testsToRun:
-                if test in TEST_RUNNERS:
-                    returnString += TEST_RUNNERS[test](**options).run()
-                else:
-                    returnString += colored("[ERR] Test set '%s' does not exist. "
-                      "It has to be added in the TEST_RUNNERS variable\n", 'red') \
-                    % test
-
+        for test in testsToRun:
+            if test in TEST_RUNNERS:
+                try:
+                    result = TEST_RUNNERS[test](**options).run()
+                except TestOptionException, e:
+                    TestManager._error(e)
+            else:
+                print colored("[ERR] Test set '%s' does not exist. "
+                              "It has to be added in the TEST_RUNNERS variable\n",
+                              'red') % test
 
         self._stopManageDB(fakeDBPolicy)
 
         self._deleteTempFolders()
 
-        return returnString
+        if result:
+            return 0
+        else:
+            return -1
 
     def _configureTempFolders(self):
         """
@@ -157,14 +172,15 @@ class TestManager(object):
 
         if fakeDBPolicy == 1:
             self._info("Starting fake DB in non-standard port")
-            self._startFakeDB(TestConfig.getInstance().getFakeDBPort())
+            self._startFakeDB('localhost', TestConfig.getInstance().getFakeDBPort())
             TestManager._createDummyUser()
         elif fakeDBPolicy == 2:
             self._info("Starting fake DB in standard port")
             self._startFakeDB(params[0], params[1])
             TestManager._createDummyUser()
         elif fakeDBPolicy == 3:
-            self._info("Stopping production DB and Starting fake DB in standard port")
+            self._info("Stopping production DB and" +
+                       " Starting fake DB in standard port")
             TestManager._stopProductionDB()
             self._startFakeDB(params[0], params[1])
             TestManager._createDummyUser()
@@ -241,7 +257,9 @@ class TestManager(object):
         """
         TestManager._info("Stopping production DB")
         try:
-            TestManager._debug(commands.getstatusoutput(TestConfig.getInstance().getStopDBCmd()))
+            TestManager._debug(
+                commands.getstatusoutput(
+                    TestConfig.getInstance().getStopDBCmd()))
         except KeyError:
             print "[ERR] Not found in tests.conf: command to stop production DB\n"
             sys.exit(1)
