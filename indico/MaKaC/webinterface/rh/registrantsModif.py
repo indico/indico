@@ -37,6 +37,7 @@ from MaKaC import epayment
 from MaKaC.i18n import _
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface.rh import registrationFormModif
+from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
 
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
@@ -417,10 +418,10 @@ class RHRegistrantDataModification( RHRegistrantModifBase ):
         p = registrants.WPRegistrantDataModification( self, self._registrant )
         return p.display()
 
-class RHRegistrantSendEmail( RHRegistrantModifBase ):
+class RHRegistrantSendEmail( RHRegistrationFormModifBase ):
 
     def _checkParams(self, params):
-        RHRegistrantModifBase._checkParams( self, params )
+        RHRegistrationFormModifBase._checkParams( self, params )
         self._regsIds = self._normaliseListParam(params.get("regsIds",[]))
         self._cancel=params.has_key("cancel")
         self._send = params.has_key("OK")
