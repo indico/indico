@@ -1693,12 +1693,15 @@ class RHFitSlot(RHSessionModCoordinationBase):
 
     def _checkParams(self, params):
         RHSessionModCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
+        self._slotID = params.get("slotId","")
+        self._slot=self._target.getSlotById(self._slotID)
+        self._sessionID = params.get("sessionId","")
+        self._targetDay=params.get("day","")
 
     def _process(self):
         if self._slot is not None:
             self._slot.fit()
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
+        self._redirect("%s#%s.s%sl%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay, self._sessionID, self._slotID))
 
 
 class RHSlotMoveUpEntry(RHSessionModCoordinationBase):

@@ -796,7 +796,6 @@ class RHConfModifScheduleEntriesRemove(RHConferenceModifBase):
         self._redirect(urlHandlers.UHConfModifSchedule.getURL(self._conf))
 
 
-
 class RHScheduleDataEdit(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModScheduleDataEdit
 
@@ -7212,6 +7211,7 @@ class RHReschedule(RHConferenceModifBase):
         self._hour=params.get("hour","")
         self._minute=params.get("minute","")
         self._action=params.get("action","duration")
+        self._fit= params.get("fit","noFit") == "doFit"
         self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
         if self._targetDay is None:
             raise MaKaCError( _("Error while rescheduling timetable: not target day"))
@@ -7235,7 +7235,7 @@ class RHReschedule(RHConferenceModifBase):
                 return p.display()
             else:
                 t=timedelta(hours=int(self._hour), minutes=int(self._minute))
-                self._conf.getSchedule().rescheduleTimes(self._action, t, self._day)
+                self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
         self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
 
 class RHRelocate(RHConferenceModifBase):

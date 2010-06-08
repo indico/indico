@@ -1457,6 +1457,15 @@ class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
     def getJSFiles(self):
         return WPConfModifScheduleGraphic.getJSFiles(self)
 
+    def _getHeadContent( self ):
+
+        baseurl = self._getBaseURL()
+        return """
+        <!-- Lightbox -->
+        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
+        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
+        """ % ( baseurl, baseurl)
+
     def _generateTimetable(self):
 
         tz = self._conf.getTimezone()

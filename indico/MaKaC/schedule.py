@@ -646,15 +646,19 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
         self.reSchedule()
         self._p_changed = 1
 
-    def rescheduleTimes( self, type, diff, day):
+    def rescheduleTimes( self, type, diff, day, doFit):
         """
         recalculate and reschedule the entries of the conference slot with a time "diff" of separation.
         """
+        from MaKaC.conference import SessionSlot
         entries = self.getEntriesOnDay(day)
         if type=="duration":
             i=0
             while i<len(entries):
                 entry=entries[i]
+                if doFit:
+                    if isinstance( entry.getOwner(), SessionSlot ) :
+                        entry.getOwner().fit()
                 if i+1 == len(entries):
                     dur=entry.getDuration()
                 else:
@@ -667,8 +671,15 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
         elif type=="startingTime":
             st = timezone('UTC').localize(datetime(day.year, day.month, day.day, self.getStartDate().hour, self.getStartDate().minute))
             for entry in entries:
+                if doFit:
+                    if isinstance( entry.getOwner(), SessionSlot ) :
+                        entry.getOwner().fit()
                 entry.setStartDate(st, check=2, moveEntries=1)
                 st=entry.getEndDate()+diff
+        elif type=="noAction" and doFit:
+            for entry in entries:
+                if isinstance( entry.getOwner(), SessionSlot ) :
+                    entry.getOwner().fit()
 
 class SessionSchedule(TimeSchedule):
     """

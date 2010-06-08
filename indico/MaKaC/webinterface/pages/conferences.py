@@ -3157,6 +3157,15 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         wc = self._getSchedule()
         return wc.getHTML(params)
 
+    def _getHeadContent( self ):
+
+        baseurl = self._getBaseURL()
+        return """
+        <!-- Lightbox -->
+        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
+        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
+        """ % ( baseurl, baseurl)
+
     def _getPageContent(self, params):
         return self._getTTPage(params)
 

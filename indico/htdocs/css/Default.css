@@ -5726,13 +5726,18 @@ div.rescheduleLabelTitle {
     cursor: default;
 }
 
+label.rescheduleLabelTitle {
+    font-weight: normal;
+    font-size: 16px;
+    color: #444444
+}
+
 div.rescheduleLabelDetails {
     font-size:12px;
     font-style: italic;
     cursor: default;
+    color: #888888
 }
-
-
 
 .rescheduleWarning {
     font-weight: bold;
