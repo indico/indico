@@ -118,7 +118,7 @@ class XMLGenerator(object):
 
     @classmethod
     def getDisplayName(cls):
-        return "EVO Meeting"
+        return _("EVO Meeting")
 
     @classmethod
     def getFirstLineInfo(cls, booking, displayTz):

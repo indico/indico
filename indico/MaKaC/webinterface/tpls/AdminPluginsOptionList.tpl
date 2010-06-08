@@ -142,7 +142,9 @@
 
                     <% if option.hasActions(): %>
                         <% for action in option.getActions(): %>
-                            <input type="submit" name="<%= 'action.' + Object.getType() + '.' + Object.getName() + "." + action.getName() %>" value="<%= action.getButtonText() %>" />
+                            <% if action.isVisible():%>
+                                <input type="submit" name="<%= 'action.' + Object.getType() + '.' + Object.getName() + "." + action.getName() %>" value="<%= action.getButtonText() %>" />
+                            <% end %>
                         <% end %>
                     <% end %>
                 <% end %>

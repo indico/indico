@@ -188,7 +188,7 @@ class CollaborationAcceptCSBooking(CollaborationAdminBookingModifBase):
     """ Performs server-side actions when a booking / request is accepted
     """
     def _getAnswer(self):
-        return fossilize(self._CSBookingManager.acceptBooking(self._bookingId),
+        return fossilize(self._CSBookingManager.acceptBooking(self._bookingId, self.getAW().getUser()),
                                   None, tz = self._conf.getTimezone())
 
 class CollaborationRejectCSBooking(CollaborationAdminBookingModifBase):

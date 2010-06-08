@@ -246,6 +246,7 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
                 c.enableSessionSlots()
             else :
                 c.disableSessionSlots()
+
         return c
 
     def _getPersons(self):

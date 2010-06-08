@@ -26,10 +26,10 @@ import MaKaC.webinterface.displayMgr as displayMgr
 
 
 class RHRegistrantsDisplayBase( conferenceDisplay.RHConferenceBaseDisplay):
-    
+
     def _checkProtection( self ):
         conferenceDisplay.RHConferenceBaseDisplay._checkProtection(self)
-        if not self._conf.hasEnabledSection("regForm") or not displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName("registrants").isEnabled():
+        if not self._conf.getEvaluation().isVisible() or not self._conf.hasEnabledSection("regForm") or not displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName("registrants").isEnabled():
             raise NoReportError("The registrants list page was disabled by the conference managers")
 
 class RHRegistrantsList( RHRegistrantsDisplayBase ):
@@ -43,10 +43,10 @@ class RHRegistrantsList( RHRegistrantsDisplayBase ):
             self._sessionFilterName="sessionfirstpriority"
         else:
             self._sessionFilterName="session"
-        
-        filterUsed=params.has_key("OK") 
+
+        filterUsed=params.has_key("OK")
         filter = {}
-        
+
         sessform =regForm.getSessionsForm()
         sesstypes = sessform.getSessionList()
         lsessions = []
@@ -60,11 +60,11 @@ class RHRegistrantsList( RHRegistrantsDisplayBase ):
         if filterUsed:
             sessionShowNoValue =  params.has_key("sessionShowNoValue")
         self._filterCrit.getField(self._sessionFilterName).setShowNoValue( sessionShowNoValue )
-        
+
         # ---- SORTING ----
         self._sortingCrit = regFilters.SortingCriteria( [params.get( "sortBy", "Name" ).strip()] )
         self._order = params.get("order","down")
-    
+
     def _process( self ):
         p = registrants.WPConfRegistrantsList( self, self._conf )
         return p.display(filterCrit=self._filterCrit, sortingCrit=self._sortingCrit, order=self._order, sessionFilterName=self._sessionFilterName)

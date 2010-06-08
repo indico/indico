@@ -1100,19 +1100,49 @@ class Avatar(Persistent, Fossilizable):
         return self.fax
 
     def addIdentity(self, newId):
+        """ Adds a new identity to this Avatar.
+            :param newId: a new PIdentity or inheriting object
+            :type newId: PIdentity
+        """
         if newId != None and (newId not in self.identities):
             self.identities.append( newId )
             self._p_changed = 1
 
     def removeIdentity(self, Id):
+        """ Removed an identity from this Avatar.
+            :param newId: a PIdentity or inheriting object
+            :type newId: PIdentity
+        """
         if Id in self.identities:
             self.identities.remove(Id)
             self._p_changed = 1
 
     def getIdentityList( self ):
+        """ Returns a list of identities for this Avatar.
+            Each identity will be a PIdentity or inheriting object
+        """
         return self.identities
 
+    def getIdentityByAuthenticatorName(self, authenticatorName):
+        """ Return a list of PIdentity objects given an authenticator name
+            :param authenticatorName: the name of an authenticator, e.g. 'Local', 'Nice', etc
+            :type authenticatorName: str
+        """
+        result = []
+        for identity in self.identities:
+            if identity.getAuthenticatorTag() == authenticatorName:
+                result.append(identity)
+        return result
+
+
     def getIdentityById(self, id, tag):
+        """ Returns a PIdentity object given an authenticator name and the identity's login
+            :param id: the login string for this identity
+            :type id: str
+            :param tag: the name of an authenticator, e.g. 'Local', 'Nice', etc
+            :type tag: str
+        """
+
         for Id in self.identities:
             if Id.getAuthenticatorTag() == tag and Id.getLogin() == id:
                 return Id

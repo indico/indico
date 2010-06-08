@@ -550,7 +550,7 @@ class WContribModifMain(wcomponents.WTemplated):
         self._eventType = eventType
 
     def _getAbstractHTML( self ):
-        if not self._contrib.getConference().hasEnabledSection("cfa"):
+        if not self._contrib.getConference().getAbstractMgr().isActive() or not self._contrib.getConference().hasEnabledSection("cfa"):
             return ""
         abs = self._contrib.getAbstract()
         if abs is not None:
@@ -662,7 +662,7 @@ class WContribModifMain(wcomponents.WTemplated):
 
     def _getAdditionalFieldsHTML(self):
         html=""
-        if self._contrib.getConference().hasEnabledSection("cfa") and self._contrib.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+        if self._contrib.getConference().getAbstractMgr().isActive() and self._contrib.getConference().hasEnabledSection("cfa") and self._contrib.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
             for f in self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
                 if f.isActive():
                     id = f.getId()
@@ -1229,7 +1229,8 @@ class WContributionDataModification(wcomponents.WTemplated):
 
     def _getAdditionalFieldsHTML(self):
         html=""
-        if self._contrib.getConference().hasEnabledSection("cfa") and \
+        if self._contrib.getConference().getAbstractMgr().isActive() and \
+                self._contrib.getConference().hasEnabledSection("cfa") and \
                 self._contrib.getConference().getType() == "conference" and \
                 self._contrib.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
             for f in self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():

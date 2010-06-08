@@ -9,59 +9,61 @@
         <%= Booking._getTypeDisplayName() %>
     </span>
 
-    <% if Kind == 'scheduled' and isSameDay(Booking.getStartDate(), Booking.getEndDate(), Timezone): %>
-        <span>
-        <% if isToday(Booking.getStartDate(), Timezone) : %>
-        today
-        <% end %>
-        <% elif isTomorrow(Booking.getStartDate(), Timezone) : %>
-            tomorrow
-        <% end %>
-        <% else: %>
-            <%= formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") %>
-        <% end %>
-        </span>
-        from
-        <%= formatTime(Booking.getAdjustedStartDate(Timezone).time()) %>
-        to
-        <%= formatTime(Booking.getAdjustedEndDate(Timezone).time()) %>
-    <% end %>
-    <% else: %>
-        <% if Kind == 'scheduled' : %>
-            from
+    <% if Booking.getStartDate(): %>
+        <% if Kind == 'scheduled' and isSameDay(Booking.getStartDate(), Booking.getEndDate(), Timezone): %>
+            <span>
             <% if isToday(Booking.getStartDate(), Timezone) : %>
-                today at
+            today
             <% end %>
             <% elif isTomorrow(Booking.getStartDate(), Timezone) : %>
+                tomorrow
+            <% end %>
+            <% else: %>
+                <%= formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") %>
+            <% end %>
+            </span>
+            from
+            <%= formatTime(Booking.getAdjustedStartDate(Timezone).time()) %>
+            to
+            <%= formatTime(Booking.getAdjustedEndDate(Timezone).time()) %>
+        <% end %>
+        <% else: %>
+            <% if Kind == 'scheduled' : %>
+                from
+                <% if isToday(Booking.getStartDate(), Timezone) : %>
+                    today at
+                <% end %>
+                <% elif isTomorrow(Booking.getStartDate(), Timezone) : %>
+                    tomorrow at
+                <% end %>
+                <% else: %>
+                    <%= formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") %> at
+                <% end %>
+
+                <%= formatTime(Booking.getAdjustedStartDate(Timezone).time()) %>
+
+                until
+
+            <% end %>
+            <% else: %>
+                ongoing until
+            <% end %>
+
+
+
+            <% if isToday(Booking.getEndDate(), Timezone) : %>
+                today at
+            <% end %>
+            <% elif isTomorrow(Booking.getEndDate(), Timezone) : %>
                 tomorrow at
             <% end %>
             <% else: %>
-                <%= formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") %> at
+                <%= formatDate(Booking.getAdjustedEndDate(Timezone).date(), format = "%a %d/%m") %> at
             <% end %>
 
-            <%= formatTime(Booking.getAdjustedStartDate(Timezone).time()) %>
-
-            until
-
-        <% end %>
-        <% else: %>
-            ongoing until
-        <% end %>
-
-
-
-        <% if isToday(Booking.getEndDate(), Timezone) : %>
-            today at
-        <% end %>
-        <% elif isTomorrow(Booking.getEndDate(), Timezone) : %>
-            tomorrow at
-        <% end %>
-        <% else: %>
-            <%= formatDate(Booking.getAdjustedEndDate(Timezone).date(), format = "%a %d/%m") %> at
-        <% end %>
-
-        <%= formatTime(Booking.getAdjustedEndDate(Timezone).time()) %>
-    <% end %>.
+            <%= formatTime(Booking.getAdjustedEndDate(Timezone).time()) %>
+        <% end %>.
+    <% end %>
 
     <% firstLineInfo = Booking._getFirstLineInfo(Timezone) %>
     <% if firstLineInfo: %>

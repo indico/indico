@@ -17,7 +17,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc
+from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, minDatetime
 from datetime import timedelta
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
@@ -46,7 +46,7 @@ class OutputGenerator(object):
             bookingXmlGenerators[pluginName] = xmlGenerator
 
         bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
-        bookings.sort(key = lambda b: b.getStartDate())
+        bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
 
         ongoingBookings = []
         scheduledBookings = []
@@ -64,8 +64,9 @@ class OutputGenerator(object):
             out.writeTag("kind", "ongoing")
             out.writeTag("type", bookingType)
             out.writeTag("typeDisplayName", bookingXmlGenerators[bookingType].getDisplayName())
-            out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-            out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
+            if b.hasStartDate():
+                out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
+                out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
             bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
             out.closeTag("booking")
 
@@ -77,8 +78,9 @@ class OutputGenerator(object):
             out.writeTag("kind", "scheduled")
             out.writeTag("type", bookingType)
             out.writeTag("typeDisplayName", bookingXmlGenerators[bookingType].getDisplayName())
-            out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
-            out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
+            if b.hasStartDate():
+                out.writeTag("startDate", b.getAdjustedStartDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
+                out.writeTag("endDate",b.getAdjustedEndDate(tz).strftime("%Y-%m-%dT%H:%M:%S"))
             bookingXmlGenerators[bookingType].getCustomBookingXML(b, tz, out)
             out.closeTag("booking")
 

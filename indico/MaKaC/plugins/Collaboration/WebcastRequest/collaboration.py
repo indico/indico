@@ -107,7 +107,7 @@ class CSBooking(CSBookingBase):
     def _checkStatus(self):
         pass
 
-    def _accept(self):
+    def _accept(self, user = None):
         self._statusMessage = "Request accepted"
         self._statusClass = "statusMessageOK"
         import MaKaC.webcast as webcast
@@ -125,7 +125,7 @@ class CSBooking(CSBookingBase):
 
         if MailTools.needToSendEmails('WebcastRequest'):
             try:
-                notification = RequestAcceptedNotificationAdmin(self)
+                notification = RequestAcceptedNotificationAdmin(self, user)
                 GenericMailer.sendAndLog(notification, self.getConference(),
                                      "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
                                      None)

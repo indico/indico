@@ -110,7 +110,7 @@ class CSBooking(CSBookingBase):
     def _checkStatus(self):
         pass
 
-    def _accept(self):
+    def _accept(self, user = None):
         self._statusMessage = "Request accepted"
         self._statusClass = "statusMessageOK"
 
@@ -126,7 +126,7 @@ class CSBooking(CSBookingBase):
 
         if MailTools.needToSendEmails('RecordingRequest'):
             try:
-                notificationAdmin = RequestAcceptedNotificationAdmin(self)
+                notificationAdmin = RequestAcceptedNotificationAdmin(self, user)
                 GenericMailer.sendAndLog(notificationAdmin, self.getConference(),
                                      "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
                                      None)
