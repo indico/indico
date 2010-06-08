@@ -13,7 +13,7 @@
                             <span class="formTitle" style="border-bottom-width: 0px">
                             <% if not title: %>
                                 <!-- Generic title -->
-                                <%= len( rooms ) %>  <%= _("Room(s) found")%>:
+                                <%= len( rooms ) %>  <%= " " + _("Room(s) found")%>:
                             <% end %>
                             <% if title: %>
                                 <%= title %>:
