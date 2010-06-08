@@ -37,25 +37,6 @@
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
-    <tr>
-        <td class="dataCaptionTD">
-          <a name="sections"></a>
-          <span class="dataCaptionFormat"> <%= _("Management features")%></span>
-          <br>
-          <br>
-          <img src="<%=enablePic%>" alt="<%= _("Click to disable")%>"> <small> <%= _("Enabled feature")%></small>
-          <br>
-          <img src="<%=disablePic%>" alt="<%= _("Click to enable")%>"> <small> <%= _("Disabled feature")%></small>
-        </td>
-        <td bgcolor="white" width="100%%" class="blacktext" style="padding-left:20px">
-            <table align="left">
-            <%=sections%>
-            </table>
-        </td>
-    </tr>
-	<tr>
-        <td colspan="3" class="horizontalLine">&nbsp;</td>
-    </tr>
 </table>
 
 <script type="text/javascript">

@@ -158,11 +158,11 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         self._cfaNewSubmissionOpt = self._sectionMenu.getLinkByName("SubmitAbstract")
         self._cfaViewSubmissionsOpt = self._sectionMenu.getLinkByName("ViewAbstracts")
         self._abstractsBookOpt = self._sectionMenu.getLinkByName("abstractsBook")
-        self._cfaOpt.setVisible(self._conf.getAbstractMgr().isActive())
-        if not self._conf.hasEnabledSection("cfa"):
+        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             self._cfaOpt.setVisible(False)
             self._abstractsBookOpt.setVisible(False)
         else:
+            self._cfaOpt.setVisible(True)
             self._abstractsBookOpt.setVisible(True)
         self._trackMgtOpt = self._sectionMenu.getLinkByName("manageTrack")
 
@@ -170,7 +170,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         self._regFormOpt = self._sectionMenu.getLinkByName("registrationForm")
         self._viewRegFormOpt = self._sectionMenu.getLinkByName("ViewMyRegistration")
         self._newRegFormOpt = self._sectionMenu.getLinkByName("NewRegistration")
-        self._regFormOpt.setVisible(self._conf.getRegistrationForm().isActivated())
         if awUser != None:
             self._viewRegFormOpt.setVisible(awUser.isRegisteredInConf(self._conf))
             self._newRegFormOpt.setVisible(not awUser.isRegisteredInConf(self._conf))
@@ -178,10 +177,11 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
             self._viewRegFormOpt.setVisible(False)
             self._newRegFormOpt.setVisible(True)
         self._registrantsListOpt = self._sectionMenu.getLinkByName("registrants")
-        if not self._conf.hasEnabledSection("regForm"):
+        if not self._conf.getRegistrationForm().isActivated() or not self._conf.hasEnabledSection("regForm"):
             self._regFormOpt.setVisible(False)
             self._registrantsListOpt.setVisible(False)
         else:
+            self._regFormOpt.setVisible(True)
             self._registrantsListOpt.setVisible(True)
 
         #evaluation
@@ -221,7 +221,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         if len(lt)==1:
             self._myTracksOpt.setCaption( _("My track"))
             self._myTracksOpt.setURL(urlHandlers.UHTrackModifAbstracts.getURL(lt[0]))
-        if not self._conf.hasEnabledSection("cfa"):
+        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             self._myTracksOpt.setVisible(False)
         self._myContribsOpt=self._sectionMenu.getLinkByName("mycontribs")
         lc=self._conf.getContribsForSubmitter(awUser)
@@ -236,7 +236,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                 url = urlHandlers.UHTrackModifAbstracts.getURL( tracks[0] )
             self._trackMgtOpt.setURL(str(url))
             self._trackMgtOpt.setVisible(True)
-            if not self._conf.hasEnabledSection("cfa"):
+            if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
                 self._trackMgtOpt.setVisible(False)
 
 
@@ -1061,7 +1061,7 @@ class WConfProgramTrack(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["bulletURL"] = Config.getInstance().getSystemIconURL( "track_bullet" )
         mgtIconHTML = ""
-        if self._track.getConference().hasEnabledSection("cfa") and self._track.canCoordinate( self._aw ):
+        if self._track.getConference().getAbstractMgr().isActive() and self._track.getConference().hasEnabledSection("cfa") and self._track.canCoordinate( self._aw ):
             url = urlHandlers.UHTrackModifAbstracts.getURL( self._track )
             if self._track.getConference().canModify( self._aw ):
                 url = urlHandlers.UHTrackModification.getURL( self._track )
@@ -2168,11 +2168,14 @@ class WPConferenceModifBase( main.WPMainBase ):
         if not (self._conf.hasEnabledSection("regForm") and (canModify or isRegistrar)):
             self._regFormMenuItem.setVisible(False)
 
-        if not (self._conf.getType() == "conference" and self._conf.hasEnabledSection('paperReviewing') and (canModify or isReviewingStaff)):
-            self._reviewingMenuItem.setVisible(False)
-        else: #reviewing tab is enabled
-            if isReviewingStaff and not canModify:
-                self._reviewingMenuItem.setVisible(True)
+#        if not (self._conf.getType() == "conference" and self._conf.hasEnabledSection('paperReviewing') and (canModify or isReviewingStaff)):
+#            self._reviewingMenuItem.setVisible(False)
+#        else: #reviewing tab is enabled
+#            if isReviewingStaff and not canModify:
+#                self._reviewingMenuItem.setVisible(True)
+        # For now we don't want the paper reviewing to be displayed
+        self._reviewingMenuItem.setVisible(False)
+
 
         if not (canModify or
                 RCVideoServicesManager.hasRights(self._rh, 'any') or
@@ -2764,45 +2767,6 @@ class WConfModifMainData(wcomponents.WTemplated):
                 type.getName(), \
                 type.getDescription()))
         vars["typeList"] = "".join(typeList)
-        #if not self._conf.isClosed():
-        #    vars["status"] = "close"
-        #    vars["statusURL"] = urlHandlers.UHConferenceClose.getURL(self._conf)
-        #else:
-        #    vars["status"] = "open"
-        #    vars["statusURL"] = urlHandlers.UHConferenceOpen.getURL(self._conf)
-        #-----Setting of the sections of the conference--------
-        vars["enablePic"]=Config.getInstance().getSystemIconURL( "enabledSection" )
-        vars["disablePic"]=Config.getInstance().getSystemIconURL( "disabledSection" )
-        enabledText = _("Click to disable")
-        disabledText = _("Click to enable")
-        lsect=[]
-        for sect in conference.ConfSectionsMgr().getSectionKeys():
-
-            # Videoconference section should not appear in conferences
-            if sect in ['collaboration', 'paperReviewing','videoconference']:
-                continue
-
-            url=urlHandlers.UHConfSectionsSettings.getURL(self._conf)
-            url.addParam("sectionId", sect)
-            url=quoteattr("%s#sections"%str(url))
-            if self._conf.hasEnabledSection(sect):
-                icon=vars["enablePic"]
-                textIcon=enabledText
-            else:
-                icon=vars["disablePic"]
-                textIcon=disabledText
-            lsect.append("""
-                            <tr>
-                                <td>
-                                    <a href=%s><img src=%s alt="%s" class="imglink"></a>&nbsp;<a href=%s>%s</a>
-                                </td>
-                            </tr>
-                            """%(url, \
-                                icon, \
-                                textIcon, \
-                                url, \
-                                conference.ConfSectionsMgr().getSection(sect)))
-        vars["sections"]="".join(lsect)
         #------------------------------------------------------
         vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._conf).getHTML()
         vars["eventType"] = self._conf.getType()
@@ -7782,7 +7746,7 @@ class WContributionCreation(wcomponents.WTemplated):
 
     def _getAdditionalFieldsHTML(self):
         html=""
-        if self.__owner.getConference().hasEnabledSection("cfa") and self.__owner.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+        if self.__owner.getConference().getAbstractMgr().isActive() and self.__owner.getConference().hasEnabledSection("cfa") and self.__owner.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
             for f in self.__owner.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
                 if f.isActive():
                     id = f.getId()
@@ -7866,7 +7830,8 @@ class WContributionSchCreation(WContributionCreation):
 
     def _getAdditionalFieldsHTML(self):
         html=""
-        if self._conf.hasEnabledSection("cfa") and \
+        if self._conf.getAbstractMgr().isActive() and \
+                self._conf.hasEnabledSection("cfa") and \
                 self._conf.getType() == "conference" and \
                 self._conf.getAbstractMgr().hasAnyEnabledAbstractField():
             for f in self._conf.getAbstractMgr().getAbstractFieldsMgr().getFields():
@@ -9357,7 +9322,7 @@ class WConfMyStuff(wcomponents.WTemplated):
             """%"".join(res)
 
     def _getTracksHTML(self):
-        if self._aw.getUser() is None or not self._conf.hasEnabledSection("cfa"):
+        if self._aw.getUser() is None or not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             return ""
         lt=self._conf.getCoordinatedTracks(self._aw.getUser())
         if len(lt)<=0:

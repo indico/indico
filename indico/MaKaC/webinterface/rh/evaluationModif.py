@@ -33,7 +33,7 @@ from MaKaC.i18n import _
 
 class RHEvaluationBase(conferenceModif.RHConferenceModifBase):
     """Basis of an Evaluation"""
-    
+
     def _checkProtection(self):
         conferenceModif.RHConferenceModifBase._checkProtection(self)
         if not self._conf.hasEnabledSection("evaluation"):
@@ -41,17 +41,17 @@ class RHEvaluationBase(conferenceModif.RHConferenceModifBase):
 
 class RHEvaluationSetup(RHEvaluationBase):
     """Modification of an Evaluation."""
-    
+
     def _process(self):
         return evaluations.WPConfModifEvaluationSetup(self, self._conf).display()
 
 class RHEvaluationSetupChangeStatus( RHEvaluationBase ):
     """changes status of an Evaluation."""
-    
+
     def _checkParams( self, params ):
         RHEvaluationBase._checkParams( self, params )
         self._newStatus = params.get("changeTo", False)
-        
+
     def _process( self ):
         evaluation = self._conf.getEvaluation()
         if self._newStatus == "True" :
@@ -62,7 +62,7 @@ class RHEvaluationSetupChangeStatus( RHEvaluationBase ):
 
 class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
     """processes a special action."""
-        
+
     def _process( self ):
         params = self.getRequestParams()
         evaluation = self._conf.getEvaluation()
@@ -83,7 +83,7 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
             self._getSession().setVar(sessionVarName, []) #Don't forget to clear session vars!
             evaluation.reinit()
         self._redirect(urlHandlers.UHConfModifEvaluationSetup.getURL(self._conf))
-        
+
     def _exportXml(self, evaluation, params):
         """exportation of an evaluation."""
         from MaKaC.common.xmlGen import XMLGen
@@ -96,7 +96,7 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
         self._req.content_type = "application/octet-stream"
         self._req.headers_out["Content-Disposition"] = 'inline; filename="%s"'%Evaluation._XML_FILENAME
         return xmlFile
-        
+
     def _importedXml(self, evaluation, params):
         """ Importation of an evaluation.
             Note: original 'isVisible' and the dates are kept.
@@ -180,11 +180,11 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
                                 if itemText.strip()!="" :
                                     isSelected = self._getValue(choiceItemNode,"isSelected")
                                     question.insertChoiceItem(itemText, isSelected)
-        
+
     def _getElement(self, container, tagname):
         """ Find the first element with given tagname contained in given container element.
             If not found, return an empty Element tagged "_empty" (in order to avoid crashes).
-            
+
             Params:
                 container -- an Element containing the wanted element
                 tagname -- tag (str) of the wanted element
@@ -197,11 +197,11 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
             return leafNodes[0]
         else :
             return Element("_empty")
-        
+
     def _getValue(self, container, tagname):
         """ finds the first leaf element with given tagname contained in given element,
             and returns its value.
-            
+
             Params:
                 container -- a non leaf Element containing the wanted leaf element
                 tagname -- tag (str) of the wanted leaf element
@@ -211,13 +211,13 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
         leafNode = self._getElement(container, tagname)
         #given a leaf node, returns its value.
         return utils.nodeValue(leafNode)
-            
+
 class RHEvaluationSetupDataModif( RHEvaluationBase ):
     """called when you want to change general parameters of your evaluation."""
-    
+
     def _process( self ):
         return evaluations.WPConfModifEvaluationSetupDataModif( self, self._conf ).display()
-            
+
 class RHEvaluationSetupPerformDataModif( RHEvaluationBase ):
     """performs changes to general parameters of the evaluation."""
 
@@ -282,17 +282,17 @@ class RHEvaluationSetupPerformDataModif( RHEvaluationBase ):
                 newSubmissionNotification.setToList(newSubmissionNotifyTo)
                 newSubmissionNotification.setCCList(newSubmissionNotifyCc)
                 evaluation.setNotification(Evaluation._NEW_SUBMISSION, newSubmissionNotification)
-        
+
         #redirecting...
         self._redirect(urlHandlers.UHConfModifEvaluationSetup.getURL(self._conf))
 
 
 class RHEvaluationEdit(RHEvaluationBase):
     """Edition of questions of an Evaluation."""
-    
+
     def _process(self):
         return evaluations.WPConfModifEvaluationEdit(self, self._conf).display()
-            
+
 class RHEvaluationEditPerformChanges( RHEvaluationBase ):
     """performs changes for Evaluation questions."""
 
@@ -307,7 +307,7 @@ class RHEvaluationEditPerformChanges( RHEvaluationBase ):
         mode = params.get("mode","")
         questionValue = params.get("questionValue","").strip()
         keyword = params.get("keyword","").strip()
-        
+
         ###################
         #check consistency#
         ###################
@@ -321,7 +321,7 @@ class RHEvaluationEditPerformChanges( RHEvaluationBase ):
                     raise FormValuesError("Please enter all values for Choice Items.", "Evaluation")
                 if choiceItem_1==choiceItem_2:
                     raise FormValuesError("Please enter different values for Choice Items.", "Evaluation")
-        
+
         ##########
         #Add mode#
         ##########
@@ -337,7 +337,7 @@ class RHEvaluationEditPerformChanges( RHEvaluationBase ):
                 raise FormValuesError("unknown question type!", "Evaluation")
             #set params for question
             self._setQuestionParams(question, params)
-            
+
         ###########
         #Edit mode#
         ###########
@@ -358,17 +358,17 @@ class RHEvaluationEditPerformChanges( RHEvaluationBase ):
                     posChange = int(params.get("posChange_"+str(i), -1))
                     if posChange>0:
                         self._evaluation.getQuestionAt(i).setPosition(posChange)
-            
+
         #############
         #Delete mode#
         #############
         elif mode==Question._REMOVE:
             #DON'T USE params:newPos BUT params:questionPos which is edited question position!!!
             self._evaluation.removeQuestion(int(params.get("questionPos",-1)))
-            
+
         #redirecting...
         self._redirect(urlHandlers.UHConfModifEvaluationEdit.getURL(self._conf))
-        
+
     def _setQuestionParams(self, question, params):
         """ set the parameters for the given question with the dictionary (params).
             Params:
@@ -411,11 +411,11 @@ class RHEvaluationEditPerformChanges( RHEvaluationBase ):
                     isSelected = str(currentItemId) in selectedChoiceItems
                     question.insertChoiceItem(itemText, isSelected)
                 currentItemId += 1
-    
+
 
 class RHEvaluationPreview(RHEvaluationBase):
     """Preview of an Evaluation."""
-    
+
     def _process(self):
         params = self.getRequestParams()
         if params.get("status","")==_("submitted") and params.has_key("submit"):
@@ -426,14 +426,14 @@ class RHEvaluationPreview(RHEvaluationBase):
 
 class RHEvaluationResults(RHEvaluationBase):
     """Results of an Evaluation."""
-    
+
     def _process(self):
         return evaluations.WPConfModifEvaluationResults(self, self._conf).display()
 
 
 class RHEvaluationResultsOptions(RHEvaluationBase):
     """Do asked actions for the results."""
-    
+
     def _process(self):
         ####################
         #get some variables#
@@ -489,7 +489,7 @@ class RHEvaluationResultsOptions(RHEvaluationBase):
             self._req.content_type = str(Config.getInstance().getFileTypeMimeType("CSV"))
             self._req.headers_out["Content-Disposition"] = 'inline; filename="%s"'%Evaluation._CSV_FILENAME
             return excelFile
-        
+
         ########
         #remove#
         ########
@@ -504,10 +504,10 @@ class RHEvaluationResultsOptions(RHEvaluationBase):
                                    self, self._conf, Evaluation._SELECT_SUBMITTERS).display()
         #redirecting...
         self._redirect(urlHandlers.UHConfModifEvaluationResults.getURL(self._conf))
-        
+
 class RHEvaluationResultsSubmittersActions(RHEvaluationBase):
     """Do asked actions for the submitters."""
-    
+
     def _process(self):
         ####################
         #get some variables#
@@ -517,7 +517,7 @@ class RHEvaluationResultsSubmittersActions(RHEvaluationBase):
         remove = params.has_key(Evaluation._REMOVE_SUBMITTERS)
         select = params.has_key(Evaluation._SELECT_SUBMITTERS)
         sessionVarName = "selectedSubmissions_%s_%s"%(self._conf.getId(), evaluation.getId())
-        
+
         ########
         #remove#
         ########
@@ -532,7 +532,7 @@ class RHEvaluationResultsSubmittersActions(RHEvaluationBase):
                 removedSubmissions = [s for s in evaluation.getSubmissions() if s.getId() in removedSubmitters]
                 for submission in removedSubmissions:
                     evaluation.removeSubmission(submission)
-        
+
         ##########
         #selected#
         ##########

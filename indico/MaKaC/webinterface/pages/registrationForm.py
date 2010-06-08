@@ -58,8 +58,6 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
             self._tabRegistrants.disable()
             self._tabEPay.disable()
             self._tabRegistrationPreview.disable()
-        if not self._conf.hasEnabledSection("epay"):
-            self._tabEPay.disable()
 
     def _getPageContent(self, params):
         self._createTabCtrl()
@@ -2254,7 +2252,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         regForm = self._conf.getRegistrationForm()
         modPay=self._conf.getModPay()
         html=[]
-        if self._conf.hasEnabledSection("epay") and modPay.isActivated() and self._registrant.doPay():
+        if modPay.isActivated() and self._registrant.doPay():
             total={}
             total["value"]=0
             html.append( _(""" <tr><td colspan="2"><table width="100%%">
@@ -2378,7 +2376,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         vars["otherSections"] = self._getFormSections()
         vars["paymentInfo"]  = self._getPaymentInfo()
         vars["epaymentAnnounce"] = ""
-        if self._conf.hasEnabledSection("epay") and self._conf.getModPay().isActivated() and self._registrant.doPay():
+        if self._conf.getModPay().isActivated() and self._registrant.doPay():
             vars["epaymentAnnounce"] = """<br><font color="black">Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</font>"""
         return vars
 

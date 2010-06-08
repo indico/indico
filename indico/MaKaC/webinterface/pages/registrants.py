@@ -176,7 +176,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
         if display == []:
             display=["Email", "Institution","Phone","City","Country"]
-            if self._conf.hasEnabledSection("epay"):
+            if self._conf.getModPay().isActivated():
                 display.extend(["isPayed","idpayment","amountToPay"])
         return display
 
@@ -1030,7 +1030,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                  """)%(quoteattr(str(urlHandlers.UHConfModifRegistrantTransactionModify.getURL(self._registrant))), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()), transHTML,"".join(html))
         elif self._registrant.doPay():
             urlEpayment=""
-            if self._registrant.getConference().hasEnabledSection("epay") and self._registrant.getConference().getModPay().isActivated() and self._registrant.doPay():
+            if self._registrant.getConference().getModPay().isActivated() and self._registrant.doPay():
                 urlEpayment = """<br/><br/><i>Direct access link for epayment:</i><br/><small>%s</small>"""%escape(str(urlHandlers.UHConfRegistrationFormCreationDone.getURL(self._registrant)))
             return _(""" <form action=%s method="POST">
                             <tr>
