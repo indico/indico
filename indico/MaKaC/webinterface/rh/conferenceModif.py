@@ -4312,11 +4312,20 @@ class RHAbstractManagmentMultiple( RHConferenceModifBase ):
 
     #checks if notification email template is defined for all selected abstracts
     #returns List of abstracts which doesn't have required template
-    def _checkNotificationTemplate(self, status):
+    def _checkNotificationTemplate(self, statusKlass):
         from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
+
+        cType=self._conf.getContribTypeById(self._typeId)
+
         abstractsWithMissingTemplate = []
         for abstract in self._abstracts:
-            status._setAbstract(abstract)
+            if statusKlass == review.AbstractStatusAccepted:
+                status=statusKlass(abstract,None,self._track,cType)
+            elif statusKlass == review.AbstractStatusRejected:
+                status=statusKlass(abstract,None, None)
+            else: # In case we pass an improper Status
+                abstractsWithMissingTemplate.append(abstract)
+                continue
             wrapper=_AbstractWrapper(status)
             if abstract.getOwner().getNotifTplForAbstract(wrapper) is None:
                 abstractsWithMissingTemplate.append(abstract)
@@ -4349,7 +4358,7 @@ class RHAbstractManagmentAcceptMultiple( RHAbstractManagmentMultiple ):
             improperAbstracts = self._checkStatus()
             if improperAbstracts == []:
                 if self._accept:
-                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusAccepted(None, None, None, None))
+                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusAccepted)
                     if self._notify and not self._warningShown and  improperTemplates != []:
                         raise FormValuesError("""The abstracts with the following IDs can not be automatically
                                                  notified: %s. Therefore, none of your request has been processed;
@@ -4386,7 +4395,7 @@ class RHAbstractManagmentRejectMultiple( RHAbstractManagmentMultiple ):
             improperAbstracts = self._checkStatus()
             if improperAbstracts == []:
                 if self._reject:
-                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusRejected(None, None))
+                    improperTemplates = self._checkNotificationTemplate(review.AbstractStatusRejected)
                     if self._notify and not self._warningShown and  improperTemplates != []:
                         raise FormValuesError("""The abstracts with the following IDs can not be automatically
                                                  notified: %s. Therefore, none of your request has been processed;
