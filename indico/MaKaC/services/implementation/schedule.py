@@ -559,7 +559,10 @@ class ModifyStartEndDate(ScheduleOperation):
         if self._reschedule:
             oldStartDate=copy.copy(self._schEntry.getStartDate())
             oldDuration=copy.copy(self._schEntry.getDuration())
-            i = self._schEntry.getSchedule().getEntries().index(self._schEntry)+1
+            i = self._schEntry.getSchedule().getEntries().index(self._schEntry) + 1
+            while(i < len(self._schEntry.getSchedule().getEntries()) and
+                  self._schEntry.getStartDate() >= self._schEntry.getSchedule().getEntries()[i].getStartDate()):
+                i += 1
             entriesList = self._schEntry.getSchedule().getEntries()[i:]
 
         self._schEntry.setStartDate(self._startDate, moveEntries=1, check=checkFlag);
