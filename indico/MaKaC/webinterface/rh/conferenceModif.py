@@ -4315,7 +4315,8 @@ class RHAbstractManagmentMultiple( RHConferenceModifBase ):
     def _checkNotificationTemplate(self, statusKlass):
         from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
 
-        cType=self._conf.getContribTypeById(self._typeId)
+        if statusKlass == review.AbstractStatusAccepted:
+            cType=self._conf.getContribTypeById(self._typeId)
 
         abstractsWithMissingTemplate = []
         for abstract in self._abstracts:
