@@ -11191,7 +11191,7 @@ class WConfModifPendingQueues( wcomponents.WTemplated ):
 
             for key in keys:
                 list.append((key, self._pendingSubmitters[key][:]))
-                list.sort(conference.ContributionParticipation._cmpFamilyName)
+                #list.sort(conference.ContributionParticipation._cmpFamilyName)
 
         elif self._tabManagers.isActive():
             # Pending managers
@@ -11205,7 +11205,7 @@ class WConfModifPendingQueues( wcomponents.WTemplated ):
 
             for key in keys:
                 list.append((key, self._pendingManagers[key][:]))
-                list.sort(conference.SessionChair._cmpFamilyName)
+                #list.sort(conference.SessionChair._cmpFamilyName)
 
         elif self._tabCoordinators.isActive():
             # Pending coordinators
