@@ -291,7 +291,7 @@ function RMMatchSummaryMessageUpdate() {
 
     var len = languageCodes.length;
     if (len > 0) {
-        message_list.push(Html.span({}, ", languages: "))
+        message_list.push(Html.span({}, ", languages: "));
         message_list.push(RMLanguagesString(languageCodes));
     }
 
@@ -325,7 +325,7 @@ function RMLanguagesString(languageCodes) {
     if (len > 0) {
         for(var i=0; i < len; i++) {
             languageCodes[i];
-            messages.push(Html.span({style:{fontWeight: "bold"}}, languageCodes[i]))
+            messages.push(Html.span({style:{fontWeight: "bold"}}, languageCodes[i]));
             if (i < len - 1) {
                 messages.push(Html.span({}, ", "));
             }

@@ -54,7 +54,7 @@
                     <!--  This column shows whether the talk has a matching LOID associated with it (only makes sense for web lectures, not plain video). -->
                     <td width="50px" valign="top">
                         <% if talk["LOID"] != '': %>
-                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerMicalaCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "../images/RecordingManagerMicalaCheck.png" %>');">
                             </div>
                         <% end %>
                         <% else: %>
@@ -225,33 +225,20 @@
     // Pass the metadata we need for each talk to JavaScript
     // replacing any double-quotes " with the encoded char %22,
     // (otherwise any quotes in the title will cause a JavaScript error)
+
+    <% from MaKaC.services.interface.rpc import json %>
+    // convert Python list of dictionaries Talks into a Javascript dictionary of dictionaries RMTalkList
     var RMTalkList = {
     <% for talk in Talks: %>
-    "<%= talk["IndicoID"]   %>": {
-        "title":      "<%= talk["title"].replace('"', '%22')      %>",
-        "titleshort": "<%= talk["titleshort"].replace('"', '%22') %>",
-        "type":       "<%= talk["type"]                           %>",
-        "CDSID":      "<%= talk["CDSID"]                          %>",
-        "CDSURL":     "<%= talk["CDSURL"]                         %>",
-        "type":       "<%= talk["type"]                           %>",
-        "speakers":   "<%= talk["speakers"]                       %>",
-        "date":       "<%= talk["date"]                           %>",
-        "date_nice":  "<%= talk["date_nice"]                      %>",
-        "LOID":       "<%= talk["LOID"]                           %>",
-        "IndicoLink": "<%= talk["IndicoLink"]                     %>"
-    },
+    "<%= talk["IndicoID"] %>": <%= json.encode(talk) %>,
     <% end %>
     };
 
     // Pass the metadata we need for each lecture object
+    // convert Python list of dictionaries Orphans into a Javascript dictionary of dictionaries RMLOList
     var RMLOList = {
     <% for orphan in Orphans: %>
-    "<%= orphan["id"]   %>": {
-        "LOID":    "<%= orphan["LOID"]    %>",
-        "time":    "<%= orphan["time"]    %>",
-        "date":    "<%= orphan["date"]    %>",
-        "box":     "<%= orphan["box"]     %>"
-    },
+        "<%= orphan["id"]   %>": <%= json.encode(orphan) %>,
     <% end %>
     };
 

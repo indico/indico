@@ -185,10 +185,10 @@ def getTalks(conference, sort = False):
                                                   session         = session.getId(),
                                                   contribution    = None,
                                                   subcontribution = None)
-        event_info["title"]    = session.getTitle()
+        event_info["title"]      = session.getTitle()
         event_info["titleshort"] = truncateString(event_info["title"], title_length)
         # Get start time as seconds since the epoch so we can sort
-        event_info["date"]     = int(time.mktime(session.getStartDate().timetuple()))
+        event_info["date"]       = int(time.mktime(session.getStartDate().timetuple()))
         event_info["LOID"]       = ""
         event_info["IndicoLink"] = doesExistIndicoLink(session)
 
@@ -362,7 +362,8 @@ def getOrphans():
     if flagSuccess == True:
         try:
             cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-            cursor.execute("SELECT id, LOID, IndicoID, Title, Creator FROM Lectures WHERE NOT IndicoID OR IndicoID IS NULL ORDER BY LOID")
+            # Query Lectures table for all records in which IndicoID is blank or NULL
+            cursor.execute("SELECT id, LOID, IndicoID FROM Lectures WHERE NOT IndicoID OR IndicoID IS NULL ORDER BY LOID")
             connection.commit()
             rows = cursor.fetchall()
             cursor.close()
@@ -591,14 +592,14 @@ def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
         result += "Stylesheet does not exist: %s" % stylePath
 
     # temporary, for my own debugging
-    f = open('/tmp/base.xml', 'w')
-    f.write(basexml)
-    f.close()
+#    f = open('/tmp/base.xml', 'w')
+#    f.write(basexml)
+#    f.close()
 
     # temporary, for my own debugging
-    f = open('/tmp/marc.xml', 'w')
-    f.write(marcxml)
-    f.close()
+#    f = open('/tmp/marc.xml', 'w')
+#    f.write(marcxml)
+#    f.close()
 
     # Submit MARC XML record to CDS
     data = urlencode({
@@ -621,9 +622,9 @@ def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
         result += "Unknown error occured when submitting CDS record: %s.\n" % e
 
     # temporary, for my own debugging
-    f = open('/tmp/cds_result.txt', 'w')
-    f.write(result)
-    f.close()
+#    f = open('/tmp/cds_result.txt', 'w')
+#    f.write(result)
+#    f.close()
 
     # Update the micala database showing the task has started, but only if
     # the submission actually succeeded.
@@ -647,7 +648,7 @@ def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
             # If it is a plain_video talk, look for its IndicoID;
             # if it is a web_lecture talk, use its LODBID
             if contentType == 'plain_video':
-                idLecture = MicalaCommunication.getIdLecture(IndicoID, pattern_cern, pattern_umich)
+                idLecture = MicalaCommunication.getIdLecture(IndicoID)
                 # If the current talk was not found in the micala DB, add a new record.
                 if idLecture == '':
                     idLecture = MicalaCommunication.createNewMicalaLecture(IndicoID, contentType, pattern_cern, pattern_umich)
@@ -713,9 +714,9 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LODBID, LOID, videoFormat, l
         result += "Stylesheet does not exist: %s" % stylePath
 
     # temporary, for my own debugging
-    f = open('/tmp/micala.xml', 'w')
-    f.write(micalaxml)
-    f.close()
+#    f = open('/tmp/micala.xml', 'w')
+#    f.write(micalaxml)
+#    f.close()
 
     # Web upload metadata to micala server
     if flagSuccess == True:
@@ -801,9 +802,9 @@ def getCDSRecords(confId):
 
     # Read each line, extracting the IndicoIDs and their corresponding CDS IDs
     for line in lines:
-        Logger.get('RecMan').debug(" CDS query result: %s" % line)
         result = line.strip()
         if result != "":
+            Logger.get('RecMan').debug(" CDS query result: %s" % line)
 
             bigcdsid = result.split(" ")[0]
             CDSID = bigcdsid.lstrip("0")
@@ -815,7 +816,7 @@ def getCDSRecords(confId):
                 IndicoID = m.group(1)
                 results[IndicoID] = CDSID
             else:
-                # If we end up here then probably something's wrong with the URL
+                # If we end up here then probably something's wrong with the URL, or perhaps we jusy got a blank line
                 pass
 
 #            results.append({"CDSID": CDSID, "IndicoID": IndicoID})

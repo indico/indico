@@ -114,7 +114,7 @@ globalOptions = [
 
     ("micalaUploadURL", {"description" : _("URL for micala web upload"),
                "type": str,
-               "defaultValue": "http://lectureprocessing01.cern.ch/micala_monitor/test.py",
+               "defaultValue": "http://lectureprocessing01.cern.ch/micala_monitor/submit_metadata.py",
                "editable": True,
                "visible": True} ),
 

@@ -239,8 +239,8 @@ class MicalaCommunication(object):
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         try:
-            cursor.execute("UPDATE Lectures SET IndicoID=%s WHERE id=%s",
-                           (IndicoID, LODBID))
+            cursor.execute("UPDATE Lectures SET IndicoID=%s, contentType=%s WHERE id=%s",
+                           (IndicoID, "WEBLECTURE", LODBID))
             connection.commit()
         except MySQLdb.Error, e:
             flagSuccess = False
@@ -271,6 +271,7 @@ class MicalaCommunication(object):
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         # The following query returns the IndicoID's for which the metadata export task was started.
+        # Whether it was finished we will find out separately by querying CDS to see what records have been created.
         cursor.execute('''SELECT L.id, L.LOID, L.IndicoID,
             T.id, T.Name,
             S.idLecture, S.idTask, S.Status, S.Message
@@ -294,7 +295,11 @@ class MicalaCommunication(object):
         for row in rows:
             try:
                 # check to see if the IndicoID in question is to be found in the dictionary of matches
+                # if it is found, that means the CDS record exists and there's nothing to do.
                 existing_cds_record = cds_indico_matches[row["IndicoID"]]
+                Logger.get('RecMan').debug(" CDS export complete for: %s" % existing_cds_record)
+                # Otherwise, if it is not found, that means the CDS record hasn't been created yet,
+                # so add the IndicoID to the list of pending records.
             except KeyError:
                 Logger.get('RecMan').debug(" CDS export pending for: %s" % row["IndicoID"])
                 talk_array.append(row["IndicoID"])
