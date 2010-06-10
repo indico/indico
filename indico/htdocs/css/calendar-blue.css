@@ -144,7 +144,7 @@ div.calendar {
 
 .calendar tbody td.active { /* Active (pressed) cells <TD> */
   background: #cde;
-  padding: 2px 2px 0px 2px;
+  padding: 1px 1px 1px 1px;
 }
 
 .calendar tbody td.selected { /* Cell showing today date */
