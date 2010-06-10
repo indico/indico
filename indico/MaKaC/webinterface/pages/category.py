@@ -111,15 +111,15 @@ class WCategoryDisplay(wcomponents.WTemplated):
 
     def _getMaterialHTML( self ):
         l = []
+        temp = wcomponents.WMaterialDisplayItem()
         for mat in self._target.getAllMaterialList():
-            temp = wcomponents.WMaterialDisplayItem()
             url = urlHandlers.UHMaterialDisplay.getURL( mat )
             l.append( temp.getHTML( self._aw, mat, url ) )
         res = ""
         if l:
             res =   _("""
-                        <span class="displayField"> _("Material"): %s</span>
-                    """)%"".join( l )
+                        <span style="color:#444"> _("Material"): %s</span>
+                    """)%", ".join( l )
         return res
 
     def getHTML( self, aw, params ):
