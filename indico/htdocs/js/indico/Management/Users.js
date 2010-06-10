@@ -1431,6 +1431,10 @@ type("UserListField", ["IWidget"], {
         return $L(this.userList);
     },
 
+    clear: function() {
+        this.userList.clearList();
+    },
+
     getPrivileges: function() {
         return this.selectedPrivileges;
     },
