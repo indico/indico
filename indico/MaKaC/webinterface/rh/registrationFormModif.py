@@ -580,7 +580,7 @@ class _RemoveFields:
         if type(self._fields) == type('string'):
             field = self._gsf.getFieldById(self._fields)
             self._gsf.removeField(field)
-        else: 
+        elif self._fields is not None: 
             for fieldID in self._fields:
                 field = self._gsf.getFieldById(fieldID)
                 self._gsf.removeField(field)
