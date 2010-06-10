@@ -22,17 +22,17 @@ from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoException, VidyoError, \
     FakeAvatarOwner, VidyoTools, getVidyoOptionValue
+import MaKaC.plugins.Collaboration.Vidyo.mail as notifications
 from MaKaC.user import AvatarHolder, Avatar
-from MaKaC.plugins.Collaboration.Vidyo.mail import VidyoMails
 from MaKaC.plugins.Collaboration.Vidyo.api.operations import VidyoOperations
 from MaKaC.plugins.Collaboration.Vidyo.fossils import ICSBookingConfModifFossil, \
     ICSBookingIndexingFossil
 from MaKaC.common.utils import unicodeLength
-from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
 from MaKaC.common.logger import Logger
-
+from MaKaC.common.mail import GenericMailer
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 class CSBooking(CSBookingBase):
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
@@ -200,7 +200,6 @@ class CSBooking(CSBookingBase):
             self.setOwnerAccount(str(result.ownerName))
             self.setBookingOK()
             VidyoTools.getEventEndDateIndex().indexBooking(self)
-            self.sendMail('create')
 
 
     def _modify(self, oldBookingParams):
@@ -219,10 +218,8 @@ class CSBooking(CSBookingBase):
             self.setOwnerAccount(str(result.ownerName))
             self.setBookingOK()
 
-            if oldBookingParams["owner"]["id"] == self.getOwnerObject().getId():
-                self.sendMail('modify')
-            else:
-                self.sendMail('modify', oldBookingParams["owner"])
+            if oldBookingParams["owner"]["id"] != self.getOwnerObject().getId():
+                self._sendNotificationToOldNewOwner(oldBookingParams["owner"])
 
 
     def _notifyOnView(self):
@@ -316,7 +313,6 @@ class CSBooking(CSBookingBase):
 
         if not fromDeleteOld:
             VidyoTools.getEventEndDateIndex().unindexBooking(self)
-            self.sendMail('delete')
 
 
     def _getLaunchDisplayInfo(self):
@@ -348,7 +344,111 @@ class CSBooking(CSBookingBase):
         VidyoTools.getEventEndDateIndex().unindexBooking(self)
 
 
-    def sendMail(self, mailType, oldOwner = None):
-        """ Sends a mail, wrapping it with ExternalOperationsManager
+    def _sendNotificationToOldNewOwner(self, oldOwner):
+
+        #notification to new owner
+        if isinstance(self.getOwnerObject(), Avatar):
+            try:
+                notification = notifications.VidyoOwnerChosenNotification(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
+                                     self.getConference().getCreator())
+
+            except Exception, e:
+                Logger.get('Vidyo').error(
+                    """Could not send VidyoOwnerChosenNotification for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+        #notification to old owner
+        if oldOwner["_type"] == "Avatar":
+            try:
+                oldOwnerAvatar = AvatarHolder().getById(oldOwner["id"])
+                if oldOwnerAvatar:
+                    notification = notifications.VidyoOwnerRemovedNotification(self, oldOwnerAvatar)
+                    GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
+                                     self.getConference().getCreator())
+
+            except Exception, e:
+                Logger.get('Vidyo').error(
+                    """Could not send VidyoOwnerRemovedNotification for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+
+    def _sendMail(self, operation):
         """
-        ExternalOperationsManager.execute(self, "sendMail_" + mailType, VidyoMails.sendMail, self, mailType, oldOwner)
+        Overloads _sendMail behavior for EVO
+        """
+
+        if operation == 'new':
+            #notification to admin
+            try:
+                notification = notifications.NewVidyoPublicRoomNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
+                                     self.getConference().getCreator())
+            except Exception, e:
+                Logger.get('Vidyo').error(
+                    """Could not send NewVidyoPublicRoomNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+            #notification to owner
+            if isinstance(self.getOwnerObject(), Avatar):
+                try:
+                    notification = notifications.VidyoOwnerChosenNotification(self)
+                    GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
+                                         self.getConference().getCreator())
+
+                except Exception, e:
+                    Logger.get('Vidyo').error(
+                        """Could not send VidyoOwnerChosenNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (self.getId(), self.getConference().getId(), str(e)))
+
+            #notification to admin if too many rooms in index
+            if VidyoTools.needToSendCleaningReminder():
+                try:
+                    notification = notifications.VidyoCleaningNotification(self)
+                    GenericMailer.send(notification)
+                except Exception, e:
+                    Logger.get('Vidyo').error(
+                        """Could not send VidyoCleaningNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (self.getId(), self.getConference().getId(), str(e)))
+
+
+        elif operation == 'modify':
+            #notification to admin
+            try:
+                notification = notifications.VidyoPublicRoomModifiedNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
+                                     self.getConference().getCreator())
+            except Exception, e:
+                Logger.get('Vidyo').error(
+                    """Could not send VidyoPublicRoomModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+
+        elif operation == 'remove':
+            #notification to admin
+            try:
+                notification = notifications.VidyoPublicRoomRemovalNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
+                                     self.getConference().getCreator())
+            except Exception, e:
+                Logger.get('Vidyo').error(
+                    """Could not send VidyoPublicRoomRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+            #notification to owner
+            if isinstance(self.getOwnerObject(), Avatar):
+                try:
+                    notification = notifications.VidyoRoomDeletedOwnerNotification(self)
+                    GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
+                                         self.getConference().getCreator())
+                except Exception, e:
+                    Logger.get('Vidyo').error(
+                        """Could not send VidyoRoomDeletedOwnerNotification for booking with id %s of event with id %s, exception: %s""" %
+                        (self.getId(), self.getConference().getId(), str(e)))

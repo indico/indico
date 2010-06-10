@@ -330,6 +330,11 @@ class MailTools(object):
 
     @classmethod
     def needToSendEmails(cls, pluginName = None):
+        """
+        Checks the plugin/global options in order to know if notification e-mails
+        need to be sent
+        """
+
         if pluginName:
             admins = CollaborationTools.getOptionValue(pluginName, 'admins')
             sendMailNotifications = CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications')
@@ -347,6 +352,7 @@ class MailTools(object):
             If pluginName is None, then the global Collaboration admin mails will be returned.
             The emails in the list are not in any particular order and should be unique.
         """
+
         if pluginName:
             adminEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
             if CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications'):

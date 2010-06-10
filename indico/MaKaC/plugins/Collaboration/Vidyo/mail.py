@@ -33,116 +33,6 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.TemplateExec import escape
 
 
-class VidyoMails(object):
-    """ Utility class with a class method to send a mail
-    """
-
-    @classmethod
-    def sendMail(cls, booking, mailType, oldOwner = None):
-        if MailTools.needToSendEmails('Vidyo'):
-
-            if mailType == 'create':
-                #notification to admin
-                try:
-                    notification = NewVidyoPublicRoomNotificationAdmin(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                                         "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                         booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('Vidyo').error(
-                        """Could not send NewVidyoPublicRoomNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                        (booking.getId(), booking.getConference().getId(), str(e)))
-
-                #notification to owner
-                if isinstance(booking.getOwnerObject(), Avatar):
-                    try:
-                        notification = VidyoOwnerChosenNotification(booking)
-                        GenericMailer.sendAndLog(notification, booking.getConference(),
-                                             "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                             booking.getConference().getCreator())
-
-                    except Exception, e:
-                        Logger.get('Vidyo').error(
-                            """Could not send VidyoOwnerChosenNotification for booking with id %s of event with id %s, exception: %s""" %
-                            (booking.getId(), booking.getConference().getId(), str(e)))
-
-                #notification to admin if too many rooms in index
-                if VidyoTools.needToSendCleaningReminder():
-                    try:
-                        notification = VidyoCleaningNotification(booking)
-                        GenericMailer.send(notification)
-                    except Exception, e:
-                        Logger.get('Vidyo').error(
-                            """Could not send VidyoCleaningNotification for booking with id %s of event with id %s, exception: %s""" %
-                            (booking.getId(), booking.getConference().getId(), str(e)))
-
-
-            elif mailType == 'modify':
-                #notification to admin
-                try:
-                    notification = VidyoPublicRoomModifiedNotificationAdmin(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                                         "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                         booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('Vidyo').error(
-                        """Could not send VidyoPublicRoomModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                        (booking.getId(), booking.getConference().getId(), str(e)))
-
-                if oldOwner:
-                    #notification to new owner
-                    if isinstance(booking.getOwnerObject(), Avatar):
-                        try:
-                            notification = VidyoOwnerChosenNotification(booking)
-                            GenericMailer.sendAndLog(notification, booking.getConference(),
-                                                 "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                                 booking.getConference().getCreator())
-
-                        except Exception, e:
-                            Logger.get('Vidyo').error(
-                                """Could not send VidyoOwnerChosenNotification for booking with id %s of event with id %s, exception: %s""" %
-                                (booking.getId(), booking.getConference().getId(), str(e)))
-
-                    #notification to old owner
-                    if oldOwner["_type"] == "Avatar":
-                        try:
-                            oldOwnerAvatar = AvatarHolder().getById(oldOwner["id"])
-                            if oldOwnerAvatar:
-                                notification = VidyoOwnerRemovedNotification(booking, oldOwnerAvatar)
-                                GenericMailer.sendAndLog(notification, booking.getConference(),
-                                                 "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                                 booking.getConference().getCreator())
-
-                        except Exception, e:
-                            Logger.get('Vidyo').error(
-                                """Could not send VidyoOwnerRemovedNotification for booking with id %s of event with id %s, exception: %s""" %
-                                (booking.getId(), booking.getConference().getId(), str(e)))
-
-
-            elif mailType == 'delete':
-                #notification to admin
-                try:
-                    notification = VidyoPublicRoomRemovalNotificationAdmin(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                                         "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                         booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('Vidyo').error(
-                        """Could not send VidyoPublicRoomRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                        (booking.getId(), booking.getConference().getId(), str(e)))
-
-                #notification to owner
-                if isinstance(booking.getOwnerObject(), Avatar):
-                    try:
-                        notification = VidyoRoomDeletedOwnerNotification(booking)
-                        GenericMailer.sendAndLog(notification, booking.getConference(),
-                                             "MaKaC/plugins/Collaboration/Vidyo/collaboration.py",
-                                             booking.getConference().getCreator())
-                    except Exception, e:
-                        Logger.get('Vidyo').error(
-                            """Could not send VidyoRoomDeletedOwnerNotification for booking with id %s of event with id %s, exception: %s""" %
-                            (booking.getId(), booking.getConference().getId(), str(e)))
-
 
 ############### E-mail templates ##############
 
@@ -298,6 +188,7 @@ class VidyoAdminNotificationBase(VidyoNotificationBase):
     def __init__(self, booking):
         VidyoNotificationBase.__init__(self, booking)
         self.setToList(MailTools.getAdminEmailList('Vidyo'))
+        self.setCCList(MailTools.getAdminEmailList())
 
 class VidyoEventManagerNotificationBase(VidyoNotificationBase):
     def __init__(self, booking):

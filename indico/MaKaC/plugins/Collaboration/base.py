@@ -41,6 +41,8 @@ import os, inspect
 import MaKaC.plugins.Collaboration as Collaboration
 from MaKaC.i18n import _
 from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
+
 from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil, ICSSanitizationErrorFossil,\
     ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil
 
@@ -222,7 +224,10 @@ class CSBookingManager(Persistent, Observer):
                         self.getHiddenBookings().add(newId)
                     self._indexBooking(newBooking)
                     self._notifyModification()
-                    self._sendMail(newBooking, 'new')
+
+                    if MailTools.needToSendEmails(bookingType):
+                        newBooking._sendNotifications('new')
+
                     return newBooking
         else:
             #we raise an exception because the web interface should take care of this never actually happening
@@ -283,7 +288,9 @@ class CSBookingManager(Persistent, Observer):
 
                 self._notifyModification()
 
-                self._sendMail(booking, 'modify')
+                if MailTools.needToSendEmails(booking.getType()):
+                    booking._sendNotifications('modify')
+
                 return booking
 
     @classmethod
@@ -336,7 +343,8 @@ class CSBookingManager(Persistent, Observer):
 
             self._notifyModification()
 
-            self._sendMail(booking, 'remove')
+            if MailTools.needToSendEmails(booking.getType()):
+                booking._sendNotifications('remove')
 
             return booking
 
@@ -442,45 +450,6 @@ class CSBookingManager(Persistent, Observer):
             indexes.append(collaborationIndex.getIndex(commonIndexName + "_pending"))
 
         return indexes
-
-    def _sendMail(self, booking, operation):
-        if MailTools.needToSendEmails():
-
-            if operation == 'new':
-                try:
-                    notification = mail.NewBookingNotification(booking)
-                    GenericMailer.sendAndLog(notification, self._conf,
-                                         "MaKaC/plugins/Collaboration/base.py",
-                                         self._conf.getCreator())
-                except Exception, e:
-                    Logger.get('VideoServ').error(
-                        """Could not send NewBookingNotification for booking with id %s of event with id %s, exception: %s""" %
-                        (booking.getId(), self._conf.getId(), str(e)))
-                    raise e
-
-            elif operation == 'modify':
-                try:
-                    notification = mail.BookingModifiedNotification(booking)
-                    GenericMailer.sendAndLog(notification, self._conf,
-                                         "MaKaC/plugins/Collaboration/base.py",
-                                         self._conf.getCreator())
-                except Exception, e:
-                    Logger.get('VideoServ').error(
-                        """Could not send BookingModifiedNotification for booking with id %s of event with id %s, exception: %s""" %
-                        (booking.getId(), self._conf.getId(), str(e)))
-                    raise e
-
-            elif operation == 'remove':
-                try:
-                    notification = mail.BookingDeletedNotification(booking)
-                    GenericMailer.sendAndLog(notification, self._conf,
-                                         "MaKaC/plugins/Collaboration/base.py",
-                                         self._conf.getCreator())
-                except Exception, e:
-                    Logger.get('VideoServ').error(
-                        """Could not send BookingDeletedNotification for booking with id %s of event with id %s, exception: %s""" %
-                        (booking.getId(), self._conf.getId(), str(e)))
-                    raise e
 
     def getManagers(self):
         if not hasattr(self, "_managers"):
@@ -1494,6 +1463,49 @@ class CSBookingBase(Persistent, Fossilizable):
             This method does not unregister the booking from the list of date change observer of the meeting
         """
         raise CollaborationException("Method _delete was not overriden for the plugin type " + str(self._type))
+
+    def _sendNotifications(self, operation):
+        """
+        Sends a mail, wrapping it with ExternalOperationsManager
+        """
+        ExternalOperationsManager.execute(self, "sendMail_" + operation, self._sendMail, operation)
+
+    def _sendMail(self, operation):
+        if operation == 'new':
+            try:
+                notification = mail.NewBookingNotification(self)
+                GenericMailer.sendAndLog(notification, self._conf,
+                                     "MaKaC/plugins/Collaboration/base.py",
+                                     self._conf.getCreator())
+            except Exception, e:
+                Logger.get('VideoServ').error(
+                    """Could not send NewBookingNotification for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self._conf.getId(), str(e)))
+                raise e
+
+        elif operation == 'modify':
+            try:
+                notification = mail.BookingModifiedNotification(self)
+                GenericMailer.sendAndLog(notification, self._conf,
+                                     "MaKaC/plugins/Collaboration/base.py",
+                                     self._conf.getCreator())
+            except Exception, e:
+                Logger.get('VideoServ').error(
+                    """Could not send BookingModifiedNotification for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self._conf.getId(), str(e)))
+                raise e
+
+        elif operation == 'remove':
+            try:
+                notification = mail.BookingDeletedNotification(self)
+                GenericMailer.sendAndLog(notification, self._conf,
+                                     "MaKaC/plugins/Collaboration/base.py",
+                                     self._conf.getCreator())
+            except Exception, e:
+                Logger.get('VideoServ').error(
+                    """Could not send BookingDeletedNotification for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self._conf.getId(), str(e)))
+                raise e
 
 
 class WCSTemplateBase(wcomponents.WTemplated):
