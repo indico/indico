@@ -64,8 +64,6 @@ ButtonCreateIndicoLink.observeEvent('mouseout', function(event){
     Dom.List.remove(document.body, tooltip);
 });
 
-IndicoUI.Effect.appear($E('RMlowerPane'), "block");
-
 // This function gets called when either plain_video or web_lecture buttons are clicked.
 function RMbuttonModeSelect(mode) {
 

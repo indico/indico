@@ -80,7 +80,7 @@
                     <!--  This column shows whether a link has been created from Indico to the CDS record. -->
                     <td width="50px" valign="top">
                         <% if talk["IndicoLink"] == True: %>
-                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "/indico/images/RecordingManagerIndicoCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "../images/RecordingManagerIndicoCheck.png" %>');">
                             </div>
                         <% end %>
                         <% else: %>
@@ -160,25 +160,34 @@
         <br />
         <strong>4. <%= _("Select language(s) in which the talk was given") %></strong>
         <br />
+        <% if not FlagLanguageDataOK: %>
+            <font color="red">ERROR: Malformed language data. Please check Recording Manager plugin settings.
+            <ul>
+                <% for msg in LanguageErrorMessages: %>
+                <li><%= msg %></li>
+                <% end %>
+            </ul>
+            </font>
+        <% end %>
+        <% else: %>
         <!-- http://www.loc.gov/marc/languages/ -->
-
-        <input type="checkbox" value="<%= LanguageList[0][0] %>" id="RMLanguagePrimary" onclick="RMLanguageTogglePrimary('<%= LanguageList[0][0] %>')"><%= LanguageList[0][1] %></input>
+        <input type="checkbox" value="<%= LanguageCodePrimary %>" id="RMLanguagePrimary" onclick="RMLanguageTogglePrimary('<%= LanguageCodePrimary %>')"><%= LanguageDictionary[LanguageCodePrimary] %></input>
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="checkbox" id="RMLanguageSecondary" onclick="RMLanguageToggleSecondary('<%= LanguageList[1][0] %>')"><%= LanguageList[1][1] %></input>
+        <input type="checkbox" value="<%= LanguageCodeSecondary %>" id="RMLanguageSecondary" onclick="RMLanguageToggleSecondary('<%= LanguageCodeSecondary %>')"><%= LanguageDictionary[LanguageCodeSecondary] %></input>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <input type="checkbox" name="Other" value="other" id="RMLanguageOther" onclick="RMLanguageToggleOther()">Other</input>
         <select id="RMLanguageOtherSelect">
             <option value="chooseOne" onclick="RMLanguageSelectOther(0)">-- <%= _('Choose one') %> --</option>
-            <% for languageCode, languageName in LanguageList: %>
-                <% if languageName != 'English' and languageName != 'French': %>
-                <option value="<%=languageCode%>" onclick="RMLanguageSelectOther('<%=languageCode%>')"><%=languageName%></option>
+            <% for languageCode in LanguageCodes: %>
+                <% if languageCode != LanguageCodePrimary and languageCode != LanguageCodeSecondary: %>
+                <option value="<%=languageCode%>" onclick="RMLanguageSelectOther('<%=languageCode%>')"><%=LanguageDictionary[languageCode]%></option>
                 <% end %>
             <% end %>
         </select>
         <span id="RMSelectLanguage">
         <!--  Javascript button here -->
         </span>
-
+        <% end %>
 <!--         <input type="button" disabled="" id="RMbuttonCreateCDSRecord" onclick="RMCreateCDSRecord()" value=<%= _("\"Create CDS record\"") %> /> -->
     </span>
     <span>
@@ -207,8 +216,6 @@
 </div>
 
 <script type="text/javascript">
-    var RM_orphans = <%= jsonEncode(Orphans) %>;
-
     var RMselectedTalkId    = '';
     var RMselectedLODBID    = '';
     var RMselectedTalkName  = '';
@@ -218,27 +225,24 @@
     var RMLanguageFlagPrimary   = true;
     var RMLanguageFlagSecondary = false;
     var RMLanguageFlagOther     = false;
-    var RMLanguageValuePrimary   = '<%= LanguageList[0][0] %>';
-    var RMLanguageValueSecondary = '<%= LanguageList[1][0] %>';
+    var RMLanguageValuePrimary   = '<%= LanguageCodePrimary %>';
+    var RMLanguageValueSecondary = '<%= LanguageCodeSecondary %>';
     var RMLanguageValueOther    = 0;
 
-    // Pass the metadata we need for each talk to JavaScript
-    // replacing any double-quotes " with the encoded char %22,
-    // (otherwise any quotes in the title will cause a JavaScript error)
-
-    <% from MaKaC.services.interface.rpc import json %>
     // convert Python list of dictionaries Talks into a Javascript dictionary of dictionaries RMTalkList
+    // (even though it's called RMTalkList, which is confusing)
     var RMTalkList = {
     <% for talk in Talks: %>
-    "<%= talk["IndicoID"] %>": <%= json.encode(talk) %>,
+    "<%= talk["IndicoID"] %>": <%= jsonEncode(talk) %>,
     <% end %>
     };
 
     // Pass the metadata we need for each lecture object
     // convert Python list of dictionaries Orphans into a Javascript dictionary of dictionaries RMLOList
+    // (even though it's called RMLOList, which is confusing)
     var RMLOList = {
     <% for orphan in Orphans: %>
-        "<%= orphan["id"]   %>": <%= json.encode(orphan) %>,
+        "<%= orphan["id"]   %>": <%= jsonEncode(orphan) %>,
     <% end %>
     };
 

@@ -21,8 +21,10 @@
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase, \
     CollaborationTools
-from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans, languageList
+from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
+import re
+from MaKaC.common.logger import Logger
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -43,8 +45,81 @@ class WNewBookingForm(WCSPageTemplateBase):
         if CollaborationTools.isUsingHTTPS():
             previewURL = previewURL.replace("http","https")
         vars["PreviewURL"] = previewURL
-        vars["LanguageList"] = languageList
+
+        langPrimary = CollaborationTools.getOptionValue("RecordingManager", "languageCodePrimary")
+        langSecondary = CollaborationTools.getOptionValue("RecordingManager", "languageCodeSecondary")
+        langDict = CollaborationTools.getOptionValue("RecordingManager", "languageDictionary")
+        (vars["FlagLanguageDataOK"], vars["LanguageErrorMessages"]) = \
+            self._checkLanguageData(langPrimary, langSecondary, langDict)
+        vars["LanguageCodePrimary"]   = langPrimary
+        vars["LanguageCodeSecondary"] = langSecondary
+        vars["LanguageDictionary"]    = langDict
+        vars["LanguageCodes"]         = sorted(CollaborationTools.getOptionValue("RecordingManager", "languageDictionary").keys())
+
         return vars
+
+    def _checkLanguageData(self, langPrimary, langSecondary, langDict):
+        success = True
+        messageList = []
+
+        # regular expression to match 3 lowercase chars only (when used with match())
+        patternLanguageCode = re.compile('[a-z][a-z][a-z]$')
+        # regular expression to match a capitalized word with at least two chars, followed by anything
+        patternLanguageName = re.compile('[A-Z].*$')
+
+        # Make sure primary code is 3 lowercase chars
+        if patternLanguageCode.match(langPrimary):
+            # Make sure primary code has a key-value pair in langDict,
+            # and that the language name is a capitalized word
+            if langPrimary in langDict:
+                if not patternLanguageName.match(langDict[langPrimary]):
+                    messageList.append("primary language name '%s' must be a capitalized word" % langDict[langPrimary])
+                    success = False
+            else:
+                messageList.append("primary language code '%s' not found in user-defined language dictionary" % langPrimary)
+                success = False
+        # If it's not 3 chars, don't even try to look it up.
+        else:
+            messageList.append(_("primary language code '%s' must be a MARC-compliant code (3 lowercase characters)") % langPrimary)
+            success = False
+
+        # Make sure secondary code is 3 lowercase chars
+        if patternLanguageCode.match(langSecondary):
+            # Make sure primary code has a key-value pair in langDict
+            # and that the language name is a capitalized word
+            if langSecondary in langDict:
+                if not patternLanguageName.match(langDict[langSecondary]):
+                    messageList.append("secondary language name '%s' must be a capitalized word" % langDict[langSecondary])
+                    success = False
+            else:
+                messageList.append("secondary language code '%s' not found in user-defined language dictionary" % langSecondary)
+                success = False
+        # If it's not 3 chars, don't even try to look it up.
+        else:
+            messageList.append("secondary language code '%s' must be a MARC-compliant code (3 lowercase characters)" % langSecondary)
+            success = False
+
+        # Loop through keys of langDict
+        for langCode in langDict.keys():
+            # Make sure primary code is 3 lowercase chars
+            if not patternLanguageCode.match(langCode):
+                success = False
+
+            # Make sure each key has a value:
+            if langCode in langDict:
+                if not patternLanguageName.match(langDict[langCode]):
+                    messageList.append("language name '%s' must be a capitalized word" % langDict[langCode])
+                    success = False
+            else:
+                messageList.append("language code '%s' not found in user-defined language dictionary" % langCode)
+                success = False
+
+
+        for msg in messageList:
+            Logger.get('RecMan').debug("LanguageErrorMessage: %s" % msg)
+        Logger.get('RecMan').debug("LANGUAGE ERROR")
+
+        return (success, messageList)
 
 class WMain (WJSBase):
     pass

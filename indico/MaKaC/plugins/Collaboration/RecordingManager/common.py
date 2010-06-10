@@ -43,34 +43,6 @@ import sys
 from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunication
 from MaKaC.i18n import _
 
-# If you want to add more languages,
-# use the MARC language codes http://www.loc.gov/marc/languages
-# Also, make sure English and French come first in the list,
-# and the rest in alphabetical order.
-languageList = [
-# English and French are the first two
-    ("eng", _("English")),
-    ("fre", _("French")),
-# now start the rest of the list
-    ("bul", _("Bulgarian")),
-    ("chi", _("Chinese")),
-    ("cze", _("Czech")),
-    ("dan", _("Danish")),
-    ("dut", _("Dutch/Flemish")),
-    ("fin", _("Finnish")),
-    ("ger", _("German")),
-    ("gre", _("Greek")),
-    ("hun", _("Hungarian")),
-    ("ita", _("Italian")),
-    ("jpn", _("Japanese")),
-    ("nor", _("Norweigan")),
-    ("pol", _("Polish")),
-    ("por", _("Portuguese")),
-    ("slo", _("Slovak")),
-    ("spa", _("Spanish")),
-    ("swe", _("Swedish"))
-]
-
 def getTalks(conference, sort = False):
     """" sort: if True, contributions are sorted by start date (non scheduled contributions at the end)
     """
