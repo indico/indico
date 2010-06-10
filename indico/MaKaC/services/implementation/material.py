@@ -54,7 +54,10 @@ class MaterialBase(object):
             #if isinstance(self._target, conference.Material):
             self._material = self._target
             self._conf = self._target.getConference()
-            self._categ = self._conf.getOwner()
+            if self._conf == None:
+                self._categ = self._target
+            else:
+                self._categ = self._conf.getOwner()
 
             ## TODO: remove this, since material/resource creation
             ## doesn't come through this method
@@ -84,7 +87,6 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
         ProtectedModificationService._checkParams(self)
 
     def _checkProtection(self):
-
         owner = self._material.getOwner()
 
         # There are two exceptions to the normal permission scheme:
