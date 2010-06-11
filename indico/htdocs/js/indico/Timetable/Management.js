@@ -193,8 +193,8 @@ type("TimetableManagementActions", [], {
             if (error) {
                 IndicoUtil.errorReport(error);
             }else {
-                this.timetable.getTimetableDrawer().setSessionBlockColors(eventData.sessionId, textColor, bgColor);
-
+                this.timetable._updateSessionData(eventData.sessionId, ['color', 'textColor'], [bgColor, textColor]);
+                this.timetable.timetableDrawer.redraw();
                 eventData.color = bgColor;
                 eventData.textColor = textColor;
             }
@@ -497,6 +497,11 @@ type("TimetableManagementActions", [], {
                  * in the session won't have the correct value
                  */
                 self.timetable.data[result.day][result.id].entries = aux;
+                /* since the session title can be changed from this dialog, we need to set the
+                 * title of all the blocks contained in the timetable that belong to the same
+                 * session.
+                 */
+                self.timetable._updateSessionData(result.session.id, ['title'], [result.session.title])
             },
             true
         );

@@ -4806,6 +4806,11 @@ div.timetableBlockContrib:hover {
     color: white;
 }*/
 
+span.sessionRenameEntry, span.sessionRenameValue {
+    color: #888888;
+    font-weight: bold;
+}
+
 div.exclusivePopup {
     background-color: white;
     position: fixed;

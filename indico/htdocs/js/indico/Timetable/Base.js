@@ -907,6 +907,23 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         });
     },
 
+    _updateSessionData: function(sessionId, fields, newValues) {
+
+        var data = this.getData();
+
+        for (day in data) {
+            for (entry in data[day]) {
+                if ( data[day][entry]["entryType"] == "Session" && data[day][entry]["sessionId"] == sessionId ) {
+                    for (i = 0 ; i < fields.length ; ++i) {
+                        data[day][entry][fields[i]] = newValues[i];
+                    }
+                }
+            }
+        }
+
+        this.timetableDrawer.redraw();
+    },
+
     _getInfoBoxContent: function() {
         return '';
     },

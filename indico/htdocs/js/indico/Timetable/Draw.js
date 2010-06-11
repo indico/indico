@@ -1375,20 +1375,6 @@ type("TimetableDrawer", ["IWidget"],
              each(this.blocks, function(block) { block.postDraw(); });
          },
 
-         /*
-          * Sets the color for all session blocks belonging to the
-          * session with sessionId
-          */
-         setSessionBlockColors: function (sessionId, textColor, bgColor) {
-             var self = this;
-
-             each(this.blocks, function(block) {
-                 if (block.eventData.entryType == 'Session' && block.eventData.sessionId == sessionId) {
-                     block.setColors(textColor, bgColor);
-                 }
-             });
-         },
-
          flatten: function(data) {
              var result = {};
              each(data, function(entry, key) {

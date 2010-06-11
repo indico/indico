@@ -627,18 +627,21 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
     def _addConveners(self, slot):
         pass
 
-    def _checkParams(self):
-        pManager = ParameterManager(self._params)
+    def _setSessionTitle(self, slot):
+        pass
 
-        self._startDateTime = pManager.extract("startDateTime",
+    def _checkParams(self):
+        self.pManager = ParameterManager(self._params)
+
+        self._startDateTime = self.pManager.extract("startDateTime",
                                                pType=datetime.datetime)
-        self._endDateTime = pManager.extract("endDateTime",
+        self._endDateTime = self.pManager.extract("endDateTime",
                                              pType=datetime.datetime)
-        self._title = pManager.extract("title", pType=str, allowEmpty=True)
-        self._conveners = pManager.extract("conveners", pType=list,
+        self._title = self.pManager.extract("title", pType=str, allowEmpty=True)
+        self._conveners = self.pManager.extract("conveners", pType=list,
                                            allowEmpty=True)
-        self._roomInfo = pManager.extract("roomInfo", pType=dict, allowEmpty=True)
-        self._isSessionTimetable = pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
+        self._roomInfo = self.pManager.extract("roomInfo", pType=dict, allowEmpty=True)
+        self._isSessionTimetable = self.pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
 
     def _performOperation(self):
         #if there is something inside the session we have to move it as well
@@ -654,6 +657,7 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
 
         self. _addConveners(self._slot)
         self._setLocationInfo(self._slot)
+        self._setSessionTitle(self._slot)
 
         self._addToSchedule()
 
@@ -695,6 +699,7 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
     def _checkParams(self):
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         ScheduleEditSlotBase._checkParams(self)
+        self._sessionTitle = self.pManager.extract("sessionTitle", pType = str, allowEmpty=False)
 
     def _addToSchedule(self):
         pass
@@ -714,6 +719,9 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
         for conv in slot.getConvenerList()[:]:
             if conv.getId() not in convenersIds:
                 slot.removeConvener(conv)
+
+    def _setSessionTitle(self, slot):
+        slot.getSession().setTitle(self._sessionTitle)
 
 class ConferenceSetSessionSlots( conferenceServices.ConferenceTextModificationBase ):
     """
