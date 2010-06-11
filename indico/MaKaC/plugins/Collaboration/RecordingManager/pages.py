@@ -73,10 +73,10 @@ class WNewBookingForm(WCSPageTemplateBase):
             # and that the language name is a capitalized word
             if langPrimary in langDict:
                 if not patternLanguageName.match(langDict[langPrimary]):
-                    messageList.append("primary language name '%s' must be a capitalized word" % langDict[langPrimary])
+                    messageList.append(_("primary language name '%s' must be a capitalized word") % langDict[langPrimary])
                     success = False
             else:
-                messageList.append("primary language code '%s' not found in user-defined language dictionary" % langPrimary)
+                messageList.append(_("primary language code '%s' not found in user-defined language dictionary") % langPrimary)
                 success = False
         # If it's not 3 chars, don't even try to look it up.
         else:
@@ -89,14 +89,14 @@ class WNewBookingForm(WCSPageTemplateBase):
             # and that the language name is a capitalized word
             if langSecondary in langDict:
                 if not patternLanguageName.match(langDict[langSecondary]):
-                    messageList.append("secondary language name '%s' must be a capitalized word" % langDict[langSecondary])
+                    messageList.append(_("secondary language name '%s' must be a capitalized word") % langDict[langSecondary])
                     success = False
             else:
-                messageList.append("secondary language code '%s' not found in user-defined language dictionary" % langSecondary)
+                messageList.append(_("secondary language code '%s' not found in user-defined language dictionary") % langSecondary)
                 success = False
         # If it's not 3 chars, don't even try to look it up.
         else:
-            messageList.append("secondary language code '%s' must be a MARC-compliant code (3 lowercase characters)" % langSecondary)
+            messageList.append(_("secondary language code '%s' must be a MARC-compliant code (3 lowercase characters)") % langSecondary)
             success = False
 
         # Loop through keys of langDict
@@ -108,10 +108,10 @@ class WNewBookingForm(WCSPageTemplateBase):
             # Make sure each key has a value:
             if langCode in langDict:
                 if not patternLanguageName.match(langDict[langCode]):
-                    messageList.append("language name '%s' must be a capitalized word" % langDict[langCode])
+                    messageList.append(_("language name '%s' must be a capitalized word") % langDict[langCode])
                     success = False
             else:
-                messageList.append("language code '%s' not found in user-defined language dictionary" % langCode)
+                messageList.append(_("language code '%s' not found in user-defined language dictionary") % langCode)
                 success = False
 
 

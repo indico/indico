@@ -259,18 +259,18 @@ def formatDate(date_str):
                      _('Fri'),
                      _('Sat'),
                      _('Sun')]
-    month_of_year = [_('January'),
-                     _('February'),
-                     _('March'),
-                     _('April'),
-                     _('May'),
-                     _('June'),
-                     _('July'),
-                     _('August'),
-                     _('September'),
-                     _('October'),
-                     _('November'),
-                     _('December')]
+#    month_of_year = [_('January'),
+#                     _('February'),
+#                     _('March'),
+#                     _('April'),
+#                     _('May'),
+#                     _('June'),
+#                     _('July'),
+#                     _('August'),
+#                     _('September'),
+#                     _('October'),
+#                     _('November'),
+#                     _('December')]
     month_of_year = [_('Jan'),
                      _('Feb'),
                      _('Mar'),
@@ -342,7 +342,7 @@ def getOrphans():
             connection.close()
         except MySQLdb.Error, e:
             flagSuccess = False
-            result += "MySQL error %d: %s" % (e.args[0], e.args[1])
+            result += _("MySQL error %d: %s") % (e.args[0], e.args[1])
         # nothing went wrong, so populate the list "rows" with the appropriate LOID metadata and assign to result to be returned
         else:
             for lecture in rows:
@@ -512,7 +512,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
                      forceCache          = True,
                      recordingManagerTags = tags)
     else:
-        raise RecordingManagerException("IndicoID %s is not a conference, session, contribution or subcontribution." % IndicoID)
+        raise RecordingManagerException(_("IndicoID %s is not a conference, session, contribution or subcontribution.") % IndicoID)
 
     xmlGen.closeTag("event")
 
@@ -558,10 +558,10 @@ def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
             marcxml = parser.process(basexml)
         except Exception:
             flagSuccess = False
-            result += "Cannot parse stylesheet: %s" % sys.exc_info()[0]
+            result += _("Cannot parse stylesheet: %s") % sys.exc_info()[0]
     else:
         flagSuccess = False
-        result += "Stylesheet does not exist: %s" % stylePath
+        result += _("Stylesheet does not exist: %s") % stylePath
 
     # temporary, for my own debugging
 #    f = open('/tmp/base.xml', 'w')
@@ -587,11 +587,11 @@ def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
         result = f.read()
     except HTTPError, e:
         flagSuccess = False
-        result += "CDS returned an error when submitting to %s: %s\n" % \
+        result += _("CDS returned an error when submitting to %s: %s\n") % \
             (CollaborationTools.getOptionValue("RecordingManager", "CDSUploadURL"), e)
     except Exception, e:
         flagSuccess = False
-        result += "Unknown error occured when submitting CDS record: %s.\n" % e
+        result += _("Unknown error occured when submitting CDS record: %s.\n") % e
 
     # temporary, for my own debugging
 #    f = open('/tmp/cds_result.txt', 'w')
@@ -680,10 +680,10 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LODBID, LOID, videoFormat, l
             micalaxml = parser.process(basexml)
         except Exception, e:
             flagSuccess = False
-            result += "Cannot parse stylesheet: %s" % sys.exc_info()[0]
+            result += _("Cannot parse stylesheet: %s") % sys.exc_info()[0]
     else:
         flagSuccess = False
-        result += "Stylesheet does not exist: %s" % stylePath
+        result += _("Stylesheet does not exist: %s") % stylePath
 
     # temporary, for my own debugging
 #    f = open('/tmp/micala.xml', 'w')

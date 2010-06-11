@@ -24,7 +24,7 @@ class MicalaCommunication(object):
                                          passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
                                          db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
         except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor()
         # believe it or not, the comma following machine_name is supposed to be there for MySQLdb's sake
@@ -58,7 +58,7 @@ class MicalaCommunication(object):
                                          passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
                                          db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
         except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor()
         cursor.execute("""SELECT id,Name FROM Tasks WHERE Name = %s""",
@@ -90,7 +90,7 @@ class MicalaCommunication(object):
                                          passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
                                          db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
         except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
 
         # Depending on style of lecture ID, search under Michigan style column or CERN style column
@@ -133,7 +133,7 @@ class MicalaCommunication(object):
                                          passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
                                          db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
         except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
 
         # Depending on style of lecture ID, search under Michigan style column or CERN style column
@@ -163,7 +163,7 @@ class MicalaCommunication(object):
                                          passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
                                          db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
         except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
         cursor.execute('''SELECT IndicoID, LOID, ContentType FROM Lectures WHERE IndicoID LIKE "%s%%"''' % confID)
@@ -201,7 +201,7 @@ class MicalaCommunication(object):
                                          passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
                                          db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
         except MySQLdb.Error, e:
-            raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor()
         cursor.execute("""INSERT INTO Status
@@ -231,10 +231,10 @@ class MicalaCommunication(object):
                                          db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
         except MySQLdb.Error, e:
             flagSuccess = False
-            result += "MySQL error %d: %s" % (e.args[0], e.args[1])
+            result += _("MySQL error %d: %s") % (e.args[0], e.args[1])
         except Exception, e:
             flagSuccess = False
-            result += "Unknown error %d: %s" % (e.args[0], e.args[1])
+            result += _("Unknown error %d: %s") % (e.args[0], e.args[1])
 
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
@@ -244,10 +244,10 @@ class MicalaCommunication(object):
             connection.commit()
         except MySQLdb.Error, e:
             flagSuccess = False
-            result += "MySQL error %d: %s" % (e.args[0], e.args[1])
+            result += _("MySQL error %d: %s") % (e.args[0], e.args[1])
         except Exception, e:
             flagSuccess = False
-            result += "Unknown error %d: %s" % (e.args[0], e.args[1])
+            result += _("Unknown error %d: %s") % (e.args[0], e.args[1])
 
         cursor.close()
         connection.close()

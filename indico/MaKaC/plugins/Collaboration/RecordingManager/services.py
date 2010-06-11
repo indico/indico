@@ -37,22 +37,22 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         self._languages   = self._params.get('languages',   None)
 
         if not self._contentType:
-            raise RecordingManagerException("No content type supplied (plain video or web lecture)")
+            raise RecordingManagerException(_("No content type supplied (plain video or web lecture)"))
         if not self._IndicoID:
-            raise RecordingManagerException("No IndicoID supplied")
+            raise RecordingManagerException(_("No IndicoID supplied"))
 
         if self._contentType == 'web_lecture':
             if not self._LODBID:
-                raise RecordingManagerException("No LODBID supplied")
+                raise RecordingManagerException(_("No LODBID supplied"))
         elif self._contentType == 'plain_video':
             if not self._videoFormat:
-                raise RecordingManagerException("No video format supplied")
+                raise RecordingManagerException(_("No video format supplied"))
 
         if not self._confId:
-            raise RecordingManagerException("No conference ID supplied")
+            raise RecordingManagerException(_("No conference ID supplied"))
 
         if not self._languages:
-            raise RecordingManagerException("No languages supplied")
+            raise RecordingManagerException(_("No languages supplied"))
 
     def _getAnswer(self):
         """This method does everything necessary to create a CDS record and also update the micala database.
@@ -81,8 +81,8 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
                                                 self._videoFormat,
                                                 self._languages)
         if resultCreateCDSRecord["success"] == False:
-            raise RecordingManagerException("CDS record creation failed.\n%s" % resultCreateCDSRecord["result"])
-            return "CDS record creation aborted."
+            raise RecordingManagerException(_("CDS record creation failed.\n%s") % resultCreateCDSRecord["result"])
+            return _("CDS record creation aborted.")
 
         if self._contentType == 'web_lecture':
             # Update the micala database to match the LODBID with the IndicoID
@@ -91,8 +91,8 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
             resultAssociateIndicoIDToLOID = MicalaCommunication.associateIndicoIDToLOID(self._IndicoID,
                                               self._params.get('LODBID', None))
             if resultAssociateIndicoIDToLOID["success"] == False:
-                raise RecordingManagerException("micala database update failed.\n%s" % resultAssociateIndicoIDToLOID["result"])
-                return "CDS record creation aborted."
+                raise RecordingManagerException(_("micala database update failed.\n%s") % resultAssociateIndicoIDToLOID["result"])
+                return _("CDS record creation aborted.")
 
             # Create lecture.xml and submit to micala server,
             # then update micala database Status table showing task completed
@@ -105,10 +105,10 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
                                                               self._videoFormat,
                                                               self._languages)
             if resultSubmitMicalaMetadata["success"] == False:
-                raise RecordingManagerException("CDS record creation failed.\n%s" % resultSubmitMicalaMetadata["result"])
-                return "micala metadata creation aborted."
+                raise RecordingManagerException(_("CDS record creation failed.\n%s") % resultSubmitMicalaMetadata["result"])
+                return _("micala metadata creation aborted.")
 
-        return "Successfully updated micala database and submitted CDS record for creation."
+        return _("Successfully updated micala database and submitted CDS record for creation.")
 
 class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
 
@@ -119,11 +119,11 @@ class RMCreateIndicoLinkService(CollaborationPluginServiceBase):
         self._CDSID    = self._params.get('CDSID',      None)
 
         if not self._IndicoID:
-            raise RecordingManagerException("No IndicoID supplied")
+            raise RecordingManagerException(_("No IndicoID supplied"))
         if not self._confId:
-            raise RecordingManagerException("No conference ID supplied")
+            raise RecordingManagerException(_("No conference ID supplied"))
         if not self._CDSID:
-            raise RecordingManagerException("No CDS record ID supplied")
+            raise RecordingManagerException(_("No CDS record ID supplied"))
 
     def _getAnswer(self):
         # Create the Indico link

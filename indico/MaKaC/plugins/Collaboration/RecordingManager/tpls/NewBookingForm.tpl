@@ -161,7 +161,7 @@
         <strong>4. <%= _("Select language(s) in which the talk was given") %></strong>
         <br />
         <% if not FlagLanguageDataOK: %>
-            <font color="red">ERROR: Malformed language data. Please check Recording Manager plugin settings.
+            <font color="red"><%= _("ERROR: Malformed language data. Please check Recording Manager plugin settings.") %>
             <ul>
                 <% for msg in LanguageErrorMessages: %>
                 <li><%= msg %></li>
@@ -188,7 +188,6 @@
         <!--  Javascript button here -->
         </span>
         <% end %>
-<!--         <input type="button" disabled="" id="RMbuttonCreateCDSRecord" onclick="RMCreateCDSRecord()" value=<%= _("\"Create CDS record\"") %> /> -->
     </span>
     <span>
         <br />
@@ -199,8 +198,6 @@
         </span>
         <span id="RMMatchSummaryMessage">
         </span>
-
-<!--         <input type="button" disabled="" id="RMbuttonCreateCDSRecord" onclick="RMCreateCDSRecord()" value=<%= _("\"Create CDS record\"") %> /> -->
     </span>
     <br />
     <br />
@@ -211,7 +208,6 @@
         <div id="RMbuttonCreateIndicoLink">
         <!--  Javascript button here -->
         </div>
-<!--         <input type="button" disabled="" id="RMbuttonCreateIndicoLink" onclick="RMcreateIndicoLink()" value="<%= _("Create Indico link") %>" /> -->
     </span>
 </div>
 
