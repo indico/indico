@@ -1,7 +1,6 @@
 {
     checkParams : function () {
-        return {
-        }
+        return {};
     },
 
     errorHandler: function(event, error) {

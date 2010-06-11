@@ -114,11 +114,6 @@ class WNewBookingForm(WCSPageTemplateBase):
                 messageList.append(_("language code '%s' not found in user-defined language dictionary") % langCode)
                 success = False
 
-
-        for msg in messageList:
-            Logger.get('RecMan').debug("LanguageErrorMessage: %s" % msg)
-        Logger.get('RecMan').debug("LANGUAGE ERROR")
-
         return (success, messageList)
 
 class WMain (WJSBase):

@@ -21,7 +21,7 @@
                     <table cellspacing="0px" cellpadding="0px" border="0">
                     <tr>
                     <td width="370px">
-                        <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>')" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');">
+                        <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>');" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');">
                             <table cellpadding="0px" cellspacing="0px" border="0">
                             <tr>
                             <td colspan="2" width="370px">
@@ -65,7 +65,7 @@
                     <!--  This column shows whether a CDS record for this talk exists, or if it is pending. -->
                     <td width="50px" valign="top">
                         <% if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': %>
-                            <div class="RMcolumnStatusCDSDone" id="divCDS<%= talk["IndicoID"] %>" onclick="RMCDSDoneClick('<%= talk["CDSURL"] %>')" onmouseover="RMCDSDoneOnHover('<%= talk["IndicoID"] %>')" onmouseout="RMCDSDoneOffHover('<%= talk["IndicoID"] %>')">
+                            <div class="RMcolumnStatusCDSDone" id="divCDS<%= talk["IndicoID"] %>" onclick="RMCDSDoneClick('<%= talk["CDSURL"] %>');" onmouseover="RMCDSDoneOnHover('<%= talk["IndicoID"] %>');" onmouseout="RMCDSDoneOffHover('<%= talk["IndicoID"] %>');">
                             </div>
                         <% end %>
                         <% elif talk["CDSID"] == 'pending': %>

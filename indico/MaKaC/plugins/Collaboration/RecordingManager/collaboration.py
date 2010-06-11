@@ -25,7 +25,8 @@ class CSBooking(CSBookingBase):
 
     _allowMultiple = False
     _hasStartDate = False
-
+    _shouldBeIndexed = False
+    _canBeNotifiedOfEventDateChanges = False
     _adminOnly = True
 
     def __init__(self, bookingType, conf):

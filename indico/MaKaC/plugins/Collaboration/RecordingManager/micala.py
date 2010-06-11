@@ -2,7 +2,10 @@ from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingMan
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.logger import Logger
 
-import MySQLdb
+try:
+    import MySQLdb
+except ImportError:
+    Logger.get("RecMan").debug("Cannot import MySQLdb")
 
 class MicalaCommunication(object):
 
@@ -15,7 +18,7 @@ class MicalaCommunication(object):
     def getIdMachine(cls, machine_name):
         '''Look up ID of this machine in database'''
 
-        Logger.get('RecMan').debug('in getIdMachine(), machine_name = %s' % machine_name)
+#        Logger.get('RecMan').debug('in getIdMachine(), machine_name = %s' % machine_name)
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -49,7 +52,7 @@ class MicalaCommunication(object):
     def getIdTask(cls, task_name):
         '''Look up ID of this task in database'''
 
-        Logger.get('RecMan').debug('task_name = [%s]' % task_name)
+#        Logger.get('RecMan').debug('task_name = [%s]' % task_name)
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -81,7 +84,7 @@ class MicalaCommunication(object):
     def getIdLecture(cls, lecture_name):
         '''Look up internal database ID of the given lecture'''
 
-        Logger.get('RecMan').debug('lecture_name = [%s]' % lecture_name)
+#        Logger.get('RecMan').debug('lecture_name = [%s]' % lecture_name)
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -102,7 +105,7 @@ class MicalaCommunication(object):
         result_set = cursor.fetchone()
 
         if result_set is not None and len(result_set) > 0:
-            Logger.get('RecMan').debug("result_set: %s" % str(result_set))
+#            Logger.get('RecMan').debug("result_set: %s" % str(result_set))
             idLecture = result_set[0]
         else:
             idLecture = ''
@@ -113,18 +116,10 @@ class MicalaCommunication(object):
         return(idLecture)
 
     @classmethod
-    def createNewMicalaLecture(cls, lecture_name, contentType, pattern_cern, pattern_umich):
+    def createNewMicalaLecture(cls, lecture_name, contentType):
         '''insert a record into the micala database for a new lecture'''
 
-        Logger.get('RecMan').debug('createNewMicalaLecture for [%s]' % lecture_name)
-
-        if contentType == 'plain_video':
-            micalaContentType = "PLAINVIDEO"
-        elif contentType == 'web_lecture':
-            micalaContentType = "WEBLECTURE"
-
-        match_cern  = pattern_cern.search(lecture_name)
-        match_umich = pattern_umich.search(lecture_name)
+#        Logger.get('RecMan').debug('createNewMicalaLecture for [%s]' % lecture_name)
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -135,16 +130,16 @@ class MicalaCommunication(object):
         except MySQLdb.Error, e:
             raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
-
-        # Depending on style of lecture ID, search under Michigan style column or CERN style column
         cursor = connection.cursor()
 
-        if match_umich:
-            Logger.get('RecMan').debug("""INSERT INTO Lectures (LOID, contentType, DateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
-            cursor.execute("""INSERT INTO Lectures (LOID, contentType, DateCreated) VALUES(%s, %s, NOW());""", (lecture_name, micalaContentType))
-        elif match_cern:
-            Logger.get('RecMan').debug("""INSERT INTO Lectures (IndicoID, contentType, DateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
+        if contentType == "plain_video":
+            micalaContentType = "PLAINVIDEO"
+#            Logger.get('RecMan').debug("""INSERT INTO Lectures (IndicoID, contentType, DateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
             cursor.execute("""INSERT INTO Lectures (IndicoID, contentType, DateCreated) VALUES(%s, %s, NOW());""", (lecture_name, micalaContentType))
+        elif contentType == "web_lecture":
+            micalaContentType = "WEBLECTURE"
+#            Logger.get('RecMan').debug("""INSERT INTO Lectures (LOID, contentType, DateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
+            cursor.execute("""INSERT INTO Lectures (LOID, contentType, DateCreated) VALUES(%s, %s, NOW());""", (lecture_name, micalaContentType))
 
         connection.commit()
 
@@ -189,7 +184,7 @@ class MicalaCommunication(object):
     def reportStatus(cls, status, message, idMachine, idTask, idLecture):
         '''Make status report to the database'''
 
-        Logger.get('RecMan').debug('in reportStatus()')
+#        Logger.get('RecMan').debug('in reportStatus()')
 
         if idLecture == '':
             idLecture = None
@@ -205,7 +200,7 @@ class MicalaCommunication(object):
 
         cursor = connection.cursor()
         cursor.execute("""INSERT INTO Status
-            (idMachine, idTask, idLecture, Status, Message, Time)
+            (idMachine, idTask, idLecture, Status, Message, DateReported)
             VALUES(%s, %s, %s, %s, %s, NOW());""", \
                        (idMachine, idTask, idLecture, status, message))
         cursor.close()
@@ -221,7 +216,7 @@ class MicalaCommunication(object):
         flagSuccess = True
         result      = ""
 
-        Logger.get('RecMan').debug("in associateIndicoIDToLOID()")
+#        Logger.get('RecMan').debug("in associateIndicoIDToLOID()")
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -297,11 +292,11 @@ class MicalaCommunication(object):
                 # check to see if the IndicoID in question is to be found in the dictionary of matches
                 # if it is found, that means the CDS record exists and there's nothing to do.
                 existing_cds_record = cds_indico_matches[row["IndicoID"]]
-                Logger.get('RecMan').debug(" CDS export complete for: %s" % existing_cds_record)
+#                Logger.get('RecMan').debug(" CDS export complete for: %s" % existing_cds_record)
                 # Otherwise, if it is not found, that means the CDS record hasn't been created yet,
                 # so add the IndicoID to the list of pending records.
             except KeyError:
-                Logger.get('RecMan').debug(" CDS export pending for: %s" % row["IndicoID"])
+#                Logger.get('RecMan').debug(" CDS export pending for: %s" % row["IndicoID"])
                 talk_array.append(row["IndicoID"])
 
         return talk_array
@@ -312,17 +307,17 @@ class MicalaCommunication(object):
         cds_indico_matches is a dictionary of key-value pairs { IndicoID1: CDSID1, IndicoID2: CDSID2, ... }
         cds_indico_pending is a list of IndicoIDs.'''
 
-        Logger.get('RecMan').debug('in updateMicalaCDSExport()')
+#        Logger.get('RecMan').debug('in updateMicalaCDSExport()')
 
         # debugging:
-        for matched in cds_indico_matches.keys():
-            Logger.get('RecMan').debug('Looping through cds_indico_matches: %s -> %s' % (matched, cds_indico_matches[matched]))
-        for pending in cds_indico_pending:
-            Logger.get('RecMan').debug('Looping through cds_indico_pending: %s' % pending)
+#        for matched in cds_indico_matches.keys():
+#            Logger.get('RecMan').debug('Looping through cds_indico_matches: %s -> %s' % (matched, cds_indico_matches[matched]))
+#        for pending in cds_indico_pending:
+#            Logger.get('RecMan').debug('Looping through cds_indico_pending: %s' % pending)
 
 
         for pending in cds_indico_pending:
-            Logger.get('RecMan').debug('Looping through cds_indico_pending: %s (and looking up in cds_indico_matches)' % pending)
+#            Logger.get('RecMan').debug('Looping through cds_indico_pending: %s (and looking up in cds_indico_matches)' % pending)
             try:
                 new_record = cds_indico_matches[pending]
                 idMachine = cls.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))

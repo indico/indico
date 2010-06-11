@@ -218,16 +218,16 @@ class outputGenerator:
                    out                    = None,
                    recordingManagerTags   = None):
 
-        Logger.get('RecMan').info("in _confToXML()")
-        Logger.get('RecMan').info(" conf = %s" % conf)
-        Logger.get('RecMan').info(" includeSession = %s" % includeSession)
-        Logger.get('RecMan').info(" includeContribution = %s" % includeContribution)
-        Logger.get('RecMan').info(" includeSubContribution = %s" % includeSubContribution)
-        if recordingManagerTags is not None:
-            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
-            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
-            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
-            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
+#        Logger.get('RecMan').info("in _confToXML()")
+#        Logger.get('RecMan').info(" conf = %s" % conf)
+#        Logger.get('RecMan').info(" includeSession = %s" % includeSession)
+#        Logger.get('RecMan').info(" includeContribution = %s" % includeContribution)
+#        Logger.get('RecMan').info(" includeSubContribution = %s" % includeSubContribution)
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
 
         if not out:
             out = self._XMLGen
@@ -247,7 +247,7 @@ class outputGenerator:
         out.writeTag("parentProtection", simplejson.dumps(conf.getAccessController().isProtected()))
         out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(conf)))
 
-        Logger.get('RecMan').info('showContribution: ' + str(showContribution))
+#        Logger.get('RecMan').info('showContribution: ' + str(showContribution))
 
         # Access list info (tag 506)
         # Check to make sure this request is coming from the Recording Manager.
@@ -261,8 +261,8 @@ class outputGenerator:
                 # Only create the access list and video tags if this conference
                 # is the desired talk.
                 if recordingManagerTags["talkType"] == "conference" and recordingManagerTags["talkId"] == conf.getId():
-                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
-                    Logger.get('RecMan').info('showContribution: ' + str(showContribution))
+#                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('showContribution: ' + str(showContribution))
 
                     # Now we know it's safe to import the necessary methods,
                     # because we have verified that the RecordingManager plugin is installed.
@@ -365,7 +365,7 @@ class outputGenerator:
             out.closeTag("chair")
 
 
-            Logger.get('RecMan').info('HEY now calling _contribToXML()...')
+#            Logger.get('RecMan').info('HEY now calling _contribToXML()...')
 
         # This case happens when called by RecordingManager to generate XML for a contribution:
         if showContribution != "all" and conf.getContributionById(showContribution) != None:
@@ -411,7 +411,7 @@ class outputGenerator:
             sessionList = conf.getSessionList()
             for session in sessionList: # here is the part that displays all the sessions (for the RecordingManager, anyway). It should be changed to check if showSession has been set.
                 if session.canAccess(self.__aw) and includeSession and (showSession == 'all' or str(session.getId()) == str(showSession)):
-                    Logger.get('RecMan').info("session id = %s" % session.getId())
+#                    Logger.get('RecMan').info("session id = %s" % session.getId())
                     self._sessionToXML(session, vars, includeContribution, includeMaterial, showWithdrawed=showWithdrawed, useSchedule=False, out=out, recordingManagerTags=recordingManagerTags)
 
         mList = conf.getAllMaterialList()
@@ -461,12 +461,12 @@ class outputGenerator:
                       out                    = None,
                       recordingManagerTags   = None):
 
-        Logger.get('RecMan').info("in _sessionToXML()")
-        if recordingManagerTags is not None:
-            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
-            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
-            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
-            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
+#        Logger.get('RecMan').info("in _sessionToXML()")
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
 
         if not out:
             out = self._XMLGen
@@ -559,7 +559,7 @@ class outputGenerator:
                 # Only create the access list and video tags if this conference
                 # is the desired talk (the video tags only apply to one talk at a time).
                 if recordingManagerTags["talkType"] == "session" and recordingManagerTags["talkId"] == session.getId():
-                    Logger.get('RecMan').info('Called _sessionToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('Called _sessionToXML() with RecordingManager')
                     # only now do we know it's safe to import the necessary method
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
                     MarcAccessListGenerator.generateAccessListXML(out, session)
@@ -662,20 +662,20 @@ class outputGenerator:
                       out                  = None,
                       recordingManagerTags = None):
 
-        Logger.get('RecMan').info('in _contribToXML')
-        Logger.get('RecMan').info(" conf: %s" % conf)
-#        Logger.get('RecMan').info(" conf.getTimezone(): %s" % conf.getTimezone())
-        Logger.get('RecMan').info(" contribution: %s" % contribution)
-        Logger.get('RecMan').info(" vars: %s" % vars)
-        Logger.get('RecMan').info(" includeSubContribution: %s" % includeSubContribution)
-        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
-        Logger.get('RecMan').info(" showSubContribution: %s" % showSubContribution)
-        Logger.get('RecMan').info(" out: %s" % out)
-        if recordingManagerTags is not None:
-            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
-            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
-            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
-            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
+#        Logger.get('RecMan').info('in _contribToXML')
+#        Logger.get('RecMan').info(" conf: %s" % conf)
+##        Logger.get('RecMan').info(" conf.getTimezone(): %s" % conf.getTimezone())
+#        Logger.get('RecMan').info(" contribution: %s" % contribution)
+#        Logger.get('RecMan').info(" vars: %s" % vars)
+#        Logger.get('RecMan').info(" includeSubContribution: %s" % includeSubContribution)
+#        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
+#        Logger.get('RecMan').info(" showSubContribution: %s" % showSubContribution)
+#        Logger.get('RecMan').info(" out: %s" % out)
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
 
         if not out:
             out = self._XMLGen
@@ -774,7 +774,7 @@ class outputGenerator:
                 else:
                     out.writeTag("material",out.writeTag("id",mat.id))
         for subC in contribution.getSubContributionList():
-            Logger.get('RecMan').info("subC.getId = %s, " % (subC.getId()))
+#            Logger.get('RecMan').info("subC.getId = %s, " % (subC.getId()))
             if includeSubContribution:
                 if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
                     self._subContributionToXML(subC,vars,includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
@@ -791,8 +791,8 @@ class outputGenerator:
                 # Only create the access list and video tags if this conference
                 # is the desired talk (the video tags only apply to one talk at a time).
                 if recordingManagerTags["talkType"] == "contribution" and recordingManagerTags["talkId"] == contribution.getId():
-                    Logger.get('RecMan').info('Called _contribToXML() with RecordingManager')
-                    Logger.get('RecMan').info('showSubContribution: ' + str(showSubContribution))
+#                    Logger.get('RecMan').info('Called _contribToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('showSubContribution: ' + str(showSubContribution))
 
                     # only now do we know it's safe to import the necessary method
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
@@ -810,16 +810,16 @@ class outputGenerator:
                               out         = None,
                               recordingManagerTags = None):
 
-        Logger.get('RecMan').info('in _subContributionToXML')
-        Logger.get('RecMan').info(" subCont: %s" % subCont)
-        Logger.get('RecMan').info(" vars: %s" % vars)
-        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
-        Logger.get('RecMan').info(" out: %s" % out)
-        if recordingManagerTags is not None:
-            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
-            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
-            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
-            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
+#        Logger.get('RecMan').info('in _subContributionToXML')
+#        Logger.get('RecMan').info(" subCont: %s" % subCont)
+#        Logger.get('RecMan').info(" vars: %s" % vars)
+#        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
+#        Logger.get('RecMan').info(" out: %s" % out)
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
 
         if not out:
             out = self._XMLGen
@@ -877,7 +877,7 @@ class outputGenerator:
                 # Only create the access list and video tags if this conference
                 # is the desired talk (the video tags only apply to one talk at a time).
                 if recordingManagerTags["talkType"] == "subcontribution" and recordingManagerTags["talkId"] == subCont.getId():
-                    Logger.get('RecMan').info('Called _subContributionToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('Called _subContributionToXML() with RecordingManager')
 
                     # only now do we know it's safe to import the necessary method
                     from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator

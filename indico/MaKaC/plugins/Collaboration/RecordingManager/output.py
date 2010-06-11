@@ -43,8 +43,8 @@ class MarcAccessListGenerator(object):
     def generateVideoXML(cls, out, recordingManagerTags):
         """Generate XML variables needed for video records."""
 
-        Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % recordingManagerTags["contentType"])
-        Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % recordingManagerTags["videoFormat"])
+#        Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % recordingManagerTags["contentType"])
+#        Logger.get('RecMan').info("in generateVideoXML(), contentType = %s" % recordingManagerTags["videoFormat"])
 
         # retrieve actual syntax to use from RecordingManager plug-in options.
         videoTagStandard      = CollaborationTools.getOptionValue("RecordingManager", "videoFormatStandard")
@@ -68,6 +68,6 @@ class MarcAccessListGenerator(object):
         if len(recordingManagerTags["languages"]) > 0:
             out.openTag("languages")
             for l in recordingManagerTags["languages"]:
-                Logger.get('RecMan').info("in generateLanguagesXML(), language = %s" % l)
+#                Logger.get('RecMan').info("in generateLanguagesXML(), language = %s" % l)
                 out.writeTag("code", l)
             out.closeTag("languages")
