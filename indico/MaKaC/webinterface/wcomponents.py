@@ -4001,13 +4001,14 @@ class WSelectionBoxConveners:
           }
         return wc.getHTML(p)
 
-class WSelectionBoxConvToManager:
+class WSelectionBoxConvToManagerCoordinator:
 
     def getHTML(self):
         wc=WSelectionBox()
         p={
-            "description":  _(""" _("Please check the box if you want to add them as manager/s"):<br><br><i><font color=\"black\"><b> _("Note"): </b></font>_("If this person is not already an Indico user they will be sent an email asking them to create an account. After their registration the user will automatically be given session manager rights").</i><br>"""),\
-            "options":  _("""<input type="checkbox" name="userRole" value="convener"> _("Add as session manager")
+            "description":  _(""" _("Please check the box if you want to add them as managers/coordinators"):"""),\
+            "options":  _("""<input type="checkbox" name="managerControl"> _("Add as session manager")<br>
+                             <input type="checkbox" name="coordinatorControl"> _("Add as session coordinator")
                         """)
           }
         return wc.getHTML(p)
@@ -4040,6 +4041,7 @@ class WUserSelection(WTemplated):
         #addTo=2: show selection box to add primary author, coauthor or speaker as submitter.
         #addTo=3: show selection box to add session managers as session conveners
         #addTo=4: show selection box to add submitter as speaker. This is just for meetings
+        #addTo=5: show selection box to add submitter and/or manager rights for convener.
         self._addTo=addTo
 
     def _performSearch( self, criteria, exact=0 ):
@@ -4141,6 +4143,8 @@ class WUserSelection(WTemplated):
                 sb=WSelectionBoxConveners().getHTML()
             elif self._addTo==4:
                 sb=WMSelectionBoxAuthors().getHTML()
+            elif self._addTo==5:
+                sb=WSelectionBoxConvToManagerCoordinator().getHTML()
         vars["selectionBox"]=sb
         vars["searchOptions"]=""
         authenticators = Config.getInstance().getAuthenticatorList()
@@ -4211,9 +4215,9 @@ class WPrincipalSelection(WUserSelection):
 class WComplexSelection(WUserSelection):
 
 
-    def __init__(self, target, searchAction, forceWithoutExtAuth=False):
+    def __init__(self, target, searchAction, addTo = 0, forceWithoutExtAuth=False):
         _title = _("Search for users")
-        WUserSelection.__init__(self, searchAction, forceWithoutExtAuth=forceWithoutExtAuth)
+        WUserSelection.__init__(self, searchAction, addTo = addTo, forceWithoutExtAuth=forceWithoutExtAuth)
         try:
             self._conf = target.getConference()
         except:
