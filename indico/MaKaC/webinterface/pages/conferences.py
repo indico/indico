@@ -4591,12 +4591,18 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
                         """    %(convener.getEmail(),\
                         self.htmlText(convener.getFullName()) or "&nbsp;", \
                         self.htmlText(convener.getEmail()) or "&nbsp;" )
-
-                url = urlHandlers.UHSessionModification.getURL(self.__conf)
-                url.addParam("sessionId",convener.getSession().getId() )
-                sesurl = quoteattr(str(url))
-                sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
-                sessions.append("<a href=%s>%s</a>"%(sesurl,sestitle))
+                if isinstance(convener, conference.SlotChair):
+                    url = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
+                    url.addParam("sessionId",convener.getSession().getId() )
+                    sesurl = quoteattr(str(url))
+                    sestitle = self.htmlText(convener.getSlot().getTitle()) or "Slot%s" % convener.getSlot().getId()
+                    sessions.append("<a href=%s>%s</a>"%(sesurl,self.htmlText(convener.getSession().getTitle()) + ": " + sestitle))
+                else:
+                    url = urlHandlers.UHSessionModification.getURL(self.__conf)
+                    url.addParam("sessionId",convener.getSession().getId() )
+                    sesurl = quoteattr(str(url))
+                    sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
+                    sessions.append("<a href=%s>%s</a>"%(sesurl,sestitle))
 
                 counter = counter + 1
 
@@ -4692,7 +4698,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 class WPConfAllSessionsConveners( WPConfModifListings ):
 
     def _getPageContent( self, params ):
-        banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, "Conveners list").getHTML()
         p = WConferenceAllSessionsConveners( self._conf )
         return banner+p.getHTML()
 
@@ -4798,7 +4804,7 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
 class WPConfAllSpeakers( WPConfModifListings ):
 
     def _getPageContent( self, params ):
-        banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, "Speakers list").getHTML()
         p = WConfModifAllContribParticipants( self._conf, self._conf.getSpeakerIndex() )
         return banner+p.getHTML({"title": _("All speakers list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllSpeakers.getURL(self._conf), \
@@ -11253,7 +11259,7 @@ class WPConfModifPendingQueuesBase( WPConferenceModifBase ):
         self._activeTab=activeTab
 
     def _getPageContent(self, params):
-        banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, "Pending queues").getHTML()
         return banner+self._getTabContent( params )
 
     def _setActiveSideMenuItem(self):

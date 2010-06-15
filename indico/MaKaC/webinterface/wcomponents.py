@@ -920,10 +920,10 @@ class WEpaymentBannerModif(WBannerModif):
 
 class WListingsBannerModif(WBannerModif):
 
-    def __init__( self, conf ):
+    def __init__( self, conf, type ):
         path=[{"url": urlHandlers.UHConfModifListings.getURL(conf), "title":_("All listings")}]
 
-        itemType="Pending queues"
+        itemType=type
         title=""
         WBannerModif.__init__(self, path, itemType, title)
 

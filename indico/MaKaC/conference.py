@@ -90,6 +90,7 @@ from MaKaC.webinterface import urlHandlers
 
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
+from sets import Set
 
 class CommonObjectBase(object):
     """This class is for holding commonly used methods that are used by several classes.
@@ -3367,11 +3368,21 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
             for convener in session.getConvenerList() :
                 key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
                 if dictionary.has_key(key) :
-                    dictionary[key].append(convener)
+                    dictionary[key].add(convener)
                 else :
-                    list = []
-                    list.append(convener)
-                    dictionary[key] = list
+                    set = Set()
+                    set.add(convener)
+                    dictionary[key] = set
+            for slot in session.getSlotList():
+                for convener in slot.getConvenerList() :
+                    key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
+                    if dictionary.has_key(key) :
+                        dictionary[key].add(convener)
+                    else :
+                        set = Set()
+                        set.add(convener)
+                        dictionary[key] = set
+
 
         return dictionary
 
