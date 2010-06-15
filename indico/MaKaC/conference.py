@@ -31,7 +31,7 @@ from MaKaC.fossils.contribution import IContributionParticipationFossil,\
 from MaKaC.fossils.conference import IConferenceMinimalFossil,\
     ISessionFossil, ISessionSlotFossil, IMaterialFossil,\
     IConferenceParticipationFossil, IResourceFossil, ILinkFossil,\
-    ILocalFileFossil
+    ILocalFileFossil, IConferenceParticipationMinimalFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 import re, os
@@ -1568,7 +1568,7 @@ class CustomRoom(Persistent):
 
 class ConferenceParticipation(Persistent, Fossilizable):
 
-    fossilizes(IConferenceParticipationFossil)
+    fossilizes(IConferenceParticipationFossil, IConferenceParticipationMinimalFossil)
 
     @Retrieves(['MaKaC.conference.ConferenceParticipation',
                  'MaKaC.conference.SessionChair',

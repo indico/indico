@@ -64,16 +64,10 @@ class IConferenceParticipationMinimalFossil(IFossil):
         """ Conference Participation Family Name """
 
 
-class IConferenceParticipationFossil(IFossil):
+class IConferenceParticipationFossil(IConferenceParticipationMinimalFossil):
 
     def getId( self ):
         """ Conference Participation Id """
-
-    def getFirstName( self ):
-        """ Conference Participation First Name """
-
-    def getFamilyName( self ):
-        """ Conference Participation Family Name """
 
     def getFullName( self ):
         """ Conference Participation Full Name """
