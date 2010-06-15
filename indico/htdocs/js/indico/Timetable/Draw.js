@@ -725,7 +725,8 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if (self.eventData.entryType == 'Contribution') {
             url = Indico.Urls.ContributionDisplay + '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
         } else if (self.eventData.entryType == 'Session') {
-            url = Indico.Urls.SessionDisplay + '?sessionId=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
+            url = Indico.Urls.SessionDisplay + '?sessionId=' + self.eventData.sessionId +
+                    '&confId=' + self.eventData.conferenceId + '#' + self.timetable.currentDay;
         }
         var viewLink = Html.a({'href': url}, "View details");
         bar.append(viewLink);

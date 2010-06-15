@@ -147,12 +147,6 @@ class WContributionDisplayPosterItem:
         return ""
 
 
-class WSessionTabControl(wcomponents.WTabControl):
-    _unSelTabCls="display_unselectedhtab"
-    _selTabCls="display_selectedhtab"
-    _noTabCls="display_neutralhtab"
-
-
 class _NoWitdhdrawFF(filters.FilterField):
     _id="no_withdrawn"
 
@@ -388,88 +382,41 @@ class WSessionDisplayBase(wcomponents.WTemplated):
 
     def _getTimeTableHTML(self):
 
-        timeTable=timetable.TimeTable(self._session.getSchedule(),self._tz)
-        sDate,eDate=self._session.getAdjustedStartDate(self._tz),self._session.getAdjustedEndDate(self._tz)
-        timeTable.setStartDate(sDate)
-        timeTable.setEndDate(eDate)
         tz = self._session.getTimezone()
-        timeTable.mapEntryList(self._getSchEntries())
-        daySch = []
-        num_slots_in_hour=int(timedelta(hours=1).seconds/timeTable.getSlotLength().seconds)
-        hourSlots,hourNeedsDisplay=[],False
-        for day in timeTable.getDayList():
-            hourSlots = []
-            slotList=[]
-            lastEntries=[]
-            maxOverlap=day.getNumMaxOverlaping()
-            width="100"
-            if maxOverlap!=0:
-                width=100/maxOverlap
-            else:
-                maxOverlap=1
-            for slot in day.getSlotList():
-                if slot.getAdjustedStartDate().minute==0:
-                    if hourNeedsDisplay:
-                        slotList.append("".join(hourSlots))
-                    hourSlots,hourNeedsDisplay=[],False
-                remColSpan=maxOverlap
-                temp=[]
-                for entry in slot.getEntryList():
-                    hourNeedsDisplay=True
-                    if len(slot.getEntryList()):
-                        remColSpan=0
-                    else:
-                        remColSpan-=1
-                    if entry in lastEntries:
-                        continue
-                    bgcolor=self._getColor(entry)
-                    colspan=""
-                    if not day.hasEntryOverlaps(entry):
-                        colspan=""" colspan="%s" """%maxOverlap
-                    temp.append("""<td valign="top" rowspan="%i" align="center" bgcolor="%s" width="%i%%"%s>%s</td>"""%(day.getNumSlots(entry),bgcolor,width,colspan,self._getEntryHTML(entry)))
-                    lastEntries.append(entry)
-                if remColSpan>0:
-                    temp.append("""<td width="100%%" colspan="%i"></td>"""%(remColSpan))
-                if slot.getAdjustedStartDate().minute==0:
-                    slotHTML="""
-                        <tr>
-                            <td valign="top" rowspan="%s" bgcolor="white" width="40"><font color="gray" size="-1">%s</font></td>
-                            %s
-                        </tr>
-                        """%(num_slots_in_hour,\
-                                slot.getAdjustedStartDate().strftime("%H:%M"),\
-                                "".join(temp))
-                else:
-                    if len(temp) == 0:
-                        temp = ["<td></td>"]
-                    slotHTML = """<tr>%s</tr>"""%"".join(temp)
-                hourSlots.append(slotHTML)
 
-                if slot == day.getSlotList()[-1]:
-                    if hourNeedsDisplay:
-                        slotList.append("".join(hourSlots))
+        ttdata = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz,
+                                                                           None, days = None, mgmtMode = False))
 
-            dayHTML="""
-                <a name="%s">
-                <table align="center" width="100%%">
-                    <tr>
-                        <td width="100%%">
-                            <table align="center" border="0" width="100%%"
-                                    celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
-                                <tr>
-                                    <td colspan="%i" align="center" bgcolor="white"><b>%s</b></td>
-                                </tr>
-                                %s
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-                """%(day.getDate().strftime("%Y-%m-%d"),maxOverlap+2,
-                        day.getDate().strftime("%A, %d %B %Y"),
-                        "".join(slotList) )
-            daySch.append(dayHTML)
-        dayHTML = "<br>".join( daySch )
-        return dayHTML
+        eventInfo = DictPickler.pickle(self._session.getConference(), timezone=tz)
+        eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=tz)
+        eventInfo = simplejson.dumps(eventInfo)
+
+        return """
+            <div id="timetableDiv" style="position: relative;">
+
+            <div class="timetablePreLoading" style="width: 700px; height: 300px;">
+                <div class="text" style="padding-top: 200px;">&nbsp;&nbsp;&nbsp;%s</div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <script type="text/javascript">
+                var ttdata = %s;
+                var eventInfo = %s;
+
+                var historyBroker = new BrowserHistoryBroker();
+                var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 850, $E('timetableDiv'), historyBroker);
+
+                IndicoUI.executeOnLoad(function(){
+
+                  $E('timetableDiv').set(timetable.draw());
+                  timetable.postDraw();
+
+                });
+            </script>
+        """ %(_("Building timetable..."),
+              str(ttdata).replace('%','%%'),
+              eventInfo)
 
     def _getContribsHTML(self):
         self._createTabCtrl()
@@ -480,7 +427,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                 html=self._getContribListHTML()
         else:
             html=self._getTimeTableHTML()
-        return WSessionTabControl(self._tabCtrl, self._aw).getHTML(html)
+        return wcomponents.WTabControl(self._tabCtrl, self._aw).getHTML(html)
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars( self )
@@ -571,6 +518,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                     self._sortingCrit.getField() is not None:
                 url.addParam("sortBy",self._sortingCrit.getField().getId())
         vars["PDFURL"]=quoteattr(str(url))
+
         return vars
 
 
@@ -628,6 +576,9 @@ class WPSessionDisplay( WPSessionDefaultDisplayBase ):
         self._toolBar.addItem(pdf)
         self._toolBar.addItem(ical)
 
+    def getJSFiles(self):
+        return WPSessionDefaultDisplayBase.getJSFiles(self) + \
+               self._includeJSPackage('Timetable')
 
 class WPSessionModifBase( WPConferenceModifBase ):
 

@@ -279,31 +279,31 @@ type("DisplayTimeTable", ["TimeTable"], {
     _functionButtons: function() {
         var self = this;
 
-        var printButton = {'btn': Html.div('printButtonWhite', $T('Print')),
+        this.printButton = {'btn': Html.div('printButtonWhite', $T('Print')),
             'onclick': function(btnContainer) {
                 self.print();
             }
         };
 
-        var pdfButton = {'btn': Html.div('buttonWhite', $T('PDF')),
+        this.pdfButton = {'btn': Html.div('buttonWhite', $T('PDF')),
                 'onclick': function(btnContainer) {
                     self.pdf();
                 }
         };
 
-        var fullScreenButton = {'btn': Html.div('buttonWhite', $T('Full screen')),
+        this.fullScreenButton = {'btn': Html.div('buttonWhite', $T('Full screen')),
                 'onclick': function(btnContainer) {
                     self.fullScreen();
                 }
         };
 
         // TODO: Needs to be implemented
-        var linkButton = Html.div('linkButtonWhite', $T('Link'));
+        this.linkButton = Html.div('linkButtonWhite', $T('Link'));
 
         this.detailsButton = {'btn': Html.div('buttonWhite', Html.span({}, $T('Detailed view'))),
             'onclick': function() {self.toggleDetailedView();}};
 
-        var filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
+        this.filterButton = {'btn': Html.div('buttonWhite', $T('Filter')),
             'onclick': function(btnContainer) {
                 // Save the container so that the filter button background
                 // color can be restored when filter is closed
@@ -314,11 +314,11 @@ type("DisplayTimeTable", ["TimeTable"], {
             }
         };
 
-        return [printButton,
-                pdfButton,
-                fullScreenButton,
+        return [this.printButton,
+                this.pdfButton,
+                this.fullScreenButton,
                 this.detailsButton,
-                filterButton];
+                this.filterButton];
     }
 },
      function(data, width, wrappingElement, detailLevel) {
@@ -1095,3 +1095,22 @@ type("SessionManagementTimeTable", ["TopLevelManagementTimeTable"], {
 
          this.TopLevelManagementTimeTable(data, eventInfo, width, wrappingElement, 'session', historyBroker, true);
      });
+
+type("SessionDisplayTimeTable", ["TopLevelDisplayTimeTable"], {
+
+    _functionButtons: function() {
+        var self = this;
+
+        this.TopLevelDisplayTimeTable.prototype._functionButtons.call(this);
+
+        return [this.printButton,
+                this.fullScreenButton,
+                this.filterButton];
+    }
+},
+    function(data, eventInfo, width, wrappingElement, historyBroker) {
+
+        this.TopLevelDisplayTimeTable(data, eventInfo, width, wrappingElement, 'contribution', historyBroker, null);
+
+    });
+
