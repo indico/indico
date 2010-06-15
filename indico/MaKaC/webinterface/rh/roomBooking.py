@@ -105,12 +105,12 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         if sMonth and len( sMonth.strip() ) > 0:
             sMonth = int( sMonth.strip() )
 
-        if sYear and sMonth and sDay:
-            # For format checking
-            try:
-                time.strptime(sDay.strip() + "/" + sMonth.strip() + "/" + sYear.strip() , "%d/%m/%Y")
-            except ValueError:
-                raise NoReportError(_("The Start Date must be of the form DD/MM/YYYY and must be a valid date."))
+#        if sYear and sMonth and sDay:
+#            # For format checking
+#            try:
+#                time.strptime(sDay.strip() + "/" + sMonth.strip() + "/" + sYear.strip() , "%d/%m/%Y")
+#            except ValueError:
+#                raise NoReportError(_("The Start Date must be of the form DD/MM/YYYY and must be a valid date."))
 
         if eMonth and len( eMonth.strip() ) > 0:
             eMonth = int( eMonth.strip() )
@@ -121,12 +121,12 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         if eYear and len( eYear.strip() ) > 0:
             eYear = int( eYear.strip() )
 
-        if eYear and eMonth and eDay:
-            # For format checking
-            try:
-                time.strptime(eDay.strip() + "/" + eMonth.strip() + "/" + eYear.strip() , "%d/%m/%Y")
-            except ValueError:
-                raise NoReportError(_("The End Date must be of the form DD/MM/YYYY and must be a valid date."))
+#        if eYear and eMonth and eDay:
+#            # For format checking
+#            try:
+#                time.strptime(eDay.strip() + "/" + eMonth.strip() + "/" + eYear.strip() , "%d/%m/%Y")
+#            except ValueError:
+#                raise NoReportError(_("The End Date must be of the form DD/MM/YYYY and must be a valid date."))
 
 
         sTime = params.get( "sTime" )
