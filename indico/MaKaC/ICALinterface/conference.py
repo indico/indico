@@ -24,7 +24,6 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.review as review
 from MaKaC.ICALinterface.base import ICALBase
 from MaKaC.common.utils import encodeUnicode
-from pytz import timezone
 
 
 class ProgrammeToiCal(ICALBase):
@@ -69,41 +68,12 @@ class ConferenceToiCal(ICALBase):
     def _lt(self, text):
         return "\\n".join(encodeUnicode(text).splitlines())
 
-    def getTimezone(self):
-        tzOffset = self._conf.getAdjustedStartDate().utcoffset()
-        dst = self._conf.getAdjustedStartDate().dst()
-
-        stdStr = "%02d00" % abs(tzOffset.seconds / 3600)
-        dstStr = "%02d00" % abs((tzOffset.seconds - dst.seconds) / 3600)
-
-        if tzOffset.seconds < 0:
-            stdStr = "-%s" % stdStr
-
-        if (tzOffset.seconds - dst.seconds) < 0:
-            dstStr = "-%s" % dstStr
-
-
-        text = "BEGIN:VTIMEZONE\n"
-        text += "TZID:%s\n" % self._conf.getTimezone()
-        text += "BEGIN:STANDARD\n"
-        text += "DTSTART:%s\n" % escape(self._conf.getAdjustedStartDate().strftime("%Y%m%dT%H%M00"))
-        text += "TZOFFSETFROM:%s\n" % stdStr
-        text += "TZOFFSETTO:%s\n" % dstStr
-        text += "END:STANDARD\n"
-        text += "BEGIN:DAYLIGHT\n"
-        text += "DTSTART:%s\n" % escape(self._conf.getAdjustedStartDate().strftime("%Y%m%dT%H%M00"))
-        text += "TZOFFSETFROM:%s\n" % dstStr
-        text += "TZOFFSETTO:%s\n" % stdStr
-        text += "END:DAYLIGHT\n"
-        text += "END:VTIMEZONE\n"
-        return text
-
     def getCore(self):
         url = str( urlHandlers.UHConferenceDisplay.getURL( self._conf ) )
         text = self._printEventHeader(self._conf)
         text += "URL;VALUE=URI:%s\n" % url
-        text += "DTSTART;TZID=%s:%s\n" % (self._conf.getTimezone(), escape(self._conf.getAdjustedStartDate().strftime("%Y%m%dT%H%M00")))
-        text += "DTEND;TZID=%s:%s\n" % (self._conf.getTimezone(), escape(self._conf.getAdjustedEndDate().strftime("%Y%m%dT%H%M00")))
+        text += "DTSTART:%s\n" % escape(self._conf.getStartDate().strftime("%Y%m%dT%H%M00Z"))
+        text += "DTEND:%s\n" % escape(self._conf.getEndDate().strftime("%Y%m%dT%H%M00Z"))
         desc = ""
         chair = fullchair = ""
         if len(self._conf.getChairList()) != 0:
@@ -136,7 +106,6 @@ class ConferenceToiCal(ICALBase):
 
     def getBody(self):
         text = self._printHeader()
-        text += self.getTimezone()
         text += self.getCore()
         text += self._printFooter()
         return text
