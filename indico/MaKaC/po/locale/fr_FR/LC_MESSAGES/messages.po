@@ -16614,6 +16614,15 @@ msgstr "Coordinateur de thématique"
 msgid "new convener"
 msgstr "Nouveau président de session"
 
+msgid "Conveners list"
+msgstr "Liste des présidents de session"
+
+msgid "Speakers list"
+msgstr "Liste des orateurs"
+
+msgid "Pending queues"
+msgstr "Listes d'attente"
+
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/wcomponents.py:851
 msgid "Abstracts list"
 msgstr "Liste des résumés"

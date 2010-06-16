@@ -4557,7 +4557,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
     def __init__(self, conference):
         self.__conf = conference
         self._display = []
-        self._dispopts = [ "Email", "Session" ]
+        self._dispopts = [ "Email", "Session", "Actions" ]
         self._order = ""
 
     def getVars(self):
@@ -4581,6 +4581,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         for key in convenersDictionary.keys() :
             counter = 0
             sessions = []
+            actions = []
 
             for convener in  convenersDictionary[key] :
                 if counter == 0 :
@@ -4592,23 +4593,28 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
                         self.htmlText(convener.getFullName()) or "&nbsp;", \
                         self.htmlText(convener.getEmail()) or "&nbsp;" )
                 if isinstance(convener, conference.SlotChair):
-                    url = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
-                    url.addParam("sessionId",convener.getSession().getId() )
-                    sesurl = quoteattr(str(url))
+                    timetableUrl = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
+                    timetableUrl.addParam("sessionId",convener.getSession().getId() )
                     sestitle = self.htmlText(convener.getSlot().getTitle()) or "Slot%s" % convener.getSlot().getId()
-                    sessions.append("<a href=%s>%s</a>"%(sesurl,self.htmlText(convener.getSession().getTitle()) + ": " + sestitle))
+                    sessions.append("%s"%(self.htmlText(convener.getSession().getTitle()) + ": " + sestitle))
+                    actions.append("""<a href="%s">timetable</a>"""%timetableUrl)
                 else:
                     url = urlHandlers.UHSessionModification.getURL(self.__conf)
                     url.addParam("sessionId",convener.getSession().getId() )
+                    timetableUrl = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
+                    timetableUrl.addParam("sessionId",convener.getSession().getId() )
                     sesurl = quoteattr(str(url))
                     sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
                     sessions.append("<a href=%s>%s</a>"%(sesurl,sestitle))
+                    actions.append("""<a href="%s">timetable</a>"""%timetableUrl)
 
                 counter = counter + 1
 
             sessionlist = "<br/>".join(sessions)
-            html = html + """<td valign="top"  class="abstractDataCell">%s"""%sessionlist
-            html = html + """</td></tr>"""
+            actionsList = "<br/>".join(actions)
+            html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%sessionlist
+            html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%actionsList
+            html = html + """</tr>"""
         html += _("""
                     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
                     <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
@@ -4618,7 +4624,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 
     def _getColumnsHTML(self, sortingField):
         res =[]
-        columns ={"Email": _("Email"),"Session": _("Session") }
+        columns ={"Email": _("Email"),"Session": _("Session"), "Actions": _("Actions") }
         currentSorting=""
         if sortingField is not None:
             currentSorting=sortingField.getId()
@@ -4643,7 +4649,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
                         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s%s<a href=%s>Name</a></td>"""%(nameImg, checkboxes, nameSortingURL))
         if self._display == []:
             for key in self._dispopts:
-                if key in ["Email","Session"]:
+                if key in ["Email","Session", "Actions"]:
                     url=self._getURL()
                     url.addParam("sortBy",key)
                     img=""
