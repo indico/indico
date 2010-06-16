@@ -21,7 +21,7 @@
 from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.conference import IMaterialFossil,\
-        IConferenceParticipationFossil
+        IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
 from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
     IContributionParticipationTTMgmtFossil
 
@@ -274,7 +274,7 @@ class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
     def getConveners(self):
         """ Entry Conveners """
     getConveners.produce = lambda s: s.getOwner().getOwnConvenerList()
-    getConveners.result = IConferenceParticipationFossil
+    getConveners.result = IConferenceParticipationMinimalFossil
 
 
 class ILinkedTimeSchEntryMgmtFossil(ILinkedTimeSchEntryFossil):

@@ -239,8 +239,16 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
         UtilsConference.setValues( c, self._params )
         if self._wf:
             self._wfReg.registerFactory( c, self._wf )
-        avatars, newUsers = self._getPersons()
-        UtilPersons.addToConf(avatars, newUsers, c, self._params.has_key('grant-manager'))
+
+        eventAccessProtection = params.get("eventProtection", "inherit")
+
+        if eventAccessProtection == "private" :
+            c.getAccessController().setProtection(1)
+        elif eventAccessProtection == "public" :
+            c.getAccessController().setProtection(-1)
+
+        avatars, newUsers, allowedAvatars = self._getPersons()
+        UtilPersons.addToConf(avatars, newUsers, allowedAvatars, c, self._params.has_key('grant-manager'))
         if params.get("sessionSlots",None) is not None :
             if params["sessionSlots"] == "enabled" :
                 c.enableSessionSlots()
@@ -250,13 +258,16 @@ class RHConferencePerformCreation( RHConferenceCreationBase ):
         return c
 
     def _getPersons(self):
-        avatars, newUsers = [], []
+        cpAvatars, cpNewUsers, auAvatars = [], [], []
         from MaKaC.services.interface.rpc import json
         chairpersonDict = json.decode(self._params.get("chairperson"))
+        allowedUsersDict = json.decode(self._params.get("allowedUsers"))
         if chairpersonDict:
-            avatars, newUsers, editedAvatars = UserListModificationBase.retrieveUsers({"userList":chairpersonDict})
+            cpAvatars, cpNewUsers, cpEditedAvatars = UserListModificationBase.retrieveUsers({"userList":chairpersonDict})
+        if allowedUsersDict :
+            auAvatars, auNewUsers, auEditedAvatars = UserListModificationBase.retrieveUsers({"userList":allowedUsersDict})
         #raise "avt: %s, newusers: %s, edited: %s"%(map(lambda x:x.getFullName(),avatars), newUsers, editedAvatars)
-        return avatars, newUsers
+        return cpAvatars, cpNewUsers, auAvatars
 
     def alertCreation(self, confs):
         conf = confs[0]
@@ -324,7 +335,7 @@ _Access%s_
 class UtilPersons:
 
     @staticmethod
-    def addToConf( avatars, newUsers, conf, grantManager):
+    def addToConf( avatars, newUsers, accessingAvatars, conf, grantManager):
 
         if newUsers :
             for newUser in newUsers:
@@ -339,7 +350,7 @@ class UtilPersons:
                 person.setFax(newUser.get("fax",""))
                 if not UtilPersons._alreadyDefined(person) :
                     #TODO: add to conf
-                    UtilPersons._add(conf, person, grantManager)
+                    UtilPersons._addChair(conf, person, grantManager)
                 else :
                     #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
                     pass
@@ -352,7 +363,7 @@ class UtilPersons:
                     person.setDataFromAvatar(selected)
                     if not UtilPersons._alreadyDefined(person):
                         #TODO: add to conf
-                        UtilPersons._add(conf, person, grantManager)
+                        UtilPersons._addChair(conf, person, grantManager)
                     else :
                         #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
                         pass
@@ -365,6 +376,11 @@ class UtilPersons:
                 #            definedList.append([person,params.has_key("submissionControl")])
                 #        else :
                 #            self._errorList.append("%s has been already defined as %s of this conference"%(presenter.getFullName(),self._typeName))
+
+        if accessingAvatars:
+            for person in accessingAvatars :
+                if isinstance(person, user.Avatar) or isinstance(person, user.Group) or isinstance(person, user.CERNGroup):
+                    conf.grantAccess(person)
 
     @staticmethod
     def _alreadyDefined(person):#, definedList):
@@ -379,7 +395,7 @@ class UtilPersons:
         return False
 
     @staticmethod
-    def _add(conf, chair, grant):
+    def _addChair(conf, chair, grant):
         conf.addChair(chair)
         if grant:
             conf.grantModification(chair)

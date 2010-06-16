@@ -19,7 +19,7 @@
 	  <td width="100%%">&nbsp;<td>
 	</tr>
         <%
-          if not self._rh._target.getConference().hasEnabledSection("cfa") or not self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+          if not self._rh._target.getConference().getAbstractMgr().isActive() or not self._rh._target.getConference().hasEnabledSection("cfa") or not self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
         %>
 	<tr>
 	  <td>
@@ -38,7 +38,7 @@
 	  <td>
             <table align="center" width="90%%">
                 <%
-                if self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+                if self._rh._target.getConference().getAbstractMgr().isActive() and self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
                 %>
             %(additionalFields)s
                 <%end%>
@@ -142,14 +142,14 @@
                   </tr>
                   <tr>
                       <td colspan="2">
-                           %(reviewingHistoryStuffDisplay)s                          
+                           %(reviewingHistoryStuffDisplay)s
                       </td>
                   </tr>
               <% end %>
               </table>
            </td>
         </tr>
-        
+
         </table>
     </td>
 </tr>

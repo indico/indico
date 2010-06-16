@@ -21,6 +21,9 @@
 from datetime import datetime
 from pytz import timezone
 from MaKaC.plugins.base import PluginsHolder
+
+from MaKaC.common.logger import Logger
+
 try:
     import libxml2
     import libxslt
@@ -119,10 +122,10 @@ class outputGenerator:
         return materialRegistry.getMaterialList(obj.getConference())
 
 
-    def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
+    def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         # get xml conference
         start_time_XML = time.time()
-        xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeMaterial,showSession,showDate,showContribution)
+        xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate,showContribution)
         end_time_XML = start_time_HTML = time.time()
         if not os.path.exists(stylesheet):
             self.text = _("Cannot find stylesheet")
@@ -157,7 +160,7 @@ class outputGenerator:
         else:
             return html + stat_text
 
-    def _getBasicXML(self, conf, vars,includeSession,includeContribution,includeMaterial,showSession="all",showDate="all",showContribution="all", out=None):
+    def _getBasicXML(self, conf, vars,includeSession,includeContribution,includeSubContribution,includeMaterial,showSession="all",showDate="all",showContribution="all", showSubContribution="all", out=None):
         if not out:
             out = self._XMLGen
         """
@@ -165,7 +168,7 @@ class outputGenerator:
         """
         #out.initXml()
         out.openTag("iconf")
-        self._confToXML(conf,vars,includeSession,includeContribution,includeMaterial,showSession,showDate, showContribution,out=out)
+        self._confToXML(conf,vars,includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate, showContribution,out=out)
         out.closeTag("iconf")
         return out.getXml()
 
@@ -199,11 +202,35 @@ class outputGenerator:
                 roomName = roomFromDB.getFullName()
         return roomName
 
+    def _confToXML(self,
+                   conf,
+                   vars,
+                   includeSession         = 1,
+                   includeContribution    = 1,
+                   includeSubContribution = 1,
+                   includeMaterial        = 1,
+                   showSession            = "all",
+                   showDate               = "all",
+                   showContribution       = "all",
+                   showSubContribution    = "all",
+                   showWithdrawed         = True,
+                   useSchedule            = True,
+                   out                    = None,
+                   recordingManagerTags   = None):
 
-    def _confToXML(self, conf, vars, includeSession=1, includeContribution=1, includeMaterial=1, showSession="all", showDate="all",showContribution="all", showWithdrawed=True, useSchedule=True, out=None):
+#        Logger.get('RecMan').info("in _confToXML()")
+#        Logger.get('RecMan').info(" conf = %s" % conf)
+#        Logger.get('RecMan').info(" includeSession = %s" % includeSession)
+#        Logger.get('RecMan').info(" includeContribution = %s" % includeContribution)
+#        Logger.get('RecMan').info(" includeSubContribution = %s" % includeSubContribution)
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
+
         if not out:
             out = self._XMLGen
-
         if vars and vars.has_key("frame") and vars["frame"] == "no":
             modificons = 0
         else:
@@ -218,6 +245,30 @@ class outputGenerator:
 
         out.writeTag("parentProtection", simplejson.dumps(conf.getAccessController().isProtected()))
         out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(conf)))
+
+#        Logger.get('RecMan').info('showContribution: ' + str(showContribution))
+
+        # Access list info (tag 506)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        if recordingManagerTags is not None:
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
+
+                # Only create the access list and video tags if this conference
+                # is the desired talk.
+                if recordingManagerTags["talkType"] == "conference" and recordingManagerTags["talkId"] == conf.getId():
+#                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('showContribution: ' + str(showContribution))
+
+                    # Now we know it's safe to import the necessary methods,
+                    # because we have verified that the RecordingManager plugin is installed.
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                    MarcAccessListGenerator.generateAccessListXML(out, conf)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -266,6 +317,8 @@ class outputGenerator:
         if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
             out.writeTag("evaluationLink",urlHandlers.UHConfEvaluationDisplay.getURL(conf))
 
+        out.writeTag("closed", str(conf.isClosed()))
+
 #        if len(conf.getBookingsList()):
 #            out.openTag("videoconference")
 #            for b in conf.getBookingsList():
@@ -312,8 +365,12 @@ class outputGenerator:
                 out.writeTag("UnformatedUser",conf.getChairmanText())
             out.closeTag("chair")
 
+
+#            Logger.get('RecMan').info('HEY now calling _contribToXML()...')
+
+        # This case happens when called by RecordingManager to generate XML for a contribution:
         if showContribution != "all" and conf.getContributionById(showContribution) != None:
-            self._contribToXML(conf.getContributionById(showContribution),vars,includeMaterial,conf, out=out)
+            self._contribToXML(conf.getContributionById(showContribution),vars,includeSubContribution,includeMaterial,conf, showSubContribution=showSubContribution,out=out, recordingManagerTags=recordingManagerTags)
         elif useSchedule:
             confSchedule = conf.getSchedule()
             if showDate == "all":
@@ -328,22 +385,22 @@ class outputGenerator:
                     if owner.canView(self.__aw):
                         if includeContribution:
                             if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
-                                self._contribToXML(owner,vars,includeMaterial,conf, out=out)
+                                self._contribToXML(owner,vars,includeSubContribution,includeMaterial,conf, showSubContribution=showSubContribution,out=out)
                 elif type(entry) is schedule.LinkedTimeSchEntry: #TODO: schedule.LinkedTimeSchEntry doesn't seem to exist!
                     owner = entry.getOwner()
                     if type(owner) is conference.Contribution:
                         if owner.canView(self.__aw):
                             if includeContribution:
                                 if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
-                                    self._contribToXML(owner,vars,includeMaterial,conf, out=out)
+                                    self._contribToXML(owner,vars,includeSubContribution,includeMaterial,conf, out=out)
                     elif type(owner) is conference.Session:
                         if owner.canView(self.__aw):
                             if includeSession and (showSession == "all" or owner.getId() == showSession):
-                                self._sessionToXML(owner,vars,includeContribution,includeMaterial, showWithdrawed=showWithdrawed, out=out)
+                                self._sessionToXML(owner,vars,includeContribution,includeMaterial, showWithdrawed=showWithdrawed, out=out, recordingManagerTags=recordingManagerTags)
                     elif type(owner) is conference.SessionSlot:
                         if owner.getSession().canView(self.__aw):
                             if includeSession and (showSession == "all" or owner.getSession().getId() == showSession):
-                                self._slotToXML(owner,vars,includeContribution,includeMaterial, showWithdrawed=showWithdrawed, out=out)
+                                self._slotToXML(owner,vars,includeContribution,includeMaterial, showWithdrawed=showWithdrawed, out=out, recordingManagerTags=recordingManagerTags)
         else:
             confSchedule = conf.getSchedule()
             for entry in confSchedule.getEntries():
@@ -351,11 +408,12 @@ class outputGenerator:
                     owner = entry.getOwner()
                     if owner.canView(self.__aw):
                         if includeContribution:
-                            self._contribToXML(owner,vars,includeMaterial,conf,out=out)
+                            self._contribToXML(owner,vars,includeSubContribution,includeMaterial,conf,showSubContribution=showSubContribution,out=out, recordingManagerTags=recordingManagerTags)
             sessionList = conf.getSessionList()
-            for session in sessionList:
-                if session.canAccess(self.__aw) and includeSession:
-                    self._sessionToXML(session, vars, includeContribution, includeMaterial, showWithdrawed=showWithdrawed, useSchedule=False, out=out)
+            for session in sessionList: # here is the part that displays all the sessions (for the RecordingManager, anyway). It should be changed to check if showSession has been set.
+                if session.canAccess(self.__aw) and includeSession and (showSession == 'all' or str(session.getId()) == str(showSession)):
+#                    Logger.get('RecMan').info("session id = %s" % session.getId())
+                    self._sessionToXML(session, vars, includeContribution, includeMaterial, showWithdrawed=showWithdrawed, useSchedule=False, out=out, recordingManagerTags=recordingManagerTags)
 
         mList = conf.getAllMaterialList()
         for mat in mList:
@@ -391,7 +449,26 @@ class outputGenerator:
 
 
 
-    def _sessionToXML(self,session,vars,includeContribution,includeMaterial, showWithdrawed=True, useSchedule=True, out=None):
+    def _sessionToXML(self,
+                      session,
+                      vars,
+                      includeContribution,
+                      includeMaterial,
+                      includeSubContribution = 1,
+                      showContribution       = None,
+                      showSubContribution    = None,
+                      showWithdrawed         = True,
+                      useSchedule            = True,
+                      out                    = None,
+                      recordingManagerTags   = None):
+
+#        Logger.get('RecMan').info("in _sessionToXML()")
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
+
         if not out:
             out = self._XMLGen
         if vars and vars.has_key("frame") and vars["frame"] == "no":
@@ -441,7 +518,7 @@ class outputGenerator:
             # not logged in, use meeting timezone
             displayMode = 'Meeting'
         if displayMode == 'Meeting':
-            tz = self.conf.getTimezone()
+            tz = session.getConference().getTimezone()
         else:
             tz = self.__aw._currentUser.getTimezone()
         startDate = session.getStartDate().astimezone(timezone(tz))
@@ -460,21 +537,41 @@ class outputGenerator:
                         if type(owner) is conference.Contribution:
                             if owner.canView(self.__aw):
                                 if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
-                                    self._contribToXML(owner,vars,includeMaterial, conf,out=out)
+                                    self._contribToXML(owner,vars,includeSubContribution,includeMaterial, session.getConference(),out=out, recordingManagerTags=recordingManagerTags) # needs to be re-done?
             else:
                 for contrib in session.getContributionList():
                     if contrib.canView(self.__aw):
                         if showWithdrawed or not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn):
-                            self._contribToXML(contrib, vars, includeMaterial, conf,out=out)
+                            self._contribToXML(contrib, vars, includeSubContribution,includeMaterial, session.getConference(),out=out, recordingManagerTags=recordingManagerTags) # needs to be re-done
 
         mList = session.getAllMaterialList()
         for mat in mList:
             self._materialToXML(mat, vars, out=out)
+
+        # Access list info (tag 506)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        if recordingManagerTags is not None:
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
+
+                # Only create the access list and video tags if this conference
+                # is the desired talk (the video tags only apply to one talk at a time).
+                if recordingManagerTags["talkType"] == "session" and recordingManagerTags["talkId"] == session.getId():
+#                    Logger.get('RecMan').info('Called _sessionToXML() with RecordingManager')
+                    # only now do we know it's safe to import the necessary method
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                    MarcAccessListGenerator.generateAccessListXML(out, session)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
+
         out.closeTag("session")
 
 
 
-    def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None):
+    def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None, recordingManagerTags=None):
         if not out:
             out = self._XMLGen
         session = slot.getSession()
@@ -548,7 +645,7 @@ class outputGenerator:
                     if isinstance(owner, conference.AcceptedContribution) or isinstance(owner, conference.Contribution):
                         if owner.canView(self.__aw):
                             if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
-                                self._contribToXML(owner,vars,includeMaterial, conf,out=out)
+                                self._contribToXML(owner,vars,1,includeMaterial, conf,out=out)
         mList = session.getAllMaterialList()
         for mat in mList:
             self._materialToXML(mat, vars, out=out)
@@ -556,7 +653,31 @@ class outputGenerator:
 
 
 
-    def _contribToXML(self,cont,vars,includeMaterial, conf, out=None):
+    def _contribToXML(self,
+                      contribution,
+                      vars,
+                      includeSubContribution,
+                      includeMaterial,
+                      conf,
+                      showSubContribution  = None,
+                      out                  = None,
+                      recordingManagerTags = None):
+
+#        Logger.get('RecMan').info('in _contribToXML')
+#        Logger.get('RecMan').info(" conf: %s" % conf)
+##        Logger.get('RecMan').info(" conf.getTimezone(): %s" % conf.getTimezone())
+#        Logger.get('RecMan').info(" contribution: %s" % contribution)
+#        Logger.get('RecMan').info(" vars: %s" % vars)
+#        Logger.get('RecMan').info(" includeSubContribution: %s" % includeSubContribution)
+#        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
+#        Logger.get('RecMan').info(" showSubContribution: %s" % showSubContribution)
+#        Logger.get('RecMan').info(" out: %s" % out)
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
+
         if not out:
             out = self._XMLGen
         if vars and vars.has_key("frame") and vars["frame"] == "no":
@@ -564,31 +685,31 @@ class outputGenerator:
         else:
             modificons = 1
         out.openTag("contribution")
-        out.writeTag("ID",cont.getId())
+        out.writeTag("ID",contribution.getId())
 
-        out.writeTag("parentProtection", simplejson.dumps(cont.getAccessController().isProtected()))
-        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(cont)))
+        out.writeTag("parentProtection", simplejson.dumps(contribution.getAccessController().isProtected()))
+        out.writeTag("materialList", simplejson.dumps(self._generateMaterialList(contribution)))
 
-        if cont.getBoardNumber() != "":
-            out.writeTag("board",cont.getBoardNumber())
-        if cont.getTrack() != None:
-            out.writeTag("track",cont.getTrack().getTitle())
-        if cont.getType() != None:
+        if contribution.getBoardNumber() != "":
+            out.writeTag("board",contribution.getBoardNumber())
+        if contribution.getTrack() != None:
+            out.writeTag("track",contribution.getTrack().getTitle())
+        if contribution.getType() != None:
             out.openTag("type")
-            out.writeTag("id",cont.getType().getId())
-            out.writeTag("name",cont.getType().getName())
+            out.writeTag("id",contribution.getType().getId())
+            out.writeTag("name",contribution.getType().getName())
             out.closeTag("type")
-        if cont.canModify( self.__aw ) and vars and modificons:
-            out.writeTag("modifyLink",vars["contribModifyURLGen"](cont))
-        if (cont.canModify( self.__aw ) or cont.canUserSubmit(self.__aw.getUser())) and vars and modificons:
+        if contribution.canModify( self.__aw ) and vars and modificons:
+            out.writeTag("modifyLink",vars["contribModifyURLGen"](contribution))
+        if (contribution.canModify( self.__aw ) or contribution.canUserSubmit(self.__aw.getUser())) and vars and modificons:
             out.writeTag("minutesLink", True)
-        if (cont.canModify( self.__aw ) or cont.canUserSubmit(self.__aw.getUser())) and vars and modificons:
+        if (contribution.canModify( self.__aw ) or contribution.canUserSubmit(self.__aw.getUser())) and vars and modificons:
             out.writeTag("materialLink", True)
-        keywords = cont.getKeywords()
+        keywords = contribution.getKeywords()
         keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("keyword",keyword.strip())
-        rnh = cont.getReportNumberHolder()
+        rnh = contribution.getReportNumberHolder()
         rns = rnh.listReportNumbers()
         if len(rns) != 0:
             for rn in rns:
@@ -596,37 +717,37 @@ class outputGenerator:
                 out.writeTag("system",rn[0])
                 out.writeTag("rn",rn[1])
                 out.closeTag("repno")
-        out.writeTag("title",cont.title)
-        sList = cont.getSpeakerList()
+        out.writeTag("title",contribution.title)
+        sList = contribution.getSpeakerList()
         if len(sList) != 0:
             out.openTag("speakers")
             for sp in sList:
                 self._userToXML(sp, out)
-            if cont.getSpeakerText() != "":
-                out.writeTag("UnformatedUser",cont.getSpeakerText())
+            if contribution.getSpeakerText() != "":
+                out.writeTag("UnformatedUser",contribution.getSpeakerText())
             out.closeTag("speakers")
-        primaryAuthorList = cont.getPrimaryAuthorList()
+        primaryAuthorList = contribution.getPrimaryAuthorList()
         if len(primaryAuthorList) != 0:
             out.openTag("primaryAuthors")
             for sp in primaryAuthorList:
                 self._userToXML(sp, out)
             out.closeTag("primaryAuthors")
-        coAuthorList = cont.getCoAuthorList()
+        coAuthorList = contribution.getCoAuthorList()
         if len(coAuthorList) != 0:
             out.openTag("coAuthors")
             for sp in coAuthorList:
                 self._userToXML(sp, out)
             out.closeTag("coAuthors")
-        l = cont.getLocation()
-        if l != None or cont.getRoom():
+        l = contribution.getLocation()
+        if l != None or contribution.getRoom():
             out.openTag("location")
             if l!=None:
                 out.writeTag("name",l.getName())
                 out.writeTag("address",l.getAddress())
-            if cont.getRoom():
-                roomName = self._getRoom(cont.getRoom(), l)
+            if contribution.getRoom():
+                roomName = self._getRoom(contribution.getRoom(), l)
                 out.writeTag("room", roomName)
-                url=RoomLinker().getURL(cont.getRoom(), l)
+                url=RoomLinker().getURL(contribution.getRoom(), l)
                 if url != "":
                     out.writeTag("roomMapURL",url)
             else:
@@ -636,29 +757,71 @@ class outputGenerator:
         tz = tzUtil.getDisplayTZ()
 
         startDate = None
-        if cont.startDate:
-            startDate = cont.startDate.astimezone(timezone(tz))
+        if contribution.startDate:
+            startDate = contribution.startDate.astimezone(timezone(tz))
 
         if startDate:
-            endDate = startDate + cont.duration
+            endDate = startDate + contribution.duration
             out.writeTag("startDate","%d-%s-%sT%s:%s:00" %(startDate.year, string.zfill(startDate.month,2), string.zfill(startDate.day,2),string.zfill(startDate.hour,2), string.zfill(startDate.minute,2)))
             out.writeTag("endDate","%d-%s-%sT%s:%s:00" %(endDate.year, string.zfill(endDate.month,2), string.zfill(endDate.day,2),string.zfill(endDate.hour,2), string.zfill(endDate.minute,2)))
-        if cont.duration:
-            out.writeTag("duration","%s:%s" %(string.zfill((datetime(1900,1,1)+cont.duration).hour,2), string.zfill((datetime(1900,1,1)+cont.duration).minute,2)))
-        out.writeTag("abstract",cont.getDescription())
-        matList = cont.getAllMaterialList()
+        if contribution.duration:
+            out.writeTag("duration","%s:%s" %(string.zfill((datetime(1900,1,1)+contribution.duration).hour,2), string.zfill((datetime(1900,1,1)+contribution.duration).minute,2)))
+        out.writeTag("abstract",contribution.getDescription())
+        matList = contribution.getAllMaterialList()
         for mat in matList:
             if mat.canView(self.__aw):
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
                 else:
                     out.writeTag("material",out.writeTag("id",mat.id))
-        for subC in cont.getSubContributionList():
-            self._subContributionToXML(subC,vars,includeMaterial, out=out)
+        for subC in contribution.getSubContributionList():
+#            Logger.get('RecMan').info("subC.getId = %s, " % (subC.getId()))
+            if includeSubContribution:
+                if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
+                    self._subContributionToXML(subC,vars,includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
+
+        # Access list info (tag 506)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        if recordingManagerTags is not None:
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
+
+                # Only create the access list and video tags if this conference
+                # is the desired talk (the video tags only apply to one talk at a time).
+                if recordingManagerTags["talkType"] == "contribution" and recordingManagerTags["talkId"] == contribution.getId():
+#                    Logger.get('RecMan').info('Called _contribToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('showSubContribution: ' + str(showSubContribution))
+
+                    # only now do we know it's safe to import the necessary method
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                    MarcAccessListGenerator.generateAccessListXML(out, contribution)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
+
         out.closeTag("contribution")
 
 
-    def _subContributionToXML(self, subCont, vars, includeMaterial, out=None):
+    def _subContributionToXML(self,
+                              subCont,
+                              vars,
+                              includeMaterial,
+                              out         = None,
+                              recordingManagerTags = None):
+
+#        Logger.get('RecMan').info('in _subContributionToXML')
+#        Logger.get('RecMan').info(" subCont: %s" % subCont)
+#        Logger.get('RecMan').info(" vars: %s" % vars)
+#        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
+#        Logger.get('RecMan').info(" out: %s" % out)
+#        if recordingManagerTags is not None:
+#            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
+#            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
+#            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
+#            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
+
         if not out:
             out = self._XMLGen
         if vars and vars.has_key("frame") and vars["frame"] == "no":
@@ -702,6 +865,27 @@ class outputGenerator:
             if mat.canView(self.__aw):
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
+
+        # Access list info (tag 506)
+        # Check to make sure this request is coming from the Recording Manager.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        if recordingManagerTags is not None:
+            # Also check to make sure that the RecordingManager plugin is installed and active
+            if (PluginsHolder().hasPluginType("Collaboration") and
+                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
+                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
+
+                # Only create the access list and video tags if this conference
+                # is the desired talk (the video tags only apply to one talk at a time).
+                if recordingManagerTags["talkType"] == "subcontribution" and recordingManagerTags["talkId"] == subCont.getId():
+#                    Logger.get('RecMan').info('Called _subContributionToXML() with RecordingManager')
+
+                    # only now do we know it's safe to import the necessary method
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
+                    MarcAccessListGenerator.generateAccessListXML(out, subCont)
+                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
+                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
+
         out.closeTag("subcontribution")
 
 
@@ -847,11 +1031,26 @@ class outputGenerator:
         out.closeTag("break")
 
 
-    def confToXML(self,conf,includeSession,includeContribution,includeMaterial,showSession="all", showContribution="all", out=None, forceCache=False):
+    def confToXML(self,
+                  conf,
+                  includeSession,
+                  includeContribution,
+                  includeMaterial,
+                  showSession            = "all",
+                  showContribution       = "all",
+                  showSubContribution    = "all",
+                  out                    = None,
+                  forceCache             = False,
+                  recordingManagerTags   = None):
+        """forceCache = True apparently means force it NOT to use the cache. """
+
         if not out:
             out = self._XMLGen
         #try to get a cache
-        version = "ses-%s_cont-%s_mat-%s_sch-%s"%(includeSession,includeContribution,includeMaterial,False)
+        version = "ses-%s_cont-%s_mat-%s_sch-%s" % (includeSession,
+                                                    includeContribution,
+                                                    includeMaterial,
+                                                    False)
         obj = None
         if not forceCache:
             obj = self.cache.loadObject(version, conf)
@@ -859,7 +1058,19 @@ class outputGenerator:
             xml = obj.getContent()
         else:
             temp = XMLGen(init=False)
-            self._confToXML(conf,None,includeSession,includeContribution,includeMaterial,showSession=showSession, showDate="all", showContribution=showContribution, showWithdrawed=False, useSchedule=False, out=temp)
+            self._confToXML(conf,
+                            None,
+                            includeSession,
+                            includeContribution,
+                            includeMaterial,
+                            showSession          = showSession,
+                            showDate             = "all",
+                            showContribution     = showContribution,
+                            showSubContribution  = showSubContribution,
+                            showWithdrawed       = False,
+                            useSchedule          = False,
+                            out                  = temp,
+                            recordingManagerTags = recordingManagerTags)
             xml = temp.getXml()
             self.cache.cacheObject(version, xml, conf)
         #    out.writeTag("cache", "not found in cache")
@@ -869,9 +1080,6 @@ class outputGenerator:
         out.writeXML(xml)
         #return xml
 
-
-
-    #fb
 
     def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, forceCache=False):
 
@@ -1049,8 +1257,6 @@ class outputGenerator:
         out.writeTag("marc:subfield",url,[["code","u"]])
         out.writeTag("marc:subfield", "Event details", [["code","y"]])
         out.closeTag("marc:datafield")
-
-
 
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, forceCache=False):
     ##     if not out:
@@ -1512,7 +1718,6 @@ class outputGenerator:
         out.writeTag("marc:subfield",url,[["code","u"]])
         out.writeTag("marc:subfield", "Contribution details", [["code","y"]])
         out.closeTag("marc:datafield")
-
 
     def materialToXMLMarc21(self,mat, out=None):
         if not out:

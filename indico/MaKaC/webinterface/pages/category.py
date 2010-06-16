@@ -1005,9 +1005,9 @@ class WPCategOverview( WPCategoryDisplayBase ):
             return wc.getHTML( pars )
 
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCategoryOverview.getURL(self._target), "title": _("Events overview"), "type": "Overview"}]
+        #link = [{"url": urlHandlers.UHCategoryOverview.getURL(self._target), "title": _("Events overview")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, appendPath = link )
+        return wcomponents.WNavigationDrawer( pars, type = "Overview" )
 
 class WCategoryMap(wcomponents.WTemplated):
 
@@ -1047,9 +1047,9 @@ class WPCategoryMap( WPCategoryDisplayBase ):
         return wc.getHTML( pars )
 
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCategoryMap.getURL(self._target), "title": _("Category map"), "type": "Map"}]
+        #link = [{"url": urlHandlers.UHCategoryMap.getURL(self._target), "title": _("Category map")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, appendPath = link )
+        return wcomponents.WNavigationDrawer( pars, type = "Map" )
 
 class WCategoryStatistics(wcomponents.WTemplated):
 
@@ -1107,9 +1107,9 @@ class WPCategoryStatistics( WPCategoryDisplayBase ):
         return wcs.getHTML( self._getAW() )
 
     def _getNavigationDrawer(self):
-        link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics"), "type": "Statistics"}]
+        #link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, appendPath = link )
+        return wcomponents.WNavigationDrawer( pars, type = "Statistics" )
 
 class WEventTypeSelectionItem(wcomponents.WTemplated):
 
@@ -1205,13 +1205,18 @@ class WConferenceCreation( wcomponents.WTemplated ):
         vars["locationAddress"] = vars.get("locationAddress","")
         vars["roomName"] = vars.get("locationRoom","")
         #vars["locator"] = self._categ.getLocator().getWebForm()
-        vars["categ"] = {"id":"", "title":_("-- please, choose a category --") }
+        vars["protection"] = "public"
+        vars["categ"] = {"id":"", "title":_("-- please, choose a category --")}
         if self._categ and not self._categ.hasSubcategories():
+            if self._categ.isProtected() :
+                vars["protection"] = "private"
             vars["categ"] = {"id":self._categ.getId(), "title":self._categ.getTitle()}
         vars["nocategs"] = False
         if not CategoryManager().getRoot().hasSubcategories():
             vars["nocategs"] = True
             rootcateg = CategoryManager().getRoot()
+            if rootcateg.isProtected():
+                vars["protection"] = "private"
             vars["categ"] = {"id":rootcateg.getId(), "title":rootcateg.getTitle()}
         #vars["event_type"] = ""
         vars["navigator"] = navigator
@@ -1632,6 +1637,12 @@ class WCategoryCreation(wcomponents.WTemplated):
         except:
            default_tz = 'UTC'
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(default_tz)
+        vars["categTitle"] = self.__target.getTitle()
+        if self.__target.isProtected() :
+            vars["categProtection"] = "private"
+        else :
+            vars["categProtection"] = "public"
+
         return vars
 
 

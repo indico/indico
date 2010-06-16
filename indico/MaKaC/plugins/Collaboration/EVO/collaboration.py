@@ -197,16 +197,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
             self.bookingOK()
             self.checkCanStart()
 
-            if MailTools.needToSendEmails('EVO'):
-                try:
-                    notification = NewEVOMeetingNotificationAdmin(self)
-                    GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                         self.getConference().getCreator())
-                except Exception,e:
-                    Logger.get('EVO').error(
-                        """Could not send NewEVOMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                        (self.getId(), self.getConference().getId(), str(e)))
 
 #            if self._bookingParams["sendMailToManagers"]:
 #                try:
@@ -248,17 +238,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
                 self.bookingOK()
                 self.checkCanStart()
-
-                if MailTools.needToSendEmails('EVO'):
-                    try:
-                        notification = EVOMeetingModifiedNotificationAdmin(self)
-                        GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                             self.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('EVO').error(
-                            """Could not send EVOMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                            (self.getId(), self.getConference().getId(), str(e)))
 
 #                if self._bookingParams["sendMailToManagers"]:
 #                    try:
@@ -340,17 +319,6 @@ class CSBooking(CSBookingBase): #already Fossilizable
             try:
                 requestURL = getRequestURL("delete", arguments)
                 getEVOAnswer("delete", arguments, self.getConference().getId(), self._id)
-
-                if MailTools.needToSendEmails('EVO'):
-                    try:
-                        notification = EVOMeetingRemovalNotificationAdmin(self)
-                        GenericMailer.sendAndLog(notification, self.getConference(),
-                                             "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                             self.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('EVO').error(
-                            """Could not send EVOMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-                            (self.getId(), self.getConference().getId(), str(e)))
 
 #                if self._bookingParams["sendMailToManagers"]:
 #                    try:
@@ -469,3 +437,42 @@ class CSBooking(CSBookingBase): #already Fossilizable
                     self._canBeNotifiedOfEventDateChanges = False
                 elif changeMessage:
                     self.bookingOK()
+
+    def _sendMail(self, operation):
+        """
+        Overloads _sendMail behavior for EVO
+        """
+
+        if operation == 'new':
+            try:
+                notification = NewEVOMeetingNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                         self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('EVO').error(
+                    """Could not send NewEVOMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+        elif operation == 'modify':
+            try:
+                notification = EVOMeetingModifiedNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                         self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('EVO').error(
+                    """Could not send EVOMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+        elif operation == 'remove':
+            try:
+                notification = EVOMeetingRemovalNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
+                                         self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('EVO').error(
+                    """Could not send EVOMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+

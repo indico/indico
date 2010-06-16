@@ -1,5 +1,43 @@
 <% declareTemplate(newTemplateStyle=True) %>
 <script type="text/javascript">
+
+    // Function for checking and submitting the form when the user presses Enter.
+    // The JavaScript doesn't behave as expected in this case, since the checking is
+    // skipped.
+    function submit_on_enter(ev) {
+
+        var kc, e;
+        if (window.event) {
+            e = window.event;
+            kc = window.event.keyCode;
+        }
+        else if (ev) {
+            e = ev;
+            kc = ev.which;
+        }
+        else {
+            return true;
+        }
+
+        if (kc == 13) {
+            // If Enter was pressed in the "Reason" textarea, we don't want
+            // to submit the form
+            if (e.target == $('reason')) {
+                 return true;
+            }
+            if (forms_are_valid( true )) {
+                submit_booking();
+            }
+            else {
+                alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> );
+            }
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
     function forms_are_valid( onSubmit )
@@ -89,7 +127,7 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form id="bookingForm" action="#conflicts" method="post">
+    <form id="bookingForm" action="#conflicts" method="post" onkeypress="return submit_on_enter(event);">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
     <table cellpadding="0" cellspacing="0" border="0" width="80%%">
 		<% if standalone: %>

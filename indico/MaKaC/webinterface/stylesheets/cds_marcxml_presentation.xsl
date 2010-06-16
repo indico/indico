@@ -171,7 +171,6 @@
   <subfield code="b">TALK</subfield>
 </datafield>
 </xsl:if>
-
 </record>
 
 </xsl:template>
@@ -182,7 +181,7 @@
   <xsl:text disable-output-escaping="yes">, </xsl:text>
   </xsl:if>
   <xsl:value-of select="./@first" disable-output-escaping="yes"/>
-</xsl:template>	
+</xsl:template>
 
 </xsl:stylesheet>
 

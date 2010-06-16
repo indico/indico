@@ -17,13 +17,17 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.plugins.base import PluginsHolder
-from TestsConfig import TestsConfig
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 class VidyoTestSetup(object):
 
     @classmethod
     def setup(cls):
+
+        # lazy loading, as the plugin system imports everything, and we really
+        # don't need this, except for testing
+        from TestsConfig import TestsConfig
+
         PluginsHolder().loadAllPlugins()
 
         testConfig = TestsConfig.getInstance()

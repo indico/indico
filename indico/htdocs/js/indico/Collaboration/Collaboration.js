@@ -1381,24 +1381,28 @@ var refreshBookingS = function(booking) {
 };
 
 var refreshPlugin = function(name) {
-    if (exists(singleBookings[name])) {
-        refreshBookingS(singleBookings[name]);
-        var formNodes = IndicoUtil.findFormFields($E(name + 'Form'));
-        IndicoUtil.setFormValues(formNodes, singleBookings[name].bookingParams);
-        IndicoUI.Effect.appear($E('withdraw'+name+'Top'), 'inline');
-        IndicoUI.Effect.appear($E('withdraw'+name+'Bottom'), 'inline');
-        IndicoUI.Effect.appear($E('modify'+name+'Top'), 'inline');
-        IndicoUI.Effect.appear($E('modify'+name+'Bottom'), 'inline');
-        IndicoUI.Effect.disappear($E('send'+name+'Top'));
-        IndicoUI.Effect.disappear($E('send'+name+'Bottom'));
-    } else {
-        IndicoUI.Effect.disappear($E('withdraw'+name+'Top'));
-        IndicoUI.Effect.disappear($E('withdraw'+name+'Bottom'));
-        IndicoUI.Effect.disappear($E('modify'+name+'Top'));
-        IndicoUI.Effect.disappear($E('modify'+name+'Bottom'));
-        IndicoUI.Effect.appear($E('send'+name+'Top'), 'inline');
-        IndicoUI.Effect.appear($E('send'+name+'Bottom'), 'inline');
-        $E(name + 'Info').clear();
+  //Check if there are buttons to withdraw, modify or send. If not, it means it
+    // is not a "request" collaboration plugin.
+    if (exists($E('withdraw'+name+'Top'))) {
+        if (exists(singleBookings[name])) {
+            refreshBookingS(singleBookings[name]);
+            var formNodes = IndicoUtil.findFormFields($E(name + 'Form'));
+            IndicoUtil.setFormValues(formNodes, singleBookings[name].bookingParams);
+            IndicoUI.Effect.appear($E('withdraw'+name+'Top'), 'inline');
+            IndicoUI.Effect.appear($E('withdraw'+name+'Bottom'), 'inline');
+            IndicoUI.Effect.appear($E('modify'+name+'Top'), 'inline');
+            IndicoUI.Effect.appear($E('modify'+name+'Bottom'), 'inline');
+            IndicoUI.Effect.disappear($E('send'+name+'Top'));
+            IndicoUI.Effect.disappear($E('send'+name+'Bottom'));
+        } else {
+            IndicoUI.Effect.disappear($E('withdraw'+name+'Top'));
+            IndicoUI.Effect.disappear($E('withdraw'+name+'Bottom'));
+            IndicoUI.Effect.disappear($E('modify'+name+'Top'));
+            IndicoUI.Effect.disappear($E('modify'+name+'Bottom'));
+            IndicoUI.Effect.appear($E('send'+name+'Top'), 'inline');
+            IndicoUI.Effect.appear($E('send'+name+'Bottom'), 'inline');
+            $E(name + 'Info').clear();
+        }
     }
 };
 

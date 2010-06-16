@@ -15,13 +15,13 @@ class CategoryBase(object):
     """
     Base class for category
     """
-    
+
     def _checkParams( self ):
         try:
             l = locators.WebLocator()
             l.setCategory( self._params )
             self._target = self._categ = l.getObject()
-        except:           
+        except:
             #raise ServiceError("ERR-E4", "Invalid category id.")
             self._target = self._categ = conference.CategoryManager().getRoot()
 
@@ -32,11 +32,11 @@ class CategoryModifBase(ProtectedModificationService, CategoryBase):
         ProtectedModificationService._checkParams(self)
 
 class CategoryDisplayBase(ProtectedDisplayService, CategoryBase):
-    
+
     def _checkParams(self):
         CategoryBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
-        
+
 class GetCategoryList(CategoryDisplayBase):
 
     def _checkProtection( self ):
@@ -82,15 +82,19 @@ class GetCategoryList(CategoryDisplayBase):
             #    protected = False
             categList.append({"id":cat.getId(), "title":cat.getTitle(), "subcatLength":len(cat.getSubCategoryList()), "final": not cat.hasSubcategories()})
         return {"parentCateg":
-                    {"id":parent.getId(), "title":parent.getTitle()}, 
+                    {"id":parent.getId(), "title":parent.getTitle()},
                 "currentCateg":
-                    {"id":target.getId(), "title":target.getTitle(), "breadcrumb": breadcrumbs}, 
+                    {"id":target.getId(), "title":target.getTitle(), "breadcrumb": breadcrumbs},
                 "categList":categList,
                 "accessAllowed": allowed
                 }
 
 class CanCreateEvent(CategoryDisplayBase):
-
+    """
+    This service returns whether or not the user can create
+    an event in this category along with the protection of
+    the chosen category.
+    """
     def _checkProtection( self ):
         self._accessAllowed = False
         try:
@@ -100,22 +104,30 @@ class CanCreateEvent(CategoryDisplayBase):
             pass
 
     def _getAnswer( self ):
+        canCreate = False
+        protection = "public"
+
         if (self._accessAllowed and self._categ.canCreateConference( self._getUser() )):
-                return True
-        return False
+            canCreate = True
+
+        if self._categ.isProtected() :
+            protection = "private"
+
+        return {"canCreate": canCreate,
+                "protection": protection}
 
 
 class GetPastEventsList(CategoryDisplayBase):
-    
+
     def _checkParams(self):
         CategoryDisplayBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._fromDate = pm.extract("fromDate", pType=datetime.datetime, allowEmpty=False).date()
 
     def _getAnswer( self ):
-        
+
         allEvents,eventsByMonth = WConferenceList.sortEvents(self._target.getConferenceList())
-        
+
         ## CREATE future events dict and future/past counter
         pastEvents = {}
         for year in allEvents.keys():
@@ -125,7 +137,7 @@ class GetPastEventsList(CategoryDisplayBase):
                 for month in allEvents[year].keys():
                     if month < self._fromDate.month:
                         pastEvents.setdefault(year,{})[month] = allEvents[year][month]
-        
+
         return WConferenceListEvents(pastEvents, self._aw).getHTML()
 
 

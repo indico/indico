@@ -1,0 +1,190 @@
+<% declareTemplate(newTemplateStyle=True) %>
+
+/* jherr stuff follows... */
+
+/* For stuff you don't want to be visible at first */
+div.RMHolderPaneDefaultInvisible {
+    display: none;
+}
+
+/* A div to hold stuff starting off visible (seems kinda pointless) */
+div.RMHolderPaneDefaultVisible {
+    display: block;
+}
+
+div.nicebox {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #CCCCCC;
+}
+
+div.RMMatchPane {
+    background-color: #FFFFFF;
+    padding: 3px 3px 3px 3px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    height: 450px;
+    overflow: auto;
+}
+
+span.RMbuttonDisplay {
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-color: #FFFFFF;
+    border-width: 1px;
+    padding: 4px;
+    font-weight: normal;
+}
+
+span.RMbuttonSelected {
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+    padding: 4px;
+    font-weight: bold;
+}
+
+span.RMbuttonNotSelected {
+    background-color: #FFFFFF;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #FFFFFF;
+    padding: 4px;
+    font-weight: normal;
+    color: #CCCCCC;
+}
+
+span.RMbuttonDisplay, span.RMbuttonSelected, span.RMbuttonNotSelected {
+    cursor: pointer;
+}
+
+span.RMbuttonDisplay:hover, span.RMbuttonNotSelected:hover {
+    background-color: #FFF6DF;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #000000;
+    padding: 4px;
+}
+
+div.RMtalkDisplay {
+    background-color: #FFFFFF;
+    border: 1px;
+    border-color: #FFFFFF;
+    border-style: solid;
+    height: 34px;
+    font-family: serif;
+    font-size: -2;
+    line-height: 1;
+    margin: 0px;
+    padding: 2px;
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+div.RMtalkHover {
+    background-color: #FFF6DF;
+    border-width: 1px;
+    border-style: dashed;
+    height: 34px;
+    font-family: serif;
+    font-size: -1;
+    line-height: 1;
+    margin: 0px;
+    padding: 2px;
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+div.RMtalkSelected {
+    background-color: #CDEB8B;
+    border-width: 1px;
+    border-style: solid;
+    height: 34px;
+    font-family: serif;
+    font-size: -1;
+    font-weight: normal;
+    line-height: 1;
+    margin: 0px;
+    padding: 2px;
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+div.RMLODisplay {
+    background-color: #FFFFFF;
+    border: 1px;
+    border-color: #FFFFFF;
+    border-style: solid;
+    height: 220px;
+    font-family: sans-serif;
+    font-size: -1;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMLOHover {
+    background-color: #FFF6DF;
+    border-width: 1px;
+    border-style: dashed;
+    height: 220px;
+    font-family: sans-serif;
+    font-size: -1;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMLOSelected {
+    background-color: #CDEB8B;
+    border-width: 1px;
+    border-style: solid;
+    height: 220px;
+    font-family: sans-serif;
+    font-size: -1;
+    margin: 0px;
+    padding: 2px;
+}
+
+div.RMcolumnStatusNone {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+}
+
+div.RMcolumnStatusCDSPending {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+    background-image: url(../images/RecordingManagerCDSPending.png);
+}
+
+div.RMcolumnStatusCDSDone {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+    background-image: url(../images/RecordingManagerCDSCheck.png);
+}
+
+div.RMcolumnStatusCDSDoneHover {
+    width: 50px;
+    height: 28px;
+    text-align: center;
+    cursor: pointer;
+    background-image: url(../images/RecordingManagerCDSHover.png);
+}
+
+div.RMlowerPane {
+    width: 100%;
+}
+
+span.RMButtonCreateCDSRecord {
+    display:inline;
+}
+
+span.RMMatchSummaryMessage {
+    width: 300px;
+    height: 20px;
+    border-width: 1px;
+    border-style: solid;
+    display:inline;
+}

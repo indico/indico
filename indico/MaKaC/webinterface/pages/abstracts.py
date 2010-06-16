@@ -30,7 +30,7 @@ from MaKaC.common import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 
 class WConfCFADeactivated(wcomponents.WTemplated):
 
@@ -180,6 +180,10 @@ class WUserAbstracts( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         cfaMgr = self._conf.getAbstractMgr()
+
+        tzUtil = DisplayTZ(self._aw,self._conf)
+        tz = tzUtil.getDisplayTZ()
+
         l = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )
         if not l:
             vars["abstracts"] = _("""<tr>
@@ -217,7 +221,7 @@ class WUserAbstracts( wcomponents.WTemplated ):
         quoteattr(abstract.getId()), \
         quoteattr(str(urlHandlers.UHAbstractDisplay.getURL(abstract))), \
         self.htmlText( abstract.getTitle() ), statusLabel, \
-        abstract.getModificationDate().strftime("%Y-%m-%d %H:%M")))
+        getAdjustedDate(abstract.getModificationDate(),tz=tz).strftime("%Y-%m-%d %H:%M")))
             vars["abstracts"] = "".join(res)
         vars["abstractsPDFURL"]=quoteattr(str(urlHandlers.UHAbstractsDisplayPDF.getURL(self._conf)))
         return vars
@@ -318,6 +322,10 @@ class WAbstractDisplay( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+
+        tzUtil = DisplayTZ(self._aw, self._abstract.getConference())
+        tz = tzUtil.getDisplayTZ()
+
         vars["title"] = self.htmlText( self._abstract.getTitle() )
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
         vars["primary_authors"] = _("""--_("none")--""")
@@ -373,8 +381,8 @@ class WAbstractDisplay( wcomponents.WTemplated ):
         else:
             vars["contribType"]=""
         vars["submitter"] = "%s"%self.htmlText( self._abstract.getSubmitter().getFullName() )
-        vars["submissionDate"] = self._abstract.getSubmissionDate().strftime("%d %B %Y %H:%M")
-        vars["modificationDate"] = self._abstract.getModificationDate().strftime("%d %B %Y %H:%M")
+        vars["submissionDate"] = getAdjustedDate(self._abstract.getSubmissionDate(),tz=tz).strftime("%d %B %Y %H:%M")
+        vars["modificationDate"] = getAdjustedDate(self._abstract.getModificationDate(),tz=tz).strftime("%d %B %Y %H:%M")
         vars["modifyURL"] = quoteattr( str( urlHandlers.UHAbstractModify.getURL( self._abstract ) ) )
         vars["withdrawURL"] = quoteattr( str( urlHandlers.UHAbstractWithdraw.getURL( self._abstract ) ) )
         vars["status"] = _("SUBMITTED")
@@ -394,7 +402,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
             vars["btnModifyDisabled"] = "disabled"
             vars["btnWithdrawDisabled"] = "disabled"
         elif isinstance( status, review.AbstractStatusWithdrawn ):
-            vars["status"] = _(""" _("WITHDRAWN") <font size="-1">by %s _("on") %s</font>""")%(self.htmlText(status.getResponsible().getFullName()),status.getDate().strftime("%d %B %Y %H:%M"))
+            vars["status"] = _(""" _("WITHDRAWN") <font size="-1">by %s _("on") %s</font>""")%(self.htmlText(status.getResponsible().getFullName()),getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M"))
             if status.getComments().strip() != "":
                 vars["status"] = """%s<br><i>%s</i>"""%(vars["status"],self.htmlText(status.getComments()))
             vars["btnWithdrawDisabled"] = "disabled"
@@ -752,6 +760,8 @@ class WAbstractManagment( wcomponents.WTemplated ):
     def _getStatusHTML( self ):
         status = self._abstract.getCurrentStatus()
         html = """<b>%s</b>"""%AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
+        tzUtil = DisplayTZ(self._aw,self._conf)
+        tz = tzUtil.getDisplayTZ()
 
         if status.__class__  == review.AbstractStatusAccepted:
             trackTitle, contribTitle = "", ""
@@ -762,7 +772,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             html = _("""%s%s%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
                             html, trackTitle, contribTitle,\
                             self._getAuthorHTML(status.getResponsible()), \
-                            status.getDate().strftime("%d %B %Y %H:%M") )
+                            getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
@@ -770,14 +780,14 @@ class WAbstractManagment( wcomponents.WTemplated ):
             html = _("""%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
                             html, \
                             self._getAuthorHTML( status.getResponsible() ), \
-                            status.getDate().strftime("%d %B %Y %H:%M") )
+                            getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
         elif status.__class__ == review.AbstractStatusWithdrawn:
             html = _("""%s <font size="-1"> _("by") %s _("on") %s</font>""")%( \
                             html,self._getAuthorHTML(status.getResponsible()),\
-                            status.getDate().strftime("%d %B %Y %H:%M") )
+                            getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
@@ -787,7 +797,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             html = _("""%s (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(original.getId()),\
                 self.htmlText(original.getTitle()),\
                 self._getAuthorHTML(status.getResponsible()), \
-                status.getDate().strftime("%d %B %Y %H:%M") )
+                getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
@@ -797,7 +807,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             html = _("""<font color="black"><b>%s</b></font> (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(target.getId()),\
                 self.htmlText(target.getTitle()),\
                 self._getAuthorHTML(status.getResponsible()), \
-                status.getDate().strftime("%d %B %Y %H:%M") )
+                getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
@@ -1443,6 +1453,10 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tracks = ""
+
+        tzUtil = DisplayTZ(self._aw,self._conf)
+        tz = tzUtil.getDisplayTZ()
+
         for track in self._abstract.getTrackListSorted():
             firstJudg=True
             for status in self._abstract.getJudgementsHistoricalByTrack(track):
@@ -1452,13 +1466,13 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                         contribType = "(%s)"%status.getContribType().getName()
                     st = _("Proposed to accept %s")%(self.htmlText(contribType))
                     color = "#D2FFE9"
-                    modifDate = status.getDate().strftime("%d %B %Y %H:%M")
+                    modifDate = getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M")
                     modifier = self._getResponsibleHTML( track, status.getResponsible() )
                     comments = status.getComment()
                 elif status.__class__ == review.AbstractRejection:
                     st = _("Proposed to reject")
                     color = "#FFDDDD"
-                    modifDate = status.getDate().strftime("%d %B %Y %H:%M")
+                    modifDate = getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M")
                     modifier = self._getResponsibleHTML( track, status.getResponsible() )
                     comments = status.getComment()
                 elif status.__class__ == review.AbstractReallocation:
@@ -1467,19 +1481,19 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                         l.append( self.htmlText( propTrack.getTitle() ) )
                     st = _(""" _("Proposed for other tracks"):<font size="-1"><table style="padding-left:10px"><tr><td>%s</td></tr></table></font>""")%"<br>".join(l)
                     color = "#F6F6F6"
-                    modifDate = status.getDate().strftime("%d %B %Y %H:%M")
+                    modifDate = getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M")
                     modifier = self._getResponsibleHTML( track, status.getResponsible() )
                     comments = status.getComment()
                 elif status.__class__ == review.AbstractMarkedAsDuplicated:
                     st = _("""Marked as duplicated: original abstract has id '%s'""")%(status.getOriginalAbstract().getId())
                     color = "#DDDDFF"
-                    modifDate = status.getDate().strftime("%d %B %Y %H:%M")
+                    modifDate = getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M")
                     modifier = self._getResponsibleHTML( track, status.getResponsible() )
                     comments = status.getComment()
                 elif status.__class__ == review.AbstractUnMarkedAsDuplicated:
                     st = _("""Unmarked as duplicated""")
                     color = "#FFFFCC"
-                    modifDate = status.getDate().strftime("%d %B %Y %H:%M")
+                    modifDate = getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M")
                     modifier = self._getResponsibleHTML( track, status.getResponsible() )
                     comments = status.getComment()
                 else:

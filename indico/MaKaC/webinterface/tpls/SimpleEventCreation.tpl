@@ -95,6 +95,8 @@
         </tr>
     </table>
 
+    <% includeTpl('EventSetProtection', eventType='lecture') %>
+
     <table class="groupTable" style="background-color: #ECECEC; border-top: 1px dashed #777777;">
         <tr>
             <td width="15%%" nowrap>&nbsp;</td>
@@ -134,11 +136,13 @@
 
 
     // ----- Categ Chooser
-    var categoryChooserHandler = function(categ){
+    var categoryChooserHandler = function(categ, protection){
         $E("createCategId").set(categ.id);
         $E("categTitle").set(categ.title);
         $E("buttonCategChooser").set("<%= _("Change...")%>")
         IndicoUI.Effect.highLightBackground("categTitle");
+
+        updateProtectionChooser(categ.title, protection);
     };
 
     var openCategoryChooser = function() {
@@ -159,6 +163,8 @@
             $E("buttonCategChooser").set("<%= _("Change...")%>");
         }
 
+        protectionChooserExecOnLoad("<%=categ["id"]%>", "<%=protection%>");
+
 		injectValuesInForm($E('eventCreationForm'),function() {
                 if (!verifyDates()) {
                     var popup = new ErrorPopup("Invalid dates", ["<%= _("Dates have an invalid format: dd/mm/yyyy hh:mm")%>"], "");
@@ -171,6 +177,7 @@
                     return false;
                 }else {
                     $E('chairperson').set(Json.write(uf.getUsers()));
+                    injectFromProtectionChooser();
                 }
         });
 

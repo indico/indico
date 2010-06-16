@@ -124,6 +124,8 @@ class Location( Persistent, object ):
     def setDefaultLocation( locationName ):
         root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
         root[_DEFAULT_ROOM_BOOKING_LOCATION] = locationName
+        from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
+        RHGetVarsJs.removeTmpVarsFile()
 
     @staticmethod
     def getDefaultLocation():
@@ -149,6 +151,8 @@ class Location( Persistent, object ):
         locations = root[_ROOM_BOOKING_LOCATION_LIST]
         locations.append( location )
         root[_ROOM_BOOKING_LOCATION_LIST] = locations
+        from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
+        RHGetVarsJs.removeTmpVarsFile()
 
     @staticmethod
     def removeLocation( locationName ):
@@ -159,6 +163,8 @@ class Location( Persistent, object ):
         locations = root[_ROOM_BOOKING_LOCATION_LIST]
         locations = [ loc for loc in locations if loc.friendlyName != locationName ]
         root[_ROOM_BOOKING_LOCATION_LIST] = locations
+        from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
+        RHGetVarsJs.removeTmpVarsFile()
 
     @staticmethod
     def allFactories():

@@ -290,6 +290,8 @@ class MaKaCInfo(Persistent):
 
     def setRoomBookingModuleActive( self, active = False ):
         self._roomBookingModuleActive = active
+        from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
+        RHGetVarsJs.removeTmpVarsFile()
 
     # Only for default Indico/ZODB plugin
     def getRoomBookingDBConnectionParams( self ):

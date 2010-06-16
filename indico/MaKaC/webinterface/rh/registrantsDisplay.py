@@ -29,7 +29,7 @@ class RHRegistrantsDisplayBase( conferenceDisplay.RHConferenceBaseDisplay):
 
     def _checkProtection( self ):
         conferenceDisplay.RHConferenceBaseDisplay._checkProtection(self)
-        if not self._conf.getEvaluation().isVisible() or not self._conf.hasEnabledSection("regForm") or not displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName("registrants").isEnabled():
+        if not self._conf.getRegistrationForm().isActivated() or not self._conf.hasEnabledSection("regForm") or not displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName("registrants").isEnabled():
             raise NoReportError("The registrants list page was disabled by the conference managers")
 
 class RHRegistrantsList( RHRegistrantsDisplayBase ):

@@ -64,6 +64,8 @@ class IndexPluginsPerIndexAction(ActionBase):
         for pluginName in pluginNames:
             csBookingClass = CollaborationTools.getCSBookingClass(pluginName)
 
+            if not csBookingClass._shouldBeIndexed:
+                continue
             itiAll.addPlugin(pluginName)
             if csBookingClass._hasAcceptReject:
                 itiAll.setHasShowOnlyPending(True)

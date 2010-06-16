@@ -239,7 +239,7 @@ class WPRoomBookingRoomList( WPRoomBookingBase ):
         if self._onlyMy:
             self._myRoomListOpt.setActive(True)
         else:
-            self._bookingListSearchOpt.setActive(True)
+            self._roomSearchOpt.setActive(True)
 
 
     def _getBody( self, params ):

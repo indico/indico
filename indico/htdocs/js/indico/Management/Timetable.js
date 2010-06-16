@@ -253,6 +253,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     postDraw: function() {
         this.roomEditor.postDraw();
         this.ServiceDialogWithButtons.prototype.postDraw.call(this);
+        $E('addContributionFocusField').dom.focus();
     },
 
     _success: function(response) {
@@ -367,12 +368,11 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             $B(info.accessor('duration'), self.timeField);
             datecomponent = [$T('Duration'), self.timeField];
         }
-
         return IndicoUtil.createFormFromMap(
             [
                 [
                     $T('Title'),
-                    $B(this.parameterManager.add(Html.edit({}), 'text', false),
+                    $B(this.parameterManager.add(Html.edit({id:'addContributionFocusField'}), 'text', false),
                        info.accessor('title'))
                 ],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],

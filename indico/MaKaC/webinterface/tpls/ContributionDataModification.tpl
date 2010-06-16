@@ -12,13 +12,13 @@
             </td>
         </tr>
         <%
-        if self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
+        if self._rh._target.getConference().getAbstractMgr().isActive() and self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
         %>
         %(additionalFields)s
         <%end%>
         <%
             else:
-        %>        
+        %>
         <tr>
             <td class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Description")%></span>
@@ -26,7 +26,7 @@
             <td bgcolor="white" width="100%%" valign="top" class="blacktext">
                 <textarea name="description" cols="80" rows="6" wrap="soft">%(description)s</textarea>
             </td>
-            
+
         </tr>
         <%end%>
 	<tr>
@@ -42,7 +42,7 @@
 	  <td><span id="duration"></span></td>
 	</tr>
         <% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, parentRoomInfo=roomInfo(self._rh._target, level='inherited'), showParent=True) %>
-	
+
 
 	%(Board)s
 	%(Type)s
@@ -68,7 +68,7 @@
 <% if contrib.isScheduled(): %>
 var dateTime = IndicoUI.Widgets.Generic.dateField(true, {name: 'dateTime'});
 dateTime.set('<%= dateTime %>');
-$E('dateTime').set(dateTime)	
+$E('dateTime').set(dateTime)
 <% end %>
 <% else: %>
 $E('dateTime').set('Not scheduled')

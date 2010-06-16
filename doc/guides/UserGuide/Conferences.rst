@@ -28,8 +28,9 @@ In order to create a conference, you just need to click on
 *Create event* and *Create conference*, in blue bar at the top of
 the page. You will be presented with a form in which you:
 
-1. choose the category where you want to place your conference and
-2. fill the details of the conference you wish to create.
+1. choose the category where you want to place your conference
+2. fill the details of the conference you wish to create
+3. set the access protection of the conference
 
 Once this is done your conference will be created and you will be
 redirected to the Management Area of the conference. If you want

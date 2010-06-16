@@ -216,7 +216,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
     _createSearchForm: function() {
         var self = this;
 
-        var familyName = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
+        var familyName = new EnterObserverTextBox("text",{style:{width:"100%"},id:'userSearchFocusField'}, function() {
             self._searchAction();
             return false;
         });
@@ -298,7 +298,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
      */
     draw: function() {
         return this.SimpleSearchPanel.prototype.draw.call(this);
-    }
+    },
 },
 
     /**
@@ -754,6 +754,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             this.suggestedUsersPanel.suggestedUserListDiv.setStyle('height', pixels(this.cellSuggested.dom.offsetHeight - this.suggestedUsersPanel.titleDiv.dom.offsetHeight - 10));
         }
         this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
+        $E('userSearchFocusField').dom.focus();
     }
 },
     /**
@@ -1559,7 +1560,6 @@ type("UserListField", ["IWidget"], {
      * @param {Function} newProcess A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
      * @param {Function} editProcess A function that will be called when a user is edited.
      * @param {Function} removeProcess A function that will be called when a user is removed.
-     * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
      */
     function(userDivStyle, userListStyle,
              initialUsers, includeFavourites, suggestedUsers,

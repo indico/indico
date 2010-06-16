@@ -680,8 +680,8 @@ type("RemoteWidget", [],
              self.source.state.observe(function(value) {
                  if (value == SourceState.Loaded) {
                      canvas.set(self.drawContent(content));
-                 }else if(value == SourceState.Committing){
-                    self.runIndicator(canvas);
+                 } else if(value == SourceState.Loading || value == SourceState.Committing){
+                     self.runIndicator(canvas);
                  } else if (value == SourceState.Error) {
                      self._error(self.source.error.get());
                  }

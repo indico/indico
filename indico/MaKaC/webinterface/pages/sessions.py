@@ -875,7 +875,7 @@ class WPSessionDataModificationConvenerSelect( WPSessionModifBase):
             searchLocal = False
         else:
             searchLocal = True
-        p = wcomponents.WComplexSelection(self._conf,searchAction,forceWithoutExtAuth=searchLocal)
+        p = wcomponents.WComplexSelection(self._conf,searchAction, addTo = 5, forceWithoutExtAuth=searchLocal)
         return p.getHTML(params)
 
 #---------------------------------------------------------------------------

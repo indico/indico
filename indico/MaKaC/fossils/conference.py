@@ -55,13 +55,45 @@ class IConferenceMinimalFossil(IFossil):
     def getSupportEmail(self):
         """ Support Email """
 
-class IConferenceParticipationFossil(IFossil):
+class IConferenceParticipationMinimalFossil(IFossil):
 
     def getFirstName( self ):
         """ Conference Participation First Name """
 
     def getFamilyName( self ):
         """ Conference Participation Family Name """
+
+
+class IConferenceParticipationFossil(IConferenceParticipationMinimalFossil):
+
+    def getId( self ):
+        """ Conference Participation Id """
+
+    def getFullName( self ):
+        """ Conference Participation Full Name """
+
+    def getFullNameNoTitle(self):
+        """ Conference Participation Full Name """
+    getFullNameNoTitle.name = "name"
+
+    def getAffiliation(self):
+        """Conference Participation Affiliation """
+
+    def getAddress(self):
+        """Conference Participation Address """
+
+    def getEmail(self):
+        """Conference Participation Email """
+
+    def getFax(self):
+        """Conference Participation Fax """
+
+    def getTitle(self):
+        """Conference Participation Title """
+
+    def getPhone(self):
+        """Conference Participation Phone """
+
 
 
 class IResourceFossil(IFossil):
