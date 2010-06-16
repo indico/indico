@@ -679,16 +679,19 @@ class JSUnitTestRunner(BaseTestRunner):
                                              (TestConfig.getInstance().
                                               getJSUnitFilename(),
                                               JSTEST_CFG_FILE))
-                if jsDryRun[1].startswith("No browsers were captured"):
-                    print ("Js-test-driver server has not started yet. "
-                           "Attempt #%s\n") % (i+1)
+
+                # Not very nice error checking, but how to do it nicely?
+                if "browsers" in jsDryRun[1] or \
+                    "Connection refused" in jsDryRun[1]:
+                    print "Js-test-driver server has not started yet. " \
+                          "Attempt #%s\n" % (i+1)
                     time.sleep(5)
                 else:
                     #server is ready
                     break
             else:
-                return ('[ERR] Could not start js unit tests because '
-                        'js-test-driver server cannot be started.\n')
+                raise Exception('Could not start js unit tests because '
+                                'js-test-driver server cannot be started.\n')
 
             #setting tests to run
             toTest = ""
@@ -722,13 +725,16 @@ class JSUnitTestRunner(BaseTestRunner):
             os.chdir(self.setupDir)
 
         except OSError, e:
-            return ("[ERR] Could not start js-test-driver server - command "
-                    "\"java\" needs to be in your PATH. (%s)\n" % e)
+            self._error("[ERR] Could not start js-test-driver server - command "
+                        "\"java\" needs to be in your PATH. (%s)\n" % e)
         except KeyError:
-            return "[ERR] Please specify a JSUnitFilename in tests.conf\n"
+            self._error("[ERR] Please specify a JSUnitFilename in tests.conf\n")
+        except Exception, e:
+            self._error(e)
+        finally:
+            # stopping the server
+            server.kill()
 
-        #stopping the server
-        server.kill()
         return True
 
     def buildConfFile(self, confFilePath, coverage):

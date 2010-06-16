@@ -60,7 +60,11 @@ def main():
     global PWD_INDICO_CONF
     global eggDir
 
-    optlist, args = getopt.getopt(sys.argv[1:],'',['rpm','existing-config='])
+    optlist, args = getopt.getopt(sys.argv[1:],'',['rpm','existing-config=',
+                                                   'www-uid=','www-gid='])
+
+    wwwUid = None
+    wwwGid = None
 
     forRPM = False
     existingPath = None
@@ -70,6 +74,10 @@ def main():
             forRPM = True
         elif o == '--existing-config':
             existingPath = a
+        elif o == "--www-uid":
+            wwwUid = a
+        elif o == "--www-gid":
+            wwwGid = a
 
     setIndicoInstallMode(True)
 
@@ -96,7 +104,9 @@ def main():
                                      '..',
                                      'common'),
                         eggDir,
-                        force_no_db=(existingPath != None))
+                        force_no_db=(existingPath != None),
+                        uid = wwwUid,
+                        gid = wwwGid)
 
 if __name__ == '__main__':
     main()
