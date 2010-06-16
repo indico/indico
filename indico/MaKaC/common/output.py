@@ -456,7 +456,7 @@ class outputGenerator:
                       includeMaterial,
                       includeSubContribution = 1,
                       showContribution       = None,
-                      showSubContribution    = None,
+                      showSubContribution    = "all",
                       showWithdrawed         = True,
                       useSchedule            = True,
                       out                    = None,
@@ -659,7 +659,7 @@ class outputGenerator:
                       includeSubContribution,
                       includeMaterial,
                       conf,
-                      showSubContribution  = None,
+                      showSubContribution  = "all",
                       out                  = None,
                       recordingManagerTags = None):
 
