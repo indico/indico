@@ -923,7 +923,7 @@ class WListingsBannerModif(WBannerModif):
     def __init__( self, conf, type ):
         path=[{"url": urlHandlers.UHConfModifListings.getURL(conf), "title":_("All listings")}]
 
-        itemType= _(type)
+        itemType= type
         title=""
         WBannerModif.__init__(self, path, itemType, title)
 

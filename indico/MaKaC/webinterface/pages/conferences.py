@@ -4572,6 +4572,16 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         vars["backURL"]=quoteattr(str(urlHandlers.UHConfModifListings.getURL(self.__conf)))
         return vars
 
+    def _getTimetableURL(self, convener):
+        url = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
+        url.addParam("sessionId",convener.getSession().getId() )
+        if hasattr(convener, "getSlot"):
+            timetable = "#" + str(convener.getSlot().getStartDate().strftime("%Y%m%d")) + ".s%sl%s" %(convener.getSession().getId(), convener.getSlot().getId())
+        else:
+            timetable = "#" + str(convener.getSession().getStartDate().strftime("%Y%m%d"))
+
+        return "%s%s"%(url,timetable)
+
     def _getAllConvenersHTML(self):
         html = ''
 
@@ -4593,20 +4603,16 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
                         self.htmlText(convener.getFullName()) or "&nbsp;", \
                         self.htmlText(convener.getEmail()) or "&nbsp;" )
                 if isinstance(convener, conference.SlotChair):
-                    timetableUrl = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
-                    timetableUrl.addParam("sessionId",convener.getSession().getId() )
-                    sestitle = self.htmlText(convener.getSlot().getTitle()) or "Slot%s" % convener.getSlot().getId()
+                    sestitle = self.htmlText(convener.getSlot().getTitle()) or "Block %s" % convener.getSlot().getId()
                     sessions.append("%s"%(self.htmlText(convener.getSession().getTitle()) + ": " + sestitle))
-                    actions.append("""<a href="%s">timetable</a>"""%timetableUrl)
+                    actions.append('<a href="%s">'%self._getTimetableURL(convener) + _('Edit timetable') + '</a>')
                 else:
                     url = urlHandlers.UHSessionModification.getURL(self.__conf)
                     url.addParam("sessionId",convener.getSession().getId() )
-                    timetableUrl = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
-                    timetableUrl.addParam("sessionId",convener.getSession().getId() )
                     sesurl = quoteattr(str(url))
                     sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
-                    sessions.append("<a href=%s>%s</a>"%(sesurl,sestitle))
-                    actions.append("""<a href="%s">timetable</a>"""%timetableUrl)
+                    sessions.append("%s"%(self.htmlText(sestitle)))
+                    actions.append('<a href="%s">'%self._getTimetableURL(convener) + _('Edit timetable') + '</a> | <a href=%s>%s</a>'%(sesurl,_("Edit session")))
 
                 counter = counter + 1
 
@@ -4704,7 +4710,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 class WPConfAllSessionsConveners( WPConfModifListings ):
 
     def _getPageContent( self, params ):
-        banner = wcomponents.WListingsBannerModif(self._conf, "Conveners list").getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, _("Conveners list")).getHTML()
         p = WConferenceAllSessionsConveners( self._conf )
         return banner+p.getHTML()
 
@@ -4810,7 +4816,7 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
 class WPConfAllSpeakers( WPConfModifListings ):
 
     def _getPageContent( self, params ):
-        banner = wcomponents.WListingsBannerModif(self._conf, "Speakers list").getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, _("Speakers list")).getHTML()
         p = WConfModifAllContribParticipants( self._conf, self._conf.getSpeakerIndex() )
         return banner+p.getHTML({"title": _("All speakers list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllSpeakers.getURL(self._conf), \
@@ -11265,7 +11271,7 @@ class WPConfModifPendingQueuesBase( WPConferenceModifBase ):
         self._activeTab=activeTab
 
     def _getPageContent(self, params):
-        banner = wcomponents.WListingsBannerModif(self._conf, "Pending queues").getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, _("Pending queues")).getHTML()
         return banner+self._getTabContent( params )
 
     def _setActiveSideMenuItem(self):
