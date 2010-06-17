@@ -174,7 +174,7 @@ def getTalks(conference, sort = False):
     # Get list of matching IndicoIDs and CDS records from CDS
     cds_indico_matches = getCDSRecords(conference.getId())
 #    Logger.get('RecMan').debug('cds_indico_pending...')
-    cds_indico_pending = MicalaCommunication.getCDSPending(conference.getId(), cds_indico_matches)
+    cds_indico_pending = MicalaCommunication.getCDSPending(conference.getId())
 
     # In case there are any records that were pending and are now appearing in CDS,
     # then update the micala database accordingly.
@@ -342,7 +342,7 @@ def getOrphans():
         try:
             cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
             # Query Lectures table for all records in which IndicoID is blank or NULL
-            cursor.execute("SELECT id, LOID, IndicoID FROM Lectures WHERE NOT IndicoID OR IndicoID IS NULL ORDER BY LOID")
+            cursor.execute("SELECT idLecture, LOID, IndicoID FROM Lectures WHERE NOT IndicoID OR IndicoID IS NULL ORDER BY LOID")
             connection.commit()
             rows = cursor.fetchall()
             cursor.close()
