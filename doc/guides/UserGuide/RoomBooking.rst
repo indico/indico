@@ -85,7 +85,7 @@ Three Kinds of Room
 
 There are three kinds of room. They determine how much freedom
 users have.
-   
+
 * *Public rooms* which do not require confirmation (black/green
    colour). This means all bookings are considered accepted.
 * *Public rooms* which do require confirmation (orange colour). You can
@@ -147,7 +147,7 @@ booking form. More detailed steps are:
 * Click the *Book* link on for the room of your choice.
 
 |image170|
- 
+
 * Fill in a booking form. If you have searched for rooms, most fields
   are already filled in for your convenience. These data come from
   the searching form. After filling in the form, click the [Re-check for
@@ -165,7 +165,7 @@ booking form. More detailed steps are:
   - In general, you will prefer to resolve conflicts manually: by
     changing dates, hours or maybe trying another room.
   - The alternative is to automatically book everything except
-    conflicting days. This may be useful if you do long-term, recurring 
+    conflicting days. This may be useful if you do long-term, recurring
     booking, for example, *whole year, every week*. Imagine everything
     looks perfect, except for several weeks when the room is not available.
     In this case check the 'skip conflicting dates' option to book
@@ -180,7 +180,7 @@ booking form. More detailed steps are:
 
 |image171|
 
-Note: some rooms require confirmation. These rooms are usually coded 
+Note: some rooms require confirmation. These rooms are usually coded
 in orange. In this case, you cannot directly book them. You
 can only *PRE-book* such a room. PRE-booking works exactly the same
 way as booking. The only difference is that you must wait for
@@ -191,6 +191,28 @@ will again be checked for conflicts.
 
 Note: you can always browse your own bookings and PRE-bookings
 using the menu options *My bookings* and *My PRE-bookings*
+
+--------------
+
+View your Booking
+~~~~~~~~~~~~~~~~~
+
+You can view the bookings or pre-bookings that you made by going
+under the 'My bookings' and 'My PRE-bookings' sections of the Room
+Booking side menu. By selecting one of the bookings in the list, you
+will get the following :
+
+|image172|
+
+This page contains all the information about a booking, and it allows
+you to modify, clone or cancel the booking. If the reservation is
+done for more than a single day, each of the occurences of the booking
+can be canceled individually. In addition, this page lets you watch
+the history of the booking (i.e. all the past actions that were performed
+on this reservation) if you are the creator of the booking. Only the most
+recent entry is partially displayed, but you can see the rest of it by
+clicking on the 'Show All History...' link. Additional information about
+a particular entry can be viewed by clicking the 'More Info' link.
 
 --------------
 
@@ -219,7 +241,7 @@ Core Features
 
 General
 ^^^^^^^
-   
+
 * Stand-alone and "in-conference" mode.
 
   - The stand-alone mode allows you to book, manage bookings and do
@@ -237,7 +259,7 @@ General
   (3) ordinary user.
 * Optional booking moderation. Each room may work in one of the
   following modes:
-  
+
   - Bookings require explicit confirmation of room manager, *or*
   - Bookings are automatically accepted.
 
@@ -322,3 +344,4 @@ responsible for any number of rooms.
 .. |image169| image:: UserGuidePics/rb_booking_a_room.png
 .. |image170| image:: UserGuidePics/rb_booking_form.png
 .. |image171| image:: UserGuidePics/rb_conflicts.png
+.. |image172| image:: UserGuidePics/rb_booking_display.png

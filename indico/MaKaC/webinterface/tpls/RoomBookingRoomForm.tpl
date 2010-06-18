@@ -236,7 +236,15 @@
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small><%=ca['name']%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="text" name="cattr_<%=ca['name']%>" value=<%= quoteattr(verbose( room.customAtts.get( ca['name'] ) )) %> />
-                                            <% if ca['required']: %>
+                                            <% if ca['name'] == 'notification email' : %>
+                                                <% if ca['required'] : %>
+                                                    <% inlineContextHelp( '<b>Required.</b> You can specify more than one email address separated by commas, semicolons or whitespaces.' ) %>
+                                                <% end %>
+                                                <% else : %>
+                                                    <% inlineContextHelp( 'You can specify more than one email address separated by commas, semicolons or whitespaces.' ) %>
+                                                <% end %>
+                                            <% end %>
+                                            <% elif ca['required'] : %>
                                                 <% inlineContextHelp( '<b>Required.</b>' ) %>
                                             <% end %>
                                             </td>

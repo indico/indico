@@ -69,11 +69,13 @@
             <td bgcolor="white" width="100%%"><input type="text" name="supportEmail" value=%(supportEmail)s size="50"></td>
         </tr>
         <!-- TO REMOVE CHAIRPERSON TEXT -->
-        <% if conference.getType() != "simple_event": %>
+        <% if conference.getType() != "simple_event" and chairText != '""': %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Chairperson text")%></span></td>
             <td bgcolor="white" width="100%%">
-                <input type="text" name="chairText" value=%(chairText)s size="50">
+                <input type="text" name="chairText" id="chairText" value=%(chairText)s size="50" disabled="disabled">
+                <span id="removeChairpersonText"></span>
+                <% inlineContextHelp( _("Chairperson text is deprecated, use chairpersons list instead.<br>Click on the red cross to remove the text.") ) %>
             </td>
         </tr>
         <% end %>
@@ -132,12 +134,20 @@
 
         IndicoUI.executeOnLoad(function()
 	{
-
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
         $E('sDatePlace').set(startDate);
 
         var endDate = IndicoUI.Widgets.Generic.dateField(true,null,['eDay', 'eMonth', 'eYear', 'eHour', 'eMinute']);
         $E('eDatePlace').set(endDate);
+
+        <% if conference.getType() != "simple_event" and chairText != '""': %>
+            var removeChairpersonTextButton = Html.img({src: imageSrc("remove.png")});
+            removeChairpersonTextButton.observeClick( function(){
+                $E('chairText').dom.value = "";
+            });
+
+            $E('removeChairpersonText').set(removeChairpersonTextButton);
+        <% end %>
 
         <% if sDay != '': %>
             startDate.set('<%= sDay %>/<%= sMonth %>/<%= sYear %><%= " " %><%if len (sHour) == 1:%>0<%= sHour %><%end%><%else:%><%= sHour %><%end%>:<% if len (sMinute) == 1:%>0<%= sMinute %><%end%><%else:%><%= sMinute %><%end%>');

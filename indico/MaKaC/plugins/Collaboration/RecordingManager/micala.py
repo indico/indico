@@ -31,7 +31,7 @@ class MicalaCommunication(object):
 
         cursor = connection.cursor()
         # believe it or not, the comma following machine_name is supposed to be there for MySQLdb's sake
-        cursor.execute("""SELECT id,Hostname FROM Machines WHERE Hostname = %s""",
+        cursor.execute("""SELECT idMachine,Hostname FROM Machines WHERE Hostname = %s""",
             (machine_name,))
         connection.commit()
 
@@ -64,7 +64,7 @@ class MicalaCommunication(object):
             raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor()
-        cursor.execute("""SELECT id,Name FROM Tasks WHERE Name = %s""",
+        cursor.execute("""SELECT idTask,Name FROM Tasks WHERE Name = %s""",
             (task_name,))
         connection.commit()
 
@@ -98,7 +98,7 @@ class MicalaCommunication(object):
 
         # Depending on style of lecture ID, search under Michigan style column or CERN style column
         cursor = connection.cursor()
-        cursor.execute("""SELECT id,LOID,IndicoID FROM Lectures WHERE LOID = %s OR IndicoID = %s""",
+        cursor.execute("""SELECT idLecture,LOID,IndicoID FROM Lectures WHERE LOID = %s OR IndicoID = %s""",
             (lecture_name, lecture_name))
         connection.commit()
 
@@ -234,7 +234,7 @@ class MicalaCommunication(object):
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         try:
-            cursor.execute("UPDATE Lectures SET IndicoID=%s, contentType=%s WHERE id=%s",
+            cursor.execute("UPDATE Lectures SET IndicoID=%s, contentType=%s WHERE idLecture=%s",
                            (IndicoID, "WEBLECTURE", LODBID))
             connection.commit()
         except MySQLdb.Error, e:
@@ -250,9 +250,10 @@ class MicalaCommunication(object):
         return {"success": flagSuccess, "result": result}
 
     @classmethod
-    def getCDSPending(cls, confId, cds_indico_matches):
-        """Query the Micala database to find Indico IDs whose MARC has been exported to CDS, but no CDS record exists yet.
-        Return a list of these Indico IDs."""
+    def getCDSPending(cls, confId):
+        """Query the Micala database to find Indico IDs whose MARC has been exported to CDS, but not marked as completed in the micala DB.
+        (Note: they may have just been completed, but we'll deal with newly completed tasks separately)
+         Return a list of these Indico IDs."""
 
         try:
             connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
@@ -263,49 +264,54 @@ class MicalaCommunication(object):
         except MySQLdb.Error, e:
             raise RecordingManagerException("MySQL database error %d: %s" % (e.args[0], e.args[1]))
 
-        cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+        cursorTaskStarted = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         # The following query returns the IndicoID's for which the metadata export task was started.
         # Whether it was finished we will find out separately by querying CDS to see what records have been created.
-        cursor.execute('''SELECT L.id, L.LOID, L.IndicoID,
-            T.id, T.Name,
-            S.idLecture, S.idTask, S.Status, S.Message
-            FROM Lectures L, Tasks T, Status S
-            WHERE ( L.id = S.idLecture)
-            AND S.Status = 'START'
-            AND T.Name = '%s'
-            AND T.id = S.idTask
-            AND L.IndicoID LIKE "%s%%"''' % \
+        cursorTaskStarted.execute('''SELECT IndicoID, LOID, Name, Status FROM ViewStatusComprehensive
+                        WHERE Status = 'START'
+                        AND Name = "%s"
+                        AND IndicoID LIKE "%s%%"'''  % \
                        (CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"),
                        confId))
 
         connection.commit()
-        rows = cursor.fetchall()
-        cursor.close()
+        rowsStarted = cursorTaskStarted.fetchall()
+        cursorTaskStarted.close()
+
+        # Do another query to get list of IndicoIDs marked as completed
+        cursorTaskComplete = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
+        # The following query returns the IndicoID's for which the metadata export task is COMPLETE.
+        cursorTaskComplete.execute('''SELECT IndicoID, LOID, Name, Status FROM ViewStatusComprehensive
+                        WHERE Status = 'COMPLETE'
+                        AND Name = "%s"
+                        AND IndicoID LIKE "%s%%"'''  % \
+                       (CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"),
+                       confId))
+
+        connection.commit()
+        rowsComplete = cursorTaskComplete.fetchall()
+        cursorTaskComplete.close()
+
         connection.close()
 
-        talk_array = []
-        # Now we need to eliminate from our list those talks listed in cds_indico_matches.
-        # Those are not pending.
-        for row in rows:
-            try:
-                # check to see if the IndicoID in question is to be found in the dictionary of matches
-                # if it is found, that means the CDS record exists and there's nothing to do.
-                existing_cds_record = cds_indico_matches[row["IndicoID"]]
-#                Logger.get('RecMan').debug(" CDS export complete for: %s" % existing_cds_record)
-                # Otherwise, if it is not found, that means the CDS record hasn't been created yet,
-                # so add the IndicoID to the list of pending records.
-            except KeyError:
-#                Logger.get('RecMan').debug(" CDS export pending for: %s" % row["IndicoID"])
-                talk_array.append(row["IndicoID"])
+        # Now from these queries, build two sets
+        setStarted = set()
+        setComplete = set()
+        for row in rowsStarted:
+            setStarted.add(row["IndicoID"])
+        for row in rowsComplete:
+            setComplete.add(row["IndicoID"])
 
-        return talk_array
+        # Return a list containing the IndicoID's for whom the task was marked as started but not finished.
+        return list(setStarted.difference(setComplete))
 
     @classmethod
     def updateMicalaCDSExport(cls, cds_indico_matches, cds_indico_pending):
         '''If there are records found in CDS but not yet listed in the micala database as COMPLETE, then update it.
         cds_indico_matches is a dictionary of key-value pairs { IndicoID1: CDSID1, IndicoID2: CDSID2, ... }
-        cds_indico_pending is a list of IndicoIDs.'''
+cds_indico_pending is a list of IndicoIDs (for whom the CDS export task has been started but not completed).'''
 
 #        Logger.get('RecMan').debug('in updateMicalaCDSExport()')
 
@@ -320,12 +326,13 @@ class MicalaCommunication(object):
 #            Logger.get('RecMan').debug('Looping through cds_indico_pending: %s (and looking up in cds_indico_matches)' % pending)
             try:
                 new_record = cds_indico_matches[pending]
+
                 idMachine = cls.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
                 idTask    = cls.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
                 idLecture = cls.getIdLecture(pending)
                 cls.reportStatus("COMPLETE", "CDS record: %s" % new_record, idMachine, idTask, idLecture)
 
-                # I should still update the Lectures table to add the CDS record
+                # TODO: I should still update the Lectures table to add the CDS record
 
             except KeyError:
                 # current pending lecture still not found in CDS so do nothing.

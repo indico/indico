@@ -5195,6 +5195,18 @@ class RHConfModifToggleSearch( RHConferenceModifBase ):
         self._redirect( "%s#headerFeatures"%url )
 
 
+class RHConfModifToggleNavigationBar( RHConferenceModifBase ):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        self._displayMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
+        self._navigationBarEnabled=self._displayMgr.getDisplayNavigationBar()
+
+    def _process( self ):
+        url=urlHandlers.UHConfModifDisplayConfHeader.getURL( self._conf )
+        self._displayMgr.setDisplayNavigationBar(not self._navigationBarEnabled)
+        self._redirect( "%s#headerFeatures"%url )
+
 class RHConfAddContribType(RHConferenceModifBase):
     _uh = urlHandlers.UHConfAddContribType
 

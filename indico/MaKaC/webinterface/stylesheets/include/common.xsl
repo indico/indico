@@ -239,10 +239,48 @@
         </a>
 </xsl:template>
 
+<xsl:template match="materialLink">
+    <xsl:param name="fileType"/>
+    <xsl:param name="imgURL"/>
+    <xsl:param name="imgAlt"/>
+
+    <xsl:if test="count(./files/file[type='$fileType']) = 1">
+        <a href="{./files/file[type='$fileType'][1]/url}" class="material"><img src="{$imgURL}" border="0" alt="{$imgAlt}"/></a>
+    </xsl:if>
+
+    <xsl:if test="count(./files/file[type='$fileType']) &gt; 1">
+        <xsl:variable name="materialMenuName">materialMenu<xsl:value-of select="./type"/><xsl:value-of select="$fileType"/><xsl:value-of select="$sessionId"/><xsl:value-of select="$contribId"/><xsl:value-of select="$subContId"/></xsl:variable>
+            <a class="material">
+                <div class="dropDownMaterialMenu" id="{$materialMenuName}">
+                    <img src="{$imgURL}" border="0" alt="{$imgAlt}"/>
+<!--                    <img src="images/pdf_small.png" border="0" alt="pdf file"/>-->
+                </div>
+            </a>
+            <script type="text/javascript">
+                $E('<xsl:value-of select="$materialMenuName"/>').observeClick(function() {
+                    var elem = $E('<xsl:value-of select="$materialMenuName"/>');
+                    var parentElem = $E(elem.dom.parentNode);
+                    <xsl:value-of select="$materialMenuName"/>.open(parentElem.getAbsolutePosition().x, parentElem.getAbsolutePosition().y + parentElem.dom.offsetHeight);
+                    }
+                 );
+
+                var <xsl:value-of select="$materialMenuName"/> = new PopupMenu({
+                    <xsl:for-each select="./files/file[type='$fileType']">
+                    '<xsl:value-of select="./name"/>':'<xsl:value-of select="./url"/>'
+                    <xsl:if test="position() != last()">
+                    ,
+                    </xsl:if>
+                    </xsl:for-each>
+                    }, [$E("<xsl:value-of select="$materialMenuName"/>")], 'materialMenuPopupList', false, false);
+            </script>
+    </xsl:if>
+</xsl:template>
+
 <xsl:template match="material">
 	<xsl:param name="sessionId"/>
 	<xsl:param name="contribId"/>
     <xsl:param name="subContId"/>
+
     <span class="materialGroup">
         <a href="{./displayURL}" class="material materialGroup">
             <xsl:value-of select="./type"/>
@@ -252,27 +290,41 @@
             </xsl:if>
         </a>
 
-        <xsl:if test="./pdf != ''">
-          <a href="{./pdf}" class="material"><img src="images/pdf_small.png" border="0" alt="pdf file"/></a>
-        </xsl:if>
-        <xsl:if test="./ppt != ''">
-          <a href="{./ppt}" class="material"><img src="images/powerpoint.png" border="0" alt="ppt file"/></a>
-        </xsl:if>
-        <xsl:if test="./odp != ''">
-          <a href="{./odp}" class="material"><img src="images/impress.png" border="0" alt="presentation file"/></a>
-        </xsl:if>
-        <xsl:if test="./ods != ''">
-          <a href="{./ods}" class="material"><img src="images/calc.png" border="0" alt="spreadsheet file"/></a>
-        </xsl:if>
-        <xsl:if test="./odt != ''">
-          <a href="{./odt}" class="material"><img src="images/writer.png" border="0" alt="writer file"/></a>
-        </xsl:if>
-        <xsl:if test="./doc != ''">
-          <a href="{./doc}" class="material"><img src="images/word.png" border="0" alt="word file"/></a>
-        </xsl:if>
+        <xsl:for-each select="./types/type">
+
+            <xsl:variable name="typeName" select="./name"/>
+
+            <xsl:if test="count(./../../files/file[type=$typeName]) = 1">
+                <a href="{./../../files/file[type=$typeName][1]/url}" class="material"><img src="{./imgURL}" border="0" alt="{./imgAlt}"/></a>
+            </xsl:if>
+
+            <xsl:if test="count(./../../files/file[type=$typeName]) &gt; 1">
+                <xsl:variable name="materialMenuName">materialMenu<xsl:value-of select="./../../title"/><xsl:value-of select="./name"/><xsl:value-of select="$sessionId"/><xsl:value-of select="$contribId"/><xsl:value-of select="$subContId"/></xsl:variable>
+                    <a class="material dropDownMaterialMenu" id="{$materialMenuName}">
+                        <img class="resourceIcon" src="{./imgURL}" border="0" alt="{./imgAlt}"/>
+                        <img class="arrow" src="images/menu_arrow_black.png" border='0' alt="down arrow"/>
+                    </a>
+                    <script type="text/javascript">
+                        $E('<xsl:value-of select="$materialMenuName"/>').observeClick(function() {
+                            var elem = $E('<xsl:value-of select="$materialMenuName"/>');
+                            <xsl:value-of select="$materialMenuName"/>.open(elem.getAbsolutePosition().x, elem.getAbsolutePosition().y + elem.dom.offsetHeight);
+                            }
+                         );
+
+                        var <xsl:value-of select="$materialMenuName"/> = new PopupMenu({
+                            <xsl:for-each select="./../../files/file[type=$typeName]">
+                            '<xsl:value-of select="./name"/>':'<xsl:value-of select="./url"/>'
+                            <xsl:if test="position() != last()">
+                            ,
+                            </xsl:if>
+                            </xsl:for-each>
+                            }, [$E("<xsl:value-of select="$materialMenuName"/>")], 'materialMenuPopupList', false, false);
+                    </script>
+            </xsl:if>
+
+        </xsl:for-each>
     </span>
 </xsl:template>
-
 
 <xsl:template match="description|abstract|minutesText">
     <xsl:choose>

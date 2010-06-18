@@ -686,7 +686,6 @@ Please use this information for your payment (except for e-payment):\n
         booking=[]
         total=0
         booking.append( _("""
-detail of Booking:
 \tQuantity\t\tItem\t\tunit.price\t\tCost"""))
         for gsf in registrant.getMiscellaneousGroupList():
             miscGroup=registrant.getMiscellaneousGroupById(gsf.getId())
@@ -1493,7 +1492,7 @@ class RadioGroupInput(FieldInputType):
                 checked="checked"
             elif not value and val.getCaption() == self.getDefaultItem():
                 checked="checked"
-            tmp.append("""<tr><td></td><td><input type="radio" name="%s"  value="%s" %s %s> %s</td><td align="right" align="bottom">"""%(self.getHTMLName(), val.getId(), checked,disable, val.getCaption()))
+            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" name="%s"  value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >"""%(self.getHTMLName(), val.getId(), checked,disable, val.getCaption()))
             if val.isBillable():
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td></tr> """%(val.getPrice(),currency))
             else:

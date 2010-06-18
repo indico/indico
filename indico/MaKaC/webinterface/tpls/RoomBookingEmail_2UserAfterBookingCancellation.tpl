@@ -1,4 +1,4 @@
-Dear <%= reservation.createdByUser().getFirstName() %>,
+Dear <%= firstName %>,
 
 
 <% if date: %>
@@ -9,15 +9,15 @@ You have CANCELLED your booking:
 <% end %>
 
 <%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
-Room: <%= reservation.room.getFullName() %> 
+Room: <%= reservation.room.getFullName() %>
 For:  <%= reservation.bookedForName %>
 Reason: <%= reservation.reason %>
-Dates: 
+Dates:
 <% if date: %>
-<%= formatDate(date) %> 
+<%= formatDate(date) %>
 <% end %>
 <% else: %>
-<%= formatDate(reservation.startDT.date()) %> -- <%= formatDate(reservation.endDT.date()) %> 
+<%= formatDate(reservation.startDT.date()) %> -- <%= formatDate(reservation.endDT.date()) %>
 <% end %>
 Hours: <%= reservation.startDT.strftime("%H:%M") %> -- <%= reservation.endDT.strftime("%H:%M") %>
 

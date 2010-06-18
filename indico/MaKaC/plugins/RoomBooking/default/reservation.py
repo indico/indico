@@ -25,7 +25,7 @@ from persistent import Persistent
 
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum, WeekDayEnum
-from MaKaC.rb_tools import qbeMatch, doesPeriodsOverlap, iterdays, overlap, weekNumber, containsExactly_OR_containsAny
+from MaKaC.rb_tools import qbeMatch, doesPeriodsOverlap, iterdays, overlap, weekNumber, containsExactly_OR_containsAny, fromUTC
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 
@@ -51,6 +51,7 @@ class Reservation( Persistent, ReservationBase ):
         ReservationBase.__init__( self )
         self._excludedDays = []
         self.useVC = []
+        self.resvHistory = ResvHistoryHandler()
 
     def getUseVC( self ):
         try:
@@ -58,6 +59,13 @@ class Reservation( Persistent, ReservationBase ):
         except:
             self.useVC = []
         return self.useVC
+
+    def getResvHistory( self ):
+        try:
+            return self.resvHistory
+        except:
+            self.resvHistory = ResvHistoryHandler()
+        return self.resvHistory
 
     @staticmethod
     def getReservationsRoot( ):
@@ -120,11 +128,11 @@ class Reservation( Persistent, ReservationBase ):
         # createdBy, once assigned to rerservation, CAN NOT be changed later (index!)
         # room, once assigned to reservation, CAN NOT be changed later (index!)
 
-    def indexDayReservations(self):
+    def indexDayReservations( self ):
         self._addToDayReservationsIndex()
         self._p_changed = True
 
-    def unindexDayReservations(self):
+    def unindexDayReservations( self ):
         self._removeFromDayReservationsIndex()
         self._p_changed = True
 
@@ -395,6 +403,19 @@ class Reservation( Persistent, ReservationBase ):
         ReservationBase.dayIsExcluded( self, dayD )
         return dayD in self.getExcludedDays()
 
+    def createSnapshot( self ):
+        """
+        Creates dynamically a dictionnary of the attributes of the object.
+        This dictionnary will be mainly used to compare the reservation
+        before and after a modification
+        """
+        result = {}
+
+        for attr, val in self.__dict__.iteritems():
+            result[attr] = val
+
+        return result
+
     # Statistical
 
     @staticmethod
@@ -422,6 +443,7 @@ class Reservation( Persistent, ReservationBase ):
         """
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
         return Reservation.countReservations( archival = True, location = location )
+
 
     # ==== Private ===================================================
 
@@ -452,6 +474,138 @@ class Reservation( Persistent, ReservationBase ):
         if self.room == None:
             return None
         return self.room.locationName
+
+class ResvHistoryEntry( Persistent ):
+
+    def __init__( self, user, info, emails ):
+        self._timestamp = datetime.utcnow().strftime("%d %b %Y %H:%M")
+        self._responsibleUser = user.getFullName()
+        self._info = info #List of str
+        # Generate list of email addresses to which a notification email was sent,
+        # and adds them to the info if there are any
+        emailAddrs = ""
+        for email in emails :
+            for toAddr in email["toList"] :
+                emailAddrs += (", " + toAddr)
+        if emailAddrs != "":
+            self._info.append("Emails triggered to:<span style='font-family: \"Courier New\"'>" + emailAddrs[1:] +"</span>")
+
+    def getTimestamp( self ):
+        return self._timestamp
+
+    def getResponsibleUser( self ):
+        return self._responsibleUser
+
+    def getInfo( self ):
+        return self._info
+
+
+class ResvHistoryHandler( Persistent ):
+    """
+    Utility class used to record actions performed on a reservation
+    """
+
+    # Dictionnary used to map Reservation attribute names to human-friendly
+    # names
+    _attrNamesMap = {"_utcStartDT"  :   "start date",
+                     "_utcEndDT"    :   "end date",
+                     "repeatability":   "type",
+                     "bookedForName":   "'Booked for' name",
+                     "contactEmail" :   "'Booked for' email",
+                     "contactPhone" :   "'Booked for' phone",
+                     "reason"       :   "reason"
+                     }
+
+    # Dictionnary used to map Reservation attribute names to methods that
+    # will format them into human-friendly strings
+    _attrFormatMap = {"_utcStartDT" :   fromUTC,
+                    "_utcEndDT"     :   fromUTC,
+                    "repeatability" :   lambda x: RepeatabilityEnum.rep2description[x]
+                    }
+
+    def __init__( self ):
+        self._entries = []
+
+    def addHistoryEntry( self, entry ):
+        if entry == None :
+            return False
+        try:
+            self._entries.insert(0, entry )
+        except:
+            self._entries = []
+            self._entries.insert(0, entry )
+        self.notifyModification()
+        return True
+
+#    def clearHistory(self):
+#        self._entries = []
+#        self.notifyModification()
+
+    def getEntries( self ):
+        try :
+            return self._entries
+        except :
+            self._entries = []
+        return self._entries
+
+    def hasHistory( self ):
+        return not(self._entries == None or self._entries == [])
+
+    def notifyModification( self ):
+        self._p_changed=1
+
+
+    def _bookingSnapshotsDiff( self, prevSnapshot, newSnapshot ):
+        """
+        This method compares two "snapshots" of bookings and returns a
+        dictionnary containing the attributes that differs, along with their
+        values
+        """
+        result = {}
+        for attr in newSnapshot.keys() :
+            if attr in prevSnapshot :
+                if prevSnapshot[attr] != newSnapshot[attr] :
+                    result[attr] = {"prev": prevSnapshot[attr],
+                                    "new": newSnapshot[attr]}
+            else :
+                # The attribute was created in the meanwhile
+                result[attr] = {"prev": None, "new": newSnapshot[attr]}
+
+        return result
+
+    def getResvModifInfo(self, info, before, after):
+        """
+        This utility method generates the info of the history entry when
+        a reservation is modified.
+        - info : List of str - The list to fill in with the info
+        - before : dict - Snapshot of the reservation before modification
+        - after : dict - Snapshot of the reservation after modification
+        """
+
+        info.append("Booking modified")
+        # Getting the attributes that changed:
+        attrDiff = self._bookingSnapshotsDiff( before, after )
+        # Create the info strings out of the diffs
+        for attr in attrDiff.keys() :
+            try:
+                attrName = self._attrNamesMap[attr]
+            except KeyError:
+                attrName = attr
+            try:
+                prevValue = self._attrFormatMap[attr](attrDiff[attr]["prev"])
+            except KeyError, AttributeError:
+                prevValue = str(attrDiff[attr]["prev"])
+            try:
+                newValue = self._attrFormatMap[attr](attrDiff[attr]["new"])
+            except KeyError, AttributeError:
+                newValue = str(attrDiff[attr]["new"])
+
+            if prevValue == "" :
+                info.append("The %s was set to '%s'" %(attrName, newValue))
+            elif newValue == "" :
+                info.append("The %s was cleared" %attrName)
+            else :
+                info.append("The %s was changed from '%s' to '%s'" %(attrName, prevValue, newValue))
 
 # ============================================================================
 # ================================== TEST ====================================

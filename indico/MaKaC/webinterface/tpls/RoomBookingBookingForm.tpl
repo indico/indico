@@ -54,7 +54,7 @@
         isValid = validate_period( f1, true, <%= allowPast %>  ) && isValid
         isValid = required_fields( ['bookedForName', 'contactEmail', 'reason'] ) && isValid
 
-        if ( !valid_email( $F( 'contactEmail' ) ) )
+        if ( !Util.Validation.isEmailList( $F( 'contactEmail' ) ) )
         {
             isValid = false
             $('contactEmail').className = 'invalid'
@@ -184,7 +184,7 @@
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("E-mail")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
                                                 <input type="text" id="contactEmail" name="contactEmail" style="width: 240px;" value="<%= verbose( candResv.contactEmail )%>" />
-                                                <% inlineContextHelp( '<b>Required.</b> Contact email.' ) %>
+                                                <% inlineContextHelp( '<b>Required.</b> Contact email. You can specify more than one email address by separating them with commas, semicolons or whitespaces.' ) %>
                                             </td>
                                         </tr>
                                         <tr>

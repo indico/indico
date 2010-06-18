@@ -106,7 +106,7 @@
         <div class="nicebox">
         <div class="RMMatchPane">
             <% for orphan in Orphans: %>
-                <% lectureDBid = orphan["id"] %>
+                <% lectureDBid = orphan["idLecture"] %>
                 <% LOID        = orphan["LOID"] %>
                 <div id="lo<%= lectureDBid %>" class="RMLODisplay" onclick="RMLOSelect(<%= lectureDBid %>)" onmouseover="RMLOBoxOnHover(<%= lectureDBid %>);" onmouseout="RMLOBoxOffHover(<%= lectureDBid %>);">
                     <table>
@@ -238,7 +238,7 @@
     // (even though it's called RMLOList, which is confusing)
     var RMLOList = {
     <% for orphan in Orphans: %>
-        "<%= orphan["id"]   %>": <%= jsonEncode(orphan) %>,
+        "<%= orphan["idLecture"]   %>": <%= jsonEncode(orphan) %>,
     <% end %>
     };
 

@@ -28,7 +28,7 @@ from MaKaC.common.general import *
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
 from datetime import datetime, timedelta
-from MaKaC.common.utils import HolidaysHolder
+from MaKaC.common.utils import HolidaysHolder, validMail, setValidEmailSeparators
 from MaKaC.common.datetimeParser import parse_date
 
 # The following are room booking related
@@ -42,6 +42,8 @@ from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
 from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap
 from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.plugins.pluginLoader import PluginLoader
+from MaKaC import plugins
+from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -237,6 +239,9 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         # Custom attributes
         manager = CrossLocationQueries.getCustomAttributesManager( c.locationName )
         for ca in manager.getAttributes( location = c.locationName ):
+            if ca['name'] == 'notification email' :
+                if c.customAtts[ 'notification email' ] and not validMail(c.customAtts['notification email']) :
+                    errors.append( "Invalid format for the notification email" )
             if ca['required']:
                 if not c.customAtts.has_key( ca['name'] ): # not exists
                     errors.append( ca['name'] + " can not be blank" )
@@ -294,7 +299,10 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         for ca in manager.getAttributes( location = candRoom.locationName ):
             value = session.getVar( "cattr_" + ca['name'] )
             if value != None:
-                candRoom.customAtts[ ca['name'] ] = value
+                if ca['name'] == 'notification email' :
+                    candRoom.customAtts[ 'notification email' ] = setValidEmailSeparators(value)
+                else :
+                    candRoom.customAtts[ ca['name'] ] = value
 
 
     def _loadRoomCandidateFromParams( self, candRoom, params ):
@@ -337,7 +345,10 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         for k, v in params.iteritems():
             if k.startswith( "cattr_" ):
                 attrName = k[6:len(k)]
-                candRoom.customAtts[attrName] = v
+                if attrName == 'notification email' :
+                    candRoom.customAtts['notification email'] = setValidEmailSeparators(v)
+                else :
+                    candRoom.customAtts[attrName] = v
 
     # Resv
 
@@ -412,7 +423,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candResv.repeatability = session.getVar( "repeatability" )
         candResv.bookedForName = session.getVar( "bookedForName" )
         candResv.contactPhone = session.getVar( "contactPhone" )
-        candResv.contactEmail = session.getVar( "contactEmail" )
+        candResv.contactEmail = setValidEmailSeparators(session.getVar( "contactEmail" ))
         candResv.reason = session.getVar( "reason" )
         candResv.usesAVC = session.getVar( "usesAVC" )
         candResv.needsAVCSupport = session.getVar( "needsAVCSupport" )
@@ -443,7 +454,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
         candResv.endDT = self._endDT
         candResv.repeatability = self._repeatability
         candResv.bookedForName = params["bookedForName"]
-        candResv.contactEmail = params["contactEmail"]
+        candResv.contactEmail = setValidEmailSeparators(params["contactEmail"])
         candResv.contactPhone = params["contactPhone"]
         candResv.reason = params["reason"]
         candResv.usesAVC = params.get( "usesAVC" ) == "on"
@@ -1122,7 +1133,8 @@ class RHRoomBookingCloneBooking( RHRoomBookingBase ):
 class RHRoomBookingSaveBooking( RHRoomBookingBase ):
     """
     Performs physical INSERT or UPDATE.
-    When succeeded redirects to booking details, otherwise returns to booking form.
+    When succeeded redirects to booking details, otherwise returns to booking
+    form.
     """
 
     def _checkParams( self, params ):
@@ -1149,6 +1161,9 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             _candResv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
             self._orig_candResv = _candResv
 
+            # Creates a "snapshot" of the reservation's attributes before modification
+            self._resvAttrsBefore = self._orig_candResv.createSnapshot()
+
             import copy
             candResv = copy.copy(_candResv)
 
@@ -1157,6 +1172,9 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                 self._loadResvCandidateFromSession( candResv, params )
             else:
                 self._loadResvCandidateFromParams( candResv, params )
+
+            # Creates a "snapshot" of the reservation's attributes after modification
+            self._resvAttrsAfter = candResv.createSnapshot()
 
             self._resvID = resvID
 
@@ -1254,6 +1272,17 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                     self._orig_candResv.update()
                     self._orig_candResv.indexDayReservations()
                     self._emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
+
+                    # Add entry to the log
+                    info = []
+                    self._orig_candResv.getResvHistory().getResvModifInfo(info, self._resvAttrsBefore , self._resvAttrsAfter)
+
+                    # If no modification was observed ("Save" was pressed but no field
+                    # was changed) no entry is added to the log
+                    if len(info) > 1 :
+                        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+                        self._orig_candResv.getResvHistory().addHistoryEntry(histEntry)
+
                     session.setVar( "title", 'Booking updated.' )
                     session.setVar( "description", 'Please review details below.' )
                 session.setVar( "actionSucceeded", True )
@@ -1500,6 +1529,12 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
         self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutCancellation()
 
+        # Add entry to the booking history
+        info = []
+        info.append("Booking cancelled")
+        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        self._resv.getResvHistory().addHistoryEntry(histEntry)
+
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Booking has been cancelled." )
         self._websession.setVar( 'description', "You have successfully cancelled the booking." )
@@ -1532,9 +1567,15 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
         self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutCancellation( date = self._date )
 
+        # Add entry to the booking history
+        info = []
+        info.append("Booking occurence of the %s cancelled" %self._date.strftime("%d %b %Y"))
+        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        self._resv.getResvHistory().addHistoryEntry(histEntry)
+
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Selected occurrence has been cancelled." )
-        self._websession.setVar( 'description', "YOu have successfully cancelled an occurrence of this booking." )
+        self._websession.setVar( 'description', "You have successfully cancelled an occurrence of this booking." )
         url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._resv )
         self._redirect( url ) # Redirect to booking details
 
@@ -1564,6 +1605,13 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
         self._resv.reject()    # Just sets isRejected = True
         self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutRejection()
+
+        # Add entry to the booking history
+        info = []
+        info.append("Booking rejected")
+        info.append("Reason : '%s'" %self._resv.rejectionReason)
+        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        self._resv.getResvHistory().addHistoryEntry(histEntry)
 
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Booking has been rejected." )
@@ -1605,6 +1653,11 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
                 resv.update()
                 self._emailsToBeSent += resv.notifyAboutRejection()
                 counter += 1
+                # Add entry to the history of the rejected reservation
+                info = []
+                info.append("Booking rejected due to conflict with existing booking")
+                histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+                resv.getResvHistory().addHistoryEntry(histEntry)
         self._websession.setVar( 'prebookingsRejected', True )
         if counter > 0:
             self._websession.setVar( 'title', str( counter ) + " conflicting PRE-bookings have been rejected." )
@@ -1643,6 +1696,12 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             self._resv.isConfirmed = True
             self._resv.update()
             self._emailsToBeSent += self._resv.notifyAboutConfirmation()
+
+            # Add entry to the booking history
+            info = []
+            info.append("Booking accepted")
+            histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+            self._resv.getResvHistory().addHistoryEntry(histEntry)
 
             session.setVar( 'actionSucceeded', True )
             session.setVar( 'title', "Booking has been accepted." )
@@ -1947,6 +2006,13 @@ class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
         self._resv.excludeDay( self._date, unindex=True )
         self._resv.update()
         self._emailsToBeSent += self._resv.notifyAboutRejection( date = self._date, reason = self._rejectionReason )
+
+        # Add entry to the booking history
+        info = []
+        info.append("Booking occurence of the %s rejected" %self._date.strftime("%d %b %Y"))
+        info.append("Reason : '%s'" %self._rejectionReason)
+        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+        self._resv.getResvHistory().addHistoryEntry(histEntry)
 
         self._websession.setVar( 'actionSucceeded', True )
         self._websession.setVar( 'title', "Selected occurrence of this booking has been rejected." )

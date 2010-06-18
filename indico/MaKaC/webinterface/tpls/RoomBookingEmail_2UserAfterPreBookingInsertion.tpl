@@ -1,14 +1,14 @@
- Dear <%= reservation.createdByUser().getFirstName() %>,
+ Dear <%= firstName %>,
 
 
- NOTE: 
+ NOTE:
 Your pre-booking is NOT YET ACCEPTED by person responsible.
 Please be aware that pre-bookings are subject to acceptance
-or rejection. Expect an e-mail with acceptance/rejection 
+or rejection. Expect an e-mail with acceptance/rejection
 information.
 
 INFO:
-The conference room <%= reservation.room.getFullName() %> 
+The conference room <%= reservation.room.getFullName() %>
 has been pre-booked for <%= reservation.bookedForName %>
 reason: <%= reservation.reason %>
 from <%= formatDate(reservation.startDT.date()) %> to <%= formatDate(reservation.endDT.date()) %> between <%= reservation.startDT.strftime("%H:%M") %> and <%= reservation.endDT.strftime("%H:%M") %>

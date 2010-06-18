@@ -434,15 +434,18 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
             isLibxml = False
         # create the html factory
         if type == "conference":
-            self._page = None
-            intPagesMgr=internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._target)
-            for page in intPagesMgr.getPagesList():
-                if page.isHome():
-                    self._page = page
-            if not self._page:
+            if params.get("ovw", False):
                 p = conferences.WPConferenceDisplay( self, self._target )
             else:
-                p = conferences.WPInternalPageDisplay(self,self._target, self._page)
+                self._page = None
+                intPagesMgr=internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._target)
+                for page in intPagesMgr.getPagesList():
+                    if page.isHome():
+                        self._page = page
+                if not self._page:
+                    p = conferences.WPConferenceDisplay( self, self._target )
+                else:
+                    p = conferences.WPInternalPageDisplay(self,self._target, self._page)
         elif view != "static" and isLibxml:
             p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:

@@ -109,8 +109,11 @@ def tickerTapeAction(req, **params ):
 def toggleSearch(req, **params ):
     return conferenceModif.RHConfModifToggleSearch( req ).process( params )
 
+def toggleNavigationBar(req, **params ):
+    return conferenceModif.RHConfModifToggleNavigationBar( req ).process( params )
+
 def previewCSS(req, **params):
     return conferenceModif.RHConfModifPreviewCSS(req).process(params)
-    
+
 def useCSS(req, **params):
     return conferenceModif.RHConfUseCSS(req).process(params)

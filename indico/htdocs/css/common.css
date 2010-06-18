@@ -357,8 +357,8 @@ a.material {
 	color: #333333;
 	float: left;
 	border-left: 1px dotted #AAA;
-    background-color: #F7EDD0;
-	font-weight: normal;
+    /*background-color: #F7EDD0;*/
+    background-color: #EEEEEE;
     color: #333333;
 }
 
@@ -389,6 +389,29 @@ span.materialGroup {
 a.materialGroup {
     font-size: 12px;
     border-left: none;
+    background-color: #DDDDDD;
+    color: #333333;
+	font-weight: bold;
+}
+
+ul.materialMenuPopupList {
+    background-color: white;
+    font-weight: normal;
+    border: 1px solid #BBBBBB;
+}
+
+ul.materialMenuPopupList li a {
+    color: #333333
+}
+
+a.dropDownMaterialMenu img.arrow {
+    margin-right: -5px;
+    padding-left: 5px;
+    padding-bottom: 5px;
+}
+
+a.dropDownMaterialMenu img.resourceIcon {
+    margin-left: -5px;
 }
 
 .headerselectedimg {

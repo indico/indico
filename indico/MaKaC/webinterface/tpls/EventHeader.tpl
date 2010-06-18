@@ -34,7 +34,7 @@ except NameError:
     <% if 'needsBackButton' in locals() and needsBackButton: %>
         <a href="<%= urlHandlers.UHConferenceDisplay.getURL(self._conf) %>" style=class="eventHeaderButtonBar"><%= _('Go back to Conference') %><div class="leftCorner"></div></a>
     <% end %>
-    <% else: %>
+    <% elif conf.getType() != "conference" or displayNavigationBar: %>
         <a id="homeButton" href="<%= urlHandlers.UHWelcome.getURL() %>"
            style="background-image: url(<%= systemIcon('home') %>); margin-left: 10px"></a>
 
@@ -63,11 +63,11 @@ except NameError:
                style="background-image: url(<%= systemIcon('last_arrow') %>)"></a>
         <% end %>
 
-    <% end %>
-
 		<% if showPrintButton or showMoreButton or showFilterButton: %>
             <div class="separator"></div>
         <% end %>
+
+    <% end %>
 
         <% if showPrintButton : %>
             <a id="printButton" href="<%= printURL %>"
