@@ -129,7 +129,7 @@ def _versionInit():
         from indico.MaKaC import __version__
         v = __version__
 
-        print('Version being packaged: %s' % v)
+        print('Indico %s' % v)
 
         return v
 
