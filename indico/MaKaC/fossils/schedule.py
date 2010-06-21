@@ -295,18 +295,18 @@ class ILinkedTimeSchEntryMgmtFossil(ILinkedTimeSchEntryFossil):
     getId.name = "scheduleEntryId"
 
 
-#class IConferenceScheduleDisplayFossil(IFossil):
-#
-#    def getEntries(self):
-#        """ Schedule Entries """
-#    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
-#                         "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
-#                         "ContribSchEntry": IContribSchEntryDisplayFossil}
-#
-#class IConferenceScheduleMgmtFossil(IFossil):
-#
-#    def getEntries(self):
-#        """ Schedule Entries """
-#    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
-#                         "BreakTimeSchEntry": IBreakTimeSchEntryMgmtFossil,
-#                         "ContribSchEntry": IContribSchEntryMgmtFossil}
+class IConferenceScheduleDisplayFossil(IFossil):
+
+    def getEntries(self):
+        """ Schedule Entries """
+    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
+                         "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
+                         "ContribSchEntry": IContribSchEntryDisplayFossil}
+
+class IConferenceScheduleMgmtFossil(IFossil):
+
+    def getEntries(self):
+        """ Schedule Entries """
+    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                         "BreakTimeSchEntry": IBreakTimeSchEntryMgmtFossil,
+                         "ContribSchEntry": IContribSchEntryMgmtFossil}

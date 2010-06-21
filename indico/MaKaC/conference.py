@@ -6575,11 +6575,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
             for mat in self.getMaterialList():
                 mat.resetModifyCache(False, True)
 
-    def hasProtectedOwner( self ):
-        if self.getOwner() != None:
-            return self.getOwner().isProtected()
-        return False
-
     def grantModification( self, sb, sendEmail=True ):
         if isinstance(sb, SessionChair):
             ah = AvatarHolder()

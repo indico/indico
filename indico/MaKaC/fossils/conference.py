@@ -129,30 +129,54 @@ class IMaterialFossil(IFossil):
 
 class ISessionFossil(IFossil):
 
-    def getTitle(self):
-        """ Session Title """
-
     def getId(self):
         """ Session Id """
-    getId.name = "sessionId"
+    #getId.name = "sessionId"
 
-    def getDescription(self):
-        """ Session Description """
+    def getTitle(self):
+        """ Session Title """
 
     def getAllMaterialList(self):
         """ Session List of all material """
     getAllMaterialList.result = IMaterialFossil
     getAllMaterialList.name = "material"
 
+    def getNumSlots(self):
+        """ Number of slots present in the session """
+    getNumSlots.produce = lambda s : len(s.getSlotList())
+
     def getColor(self):
         """ Session Color """
 
-    def getTextColor(self):
-        """ Session Text Color """
+    def getAdjustedStartDate(self):
+        """ Session Start Date """
+    getAdjustedStartDate.convert = Conversion.datetime
+    getAdjustedStartDate.name = "startDate"
+
+    def getLocation(self):
+        """ Session Location """
+    getLocation.convert = Conversion.locationName
+
+    def getAddress(self):
+        """ Session Address """
+    getAddress.produce = lambda s: s.getLocation()
+    getAddress.convert = Conversion.locationAddress
+
+    def getRoom(self):
+        """ Session Room """
+    getRoom.convert = Conversion.roomName
+
+    def getConvenerList(self):
+        """ Session Conveners list """
+    getConvenerList.result = IConferenceParticipationFossil
+    getConvenerList.name = "sessionConveners"
 
     def isPoster(self):
         """ Is self a Poster Session ? """
     isPoster.produce = lambda s: s.getScheduleType() == 'poster'
+
+    def getTextColor(self):
+        """ Session Text Color """
 
 
 class ISessionSlotFossil(IFossil):
