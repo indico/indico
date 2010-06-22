@@ -559,9 +559,15 @@ if __name__ == '__main__':
 
     dataFiles = _getDataFiles(x)
 
-    foundPackages = find_packages(where = 'indico', exclude = ('htdocs',))
+    foundPackages = find_packages(where = 'indico',
+                                  exclude = ('htdocs','tests*'))
+
+
     # add our namespace package
-    foundPackages.append('indico')
+    foundPackages += list('indico.%s' % pkg for pkg in
+                         find_packages(where = 'indico',
+                                       exclude = ('htdocs','MaKaC*')))
+
 
     setup(name = "cds-indico",
           cmdclass = {'sdist': sdist_indico,
@@ -582,7 +588,8 @@ if __name__ == '__main__':
           platforms = ["any"],
           long_description = "Indico allows you to schedule conferences, from single talks to complex meetings with sessions and contributions. It also includes an advanced user delegation mechanism, allows paper reviewing, archival of conference information and electronic proceedings",
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
-          package_dir = { '': 'indico' },
+          package_dir = { 'indico': 'indico',
+                          'MaKaC' : os.path.join('indico', 'MaKaC')},
           entry_points = {
             'console_scripts': [ 'taskDaemon           = MaKaC.consoleScripts.taskDaemon:main',
                                  'indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main',
