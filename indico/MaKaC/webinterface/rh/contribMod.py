@@ -1600,7 +1600,7 @@ class RHContributionToXML(RHContributionModification):
         for f in afm.getFields():
             id = f.getId()
             if f.isActive() and self._target.getField(id).strip() != "":
-                x.writeTag(id.replace(" ","_"),self._target.getField(id))
+                x.writeTag(f.getName().replace(" ","_"),self._target.getField(id))
         x.writeTag("Conference", self._target.getConference().getTitle())
         session = self._target.getSession()
         if session!=None:
@@ -1612,7 +1612,7 @@ class RHContributionToXML(RHContributionModification):
                 x.writeTag("FirstName", au.getFirstName())
                 x.writeTag("FamilyName", au.getFamilyName())
                 x.writeTag("Email", au.getEmail())
-                #x.writeTag("Affiliation", au.getAffiliation())
+                x.writeTag("Affiliation", au.getAffiliation())
                 x.closeTag("PrimaryAuthor")
             else:
                 l.append(au)
@@ -1622,7 +1622,7 @@ class RHContributionToXML(RHContributionModification):
             x.writeTag("FirstName", au.getFirstName())
             x.writeTag("FamilyName", au.getFamilyName())
             x.writeTag("Email", au.getEmail())
-            #x.writeTag("Affiliation", au.getAffiliation())
+            x.writeTag("Affiliation", au.getAffiliation())
             x.closeTag("Co-Author")
 
         for au in self._target.getSpeakerList():
@@ -1630,7 +1630,7 @@ class RHContributionToXML(RHContributionModification):
             x.writeTag("FirstName", au.getFirstName ())
             x.writeTag("FamilyName", au.getFamilyName())
             x.writeTag("Email", au.getEmail())
-            #x.writeTag("Affiliation", au.getAffiliation())
+            x.writeTag("Affiliation", au.getAffiliation())
             x.closeTag("Speaker")
 
         #To change for the new contribution type system to:
