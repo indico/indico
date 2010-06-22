@@ -559,6 +559,10 @@ if __name__ == '__main__':
 
     dataFiles = _getDataFiles(x)
 
+    foundPackages = find_packages(where = 'indico', exclude = ('htdocs',))
+    # add our namespace package
+    foundPackages.append('indico')
+
     setup(name = "cds-indico",
           cmdclass = {'sdist': sdist_indico,
                     'bdist': _bdist_indico(dataFiles),
@@ -586,7 +590,8 @@ if __name__ == '__main__':
                                  ]
           },
           zip_safe = False,
-          packages = find_packages(where = 'indico', exclude = ('htdocs',)),
+          packages = foundPackages,
+          namespace_packages = ['indico'],
           install_requires = _getInstallRequires(),
           data_files = dataFiles,
           package_data = {'indico': ['*.*'] },
