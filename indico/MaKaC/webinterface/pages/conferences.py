@@ -68,7 +68,8 @@ from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
 from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
-from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.conference import IConferenceEventInfoFossil
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -1158,7 +1159,7 @@ class WConferenceTimeTable(wcomponents.WTemplated):
         vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                                                           tz, self._aw,
                                                                           useAttrCache = True))
-        eventInfo = DictPickler.pickle(self._conf, timezone=tz)
+        eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
         vars['eventInfo'] = simplejson.dumps(eventInfo)
         vars['timetableLayout'] = vars.get('ttLyt','')
@@ -3132,8 +3133,9 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         vars["editURL"]=quoteattr(str(urlHandlers.UHConfModScheduleDataEdit.getURL(self._conf)))
 
         vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
-                                                                          days = None, mgmtMode = True))
-        eventInfo = DictPickler.pickle(self._conf, timezone=tz)
+                                                                            days = None, mgmtMode = True))
+
+        eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
         vars['eventInfo'] = simplejson.dumps(eventInfo)
 

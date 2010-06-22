@@ -11,7 +11,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.common.Configuration import Config
 from MaKaC.common import filters
 from MaKaC.common.utils import validMail, setValidEmailSeparators
-from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.fossilize import fossilize
 from MaKaC.common import indexes, info
 from MaKaC.common.fossilize import fossilize
 
@@ -37,6 +37,7 @@ from MaKaC.i18n import _
 
 from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
         ResultWithWarning, TimingNoReportError, ServiceAccessError
+from MaKaC.fossils.contribution import IContributionFossil
 
 class ConferenceBase(object):
     """
@@ -386,7 +387,7 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
                                        'However, there were the following problems:'),
                                        warningContent])
 
-            return DictPickler.pickle(ResultWithWarning(self._params.get('value'), w))
+            return ResultWithWarning(self._params.get('value'), w).fossilize()
 
         else:
             return self._params.get('value')
@@ -529,7 +530,7 @@ class ConferenceListContributions (ConferenceListModificationBase):
         f= filters.SimpleFilter(filterCrit, sortingCrit)
         contributions = f.apply(contributions)
 
-        return DictPickler.pickle(contributions)
+        return fossilize(contributions, IContributionFossil)
 
 #########################
 # Contribution filtering

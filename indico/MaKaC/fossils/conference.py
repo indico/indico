@@ -22,16 +22,26 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 
+class ICategoryFossil(IFossil):
+
+    def getId(self):
+        """ Category Id """
+
+    def getName(self):
+        """ Category Name """
+
 class IConferenceMinimalFossil(IFossil):
 
     def getId(self):
         """Conference id"""
 
-    def getType(self):
-        """ Event type: 'conference', 'meeting', 'simple_event' """
-
     def getTitle(self):
         """Conference title"""
+
+class IConferenceFossil(IConferenceMinimalFossil):
+
+    def getType(self):
+        """ Event type: 'conference', 'meeting', 'simple_event' """
 
     def getDescription(self):
         """Conference description"""
@@ -95,36 +105,112 @@ class IConferenceParticipationFossil(IConferenceParticipationMinimalFossil):
         """Conference Participation Phone """
 
 
-
-class IResourceFossil(IFossil):
+class IResourceMinimalFossil(IFossil):
 
     def getName(self):
         """ Name of the Resource """
 
-
-class ILinkFossil(IResourceFossil):
+class ILinkMinimalFossil(IResourceMinimalFossil):
 
     def getURL(self):
         """ URL of the file pointed by the link """
     getURL.name = "url"
 
-class ILocalFileFossil(IResourceFossil):
+class ILocalFileMinimalFossil(IResourceMinimalFossil):
 
     def getURL(self):
         """ URL of the Local File """
     getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
     getURL.name = "url"
 
+class IResourceFossil(IResourceMinimalFossil):
 
-class IMaterialFossil(IFossil):
+    def getId(self):
+        """ Resource Id """
+
+    def getDescription(self):
+        """ Resource description """
+
+    def getAccessProtectionLevel(self):
+        """ Resource Access Protection Level """
+    getAccessProtectionLevel.name = "protection"
+
+    def getReviewingState(self):
+        """ Resource reviewing state """
+
+class ILinkFossil(IResourceFossil, ILinkMinimalFossil):
+
+    def getType(self):
+        """ Type """
+    getType.produce = lambda s: 'external'
+
+class ILocalFileFossil(IResourceFossil, ILocalFileMinimalFossil):
+
+    def getType(self):
+        """ Type """
+    getType.produce = lambda s: 'stored'
+
+class ILocalFileExtendedFossil(ILocalFileFossil):
+
+    def getFileName(self):
+        """ Local File Filename """
+    getFileName.name = "file.fileName"
+
+    def getFileType(self):
+        """ Local File File Type """
+    getFileType.name = "file.fileType"
+
+    def getCreationDate(self):
+        """ Local File Creation Date """
+    getCreationDate.convert = lambda s: s.strftime("%d.%m.%Y %H:%M:%S")
+    getCreationDate.name = "file.creationDate"
+
+    def getSize(self):
+        """ Local File File Size """
+    getSize.name = "file.fileSize"
+
+class IMaterialMinimalFossil(IFossil):
+
+    def getId(self):
+        """ Material Id """
 
     def getTitle( self ):
         """ Material Title """
 
     def getResourceList(self):
         """ Material Resource List """
-    getResourceList.result = {"MaKaC.conference.Link": ILinkFossil, "MaKaC.conference.LocalFile": ILocalFileFossil}
+    getResourceList.result = {"MaKaC.conference.Link": ILinkMinimalFossil, "MaKaC.conference.LocalFile": ILocalFileMinimalFossil}
     getResourceList.name = "resources"
+
+class IMaterialFossil(IMaterialMinimalFossil):
+
+    def getReviewingState(self):
+        """ Material Reviewing State """
+
+    def getAccessProtectionLevel(self):
+        """ Material Access Protection Level """
+    getAccessProtectionLevel.name = "protection"
+
+    def hasProtectedOwner(self):
+        """ Does it have a protected owner ?"""
+
+    def getDescription(self):
+        """ Material Description """
+
+    def isHidden(self):
+        """ Whether the Material is hidden or not """
+    isHidden.name = 'hidden'
+
+    def getAccessKey(self):
+        """ Material Access Key """
+
+    def getResourceList(self):
+        """ Material Resource List """
+    getResourceList.result = {"MaKaC.conference.Link": ILinkFossil, "MaKaC.conference.LocalFile": ILocalFileExtendedFossil}
+    getResourceList.name = "resources"
+
+    def getMainResource(self):
+        """ The main resource"""
 
 
 class ISessionFossil(IFossil):
@@ -195,7 +281,7 @@ class ISessionSlotFossil(IFossil):
 
     def getConference(self):
         """ Session Slot Conference """
-    getConference.result = IConferenceMinimalFossil
+    getConference.result = IConferenceFossil
 
     def getRoom(self):
         """ Session Slot Room """
@@ -227,3 +313,44 @@ class ISessionSlotFossil(IFossil):
         """ Session Slot Conveners List """
     getOwnConvenerList.result = IConferenceParticipationFossil
     getOwnConvenerList.name = "conveners"
+
+class IConferenceEventInfoFossil(IConferenceMinimalFossil):
+    """
+    Fossil used to format the 'eventInfo' javascript object used
+    in the timetable operations
+    """
+
+    def getAddress(self):
+        """ Address """
+    getAddress.produce = lambda s: s.getLocation()
+    getAddress.convert = Conversion.locationAddress
+
+    def getLocation(self):
+        """ Location (CERN/...) """
+    getLocation.convert = Conversion.locationName
+
+    def getRoom(self):
+        """ Room (inside location) """
+    getRoom.convert = Conversion.roomName
+
+    def getAdjustedStartDate(self):
+        """ Start Date """
+    getAdjustedStartDate.convert = Conversion.datetime
+    getAdjustedStartDate.name = "startDate"
+
+    def getAdjustedEndDate(self):
+        """ End Date """
+    getAdjustedEndDate.convert = Conversion.datetime
+    getAdjustedEndDate.name = "endDate"
+
+    def getSessions(self):
+        """ Conference Sessions """
+    getSessions.produce = lambda s: Conversion.sessionList(s)
+    getSessions.result = ISessionFossil
+
+    def isConference(self):
+        """ Is this event a conference ? """
+    isConference.produce = lambda s : s.getType() == 'conference'
+
+    def getFavoriteRooms(self):
+        """ Favorite Rooms """

@@ -19,7 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import timedelta
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase

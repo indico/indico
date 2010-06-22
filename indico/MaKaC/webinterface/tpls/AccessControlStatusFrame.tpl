@@ -112,7 +112,7 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
                     'userListDiv', 'userList',
                     allowedList, true, null,
                     true, true, null, null,
-                    false, false, false,
+                    false, false, true,
                     addUsers, null, removeUser);
 
             // ---- On Load

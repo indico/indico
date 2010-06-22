@@ -23,8 +23,6 @@ from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.common import search
 
-from MaKaC.common.PickleJar import DictPickler
-
 from MaKaC.webinterface import urlHandlers
 from MaKaC.fossils.user import IAvatarFossil, IGroupFossil
 from MaKaC.common.fossilize import fossilize
@@ -111,14 +109,14 @@ class SearchUsersGroups(ServiceBase):
         groups = search.searchGroups(group = self._params.get("group", ""),
                                searchExt = self._params.get("searchExt", False))
 
-        pickledUsers = [DictPickler.pickle(human) for human in users]
-        pickledGroups = [DictPickler.pickle(group) for group in groups]
+        fossilizedUsers = [human.fossilize(IAvatarFossil) for human in users]
+        fossilizedGroups = [group.fossilize(IGroupFossil) for group in groups]
 
-        pickledUsers.sort(cmp=UserComparator.cmpUsers)
-        pickledGroups.sort(cmp=UserComparator.cmpGroups)
+        fossilizedUsers.sort(cmp=UserComparator.cmpUsers)
+        fossilizedGroups.sort(cmp=UserComparator.cmpGroups)
 
-        results["people"] = pickledUsers
-        results["groups"] = pickledGroups
+        results["people"] = fossilizedUsers
+        results["groups"] = fossilizedGroups
 
         return results
 

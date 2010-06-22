@@ -7,7 +7,6 @@ from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.roomBooking import GetBookingBase
 import MaKaC.conference as conference
-from MaKaC.common.PickleJar import DictPickler
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators

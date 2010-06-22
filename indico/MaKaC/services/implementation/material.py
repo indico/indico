@@ -12,6 +12,8 @@ from MaKaC.errors import ModificationError, MaKaCError
 import MaKaC.conference as conference
 from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.conference import IMaterialFossil, IMaterialMinimalFossil,\
+        ILinkFossil, ILocalFileFossil, ILocalFileExtendedFossil
 from MaKaC.common.PickleJar import DictPickler
 
 
@@ -200,7 +202,8 @@ class GetMaterialClassesBase(MaterialDisplayBase):
         matList = {}
 
         for mat in self._target.getAllMaterialList():
-            matList[mat.getId()] = DictPickler.pickle(mat)
+            matList[mat.getId()] = mat.fossilize(IMaterialFossil)
+
         return matList
 
 class GetMaterial(MaterialDisplayBase):
@@ -213,7 +216,7 @@ class GetMaterial(MaterialDisplayBase):
         Provides the list of material classes, based on the target
         resource (conference, session, contribution, etc...)
         """
-        return DictPickler.pickle(self._material)
+        return self._material.fossilize(IMaterialFossil)
 
 
 class GetMaterialAllowedUsers(MaterialModifBase):
@@ -309,7 +312,7 @@ class EditMaterialClassBase(MaterialModifBase, UserListChange):
         materialRegistry = event.getMaterialRegistry()
 
         return {
-            'material': DictPickler.pickle(self._material),
+            'material': self._material.fossilize(IMaterialFossil),
             'newMaterialTypes': materialRegistry.getMaterialList(event)
             }
 
@@ -335,7 +338,8 @@ class GetResourcesBase(ResourceDisplayBase):
         resList = {}
 
         for resource in self._material.getResourceList():
-            resList[resource.getId()] = DictPickler.pickle(resource)
+            resList[resource.getId()] = resource.fossilize({"MaKaC.conference.Link": ILinkFossil,
+                                                           "MaKaC.conference.LocalFile": ILocalFileFossil})
         return resList
 
 class EditResourceBase(ResourceModifBase, UserListChange):
@@ -343,7 +347,6 @@ class EditResourceBase(ResourceModifBase, UserListChange):
     def _checkParams(self):
         ResourceModifBase._checkParams(self)
 
-        resId = self._params.get("resourceId",None)
         self._newProperties = self._params.get("resourceInfo",None)
         self._newUserList = self._newProperties['userList']
 
@@ -352,7 +355,8 @@ class EditResourceBase(ResourceModifBase, UserListChange):
         self.changeUserList(self._resource, self._newUserList)
 
         DictPickler.update(self._resource, self._newProperties)
-        return DictPickler.pickle(self._resource)
+        return self._resource.fossilize({"MaKaC.conference.Link": ILinkFossil,
+                                        "MaKaC.conference.LocalFile": ILocalFileExtendedFossil})
 
 class GetResourceAllowedUsers(ResourceModifBase):
     """

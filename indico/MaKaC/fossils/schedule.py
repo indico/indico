@@ -20,7 +20,7 @@
 
 from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
-from MaKaC.fossils.conference import IMaterialFossil,\
+from MaKaC.fossils.conference import IMaterialMinimalFossil,\
         IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
 from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
     IContributionParticipationTTMgmtFossil
@@ -170,7 +170,7 @@ class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
     def getMaterial(self):
         """ Entry Material """
     getMaterial.produce = lambda s: s.getOwner().getAllMaterialList()
-    getMaterial.result = IMaterialFossil
+    getMaterial.result = IMaterialMinimalFossil
 
     def getPresenters(self):
         """ Entry Presenters """
@@ -274,7 +274,7 @@ class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
     def getMaterial(self):
         """ Entry Material """
     getMaterial.produce = lambda s: s.getOwner().getSession().getAllMaterialList()
-    getMaterial.result = IMaterialFossil
+    getMaterial.result = IMaterialMinimalFossil
 
     def getConveners(self):
         """ Entry Conveners """

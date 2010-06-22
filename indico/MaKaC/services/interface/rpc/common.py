@@ -18,11 +18,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.common.PickleJar import Retrieves
 import sys
 import traceback
 from MaKaC.common.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.error import ICausedErrorFossil, INoReportErrorFossil
+from MaKaC.fossils.error import ICausedErrorFossil, INoReportErrorFossil, IWarningFossil,\
+    IResultWithWarningFossil
 
 class CausedError(Exception, Fossilizable):
 
@@ -106,34 +106,33 @@ class TimingNoReportError(NoReportError):
     pass
 
 
-class Warning(object):
+class Warning(Fossilizable):
+
+    fossilizes(IWarningFossil)
 
     def __init__(self, title, content):
         self._title = title
         self._content = content
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.Warning'], 'title')
     def getTitle(self):
         return self._title
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.Warning'], 'content')
     def getProblems(self):
         return self._content
 
-class ResultWithWarning(object):
+class ResultWithWarning(Fossilizable):
+
+    fossilizes(IResultWithWarningFossil)
 
     def __init__(self, result, warning):
         self._result = result
         self._warning = warning
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.ResultWithWarning'], 'result', isPicklableObject = True)
     def getResult(self):
         return self._result
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.ResultWithWarning'], 'warning', isPicklableObject = True)
     def getWarning(self):
         return self._warning
 
-    @Retrieves(['MaKaC.services.interface.rpc.common.ResultWithWarning'], 'hasWarning')
     def hasWarning(self):
         return True

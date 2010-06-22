@@ -310,7 +310,8 @@ class RHSubmitMaterialBase:
 
     def _addMaterialType(self, text, user):
 
-        from MaKaC.common.PickleJar import DictPickler
+        from MaKaC.common.fossilize import fossilize
+        from MaKaC.fossils.conference import ILocalFileExtendedFossil, ILinkFossil
 
         Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._callerRH._req)))
 
@@ -392,7 +393,8 @@ class RHSubmitMaterialBase:
                 avatar = AvatarHolder().getById(userElement['id'])
             protectedObject.grantAccess(avatar)
 
-        return mat, status, DictPickler.pickle(info)
+        return mat, status, fossilize(info, {"MaKaC.conference.Link": ILinkFossil,
+                                             "MaKaC.conference.LocalFile": ILocalFileExtendedFossil})
 
     def _process(self, rh, params):
 

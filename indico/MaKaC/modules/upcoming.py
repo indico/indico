@@ -10,8 +10,8 @@ import MaKaC.modules.base as modules
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.common import timezoneUtils, indexes
 
-from MaKaC.common.PickleJar import Retrieves
-
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.modules import IObservedObjectFossil
 import MaKaC.conference as conference
 
 from MaKaC.common.logger import Logger
@@ -74,7 +74,9 @@ class UpcomingEventsCache(MultiLevelCache, Persistent):
         MultiLevelCache.cacheObject(self, '', object)
         self._dirty = False
 
-class ObservedObject(Persistent):
+class ObservedObject(Persistent, Fossilizable):
+
+    fossilizes(IObservedObjectFossil)
 
     def __init__(self, obj, weight, advertisingDelta):
         """
@@ -87,15 +89,12 @@ class ObservedObject(Persistent):
         self.weight = weight
         self.advertisingDelta = advertisingDelta
 
-    @Retrieves('MaKaC.modules.upcoming.ObservedObject', 'object', isPicklableObject=True)
     def getObject(self):
         return self.obj
 
-    @Retrieves('MaKaC.modules.upcoming.ObservedObject', 'weight')
     def getWeight(self):
         return self.weight
 
-    @Retrieves('MaKaC.modules.upcoming.ObservedObject', 'delta', lambda x: x.days)
     def getAdvertisingDelta(self):
         return self.advertisingDelta
 

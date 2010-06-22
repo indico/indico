@@ -42,13 +42,14 @@ from MaKaC import user
 from MaKaC.i18n import _
 
 from pytz import timezone
-from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.timezoneUtils import DisplayTZ
 import simplejson
 import pytz
 import copy
 import MaKaC.webinterface.common.timezones as convertTime
 import MaKaC.common.timezoneUtils as timezoneUtils
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 
 
 class WPSessionBase( WPConferenceBase ):
@@ -387,8 +388,8 @@ class WSessionDisplayBase(wcomponents.WTemplated):
         ttdata = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz,
                                                                            None, days = None, mgmtMode = False))
 
-        eventInfo = DictPickler.pickle(self._session.getConference(), timezone=self._tz)
-        eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=self._tz)
+        eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz=self._tz)
+        eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz=self._tz)
         eventInfo = simplejson.dumps(eventInfo)
 
         return """
@@ -1450,8 +1451,8 @@ class WSessionModifSchedule(wcomponents.WTemplated):
         vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz,
                                                                            None, days = None, mgmtMode = True))
 
-        eventInfo = DictPickler.pickle(self._session.getConference(), timezone=tz)
-        eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=tz)
+        eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz=tz)
+        eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._session.getConference().getAbstractMgr().isActive()
         vars['eventInfo'] = simplejson.dumps(eventInfo)
 

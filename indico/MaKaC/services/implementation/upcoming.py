@@ -1,19 +1,21 @@
 import datetime
 
-from MaKaC.common.PickleJar import DictPickler
-
 from MaKaC.services.implementation.base import ParameterManager, AdminService
 from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.modules.base import ModulesHolder
 
 from MaKaC import conference
 
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.modules import IObservedObjectFossil
+
+
 class ConfigUpcomingEventsBase(AdminService):
     def _checkParams(self):
         AdminService._checkParams(self)
         self._pm = ParameterManager(self._params)
 
-    def _getAnswer(self):        
+    def _getAnswer(self):
         upcomingModule = ModulesHolder().getById("upcoming_events")
 
         return self._getResult(upcomingModule)
@@ -22,7 +24,7 @@ class ConfigUpcomingEventsBase(AdminService):
 class ChangeCacheTTL(ConfigUpcomingEventsBase):
     def _checkParams(self):
         ConfigUpcomingEventsBase._checkParams(self)
-        
+
         self._newTTL = self._pm.extract("value", pType=int, allowEmpty=True)
 
     def _getResult(self, module):
@@ -34,7 +36,7 @@ class ChangeCacheTTL(ConfigUpcomingEventsBase):
 class ChangeNumberUpcomingItems(ConfigUpcomingEventsBase):
     def _checkParams(self):
         ConfigUpcomingEventsBase._checkParams(self)
-        
+
         self._newNumberItems = self._pm.extract("value", pType=int, allowEmpty=True)
 
     def _getResult(self, module):
@@ -46,8 +48,7 @@ class ChangeNumberUpcomingItems(ConfigUpcomingEventsBase):
 class GetEventCategoryList(ConfigUpcomingEventsBase):
 
     def _getResult(self, module):
-        return DictPickler.pickle(module.getObjectList());
-
+        return fossilize(module.getObjectList(), IObservedObjectFossil);
 
 
 class ObservedObjectBase(ConfigUpcomingEventsBase):
@@ -65,18 +66,18 @@ class ObservedObjectBase(ConfigUpcomingEventsBase):
                 raise ServiceError("ERR-O0", "Event '%s' does not exist" % self._objId)
         elif self._objType == 'category':
             try:
-                self._obj = conference.CategoryManager().getById(self._objId)            
+                self._obj = conference.CategoryManager().getById(self._objId)
             except:
                 raise ServiceError("ERR-O1", "Category '%s' does not exist" % self._objId)
         else:
-            raise ServiceError("ERR-O2", "Unknown type!")        
+            raise ServiceError("ERR-O2", "Unknown type!")
 
 
 class AddObservedObject(ObservedObjectBase):
 
     def _checkParams(self):
         ObservedObjectBase._checkParams(self)
-        
+
         self._objWeight = self._pm.extract("weight", pType=float, allowEmpty=False)
         self._objDelta = self._pm.extract("delta", pType=int, allowEmpty=False)
 
@@ -87,7 +88,7 @@ class AddObservedObject(ObservedObjectBase):
 
         module.addObject(self._obj, self._objWeight, datetime.timedelta(days=self._objDelta))
 
-        return DictPickler.pickle(module.getObjectList()[-1])
+        return fossilize(module.getObjectList()[-1], IObservedObjectFossil);
 
 class RemoveObservedObject(ObservedObjectBase):
 
