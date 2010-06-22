@@ -19,9 +19,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-`fossilize` allows us to "serialize" complex python objects into dictionaries
+``fossilize`` allows us to "serialize" complex python objects into dictionaries
 and lists. Such operation is very useful for generating JSON data structures
-from business objects. It works as a wrapper around `zope.interface`.
+from business objects. It works as a wrapper around ``zope.interface``.
 
 Some of the features are:
  * Different "fossil" types for the same source class;

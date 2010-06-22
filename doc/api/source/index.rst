@@ -13,6 +13,7 @@ Contents:
    :numbered:
 
    ./fossilize.rst
+   ./test.rst
 
 Indices and tables
 ==================
