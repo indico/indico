@@ -310,7 +310,9 @@
 
           <xsl:if test="count(child::speakers) != 0">
             <tr>
-              <td class="leftCol">Speakers:</td>
+                <td class="leftCol"><xsl:choose>
+              <xsl:when test="count(child::speakers/user) = 1">Speaker</xsl:when>
+              <xsl:otherwise>Speakers</xsl:otherwise></xsl:choose>:</td>
               <td><xsl:apply-templates select="./speakers"/></td>
             </tr>
           </xsl:if>
