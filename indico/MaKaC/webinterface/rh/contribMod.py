@@ -1634,7 +1634,7 @@ class RHContributionToXML(RHContributionModification):
             x.closeTag("Speaker")
 
         #To change for the new contribution type system to:
-        x.writeTag("ContributionType", self._target.getType())
+        x.writeTag("ContributionType", self._target.getType().getName())
 
         t = self._target.getTrack()
         if t!=None:
