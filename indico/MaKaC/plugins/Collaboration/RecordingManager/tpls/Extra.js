@@ -143,7 +143,7 @@ function RMtalkSelect(IndicoID) {
     if (typeof RMselectedTalkId != 'undefined' && RMselectedTalkId != '' &&
             RMTalkList[RMselectedTalkId]["CDSID"] != "none" &&
             RMTalkList[RMselectedTalkId]["CDSID"] != "pending" &&
-            RMTalkList[RMselectedTalkId]["IndicoLink"] == 'False') {
+            RMTalkList[RMselectedTalkId]["IndicoLink"] == false) {
         ButtonCreateIndicoLink.enable();
     }
     else {
