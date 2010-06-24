@@ -79,8 +79,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                 },
                 'remote': function() {
                     self.pm.remove(file);
-                    setTimeout(function() { urlBox.dom.focus();
-                                            urlBox.set('http://'); }, 200);
+                    setTimeout(function() { urlBox.dom.focus(); }, 200);
                     return Html.div({},
                                     Html.label('popUpLabel', $T("URL")),
                                     self.pm.add(urlBox, 'url'),
