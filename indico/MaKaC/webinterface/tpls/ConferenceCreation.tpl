@@ -61,7 +61,10 @@
 
             <table class="groupTable">
                 <tr>
-                    <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
+                    <td nowrap class="titleCellTD">
+                        <span class="titleCellFormat"> <%= _("Description")%></span>
+                        <input type="hidden" id="description" name="description" value="">
+                    </td>
                     <td nowrap  id="descriptionBox" class="contentCellTD">
                     </td>
                 </tr>
@@ -212,11 +215,12 @@
                     return false;
                 }else {
                     $E('chairperson').set(Json.write(uf.getUsers()));
+                    $E('description').set(editor.get());
                     injectFromProtectionChooser();
                 }
         });
 
-                var editor = new RichTextWidget(500, 200, {name: 'description'});
+                var editor = new RichTextWidget(500, 200,"IndicoMinimal");
 		$E('descriptionBox').set(editor.draw());
 	});
 

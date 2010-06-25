@@ -1,4 +1,4 @@
-include(ScriptRoot + "fckeditor/fckeditor.js");
+include(ScriptRoot + "ckeditor/ckeditor.js");
 
 var indicoSource = null;
 var indicoRequest = null;

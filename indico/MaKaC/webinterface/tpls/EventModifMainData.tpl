@@ -33,7 +33,9 @@ visibilityList[999] = 'Everywhere'
 numRows = 11
 
 
-favoriteRooms = confObj.getFavoriteRooms();
+favoriteRooms = confObj.getFavoriteRooms()
+
+additionalInfo = confObj.getContactInfo()
 
 %>
 <div class="groupTitle"><%= _("General Settings")%></div>
@@ -254,7 +256,7 @@ $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates
 $E('inPlaceEditDescription').set(new RichTextInlineEditWidget('event.main.changeDescription', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, confFossile.description).draw());
 
 <% if evtType == 'conference':%>
-    <%= macros.genericField(macros.FIELD_RICHTEXT, 'inPlaceEditAdditionalInfo', 'event.main.changeAdditionalInfo', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=(400,200)) %>
+    $E('inPlaceEditAdditionalInfo').set(new RichTextInlineEditWidget('event.main.changeAdditionalInfo', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, <%= jsonEncode(additionalInfo) %>, 600, 45).draw());
 <% end %>
 
 // Room parameters widget

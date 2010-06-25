@@ -582,7 +582,7 @@ extend(IndicoUI.Dialogs,
                var compileMinutes = exists(compile)?compile:false;
                var killProgress = null;
 
-               var rtWidget = new RichTextWidget(600,400,{},'','rich','IndicoFull');
+               var rtWidget = new RichTextWidget(700,400,'IndicoFull');
 
                var saveButton;
                var intToStr = function(id) {
@@ -593,7 +593,7 @@ extend(IndicoUI.Dialogs,
                    }
                };
 
-               var popup = new ExclusivePopup(
+               var popup = new ExclusivePopupWithButtons(
                        $T('My minutes'),
                        function() {
                            popup.closeMinutesPopup();
@@ -637,7 +637,6 @@ extend(IndicoUI.Dialogs,
                            changedText.set(false);
                            wasChanged = true;
                            saveButton.dom.disabled = true;
-                           closeMinutes();
                        }
                    }
                });
@@ -767,13 +766,12 @@ extend(IndicoUI.Dialogs,
                    saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}, null), $T("Save")));
                    saveButton.dom.disabled = !compileMinutes;
 
-                   return this.ExclusivePopup.prototype.draw.call(
+                   return this.ExclusivePopupWithButtons.prototype.draw.call(
                        this,
-                       Html.div({},
-                                content,
-                                Html.div({style:{marginTop: pixels(20)}},
-                                         saveButton,
-                                         Widget.button(command(self.closeMinutesPopup, $T("Close"))))));
+                       content,
+                       Html.div({style:{marginTop: pixels(20)}},
+                                 saveButton,
+                                 Widget.button(command(self.closeMinutesPopup, $T("Close")))));
                };
 
                popup.open();

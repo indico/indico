@@ -6314,3 +6314,11 @@ div.invalid {
 .beforeRegistrationInput {
     width: 7px;
 }
+
+/*
+    Used to display scroll bar in CKEditor properly.
+*/
+
+body.cke_show_borders {
+    height: auto;
+}
