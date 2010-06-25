@@ -12,7 +12,7 @@
         <!--
             set fixed height on anchor to assure that the height is
             corrected if the image cannot be retrieved (i.e. https problems) -->
-        <a style="display: block; min-height: 66px;" href="<%= urlHandlers.UHWelcome.getURL() %>">
+        <a style="min-height: 66px;" href="<%= urlHandlers.UHWelcome.getURL() %>">
             <img class="headerLogo" src="<%= imgLogo %>" />
         </a>
 
