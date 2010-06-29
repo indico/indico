@@ -2023,9 +2023,8 @@ class WSessionModifAC(wcomponents.WTemplated):
         vars=wcomponents.WTemplated.getVars(self)
         wc=wcomponents.WAccessControlFrame()
         vars["accessControlFrame"]=wc.getHTML(self._session,\
-                                urlHandlers.UHSessionSetVisibility.getURL(),\
-                                urlHandlers.UHSessionSelectAllowed.getURL(),\
-                                urlHandlers.UHSessionRemoveAllowed.getURL())
+                                urlHandlers.UHSessionSetVisibility.getURL(),
+                                "Session")
         if not self._session.isProtected():
             df=wcomponents.WDomainControlFrame(self._session)
             vars["accessControlFrame"] += "<br>%s"%df.getHTML( \

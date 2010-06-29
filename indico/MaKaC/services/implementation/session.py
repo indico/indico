@@ -8,10 +8,12 @@ from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.roomBooking import GetBookingBase
 import MaKaC.conference as conference
 from MaKaC.common.PickleJar import DictPickler
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
 from MaKaC.conference import SessionSlot
+from MaKaC.common.fossilize import fossilize
+from MaKaC.user import PrincipalHolder, Avatar, Group
 
 class SessionBase(conferenceServices.ConferenceBase):
 
@@ -154,6 +156,51 @@ class SessionSlotModifUnrestrictedContribMngCoordBase(SessionSlotModifBase, Sess
 class SessionGetBooking(SessionBase, GetBookingBase):
     pass
 
+class SessionProtectionUserList(SessionModifBase):
+    def _getAnswer(self):
+        #will use IAvatarFossil or IGroupFossil
+        return fossilize(self._session.getAllowedToAccessList())
+
+class SessionProtectionAddUsers(SessionModifBase):
+
+    def _checkParams(self):
+        SessionModifBase._checkParams(self)
+
+        self._usersData = self._params['value']
+        self._user = self.getAW().getUser()
+
+    def _getAnswer(self):
+
+        for user in self._usersData :
+
+            userToAdd = PrincipalHolder().getById(user['id'])
+
+            if not userToAdd :
+                raise ServiceError("ERR-U0","User does not exist!")
+
+            self._session.grantAccess(userToAdd)
+
+class SessionProtectionRemoveUser(SessionModifBase):
+
+    def _checkParams(self):
+        SessionModifBase._checkParams(self)
+
+        self._userData = self._params['value']
+
+        self._user = self.getAW().getUser()
+
+    def _getAnswer(self):
+
+        userToRemove = PrincipalHolder().getById(self._userData['id'])
+
+        if not userToRemove :
+            raise ServiceError("ERR-U0","User does not exist!")
+        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+            self._session.revokeAccess(userToRemove)
+
 methodMap = {
-    "getBooking": SessionGetBooking
+    "getBooking": SessionGetBooking,
+    "protection.getAllowedUsersList": SessionProtectionUserList,
+    "protection.addAllowedUsers": SessionProtectionAddUsers,
+    "protection.removeAllowedUser": SessionProtectionRemoveUser
 }

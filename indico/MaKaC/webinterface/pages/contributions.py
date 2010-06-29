@@ -988,9 +988,12 @@ class WContribModifAC(wcomponents.WTemplated):
         vars["modifyControlFrame"]=mcf.getHTML(self._contrib,addMgrURL,remMgrURL)
         acf=wcomponents.WAccessControlFrame()
         visURL=urlHandlers.UHContributionSetVisibility.getURL()
-        addAlwURL=urlHandlers.UHContributionSelectAllowed.getURL()
-        remAlwURL=urlHandlers.UHContributionRemoveAllowed.getURL()
-        vars["accessControlFrame"]=acf.getHTML(self._contrib,visURL,addAlwURL,remAlwURL)
+
+        if isinstance(self._contrib.getOwner(), conference.Session):
+            vars["accessControlFrame"]=acf.getHTML(self._contrib, visURL, "InSessionContribution")
+        else :
+            vars["accessControlFrame"]=acf.getHTML(self._contrib, visURL, "Contribution")
+
         if not self._contrib.isProtected():
             df=wcomponents.WDomainControlFrame( self._contrib )
             addDomURL=urlHandlers.UHContributionAddDomain.getURL()

@@ -3746,8 +3746,6 @@ class WConfModifAC:
     def getHTML( self, params ):
         ac = wcomponents.WConfAccessControlFrame().getHTML( self.__conf,\
                                             params["setVisibilityURL"],\
-                                            params["addAllowedURL"],\
-                                            params["removeAllowedURL"],\
                                             params["setAccessKeyURL"] )
         dc = ""
         if not self.__conf.isProtected():

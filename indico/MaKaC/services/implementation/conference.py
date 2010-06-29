@@ -13,6 +13,7 @@ from MaKaC.common import filters
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import indexes, info
+from MaKaC.common.fossilize import fossilize
 
 from MaKaC.conference import ConferenceHolder
 import MaKaC.conference as conference
@@ -25,6 +26,7 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.user import PrincipalHolder, Avatar, Group
 
 import datetime
 from pytz import timezone
@@ -33,7 +35,8 @@ from MaKaC.errors import TimingError
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
-from MaKaC.services.interface.rpc.common import ServiceError, Warning, ResultWithWarning, TimingNoReportError
+from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
+        ResultWithWarning, TimingNoReportError, ServiceAccessError
 
 class ConferenceBase(object):
     """
@@ -44,11 +47,14 @@ class ConferenceBase(object):
 
         try:
             self._target = self._conf = ConferenceHolder().getById(self._params["conference"]);
+        except:
+            try:
+                self._target = self._conf = ConferenceHolder().getById(self._params["confId"]);
+            except:
+                raise ServiceError("ERR-E4", "Invalid conference id.")
             if self._target == None:
                 Logger.get('rpc.conference').debug('self._target is null')
                 raise Exception("Null target.")
-        except:
-            raise ServiceError("ERR-E4", "Invalid conference id.")
 
 
     def _getCheckFlag(self):
@@ -649,6 +655,50 @@ class ConferenceParticipationForm(ConferenceDisplayBase):
 
         return p.getHTML(params)
 
+class ConferenceProtectionUserList(ConferenceModifBase):
+
+    def _getAnswer(self):
+        #will use IAvatarFossil or IGroupFossil
+        return fossilize(self._conf.getAllowedToAccessList())
+
+class ConferenceProtectionAddUsers(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+
+        self._usersData = self._params['value']
+        self._user = self.getAW().getUser()
+
+    def _getAnswer(self):
+
+        for user in self._usersData :
+
+            userToAdd = PrincipalHolder().getById(user['id'])
+
+            if not userToAdd :
+                raise ServiceError("ERR-U0","User does not exist!")
+
+            self._conf.grantAccess(userToAdd)
+
+class ConferenceProtectionRemoveUser(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+
+        self._userData = self._params['value']
+
+        self._user = self.getAW().getUser()
+
+    def _getAnswer(self):
+
+        userToRemove = PrincipalHolder().getById(self._userData['id'])
+
+        if not userToRemove :
+            raise ServiceError("ERR-U0","User does not exist!")
+        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+            self._conf.revokeAccess(userToRemove)
+
+
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupportEmail": ConferenceSupportEmailModification,
@@ -669,5 +719,8 @@ methodMap = {
     "showConcurrentEvents": ShowConcurrentEvents,
 #    "getFields": ConferenceGetFields,
     "getFieldsAndContribTypes": ConferenceGetFieldsAndContribTypes,
-    "getParticipationForm": ConferenceParticipationForm
+    "getParticipationForm": ConferenceParticipationForm,
+    "protection.getAllowedUsersList": ConferenceProtectionUserList,
+    "protection.addAllowedUsers": ConferenceProtectionAddUsers,
+    "protection.removeAllowedUser": ConferenceProtectionRemoveUser
     }

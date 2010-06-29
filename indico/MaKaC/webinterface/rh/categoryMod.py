@@ -600,10 +600,17 @@ class RHCategorySetVisibility( RHCategModifBase ):
         params = self._getRequestParams()
         if params["visibility"] == "PRIVATE":
             self._target.setProtection( 1 )
-        elif params["visibility"] == "PUBLIC":
+        elif params["visibility"] == "INHERITING":
             self._target.setProtection( 0 )
-        elif params["visibility"] == "ABSOLUTELY PUBLIC":
-            self._target.setProtection( -1 )
+        elif params["visibility"] == "PUBLIC":
+            # The 'Home' category is handled as a special case.
+            # We maintain the illusion for the user of it being either
+            # private or public, but actually it can be either private
+            # or inheriting for legacy reasons.
+            if params["type"] == "Home":
+                self._target.setProtection( 0 )
+            else :
+                self._target.setProtection( -1 )
         self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
 
 
