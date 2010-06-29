@@ -461,7 +461,7 @@ type("TopLevelTimeTableMixin", ["LookupTabWidget"], {
                  initialTab = todayStr;
              } else {
                  // otherwise use the default
-                 initialTab = keys(data)[0];
+                 initialTab = this.sortedKeys[0];
              }
          }
 
