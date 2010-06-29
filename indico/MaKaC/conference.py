@@ -209,7 +209,7 @@ class Category(Persistent, CommonObjectBase):
         self._defaultStyle = { "simple_event":"","meeting":"" }
         self._order = 0
         self.__ac = AccessController()
-        self.__confCreationRestricted = 0
+        self.__confCreationRestricted = 1
         self.__confCreators = []
         self._visibility = 999
         self._statistics = {"events":None,"contributions":None,"resources":None,\
