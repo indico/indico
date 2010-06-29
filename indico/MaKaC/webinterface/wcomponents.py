@@ -5565,8 +5565,12 @@ class WMaterialListItem(WTemplated):
 
 class WShowExistingMaterial(WTemplated):
 
-    def __init__(self,target):
+    def __init__(self,target, mode='display'):
+        """
+        mode should be 'display' or 'management'
+        """
         self._target=target
+        self._mode = mode
 
     def getVars(self):
         vars=WTemplated.getVars(self)
@@ -5582,6 +5586,7 @@ class WShowExistingMaterial(WTemplated):
         vars["resourcesFileProtectHandler"] = vars.get("resourcesFileProtectHandler", None)
         vars["resourcesLinkModifHandler"] = vars.get("resourcesLinkModifHandler", None)
         vars["resourcesLinkProtectHandler"] = vars.get("resourcesLinkProtectHandler", None)
+        vars['mode'] = self._mode
 
         return vars
 

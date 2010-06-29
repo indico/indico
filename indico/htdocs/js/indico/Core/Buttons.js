@@ -50,6 +50,16 @@ IndicoUI.Buttons = {
             }
         });
     },
+
+    starButton: function(faded){
+        return Html.img({
+            src: faded ? imageSrc("starGrey") : imageSrc("star"),
+            style: {
+                'marginLeft': '5px',
+                'verticalAlign': 'middle'
+            }
+        });
+    },
     /**
      * Returns an image with an 'play' icon
      */

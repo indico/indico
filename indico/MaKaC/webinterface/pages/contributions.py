@@ -453,7 +453,7 @@ class WPContributionModifMaterials( WPContributionModifBase ):
         self._tabMaterials.setActive()
 
     def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target)
+        wc=wcomponents.WShowExistingMaterial(self._target, mode='management')
         return wc.getHTML( pars )
 
 class WPModSearchPrimAuthor ( WPContribModifMain ):

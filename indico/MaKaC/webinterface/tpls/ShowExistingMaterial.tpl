@@ -14,6 +14,9 @@ function contains(a, obj){
     return false;
 }
 
+var showMainResourceOption = false;
+var mode = '<%= mode %>';
+
 <% import MaKaC.conference as conference %>
 <% from MaKaC.common.PickleJar import DictPickler %>
 
@@ -44,6 +47,9 @@ function contains(a, obj){
     };
     var uploadAction = Indico.Urls.UploadAction.contribution;
     var targetType = '<%= self._target.getConference().getType() %>';
+    if (targetType == "conference" && mode == 'management') {
+        showMainResourceOption = true;
+    }
 <% end %>
 
 <% elif isinstance(self._target, conference.Session): %>
@@ -78,9 +84,9 @@ function contains(a, obj){
     var targetType = 'category';
 <% end %>
 
-var matList = <%= DictPickler.pickle(materialList) %>
+var matList = <%= DictPickler.pickle(materialList) %>;
 
-var mlist = new MaterialListWidget(args, matList, uploadAction);
+var mlist = new MaterialListWidget(args, matList, uploadAction, null, null, showMainResourceOption);
 
 $E('materialListPlace').set(mlist.draw());
 

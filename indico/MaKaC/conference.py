@@ -11325,6 +11325,12 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         recRes.recover()
         self.notifyModification()
 
+    @Retrieves (['MaKaC.conference.Material',
+                 'MaKaC.conference.Minutes',
+                 'MaKaC.conference.Paper',
+                 'MaKaC.conference.Slides',
+                 'MaKaC.conference.Video',
+                 'MaKaC.conference.Poster'], 'mainResource', isPicklableObject = True)
     def getMainResource(self):
         try:
             if self._mainResource:
