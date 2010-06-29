@@ -459,6 +459,7 @@ class WAdminPlugins (wcomponents.WTemplated):
         vars["PluginType"] = PluginsHolder().getPluginType(self._pluginType)
         vars["InitialPlugin"] = self._initialPlugin
         vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
+        vars["rbActive"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
         return vars
 

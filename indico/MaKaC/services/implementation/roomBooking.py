@@ -6,6 +6,7 @@ from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.rb_location import Location
 from MaKaC.rb_location import CrossLocationQueries
+import MaKaC.common.info as info
 
 class RoomBookingListLocations( ServiceBase ):
 
@@ -61,12 +62,16 @@ class RoomBookingFullNameListRooms( RoomBookingListRooms):
 class RoomBookingListLocationsAndRooms( ServiceBase ):
 
     def _getAnswer( self ):
-        result = {}
-        locationNames = map(lambda l: l.friendlyName, Location.allLocations);
-        for loc in locationNames:
-            for room in CrossLocationQueries.getRooms( location = loc ):
-                result[loc +":" +room.name] = loc +":" +room.name;
-        return sorted(result)
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getRoomBookingModuleActive():
+            result = {}
+            locationNames = map(lambda l: l.friendlyName, Location.allLocations);
+            for loc in locationNames:
+                for room in CrossLocationQueries.getRooms( location = loc ):
+                    result[loc +":" +room.name] = loc +":" +room.name;
+            return sorted(result)
+        else:
+            return []
 
 class GetBookingBase(object):
 

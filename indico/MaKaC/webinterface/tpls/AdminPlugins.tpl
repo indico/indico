@@ -66,7 +66,7 @@
         </td>
     </tr>
     <% if PluginType.getOptions() is not None and len(PluginType.getOptions()) > 0: %>
-        <% includeTpl('AdminPluginsOptionList', Object = PluginType, ObjectType = "PluginType", Favorites = Favorites, Index = 0) %>
+        <% includeTpl('AdminPluginsOptionList', Object = PluginType, ObjectType = "PluginType", Favorites = Favorites, Index = 0, rbActive = rbActive) %>
     <% end %>
     <% else: %>
     <tr>
@@ -88,7 +88,7 @@
         <% for i, plugin in enumerate(pluginList): %>
         <div id="<%=plugin.getName()%>OptionsDiv" style="display:none;">
             <% if plugin.hasAnyOptions(): %>
-                <% includeTpl('AdminPluginsOptionList', Object = plugin, ObjectType = "Plugin", Favorites = Favorites, Index = i) %>
+                <% includeTpl('AdminPluginsOptionList', Object = plugin, ObjectType = "Plugin", Favorites = Favorites, Index = i, rbActive = rbActive) %>
             <% end %>
             <% else: %>
                 <span><%=_("No options defined for this plugin")%></span>
