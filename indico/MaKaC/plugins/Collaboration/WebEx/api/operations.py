@@ -39,6 +39,7 @@ from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAd
     NewWebExMeetingNotificationManager, WebExMeetingModifiedNotificationManager,\
     WebExMeetingRemovalNotificationManager, WebExParticipantNotification
 from MaKaC.common.mail import GenericMailer
+from cgi import escape
 
 from MaKaC.plugins.Collaboration.WebEx.common import getWebExOptionValueByName
 
@@ -97,7 +98,7 @@ class WebExOperations(object):
 </body>
 </serv:message>
 
-""" % ( { "username" : params['webExUser'], "password" : params['webExPass'], "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "meetingPassword": params['accessPassword'], "startDate" : start_date, "duration" : booking.getDuration(), "meetingName" : params['meetingTitle'], "description" : params['meetingDescription'], "participants": participant_xml } )
+""" % ( { "username" : params['webExUser'], "password" : escape(params['webExPass']), "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "meetingPassword": escape(params['accessPassword']), "startDate" : start_date, "duration" : booking.getDuration(), "meetingName" : escape(params['meetingTitle']), "description" : escape(params['meetingDescription']), "participants": participant_xml } )
             Logger.get('WebEx').debug( "WebEx Response:\n\n%s" % ( request_xml ) )
             response_xml = sendXMLRequest( request_xml )
             Logger.get('WebEx').debug( "WebEx Response:\n\n%s" % ( response_xml ) )
@@ -114,12 +115,13 @@ class WebExOperations(object):
 #                else:  #Add in the slash for them
 #                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=JM&MK=' + booking._webExKey
 
-                recipients = []
-                for k in booking._participants.keys():
-                    recipients.append( booking._participants[k]._email )
-                if len(recipients)>0:
-                    notification = WebExParticipantNotification( booking, recipients, 'new' )
-                    GenericMailer.send( notification )
+                if params.has_key('sendAttendeesEmail') and params['sendAttendeesEmail'][0].lower() == 'yes':
+                    recipients = []
+                    for k in booking._participants.keys():
+                        recipients.append( booking._participants[k]._email )
+                    if len(recipients)>0:
+                        notification = WebExParticipantNotification( booking, recipients, 'new' )
+                        GenericMailer.send( notification )
             else:
                 booking._url = ""
                 errorID = dom.getElementsByTagName( "serv:exceptionID" )[0].firstChild.toxml('utf-8')
@@ -205,26 +207,28 @@ class WebExOperations(object):
 </body>
 </serv:message>
 
-""" % ( { "username" : params['webExUser'], "password" : params['webExPass'], "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "meetingPassword": params['accessPassword'], "startDate" : start_date, "duration" : int(duration), "meetingName" : params['meetingTitle'], "meetingKey" : booking._webExKey, "description": params["meetingDescription"], "participants": makeParticipantXML(booking._participants) } )
+""" % ( { "username" : params['webExUser'], "password" : escape(params['webExPass']), "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "meetingPassword": escape(params['accessPassword']), "startDate" : start_date, "duration" : int(duration), "meetingName" : escape(params['meetingTitle']), "meetingKey" : booking._webExKey, "description": escape(params["meetingDescription"]), "participants": makeParticipantXML(booking._participants) } )
             Logger.get('WebEx').debug( "WebEx Modify Request:\n\n%s" % ( request_xml ) )
             response_xml = sendXMLRequest( request_xml )
             Logger.get('WebEx').debug( "WebEx Modify Response:\n\n%s" % ( response_xml ) )
             dom = xml.dom.minidom.parseString( response_xml )
             status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
             if status != "SUCCESS":
+                Logger.get('WebEx').debug( "WebEx Modify failed.... Sending error to user" )
                 errorID = dom.getElementsByTagName( "serv:exceptionID" )[0].firstChild.toxml('utf-8')
                 errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
-                return WebExError( errorType = None, userMessage = errorReason )
+                return WebExError( errorID, userMessage = errorReason )
 
             booking.bookingOK()
             booking.checkCanStart()
             booking._checkStatus()
-            recipients = []
-            for k in booking._participants.keys():
-                recipients.append( booking._participants[k]._email )
-            if len(recipients)>0:
-                notification = WebExParticipantNotification( booking, recipients, 'modify' )
-                GenericMailer.send( notification )
+            if params.has_key('sendAttendeesEmail') and params['sendAttendeesEmail'][0].lower() == 'yes':
+                recipients = []
+                for k in booking._participants.keys():
+                    recipients.append( booking._participants[k]._email )
+                if len(recipients)>0:
+                    notification = WebExParticipantNotification( booking, recipients, 'modify' )
+                    GenericMailer.send( notification )
             if MailTools.needToSendEmails('WebEx'):
                 Logger.get('WebEx').info("We need to alert WebEx admins; attempting to send emails")
                 try:
@@ -270,7 +274,7 @@ class WebExOperations(object):
       </bodyContent>
    </body>
 </serv:message>
-""" % { "username" : params['webExUser'], "password" : params['webExPass'], "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "webex_key": booking._webExKey }
+""" % { "username" : params['webExUser'], "password" : escape(params['webExPass']), "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "webex_key": booking._webExKey }
         Logger.get('WebEx').debug( "delete func. is booking._created? %s XML:\n%s " % ( booking._created, request_xml ) )
         response_xml = sendXMLRequest( request_xml )
         dom = xml.dom.minidom.parseString( response_xml )
@@ -280,7 +284,6 @@ class WebExOperations(object):
             errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
             Logger.get('WebEx').info( "In delete function, appears to have failed: %s" % response_xml )
             return WebExError( errorID, userMessage = errorReason )
-#            booking._warning = WebExWarning( reason )
         else:
             Logger.get('WebEx').info( "In delete function, appears to have been successful" )
 
@@ -296,7 +299,6 @@ class WebExOperations(object):
                     Logger.get('WebEx').error(
         	               """Could not send WebExMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
         	               (booking.getId(), booking.getConference().getId(), str(e)))
-#            if MailTools.needToSendEmails('WebEx'):
             if True:
                 try:
                     Logger.get('WebEx').info("I am in the mailer block")
@@ -310,16 +312,6 @@ class WebExOperations(object):
                     Logger.get('WebEx').error(
                         """Could not send notification emails for booking with id %s of event with id %s, exception: %s""" %
                         (booking.getId(), booking.getConference().getId(), str(e)))
-               
-#                if booking._bookingParams["sendMailToManagers"]:
-#                    try:
-#                        notification = WebExMeetingRemovalNotificationManager(booking)
-#                        GenericMailer.sendAndLog(notification, booking.getConference(),
-#                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                                             booking.getConference().getCreator())
-#                    except Exception,e:
-#                        Logger.get('WebEx').error(
-#                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
         return None
 
 

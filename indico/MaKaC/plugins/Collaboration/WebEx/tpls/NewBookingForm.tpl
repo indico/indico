@@ -77,9 +77,13 @@
         <td style="padding-top: 10px;" id="participantsCell">
         </td>
     </tr>
+    <tr>
+        <td class="bookingFormFieldName">
+            <span>Send email to attendees?</span>
+        </td>
+        <td>
+            <input id="sendAttendeesEmail" type="checkbox" size="16" name="sendAttendeesEmail" value="yes" checked />
+        </td>
+    </tr>
+
 </table>
-<!--
-<div>
-<input type="checkbox" id="sendMailCB" name="sendMailToManagers" value="sendMailToManagers"/><label for="sendMailCB">Send a mail notification to all event managers</label>
-</div>
- -->

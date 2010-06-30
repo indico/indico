@@ -37,6 +37,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.WebEx.fossils import IWebExWarningFossil, IWebExErrorFossil, \
     IChangesFromWebExErrorFossil, IParticipantFossil
+from cgi import escape
 
 def sendXMLRequest(xml):  
     conn = httplib.HTTPSConnection( getWebExOptionValueByName("WEhttpServerLocation") )
@@ -66,7 +67,7 @@ def makeParticipantXML( participants ):
     <email>%(email)s</email>
   </person>
 </attendee>
-""" % { "firstName": p._firstName, "lastName":p._familyName, "email":p._email }
+""" % { "firstName": escape(p._firstName), "lastName":escape(p._familyName), "email":p._email }
         participants_xml = participants_xml + p_xml    
     participants_xml = participants_xml + "</attendees></participants>\n"
     return participants_xml
