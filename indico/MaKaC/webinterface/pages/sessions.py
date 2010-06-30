@@ -1452,6 +1452,7 @@ class WSessionModifSchedule(wcomponents.WTemplated):
 
         eventInfo = DictPickler.pickle(self._session.getConference(), timezone=tz)
         eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=tz)
+        eventInfo['isCFAEnabled'] = self._session.getConference().getAbstractMgr().isActive()
         vars['eventInfo'] = simplejson.dumps(eventInfo)
 
         return vars

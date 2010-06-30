@@ -1158,7 +1158,9 @@ class WConferenceTimeTable(wcomponents.WTemplated):
         vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                                                           tz, self._aw,
                                                                           useAttrCache = True))
-        vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
+        eventInfo = DictPickler.pickle(self._conf, timezone=tz)
+        eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        vars['eventInfo'] = simplejson.dumps(eventInfo)
         vars['timetableLayout'] = vars.get('ttLyt','')
         return vars
 
@@ -3131,7 +3133,9 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
         vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
                                                                           days = None, mgmtMode = True))
-        vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
+        eventInfo = DictPickler.pickle(self._conf, timezone=tz)
+        eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        vars['eventInfo'] = simplejson.dumps(eventInfo)
 
         return vars
 

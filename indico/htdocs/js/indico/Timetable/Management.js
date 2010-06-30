@@ -357,7 +357,8 @@ type("TimetableManagementActions", [], {
             this.timetable,
             function(result) {
                 self._addEntries(result);
-            });
+            },
+            this.eventInfo.isCFAEnabled);
 
         dialog.execute();
     },

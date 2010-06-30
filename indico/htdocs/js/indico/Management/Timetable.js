@@ -170,7 +170,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
          }
      },
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc) {
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled) {
          var self = this;
 
          this.newArgs = Array.prototype.slice.call(arguments, 0);
@@ -180,6 +180,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
          this.days = days;
          this.successFunc = successFunc;
          this.timetable = timetable;
+         this.isCFAEnabled = isCFAEnabled;
 
          this.PreLoadHandler(
              self._preload,
@@ -395,7 +396,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var keywordField = IndicoUI.Widgets.keywordList('oneLineListItem');
         var fields = [];
 
-        if (!this.isConference) {
+        if (!this.isConference || !this.isCFAEnabled) {
             // if it's a meeting, just add a description
             fields = [[$T('Description'),$B(Html.textarea({cols: 50,rows: 2}),
                                             info.accessor('field_content'))]];
@@ -545,8 +546,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
       * @param timeStartMethod rpc_method_name if this parameter is null, the date will not be shown in the form.
       */
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc) {
-
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled) {
          this.args = clone(args);
 
          this.dateArgs = clone(args);
@@ -562,6 +562,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
          this.timetable = timetable;
          this.successFunc = successFunc;
          this.favoriteRooms = favoriteRooms;
+         this.isCFAEnabled = isCFAEnabled;
 
          this.previousDate = dayStartDate;
          this.info = new WatchObject();
