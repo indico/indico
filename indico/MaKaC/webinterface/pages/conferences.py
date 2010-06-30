@@ -11820,6 +11820,18 @@ class WPConfModifRoomBookingBookingForm( WPConfModifRoomBookingBase ):
         wc = wcomponents.WRoomBookingBookingForm( self._rh )
         return wc.getHTML( params )
 
+class WPConfModifRoomBookingConfirmBooking( WPConfModifRoomBookingBase ):
+
+    def __init__( self, rh ):
+        self._rh = rh
+        WPConfModifRoomBookingBase.__init__( self, rh, rh._conf)
+
+    def _setActiveTab( self ):
+        self._tabNewBooking.setActive()
+
+    def _getTabContent( self, params ):
+        wc = wcomponents.WRoomBookingConfirmBooking( self._rh, standalone = False )
+        return wc.getHTML( params )
 
 # ============================================================================
 # === Badges related =========================================================

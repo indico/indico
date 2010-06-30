@@ -7642,6 +7642,9 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
         if self._thereAreConflicts:
             url = urlHandlers.UHConfModifRoomBookingBookingForm.getURL( self._candResv.room )
             self._redirect( url )
+        elif self._confirmAdditionFirst:
+            p = conferences.WPConfModifRoomBookingConfirmBooking( self )
+            return p.display()
         else:
             # Add it to event reservations list
             guid = ReservationGUID( Location.parse( self._candResv.locationName ), self._candResv.id )
