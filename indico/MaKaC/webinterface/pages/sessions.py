@@ -405,7 +405,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                 var eventInfo = %s;
 
                 var historyBroker = new BrowserHistoryBroker();
-                var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 850, $E('timetableDiv'), historyBroker);
+                var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timetableDiv'), historyBroker);
 
                 IndicoUI.executeOnLoad(function(){
 
