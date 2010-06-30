@@ -17,14 +17,6 @@
             <textarea rows="3" cols="60" name="meetingDescription"><%=EventDescription%></textarea>
         </td>
     </tr>
-<!--    <tr>
-        <td class="bookingFormFieldName" style="vertical-align: top;">
-            <span>Email addresses to send notifications to</span>
-        </td>
-        <td>
-            <textarea rows="3" cols="60" name="attendeeEmails"></textarea>
-        </td>
-    </tr>-->
     <tr>
         <td class="bookingFormFieldName">
             <span>Timezone</span>
@@ -85,15 +77,6 @@
         <td style="padding-top: 10px;" id="participantsCell">
         </td>
     </tr>
-<!--    <tr>
-        <td class="bookingFormFieldName">
-            <span>Send attendees email?</span>
-        </td>
-        <td>
-            <input id="sendAttendeesEmail" type="checkbox" name="sendAttendeesEmail" value="" />
-            <span id="sendAttendeesEmailHelp"></span>
-        </td>
-    </tr>-->
 </table>
 <!--
 <div>

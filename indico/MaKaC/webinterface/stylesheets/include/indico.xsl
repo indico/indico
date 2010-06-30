@@ -919,6 +919,13 @@
                                   </a>
                                 </div>
                               </xsl:for-each>
+                              <xsl:for-each select="./linkLineNewWindow">
+                                <div>
+                                  <a href="{./href}" target="_blank">
+                                    <xsl:value-of select="./caption"/>
+                                  </a>
+                                </div>
+                              </xsl:for-each>
                             </td>
                           </tr>
                         </xsl:for-each>

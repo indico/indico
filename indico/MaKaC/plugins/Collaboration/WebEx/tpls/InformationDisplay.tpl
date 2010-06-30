@@ -23,7 +23,7 @@
                 <span><%= _('Join URL')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking._url %>      
+                <a href="<%= Booking._url %>" target="_blank" ><%= Booking._url %></a>
             </td>
         </tr>
     </tbody>

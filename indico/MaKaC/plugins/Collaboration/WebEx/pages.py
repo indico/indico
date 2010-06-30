@@ -28,6 +28,7 @@ from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate,\
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
+import re
 
 class WNewBookingForm(WCSPageTemplateBase):
         
@@ -111,33 +112,37 @@ class XMLGenerator(object):
             out.openTag("launchInfo")
             out.writeTag("launchText", _("Join Now!"))
             out.writeTag("launchLink", booking.getUrl())
-            out.writeTag("launchTooltip", _('Click here to join the EVO meeting!'))
+            out.writeTag("launchTooltip", _('Click here to join the WebEx meeting!'))
             out.closeTag("launchInfo")
-
         out.openTag("information")
         
         if booking.getHasAccessPassword():
             out.openTag("section")
             out.writeTag("title", _('Protection:'))
-            out.writeTag("line", _('This EVO meeting is protected by a password'))
+            out.writeTag("line", _('This WebEx meeting is protected by a password'))
             out.closeTag("section")
         out.openTag("section")
-        out.writeTag("title", _('Description:'))
+        out.writeTag("title", _('Agenda:'))
         out.writeTag("line", booking._bookingParams["meetingDescription"])
         out.closeTag("section")
         out.openTag("section")
         out.writeTag("title", _('Join URL:'))
-        out.writeTag("line", booking.getUrl())
-        out.writeTag("titleTooltip", _('Click here to join the WebEx meeting!') )
+        out.openTag("linkLineNewWindow")
+        out.writeTag("href", booking.getUrl())
+        out.writeTag("caption", "Click here to go to the WebEx meeting page")
+        out.closeTag("linkLineNewWindow")
         out.closeTag("section")
         out.openTag("section")
-        out.writeTag("title", _('Call in number:'))
+        out.writeTag("title", _('Toll free call-in number (US/Canada):'))
         out.writeTag("line", booking._phoneNum)
         out.closeTag("section")
         out.openTag("section")
-        out.writeTag("title", _('WebEx meeting number:'))
-        out.writeTag("line", booking._webExKey)
+        out.writeTag("title", _('Toll call-in number: (US/Canada)'))
+        out.writeTag("line", booking._phoneNumToll)
+        out.closeTag("section")
+        out.openTag("section")
+        out.writeTag("title", _('Call-in access code:'))
+        out.writeTag("line", re.sub(r'(\d{3})(?=\d)',r'\1 ', str(booking._webExKey)[::-1])[::-1])
         out.closeTag("section")
         out.closeTag("information")
 
-                    

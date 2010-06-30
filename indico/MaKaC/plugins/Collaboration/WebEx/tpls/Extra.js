@@ -5,9 +5,8 @@
 var WebExLaunchClientHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px">' +
-            $T('If you are using Internet Explorer, Indico cannot load the WebEx client directly;') + '<br \/>' +
-            $T('you need to click on the link.') + '<br \/>' +
-            $T('You can avoid this by using another browser. Sorry for the inconvenience.') +
+            $T('This link is valid only once and will open a WebEx window logged in as the host.') + '<br \/>' +
+            $T('Please leave the window open to keep the meeting active.') + '<br \/>' +
         '<\/div>');
 };
 
@@ -15,16 +14,12 @@ type("WebExLaunchClientPopup", ["ExclusivePopup"],
     {
         draw: function() {
             var self = this;
-    
-            var linkClicked = function(){
-                self.close();return true;
-            }
-            
-            var clientLink = Html.a({href: this.bookingUrl, onclick : linkClicked, style:{display: 'block'}},
+
+            var clientLink = Html.a({href: self.bookingUrl, onclick: 'self.close();', style:{display: 'block'}, target:'_blank'},
                     $T("Click here to launch the WebEx client"));
             
             var infoLink = Html.span({className: 'fakeLink', style: {display: 'block', fontSize: 'smaller', paddingTop: pixels(10)}},
-                $T('(Why am I getting this popup?)'));
+                $T('(Help)'));
             infoLink.dom.onmouseover = WebExLaunchClientHelpPopup
             
             var cancelButton = Html.button({style: {marginTop: pixels(10)}}, $T("Cancel"));
@@ -38,7 +33,7 @@ type("WebExLaunchClientPopup", ["ExclusivePopup"],
         }
     },
     function(bookingUrl) {
-        this.bookingUrl = bookingUrl;
+        this.bookingUrl = bookingUrl.replace(/&amp;/g, '&');
         this.ExclusivePopup($T('Launch WebEx client'), positive);
     }
 );
@@ -52,7 +47,7 @@ var WebExStartDateHelpPopup = function(event) {
         '<div style="padding:3px">' +
             $T('Please create your booking between <%= MinStartDate %> and <%= MaxEndDate %>.') + '<br \/>' +
             $T("(Allowed dates \/ times based on your event's start date and end date)") + '<br \/>' +
-            $T('Also remember the start date cannot be more than <%= AllowedStartMinutes %> in the past.') +
+            $T('Also remember the start date cannot be more than <%= AllowedStartMinutes %> minutes in the past.') +
         '<\/div>');
 };
 
@@ -136,11 +131,6 @@ type("PersonDataPopup", ["ExclusivePopup"],
             var saveButton = Html.button({style:{marginLeft:pixels(5)}}, "Save");
             saveButton.observeClick(function(){
                 if (self.parameterManager.check()) {
-//                    if ( )
-//                    {
-//                        alert( "Invalid email: " + personData.get("email"));
-//                        return;
-//                    } 
                     self.action(personData, closePopup);
                 }
             });
@@ -168,7 +158,6 @@ type("PersonDataPopup", ["ExclusivePopup"],
                         if ( !( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test( personData.get("email") )) )
                             return ($T("Invalid email address"));
                     }), personData.accessor('email'))]
-                    //['Endpoint IP', $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'ip', false), personData.accessor('ip'))]
                 ]),
                 buttonDiv
             ]));
@@ -230,7 +219,6 @@ type("ParticipantListWidget", ["ListWidget"],
             var participantDiv = Html.div({style:{display: 'inline'}});
             
 
-            //alert( 'Adding a person into the list' )
             participantDiv.appendMany([
                 Html.img({alt: "Person", title: "Person", src: imageSrc("user"),
                           style: {verticalAlign: 'middle', marginRight: pixels(5)}}),
@@ -242,7 +230,6 @@ type("ParticipantListWidget", ["ListWidget"],
             ', ',
             $B(Html.span(), participantData.accessor('firstName'), function(name){if (name) {return name.toUpperCase()}}),
             ' - ',
-            //$B(Html.span(), participantData.accessor('firstName') ),
             $B(Html.span(), participantData.accessor('email')),
             $B(Html.span(), participantData.accessor('affiliation'),
                 function(affiliation) {
@@ -273,7 +260,6 @@ type("ParticipantListField", ["IWidget"],
         },
         
         _addNewParticipant : function(participant, type) {
-            //alert( 'ParticipantListField._addNewParticipant was called');
             var newId = this.newParticipantCounter++;
             participant.set('type', type)
             this.participantList.set(newId, participant);
@@ -281,7 +267,6 @@ type("ParticipantListField", ["IWidget"],
         },
     
         getParticipants: function() {
-            //alert( 'ParticipantListField.getParticipants was called');
             return $L(this.participantList);
         },
 
@@ -328,7 +313,6 @@ type("ParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-//                var popup = new UserSearchPopup($T("Add existing person"), handler);
                 var popup = new ChooseUsersPopup($T("Add existing person"), true, null, false, true, null, false, true, handler);
 
                 popup.open();

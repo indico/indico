@@ -40,7 +40,7 @@ class WebExNotificationBase(GenericNotification):
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setContentType("text/html")
     
-    def _getBookingDetails(self, typeOfMail):
+    def _getBookingDetails(self):
         bp = self._bp
         
         return """
@@ -160,6 +160,9 @@ class WebExParticipantNotification(WebExNotificationBase):
             self.setSubject("""[Indico] Modification to WebEx meeting: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
             body_text = "There has been a change to the WebEx meeting %s (event id: %s).  The new information is as follows. " % (self._conference.getTitle(), str(self._conference.getId()))
+            if len( booking._bookingChangesHistory ) > 0:
+                for change in booking._bookingChangesHistory:
+                    body_text += change + "<br/>"
         elif typeOfMail == 'new':
             self.setSubject("""[Indico] New WebEx meeting: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
@@ -167,10 +170,10 @@ class WebExParticipantNotification(WebExNotificationBase):
         elif typeOfMail == 'delete':
             self.setSubject("""[Indico] WebEx meeting deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-            body_text = "A new WebEx meeting %s (event id: %s) has been deleted.  The information is as follows. " % (self._conference.getTitle(), str(self._conference.getId()))
+            body_text = "A WebEx meeting %s (event id: %s) has been deleted.  The information is as follows. " % (self._conference.getTitle(), str(self._conference.getId()))
         if changes != None:
             body_text += "Changes to modification: <br/>" + self.listToStr( changes )
-        body_text += self._getBookingDetails(typeOfMail)
+        body_text += self._getBookingDetails()
         self.setBody( body_text )  
         return None
 
@@ -212,7 +215,7 @@ Click <a href="%s">here</a> to see it in Indico.<br />
         self._modifLink,
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
-        self._getBookingDetails('new')
+        self._getBookingDetails()
         ))
         
 class NewWebExMeetingNotificationManager(WebExEventManagerNotificationBase):
@@ -238,7 +241,7 @@ Click <a href="%s">here</a> to see it in Indico.<br />
 Please note that the auto-join URL will not work until the EVO meeting time arrives.
 """ % ( self._modifLink,
         MailTools.eventDetails(self._conference),
-        self._getBookingDetails('new')
+        self._getBookingDetails()
         ))
         
         
@@ -246,17 +249,21 @@ Please note that the auto-join URL will not work until the EVO meeting time arri
 class WebExMeetingModifiedNotificationAdmin(WebExAdminNotificationBase):
     """ Template to build an email notification to the responsible
     """
-    
     def __init__(self, booking):
         WebExAdminNotificationBase.__init__(self, booking)
         
         self.setSubject("""[WebEx] WebEx meeting modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
-        self.setBody("""Dear WebEx Responsible,<br />
+
+        body_text = "Dear WebEx Responsible,<br /> There has been a change on %s to the WebEx meeting %s (event id: %s).  The changed information is as follows. <br/><br/>	 " % (MailTools.getServerName(), self._conference.getTitle(), str(self._conference.getId()))
+        if len( booking._bookingChangesHistory ) > 0:
+            for change in booking._bookingChangesHistory:
+                body_text += change + "<br/>"
+        the_body2 = """
 <br />
-An WebEx meeting <strong>was modified</strong> in <a href="%s">%s</a><br />
-Click <a href="%s">here</a> to see it in Indico.<br />
+See the event page here: %s <br/>
+The full details are below:
 <br />
 %s
 <br />
@@ -264,14 +271,13 @@ Click <a href="%s">here</a> to see it in Indico.<br />
 <br />
 <br />
 %s
-""" % ( MailTools.getServerName(),
-        MailTools.getServerName(),
+""" % ( 
         self._modifLink,
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
-        self._getBookingDetails('modify')
-        ))
-        
+        self._getBookingDetails()
+        )
+        self.setBody(body_text + the_body2)
         
 class WebExMeetingModifiedNotificationManager(WebExEventManagerNotificationBase):
     """ Template to build an email notification to the responsible
@@ -293,10 +299,10 @@ Click <a href="%s">here</a> to see it in Indico.<br />
 <br />
 %s
 <br />
-Please note that the auto-join URL will not work until the EVO meeting time arrives.
+Please note that the auto-join URL will not work until the WebEx host starts the meeting.
 """ % ( self._modifLink,
         MailTools.eventDetails(self._conference),
-        self._getBookingDetails('modify')
+        self._getBookingDetails()
         ))
         
         
@@ -325,7 +331,7 @@ A WebEx meeting <strong>was deleted</strong> in <a href="%s">%s</a><br />
         MailTools.getServerName(),
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference),
-        self._getBookingDetails('remove')
+        self._getBookingDetails()
         ))
         
 class WebExMeetingRemovalNotificationManager(WebExEventManagerNotificationBase):
@@ -349,5 +355,5 @@ You also can see a list of all the EVO meetings here: (not implemented yet).<br 
 <br />
 %s
 """ % ( MailTools.eventDetails(self._conference),
-        self._getBookingDetails('remove')
+        self._getBookingDetails()
         ))

@@ -51,13 +51,12 @@ class CSBooking(CSBookingBase):
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
 
     _hasTitle = True
-#    _hasStart = True
-    _hasStart = False
+    _hasStart = True
     _hasStop = False
     _hasCheckStatus = True
 
     _requiresServerCallForStart = True
-    _requiresClientCallForStart = False
+    _requiresClientCallForStart = True
 
     _needsBookingParamsCheck = True
     _needsToBeNotifiedOnView = True
@@ -68,7 +67,7 @@ class CSBooking(CSBookingBase):
     _hasEventDisplay = True
 
     _commonIndexes = ["All Videoconference"]
-    _changesFromWebEx = []
+    _bookingChangesHistory = []
 
     _simpleParameters = {
             "meetingTitle": (str, ''),
@@ -87,11 +86,12 @@ class CSBooking(CSBookingBase):
         self._participantIdCounter = Counter(1)
         self._accessPassword = None
         self._url = None
+        self._startURL = None
         self._webExKey = None
         self._phoneNum = None
+        self._phoneNumToll = None
         self._duration = None
-        self._iCalURL = None
-        
+
         self._created = False
         self._error = False
         self._errorMessage = None
@@ -153,6 +153,9 @@ class CSBooking(CSBookingBase):
     def getUrl(self):
         return self._url
 
+    def getStartURL(self):
+        return self._startURL
+
     def getErrorMessage(self):
         return self._errorMessage
 
@@ -172,7 +175,7 @@ class CSBooking(CSBookingBase):
         return self._errorDetails
     
     def getChangesFromWebEx(self):
-        return self._changesFromWebEx
+        return self._bookingChangesHistory
 
     def setWebExKey( self, webExKey ):
         self._webExKey = webExKey
@@ -235,7 +238,7 @@ class CSBooking(CSBookingBase):
                         return OverlappedError(booking)
         
         return False
-        
+
     def getWebExTimeZoneToUTC( self, tz_id, the_date ):
         """
         The date is required because the WebEx server
@@ -280,10 +283,15 @@ class CSBooking(CSBookingBase):
         self._created = True
         
     def checkCanStart(self, changeMessage = True):
+#        self._canBeStarted = False
+#        self._statusMessage = _("Ready to start!")
+#        self._statusClass = "statusMessageOK"
+#        return True
         if self._created:
             now = nowutc()
             self._canBeDeleted = True
             self._canBeNotifiedOfEventDateChanges = CSBooking._canBeNotifiedOfEventDateChanges
+#            if self.getStartDate() - timedelta(minutes=self._WebExOptions["allowedMinutes"].getValue()) < now and self.getEndDate() + timedelta(self._WebExOptions["allowedMinutes"].getValue()) > now:
             if self.getStartDate() < now and self.getEndDate() > now:
                 self._canBeStarted = True
                 self._canBeDeleted = False
@@ -314,56 +322,101 @@ class CSBooking(CSBookingBase):
         #We do this because the call in number is not returned in create response
         self.bookingOK()
         self.checkCanStart()
-        self._checkStatus()
         return None
 
     def _modify(self, oldBookingParams):
         """ Modifies a booking in the EVO server if all conditions are met.
         """
+        verboseKeyNames = {
+            "meetingDescription": "Meeting description",
+            "meetingTitle": "Title",
+            "webExUser": "WebEx username",
+            "webExPass": "WebEx password",
+            "meet:meetingPassword": "Meeting password",
+            "participants" : "Participants", 
+            "startDate" : "Start date",
+            "endDate" : "End date",
+            "hidden" : "Is hidden",
+#            "dateSync" : "Keep synchronized",
+            "notifyOnDateChanges" : "Keep booking synchronized"
+        }
         Logger.get('WebEx').debug( "in _modify" )
         if self._created:
+            self._bookingChangesHistory
+            params = self.getBookingParams()
+            Logger.get('WebEx').debug( "In modify: params = %s" % params )
+            for key in oldBookingParams.keys():
+#                try:
+#                    Logger.get('WebEx').debug( "New Param: %s = %s" % ( key, params[key]) )
+#                    Logger.get('WebEx').debug( "Old Param: %s = %s" % ( key, oldBookingParams[key]) )
+
+                    if key == "hidden" or key == "notifyOnDateChanges":
+                        if oldBookingParams.has_key( key ) != params.has_key( key ) or oldBookingParams[key] != params[key]:
+                            self._bookingChangesHistory.append( "%s has changed." % ( verboseKeyNames[key] ) )
+                            continue
+                    if oldBookingParams[key] != params[key]:
+                        if key == "participants":
+                            #Number of participants changed - report this 
+                            if len(params[key]) != len(oldBookingParams[key]):
+                                self._bookingChangesHistory.append( "%s has changed." % ( verboseKeyNames[key] ) )
+                                continue
+                            count = -1
+                            for participant in params[key]:
+                                count = count + 1
+                                for participantKey in participant.keys():
+                                    if participantKey=="id":
+                                        continue
+#                                        Logger.get('WebEx').debug( "Evaluating %s vs %s" % ( params[key][0], oldBookingParams[key][0] ) )
+                                    if oldBookingParams[key][count].get(participantKey) != params[key][count].get(participantKey):
+                                        self._bookingChangesHistory.append( "%s has changed." % ( verboseKeyNames[key] ) )
+                                        break
+                        else:
+                            self._bookingChangesHistory.append( "%s has changed: %s" % ( verboseKeyNames[key], params[key] ) )
+                        
+#                except:
+#                    Logger.get('WebEx').debug( "Error on key name in modify:\n\n%s" % ( key ) )
             result = ExternalOperationsManager.execute(self, "modifyBooking", WebExOperations.modifyBooking, self)
             if isinstance(result, WebExError):
                 return result
         else:
             return WebExError( errorType = None, userMessage = "The booking appears to have not been created according to the Indico system" )
-#            self._create()
         return None
 
     def _start(self):
         """ Starts an EVO meeting.
             A last check on the EVO server is performed.
         """
-        Logger.get('WebEx').debug( "in _start" )
-##########################
-#        try:
-#            site_name = re.split( '.webex.com', getWebExOptionValueByName("WEhttpServerLocation").lower())[0]
-#        except:
-#            raise WebExException(_("Could not isolate the site name from the given site URL in the WebEx plugin configuration in the administration area.\n") )
-#        try:
-#####            urllib.urllibopen( "https://" + site_name + ".webex.com/" + site_name + "/m.php?AT=HM&MK=" + self._webExKey )
-#            conn = httplib.HTTPSConnection( getWebExOptionValueByName("WEhttpServerLocation") )
-#            values = {}
-#            conn.request( "POST", "/" + site_name + "/p.php?AT=LO", values )
-#            response = conn.getresponse()
-###################
-#print the_xml
-#print response.read()
-#           urllib.urllibopen( "https://" + site_name + ".webex.com/" + site_name + "/m.php?AT=HM&MK=" + self._webExKey )
-#        except:
-#            raise WebExException(_("Could not connect to site url and start the meeting.\n") )
-
-
-
-        #Check if they left the trialing slash in the base URL we need
-#        if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
-#            start_url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=HM&AS=WebTour&WL=http://www.aol.com&MK=' + self._webExKey
-#        else:  #Add in the slash for them
-#            start_url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=HM&MK=' + self._webExKey
-#        urllib.urllibopen( self._startURL )
         self._checkStatus()
         if self._canBeStarted:
-            self._permissionToStart = True
+            params = self.getBookingParams()
+            request_xml = """<?xml version="1.0\" encoding="UTF-8"?>
+<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:serv=\"http://www.webex.com/schemas/2002/06/service" >
+<header>
+  <securityContext>
+    <webExID>%(username)s</webExID>
+    <password>%(password)s</password>
+    <siteID>%(siteID)s</siteID>
+    <partnerID>%(partnerID)s</partnerID>
+  </securityContext>
+</header>
+<body>
+  <bodyContent xsi:type="java:com.webex.service.binding.meeting.GethosturlMeeting" >
+    <sessionKey>%(webExKey)s</sessionKey>
+  </bodyContent>
+</body>
+</serv:message>
+""" % ( { "username" : params['webExUser'], "password" : params['webExPass'], "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "webExKey":self._webExKey } )
+            Logger.get('WebEx').debug( "Start request XML:\n %s" % request_xml )
+            response_xml = sendXMLRequest( request_xml )
+            Logger.get('WebEx').debug( "Start response XML:\n %s" % response_xml )
+            dom = xml.dom.minidom.parseString( response_xml )
+            status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
+            if status == "SUCCESS":
+                self._startURL = dom.getElementsByTagName( "meet:hostMeetingURL" )[0].firstChild.toxml('utf-8')
+                self._permissionToStart = True
+            else:
+                return WebExError( errorType = None, userMessage = "There was an error attempting to get the start booking URL from the WebEx server." ) 
+        return None
         
     def _notifyOnView(self):
         """ This method is called every time that the user sees a booking.
@@ -386,7 +439,7 @@ class CSBooking(CSBookingBase):
         
         if not checkDone:
             self.checkCanStart()
-            
+
     def _checkStatus(self):
         if self._created:
             try:
@@ -465,7 +518,8 @@ class CSBooking(CSBookingBase):
         dom = xml.dom.minidom.parseString( response_xml )
         oldArguments = self.getCreateModifyArguments()
         
-        changesFromWebEx = self._changesFromWebEx
+#        changesFromWebEx = self._changesFromWebEx
+        changesFromWebEx = self._bookingChangesHistory
 #        changesFromWebEx = []
         
         start_date = makeTime( self.getAdjustedStartDate('UTC') ).strftime( "%m/%d/%Y %H:%M:%S" )
@@ -491,11 +545,17 @@ class CSBooking(CSBookingBase):
             try:
                 if dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8') != str(oldArguments[key]) and key in verboseKeyNames:
                     changesFromWebEx.append(verboseKeyNames[key] + ": " + dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8'))
+                    if key == "meet:confName":
+                        self._bookingParams["meetingTitle"] = dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8')
+                    elif key == "meet:agenda":
+                        self._bookingParams["meetingDescription"] = dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8')
+
                     Logger.get('WebEx').info( "WebEx Val: '" + dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8') + "' and local:'" + str(oldArguments[key]) ) 
             except:
                 Logger.get('WebEx').info( "caught exception on: " + key )
                 pass
         self._phoneNum = dom.getElementsByTagName( "serv:tollFreeNum" )[0].firstChild.toxml('utf-8') 
+        self._phoneNumToll = dom.getElementsByTagName( "serv:tollNum" )[0].firstChild.toxml('utf-8') 
         
         #We calculate the time from WebEx first assuming it is in UTC.
         #If not, we then apply the offset to keep it simple
@@ -512,20 +572,14 @@ class CSBooking(CSBookingBase):
             WE_time = calc_time + timedelta( minutes= -1*int( time_offset_mins ) ) 
             if time_discrepancy == True:
                 Logger.get('WebEx').info( "webex time with offset in event time zone: " + getAdjustedDate(WE_time, tz=self._conf.getTimezone()).strftime("%m/%d/%Y %H:%M:%S") )
-                changesFromWebEx.append("Updated time to match WebEx time (displayed in event timezone) <br/>Start: " \
-                    + getAdjustedDate(WE_time, tz=self._conf.getTimezone()).strftime("%m/%d/%Y %H:%M:%S") \
-                    + "<br/>End: " \
-                    + (getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )).strftime("%m/%d/%Y %H:%M:%S") )  
+#                changesFromWebEx.append("Updated time to match WebEx time (displayed in event timezone) <br/>Start: " \
+#                    + getAdjustedDate(WE_time, tz=self._conf.getTimezone()).strftime("%m/%d/%Y %H:%M:%S") \
+#                    + "<br/>End: " \
+#                    + (getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )).strftime("%m/%d/%Y %H:%M:%S") )  
             self._startDate = getAdjustedDate(WE_time, tz=self._conf.getTimezone())
             self._endDate = getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )
 
-####################
-####################
-## INSERT THE CORRECT MAILING CODE HERE
-#        if time_discrepancy == True:
-####################
-####################
-
         self.checkCanStart()
-        self._changesFromWebEx = changesFromWebEx
+#        self._changesFromWebEx = changesFromWebEx
+        self._bookingChangesHistory = changesFromWebEx
 

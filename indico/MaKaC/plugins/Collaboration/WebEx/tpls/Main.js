@@ -1,11 +1,7 @@
 {
     start : function(booking, iframeElement) {
-        if (Browser.IE) {
-            var popup = new WebExLaunchClientPopup(booking.url);
+            var popup = new WebExLaunchClientPopup(booking.startURL);
             popup.open();
-        } else {
-            iframeElement.location.href = booking.url;
-        }
     },
         
     checkStart : function(booking) {
@@ -32,12 +28,12 @@
                 
                 // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
                 if (startDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("Start date cannot be <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                    errors.push($T("Start date cannot be more than <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
                 
                 // check start date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
                 if (startDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("Start date cannot be <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                    errors.push($T("Start date cannot be more than <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
                 
                 // check start date is not after end date, if end date exists
@@ -62,12 +58,12 @@
               
                 // check end date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
                 if (endDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("End date cannot be <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                    errors.push($T("End date cannot be more than <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
                 
                 // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
                 if (endDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("End date cannot be <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                    errors.push($T("End date cannot be more than <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
               
                 // check start date is not after end date, if start date exists
@@ -246,7 +242,7 @@
             var participant = participants.item(i).get();
             if ( !( /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test( participant.get("email") )) )
             {
-                CSErrorPopup("Invalid participants", ["The participant " + (i + 1) + " does has an invalid email address"]);
+                CSErrorPopup("Invalid participants", ["The participant " + (i + 1) + " has an invalid email address"]);
                 errors = true;
             }
             

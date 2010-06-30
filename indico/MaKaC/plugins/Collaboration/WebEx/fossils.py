@@ -23,6 +23,9 @@ from MaKaC.common.fossilize import IFossil
 
 
 class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
+    def getStartURL(self):
+        pass
+
     def getUrl(self):
         pass
 

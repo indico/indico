@@ -20,6 +20,9 @@
 """
 These functions are designed to make changes on the WebEx server. 
 They do not modify any of the booking parameters themselves.  
+(Except after the booking is created, we DO save the WebEx ID (meeting key)
+and the auto-join URL, because we have no way to keep track of that booking
+on the WebEx server otherwise...) 
 """
 
 
@@ -104,6 +107,7 @@ class WebExOperations(object):
                 booking.setWebExKey( dom.getElementsByTagName( "meet:meetingkey" )[0].firstChild.toxml('utf-8') )
                 booking._url = dom.getElementsByTagName( "serv:attendee" )[0].firstChild.toxml('utf-8')
                 booking._startURL = dom.getElementsByTagName( "serv:host" )[0].firstChild.toxml('utf-8') 
+                booking._checkStatus()
                 #Check if they left the trialing slash in the base URL we need
 #                if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
 #                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=JM&MK=' + booking._webExKey
@@ -133,15 +137,15 @@ class WebExOperations(object):
         	               """Could not send NewWebExMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
         	               (booking.getId(), booking.getConference().getId(), str(e)))
                     
-            if booking._bookingParams["sendMailToManagers"]:
-                try:
-                    notification = NewWebExMeetingNotificationManager(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                             booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('WebEx').error(
-                        """Could not send NewEVOMeetingNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
+#            if booking._bookingParams["sendMailToManagers"]:
+#                try:
+#                    notification = NewWebExMeetingNotificationManager(booking)
+#                    GenericMailer.sendAndLog(notification, booking.getConference(),
+#                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+#                                             booking.getConference().getCreator())
+#                except Exception, e:
+#                    Logger.get('WebEx').error(
+#                        """Could not send NewEVOMeetingNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
         except WebExControlledException, e:
             Logger.get('WebEx').debug( "caught exception in function _create" )
             raise WebExException(_("The booking could not be created due to a problem with the WebEx Server\n.It sent the following message: ") + e.message, e)
@@ -232,15 +236,15 @@ class WebExOperations(object):
                     Logger.get('WebEx').error(
         	               """Could not send WebExMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
         	               (booking.getId(), booking.getConference().getId(), str(e)))
-            if booking._bookingParams["sendMailToManagers"]:
-                try:
-                    notification = WebExMeetingModifiedNotificationManager(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                         booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('WebEx').error(
-                        """Could not send WebExMeetingModifiedNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
+#            if booking._bookingParams["sendMailToManagers"]:
+#                try:
+#                    notification = WebExMeetingModifiedNotificationManager(booking)
+#                    GenericMailer.sendAndLog(notification, booking.getConference(),
+#                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+#                                         booking.getConference().getCreator())
+#                except Exception, e:
+#                    Logger.get('WebEx').error(
+#                        """Could not send WebExMeetingModifiedNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
                 
         except WebExControlledException, e:
             raise WebExException(_("The booking could not be modified due to a problem with the WebEx Server.\n") )
@@ -307,15 +311,15 @@ class WebExOperations(object):
                         """Could not send notification emails for booking with id %s of event with id %s, exception: %s""" %
                         (booking.getId(), booking.getConference().getId(), str(e)))
                
-                if booking._bookingParams["sendMailToManagers"]:
-                    try:
-                        notification = WebExMeetingRemovalNotificationManager(booking)
-                        GenericMailer.sendAndLog(notification, booking.getConference(),
-                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                                             booking.getConference().getCreator())
-                    except Exception,e:
-                        Logger.get('WebEx').error(
-                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
+#                if booking._bookingParams["sendMailToManagers"]:
+#                    try:
+#                        notification = WebExMeetingRemovalNotificationManager(booking)
+#                        GenericMailer.sendAndLog(notification, booking.getConference(),
+#                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+#                                             booking.getConference().getCreator())
+#                    except Exception,e:
+#                        Logger.get('WebEx').error(
+#                            """Could not send EVOMeetingRemovalNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
         return None
 
 
