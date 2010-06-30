@@ -7375,7 +7375,9 @@ class WConfModifContribList(wcomponents.WTemplated):
             sdate=contrib.getAdjustedStartDate().strftime("%d-%b-%Y %H:%M" )
         title = """<a href=%s>%s</a>"""%( quoteattr( str( urlHandlers.UHContributionModification.getURL( contrib ) ) ), self.htmlText( contrib.getTitle() ))
         strdur = ""
-        if contrib.getDuration() is not None and contrib.getDuration().seconds != 0:
+        if contrib.getSession() and contrib.getSession()._ttType == 'poster':
+            strdur = 'poster'
+        elif contrib.getDuration() is not None and contrib.getDuration().seconds != 0:
             strdur = (datetime(1900,1,1)+ contrib.getDuration()).strftime("%Hh%M'")
             dur = contrib.getDuration()
             self._totaldur = self._totaldur + dur

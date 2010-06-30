@@ -58,10 +58,12 @@
 			    </table>
 			</td>
 		    </tr>
+            <% if sessionType != "poster": %>
 		    <tr>
 		        <td align="right" valign="top" class="displayField"><b><%= _("Duration")%>:</b></td>
 			<td width="100%%">%(duration)s</td>
 		    </tr>
+            <% end %>
 					%(contribType)s
 					%(primaryAuthors)s
 					%(coAuthors)s

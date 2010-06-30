@@ -376,8 +376,8 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                        info.accessor('title'))
                 ],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
-                daySelect,
-                startTimeLine,
+                this.timetable.isPoster?Html.div({}):daySelect,
+                this.timetable.isPoster?Html.div({}):startTimeLine,
                 [$T('Presenter(s)'), presListWidget.draw()]
             ]);
 
@@ -571,7 +571,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                  }
              };
          this.startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
-         this.timeField = IndicoUI.Widgets.Generic.durationField(20);
+         this.timeField = IndicoUI.Widgets.Generic.durationField(this.timetable.isPoster?1:20);
 
          var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
 

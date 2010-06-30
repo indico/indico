@@ -273,7 +273,7 @@ type("TimetableManagementActions", [], {
         }
 
         if (this._allowCreateHere('Contribution')){
-            menuItems[$T('Contribution')] = function() { self.addContribution(); };
+            menuItems[target.isPoster?$T('Poster'):$T('Contribution')] = function() { self.addContribution(); };
         }
 
         if (this._allowCreateHere('Break')){

@@ -281,6 +281,10 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         import contributionReviewing
         vars["reviewingStuffDisplay"]= contributionReviewing.WContributionReviewingDisplay(self._contrib).getHTML({"ShowReviewingTeam" : False})
         vars["reviewingHistoryStuffDisplay"]= contributionReviewing.WContributionReviewingHistory(self._contrib).getHTML({"ShowReviewingTeam" : False})
+        if self._contrib.getSession():
+            vars["sessionType"] = self._contrib.getSession()._ttType
+        else:
+            vars["sessionType"] = 'none'
         return vars
 
 
@@ -752,6 +756,10 @@ class WContribModifMain(wcomponents.WTemplated):
             vars["withdrawDisabled"]=True
         vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._contrib,"contribution").getHTML()
         vars["keywords"]=self._contrib.getKeywords()
+        if self._contrib.getSession():
+            vars["sessionType"] = self._contrib.getSession()._ttType
+        else:
+            vars["sessionType"] = 'none'
         return vars
 
 
@@ -1343,6 +1351,10 @@ class WContributionDataModification(wcomponents.WTemplated):
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
+        if self._contrib.getSession():
+            vars["sessionType"] = self._contrib.getSession()._ttType
+        else:
+            vars["sessionType"] = 'none'
         return vars
 
 

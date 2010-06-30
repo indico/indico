@@ -859,7 +859,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     style: {fontWeight: 'normal'}},
                     value.title) :
                     Html.span({}, value.title);
-                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.r ? '-' : value.startDate.time.substr(0,5)),
+                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.r || self.eventData.isPoster ? '-' : value.startDate.time.substr(0,5)),
                                              Html.td('timetablePopupContributionTitle', element)));
             }
         });
@@ -1690,11 +1690,10 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
                 var entryTools = Html.div({style:{cssFloat: "right"}},editLink," | ",deleteLink);
                 var entryInfo = Html.div({},blockData.contributionId + " - " + blockData.title );
-                var timeDiv = Html.div("posterBlockTime", blockData.startDate.time.substring(0,5) +' - '+ blockData.endDate.time.substring(0,5));
                 var block = Html.div({className:'posterEntry'},
                     entryTools,
                     entryInfo,
-                    Html.div({},timeDiv));
+                    Html.div({}));
                 blockDiv.append(block);
                 self.blocks.push(block);
             });

@@ -1133,7 +1133,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
          this.IntervalTimeTableMixin(parent, width, wrappingElement, managementActions);
 
          this.canvas = Html.div({});
-
+         this.isPoster = contextInfo.isPoster;
 
          this.setData = IntervalTimeTableMixin.prototype.setData;
          this.getById = IntervalTimeTableMixin.prototype.getById;

@@ -58,10 +58,12 @@
 		      <% end %>
 		    </td>
                 </tr>
+                <% if sessionType != "poster": %>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Duration")%></span</td>
                     <td bgcolor="white" class="blacktext">%(duration)s</td>
                 </tr>
+                <% end %>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Type")%></span</td>
                     <td bgcolor="white" class="blacktext">%(type)s</td>

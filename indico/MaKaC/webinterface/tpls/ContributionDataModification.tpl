@@ -35,12 +35,14 @@
 	  </td>
 	  <td><span id="dateTime"></span></td>
 	</tr>
+    <% if sessionType != 'poster': %>
 	<tr>
 	  <td style="text-align: right;">
 	    <span class="titleCellFormat"><%= _("Duration")%></span>
 	  </td>
 	  <td><span id="duration"></span></td>
 	</tr>
+    <% end %>
         <% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, parentRoomInfo=roomInfo(self._rh._target, level='inherited'), showParent=True) %>
 
 
@@ -73,9 +75,10 @@ $E('dateTime').set(dateTime)
 <% else: %>
 $E('dateTime').set('Not scheduled')
 <% end %>
-
-var duration = IndicoUI.Widgets.Generic.durationField('<%= duration %>', {name: 'duration'});
-$E('duration').set(duration)
+<% if sessionType != 'poster': %>
+    var duration = IndicoUI.Widgets.Generic.durationField('<%= duration %>', {name: 'duration'});
+    $E('duration').set(duration)
+<% end %>
 
 injectValuesInForm($E('ContributionDataModificationForm'));
 
