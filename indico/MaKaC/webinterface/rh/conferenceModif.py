@@ -7630,7 +7630,7 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
         self._assign2Contribution = websession.getVar( "assign2Contribution" ) # Contribution or None
         self._assign2Conference = None
         if not self._assign2Session  and  not self._assign2Contribution:
-            if self._conf  and  websession.getVar( "dontAssign" ) != "True": # 'True' or None
+            if self._conf  and  websession.getVar( "dontAssign" ) != True: # True or None
                 self._assign2Conference = self._conf
 
         self._setMenuStatus( params )
@@ -7652,9 +7652,10 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
 
             # Set room for event / session / contribution (always only _one_ available)
             assign2 = self._assign2Conference or self._assign2Contribution or self._assign2Session
-            croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
-            croom.setName( self._candResv.room.name )
-            assign2.setRoom( croom )
+            if assign2:
+                croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
+                croom.setName( self._candResv.room.name )
+                assign2.setRoom( croom )
 
             # Redirect
             self._candResv.setOwner( self._conf )
