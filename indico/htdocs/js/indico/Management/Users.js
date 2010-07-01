@@ -298,7 +298,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
      */
     draw: function() {
         return this.SimpleSearchPanel.prototype.draw.call(this);
-    },
+    }
 },
 
     /**
