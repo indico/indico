@@ -34,15 +34,21 @@ from MaKaC.common.timezoneUtils import nowutc, naive2local, getAdjustedDate
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import WebExControlledException, WebExException,\
     getMinStartDate, getMaxEndDate, Participant, sendXMLRequest, \
-    WebExError, getWebExOptionValueByName, makeTime, findDuration
+    WebExError, getWebExOptionValueByName, makeTime, findDuration, unescape
 from MaKaC.plugins.Collaboration.WebEx.api.operations import WebExOperations
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.common.Counter import Counter
+from MaKaC.common.mail import GenericMailer
+from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAdmin, \
+    WebExMeetingModifiedNotificationAdmin, WebExMeetingRemovalNotificationAdmin, \
+    NewWebExMeetingNotificationManager, WebExMeetingModifiedNotificationManager,\
+    WebExMeetingRemovalNotificationManager, WebExParticipantNotification
 
 from MaKaC.plugins.Collaboration.WebEx.fossils import ICSBookingIndexingFossil, ICSBookingConfModifFossil
 from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
+#from MaKaC.errors import TimingError
 from cgi import escape
 
 class CSBooking(CSBookingBase):
@@ -61,14 +67,12 @@ class CSBooking(CSBookingBase):
 
     _needsBookingParamsCheck = True
     _needsToBeNotifiedOnView = True
-    _needsToBeNotifiedOfDateChanges = True
-    _canBeNotifiedOfEventDateChanges = True
+#    _canBeNotifiedOfEventDateChanges = True
     _allowMultiple = True 
 
     _hasEventDisplay = True
 
     _commonIndexes = ["All Videoconference"]
-    _bookingChangesHistory = []
 
     _simpleParameters = {
             "meetingTitle": (str, ''),
@@ -97,6 +101,7 @@ class CSBooking(CSBookingBase):
 
         self._lastCheck = nowutc()
         self._checksDone = []
+        self._bookingChangesHistory = []
         
     def getParticipantList(self, sorted = False):
         Logger.get('WebEx').debug( "In getParticipantList" )
@@ -231,13 +236,6 @@ class CSBooking(CSBookingBase):
         if self.getAdjustedEndDate() > maxEndDate:
             raise WebExException("Cannot create a booking %s minutes after before the Indico event's end date. Please create it before %s"%(self._WebExOptions["allowedMinutes"].getValue(), formatDateTime(maxEndDate)))
         
-        if False: #for now, we don't detect overlapping
-            for booking in self.getBookingsOfSameType():
-                if self._id != booking.getId():
-                    if not ((self._startDate < booking.getStartDate() and self._endDate <= booking.getStartDate()) or
-                            (self._startDate >= booking.getEndDate() and self._endDate > booking.getEndDate())):
-                        return OverlappedError(booking)
-        
         return False
 
     def getWebExTimeZoneToUTC( self, tz_id, the_date ):
@@ -291,7 +289,6 @@ class CSBooking(CSBookingBase):
         if self._created:
             now = nowutc()
             self._canBeDeleted = True
-            self._canBeNotifiedOfEventDateChanges = CSBooking._canBeNotifiedOfEventDateChanges
 #            if self.getStartDate() - timedelta(minutes=self._WebExOptions["allowedMinutes"].getValue()) < now and self.getEndDate() + timedelta(self._WebExOptions["allowedMinutes"].getValue()) > now:
             if self.getStartDate() < now and self.getEndDate() > now:
                 self._canBeStarted = True
@@ -306,7 +303,6 @@ class CSBooking(CSBookingBase):
                     self._statusMessage = _("Already took place")
                     self._statusClass = "statusMessageOther"
                     self._needsToBeNotifiedOfDateChanges = False
-                    self._canBeNotifiedOfEventDateChanges = False
                 elif changeMessage:
                     self.bookingOK()
 
@@ -316,6 +312,8 @@ class CSBooking(CSBookingBase):
         params = self.getBookingParams()
         self.setAccessPassword( params['accessPassword'] )
         self._duration = findDuration( self.getAdjustedStartDate('UTC'), self.getAdjustedEndDate('UTC') )
+#        self._originalDuration = self._duration
+#        self._offsetFromEventStart = findDuration( self._conf.getAdjustedStartDate('UTC'), self.getAdjustedEndDate('UTC') ) 
 
 #        Logger.get('WebEx').info("sendemail to attendees: %s" % params['sendAttendeesEmail'])
         result = ExternalOperationsManager.execute(self, "createBooking", WebExOperations.createBooking, self)
@@ -326,8 +324,18 @@ class CSBooking(CSBookingBase):
         self.checkCanStart()
         return None
 
+    def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
+#        self._startDate = self.getAdjustedStartDate('UTC') + timedelta( minutes=int( self._offsetFromEventStart ) )
+#        self._endDate = self.getAdjustedStartDate('UTC') + timedelta( minutes=int( self._originalDuration ) )
+#        result = ExternalOperationsManager.execute(self, "modifyBooking", WebExOperations.modifyBooking, self)
+#getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )
+#        result = ExternalOperationsManager.execute(self, "createBooking", WebExOperations.createBooking, self)
+        Logger.get('WebEx').debug( "In notifyEventDateChanges" )
+        Logger.get('WebEx').info( "%s %s %s %s" % (oldStartDate, newStartDate, oldEndDate, newEndDate) )
+
+
     def _modify(self, oldBookingParams):
-        """ Modifies a booking in the EVO server if all conditions are met.
+        """ Modifies a booking in the WebEx server if all conditions are met.
         """
         verboseKeyNames = {
             "meetingDescription": "Meeting description",
@@ -379,6 +387,7 @@ class CSBooking(CSBookingBase):
 #                    Logger.get('WebEx').debug( "Error on key name in modify:\n\n%s" % ( key ) )
             result = ExternalOperationsManager.execute(self, "modifyBooking", WebExOperations.modifyBooking, self)
             if isinstance(result, WebExError):
+#                raise TimingError("The WebEx system was not able to perform the booking modification")
                 return WebExError( errorType = None, userMessage = "The booking appears to have not been created according to the Indico system" )
                 #Logger.get('WebEx').debug( "returning error" )
                 #return result
@@ -387,8 +396,8 @@ class CSBooking(CSBookingBase):
         return None
 
     def _start(self):
-        """ Starts an EVO meeting.
-            A last check on the EVO server is performed.
+        """ Starts an WebEx meeting.
+            A last check on the WebEx server is performed.
         """
         self._checkStatus()
         if self._canBeStarted:
@@ -478,7 +487,7 @@ class CSBooking(CSBookingBase):
                 self.assignAttributes( response_xml )
 
             except WebExControlledException, e:                
-                raise WebExException(_("Information could not be retrieved due to a problem with the EVO Server\n.The EVO Server sent the following error message: ") + e.message, e)
+                raise WebExException(_("Information could not be retrieved due to a problem with the WebEx Server\n.The WebEx Server sent the following error message: ") + e.message, e)
             return None
 
     def _delete(self):
@@ -487,8 +496,8 @@ class CSBooking(CSBookingBase):
         """
         result = ExternalOperationsManager.execute(self, "deleteBooking", WebExOperations.deleteBooking, self)
         if isinstance(result, WebExError):
-            return result
-        
+            return None
+        self.warning = "The booking was deleted successfully."
         
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
@@ -542,12 +551,12 @@ class CSBooking(CSBookingBase):
                         Logger.get('WebEx').info( user_msg )
                 continue
             try:
-                if dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8') != str(oldArguments[key]) and key in verboseKeyNames:
+                if unescape(dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8')) != unescape(str(oldArguments[key])) and key in verboseKeyNames:
                     changesFromWebEx.append(verboseKeyNames[key] + ": " + dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8'))
                     if key == "meet:confName":
-                        self._bookingParams["meetingTitle"] = dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8')
+                        self._bookingParams["meetingTitle"] = unescape(dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8'))
                     elif key == "meet:agenda":
-                        self._bookingParams["meetingDescription"] = dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8')
+                        self._bookingParams["meetingDescription"] = unescape(dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8'))
 
                     Logger.get('WebEx').info( "WebEx Val: '" + dom.getElementsByTagName( key )[0].firstChild.toxml('utf-8') + "' and local:'" + str(oldArguments[key]) ) 
             except:
@@ -580,4 +589,41 @@ class CSBooking(CSBookingBase):
 
         self.checkCanStart()
         self._bookingChangesHistory = changesFromWebEx
+    def _sendMail(self, operation):
+        """
+        Overloads _sendMail behavior for WebEx
+        """
+
+        if operation == 'new':
+            try:
+                notification = NewWebExMeetingNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+                                         self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('WebEx').error(
+                    """Could not send NewWebExMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+        elif operation == 'modify':
+            try:
+                notification = WebExMeetingModifiedNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+                                         self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('WebEx').error(
+                    """Could not send WebExMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
+
+        elif operation == 'remove':
+            try:
+                notification = WebExMeetingRemovalNotificationAdmin(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+                                         self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('WebEx').error(
+                    """Could not send WebExMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+                    (self.getId(), self.getConference().getId(), str(e)))
 

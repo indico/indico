@@ -128,16 +128,17 @@ class WebExOperations(object):
                 errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
                 return WebExError( errorID, userMessage = errorReason )
 
-            if MailTools.needToSendEmails('WebEx'):
-                try:
-                    notification = NewWebExMeetingNotificationAdmin(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                            booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('WebEx').error(
-        	               """Could not send NewWebExMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-        	               (booking.getId(), booking.getConference().getId(), str(e)))
+####### Replaces by the sendEmail function
+#            if MailTools.needToSendEmails('WebEx'):
+#                try:
+#                    notification = NewWebExMeetingNotificationAdmin(booking)
+#                    GenericMailer.sendAndLog(notification, booking.getConference(),
+#                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+#                            booking.getConference().getCreator())
+#                except Exception, e:
+#                    Logger.get('WebEx').error(
+#        	               """Could not send NewWebExMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+#        	               (booking.getId(), booking.getConference().getId(), str(e)))
                     
 #            if booking._bookingParams["sendMailToManagers"]:
 #                try:
@@ -229,17 +230,21 @@ class WebExOperations(object):
                 if len(recipients)>0:
                     notification = WebExParticipantNotification( booking, recipients, 'modify' )
                     GenericMailer.send( notification )
-            if MailTools.needToSendEmails('WebEx'):
-                Logger.get('WebEx').info("We need to alert WebEx admins; attempting to send emails")
-                try:
-                    notification = WebExMeetingModifiedNotificationAdmin(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                            booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('WebEx').error(
-        	               """Could not send WebExMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-        	               (booking.getId(), booking.getConference().getId(), str(e)))
+######### Replaced by sendEmail function
+#            if MailTools.needToSendEmails('WebEx'):
+#                Logger.get('WebEx').info("We need to alert WebEx admins; attempting to send emails")
+#                try:
+#                    notification = WebExMeetingModifiedNotificationAdmin(booking)
+#                    GenericMailer.sendAndLog(notification, booking.getConference(),
+#                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+#                            booking.getConference().getCreator())
+#                except Exception, e:
+#                    Logger.get('WebEx').error(
+#        	               """Could not send WebExMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+#        	               (booking.getId(), booking.getConference().getId(), str(e)))
+
+
+
 #            if booking._bookingParams["sendMailToManagers"]:
 #                try:
 #                    notification = WebExMeetingModifiedNotificationManager(booking)
@@ -256,7 +261,6 @@ class WebExOperations(object):
 
     @classmethod
     def deleteBooking( cls, booking ):
-        booking._warning = WebExWarning( "a test of the warning system" )
         params = booking.getBookingParams()
         request_xml = """<?xml version="1.0" encoding="ISO-8859-1"?>
 <serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -282,23 +286,25 @@ class WebExOperations(object):
         if status != "SUCCESS":
             errorID = dom.getElementsByTagName( "serv:exceptionID" )[0].firstChild.toxml('utf-8')
             errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
+            booking._warning = WebExWarning( "WebEx error reported: %s" % errorReason )
             Logger.get('WebEx').info( "In delete function, appears to have failed: %s" % response_xml )
             return WebExError( errorID, userMessage = errorReason )
         else:
             Logger.get('WebEx').info( "In delete function, appears to have been successful" )
 
         if booking._created:
-            if MailTools.needToSendEmails('WebEx'):
-                Logger.get('WebEx').info("We need to alert WebEx admins; attempting to send emails")
-                try:
-                    notification = WebExMeetingRemovalNotificationAdmin(booking)
-                    GenericMailer.sendAndLog(notification, booking.getConference(),
-                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-                            booking.getConference().getCreator())
-                except Exception, e:
-                    Logger.get('WebEx').error(
-        	               """Could not send WebExMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-        	               (booking.getId(), booking.getConference().getId(), str(e)))
+####### Replaced by sendEmail function in collaboartion
+#            if MailTools.needToSendEmails('WebEx'):
+#                Logger.get('WebEx').info("We need to alert WebEx admins; attempting to send emails")
+#                try:
+#                    notification = WebExMeetingRemovalNotificationAdmin(booking)
+#                    GenericMailer.sendAndLog(notification, booking.getConference(),
+#                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
+#                            booking.getConference().getCreator())
+#                except Exception, e:
+#                    Logger.get('WebEx').error(
+#        	               """Could not send WebExMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
+#        	               (booking.getId(), booking.getConference().getId(), str(e)))
             if True:
                 try:
                     Logger.get('WebEx').info("I am in the mailer block")

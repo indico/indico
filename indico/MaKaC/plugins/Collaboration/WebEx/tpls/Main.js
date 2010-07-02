@@ -261,7 +261,7 @@
     
     postDelete: function(booking) {
         if (booking.warning) {
-            var popup = new AlertPopup("Booking deletion", Html.span({},"The booking was deleted successfully from Indico.", Html.br(), booking.message ));
+            var popup = new AlertPopup("Booking deletion", Html.span({},booking.warning.message, Html.br(), booking.message ));
                 popup.open();
         }
     }

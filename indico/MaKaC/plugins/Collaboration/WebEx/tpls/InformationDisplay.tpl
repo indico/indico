@@ -20,6 +20,14 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
+                <span><%= _('Call in number')%>:</span>
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <%= Booking._bookingParams["meetingDescription"] %>      
+            </td>
+        </tr>
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
                 <span><%= _('Join URL')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">

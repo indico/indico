@@ -39,6 +39,14 @@ from MaKaC.plugins.Collaboration.WebEx.fossils import IWebExWarningFossil, IWebE
     IChangesFromWebExErrorFossil, IParticipantFossil
 from cgi import escape
 
+def unescape(s):
+    s = s.replace("&lt;","<")
+    s = s.replace("&gt;",">")
+    s = s.replace("&apos;","'")
+    s = s.replace("&quot;",'"')
+    s = s.replace("&amp;","&")
+    return s
+
 def sendXMLRequest(xml):  
     conn = httplib.HTTPSConnection( getWebExOptionValueByName("WEhttpServerLocation") )
     conn.request( "POST", "/WBXService/XMLService", xml )
