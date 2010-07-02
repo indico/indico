@@ -27,7 +27,7 @@
         <% end %>
 
 	<script type="text/javascript">
-	  currentLanguage = '<%= language %>';
+	  var currentLanguage = '<%= language %>';
 	  loadDictionary(currentLanguage);
 	</script>
 
