@@ -432,7 +432,6 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          this.selected = new WatchValue();
          // Load data source on startup
          this.InlineRemoteWidget(method, args, true);
-         this.loadOnStartup = false;
      });
 
 

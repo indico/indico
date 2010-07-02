@@ -120,7 +120,7 @@
                                         }
                                     );
                             });
-                            setTimeout("$E('roomChooser').set(roomChooser.draw(),addRoomButton);",500);
+                            $E('roomChooser').set(roomChooser.draw(),addRoomButton);
                             $E('roomAddButton').set();
                         <% end %>
                     </script>
