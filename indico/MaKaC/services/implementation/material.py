@@ -2,19 +2,17 @@
 Schedule-related services
 """
 
-import MaKaC.conference as conference
-
-from MaKaC.common.PickleJar import DictPickler
-import MaKaC.webinterface.locators as locators
-from MaKaC.user import AvatarHolder, GroupHolder
-
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.implementation.base import \
+     ParameterManager, ProtectedModificationService, ProtectedDisplayService
 
-from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.implementation.base import ProtectedModificationService
-from MaKaC.services.implementation.base import ProtectedDisplayService
+import MaKaC.webinterface.locators as locators
 from MaKaC.errors import ModificationError, MaKaCError
+
+import MaKaC.conference as conference
+from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.fossilize import fossilize
+from MaKaC.common.PickleJar import DictPickler
 
 
 class UserListChange(object):
@@ -31,7 +29,9 @@ class UserListChange(object):
                 del newList[user.getId()]
 
         for elem in newList:
-            if 'isGroup' in elem and elem['isGroup']:
+            # TODO: Change this, when DictPickler goes away
+            if ('isGroup' in elem and elem['isGroup']) or \
+                   ('_fossil' in elem and elem['_fossil'] == 'group'):
                 avatar = GroupHolder().getById(elem['id'])
             else:
                 avatar = AvatarHolder().getById(elem['id'])
@@ -103,7 +103,8 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
                 owner.canUserSubmit(self._aw.getUser())):
                 # Submitters have access
                 return
-            elif owner.getSession() and owner.getSession().canCoordinate(self._aw, "modifContribs"):
+            elif owner.getSession() and \
+                     owner.getSession().canCoordinate(self._aw, "modifContribs"):
                 # Coordinators of the parent session have access
                 return
 
@@ -117,7 +118,9 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
         try:
             ProtectedModificationService._checkProtection(self)
         except ModificationError:
-            raise ServiceAccessError("ERR-P5", _("you are not authorised to manage material for this contribution"))
+            raise ServiceAccessError("ERR-P5",
+                                     _("you are not authorised to manage material "
+                                       "for this contribution"))
         except Exception, e:
             raise e
 
@@ -228,7 +231,9 @@ class GetMaterialAllowedUsers(MaterialModifBase):
         #will use IAvatarFossil or IGroupFossil
         allowedAccesList = fossilize(self._material.getAllowedToAccessList())
         if self._includeFavList and self._user:
-            favList = fossilize(self._user.getPersonalInfo().getBasket().getUsers().values())
+            favList = fossilize(
+                self._user.getPersonalInfo().getBasket().getUsers().values())
+
             return [allowedAccesList, favList]
         else:
             return allowedAccesList
@@ -243,9 +248,10 @@ class GetMaterialProtection(MaterialModifBase):
         try:
             materialId = self._target.getMaterialById(self._params['matId'])
         except:
-        #it's not in the material list, we return the parent's level of protection
-        #WATCH OUT! This is the default value to inherit from parent in Editor.js, if that value is changed
-        #for any reason this function may not work properly
+            # it's not in the material list, we return the parent's level of protection
+            # WATCH OUT! This is the default value to inherit from parent in Editor.js.
+            # if that value is changed for any reason this function may not
+            # work properly
             return 0
         else:
             return materialId.getAccessProtectionLevel()
@@ -391,6 +397,7 @@ methodMap = {
 
     # Resource add is quite hacky, and uses a normal RH, because of file upload
     # So, you won't find it here...
+
     "resources.listAllowedUsers": GetResourceAllowedUsers,
     "resources.list": GetResourcesBase,
     "resources.edit": EditResourceBase,
