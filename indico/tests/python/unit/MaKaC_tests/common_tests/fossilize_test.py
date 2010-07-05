@@ -124,6 +124,9 @@ class ComplexClass(Fossilizable):
     def getSimpleInstance(self):
         return self.simpleInstance
 
+class IterableWrapper(object):
+    def __init__(self, *content):
+        self.onlyAttribute = list(content)
 
 class ConversionClass(object):
     @classmethod
@@ -287,6 +290,14 @@ class TestFossilize(unittest.TestCase):
         s1 = SimpleClass(10, 20, 'foo')
         self.assertEquals(s1.fossilize(IFossilWithProduceFossil),
                           {'_type': 'SimpleClass', '_fossil': 'fossilWithProduce', 'sum': 30, 'b': 20, 'c': 'FOO'})
+
+    def testFossilizeIterableWrapper(self):
+        "Iterable wrapper (legacy PersistentList, etc...)"
+
+        s1 = SimpleClass(10, 20, 'foo')
+        iterWrap = IterableWrapper(s1)
+        self.assertEquals(fossilize(iterWrap),
+                          [{'_fossil': 'simpleFossil1', 'c': 'FOO', 'b': 20, '_type': 'SimpleClass'}])
 
 
     def testFossilizeDefault(self):
