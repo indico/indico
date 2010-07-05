@@ -221,7 +221,7 @@ EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
 	        </b>
 	</xsl:when>
 	<xsl:otherwise>
-		<font face="times" size="+1"><xsl:number from="agenda" level="any" format="1. "/></font>
+		<font face="times" size="+1"><xsl:number from="session" level="any" format="1. "/></font>
 	</xsl:otherwise>
 	</xsl:choose>
         </td>
