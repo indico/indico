@@ -10,13 +10,11 @@
 
         <tr>
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> <%= _("Status")%></span></td>
-            <td bgcolor="white" width="65%%" class="blacktext"><b>%(status)s</b>
-                <input type="button"  id="toggleSimpleTextButton" class="btn" style="margin-left: 30px;" value="%(statusBtn)s">
-                <script type="text/javascript">
-                $E('toggleSimpleTextButton').observeClick(function() {
-                    window.location = <%= simpleTextURL %>
-                });
-                </script>
+            <td bgcolor="white" width="65%%" class="blacktext">
+                <form action=%(simpleTextURL)s method="POST">
+                    <b>%(status)s</b>
+                    <input type="submit"  id="toggleSimpleTextButton" class="btn" value="%(statusBtn)s">
+                </form>
             </td>
         </tr>
         <tr>
