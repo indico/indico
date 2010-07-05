@@ -58,5 +58,6 @@ FileTypes = {"DOC":  ["Ms Word","application/msword","word_big.png"],
              "MOV":  ["Quicktime Video","video/quicktime",""],
              "RTF":  ["RTF","application/rtf",""],
              "OGG":  ["Ogg/Theora Video","application/ogg",""],
-             "RSS":  ["RSS","application/xhtml+xml",""]}
+             "RSS":  ["RSS","application/xhtml+xml",""],
+             "MHT":  ["MHT", " message/rfc822", ""]}
 

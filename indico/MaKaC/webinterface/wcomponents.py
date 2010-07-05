@@ -3986,7 +3986,7 @@ class WSelectionBoxSubmitter:
         wc=WSelectionBox()
         p={
             "description":  _(""" _("Please check the box if you want to add them as submitters"):<br><br><i><font color=\"black\"><b> _("Note"): </b></font> _("If this person is not already a user they will be sent an email asking them to create an account. After their registration the user will automatically be given submission rights").</i><br>"""),\
-            "options":  _("""<input type="checkbox" name="submissionControl" value="speaker"> _("Add as submitter")
+            "options":  _("""<input type="checkbox" name="submissionControl" value="speaker" checked> _("Add as submitter")
                         """)
           }
         return wc.getHTML(p)

@@ -298,7 +298,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
      */
     draw: function() {
         return this.SimpleSearchPanel.prototype.draw.call(this);
-    },
+    }
 },
 
     /**
@@ -1431,6 +1431,10 @@ type("UserListField", ["IWidget"], {
         return $L(this.userList);
     },
 
+    clear: function() {
+        this.userList.clearList();
+    },
+
     getPrivileges: function() {
         return this.selectedPrivileges;
     },
@@ -1534,7 +1538,7 @@ type("UserListField", ["IWidget"], {
             }
             var key = keysList[i];
             var value = this.privileges[key];
-            var checkbox = Html.checkbox({id:key, name:key, style:{verticalAlign:"middle"}}, value[1]?value[1]:null);
+            var checkbox = Html.checkbox({id:key, style:{verticalAlign:"middle"}}, value[1]? value[1] : null);
             $B(this.selectedPrivileges.accessor(key), checkbox);
             privilegesDiv.append(Html.span({},checkbox, value[0] + comma));
         }

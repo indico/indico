@@ -68,21 +68,21 @@ class RHLoginStatus( RHXMLHandlerBase ):
             XG.writeTag("user-id", self._getSession().getUser().getId())
         XG.closeTag("login-status")
         XG.closeTag("response")
-        
+
         self._req.content_type = "text/xml"
         return XG.getXml()
-        
+
 
 class RHSignIn( RHXMLHandlerBase ):
-    
+
     def _checkParams( self, params ):
-        
+
         self._login = params.get( "login", "" ).strip()
         self._password = params.get( "password", "" ).strip()
-    
+
     def _process( self ):
 
-        li = LoginInfo( self._login, self._password )   
+        li = LoginInfo( self._login, self._password )
         auth = AuthenticatorMgr()
         av = auth.getAvatar(li)
         value = "OK"
@@ -106,7 +106,7 @@ class RHSignIn( RHXMLHandlerBase ):
 
 
 class RHSignOut( RHXMLHandlerBase ):
-    
+
     def _process( self ):
         if self._getUser():
             self._getSession().setUser( None )
@@ -121,6 +121,7 @@ class RHWebcastOnAir( RHXMLHandlerBase ):
         XG.writeTag("title",wc.getTitle())
         XG.writeTag("startDate",wc.getStartDate())
         XG.writeTag("id",wc.getId())
+        XG.writeTag("room",wc.getRoom())
         XG.closeTag("webcast")
 
     def _printStream( self, stream, XG ):
@@ -166,8 +167,9 @@ class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
         XG.writeTag("title",wc.getTitle())
         XG.writeTag("id",wc.getId())
         XG.writeTag("startDate",wc.getStartDate())
+        XG.writeTag("room",wc.getRoom())
         XG.closeTag("webcast")
-        
+
     def _process( self ):
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         XG = xmlGen.XMLGen()
@@ -186,7 +188,7 @@ class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
         XG.closeTag("response")
         self._req.content_type = "text/xml"
         return XG.getXml()
-    
+
 class RHSearch ( base.RHProtected, RHXMLHandlerBase ):
 
   def _stringToDatetime(self, source):
@@ -211,7 +213,7 @@ class RHSearch ( base.RHProtected, RHXMLHandlerBase ):
 
     if (attrName == None):
       attrName = "_" + paramName
-    try:    
+    try:
       if (self._extractParam(params, paramName, attrName)):
         setattr(self, attrName, self._stringToDatetime(getattr(self, attrName)))
     except:
@@ -242,8 +244,8 @@ class RHSearch ( base.RHProtected, RHXMLHandlerBase ):
         if j.getRoom() != None and j.getRoom().getName().lower().find(room.lower()) != -1:
           return True
     return False
-      
-    
+
+
 
   def _checkParams(self, params):
     base.RHProtected._checkParams(self, params)
@@ -386,7 +388,7 @@ class RHSearch ( base.RHProtected, RHXMLHandlerBase ):
     # A *preliminary* set of conference id's is created here
     # This set is constructed using indexes, without getting the Conference
     # objects from the DB.
- 
+
     listOfSets = []
 
     if self._startDateAt != None:
@@ -466,7 +468,7 @@ class RHSearch ( base.RHProtected, RHXMLHandlerBase ):
             og = outputGenerator(self.getAW(), XG)
             og._confToXML(c,{})
             XG.closeTag("event")
-            
+
       except KeyError:
         continue
 
@@ -475,14 +477,14 @@ class RHSearch ( base.RHProtected, RHXMLHandlerBase ):
     self._req.content_type = "text/xml"
 
     return XG.getXml()
-    
+
 class RHAddMaterialBase ( base.RHModificationBaseProtected, RHXMLHandlerBase ):
 
     def _checkParams(self, params):
         base.RHModificationBaseProtected._checkParams(self, params)
         self._title = params.get('title', 'video')
         self._value = params.get('value', '')
-        
+
     def _process(self):
         try:
             try:
@@ -600,7 +602,7 @@ class RHCreateEventBase ( base.RHProtected, RHXMLHandlerBase ):
             self._statusValue = "ERROR"
             self._message = "Internal error"
 
-        
+
 class RHCreateLecture ( RHCreateEventBase ):
 
     def _process(self):
@@ -616,7 +618,7 @@ class RHCreateLecture ( RHCreateEventBase ):
 
 
 class RHCategInfo( RHXMLHandlerBase ):
-    
+
     def _checkParams( self, params ):
         self._id = params.get( "id", "" ).strip()
         self._fp = params.get( "fp", "no" ).strip()
@@ -669,7 +671,7 @@ class RHStatsRoomBooking( base.RoomBookingDBMixin, RHXMLHandlerBase ):
         XG.writeTag("fullname", fullname)
         XG.writeTag("value", value)
         XG.closeTag("indicator")
-        
+
     def _process( self ):
         from MaKaC.rb_room import RoomBase
         from datetime import datetime,timedelta
@@ -679,11 +681,11 @@ class RHStatsRoomBooking( base.RoomBookingDBMixin, RHXMLHandlerBase ):
         today = startdt.date()
         startdt.replace( hour = 0, minute = 0)
         enddt.replace( hour = 23, minute = 59)
-        
+
         self._req.content_type = "text/xml"
         XG = xmlGen.XMLGen()
         XG.openTag("response")
-        
+
         rooms = RoomBase.getRooms()
         nbRooms = len(rooms)
         nbPublicRooms = nbPrivateRooms = nbSemiPrivateRooms = 0
@@ -694,7 +696,7 @@ class RHStatsRoomBooking( base.RoomBookingDBMixin, RHXMLHandlerBase ):
                 nbPublicRooms += 1
             else:
                 nbSemiPrivateRooms += 1
-                
+
         self._createIndicator(XG, "total", "total number of managed rooms", nbRooms)
         self._createIndicator(XG, "public", "number of public rooms", nbPublicRooms)
         self._createIndicator(XG, "semiprivate", "number of semi-private rooms", nbSemiPrivateRooms)
@@ -708,11 +710,11 @@ class RHStatsRoomBooking( base.RoomBookingDBMixin, RHXMLHandlerBase ):
         nbAVResvs = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
         resvex.needsAVCSupport = True
         nbAVResvsWithSupport = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
-        
+
         self._createIndicator(XG, "nbbookings", "total number of bookings for today", nbResvs)
         self._createIndicator(XG, "nbvc", "number of remote collaboration bookings (video or phone conference)", nbAVResvs)
         self._createIndicator(XG, "nbvcsupport", "number of remote collaboration bookings with planned IT support", nbAVResvsWithSupport)
-        
+
         XG.closeTag("response")
         return XG.getXml()
 
@@ -725,7 +727,7 @@ class RHStatsIndico( RHXMLHandlerBase ):
         XG.writeTag("fullname", fullname)
         XG.writeTag("value", value)
         XG.closeTag("indicator")
-        
+
     def _process( self ):
         from datetime import datetime,timedelta
         from MaKaC.common.indexes import IndexesHolder
@@ -733,7 +735,7 @@ class RHStatsIndico( RHXMLHandlerBase ):
         self._req.content_type = "text/xml"
         XG = xmlGen.XMLGen()
         XG.openTag("response")
-        
+
         now = startdt = enddt = datetime.now()
         today = startdt.date()
         startdt.replace( hour = 0, minute = 0)

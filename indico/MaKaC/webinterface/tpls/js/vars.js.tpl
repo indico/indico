@@ -120,7 +120,7 @@ var Indico = {
 
         Reschedule: "<%= urlHandlers.UHConfModifReschedule.getURL() %>",
         SlotCalc: "<%= urlHandlers.UHSessionModSlotCalc.getURL() %>",
-        FitSession: "<%= urlHandlers.UHSessionModFit.getURL() %>",
+        FitSessionSlot: "<%= urlHandlers.UHSessionFitSlot.getURL() %>",
 
         UploadAction: {
             subContribution: '<%= str(urlHandlers.UHSubContribModifAddMaterials.getURL()) %>',

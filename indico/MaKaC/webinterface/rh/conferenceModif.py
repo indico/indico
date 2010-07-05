@@ -796,7 +796,6 @@ class RHConfModifScheduleEntriesRemove(RHConferenceModifBase):
         self._redirect(urlHandlers.UHConfModifSchedule.getURL(self._conf))
 
 
-
 class RHScheduleDataEdit(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModScheduleDataEdit
 
@@ -7212,6 +7211,7 @@ class RHReschedule(RHConferenceModifBase):
         self._hour=params.get("hour","")
         self._minute=params.get("minute","")
         self._action=params.get("action","duration")
+        self._fit= params.get("fit","noFit") == "doFit"
         self._targetDay=params.get("targetDay",None) #comes in format YYYYMMDD, ex: 20100317
         if self._targetDay is None:
             raise MaKaCError( _("Error while rescheduling timetable: not target day"))
@@ -7235,7 +7235,7 @@ class RHReschedule(RHConferenceModifBase):
                 return p.display()
             else:
                 t=timedelta(hours=int(self._hour), minutes=int(self._minute))
-                self._conf.getSchedule().rescheduleTimes(self._action, t, self._day)
+                self._conf.getSchedule().rescheduleTimes(self._action, t, self._day, self._fit)
         self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay))
 
 class RHRelocate(RHConferenceModifBase):
@@ -7630,7 +7630,7 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
         self._assign2Contribution = websession.getVar( "assign2Contribution" ) # Contribution or None
         self._assign2Conference = None
         if not self._assign2Session  and  not self._assign2Contribution:
-            if self._conf  and  websession.getVar( "dontAssign" ) != "True": # 'True' or None
+            if self._conf  and  websession.getVar( "dontAssign" ) != True: # True or None
                 self._assign2Conference = self._conf
 
         self._setMenuStatus( params )
@@ -7642,6 +7642,9 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
         if self._thereAreConflicts:
             url = urlHandlers.UHConfModifRoomBookingBookingForm.getURL( self._candResv.room )
             self._redirect( url )
+        elif self._confirmAdditionFirst:
+            p = conferences.WPConfModifRoomBookingConfirmBooking( self )
+            return p.display()
         else:
             # Add it to event reservations list
             guid = ReservationGUID( Location.parse( self._candResv.locationName ), self._candResv.id )
@@ -7649,9 +7652,10 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
 
             # Set room for event / session / contribution (always only _one_ available)
             assign2 = self._assign2Conference or self._assign2Contribution or self._assign2Session
-            croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
-            croom.setName( self._candResv.room.name )
-            assign2.setRoom( croom )
+            if assign2:
+                croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
+                croom.setName( self._candResv.room.name )
+                assign2.setRoom( croom )
 
             # Redirect
             self._candResv.setOwner( self._conf )

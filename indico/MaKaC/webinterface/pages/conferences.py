@@ -3157,6 +3157,15 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         wc = self._getSchedule()
         return wc.getHTML(params)
 
+    def _getHeadContent( self ):
+
+        baseurl = self._getBaseURL()
+        return """
+        <!-- Lightbox -->
+        <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
+        <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
+        """ % ( baseurl, baseurl)
+
     def _getPageContent(self, params):
         return self._getTTPage(params)
 
@@ -11811,6 +11820,18 @@ class WPConfModifRoomBookingBookingForm( WPConfModifRoomBookingBase ):
         wc = wcomponents.WRoomBookingBookingForm( self._rh )
         return wc.getHTML( params )
 
+class WPConfModifRoomBookingConfirmBooking( WPConfModifRoomBookingBase ):
+
+    def __init__( self, rh ):
+        self._rh = rh
+        WPConfModifRoomBookingBase.__init__( self, rh, rh._conf)
+
+    def _setActiveTab( self ):
+        self._tabNewBooking.setActive()
+
+    def _getTabContent( self, params ):
+        wc = wcomponents.WRoomBookingConfirmBooking( self._rh, standalone = False )
+        return wc.getHTML( params )
 
 # ============================================================================
 # === Badges related =========================================================

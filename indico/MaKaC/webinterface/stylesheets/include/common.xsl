@@ -299,7 +299,7 @@
             </xsl:if>
 
             <xsl:if test="count(./../../files/file[type=$typeName]) &gt; 1">
-                <xsl:variable name="materialMenuName">materialMenu<xsl:value-of select="./../../title"/><xsl:value-of select="./name"/><xsl:value-of select="$sessionId"/><xsl:value-of select="$contribId"/><xsl:value-of select="$subContId"/></xsl:variable>
+                <xsl:variable name="materialMenuName">materialMenu<xsl:value-of select="./../../ID"/><xsl:value-of select="./name"/><xsl:value-of select="$sessionId"/><xsl:value-of select="$contribId"/><xsl:value-of select="$subContId"/></xsl:variable>
                     <a class="material dropDownMaterialMenu" id="{$materialMenuName}">
                         <img class="resourceIcon" src="{./imgURL}" border="0" alt="{./imgAlt}"/>
                         <img class="arrow" src="images/menu_arrow_black.png" border='0' alt="down arrow"/>

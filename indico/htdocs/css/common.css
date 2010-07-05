@@ -76,6 +76,7 @@ ul.meetingTimetable {
     list-style-type: none;
     padding: 0 10px;
     margin: 0;
+    height: 100%;
 }
 
 ul.meetingTimetable > li {

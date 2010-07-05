@@ -49,6 +49,10 @@
 
         function injectFromProtectionChooser()
         {
+            if(!($E("privateRadioButton").dom.checked)) {
+                allowedUsersList.clear();
+            }
+
             $E('allowedUsers').set(Json.write(allowedUsersList.getUsers()));
         }
 

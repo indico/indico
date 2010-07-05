@@ -564,9 +564,9 @@ class MonthOverview( Overview ):
 
     def getEndDate( self ):
         try:
-            d = self.getDate().replace(month=self.getDate().month+1) - timedelta(1)
+            d = self.getStartDate().replace(month=self.getDate().month+1) - timedelta(1)
         except:
-            d = self.getDate().replace(year=self.getDate().year+1,month=1) - timedelta(1)
+            d = self.getStartDate().replace(year=self.getDate().year+1,month=1) - timedelta(1)
         return d
     
     def getOverviewNextPeriod( self ):

@@ -144,7 +144,10 @@ def getTalks(conference, sort = False):
                 # Subcontribution objects don't have start dates,
                 # so get the owner contribution's start date
                 # and add the counter ctr_sc to that
-                event_info["date"]     = int(time.mktime(subcontribution.getOwner().getStartDate().timetuple()) + ctr_sc)
+                try:
+                    event_info["date"]     = int(time.mktime(subcontribution.getOwner().getStartDate().timetuple()) + ctr_sc)
+                except AttributeError:
+                    event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple())) + ctr_sc
                 event_info["LOID"]       = ""
                 event_info["IndicoLink"] = doesExistIndicoLink(subcontribution)
 

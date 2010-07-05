@@ -49,6 +49,8 @@ def index(req, **params):
     event = params.get('event',"")
     of = params.get('of','text')
     rooms = params.get('rooms',[])
+    if isinstance(rooms, str):
+        rooms = [rooms]
     tzstring = params.get('tz',info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
     if tzstring not in all_timezones:
         tzstring = 'UTC'

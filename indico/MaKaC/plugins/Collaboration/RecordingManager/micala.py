@@ -250,6 +250,51 @@ class MicalaCommunication(object):
         return {"success": flagSuccess, "result": result}
 
     @classmethod
+    def associateCDSRecordToLOID(cls, CDSID, LODBID):
+        """Update the micala DB to associate the CDS record number with the given lecture.
+        Note: if you are using cdsdev, the CDSID stored in the micala database will be the cdsdev record, not the cds record.
+        The micala database doesn't know the difference between cds and cdsdev. So if you create a bunch of test records and
+        then want to go back and create them again in CDS, you'll have to tinker around with the micala database,
+        deleting some status records and probably re-publish those lectures from the beginning."""
+
+        # Initialize success flag and result string
+        flagSuccess = True
+        result      = ""
+
+#        Logger.get('RecMan').debug("in associateIndicoIDToLOID()")
+
+        try:
+            connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
+                                         port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
+                                         user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
+                                         passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
+                                         db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
+        except MySQLdb.Error, e:
+            flagSuccess = False
+            result += _("MySQL error %d: %s") % (e.args[0], e.args[1])
+        except Exception, e:
+            flagSuccess = False
+            result += _("Unknown error %d: %s") % (e.args[0], e.args[1])
+
+        cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
+        try:
+            cursor.execute("UPDATE Lectures SET CDSRecord=%s WHERE idLecture=%s",
+                           (CDSID, LODBID))
+            connection.commit()
+        except MySQLdb.Error, e:
+            flagSuccess = False
+            result += _("MySQL error %d: %s") % (e.args[0], e.args[1])
+        except Exception, e:
+            flagSuccess = False
+            result += _("Unknown error %d: %s") % (e.args[0], e.args[1])
+
+        cursor.close()
+        connection.close()
+
+        return {"success": flagSuccess, "result": result}
+
+    @classmethod
     def getCDSPending(cls, confId):
         """Query the Micala database to find Indico IDs whose MARC has been exported to CDS, but not marked as completed in the micala DB.
         (Note: they may have just been completed, but we'll deal with newly completed tasks separately)
@@ -311,7 +356,7 @@ class MicalaCommunication(object):
     def updateMicalaCDSExport(cls, cds_indico_matches, cds_indico_pending):
         '''If there are records found in CDS but not yet listed in the micala database as COMPLETE, then update it.
         cds_indico_matches is a dictionary of key-value pairs { IndicoID1: CDSID1, IndicoID2: CDSID2, ... }
-cds_indico_pending is a list of IndicoIDs (for whom the CDS export task has been started but not completed).'''
+        cds_indico_pending is a list of IndicoIDs (for whom the CDS export task has been started but not completed).'''
 
 #        Logger.get('RecMan').debug('in updateMicalaCDSExport()')
 
@@ -325,14 +370,19 @@ cds_indico_pending is a list of IndicoIDs (for whom the CDS export task has been
         for pending in cds_indico_pending:
 #            Logger.get('RecMan').debug('Looping through cds_indico_pending: %s (and looking up in cds_indico_matches)' % pending)
             try:
-                new_record = cds_indico_matches[pending]
+                newRecord = cds_indico_matches[pending]
 
                 idMachine = cls.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
                 idTask    = cls.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
                 idLecture = cls.getIdLecture(pending)
-                cls.reportStatus("COMPLETE", "CDS record: %s" % new_record, idMachine, idTask, idLecture)
+                cls.reportStatus("COMPLETE", "CDS record: %s" % newRecord, idMachine, idTask, idLecture)
 
-                # TODO: I should still update the Lectures table to add the CDS record
+                # add the CDS record number to the Lectures table
+                resultAssociateCDSRecord = cls.associateCDSRecordToLOID(newRecord, idLecture)
+                if not resultAssociateCDSRecord["success"]:
+                    Logger.get('RecMan').error("Unable to update Lectures table in micala database: %s" % resultAssociateCDSRecord["result"])
+                    # this is not currently used:
+                    return resultAssociateCDSRecord["result"]
 
             except KeyError:
                 # current pending lecture still not found in CDS so do nothing.

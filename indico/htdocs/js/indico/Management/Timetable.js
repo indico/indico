@@ -1225,7 +1225,8 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                     this.isTopLevelTimetable ?
                             $T("The first entry will start when the event starts (") + this.tt.eventInfo.startDate.time.slice(0,5) + "), " :
                             $T("The first entry will start when the interval starts (") + this.tt.contextInfo.startDate.time.slice(0,5) + "), " ,
-                    $T("and the other entries will follow consecutively after it (with no gaps by default). The durations of the entries will not change.")));
+                    $T("and the other entries will follow consecutively after it. The durations of the entries will not change. "),
+                    Html.a({href: Indico.Urls.ImagesBase + '/resched_ex_1.png', rel: 'lightbox', title: 'Starting Time Example', onclick: "showLightbox(this); return false;"}, $T("See an example"))));
 
         startTimeRescheduleLabel.dom.htmlFor = "startTimeRescheduleRB";
 
@@ -1237,8 +1238,10 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                     this.isTopLevelTimetable ?
                         this.__getCurrentDayText() + "," :
                         $T("the interval ") + this.__getIntervalTitle(),
-                        $T(" so that there are no entries running in parallel (and no gaps by default). "),
-                    $T("The starting times will not change.")));
+                        $T(" to fill the gaps between them, so that their starting time don't change. " +
+                        		"If a time gap is specified, the duration will be extended up to the value of " +
+                        		"this time gap before the starting time of the next entry. "),
+                        Html.a({href: Indico.Urls.ImagesBase + '/resched_ex_2.png', rel: 'lightbox', title: 'Duration Example', onclick: "showLightbox(this); return false;"}, $T("See an example"))));
 
         durationRescheduleLabel.dom.htmlFor = "durationRescheduleRB";
 
@@ -1258,16 +1261,36 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         actionChoose.append(actionChooseTbody);
 
         startTimeRescheduleRB.observeClick(function(){
-            self.rescheduleButton.enable();
-            self.rescheduleAction = "startingTime";
-            startTimeRescheduleTr.dom.className = "selectedAction";
-            durationRescheduleTr.dom.className = "";
+            if(self.rescheduleAction == "startingTime") {
+                if (self.fitInnerAction == "noFit") {
+                    self.rescheduleButton.disable();
+                }
+                self.rescheduleAction = "noAction";
+                startTimeRescheduleTr.dom.className = "";
+                startTimeRescheduleRB.dom.checked = false;
+            }
+            else {
+                self.rescheduleButton.enable();
+                self.rescheduleAction = "startingTime";
+                startTimeRescheduleTr.dom.className = "selectedAction";
+                durationRescheduleTr.dom.className = "";
+            }
         });
         durationRescheduleRB.observeClick(function(){
-            self.rescheduleButton.enable();
-            self.rescheduleAction = "duration";
-            durationRescheduleTr.dom.className = "selectedAction";
-            startTimeRescheduleTr.dom.className = "";
+            if(self.rescheduleAction == "duration" ) {
+                if (self.fitInnerAction == "noFit") {
+                    self.rescheduleButton.disable();
+                }
+                self.rescheduleAction = "noAction";
+                durationRescheduleTr.dom.className = "";
+                durationRescheduleRB.dom.checked = false;
+            }
+            else{
+                self.rescheduleButton.enable();
+                self.rescheduleAction = "duration";
+                durationRescheduleTr.dom.className = "selectedAction";
+                startTimeRescheduleTr.dom.className = "";
+            }
         });
 
         return Html.div("rescheduleSection", actionChooseTitle, actionChoose);
@@ -1293,6 +1316,32 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         });
 
         return Html.div("rescheduleSection", intervalTitle, intervalInputDiv, this.intervalExplanationDiv);
+    },
+
+
+    /**
+     * Draws the step 3: choose whether to fit the inner entries or not
+     */
+    __drawFitInner: function (){
+        var self = this;
+        // Step 3: choose to fit or not the inner entries
+        var fitInnerTitle = Html.div("rescheduleTitle", $T("Step 3: Choose to fit sessions to their content"));
+
+        this.fitInnerCheckBox = Html.checkbox({id:'fitInnerCheckBox', name:'fitInnerCheckBox'}, false);
+
+        var fitInnerLabel = Html.label({htmlFor:'fitInnerCheckBox', className:'rescheduleLabelTitle'},
+                "Fit all the sessions contained on " + this.__getCurrentDayText() + " to their content.");
+        var fitInnerDiv = Html.div({style:{textAlign:"center"}}, this.fitInnerCheckBox, fitInnerLabel);
+
+        this.fitInnerExplanationDiv = Html.div({className: 'rescheduleLabelDetails', style:{paddingLeft: pixels(30), paddingTop: pixels(8)}});
+        this.fitInnerExplanationDiv.set($T("This changes the start and end times of the session blocks occuring on " + this.__getCurrentDayText() +
+        " in order to fit their respective content "), Html.strong({}, $T("before")), $T(" performing the rescheduling."));
+
+        this.fitInnerCheckBox.observeEvent("change", function(event){
+            self.__fitInnerObserver();
+        });
+
+        return Html.div("fitInnerSection", fitInnerTitle, fitInnerDiv, this.fitInnerExplanationDiv);
     },
 
 
@@ -1334,6 +1383,26 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
             }
 
             this.intervalExplanationDiv.set(intervalExplanationText);
+        }
+    },
+
+
+    /**
+     * Function that will be called when the 'Fit checkbox' gets checked/unchecked
+     */
+    __fitInnerObserver: function(){
+
+        var checked = this.fitInnerCheckBox.get();
+
+        if ( checked ) {
+            this.rescheduleButton.enable();
+            this.fitInnerAction = "doFit";
+        }
+        else {
+            if (this.rescheduleAction == "noAction") {
+                this.rescheduleButton.disable();
+            }
+            this.fitInnerAction = "noFit";
         }
     },
 
@@ -1401,7 +1470,8 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                                     action: self.rescheduleAction,
                                     hour: "0",
                                     minute: self.minuteInput.get(),
-                                    targetDay: self.tt.currentDay
+                                    targetDay: self.tt.currentDay,
+                                    fit: self.fitInnerAction
                                 });
 
                     } else if (self.isIntervalTimetable) {
@@ -1434,9 +1504,12 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
             };
 
             var confirmText = Html.div({},
-                Html.div({}, $T("Are you sure you want to reschedule? ")),
-                Html.div({}, $T("All entries "),
-                        this.isTopLevelTimetable ? "on " + this.__getCurrentDayText() : "of the interval " + this.__getIntervalTitle() ,
+                Html.div({}, $T("Are you sure you want to reschedule entries " +
+                (this.isTopLevelTimetable ? "on " + this.__getCurrentDayText() : "of the interval " + this.__getIntervalTitle()) + "?")),
+                Html.div({}, this.fitInnerAction === "doFit" ? $T("The entries that are part of a session will") : $T(""),
+                             this.fitInnerAction === "doFit" ? ( this.rescheduleAction === "noAction" ? $T("") : $T(" first") ) : $T(""),
+                             this.fitInnerAction === "doFit" ? $T(" be fitted to their content.") : $T("")),
+                this.rescheduleAction === "noAction" ? Html.div({}, $T("")) : Html.div({}, (this.fitInnerAction === "doFit" ? $T("Then, all entries ") : $T("All entries ")),
                         $T(" will have their "),
                         this.rescheduleAction === "startingTime" ? $T("starting times") : $T("duration"),
                         $T(" changed.")),
@@ -1458,11 +1531,18 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
 
         var actionChooseDiv = this.__drawChooseAction();
         var intervalDiv = this.__drawChooseInterval();
+        var actionFitDiv = "";
+        if (this.isTopLevelTimetable) {
+            actionFitDiv = this.__drawFitInner();
+        }
 
-        this.mainContent = Html.div({style:{width:pixels(450)}}, actionChooseDiv, intervalDiv);
+        this.mainContent = Html.div({style:{width:pixels(450)}}, actionChooseDiv, intervalDiv, actionFitDiv);
         var buttonContent = this.__drawButtons();
 
         this.__intervalObserver();
+        if (this.isTopLevelTimetable) {
+            this.__fitInnerObserver();
+        }
         this.__buildParameterManager();
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.mainContent, buttonContent);
@@ -1479,8 +1559,9 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         this.isTopLevelTimetable = exists(this.tt.TopLevelManagementTimeTable);
         this.isIntervalTimetable = exists(this.tt.IntervalManagementTimeTable);
 
-        this.rescheduleAction = null;
+        this.rescheduleAction = "noAction";
         this.timeInput = null;
+        this.fitInnerAction = "noFit";
         this.rescheduleButton = null;
     }
 );
@@ -1493,7 +1574,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
 type("FitInnerTimetableDialog", ["ConfirmPopup"], {
 
     /**
-     * Returns the title of the session
+     * Returns the title of the timetable/session/entry
      */
     __getSessionTitle: function(){
         return '"' + this.tt.contextInfo.title + '"';
@@ -1503,10 +1584,12 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
      * Builds the content for the ConfirmPopup
      */
     __getContent: function() {
+        var type;
+
         var content = Html.div("fitInnerTimetableDialog",
-                $T("This will ajdust the starting and ending times of the session "),
+                $T("This will change the starting and ending times of the Session "),
                 this.__getSessionTitle(),
-                $T(" so that it encompasses all the blocks and entries defined in this session timetable."),
+                $T(" so that it encompasses all entries defined in its timetable."),
                 Html.br(),
                 $T("Are you sure you want to proceed?"));
         return content;
@@ -1519,13 +1602,37 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
         var self = this;
 
         if (confirm) {
-            IndicoUI.Dialogs.Util.progress($T("Fitting inner timetable"));
-            Util.postRequest(Indico.Urls.FitSession,
-                    {
-                        confId: self.tt.eventInfo.id,
-                        sessionId: self.tt.contextInfo.timetableSession.id
-                    },
-                    {});
+            if (this.tt.IntervalManagementTimeTable){
+                // Fit session slot according to its entries.
+                IndicoUI.Dialogs.Util.progress($T("Fitting session to content"));
+                Util.postRequest(Indico.Urls.FitSessionSlot,
+                        {
+                            confId: self.tt.contextInfo.conferenceId,
+                            sessionId: self.tt.contextInfo.sessionId,
+                            slotId: self.tt.contextInfo.sessionSlotId,
+                            day: self.tt.currentDay
+                        },
+                        {});
+            }
+//            else if (this.tt.isSessionTimetable) {
+//                // Fit session according to its session slots
+//                IndicoUI.Dialogs.Util.progress($T("Fitting timetable to content"));
+//                Util.postRequest(Indico.Urls.FitSession,
+//                        {
+//                            confId: self.tt.eventInfo.id,
+//                            sessionId: self.tt.eventInfo.timetableSession.id
+//                        },
+//                        {});
+//            }
+//            else {
+//                // Fit the event according to its entries
+//                IndicoUI.Dialogs.Util.progress($T("Fitting timetable to content"));
+//                Util.postRequest(Indico.Urls.FitConf,
+//                        {
+//                            confId: self.tt.eventInfo.id
+//                        },
+//                        {});
+//            }
         }
     }
 },
@@ -1535,6 +1642,6 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
      */
     function(parentTimetable) {
         this.tt = parentTimetable;
-        this.ConfirmPopup($T("Fit inner timetable"), this.__getContent(), this.__handler);
+        this.ConfirmPopup($T("Fit timetable to content"), this.__getContent(), this.__handler);
     }
 );

@@ -725,7 +725,8 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if (self.eventData.entryType == 'Contribution') {
             url = Indico.Urls.ContributionDisplay + '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
         } else if (self.eventData.entryType == 'Session') {
-            url = Indico.Urls.SessionDisplay + '?sessionId=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
+            url = Indico.Urls.SessionDisplay + '?sessionId=' + self.eventData.sessionId +
+                    '&confId=' + self.eventData.conferenceId + '#' + self.timetable.currentDay;
         }
         var viewLink = Html.a({'href': url}, "View details");
         bar.append(viewLink);
@@ -1373,20 +1374,6 @@ type("TimetableDrawer", ["IWidget"],
 
          postDraw: function() {
              each(this.blocks, function(block) { block.postDraw(); });
-         },
-
-         /*
-          * Sets the color for all session blocks belonging to the
-          * session with sessionId
-          */
-         setSessionBlockColors: function (sessionId, textColor, bgColor) {
-             var self = this;
-
-             each(this.blocks, function(block) {
-                 if (block.eventData.entryType == 'Session' && block.eventData.sessionId == sessionId) {
-                     block.setColors(textColor, bgColor);
-                 }
-             });
          },
 
          flatten: function(data) {

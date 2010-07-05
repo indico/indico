@@ -336,6 +336,7 @@ extend(IndicoUI.Dialogs,
                             * This is the setup for the edition of sessions slots
                             *******************************************************/
                            if (isEdit){
+                               info.set('sessionTitle', params.title);
                                info.set('startDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.startDate)));
                                info.set('endDateTime', IndicoUtil.formatDateTime(IndicoUtil.parseJsonDate(params.endDate)));
                                info.set('title', params.slotTitle);
@@ -366,6 +367,12 @@ extend(IndicoUI.Dialogs,
                            addButton.observeClick(function(){
                                submitInfo();
                            });
+
+                           var sessionRename = new SessionRenameWidget(
+                                   info.get('sessionTitle'),
+                                   parameterManager,
+                                   this,
+                                   info);
 
                            var convListWidget = new UserListField(
                                'VeryShortPeopleListDiv', 'PeopleList',
@@ -444,10 +451,12 @@ extend(IndicoUI.Dialogs,
                            parameterManager.add(startEndTimeField.startTimeField, 'time', false);
                            parameterManager.add(startEndTimeField.endTimeField, 'time', false);
                            startEndTimeComponent = [$T('Time'), startEndTimeField.element];
+                           sessionRenameComponent = isEdit ? [$T('Session'), $T(Html.div({}, sessionRename.draw()))]:[];
 
                            $B(info.accessor('conveners'), convListWidget.getUsers());
 
                            var content = IndicoUtil.createFormFromMap([
+                               sessionRenameComponent,
                                isEdit ? [$T('Sub-Title'), $B(Html.edit({style: { width: '300px'}}), info.accessor('title'))]:[],
                                [$T('Date'), conferenceDays],
                                startEndTimeComponent,

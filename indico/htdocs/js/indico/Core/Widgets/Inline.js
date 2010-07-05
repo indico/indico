@@ -1189,7 +1189,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
                  this.saveButton,
                  Widget.button(command(function() {
                      // back to the start
-                     self.setMode('display')
+                     self.setMode('display');
                  }, 'Cancel')));
 
              // there are two possible states for the "switch" area
@@ -1320,4 +1320,112 @@ type("SupportEditWidget", ["InlineEditWidget"],
             this.__parameterManager = new IndicoUtil.parameterManager();
         });
 
+/*
+ * This class implements a widget that lets the user edit the title
+ * of a session.
+ */
+type("SessionRenameWidget", ["InlineWidget"],
+        {
+            setMode: function(mode) {
+                this.modeChooser.set(mode);
+                // Adjust the height of the parent container (which is a popup) and
+                // prevent the appearance of a scroll bar.
+                var contentHeight = this.parentContainer.content.dom.offsetHeight;
+                this.parentContainer.contentWrapper.setStyle('height', pixels(contentHeight));
+            },
 
+            _buildFrame: function(modeChooser, switchChooser) {
+                return Html.div({},
+                            modeChooser,
+                            Html.div({style:{marginTop: '5px', marginLeft: '5px', display: 'inline'}},
+                                     switchChooser));
+            },
+
+            /* builds the basic structure for both display and
+            edit modes */
+            __buildStructure: function(sessionTitleValue) {
+
+                return Html.div({style:{display:'inline'}},
+                     Html.span("sessionRenameEntry", $T("This slot belongs to the session ")),
+                     Html.span("sessionRenameValue", sessionTitleValue));
+
+            },
+
+            draw: function() {
+                var self = this;
+
+                var content = this._handleContent();
+
+                // if the widget is set to load on startup,
+                // the content will be a 'loading' message
+                var wcanvas = Html.div({}, content);
+
+                return wcanvas;
+            },
+
+            _handleContent: function(mode) {
+
+                var self = this;
+
+                // there are two possible widget modes: edit and display
+                this.modeChooser = new Chooser(new Lookup(
+                    {
+                        'edit': function() { return self._handleContentEdit(); },
+                        'display': function() { return self._handleContentDisplay(); }
+                    }));
+
+                // start in display mode
+                this.modeChooser.set('display');
+
+                return Widget.block(this.modeChooser);
+            },
+
+            _handleContentEdit: function() {
+
+                var self = this;
+
+                return this._buildFrame(self._handleEditMode(self.value), '');
+
+            },
+
+            _handleContentDisplay: function() {
+
+                var self = this;
+                return this._buildFrame(self._handleDisplayMode(self.value),
+                                        Widget.link(command(function() {
+                                            self.setMode('edit');
+                                            return false;
+                                        }, $T('(rename Session)'))));
+            },
+
+            _handleEditMode: function(value) {
+
+                // create field and set it to the value transmitted
+                this.sessionTitle = Html.edit({}, value);
+
+                // add the field to the parameter manager
+                this.__parameterManager.add(this.sessionTitle, 'text', false);
+
+                // bind it to the info of the form
+                $B(this.info.accessor('sessionTitle'), this.sessionTitle);
+
+                // call buildStructure with modification widgets
+                return this.__buildStructure(this.sessionTitle);
+            },
+
+            _handleDisplayMode: function(value) {
+                var val = value;
+                // truncate the title if longer than 20 characters
+                if( val.length > 20 ) {
+                    val = val.substr(0,17) + '...';
+                }
+                return this.__buildStructure("'"+val+"'");
+            }
+
+        },
+        function(initValue, parameterManager, parentContainer, info) {
+            this.value = initValue;
+            this.parentContainer = parentContainer;
+            this.__parameterManager = parameterManager;
+            this.info = info;
+    });

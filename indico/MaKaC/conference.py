@@ -4119,7 +4119,8 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     def removeFromRegistrars(self, av):
         self.getRegistrarList().remove(av)
         self.notifyModification()
-        av.unlinkTo(self, "registrar")
+        if isinstance(av, MaKaC.user.Avatar):
+            av.unlinkTo(self, "registrar")
 
     def isRegistrar(self, av):
         if av == None:
@@ -4379,6 +4380,19 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         except AttributeError, e:
             self._setSchedule()
         return self.__schedule
+
+    def fit( self ):
+        sch = self.getSchedule()
+
+        sDate = sch.calculateStartDate()
+        eDate = sch.calculateEndDate()
+        self.setStartDate(sDate)
+        self.setEndDate(eDate)
+
+    def fitSlotsOnDay( self, day ):
+        for entry in self.getSchedule().getEntriesOnDay(day) :
+            if isinstance(entry.getOwner(), SessionSlot) :
+                entry.getOwner().fit()
 
     def getDefaultStyle( self ):
         from MaKaC.webinterface import displayMgr
@@ -11257,7 +11271,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
 
     @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
                  'MaKaC.conference.Paper',
                  'MaKaC.conference.Slides',
                  'MaKaC.conference.Video',
@@ -11669,6 +11682,7 @@ class Minutes(Material):
             return ""
         return self.file.readBin()
 
+    @Retrieves (['MaKaC.conference.Minutes'],'resources', isPicklableObject = True)
     def getResourceList( self ):
         res = Material.getResourceList( self )
         if self.file:
