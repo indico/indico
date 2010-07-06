@@ -669,7 +669,7 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
                 entry.setDuration(dur=dur, check=2)
                 i+=1
         elif type=="startingTime":
-            st = day.astimezone(timezone('UTC')).replace(hour=self.getStartDate().hour, minute=self.getStartDate().minute)
+            st = day.replace(hour=self.getAdjustedStartDate().hour, minute=self.getAdjustedStartDate().minute).astimezone(timezone('UTC'))
             for entry in entries:
                 if doFit:
                     if isinstance( entry.getOwner(), SessionSlot ) :
