@@ -335,16 +335,24 @@ class MailTools(object):
         need to be sent
         """
 
+        # this is not cool... the object should be passed in the first place
         if pluginName:
-            admins = CollaborationTools.getOptionValue(pluginName, 'admins')
-            sendMailNotifications = CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications')
-            additionalEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
+            plugin = CollaborationTools.getCollaborationPluginType().getPlugin(pluginName)
         else:
-            admins = CollaborationTools.getCollaborationOptionValue('collaborationAdmins')
-            sendMailNotifications = CollaborationTools.getCollaborationOptionValue('sendMailNotifications')
-            additionalEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
+            plugin = None
 
-        return (sendMailNotifications and len(admins) > 0) or len(additionalEmails) > 0
+        if plugin and plugin.hasOption('sendMailNotifications'):
+            admins = plugin.getOption('admins').getValue()
+            sendMail = plugin.getOption('sendMailNotifications').getValue()
+            addEmails = plugin.getOption('additionalEmails').getValue()
+
+        else:
+            # get definitions from the Collaboration plugin type
+            admins = CollaborationTools.getCollaborationOptionValue('collaborationAdmins')
+            sendMail = CollaborationTools.getCollaborationOptionValue('sendMailNotifications')
+            addEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
+
+        return (sendMail and len(admins) > 0) or len(addEmails) > 0
 
     @classmethod
     def getAdminEmailList(cls, pluginName = None):
@@ -354,6 +362,7 @@ class MailTools(object):
         """
 
         if pluginName:
+
             adminEmails = CollaborationTools.getOptionValue(pluginName, 'additionalEmails')
             if CollaborationTools.getOptionValue(pluginName, 'sendMailNotifications'):
                 adminEmails.extend([u.getEmail() for u in CollaborationTools.getOptionValue(pluginName, 'admins')])
