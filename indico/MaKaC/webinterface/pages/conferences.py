@@ -1027,7 +1027,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                     includeContribution = 1
                 else:
                     includeContribution = 0
-                body = outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,self._params.get("showSession",""),self._params.get("showDate",""))
+                body = outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,1,self._params.get("showSession",""),self._params.get("showDate",""))
             if useManagerCache or useNormalCache:
                 cache.saveCachePage( body )
             if not frame:
@@ -10395,7 +10395,7 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
                 includeContribution = 1
             else:
                 includeContribution = 0
-            return outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,self._params.get("showSession",""),self._params.get("showDate",""))
+            return outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,1,self._params.get("showSession",""),self._params.get("showDate",""))
         else:
             return "Cannot find the %s stylesheet" % view
 
