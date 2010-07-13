@@ -1417,11 +1417,20 @@ class ContribSchEntry(LinkedTimeSchEntry):
     def getRoom(self):
         return self.getOwner().getRoom()
 
+    def setRoom(self, room):
+        self.getOwner().setRoom(room)
+
     def getLocation(self):
         return self.getOwner().getLocation()
 
+    def setLocation(self, loc):
+        self.getOwner().setLocation(loc)
+
     def getOwnRoom(self):
         return self.getOwner().getOwnRoom()
+
+    def getOwnLocation(self):
+        return self.getOwner().getOwnLocation()
 
 class ScheduleToJson:
 

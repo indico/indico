@@ -51,7 +51,7 @@
             </td>
         </tr>
         <!-- Fermi timezone awareness(end) -->
-        <% includeTpl('EventLocationInfo', modifying=False, showParent=False) %>
+        <% includeTpl('EventLocationInfo', modifying=False, showParent=False, conf=False) %>
         <tr>
             <td>&nbsp;</td>
             <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink" onclick="showAdvancedOptions()">&nbsp;</span></td>

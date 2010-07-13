@@ -24,7 +24,7 @@
             </td>
         </tr>
 
-	<% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, showParent=False) %>
+	<% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, showParent=False, conf=False) %>
 
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>

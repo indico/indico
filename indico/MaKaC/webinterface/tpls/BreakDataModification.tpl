@@ -22,16 +22,16 @@
 	<tr>
 
 
-        <% includeTpl('EventLocationInfo', event=self._rh._break, modifying=True, parentRoomInfo=roomInfo(self._rh._break, level='inherited'), showParent=True) %>
+        <% includeTpl('EventLocationInfo', event=self._rh._break, modifying=True, parentRoomInfo=roomInfo(self._rh._break, level='inherited'), showParent=True, conf = False) %>
 
-	</tr>       
+	</tr>
 	<tr>
             <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>
             <td bgcolor="white" width="100%%">
                 <span id="sDatePlace"></span>
-                <input type="hidden" value="<%= sDay %>" name="sDay" id="sDay"/>                                       
+                <input type="hidden" value="<%= sDay %>" name="sDay" id="sDay"/>
                 <input type="hidden" value="<%= sMonth %>" name="sMonth" id="sMonth"/>
-                <input type="hidden" value="<%= sYear %>" name="sYear" id="sYear"/>   
+                <input type="hidden" value="<%= sYear %>" name="sYear" id="sYear"/>
                 <input type="hidden" value="<%= sHour %>" name="sHour" id="sHour" />
                 <input type="hidden" value="<%= sMinute %>" name="sMinute" id="sMinute" />
 		%(autoUpdate)s
@@ -43,9 +43,9 @@
                 <span class="titleCellFormat"> <%= _("Duration")%></span>
             </td>
             <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                <input type="text" size="2" name="durHours" 
+                <input type="text" size="2" name="durHours"
                     value=%(durationHours)s>:
-                <input type="text" size="2" name="durMins" 
+                <input type="text" size="2" name="durMins"
                     value=%(durationMinutes)s>
             </td>
         </tr>
@@ -61,14 +61,14 @@
 
 <script type="text/javascript">
 IndicoUI.executeOnLoad(function()
-    {   
+    {
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
         $E('sDatePlace').set(startDate);
-       
+
         <% if sDay != '': %>
             startDate.set('<%= sDay %>/<%= sMonth %>/<%= sYear %><%= " " %><%if len (sHour) == 1:%>0<%= sHour %><%end%><%else:%><%= sHour %><%end%>:<% if len (sMinute) == 1:%>0<%= sMinute %><%end%><%else:%><%= sMinute %><%end%>');
-        <% end %>        
-    });       
+        <% end %>
+    });
 injectValuesInForm($E('BreakDataModificationForm'));
 
 </script>

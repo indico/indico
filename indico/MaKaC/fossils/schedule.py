@@ -189,6 +189,14 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
         """ Default Id """
     getId.name = "scheduleEntryId"
 
+    def getInheritLoc(self):
+        """ Inherited Loc """
+    getInheritLoc.produce = lambda x: x.getOwner().getOwnLocation() is None
+
+    def getInheritRoom(self):
+        """ Inherited Room """
+    getInheritRoom.produce = lambda x: x.getOwner().getOwnRoom() is None
+
 
 
 class ILinkedTimeSchEntryFossil(ISchEntryFossil):
@@ -257,10 +265,19 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
         """ Entry Conference id """
     getConferenceId.produce = lambda s: s.getOwner().getConference().getId()
 
+
     def getContribDuration(self):
         """ Default duration for contribs """
     getContribDuration.produce = lambda s: s.getOwner().getSession().getContribDuration()
     getContribDuration.convert = Conversion.timedelta
+
+    def getInheritLoc(self):
+        """ Inherited Loc """
+    getInheritLoc.produce = lambda x: x.getOwner().getOwnLocation() is None
+
+    def getInheritRoom(self):
+        """ Inherited Room """
+    getInheritRoom.produce = lambda x: x.getOwner().getOwnRoom() is None
 
 
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):

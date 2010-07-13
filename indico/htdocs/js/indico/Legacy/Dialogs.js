@@ -5,7 +5,7 @@
 
 extend(IndicoUI.Dialogs,
        {
-           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, favoriteRooms, days, successFunc){
+           addSession: function(method, timeStartMethod, args, roomInfo, parentRoomInfo, dayStartDate, favoriteRooms, days, successFunc, bookedRooms, timetable){
 
                var parameterManager = new IndicoUtil.parameterManager();
 
@@ -88,7 +88,7 @@ extend(IndicoUI.Dialogs,
                            info.set('roomInfo', $O(roomInfo));
 
 
-                           roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms, null);
+                           roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms, null, bookedRooms, timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData(), info);
 
                            cancelButton.observeClick(function(){
                                self.close();
@@ -233,7 +233,7 @@ extend(IndicoUI.Dialogs,
         * @param {String} dayStartDate A string representing the date of the day the
         *        calendar is currently pointing to (DD/MM/YYYY)
         */
-           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, days, successFunc, editOn){
+           addSessionSlot: function(method, timeStartMethod, params, roomInfo, parentRoomInfo, confStartDate, dayStartDate, favoriteRooms, days, successFunc, editOn, bookedRooms, timetable){
                var parameterManager = new IndicoUtil.parameterManager();
                var isEdit = exists(editOn)?editOn:false;
                var args = isEdit?params:params.args;
@@ -352,12 +352,16 @@ extend(IndicoUI.Dialogs,
                                info.set('roomInfo', $O({location: null, room: null}));
                            }
 
-                           roomEditor = new RoomBookingWidget(Indico.Data.Locations,
+                           roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations,
                                                               info.get('roomInfo'),
                                                               parentRoomInfo,
                                                               nullRoomInfo(info.get('roomInfo')),
                                                               favoriteRooms,
-                                                              null);
+                                                              null,
+                                                              bookedRooms,
+                                                              timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData(),
+                                                              info,
+                                                              editOn?params.id:null);
 
 
                            cancelButton.observeClick(function(){

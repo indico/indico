@@ -5069,6 +5069,7 @@ class WSessionModEditData(WTemplated):
     def getVars( self ):
         vars=WTemplated.getVars(self)
         vars["conference"] = self._conf
+        vars["eventId"] = "s" + vars["sessionId"]
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
         vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )

@@ -53,7 +53,7 @@
         </tr>
         <!-- Fermi timezone awareness(end) -->
 
-    	<% includeTpl('EventLocationInfo', modifying=False, showParent=False) %>
+    	<% includeTpl('EventLocationInfo', modifying=False, showParent=False, conf = False) %>
 
         <tr>
             <td>&nbsp;</td>

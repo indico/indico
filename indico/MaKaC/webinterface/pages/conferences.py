@@ -70,6 +70,7 @@ from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
+from MaKaC.common.Conversion import Conversion
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -7731,6 +7732,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         mins = ((totaldur.seconds)/60)-(hours*60)
         vars["totaldur" ]="""%sh%sm"""%(dayhours,mins)
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+        vars["bookings"] = Conversion.reservationsList(self._conf.getRoomBookingList())
         return vars
 
 class WPModifContribList( WPConferenceModifBase ):

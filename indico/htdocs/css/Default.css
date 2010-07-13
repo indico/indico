@@ -2320,6 +2320,59 @@ ul.UIUserEvtList li
 .favoriteItem
 {
     font-style: italic;
+    color:blue;
+}
+
+.bookedItem
+{
+    font-style: italic;
+    color: #008C00;
+}
+
+.bookedItemHeader
+{
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+    padding: 5px;
+}
+
+.bookedItemCollision
+{
+    font-style: italic;
+    color: #881122;
+}
+
+.bookedItemOutsideBooking
+{
+    font-style: italic;
+    color: #FF7400;
+}
+
+.bookedItemCollisionDiv {
+    position:relative;
+}
+
+.bookedItemCollisionDiv div{
+    display:none;
+}
+
+.bookedItemCollision:hover + div{
+    display: block;
+    position: absolute; top: 25px; left: 0px; width: 100% - 6;
+    color: #AAA;
+    background-color: #FFF6DF;
+    padding: 3px;
+    z-index: 2;
+}
+
+.bookedItemOutsideBooking:hover + div{
+    display: block;
+    position: absolute; top: 25px; left: 0px; width: 100% - 6;
+    color: #AAA;
+    background-color: #FFF6DF;
+    padding: 3px;
+    z-index: 2;
 }
 
 .UINavBar
@@ -5560,14 +5613,57 @@ div.cssPreview {
 .roomWidget {
 }
 
-.roomWidget th .roomWidgetTitle {
-    font-size: 13px;
+.roomWidgetTitle {
+    font-size: 12px;
     color: #444444;
     font-family: Verdana;
-    text-align: left;
     font-weight: normal;
-    margin-right: 10px;
+    width: 60px;
     text-align: left;
+    padding-bottom: 5px;
+}
+
+.roomVerticalWidgetTitle {
+    font-size: 12px;
+    color: #444444;
+    font-family: Verdana;
+    font-weight: normal;
+    float: left;
+    width: 60px;
+    text-align: left;
+}
+
+.roomPopupTitle {
+    font-weight: bold;
+    width: 70px;
+    float: left;
+    font-style: normal;
+
+}
+
+.timeLocationDiv {
+    padding: 5px;
+    margin-left: -5px;
+}
+
+.timeLocationDiv img {
+    float: right;
+    opacity: 0.4;
+    filter: alpha(opacity=40);
+    background-color: #F8F8F8;
+}
+
+.timeLocationDiv:hover {
+    border: 1px solid #EAEAEA;
+    background: #FFF6DF;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.timeLocationDiv:hover img {
+    opacity: 1;
+    filter: alpha(opacity=100);
+    background-color: #FFF6DF;
 }
 
 ul.nobulletsList
@@ -6032,6 +6128,7 @@ div.disabled input[disabled] {
     width: 200px;
     overflow: hidden;
     background-color: white;
+    z-index: 1;
 }
 
 .optionBoxList {
@@ -6044,6 +6141,10 @@ div.disabled input[disabled] {
 
 .bottomLine {
     border-bottom:1px dotted #DDDDDD;
+}
+
+.topLine {
+    border-top:1px dotted #DDDDDD;
 }
 
 .optionBoxList li {

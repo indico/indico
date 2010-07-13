@@ -1,4 +1,5 @@
 <% import MaKaC %>
+<% import simplejson %>
 
 <tr>
   <td class="titleCellTD"><span class="titleCellFormat"><%= _("Place")%></span></td>
@@ -35,7 +36,16 @@
     <% eventFavorites = [] %>
   <% end %>
 
-  var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>, <% if modifying: %>null<%end%><%else:%>Indico.Data.DefaultLocation<%end%>);
+  <% if conf: %>
+      var ttdata = <%= simplejson.dumps(MaKaC.schedule.ScheduleToJson.process(conf.getSchedule(), conf.getTimezone(), None,
+                                                                                days = None, mgmtMode = True)) %> ;
+      <% from MaKaC.common.Conversion import Conversion %>
+      var bookedRooms = <%= Conversion.reservationsList(conf.getRoomBookingList()) %>;
+      rbWidget = new RoomBookingReservationWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>, <% if modifying: %>null<%end%><%else:%>Indico.Data.DefaultLocation<%end%>, bookedRooms, ttdata, null, "<%= eventId %>");
+  <% end %>
+  <% else: %>
+      rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>, <% if modifying: %>null<%end%><%else:%>Indico.Data.DefaultLocation<%end%>);
+  <% end %>
 
   var domContent = rbWidget.draw();
 

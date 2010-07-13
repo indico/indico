@@ -44,7 +44,7 @@
 	</tr>
     <% end %>
 
-    <% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, parentRoomInfo=roomInfo(self._rh._target, level='inherited'), showParent=True) %>
+    <% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, parentRoomInfo=roomInfo(self._rh._target, level='inherited'), showParent=True, conf = self._conf, eventId = self.getContribId()) %>
 
 
 	%(Board)s
@@ -67,12 +67,19 @@
 </form>
 
 <script type="text/javascript">
+IndicoUI.executeOnLoad(function()
+        {
+            var info = new WatchObject();
 
 <% if contrib.isScheduled(): %>
     <% if sessionType != 'poster': %>
         var dateTime = IndicoUI.Widgets.Generic.dateField(true, {name: 'dateTime'});
         dateTime.set('<%= dateTime %>');
+        dateTime.observeChange(function() {
+            info.set('startDate', dateTime.get());
+        });
         $E('dateTime').set(dateTime)
+        info.set('startDate', dateTime.get());
     <% end %>
 <% end %>
 <% else: %>
@@ -80,9 +87,16 @@ $E('dateTime').set('Not scheduled')
 <% end %>
 <% if sessionType != 'poster': %>
     var duration = IndicoUI.Widgets.Generic.durationField('<%= duration %>', {name: 'duration'});
-    $E('duration').set(duration)
+    $E('duration').set(duration);
+    $E('duration').observeChange(function() {
+                info.set('duration', duration.get());
+            });
+    info.set('duration', duration.get());
 <% end %>
 
-injectValuesInForm($E('ContributionDataModificationForm'));
+rbWidget.setDateTimeInfo(info);
+
+            injectValuesInForm($E('ContributionDataModificationForm'));
+        });
 
 </script>

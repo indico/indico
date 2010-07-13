@@ -2224,12 +2224,14 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
             #self.__TMP_PopulateRoomBookings()
 
         resvs = []
-        for resvGuid in self.__roomBookingGuids:
-            r = resvGuid.getReservation()
-            if r == None:
-                self.removeRoomBookingGuid( resvGuid )
-            elif r.isValid:
-                resvs.append( r )
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.getRoomBookingModuleActive():
+            for resvGuid in self.__roomBookingGuids:
+                r = resvGuid.getReservation()
+                if r == None:
+                    self.removeRoomBookingGuid( resvGuid )
+                elif r.isValid:
+                    resvs.append( r )
         return resvs
 
     def getRoomBookingIds( self ):
@@ -3401,7 +3403,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     def getFavoriteRooms(self):
         roomList = []
         roomList.extend(self.getRoomList())
-        roomList.extend(map(lambda x: x._getName(), self.getBookedRooms()))
+        #roomList.extend(map(lambda x: x._getName(), self.getBookedRooms()))
 
         return roomList
 

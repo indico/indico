@@ -53,7 +53,7 @@
                 <select name="Timezone">%(timezoneOptions)s</select>
             </td>
         </tr>
-        <% includeTpl('EventLocationInfo', modifying=False, showParent=False) %>
+        <% includeTpl('EventLocationInfo', modifying=False, showParent=False, conf=False) %>
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Speaker") %></span>
