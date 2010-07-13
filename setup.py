@@ -292,7 +292,7 @@ Please specify the directory where you'd like it to be placed.
 %s
         ''' % _databaseText('etc')
 
-    def _update_conf_dir_paths(self, filepath, dirs):
+    def _update_conf_dir_paths(self, filePath, dirs):
         fdata = open(filePath).read()
         for dir in dirs.items():
             d = dir[1].replace("\\","/") # For Windows users
@@ -343,7 +343,7 @@ if __name__ == '__main__':
                     'jsbuild': jsbuild,
                     'tests': tests_indico,
                     'fetchdeps': fetchdeps_indico,
-                    'develop': develop_indico,
+                    'develop_config': develop_indico,
                     },
 
           version = _versionInit(),

@@ -138,7 +138,7 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
         else:
-            raise 'Invalid config value "%s = %s"' % (k, new_values[k])
+            raise Exception('Invalid config value "%s = %s"' % (k, new_values[k]))
 
     # We write unknown options to the end of the file, they may not be just outdated options but plugins'
 
