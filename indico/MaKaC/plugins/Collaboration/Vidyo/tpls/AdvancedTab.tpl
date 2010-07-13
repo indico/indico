@@ -10,7 +10,7 @@
 </div>
 
 <div class="collaborationAdvancedTabCheckboxDiv" style="margin-bottom:10px">
-    <input type="checkbox" id="displayURL" class="centeredCheckBox" name="displayURL" value="yes" />
+    <input type="checkbox" id="displayURL" class="centeredCheckBox" name="displayURL" value="yes" checked="checked" />
     <label for="displayURL" class="normal"><%= _("Display auto-join URL in event page") %></label>
     <img id="displayURLHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
 </div>
