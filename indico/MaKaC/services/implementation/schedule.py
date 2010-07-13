@@ -955,10 +955,10 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
     def _getSlotEntry(self):
         return None
 
-class MoveEntry(ScheduleOperation, conferenceServices.ConferenceModifBase):
+class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
 
     def _checkParams(self):
-        conferenceServices.ConferenceModifBase._checkParams(self)
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
 
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
         self._contribPlace = pManager.extract("value", pType=str, allowEmpty=False)
