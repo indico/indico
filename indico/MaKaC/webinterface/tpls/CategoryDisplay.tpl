@@ -10,7 +10,6 @@ containsCategories = len(categ.getSubCategoryList()) > 0
         <% if not isRootCategory: %>            
             <li><a href="<%= urlHandlers.UHCategoryDisplay.getURL(categ.owner) %>"><%= _("Go to parent category") %></a>|</li>
         <% end %>
-        <li style="display: none"><a href="<%= urlHandlers.UHCategoryOverview.getURL(categ) %>"><%= _("Today's events") %><img style="display: none;"  src="<%= systemIcon("day") %>" alt="<%= _("Overview") %>" /></a></li>
             <% if categ.getConferenceList() != []: %>            
                 <li><a href="<%= urlHandlers.UHCategoryToiCal.getURL(categ) %>"><%= _("iCal export")%></a>|</li>
             <% end %>
