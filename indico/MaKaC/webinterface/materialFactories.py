@@ -358,7 +358,7 @@ class DefaultMaterialFactory(MaterialFactory):
 
     def create(self, target):
         m = conference.Material()
-        m.setTitle(self.name.title())
+        m.setTitle(self.name)
         target.addMaterial( m )
         return m
 
