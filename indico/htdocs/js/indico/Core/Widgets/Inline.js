@@ -64,12 +64,12 @@ type("InlineRemoteWidget", ["InlineWidget"],
       * loadOnStartup - should the widget start loading from the
       * server automatically?
       */
-     function(method, attributes, loadOnStartup) {
+     function(method, attributes, loadOnStartup, callback) {
          loadOnStartup = exists(loadOnStartup)?loadOnStartup:true;
          this.ready = new WatchValue();
          this.ready.set(false);
          this.loadOnStartup = loadOnStartup;
-         this.source = indicoSource(method, attributes, null, !loadOnStartup);
+         this.source = indicoSource(method, attributes, null, !loadOnStartup, callback);
      });
 
 /*
@@ -426,12 +426,13 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
          }
 
      },
-     function(method, args) {
+     function(method, args, callback) {
          this.options = new WatchObject();
          this.select = Html.select({});
          this.selected = new WatchValue();
          // Load data source on startup
-         this.InlineRemoteWidget(method, args, true);
+         this.InlineRemoteWidget(method, args, true, callback);
+         this.loadOnStartup = false;
      });
 
 

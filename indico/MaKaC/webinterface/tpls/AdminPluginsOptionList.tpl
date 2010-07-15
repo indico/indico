@@ -74,6 +74,10 @@
                     <div id="roomChooser"></div>
                     <div id="roomAddButton"></div>
                     <script type="text/javascript">
+                        var callback = function(){
+                            $E('roomChooser').set(roomChooser.draw(),addRoomButton);
+                        }
+
                         var removeRoomHandler = function (roomToRemove,setResult){
                             indicoRequest(
                                     'plugins.removeRooms',
@@ -101,7 +105,7 @@
 
                         <% if rbActive: %>
 
-                            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {})
+                            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {}, callback);
                             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
                             addRoomButton.observeClick(
                                 function(setResult){
@@ -120,7 +124,6 @@
                                         }
                                     );
                             });
-                            $E('roomChooser').set(roomChooser.draw(),addRoomButton);
                             $E('roomAddButton').set();
                         <% end %>
                     </script>

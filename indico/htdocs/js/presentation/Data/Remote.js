@@ -112,7 +112,7 @@ function jsonRpcObject(url, method, params, dontWatch) {
  * @param {Object} [def]
  * @return {WatchAccessor} value
  */
-function jsonRpcValue(url, method, params, def, dontStart) {
+function jsonRpcValue(url, method, params, def, dontStart, callback) {
         // not an object for url... curry
         var self = new Source();
         var object = mixWatchGetters(self, ["state", "error"]);
@@ -131,6 +131,10 @@ function jsonRpcValue(url, method, params, def, dontStart) {
                                 data: result,
                                 error: null
                         });
+
+                        if(callback) {
+                            callback();
+                        }
                 }
         }
 
