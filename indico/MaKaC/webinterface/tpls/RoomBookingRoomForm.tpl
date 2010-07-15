@@ -16,6 +16,12 @@
         <div id="roomCH" class="tip">
             <b> <%= _("Required.")%></b>  <%= _("Room number.")%>
         </div>
+        <div id="latitudeCH" class="tip">
+            <b> <%= _("Latitude.")%>
+        </div>
+        <div id="longitudeCH" class="tip">
+            <b> <%= _("Longitude.")%>
+        </div>
         <div id="isActiveCH" class="tip">
              <%= _("Whether the room exists. Turn it off if room is no longer suitable for meetings, but for some reason you don't want to delete it.")%>
         </div>
@@ -115,6 +121,14 @@
                                         <tr>
                                             <td align="right" valign="top"><small> <%= _("Room")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="text" id="roomNr" name="roomNr" value="<%= verbose( room.roomNr ) %>" /><% contextHelp( 'roomCH' ) %></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Latitude")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="text" id="latitude" name="latitude" value="<%= verbose( room.latitude ) %>" /><% contextHelp( 'latitudeCH' ) %></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Longitude")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="text" id="longitude" name="longitude" value="<%= verbose( room.longitude ) %>" /><% contextHelp( 'longitudeCH' ) %></td>
                                         </tr>
                                  </table>
                                 </td>

@@ -93,6 +93,16 @@
                                             <td align="right" valign="top"><small> <%= _("Room")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= room.roomNr %></td>
                                         </tr>
+                                        <% if user.isAdmin(): %>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Latitude")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><%= room.latitude %></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Longitude")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><%= room.longitude %></td>
+                                        </tr>
+                                        <% end %>
                                  </table>
                                 </td>
                                 <td width="20%%" align="right" class="thumbnail">

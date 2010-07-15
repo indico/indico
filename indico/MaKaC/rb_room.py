@@ -755,6 +755,8 @@ rNeedConfirmation: #{self.resvsNeedConfirmation}
     building = None       # int, positive
     floor = None          # str, alphanumeric
     roomNr = None         # str
+    latitude = None       # str
+    longitude = None      # str
 
     name = property( _getName, _setName ) # str - room name
 

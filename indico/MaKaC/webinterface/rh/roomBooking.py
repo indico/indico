@@ -200,6 +200,8 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
         session.setVar( "building", c.building )
         session.setVar( "floor", c.floor )
         session.setVar( "roomNr", c.roomNr )
+        session.setVar( "latitude", c.latitude )
+        session.setVar( "longitude", c.longitude )
 
         session.setVar( "isActive", c.isActive )
         session.setVar( "isReservable", c.isReservable )
@@ -232,6 +234,19 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
             errors.append( "Building must be a positive integer" )
         if not c.capacity or c.capacity < 1:
             errors.append( "Capacity must be a positive integer" )
+
+        try:
+            if c.longitude and float(c.longitude) < 0:
+                errors.append("Longitude must be a positive number")
+        except ValueError:
+            errors.append("Longitude must be a number")
+
+        try:
+            if c.latitude and float(c.latitude) < 0:
+                errors.append("Latitude must be a positive number")
+        except ValueError:
+            errors.append("Latitude must be a number")
+
         params = self._params
         if ( params['largePhotoPath'] != '' ) ^ ( params['smallPhotoPath'] != '' ):
             errors.append( "Either upload both photos or none")
@@ -256,6 +271,8 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
         candRoom.building = None
         candRoom.floor = ''
         candRoom.roomNr = ''
+        candRoom.longitude = ''
+        candRoom.latitude = ''
 
         candRoom.capacity = 20
         candRoom.site = ''
@@ -279,6 +296,8 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
         candRoom.building = intd( session.getVar( "building" ) )
         candRoom.floor = session.getVar( "floor" )
         candRoom.roomNr = session.getVar( "roomNr" )
+        candRoom.latitude = session.getVar( "latitude" )
+        candRoom.longitude = session.getVar( "longitude" )
 
         candRoom.isActive = bool( session.getVar( "isActive" ) )
         candRoom.isReservable = bool( session.getVar( "isReservable" ) )
@@ -311,6 +330,8 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
         candRoom.building = intd( params.get( "building" ) )
         candRoom.floor = params.get( "floor" )
         candRoom.roomNr = params.get( "roomNr" )
+        candRoom.latitude = params.get( "latitude" )
+        candRoom.longitude = params.get( "longitude" )
 
         candRoom.isActive = bool( params.get( "isActive" ) ) # Safe
         candRoom.isReservable = bool( params.get( "isReservable" ) ) # Safe
