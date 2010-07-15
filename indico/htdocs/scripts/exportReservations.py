@@ -28,6 +28,7 @@ from MaKaC.domain import DomainHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import HostnameResolveError
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
+from MaKaC.common.utils import parseDate
 
 """
 TODO: This must be refactor to be done with RH???
@@ -66,13 +67,13 @@ def index(req, **params):
 
     ################### checking params ###################
     if not (params.has_key("sd") and params.has_key("ed") and params.has_key("r")):
-        return """Missing parameters. The request should be like this: http://indico.cern.ch/exportRooms.py?sd=24-09-2010&ed=25-09-2010&r=1,18,114,42"""
+        return """Missing parameters. The request should be like this: http://indico.cern.ch/exportReservations.py?sd=24-09-2010&ed=25-09-2010&r=1,18,114,42"""
 
     try:
-        sd = parse_date(params.get("sd"))
-        ed = parse_date(params.get("ed"))
+        sd = parseDate(params.get("sd"), "%Y-%m-%d")
+        ed = parseDate(params.get("ed"), "%Y-%m-%d")
     except ValueError, e:
-        return """The format for the dates (sd and ed) must be like this: DD-MM-YYYY"""
+        return """The format for the dates (sd and ed) must be like this: YYYY-MM-DD"""
     if sd > ed:
         return """'sd' must be <= than 'ed'"""
     if ed - sd > timedelta(35):
@@ -86,7 +87,7 @@ def index(req, **params):
         roomIDs = map(lambda x: int(x), roomIDs)
     except ValueError:
         return """Room IDs must be integers separated by commas (http://....?r=1,42,14,...)"""
-    if len(roomIDs) > 20:
+    if len(roomIDs) > 10:
         return "One can only export 10 rooms at most"
 
     #################### process ###################
@@ -101,7 +102,8 @@ def index(req, **params):
              'floor',
              'roomNr',
              'IP',
-             'H323 IP\n'
+             'H323 IP',
+             'uses VC equipment'
              ]]
 
     rooms = []
@@ -117,17 +119,22 @@ def index(req, **params):
 
     for collision in resvs:
         resv = collision.withReservation
+        if resv.usesAVC:
+            usesAVC = 1
+        else:
+            usesAVC = 0
         results.append([str(UHRoomBookingBookingDetails.getURL(resv)),
                          str(resv.id),
-                         collision.startDT.strftime("%d-%m-%Y %H:%M"),
-                         collision.endDT.strftime("%d-%m-%Y %H:%M"),
+                         collision.startDT.strftime("%Y-%m-%d %H:%M:%S"),
+                         collision.endDT.strftime("%Y-%m-%d %H:%M:%S"),
                          resv.room.name or "",
                          resv.room.site,
                          str(resv.room.building),
                          resv.room.floor,
                          str(resv.room.roomNr),
                          resv.room.customAtts.get('IP') or "",
-                         resv.room.customAtts.get('H323 IP') or "" + '\n'
+                         resv.room.customAtts.get('H323 IP') or "",
+                         usesAVC
                          ])
 
     Factory.getDALManager().disconnect()
@@ -140,7 +147,7 @@ def index(req, **params):
 
     #################### write the results in the temp file ###################
     fd=open(tempFileName, 'w')
-    writer = csv.writer(fd, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    writer = csv.writer(fd, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     for i in results:
         writer.writerow(i)
     fd.close()
