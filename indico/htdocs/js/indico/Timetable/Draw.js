@@ -1643,12 +1643,12 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             //var dayFiltered = this.applyFilters(this.data[this.day]);
             //var dayData = this.layoutChooser.get().drawDay(dayFiltered);
             var dayData = this.layoutChooser.get().drawDay(this.data[this.day]);
-            var height = 100+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
-            this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
-
             var blocks = this._posterBlocks(dayData);
-
             this.canvas.set(Html.div({style: {position: 'relative'}}, blocks));
+
+            var height = this.canvas.dom.clientHeight + 50 + TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
+
+            this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
             this.postDraw();
 
@@ -1718,5 +1718,6 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
     },
     function(data, canvas, width, wrappingElement, extraButtons, loadingIndicator, managementMode, managementActions) {
         this.TimetableDrawer(data, canvas, width, wrappingElement, 'session', extraButtons, loadingIndicator, managementMode, managementActions, data.isPoster?'poster':null);
+        this.wrappingElement = data.parentTimetable.timetableDrawer.wrappingElement;
     }
 );
