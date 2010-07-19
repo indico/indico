@@ -310,7 +310,7 @@ _Creator_
 _Date_
 %s -> %s
 _Access_
-%s""" % ( conf.getStartDate(), conf.getEndDate(), urlHandlers.UHConferenceDisplay.getURL(conf))
+%s""" % ( conf.getAdjustedStartDate(), conf.getAdjustedEndDate(), urlHandlers.UHConferenceDisplay.getURL(conf))
         else:
             i = 1
             for c in confs:
@@ -318,7 +318,7 @@ _Access_
 _Date%s_
 %s -> %s
 _Access%s_
-%s """ % (i,c.getStartDate(), c.getEndDate(), i,urlHandlers.UHConferenceDisplay.getURL(c))
+%s """ % (i,c.getAdjustedStartDate(), c.getAdjustedEndDate(), i,urlHandlers.UHConferenceDisplay.getURL(c))
                 i+=1
 
         msg = ("Content-Type: text/plain; charset=\"utf-8\"\r\nFrom: %s\r\nReturn-Path: %s\r\nTo: %s\r\nCc: \r\nSubject: %s\r\n\r\n"%(fromAddr, fromAddr, addrs, subject))

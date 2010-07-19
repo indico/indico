@@ -183,7 +183,7 @@
         <label for="permissionYesRB" id="permissionYesRBLabel">Yes</label>
         <input type="radio" name="permission" id="permissionNoRB"value="No" >
         <label for="permissionNoRB" id="permissionNoRBLabel">No</label>
-        <span style="margin-left: 2em;"><%=_("Here is the ")%><a href="<%= ConsentFormURL %>"><%=_("Webcast Consent Form")%></a> <%=_("to be signed by each speaker.")%></span>
+        <% if ConsentForm: %><span style="margin-left: 2em;"><%= ConsentForm %></span><% end %>
         </div>
     </div>
 

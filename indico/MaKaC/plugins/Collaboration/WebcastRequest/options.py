@@ -48,19 +48,19 @@ globalOptions = [
                           "defaultValue": [],
                           "editable": True,
                           "visible": True} ),
-    
+
     ("contributionLoadLimit", {"description" : "Allowed number of talks fetched on new request page load",
                "type": int,
                "defaultValue": 20,
                "editable": True,
                "visible": True} ),
-               
-    ("ConsentFormURL", {"description" : "Webcast consent form URL",
+
+    ("ConsentForm", {"description" : "Webcast consent form information",
                "type": str,
                "defaultValue": "",
                "editable": True,
                "visible": True}),
-               
+
     ("webcastCapableRooms", {"description": "Rooms capable of webcasting",
                       "type": "rooms",
                       "defaultValue": [],

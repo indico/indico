@@ -71,7 +71,7 @@
         <input type="radio" name="permission" id="permissionNoRB"value="No" >
         <label for="permissionNoRB" id="permissionNoRBLabel"><%= _('No') %></label>
         <br/>
-        <span style="margin-left: 2em;"><%= _('Here is the') %> <a href="<%= ConsentFormURL %>"><%= _('Recording Consent Form') %></a> <%= _('to be signed by each speaker. Please have this form signed by each speaker and return it to the <a href="http://it-multimedia.web.cern.ch/it-multimedia/audiovisual/">Audiovisual Service</a> (<a href="http://building.web.cern.ch/map/building?bno=50">50-1-004</a>). We may not publish the recorded video if we do not get the signed release form.') %></span>
+        <% if ConsentForm: %><span style="margin-left: 2em;"><%= ConsentForm %></span><%end%>
     </div>
 </div>
 
