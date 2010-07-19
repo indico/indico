@@ -49,14 +49,14 @@ globalOptions = [
                           "defaultValue": [],
                           "editable": True,
                           "visible": True} ),
-    
+
     ("contributionLoadLimit", {"description" : _("Allowed number of talks fetched on new request page load"),
                "type": int,
                "defaultValue": 20,
                "editable": True,
                "visible": True} ),
-               
-    ("ConsentFormURL", {"description" : _("Recording consent form URL"),
+
+    ("ConsentForm", {"description" : _("Recording consent form information"),
                "type": str,
                "defaultValue": "",
                "editable": True,

@@ -30,16 +30,16 @@ from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 
 class WNewBookingForm(WCSPageTemplateBase):
-        
+
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )
-        
+
         vars["IsSingleBooking"] = not CollaborationTools.getCSBookingClass(self._pluginName)._allowMultiple
         vars["Conference"] = self._conf
-        
+
         isLecture = self._conf.getType() == 'simple_event'
         vars["IsLecture"] = isLecture
-        
+
         location = self._conf.getLocation()
         room = self._conf.getRoom()
         if location and location.getName() and location.getName().strip() and \
@@ -47,47 +47,47 @@ class WNewBookingForm(WCSPageTemplateBase):
             vars["HasRoom"] = True
         else:
             vars["HasRoom"] = False
-        
+
         booking = self._conf.getCSBookingManager().getSingleBooking('RecordingRequest')
-        
+
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         vars["InitialChoose"] = initialChoose
-        
+
         contributions = []
-        
+
         if not isLecture and self._conf.getNumberOfContributions() > 0:
             underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
-            
+
             initialDisplay = underTheLimit or (booking is not None and initialChoose)
             vars["DisplayTalks"] = initialDisplay
-            
+
             #a talk is defined as a non-poster contribution
             talks = getTalks(self._conf, oneIsEnough = not initialDisplay)
             nTalks = len(talks)
-            vars["HasTalks"] = nTalks > 0 
-            
+            vars["HasTalks"] = nTalks > 0
+
             if initialDisplay:
                 talks.sort(key = Contribution.contributionStartDateForSort)
-                    
+
                 contributions = fossilize(talks, IContributionWithSpeakersFossil,
                                           tz = self._conf.getTimezone(),
                                           units = '(hours)_minutes',
                                           truncate = True)
-                    
+
         else:
             vars["DisplayTalks"] = booking is not None and initialChoose
             vars["HasTalks"] = False
-                
+
         vars["Contributions"] = contributions
-                
-        vars["ConsentFormURL"] = self._RecordingRequestOptions["ConsentFormURL"].getValue()
+
+        vars["ConsentForm"] = self._RecordingRequestOptions["ConsentForm"].getValue()
         vars["LectureOptions"] = lectureOptions
         vars["TypesOfEvents"] = typeOfEvents
         vars["PostingUrgency"] = postingUrgency
         vars["RecordingPurpose"] = recordingPurpose
         vars["IntendedAudience"] = intendedAudience
         vars["SubjectMatter"] = subjectMatter
-        
+
         return vars
 
 class WMain (WJSBase):
@@ -95,11 +95,11 @@ class WMain (WJSBase):
 
 class WIndexing(WJSBase):
     pass
-    
+
 class WExtra (WJSBase):
     def getVars(self):
-        vars = WJSBase.getVars( self )    
-        
+        vars = WJSBase.getVars( self )
+
         if self._conf:
             vars["ConferenceId"] = self._conf.getId()
             vars["NumberOfContributions"] = self._conf.getNumberOfContributions()
@@ -107,12 +107,12 @@ class WExtra (WJSBase):
             # these 2 vars are used to see if contrib dates shown should include day or just time
             vars["ConfStartDate"] = Conversion.datetime(self._conf.getAdjustedStartDate())
             vars["IsMultiDayEvent"] = not isSameDay(self._conf.getStartDate(), self._conf.getEndDate(), self._conf.getTimezone())
-            
+
             location = ""
             if self._conf.getLocation() and self._conf.getLocation().getName():
                 location = self._conf.getLocation().getName().strip()
             vars["ConfLocation"] = location
-            
+
             room = ""
             if self._conf.getRoom() and self._conf.getRoom().getName():
                 room = self._conf.getRoom().getName().strip()
@@ -128,7 +128,7 @@ class WExtra (WJSBase):
             vars["IsMultiDayEvent"] = False
             vars["ConfLocation"] = ""
             vars["ConfRoom"] = ""
-        
+
         return vars
 
 class WStyle (WCSCSSBase):
