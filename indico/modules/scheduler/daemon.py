@@ -20,6 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import sys, getopt, os, time
+from MaKaC.common.Configuration import Config
 
 def _isPosix():
     return os.name == "posix"
@@ -50,7 +51,7 @@ def _getPID(printExceptions=True):
 def _killProcess():
     if not _isPosix():
         return False
-    
+
     pid = _getPID()
     if pid != -1:
         try:
@@ -60,7 +61,7 @@ def _killProcess():
         else:
             os.remove(linuxPIDFile)
             return True
-        
+
     return False
 
 def initDefaultTasks():
@@ -104,20 +105,20 @@ def initDefaultTasks():
 
 
 def run(log=None):
-    from MaKaC.tasks.controllers import Supervisor
-    Supervisor.getInstance().run()
+    from indico.modules.scheduler import Scheduler
+    Scheduler.getInstance().run()
     # initDefaultTasks()
-    
 
-def startTaskDaemon():
+
+def startScheduler():
     """
     Run the function listed in the toExec instance each 'duration' seconds
     """
     oldPID=_getPID(False)
     if oldPID!=-1:
-        print "Task daemon is already running"
+        print "Scheduler daemon is already running"
         sys.exit(0)
-        
+
     if _isPosix():
         pid=os.fork()
         if pid==0:
@@ -135,20 +136,28 @@ def startTaskDaemon():
         print "Impossible to start the daemon"
 
 
-def stopTaskDaemon():
+def stopScheduler():
     if _killProcess():
         print "Daemon stopped!"
     else:
-        print "Impossible to stop the process 'taskDaemon', please do it manually"
+        print "Impossible to stop the process, please do it manually"
 
 
-def restartTaskDaemon():
-    stopTaskDaemon()
-    startTaskDaemon()
+def restartScheduler():
+    stopScheduler()
+    startScheduler()
 
 
 def main():
-    "Main"
+    """
+    Main cycle
+    """
+
+    global linuxPIDFile
+
+    cfg = Config.getInstance()
+    linuxPIDFile = "%s/IndicoScheduler.pid" % cfg.getLogDir()
+
     try:
         opts, args = getopt.getopt(sys.argv[1:],"hstr", [ "help", "start", "stop", "restart" ])
     except getopt.GetoptError, e:
@@ -160,14 +169,14 @@ def main():
         arg=args[0]
     elif len(opts)==1:
         arg=opts[0][0]
-        
+
     if arg:
         if arg in ("start", "s", "-s"):
-            startTaskDaemon()
+            startScheduler()
         elif arg in ("stop", "t", "-t"):
-            stopTaskDaemon()
+            stopScheduler()
         elif arg in ("restart", "r", "-r"):
-            restartTaskDaemon()
+            restartScheduler()
         elif arg in ("help", "h", "-h", "--help"):
             usage()
             sys.exit()
@@ -181,16 +190,12 @@ def main():
 
 
 def usage():
-    print "\nUsage: python taskDaemon.py  start|stop|restart [-h]\n"
+    print "\nUsage: %s start|stop|restart [-h]\n" % sys.argv[0]
     print "  -h                    Help"
-    print "  -s                    Start the task daemon"
-    print "  -t                    Stop the task daemon"
-    print "  -r                    Restart the task daemon"
+    print "  -s                    Start the scheduler daemon"
+    print "  -t                    Stop the scheduler daemon"
+    print "  -r                    Restart the scheduler daemon"
 
 
 if __name__ == "__main__":
-    from MaKaC.common.Configuration import Config
-    cfg = Config.getInstance()
-    linuxPIDFile = "%s/IndicoTaskDaemon.pid" % cfg.getLogDir()
-    logFile = "%s/taskDaemon.log" % cfg.getLogDir()
     main()

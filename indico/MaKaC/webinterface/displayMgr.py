@@ -1381,8 +1381,8 @@ class StyleManager(Persistent):
     def setCSS( self, cssFile ):
         if isinstance(cssFile, str):
             # we will use a template but we keep the uploaded css file
-            from MaKaC.modules.base import ModulesHolder
-            self._cssTplsModule = ModulesHolder().getById("cssTpls")
+            from indico.modules import ModuleHolder
+            self._cssTplsModule = ModuleHolder().getById("cssTpls")
             self._usingTemplate = self._cssTplsModule.getCssTplById(cssFile)
         else:
             # uploaded file

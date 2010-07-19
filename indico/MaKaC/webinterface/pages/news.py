@@ -19,34 +19,34 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.webinterface.pages.main import WPMainBase
-import MaKaC.webinterface.wcomponents as wcomponents      
-from MaKaC.modules.base import ModulesHolder
+import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common import timezoneUtils
+
+from indico.modules import ModuleHolder
 
 class WPNews(WPMainBase):
 
     def _getBody(self, params):
         wc = WNews(tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ()))
         return wc.getHTML()
-    
+
     def _getTitle(self):
         return WPMainBase._getTitle(self) + " - " + _("News")
 
 
 class WNews(wcomponents.WTemplated):
-    
+
     def __init__(self, tz):
         wcomponents.WTemplated.__init__(self)
         self._tz = tz
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        
-        newsModule = ModulesHolder().getById("news")
+
+        newsModule = ModuleHolder().getById("news")
         vars["news"] = newsModule.getNewsItemsList()
         vars["tz"] = self._tz
-        
+
         return vars
-        

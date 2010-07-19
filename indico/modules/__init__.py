@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
 ## CDS Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,4 +18,4 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.modules.upcoming import *
+from base import ModuleHolder, Module

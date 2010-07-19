@@ -27,7 +27,7 @@ from MaKaC.common.utils import formatTime, formatDateTime
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.conference import Category, Conference
-from MaKaC.modules.base import ModulesHolder
+from indico.modules import ModuleHolder
 
 class WPMainBase(base.WPDecorated):
 
@@ -181,9 +181,10 @@ class WUpcomingEvents(wcomponents.WTemplated):
             return formatDateTime(dateTime, format="%d %b %Y")
 
     def _getUpcomingEvents(self):
-        upcomingMod = ModulesHolder().getById('upcoming_events')
+        upcomingMod = ModuleHolder().getById('upcoming_events')
 
         # Just convert UTC to display timezone
+
         return map(lambda x: (x[0], x[1].astimezone(self._timezone), x[2], x[3]),
                    upcomingMod.getUpcomingEventList())
 

@@ -19,13 +19,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import datetime, timedelta
-import MaKaC.common.indexes as indexes 
+import MaKaC.common.indexes as indexes
 from MaKaC.common import DBMgr
 from MaKaC.webinterface import mail, urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.timerExec import task, obj
-from MaKaC.tasks.controllers import Supervisor
-from MaKaC.tasks.base import OneShotTask 
+from indico.modules.scheduler import Scheduler
+from MaKaC.tasks.base import OneShotTask
 from persistent import Persistent
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
@@ -38,7 +38,7 @@ class PendingHolder(object):
     """ This is an index that holds all the requests to add pending people to become
         Indico users.
         Those participants are not Avatars yet (do not have Indico account) and that's why
-        they are in this pending queue. So once they become Indico users they will be removed 
+        they are in this pending queue. So once they become Indico users they will be removed
         from the index"""
 
     def __init__(self):
@@ -57,7 +57,7 @@ class PendingHolder(object):
         email=sb.getEmail().lower().strip()
         if self.getPendingByEmail(email)==[]:
             self._removeTask(email)
-    
+
     def addPending(self, sb, sendEmail=True, sendPeriodicEmail=False):
         """Add a new user to the index, and a new task only the first time"""
         self._idx.indexPendingUser(sb)
@@ -75,7 +75,7 @@ class PendingHolder(object):
     def _sendReminderEmail(self, sb):
         """We must implement this method in order to sent an email with the reminder for the specific pending users"""
         pass
-    
+
 
     def _getTasksIdx(self):
         return self._tasksIdx
@@ -90,20 +90,20 @@ class PendingHolder(object):
             pedingReminder.setId("ReminderPending%s-%s" % (self._id,email))
             # Create the task
             t=task()
-            t.addObj(pedingReminder) 
+            t.addObj(pedingReminder)
             t.setInterval(timedelta(7)) # Remind each 7 days
             nw=nowutc()
             t.setLastDate(nw) # start in 7 days cos the first email was already sent
             t.setEndDate(nw+timedelta(15)) # keep trying during 15 days
             self._tasksIdx.indexTask(email, t)
-            
-            Supervisor.addTask(t)
-            
-        
+
+            Scheduler.addTask(t)
+
+
     def _removeTask(self, email):
         if self._hasTask(email):
             t=self._getTasksIdx().matchTask(email)[0]
-            Supervisor.removeTask(t)
+            Scheduler.removeTask(t)
             self._tasksIdx.unindexTask(email, t)
 
     def _hasTask(self, email):
@@ -117,7 +117,7 @@ class _PendingNotification(object):
         self._participationsByConf=self._calculateParticipationsByConf()
         self._forceIndicoFromAddress=len(self._participationsByConf)>1
         self._ccList = []
-        
+
     def getFromAddr(self):
         # TODO: There will be on "from address" from a conference, but what if there are more different conferences
         supEmail=self._psList[0].getConference().getSupportEmail(returnNoReply=True)
@@ -159,7 +159,7 @@ class PendingReminder(OneShotTask):
         """Mandatory to implement for the specific queues.
            It runs the task of sending an email to the users in order to
            ask them for the creation of the account.
-           
+
            It returns:
                - TRUE if the pending user has already created the account.
                - FALSE if not."""
@@ -175,12 +175,12 @@ class PendingReminder(OneShotTask):
             ph.grantRights(av)
             return True
         return False
-    
+
     def tearDown(self):
         '''Inheriting classes must implement this method'''
         raise Exception('Unimplemented tearDown')
-    
-    
+
+
     def getEmail(self):
         return self._email
 #---END GENERAL
@@ -190,10 +190,10 @@ class PendingReminder(OneShotTask):
 
 class PendingSubmittersHolder(PendingHolder):
 
-    """ This is an index that holds all the requests to add Authors and Speakers in the 
+    """ This is an index that holds all the requests to add Authors and Speakers in the
         list of avatars with rights to submit material.
         Those participants are not Avatars yet (do not have Indico account) and that's why
-        they are in this pending queue. So once they become Indico users they will be removed 
+        they are in this pending queue. So once they become Indico users they will be removed
         from the index"""
 
     def __init__(self):
@@ -209,25 +209,25 @@ class PendingSubmittersHolder(PendingHolder):
             # We must grant the new avatar with submission rights
             contrib=e.getContribution()
             contrib.grantSubmission(av)
-            # the Conference method "removePendingSubmitter" will remove the Submitter 
-            # (type-ContributionParticipation) objects from the conference pending submitter 
+            # the Conference method "removePendingSubmitter" will remove the Submitter
+            # (type-ContributionParticipation) objects from the conference pending submitter
             # list and from the this index (PendingSubmitterHolder).
             e.getConference().getPendingQueuesMgr().removePendingSubmitter(e)
 
-    def _sendReminderEmail(self, sb):                
+    def _sendReminderEmail(self, sb):
         from MaKaC.conference import ContributionParticipation
         DBMgr.getInstance().commit()
         if type(sb)==list:
-            # Sending email just about the contribution participations of the list "sb" (normally 
+            # Sending email just about the contribution participations of the list "sb" (normally
             # they are contributions from one event)
             notif = _PendingSubmitterNotification( sb )
             mail.GenericMailer.send( notif )
         elif isinstance(sb, ContributionParticipation):
             # The param "sb" is a ContributionParticipant, so we send an email with the info
             # about all its participations
-            psList=self.getPendingByEmail(sb.getEmail())            
+            psList=self.getPendingByEmail(sb.getEmail())
             if psList != [] and psList is not None:
-                notif = _PendingSubmitterNotification( psList )                
+                notif = _PendingSubmitterNotification( psList )
                 mail.GenericMailer.send( notif )
 
 class _PendingSubmitterNotification(_PendingNotification):
@@ -239,14 +239,14 @@ class _PendingSubmitterNotification(_PendingNotification):
     You have been added as author/speaker of the following contributions:%s
     and material submission rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
-                  
+
     <%s>
 
     *Note that you must use this email address %s when creating the account*
 
     Best Regards.
 
-    -- 
+    --
     Indico project <http://cern.ch/indico>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
@@ -284,23 +284,23 @@ class PendingSubmitterReminder(PendingReminder):
         psl=psh.getPendingByEmail(self._email)
         for e in psl:
             e.getConference().getPendingQueuesMgr().removePendingSubmitter(e)
-    
+
     def getPendings(self):
         psh=PendingSubmittersHolder()
         try:
             return psh.getPendingByEmail(self._email)
         except:
             return None
-    
+
 #---END SUBMITTERS
 
 #---PENDING SESSION MANAGERS
 class PendingManagersHolder(PendingHolder):
 
-    """ This is an index that holds all the requests to add non existing users in the 
+    """ This is an index that holds all the requests to add non existing users in the
         list of avatars with rights to manage.
         Those participants are not Avatars yet (do not have Indico account) and that's why
-        they are in this pending queue. So once they become Indico users they will be removed 
+        they are in this pending queue. So once they become Indico users they will be removed
         from the index"""
 
     def __init__(self):
@@ -310,14 +310,14 @@ class PendingManagersHolder(PendingHolder):
         self._tasksIdx=indexes.IndexesHolder().getById("pendingManagersTasks") # Tasks which send reminder emails periodically asking
                                                                                # for the creation of one indico account
         self._reminder=PendingManagerReminder
-        
+
     def grantRights(self, av):
         l=self.getPendingByEmail(av.getEmail())
         for e in l:
             # We must grant the new avatar with submission rights
             session=e.getSession()
             session.grantModification(av)
-            # the ConfPendingQueuesMgr method "removePendingManager" will remove the Manager 
+            # the ConfPendingQueuesMgr method "removePendingManager" will remove the Manager
             # (type-SessionChair) objects from the conference pending manager
             # list and from the this index (PendingManagersHolder).
             e.getConference().getPendingQueuesMgr().removePendingManager(e)
@@ -326,7 +326,7 @@ class PendingManagersHolder(PendingHolder):
         from MaKaC.conference import SessionChair
         DBMgr.getInstance().commit()
         if type(sb)==list:
-            # Sending email just about the participations of the list "sb" (normally 
+            # Sending email just about the participations of the list "sb" (normally
             # they are sessions from one event)
             notif = _PendingManagerNotification( sb )
             mail.GenericMailer.send( notif )
@@ -347,14 +347,14 @@ class _PendingManagerNotification(_PendingNotification):
     You have been added as convener of the following sessions:%s
     And session modification rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
-                  
+
     <%s>
 
     *Note that you must use this email address %s when creating the account*
 
     Best Regards.
 
-    -- 
+    --
     Indico project <http://cern.ch/indico>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
@@ -386,20 +386,20 @@ class PendingManagerReminder(PendingReminder):
         psl = psh.getPendingByEmail(self._email)
         for e in psl:
             e.getConference().getPendingQueuesMgr().removePendingManager(e)
-    
+
     def getPendings(self):
         psh=PendingManagersHolder()
         return psh.getPendingByEmail(self._email)
-#---END MANAGERS 
+#---END MANAGERS
 
 
 #---PENDING CONFERENCE MANAGERS
 class PendingConfManagersHolder(PendingHolder):
 
-    """ This is an index that holds all the requests to add non existing users in the 
+    """ This is an index that holds all the requests to add non existing users in the
         list of avatars with rights to manage.
         Those participants are not Avatars yet (do not have Indico account) and that's why
-        they are in this pending queue. So once they become Indico users they will be removed 
+        they are in this pending queue. So once they become Indico users they will be removed
         from the index"""
 
     def __init__(self):
@@ -409,14 +409,14 @@ class PendingConfManagersHolder(PendingHolder):
         self._tasksIdx=indexes.IndexesHolder().getById("pendingManagersTasks") # Tasks which send reminder emails periodically asking
                                                                                # for the creation of one indico account
         self._reminder=PendingManagerReminder
-        
+
     def grantRights(self, av):
         l=self.getPendingByEmail(av.getEmail())
         for e in l:
             # We must grant the new avatar with submission rights
             session=e.getSession()
             session.grantModification(av)
-            # the ConfPendingQueuesMgr method "removePendingManager" will remove the Manager 
+            # the ConfPendingQueuesMgr method "removePendingManager" will remove the Manager
             # (type-SessionChair) objects from the conference pending manager
             # list and from the this index (PendingManagersHolder).
             e.getConference().getPendingQueuesMgr().removePendingManager(e)
@@ -425,7 +425,7 @@ class PendingConfManagersHolder(PendingHolder):
         from MaKaC.conference import SessionChair
         DBMgr.getInstance().commit()
         if type(sb)==list:
-            # Sending email just about the participations of the list "sb" (normally 
+            # Sending email just about the participations of the list "sb" (normally
             # they are sessions from one event)
             notif = _PendingManagerNotification( sb )
             mail.GenericMailer.send( notif )
@@ -445,14 +445,14 @@ class _PendingConfManagerNotification(_PendingNotification):
     You have been added as manager of the following Event:%s
     And modification rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
-                  
+
     <%s>
 
     *Note that you must use this email address %s when creating the account*
 
     Best Regards.
 
-    -- 
+    --
     Indico project <http://cern.ch/indico>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
@@ -480,19 +480,19 @@ class PendingConfManagerReminder(PendingReminder):
         psl = psh.getPendingByEmail(self._email)
         for e in psl:
             e.getConference().getPendingQueuesMgr().removePendingManager(e)
-    
+
     def getPendings(self):
         psh = PendingManagersHolder()
         return psh.getPendingByEmail(self._email)
-#---END MANAGERS 
+#---END MANAGERS
 
 #---PENDING COORDINATORS
 class PendingCoordinatorsHolder(PendingHolder):
 
-    """ This is an index that holds all the requests to add non existing users in the 
+    """ This is an index that holds all the requests to add non existing users in the
         list of avatars with rights to coordinate.
         Those participants are not Avatars yet (do not have Indico account) and that's why
-        they are in this pending queue. So once they become Indico users they will be removed 
+        they are in this pending queue. So once they become Indico users they will be removed
         from the index"""
 
     def __init__(self):
@@ -502,14 +502,14 @@ class PendingCoordinatorsHolder(PendingHolder):
         self._tasksIdx=indexes.IndexesHolder().getById("pendingCoordinatorsTasks") # Tasks which send reminder emails periodically asking
                                                                                # for the creation of one indico account
         self._reminder=PendingCoordinatorReminder
-    
+
     def grantRights(self, av):
         l=self.getPendingByEmail(av.getEmail())
         for e in l:
             # We must grant the new avatar with submission rights
             session=e.getSession()
             session.addCoordinator(av)
-            # the ConfPendingQueuesMgr method "removePendingCoordinator" will remove the Coordinator 
+            # the ConfPendingQueuesMgr method "removePendingCoordinator" will remove the Coordinator
             # (type-SessionChair) objects from the conference pending coordinator
             # list and from the this index (PendingCoordinatorsHolder).
             e.getConference().getPendingQueuesMgr().removePendingCoordinator(e)
@@ -518,7 +518,7 @@ class PendingCoordinatorsHolder(PendingHolder):
         from MaKaC.conference import SessionChair
         DBMgr.getInstance().commit()
         if type(sb)==list:
-            # Sending email just about the participations of the list "sb" (normally 
+            # Sending email just about the participations of the list "sb" (normally
             # they are sessions from one event)
             notif = _PendingCoordinatorNotification( sb )
             mail.GenericMailer.send( notif )
@@ -539,14 +539,14 @@ class _PendingCoordinatorNotification(_PendingNotification):
     You have been added as convener of the following sessions:%s
     And session coordination rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
-                  
+
     <%s>
 
     *Note that you must use this email address %s when creating your account*
 
     Best Regards.
 
-    -- 
+    --
     Indico project <http://cern.ch/indico>
                 """)%( self._getParticipations(), url, self._psList[0].getEmail() )
 
@@ -577,12 +577,12 @@ class PendingCoordinatorReminder(PendingReminder):
         psl = psh.getPendingByEmail(self._email)
         for e in psl:
             e.getConference().getPendingQueuesMgr().removePendingCoordinator(e)
-    
+
     def getPendings(self):
         psh = PendingCoordinatorsHolder()
         return psh.getPendingByEmail(self._email)
 
-#---END COORDINATORS 
+#---END COORDINATORS
 
 #--GENERAL---
 class PendingQueuesHolder(object):
@@ -607,11 +607,11 @@ class PendingQueuesHolder(object):
                 return l[0]
         return None
     getFirstPending=classmethod(getFirstPending)
-        
+
 ###---------------------------- Conference Pending Queues ---------------------------------
 
 class ConfPendingQueuesMgr(Persistent):
-    
+
     def __init__(self, conf):
         self._conf=conf
         self._pendingSubmitters={}
@@ -683,7 +683,7 @@ class ConfPendingQueuesMgr(Persistent):
             if self._pendingSubmitters[email] == []:
                 del self._pendingSubmitters[email]
             self.notifyModification()
-    
+
     def getPendingSubmittersByEmail(self, email):
         email=email.lower().strip()
         if self.getPendingSubmitters().has_key(email):
@@ -737,7 +737,7 @@ class ConfPendingQueuesMgr(Persistent):
             if self._pendingManagers[email] == []:
                 del self._pendingManagers[email]
             self.notifyModification()
-    
+
     def getPendingManagersByEmail(self, email):
         email=email.lower().strip()
         if self.getPendingManagers().has_key(email):
@@ -792,7 +792,7 @@ class ConfPendingQueuesMgr(Persistent):
             if self._pendingCoordinators[email] == []:
                 del self._pendingCoordinators[email]
             self.notifyModification()
-    
+
     def getPendingCoordinatorsByEmail(self, email):
         email=email.lower().strip()
         if self.getPendingCoordinators().has_key(email):
@@ -804,6 +804,6 @@ class ConfPendingQueuesMgr(Persistent):
         return cp in self.getPendingCoordinatorsByEmail(email)
 
     #----End coordinators
-    
+
     def notifyModification(self):
         self._p_changed=1

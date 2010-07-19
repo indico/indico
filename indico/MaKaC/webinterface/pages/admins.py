@@ -49,11 +49,11 @@ import MaKaC.webinterface.personalization as personalization
 from cgi import escape
 import re
 from MaKaC.i18n import _
-from MaKaC.modules.base import ModulesHolder
 from MaKaC.plugins.pluginLoader import PluginLoader
 
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
+from indico.modules import ModuleHolder
 
 class WPAdminsBase( WPMainBase ):
 
@@ -354,7 +354,7 @@ class WPUpdateNews( WPHomepageCommon ):
     def _getTabContent( self, params ):
         tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
         wc = WUpdateNews()
-        newsModule = ModulesHolder().getById("news")
+        newsModule = ModuleHolder().getById("news")
 
         newslist = fossilize(newsModule.getNewsItemsList(),INewsItemFossil, tz=tz)
         newsTypesList = newsModule.getNewsTypesAsDict()
@@ -825,8 +825,7 @@ class WAdminsConferenceStyles(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["contextHelpText"] = _("This is the list of templates that an organizer can use to customize a conference")
-        #from MaKaC.modules.base import ModulesHolder
-        cssTplsModule=ModulesHolder().getById("cssTpls")
+        cssTplsModule=ModuleHolder().getById("cssTpls")
         vars["cssTplsModule"] = cssTplsModule
         return vars
 

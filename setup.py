@@ -293,6 +293,11 @@ Please specify the directory where you'd like it to be placed.
 %s
         ''' % _databaseText('etc')
 
+        if sys.platform == "linux2":
+            # create symlink to legacy MaKaC dir
+            # this is so that the ".egg-link" created by the "develop" command works
+            os.symlink('indico/MaKaC','MaKaC')
+
     def _update_conf_dir_paths(self, filePath, dirs):
         fdata = open(filePath).read()
         for dir in dirs.items():
@@ -574,7 +579,7 @@ if __name__ == '__main__':
     dataFiles = _getDataFiles(x)
 
     foundPackages = find_packages(where = 'indico',
-                                  exclude = ('htdocs*','tests*','web*'))
+                                  exclude = ('htdocs','tests*', 'core*', 'modules*', 'web*'))
 
 
     # add our namespace package
@@ -607,7 +612,7 @@ if __name__ == '__main__':
           package_dir = { 'indico': 'indico',
                           'MaKaC' : os.path.join('indico', 'MaKaC')},
           entry_points = {
-            'console_scripts': [ 'taskDaemon           = MaKaC.consoleScripts.taskDaemon:main',
+            'console_scripts': [ 'indico_scheduler           = indico.modules.scheduler.daemon:main',
                                  'indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main',
                                  'indico_ctl           = MaKaC.consoleScripts.indicoCtl:main',
                                  ]

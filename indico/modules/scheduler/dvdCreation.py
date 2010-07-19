@@ -28,13 +28,14 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC import conference, schedule
-from MaKaC.tasks.controllers import Supervisor
-from MaKaC.tasks.base import OneShotTask 
+from MaKaC.tasks.base import OneShotTask
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+
+from indico.modules.scheduler.controllers import Scheduler
 
 class OfflineWebsiteCreator(OneShotTask):
     def __init__(self, rh, conf, **kwargs):
@@ -112,12 +113,12 @@ class OfflineWebsiteCreator(OneShotTask):
         ty, ex, tb = sys.exc_info()
         tracebackList = traceback.format_list( traceback.extract_tb( tb ) )
         text = _("""
-                    Offline website creation for the [event:%s] had caused 
+                    Offline website creation for the [event:%s] had caused
                     an error while running the task.
 
                     - Request from user: %s <%s>
 
-                    - Details of the exception: 
+                    - Details of the exception:
                         %s
 
                     - Traceback:
@@ -135,15 +136,15 @@ class OfflineWebsiteCreator(OneShotTask):
         forbiddenChars=string.maketrans(" /:()*?<>|\"","___________")
         path=path.translate(forbiddenChars)
         return path
-    
-    
+
+
 class ConferenceOfflineCreator(OfflineWebsiteCreator):
     def _getSubdir(self, pars):
         aux = {}
         for par in pars.keys():
             aux[par] = ".%s"%pars[par]
         return aux
-        
+
 
     def run(self, fileHandler=None):
         publicFileURL = ""
@@ -176,7 +177,7 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
             self._fileHandler.addNewFile(os.path.join(dvdPath, "css", "common.css"), commonCSSFile.read())
             commonCSSFile.close()
 
-            
+
             # Index web page for a conference + material/resources
             fname = os.path.join(dvdPath,urlHandlers.UHStaticConferenceDisplay.getRelativeURL())
             par = imagesPaths
@@ -225,7 +226,7 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
             trackDict={}
             for track in self._conf.getTrackList():
                 trackDict[track.getId()]=[]
-                
+
             for session in self._conf.getSessionList():
                 for slotEntry in session.getSchedule().getEntries():
                     slot = slotEntry.getOwner()
@@ -236,7 +237,7 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
                             if track is not None:
                                 trackDict[track.getId()].append(contrib)
             #print ".",
-            
+
             # Contribution list page
             fname = os.path.join(dvdPath,urlHandlers.UHStaticContributionList.getRelativeURL())
             par = imagesPaths
@@ -275,7 +276,7 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
                                     fname = os.path.join(trackDir, urlHandlers.UHStaticResourceDisplay.getRelativeURL(res))
                                     self._fileHandler.addNewFile(fname, res.readBin())
                 #print ".",
-            
+
 
             # ------ Other contributions not within a track -------
             otherContribsDir=os.path.join(dvdPath, "other_contributions")
@@ -331,7 +332,7 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
                                 self._fileHandler.addNewFile(fname, res.readBin())
 
             self._fileHandler.close()
-            
+
             #print "[DONE]\nmaking public the DVD...",
             self._outputFileName=self._publicFile(self._fileHandler.getPath())
             #print "[DONE]"
@@ -347,7 +348,7 @@ class ConferenceOfflineCreator(OfflineWebsiteCreator):
         return publicFileURL
 
 
-class MeetingOfflineCreator(OfflineWebsiteCreator):    
+class MeetingOfflineCreator(OfflineWebsiteCreator):
     def getRootDirPars(self, target, pars):
         rootDir="."
         if not isinstance(target, conference.Conference):
@@ -360,8 +361,8 @@ class MeetingOfflineCreator(OfflineWebsiteCreator):
         for par in pars.keys():
             aux[par] = "%s/%s"%(rootDir,pars[par])
         return aux
-    
-    
+
+
     def run( self, fileHandler=None ):
         publicFileURL = ""
         try:
@@ -390,7 +391,7 @@ class MeetingOfflineCreator(OfflineWebsiteCreator):
             commonCSSFile = open(os.path.join(Config.getInstance().getHtdocsDir(), "css", "common.css"))
             self._fileHandler.addNewFile(os.path.join(dvdPath, "css", "common.css"), commonCSSFile.read())
             commonCSSFile.close()
-            
+
             # Index web page for a conference + material/resources
             fname = os.path.join(dvdPath,urlHandlers.UHStaticConferenceDisplay.getRelativeURL())
             par = imagesPaths
@@ -449,11 +450,11 @@ class MeetingOfflineCreator(OfflineWebsiteCreator):
                                         self._fileHandler.addNewFile(fname, res.readBin())
                                     except Exception, e:
                                         continue
-                        
-                        
+
+
 
             self._fileHandler.close()
-            
+
             self._outputFileName=self._publicFile(self._fileHandler.getPath())
             publicFileURL = "%s/%s"%(Config.getInstance().getPublicURL(), self._outputFileName)
             self._sendEmail(publicFileURL)
@@ -461,8 +462,8 @@ class MeetingOfflineCreator(OfflineWebsiteCreator):
             self._sendErrorEmail(e)
         self._fileHandler=None
         return publicFileURL
-    
-    
+
+
 class RHWrapper(Persistent):
     def __init__(self, rh):
         self._user = rh._getUser()
@@ -484,8 +485,8 @@ class RHWrapper(Persistent):
 
     def getCurrentURL(self):
         return ""
-    
-    
+
+
 class DVDCreation:
     def __init__(self, rh, conf, wf):
         self._rh = rh
@@ -495,14 +496,14 @@ class DVDCreation:
     def create(self):
         # Create a wrapper for the RH
         rhw = RHWrapper(self._rh)
-        
+
         # Instantiate a dvd creator
         if self._wf is None:
             dvdCreator = ConferenceOfflineCreator(rhw, self._conf)
         else:
             dvdCreator = MeetingOfflineCreator(rhw, self._conf)
-            
+
         dvdCreator.setId("OffLineWebsiteCreator")
-        
+
         # Submit the task
-        Supervisor.addTask(dvdCreator)
+        Scheduler.addTask(dvdCreator)

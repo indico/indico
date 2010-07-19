@@ -2,12 +2,12 @@ import datetime
 
 from MaKaC.services.implementation.base import ParameterManager, AdminService
 from MaKaC.services.interface.rpc.common import ServiceError
-from MaKaC.modules.base import ModulesHolder
 
 from MaKaC import conference
 
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import IObservedObjectFossil
+from indico.modules import ModuleHolder
 
 
 class ConfigUpcomingEventsBase(AdminService):
@@ -16,7 +16,7 @@ class ConfigUpcomingEventsBase(AdminService):
         self._pm = ParameterManager(self._params)
 
     def _getAnswer(self):
-        upcomingModule = ModulesHolder().getById("upcoming_events")
+        upcomingModule = ModuleHolder().getById("upcoming_events")
 
         return self._getResult(upcomingModule)
 

@@ -117,6 +117,13 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
 
+        elif new_values[k].__class__ == bool:
+            regexp = re.compile('^(%s[ ]*=[ ]*)(True|False)' % k, re.MULTILINE)
+            if regexp.search(new_contents):
+                new_contents = re.sub(regexp, "\\g<1>%s" % result_values[k], new_contents)
+            else:
+                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
+
         elif new_values[k].__class__ == tuple:
             regexp = re.compile('^(%s[ ]*=[ ]*)[\(]{1}([^\)]+)[\)]{1}' % k, re.MULTILINE)
             if regexp.search(new_contents):

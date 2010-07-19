@@ -1,7 +1,7 @@
 <%!
-from MaKaC.modules.base import ModulesHolder
+from indico.modules import ModuleHolder
 from MaKaC.common.timezoneUtils import DisplayTZ
-newsModule = ModulesHolder().getById("news")
+newsModule = ModuleHolder().getById("news")
 newsList = newsModule.getNewsItemsList()
 %>
 

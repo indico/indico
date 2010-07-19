@@ -66,10 +66,11 @@ from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
 from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
-from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
+
+from indico.modules import ModuleHolder
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -12031,7 +12032,7 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
 
         self._conf = conf
-        self._cssTplsModule = ModulesHolder().getById("cssTpls")
+        self._cssTplsModule = ModuleHolder().getById("cssTpls")
         self._styleMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
 
         self._selectedCSS = None
