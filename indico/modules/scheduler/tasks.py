@@ -146,14 +146,12 @@ class SendMailTask(OneShotTask):
 
 
 
-class AlarmTask(OneShotTask):
+class AlarmTask(SendMailTask):
     """
     implement an alarm componment
     """
     def __init__(self, conf, **kwargs):
         super(AlarmTask, self).__init__(**kwargs)
-        self.mail = sendMail()
-        self.addObj(self.mail)
         self.conf = conf
         self.timeBefore = None
         self.text = ""
@@ -224,73 +222,29 @@ class AlarmTask(OneShotTask):
     def getTimeBefore(self):
         return self.timeBefore
 
-    def setFromAddr(self, addr):
-        self.mail.setFromAddr(addr)
-
-    def getFromAddr(self):
-        return self.mail.getFromAddr()
-
-    def initialiseToAddr(self):
-        self.mail.initialiseToAddr()
-
-    def addToAddr(self, addr):
-        self.mail.addToAddr(addr)
-
-    def addCcAddr(self, addr):
-        self.mail.addCcAddr(addr)
-
-    def removeToAddr(self, addr):
-        self.mail.removeToAddr(addr)
-
-    def setToAddrList(self, addrList):
-        self.mail.setToAddrList(addrList)
-
-    def getToAddrList(self):
-        return self.mail.getToAddrList()
-
-    def setCcAddrList(self, addrList):
-        self.mail.setCcAddrList(addrList)
-
-    def getCcAddrList(self):
-        return self.mail.getCcAddrList()
-
     def addToUser(self, user):
-        self.mail.addToUser(user)
+        super(AlarmTask, self).addToUser(user)
         if isinstance(user, Avatar):
             user.linkTo(self, "to")
 
     def removeToUser(self, user):
-        self.mail.removeToUser(user)
+        super(AlarmTask, self).removeToUser(user)
         if isinstance(user, Avatar):
             user.unlinkTo(self, "to")
-
-    def getToUserList(self):
-        return self.mail.getToUserList()
-
-    def setSubject(self, subject):
-        self.mail.setSubject(subject)
-
-    def getSubject(self):
-        return self.mail.getSubject()
-
-    def setText(self, text):
-        self.text = text
-        self._setMailText()
-        self._p_changed=1
 
     def getText(self):
         return self.text
 
     def getLocator(self):
-        d = self.getOwner().getLocator()
+        d = self.conf.getLocator()
         d["alarmId"] = self.getId()
         return d
 
     def canAccess(self, aw):
-        return self.getOwner().canAccess(aw)
+        return self.conf.canAccess(aw)
 
     def canModify(self, aw):
-        return self.getOwner().canModify(aw)
+        return self.conf.canModify(aw)
 
     def _setMailText(self):
         text = self.text
@@ -319,7 +273,7 @@ class AlarmTask(OneShotTask):
                 text += "\n\n\n" + confText
             #except:
             #    text += "\n\n\nSorry could not embed text version of the agenda..."
-        self.mail.setText(text)
+        super(AlarmTask, self).setText(text)
 
     def setNote(self, note):
         self.note = note
@@ -337,7 +291,8 @@ class AlarmTask(OneShotTask):
     def getConfSumary(self):
         return self.confSumary
 
-    def prerun(self):
+    def run(self):
+
         # Date checkings...
         from MaKaC.conference import ConferenceHolder
         from MaKaC.common.timezoneUtils import nowutc
@@ -384,7 +339,6 @@ Best Regards
                 ))
         self._setMailText()
         return False
-
 
 class SampleOneShotTask(OneShotTask):
     def run(self):

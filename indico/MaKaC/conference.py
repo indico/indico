@@ -93,6 +93,8 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from sets import Set
 
+from indico.modules.scheduler import Scheduler, tasks
+
 class CommonObjectBase(object):
     """This class is for holding commonly used methods that are used by several classes.
     It is inherited by the following classes:
@@ -4493,29 +4495,27 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         return conf
 
     def newAlarm(self):
-        al = Alarm(self)
-        tl = HelperTaskList.getTaskListInstance()
-        tl.addTask(al)
-        self.alarmList[al.getId()] = al
-        self._p_changed = 1
-        al.setOwner(self)
+        al = tasks.AlarmTask(self)
+        self.addAlarm(al)
         return al
 
     def removeAlarm(self, alarm):
         if alarm in self.alarmList.values():
             del self.alarmList[alarm.getId()]
             self._p_changed = 1
-            tl = HelperTaskList.getTaskListInstance()
-            tl.removeTask(alarm)
-            alarm.setOwner(None)
+
+            tl = Scheduler.getInstance()
+            tl.dequeue(alarm)
+
             alarm.delete()
 
     def addAlarm(self, alarm):
-        tl = HelperTaskList.getTaskListInstance()
-        tl.addTask(alarm)
+        tl = Scheduler.getInstance()
+
+        tl.enqueue(alarm)
+
         self.alarmList[alarm.getId()] = alarm
         self._p_changed = 1
-        alarm.setOwner(self)
 
     def recoverAlarm(self, alarm):
         self.addAlarm(alarm)

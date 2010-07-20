@@ -71,7 +71,7 @@ class Scheduler(object):
             logger.warning('Task %s found in runningList on startup. Relaunching..' % task.id)
             task.tearDown()
             self.tasksModule.removeTaskFromRunningList(task)
-            self.addTask(task)
+            self.enqueue(task)
 
 
     def run(self):
@@ -102,13 +102,13 @@ class Scheduler(object):
                 # The task has a startOn date in the future and we have already seen
                 # the task this round
                 if curTask.id in returned_tasks_ids:
-                    Scheduler.addTask(curTask)
+                    Scheduler.enqueue(curTask)
                     logger.debug('Only future tasks in the incomingQueue. Sleeping for %d secs..' % SLEEP_INTERVAL)
                     time.sleep(SLEEP_INTERVAL)
 
                 # the task starts in the future and we have not seen it yet
                 elif curTask.getStartOn() and curTask.getStartOn() > time.time():
-                    Scheduler.addTask(curTask)
+                    Scheduler.enqueue(curTask)
                     returned_tasks_ids.append(curTask.id)
 
                 # The task is periodicUnique and it is already in the runningList
@@ -235,10 +235,10 @@ class Scheduler(object):
 
 
     # The following methods are the interface for operating with tasks _outside_ of the Scheduler main loop
-    # They assume a working db connection and requent commit handling
+    # They assume a working db connection and request commit handling
 
     @classmethod
-    def addTask(self, task):
+    def enqueue(self, task):
         '''Submits a new task'''
         # self._readFromDb()
         ModuleHolder().getById('tasks').addTaskToWaitingQueue(task)
@@ -255,6 +255,9 @@ class Worker(threading.Thread):
         logger.debug('Running task %s..' % self.task.id)
         # We will try to run the task TASK_MAX_RETRIES times and if it continues failing we abort it
         i = 0
+
+        db.DBMgr.getInstance().startRequest()
+
         while i < TASK_MAX_RETRIES and not self.task.endedOn:
             i = i + 1
             try:
@@ -262,14 +265,16 @@ class Worker(threading.Thread):
                 self.task.start()
             except Exception, e:
                 nextRunIn = i * 10 # secs
-                logger.warning('Task %s failed with exception %s. Retrying for the %dth time in %d secs..' % (self.task.id, e, i + 1, nextRunIn))
+                logger.warning("Task %s failed with exception '%s'. Retrying for the %dth time in %d secs.." % (self.task.id, e, i + 1, nextRunIn))
+                logger.exception('Error message')
                 # We sleep progressivelly so that if the error is caused by concurrency
                 # we don't make the problem worse by hammering the server.
                 time.sleep(nextRunIn)
             else:
                 break
-        # db.DBMgr.getInstance().endRequest()
-        # db.DBMgr.getInstance().startRequest()
+
+        db.DBMgr.getInstance().endRequest()
+
         if self.task.endedOn: # task successfully finished
             Scheduler.getInstance().notifyTaskFinished(self.task)
             if i > 1:

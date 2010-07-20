@@ -2157,7 +2157,7 @@ class WAlarmFrame(WTemplated):
 
             if al.getToAllParticipants() :
                 addr = "to all participants"
-            if al.getAdjustedLastDate() != None:
+            if al.getEndedOn() != None:
                 sent = " (Sent the %s)"%al.getAdjustedLastDate().strftime("%Y-%m-%d %HH")
             else:
                 sent = ""

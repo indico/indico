@@ -22,6 +22,7 @@
 import logging
 
 from zc.queue import Queue
+from BTrees import IOBTree
 
 from MaKaC.common import db
 
