@@ -26,7 +26,7 @@ class TypeFilterField( filters.FilterField ):
     """
     """
     _id = "type"
-    
+
     def satisfies( self, contribution ):
         """
         """
@@ -37,16 +37,16 @@ class TypeFilterField( filters.FilterField ):
 
 class TrackFilterField( filters.FilterField ):
     """Contains the filtering criteria for the track of a contribution.
-        
+
         Inherits from: AbstractFilterField
 
         Attributes:
             _values -- (list) List of track identifiers;
-            _showNoValue -- (bool) Tells whether an contribution satisfies the 
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
                 filter if it hasn't belonged to any track.
     """
     _id = "track"
-    
+
     def satisfies( self, contribution ):
         """
         """
@@ -60,16 +60,16 @@ class TrackFilterField( filters.FilterField ):
 
 class SessionFilterField( filters.FilterField ):
     """Contains the filtering criteria for the session which a contribution belongs.
-        
+
         Inherits from: AbstractFilterField
 
         Attributes:
             _values -- (list) List of session identifiers;
-            _showNoValue -- (bool) Tells whether an contribution satisfies the 
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
                 filter if it hasn't belonged to any session.
     """
     _id = "session"
-    
+
     def satisfies( self, contribution ):
         """
         """
@@ -83,16 +83,16 @@ class SessionFilterField( filters.FilterField ):
 class PosterFilterField (filters.FilterField):
     """ Contains the filtering criteria for the contribution being a poster or not.
         A contribution is considered a poster contribution if it belongs to a poster session.
-        
+
         Inherits from: AbstractFilterField
 
         Attributes:
             _values -- (bool) Tells if the contribution should be a poster or not.
-            _showNoValue -- (bool) Tells whether an contribution satisfies the 
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
                 filter if it doesn't satisfy the _values criterion. So, if True, all
                 contribution will satisfy the criterion.
     """
-    
+
     _id = "poster"
     def satisfies( self, contribution ):
         if self._showNoValue:
@@ -101,13 +101,13 @@ class PosterFilterField (filters.FilterField):
             return contribution.getSession() and contribution.getSession().getScheduleType() == "poster"
         else: #contribution must not be a poster
             return not contribution.getSession() or contribution.getSession().getScheduleType() != "poster"
-        
+
 
 class StatusFilterField(filters.FilterField):
     """
     """
     _id = "status"
-    
+
     def satisfies(self,contribution):
         """
         """
@@ -119,7 +119,7 @@ class AuthorFilterField( filters.FilterField ):
     """
     """
     _id = "author"
-    
+
     def satisfies(self,contribution):
         """
         """
@@ -137,7 +137,7 @@ class MaterialFilterField(filters.FilterField):
     """
     """
     _id = "material"
-    
+
     def satisfies(self,contribution):
         """
         """
@@ -163,14 +163,14 @@ class RefereeFilterField( filters.FilterField ):
         Attributes:
             _value -- (User object) a User object. Can also be the string "any",
                       and then the contribution won't be filtered by referee.
-            _showNoValue -- (bool) Tells whether an contribution satisfies the 
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
                 filter if it doesn't have a Referee
     """
     _id = "referee"
-    
+
     def __init__( self, conf, values, showNoValue = True ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
-    
+
     def satisfies( self, contribution ):
         rm = contribution.getReviewManager()
         if rm.hasReferee():
@@ -180,20 +180,20 @@ class RefereeFilterField( filters.FilterField ):
                 return False
         else:
             return self._showNoValue
-        
+
 class EditorFilterField( filters.FilterField ):
     """ Contains the filtering criteria for the Editor of a contribution.
         Attributes:
             _value -- (User object) a User object. Can also be the string "any",
                       and then the contribution won't be filtered by editor.
-            _showNoValue -- (bool) Tells whether an contribution satisfies the 
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
                 filter if it doesn't have an Editor
     """
     _id = "editor"
-    
+
     def __init__( self, conf, values, showNoValue = True ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
-    
+
     def satisfies( self, contribution ):
         rm = contribution.getReviewManager()
         if rm.hasEditor():
@@ -203,20 +203,20 @@ class EditorFilterField( filters.FilterField ):
                 return False
         else:
             return self._showNoValue
-        
+
 class ReviewerFilterField( filters.FilterField ):
     """ Contains the filtering criteria for a Reviewer of a contribution.
         Attributes:
             _value -- (User object) a User object. Can also be the string "any",
                       and then the contribution won't be filtered by reviewer.
-            _showNoValue -- (bool) Tells whether an contribution satisfies the 
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
                 filter if it doesn't have any Reviewers
     """
     _id = "reviewer"
-    
+
     def __init__( self, conf, values, showNoValue = True ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
-    
+
     def satisfies( self, contribution ):
         rm = contribution.getReviewManager()
         if rm.hasReviewers():
@@ -250,7 +250,7 @@ class TitleSF(filters.SortingField):
 #    def compare( self, c1, c2 ):
 #        """
 #        """
-#      
+#
 #        if c1.getFirstMaterial() == None and c2.getFirstMaterial() == None:
 #            return 0
 #        if c1.getFirstMaterial()== None:
@@ -259,7 +259,7 @@ class TitleSF(filters.SortingField):
 #            return -1
 #        raise "%s,%s"%(c1.getFirstMaterial(), c2.getFirstMaterial())
 #        return cmp( c1.getFirstMaterial().getId(), c2.getFirstMaterial().getId())
-        
+
 
 class NumberSF( filters.SortingField ):
     _id = "number"
@@ -287,7 +287,7 @@ class DateSF( filters.SortingField ):
 
 
 class ContribTypeSF( filters.SortingField ):
-    
+
     _id = "type"
 
     def compare( self, c1, c2 ):

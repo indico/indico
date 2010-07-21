@@ -8950,7 +8950,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         else:
             vars["trackHeader"] = ""
 
-        url = urlHandlers.UHContributionList.getURL( self._conf )
+        url = urlHandlers.UHContributionListFilter.getURL( self._conf )
         url.setSegment( "contributions" )
         vars["filterPostURL"] = quoteattr( str( url ) )
 
