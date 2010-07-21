@@ -84,7 +84,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                     return Html.div({},
                                     Html.label('popUpLabel', $T("URL")),
                                     self.pm.add(urlBox, 'url'),
-                                    Html.div("smallGrey", "Example: http://www.example.com/YourPDFFile.pdf"));
+                                    Html.div("smallGrey", $T("Example: http://www.example.com/YourPDFFile.pdf")));
                 }
             }));
 
@@ -273,13 +273,13 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         this.pm = new IndicoUtil.parameterManager();
         var typeSelector = new TypeSelector(this.pm, this.types, {style:{width: '150px'}},{style:{width: '150px'}, maxlength: '50'});
-        var description = Html.textarea({name: 'description', style:{width:'220px', height: '60px'}});
 
         // local file vs. url
         var locationSelector = new RadioFieldWidget([['local',$T('Local file')],['remote',$T('External resource (hyperlink)')]]);
 
         // draw the resource pane
         var resourcePathPane = this._drawResourcePathPane(locationSelector);
+
         // protection page
         var protectionPane = $B(
             Html.div({}),
@@ -304,10 +304,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                                                       Widget.block(resourcePathPane)))
                                 ],
                                 [
-                                    $T('Description'),
-                                    description
-                                ],
-                                [
                                     $T('Material type'),
                                     Html.div({style:{height: '40px'}}, typeSelector.draw())
                                 ]
@@ -316,6 +312,31 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                         protectionPane);
 
    },
+
+   _drawAdvanced: function() {
+
+       var self = this;
+
+       this.pm = new IndicoUtil.parameterManager();
+
+       var description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
+       var displayName = Html.input("text",{'name':'displayName', style:{width:'220px'}});
+
+       return Html.div({},
+                       IndicoUtil.createFormFromMap(
+                           [
+                               [
+                                $T('Description'),
+                                description
+                               ],
+                               [
+                                   $T('Display Name'),
+                                   Html.div({}, displayName,
+                                                Html.div("smallGrey", $T("'Display name' will be used instead of the original file name")))
+                               ]
+                           ]) );
+
+  },
 
     _upload: function() {
 
@@ -459,8 +480,9 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         var protectionDiv = this._drawProtectionDiv();
 
-        this.tabWidget = new TabWidget([[$T('Upload'), this._drawUpload()],
-                                        [$T("Protection"), protectionDiv]],
+        this.tabWidget = new TabWidget([[$T('Basic'), this._drawUpload()],
+                                        [$T("Protection"), protectionDiv],
+                                        [$T('Advanced'), this._drawAdvanced()]],
                                        400, 300);
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(this,
