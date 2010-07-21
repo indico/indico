@@ -494,7 +494,7 @@ class RH(RequestHandlerBase):
                     except MaKaCError, e:
                         #DBMgr.getInstance().endRequest(False)
                         res = self._processError(e)
-                except ConflictError, POSKeyError:
+                except (ConflictError, POSKeyError):
                     import traceback
                     Logger.get('requestHandler').debug('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
                     self._abortSpecific2RH()
