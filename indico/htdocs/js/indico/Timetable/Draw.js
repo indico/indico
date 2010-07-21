@@ -138,12 +138,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
             _blockDescription: function(block, event) {
                 var self = this;
 
-                //this.titleID = Html.div({className: 'timetableBlockTitleID', style: {fontWeight: this.eventData.fontWeight}}, this._getTitleID());
-
                 this.titleDiv = Html.div({className: 'timetableBlockTitle', style: {fontWeight: this.eventData.fontWeight}}, this._getTitle());
 
-                // TODO 2 - drawing
-                this.titleWrapper = Html.div({}, this._getRightSideDecorators(), /*this.titleID,*/ this.titleDiv);
+                this.titleWrapper = Html.div({}, this._getRightSideDecorators(), this.titleDiv);
 
                 this.div = Html.div({style: { width: '100%', height: '100%'}}, this.titleWrapper);
 
@@ -594,20 +591,16 @@ type("TimetableBlockNormalDisplay", ["TimetableBlockNormal", "TimetableBlockDisp
          this.TimetableBlockNormal(timetable, eventData, blockData, compactMode, printableVersion, detailLevel);
      });
 
-// TODO 1
-// sessionId, conferenceId, contributionId
-// if(this.eventData.entryType == "Contribution")
-//    return this.eventData.contributionId + " " + title;
 type("TimetableBlockNormalManagement", ["TimetableBlockNormal", "TimetableBlockManagementMixin"],
      {
          _getTitle: function(){
-             var title = this.eventData.title;
+             var title = this.TimetableBlockNormal.prototype._getTitle.call(this);
 
-             if (this.eventData.slotTitle && this.eventData.slotTitle !== "") {
-                 title += ": " + this.eventData.slotTitle;
+             if (this.eventData.entryType == "Session") {
+                 return this.eventData.sessionId + " - " + title;
+             } else if (this.eventData.entryType == "Contribution") {
+                 return this.eventData.contributionId + " - " + title;
              }
-             if(this.eventData.entryType == "Session")
-                 return this.eventData.sessionId + " " + title;
 
              return title;
          }
@@ -1696,7 +1689,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
 
                 var entryTools = Html.div({style:{cssFloat: "right"}},editLink," | ",deleteLink);
-                var entryInfo = Html.div({},blockData.title );
+                var entryInfo = Html.div({},blockData.contributionId + " - " + blockData.title );
                 var timeDiv = Html.div("posterBlockTime", blockData.startDate.time.substring(0,5) +' - '+ blockData.endDate.time.substring(0,5));
                 var block = Html.div({className:'posterEntry'},
                     entryTools,
