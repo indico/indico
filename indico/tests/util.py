@@ -25,25 +25,27 @@ such as a wrapper for ZEOServer that allows a "test" server to be created
 """
 
 import os
+from multiprocessing import Process
 from StringIO import StringIO
 
 from ZEO.runzeo import ZEOOptions, ZEOServer
 
 
-class TestZEOServer:
+class TestZEOServer(Process):
     """
     Creates a standalone ZEO server for tests
     """
     def __init__(self, port, fd, hostname="localhost"):
+        Process.__init__(self)
         self.options = ZEOOptions()
         self.options.realize(['-f', fd, '-a', '%s:%d' % (hostname, port)])
         self.server = ZEOServer(self.options)
 
-    def start(self):
+    def run(self):
         """
         Actually starts the server
         """
-        print "spawning server on PID %s" % os.getpid()
+        print "spawning server on PID %s" % self.pid
         self.server.main()
 
 

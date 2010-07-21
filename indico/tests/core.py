@@ -219,15 +219,10 @@ class TestManager(object):
         print colored("-- Stoppping test DB", "cyan")
 
         try:
-            os.kill(self.zeoServer, signal.SIGINT)
-        except OSError, e:
-            print ("Problem sending kill signal: " + str(e))
-
-        try:
-            os.waitpid(self.zeoServer, 0)
+            self.zeoServer.terminate()
             self._removeDBFile()
         except OSError, e:
-            print ("Problem waiting for ZEO Server: " + str(e))
+            print ("Problem terminating ZEO Server: " + str(e))
 
     @staticmethod
     def _restoreDBInstance():
@@ -294,14 +289,11 @@ class TestManager(object):
         Creates a fake DB server for testing
         """
 
-        pid = os.fork()
-        if pid:
-            return pid
-        else:
-            # run a DB in a child process
-            from indico.tests.util import TestZEOServer
-            server = TestZEOServer(port, dbFile, hostname = host)
-            server.start()
+        # run a DB in a child process
+        from indico.tests.util import TestZEOServer
+        server = TestZEOServer(port, dbFile, hostname = host)
+        server.start()
+        return server
 
 ################## End of DB Managing functions ##################
 
