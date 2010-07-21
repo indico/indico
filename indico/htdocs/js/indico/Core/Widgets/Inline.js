@@ -1059,8 +1059,8 @@ type("ShowablePasswordField", ["IWidget", "ErrorAware"], {
         this.inputDiv = Html.div({style:{display:'inline'}});
 
         // We do not use $B and $V for the password because of a bug with two dual bindings between 2 XElements and a $V
-        this.passwordField = Html.input('password', {name: this.name}, this.initialPassword);
-        this.clearTextField = Html.input('text', {name: this.name}, this.initialPassword);
+        this.passwordField = Html.input('password', {name: this.name, id:this.id}, this.initialPassword);
+        this.clearTextField = Html.input('text', {name: this.name, id:this.id}, this.initialPassword);
 
         this.button = Html.span("fakeLink");
 
@@ -1081,10 +1081,11 @@ type("ShowablePasswordField", ["IWidget", "ErrorAware"], {
         return this.IWidget.prototype.draw.call(this, content);
     }
 },
-    function(name, initialPassword, initialShow) {
+    function(name, initialPassword, initialShow, id) {
         this.name = name;
         this.initialPassword = initialPassword;
         this.show = initialShow;
+        this.id = id?id:'';
 
         this.invalidFieldTooltips = [];
         this.invalidFieldObserverDetachers = [];

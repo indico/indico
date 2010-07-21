@@ -68,8 +68,8 @@ class NoReportError(CausedError):
 
     fossilizes(INoReportErrorFossil)
 
-    def __init__(self, code, message, inner=None, title=None, explanation=None):
-        CausedError.__init__(self, code, message, inner, "noReport")
+    def __init__(self, message, inner=None, title=None, explanation=None):
+        CausedError.__init__(self, "", message, inner, "noReport")
         self._title = title
         self._explanation = explanation
 
@@ -91,7 +91,8 @@ class ProcessError(CausedError):
         CausedError.__init__(self, code, message, inner = traceback.format_exception(*sys.exc_info()))
 
 class ServiceError(CausedError):
-    pass
+    def __init__(self, code='', message='', inner = None):
+        CausedError.__init__(self, code, message, inner)
 
 class PermissionError(CausedError):
     pass

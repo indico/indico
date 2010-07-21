@@ -4188,6 +4188,90 @@ span.optionKey1 {
     font-weight: bold;
 }
 
+/* CHAT */
+
+td.chatTitleCell {
+    color: #523D04;
+    /*text-align: center;*/
+    padding-bottom: 3px;
+}
+
+td.chatCell {
+    padding: 0px;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    /*text-align: center;*/
+    white-space: nowrap;
+}
+
+td.chatCellNarrow {
+    padding: 0px;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    width: 0px;
+    white-space: nowrap;
+}
+
+td.titleChat {
+	padding-top: 5px;
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #523D04;
+}
+
+.chatInfoCell {
+    padding: 0px;
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-bottom: 5px;
+	padding-right: 15px;
+	background-color: #FEFEFE;
+	-moz-box-shadow: 2px 2px 2px #444444;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+}
+
+div.chatTable {
+    color: #523D04;
+	-moz-box-shadow: 4px 4px 4px #444444;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+}
+
+div.chatAdvancedTabTitle {
+    font-size:13px;
+    background:none repeat scroll 0 0 white;
+    position:absolute;
+    padding-right:5px;
+}
+
+div.chatAdvancedTabTitleLine {
+    height: 9px;
+    border-bottom: 1px dotted #777;
+    position: relative;
+    min-width: 200px;
+}
+
+div.chatAdvancedTabCheckboxDiv {
+    margin-left:50px;
+    padding-top:5px;
+}
+
+td.chatInfoLeftCol {
+    vertical-align: top;
+    text-align: left;
+    padding-right: 5px;
+    white-space: nowrap;
+    color: #523D04;
+}
+
+
 /* COLLABORATION */
 
 span.createBookingText {
@@ -4196,7 +4280,7 @@ span.createBookingText {
 
 td.collaborationTitleCell {
     color: #523D04;
-    text-align: center;
+    /*text-align: center;*/
     padding-bottom: 3px;
 }
 
@@ -4206,7 +4290,7 @@ td.collaborationCell {
     padding-right: 15px;
     padding-top: 3px;
     padding-bottom: 3px;
-    text-align: center;
+    /*text-align: center;*/
     white-space: nowrap;
 }
 
@@ -4668,6 +4752,25 @@ td.ACBookingTime {
     padding: 2px;
     text-align: right;
 }
+
+/* Instant Messaging display pages */
+
+.CRDisplayMoreInfo {
+    color: #0B63A5;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.CRDisplayHideInfo {
+    color: #B38B1F;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+div.CRDisplayInfoLine {
+    padding-bottom: 8px;
+}
+
 
 /* Collaboration display pages */
 

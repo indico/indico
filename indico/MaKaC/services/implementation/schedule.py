@@ -90,7 +90,7 @@ class ScheduleOperation:
         try:
             return self._performOperation()
         except TimingError, e:
-            raise TimingNoReportError("ERR-E2", e.getMsg())
+            raise TimingNoReportError(e.getMsg())
 
     def initializeAutoOps(self):
         ContextManager.set('autoOps',[])

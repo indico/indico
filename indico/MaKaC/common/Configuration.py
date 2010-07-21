@@ -228,6 +228,7 @@ class Config:
                  "play_small":"play_small.png",
                  "stop_small":"stop_small.png",
                  "reload":"reload.png",
+                 "reload_faded":"reload_faded.png",
                  "play_faded":"play_faded.png",
                  "stop_faded":"stop_faded.png",
                  "play_faded_small":"play_faded_small.png",

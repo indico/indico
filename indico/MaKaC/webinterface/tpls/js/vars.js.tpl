@@ -66,6 +66,7 @@ var Indico = {
         play_small: "<%= iconFileName("play_small") %>",
         stop_small: "<%= iconFileName("stop_small") %>",
         reload: "<%= iconFileName("reload") %>",
+        reload_faded: "<%= iconFileName("reload_faded") %>",
         mail_big: "<%= iconFileName("mail_big") %>",
         play_faded: "<%= iconFileName("play_faded") %>",
         stop_faded: "<%= iconFileName("stop_faded") %>",

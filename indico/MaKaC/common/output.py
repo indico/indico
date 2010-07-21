@@ -46,6 +46,7 @@ from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
+from MaKaC.plugins.base import Observable
 
 
 def fake(string1=""):
@@ -72,7 +73,7 @@ class XSLTransformer:
 
         return etree.tostring(result)
 
-class outputGenerator:
+class outputGenerator(Observable):
     """
     this class generates the application standard XML (getBasicXML)
     and also provides a method to format it using an XSLt stylesheet
@@ -493,6 +494,8 @@ class outputGenerator:
 
         #plugins XML
         out.openTag("plugins")
+        #we add all the information to be displayed by the plugins
+        self._notify('meetingAndLectureDisplay', {'out': out, 'conf': conf})
         if PluginsHolder().hasPluginType("Collaboration"):
             from MaKaC.plugins.Collaboration.output import OutputGenerator
             OutputGenerator.collaborationToXML(out, conf, tz)

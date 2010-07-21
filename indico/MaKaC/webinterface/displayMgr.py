@@ -28,6 +28,7 @@ from MaKaC.trashCan import TrashCanManager
 import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
+from MaKaC.plugins.base import Observable
 import re
 from MaKaC.i18n import _
 
@@ -274,7 +275,6 @@ class Menu(Persistent):
         return self._conf
 
     def updateSystemLink(self):
-
         systemLinkData = SystemLinkData(self._conf)
         linksData = systemLinkData.getLinkData()
         linksDataOrderedKeys = systemLinkData.getLinkDataOrderedKeys()
@@ -790,7 +790,7 @@ class SystemLink(Link):
         self._v_caption = caption
 
 
-class SystemLinkData:
+class SystemLinkData(Observable):
 
     def __init__(self, conf=None):
         #the following dict is used to update the system link of the menu. each new entry is added to the menu,
@@ -945,6 +945,7 @@ class SystemLinkData:
                 "staticURL": "", \
                 "parent": ""} \
             }
+            self._notify('confDisplaySMFillDict', {'dict': self._linkData, 'conf': conf})
         #this ordered list allow us to keep the order we want for the menu
         if not hasattr(self, "_linkDataOrderedKeys"):
             self._linkDataOrderedKeys = ["overview",
@@ -976,6 +977,8 @@ class SystemLinkData:
                                         "newEvaluation",
                                         "viewMyEvaluation",
                                         "collaboration"]
+            self._notify('confDisplaySMFillOrderedKeys', self._linkDataOrderedKeys)
+
 
     def getLinkData(self):
         return self._linkData

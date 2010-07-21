@@ -348,7 +348,13 @@ class RHAdminPluginsBase(RHAdminBase):
     def _checkParams(self, params):
         RHAdminBase._checkParams(self, params)
         self._pluginType = params.get("pluginType", None)
+        #take out white spaces in case there are some
+        if self._pluginType:
+            self._pluginType = self._pluginType.replace(' ', '')
         self._pluginId = params.get("pluginId", None)
+        #take out white spaces in case there are some
+        if self._pluginId:
+            self._pluginId = self._pluginId.replace(' ', '')
         self._ph = PluginsHolder()
         if self._pluginType and not self._ph.hasPluginType(self._pluginType, mustBeActive = False):
             raise PluginError("The plugin type " + self._pluginType + " does not exist or is not visible")
@@ -420,7 +426,8 @@ class RHAdminTogglePlugin(RHAdminPluginsBase):
 
     def _process( self ):
         pluginType = self._ph.getPluginType(self._pluginType)
-        pluginType.getPlugin(self._pluginId).toggleActive()
+        plugin = pluginType.getPlugin(self._pluginId)
+        plugin.toggleActive()
         self._redirect( urlHandlers.UHAdminPlugins.getURL(pluginType))
 
 

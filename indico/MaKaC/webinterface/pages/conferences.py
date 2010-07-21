@@ -64,9 +64,13 @@ import MaKaC.common.info as info
 from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
 import MaKaC.webcast as webcast
+
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
+from MaKaC.common.PickleJar import DictPickler
+from MaKaC.plugins.base import Observable
+from MaKaC.common.logger import Logger
 
 from indico.modules import ModuleHolder
 
@@ -122,7 +126,7 @@ class WPConferenceDisplayBase( WPConferenceBase ):
         return WPConferenceBase.getJSFiles(self) + \
                self._includeJSPackage('MaterialEditor')
 
-class WPConferenceDefaultDisplayBase( WPConferenceBase ):
+class WPConferenceDefaultDisplayBase( WPConferenceBase, Observable ):
     navigationEntry = None
 
     def _getFooter( self ):
@@ -184,6 +188,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         else:
             self._regFormOpt.setVisible(True)
             self._registrantsListOpt.setVisible(True)
+
+
+        #instant messaging
+        self._notify('confDisplaySMShow', {})
+        #from MaKaC.plugins.InstantMessaging.handlers import DBUtils
+        #self._instantMessaging = self._sectionMenu.getLinkByName("instantMessaging")
+        #if not DBUtils.roomsToShow(self._conf):
+        #    self._instantMessaging.setVisible(False)
 
         #evaluation
         evaluation = self._conf.getEvaluation()
@@ -2040,7 +2052,7 @@ class WPMeetingTimeTable( WPXSLConferenceDisplay ):
         wc = WConferenceTimeTable( self._conf, self._getAW()  )
         return wc.getHTML(params)
 
-class WPConferenceModifBase( main.WPMainBase ):
+class WPConferenceModifBase( main.WPMainBase, Observable ):
 
     _userData = ['favorite-user-ids']
 
@@ -2115,6 +2127,14 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._regFormMenuItem = wcomponents.SideMenuItem(_("Registration"),
             urlHandlers.UHConfModifRegForm.getURL( self._conf ))
         self._generalSection.addItem( self._regFormMenuItem)
+
+        self._pluginsDictMenuItem = {}
+        self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
+        for element in self._pluginsDictMenuItem.values():
+            try:
+                self._generalSection.addItem( element)
+            except Exception, e:
+                Logger.get('Conference').error("Exception while trying to access the plugin elements of the side menu: %s" %str(e))
 
         if self._conf.getCSBookingManager() is not None and self._conf.getCSBookingManager().isCSAllowed(self._rh.getAW().getUser()):
             from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools

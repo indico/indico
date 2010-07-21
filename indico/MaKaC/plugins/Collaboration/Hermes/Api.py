@@ -11,12 +11,12 @@ def CreateConference(conference, title, start, end, pin, h239):
     id = conference.getNewBookingId()
     namespace = Config.getInstance().getHostNameURL()
     hermesName = namespace + "-" + str(conference.getId()) + "-" + id
-    
+
     try:
         hermesId, pin = RmsApi.CreateConference(hermesName, start, end, pin, h239)
     except Exception, e:
         raise e
-    
+
     booking = HermesBooking(conference)
     booking.setId(id)
     booking.setHermesName(hermesName)
@@ -26,7 +26,7 @@ def CreateConference(conference, title, start, end, pin, h239):
     booking.setStartingDate(start)
     booking.setEndingDate(end)
     booking.setH239(h239)
-    
+
     conference.addBooking(booking)
     return booking
 
@@ -37,8 +37,8 @@ def DeleteConference(conference, booking):
 def QueryConference(conference, bookingId):
     booking = conference.getBookingById(bookingId)
     if booking == None:
-        raise ServiceError("Invalid hermes id.")
-    
+        raise ServiceError(message="Invalid hermes id.")
+
     #mcuConference = McuApi.first(McuApi.SelectConferences(conferenceName = booking.getHermesName()))
     #if mcuConference == None:
         #raise ServiceError("Conference no longer exists in MCU.", conferenceName)
@@ -66,7 +66,7 @@ def QueryConference(conference, bookingId):
 def QueryConferenceStreaming(conference, bookingId):
     booking = conference.getBookingById(bookingId)
     if booking == None:
-        raise ServiceError("Invalid hermes id.")
+        raise ServiceError(message="Invalid hermes id.")
     try:
         response = McuApi.QueryConferenceStreaming(conferenceName = booking.getHermesName())
         streaming = {
@@ -74,14 +74,14 @@ def QueryConferenceStreaming(conference, bookingId):
         }
     except:
         streaming = None
-    
+
     return streaming
 
 def ListConferenceParticipant(conference, bookingId):
     booking = conference.getBookingById(bookingId)
     if booking == None:
-        raise ServiceError("Invalid hermes id.")
-    
+        raise ServiceError(message="Invalid hermes id.")
+
     mcuParticipants = McuApi.SelectParticipants({
         "enumerateFilter": "connected",
         "operationScope": ["currentState"]
@@ -96,8 +96,8 @@ def ListConferenceParticipant(conference, bookingId):
 def ConnectConferenceParticipant(conference, bookingId, address):
     booking = conference.getBookingById(bookingId)
     if booking == None:
-        raise ServiceError("Invalid hermes id.")
-    
+        raise ServiceError(message="Invalid hermes id.")
+
     return McuApi.AddParticipant(conferenceName = booking.getHermesName(),
                                  participantType = "ad_hoc",
                                  Address = address)
@@ -105,8 +105,8 @@ def ConnectConferenceParticipant(conference, bookingId, address):
 def DisconnectConferenceParticipant(conference, bookingId, id):
     booking = conference.getBookingById(bookingId)
     if booking == None:
-        raise ServiceError("Invalid hermes id.")
-    
+        raise ServiceError(message="Invalid hermes id.")
+
     return McuApi.RemoveParticipant(conferenceName = booking.getHermesName(),
                                     participantType = "ad_hoc",
                                     participantName = id)

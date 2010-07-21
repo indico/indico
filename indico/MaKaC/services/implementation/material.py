@@ -120,8 +120,7 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
         try:
             ProtectedModificationService._checkProtection(self)
         except ModificationError:
-            raise ServiceAccessError("ERR-P5",
-                                     _("you are not authorised to manage material "
+            raise ServiceAccessError(_("you are not authorised to manage material "
                                        "for this contribution"))
         except Exception, e:
             raise e

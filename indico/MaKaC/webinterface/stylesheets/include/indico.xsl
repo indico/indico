@@ -541,7 +541,6 @@
 
     <table class="eventDetails">
       <tbody>
-
         <xsl:if test="./description != ''">
           <tr>
             <td class="leftCol">Description</td>
@@ -743,6 +742,135 @@
           </tr>
         </xsl:if>
 
+
+        <xsl:if test="count(./plugins/chatrooms) != 0">
+          <tr>
+            <td class="leftCol">Chat rooms</td>
+			<td>
+				<div>
+
+					<xsl:for-each select="./plugins/chatrooms/chatroom">
+					<div class="CRDisplayInfoLine">
+						<span><xsl:value-of select="./name" /> </span>
+						<span style="margin-left: 20px;"></span>
+						<span class="CRDisplayMoreInfo" id="CRMoreInfo{./id}">More Info</span>
+						<span style="margin-left:8px;margin-right:8px;">|</span>
+						<span><a href="xmpp://{./name}@{./server}"> Join now! </a></span>
+
+		                  <!-- Start of a chat room info line -->
+		                  <div id="collaborationInfoLine{./id}" style="visibility: hidden; overflow: hidden;">
+		                    <div class="CRDisplayInfoLine">
+		                    <table>
+		                      <tbody>
+		                          <tr>
+		                            <td class="collaborationDisplayInfoLeftCol"> Name: </td>
+		                            <td class="collaborationDisplayInfoRightCol"> <xsl:value-of select="./name"/> </td>
+								   </tr>
+		                          <tr>
+		                            <td class="collaborationDisplayInfoLeftCol"> Server: </td>
+									<td class="collaborationDisplayInfoRightCol" style="font-family:monospace;"> <xsl:value-of select="./server"/> </td>
+								   </tr>								   						   		                          <tr>
+		                            <td class="collaborationDisplayInfoLeftCol"> Description: </td>
+		                            <td class="collaborationDisplayInfoRightCol"> <xsl:value-of select="./description"/> </td>
+								   </tr>
+		                          <tr>
+		                            <td class="collaborationDisplayInfoLeftCol"> Requires password: </td>
+		                            <td class="collaborationDisplayInfoRightCol"> <xsl:value-of select="./reqPassword"/> </td>
+								   </tr>
+		                          <tr>
+		                            <td class="collaborationDisplayInfoLeftCol"> Password: </td>
+									  <xsl:choose>
+										  <xsl:when test="./showPassword = 'True' and count(./password) != 0">
+											<td> <xsl:value-of select="./password"/> </td>
+										  </xsl:when>
+										  <xsl:when test="./showPassword = 'False' and count(./password) != 0">
+											<td style="font-style:italic"> Not displayed </td>
+		 								  </xsl:when>
+										  <xsl:otherwise>
+				        					<td style="font-style:italic"> - </td>
+										  </xsl:otherwise>
+	   	 							  </xsl:choose>
+								   </tr>
+		                      </tbody>
+		                    </table>
+		                    </div>
+		                  </div>
+
+
+		                  <xsl:text disable-output-escaping="yes"><![CDATA[
+		                    <script type="text/javascript">
+
+		                      $E('CRMoreInfo]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
+		                          IndicoUI.Widgets.Generic.tooltip($E('CRMoreInfo]]></xsl:text>
+		                            <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                            <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
+		                              <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
+		                              <xsl:text>Click here to show / hide detailed information.</xsl:text>
+		                              <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
+		                              <xsl:text disable-output-escaping="yes"><![CDATA[
+		                              );
+		                        }
+
+		                      var chatInfoState]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                      <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
+
+		                      var height]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                      <xsl:text disable-output-escaping="yes"><![CDATA[ = IndicoUI.Effect.prepareForSlide('collaborationInfoLine]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                      <xsl:text disable-output-escaping="yes"><![CDATA[', true);
+
+		                      $E('CRMoreInfo]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                      <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
+		                        if (chatInfoState]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                      <xsl:text disable-output-escaping="yes"><![CDATA[) {
+		                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                      <xsl:text disable-output-escaping="yes"><![CDATA[);
+		                        $E('CRMoreInfo]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('More info');
+		                        $E('CRMoreInfo]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "CRDisplayMoreInfo";
+		                      } else {
+		                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                      <xsl:text disable-output-escaping="yes"><![CDATA[);
+		                        $E('CRMoreInfo]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('Hide info');
+		                        $E('CRMoreInfo]]></xsl:text>
+		                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "CRDisplayHideInfo";
+		                      }
+		                      chatInfoState]]></xsl:text>
+		                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                    <xsl:text disable-output-escaping="yes"><![CDATA[ = !chatInfoState]]></xsl:text>
+		                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+		                    <xsl:text disable-output-escaping="yes"><![CDATA[
+		                    });
+		                  </script>
+		                  ]]></xsl:text>
+
+					</div>
+		        </xsl:for-each>
+      			</div>
+			</td>
+          </tr>
+
+
+
+        </xsl:if>
         <xsl:if test="count(./plugins/collaboration/booking) != 0">
           <xsl:variable name="collaborationToday" select="./plugins/collaboration/todayReference"/>
           <xsl:variable name="collaborationTomorrow" select="./plugins/collaboration/tomorrowReference"/>

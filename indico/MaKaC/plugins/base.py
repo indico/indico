@@ -27,9 +27,225 @@ from MaKaC.plugins.pluginLoader import PluginLoader
 from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from persistent import Persistent
+from BTrees.OOBTree import OOBTree
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import PluginError
 from MaKaC.common import DBMgr
+from MaKaC.common.logger import Logger
+import zope.interface
+from MaKaC.services.interface.rpc.common import NoReportError
+
+class Observable:
+    def _notify(self, event, params):
+        try:
+            PluginsHolder().getComponentsManager().notifyComponent(event, self, params)
+        except NoReportError, e:
+            raise NoReportError(str(e))
+        except Exception, e:
+            raise Exception(str(e))
+
+class ComponentsManager(Persistent):
+    '''
+    Manages all what is related to the components.
+
+    eventComponentsDict keeps a record of the components that implement a certain event, and is used to register and unregister
+    events when a plugin or a pluginType is either activated or desactivated.
+    components is a list with all the components found in MaKaC/plugins, it is updated every time that the method loadPlugins is called.
+    '''
+
+    def __init__(self):
+        self.__id = "componentsManager"
+        self.__eventComponentsDict = {}
+        self.__components = []
+
+    def getId(self):
+        return self.__id
+
+    def addComponent(self, component):
+        if component is not None and component not in self.__components:
+            self.__components.append(component)
+        self._notifyModification()
+
+    def registerAllComponents(self, pluginType = None):
+        '''We register all the components, but if a plugintype is passed we should just register the changes
+        in the part referred to that plugintype'''
+
+        for component in self.__components:
+            pluginTypeName, possiblePluginName = self.getAssociatedPlugin(component)
+
+            #it's a plugin
+            if PluginsHolder().getPluginType(pluginTypeName).hasPlugin(possiblePluginName):
+                isActive = PluginsHolder().getPluginType(pluginTypeName).getPlugin(possiblePluginName).isActive()
+                #if the pluginType that the plugin belongs to is not active we won't register the components for the plugin
+                if not PluginsHolder().getPluginType(pluginTypeName).isActive():
+                    isActive = False
+
+            #it's a pluginType
+            else:
+                isActive = PluginsHolder().getPluginType(pluginTypeName).isActive()
+
+            if isActive:
+                self.registerComponent(component)
+
+    def registerComponent(self, component):
+        #Register it. We take the list of the interfaces implemented by the component
+        implementedInterfaces = list(zope.interface.implementedBy(component))
+        for interface in implementedInterfaces:
+            #we take the list of the methods in the interface
+            for met in list(interface):
+                #if the method is implemented in the component, then we register it
+                if met in dir(component):
+                    self.registerNewEvent(met , component)
+
+    def registerNewEvent(self, event, componentClass):
+        changed = False
+        if event not in self.__eventComponentsDict:
+            self.__eventComponentsDict[event] = []
+            changed = True
+
+        isInList = False
+        #we just need aux to make the comparation, since componentClass is just a type and component is an instance of an object
+        aux = componentClass()
+        for component in self.__eventComponentsDict[event]:
+            if component.__class__ == aux.__class__:
+                isInList = True
+        #we don't want to have the 2 same components in the list, so we check it
+        if not isInList:
+            self.__eventComponentsDict[event].append(componentClass())
+            changed = True
+        if changed:
+            self._notifyModification()
+
+    def notifyComponent(self, event, obj, params):
+        for subscriber in self.getAllSubscribers(event):
+            #we check if the method is in the method list of the interface
+            #make the check
+            #if(method in list(interface)):
+                #the event exists
+                f = getattr(subscriber,event)
+                try:
+                    f(obj, params)
+                except NoReportError, e:
+                    raise NoReportError(str(e))
+                except Exception, e:
+                    Logger.get('PluginNotifier').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
+                    raise Exception("Exception while calling subscriber %s: %s" % str(subscriber.__class__), e)
+            #else:
+            #    Logger.get('PluginNotifier').error('the method %s is not definend by the interface %s'%(method, interface))
+
+    def getAllSubscribers(self, method):
+        return self.__eventComponentsDict[method]
+
+    def getAssociatedPlugin(self, component):
+        ''' returns the plugin the component belongs to, according to the component path'''
+        #TODO: what if the path is not makac.plugins?
+        componentClassModuleName = component.__module__
+        moduleNames = componentClassModuleName[len('MaKaC.plugins.'):].split('.')
+        #return (pluginTypeName, possiblePluginName) we'll have to check if possiblePluginName is a plugin
+        return moduleNames[0], moduleNames[1]
+
+    def cleanPlugin(self, name):
+        '''receives the name of the plugin, (EVO, CERNMCU...) and unregisters it'''
+        #TODO: VERY inefficient!
+        changed = False
+        for event in self.__eventComponentsDict.keys():
+            #check if the component is in the dictionary to erase it
+            oldSize = len(self.__eventComponentsDict[event])
+            self.__eventComponentsDict[event] = list( component for component in self.__eventComponentsDict[event] if not self.pluginContainsComponent(name, component))
+            if oldSize != len(self.__eventComponentsDict[event]):
+                changed = True
+        if changed:
+            self._notifyModification()
+
+    def pluginContainsComponent(self, plugin, component):
+        associatedPlugin = self.getAssociatedPlugin(component)
+        if plugin == associatedPlugin[1]:
+            return True
+        return False
+
+    def addPlugin(self, name):
+        '''Someone activated a plugin (EVO, CERNMCU) and we need to register it again for the notifications'''
+
+        for component in self.__components:
+            if self.pluginContainsComponent(name, component):
+                self.registerComponent(component)
+
+    def cleanAll(self):
+        self.__eventComponentsDict.clear()
+        del self.__components[:]
+        self._notifyModification()
+
+    def _notifyModification(self):
+        self._p_changed = 1
+
+
+
+class AJAXMethodMap(Persistent):
+    def __init__(self):
+        self.__id = "ajaxMethodMap"
+        self.__map = {}
+
+    def _notifyModification(self):
+        self._p_changed = 1
+
+    def getAJAXMethodMap(self):
+        if not self.hasKey('ajaxMethodMap'):
+            self.add(AJAXMethodMap())
+        return self.getById('ajaxMethodMap')
+
+    def getId(self):
+        return self.__id
+
+    def addMethods2AJAXDict(self, dict):
+        """ Every time a handlers.py file is checked in the pluginLoader, it fills this dictionary with AJAX methods from its methodMap
+        """
+        self.__map.update(dict)
+        self._notifyModification()
+
+    def getAJAXDict(self):
+        return self.__map
+
+    def cleanAJAXDict(self):
+        """ Attributes in this class are persistent, so when we want to erase them we'll need to explicitely invoke this method
+        """
+        self.__map.clear()
+        self._notifyModification()
+
+
+class PluginsHelper(object):
+    def __init__(self, pluginType, plugin):
+        self._pluginType = pluginType
+        self._plugin = plugin
+        try:
+            self._plugin = PluginsHolder().getPluginType(pluginType).getPlugin(plugin)
+        except Exception, e:
+            Logger.get('Plugins').error("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
+            raise Exception("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
+
+
+class PluginFieldsHelper(PluginsHelper):
+    """Provides a simple interface to access fields of a given plugin"""
+
+    def __init__(self, pluginType, plugin):
+        PluginsHelper.__init__(self, pluginType, plugin)
+
+    def getOption(self, optionName):
+        try:
+            return self._plugin.getOption(optionName).getValue()
+        except Exception, e:
+            Logger.get('Plugins').error("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
+            raise Exception("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
+
+    def getAttribute(self, attribute):
+        try:
+            return getattr(self._plugin, attribute)
+        except AttributeError:
+            Logger.get('Plugins').error("No attribute %s in plugin %s" % (attribute, self._plugin))
+            raise Exception("No attribute %s in plugin %s" % (attribute, self._plugin))
+
+    def getStorage(self):
+        return self._plugin.getStorage()
+
 
 class PluginsHolder (ObjectHolder):
     """ A PluginsHolder object is the "gateway" to all the methods for getting plugin meta-data stored in the DB.
@@ -45,8 +261,13 @@ class PluginsHolder (ObjectHolder):
         ObjectHolder.__init__(self)
         if not self.hasKey("globalPluginOptions"):
             self.add(GlobalPluginOptions())
+        if not self.hasKey('componentsManager'):
+            self.add(ComponentsManager())
         if len(self._getIdx()) == 0: #no plugins
             self.loadAllPlugins()
+        if not self.hasKey('ajaxMethodMap'):
+            self.add(AJAXMethodMap())
+
 
     def getRHMap(self):
         # Replace with the real dict obtained while exploring the directories
@@ -57,6 +278,11 @@ class PluginsHolder (ObjectHolder):
         """
         return self.getById("globalPluginOptions")
 
+    def getComponentsManager(self):
+        if not self.hasKey('componentsManager'):
+            self.add(ComponentsManager())
+        return self.getById('componentsManager')
+
     def loadAllPlugins(self):
         """ Initially loads all plugins and stores their information
         """
@@ -66,8 +292,11 @@ class PluginsHolder (ObjectHolder):
     def reloadAllPlugins(self):
         """ Reloads all plugins and updates their information
         """
+        self.getComponentsManager().cleanAll()
+        self.getById("ajaxMethodMap").cleanAJAXDict()
         PluginLoader.reloadPlugins()
         self.updateAllPluginInfo()
+        self.getComponentsManager().registerAllComponents()
 
     def reloadPluginType(self, pluginTypeName):
         """ Reloads plugins of a given type and updates their information
@@ -98,7 +327,6 @@ class PluginsHolder (ObjectHolder):
             else:
                 pluginType = PluginType(pluginTypeName)
                 self.add(pluginType)
-
             pluginType.updateInfo()
 
     def clearPluginInfo(self):
@@ -267,6 +495,7 @@ class PluginBase(Persistent):
             -if includeOnlyVisible = True, only the "visible" options are returned
             WARNING: this method returns a copy of the options, so use it only for reading, not for writing values/ adding options.
         """
+
         options = self.getOptions(includeNonPresent, includeOnlyEditable, includeOnlyNonEditable, includeOnlyVisible, filterByType).values()
         if doSort:
             options.sort(key=lambda option: option.getOrder())
@@ -426,12 +655,12 @@ class PluginType (PluginBase):
         """
         PluginBase.__init__(self)
         self.__id = name
+        self.__name = name
         self.__description = description
         self.__present = True
         self.__plugins = {}
         self._visible = True
         self._active = False
-
 
     def updateInfo(self):
         """ This method will update the information in the DB about this plugin type.
@@ -444,7 +673,7 @@ class PluginType (PluginBase):
             plugin.setPresent(False)
 
         #we get the list of modules (plugins) of this type
-        pluginModules = PluginLoader.getPluginsByType(self.getName())
+        pluginModules = PluginLoader.getPluginsByType(self.getId())
 
         #we loop through the plugins
         for pluginModule in pluginModules:
@@ -483,6 +712,8 @@ class PluginType (PluginBase):
 
         self.updateAllActions(self._retrievePluginTypeActions())
 
+        self.__name = self._retrievePluginTypeName()
+
         self.__description = self._retrievePluginTypeDescription()
 
         self._visible = self._retrieveIsVisible()
@@ -500,6 +731,13 @@ class PluginType (PluginBase):
         hasPluginTypeActions = hasActionsModule and hasattr(self.getModule().actions, "pluginTypeActions")
         if hasActionsModule and hasPluginTypeActions:
             return self.getModule().actions.pluginTypeActions
+        else:
+            return None
+
+    def _retrievePluginTypeName(self):
+        hasName = hasattr(self.getModule(), "pluginTypeName")
+        if hasName:
+            return self.getModule().pluginTypeName
         else:
             return None
 
@@ -524,7 +762,7 @@ class PluginType (PluginBase):
         self.__id = id
 
     def getName(self):
-        return self.__id
+        return self.__name if self.__name is not None else self.__id
 
     def getDescription(self):
         return self.__description
@@ -549,7 +787,7 @@ class PluginType (PluginBase):
         self._notifyModification()
 
     def getModule(self):
-        return PluginLoader.getPluginType(self.getName())
+        return PluginLoader.getPluginType(self.getId())
 
     def hasPlugins(self):
         """ Returns if this plugin type has any plugins at all.
@@ -598,9 +836,20 @@ class PluginType (PluginBase):
 
     def setActive(self, value):
         self._active = value
+        PluginsHolder().reloadAllPlugins()
 
     def toggleActive(self):
-        self._active = not self.isActive()
+        if not self.isActive():
+            self._active = True
+            #register the components related to the plugin
+            PluginsHolder().reloadAllPlugins()
+            #PluginsHolder().getComponentsManager().addPluginType(self.getName(), True)
+        else:
+            self._active = False
+            #unregister the components related to the plugin
+            PluginsHolder().reloadAllPlugins()
+            #PluginsHolder().getComponentsManager().cleanPluginType(self.getName(), True)
+
 
 class Plugin(PluginBase):
     """ This class represents a plugin ("EVO", "paypal", etc.).
@@ -630,6 +879,7 @@ class Plugin(PluginBase):
         self.__active = active
         self._testPlugin = False
         self._globalData = self.initializeGlobalData()
+        self._storage = OOBTree() # storage.....
 
     def getId(self):
         return self.__name
@@ -669,9 +919,22 @@ class Plugin(PluginBase):
 
     def setActive(self, value):
         self.__active = value
+        if value is True:
+            #register the components related to the plugin
+            PluginsHolder().getComponentsManager().addPlugin(self.getName())
+        else:
+            #unregister the components related to the plugin
+            PluginsHolder().getComponentsManager().cleanPlugin(self.getName())
 
     def toggleActive(self):
-        self.__active = not self.__active
+        if not self.isActive():
+            self.__active = True
+            #register the components related to the plugin
+            PluginsHolder().getComponentsManager().addPlugin(self.getName())
+        else:
+            self.__active = False
+            #unregister the components related to the plugin
+            PluginsHolder().getComponentsManager().cleanPlugin(self.getName())
 
     def setTestPlugin(self, testPlugin):
         self._testPlugin = testPlugin
@@ -700,6 +963,11 @@ class Plugin(PluginBase):
         l = self.__owner.getLocator()
         l["pluginId"] = self.getId()
         return l
+
+    def getStorage(self):
+        if not hasattr(self, "_storage") or self._storage is None:
+            self._storage = OOBTree()
+        return self._storage
 
     def __str__(self):
         return str(self.__name)
@@ -739,7 +1007,8 @@ class PluginOption(Persistent):
     _extraTypes = {
         'users': list,
         'usersGroups': list,
-        'rooms': list
+        'rooms': list,
+        'password': str
     }
 
     def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0):

@@ -15,10 +15,10 @@
             </td>
             <td>
                 <% if ObjectType == "PluginType" :%>
-                    <% name = Object.getName() + '.' + option.getName() %>
+                    <% name = Object.getId() + '.' + option.getName() %>
                 <% end %>
                 <% else: %>
-                    <% name = Object.getOwner().getName() + '.' + Object.getName() + "." + option.getName() %>
+                    <% name = Object.getOwner().getId() + '.' + Object.getId() + "." + option.getName() %>
                 <% end %>
 
                 <% if option.getType() == "users": %>
@@ -95,6 +95,25 @@
                                     }
                                 );
                             }
+                        var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {})
+                        var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
+                        addRoomButton.observeClick(
+                            function(setResult){
+                                var selectedValue = roomChooser.select.get();
+                                indicoRequest(
+                                    'plugins.addRooms',
+                                    {
+                                     optionName: "<%= name %>",
+                                     room: selectedValue
+                                     },function(result,error) {
+                                         if (!error) {
+                                             roomList.set(selectedValue,$O(selectedValue));
+                                         } else {
+                                                IndicoUtil.errorReport(error);
+                                         }
+                                    }
+                                );
+                        });
                         var roomList = new RoomListWidget('PeopleList',removeRoomHandler);
                         //var temp = roomChooser.source.get()["CERN:1"];
                         var roomSelectedBefore=<%= option.getValue() %>
@@ -176,6 +195,11 @@
                         $E('userGroupList<%=name%>').set(uf.draw())
                     </script>
                 <% end %>
+
+                <% elif option.getType() == "password": %>
+                    	<input name="<%= name %>" type="password" size="50" value="<%= option.getValue() %>">
+                <% end %>
+
                 <% else: %>
                     <% if option.getType() == list: %>
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>

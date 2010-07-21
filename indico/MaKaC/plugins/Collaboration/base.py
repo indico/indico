@@ -379,7 +379,7 @@ class CSBookingManager(Persistent, Observer):
             else:
                 return booking
         else:
-            raise ServiceError(_("Tried to check status of booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking does not support the check status service."))
+            raise ServiceError(message=_("Tried to check status of booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking does not support the check status service."))
 
     def acceptBooking(self, id, user = None):
         booking = self._bookings[id]
@@ -389,7 +389,7 @@ class CSBookingManager(Persistent, Observer):
             booking.accept(user)
             return booking
         else:
-            raise ServiceError(_("Tried to accept booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be accepted."))
+            raise ServiceError(message=_("Tried to accept booking ") + str(id) + _(" of meeting ") + str(self._conf.getId()) + _(" but this booking cannot be accepted."))
 
     def rejectBooking(self, id, reason):
         booking = self._bookings[id]

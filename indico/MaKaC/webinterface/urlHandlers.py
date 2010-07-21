@@ -1481,6 +1481,9 @@ class UHAdminCollaboration(URLHandler):
 class UHConfModifCollaboration(OptionallySecureURLHandler):
     _relativeURL = "confModifCollaboration.py"
 
+class UHConfModifChat(URLHandler):
+    _relativeURL = "confModifChat.py"
+
 class UHConfModifCollaborationManagers(URLHandler):
     _relativeURL = "confModifCollaboration.py/managers"
 
@@ -2817,6 +2820,8 @@ class UHConferenceProgramPDF( URLHandler ):
 class UHConferenceTimeTable( URLHandler ):
     _relativeURL = "conferenceTimeTable.py"
 
+class UHConferenceInstantMessaging( URLHandler ):
+    _relativeURL = "conferenceInstantMessaging.py"
 
 class UHConfTimeTablePDF( URLHandler ):
     _relativeURL = "conferenceTimeTable.py/pdf"

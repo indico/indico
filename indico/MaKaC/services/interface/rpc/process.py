@@ -16,6 +16,10 @@ from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 
 def lookupHandler(method):
+
+    # TODO: better way to do this without the need of DB connection?
+    handlers.updateMethodMapWithPlugins()
+
     endpoint = handlers
     functionName = method
     while True:
@@ -49,7 +53,6 @@ def processRequest(method, params, req):
     return result
 
 def invokeMethod(method, params, req):
-
     # create the context
     ContextManager.create()
 

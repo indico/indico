@@ -3,6 +3,8 @@ from MaKaC.services.implementation import roomBooking
 from MaKaC.services.implementation import error
 
 from MaKaC.services.interface.rpc import description
+from MaKaC.plugins.base import PluginsHolder
+from MaKaC.common import DBMgr
 
 
 def importModule(name):
@@ -12,6 +14,8 @@ def importModule(name):
         mod = getattr(mod, comp)
     return mod
 
+def updateMethodMapWithPlugins():
+    methodMap.update(PluginsHolder().getById("ajaxMethodMap").getAJAXDict())
 
 methodMap = {
 
@@ -33,7 +37,6 @@ methodMap = {
     "system.describe": description.describe,
     "system.error.report": error.SendErrorReport
 }
-
 
 endpointMap = {
 

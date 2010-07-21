@@ -20,6 +20,7 @@
 
 # fossil classes
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.base import Observable
 from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContributionFossil, ISubContributionWithSpeakersFossil
@@ -1570,7 +1571,7 @@ class CustomRoom(Persistent):
         return self.name
 
 
-class ConferenceParticipation(Persistent, Fossilizable):
+class ConferenceParticipation(Persistent, Fossilizable, Observable):
 
     fossilizes(IConferenceParticipationFossil, IConferenceParticipationMinimalFossil)
 
@@ -1992,7 +1993,7 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
-class Conference(Persistent, Fossilizable, CommonObjectBase):
+class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
         access to other objects representing certain parts of the conferences
@@ -2768,15 +2769,14 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         """deletes the conference from the system.
         """
         #we notify the observers that the conference has been deleted
-        for observer in self.getObservers():
+        try:
+            self._notify('notifyDelete', {})
+        except Exception, e:
             try:
-                observer.notifyDeletion()
-            except Exception, e:
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer %s of of a conference deletion for conference %s: %s"%
-                                                   (observer.getObserverName(), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)"%(str(e2), str(e)))
+                Logger.get('Conference').error("Exception while notifying the observer of a conference deletion for conference %s: %s" %
+                            (self.getId(), str(e)))
+            except Exception, e2:
+                Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)" % (str(e2), str(e)))
 
         self.unindexContributions()
         #index a DeletedObject to keep track of the conference after the deletion
@@ -2879,16 +2879,16 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         self.cleanCategoryCache()
 
         # notify observers
-        for observer in self.getObservers():
+        try:
+            self._notify('notifyDateChange', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
+        except Exception, e:
             try:
-                observer.notifyEventDateChanges(oldStartDate, self.getStartDate(), oldEndDate, self.getEndDate())
-            except Exception, e:
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer %s of a start and end date change from %s - %s to %s - %s for conference %s: %s"%
-                                                   (observer.getObserverName(), formatDateTime(oldStartDate), formatDateTime(oldEndDate),
-                                                    formatDateTime(self.getStartDate()), formatDateTime(self.getEndDate()), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a start and end date change: %s (origin: %s)"%(str(e2), str(e)))
+                Logger.get('Conference').error("Exception while notifying the observer of a start and end date change from %s - %s to %s - %s for conference %s: %s" %
+                            (formatDateTime(oldStartDate), formatDateTime(oldEndDate),
+                            formatDateTime(self.getStartDate()), formatDateTime(self.getEndDate()), self.getId(), str(e)))
+            except Exception, e2:
+                Logger.get('Conference').error("Exception while notifying a start and end date change: %s (origin: %s)" % (str(e2), str(e)))
+
 
     def _checkInnerSchedule( self ):
         self.getSchedule().checkSanity()
@@ -2935,15 +2935,14 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getObservers():
+            try:
+                self._notify('notifyStartDateChange', {'newDate': sDate, 'oldDate': oldSdate})
+            except Exception, e:
                 try:
-                    observer.notifyEventDateChanges(oldSdate, sDate, None, None)
-                except Exception, e:
-                    try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a start date change from %s to %s for conference %s: %s"%
-                                                       (observer.getObserverName(), formatDateTime(oldSdate), formatDateTime(sDate), self.getId(), str(e)))
-                    except Exception, e2:
-                        Logger.get('Conference').error("Exception while notifying a start date change: %s (origin: %s)"%(str(e2), str(e)))
+                    Logger.get('Conference').error("Exception while notifying the observer of a start date change from %s to %s for conference %s: %s" %
+                    (formatDateTime(oldSdate), formatDateTime(sDate), self.getId(), str(e)))
+                except Exception, e2:
+                    Logger.get('Conference').error("Exception while notifying a start date change: %s (origin: %s)" % (str(e2), str(e)))
 
 
     def verifyStartDate(self, sdate, check=1):
@@ -3049,15 +3048,15 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getObservers():
+            try:
+                self._notify('notifyEndDateChange', {'newDate': eDate, 'oldDate': oldEdate})
+            except Exception, e:
                 try:
-                    observer.notifyEventDateChanges(None, None, oldEdate, eDate)
-                except Exception, e:
-                    try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a end date change from %s to %s for conference %s: %s" %
-                                                       (observer.getObserverName(), formatDateTime(oldEdate), formatDateTime(eDate), self.getId(), str(e)))
-                    except Exception, e2:
-                        Logger.get('Conference').error("Exception while notifying a end date change: %s (origin: %s)"%(str(e2), str(e)))
+                    Logger.get('Conference').error("Exception while notifying the observer of a end date change from %s to %s for conference %s: " %
+                              (formatDateTime(oldEdate), formatDateTime(eDate), self.getId(), str(e)))
+                except Exception, e2:
+                    Logger.get('Conference').error("Exception while notifying a end date change: %s (origin: %s)" % (str(e2), str(e)))
+
 
     def setEndTime(self, hours = 0, minutes = 0, notifyObservers = True):
         """ Changes the current conference end time (not date) to the one specified by the parameters.
@@ -3193,15 +3192,15 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         self.notifyModification(updateChildren = True)
 
         #we notify the observers that the conference's title has changed
-        for observer in self.getObservers():
+        try:
+            self._notify('notifyTitleChange', {'oldTitle': oldTitle, 'newTitle': title})
+        except Exception, e:
             try:
-                observer.notifyTitleChange(oldTitle, title)
-            except Exception, e:
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer %s of of a conference title change for conference %s: %s"%
-                                                   (observer.getObserverName(), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a conference title change: %s (origin: %s)"%(str(e2), str(e)))
+                Logger.get('Conference').error("Exception while notifying the observer of a conference title change for conference %s: %s" %
+                          (self.getId(), str(e)))
+            except Exception, e2:
+                Logger.get('Conference').error("Exception while notifying a conference title change: %s (origin: %s)" % (str(e2), str(e)))
+
 
     def getDescription(self):
         """returns (String) the description of the conference"""

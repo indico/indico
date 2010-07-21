@@ -258,7 +258,7 @@ class ProtectedService(ServiceBase):
 
         if self._getUser() == None:
             self._doProcess = False
-            raise ServiceAccessError("ERR-P4", "You are currently not authenticated. Please log in again.")
+            raise ServiceAccessError("You are currently not authenticated. Please log in again.")
 
 
 class ProtectedDisplayService(ProtectedService):
@@ -284,11 +284,11 @@ class ProtectedDisplayService(ProtectedService):
                 target = self._target
             if not isinstance(target, Category):
                 if target.getAccessKey() != "" or target.getConference().getAccessKey() != "":
-                    raise ServiceAccessError("ERR-P4", "You are currently not authenticated or cannot access this service. Please log in again if necessary.")
+                    raise ServiceAccessError("You are currently not authenticated or cannot access this service. Please log in again if necessary.")
             if self._getUser() == None:
                 self._checkSessionUser()
             else:
-                raise ServiceAccessError("ERR-P4", "You cannot access this service. Please log in again if necessary.")
+                raise ServiceAccessError("You cannot access this service. Please log in again if necessary.")
 
 
 class LoggedOnlyService(ProtectedService):
@@ -317,14 +317,14 @@ class ProtectedModificationService(ProtectedService):
 
         if not target.canModify( self.getAW() ):
             if target.getModifKey() != "":
-                raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
+                raise ServiceAccessError("You don't have the rights to modify this object")
             if self._getUser() == None:
                 self._checkSessionUser()
             else:
-                raise ServiceAccessError("ERR-P5", "You don't have the rights to modify this object")
+                raise ServiceAccessError("You don't have the rights to modify this object")
         if hasattr(self._target, "getConference") and hasattr(self._target, "isClosed"):
             if target.getConference().isClosed():
-                raise ServiceAccessError("ERR-P6", "Conference %s is closed"%target.getConference().getId())
+                raise ServiceAccessError("Conference %s is closed"%target.getConference().getId())
 
 class AdminService(LoggedOnlyService):
     """
@@ -338,7 +338,7 @@ class AdminService(LoggedOnlyService):
         LoggedOnlyService._checkProtection(self)
 
         if not self._getUser().isAdmin():
-            raise ServiceAccessError("ERR-P7", _("Only administrators can perform this operation"))
+            raise ServiceAccessError(_("Only administrators can perform this operation"))
 
 class TextModificationBase( object ):
     """

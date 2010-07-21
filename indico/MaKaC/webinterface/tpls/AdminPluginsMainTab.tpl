@@ -6,11 +6,11 @@
     <% end %>
     <% else: %>
         <% checked = "" %>
-    <% end %> 
-    
+    <% end %>
+
     <input type="checkbox" name="optionReloadAll" id="reloadAllCheckbox" <%= checked %> />
     <label for="reloadAllCheckbox"><%= _("Reload all plugins every time you open / navigate the Server Admin > Plugins tab")%></label>
-    
+
     <input type="submit" value="<%= _("Save")%>" />
 
 </form>
@@ -57,7 +57,7 @@
                                 <img class="imglink" alt="<%= _("Click to enable")%>" src="<%=Config.getInstance().getSystemIconURL( 'disabledSection' )%>"/>
                         <% end %>
                         </a>
-                        <a href="<%=urlHandlers.UHAdminTogglePluginType.getURL(pluginType)%>">
+                        <a href="<%=urlHandlers.UHAdminTogglePluginType.getURL(pluginType)%>" onclick="return confirm('<%= _('This will reload all the plugins too. Do you want to continue?')%>');"
                             <%= pluginType.getName() %>
                         </a>
                         <% if pluginType.hasDescription(): %>
