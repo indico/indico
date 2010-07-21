@@ -35,7 +35,7 @@ try:
     from mod_python import apache
 except ImportError:
     pass
-from ZODB.POSException import ConflictError
+from ZODB.POSException import ConflictError, POSKeyError
 from ZEO.Exceptions import ClientDisconnected
 
 from MaKaC.common import fossilize
@@ -494,7 +494,7 @@ class RH(RequestHandlerBase):
                     except MaKaCError, e:
                         #DBMgr.getInstance().endRequest(False)
                         res = self._processError(e)
-                except ConflictError:
+                except ConflictError, POSKeyError:
                     import traceback
                     Logger.get('requestHandler').debug('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
                     self._abortSpecific2RH()
