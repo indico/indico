@@ -71,6 +71,14 @@ class IFossilWithProduceFossil(ISimpleFossil1Fossil):
         pass
     getSum.produce = lambda self: self.a + self.b
 
+class IAttributeFossil(IFossil):
+    def a(self):
+        pass
+    def b(self):
+        pass
+    def c(self):
+        pass
+
 class IClassWithDifferentMethodNamesFossil(IFossil):
     def getAttributeOne(self):
         pass
@@ -95,7 +103,7 @@ class IClassWithDifferentMethodNamesBad2Fossil(IClassWithDifferentMethodNamesFos
 
 class SimpleClass(Fossilizable):
 
-    fossilizes(ISimpleFossil1Fossil, ISimpleFossil2Fossil, IFossilWithProduceFossil)
+    fossilizes(ISimpleFossil1Fossil, ISimpleFossil2Fossil, IFossilWithProduceFossil, IAttributeFossil)
 
     def __init__(self, a, b, c):
         self.a = a
@@ -317,6 +325,11 @@ class TestFossilize(unittest.TestCase):
         self.assertEquals(fossilize([s1, d1], {"indico.tests.python.unit.MaKaC_tests.common_tests.fossilize_test.SimpleClass": ISimpleFossil2Fossil, "indico.tests.python.unit.MaKaC_tests.common_tests.fossilize_test.DerivedClass": ISimpleFossil1Fossil}),
                           [s1.fossilize(ISimpleFossil2Fossil), d1.fossilize(ISimpleFossil1Fossil)])
 
+    def testFossilizeWithAttributes(self):
+        s1 = SimpleClass(10, 20, 'foo')
+        d1 = DerivedClass(10, 50, 'bar')
+        self.assertEquals(s1.fossilize(IAttributeFossil), {'_type':'SimpleClass', '_fossil':'attribute', "a": 10, "b": 20, "c":"foo"})
+        self.assertEquals(fossilize(d1, IAttributeFossil), {'_type':'DerivedClass', '_fossil':'attribute', "a": 10, "b": 50, "c":"bar"})
 
 if __name__ == '__main__':
     unittest.main()
