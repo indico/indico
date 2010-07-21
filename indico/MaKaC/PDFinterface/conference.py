@@ -24,10 +24,8 @@ from copy import deepcopy
 from textwrap import wrap, fill
 try :
     from PIL import Image
-    HAVE_PIL = True
 except ImportError, e:
     from MaKaC.PDFinterface.base import Image
-    HAVE_PIL = False
 from MaKaC.PDFinterface.base import escape
 from datetime import timedelta,datetime
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -61,10 +59,6 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 import re
 from MaKaC.i18n import _
 
-# PIL is the library used by reportlab to work with images.
-# If it isn't available, we must NOT put images in the PDF.
-# Then before add an image, we must check the HAVE_PIL global variable
-
 
 styles = getSampleStyleSheet()
 charRplace = [
@@ -90,15 +84,7 @@ class ProgrammeToPDF(PDFBase):
 
     def firstPage(self, c, doc):
         c.saveState()
-        if HAVE_PIL:
-            logo = self._conf.getLogo()
-            imagePath = ""
-            if logo:
-                imagePath = logo.getFilePath()
-            if imagePath:
-                img = Image.open(imagePath)
-                width, heigth = img.size
-                c.drawInlineImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, self._PAGE_HEIGHT - inch - heigth)
+        self._drawLogo(c, False)
         height=self._drawWrappedString(c, strip_ml_tags(self._conf.getTitle()))
         c.setFont('Times-Bold', 15)
         height-=2*cm
@@ -155,20 +141,8 @@ class AbstractToPDF(PDFBase):
 
     def firstPage(self, c, doc):
         c.saveState()
-        showLogo = False
         c.setFont('Times-Bold', 30)
-        if HAVE_PIL:
-            logo = self._conf.getLogo()
-            imagePath = ""
-            if logo:
-                imagePath = logo.getFilePath()
-            if imagePath:
-                img = Image.open(imagePath)
-                showLogo = True
-                width, heigth = img.size
-                c.drawInlineImage(imagePath, self._PAGE_WIDTH/4.0 - width/2, self._PAGE_HEIGHT - inch - heigth)
-                c.drawCentredString( self._PAGE_WIDTH*3/4, self._PAGE_HEIGHT - inch - heigth/2, escape(self._conf.getTitle()))
-        if not showLogo:
+        if not self._drawLogo(c):
             self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
 
         c.setFont('Times-Bold', 25)
@@ -360,18 +334,7 @@ class AbstractsToPDF(PDFWithTOC):
         c.saveState()
         showLogo = False
         c.setFont('Times-Bold', 30)
-        if HAVE_PIL:
-            logo = self._conf.getLogo()
-            imagePath = ""
-            if logo:
-                imagePath = logo.getFilePath()
-            if imagePath:
-                img = Image.open(imagePath)
-                showLogo = True
-                width, heigth = img.size
-                c.drawInlineImage(imagePath, self._PAGE_WIDTH/4.0 - width/2, self._PAGE_HEIGHT - inch - heigth)
-                c.drawCentredString( self._PAGE_WIDTH*3/4, self._PAGE_HEIGHT - inch - heigth/2, escape(self._conf.getTitle()))
-        if not showLogo:
+        if not self._drawLogo(c):
             self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
 
         c.setFont('Times-Bold', 35)
@@ -694,20 +657,8 @@ class ContribToPDF(PDFBase):
 
     def firstPage(self, c, doc):
         c.saveState()
-        showLogo = False
         c.setFont('Times-Bold', 30)
-        if HAVE_PIL:
-            logo = self._conf.getLogo()
-            imagePath = ""
-            if logo:
-                imagePath = logo.getFilePath()
-            if imagePath:
-                img = Image.open(imagePath)
-                showLogo = True
-                width, heigth = img.size
-                c.drawInlineImage(imagePath, self._PAGE_WIDTH/4.0 - width/2, self._PAGE_HEIGHT - inch - heigth)
-                c.drawCentredString( self._PAGE_WIDTH*3/4, self._PAGE_HEIGHT - inch - heigth/2, escape(self._conf.getTitle()))
-        if not showLogo:
+        if not self._drawLogo(c):
             self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 25)
         #c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT - inch - 5*cm, self._abstract.getTitle())
@@ -902,16 +853,7 @@ class ContributionBook(PDFBase):
 
     def firstPage(self,c,doc):
         c.saveState()
-        if HAVE_PIL:
-            logo=self._conf.getLogo()
-            imagePath=""
-            if logo:
-                imagePath=logo.getFilePath()
-            if imagePath:
-                img=Image.open(imagePath)
-                width,heigth=img.size
-                c.drawInlineImage(imagePath,self._PAGE_WIDTH/2.0-width/2,
-                    self._PAGE_HEIGHT-inch-heigth)
+        self._drawLogo(c, False)
         height=self._drawWrappedString(c, self._conf.getTitle())
         c.setFont('Times-Bold',15)
         height-=2*cm
@@ -1039,18 +981,7 @@ class ContribsToPDF(PDFWithTOC):
         c.saveState()
         showLogo = False
         c.setFont('Times-Bold', 30)
-        if HAVE_PIL:
-            logo = self._conf.getLogo()
-            imagePath = ""
-            if logo:
-                imagePath = logo.getFilePath()
-            if imagePath:
-                img = Image.open(imagePath)
-                showLogo = True
-                width, heigth = img.size
-                c.drawInlineImage(imagePath, self._PAGE_WIDTH/4.0 - width/2, self._PAGE_HEIGHT - inch - heigth)
-                c.drawCentredString( self._PAGE_WIDTH*3/4, self._PAGE_HEIGHT - inch - heigth/2, escape(self._conf.getTitle()))
-        if not showLogo:
+        if not self._drawLogo(c):
             self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 35)
         c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
@@ -1278,16 +1209,8 @@ class TimeTablePlain(PDFWithTOC):
     def firstPage(self,c,doc):
         if self._ttPDFFormat.showCoverPage():
             c.saveState()
-            if HAVE_PIL and self._ttPDFFormat.showLogo():
-                logo=self._conf.getLogo()
-                imagePath=""
-                if logo:
-                    imagePath=logo.getFilePath()
-                if imagePath:
-                    img=Image.open(imagePath)
-                    width,heigth=img.size
-                    c.drawInlineImage(imagePath,self._PAGE_WIDTH/2.0-width/2,
-                        self._PAGE_HEIGHT-inch-heigth)
+            if self._ttPDFFormat.showLogo():
+                self._drawLogo(c, False)
             height=self._drawWrappedString(c, escape(self._conf.getTitle()))
             c.setFont('Times-Bold',modifiedFontSize(15, self._fontsize))
             height-=2*cm
@@ -2010,15 +1933,7 @@ class AbstractBook(PDFBase):
 
     def firstPage(self,c,doc):
         c.saveState()
-        if HAVE_PIL:
-            logo=self._conf.getLogo()
-            imagePath=""
-            if logo:
-                imagePath=logo.getFilePath()
-            if imagePath:
-                img=Image.open(imagePath)
-                width,heigth=img.size
-                c.drawInlineImage(imagePath,self._PAGE_WIDTH/2.0-width/2,self._PAGE_HEIGHT-inch-heigth)
+        self._drawLogo(c, False)
         height=self._drawWrappedString(c,self._conf.getTitle())
         c.setFont('Times-Bold',15)
         height-=2*cm
@@ -2169,16 +2084,7 @@ class ProceedingsTOC(PDFBase):
 
     def firstPage(self,c,doc):
         c.saveState()
-        if HAVE_PIL:
-            logo=self._conf.getLogo()
-            imagePath=""
-            if logo:
-                imagePath=logo.getFilePath()
-            if imagePath:
-                img=Image.open(imagePath)
-                width,heigth=img.size
-                c.drawInlineImage(imagePath,self._PAGE_WIDTH/2.0-width/2,
-                    self._PAGE_HEIGHT-inch-heigth)
+        self._drawLogo(c, False)
         height=self._drawWrappedString(c, self._conf.getTitle())
         c.setFont('Times-Bold',15)
         height-=2*cm

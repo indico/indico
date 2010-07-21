@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os, math, types
+import os, math, types, tempfile
 import xml.sax.saxutils as saxutils
 from HTMLParser import HTMLParser
 from reportlab.platypus import SimpleDocTemplate, PageTemplate
@@ -36,6 +36,17 @@ from reportlab.pdfbase.ttfonts import TTFont
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
 from MaKaC.errors import MaKaCError
+from MaKaC.common import Config
+
+# PIL is the library used by reportlab to work with images.
+# If it isn't available, we must NOT put images in the PDF.
+# Then before add an image, we must check the HAVE_PIL global variable
+try :
+    from PIL import Image as PILImage
+    HAVE_PIL = True
+except ImportError, e:
+    from MaKaC.PDFinterface.base import Image as PILImage
+    HAVE_PIL = False
 
 ratio = math.sqrt(math.sqrt(2.0))
 
@@ -395,6 +406,30 @@ class PDFBase:
             draw(width, height, escape(line))
         return height
 
+    def _drawLogo(self, c, drawTitle = True):
+        if HAVE_PIL:
+            logo = self._conf.getLogo()
+            imagePath = ""
+            if logo:
+                imagePath = logo.getFilePath()
+            if imagePath:
+                img = PILImage.open(imagePath)
+                width, height = img.size
+                if width > self._PAGE_WIDTH:
+                    ratio =  float(height)/width
+                    width = self._PAGE_WIDTH
+                    height = self._PAGE_WIDTH * ratio
+                    fd, imagePath = tempfile.mkstemp( suffix="IndicoLogo." + imagePath[-3:], dir = Config.getInstance().getUploadedFilesTempDir() )
+                    img.resize((width, height)).save(imagePath)
+                    clean = True
+                c.drawInlineImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, self._PAGE_HEIGHT - 1.5 * inch - height)
+                if drawTitle:
+                    c.drawCentredString( self._PAGE_WIDTH*0.75, self._PAGE_HEIGHT - inch , escape(self._conf.getTitle()))
+                if clean:
+                    os.close(fd)
+                    os.remove(imagePath)
+                return True
+        return False
 
 
 def _doNothing(canvas, doc):
