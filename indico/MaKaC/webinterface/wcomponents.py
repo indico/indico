@@ -6117,6 +6117,20 @@ class WRoomBookingSearch4Bookings( WTemplated ):
 
         return vars
 
+class WRoomBookingMapOfRooms(WTemplated):
+
+    def __init__(self, rh):
+        self._rh = rh
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+
+        vars["buildings"] = self._rh._buildings
+
+        return vars
+
+# 2. List of...
+
 class WRoomBookingRoomList( WTemplated ):
 
     def __init__( self, rh, standalone = False ):

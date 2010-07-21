@@ -1,0 +1,72 @@
+/* Marker info */
+
+#filter_canvas {
+    width: 200px;
+}
+
+#map_table_right {
+    vertical-align: top;
+}
+
+#map_table_left {
+    width: 100%;
+}
+
+#map_canvas {
+    width: 100%;
+    height: 600px;
+}
+
+#map_table {
+    width: 100%;
+}
+
+.mapBuildingTitle {
+    font-weight: bold;
+}
+
+/* Aspects links */
+
+ul.mapAspectsList {
+    display: block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 5px;
+}
+
+ul.mapAspectsList li {
+    display: inline;
+    position: relative;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-right: 1px solid #AAAAAA;
+}
+
+ul.mapAspectsList a {
+    font-family: Verdana;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+ul.mapAspectsList a:hover {
+    color: #dbb03a !important;
+}
+
+.mapAspectSelected {
+    color: #B38B1F !important;
+}
+
+.mapAspectUnselected {
+    color: #4C6A83 !important;
+}
+
+ul.mapAspectsList li.first {
+    padding-left: 0px;
+}
+
+ul.mapAspectsList li.last {
+    padding-right: 0px;
+    border-right: none;
+}

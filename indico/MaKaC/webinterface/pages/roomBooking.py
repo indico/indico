@@ -220,6 +220,27 @@ class WPRoomBookingSearch4Users( WPRoomBookingBase ):
         params["addURL"] = urlHandlers.UHRoomBookingRoomForm.getURL()
         return wc.getHTML( params )
 
+class WPRoomBookingMapOfRooms(WPRoomBookingBase):
+
+    def __init__(self, rh):
+        WPRoomBookingBase.__init__(self, rh)
+        self._rh = rh
+        self.addExtraCSSFile('mapofrooms.css')
+
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+               self._includeJSPackage('RoomBooking')
+
+    def _getTitle(self):
+        return WPRoomBookingBase._getTitle(self) + " - " + _("Map of rooms")
+
+    def _setCurrentMenuItem(self):
+        self._roomMapOpt.setActive(True)
+
+    def _getBody(self, params):
+        wc = wcomponents.WRoomBookingMapOfRooms(self._rh)
+        return wc.getHTML(params)
+
 # 2. List of ...
 
 class WPRoomBookingRoomList( WPRoomBookingBase ):

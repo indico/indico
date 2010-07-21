@@ -26,16 +26,23 @@ from MaKaC.rb_location import CrossLocationQueries, Location
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.rb_tools import qbeMatch
 from MaKaC.common.Configuration import Config
+from MaKaC.webinterface import urlHandlers
+
+# fossils
+from MaKaC.fossils.room import IRoomMapFossil
+from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 # Branch name in ZODB root
 _ROOMS = 'Rooms'
 
-class Room( Persistent, RoomBase ):
+class Room( Persistent, RoomBase, Fossilizable ):
     """
     ZODB specific implementation.
 
     For documentation of methods see base class.
     """
+
+    fossilizes(IRoomMapFossil)
 
     __dalManager = Factory.getDALManager()
     vcList = []
@@ -401,6 +408,19 @@ class Room( Persistent, RoomBase ):
             if not have:
                 return False
         return True
+
+    def getUrl(self):
+        """ Room URL """
+        return str(urlHandlers.UHRoomBookingRoomDetails.getURL(target=self))
+        #return 'http://indico.cern.ch/roomBooking.py/roomDetails?roomLocation=CERN&roomID=3'
+
+    def getMarkerDescription(self):
+        """ Room description for the map marker """
+        return _("Capacity") + ": %s " % self.capacity + _("people")
+
+    def getIsAutoConfirm(self):
+        """ Has the room auto-confirmation of schedule? """
+        return not self.resvsNeedConfirmation
 
     locationName = property( getLocationName, setLocationName )
 

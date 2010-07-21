@@ -1,0 +1,1 @@
+include(ScriptRoot + "indico/RoomBooking/MapOfRooms.js");
