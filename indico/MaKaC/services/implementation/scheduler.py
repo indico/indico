@@ -18,26 +18,34 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from BTrees.Length import Length
-from zope.index.field import FieldIndex
+"""
+AJAX Services for Scheduler (admin)
+"""
 
-class IntFieldIndex(FieldIndex):
+from MaKaC.services.implementation.base import AdminService
 
-    def clear(self):
-        """
-        Initialize forward and reverse mappings.
-        """
+from indico.modules import ModuleHolder
+from indico.util import fossilize
 
-        # The forward index maps indexed values to a sequence of docids
-        self._fwd_index = self.family.IO.BTree()
+class GetWaitingTaskList(AdminService):
+    """
+    Returns the list of tasks currently waiting to be executed
+    """
 
-        # The reverse index maps a docid to its index value
-        self._rev_index = self.family.II.BTree()
-        self._num_docs = Length(0)
+    def _getAnswer(self):
+        schedModule = ModuleHolder().getById('scheduler')
+        return fossilize.fossilize(list(schedModule.getWaitingQueue()))
 
-    def has_doc(self, docid):
-        if type(docid) == int:
-            return docid in self._rev_index
-        else:
-            return False
+class GetRunningTaskList(AdminService):
+    """
+    Returns the list of tasks currently running
+    """
 
+    def _getAnswer(self):
+        schedModule = ModuleHolder().getById('scheduler')
+        return fossilize.fossilize(schedModule.getRunningList())
+
+methodMap = {
+    "tasks.listWaiting": GetWaitingTaskList,
+    "tasks.listRunning": GetRunningTaskList
+    }

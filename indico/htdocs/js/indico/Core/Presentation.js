@@ -352,3 +352,10 @@ Html.unescaped = map({'div': null, 'span': null}, function(value, elemType) {
         return res;
     };
 });
+
+declareMixin = function(targetName, sourceName, mixins) {
+    type(targetName, [sourceName].concat(mixins), {},
+     function() {
+         this[sourceName].apply(this, arguments);
+     });
+};

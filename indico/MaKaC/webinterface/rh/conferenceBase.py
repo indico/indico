@@ -158,7 +158,7 @@ class RHAlarmBase( RHConferenceSite ):
         l = locators.WebLocator()
         l.setAlarm( params )
         self._alarm = self._target = l.getObject()
-        self._conf = self._alarm.getOwner().getConference()
+        self._conf = self._alarm.getConference()
         self._setMenuStatus(params)
 
 

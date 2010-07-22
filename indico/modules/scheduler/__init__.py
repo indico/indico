@@ -19,18 +19,38 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-import logging
+import logging, time, datetime
 
 from zc.queue import Queue
-from BTrees import IOBTree
+from BTrees.IOBTree import IOBTree
+from BTrees.Length import Length
 
 from MaKaC.common import db
+from MaKaC.trashCan import TrashCanManager
 
 from indico.modules import Module
 from indico.modules.scheduler.controllers import Scheduler
 
+from indico.core.index import IntFieldIndex
+
+class SchedulerException(Exception):
+    pass
+
+
+class TaskStillRunningException(SchedulerException):
+    def __init__(self, task):
+        SchedulerException.__init__(self, 'Task %s (%s) is currently running' %
+                                    (task.id, task.typeId))
+
+class TaskNotFoundException(SchedulerException):
+    pass
+
+class TaskInconsistentStatusException(SchedulerException):
+    pass
+
+
 class SchedulerModule(Module):
-    id = "tasks"
+    id = "scheduler"
 
     def __init__(self):
         # logging.getLogger('scheduler') = logging.getLogger('scheduler')
@@ -38,37 +58,146 @@ class SchedulerModule(Module):
         self.waitingQueue = Queue()
         self.runningList = []
 
+        # Failed tasks (there is an object still in the DB)
+        self._failedIndex = IntFieldIndex()
+
+        # Finished tasks (no object data, just metadata)
+        self._finishedIndex = IntFieldIndex()
+
+        # Stores metadata
+        self._taskIdx = IOBTree()
+        self._taskCounter = Length(0)
+
+    def _assertTaskStatus(self, task, status):
+        """
+        Confirm the status of this task
+        """
+
+        if task.status != status:
+            raise TaskInconsistentStatusException(
+                "%s's status is not %s" %
+                (task, status))
+
+        if status == base.TASK_STATUS_RUNNING and \
+               task not in self.runningList:
+                raise TaskInconsistentStatusException(
+                    'task %s (%s) was not found in the running task list' %
+                    (task.id, task))
+
+        # TODO: remaining elifs
 
     def addTaskToWaitingQueue(self, task):
-        logging.getLogger('scheduler').debug('Added task %s to waitingList..' % task.id)
+        logging.getLogger('scheduler').debug(
+            'Added task %s to waitingList..' % task.id)
         self.waitingQueue.put(task)
 
-
-    def getNextWaitingTask(self):
+    def popNextWaitingTask(self):
         try:
             item = self.waitingQueue.pull()
             self.waitingQueue._p_changed = 1
             return item
-        except IndexError: # No items in the Queue
+        except IndexError:
+            # No items in the Queue
             return None
-
 
     def getRunningList(self):
         return self.runningList
 
-
     def getWaitingQueue(self):
         return self.waitingQueue
 
+    def indexTask(self, task):
+
+        # give it a serial id
+        task.setId(self._taskCounter())
+
+        # index it and increase the count
+        self._taskIdx[task.id] = task
+        self._taskCounter.change(1)
+
+        logging.getLogger('scheduler').debug(
+            'Added %s to index..' % task)
+
+
     def addTaskToRunningList(self, task):
-        logging.getLogger('scheduler').debug('Added task %s to runningList..' % task.id)
+
+        logging.getLogger('scheduler').debug(
+            'Added task %s to runningList..' % task.id)
         self.runningList.append(task)
 
+    def removeTaskFromQueue(self, task):
+        """
+        """
 
-    def removeTaskFromRunningList(self, task):
-        if task in self.runningList:
-            self.runningList.remove(task)
-            return True
+        index = None
+
+        for i in self.waitingQueue:
+            if self.waitingQueue[i] == task:
+                index = i
+                break;
         else:
-            logging.getLogger('scheduler').warning('task %s (%s) should have been on runningList but it was not found' % (task.id, task))
-            return False
+            raise TaskNotFoundException()
+
+        self.waitingQueue.pull(index)
+
+    def removeTask(self, task):
+        """
+        Remove a task, no matter what is its current state
+        """
+
+        # TODO - implement this using task code?
+
+        # Task still running - throw exception
+        if task.state  == base.TASK_STATUS_RUNNING:
+            raise TaskStillRunningException(task)
+
+        # task has failed - remove it from 'failed' index
+        elif task.state == base.TASK_STATUS_FAILED:
+            self._failedIndex.unindex_doc(task.id)
+
+        # task has finished - remove it from 'finished' index
+        elif task.state == base.TASK_STATUS_FINISHED:
+            self._finishedIndex.unindex_doc(task.id)
+
+        # task is queued - removed it from queue
+        elif task.state == base.TASK_STATUS_QUEUED:
+            self.removeTaskFromQueue(task)
+
+
+        # task not found - throw exception
+        else:
+            raise TaskInconsistentStatusException()
+
+    def deleteTask(self, task):
+        """
+        Add a task to the TrashCanManager.
+        No unindexing is done by this method
+        """
+
+        self.removeTask(task)
+
+        TrashCanManager().add(task)
+
+
+    def moveTaskFromRunningList(self, task, status):
+        """
+        Remove a task from the running list
+        """
+
+        self._assertTaskStatus(task, base.TASK_STATUS_RUNNING)
+
+        # generate a timestamp
+        timestamp = int(time.mktime(datetime.datetime.now().timetuple()))
+
+        # actually remove it from list
+        self.runningList.remove(task)
+
+        # index it either in finished or failed
+        if status == base.TASK_STATUS_FINISHED:
+            self._finishedIndex.index_doc(task.id, timestamp)
+        elif status == base.TASK_STATUS_FAIL:
+            self._failedIndex.index_doc(task.id, timestamp)
+            # or just re-add it to the waiting queue
+        elif status == base.TASK_STATUS_QUEUED:
+            self.addTaskToWaitingQueue(task)
+

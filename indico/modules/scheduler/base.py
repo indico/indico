@@ -1,3 +1,23 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 import logging
 import time
 from datetime import timedelta
@@ -5,10 +25,17 @@ from datetime import timedelta
 import ZODB
 from persistent import Persistent
 
-from indico.modules.scheduler.controllers import Scheduler
+from indico.util.fossilize import fossilizes, Fossilizable
+from indico.util.timezone import nowutc
+from indico.modules.scheduler.fossils import ITaskFossil
 
-class BaseTask(Persistent):
-    '''To create a new Task subclass Task and define a _run() method with the tasks' actions
+TASK_STATUS_NONE, TASK_STATUS_QUEUED, TASK_STATUS_RUNNING, \
+TASK_STATUS_FAILED, TASK_STATUS_ABORTED, TASK_STATUS_FINISHED = range(0,6)
+
+
+class BaseTask(Persistent, Fossilizable):
+    """
+    To create a new Task subclass Task and define a _run() method with the tasks' actions
     Description of each attribute:
     AUTOMATIC ATTRS:
     - startedOn:  actual date the task started running
@@ -19,9 +46,12 @@ class BaseTask(Persistent):
     - startOn:    time at which the task creator wanted the task to start (can be blank)
     - endOn:      last point in time where the task can run. A task will never enter the
                   runningQueue if current time is past endOn
-    '''
+    """
+
+    fossilizes(ITaskFossil)
+
     def __init__(self, **kwargs):
-        self.id = self.__class__.__name__
+        self.typeId = self.__class__.__name__
         self.reset(**kwargs)
 
 
@@ -33,6 +63,8 @@ class BaseTask(Persistent):
         self.onRunningListSince = None
         self.startOn = None
         self.endOn = None
+        self.status = TASK_STATUS_NONE
+        self.id = None
 
         for k in ('startOn', 'endOn'):
             if k in kwargs:
@@ -63,6 +95,9 @@ class BaseTask(Persistent):
     def getId(self):
         return self.id
 
+    def getTypeId(self):
+        return self.typeId
+
     def setId(self, newid):
         self.id = newid
 
@@ -79,7 +114,7 @@ class BaseTask(Persistent):
         return self.endedOn
 
     def start(self):
-        if self.startOn and time.time() < self.startOn:
+        if self.startOn and nowutc() < self.startOn:
             logging.getLogger('scheduler').debug('Task %s will sleep for some time. Her time has not come yet startOn (%s) > current time (%s)' % (self.id, self.startOn, time.time()))
             time.sleep(time.time() - self.startOn)
 
@@ -87,11 +122,12 @@ class BaseTask(Persistent):
             logging.getLogger('scheduler').warning('Task %s will not be executed, endOn (%s) < current time (%s)' % (self.id, self.endOn, time.time()))
             return False
 
-        self.startedOn = time.time()
+        self.startedOn = nowutc()
         self.running = True
+        self.status = TASK_STATUS_RUNNING
         self.run()
         self.running = False
-        self.endedOn = time.time()
+        self.endedOn = nowutc()
 
 
     def tearDown(self):
@@ -99,6 +135,8 @@ class BaseTask(Persistent):
         overload this method'''
         pass
 
+    def __str__(self):
+        return "<%s %s %s %s>" % (self.typeId, self.id, self.status, self.startOn)
 
 
 class OneShotTask(BaseTask):
@@ -128,12 +166,15 @@ class OneShotTask(BaseTask):
 
 
 class PeriodicTask(BaseTask):
-    '''Tasks that should be executed at regular intervals'''
+    """
+    Tasks that should be executed at regular intervals
+    """
 
     def __init__(self, **kwargs):
-        '''Must be fed:
-            - interval: seconds between each successive run
-        '''
+        """
+        Must be fed:
+        - interval: seconds between each successive run
+        """
         super(PeriodicTask, self).__init__(**kwargs)
         if 'interval' not in kwargs:
             raise Exception('Error: PeriodicTask was not given an interval')
@@ -158,7 +199,6 @@ class PeriodicTask(BaseTask):
 
         # We reinject ourselves into the Queue
         self.reset()
-        Scheduler.addTask(self)
 
 
 class PeriodicUniqueTask(PeriodicTask):

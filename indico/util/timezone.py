@@ -18,26 +18,4 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from BTrees.Length import Length
-from zope.index.field import FieldIndex
-
-class IntFieldIndex(FieldIndex):
-
-    def clear(self):
-        """
-        Initialize forward and reverse mappings.
-        """
-
-        # The forward index maps indexed values to a sequence of docids
-        self._fwd_index = self.family.IO.BTree()
-
-        # The reverse index maps a docid to its index value
-        self._rev_index = self.family.II.BTree()
-        self._num_docs = Length(0)
-
-    def has_doc(self, docid):
-        if type(docid) == int:
-            return docid in self._rev_index
-        else:
-            return False
-
+from MaKaC.common.timezoneUtils import nowutc

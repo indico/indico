@@ -3390,12 +3390,15 @@ Best Regards%s
         else :
             self._al.setToAllParticipants(False)
 
-        if self._dateType == "2":
-            self._al.setTimeBefore(timedelta(days=int(self._dayBefore)))
-        elif self._dateType == "3":
-            self._al.setTimeBefore(timedelta(0, int(self._hourBefore)*3600))
+        if self._dateType == "1":
+            self._al.setStartOn(timezone(self._conf.getTimezone()).localize(datetime(self._year, self._month, self._day, self._hour)).astimezone(timezone('UTC')))
         else:
-            self._al.setStartDate(timezone(self._conf.getTimezone()).localize(datetime(self._year, self._month, self._day, self._hour)).astimezone(timezone('UTC')))
+            if self._dateType == "2":
+                delta = timedelta(days=int(self._dayBefore))
+            elif self._dateType == "3":
+                delta = timedelta(0, int(self._hourBefore)*3600)
+            self._al.setStartOn(self._target.getStartDate() - delta)
+
         self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
 
 

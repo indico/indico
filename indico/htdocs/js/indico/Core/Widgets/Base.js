@@ -49,7 +49,7 @@ type("IWidget", [],
  *                                     4. the event object
  *
  */
-type("ListWidget", ["WatchObject", "IWidget"],
+type("EnumWidget", ["WatchObject", "IWidget"],
     {
         /**
          * The DOM id of the <ul> element, chosen randomly at construction.
@@ -85,7 +85,8 @@ type("ListWidget", ["WatchObject", "IWidget"],
 
             var returnedDom = $B(self.domList, self,
                 function(pair) {
-                    var listItem =  Html.li({id: self.id + '_' + pair.key}, self._drawItem(pair));
+                    var listItem =  self._iteratingElement(
+                        {id: self.id + '_' + pair.key}, self._drawItem(pair));
                     if (exists(self.mouseoverObserver)) {
                         listItem.observeEvent('mouseover', function(event){
                             self.mouseoverObserver(true, pair, listItem, event);
@@ -98,7 +99,7 @@ type("ListWidget", ["WatchObject", "IWidget"],
                 });
 
             if (exists(this.message)) {
-                this.domList.append(Html.li('listMessage', this.message));
+                this.domList.append(self._iteratingElement('listMessage', this.message));
             }
 
             return this.IWidget.prototype.draw.call(this, returnedDom);
@@ -118,11 +119,37 @@ type("ListWidget", ["WatchObject", "IWidget"],
     function(listCssClass, mouseoverObserver) {
         this.WatchObject();
         this.id = Html.generateId();
-        this.domList = Html.ul({id: this.id, className: listCssClass});
+        this.domList = this._containerElement({id: this.id, className: listCssClass});
+
         this.listCssClass = listCssClass;
         this.mouseoverObserver = mouseoverObserver;
     }
 );
+
+type("TableWidgetMixin", [],
+     {
+         _iteratingElement: function() {
+             return Html.tr.call(this, arguments);
+         },
+
+         _containerElement: function() {
+             return Html.table.call(this, arguments);
+         }
+     });
+
+type("ListWidgetMixin", [],
+     {
+        _iteratingElement: function() {
+            return Html.li.apply(this, arguments);
+        },
+
+        _containerElement: function() {
+            return Html.ul.apply(this, arguments);
+        }
+     });
+
+declareMixin("ListWidget", "EnumWidget", ["ListWidgetMixin"]);
+declareMixin("TableWidget", "EnumWidget", ["TableWidgetMixin"]);
 
 /**
  * Base class which adds selection capability to ListWidget.
@@ -706,7 +733,7 @@ type("RemoteWidget", [],
          this.source = indicoSource(method, args);
      });
 
-type("RemoteListWidget", ["ListWidget", "RemoteWidget"], {
+type("RemoteEnumWidget", ["EnumWidget", "RemoteWidget"], {
 
     draw: function() {
         return this.RemoteWidget.prototype.draw.call(this);
@@ -731,14 +758,18 @@ type("RemoteListWidget", ["ListWidget", "RemoteWidget"], {
         each($L(this.getList()), function(elem){
                 self._addElement(elem);
                 });
-        return this.ListWidget.prototype.draw.call(this);
+        return this.EnumWidget.prototype.draw.call(this);
     }
 
     },
     function(listCssClass, method, args, noIndicator) {
-        this.ListWidget(listCssClass);
+        this.EnumWidget(listCssClass);
         this.RemoteWidget(method, args, noIndicator);
     });
+
+declareMixin("RemoteListWidget", "RemoteEnumWidget", ["ListWidgetMixin"]);
+declareMixin("RemoteTableWidget", "RemoteEnumWidget", ["TableWidgetMixin"]);
+
 
 type("PreloadedWidget", ["IWidget"],
      {

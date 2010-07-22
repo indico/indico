@@ -18,26 +18,20 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from BTrees.Length import Length
-from zope.index.field import FieldIndex
+"""
+Fossils for tasks
+"""
 
-class IntFieldIndex(FieldIndex):
+from indico.util.fossilize import IFossil
 
-    def clear(self):
-        """
-        Initialize forward and reverse mappings.
-        """
+class ITaskFossil(IFossil):
+    """
+    A fossil representing a scheduler task
+    """
+    def getId():
+        pass
 
-        # The forward index maps indexed values to a sequence of docids
-        self._fwd_index = self.family.IO.BTree()
+    def getTypeId():
+        pass
 
-        # The reverse index maps a docid to its index value
-        self._rev_index = self.family.II.BTree()
-        self._num_docs = Length(0)
-
-    def has_doc(self, docid):
-        if type(docid) == int:
-            return docid in self._rev_index
-        else:
-            return False
 

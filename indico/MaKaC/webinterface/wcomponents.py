@@ -2158,7 +2158,7 @@ class WAlarmFrame(WTemplated):
             if al.getToAllParticipants() :
                 addr = "to all participants"
             if al.getEndedOn() != None:
-                sent = " (Sent the %s)"%al.getAdjustedLastDate().strftime("%Y-%m-%d %HH")
+                sent = " (Sent the %s)"%al.getStartedOn().strftime("%Y-%m-%d %HH")
             else:
                 sent = ""
             sd = ""
@@ -2166,11 +2166,11 @@ class WAlarmFrame(WTemplated):
                 tb = al.getTimeBefore()
                 d = tb.days
                 if d != 0:
-                    sd = "D-%s (%s)" % (d,al.getAdjustedStartDate().strftime("%Y-%m-%d %HH"))
+                    sd = "D-%s (%s)" % (d,al.getStartedOn().strftime("%Y-%m-%d %HH"))
                 else:
-                    sd = "H-%s (%s)" % (tb.seconds/3600,al.getAdjustedStartDate().strftime("%Y-%m-%d %HH"))
-            elif al.getAdjustedStartDate() is not None:
-                sd = al.getAdjustedStartDate().strftime("%Y-%m-%d %HH")
+                    sd = "H-%s (%s)" % (tb.seconds/3600,al.getStartedOn().strftime("%Y-%m-%d %HH"))
+            elif al.getStartedOn() is not None:
+                sd = al.getStartedOn().strftime("%Y-%m-%d %HH")
             else:
                 sd = "not set"
             stri = stri +  _("""<tr> <td nowrap>%s</td> <td width=\"60%%\"><a href=\"%s\">%s</a>%s</td> <td nowrap>%s</td>  <td align=\"center\"><a href=\"%s\"> _("Delete")</a></td>   </tr>""")%(\
