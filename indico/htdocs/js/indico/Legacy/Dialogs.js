@@ -585,7 +585,6 @@ extend(IndicoUI.Dialogs,
                var rtWidget = new RichTextWidget(600,400,{},'','rich','IndicoFull');
 
                var saveButton;
-               var saveCloseButton;
                var intToStr = function(id) {
                    if (IndicoUtil.isInteger(id)) {
                        return id+'';
@@ -628,7 +627,6 @@ extend(IndicoUI.Dialogs,
                            changedText.set(false);
                            wasChanged = true;
                            saveButton.dom.disabled = true;
-                           saveCloseButton.dom.disabled = true;
                            if (exists(closeMinutes)) {
                                closeMinutes();
                            }
@@ -643,7 +641,6 @@ extend(IndicoUI.Dialogs,
                    function(value) {
                        if (value) {
                            saveButton.dom.disabled = false;
-                           saveCloseButton.dom.disabled = false;
                        }
                    });
 
@@ -651,14 +648,14 @@ extend(IndicoUI.Dialogs,
                var popup = new ExclusivePopup(
                    $T('My minutes'),
                    function() {
-                       popup.close();
+                       popup.closeMinutesPopup();
                    });
 
                popup.draw = function() {
                    var self = this;
                    var content = Html.div({}, rtWidget.draw());
 
-                   saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}), $T("Save")));
+                   saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}, null), $T("Save")));
                    saveButton.dom.disabled = !compileMinutes;
 
                    var closeMinutes = function(){
@@ -671,12 +668,28 @@ extend(IndicoUI.Dialogs,
 
                    };
 
+                   self.closeMinutesPopup = function(){
+                       var confirmation = function(confirmed){
+                           if (confirmed == 1){
+                               commitChangesAndClose();
+                           }
+                           else if (confirmed == 2){
+                               closeMinutes();
+                           }
+                       };
+
+                       if (changedText.get()){
+                           var popupConfirm = new SaveConfirmPopup( $T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}}, $T("You have modified your text since you last saved.")), Html.div({}, $T("Do you want to save your changes?"))), confirmation);
+                           popupConfirm.open();
+                       } else {
+                           closeMinutes();
+                       }
+                   };
+
+
                    var commitChangesAndClose = function(suicideHook) {
                        commitChanges(suicideHook, closeMinutes);
                    };
-                   saveCloseButton = Widget.button(command(curry(commitChangesAndClose, function(){self.close();}), $T("Save and close")));
-                   saveCloseButton.dom.disabled = !compileMinutes;
-
 
                    return this.ExclusivePopup.prototype.draw.call(
                        this,
@@ -684,8 +697,7 @@ extend(IndicoUI.Dialogs,
                                 content,
                                 Html.div({style:{marginTop: pixels(20)}},
                                          saveButton,
-                                         saveCloseButton,
-                                         Widget.button(command(closeMinutes, $T("Close"))))));
+                                         Widget.button(command(self.closeMinutesPopup, $T("Close"))))));
                };
 
                popup.open();
