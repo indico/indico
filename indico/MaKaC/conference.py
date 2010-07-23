@@ -3167,7 +3167,10 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     # Fermi timezone awareness         #
     ####################################
     def setTimezone(self, tz):
-        oldTimezone = self.timezone
+        try:
+            oldTimezone = self.timezone
+        except AttributeError:
+            oldTimezone = tz
         self.timezone = tz
 
         for observer in self.getObservers():
