@@ -23,7 +23,7 @@ import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.user as user
 import MaKaC.common.info as info
-from MaKaC.errors import AdminError, MaKaCError, PluginError
+from MaKaC.errors import AdminError, MaKaCError, PluginError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.common.cache import CategoryCache, EventCache
@@ -236,6 +236,8 @@ class RHUserMerge(RHAdminBase):
         self.merge = False
         if self._params.get("merge", None):
             self.merge = True
+            if self.prin is not None and self.toMerge is not None and self.prin == self.toMerge:
+                raise FormValuesError(_("One cannot merge a user with him/herself"))
         self.cancel = False
         self.setPrin = False
         self.newPrin = None
