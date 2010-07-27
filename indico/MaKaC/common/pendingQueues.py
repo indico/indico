@@ -25,7 +25,7 @@ from MaKaC.webinterface import mail, urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.timerExec import task, obj
 from indico.modules.scheduler import Scheduler
-from MaKaC.tasks.base import OneShotTask
+from indico.modules.scheduler.tasks import OneShotTask
 from persistent import Persistent
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc

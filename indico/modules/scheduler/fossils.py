@@ -23,6 +23,7 @@ Fossils for tasks
 """
 
 from indico.util.fossilize import IFossil
+from indico.util.fossilize.conversion import Conversion
 
 class ITaskFossil(IFossil):
     """
@@ -34,4 +35,14 @@ class ITaskFossil(IFossil):
     def getTypeId():
         pass
 
+    def getStartOn():
+        pass
+    getStartOn.convert = Conversion.datetime
 
+    def getEndedOn():
+        pass
+    getEndedOn.convert = Conversion.datetime
+
+    def getCreatedOn():
+        pass
+    getCreatedOn.convert = Conversion.datetime

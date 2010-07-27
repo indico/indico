@@ -21,33 +21,17 @@
 
 import logging, time, datetime
 
-from zc.queue import Queue
 from BTrees.IOBTree import IOBTree
 from BTrees.Length import Length
 
-from MaKaC.common import db
 from MaKaC.trashCan import TrashCanManager
 
 from indico.modules import Module
 from indico.modules.scheduler.controllers import Scheduler
-
+from indico.modules.scheduler import base
+from indico.util.struct.queue import PersistentWaitingQueue
+from indico.util.date_time import int_timestamp
 from indico.core.index import IntFieldIndex
-
-class SchedulerException(Exception):
-    pass
-
-
-class TaskStillRunningException(SchedulerException):
-    def __init__(self, task):
-        SchedulerException.__init__(self, 'Task %s (%s) is currently running' %
-                                    (task.id, task.typeId))
-
-class TaskNotFoundException(SchedulerException):
-    pass
-
-class TaskInconsistentStatusException(SchedulerException):
-    pass
-
 
 class SchedulerModule(Module):
     id = "scheduler"
@@ -55,7 +39,7 @@ class SchedulerModule(Module):
     def __init__(self):
         # logging.getLogger('scheduler') = logging.getLogger('scheduler')
         # logging.getLogger('scheduler').warning('Creating incomingQueue and runningList..')
-        self.waitingQueue = Queue()
+        self.waitingQueue = PersistentWaitingQueue()
         self.runningList = []
 
         # Failed tasks (there is an object still in the DB)
@@ -74,13 +58,13 @@ class SchedulerModule(Module):
         """
 
         if task.status != status:
-            raise TaskInconsistentStatusException(
+            raise base.TaskInconsistentStatusException(
                 "%s's status is not %s" %
                 (task, status))
 
         if status == base.TASK_STATUS_RUNNING and \
                task not in self.runningList:
-                raise TaskInconsistentStatusException(
+                raise base.TaskInconsistentStatusException(
                     'task %s (%s) was not found in the running task list' %
                     (task.id, task))
 
@@ -89,22 +73,34 @@ class SchedulerModule(Module):
     def addTaskToWaitingQueue(self, task):
         logging.getLogger('scheduler').debug(
             'Added task %s to waitingList..' % task.id)
-        self.waitingQueue.put(task)
+
+        # get an int timestamp
+        timestamp = int_timestamp(task.getStartOn())
+        self.waitingQueue.enqueue(timestamp, task)
 
     def popNextWaitingTask(self):
-        try:
-            item = self.waitingQueue.pull()
-            self.waitingQueue._p_changed = 1
-            return item
-        except IndexError:
-            # No items in the Queue
-            return None
+        return self.waitingQueue.pop()
+
+    def peekNextWaitingTask(self):
+        return self.waitingQueue.peek()
+
+    def removeWaitingTask(self, timestamp, task):
+        return self.waitingQueue.dequeue(timestamp, task)
 
     def getRunningList(self):
         return self.runningList
 
     def getWaitingQueue(self):
         return self.waitingQueue
+
+    def getFailedIndex(self):
+        return self._failedIndex
+
+    def getFinishedIndex(self):
+        return self._finishedIndex
+
+    def getTaskIndex(self):
+        return self._taskIdx
 
     def indexTask(self, task):
 
@@ -124,6 +120,7 @@ class SchedulerModule(Module):
         logging.getLogger('scheduler').debug(
             'Added task %s to runningList..' % task.id)
         self.runningList.append(task)
+        self._p_changed = 1
 
     def removeTaskFromQueue(self, task):
         """
@@ -131,14 +128,7 @@ class SchedulerModule(Module):
 
         index = None
 
-        for i in self.waitingQueue:
-            if self.waitingQueue[i] == task:
-                index = i
-                break;
-        else:
-            raise TaskNotFoundException()
-
-        self.waitingQueue.pull(index)
+        self.waitingQueue.dequeue(task)
 
     def removeTask(self, task):
         """
@@ -149,7 +139,7 @@ class SchedulerModule(Module):
 
         # Task still running - throw exception
         if task.state  == base.TASK_STATUS_RUNNING:
-            raise TaskStillRunningException(task)
+            raise base.TaskStillRunningException(task)
 
         # task has failed - remove it from 'failed' index
         elif task.state == base.TASK_STATUS_FAILED:
@@ -166,7 +156,7 @@ class SchedulerModule(Module):
 
         # task not found - throw exception
         else:
-            raise TaskInconsistentStatusException()
+            raise base.TaskInconsistentStatusException()
 
     def deleteTask(self, task):
         """
@@ -179,23 +169,25 @@ class SchedulerModule(Module):
         TrashCanManager().add(task)
 
 
-    def moveTaskFromRunningList(self, task, status):
+    def moveTaskFromRunningList(self, task, status, nocheck=False):
         """
         Remove a task from the running list
         """
 
-        self._assertTaskStatus(task, base.TASK_STATUS_RUNNING)
+        if not nocheck:
+            self._assertTaskStatus(task, base.TASK_STATUS_RUNNING)
 
         # generate a timestamp
         timestamp = int(time.mktime(datetime.datetime.now().timetuple()))
 
         # actually remove it from list
         self.runningList.remove(task)
+        self._p_changed = 1
 
         # index it either in finished or failed
         if status == base.TASK_STATUS_FINISHED:
             self._finishedIndex.index_doc(task.id, timestamp)
-        elif status == base.TASK_STATUS_FAIL:
+        elif status == base.TASK_STATUS_FAILED:
             self._failedIndex.index_doc(task.id, timestamp)
             # or just re-add it to the waiting queue
         elif status == base.TASK_STATUS_QUEUED:

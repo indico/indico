@@ -19,7 +19,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import sys, getopt, os, time
+import sys, getopt, os, time, logging
 from MaKaC.common.Configuration import Config
 
 def _isPosix():
@@ -106,6 +106,7 @@ def initDefaultTasks():
 
 def run(log=None):
     from indico.modules.scheduler import Scheduler
+
     Scheduler.getInstance().run()
     # initDefaultTasks()
 
@@ -154,6 +155,20 @@ def main():
     """
 
     global linuxPIDFile
+
+    cfg = Config.getInstance()
+
+    # logging setup
+    handler = logging.FileHandler(os.path.join(cfg.getLogDir(), 'scheduler.log'), 'a')
+    handler.setFormatter(logging.Formatter('%(asctime)s %(process)s %(name)s: %(levelname)-8s %(message)s'))
+
+    root_logger = logging.getLogger('')
+    root_logger.addHandler(handler)
+
+#    if MT_MODE == 'PROCESS':
+#        mp_logger = multiprocessing.get_logger()
+#        mp_logger.setLevel(logging.DEBUG)
+#        mp_logger.addHandler(handler)
 
     cfg = Config.getInstance()
     linuxPIDFile = "%s/IndicoScheduler.pid" % cfg.getLogDir()

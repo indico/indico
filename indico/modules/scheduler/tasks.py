@@ -359,11 +359,12 @@ Best Regards
 
 class SampleOneShotTask(OneShotTask):
     def run(self):
-        time.sleep(1)
-        logging.getLogger('scheduler').debug('%s executed' % self.__class__.__name__)
+        self.getLogger().debug('Now i shall sleeeeeeeep!')
+        time.sleep(120)
+        self.getLogger().debug('%s executed' % self.__class__.__name__)
 
 
 class SamplePeriodicTask(PeriodicTask):
     def run(self):
         time.sleep(1)
-        logging.getLogger('scheduler').debug('%s executed' % self.__class__.__name__)
+        self.getLogger().debug('%s executed' % self.__class__.__name__)

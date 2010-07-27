@@ -41,3 +41,6 @@ class IntFieldIndex(FieldIndex):
         else:
             return False
 
+    def all(self):
+        return self.family.IF.multiunion(
+            self._fwd_index.values())

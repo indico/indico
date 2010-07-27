@@ -579,8 +579,8 @@ if __name__ == '__main__':
     dataFiles = _getDataFiles(x)
 
     foundPackages = find_packages(where = 'indico',
-                                  exclude = ('htdocs','tests*', 'core*', 'modules*', 'web*'))
-
+                                  exclude = ('htdocs*', 'tests*', 'core*',
+                                             'modules*', 'util*', 'web*'))
 
     # add our namespace package
     foundPackages += list('indico.%s' % pkg for pkg in
@@ -588,7 +588,6 @@ if __name__ == '__main__':
                                        exclude = ('htdocs*','MaKaC*')))
 
     foundPackages.append('indico')
-
 
     setup(name = "cds-indico",
           cmdclass = {'sdist': sdist_indico,

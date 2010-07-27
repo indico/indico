@@ -129,11 +129,11 @@ type("EnumWidget", ["WatchObject", "IWidget"],
 type("TableWidgetMixin", [],
      {
          _iteratingElement: function() {
-             return Html.tr.call(this, arguments);
+             return Html.tr.apply(this, arguments);
          },
 
          _containerElement: function() {
-             return Html.table.call(this, arguments);
+             return Html.table.apply(this, arguments);
          }
      });
 

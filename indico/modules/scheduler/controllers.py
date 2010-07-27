@@ -3,18 +3,31 @@ import os
 import thread
 import time
 import random
-import multiprocessing
 
-from zc.queue import Queue
 from MaKaC.common import db
 from MaKaC.common.logger import Logger
 from ZODB.POSException import ConflictError
 
 from indico.modules import ModuleHolder
 from indico.modules.scheduler import base
-from indico.util.timezone import nowutc
+from indico.util.date_time import nowutc, int_timestamp
 
-SLEEP_INTERVAL = 30 # seconds
+# threading vs. multiprocessing
+MT_MODE = 'THREAD'
+
+if MT_MODE == 'THREAD':
+    import threading
+    _MT_MODULE = threading
+    _MT_UNIT = threading.Thread
+elif SPAWNING_MODE == 'PROCESS':
+    import multiprocessing
+    _MT_MODULE = multiprocessing
+    _MT_UNIT = multiprocessing.Process
+
+###
+
+# some basic definitions
+SLEEP_INTERVAL = 10 # seconds
 TASK_MAX_RETRIES = 10 # Number of times to try to run a task before aborting
 CONFLICTERROR_MAX_RETRIES = 10
 
@@ -26,15 +39,48 @@ SLEEP_INTERVAL_IF_TOO_MANY_THREADS = 15 # seconds
 MAX_TASKS_PER_BURST = 10 # number of tasks that we will process in Scheduler's main loop before sleeping
 _touchesTasksContainersLock = None
 
+logger = logging.getLogger('scheduler')
 
-# logging setup
-from MaKaC.common.Configuration import Config
-cfg = Config.getInstance()
-logger = multiprocessing.get_logger()
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(os.path.join(cfg.getLogDir(), 'scheduler.log'), 'a')
-handler.setFormatter(logging.Formatter('%(asctime)s %(process)s %(name)s: %(levelname)-8s %(message)s'))
-logger.addHandler(handler)
+def touchesTasksContainers(func):
+    """
+    This wrapper will make sure that the method it wraps around will
+    not be interleaved with another method call that also touches tasks
+    containers.
+
+    It is used to make sure accesses to incomingQueue and runningList
+    are serial
+    """
+
+    def _touchesTasksContainers(*args, **kwds):
+        global _touchesTasksContainersLock
+        _touchesTasksContainersLock.acquire()
+        retval = None
+        try:
+            retval = func(*args)
+        finally:
+            _touchesTasksContainersLock.release()
+
+        return retval
+
+    return _touchesTasksContainers
+
+
+def commitAfterwards(func):
+    def _commitAfterwards(self, *args, **kwds):
+        retval = func(self, *args)
+        self._p_changed = 1
+
+        try:
+            db.DBMgr.getInstance().commit()
+        except ConflictError, e:
+            logger.debug('db commitAfterwards ConflictError. Syncync and retrying..')
+            db.DBMgr.getInstance().sync()
+            db.DBMgr.getInstance().commit()
+
+        logger.debug('db Commit()')
+        return retval
+
+    return _commitAfterwards
 
 
 class Scheduler(object):
@@ -58,12 +104,13 @@ class Scheduler(object):
 
     def __init__(self):
         global _touchesTasksContainersLock
-        _touchesTasksContainersLock = multiprocessing.Lock()
+        _touchesTasksContainersLock = _MT_MODULE.Lock()
 
         self.dbInstance = db.DBMgr.getInstance()
+
         self.dbInstance.startRequest()
         self.tasksModule = ModuleHolder().getById('scheduler')
-        # TODO endRequest
+
 
     def _relaunchRunningListItems(self):
         # During startup any item in runningList will have died prematurely
@@ -73,8 +120,46 @@ class Scheduler(object):
         for task in self.tasksModule.getRunningList():
             logger.warning('Task %s found in runningList on startup. Relaunching..' % task.id)
             task.tearDown()
-            self.tasksModule.moveTaskFromRunningList(task, base.TASK_STATUS_QUEUED)
+            try:
+                self.tasksModule.moveTaskFromRunningList(task, base.TASK_STATUS_QUEUED)
+            except base.TaskInconsistentStatusException, e:
+                logger.exception('Problem relaunching task %s - setting it as failed' % task)
+                self.tasksModule.moveTaskFromRunningList(task,
+                                                         base.TASK_STATUS_FAILED,
+                                                         nocheck=True)
+                self.dbInstance.commit();
+
             self._addTaskToQueue(task)
+
+    def _iterateTasks(self):
+
+        while True:
+
+            # we check AWOL tasks from time to time
+            if random.random() < AWOL_TASKS_CHECK_PROBABILITY:
+                self._checkAWOLTasks()
+
+            currentTimestamp = int_timestamp(nowutc())
+
+            self._readFromDb()
+
+            logger.debug('Status: waitingList: [%d] | runningList: [%d]' %
+                         (len(self.tasksModule.getWaitingQueue()),
+                          len(self.tasksModule.getRunningList())))
+
+            res = self.tasksModule.peekNextWaitingTask()
+
+            if res:
+                nextTS, nextTask = res
+
+                if  (nextTS <= currentTimestamp):
+                    # return something
+                    yield nextTS, nextTask
+
+                    # don't sleep
+                    continue
+
+            self._sleep('Nothing to do. Sleeping for %d secs...' % SLEEP_INTERVAL)
 
 
     def run(self):
@@ -86,81 +171,43 @@ class Scheduler(object):
         logger.debug('scheduler started')
 
         self._relaunchRunningListItems()
-        self._nTasksDone = 0
 
-        seenTaskList = []
+        for timestamp, curTask in self._iterateTasks():
 
-
-        while True:
-
-            self._readFromDb()
-
-            _touchesTasksContainersLock.acquire()
-            curTask = self.tasksModule.popNextWaitingTask()
-            _touchesTasksContainersLock.release()
-
-            logger.debug('Status: waitingList: [%d] | runningList: [%d]' %
-                         (len(self.tasksModule.getWaitingQueue()),
-                          len(self.tasksModule.getRunningList())))
-
-            if self._nTasksDone >= MAX_TASKS_PER_BURST:
-                self._sleep('Too many tasks done in a burst. '
-                            'Sleeping for %d secs..' % SLEEP_INTERVAL)
-            elif not curTask:
-                self._sleep('Nothing to do. Sleeping for %d secs..' % SLEEP_INTERVAL)
-            else:
-                logger.debug("%s %s %s" % (curTask, curTask.getStartOn(), seenTaskList))
-                self._taskCycle(curTask, seenTaskList)
-
-            # we check AWOL tasks from time to time
-            if random.random() < AWOL_TASKS_CHECK_PROBABILITY:
-                self._checkAWOLTasks()
+            logger.debug("%s %s" % (curTask, curTask.getStartOn()))
+            self._taskCycle(timestamp, curTask)
 
 
-    def _taskCycle(self, curTask, seenTaskList):
+    def _taskCycle(self, timestamp, curTask):
 
-        logger.debug(seenTaskList)
+        if nowutc() >= curTask.getStartOn():
 
-        # The task has a startOn date in the future and we have already seen
-        # the task this round
-        if curTask.id in seenTaskList:
-            Scheduler._addTaskToQueue(curTask)
-            self._sleep('Only future tasks in the incomingQueue. '
-                        'Sleeping for %d secs..' % SLEEP_INTERVAL)
-            # Empty "seen" list
-            del seenTaskList[:]
+            global _touchesTasksContainersLock
 
-        # the task starts in the future and we have not seen it yet
-        elif curTask.getStartOn() and curTask.getStartOn() > nowutc():
-            Scheduler._addTaskToQueue(curTask)
-            seenTaskList.append(curTask.id)
-            logger.debug(seenTaskList)
+            # lock task containers
+            with _touchesTasksContainersLock:
+                # remove task from waiting list
+                self.tasksModule.removeWaitingTask(timestamp, curTask)
 
-        # The task is periodicUnique and it is already in the runningList
-        elif curTask.isPeriodicUnique() and curTask.__class__ in \
-                 [x.__class__ for x in self.tasksModule.getRunningList()]:
-            logger.warning('PeriodicUniqueTask %s is already running, '
-                           'ignoring this element from the queue..' %
-                           curTask.id)
-            return
+                logger.warning('%s > %s' %
+                               (curTask.getStartOn(), nowutc()))
 
-        # Everything else
-        else:
-            curTask.setOnRunningListSince(time.time())
-            logger.warning('%s.getOnRunningListSince(): %s' %
-                           (curTask.id, curTask.getOnRunningListSince()))
-            self._writeToDb()
+                curTask.setOnRunningListSince(nowutc())
+                logger.warning('%s.getOnRunningListSince(): %s' %
+                               (curTask.id, curTask.getOnRunningListSince()))
 
-            self.tasksModule.addTaskToRunningList(curTask)
-            self._nTasksDone += 1
+                self.tasksModule.addTaskToRunningList(curTask)
+                self._writeToDb()
 
             # Start a worker subprocess
             Worker(curTask).start()
+        else:
+            self._sleep('Only future tasks in the incomingQueue. '
+                        'Sleeping for %d secs..' % SLEEP_INTERVAL)
 
     def _sleep(self, msg):
         logger.debug(msg)
         time.sleep(SLEEP_INTERVAL)
-        self._nTasksDone = 0
 
     def _writeToDb(self):
         # logger.debug('_writeToDb()..')
@@ -169,7 +216,7 @@ class Scheduler(object):
             try:
                 self.dbInstance.commit()
             except ConflictError:
-                self._readFromDb() # TODO seguro?
+                self._readFromDb()
                 pass
             else:
                 ok = True
@@ -183,54 +230,16 @@ class Scheduler(object):
         logger.debug('_readFromDb()..')
         self.dbInstance.sync()
 
-
-    def touchesTasksContainers(func):
-        """
-        This wrapper will make sure that the method it wraps around will
-        not be interleaved with another method call that also touches tasks
-        containers.
-
-        It is used to make sure accesses to incomingQueue and runningList
-        are serial
-        """
-        def _touchesTasksContainers(*args, **kwds):
-            global _touchesTasksContainersLock
-            _touchesTasksContainersLock.acquire()
-            retval = None
-            try:
-                retval = func(*args)
-            finally:
-                _touchesTasksContainersLock.release()
-
-            return retval
-
-        return _touchesTasksContainers
-
-
-    def commitAfterwards(func):
-        def _commitAfterwards(*args, **kwds):
-            retval = func(*args)
-            args[0]._p_changed = 1 # args[0] is self(SchedulerModule)
-
-            #root = db.DBMgr.getInstance().getDBConnection().root()
-            #root["tasksIncomingQueue"] = args[0].waitingQueue
-            try:
-                db.DBMgr.getInstance().commit()
-            except ConflictError, e:
-                logging.getLogger('scheduler').debug('db commitAfterwards ConflictError. Syncync and retrying..')
-                db.DBMgr.getInstance().sync()
-                db.DBMgr.getInstance().commit()
-
-            logging.getLogger('scheduler').debug('db Commit()')
-            return retval
-
-        return _commitAfterwards
-
-
+    def _abortDb(self):
+        logger.debug('_abortDb()..')
+        self.dbInstance.abort()
 
     @commitAfterwards
     @touchesTasksContainers
     def _checkAWOLTasks(self):
+
+        logger.info('Checking AWOL tasks')
+
         for task in self.tasksModule.getRunningList():
             if not task.getOnRunningListSince():
                 logger.warning('Task %s is in the runningList but has no onRunningListSince value! Removing from runningList and relaunching' % (task.id))
@@ -238,36 +247,11 @@ class Scheduler(object):
                 # relaunch it
                 self.tasksModule.moveTaskFromRunningList(task, base.TASK_STATUS_QUEUED)
             else:
-                runForSecs = time.time() - task.getOnRunningListSince()
+                runForSecs = int_timestamp(nowutc()) - int_timestamp(task.getOnRunningListSince())
                 if runForSecs > AWOL_TASKS_THRESHOLD:
                     logger.warning('Task %s has been running for %d secs. Assuming it has died abnormally and forcibly calling its tearDown()..' % (task.id, runForSecs))
                     task.tearDown()
                     self.tasksModule.moveTaskFromRunningList(task, base.TASK_STATUS_FAIL)
-
-
-    @commitAfterwards
-    @touchesTasksContainers
-    def notifyTaskFinished(self, task):
-        """
-        Called by a task when it's done. If a task doesn't notify us
-        after AWOL_TASKS_THRESHOLD seconds we assume she went AWOL and we notify admins
-        """
-
-        logger.debug('Task %s says it\'s finished..' % task)
-
-        # if task was in the running list
-        if self.tasksModule.moveTaskFromRunningList(task, base.TASK_STATUS_FINISHED):
-            task.tearDown()
-
-            # Add periodic tasks back to the queue
-            if isinstance(task, base.PeriodicTask):
-                Scheduler.addTask(self)
-
-
-
-    def notifyTaskFinishedAbruptly(self, task):
-        self.notifyTaskFinished(task)
-        # TODO send email to admins
 
 
     # The following methods are the interface for operating with tasks
@@ -301,21 +285,48 @@ class Scheduler(object):
         ModuleHolder().getById('scheduler').removeTaskFromQueue(task)
 
 
-class Worker(multiprocessing.Process):
+class Worker(_MT_UNIT):
+
     def __init__(self, task):
         super(Worker, self).__init__()
         self.task = task
-        self.logger = multiprocessing.get_logger()
 
+        self.tasksModule = ModuleHolder().getById('scheduler')
+        self.logger = logging.getLogger('worker')
+
+        # open a logging channel
+        self.task.plugLogger(self.logger)
+
+    @commitAfterwards
+    @touchesTasksContainers
+    def notifyTaskFinished(self, task):
+        """
+        Called by a task when it's done. If a task doesn't notify us
+        after AWOL_TASKS_THRESHOLD seconds we assume she went AWOL and we notify admins
+        """
+
+        self.logger.debug('Task %s says it\'s finished..' % task)
+
+        # if task was in the running list
+        if self.tasksModule.moveTaskFromRunningList(task, base.TASK_STATUS_FINISHED):
+            task.tearDown()
+
+            # Add periodic tasks back to the queue
+            if isinstance(task, base.PeriodicTask):
+                Scheduler.addTask(self)
+
+    def notifyTaskFinishedAbruptly(self, task):
+        self.notifyTaskFinished(task)
+        # TODO send email to admins
 
     def run(self):
         self.logger.debug('Running task %s..' % self.task.id)
         # We will try to run the task TASK_MAX_RETRIES times and if it continues failing we abort it
         i = 0
 
-#        print self.logger, handler, "foo"
+        dbi = db.DBMgr()
 
-        db.DBMgr.getInstance().startRequest()
+        dbi.startRequest()
 
         self.logger.debug('db started %s %s' % (self.task, self.task.endedOn))
 
@@ -334,12 +345,16 @@ class Worker(multiprocessing.Process):
                 time.sleep(nextRunIn)
             else:
                 break
-        db.DBMgr.getInstance().endRequest()
+
+        self.logger.info('Ended on: %s' % self.task.endedOn)
 
         if self.task.endedOn: # task successfully finished
-            Scheduler.getInstance().notifyTaskFinished(self.task)
+            self.notifyTaskFinished(self.task)
             if i > 1:
                 self.logger.warning('Task %s failed %d times before finishing correctly' % (self.task.id, i - 1))
         else:
             self.logger.error('Task %s failed too many (%d) times. Aborting its execution..' % (self.task.id, i))
-            Scheduler.getInstance().notifyTaskFinishedAbruptly(self.task)
+            self.notifyTaskFinishedAbruptly(self.task)
+
+        dbi.endRequest()
+

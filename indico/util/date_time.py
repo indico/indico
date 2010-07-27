@@ -19,3 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.common.timezoneUtils import nowutc
+import time
+
+def int_timestamp(datetimeVal):
+    return int(time.mktime(datetimeVal.timetuple()))

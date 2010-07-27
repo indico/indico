@@ -21,17 +21,56 @@
 import logging
 import time
 from datetime import timedelta
+from contextlib import contextmanager
 
 import ZODB
 from persistent import Persistent
 
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.timezone import nowutc
+from indico.util.date_time import nowutc, int_timestamp
 from indico.modules.scheduler.fossils import ITaskFossil
 
 TASK_STATUS_NONE, TASK_STATUS_QUEUED, TASK_STATUS_RUNNING, \
 TASK_STATUS_FAILED, TASK_STATUS_ABORTED, TASK_STATUS_FINISHED = range(0,6)
 
+class SchedulerException(Exception):
+    pass
+
+
+class TaskStillRunningException(SchedulerException):
+    def __init__(self, task):
+        SchedulerException.__init__(self, 'Task %s (%s) is currently running' %
+                                    (task.id, task.typeId))
+
+class TaskNotFoundException(SchedulerException):
+    pass
+
+
+class TaskInconsistentStatusException(SchedulerException):
+    pass
+
+
+class TaskLogger(Persistent, Fossilizable):
+    """
+    A task-level logger that can be stored in the DB.
+    It acts as a wrapper/proxy for the system-wide logger
+    """
+
+    def __init__(self):
+        super(TaskLogger, self).__init__(self)
+        self._logger = None
+        self._messages = []
+
+    def plugLogger(self, logger):
+        self._logger = logger
+
+    def _write(self, level, message):
+        self._messages.append((time, level, message))
+
+    def __getattr__(self):
+        # etc...
+        #self._logger
+        pass
 
 class BaseTask(Persistent, Fossilizable):
     """
@@ -51,12 +90,13 @@ class BaseTask(Persistent, Fossilizable):
     fossilizes(ITaskFossil)
 
     def __init__(self, **kwargs):
+        self.createdOn = nowutc()
         self.typeId = self.__class__.__name__
         self.reset(**kwargs)
 
-
     def reset(self, **kwargs):
         '''Resets a task to its state before being run'''
+
         self.startedOn = None
         self.endedOn = None
         self.running = False
@@ -70,13 +110,14 @@ class BaseTask(Persistent, Fossilizable):
             if k in kwargs:
                 setattr(self, k, kwargs[k])
 
-        logging.getLogger('scheduler').warning('Task %s reset' % self.id)
-
     def getEndOn(self):
         return self.EndOn
 
     def getStartOn(self):
         return self.startOn
+
+    def getCreatedOn(self):
+        return self.createdOn
 
     def setStartOn(self, newtime):
         self.startOn = newtime
@@ -87,7 +128,6 @@ class BaseTask(Persistent, Fossilizable):
     def setOnRunningListSince(self, sometime):
         self.onRunningListSince = sometime
         self._p_changed = 1
-
 
     def getOnRunningListSince(self):
         return self.onRunningListSince
@@ -113,13 +153,24 @@ class BaseTask(Persistent, Fossilizable):
     def getEndedOn(self):
         return self.endedOn
 
-    def start(self):
-        if self.startOn and nowutc() < self.startOn:
-            logging.getLogger('scheduler').debug('Task %s will sleep for some time. Her time has not come yet startOn (%s) > current time (%s)' % (self.id, self.startOn, time.time()))
-            time.sleep(time.time() - self.startOn)
+    def plugLogger(self, logger):
+        self._v_logger = logger
 
-        if self.endOn and time.time() > self.endOn:
-            logging.getLogger('scheduler').warning('Task %s will not be executed, endOn (%s) < current time (%s)' % (self.id, self.endOn, time.time()))
+    def getLogger(self):
+        if not getattr(self, '_v_logger') or not self._v_logger:
+            self._v_logger = logging.getLogger('task/%s' % self.typeId)
+        return self._v_logger
+
+    def start(self):
+
+        tsDiff = int_timestamp(nowutc()) - int_timestamp(self.startOn)
+
+        if tsDiff < 0:
+            self.getLogger().debug('Task %s will wait for some time. (%s) > (%s)' % (self.id, self.startOn, nowutc()))
+            time.sleep(tsDiff)
+
+        if self.endOn and nowutc() > self.endOn:
+            self.getLogger().warning('Task %s will not be executed, endOn (%s) < current time (%s)' % (self.id, self.endOn, nowutc()))
             return False
 
         self.startedOn = nowutc()
@@ -146,23 +197,11 @@ class OneShotTask(BaseTask):
         if 'runOn' in kwargs:
             self.runOn = kwargs['runOn']
         else:
-            self.runOn = time.time()
+            self.runOn = nowutc()
 
 
     def getRunOn(self):
         return self.runOn
-
-    def start(self):
-        diff = self.runOn - time.time()
-        if diff < -60: # we only warn if we are over 60 seconds late
-            logging.getLogger('scheduler').warning('Task %s should have been executed %d ago' % (self.id, -diff))
-        else:
-            if diff < 0:
-                diff = 0
-            logging.getLogger('scheduler').debug('Sleeping for %d secs before executing OneShotTask %s' % (diff, self.id))
-            time.sleep(diff)
-
-        super(OneShotTask, self).start()
 
 
 class PeriodicTask(BaseTask):
@@ -190,8 +229,6 @@ class PeriodicTask(BaseTask):
 
     def start(self):
         super(PeriodicTask, self).start()
-        #logging.getLogger('scheduler').debug('PeriodicTask %s finished, sleeping %d secs before next run..' % (self.id, (self.interval - timedelta(0, self.endedOn - self.startedOn)).seconds))
-        #time.sleep((self.interval - timedelta(0, self.endedOn - self.startedOn)).seconds)
 
     def tearDown(self):
         super(PeriodicTask, self).tearDown()

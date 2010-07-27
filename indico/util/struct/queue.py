@@ -1,0 +1,160 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+Queue-style data structures
+"""
+
+from BTrees.IOBTree import IOBTree
+from BTrees.OOBTree import OOTreeSet
+from BTrees.Length import Length
+from persistent import Persistent
+
+class DummyLock(object):
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+class PersistentWaitingQueue(Persistent):
+    """
+    A Waiting queue, implemented using a map structure (BTree...)
+    It is persistent and can be thread-safe, if a lock is specified
+    """
+
+    def __init__(self, lock = None):
+        super(PersistentWaitingQueue, self).__init__(self)
+        self._reset()
+
+        self._lock = lock or DummyLock()
+
+    def _reset(self):
+        # this counter keeps the number of elements
+        self._elem_counter = Length(0)
+        self._container = IOBTree()
+
+    def _gc_bin(self, t):
+        """
+        'garbage-collect' bins
+        """
+        if len(self._container[t]) == 0:
+            del self._container[t]
+
+    def enqueue(self, t, obj):
+        """
+        Add an element to the queue
+        """
+
+        with self._lock:
+            if t not in self._container:
+                self._container[t] = OOTreeSet()
+
+            self._container[t].add(obj)
+            self._elem_counter.change(1)
+
+
+    def _dequeue(self, t, obj):
+        """
+        Thread-unsafe version - use `dequeue()` instead
+        """
+
+        self._container[t].remove(obj)
+        self._gc_bin(t)
+        self._elem_counter.change(-1)
+
+    def dequeue(self, t, obj):
+        """
+        Remove an element from the queue
+        """
+        with self._lock:
+            self._dequeue(t, obj)
+
+    def _next_timestamp(self):
+        """
+        Return the next 'priority' to be served
+        """
+        i = iter(self._container)
+
+        try:
+            t = i.next()
+            return t
+        except StopIteration:
+            return None
+
+    def peek(self):
+        """
+        Return the next element
+        """
+        t = self._next_timestamp()
+        if t:
+            # just to be sure
+            assert(len(self._container[t]) != 0)
+
+            # find the next element
+            i = iter(self._container[t])
+            # store it
+            elem = i.next()
+
+            # return the element
+            return t, elem
+        else:
+            return None
+
+    def pop(self):
+        """
+        Remove and return the next set of elements to be processed
+        """
+        with self._lock:
+            pair = self.peek()
+            if pair:
+                self._dequeue(*pair)
+
+                # return the element
+                return pair
+            else:
+                return None
+
+    def nbins(self):
+        """
+        Return the number of 'bins' (map entries) currently used
+        """
+        # get 'real' len()
+        return len(self._container)
+
+    def __len__(self):
+        return self._elem_counter()
+
+
+    def __getitem__(self, param):
+        return self._container.__getitem__(param)
+
+    def __iter__(self):
+
+        # tree iterator
+        for tstamp in iter(self._container):
+            cur_set = self._container[tstamp]
+            try:
+                # set iterator
+                for elem in cur_set:
+                    yield tstamp, elem
+            except StopIteration:
+                pass
+

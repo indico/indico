@@ -27,25 +27,60 @@ from MaKaC.services.implementation.base import AdminService
 from indico.modules import ModuleHolder
 from indico.util import fossilize
 
-class GetWaitingTaskList(AdminService):
+
+class SchedulerModuleAdminService(AdminService):
+
+    def _checkParams(self):
+        AdminService._checkParams(self)
+        self.schedModule = ModuleHolder().getById('scheduler')
+
+
+class GetWaitingTaskList(SchedulerModuleAdminService):
     """
     Returns the list of tasks currently waiting to be executed
     """
 
     def _getAnswer(self):
-        schedModule = ModuleHolder().getById('scheduler')
-        return fossilize.fossilize(list(schedModule.getWaitingQueue()))
+        return fossilize.fossilize(list(v for (k,v) in
+                                        self.schedModule.getWaitingQueue()))
 
-class GetRunningTaskList(AdminService):
+
+class GetRunningTaskList(SchedulerModuleAdminService):
     """
     Returns the list of tasks currently running
     """
 
     def _getAnswer(self):
-        schedModule = ModuleHolder().getById('scheduler')
-        return fossilize.fossilize(schedModule.getRunningList())
+        return fossilize.fossilize(self.schedModule.getRunningList())
+
+
+class GetFailedTaskList(SchedulerModuleAdminService):
+    """
+    Returns the list of tasks currently running
+    """
+
+    def _getAnswer(self):
+        failedIds = self.schedModule.getFailedIndex().all()
+        taskIdx = self.schedModule.getTaskIndex()
+
+        return fossilize.fossilize(list((taskIdx[k] for k in failedIds)))
+
+
+class GetFinishedTaskList(SchedulerModuleAdminService):
+    """
+    Returns the list of tasks that have successfully finished their execution
+    """
+
+    def _getAnswer(self):
+        finishedIds = self.schedModule.getFinishedIndex().all()
+        taskIdx = self.schedModule.getTaskIndex()
+
+        return fossilize.fossilize(list((taskIdx[k] for k in finishedIds)))
+
 
 methodMap = {
     "tasks.listWaiting": GetWaitingTaskList,
-    "tasks.listRunning": GetRunningTaskList
+    "tasks.listRunning": GetRunningTaskList,
+    "tasks.listFailed": GetFailedTaskList,
+    "tasks.listFinished": GetFinishedTaskList
     }
