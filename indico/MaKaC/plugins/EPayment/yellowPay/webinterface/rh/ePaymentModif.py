@@ -108,6 +108,11 @@ class RHEPaymentNotConfirmeYellowPay( RHRegistrationFormDisplayBase ):
                 
 class RHEPaymentValideParamYellowPay( RHConferenceBaseDisplay ):
     _requestTag = "params"
+
+    def _checkProtection(self):
+        # Just bypass everything else, as we want the payment service
+        # to acknowledge the payment
+        pass
     
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams(self, params)

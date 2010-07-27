@@ -92,7 +92,7 @@ class RHEPaymentCancelPayPal( RHRegistrationFormDisplayBase ):
                 
 class RHEPaymentValideParamPayPal( RHConferenceBaseDisplay ):
     _requestTag = "params"
-    
+
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams(self, params)
         self._regForm = self._conf.getRegistrationForm()     
@@ -100,8 +100,13 @@ class RHEPaymentValideParamPayPal( RHConferenceBaseDisplay ):
         self._registrant=None
         regId=params.get("registrantId","")
         if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)                                
-        
+            self._registrant=self._conf.getRegistrantById(regId)
+
+    def _checkProtection(self):
+        # Just bypass everything else, as we want the payment service
+        # to acknowledge the payment
+        pass
+
     def _process( self ):
         regForm = self._conf.getRegistrationForm()
         if not regForm.isActivated() or not self._conf.hasEnabledSection("regForm"):

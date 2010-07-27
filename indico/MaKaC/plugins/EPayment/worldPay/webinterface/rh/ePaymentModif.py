@@ -67,7 +67,12 @@ class RHEPaymentmodifWorldPayPerformDataModif( RHEPaymentModifBase ):
 # two classes to take the callback from worldpay
 class RHEPaymentConfirmWorldPay( RHConferenceBaseDisplay ):
     _requestTag = "confirm"
-    
+
+    def _checkProtection(self):
+        # Just bypass everything else, as we want the payment service
+        # to acknowledge the payment
+        pass
+
     def _checkParams( self, params ):
         if not "confId" in params.keys():
             params["confId"] = params.get("M_confId","")
