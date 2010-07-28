@@ -244,6 +244,12 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
                 convenerValues['submission'] :
                 session.grantModification(convener)
 
+    def __addConveners2Slot(self, slot):
+        for convenerValues in self._conveners:
+            convener = conference.SlotChair()
+            DictPickler.update(convener, convenerValues)
+            slot.addConvener(convener)
+
     def _checkParams(self):
         conferenceServices.ConferenceModifBase._checkParams(self)
 
@@ -299,6 +305,7 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         session.addSlot(slot)
 
         self.__addConveners(session)
+        self.__addConveners2Slot(slot)
         self._setLocationInfo(session)
 
         logInfo = session.getLogInfo()
