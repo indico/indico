@@ -1401,6 +1401,7 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
                 sessionList.append( _("Session Unknown"))
 
 
+
             for hour in range(day.getStartHour(),day.getEndHour()+1):
                 hourSlots=[]
                 emptyHour = True
@@ -1575,6 +1576,16 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
                                     %s
                                 </td>
                             <tr>""")%(session.getTextColor(),session.getTextColor(),"<br>".join(convenerList))
+
+        conveners = ""
+#        conveners = _("""<tr>
+#                            <td valign="top" align="left" style="color:%s"><b> _("Video Sessions"): </b></td>
+#                            <td nowrap align="left" style="color:%s">
+#                                %s
+#                            </td>
+#                        <tr>""")%(session.getTextColor(),session.getTextColor(),"<br>SOME BOOKINGS HERE")
+
+
         materialList = []
         for material in session.getMaterialList():
             materialList.append(material.getTitle())

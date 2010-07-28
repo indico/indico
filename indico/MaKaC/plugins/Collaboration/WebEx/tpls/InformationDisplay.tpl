@@ -12,7 +12,7 @@
         <% end %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Description')%>:</span>
+                <span><%= _('Agenda')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <%= Booking._bookingParams["meetingDescription"] %>      
@@ -20,10 +20,26 @@
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Call in number')%>:</span>
+                <span><%= _('Toll free call in number')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking._bookingParams["meetingDescription"] %>      
+                <%= Booking.getPhoneNum() %>      
+            </td>
+        </tr>
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
+                <span><%= _('Toll call in number')%>:</span>
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <%= Booking.getPhoneNumToll() %>      
+            </td>
+        </tr>
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
+                <span><%= _('Call in access code')%>:</span>
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <%= Booking.getPhoneAccessCode() %>      
             </td>
         </tr>
         <tr>
@@ -31,7 +47,7 @@
                 <span><%= _('Join URL')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <a href="<%= Booking._url %>" target="_blank" ><%= Booking._url %></a>
+                <a href="<%= Booking.getUrl() %>" target="_blank" ><%= Booking.getUrl() %></a>
             </td>
         </tr>
     </tbody>

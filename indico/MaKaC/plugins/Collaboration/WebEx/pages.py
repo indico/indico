@@ -51,6 +51,16 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["DefaultWebExUser"] = ""#self._WebExUser
         vars["DefaultWebExPass"] = ""#self._WebExPass
         vars["TimeZone"] = self._conf.getTimezone()
+        sessions = "<select name='session'><option value=''>None</option>"
+        count = 0
+        sessionList = self._conf.getSessionList()
+        for session  in sessionList: 
+            count = count + 1
+#            Logger.get('WebEx').info( "Session found: %s, %s" % ( str(session.getId()), session.getTitle() ))
+            sessions = sessions + "<option value='%s'>%s</option>" % (str(session.getId()), session.getTitle() )
+        sessions += "</select>"
+
+        vars["SessionList"] = sessions
 
         
         return vars
@@ -100,7 +110,10 @@ class WInformationDisplay(WCSPageTemplateBase):
         return vars
     
 class XMLGenerator(object):
-    
+    @classmethod
+    def getFirstLineInfo(cls, booking, displayTz):
+         return booking._bookingParams["meetingTitle"]
+#        return None    
     @classmethod
     def getDisplayName(cls):
         return "WebEx"
@@ -145,4 +158,6 @@ class XMLGenerator(object):
         out.writeTag("line", re.sub(r'(\d{3})(?=\d)',r'\1 ', str(booking._webExKey)[::-1])[::-1])
         out.closeTag("section")
         out.closeTag("information")
+
+
 

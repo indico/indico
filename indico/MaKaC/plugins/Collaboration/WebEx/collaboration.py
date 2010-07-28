@@ -78,7 +78,8 @@ class CSBooking(CSBookingBase):
             "meetingTitle": (str, ''),
             "meetingDescription": (str, None),
             "webExUser":(str, None),
-            "sendAttendeesEmail":(bool, True)
+            "sendAttendeesEmail":(bool, True), 
+            "session": (str,"")
     }
     _complexParameters = ["accessPassword", "hasAccessPassword", "participants", "webExPass" ]
 
@@ -117,6 +118,10 @@ class CSBooking(CSBookingBase):
     def getParticipants(self):
         Logger.get('WebEx').debug( "In getParticipants" )
         return fossilize(self.getParticipantList(sorted = True))
+
+    def getSessionId(self):
+        if self._bookingParams.has_key( 'session' ):
+            return self._bookingParams["session"]
         
     def setParticipants(self, participants):
         Logger.get('WebEx').debug( "In setParticipants" )
@@ -162,6 +167,18 @@ class CSBooking(CSBookingBase):
     
     def getUrl(self):
         return self._url
+
+    def getURL(self):
+        return self._url
+
+    def getPhoneNum(self):
+        return self._phoneNum
+
+    def getPhoneNumToll(self):
+        return self._phoneNumToll
+
+    def getPhoneAccessCode(self):
+        return re.sub(r'(\d{3})(?=\d)',r'\1 ', str(self._webExKey)[::-1])[::-1]
 
     def getStartURL(self):
         return self._startURL
@@ -319,9 +336,11 @@ class CSBooking(CSBookingBase):
         result = ExternalOperationsManager.execute(self, "createBooking", WebExOperations.createBooking, self)
         if isinstance(result, WebExError):
             return result
+        self.getLoginURL()
         #We do this because the call in number is not returned in create response
         self.bookingOK()
         self.checkCanStart()
+        self._checkStatus()
         return None
 
     def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
@@ -348,7 +367,9 @@ class CSBooking(CSBookingBase):
             "endDate" : "End date",
             "hidden" : "Is hidden",
             "sendAttendeesEmail" : "Send emails to participants",
-            "notifyOnDateChanges" : "Keep booking synchronized"
+            "notifyOnDateChanges" : "Keep booking synchronized",
+            "accessPassword" : "Meeting password", 
+            "session" : "Session"
         }
         Logger.get('WebEx').debug( "in _modify" )
         if self._created:
@@ -389,8 +410,7 @@ class CSBooking(CSBookingBase):
             if isinstance(result, WebExError):
 #                raise TimingError("The WebEx system was not able to perform the booking modification")
                 return WebExError( errorType = None, userMessage = "The booking appears to have not been created according to the Indico system" )
-                #Logger.get('WebEx').debug( "returning error" )
-                #return result
+            self.getLoginURL()
         else:
             return WebExError( errorType = None, userMessage = "The booking appears to have not been created according to the Indico system" )
         return None
@@ -429,6 +449,44 @@ class CSBooking(CSBookingBase):
                 self._permissionToStart = True
             else:
                 return WebExError( errorType = None, userMessage = "There was an error attempting to get the start booking URL from the WebEx server." ) 
+        return None
+
+    def getLoginURL(self):
+        """ Starts an WebEx meeting.
+            A last check on the WebEx server is performed.
+        """
+        Logger.get('WebEx').debug( "In get login URL:" )
+        if self._canBeStarted:
+            params = self.getBookingParams()
+            request_xml = """<?xml version="1.0\" encoding="UTF-8"?>
+<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:serv=\"http://www.webex.com/schemas/2002/06/service" >
+<header>
+  <securityContext>
+    <webExID>%(username)s</webExID>
+    <password>%(password)s</password>
+    <siteID>%(siteID)s</siteID>
+    <partnerID>%(partnerID)s</partnerID>
+  </securityContext>
+</header>
+<body>
+  <bodyContent xsi:type="java:com.webex.service.binding.meeting.GetjoinurlMeeting" >
+    <sessionKey>%(webExKey)s</sessionKey>
+    <meetingPW>%(meetingPW)s</meetingPW>
+  </bodyContent>
+</body>
+</serv:message>
+""" % ( { "username" : params['webExUser'], "password" : self.getWebExPass(), "siteID" : getWebExOptionValueByName("WESiteID"), "partnerID" : getWebExOptionValueByName("WEPartnerID"), "webExKey":self.getWebExKey(), 'meetingPW':self.getAccessPassword() } )
+            Logger.get('WebEx').debug( "Start request XML:\n %s" % request_xml )
+            response_xml = sendXMLRequest( request_xml )
+            Logger.get('WebEx').debug( "Start response XML:\n %s" % response_xml )
+            dom = xml.dom.minidom.parseString( response_xml )
+            status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
+            if status == "SUCCESS":
+                self._url = dom.getElementsByTagName( "meet:joinMeetingURL" )[0].firstChild.toxml('utf-8').replace('&amp;','&')
+                self._permissionToStart = True
+            else:
+                Logger.get('WebEx').debug( "Error getting login URL" )
+                return WebExError( errorType = None, userMessage = "There was an error attempting to get the join booking URL from the WebEx server." ) 
         return None
         
     def _notifyOnView(self):
@@ -501,7 +559,7 @@ class CSBooking(CSBookingBase):
         
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
-                'launchLink' : str(self.getURL()),
+                'launchLink' : str(self.getUrl()),
                 'launchTooltip': _("Click here to join the WebEx meeting!")}
             
     def getCreateModifyArguments(self):

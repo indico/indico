@@ -27,6 +27,15 @@
     </tr>
     <tr>
         <td class="bookingFormFieldName">
+            <span>Session</span>
+        </td>
+        <td>
+            <%= SessionList %>
+            <span id="session"></span>
+        </td>
+    </tr>
+    <tr>
+        <td class="bookingFormFieldName">
             <span>Start time</span>
         </td>
         <td>

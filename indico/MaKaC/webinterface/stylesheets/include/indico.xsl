@@ -154,6 +154,18 @@
       <table class="sessionDetails">
         <tbody>
 
+          <xsl:for-each select="./videoBooking">
+            <tr>
+              <td class="leftCol">
+                Video Booking
+              </td>
+              <td>
+                 <span class="videoBooking" >
+                   <a href="{./videoBookingUrl}" target="_blank"><xsl:value-of select="./videoBookingTitle"/></a>
+                 </span>
+              </td>
+            </tr>
+          </xsl:for-each>
           <xsl:if test="count(child::convener) != 0">
             <tr>
               <td class="leftCol"><xsl:choose>
@@ -921,7 +933,8 @@
                               </xsl:for-each>
                               <xsl:for-each select="./linkLineNewWindow">
                                 <div>
-                                  <a href="{./href}" target="_blank">
+                                    <a href="{./href}" target="_blank">
+<!--                                    <xsl:text disable-output-escaping="yes"><![CDATA[HI]]></xsl:text>-->
                                     <xsl:value-of select="./caption"/>
                                   </a>
                                 </div>

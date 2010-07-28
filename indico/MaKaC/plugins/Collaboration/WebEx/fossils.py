@@ -26,6 +26,9 @@ class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
     def getStartURL(self):
         pass
 
+#    def getSessions(self):
+#        pass
+
     def getUrl(self):
         pass
 

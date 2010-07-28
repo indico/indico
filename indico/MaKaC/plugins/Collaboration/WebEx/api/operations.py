@@ -106,14 +106,9 @@ class WebExOperations(object):
             status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
             if status == "SUCCESS":
                 booking.setWebExKey( dom.getElementsByTagName( "meet:meetingkey" )[0].firstChild.toxml('utf-8') )
-                booking._url = dom.getElementsByTagName( "serv:attendee" )[0].firstChild.toxml('utf-8')
-                booking._startURL = dom.getElementsByTagName( "serv:host" )[0].firstChild.toxml('utf-8') 
+#                booking._url = dom.getElementsByTagName( "serv:attendee" )[0].firstChild.toxml('utf-8')
+#                booking._startURL = dom.getElementsByTagName( "serv:host" )[0].firstChild.toxml('utf-8') 
                 booking._checkStatus()
-                #Check if they left the trialing slash in the base URL we need
-#                if getWebExOptionValueByName("WEhttpServerLocation")[-1] == "/":
-#                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + 'm.php?AT=JM&MK=' + booking._webExKey
-#                else:  #Add in the slash for them
-#                    booking._url = getWebExOptionValueByName("WEautoJoinURL") + '/m.php?AT=JM&MK=' + booking._webExKey
 
                 if params.has_key('sendAttendeesEmail') and params['sendAttendeesEmail'][0].lower() == 'yes':
                     recipients = []

@@ -45,11 +45,6 @@ globalOptions = [
                "defaultValue": False,
                "editable": True,
                "visible": True} ),
-#    ("additionalEmails", {"description": _("Additional email addresses who will receive notifications (always)"),
-#                          "type": list,
-#                          "defaultValue": [],
-#                          "editable": True,
-#                          "visible": True} ),
     ("WESiteID" , {"description" : _("Indico site ID for WebEx"),
                       "type": str,
                       "defaultValue": "243585"} ),
@@ -59,30 +54,15 @@ globalOptions = [
     ("WEhttpServerLocation", {"description" : _("WebEx HTTP server location"),
                            "type": str,
                            "defaultValue": "apidemoeu.webex.com"} ),
-    ("expirationTime", {"description" : _("Expiration time in minutes"),
-                           "type": int,
-                           "defaultValue": 10} ),
     ("verifyMinutes", {"description" : _("Minutes to verify the booking before meeting"),
                       "type": list,
                       "defaultValue": [10,30]} ),
-    ("allowedMinutes", {"description" : _("Temporal margin around Indico event times where we allow EVO meeting creation (minutes)"),
+    ("allowedMinutes", {"description" : _("Temporal margin around Indico event times where we allow WebEx meeting creation (minutes)"),
                             "type": int,
                             "defaultValue": 60} ),
-    ("allowedPastMinutes", {"description" : _("Time that we allow EVO meetings to be created in the past (minutes)"),
+    ("allowedPastMinutes", {"description" : _("Time that we allow WebEx meetings to be created in the past (minutes)"),
                             "type": int,
-                            "defaultValue": 30} ),
-    ("APIMap", {"description" : _("Map of actions and URLs"),
-               "type": dict,
-               "defaultValue": {
-                                "reloadCommunityList" : "communities.jsp",
-                                "create" : "create.jsp",
-                                "modify" : "modify.jsp",
-                                "delete" : "delete.jsp",
-                                "getInfo": "meeting.jsp"
-                               },
-               "editable": False,
-               "visible": False,
-               "mustReload": True} )
+                            "defaultValue": 30} )
 
 ]
 
