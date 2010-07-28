@@ -27,24 +27,28 @@ from BTrees.OOBTree import OOTreeSet
 from BTrees.Length import Length
 from persistent import Persistent
 
-class DummyLock(object):
-    def __enter__(self):
-        pass
+class DuplicateElementException(Exception):
+    """
+    Tried to insert the same element twice in the queue
+    """
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
 
 class PersistentWaitingQueue(Persistent):
     """
     A Waiting queue, implemented using a map structure (BTree...)
-    It is persistent and can be thread-safe, if a lock is specified
+    It is persistent, but very vulnerable to conflicts. This is due to the
+    fact that sets are used as container, and there can happen a situation
+    where two different sets are assigned to the same timestamp. This will
+    for sure result in conflict.
+
+    That said, the commits of objects like these have to be carefully
+    synchronized. See `indico.modules.scheduler.controllers` for more info
+    (particularly the way we use the 'spool').
     """
 
-    def __init__(self, lock = None):
-        super(PersistentWaitingQueue, self).__init__(self)
+    def __init__(self):
+        super(PersistentWaitingQueue, self).__init__()
         self._reset()
-
-        self._lock = lock or DummyLock()
 
     def _reset(self):
         # this counter keeps the number of elements
@@ -58,24 +62,35 @@ class PersistentWaitingQueue(Persistent):
         if len(self._container[t]) == 0:
             del self._container[t]
 
+    def _check_gc_consistency(self):
+        """
+        'check that there are no empty bins'
+        """
+        for t in self._container:
+            if len(self._container[t]) == 0:
+                return False
+
+        return True
+
     def enqueue(self, t, obj):
         """
         Add an element to the queue
         """
 
-        with self._lock:
-            if t not in self._container:
-                self._container[t] = OOTreeSet()
+        if t not in self._container:
+            self._container[t] = OOTreeSet()
 
-            self._container[t].add(obj)
-            self._elem_counter.change(1)
+        if obj in self._container[t]:
+            raise DuplicateElementException(obj)
+
+        self._container[t].add(obj)
+        self._elem_counter.change(1)
 
 
     def _dequeue(self, t, obj):
         """
         Thread-unsafe version - use `dequeue()` instead
         """
-
         self._container[t].remove(obj)
         self._gc_bin(t)
         self._elem_counter.change(-1)
@@ -84,8 +99,7 @@ class PersistentWaitingQueue(Persistent):
         """
         Remove an element from the queue
         """
-        with self._lock:
-            self._dequeue(t, obj)
+        self._dequeue(t, obj)
 
     def _next_timestamp(self):
         """
@@ -122,15 +136,14 @@ class PersistentWaitingQueue(Persistent):
         """
         Remove and return the next set of elements to be processed
         """
-        with self._lock:
-            pair = self.peek()
-            if pair:
-                self._dequeue(*pair)
+        pair = self.peek()
+        if pair:
+            self._dequeue(*pair)
 
-                # return the element
-                return pair
-            else:
-                return None
+            # return the element
+            return pair
+        else:
+            return None
 
     def nbins(self):
         """
@@ -157,4 +170,5 @@ class PersistentWaitingQueue(Persistent):
                     yield tstamp, elem
             except StopIteration:
                 pass
+
 

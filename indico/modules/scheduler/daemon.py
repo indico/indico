@@ -107,7 +107,7 @@ def initDefaultTasks():
 def run(log=None):
     from indico.modules.scheduler import Scheduler
 
-    Scheduler.getInstance().run()
+    Scheduler().run()
     # initDefaultTasks()
 
 

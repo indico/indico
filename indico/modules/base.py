@@ -95,3 +95,7 @@ class Module(Persistent):
     def setId(self, id):
         self.id = id
         return self.id
+
+    @classmethod
+    def getDBInstance(cls):
+        return ModuleHolder().getById(cls.id)

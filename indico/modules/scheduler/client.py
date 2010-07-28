@@ -18,6 +18,26 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.modules.scheduler.module import SchedulerModule
-from indico.modules.scheduler.controllers import Scheduler
-from indico.modules.scheduler.client import Client
+from indico.modules.scheduler import SchedulerModule
+
+class Client(object):
+
+    """
+    `Client`, as the name says, represents a scheduler client, that
+    allows Indico client processes to interact with the scheduler.
+
+    It acts as a sort of proxy between clients and the SchedulerModule.
+    """
+
+    def __init__(self):
+        super(Client, self).__init__()
+
+    def enqueue(self, task):
+        """
+        Schedules a task for execution
+        Returns a tuple containing the task id and the
+        next execution time
+        """
+
+        schedulerMod = SchedulerModule.getDBInstance()
+        return schedulerMod.spool(task)

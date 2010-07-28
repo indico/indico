@@ -24,10 +24,11 @@ Tests for `indico.modules.scheduler.queue` module
 
 import unittest
 
-from indico.util.struct.queue import PersistentWaitingQueue
+from MaKaC.common.db import DBMgr
+from indico.util.struct.queue import PersistentWaitingQueue, DuplicateElementException
 
 
-class TestPersisitentWaitingQueue(unittest.TestCase):
+class TestPersistentWaitingQueue(unittest.TestCase):
 
     def setUp(self):
         self._q = PersistentWaitingQueue()
@@ -100,6 +101,9 @@ class TestPersisitentWaitingQueue(unittest.TestCase):
         self.assertEqual(self._q.nbins(), 2)
 
     def testIteration(self):
+        """
+        Iterate over a queue
+        """
 
         self._enqueueSomeElements()
 
@@ -109,3 +113,12 @@ class TestPersisitentWaitingQueue(unittest.TestCase):
             l.append(e)
 
         self.assertEqual(l, [(1,0), (1,1), (2,2), (2,4), (3,'a')])
+
+    def testDuplicateInsert(self):
+        """
+        Insert the same element twice
+        """
+
+        self._q.enqueue(1,1)
+
+        self.assertRaises(DuplicateElementException, self._q.enqueue, 1, 1)

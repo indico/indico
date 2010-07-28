@@ -22,6 +22,7 @@ import copy
 import logging
 import time
 
+from datetime import timedelta
 from pytz import timezone
 from pytz import common_timezones
 
@@ -33,7 +34,200 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 # end required
 
-from base import PeriodicTask, PeriodicUniqueTask, OneShotTask
+import ZODB
+from persistent import Persistent
+
+from indico.util.fossilize import fossilizes, Fossilizable
+from indico.util.date_time import nowutc, int_timestamp
+from indico.modules.scheduler.fossils import ITaskFossil
+from indico.modules.scheduler import base
+
+"""
+Defines base classes for tasks, and some specific tasks as well
+"""
+
+
+class BaseTask(Persistent, Fossilizable):
+    """
+    To create a new Task subclass Task and define a _run() method with
+    the tasks' actions
+
+    Description of each attribute:
+    AUTOMATIC ATTRS:
+    - startedOn:  actual date the task started running
+    - endedOn:    actual date the task's run method finished
+    - running:    True or False depending on what the task thinks it's happening
+
+    USER-CONFIGURABLE ATTRS (through kw arguments to init and setters/getters)
+    - startOn:    time at which the task creator wanted the task to start (can be blank)
+    - endOn:      last point in time where the task can run. A task will never enter the
+                  runningQueue if current time is past endOn
+    """
+
+    fossilizes(ITaskFossil)
+
+    def __init__(self, **kwargs):
+        self.createdOn = nowutc()
+        self.typeId = self.__class__.__name__
+        self.reset(**kwargs)
+
+    def reset(self, **kwargs):
+        '''Resets a task to its state before being run'''
+
+        self.startedOn = None
+        self.endedOn = None
+        self.running = False
+        self.onRunningListSince = None
+        self.startOn = None
+        self.endOn = None
+        self.status = base.TASK_STATUS_NONE
+        self.id = None
+
+        for k in ('startOn', 'endOn'):
+            if k in kwargs:
+                setattr(self, k, kwargs[k])
+
+    def getEndOn(self):
+        return self.EndOn
+
+    def getStartOn(self):
+        return self.startOn
+
+    def getCreatedOn(self):
+        return self.createdOn
+
+    def setStartOn(self, newtime):
+        self.startOn = newtime
+
+    def setEndOn(self, newtime):
+        self.endOn = newtime
+
+    def setOnRunningListSince(self, sometime):
+        self.onRunningListSince = sometime
+        self._p_changed = 1
+
+    def setStatus(self, newstatus):
+        self.status = base.TASK_STATUS_QUEUED
+
+    def getOnRunningListSince(self):
+        return self.onRunningListSince
+
+    def getId(self):
+        return self.id
+
+    def getTypeId(self):
+        return self.typeId
+
+    def initialize(self, newid, newstatus):
+        self.id = newid
+        self.status = newstatus
+
+    def isPeriodic(self):
+        return False
+
+    def isPeriodicUnique(self):
+        return False
+
+    def getStartedOn(self):
+        return self.startedOn
+
+    def getEndedOn(self):
+        return self.endedOn
+
+    def plugLogger(self, logger):
+        self._v_logger = logger
+
+    def getLogger(self):
+        if not getattr(self, '_v_logger') or not self._v_logger:
+            self._v_logger = logging.getLogger('task/%s' % self.typeId)
+        return self._v_logger
+
+    def start(self):
+
+        tsDiff = int_timestamp(nowutc()) - int_timestamp(self.startOn)
+
+        if tsDiff < 0:
+            self.getLogger().debug('Task %s will wait for some time. (%s) > (%s)' % (self.id, self.startOn, nowutc()))
+            time.sleep(tsDiff)
+
+        if self.endOn and nowutc() > self.endOn:
+            self.getLogger().warning('Task %s will not be executed, endOn (%s) < current time (%s)' % (self.id, self.endOn, nowutc()))
+            return False
+
+        self.startedOn = nowutc()
+        self.running = True
+        self.status = base.TASK_STATUS_RUNNING
+        self.run()
+        self.running = False
+        self.endedOn = nowutc()
+
+
+    def tearDown(self):
+        '''If a task needs to do something once it has run and been removed from runningList
+        overload this method'''
+        pass
+
+    def __str__(self):
+        return "<%s %s %s %s>" % (self.typeId, self.id, self.status, self.startOn)
+
+
+class OneShotTask(BaseTask):
+    '''Tasks that are executed only once'''
+    def __init__(self, **kwargs):
+        super(OneShotTask, self).__init__(**kwargs)
+        if 'runOn' in kwargs:
+            self.runOn = kwargs['runOn']
+        else:
+            self.runOn = nowutc()
+
+
+    def getRunOn(self):
+        return self.runOn
+
+
+class PeriodicTask(BaseTask):
+    """
+    Tasks that should be executed at regular intervals
+    """
+
+    def __init__(self, **kwargs):
+        """
+        Must be fed:
+        - interval: seconds between each successive run
+        """
+        super(PeriodicTask, self).__init__(**kwargs)
+        if 'interval' not in kwargs:
+            raise Exception('Error: PeriodicTask was not given an interval')
+
+        self.interval = kwargs['interval']
+
+
+    def isPeriodic(self):
+        return True
+
+    def getInterval(self):
+        return self.interval
+
+    def start(self):
+        super(PeriodicTask, self).start()
+
+    def tearDown(self):
+        super(PeriodicTask, self).tearDown()
+        # precision of seconds, don't use this for real time response systems
+
+        # We reinject ourselves into the Queue
+        self.reset()
+
+
+class PeriodicUniqueTask(PeriodicTask):
+    '''Singleton periodic tasks: no two or more PeriodicUniqueTask of this
+    class will be queued or running at the same time'''
+    def __init__(self, **kwargs):
+        super(PeriodicUniqueTask, self).__init__(**kwargs)
+
+    def isPeriodicUnique(self):
+        return True
+
 
 class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
     '''Updates statistics associated with categories
@@ -360,7 +554,7 @@ Best Regards
 class SampleOneShotTask(OneShotTask):
     def run(self):
         self.getLogger().debug('Now i shall sleeeeeeeep!')
-        time.sleep(120)
+        time.sleep(10)
         self.getLogger().debug('%s executed' % self.__class__.__name__)
 
 
