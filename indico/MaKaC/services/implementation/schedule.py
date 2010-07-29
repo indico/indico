@@ -986,11 +986,9 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
     def _getSlotEntry(self):
         return None
 
-class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
+class MoveEntryBase(ScheduleOperation):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
-
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
         self._contribPlace = pManager.extract("value", pType=str, allowEmpty=False)
         self._schEntryId = pManager.extract("scheduleEntryId", pType=int, allowEmpty=False)
@@ -1072,6 +1070,17 @@ class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationB
                 'slotEntry': fossilizedDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
+class MoveEntry(MoveEntryBase, conferenceServices.ConferenceModifBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceModifBase._checkParams(self)
+        MoveEntryBase._checkParams(self)
+
+class MoveEntryFromSessionBlock(MoveEntryBase, sessionServices.SessionSlotModifCoordinationBase):
+
+    def _checkParams(self):
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
+        MoveEntryBase._checkParams(self)
 
 
 class MoveEntryUpDown(ScheduleOperation):
@@ -1130,6 +1139,7 @@ methodMap = {
     "event.getDayEndDate": ConferenceScheduleGetDayEndDate,
     "event.getUnscheduledContributions": ConferenceGetUnscheduledContributions,
     "event.scheduleContributions": ConferenceScheduleContributions,
+    "event.moveEntry": MoveEntry,
 
     "slot.addContribution": SessionSlotScheduleAddContribution,
     "slot.addBreak": SessionSlotScheduleAddBreak,
@@ -1139,6 +1149,7 @@ methodMap = {
     "slot.getDayEndDate": SessionSlotScheduleGetDayEndDate,
     "slot.getBooking": SessionSlotGetBooking,
     "slot.modifyStartEndDate": SessionSlotScheduleModifyStartEndDate,
+    "slot.moveEntry": MoveEntryFromSessionBlock,
 
     "session.getDayEndDate": SessionScheduleGetDayEndDate,
     "session.addSlot": SessionScheduleAddSessionSlot,
@@ -1158,8 +1169,6 @@ methodMap = {
 
     "getAllSessionConveners": ConferenceGetAllConveners,
     "getAllSpeakers": ConferenceGetAllSpeakers,
-
-    "moveEntry": MoveEntry,
 
     "event.moveEntryUpDown": ConferenceTimetableMoveEntryUpDown,
     "session.moveEntryUpDown": SessionTimetableMoveEntryUpDown,

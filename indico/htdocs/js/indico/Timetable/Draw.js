@@ -1030,7 +1030,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
             moveEntryLink.observeClick(function(){
                 self.close();
-                self.managementActions.moveEntryContrib(self.eventData);
+                self.managementActions.moveEntry(self.eventData);
             });
 
             menu.insert(moveEntryLink);

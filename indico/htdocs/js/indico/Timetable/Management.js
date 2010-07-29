@@ -21,6 +21,9 @@ type("TimetableManagementActions", [], {
             'delete': 'schedule.slot.deleteBreak',
             moveUpDown: 'schedule.slot.moveEntryUpDown'
         },
+        'SessionEntry': { // common methods for breaks and contributions
+            moveEntry: 'schedule.slot.moveEntry'
+        },
         'Session': {
             add: 'schedule.event.addSession',
             dayEndDate: 'schedule.session.getDayEndDate',
@@ -43,7 +46,8 @@ type("TimetableManagementActions", [], {
             moveUpDown: 'schedule.event.moveEntryUpDown'
         },
         'Event': {
-            'dayEndDate': 'schedule.event.getDayEndDate'
+            'dayEndDate': 'schedule.event.getDayEndDate',
+            moveEntry: 'schedule.event.moveEntry'
         }
     },
     deleteEntry: function(eventData) {
@@ -508,7 +512,7 @@ type("TimetableManagementActions", [], {
     },
 
 
-    moveEntryContrib: function(eventData){
+    moveEntry: function(eventData){
         var moveEntryDiag = new MoveEntryDialog(
             this,
             this.timetable,

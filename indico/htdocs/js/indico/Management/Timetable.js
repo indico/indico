@@ -1109,7 +1109,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
 
                     var killProgress = IndicoUI.Dialogs.Util.progress("Moving the entry...");
 
-                    indicoRequest('schedule.moveEntry', {
+                    indicoRequest(self.managementActions.methods[self.inSession?'SessionEntry':'Event'].moveEntry, {
                         value : value,
                         conference : self.confId,
                         scheduleEntryId : self.scheduleEntryId,
