@@ -109,14 +109,17 @@ class SchedulerModule(Module):
     def getSpool(self):
         return self._taskSpool
 
-    def spool(self, task):
-        self._indexTask(task)
-        self._taskSpool.put(task)
+    def spool(self, op, obj):
+        """
+        Adds an 'instruction' to the spool, in the form (op, obj)
+        """
+
+        self._taskSpool.put((op, obj))
 
         logging.getLogger('scheduler').debug(
-            'Added task %s to spool..' % task)
+            'Added instruction %s to spool..' % ((op, obj),))
 
-        return (task.id, task.getStartOn())
+        return True
 
     def moveTaskFromRunningList(self, task, status, nocheck=False):
         """
@@ -144,6 +147,9 @@ class SchedulerModule(Module):
 
 
     def addTaskToWaitingQueue(self, task):
+
+        self._indexTask(task)
+
         logging.getLogger('scheduler').debug(
             'Added task %s to waitingList..' % task.id)
 

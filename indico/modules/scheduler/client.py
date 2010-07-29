@@ -31,6 +31,7 @@ class Client(object):
 
     def __init__(self):
         super(Client, self).__init__()
+        self._schedMod = SchedulerModule.getDBInstance()
 
     def enqueue(self, task):
         """
@@ -39,5 +40,11 @@ class Client(object):
         next execution time
         """
 
-        schedulerMod = SchedulerModule.getDBInstance()
-        return schedulerMod.spool(task)
+        return self._schedMod.spool('add', task)
+
+    def shutdown(self, msg = ""):
+        """
+        Shuts down the scheduler
+        """
+
+        return self._schedMod.spool('shutdown', msg)

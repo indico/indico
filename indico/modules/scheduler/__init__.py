@@ -19,5 +19,5 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from indico.modules.scheduler.module import SchedulerModule
-from indico.modules.scheduler.controllers import Scheduler
+from indico.modules.scheduler.server import Scheduler
 from indico.modules.scheduler.client import Client

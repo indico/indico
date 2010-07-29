@@ -46,7 +46,7 @@ class OperationManager(object):
     Takes care of synchronizing resources
     """
 
-    def __init__(self, dbi, logger):
+    def __init__(self, dbi, logger = None):
         self._dbi = dbi
         self._logger = logger
 
@@ -64,8 +64,9 @@ class OperationManager(object):
             else:
                 break
         else:
-            self._logger.error("Commit failed %d consecutive times. "
-                               "Something bad must be going on..." %
+            if self._logger:
+                self._logger.error("Commit failed %d consecutive times. "
+                                   "Something bad must be going on..." %
                                    CONFLICTERROR_MAX_RETRIES)
 
 
@@ -87,6 +88,10 @@ class TaskNotFoundException(SchedulerException):
 class TaskInconsistentStatusException(SchedulerException):
     pass
 
+class SchedulerQuitException(SchedulerException):
+    pass
 
+class SchedulerUnknownOperationException(SchedulerException):
+    pass
 
 

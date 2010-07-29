@@ -191,18 +191,27 @@ class Scheduler(object):
         Main loop, should only be called from scheduler
         """
 
-        self._logger.debug('\n\n\Scheduler started\n')
-        self._printStatus()
+        try:
+            self._logger.debug('\n\n\Scheduler started\n')
+            self._printStatus()
 
-        # relaunch items that were running in the last session
-        with self._op.commit():
-            self._relaunchRunningListItems()
+            # relaunch items that were running in the last session
+            with self._op.commit():
+                self._relaunchRunningListItems()
 
-            # iterate over the tasks in the waiting queue
-            # that should be running
-        for timestamp, curTask in self._iterateTasks():
-            # execute the "task cycle" for each new task
-            self._taskCycle(timestamp, curTask)
+                # iterate over the tasks in the waiting queue
+                # that should be running
+
+            for timestamp, curTask in self._iterateTasks():
+                # execute the "task cycle" for each new task
+                self._taskCycle(timestamp, curTask)
+
+        except base.SchedulerQuitException, e:
+            self._logger.info('Scheduler was shut down: %s' % e)
+            return 0
+        except Exception, e:
+            self._logger.error('Unexpected error')
+            raise e
 
 
     def _taskCycle(self, timestamp, curTask):
@@ -231,22 +240,29 @@ class Scheduler(object):
 
         try:
             with self._op.commit():
-                task = spool.pull()
+                pair = spool.pull()
         except IndexError:
-            task = None
+            pair = None
 
-        return task
+        return pair
 
     def _processSpool(self):
         """
         Adds all the tasks in the spool to the waiting list
         """
         # pop the first one
-        task = self._popFromSpool()
+        pair = self._popFromSpool()
 
-        while task:
-            self._addTaskToQueue(task)
-            task = self._popFromSpool()
+        while pair:
+            op, obj = pair
+
+            if op == 'add':
+                self._addTaskToQueue(obj)
+            elif op == 'shutdown':
+                raise base.SchedulerQuitException(obj)
+            else:
+                raise base.SchedulerUnknownOperationException(op)
+            pair = self._popFromSpool()
 
     def _sleep(self, msg):
         self._logger.debug(msg)
@@ -266,7 +282,7 @@ class Scheduler(object):
         """
         task.setStatus(base.TASK_STATUS_QUEUED)
 
-        with self._op.commit():
+        with self._op.commit('taskIdx'):
             SchedulerModule.getDBInstance().addTaskToWaitingQueue(task)
 
         self._logger.info("Task %s queued for execution" % task)

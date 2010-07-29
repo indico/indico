@@ -35,7 +35,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 
-from indico.modules.scheduler.controllers import Scheduler
+from indico.modules.scheduler.server import Scheduler
 
 class OfflineWebsiteCreator(OneShotTask):
     def __init__(self, rh, conf, **kwargs):
