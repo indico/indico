@@ -43,6 +43,7 @@ from MaKaC.i18n import _
 
 from pytz import timezone
 from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.timezoneUtils import DisplayTZ
 import simplejson
 import pytz
 import copy
@@ -73,6 +74,7 @@ class WContributionDisplayItemBase(wcomponents.WTemplated):
 
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars( self )
+        tz = DisplayTZ(self._aw,self._contrib.getConference()).getDisplayTZ()
         vars["id"]=self.htmlText(self._contrib.getId())
         vars["title"]=self.htmlText(self._contrib.getTitle())
         cType=""
@@ -81,7 +83,7 @@ class WContributionDisplayItemBase(wcomponents.WTemplated):
         vars["type"]=self.htmlText(cType)
         vars["startDate"]="&nbsp;"
         if self._contrib.isScheduled():
-            vars["startDate"]=self._contrib.getAdjustedStartDate().strftime("%Y-%b-%d %H:%M")
+            vars["startDate"]=self._contrib.getAdjustedStartDate(tz).strftime("%Y-%b-%d %H:%M")
         vars["duration"] = "&nbsp;"
         if self._contrib.getDuration() is not None:
             if (datetime(1900,1,1)+self._contrib.getDuration()).minute>0:
@@ -382,13 +384,11 @@ class WSessionDisplayBase(wcomponents.WTemplated):
 
     def _getTimeTableHTML(self):
 
-        tz = self._session.getTimezone()
-
-        ttdata = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), tz,
+        ttdata = simplejson.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz,
                                                                            None, days = None, mgmtMode = False))
 
-        eventInfo = DictPickler.pickle(self._session.getConference(), timezone=tz)
-        eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=tz)
+        eventInfo = DictPickler.pickle(self._session.getConference(), timezone=self._tz)
+        eventInfo['timetableSession'] = DictPickler.pickle(self._session, timezone=self._tz)
         eventInfo = simplejson.dumps(eventInfo)
 
         return """

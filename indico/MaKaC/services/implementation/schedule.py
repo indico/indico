@@ -26,6 +26,7 @@ from MaKaC.fossils.schedule import ILinkedTimeSchEntryMgmtFossil, IBreakTimeSchE
 from MaKaC.fossils.contribution import IContributionParticipationTTMgmtFossil, IContributionFossil
 from MaKaC.fossils.conference import IConferenceParticipationFossil,\
     ISessionFossil
+from MaKaC.common import timezoneUtils
 
 import time, datetime, pytz, copy
 
@@ -52,6 +53,7 @@ class ConferenceGetSchedule(conferenceServices.ConferenceDisplayBase):
         conferenceServices.ConferenceDisplayBase._checkParams(self)
 
     def _getAnswer(self):
+        #TODO: tz = timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ() // use it in the fossilize?
         return self._target.getSchedule().fossilize(IConferenceScheduleDisplayFossil)
 
 class LocationSetter:

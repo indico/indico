@@ -1483,19 +1483,19 @@ class ScheduleToJson:
 
         if mgmtMode:
             if isinstance(obj, BreakTimeSchEntry):
-                entry = obj.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache)
+                entry = obj.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz)
             elif isinstance(obj, ContribSchEntry):
-                entry = obj.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache)
+                entry = obj.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz)
             elif isinstance(obj, LinkedTimeSchEntry):
-                entry = obj.fossilize(ILinkedTimeSchEntryMgmtFossil, useAttrCache = useAttrCache)
+                entry = obj.fossilize(ILinkedTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz)
             else:
-                entry = obj.fossilize(useAttrCache = useAttrCache)
+                entry = obj.fossilize(useAttrCache = useAttrCache, tz = tz)
         else:
             # the fossils used for the display of entries
             # will be taken by default, since they're first
             # in the list of their respective Fossilizable
             # objects
-            entry = obj.fossilize(useAttrCache = useAttrCache)
+            entry = obj.fossilize(useAttrCache = useAttrCache, tz = tz)
 
         genId = entry['id']
 
@@ -1510,17 +1510,17 @@ class ScheduleToJson:
                 if ScheduleToJson.checkProtection(contrib, aw):
                     if mgmtMode:
                         if isinstance(contrib, ContribSchEntry):
-                            contribData = contrib.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache)
+                            contribData = contrib.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz)
                         elif isinstance(contrib, BreakTimeSchEntry):
-                            contribData = contrib.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache)
+                            contribData = contrib.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz)
                         else:
-                            contribData = contrib.fossilize(useAttrCache = useAttrCache)
+                            contribData = contrib.fossilize(useAttrCache = useAttrCache, tz = tz)
                     else:
                         # the fossils used for the display of entries
                         # will be taken by default, since they're first
                         # in the list of their respective Fossilizable
                         # objects
-                        contribData = contrib.fossilize(useAttrCache = useAttrCache)
+                        contribData = contrib.fossilize(useAttrCache = useAttrCache, tz = tz)
 
                     entries[contribData['id']] = contribData
 
