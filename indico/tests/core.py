@@ -219,7 +219,7 @@ class TestManager(object):
         print colored("-- Stoppping test DB", "cyan")
 
         try:
-            self.zeoServer.terminate()
+            self.zeoServer.shutdown()
             self._removeDBFile()
         except OSError, e:
             print ("Problem terminating ZEO Server: " + str(e))

@@ -24,7 +24,7 @@ This module defines some utility classes for the testing framework,
 such as a wrapper for ZEOServer that allows a "test" server to be created
 """
 
-import os
+import os, time
 from multiprocessing import Process
 from StringIO import StringIO
 
@@ -47,6 +47,17 @@ class TestZEOServer(Process):
         """
         print "spawning server on PID %s" % self.pid
         self.server.main()
+
+    def shutdown(self):
+        """
+        This is basically a 'blocking' terminate()
+        """
+
+        self.terminate()
+
+        # wait till i'm dead
+        while self.is_alive():
+            time.sleep(1)
 
 
 class TeeStringIO(StringIO):
