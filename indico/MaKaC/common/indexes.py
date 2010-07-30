@@ -28,7 +28,6 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Configuration import Config
 from MaKaC.common.timezoneUtils import nowutc, date2utctimestamp
 from MaKaC.errors import MaKaCError
-import sets
 from datetime import datetime
 from datetime import timedelta
 from MaKaC.i18n import _
@@ -406,9 +405,9 @@ class CalendarIndex(Persistent):
             (Set) - set of objects starting before the specified day
         """
         date = date2utctimestamp(date)
-        res = sets.Set()
+        res = set()
         for val in self._idxSdate.values(self._idxSdate.minKey(), date):
-            res.union_update( sets.Set( val ) )
+            res.union_update( set( val ) )
         return res
 
     def _getObjectsStartingAfter( self, date ):
@@ -421,9 +420,9 @@ class CalendarIndex(Persistent):
             (Set) - set of objects starting before the specified day
         """
         date = date2utctimestamp(date)
-        res = sets.Set()
+        res = set()
         for val in self._idxSdate.values(date):
-            res.union_update( sets.Set( val ) )
+            res.union_update( set( val ) )
         return res
 
     def _getObjectsEndingBefore( self, date ):
@@ -436,9 +435,9 @@ class CalendarIndex(Persistent):
             (Set) - set of objects ending before the specified day
         """
         date = date2utctimestamp(date)
-        res = sets.Set()
+        res = set()
         for val in self._idxEdate.values(self._idxEdate.minKey(), date):
-            res.union_update( sets.Set( val ) )
+            res.union_update( set( val ) )
         return res
 
     def _getObjectsEndingAfter( self, date ):
@@ -451,9 +450,9 @@ class CalendarIndex(Persistent):
             (Set) - set of objects ending after the specified day
         """
         date = date2utctimestamp(date)
-        res = sets.Set()
+        res = set()
         for val in self._idxEdate.values(date):
-            res.union_update( sets.Set( val ) )
+            res.union_update( set( val ) )
         return res
 
     def getObjectsStartingInDay( self, date ):

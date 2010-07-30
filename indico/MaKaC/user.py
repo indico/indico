@@ -27,7 +27,6 @@ from persistent import Persistent
 from accessControl import AdminList
 import MaKaC,os
 from MaKaC.common import filters, indexes
-from sets import Set
 from MaKaC.common.Configuration import Config
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder, IndexHolder
@@ -1384,16 +1383,16 @@ class AvatarHolder( ObjectHolder ):
 
     def match(self, criteria, exact=0, onlyActivated=True, forceWithoutExtAuth=False):
         result = {}
-        set = Set()
+        iset = set()
         for f,v in criteria.items():
             if str(v).strip()!="" and f in self._indexes:
                 match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact)
                 if match!= None:
-                    if len(set) == 0:
-                        set = Set(match)
+                    if len(iset) == 0:
+                        iset = set(match)
                     else:
-                        set = set & Set(match)
-        for userid in set:
+                        iset = iset & set(match)
+        for userid in iset:
             av=self.getById(userid)
             if not onlyActivated or av.isActivated():
                 result[av.getEmail()]=av
