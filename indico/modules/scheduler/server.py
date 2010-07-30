@@ -32,39 +32,33 @@ from indico.modules.scheduler import SchedulerModule, base
 from indico.modules.scheduler.slave import Worker
 from indico.util.date_time import nowutc, int_timestamp
 
-## SOME BASIC DEFINITIONS
-
-# time to wait between cycles
-SLEEP_INTERVAL = 10
-
-# AWOL = Absent Without Leave
-# [0.0, 1.0) probability that after a Scheduler tick it will check for AWOL
-# tasks in the runningList the lower the number the lower the number of checks
-AWOL_TASKS_CHECK_PROBABILITY = 0.3
-
-# seconds to consider a task AWOL
-AWOL_TASKS_THRESHOLD = 6000
-
 
 class Scheduler(object):
     """
-    Scheduler is a singleton in the sense that inside a process only one of it will be running at a given moment
-    but it's not a singleton in the sense that you can call Scheduler.getInstance() from within Indico to add new tasks.
 
-    Scheduler.run() is the main loop and every SLEEP_INTERVAL it will spawn new workers to perform that tasks that are pending.
     """
 
     __instance = None
 
-    @classmethod
-    def getInstance(cls):
-        """returns the singleton instance of Scheduler"""
-        if cls.__instance == None:
-            cls.__instance = Scheduler()
+    # configuration options
+    _options = {
+        # time to wait between cycles
+        'sleep_interval': 10,
+        # AWOL = Absent Without Leave
+        # [0.0, 1.0) probability that after a Scheduler tick it will check for AWOL
+        # tasks in the runningList the lower the number the lower the number of checks
+        'awol_tasks_check_probability': 0.3,
+        # seconds to consider a task AWOL
+        'awol_tasks_thresold': 6000
+        }
 
-        return cls.__instance
+    def __init__(self, **config):
+        """
+        config is a dictionary containing configuration parameters
+        """
 
-    def __init__(self):
+        self._readConfig(config)
+
         self._logger = logging.getLogger('scheduler')
 
         self._dbi = db.DBMgr.getInstance()
@@ -74,6 +68,25 @@ class Scheduler(object):
         self._schedModule = SchedulerModule.getDBInstance()
 
         self._runningThreads = {}
+
+    def _readConfig(self, config):
+        """
+        Reads the config dictionary and verifies the parameters are ok.
+        If it's the case, it sets them.
+        """
+
+        class DummyType(object):
+            pass
+
+        self._config = DummyType()
+        self._config.__dict__ = dict(Scheduler._options)
+
+        for name, value in config.iteritems():
+            if name not in Scheduler._options:
+                raise base.SchedulerConfigurationException(
+                    'Option %s is not supported!')
+            else:
+                setattr(self._config, name, value)
 
     def _relaunchRunningListItems(self):
         # During startup any item in runningList will have died prematurely
@@ -138,11 +151,12 @@ class Scheduler(object):
             self._checkFinishedTasks()
 
             # we also check AWOL tasks from time to time
-            if random.random() < AWOL_TASKS_CHECK_PROBABILITY:
+            if random.random() < self._config.awol_tasks_check_probability:
                 self._checkAWOLTasks()
 
             # if we get here, we have nothing else to do...
-            self._sleep('Nothing to do. Sleeping for %d secs...' % SLEEP_INTERVAL)
+            self._sleep('Nothing to do. Sleeping for %d secs...' %
+                        self._config.sleep_interval)
 
     def _checkFinishedTasks(self):
         """
@@ -192,7 +206,7 @@ class Scheduler(object):
         """
 
         try:
-            self._logger.debug('\n\n\Scheduler started\n')
+            self._logger.info('**** Scheduler started')
             self._printStatus()
 
             # relaunch items that were running in the last session
@@ -266,7 +280,7 @@ class Scheduler(object):
 
     def _sleep(self, msg):
         self._logger.debug(msg)
-        time.sleep(SLEEP_INTERVAL)
+        time.sleep(self._config.sleep_interval)
 
     def _readFromDb(self):
         self._logger.debug('_readFromDb()..')
@@ -341,7 +355,7 @@ class Scheduler(object):
                 runForSecs = int_timestamp(nowutc()) - \
                              int_timestamp(task.getOnRunningListSince())
 
-                if runForSecs > AWOL_TASKS_THRESHOLD:
+                if runForSecs > self._config.awol_tasks_thresold:
                     self._logger.warning("Task %s has been running for %d secs. "
                                    "Assuming it has died abnormally and forcibly "
                                    "calling its tearDown()..." % (task.id, runForSecs))

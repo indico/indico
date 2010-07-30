@@ -94,4 +94,6 @@ class SchedulerQuitException(SchedulerException):
 class SchedulerUnknownOperationException(SchedulerException):
     pass
 
+class SchedulerConfigurationException(SchedulerException):
+    pass
 
