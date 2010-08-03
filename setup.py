@@ -312,6 +312,7 @@ class test_indico(Command):
                     ('jslint', None, "Run js source analysis"),
                     ('jscoverage', None, "Output coverage report in html for js"),
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
+                    ('log=', None, "Log to console, using specified level"),
                     ('grid', None, "Use Selenium Grid"),
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
@@ -333,6 +334,7 @@ class test_indico(Command):
     html = False
     record = False
     parallel = False
+    log = False
 
     def initialize_options(self):
         pass
@@ -372,7 +374,8 @@ class test_indico(Command):
                    'specify': self.specify,
                    'coverage': self.coverage,
                    'record': self.record,
-                   'parallel': self.parallel}
+                   'parallel': self.parallel,
+                   'log': self.log}
 
         # get only options that are active
         options = dict((k,v) for (k,v) in options.iteritems() if v)

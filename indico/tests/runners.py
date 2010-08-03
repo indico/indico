@@ -114,6 +114,32 @@ class CoveragePythonTestOption(CoverageBaseTestOption):
 
 
 
+class LogToConsoleTestOption(Option):
+    """
+    Python Coverage Tests
+    """
+
+    def __init__(self, value):
+        super(LogToConsoleTestOption, self).__init__(value)
+
+    def pre_run(self, __):
+        """
+        sets up logging
+        """
+
+        import logging
+        h = logging.StreamHandler()
+        logger = logging.getLogger('')
+
+        logger.setLevel(getattr(logging, self.value))
+
+        logger.addHandler(h)
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        h.setFormatter(formatter)
+
+    def shouldExecute(self):
+        # execute it as long as it is specified
+        return not not self.value
 
 
 class UnitTestRunner(BaseTestRunner):
@@ -125,7 +151,8 @@ class UnitTestRunner(BaseTestRunner):
 
     _runnerOptions = {'silent': Option,
                       'coverage': CoveragePythonTestOption,
-                      'specify': Option}
+                      'specify': Option,
+                      'log': LogToConsoleTestOption}
 
     def _run(self):
         #coverage = CoverageTestRunner.getInstance()
