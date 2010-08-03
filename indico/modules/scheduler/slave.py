@@ -18,27 +18,25 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import logging
+import time, logging
 
 from indico.modules.scheduler import SchedulerModule, base
 from MaKaC.common import DBMgr
 
-# Number of times to try to run a task before aborting
-TASK_MAX_RETRIES = 10
-
 
 class Worker(base._MT_UNIT):
 
-    def __init__(self, taskId):
+    def __init__(self, taskId, configData):
         super(Worker, self).__init__()
 
-        self._logger = logging.getLogger('worker')
+        self._logger = logging.getLogger('worker/%s' % taskId)
         self.success = None
         self._taskId = taskId
+        self._config = configData
 
     def _prepare(self):
         """
-        This acts as a second "constructor", that is executed in the
+        This acts as a second 'constructor', that is executed in the
         context of the thread (due to database reasons)
         """
         self._dbi = DBMgr.getInstance()
@@ -63,7 +61,7 @@ class Worker(base._MT_UNIT):
 
         self._dbi.startRequest()
 
-        while i < TASK_MAX_RETRIES and not self._task.endedOn:
+        while i < self._config.task_max_tries and not self._task.endedOn:
             i = i + 1
             try:
                 self._task.start()
@@ -76,9 +74,11 @@ class Worker(base._MT_UNIT):
 
                 self._logger.exception('Error message')
 
-                # We sleep progressivelly so that if the error is caused by concurrency
-                # we don't make the problem worse by hammering the server.
-                time.sleep(nextRunIn)
+                if  i < self._config.task_max_tries:
+                    # if i is still low enough, we sleep progressively more
+                    # so that if the error is caused by concurrency we don't make
+                    # the problem worse by hammering the server.
+                    time.sleep(nextRunIn)
 
                 # abort transaction and synchronize
                 self._dbi.sync()

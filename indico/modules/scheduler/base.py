@@ -20,7 +20,6 @@
 
 from contextlib import contextmanager
 from ZODB.POSException import ConflictError
-import transaction
 
 TASK_STATUS_NONE, TASK_STATUS_SPOOLED, TASK_STATUS_QUEUED, TASK_STATUS_RUNNING, \
 TASK_STATUS_FAILED, TASK_STATUS_ABORTED, TASK_STATUS_FINISHED = range(0,7)

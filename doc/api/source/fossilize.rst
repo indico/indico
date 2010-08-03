@@ -1,7 +1,7 @@
-:mod:`fossilize` -- "Serializing" elaborate Python objects to dictionaries and lists
-====================================================================================
+:mod:`indico.util.fossilize` -- "Serializing" elaborate Python objects to dictionaries and lists
+================================================================================================
 
-.. automodule:: MaKaC.common.fossilize
+.. automodule:: indico.util.fossilize
    :members:
 
 =======

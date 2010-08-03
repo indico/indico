@@ -21,6 +21,7 @@
 import copy
 import logging
 import time
+import dateutil
 
 from datetime import timedelta
 from pytz import timezone
@@ -49,65 +50,46 @@ Defines base classes for tasks, and some specific tasks as well
 
 class BaseTask(Persistent, Fossilizable):
     """
-    To create a new Task subclass Task and define a _run() method with
-    the tasks' actions
-
-    Description of each attribute:
-    AUTOMATIC ATTRS:
-    - startedOn:  actual date the task started running
-    - endedOn:    actual date the task's run method finished
-    - running:    True or False depending on what the task thinks it's happening
-
-    USER-CONFIGURABLE ATTRS (through kw arguments to init and setters/getters)
-    - startOn:    time at which the task creator wanted the task to start (can be blank)
-    - endOn:      last point in time where the task can run. A task will never enter the
-                  runningQueue if current time is past endOn
+    A base class for tasks.
+    `expiryDate` is the last point in time when the task can run. A task will refuse
+    to run if current time is past `expiryDate`
     """
 
     fossilizes(ITaskFossil)
 
-    def __init__(self, **kwargs):
+    def __init__(self, expiryDate=None):
         self.createdOn = nowutc()
+        self.expiryDate = expiryDate
         self.typeId = self.__class__.__name__
-        self.reset(**kwargs)
+        self.id = None
+        self.reset()
 
-    def reset(self, **kwargs):
+    def reset(self):
         '''Resets a task to its state before being run'''
 
-        self.startedOn = None
-        self.endedOn = None
         self.running = False
         self.onRunningListSince = None
-        self.startOn = None
-        self.endOn = None
         self.status = base.TASK_STATUS_NONE
-        self.id = None
-
-        for k in ('startOn', 'endOn'):
-            if k in kwargs:
-                setattr(self, k, kwargs[k])
-
-    def getEndOn(self):
-        return self.EndOn
-
-    def getStartOn(self):
-        return self.startOn
 
     def getCreatedOn(self):
         return self.createdOn
 
-    def setStartOn(self, newtime):
-        self.startOn = newtime
+    def getStartOn(self):
+        """
+        To be overloaded
+        """
 
-    def setEndOn(self, newtime):
-        self.endOn = newtime
+    def getLastFinishedOn(self):
+        """
+        To be overloaded
+        """
 
     def setOnRunningListSince(self, sometime):
         self.onRunningListSince = sometime
         self._p_changed = 1
 
     def setStatus(self, newstatus):
-        self.status = base.TASK_STATUS_QUEUED
+        self.status = newstatus
 
     def getOnRunningListSince(self):
         return self.onRunningListSince
@@ -122,18 +104,6 @@ class BaseTask(Persistent, Fossilizable):
         self.id = newid
         self.status = newstatus
 
-    def isPeriodic(self):
-        return False
-
-    def isPeriodicUnique(self):
-        return False
-
-    def getStartedOn(self):
-        return self.startedOn
-
-    def getEndedOn(self):
-        return self.endedOn
-
     def plugLogger(self, logger):
         self._v_logger = logger
 
@@ -144,14 +114,14 @@ class BaseTask(Persistent, Fossilizable):
 
     def start(self):
 
-        tsDiff = int_timestamp(nowutc()) - int_timestamp(self.startOn)
+        tsDiff = int_timestamp(nowutc()) - int_timestamp(self.getStartOn())
 
         if tsDiff < 0:
-            self.getLogger().debug('Task %s will wait for some time. (%s) > (%s)' % (self.id, self.startOn, nowutc()))
+            self.getLogger().debug('Task %s will wait for some time. (%s) > (%s)' % (self.id, self.getStartOn(), nowutc()))
             time.sleep(tsDiff)
 
-        if self.endOn and nowutc() > self.endOn:
-            self.getLogger().warning('Task %s will not be executed, endOn (%s) < current time (%s)' % (self.id, self.endOn, nowutc()))
+        if self.expiryDate and nowutc() > self.expiryDate:
+            self.getLogger().warning('Task %s will not be executed, expiryDate (%s) < current time (%s)' % (self.id, self.expiryDate, nowutc()))
             return False
 
         self.startedOn = nowutc()
@@ -168,45 +138,54 @@ class BaseTask(Persistent, Fossilizable):
         pass
 
     def __str__(self):
-        return "<%s %s %s %s>" % (self.typeId, self.id, self.status, self.startOn)
+        return "<%s %s %s %s>" % (self.typeId, self.id, self.status, self.getStartOn())
 
 
 class OneShotTask(BaseTask):
     '''Tasks that are executed only once'''
-    def __init__(self, **kwargs):
-        super(OneShotTask, self).__init__(**kwargs)
-        if 'runOn' in kwargs:
-            self.runOn = kwargs['runOn']
-        else:
-            self.runOn = nowutc()
+    def __init__(self, startDateTime):
+        super(OneShotTask, self).__init__()
 
+        self.startDateTime = startDateTime
+        self.startedOn = None
+        self.endedOn = None
+
+    def getStartOn(self):
+        return self.startDateTime
+
+    def setStartOn(self, newtime):
+        self.startDateTime = newtime
+
+    def getEndedOn(self):
+        return self.endedOn
+
+    def setEndedOn(self, dateTime):
+        self.endedOn = dateTime
+
+    def getStartedOn(self):
+        return self.startedOn
 
     def getRunOn(self):
         return self.runOn
 
+    def getLastFinishedOn(self):
+        return self.getEndedOn()
 
 class PeriodicTask(BaseTask):
     """
     Tasks that should be executed at regular intervals
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, frequency, **kwargs):
         """
-        Must be fed:
-        - interval: seconds between each successive run
+        - frequency - a valid dateutil frequency specifier (DAILY, HOURLY, etc...)
         """
-        super(PeriodicTask, self).__init__(**kwargs)
-        if 'interval' not in kwargs:
-            raise Exception('Error: PeriodicTask was not given an interval')
+        super(PeriodicTask, self).__init__()
 
-        self.interval = kwargs['interval']
-
-
-    def isPeriodic(self):
-        return True
-
-    def getInterval(self):
-        return self.interval
+        self.frequency = frequency
+        self.interval = kwargs
+        self.nextOccurrence = None
+        self._lastFinishedOn = None
 
     def start(self):
         super(PeriodicTask, self).start()
@@ -218,15 +197,33 @@ class PeriodicTask(BaseTask):
         # We reinject ourselves into the Queue
         self.reset()
 
+    def setNextOccurrence(self):
+        l = list(dateutil.rrule.rrule(
+            self.frequency,
+            dtstart = nowutc(),
+            count = 1,
+            **self.interval
+            ))
+
+        if l:
+            self.nextOccurrence = l[0]
+        else:
+            return None
+
+    def getStartOn(self):
+        # if it's the first time, compute the next occurrence
+        if not self.nextOccurrence:
+            self.setNextOccurrence()
+
+        return self.nextOccurrence
+
+    def getLastFinishedOn(self):
+        return self._lastFinishedOn
+
 
 class PeriodicUniqueTask(PeriodicTask):
     '''Singleton periodic tasks: no two or more PeriodicUniqueTask of this
     class will be queued or running at the same time'''
-    def __init__(self, **kwargs):
-        super(PeriodicUniqueTask, self).__init__(**kwargs)
-
-    def isPeriodicUnique(self):
-        return True
 
 
 class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
@@ -505,7 +502,6 @@ class AlarmTask(SendMailTask):
 
         # Date checkings...
         from MaKaC.conference import ConferenceHolder
-        from MaKaC.common.timezoneUtils import nowutc
         if not ConferenceHolder().hasKey(self.conf.getId()) or \
                 self.conf.getStartDate() <= nowutc():
            self.conf.removeAlarm(self)
@@ -554,7 +550,7 @@ Best Regards
 class SampleOneShotTask(OneShotTask):
     def run(self):
         self.getLogger().debug('Now i shall sleeeeeeeep!')
-        time.sleep(10)
+        time.sleep(1)
         self.getLogger().debug('%s executed' % self.__class__.__name__)
 
 

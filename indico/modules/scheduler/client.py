@@ -23,10 +23,11 @@ from indico.modules.scheduler import SchedulerModule
 class Client(object):
 
     """
-    `Client`, as the name says, represents a scheduler client, that
-    allows Indico client processes to interact with the scheduler.
+    :py:class:`~indico.modules.scheduler.Client` provices a transparent scheduler
+    client, that allows Indico client processes to interact with the Scheduler
+    without the need for a lot of code.
 
-    It acts as a sort of proxy between clients and the SchedulerModule.
+    It acts as a remote proxy.
     """
 
     def __init__(self):
@@ -36,15 +37,34 @@ class Client(object):
     def enqueue(self, task):
         """
         Schedules a task for execution
-        Returns a tuple containing the task id and the
-        next execution time
         """
 
         return self._schedMod.spool('add', task)
 
     def shutdown(self, msg = ""):
         """
-        Shuts down the scheduler
+        Shuts down the scheduler. `msg` is an optional paramater that provides
+        an information message that will be written in the logs
         """
 
         return self._schedMod.spool('shutdown', msg)
+
+    def getStatus(self):
+        """
+        Returns status information (dictionary), containing the lengths (tasks) of:
+          * spool;
+          * waiting queue;
+          * running queue;
+          * finished task index;
+          * failed task index;
+        """
+
+        return self._schedMod.getStatus()
+
+    def getTask(self, tid):
+        """
+        Returns a :py:class:`task <indico.modules.scheduler.tasks.BaseTask>` object,
+        given its task id
+        """
+
+        return self._schedMod.getTaskIndex()[tid]

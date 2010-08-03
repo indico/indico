@@ -28,14 +28,27 @@ from MaKaC.common import db
 from MaKaC.common.logger import Logger
 
 
-from indico.modules.scheduler import SchedulerModule, base
+from indico.modules.scheduler import SchedulerModule, base, tasks
 from indico.modules.scheduler.slave import Worker
 from indico.util.date_time import nowutc, int_timestamp
 
 
 class Scheduler(object):
     """
+    A :py:class:`~indico.modules.scheduler.Scheduler` object provides a job scheduler
+    based on a waiting queue, that communicates with its clients through the database.
+    Things have been done in a way that the probability of conflict is minimized, and
+    operations are repeated in case one happens.
 
+    The entry point of the process consists of a 'spooler' that periodically takes
+    tasks out of a `conflict-safe` FIFO (spool) and adds them to an ``IOBTree``-based
+    waiting queue. The waiting queue is then checked periodically for the next task,
+    and when the time comes the task is executed.
+
+    Tasks are executed in different threads.
+
+    The :py:class:`~indico.modules.scheduler.Client` class works as a transparent
+    remote proxy for this class.
     """
 
     __instance = None
@@ -44,12 +57,17 @@ class Scheduler(object):
     _options = {
         # time to wait between cycles
         'sleep_interval': 10,
+
         # AWOL = Absent Without Leave
         # [0.0, 1.0) probability that after a Scheduler tick it will check for AWOL
         # tasks in the runningList the lower the number the lower the number of checks
         'awol_tasks_check_probability': 0.3,
+
         # seconds to consider a task AWOL
-        'awol_tasks_thresold': 6000
+        'awol_tasks_thresold': 6000,
+
+        # Number of times to try to run a task before aborting (min 1)
+        'task_max_tries': 10
         }
 
     def __init__(self, **config):
@@ -131,6 +149,8 @@ class Scheduler(object):
                 # it's actually a timestamp, task tuple
                 nextTS, nextTask = res
 
+                self._logger.info((nextTS, currentTimestamp))
+
                 # if it's time to execute the task
                 if  (nextTS <= currentTimestamp):
                     yield nextTS, nextTask
@@ -143,12 +163,16 @@ class Scheduler(object):
             self._readFromDb()
 
             # move the tasks in the spool to the waiting queue
-            self._processSpool()
+            try:
+                self._processSpool()
+            finally:
+                # this `finally` makes sure finished tasks are handled
+                # even if a shutdown order is sent
 
-            # process tasks that have finished meanwhile
-            # (tasks have been running in different threads, so, the sync
-            # thas was done above won't hurt)
-            self._checkFinishedTasks()
+                # process tasks that have finished meanwhile
+                # (tasks have been running in different threads, so, the sync
+                # thas was done above won't hurt)
+                self._checkFinishedTasks()
 
             # we also check AWOL tasks from time to time
             if random.random() < self._config.awol_tasks_check_probability:
@@ -163,6 +187,8 @@ class Scheduler(object):
         Check if there are any tasks that have finished recently, and
         need to be moved to the correct places
         """
+
+        self._logger.info("Checking finished tasks")
 
         for taskId, thread in self._runningThreads.items():
 
@@ -213,9 +239,9 @@ class Scheduler(object):
             with self._op.commit():
                 self._relaunchRunningListItems()
 
-                # iterate over the tasks in the waiting queue
-                # that should be running
 
+            # iterate over the tasks in the waiting queue
+            # that should be running
             for timestamp, curTask in self._iterateTasks():
                 # execute the "task cycle" for each new task
                 self._taskCycle(timestamp, curTask)
@@ -226,7 +252,6 @@ class Scheduler(object):
         except Exception, e:
             self._logger.error('Unexpected error')
             raise e
-
 
     def _taskCycle(self, timestamp, curTask):
 
@@ -243,7 +268,7 @@ class Scheduler(object):
 
         # Start a worker subprocess
         # Add it to the thread dict
-        self._runningThreads[curTask.id] = Worker(curTask.id)
+        self._runningThreads[curTask.id] = Worker(curTask.id, self._config)
         self._runningThreads[curTask.id].start()
 
     def _popFromSpool(self):
@@ -320,10 +345,10 @@ class Scheduler(object):
                 base.TASK_STATUS_FINISHED)
             task.tearDown()
 
-        # TODO
-        # Add periodic tasks back to the queue
-        #if isinstance(task, base.PeriodicTask):
-        #    Scheduler.addTask(self)
+        if isinstance(task, tasks.PeriodicTask):
+            with self._op.commit('taskIdx'):
+                task.setNextOccurrence()
+                SchedulerModule.getDBInstance().addTaskToWaitingQueue(task)
 
     def _notifyTaskFailed(self, task):
 

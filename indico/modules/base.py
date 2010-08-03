@@ -62,21 +62,24 @@ class ModuleHolder( ObjectHolder ):
         id = ObjectHolder._newId( self )
         return "%s"%id
 
-    def getById( self, id ):
+    def destroyById(self, moduleId):
+        del self._getIdx()[str(moduleId)]
+
+    def getById(self, moduleId):
         """returns an object from the index which id corresponds to the one
             which is specified.
         """
 
-        if type(id) is int:
-            id = str(id)
-        if self._getIdx().has_key(str(id)):
-            return self._getIdx()[str(id)]
-        elif self._availableModules.has_key(id):
-            newmod=self._availableModules[id]()
+        if type(moduleId) is int:
+            moduleId = str(moduleId)
+        if self._getIdx().has_key(str(moduleId)):
+            return self._getIdx()[str(moduleId)]
+        elif self._availableModules.has_key(moduleId):
+            newmod=self._availableModules[moduleId]()
             self.add(newmod)
             return newmod
         else:
-            raise MaKaCError( ("Module id %s does not exist") % str(id) )
+            raise MaKaCError( ("Module id %s does not exist") % str(moduleId) )
 
 
 class Module(Persistent):
@@ -97,5 +100,12 @@ class Module(Persistent):
         return self.id
 
     @classmethod
+    def destroyDBInstance(cls):
+        return ModuleHolder().destroyById(cls.id)
+
+    @classmethod
     def getDBInstance(cls):
+        """
+        Returns the module instance that is stored in the database
+        """
         return ModuleHolder().getById(cls.id)

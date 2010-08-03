@@ -100,7 +100,9 @@ class SchedulerModule(Module):
         return {
             'waiting': len(self._waitingQueue),
             'running': len(self._runningList),
-            'spooled': len(self._taskSpool)
+            'spooled': len(self._taskSpool),
+            'failed': self._failedIndex._num_docs() ,
+            'finished': self._finishedIndex._num_docs()
             }
 
     def getTaskById(self, taskId):

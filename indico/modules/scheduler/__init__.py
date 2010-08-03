@@ -18,6 +18,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+The ``scheduler`` module provides Indico with a scheduling API that allows specific jobs
+(tasks to be run at given times, with a certain repeatibility, if needed).
+"""
+
 from indico.modules.scheduler.module import SchedulerModule
 from indico.modules.scheduler.server import Scheduler
 from indico.modules.scheduler.client import Client

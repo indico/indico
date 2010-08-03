@@ -18,8 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.common.timezoneUtils import nowutc
-import time
+import time, pytz
 
-def int_timestamp(datetimeVal):
-    return int(time.mktime(datetimeVal.timetuple()))
+from MaKaC.common.timezoneUtils import nowutc
+
+def int_timestamp(datetimeVal, tz = pytz.timezone('UTC')):
+    return int(time.mktime(datetimeVal.astimezone(tz).timetuple()))

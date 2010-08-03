@@ -44,7 +44,6 @@ class TestZEOServer(Process):
         """
         Actually starts the server
         """
-        print "spawning server on PID %s" % self.pid
         self.server.main()
 
     def shutdown(self):
