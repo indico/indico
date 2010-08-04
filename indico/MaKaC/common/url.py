@@ -27,23 +27,23 @@ from MaKaC.errors import MaKaCError
 
 
 class URL:
-    """This class represents an internet URL and provides methods in order to 
+    """This class represents an internet URL and provides methods in order to
         handle it in an easy way; it encapsulates the encoding of the parameters
-        so clients don't need to worry about that. It also implements the 
+        so clients don't need to worry about that. It also implements the
         __str__ method which will allow to treat it as a simple string.
-       
+
        Attributes:
-        _base - (String) base url containing the protocol, hostname and path 
+        _base - (String) base url containing the protocol, hostname and path
             in a correct way
         _params - (Dict) parameters to be added to the URL
     """
-    
+
     def __init__( self, base, **params ):
         self._segment = ""
         self.setBase( base )
         self.setParams( params )
-        """ 
-            Spearator might need to be set to &amp; by default inorder to 
+        """
+            Spearator might need to be set to &amp; by default inorder to
             follow the W3C standard, but this seems to give problems in IE.
         """
         self._separator = "&"
@@ -59,12 +59,12 @@ class URL:
 
     def setSegment( self, newSegment ):
         self._segment = newSegment.strip()
-        
+
     def getSeparator(self):
         if not hasattr(self, "_separator"):
             self._separator = "&"
         return self._separator
-    
+
     def setSeparator(self, separator):
         self._separator = separator
 
@@ -85,7 +85,7 @@ class URL:
         if self._params.has_key( name.strip() ):
             del self._params[name.strip()]
 
-    def _encodeParamValue( self, value ): 
+    def _encodeParamValue( self, value ):
         return urllib.quote_plus( str( value ).strip() )
 
     def _getParamsURLForm( self ):
@@ -94,23 +94,23 @@ class URL:
             value = self._params[name]
             if type(value) == list or isinstance(value, UserList):
                 for v in value:
-                    l.append("%s=%s"%(name, self._encodeParamValue( v )))
+                    l.append(name + '=' + self._encodeParamValue( v ))
             else:
-                l.append("%s=%s"%(name, self._encodeParamValue( value )))
+                l.append(name + '=' + self._encodeParamValue( value ))
         return self._separator.join( l )
 
     def __str__( self ):
         params = self._getParamsURLForm()
-        if params.strip() != "":
-            params = "?%s"%self._getParamsURLForm()
+        if params.strip():
+            params = "?" + params
         segment = self.getSegment()
-        if segment != "":
-            segment = "#%s"%segment
-        return "%s%s%s"%( self.getBase(), params, segment )
+        if segment:
+            segment = "#" + segment
+        return self.getBase() + params + segment
 
 
 class MailtoURL:
-    
+
     def __init__( self, dest, **params ):
         self._destination = dest
         self.setSubject( params.get("subject", "") )
@@ -133,12 +133,12 @@ class MailtoURL:
             res = "%s?%s"%(res, params)
         return res
 
-            
+
 
 class ShortURLMapper(ObjectHolder):
-    
+
     idxName = "shorturl"
-    
+
     def add( self, tag, newItem ):
         if not tag:
             raise MaKaCError("Invalid tag for short URL : \"%s\""%tag)
@@ -147,7 +147,7 @@ class ShortURLMapper(ObjectHolder):
         tree = self._getIdx()
         tree[tag] = newItem
         return tag
-    
+
     def remove( self, item ):
         """removes the specified object from the index.
         """
@@ -155,6 +155,5 @@ class ShortURLMapper(ObjectHolder):
         if not tree.has_key( item.getUrlTag() ):
             return
         del tree[item.getUrlTag()]
-    
-        
-    
+
+
