@@ -135,6 +135,11 @@ class XMLGenerator(object):
             out.writeTag("line", _('This WebEx meeting is protected by a password'))
             out.closeTag("section")
         out.openTag("section")
+        out.writeTag("title", _('Title:'))
+        out.writeTag("line", booking._bookingParams["meetingTitle"])
+        out.closeTag("section")
+
+        out.openTag("section")
         out.writeTag("title", _('Agenda:'))
         out.writeTag("line", booking._bookingParams["meetingDescription"])
         out.closeTag("section")

@@ -660,19 +660,23 @@ class outputGenerator:
         out.openTag("session")
         out.writeTag("ID",session.getId())
 
-        if PluginsHolder().getPluginType("Collaboration").hasPlugin("WebEx") and PluginsHolder().getPluginType("Collaboration").getPlugin("WebEx").isActive():
-            Logger.get('RecMan').info("WebEx is active. Printing out list of WebEx bookings")
-            csbm = conf.getCSBookingManager()
-            bookings = csbm.getBookingList(filterByType = "WebEx", notify = False, onlyPublic = True)
-            bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
-            for b in bookings:
-                Logger.get('WebEx').info("Session for booking %s, session id: %s " % ( str(b._getTitle()), str(b.getSessionId()) ) )
-                if session.getId() == b.getSessionId():
-                    Logger.get('WebEx').info("Found matching session for video booking!, session id: %s " % ( b.getSessionId() ) )
-                    out.openTag("videoBooking")
-                    out.writeTag("videoBookingTitle",b._getTitle())
-                    out.writeTag("videoBookingUrl",b.getURL())
-                    out.closeTag("videoBooking")
+        # The following code prints out the video bookings associated with a particular session
+        csbm = conf.getCSBookingManager()
+        pluginsWithSessionBookings = csbm.getEventSessionDisplayPlugins()
+        for pluginName in pluginsWithSessionBookings:
+            if PluginsHolder().hasPluginType("Collaboration") and PluginsHolder().getPluginType("Collaboration").hasPlugin(pluginName) and PluginsHolder().getPluginType("Collaboration").getPlugin(pluginName).isActive():
+                Logger.get('output.py-Printing Sessions').info("%s is active. Printing out list of bookings" % pluginName)
+                bookings = csbm.getBookingList(filterByType = "WebEx", notify = False, onlyPublic = True)
+                bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
+                for b in bookings:
+                    #Logger.get('WebEx').info("Session for booking %s, session id: %s " % ( str(b._getTitle()), str(b.getSessionId()) ) )
+                    if session.getId() == b.getSessionId():
+                        #Logger.get('WebEx').info("Found matching session for video booking!, session id: %s " % ( b.getSessionId() ) )
+                        out.openTag("videoBooking")
+                        out.writeTag("videoBookingTitle",b._getTitle())
+                        out.writeTag("videoBookingUrl",b.getURL())
+                        out.writeTag("videoBookingType",pluginName)
+                        out.closeTag("videoBooking")
 
 
         out.writeTag("parentProtection", simplejson.dumps(session.getAccessController().isProtected()))

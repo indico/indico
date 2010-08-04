@@ -626,6 +626,22 @@ class CSBookingManager(Persistent, Observer):
                 Logger.get('VideoServ').exception("Exception while deleting a booking of type %s after deleting an event: %s" % (booking.getType(), str(e)))
 
 
+    def getEventSessionDisplayPlugins(self, sorted = False):
+        """ Returns a list of names (strings) of plugins which have been configured
+            as showing bookings in the event display page under a specific session, and which have bookings
+            already (or previously) created in the event.
+            (does not check if the bookings are hidden or not)
+        """
+
+        pluginsWithEventSessionDisplay = CollaborationTools.pluginsWithEventSessionDisplay()
+        l = []
+        for pluginName in self._bookingsByType:
+            if pluginName in pluginsWithEventSessionDisplay:
+                l.append(pluginName)
+        if sorted:
+            l.sort()
+        return l
+
     def getEventDisplayPlugins(self, sorted = False):
         """ Returns a list of names (strings) of plugins which have been configured
             as showing bookings in the event display page, and which have bookings
@@ -716,6 +732,7 @@ class CSBookingBase(Persistent, Fossilizable):
     _commonIndexes = []
     _hasStartDate = True
     _hasEventDisplay = False
+    _hasEventSessionDisplay = False
     _hasTitle = False
     _adminOnly = False
 
@@ -1365,6 +1382,12 @@ class CSBookingBase(Persistent, Fossilizable):
             an event display page
         """
         return self._hasEventDisplay
+
+    def hasEventSessionDisplay(self):
+        """ Returns if the type of this booking should display something on
+            an event display page
+        """
+        return self._hasEventSessionDisplay
 
     def isAdminOnly(self):
         """ Returns if this booking / this booking's plugin pages should only be displayed

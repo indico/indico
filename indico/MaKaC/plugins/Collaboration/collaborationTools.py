@@ -29,6 +29,8 @@ from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
     IQueryResultFossil
 from MaKaC.fossils.conference import IConferenceFossil
 
+from MaKaC.common.logger import Logger
+
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
     """
@@ -281,6 +283,23 @@ class CollaborationTools(object):
         for pluginName in cls.getCollaborationPluginType().getPlugins():
             if cls.getCSBookingClass(pluginName)._hasEventDisplay:
                 l.append(pluginName)
+        return l
+
+    @classmethod
+    def pluginsWithEventSessionDisplay(cls):
+        """ Utility function that returns a list of strings with the names of the
+            collaboration plugins that want to display something in event display pages
+        """
+        l = []
+        for pluginName in cls.getCollaborationPluginType().getPlugins():
+            Logger.get('Found plugins').info("pluginName = %s" % ( pluginName ) )
+            try:
+                if cls.getCSBookingClass(pluginName)._hasEventSessionDisplay:
+                    Logger.get('Found plugins').info("%s has session display" % ( pluginName ) )
+                    l.append(pluginName)
+            except AttributeError, err:
+                Logger.get('Found plugins').info("AttributeError on pluginName = %s" % ( pluginName ) )
+                pass
         return l
 
     @classmethod

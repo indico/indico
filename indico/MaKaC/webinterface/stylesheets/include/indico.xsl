@@ -157,7 +157,7 @@
           <xsl:for-each select="./videoBooking">
             <tr>
               <td class="leftCol">
-                Video Booking
+                <xsl:value-of select="./videoBookingType"/>:
               </td>
               <td>
                  <span class="videoBooking" >
