@@ -838,7 +838,7 @@ class SlotSchedule(TimeSchedule):
            entriesList: list of entries for applying the diff"""
         if diff is not None:
             for entry in entriesList:
-                entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
+                entry.setStartDate(entry.getStartDate()+diff, check=2, moveEntries=1)
 
 class PosterSlotSchedule(SlotSchedule):
 
@@ -1279,6 +1279,9 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         elif check == 2:
             if self.getSchedule() and self.getSchedule().isOutside(self):
                 self.synchro()
+                # syncrho is not modifying the dates of the session slot. Fit does.
+                if isinstance(self.getSchedule(), SlotSchedule):
+                    self.getSchedule().getOwner().fit()
         if moveEntriesBelow == 1 and self.getSchedule():
             diff = (self.getStartDate() - oldStartDate) + (self.getDuration() - oldDuration)
             self.getSchedule().moveEntriesBelow(diff, entriesList)
@@ -1365,7 +1368,6 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         self.notifyModification()
 
     def setStartDate(self, newDate,check=2, moveEntries=0):
-
 #        try:
 #            tz = str(newDate.tzinfo)
 #        except:
@@ -1376,22 +1378,38 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                 if check==1:
                     raise ParentTimingError( _("The break \"%s\" cannot start before (%s) its parent (%s)")%\
                         (self.getTitle(), \
-                        newDate.strftime('%Y-%m-%d %H:%M'),\
-                        owner.getStartDate().strftime('%Y-%m-%d %H:%M')),\
+                        newDate.astimezone(timezone(self.getTimezone())).strftime('%Y-%m-%d %H:%M'),\
+                        owner.getAdjustedStartDate().strftime('%Y-%m-%d %H:%M')),\
                         "Break")
                 elif check==2:
                     # update the schedule
                     owner.setStartDate(newDate, check)
+                    ContextManager.get('autoOps').append((self, "OWNER_START_DATE_EXTENDED",
+                                                          owner, owner.getAdjustedStartDate()))
             if newDate > owner.getEndDate():
                 if check==1:
                     raise ParentTimingError("The break cannot start after (%s) its parent ends (%s)"%\
-                        (newDate.strftime('%Y-%m-%d %H:%M'),\
-                        owner.getEndDate().strftime('%Y-%m-%d %H:%M')),\
+                        (newDate.astimezone(timezone(self.getTimezone())).strftime('%Y-%m-%d %H:%M'),\
+                        owner.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M')),\
                          _("Break"))
                 elif check==2:
                     # update the schedule
                     owner.setEndDate(newDate,check)
+                    ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          owner, owner.getAdjustedEndDate()))
         IndTimeSchEntry.setStartDate(self, newDate,check)
+        # Check that after modifying the start date, the end date is still within the limits of the slot
+        if self.getSchedule() and self.getDuration() and self.getEndDate() > owner.getEndDate():
+            if check==1:
+                raise ParentTimingError("The break cannot end after (%s) its parent ends (%s)"%\
+                        (self.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M'),\
+                        owner.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M')),\
+                         _("Break"))
+            elif check==2:
+                # update the schedule
+                owner.setEndDate(self.getEndDate(),check)
+                ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          owner, owner.getAdjustedEndDate()))
         self.notifyModification()
 
     def setColor(self,newColor):

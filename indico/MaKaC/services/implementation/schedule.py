@@ -27,6 +27,7 @@ from MaKaC.fossils.contribution import IContributionParticipationTTMgmtFossil, I
 from MaKaC.fossils.conference import IConferenceParticipationFossil,\
     ISessionFossil
 from MaKaC.common import timezoneUtils
+from MaKaC.common.Conversion import Conversion
 
 import time, datetime, pytz, copy
 
@@ -401,6 +402,7 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._title = pManager.extract("title", pType=str)
         self._description = pManager.extract("description", pType=str,
                                           allowEmpty=True)
+        self._oldId = None
 
     def _performOperation(self):
 
@@ -417,11 +419,17 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
 
         fossilizedDataSlotSchEntry = self._getSlotEntry()
         fossilizedData = self._brk.fossilize(IBreakTimeSchEntryMgmtFossil, tz=self._conf.getTimezone())
-        return {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
+
+        res = {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': fossilizedData['id'],
                 'slotEntry': fossilizedDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps()),
                 'entry': fossilizedData}
+
+        if self._oldId and self._oldId != Conversion.locatorString(self._schEntry)+"b"+self._schEntry.getId():
+            res['oldId'] = self._oldId
+
+        return res
 
 class ConferenceScheduleAddBreak(ScheduleEditBreakBase, conferenceServices.ConferenceModifBase):
 
@@ -478,10 +486,12 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleEditBreakBase._checkParams(self)
         self._brk = self._schEntry
+        self._oldStartDate = self._schEntry.getStartDate().date()
+        self._oldId = Conversion.locatorString(self._schEntry)+"b"+self._schEntry.getId()
 
     def _addToSchedule(self, b):
         # if the schedule target day is different from the current
-        if self._schEntry.getStartDate().date() != self._dateTime.date():
+        if self._oldStartDate != self._dateTime.date():
 
             # remove the entry
             self._schEntry.getSchedule().removeEntry(self._schEntry)
@@ -538,6 +548,7 @@ class ModifyStartEndDate(ScheduleOperation):
         self._reschedule = pManager.extract("reschedule", pType=bool)
 
     def _performOperation(self):
+
 
         checkFlag = self._getCheckFlag()
 

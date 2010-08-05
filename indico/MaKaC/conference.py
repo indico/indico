@@ -7050,7 +7050,7 @@ class SessionSlot(Persistent, Fossilizable):
             st = self.getStartDate()
             entries = self.getSchedule().getEntries()[:]
             for entry in entries:
-                entry.setStartDate(st,1,0)
+                entry.setStartDate(st,0,0)
                 # add diff to last item end date if and only if the item is
                 # not a break
                 #if not isinstance(entry, BreakTimeSchEntry):
@@ -8739,6 +8739,18 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
                     _("Contribution"))
             if check == 2:
                 owner.setEndDate(sDate+self.getDuration(),check)
+        # Check that after modifying the start date, the end date is still within the limits of the slot
+        if self.getDuration() and sDate + self.getDuration() > owner.getEndDate():
+            if check==1:
+                raise ParentTimingError("The contribution cannot end after (%s) its parent ends (%s)"%\
+                        (self.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M'),\
+                        owner.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M')),\
+                         _("Contribution"))
+            elif check==2:
+                # update the schedule
+                owner.setEndDate(sDate + self.getDuration(),check)
+                ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          owner, owner.getAdjustedEndDate()))
 
     def setStartDate(self, newDate, check=2, moveEntries=0):
         """check parameter:

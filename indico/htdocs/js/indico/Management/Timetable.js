@@ -865,8 +865,11 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                           //if we are moving the result to the top timetable we don't need the session slot
                           if(self.dayChanged && exists(result.slotEntry)) {
                               result.slotEntry = null;
+                              self.managementActions.timetable._updateMovedEntry(result, result.oldId);
+                          }else {
+                              self.managementActions.timetable._updateEntry(result, result.id);
                           }
-                          self.managementActions.timetable._updateMovedEntry(result, args.get('scheduleEntryId'));
+
                           self.close();
                       }
              });

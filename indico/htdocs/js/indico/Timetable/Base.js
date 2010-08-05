@@ -756,15 +756,14 @@ type("ManagementTimeTable",["TimeTable"], {
 
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
-
         this.menu = Html.div({style: {cssFloat: 'right', color: '#777'}},
                              this.getTTMenu(),
                              this.addMenuLink,
                              this.addIntervalLink,
-                             this.separator,
-                             this.rescheduleLink,
-                             this.separator2,
-                             this.fitInnerTimetableLink);
+                             this.contextInfo.isPoster?null:this.separator,
+                             this.contextInfo.isPoster?null:this.rescheduleLink,
+                             this.contextInfo.isPoster?null:this.separator2,
+                             this.contextInfo.isPoster?null:this.fitInnerTimetableLink);
         return Html.div({}, this.warningArea, Html.div('clearfix', this.menu, this.infoBox));
     }
 },
@@ -844,8 +843,9 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         // AutoOp Warnings (before updates are done)
         this._processAutoOps(result);
 
-        // Deletes the old version of the entry
-        var oldEntries = this._deleteOldEntry(data, result, oldEntryId);
+        // Deletes the old version of the entry and temporarily
+        // stores the entry contents to be used later on this function
+        var oldContent = this._deleteOldEntry(data, result, oldEntryId);
 
         // Here's the update cycle
         if (updateCycle) {
@@ -857,9 +857,10 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
             data[result.day][result.id] = result.entry;
 
             // A session interval may contain entries, that
-            // should be preserved
-            if (oldEntries) {
-                data[result.day][result.id].entries = oldEntries;
+            // should be preserved (e.g. content (contribs, breaks) of
+            // the slot).
+            if (oldContent) {
+                data[result.day][result.id].entries = result.entry.entryType == "Session"?result.entry.entries:oldContent;
             }
 
             // If a session slot is added, let's update the list of sessions
@@ -879,6 +880,16 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         this.timetableDrawer.redraw();
     },
 
+    /**
+     * updateDay should be used when all the entries for a given day will be changed by the
+     * info received in 'result'.
+     *
+     * result must contain:
+     *
+     *     result.id: string with a given day, e.g. "20100828"
+     *     result.entry: all entries for a given day
+     *
+     */
     _updateDay: function(result) {
 
         this._processAutoOps(result);
@@ -886,9 +897,20 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         var data = this.getData();
 
         var entry = {};
-        entry[result.id] = result.entry;
+        entry[result.id] = result.entry; // entry contains a whole day
 
         extend(data, entry);
+
+        if (exists(result.session)) {
+            this.eventInfo.sessions[result.session.id] = result.session;
+        }
+
+        // Check if the result overflows the conference ending time
+        if ((result.day == this.eventInfo.endDate.date.replaceAll('-','')) &&
+            (result.entry.endDate.time.replaceAll(':','') >
+             this.eventInfo.endDate.time.replaceAll(':',''))) {
+            this.eventInfo.endDate.time = result.entry.endDate.time;
+        }
 
         this.timetableDrawer.redraw();
     },
@@ -1036,13 +1058,43 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
         });
     },
 
+    /**
+     * updateDay should be used when all the entries for a given slot will be changed by the
+     * info received in 'result'.
+     *
+     * result must contain:
+     *
+     *     result.id: string with a given day, e.g. "20100828"
+     *     result.entry: all entries for a given slot
+     *     result.slotEntry: info about the slot
+     *     result.session: info about the session
+     *
+     */
     _updateDay: function(result) {
 
         this._processAutoOps(result);
 
+        var slot = this.contextInfo;
+        var day = result.id;
         var data = this.getData();
 
         extend(data, result.entry);
+
+        if (exists(result.session)) {
+            this.parentTimetable.eventInfo.sessions[result.session.id] = result.session;
+        }
+
+        if (exists(result.slotEntry)) {
+
+            // Save the entries, otherwise they are lost
+            result.slotEntry.entries = slot.entries;
+            this.parentTimetable.data[result.day][result.slotEntry.id] = result.slotEntry;
+            this.contextInfo = result.slotEntry;
+
+            // Update the times for the slot
+            this._updateTimes(result.slotEntry.startDate.time,
+                              result.slotEntry.endDate.time);
+        }
 
         this.timetableDrawer.redraw();
     },
