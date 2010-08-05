@@ -25,18 +25,6 @@ TASK_STATUS_NONE, TASK_STATUS_SPOOLED, TASK_STATUS_QUEUED, TASK_STATUS_RUNNING, 
 TASK_STATUS_FAILED, TASK_STATUS_ABORTED, TASK_STATUS_FINISHED = range(0,7)
 
 # threading vs. multiprocessing
-_MT_MODE = 'THREAD'
-
-if _MT_MODE == 'THREAD':
-    import threading
-    _MT_MODULE = threading
-    _MT_UNIT = threading.Thread
-elif _MT_MODE == 'PROCESS':
-    import multiprocessing
-    _MT_MODULE = multiprocessing
-    _MT_UNIT = multiprocessing.Process
-    raise Exception('Still not functional!')
-###
 
 CONFLICTERROR_MAX_RETRIES = 10
 

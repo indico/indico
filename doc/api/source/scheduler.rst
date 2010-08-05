@@ -28,7 +28,7 @@ But also poses some problems such as:
 
 We tried to mitigate these problems by using conflict-free lightweight data structures.
 
-The `Scheduler` is the element that is responsible for accepting new tasks and prioritizing them by execution time, launching new processes/threads as they need to be executed. Logs of the operations are kept, and
+The `Scheduler` is the element that is responsible for accepting new tasks and prioritizing them by execution time, launching new processes/threads as they need to be executed. Logs of the operations are kept.
 
 A `Client` is basically a proxy object that allows operations to be performed on the `Scheduler` and its tasks in a transparent way.
 

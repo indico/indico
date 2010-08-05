@@ -29,7 +29,7 @@ from MaKaC.common.logger import Logger
 
 
 from indico.modules.scheduler import SchedulerModule, base, tasks
-from indico.modules.scheduler.slave import Worker
+from indico.modules.scheduler.slave import ProcessWorker, ThreadWorker
 from indico.util.date_time import nowutc, int_timestamp
 
 
@@ -55,6 +55,9 @@ class Scheduler(object):
 
     # configuration options
     _options = {
+        # either 'threads' or 'processes'
+        'multitask_mode': 'threads',
+
         # time to wait between cycles
         'sleep_interval': 10,
 
@@ -149,7 +152,7 @@ class Scheduler(object):
                 # it's actually a timestamp, task tuple
                 nextTS, nextTask = res
 
-                self._logger.info((nextTS, currentTimestamp))
+                self._logger.debug((nextTS, currentTimestamp))
 
                 # if it's time to execute the task
                 if  (nextTS <= currentTimestamp):
@@ -198,18 +201,19 @@ class Scheduler(object):
 
                 # let's check if it was successful or not
                 # and write it in the db
-                if thread.success:
+                if thread.getResult() == True:
                     self._notifyTaskFinished(task)
-                elif thread.success == False:
+                elif thread.getResult() == False:
                     self._notifyTaskFailed(task)
                 else:
                     # something weird happened
                     self._logger.warning("task %s finished, but the return value "
                                          "was %s" %
-                                         (task, thread.success))
+                                         (task, thread.getResult()))
 
                 # delete the entry from the dictionary
                 del self._runningThreads[taskId]
+                thread.join()
 
     def _printStatus(self, mode='debug'):
         """
@@ -250,7 +254,7 @@ class Scheduler(object):
             self._logger.info('Scheduler was shut down: %s' % e)
             return 0
         except Exception, e:
-            self._logger.error('Unexpected error')
+            self._logger.exception('Unexpected error')
             raise e
 
     def _taskCycle(self, timestamp, curTask):
@@ -268,7 +272,12 @@ class Scheduler(object):
 
         # Start a worker subprocess
         # Add it to the thread dict
-        self._runningThreads[curTask.id] = Worker(curTask.id, self._config)
+
+        if self._config.multitask_mode == 'processes':
+            wclass = ProcessWorker
+        else:
+            wclass = ThreadWorker
+        self._runningThreads[curTask.id] = wclass(curTask.id, self._config)
         self._runningThreads[curTask.id].start()
 
     def _popFromSpool(self):

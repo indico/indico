@@ -31,7 +31,7 @@ This module defines the TestRunners that are included by default by indico.tests
 """
 
 # System modules
-import commands, os, socket, subprocess, tempfile, threading
+import commands, os, socket, subprocess, tempfile, threading, multiprocessing
 
 # Python stdlib
 import time, urllib2
@@ -132,8 +132,11 @@ class LogToConsoleTestOption(Option):
 
         logger.setLevel(getattr(logging, self.value))
 
+        # add multiprocessing info
+        multiprocessing.get_logger().addHandler(h)
+
         logger.addHandler(h)
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter("[%(process)d] %(asctime)s - %(name)s - %(levelname)s - %(message)s")
         h.setFormatter(formatter)
 
     def shouldExecute(self):
