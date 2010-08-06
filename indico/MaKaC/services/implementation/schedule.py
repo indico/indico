@@ -11,7 +11,8 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.schedule import IConferenceScheduleDisplayFossil
 
-from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError
+from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError,\
+    NoReportError
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
@@ -28,6 +29,7 @@ from MaKaC.fossils.conference import IConferenceParticipationFossil,\
     ISessionFossil
 from MaKaC.common import timezoneUtils
 from MaKaC.common.Conversion import Conversion
+from MaKaC.schedule import BreakTimeSchEntry
 
 import time, datetime, pytz, copy
 
@@ -1034,6 +1036,9 @@ class MoveEntryBase(ScheduleOperation):
             if sessionId != "conf":
                 # Moving inside a session
                 session = self._conf.getSessionById(sessionId)
+
+                if session.getScheduleType() == "poster" and isinstance(self._schEntry, BreakTimeSchEntry):
+                    raise NoReportError("ERR-S5", _("It is not possible to move a break inside a poster session"))
 
                 if session is not None:
                     slot = session.getSlotById(sessionSlotId)
