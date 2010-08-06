@@ -934,11 +934,12 @@ class ScheduleContributions(ScheduleOperation):
 
             contrib = self._getContributionId(contribId)
 
-            self._handlePosterContributions(contrib)
+            isPoster = self._handlePosterContributions(contrib)
 
-            d = self._target.getSchedule().calculateDayEndDate(self._date)
+            if not isPoster:
+                d = self._target.getSchedule().calculateDayEndDate(self._date)
+                contrib.setStartDate(d)
 
-            contrib.setStartDate(d)
             schEntry = contrib.getSchEntry()
 
             self._target.getSchedule().addEntry(schEntry, check = self._getCheckFlag())
@@ -972,6 +973,9 @@ class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.Se
     def _handlePosterContributions(self, contrib):
         if self._slot.getSession().getScheduleType() == "poster":
             contrib.setStartDate(self._slot.getStartDate())
+            contrib.setDuration(dur=self._slot.getDuration())
+            return True
+        return False
 
     def _getSlotEntry(self):
 
@@ -1039,6 +1043,12 @@ class MoveEntryBase(ScheduleOperation):
                         self._schEntry.getSchedule().removeEntry(self._schEntry)
                         if isinstance(owner, conference.Contribution):
                             owner.setSession(session)
+                        if session.getScheduleType() == "poster":
+                            self._schEntry.setStartDate(slot.getStartDate())
+                            self._schEntry.setDuration(dur=slot.getDuration())
+                        else:
+                            self._schEntry.setStartDate(slot.getSchedule().calculateEndDate())
+                            self._schEntry.setDuration(dur=session.getContribDuration())
                         # add it to new container
                         slot.getSchedule().addEntry(self._schEntry, check=2)
                         fossilizedDataSlotSchEntry = slot.getConfSchEntry().fossilize(entriesFossilsDict, tz=self._conf.getTimezone())

@@ -29,13 +29,13 @@
 
         </tr>
         <%end%>
+    <% if sessionType != 'poster': %>
 	<tr>
 	  <td style="text-align: right;">
 	    <span class="titleCellFormat"><%= _("Date/Time")%></span>
 	  </td>
 	  <td><span id="dateTime"></span></td>
 	</tr>
-    <% if sessionType != 'poster': %>
 	<tr>
 	  <td style="text-align: right;">
 	    <span class="titleCellFormat"><%= _("Duration")%></span>
@@ -43,7 +43,8 @@
 	  <td><span id="duration"></span></td>
 	</tr>
     <% end %>
-        <% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, parentRoomInfo=roomInfo(self._rh._target, level='inherited'), showParent=True) %>
+
+    <% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, parentRoomInfo=roomInfo(self._rh._target, level='inherited'), showParent=True) %>
 
 
 	%(Board)s
@@ -68,9 +69,11 @@
 <script type="text/javascript">
 
 <% if contrib.isScheduled(): %>
-var dateTime = IndicoUI.Widgets.Generic.dateField(true, {name: 'dateTime'});
-dateTime.set('<%= dateTime %>');
-$E('dateTime').set(dateTime)
+    <% if sessionType != 'poster': %>
+        var dateTime = IndicoUI.Widgets.Generic.dateField(true, {name: 'dateTime'});
+        dateTime.set('<%= dateTime %>');
+        $E('dateTime').set(dateTime)
+    <% end %>
 <% end %>
 <% else: %>
 $E('dateTime').set('Not scheduled')

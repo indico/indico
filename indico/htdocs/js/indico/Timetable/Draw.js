@@ -859,7 +859,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     style: {fontWeight: 'normal'}},
                     value.title) :
                     Html.span({}, value.title);
-                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.r || self.eventData.isPoster ? '-' : value.startDate.time.substr(0,5)),
+                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.r || self.eventData.isPoster ? '' : value.startDate.time.substr(0,5)),
                                              Html.td('timetablePopupContributionTitle', element)));
             }
         });

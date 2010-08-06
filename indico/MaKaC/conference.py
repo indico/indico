@@ -7161,6 +7161,9 @@ class SessionSlot(Persistent, Fossilizable):
             self._contributionDuration = timedelta(hours=hour,minutes=min)
 
     def getContribDuration(self):
+        """
+        Duration by default for contributions within the slots.
+        """
         try:
             if self._contributionDuration:
                 pass

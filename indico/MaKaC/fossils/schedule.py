@@ -257,6 +257,11 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
         """ Entry Conference id """
     getConferenceId.produce = lambda s: s.getOwner().getConference().getId()
 
+    def getContribDuration(self):
+        """ Default duration for contribs """
+    getContribDuration.produce = lambda s: s.getOwner().getSession().getContribDuration()
+    getContribDuration.convert = Conversion.timedelta
+
 
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
 

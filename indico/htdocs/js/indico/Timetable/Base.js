@@ -724,11 +724,17 @@ type("ManagementTimeTable",["TimeTable"], {
 
         this.infoBox = Html.div({className: 'timetableInfoBox'});
 
-        this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
-
-        this.addMenuLink.observeClick(function() {
-            self.managementActions._openAddMenu(self.addMenuLink, self.contextInfo);
-        });
+        if (this.contextInfo.isPoster) {
+            this.addMenuLink = Html.a({className: 'fakeLink', style: {margin: '0 15px'}}, 'Add poster');
+            this.addMenuLink.observeClick(function() {
+                self.managementActions.addContribution();
+            });
+        }else {
+            this.addMenuLink = Html.a({className: 'dropDownMenu fakeLink', style: {margin: '0 15px'}}, 'Add new');
+            this.addMenuLink.observeClick(function() {
+                self.managementActions._openAddMenu(self.addMenuLink, self.contextInfo);
+            });
+        }
 
         this.separator = Html.span({}, " | ");
 

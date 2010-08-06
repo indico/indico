@@ -337,7 +337,13 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
         var startTimeLine, daySelect, datecomponent;
 
-        if (conferenceDays) {
+        // in case of poster sessions
+        if (exists(this.timetable) && this.args.session && this.timetable.isPoster) {
+            daySelect = [];
+            startTimeLine = [];
+            this.info.set('duration', self.timeField);
+            this.info.set('startDate', Util.formatDateTime(this.timetable.contextInfo.startDate, IndicoDateTimeFormats.Server));
+        } else if (conferenceDays) {
 
             var timeTranslation = {
                 toTarget: function (value) {
@@ -357,16 +363,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             $B(info.accessor('startDate'), self.startTimeField, timeTranslation);
             $B(info.accessor('duration'), self.timeField);
 
-            datecomponent = [$T('Date/Time'), conferenceDays];
             self.parameterManager.add(self.startTimeField, 'time', false);
             self.parameterManager.add(self.timeField, 'unsigned_int', false);
 
         } else {
-            startTimeLine = [$T(' Duration '), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.timeField, $T('min'))];
             daySelect = [];
-
+            startTimeLine = [$T(' Duration '), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.timeField, $T('min'))];
             $B(info.accessor('duration'), self.timeField);
-            datecomponent = [$T('Duration'), self.timeField];
+            self.parameterManager.add(self.timeField, 'unsigned_int', false);
         }
         return IndicoUtil.createFormFromMap(
             [
@@ -376,8 +380,8 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                        info.accessor('title'))
                 ],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
-                this.timetable.isPoster?Html.div({}):daySelect,
-                this.timetable.isPoster?Html.div({}):startTimeLine,
+                daySelect,
+                startTimeLine,
                 [$T('Presenter(s)'), presListWidget.draw()]
             ]);
 
@@ -510,7 +514,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
         addButton.observeClick(function(){
             //check if the day changed
-            if(self.timetable &&
+            if(self.timetable && !self.timetable.isPoster &&
                Util.formatDateTime(conferenceDays.get(), IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) !=
                self.previousDate.substr(0,10)){
                 self.dayChanged = true;
@@ -542,6 +546,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
       */
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
               confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc) {
+
          this.args = clone(args);
 
          this.dateArgs = clone(args);
@@ -564,14 +569,21 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
          if (this.timeStartMethod === null) {
              args.schedule = false;
          }
+         // if it is a poster, we do not need to query for the start date. We need this 'if' after
+         // the previous 'if (this.timeStartMethod === null)' because the contribution needs to be scheduled anyways.
+         if (this.args.session && this.timetable.isPoster) {
+             this.timeStartMethod = null;
+         }
 
          var attributes = {
                  style: {
                      width: '50px'
                  }
              };
+
          this.startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
-         this.timeField = IndicoUI.Widgets.Generic.durationField(this.timetable.isPoster?1:20);
+         var durationDefault = this.args.session?(this.timetable.isPoster?this.timetable.contextInfo.duration:this.timetable.contextInfo.contribDuration):20;
+         this.timeField = IndicoUI.Widgets.Generic.durationField(durationDefault);
 
          var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
 
