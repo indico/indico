@@ -21,7 +21,7 @@
 import copy
 import logging
 import time
-import dateutil
+from dateutil import rrule
 
 from datetime import timedelta
 from pytz import timezone
@@ -64,6 +64,9 @@ class BaseTask(Persistent, Fossilizable):
         self.id = None
         self.reset()
 
+        self.startedOn = None
+        self.endedOn = None
+
     def reset(self):
         '''Resets a task to its state before being run'''
 
@@ -71,28 +74,33 @@ class BaseTask(Persistent, Fossilizable):
         self.onRunningListSince = None
         self.status = base.TASK_STATUS_NONE
 
+    # Time methods
+
     def getCreatedOn(self):
         return self.createdOn
 
-    def getStartOn(self):
-        """
-        To be overloaded
-        """
+    def getEndedOn(self):
+        return self.endedOn
 
-    def getLastFinishedOn(self):
-        """
-        To be overloaded
-        """
+    def setEndedOn(self, dateTime):
+        self.endedOn = dateTime
+
+    def getStartedOn(self):
+        return self.startedOn
 
     def setOnRunningListSince(self, sometime):
         self.onRunningListSince = sometime
         self._p_changed = 1
 
+    def getOnRunningListSince(self):
+        return self.onRunningListSince
+
+
     def setStatus(self, newstatus):
         self.status = newstatus
 
-    def getOnRunningListSince(self):
-        return self.onRunningListSince
+    def getStatus(self):
+        return self.status
 
     def getId(self):
         return self.id
@@ -142,13 +150,13 @@ class BaseTask(Persistent, Fossilizable):
 
 
 class OneShotTask(BaseTask):
-    '''Tasks that are executed only once'''
-    def __init__(self, startDateTime):
-        super(OneShotTask, self).__init__()
+    """
+    Tasks that are executed only once
+    """
 
+    def __init__(self, startDateTime, expiryDate = None):
+        super(OneShotTask, self).__init__(expiryDate = expiryDate)
         self.startDateTime = startDateTime
-        self.startedOn = None
-        self.endedOn = None
 
     def getStartOn(self):
         return self.startDateTime
@@ -156,20 +164,6 @@ class OneShotTask(BaseTask):
     def setStartOn(self, newtime):
         self.startDateTime = newtime
 
-    def getEndedOn(self):
-        return self.endedOn
-
-    def setEndedOn(self, dateTime):
-        self.endedOn = dateTime
-
-    def getStartedOn(self):
-        return self.startedOn
-
-    def getRunOn(self):
-        return self.runOn
-
-    def getLastFinishedOn(self):
-        return self.getEndedOn()
 
 class PeriodicTask(BaseTask):
     """
@@ -182,10 +176,12 @@ class PeriodicTask(BaseTask):
         """
         super(PeriodicTask, self).__init__()
 
-        self.frequency = frequency
-        self.interval = kwargs
-        self.nextOccurrence = None
+        self._frequency = frequency
+        self._interval = kwargs
+        self._nextOccurrence = None
         self._lastFinishedOn = None
+        self._occurrences = []
+        self._repeat = True
 
     def start(self):
         super(PeriodicTask, self).start()
@@ -198,32 +194,52 @@ class PeriodicTask(BaseTask):
         self.reset()
 
     def setNextOccurrence(self):
-        l = list(dateutil.rrule.rrule(
-            self.frequency,
+        l = list(rrule.rrule(
+            self._frequency,
             dtstart = nowutc(),
             count = 1,
-            **self.interval
+            **self._interval
             ))
 
         if l:
-            self.nextOccurrence = l[0]
+            self._nextOccurrence = l[0]
         else:
             return None
 
     def getStartOn(self):
         # if it's the first time, compute the next occurrence
-        if not self.nextOccurrence:
+        if not self._nextOccurrence:
             self.setNextOccurrence()
 
-        return self.nextOccurrence
+        return self._nextOccurrence
 
     def getLastFinishedOn(self):
         return self._lastFinishedOn
+
+    def addOccurrence(self, occurrence):
+        self._occurrences.append(occurrence)
+
+    def dontComeBack(self):
+        self._repeat = False
+
+    def shouldComeBack(self):
+        return self._repeat
 
 
 class PeriodicUniqueTask(PeriodicTask):
     '''Singleton periodic tasks: no two or more PeriodicUniqueTask of this
     class will be queued or running at the same time'''
+
+
+class TaskOccurrence(Persistent, Fossilizable):
+    """
+    Wraps around a PeriodicTask object, and represents an occurrence of this task
+    """
+
+    def __init__(self, task):
+        self._task = task
+        self._startedOn = task.getStartedOn()
+        self._endedOn = task.getEndedOn()
 
 
 class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
@@ -255,7 +271,6 @@ class FoundationSyncTask(PeriodicUniqueTask):
     def run(self):
         from MaKaC.common.FoundationSync.foundationSync import FoundationSync
         FoundationSync().doAll()
-
 
 
 class SendMailTask(OneShotTask):

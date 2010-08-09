@@ -27,7 +27,7 @@ from BTrees.Length import Length
 from MaKaC.trashCan import TrashCanManager
 
 from indico.modules import Module
-from indico.modules.scheduler import base
+from indico.modules.scheduler import base, tasks
 from indico.util.struct.queue import PersistentWaitingQueue
 from indico.util.date_time import int_timestamp
 from indico.core.index import IntFieldIndex
@@ -123,30 +123,33 @@ class SchedulerModule(Module):
 
         return True
 
-    def moveTaskFromRunningList(self, task, status, nocheck=False):
+    def moveTask(self, task, moveFrom, status, nocheck = False):
         """
         Remove a task from the running list
         """
 
         #if not nocheck:
-        #    self._assertTaskStatus(task, base.TASK_STATUS_RUNNING)
+        #    self._assertTaskStatus(task, moveFrom)
 
         # generate a timestamp
         timestamp = int(time.mktime(datetime.datetime.now().timetuple()))
 
-        # actually remove it from list
-        self._runningList.remove(task)
-        self._p_changed = True
+        if moveFrom == base.TASK_STATUS_RUNNING:
+            # actually remove it from list
+            self._runningList.remove(task)
+
+            self._p_changed = True
+        elif moveFrom == base.TASK_STATUS_QUEUED:
+            idx_timestamp = int_timestamp(task.getStartOn())
+            self._waitingQueue.dequeue(idx_timestamp, task)
 
         # index it either in finished or failed
         if status == base.TASK_STATUS_FINISHED:
             self._finishedIndex.index_doc(task.id, timestamp)
         elif status == base.TASK_STATUS_FAILED:
             self._failedIndex.index_doc(task.id, timestamp)
-            # or just re-add it to the waiting queue
         elif status == base.TASK_STATUS_QUEUED:
             self.addTaskToWaitingQueue(task)
-
 
     def addTaskToWaitingQueue(self, task):
 

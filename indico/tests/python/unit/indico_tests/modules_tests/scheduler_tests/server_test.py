@@ -108,14 +108,14 @@ class _TestScheduler(unittest.TestCase):
         self._sched = SchedulerThread(self._mode)
         self._sched.start()
 
-    def _checkWorkersFinished(self, timeout):
+    def _checkWorkersFinished(self, timeout, value=1):
 
         global terminated
 
         timewaited = 0
 
         for w in self._workers:
-            while not terminated[w]:
+            while terminated[w] != value:
                 # timeout at 10 sec
                 if timewaited < timeout:
                     time.sleep(1)
@@ -261,27 +261,26 @@ class _TestScheduler(unittest.TestCase):
                             'finished': 5,
                             'failed': 3})
 
+    def testPeriodicTasks(self):
+        """
+        Creating 10 periodic tasks
+        """
 
-    ## def testPeriodicTasks(self):
-    ##     """
-    ##     Creating 10 periodic tasks
-    ##     """
+        self._startSomeWorkers([TestPeriodicTask for i in range(0, 10)],
+                               [rrule.MINUTELY] * 10,
+                               bysecond = (10,20,30))
 
-    ##     self._startSomeWorkers([TestPeriodicTask for i in range(0, 10)],
-    ##                            [rrule.MINUTELY] * 10,
-    ##                            bysecond = (10,20,30))
+        # Not all workers will have finished
+        self.assertEqual(self._checkWorkersFinished(40, value=3),
+                         False)
 
-    ##     # Not all workers will have finished
-    ##     self.assertEqual(self._checkWorkersFinished(40),
-    ##                      False)
+        self._shutdown()
 
-    ##     self._shutdown()
-
-    ##     self._assertStatus({'waiting': 10,
-    ##                         'running': 0,
-    ##                         'spooled': 0,
-    ##                         'finished': 30,
-    ##                         'failed': 3})
+        self._assertStatus({'waiting': 10,
+                            'running': 0,
+                            'spooled': 0,
+                            'finished': 30,
+                            'failed': 0})
 
  # TODO:
  # some tasks running (test resume)

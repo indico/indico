@@ -117,13 +117,15 @@ class Scheduler(object):
             self._logger.warning('Task %s found in runningList on startup. Relaunching..' % task.id)
             task.tearDown()
             try:
-                self._schedModule.moveTaskFromRunningList(task,
-                                                          base.TASK_STATUS_QUEUED)
+                self._schedModule.moveTask(task,
+                                           base.TASK_STATUS_RUNNING,
+                                           base.TASK_STATUS_QUEUED)
             except base.TaskInconsistentStatusException, e:
                 self._logger.exception("Problem relaunching task %s - "
                                        "setting it as failed" % task)
-                self._schedModule.moveTaskFromRunningList(
+                self._schedModule.moveTask(
                     task,
+                    base.TASK_STATUS_RUNNING,
                     base.TASK_STATUS_FAILED,
                     nocheck=True)
 
@@ -145,6 +147,18 @@ class Scheduler(object):
             # print a status message (only in debug mode)
             self._printStatus(mode = 'debug')
 
+            # move the tasks in the spool to the waiting queue
+            try:
+                self._processSpool()
+            finally:
+                # this `finally` makes sure finished tasks are handled
+                # even if a shutdown order is sent
+
+                # process tasks that have finished meanwhile
+                # (tasks have been running in different threads, so, the sync
+                # thas was done above won't hurt)
+                self._checkFinishedTasks()
+
             # get the next task in queue
             res = self._schedModule.peekNextWaitingTask()
 
@@ -164,18 +178,6 @@ class Scheduler(object):
             # we assume the task cycle has been completed (if there was one)
             # so, we can just reset the db status (sync)
             self._readFromDb()
-
-            # move the tasks in the spool to the waiting queue
-            try:
-                self._processSpool()
-            finally:
-                # this `finally` makes sure finished tasks are handled
-                # even if a shutdown order is sent
-
-                # process tasks that have finished meanwhile
-                # (tasks have been running in different threads, so, the sync
-                # thas was done above won't hurt)
-                self._checkFinishedTasks()
 
             # we also check AWOL tasks from time to time
             if random.random() < self._config.awol_tasks_check_probability:
@@ -202,9 +204,9 @@ class Scheduler(object):
                 # let's check if it was successful or not
                 # and write it in the db
                 if thread.getResult() == True:
-                    self._notifyTaskFinished(task)
+                    self._notifyTaskStatus(task, base.TASK_STATUS_FINISHED)
                 elif thread.getResult() == False:
-                    self._notifyTaskFailed(task)
+                    self._notifyTaskStatus(task, base.TASK_STATUS_FAILED)
                 else:
                     # something weird happened
                     self._logger.warning("task %s finished, but the return value "
@@ -306,6 +308,8 @@ class Scheduler(object):
 
             if op == 'add':
                 self._addTaskToQueue(obj)
+            elif op == 'del':
+                self._deleteTaskFromQueue(obj)
             elif op == 'shutdown':
                 raise base.SchedulerQuitException(obj)
             else:
@@ -335,10 +339,21 @@ class Scheduler(object):
 
         self._logger.info("Task %s queued for execution" % task)
 
+    def _deleteTaskFromQueue(self, task):
+        """
+        Submits a new task
+        """
 
-    # notification mechanisms
+        with self._op.commit('taskIdx'):
+            self._schedModule.moveTask(task, task.getStatus(),
+                                       base.TASK_STATUS_FAILED)
+            if isinstance(task, tasks.PeriodicTask):
+                # don't let periodic tasks respawn
+                task.dontComeBack()
 
-    def _notifyTaskFinished(self, task):
+        self._logger.info("Task %s dequeued" % task)
+
+    def _notifyTaskStatus(self, task, status):
         """
         """
 
@@ -346,28 +361,26 @@ class Scheduler(object):
         # after AWOL_TASKS_THRESHOLD seconds we assume it went AWOL and
         # we notify the admins
 
-        self._logger.debug('Task %s says it\'s finished..' % task)
+        if status == base.TASK_STATUS_FINISHED:
+            self._logger.info('Task %s says it has finished..' % task)
+        elif status == base.TASK_STATUS_FAILED:
+            self._logger.error('Task %s says it has failed..' % task)
+        else:
+            raise Exception('Impossible task state')
 
         with self._op.commit():
-            self._schedModule.moveTaskFromRunningList(
-                task,
-                base.TASK_STATUS_FINISHED)
+            self._schedModule.moveTask(task, base.TASK_STATUS_RUNNING, status)
             task.tearDown()
 
-        if isinstance(task, tasks.PeriodicTask):
-            with self._op.commit('taskIdx'):
-                task.setNextOccurrence()
-                SchedulerModule.getDBInstance().addTaskToWaitingQueue(task)
-
-    def _notifyTaskFailed(self, task):
-
-        self._logger.error('Task %s failed..' % task)
-
-        with self._op.commit():
-            self._schedModule.moveTaskFromRunningList(
-                task,
-                base.TASK_STATUS_FAILED)
-            task.tearDown()
+            self._logger.info("TTT: FOO")
+            if isinstance(task, tasks.PeriodicTask):
+                self._logger.info("TTT: %s" % task._repeat)
+                if task.shouldComeBack():
+                    task.setNextOccurrence()
+                    SchedulerModule.getDBInstance().addTaskToWaitingQueue(task)
+                    self._logger.info('Task %s rescheduled for %s' %
+                                      (task, task.getStartOn()))
+                task.addOccurrence(tasks.TaskOccurrence(task))
 
     def _checkAWOLTasks(self):
 
@@ -382,8 +395,9 @@ class Scheduler(object):
 
                 # relaunch it
                 with self._op.commit():
-                    self._schedModule.moveTaskFromRunningList(
+                    self._schedModule.moveTask(
                         task,
+                        base.TASK_STATUS_RUNNING,
                         base.TASK_STATUS_QUEUED)
             else:
                 runForSecs = int_timestamp(nowutc()) - \
@@ -396,9 +410,7 @@ class Scheduler(object):
                     task.tearDown()
 
                     with self._op.commit():
-                        self._schedModule.moveTaskFromRunningList(
+                        self._schedModule.moveTask(
                             task,
+                            base.TASK_STATUS_RUNNING,
                             base.TASK_STATUS_FAIL)
-
-
-

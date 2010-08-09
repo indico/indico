@@ -41,6 +41,13 @@ class Client(object):
 
         return self._schedMod.spool('add', task)
 
+    def dequeue(self, task):
+        """
+        Schedules a task for execution
+        """
+
+        return self._schedMod.spool('del', task)
+
     def shutdown(self, msg = ""):
         """
         Shuts down the scheduler. `msg` is an optional paramater that provides
