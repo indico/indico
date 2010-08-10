@@ -96,22 +96,33 @@ Example
 A simple client use case::
 
     >>> from indico.modules.scheduler import Client
-    >>> from indico.modules.scheduler.tasks import SampleOneShotTask
+    >>> from indico.modules.scheduler.tasks import SampleOneShotTask, SamplePeriodicTask
     >>> from datetime import timedelta
+    >>> from dateutil import rrule
     >>> from indico.util.date_time import nowutc
     >>> c = Client()
-    >>> t = SampleOneShotTask(nowutc() + timedelta(seconds=1))
-    >>> c.enqueue(t)
+    >>> st = SampleOneShotTask(nowutc() + timedelta(seconds=1))
+    >>> c.enqueue(st)
     True
     >>> dbi.commit()
-    >>> dbi.sync()
+    >>> pt = SamplePeriodicTask(rrule.MINUTELY, bysecond=(40,))
+    >>> c.enqueue(pt)
+    True
+    >>> dbi.commit()
+    >>> c.dequeue(pt)
+    >>> dbi.commit()
 
-A simple scheduler configuration:
+A simple scheduler configuration::
 
-...
+    s = Scheduler(sleep_interval = 1,
+                  task_max_tries = 1,
+                  multitask_mode = 'processes')
+
 
 ======
 Daemon
 ======
 
-``indico_scheduler``
+
+.. autoclass:: indico.modules.scheduler.Scheduler
+   :members:
