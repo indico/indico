@@ -21,6 +21,44 @@
 from BTrees.Length import Length
 from zope.index.field import FieldIndex
 
+from BTrees.IOBTree import IOBTree, IOTreeSet
+from BTrees.OOBTree import OOBTree, OOTreeSet
+from persistent import Persistent
+
+class IOIndex(Persistent):
+    """
+    Maps integer values to objects
+    int -> set(obj, ...)
+    """
+
+    def __init__(self):
+        self._fwd_index = IOBTree()
+        self._rev_index = OOBTree()
+        self._num_objs = Length(0)
+
+    def index_obj(self, obj, value):
+
+        if obj not in self._rev_index:
+            self._rev_index[obj]  = IOTreeSet()
+
+        if value in self._rev_index[obj]:
+            return
+        else:
+            self._rev_index[obj].add(value)
+
+        vset = self._fwd_index.get(value)
+        if vset is None:
+            vset = OOTreeSet()
+            self._fwd_index[value] = vset
+
+        if obj in vset:
+            raise Exception('Inconsistent Index!')
+        else:
+            vset.insert(obj)
+            self._num_objs.change(1)
+
+
+
 class IntFieldIndex(FieldIndex):
 
     def clear(self):

@@ -194,9 +194,17 @@ class PeriodicTask(BaseTask):
         self.reset()
 
     def setNextOccurrence(self):
+
+        # if there was already an occurrence in the past
+        if self._nextOccurrence:
+            # add a second to the start date, as it is the minimum margin
+            sdate = self._nextOccurrence + timedelta(seconds=1)
+        else:
+            sdate = nowutc()
+
         l = list(rrule.rrule(
             self._frequency,
-            dtstart = nowutc(),
+            dtstart = sdate,
             count = 1,
             **self._interval
             ))

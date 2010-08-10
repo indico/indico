@@ -23,7 +23,7 @@ Tests for scheduler base classes
 """
 import unittest, threading, multiprocessing
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 from dateutil import rrule
 
 from MaKaC.common.db import DBMgr
@@ -266,9 +266,20 @@ class _TestScheduler(unittest.TestCase):
         Creating 10 periodic tasks
         """
 
+        now = datetime.now()
+
+        s = ((now.second / 10) + 1) % 6
+
+        seconds = [s*10]
+
+        # get intervals of 10 seconds
+        for i in range(0,2):
+            s = s + 1
+            seconds.append((s % 6) * 10)
+
         self._startSomeWorkers([TestPeriodicTask for i in range(0, 10)],
                                [rrule.MINUTELY] * 10,
-                               bysecond = (10,20,30))
+                               bysecond = tuple(seconds))
 
         # Not all workers will have finished
         self.assertEqual(self._checkWorkersFinished(40, value=3),

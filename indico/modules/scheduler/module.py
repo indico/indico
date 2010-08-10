@@ -30,7 +30,7 @@ from indico.modules import Module
 from indico.modules.scheduler import base, tasks
 from indico.util.struct.queue import PersistentWaitingQueue
 from indico.util.date_time import int_timestamp
-from indico.core.index import IntFieldIndex
+from indico.core.index import IOIndex
 from zc.queue import Queue
 
 class SchedulerModule(Module):
@@ -43,10 +43,10 @@ class SchedulerModule(Module):
         self._runningList = []
 
         # Failed tasks (there is an object still in the DB)
-        self._failedIndex = IntFieldIndex()
+        self._failedIndex = IOIndex()
 
         # Finished tasks (no object data, just metadata)
-        self._finishedIndex = IntFieldIndex()
+        self._finishedIndex = IOIndex()
 
         # Stores all tasks
         self._taskIdx = IOBTree()
@@ -101,8 +101,8 @@ class SchedulerModule(Module):
             'waiting': len(self._waitingQueue),
             'running': len(self._runningList),
             'spooled': len(self._taskSpool),
-            'failed': self._failedIndex._num_docs() ,
-            'finished': self._finishedIndex._num_docs()
+            'failed': self._failedIndex._num_objs() ,
+            'finished': self._finishedIndex._num_objs()
             }
 
     def getTaskById(self, taskId):
@@ -145,22 +145,23 @@ class SchedulerModule(Module):
 
         # index it either in finished or failed
         if status == base.TASK_STATUS_FINISHED:
-            self._finishedIndex.index_doc(task.id, timestamp)
+            self._finishedIndex.index_obj(task, timestamp)
         elif status == base.TASK_STATUS_FAILED:
-            self._failedIndex.index_doc(task.id, timestamp)
+            self._failedIndex.index_obj(task, timestamp)
         elif status == base.TASK_STATUS_QUEUED:
             self.addTaskToWaitingQueue(task)
 
-    def addTaskToWaitingQueue(self, task):
+    def addTaskToWaitingQueue(self, task, index = False):
 
-        self._indexTask(task)
-
-        logging.getLogger('scheduler').debug(
-            'Added task %s to waitingList..' % task.id)
+        if index:
+            self._indexTask(task)
 
         # get an int timestamp
         timestamp = int_timestamp(task.getStartOn())
         self._waitingQueue.enqueue(timestamp, task)
+
+        logging.getLogger('scheduler').debug(
+            'Added task %s to waitingList..' % task.id)
 
     def popNextWaitingTask(self):
         return self._waitingQueue.pop()

@@ -328,14 +328,15 @@ class Scheduler(object):
         self._logger.debug('_abortDb()..')
         self._dbi.abort()
 
-    def _addTaskToQueue(self, task):
+    def _addTaskToQueue(self, task, index = True):
         """
         Submits a new task
         """
         task.setStatus(base.TASK_STATUS_QUEUED)
 
-        with self._op.commit('taskIdx'):
-            SchedulerModule.getDBInstance().addTaskToWaitingQueue(task)
+        with self._op.commit():
+            SchedulerModule.getDBInstance().addTaskToWaitingQueue(task,
+                                                                  index = index)
 
         self._logger.info("Task %s queued for execution" % task)
 
@@ -344,7 +345,7 @@ class Scheduler(object):
         Submits a new task
         """
 
-        with self._op.commit('taskIdx'):
+        with self._op.commit():
             self._schedModule.moveTask(task, task.getStatus(),
                                        base.TASK_STATUS_FAILED)
             if isinstance(task, tasks.PeriodicTask):
@@ -372,12 +373,13 @@ class Scheduler(object):
             self._schedModule.moveTask(task, base.TASK_STATUS_RUNNING, status)
             task.tearDown()
 
-            self._logger.info("TTT: FOO")
             if isinstance(task, tasks.PeriodicTask):
-                self._logger.info("TTT: %s" % task._repeat)
                 if task.shouldComeBack():
                     task.setNextOccurrence()
-                    SchedulerModule.getDBInstance().addTaskToWaitingQueue(task)
+
+                    # do not index the task again
+                    self._addTaskToQueue(task, index = False)
+
                     self._logger.info('Task %s rescheduled for %s' %
                                       (task, task.getStartOn()))
                 task.addOccurrence(tasks.TaskOccurrence(task))
