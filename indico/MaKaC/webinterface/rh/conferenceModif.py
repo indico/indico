@@ -3948,8 +3948,11 @@ class AbstractStatusFilter( filters.FilterField ):
     _id = "status"
 
     def satisfies( self, abstract ):
-        status = AbstractStatusList.getInstance().getId( abstract.getCurrentStatus().__class__ )
-        return status in self._values
+        if len(AbstractStatusList.getInstance().getStatusList()) == len(self._values):
+            return True
+        else:
+            status = AbstractStatusList.getInstance().getId( abstract.getCurrentStatus().__class__ )
+            return status in self._values
 
     def needsToBeApplied(self):
         for s in AbstractStatusList.getStatusList():
@@ -4110,16 +4113,15 @@ class RHAbstractList(RHConfModifCFABase):
         elif sessionData.has_key("comment"):
             del sessionData['comment']
 
-
         # TODO: improve this part and do it as with the registrants
-        self._fields["ID"] = [ _("ID"), sessionData.get("showID", "")]
-        self._fields["PrimaryAuthor"] = [ _("Primary Author"), sessionData.get("showPrimaryAuthor", "")]
-        self._fields["Tracks"] = [ _("Tracks"), sessionData.get("showTracks", "")]
-        self._fields["Type"] = [ _("Type"), sessionData.get("showType", "")]
-        self._fields["Status"] = [ _("Status"), sessionData.get("showStatus", "")]
-        self._fields["AccTrack"] = [ _("showAcc. Track"), sessionData.get("showAccTrack", "")]
-        self._fields["AccType"] = [ _("showAcc. Type"), sessionData.get("showAccType", "")]
-        self._fields["SubmissionDate"] = [ _("Submission Date"), sessionData.get("showSubmissionDate", "")]
+        sessionData["fields"] = {"ID": [ _("ID"), params.get("showID","")],
+                                "PrimaryAuthor": [ _("Primary Author"), params.get("showPrimaryAuthor","")],
+                                "Tracks": [ _("Tracks"), params.get("showTracks","")],
+                                "Type": [ _("Type"), params.get("showType","")],
+                                "Status": [ _("Status"), params.get("showStatus","")],
+                                "AccTrack": [ _("Acc. Track"), params.get("showAccTrack","")],
+                                "AccType": [ _("Acc. Type"), params.get("showAccType","")],
+                                "SubmissionDate": [ _("Submission Date"), params.get("showSubmissionDate","")]}
 
         return sessionData
 
@@ -4173,8 +4175,6 @@ class RHAbstractList(RHConfModifCFABase):
     def _checkParams( self, params ):
         RHConfModifCFABase._checkParams( self, params )
 
-        self._fields = {}
-
         operationType = params.get('operationType')
 
         # session data
@@ -4215,6 +4215,7 @@ class RHAbstractList(RHConfModifCFABase):
 
         self._msg = sessionData.get("directAbstractMsg","")
         self._authSearch = sessionData.get("authSearch", "")
+        self._fields = sessionData.get("fields",{})
 
     def _process( self ):
         p = conferences.WPConfAbstractList(self,self._target, self._msg, self._filterUsed)

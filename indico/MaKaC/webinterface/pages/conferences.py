@@ -5980,48 +5980,16 @@ class WAbstracts( wcomponents.WTemplated ):
                 vars["dateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["dateSortingURL"] = quoteattr( str( url ) )
-
-
-
-
         l = []
         f = filters.SimpleFilter( self._filterCrit, self._sortingCrit )
         abstractList=f.apply(self._conf.getAbstractMgr().getAbstractsMatchingAuth(self._authSearch))
         for abstract in abstractList:
-            tracks = []
-            for track in abstract.getTrackListSorted():
-                tracks.append("%s"%self.htmlText(track.getCode() or track.getId()))
-
             s=abstract.getCurrentStatus()
-            status=AbstractStatusList.getInstance().getCode(s.__class__ )
-            statusIconURL=AbstractStatusList.getInstance().getIconURL(s.__class__)
-            statusIconHTML = """<img src=%s border="0" alt="">"""%quoteattr(str(statusIconURL))
-            contribType = abstract.getContribType()
-            contribTypeName = _("None")
-            if contribType:
-                contribTypeName = contribType.getName()
-            subDate = abstract.getSubmissionDate().strftime("%d %B %Y")
             comments = ""
             if abstract.getComments():
                 comments = _(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
             accTrack,accType="&nbsp;","&nbsp;"
-            if isinstance(s,review.AbstractStatusAccepted):
-                if s.getTrack() is not None:
-                    accTrack=self.htmlText(s.getTrack().getCode())
-                if s.getType() is not None:
-                    accType=self.htmlText(s.getType().getName())
-            elif isinstance(s,review.AbstractStatusProposedToAccept):
-                if s.getTrack() is not None:
-                    accTrack=self.htmlText(s.getTrack().getCode())
-                if s.getType() is not None:
-                    accType=self.htmlText(s.getType().getName())
             urlGen=urlHandlers.UHCFAAbstractManagment.getURL
-            authList = []
-            for auth in abstract.getPrimaryAuthorList():
-                if auth.getFullName():
-                    authList.append(auth.getFullName())
-            PAuthors = "<br>".join(authList)
-
             m = ["""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('abstracts%s')" type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId(), abstract.getId())]
             if self._fields["ID"][1] == "checked":
                 m.append("""<td class="CRLabstractLeftDataCell" nowrap>%s%s</td>"""%(abstract.getId(), comments))
@@ -6029,19 +5997,41 @@ class WAbstracts( wcomponents.WTemplated ):
             m.append("""<td class="CRLabstractDataCell">
                         <a href=%s>%s</a></td>"""%(quoteattr(str(urlGen(abstract))), self.htmlText(abstract.getTitle())))
             if self._fields["PrimaryAuthor"][1] == "checked":
+                authList = [ auth.getFullName() for auth in abstract.getPrimaryAuthorList() if auth.getFullName()]
+                PAuthors = "<br>".join(authList)
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%PAuthors)
             if self._fields["Tracks"][1] == "checked":
+                tracks = [ self.htmlText(track.getCode() or track.getId()) for track in abstract.getTrackListSorted()]
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%("<br>".join(tracks) or "&nbsp;"))
             if self._fields["Type"][1] == "checked":
+                contribType = abstract.getContribType()
+                contribTypeName = _("None")
+                if contribType:
+                    contribTypeName = contribType.getName()
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%self.htmlText(contribTypeName))
             if self._fields["Status"][1] == "checked":
+                status=AbstractStatusList.getInstance().getCode(s.__class__ )
+                statusIconURL=AbstractStatusList.getInstance().getIconURL(s.__class__)
+                statusIconHTML = """<img src=%s border="0" alt="">"""%quoteattr(str(statusIconURL))
                 m.append("""<td class="CRLabstractDataCell" nowrap>%s %s</td>"""%(statusIconHTML,status))
             if self._fields["AccTrack"][1] == "checked":
+                if isinstance(s,review.AbstractStatusAccepted):
+                    if s.getTrack() is not None:
+                        accTrack=self.htmlText(s.getTrack().getCode())
+                elif isinstance(s,review.AbstractStatusProposedToAccept):
+                    if s.getTrack() is not None:
+                        accTrack=self.htmlText(s.getTrack().getCode())
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%accTrack)
             if self._fields["AccType"][1] == "checked":
+                if isinstance(s,review.AbstractStatusAccepted):
+                    if s.getType() is not None:
+                        accType=self.htmlText(s.getType().getName())
+                elif isinstance(s,review.AbstractStatusProposedToAccept):
+                    if s.getType() is not None:
+                        accType=self.htmlText(s.getType().getName())
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%accType)
             if self._fields["SubmissionDate"][1] == "checked":
-                m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%subDate)
+                m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%abstract.getSubmissionDate().strftime("%d %B %Y"))
             if len(m) == 1:
                 m = ["<td></td>"]
             l.append("""<tr id="abstracts%s" style="background-color: transparent;" onmouseout="javascript:onMouseOut('abstracts%s')" onmouseover="javascript:onMouseOver('abstracts%s')">

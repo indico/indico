@@ -85,15 +85,18 @@ class TrackFilterField(filters.FilterField):
         """
         if self.onlyMultiple() and len(abstract.getTrackList())<2:
             return False
-        #ToDo: to be optimised by using OOSet intersections or indexes
-        hasTracks = False
-        for track in abstract.getTrackList():
-            hasTracks = True
-            if track.getId() in self._values:
-                return True
-        if not hasTracks:
-            return self._showNoValue
-        return False
+        if len(self._conf.getTrackList()) == len(self._values):
+            return True
+        else:
+            #ToDo: to be optimised by using OOSet intersections or indexes
+            hasTracks = False
+            for track in abstract.getTrackList():
+                hasTracks = True
+                if track.getId() in self._values:
+                    return True
+            if not hasTracks:
+                return self._showNoValue
+            return False
 
     def needsToBeApplied(self):
         for t in self._conf.getTrackList():
@@ -122,9 +125,12 @@ class ContribTypeFilterField(filters.FilterField):
     _id = "type"
 
     def satisfies( self, abstract ):
-        if not abstract.getContribType():
+        if len(self._conf.getContribTypeList()) == len(self._values):
+            return True
+        elif not abstract.getContribType():
             return self._showNoValue
-        return abstract.getContribType() in self._values
+        else:
+            return abstract.getContribType() in self._values
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():
@@ -139,14 +145,17 @@ class AccContribTypeFilterField(filters.FilterField):
     _id = "acc_type"
 
     def satisfies(self,abstract):
-        s=abstract.getCurrentStatus()
-        if s.__class__ in [review.AbstractStatusAccepted,\
-                            review.AbstractStatusProposedToAccept]:
-            if s.getType() is None or s.getType()=="":
-                return self._showNoValue
-            return s.getType() in self._values
+        if len(self._conf.getContribTypeList()) == len(self._values):
+            return True
         else:
-            return self._showNoValue
+            s=abstract.getCurrentStatus()
+            if s.__class__ in [review.AbstractStatusAccepted,\
+                                review.AbstractStatusProposedToAccept]:
+                if s.getType() is None or s.getType()=="":
+                    return self._showNoValue
+                return s.getType() in self._values
+            else:
+                return self._showNoValue
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():
@@ -168,7 +177,10 @@ class AccTrackFilterField(filters.FilterField):
                             review.AbstractStatusProposedToAccept]:
             if s.getTrack() is None:
                 return self._showNoValue
-            return s.getTrack().getId() in self._values
+            elif len(self._conf.getTrackList()) == len(self._values):
+                return True
+            else:
+                return s.getTrack().getId() in self._values
         else:
             return self._showNoValue
 
