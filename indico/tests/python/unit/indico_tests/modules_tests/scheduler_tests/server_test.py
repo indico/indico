@@ -164,7 +164,8 @@ class _TestScheduler(unittest.TestCase):
 
         self._shutdown()
 
-        self._assertStatus({'waiting': 0,
+        self._assertStatus({'state': False,
+                            'waiting': 0,
                             'running': 0,
                             'spooled': 0,
                             'finished': 1,
@@ -207,7 +208,8 @@ class _TestScheduler(unittest.TestCase):
 
         self._sched.join()
 
-        self._assertStatus({'waiting': 0,
+        self._assertStatus({'state': False,
+                            'waiting': 0,
                             'running': 0,
                             'spooled': 0,
                             'finished': 2,
@@ -233,7 +235,8 @@ class _TestScheduler(unittest.TestCase):
 
         self._shutdown()
 
-        self._assertStatus({'waiting': 0,
+        self._assertStatus({'state': False,
+                            'waiting': 0,
                             'running': 0,
                             'spooled': 0,
                             'finished': 6,
@@ -255,7 +258,8 @@ class _TestScheduler(unittest.TestCase):
 
         self._shutdown()
 
-        self._assertStatus({'waiting': 2,
+        self._assertStatus({'state': False,
+                            'waiting': 2,
                             'running': 0,
                             'spooled': 0,
                             'finished': 5,
@@ -283,11 +287,12 @@ class _TestScheduler(unittest.TestCase):
 
         # Not all workers will have finished
         self.assertEqual(self._checkWorkersFinished(40, value=3),
-                         False)
+                         True)
 
         self._shutdown()
 
-        self._assertStatus({'waiting': 10,
+        self._assertStatus({'state': False,
+                            'waiting': 10,
                             'running': 0,
                             'spooled': 0,
                             'finished': 30,

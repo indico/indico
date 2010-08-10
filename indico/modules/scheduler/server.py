@@ -363,11 +363,10 @@ class Scheduler(object):
 
     def _notifyTaskStatus(self, task, status):
         """
+        Called by a task when it's done. If a task doesn't notify us
+        after AWOL_TASKS_THRESHOLD seconds we assume it went AWOL and
+        we notify the admins
         """
-
-        # Called by a task when it's done. If a task doesn't notify us
-        # after AWOL_TASKS_THRESHOLD seconds we assume it went AWOL and
-        # we notify the admins
 
         if status == base.TASK_STATUS_FINISHED:
             self._logger.info('Task %s says it has finished..' % task)
@@ -377,11 +376,20 @@ class Scheduler(object):
             raise Exception('Impossible task state')
 
         with self._op.commit():
-            self._schedModule.moveTask(task, base.TASK_STATUS_RUNNING, status)
+
+            # clean up the mess
             task.tearDown()
 
+            # if it's a periodic task, do some extra things
             if isinstance(task, tasks.PeriodicTask):
+                # prepare an "occurrence" object
+                occurrence = tasks.TaskOccurrence(task)
+
+                task.addOccurrence(occurrence)
+
+                # if the task is supposed to be run again
                 if task.shouldComeBack():
+                    # calculate next occurrence
                     task.setNextOccurrence()
 
                     # do not index the task again
@@ -389,7 +397,18 @@ class Scheduler(object):
 
                     self._logger.info('Task %s rescheduled for %s' %
                                       (task, task.getStartOn()))
-                task.addOccurrence(tasks.TaskOccurrence(task))
+
+                    # move the occurrence to the correct place
+                    self._schedModule.moveTask(task,
+                                               base.TASK_STATUS_RUNNING,
+                                               status,
+                                               occurrence = occurrence)
+            else:
+                # move the task to the correct place
+                self._schedModule.moveTask(task,
+                                           base.TASK_STATUS_RUNNING,
+                                           status)
+
 
     def _checkAWOLTasks(self):
 

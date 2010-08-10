@@ -93,7 +93,7 @@ def _start(args):
 
     if not args.force and running:
         raise Exception("The daemon seems to be already running (consider -f?)")
-    if args.standalone:
+    if hasattr(args, 'standalone') and args.standalone:
         SchedulerApp(args).run()
     else:
         pid = os.fork()
@@ -134,7 +134,8 @@ def _stop(args):
     dbi.endRequest()
 
 def _restart(args):
-    pass
+    _stop(args)
+    _start(args)
 
 def _show(args):
 

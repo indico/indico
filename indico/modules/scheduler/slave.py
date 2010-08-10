@@ -51,8 +51,6 @@ class _Worker(object):
         # open a logging channel
         self._task.plugLogger(self._logger)
 
-        self._logger.info('ended on %s' % self._task.endedOn)
-
         self._dbi.endRequest()
 
     def run(self):
@@ -67,9 +65,11 @@ class _Worker(object):
 
         self._dbi.startRequest()
 
-        self._logger.info('req done %s %s %s' % (i, self._config.task_max_tries, self._task.endedOn))
+        # potentially conflict-prone (!)
+        self._task.prepare()
+        self._dbi.commit()
 
-        while i < self._config.task_max_tries and not self._task.endedOn:
+        while i < self._config.task_max_tries:
 
             self._logger.info('cycle %d' % i)
 

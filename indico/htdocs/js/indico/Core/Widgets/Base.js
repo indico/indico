@@ -70,6 +70,13 @@ type("EnumWidget", ["WatchObject", "IWidget"],
             self.domList.clear(); //this gets rid of eventual messages
         },
 
+        /*
+         * Overloaded
+         */
+        _getHeader: function() {
+            return null;
+        },
+
         /**
          * Sets a message inside the list.
          * This will delete all the internal data.
@@ -97,6 +104,12 @@ type("EnumWidget", ["WatchObject", "IWidget"],
                     }
                     return listItem;
                 });
+
+            // Optional header
+            var header = self._getHeader();
+            if (header) {
+                self.domList.insert(header);
+            }
 
             if (exists(this.message)) {
                 this.domList.append(self._iteratingElement('listMessage', this.message));
@@ -296,6 +309,10 @@ type("TabWidget", ["IWidget"],{
         this.disableOverlay.dom.style.display = 'block';
     },
 
+    _notifyTabChange: function(from, to) {
+        // to be overloaded
+    },
+
     _drawContent: function() {
 
         var self = this;
@@ -329,6 +346,7 @@ type("TabWidget", ["IWidget"],{
                                   Html.span({}, self._titleTemplate(value))
                               );
                               liItem.observeClick(function() {
+                                  self._notifyTabChange(self.selected.get(), value);
                                   self.selected.set(value);
                               });
                               liItem.observeEvent('mouseover', function() {
@@ -653,11 +671,11 @@ type("TabWidget", ["IWidget"],{
 
          this.selected = new WatchValue();
 
+         this.selected.set(initialSelection);
+
          this.selected.observe(function(value) {
              self._drawContent();
          });
-
-         this.selected.set(initialSelection);
 
          this.initializeDisableOverlay();
      }

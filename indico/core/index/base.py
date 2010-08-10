@@ -22,29 +22,64 @@ from BTrees.Length import Length
 from zope.index.field import FieldIndex
 
 from BTrees.IOBTree import IOBTree, IOTreeSet
-from BTrees.OOBTree import OOBTree, OOTreeSet
+from BTrees.OOBTree import OOBTree, OOTreeSet, union
 from persistent import Persistent
+
+import logging
+import zope.interface
+
+
+class IUniqueIdProvider(zope.interface.Interface):
+
+    def getUniqueId(self):
+        """
+        Returns a unique, application-centered ID
+        """
+
+
+class NonIndexableException(Exception):
+    """
+    Thrown when it is impossible to index an object
+    """
+
 
 class IOIndex(Persistent):
     """
     Maps integer values to objects
     int -> set(obj, ...)
+
+    int is obtained by means of an adapter
+
+    objects need to implement IUniqueIdProvider as well, as an id is needed for
+    the backward-index (OOBTrees don't accept persisten objects as keys)
     """
 
-    def __init__(self):
+    def __init__(self, adapter):
         self._fwd_index = IOBTree()
         self._rev_index = OOBTree()
         self._num_objs = Length(0)
+        self._adapter = adapter
 
-    def index_obj(self, obj, value):
+    def index_obj(self, obj):
 
-        if obj not in self._rev_index:
-            self._rev_index[obj]  = IOTreeSet()
+        if not IUniqueIdProvider.providedBy(obj):
+            raise NonIndexableException("Object %r doesn't provide IUniqueIdProvider" %
+                                        obj)
+        elif not self._adapter.providedBy(obj):
+            raise NonIndexableException(
+                "Object %r doesn't provide %r as required" % (obj, self._adapter))
 
-        if value in self._rev_index[obj]:
+        uid = obj.getUniqueId()
+        value = self._adapter(obj)
+
+        if uid not in self._rev_index:
+            ts = IOTreeSet()
+            self._rev_index[uid]  = ts
+
+        if value in self._rev_index[uid]:
             return
         else:
-            self._rev_index[obj].add(value)
+            self._rev_index[uid].add(value)
 
         vset = self._fwd_index.get(value)
         if vset is None:
@@ -57,9 +92,39 @@ class IOIndex(Persistent):
             vset.insert(obj)
             self._num_objs.change(1)
 
+        return (uid, value)
+
+    def values(self, *args):
+        res = OOTreeSet()
+        for s in self._fwd_index.itervalues(*args):
+            res = union(res, s)
+        return res
+
+    def itervalues(self, *args):
+        for s in self._fwd_index.itervalues(*args):
+            for t in s:
+                yield t
+
+    def iteritems(self):
+        for ts, s in self._fwd_index.iteritems():
+            for t in s:
+                yield ts, t
+
+    def minKey(self):
+        return self._fwd_index.minKey()
+
+    def maxKey(self):
+        return self._fwd_index.maxKey()
 
 
-class IntFieldIndex(FieldIndex):
+class IIIndex(FieldIndex):
+
+    """
+    Maps integers to sets of integers
+
+    Since we're dealing with ids, no adaptation is done.
+    We take advantage of multiunion, which is quite fast.
+    """
 
     def clear(self):
         """

@@ -26,6 +26,7 @@ from dateutil import rrule
 from datetime import timedelta
 from pytz import timezone
 from pytz import common_timezones
+import zope.interface
 
 # Required by specific tasks
 from MaKaC.user import Avatar
@@ -35,20 +36,38 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 # end required
 
-import ZODB
 from persistent import Persistent
+from BTrees.IOBTree import IOBTree
 
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.date_time import nowutc, int_timestamp
-from indico.modules.scheduler.fossils import ITaskFossil
+from indico.modules.scheduler.fossils import ITaskFossil, ITaskOccurrenceFossil
 from indico.modules.scheduler import base
+from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 
 """
 Defines base classes for tasks, and some specific tasks as well
 """
 
+class TimedEvent(Persistent, Fossilizable):
 
-class BaseTask(Persistent, Fossilizable):
+    zope.interface.implements(IUniqueIdProvider,
+                              IIndexableByArbitraryDateTime)
+
+    def getIndexingDateTime(self):
+        # just get current date/time
+        return int_timestamp(nowutc())
+
+    def __conform__(self, proto):
+
+        if proto == IIndexableByArbitraryDateTime:
+            return self.getIndexingDateTime()
+        else:
+            return None
+
+
+
+class BaseTask(TimedEvent):
     """
     A base class for tasks.
     `expiryDate` is the last point in time when the task can run. A task will refuse
@@ -105,6 +124,9 @@ class BaseTask(Persistent, Fossilizable):
     def getId(self):
         return self.id
 
+    def getUniqueId(self):
+        return "task%s" % self.id
+
     def getTypeId(self):
         return self.typeId
 
@@ -120,7 +142,10 @@ class BaseTask(Persistent, Fossilizable):
             self._v_logger = logging.getLogger('task/%s' % self.typeId)
         return self._v_logger
 
-    def start(self):
+    def prepare(self):
+        """
+        This information will be saved regardless of the task being repeated or not
+        """
 
         tsDiff = int_timestamp(nowutc()) - int_timestamp(self.getStartOn())
 
@@ -135,10 +160,12 @@ class BaseTask(Persistent, Fossilizable):
         self.startedOn = nowutc()
         self.running = True
         self.status = base.TASK_STATUS_RUNNING
+
+    def start(self):
+
         self.run()
         self.running = False
         self.endedOn = nowutc()
-
 
     def tearDown(self):
         '''If a task needs to do something once it has run and been removed from runningList
@@ -180,7 +207,8 @@ class PeriodicTask(BaseTask):
         self._interval = kwargs
         self._nextOccurrence = None
         self._lastFinishedOn = None
-        self._occurrences = []
+        self._occurrences = IOBTree()
+        self._occurrenceCount = 0
         self._repeat = True
 
     def start(self):
@@ -195,24 +223,19 @@ class PeriodicTask(BaseTask):
 
     def setNextOccurrence(self):
 
-        # if there was already an occurrence in the past
-        if self._nextOccurrence:
-            # add a second to the start date, as it is the minimum margin
-            sdate = self._nextOccurrence + timedelta(seconds=1)
-        else:
-            sdate = nowutc()
-
         l = list(rrule.rrule(
             self._frequency,
-            dtstart = sdate,
-            count = 1,
+            dtstart = nowutc(),
+            count = 2,
             **self._interval
             ))
 
         if l:
-            self._nextOccurrence = l[0]
+            self._nextOccurrence = l[0] if l[0] != self._nextOccurrence else l[1]
         else:
-            return None
+            self._nextOccurrence = None
+
+        return self._nextOccurrence
 
     def getStartOn(self):
         # if it's the first time, compute the next occurrence
@@ -225,7 +248,9 @@ class PeriodicTask(BaseTask):
         return self._lastFinishedOn
 
     def addOccurrence(self, occurrence):
-        self._occurrences.append(occurrence)
+        occurrence.setId(self._occurrenceCount)
+        self._occurrences[self._occurrenceCount] = occurrence
+        self._occurrenceCount += 1
 
     def dontComeBack(self):
         self._repeat = False
@@ -235,20 +260,43 @@ class PeriodicTask(BaseTask):
 
 
 class PeriodicUniqueTask(PeriodicTask):
-    '''Singleton periodic tasks: no two or more PeriodicUniqueTask of this
-    class will be queued or running at the same time'''
+    """
+    Singleton periodic tasks: no two or more PeriodicUniqueTask of this
+    class will be queued or running at the same time
+    """
 
 
-class TaskOccurrence(Persistent, Fossilizable):
+class TaskOccurrence(TimedEvent):
     """
     Wraps around a PeriodicTask object, and represents an occurrence of this task
     """
+
+    fossilizes(ITaskOccurrenceFossil)
+
 
     def __init__(self, task):
         self._task = task
         self._startedOn = task.getStartedOn()
         self._endedOn = task.getEndedOn()
+        self._id = None
 
+    def getId(self):
+        return self._id
+
+    def getUniqueId(self):
+        return "%s:%s" % (self._task.getUniqueId(), self._id)
+
+    def setId(self, occId):
+        self._id = occId
+
+    def getStartedOn(self):
+        return self._startedOn
+
+    def getEndedOn(self):
+        return self._endedOn
+
+    def getTask(self):
+        return self._task
 
 class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
     '''Updates statistics associated with categories

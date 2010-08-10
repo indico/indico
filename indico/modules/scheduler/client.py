@@ -43,7 +43,7 @@ class Client(object):
 
     def dequeue(self, task):
         """
-        Schedules a task for execution
+        Schedules a task for deletion
         """
 
         return self._schedMod.spool('del', task)

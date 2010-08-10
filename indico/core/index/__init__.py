@@ -19,4 +19,4 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from indico.core.index.base import *
-from zope.index.field import FieldIndex
+from indico.core.index.adapter import *

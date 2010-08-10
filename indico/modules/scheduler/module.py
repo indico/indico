@@ -30,7 +30,8 @@ from indico.modules import Module
 from indico.modules.scheduler import base, tasks
 from indico.util.struct.queue import PersistentWaitingQueue
 from indico.util.date_time import int_timestamp
-from indico.core.index import IOIndex
+from indico.core.index import IOIndex, IIndexableByArbitraryDateTime
+
 from zc.queue import Queue
 
 class SchedulerModule(Module):
@@ -43,10 +44,10 @@ class SchedulerModule(Module):
         self._runningList = []
 
         # Failed tasks (there is an object still in the DB)
-        self._failedIndex = IOIndex()
+        self._failedIndex = IOIndex(IIndexableByArbitraryDateTime)
 
         # Finished tasks (no object data, just metadata)
-        self._finishedIndex = IOIndex()
+        self._finishedIndex = IOIndex(IIndexableByArbitraryDateTime)
 
         # Stores all tasks
         self._taskIdx = IOBTree()
@@ -138,16 +139,16 @@ class SchedulerModule(Module):
 
         return True
 
-    def moveTask(self, task, moveFrom, status, nocheck = False):
+    def moveTask(self, task, moveFrom, status, occurrence = None, nocheck = False):
         """
         Remove a task from the running list
         """
 
+        if not occurrence:
+            occurrence = task
+
         #if not nocheck:
         #    self._assertTaskStatus(task, moveFrom)
-
-        # generate a timestamp
-        timestamp = int(time.mktime(datetime.datetime.now().timetuple()))
 
         if moveFrom == base.TASK_STATUS_RUNNING:
             # actually remove it from list
@@ -160,11 +161,12 @@ class SchedulerModule(Module):
 
         # index it either in finished or failed
         if status == base.TASK_STATUS_FINISHED:
-            self._finishedIndex.index_obj(task, timestamp)
+            self._finishedIndex.index_obj(occurrence)
         elif status == base.TASK_STATUS_FAILED:
-            self._failedIndex.index_obj(task, timestamp)
+            self._failedIndex.index_obj(occurrence)
         elif status == base.TASK_STATUS_QUEUED:
-            self.addTaskToWaitingQueue(task)
+            self.addTaskToWaitingQueue(occurrence)
+
 
     def addTaskToWaitingQueue(self, task, index = False):
 

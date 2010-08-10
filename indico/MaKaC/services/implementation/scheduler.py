@@ -23,8 +23,10 @@ AJAX Services for Scheduler (admin)
 """
 
 from MaKaC.services.implementation.base import AdminService
+from MaKaC.services.interface.rpc.common import ServiceError
 
 from indico.modules import ModuleHolder
+from indico.modules.scheduler import Client
 from indico.util import fossilize
 
 
@@ -33,6 +35,15 @@ class SchedulerModuleAdminService(AdminService):
     def _checkParams(self):
         AdminService._checkParams(self)
         self.schedModule = ModuleHolder().getById('scheduler')
+
+
+class GetSchedulerSummary(SchedulerModuleAdminService):
+    """
+    Returns a summary of the status of the scheduler daemon
+    """
+
+    def _getAnswer(self):
+        return fossilize.fossilize(self.schedModule.getStatus())
 
 
 class GetWaitingTaskList(SchedulerModuleAdminService):
@@ -60,10 +71,7 @@ class GetFailedTaskList(SchedulerModuleAdminService):
     """
 
     def _getAnswer(self):
-        failedIds = self.schedModule.getFailedIndex().all()
-        taskIdx = self.schedModule.getTaskIndex()
-
-        return fossilize.fossilize(list((taskIdx[k] for k in failedIds)))
+        return fossilize.fossilize(self.schedModule.getFailedIndex().values())
 
 
 class GetFinishedTaskList(SchedulerModuleAdminService):
@@ -71,16 +79,48 @@ class GetFinishedTaskList(SchedulerModuleAdminService):
     Returns the list of tasks that have successfully finished their execution
     """
 
-    def _getAnswer(self):
-        finishedIds = self.schedModule.getFinishedIndex().all()
-        taskIdx = self.schedModule.getTaskIndex()
+    def _checkParams(self):
+        SchedulerModuleAdminService._checkParams(self)
+        self._criteria = dict((k,v) for (k,v) in
+                              self._params.iteritems() if k in ['ndays'])
 
-        return fossilize.fossilize(list((taskIdx[k] for k in finishedIds)))
+    def _getAnswer(self):
+
+        idx = self.schedModule.getFinishedIndex()
+
+        # 1 day
+        ts = idx.maxKey() - 24*60*60
+
+        return fossilize.fossilize(
+            idx.itervalues(ts))
+
+
+class DeleteTask(SchedulerModuleAdminService):
+    """
+    Deletes a task
+    """
+
+    def _checkParams(self):
+        SchedulerModuleAdminService._checkParams(self)
+        tid = self._params.get('id', None)
+
+        if tid == None:
+            raise ServiceError('ERR-T0','Task Id not provided')
+
+        self._client = Client()
+        self._task = self._client.getTask(tid)
+
+    def _getAnswer(self):
+        self._client.dequeue(self._task)
+
+
 
 
 methodMap = {
+    "summary": GetSchedulerSummary,
     "tasks.listWaiting": GetWaitingTaskList,
     "tasks.listRunning": GetRunningTaskList,
     "tasks.listFailed": GetFailedTaskList,
-    "tasks.listFinished": GetFinishedTaskList
+    "tasks.listFinished": GetFinishedTaskList,
+    "tasks.delete" : DeleteTask
     }

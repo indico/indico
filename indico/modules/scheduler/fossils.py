@@ -39,6 +39,10 @@ class ITaskFossil(IFossil):
         pass
     getStartOn.convert = Conversion.datetime
 
+    def getStartedOn(self):
+        pass
+    getStartedOn.convert = Conversion.datetime
+
     def getEndedOn():
         pass
     getEndedOn.convert = Conversion.datetime
@@ -46,3 +50,24 @@ class ITaskFossil(IFossil):
     def getCreatedOn():
         pass
     getCreatedOn.convert = Conversion.datetime
+
+
+class ITaskOccurrenceFossil(IFossil):
+    """
+    A task occurrence
+    """
+
+    def getId():
+        pass
+
+    def getStartedOn(self):
+        pass
+    getStartedOn.convert = Conversion.datetime
+
+    def getEndedOn(self):
+        pass
+    getEndedOn.convert = Conversion.datetime
+
+    def getTask(self):
+        pass
+    getTask.result = ITaskFossil

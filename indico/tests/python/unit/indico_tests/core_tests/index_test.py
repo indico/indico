@@ -22,14 +22,19 @@
 Tests for `indico.core.index` module
 """
 
-import unittest
+import unittest, zope.interface
 
-from indico.core.index.base import IntFieldIndex
+from indico.core.index.base import IIIndex, IOIndex, IUniqueIdProvider
 
-class TestIntFieldIndex(unittest.TestCase):
+from MaKaC.common import DBMgr
+
+from persistent import Persistent
+
+
+class TestIIIndex(unittest.TestCase):
 
     def setUp(self):
-        self._idx = IntFieldIndex()
+        self._idx = IIIndex()
 
     def testIndexOperation(self):
         """
@@ -98,3 +103,34 @@ class TestIntFieldIndex(unittest.TestCase):
         self._idx.unindex_doc(3)
 
         self.assertEqual(self._idx.documentCount(), 1)
+
+class IDummyAdapter(zope.interface.Interface):
+    pass
+
+class DummyObject(Persistent):
+
+    zope.interface.implements(IUniqueIdProvider,
+                              IDummyAdapter)
+
+    def __init__(self, oid):
+        self._id = oid
+
+    def getUniqueId(self):
+        return self._id
+
+    def __conform__(self, proto):
+        if proto == IDummyAdapter:
+            return 1
+
+
+class TestIOIndex(unittest.TestCase):
+
+    def setUp(self):
+        self._idx = IOIndex(IDummyAdapter)
+
+    def testIndexing(self):
+        for i in range(0, 200):
+            obj = DummyObject(i)
+            self._idx.index_obj(obj)
+
+        # ... finish this ...

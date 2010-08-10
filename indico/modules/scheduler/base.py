@@ -47,7 +47,8 @@ class OperationManager(object):
             try:
                 self._dbi.commit()
             except ConflictError:
-                pass
+                sync = True
+                self._logger.debug("Commit failed (%d)" % i)
             else:
                 break
         else:
