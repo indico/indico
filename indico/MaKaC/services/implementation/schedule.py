@@ -1056,7 +1056,7 @@ class MoveEntryBase(ScheduleOperation):
                             self._schEntry.setDuration(dur=slot.getDuration())
                         else:
                             self._schEntry.setStartDate(slot.getSchedule().calculateEndDate())
-                            self._schEntry.setDuration(dur=session.getContribDuration())
+                            #self._schEntry.setDuration(dur=session.getContribDuration())
                         # add it to new container
                         slot.getSchedule().addEntry(self._schEntry, check=2)
                         fossilizedDataSlotSchEntry = slot.getConfSchEntry().fossilize(entriesFossilsDict, tz=self._conf.getTimezone())
