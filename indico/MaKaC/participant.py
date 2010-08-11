@@ -443,8 +443,7 @@ class Participation(Persistent):
 
             participant.setStatusPending()
 
-            profileURL = urlHandlers.UHConfModifParticipantsPendingDetails.getURL(self._conference)
-            profileURL.addParam("pendingId", self._lastPendingId())
+            profileURL = urlHandlers.UHConfModifParticipantsPending.getURL(self._conference)
 
             toList = []
             creator=self._conference.getCreator()
