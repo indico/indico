@@ -112,13 +112,12 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base =  ['pytz', 'zope.index', 'zope.interface', 'simplejson', 'suds',
-             'lxml', 'cds-indico-extras', 'zc-queue', 'python-dateutil']
-    if sys.version_info[1] < 5: #for Python older than 2.5
-        base.append('hashlib') # hashlib isn't a part of Python older than 2.5
-        base.append('ZODB3>=3.8,<3.9.0a')
-    else:                       #for Python 2.5+
-        base.append('ZODB3>=3.8')
+    base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface', 'simplejson',
+             'suds', 'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil']
+
+    #for Python older than 2.7
+    if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
+        base.append('argparse')
 
     return base
 
@@ -611,7 +610,7 @@ if __name__ == '__main__':
           package_dir = { 'indico': 'indico',
                           'MaKaC' : os.path.join('indico', 'MaKaC')},
           entry_points = {
-            'console_scripts': [ 'indico_scheduler           = indico.modules.scheduler.daemon:main',
+            'console_scripts': [ 'indico_scheduler           = indico.modules.scheduler.daemon_script:main',
                                  'indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main',
                                  'indico_ctl           = MaKaC.consoleScripts.indicoCtl:main',
                                  ]

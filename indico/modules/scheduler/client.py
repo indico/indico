@@ -56,6 +56,18 @@ class Client(object):
 
         return self._schedMod.spool('shutdown', msg)
 
+    def clearSpool(self):
+        """
+        Clears the spool, returning the number of removed elements
+        """
+        return self._schedMod.clearSpool()
+
+    def getSpool(self):
+        """
+        Returns the spool
+        """
+        return self._schedMod.getSpool()
+
     def getStatus(self):
         """
         Returns status information (dictionary), containing the lengths (tasks) of:
@@ -64,6 +76,8 @@ class Client(object):
           * running queue;
           * finished task index;
           * failed task index;
+
+        As well as if the scheduler is running (`state`)
         """
 
         return self._schedMod.getStatus()

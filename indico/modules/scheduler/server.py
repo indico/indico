@@ -88,7 +88,7 @@ class Scheduler(object):
         self._dbi.startRequest()
         self._schedModule = SchedulerModule.getDBInstance()
 
-        self._runningThreads = {}
+        self._runningWorkers = {}
 
     def _readConfig(self, config):
         """
@@ -195,7 +195,7 @@ class Scheduler(object):
 
         self._logger.info("Checking finished tasks")
 
-        for taskId, thread in self._runningThreads.items():
+        for taskId, thread in self._runningWorkers.items():
 
             # the thread is dead? good, it's finished
             if not thread.isAlive():
@@ -214,7 +214,7 @@ class Scheduler(object):
                                          (task, thread.getResult()))
 
                 # delete the entry from the dictionary
-                del self._runningThreads[taskId]
+                del self._runningWorkers[taskId]
                 thread.join()
 
     def _printStatus(self, mode='debug'):
@@ -238,6 +238,9 @@ class Scheduler(object):
         """
 
         try:
+            with self._op.commit():
+                self._schedModule.setSchedulerRunningStatus(True)
+
             self._logger.info('**** Scheduler started')
             self._printStatus()
 
@@ -258,6 +261,10 @@ class Scheduler(object):
         except Exception, e:
             self._logger.exception('Unexpected error')
             raise e
+        finally:
+            self._logger.info('Setting running status as False')
+            with self._op.commit():
+                self._schedModule.setSchedulerRunningStatus(False)
 
     def _taskCycle(self, timestamp, curTask):
 
@@ -279,8 +286,8 @@ class Scheduler(object):
             wclass = ProcessWorker
         else:
             wclass = ThreadWorker
-        self._runningThreads[curTask.id] = wclass(curTask.id, self._config)
-        self._runningThreads[curTask.id].start()
+        self._runningWorkers[curTask.id] = wclass(curTask.id, self._config)
+        self._runningWorkers[curTask.id].start()
 
     def _popFromSpool(self):
         """

@@ -52,6 +52,9 @@ class SchedulerModule(Module):
         self._taskIdx = IOBTree()
         self._taskCounter = Length(0)
 
+        # Is the scheduler running
+        self._schedulerStatus = False
+
         # Temporary area where all the tasks stay before being
         # added to the waiting list
         self._taskSpool = Queue()
@@ -98,6 +101,7 @@ class SchedulerModule(Module):
         Returns some basic info
         """
         return {
+            'state': self._schedulerStatus,
             'waiting': len(self._waitingQueue),
             'running': len(self._runningList),
             'spooled': len(self._taskSpool),
@@ -110,6 +114,17 @@ class SchedulerModule(Module):
 
     def getSpool(self):
         return self._taskSpool
+
+    def clearSpool(self):
+        i = 0
+
+        try:
+            while(self._taskSpool.pull()):
+                i += 1
+        except IndexError:
+            pass
+
+        return i
 
     def spool(self, op, obj):
         """
@@ -187,7 +202,8 @@ class SchedulerModule(Module):
     def getTaskIndex(self):
         return self._taskIdx
 
-
+    def setSchedulerRunningStatus(self, status):
+        self._schedulerStatus = status
 
     def addTaskToRunningList(self, task):
 
