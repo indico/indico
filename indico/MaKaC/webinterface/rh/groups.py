@@ -65,6 +65,7 @@ class _GroupUtils:
         grp.setName( grpData["name"] )
         grp.setDescription( grpData["description"] ) 
         grp.setEmail( grpData["email"] )
+        grp.setObsolete( grpData.has_key("obsolete") )
     setGroupValues = classmethod( setGroupValues )
 
 

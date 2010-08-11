@@ -1742,9 +1742,14 @@ class WHTMLGroupList(wcomponents.WTemplated):
             else:
                 color="white"
             url = vars["groupDetailsURLGen"]( g )
+            if g.isObsolete():
+                obsolete = 'obsolete'
+            else:
+                obsolete = ''
             ul.append("""<tr>
                             <td bgcolor="%s"><a href="%s">%s</a></td>
-                         </tr>"""%(color, url, self.htmlText(g.getName())))
+                            <td bgcolor="%s" align="center">%s</td>
+                         </tr>"""%(color, url, self.htmlText(g.getName()), color, obsolete))
         if ul:
             vars["groupList"] += "".join( ul )
         else:
@@ -1834,12 +1839,14 @@ class WGroupModification(wcomponents.WTemplated):
         vars["name"] = ""
         vars["email"] = ""
         vars["description"] = ""
+        vars["obsolete"] = False
 
     def __setGroupVars( self, group, vars ):
         vars["Wtitle"] = _("Modifying group basic data")
         vars["name"] = group.getName()
         vars["email"] = group.getEmail()
         vars["description"] = group.getDescription()
+        vars["obsolete"] = group.isObsolete()
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1894,6 +1901,7 @@ class WGroupDetails(wcomponents.WTemplated):
         vars["email"] = self._group.getEmail()
         vars["membersList"] = wcomponents.WPrincipalTable().getHTML( self._group.getMemberList(),  None, vars["addMembersURL"], vars["removeMembersURL"], selectable=False )
         vars["locator"] = self._group.getLocator().getWebForm()
+        vars["obsolete"] = self._group.isObsolete()
         return vars
 
 

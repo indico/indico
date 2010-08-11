@@ -23,6 +23,10 @@
           <td nowrap class="titleCellTD"><span class="titleCellFormat">Email</span></td>
           <td><%=email%></td>
         </tr>
+        <tr>
+          <td nowrap class="titleCellTD"><span class="titleCellFormat">Obsolete</span></td>
+          <td><%= obsolete %></input></td>
+        </tr>
         </table>
       </td>
       <form action="<%=modifyURL%>" method="POST">
