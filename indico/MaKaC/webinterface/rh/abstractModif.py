@@ -32,7 +32,7 @@ from MaKaC.common import Config
 import MaKaC.webinterface.common.abstractDataWrapper as abstractDataWrapper
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
-    
+
 class RCAbstractReviewer(object):
     @staticmethod
     def hasRights(request):
@@ -40,20 +40,20 @@ class RCAbstractReviewer(object):
         """
         #TODO: write this when the ReviewManager for abstracts class is implemented
         return False
-    
+
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
     """ Base class to be used for abstract modification in the admin interface,
         when the request can only be performed by Conference managers.
     """
-    
+
     def _checkParams( self, params ):
         RHAbstractBase._checkParams( self, params )
 
     def _checkProtection( self ):
         RHModificationBaseProtected._checkProtection( self )
         CFAEnabled.checkEnabled(self)
-    
+
     def _displayCustomPage( self, wf ):
         return None
 
@@ -67,13 +67,13 @@ class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
             if res != None:
                 return res
         return self._displayDefaultPage()
-    
+
 
 class RHAbstractModifBaseAbstractManager(RHAbstractModifBase):
     """ Base class to be used when the request can only be performed
         by Abstract Managers OR by conference managers
     """
-    
+
     def _checkProtection(self):
         from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
         if not RCAbstractManager.hasRights(self):
@@ -84,21 +84,21 @@ class RHAbstractModifBaseAbstractReviewer(RHAbstractModifBase):
     """ Base class to be used when the request can only be performed
         by an Abstract Reviewer (and ONLY by an Abstract Reviewer)
     """
-    
+
     def _checkProtection(self):
         if not RCAbstractReviewer.hasRights(self):
             raise MaKaCError("Only the reviewer of this abstract can access this page / perform this request")
         CFAEnabled.checkEnabled(self)
-            
+
 class RHRHAbstractModifBaseAbstractReviewingStaff(RHAbstractModifBase):
     """ Base class to be used when the request can only be performed
         by an AM, an AR, OR a Conference Manager
     """
-    
+
     def _checkProtection(self):
         from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
         if not RCAbstractManager.hasRights(self) and not RCAbstractReviewer.hasRights(self):
-            RHAbstractBase._checkProtection(self)
+            RHAbstractModifBase._checkProtection(self)
         CFAEnabled.checkEnabled(self)
 
 
@@ -108,7 +108,7 @@ class RHAbstractDelete(RHAbstractModifBase):
         RHAbstractModifBase._checkParams( self, params )
         self._remove = params.has_key("confirm")
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if self._cancel:
             self._redirect( urlHandlers.UHAbstractModTools.getURL( self._abstract) )
@@ -119,28 +119,28 @@ class RHAbstractDelete(RHAbstractModifBase):
             else:
                 p = abstracts.WPModRemConfirmation( self, self._abstract )
                 return p.display()
-        
+
 
 class RHAbstractManagment(RHRHAbstractModifBaseAbstractReviewingStaff):
-    
+
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
     #        RHAbstractModifBase._checkProtection( self )
-    
+
     def _process( self ):
         p = abstracts.WPAbstractManagment( self, self._target )
         return p.display( **self._getRequestParams() )
 
 
 class RHAbstractSelectSubmitter(RHAbstractModifBase):
-    
+
     def _process( self ):
         p = abstracts.WPAbstractSelectSubmitter( self, self._target )
         return p.display( **self._getRequestParams() )
 
 
 class RHAbstractSetSubmitter(RHAbstractModifBase):
-    
+
     def _process( self ):
         params = self._getRequestParams()
         if "selectedPrincipals" in params and not "cancel" in params:
@@ -150,11 +150,11 @@ class RHAbstractSetSubmitter(RHAbstractModifBase):
         self._redirect( urlHandlers.UHAbstractManagment.getURL( self._target ) )
 
 class RHAbstractDirectAccess(RHAbstractModifBase, RHConferenceBase):
-    
+
     def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
         RHAbstractModifBase._checkProtection( self )
-    
+
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
         self._abstractId = params.get("abstractId","")
@@ -165,8 +165,8 @@ class RHAbstractDirectAccess(RHAbstractModifBase, RHConferenceBase):
             RHAbstractModifBase._checkParams(self, params)
         except KeyError:
             pass
-        
-    
+
+
     def _process( self ):
         if self._abstractExist and self._target is not None:
             p = abstracts.WPAbstractManagment( self, self._target )
@@ -179,7 +179,7 @@ class RHAbstractDirectAccess(RHAbstractModifBase, RHConferenceBase):
 
 
 class RHAbstractToPDF(RHAbstractModifBase):
-    
+
     def _process( self ):
         tz = self._conf.getTimezone()
         filename = "%s - Abstract.pdf"%self._target.getTitle()
@@ -194,14 +194,14 @@ class RHAbstractToPDF(RHAbstractModifBase):
 
 
 class RHAbstractToXML(RHAbstractModifBase):
-    
+
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
     #        RHAbstractModifBase._checkProtection( self )
-    
+
     def _process( self ):
         filename = "%s - Abstract.xml"%self._target.getTitle()
-        
+
         x = XMLGen()
         x.openTag("abstract")
         x.writeTag("Id", self._target.getId())
@@ -223,15 +223,15 @@ class RHAbstractToXML(RHAbstractModifBase):
                 x.closeTag("PrimaryAuthor")
             else:
                 l.append(au)
-        
+
         for au in l:
             x.openTag("Co-Author")
             x.writeTag("FirstName", au.getFirstName())
             x.writeTag("FamilyName", au.getSurName())
             x.writeTag("Email", au.getEmail())
             x.writeTag("Affiliation", au.getAffiliation())
-            x.closeTag("Co-Author") 
-        
+            x.closeTag("Co-Author")
+
         for au in self._target.getSpeakerList():
             x.openTag("Speaker")
             x.writeTag("FirstName", au.getFirstName ())
@@ -239,18 +239,18 @@ class RHAbstractToXML(RHAbstractModifBase):
             x.writeTag("Email", au.getEmail())
             x.writeTag("Affiliation", au.getAffiliation())
             x.closeTag("Speaker")
-        
+
         #To change for the new contribution type system to:
         #x.writeTag("ContributionType", self._target.getContribType().getName())
         x.writeTag("ContributionType", self._target.getContribType())
-        
+
         for t in self._target.getTrackList():
             x.writeTag("Track", t.getTitle())
-        
+
         x.closeTag("abstract")
-        
+
         data = x.getXml()
-        
+
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
@@ -260,16 +260,16 @@ class RHAbstractToXML(RHAbstractModifBase):
 
 
 class _AbstractWrapper:
-    
+
     def __init__(self,status):
         self._status=status
 
     def getCurrentStatus(self):
         return self._status
-        
+
 
 class RHAbstractManagmentAccept(RHAbstractModifBase):
-    
+
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._accept = params.get("accept", None)
@@ -281,7 +281,7 @@ class RHAbstractManagmentAccept(RHAbstractModifBase):
         self._comments = params.get("comments", "")
         self._typeId = params.get("type", "")
         self._notify=params.has_key("notify")
-    
+
     def _process( self ):
         if self._accept:
             cType=self._conf.getContribTypeById(self._typeId)
@@ -303,14 +303,14 @@ class RHAbstractManagmentAccept(RHAbstractModifBase):
 
 
 class RHAbstractManagmentReject(RHAbstractModifBase):
-    
+
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._reject = params.get("reject", None)
         self._comments = params.get("comments", "")
         self._notify=params.has_key("notify")
         self._warningShown=params.has_key("confirm")
-    
+
     def _process( self ):
         if self._reject:
             st=review.AbstractStatusRejected(self._target,None,None)
@@ -331,7 +331,7 @@ class RHAbstractManagmentReject(RHAbstractModifBase):
 
 
 class RHMarkAsDup(RHAbstractModifBase):
-    
+
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action,self._comments,self._original="","",None
@@ -346,8 +346,8 @@ class RHMarkAsDup(RHAbstractModifBase):
         res=[]
         if self._original==None or self._target==self._original:
             res.append( _("invalid original abstract id"))
-        return res 
-    
+        return res
+
     def _process( self ):
         errMsg=""
         if self._action=="MARK":
@@ -355,7 +355,7 @@ class RHMarkAsDup(RHAbstractModifBase):
             if len(errorList)==0:
                 self._target.markAsDuplicated(self._getUser(),self._original,self._comments)
                 self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
-                return 
+                return
             else:
                 errMsg="<br>".join(errorList)
         p=abstracts.WPModMarkAsDup(self,self._target)
@@ -363,7 +363,7 @@ class RHMarkAsDup(RHAbstractModifBase):
 
 
 class RHUnMarkAsDup(RHAbstractModifBase):
-    
+
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action,self._comments,self._original="","",None
@@ -371,20 +371,20 @@ class RHUnMarkAsDup(RHAbstractModifBase):
         if params.has_key("OK"):
             self._action="UNMARK"
             self._comments=params.get("comments","")
-            
-    
+
+
     def _process( self ):
         errMsg=""
         if self._action=="UNMARK":
             self._target.unMarkAsDuplicated(self._getUser(),self._comments)
             self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
-            return 
+            return
         p=abstracts.WPModUnMarkAsDup(self,self._target)
         return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
 
 
 class RHMergeInto(RHAbstractModifBase):
-    
+
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action,self._comments,self._targetAbs="","",None
@@ -401,7 +401,7 @@ class RHMergeInto(RHAbstractModifBase):
         res=[]
         if self._targetAbs==None or self._target==self._targetAbs:
             res.append("invalid target abstract id")
-        return res 
+        return res
 
     def _process( self ):
         errMsg=""
@@ -412,7 +412,7 @@ class RHMergeInto(RHAbstractModifBase):
                 if self._notify:
                     self._target.notify(EmailNotificator(),self._getUser())
                 self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
-                return 
+                return
             else:
                 errMsg="<br>".join(errorList)
         p=abstracts.WPModMergeInto(self,self._target)
@@ -420,26 +420,26 @@ class RHMergeInto(RHAbstractModifBase):
 
 
 class RHUnMerge(RHAbstractModifBase):
-    
+
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action,self._comments="",""
         if params.has_key("OK"):
             self._action="UNMERGE"
             self._comments=params.get("comments","")
-            
-    
+
+
     def _process( self ):
         if self._action=="UNMERGE":
             self._target.unMerge(self._getUser(),self._comments)
             self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
-            return 
+            return
         p=abstracts.WPModUnMerge(self,self._target)
         return p.display(comments=self._comments)
 
 
 class RHPropToAcc(RHAbstractModifBase):
-    
+
     def _checkProtection(self):
         try:
             RHAbstractModifBase._checkProtection(self)
@@ -461,7 +461,7 @@ class RHPropToAcc(RHAbstractModifBase):
             self._comment=params.get("comment","")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
-    
+
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
         if self._action=="GO":
@@ -476,7 +476,7 @@ class RHPropToAcc(RHAbstractModifBase):
 
 
 class RHPropToRej(RHAbstractModifBase):
-    
+
     def _checkProtection(self):
         try:
             RHAbstractModifBase._checkProtection(self)
@@ -484,7 +484,7 @@ class RHPropToRej(RHAbstractModifBase):
             if self._target.isAllowedToCoordinate(self._getUser()):
                 return
             raise e
-    
+
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action=""
@@ -498,7 +498,7 @@ class RHPropToRej(RHAbstractModifBase):
             self._comment=params.get("comment","")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
-    
+
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
         if self._action=="GO":
@@ -513,7 +513,7 @@ class RHPropToRej(RHAbstractModifBase):
 
 
 class RHWithdraw(RHAbstractModifBase):
-    
+
     def _checkParams(self,params):
         RHAbstractModifBase._checkParams(self,params)
         self._action,self._comments="",""
@@ -528,16 +528,16 @@ class RHWithdraw(RHAbstractModifBase):
         if self._action=="WITHDRAW":
             self._target.withdraw(self._getUser(),self._comment)
             self._redirect(url)
-            return 
+            return
         elif self._action=="CANCEL":
             self._redirect(url)
-            return 
+            return
         else:
             p=abstracts.WPModWithdraw(self,self._target)
             return p.display()
 
 class RHBackToSubmitted(RHAbstractModifBase):
-    
+
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
         if isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusWithdrawn):
@@ -546,13 +546,13 @@ class RHBackToSubmitted(RHAbstractModifBase):
 
 
 class RHAbstractManagmentChangeTrack(RHAbstractModifBase):
-    
+
     def _checkParams( self, params ):
         self._cancel = params.get("cancel", None)
         self._save = params.get("save", None)
         self._tracks = self._normaliseListParam(params.get("tracks", []))
         RHAbstractModifBase._checkParams( self, params )
-    
+
     def _process( self ):
         if self._save:
             tracks = []
@@ -568,22 +568,22 @@ class RHAbstractManagmentChangeTrack(RHAbstractModifBase):
 
 
 class RHAbstractTrackManagment(RHAbstractModifBase):
-    
+
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
     #        RHAbstractModifBase._checkProtection( self )
-    
+
     def _process( self ):
         p = abstracts.WPAbstractTrackManagment( self, self._target )
         return p.display( **self._getRequestParams() )
 
 
 class RHAC(RHAbstractModifBase):
-    
+
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
     #        RHAbstractModifBase._checkProtection( self )
-    
+
     def _process( self ):
         p = abstracts.WPModAC(self,self._target)
         return p.display()
@@ -602,14 +602,14 @@ class RHEditData(RHAbstractModifBase):
             elif key.startswith("downCA"):
                 return key.split("_")
         return None
-    
+
     def _checkParams(self,params):
         RHAbstractModifBase._checkParams(self,params)
         toNorm=["auth_prim_id","auth_prim_title", "auth_prim_first_name",
-            "auth_prim_family_name","auth_prim_affiliation", 
+            "auth_prim_family_name","auth_prim_affiliation",
             "auth_prim_email", "auth_prim_phone", "auth_prim_speaker",
             "auth_co_id","auth_co_title", "auth_co_first_name",
-            "auth_co_family_name","auth_co_affiliation", 
+            "auth_co_family_name","auth_co_affiliation",
             "auth_co_email", "auth_co_phone", "auth_co_speaker"]
         for k in toNorm:
             params[k]=self._normaliseListParam(params.get(k,[]))
@@ -644,7 +644,7 @@ class RHEditData(RHAbstractModifBase):
             else:
                 self._abstractData=abstractDataWrapper.Abstract(self._conf.getAbstractMgr().getAbstractFieldsMgr())
                 self._abstractData.mapAbstract(self._target)
-    
+
     def _process( self ):
         if self._action=="UPDATE":
             if not self._abstractData.hasErrors():
@@ -659,18 +659,18 @@ class RHEditData(RHAbstractModifBase):
 
 
 class RHIntComments(RHAbstractModifBase):
-    
+
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
     #        RHAbstractModifBase._checkProtection( self )
-    
+
     def _process( self ):
         p = abstracts.WPModIntComments(self,self._target)
         return p.display()
 
 
 class RHNewIntComment(RHIntComments):
-    
+
     def _checkParams(self,params):
         RHIntComments._checkParams(self,params)
         self._action=""
@@ -679,14 +679,14 @@ class RHNewIntComment(RHIntComments):
             self._content=params.get("content","")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
-    
+
     def _process( self ):
         if self._action=="UPDATE":
             c=review.Comment(self._getUser())
             c.setContent(self._content)
             self._target.addIntComment(c)
             self._redirect(urlHandlers.UHAbstractModIntComments.getURL(self._target))
-            return 
+            return
         elif self._action=="CANCEL":
             self._redirect(urlHandlers.UHAbstractModIntComments.getURL(self._target))
             return
@@ -695,7 +695,7 @@ class RHNewIntComment(RHIntComments):
 
 
 class RHIntCommentBase(RHAbstractModifBase):
-    
+
     def _checkParams(self,params):
         RHAbstractModifBase._checkParams(self,params)
         id=params.get("intCommentId","")
@@ -703,18 +703,18 @@ class RHIntCommentBase(RHAbstractModifBase):
             raise MaKaCError( _("the internal comment identifier hasn't been specified"))
         abstract=self._target
         self._target=abstract.getIntCommentById(id)
-        
+
 
 class RHIntCommentRem(RHIntCommentBase):
-    
+
     def _process(self):
         abstract=self._target.getAbstract()
         abstract.removeIntComment(self._target)
         self._redirect(urlHandlers.UHAbstractModIntComments.getURL(abstract))
-    
+
 
 class RHIntCommentEdit(RHIntCommentBase):
-    
+
     def _checkParams(self,params):
         RHIntCommentBase._checkParams(self,params)
         self._action=""
@@ -723,7 +723,7 @@ class RHIntCommentEdit(RHIntCommentBase):
             self._content=params.get("content","")
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
-        
+
     def _process(self):
         if self._action=="UPDATE":
             self._target.setContent(self._content)
@@ -731,27 +731,27 @@ class RHIntCommentEdit(RHIntCommentBase):
             return
         elif self._action=="CANCEL":
             self._redirect(urlHandlers.UHAbstractModIntComments.getURL(self._target.getAbstract()))
-            return 
+            return
         p=abstracts.WPModIntCommentEdit(self,self._target)
         return p.display()
 
 
 class RHNotifLog(RHAbstractModifBase):
-    
+
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
     #        RHAbstractModifBase._checkProtection( self )
-    
+
     def _process( self ):
         p = abstracts.WPModNotifLog(self,self._target)
         return p.display()
 
 class RHTools(RHAbstractModifBase):
-    
+
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
     #        RHAbstractModifBase._checkProtection( self )
-    
+
     def _process( self ):
         p = abstracts.WPModTools(self,self._target)
         return p.display()
