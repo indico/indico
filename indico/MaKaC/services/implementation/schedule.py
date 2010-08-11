@@ -30,6 +30,7 @@ from MaKaC.fossils.conference import IConferenceParticipationFossil,\
 from MaKaC.common import timezoneUtils
 from MaKaC.common.Conversion import Conversion
 from MaKaC.schedule import BreakTimeSchEntry
+from MaKaC.conference import SessionSlot
 
 import time, datetime, pytz, copy
 
@@ -565,9 +566,17 @@ class ModifyStartEndDate(ScheduleOperation):
                 i += 1
             entriesList = self._schEntry.getSchedule().getEntries()[i:]
 
-        self._schEntry.setStartDate(self._startDate, moveEntries=1, check=checkFlag);
         duration = self._endDate - self._startDate
+        owner = self._schEntry.getOwner()
+        if isinstance(owner, SessionSlot) and owner.getSession().getScheduleType() == "poster":
+            # If it is a poster session we must modify the size of all the contributions inside it.
+            for entry in owner.getSchedule().getEntries():
+                entry.setDuration(dur=duration, check=0)
+        # The order to set the start date and duration is important, please keep it like this.
+        # Otherwise, by modifying the startDate we might find entries inside a slot that are
+        # temporarly outside and an exception will be raised.
         self._schEntry.setDuration(dur=duration,check=checkFlag)
+        self._schEntry.setStartDate(self._startDate, moveEntries=1, check=checkFlag)
 
         # In case of 'reschedule', calculate the time difference
         if self._reschedule:
