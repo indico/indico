@@ -77,7 +77,7 @@ class RHAbstractModifBaseAbstractManager(RHAbstractModifBase):
     def _checkProtection(self):
         from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
         if not RCAbstractManager.hasRights(self):
-            RHAbstractBase._checkProtection(self)
+            RHAbstractModifBase._checkProtection(self)
         CFAEnabled.checkEnabled(self)
 
 class RHAbstractModifBaseAbstractReviewer(RHAbstractModifBase):
