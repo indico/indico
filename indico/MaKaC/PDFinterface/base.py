@@ -408,6 +408,7 @@ class PDFBase:
 
     def _drawLogo(self, c, drawTitle = True):
         if HAVE_PIL:
+            clean = False
             logo = self._conf.getLogo()
             imagePath = ""
             if logo:
