@@ -48,18 +48,24 @@
               <table align="left">
                 <tr>
                     <td>
-                        <a href=%(nowHappeningURL)s><img src=%(nowHappeningIcon)s alt="%(nowHappeningTextIcon)s" class="imglink"></a>&nbsp;<a href=%(nowHappeningURL)s> <%= _("Now happening...")%></a>
+                        <form action=%(nowHappeningURL)s method="POST" id="nowHappForm">
+                            <a href="#" onclick="$E('nowHappForm').dom.submit();return false;"><img src=%(nowHappeningIcon)s alt="%(nowHappeningTextIcon)s" class="imglink">&nbsp; <%= _("Now happening...")%></a>
+                        </form>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <a href=%(searchBoxURL)s><img src=%(searchBoxIcon)s alt="%(searchBoxTextIcon)s" class="imglink">&nbsp; <%= _("Display search box")%></a>
+                        <form action=%(searchBoxURL)s method="POST" id="dispSearchBoxForm">
+                            <a href="#" onclick="$E('dispSearchBoxForm').dom.submit();return false;"><img src=%(searchBoxIcon)s alt="%(searchBoxTextIcon)s" class="imglink">&nbsp; <%= _("Display search box")%></a>
+                        </form>
                     </td>
                 </tr>
                 <% if confType == "conference" : %>
                 <tr>
                     <td>
-                        <a href=%(navigationBoxURL)s><img src=%(navigationBoxIcon)s alt="%(navigationBoxTextIcon)s" class="imglink">&nbsp; <%= _("Display navigation bar")%></a>
+                        <form action=%(navigationBoxURL)s method="POST" id="navBoxForm">
+                            <a href="#" onclick="$E('navBoxForm').dom.submit();return false;"><img src=%(navigationBoxIcon)s alt="%(navigationBoxTextIcon)s" class="imglink">&nbsp; <%= _("Display navigation bar")%></a>
+                        </form>
                     </td>
                 </tr>
                 <% end %>
