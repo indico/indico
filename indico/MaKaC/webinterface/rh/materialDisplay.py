@@ -49,6 +49,42 @@ class RHMaterialDisplayModifBase( RHMaterialDisplayBase ):
         else:
             raise MaKaCError( _("you are not authorised to manage material for this contribution"))
 
+
+class RHMaterialBrowse( RHMaterialDisplayBase ):
+    _uh = urlHandlers.UHMaterialBrowse
+
+    def _checkParams(self, params):
+        confId = int(params["confId"])
+        contribId = int(params["contribId"])
+        materialId = params["materialId"]
+        conf = conference.ConferenceHolder().getById( confId )
+        contr = conf.getContributionById(contribId)
+
+        self._material = self._target = contr.getMaterialById(materialId)
+
+    def _process( self ):
+
+        # material pages should not be cached, since protection can change
+        self._disableCaching()
+
+        if len(self._material.getResourceList()) == 1:
+            res = self._material.getResourceList()[0]
+            if isinstance(res, conference.Link):
+                url = res.getURL()
+                if url.find(".wmv") != -1:
+                    urlwmv = urlHandlers.UHVideoWmvAccess().getURL(res)
+                    self._redirect( urlwmv )
+                elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
+                    urlflash = urlHandlers.UHVideoFlashAccess().getURL(res)
+                    self._redirect( urlflash, noCache=True)
+                else:
+                    self._redirect( res.getURL(), noCache=True )
+            elif isinstance(res, conference.LocalFile):
+                self._redirect( urlHandlers.UHFileAccess.getURL( res ), noCache=True )
+        else:
+            self._redirect( urlHandlers.UHContribModifMaterials.getURL( self._material ))
+
+
 class RHMaterialDisplay( RHMaterialDisplayBase ):
     _uh = urlHandlers.UHMaterialDisplay
     

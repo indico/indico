@@ -30,9 +30,12 @@ class TypeFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if contribution.getType() is None:
+        if len(self._conf._contribTypes) == self._values:
+            return True
+        elif contribution.getType() is None:
             return self._showNoValue
-        return contribution.getType().getId() in self._values
+        else:
+            return contribution.getType().getId() in self._values
 
 
 class TrackFilterField( filters.FilterField ):
@@ -50,7 +53,9 @@ class TrackFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if contribution.getTrack():
+        if len(self._conf.program) == len(self._values):
+            return True
+        elif contribution.getTrack():
             if contribution.getTrack().getId() in self._values:
                 return True
         else:
@@ -73,7 +78,9 @@ class SessionFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if contribution.getSession():
+        if len(self._conf.sessions) == len(self._values):
+            return True
+        elif contribution.getSession():
             if contribution.getSession().getId() in self._values:
                 return True
         else:
@@ -111,6 +118,8 @@ class StatusFilterField(filters.FilterField):
     def satisfies(self,contribution):
         """
         """
+        if len(ContribStatusList._statusIds) == len(self._values):
+            return True
         stKlass=contribution.getCurrentStatus().__class__
         return ContribStatusList().getId(stKlass) in self._values
 
@@ -144,6 +153,9 @@ class MaterialFilterField(filters.FilterField):
     def satisfies(self,contribution):
         """
         """
+        #all options selected
+        if len(self._values) == 4:
+            return True
         from MaKaC.webinterface.materialFactories import PaperFactory
         paper=contribution.getPaper()
         if (PaperFactory().getId() in self._values) and paper is not None:

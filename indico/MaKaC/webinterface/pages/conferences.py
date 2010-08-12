@@ -6914,70 +6914,60 @@ class WConfModifContribList(wcomponents.WTemplated):
 
         return url
 
+
+    def _createMaterialURL(self, contrib):
+        """ Creates link to material management menu of given contribution.
+            This method is faster than fetching material object from the
+            database and getting link from it """
+
+        url = urlHandlers.UHContribModifMaterials._getURL()
+        url.addParam('returnURL','')
+        url.addParam('contribId',contrib.getId())
+        url.addParam('confId',contrib.getConference().getId())
+        return url
+
+
     def _getMaterialsHTML(self, contrib):
         materials=[]
         if contrib.getPaper() is not None:
-            url=urlHandlers.UHMaterialModification.getURL(contrib.getPaper())
-            iconHTML="""<img border="0" src=%s alt="paper">"""%quoteattr(str(PaperFactory().getIconURL()))
-            if len(contrib.getPaper().getResourceList())>0:
-                r=contrib.getPaper().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(PaperFactory().getTitle().lower())))
+            url= urlHandlers.UHMaterialBrowse.getURL()
+            url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'paper'})
+            materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(PaperFactory().getTitle().lower())))
         if contrib.getSlides() is not None:
-            url=urlHandlers.UHMaterialModification.getURL(contrib.getSlides())
-            iconHTML="""<img border="0" src=%s alt="slides">"""%quoteattr(str(SlidesFactory().getIconURL()))
-            if len(contrib.getSlides().getResourceList())>0:
-                r=contrib.getSlides().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(SlidesFactory().getTitle().lower())))
+            url= urlHandlers.UHMaterialBrowse.getURL()
+            url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'slides'})
+            materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(SlidesFactory().getTitle().lower())))
         if contrib.getPoster() is not None:
-            url=urlHandlers.UHMaterialModification.getURL(contrib.getPoster())
-            iconHTML="""<img border="0" src=%s alt="slides">"""%quoteattr(str(PosterFactory().getIconURL()))
-            if len(contrib.getPoster().getResourceList())>0:
-                r=contrib.getPoster().getResourceList()[0]
-                if isinstance(r,conference.Link):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(r.getURL())),iconHTML)
-                elif isinstance(r,conference.LocalFile):
-                    iconHTML="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHFileAccess.getURL(r))),iconHTML)
-            materials.append("""%s<a href=%s>%s</a>"""%(iconHTML,quoteattr(str(url)),self.htmlText(PosterFactory.getTitle().lower())))
-        video=contrib.getVideo()
-        if video is not None:
-            materials.append("""<a href=%s><img src=%s border="0" alt="video"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialModification.getURL(video))),
-                quoteattr(str(materialFactories.VideoFactory.getIconURL())),
+            url= urlHandlers.UHMaterialBrowse.getURL()
+            url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'poster'})
+            materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(PosterFactory().getTitle().lower())))
+        if contrib.getVideo() is not None:
+            materials.append("""<a href=%s>%s</a>"""%(
+                quoteattr(str(self._createMaterialURL(contrib))),
                 self.htmlText(materialFactories.VideoFactory.getTitle())))
-        minutes=contrib.getMinutes()
-        if minutes is not None:
-            materials.append("""<a href=%s><img src=%s border="0" alt="minutes"> %s</a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialModification.getURL(minutes))),
-                quoteattr(str(materialFactories.MinutesFactory.getIconURL())),
+        if contrib.getMinutes() is not None:
+            materials.append("""<a href=%s>%s</a>"""%(
+                quoteattr(str(self._createMaterialURL(contrib))),
                 self.htmlText(materialFactories.MinutesFactory.getTitle())))
-        iconURL=quoteattr(str(Config.getInstance().getSystemIconURL("material")))
         for material in contrib.getMaterialList():
-            url=urlHandlers.UHMaterialModification.getURL(material)
-            materials.append("""<a href=%s><img src=%s border="0" alt=""> %s</a>"""%(
-                quoteattr(str(url)),iconURL,self.htmlText(material.getTitle())))
+            url=self._createMaterialURL(contrib)
+            materials.append("""<a href=%s>%s</a>"""%(
+                quoteattr(str(url)),self.htmlText(material.getTitle())))
         return "<br>".join(materials)
 
     def _getContribHTML( self, contrib ):
-        sdate = ""
-        if contrib.isScheduled():
+        try:
             sdate=contrib.getAdjustedStartDate().strftime("%d-%b-%Y %H:%M" )
+        except AttributeError:
+            sdate = ""
         title = """<a href=%s>%s</a>"""%( quoteattr( str( urlHandlers.UHContributionModification.getURL( contrib ) ) ), self.htmlText( contrib.getTitle() ))
         strdur = ""
         if contrib.getDuration() is not None and contrib.getDuration().seconds != 0:
             strdur = (datetime(1900,1,1)+ contrib.getDuration()).strftime("%Hh%M'")
             dur = contrib.getDuration()
             self._totaldur = self._totaldur + dur
-        l = []
-        for spk in contrib.getSpeakerList():
-            l.append( self.htmlText( spk.getFullName() ) )
+
+        l = [self.htmlText( spk.getFullName() ) for spk in contrib.getSpeakerList()]
         speaker = "<br>".join( l )
         session = ""
         if contrib.getSession() is not None:
@@ -7155,12 +7145,13 @@ class WConfModifContribList(wcomponents.WTemplated):
         vars["quickSearchURL"]=quoteattr(str(urlHandlers.UHConfModContribQuickAccess.getURL(self._conf)))
         vars["filterPostURL"]=quoteattr(str(urlHandlers.UHConfModifContribList.getURL(self._conf)))
         authSearch=vars.get("authSearch","").strip()
-        vars["authSearch"]=quoteattr(str(authSearch))
-        vars["types"]=self._getTypeItemsHTML()
-        vars["sessions"]=self._getSessionItemsHTML()
-        vars["tracks"]=self._getTrackItemsHTML()
-        vars["status"]=self._getStatusItemsHTML()
-        vars["materials"]=self._getMaterialItemsHTML()
+        if self._menuStatus == 'open':
+            vars["authSearch"]=quoteattr(str(authSearch))
+            vars["types"]=self._getTypeItemsHTML()
+            vars["sessions"]=self._getSessionItemsHTML()
+            vars["tracks"]=self._getTrackItemsHTML()
+            vars["status"]=self._getStatusItemsHTML()
+            vars["materials"]=self._getMaterialItemsHTML()
         cl=self._conf.getContribsMatchingAuth(authSearch)
 
         sortingField = self._sortingCrit.getField()
@@ -7261,14 +7252,12 @@ class WConfModifContribList(wcomponents.WTemplated):
                 url.addParam("order","down")
         vars["trackSortingURL"] = quoteattr( str( url ) )
 
-        l=[]
-        numContribs=0
         f=filters.SimpleFilter(self._filterCrit,self._sortingCrit)
-        contribsToPrint = []
-        for contrib in f.apply(cl):
-            l.append(self._getContribHTML(contrib))
-            numContribs+=1
-            contribsToPrint.append("""<input type="hidden" name="contributions" value="%s">"""%contrib.getId())
+        filteredContribs = f.apply(cl)
+        l = [self._getContribHTML(contrib) for contrib in filteredContribs]
+        contribsToPrint = ["""<input type="hidden" name="contributions" value="%s">"""%contrib.getId() for contrib in filteredContribs]
+        numContribs = len(filteredContribs)
+
         if self._order =="up":
             l.reverse()
         vars["contribsToPrint"] = "\n".join(contribsToPrint)

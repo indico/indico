@@ -29,6 +29,9 @@ if DEVELOPMENT:
 def index(req, **params):
     return materialDisplay.RHMaterialDisplay( req ).process( params )
 
+def browseMaterial(req, **params):
+    return materialDisplay.RHMaterialBrowse( req ).process( params )
+
 def removeResource(req, **params):
     return materialDisplay.RHMaterialDisplayRemoveResource( req ).process( params )
 

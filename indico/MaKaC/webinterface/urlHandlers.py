@@ -2806,6 +2806,9 @@ class UHSubContribModifMaterials( URLHandler ):
 class UHMaterialDisplay( URLHandler ):
     _relativeURL = "materialDisplay.py"
 
+class UHMaterialBrowse( URLHandler ):
+    _relativeURL = "materialDisplay.py/browseMaterial"
+
 class UHConferenceProgram( URLHandler ):
     _relativeURL = "conferenceProgram.py"
 
