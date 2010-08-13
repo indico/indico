@@ -214,7 +214,7 @@ class Fossilizable(object):
             return target.fossilize(interface, useAttrCache, **kwargs)
         else:
             ttype = type(target)
-            if ttype in [int, str, float, NoneType]:
+            if ttype in [int, str, float, bool, NoneType]:
                 return target
             elif ttype is dict:
                 container = {}
