@@ -77,7 +77,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         """
         """
         self._statuses = {}
-        for st in self._conf.getRegistrationForm().getStatusesList():
+        for st in self._conf.getRegistrationForm().getStatusesList(False):
             self._statuses[st.getId()] = st.getStatusValues()
 
     def _setDispOpts(self):
@@ -87,7 +87,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         """
         self._dispopts = {"PersonalData":[ "Id", "LastName", "FirstName", "Email", "Position", "Institution","Phone","City","Country","Address","isPayed","idpayment","amountToPay"]}
         self._dispopts["statuses"]=[]
-        for st in self._conf.getRegistrationForm().getStatusesList():
+        for st in self._conf.getRegistrationForm().getStatusesList(False):
             self._dispopts["statuses"].append("s-%s"%st.getId())
         #if self._conf.getRegistrationForm().getAccommodationForm().isEnabled():
         self._dispopts["Accommodation"]=["Accommodation", "ArrivalDate","DepartureDate"]
@@ -150,7 +150,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             columns["LastName"]="Last name"
             columns["FirstName"]="First name"
 
-            for st in self._conf.getRegistrationForm().getStatusesList():
+            for st in self._conf.getRegistrationForm().getStatusesList(False):
                 columns["s-%s"%st.getId()]=st.getCaption()
             for sect in self._conf.getRegistrationForm().getGeneralSectionFormsList():
                 tit=sect.getTitle()
@@ -189,7 +189,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
     def _getStatusesHTML(self):
         self._statusesObjects = {}
-        for st in self._conf.getRegistrationForm().getStatusesList():
+        for st in self._conf.getRegistrationForm().getStatusesList(False):
             self._statusesObjects[st.getId()] = st
         return WRegistrantsFilterStatuses(self._statuses, self._filterCrit, self._statusesObjects).getHTML()
 
@@ -328,91 +328,22 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
     def _getRegistrantsHTML( self, reg ):
         url = urlHandlers.UHRegistrantModification.getURL(reg)
         fullName = reg.getFullName()
-        regdict={}
-        regdict["FirstName"]=reg.getFirstName()
-        regdict["LastName"]=reg.getSurName()
-        regdict["Institution"]=reg.getInstitution()
-        regdict["Position"] = reg.getPosition()
-        regdict["Phone"]=reg.getPhone()
-        regdict["City"]= reg.getCity()
-        regdict["Country"]=CountryHolder().getCountryById(reg.getCountry())
-        regdict["Address"] = reg.getAddress()
-        regdict["Email"]=reg.getEmail()
-        regdict["isPayed"]=reg.isPayedText()
-        regdict["idpayment"]=reg.getIdPay()
-        regdict["amountToPay"]="%.2f %s"%(reg.getTotal(), reg.getConference().getRegistrationForm().getCurrency())
-        regdict["Accommodation"]=""
-        regdict["DepartureDate"]=""
-        regdict["ArrivalDate"]=""
-        if reg.getAccommodation() is not None:
-            if reg.getAccommodation().getAccommodationType() is not None:
-                regdict["Accommodation"]= reg.getAccommodation().getAccommodationType().getCaption()
-            if reg.getAccommodation().getDepartureDate() is not None:
-                regdict["DepartureDate"]=reg.getAccommodation().getDepartureDate().strftime("%d-%B-%Y")
-            if reg.getAccommodation().getArrivalDate() is not None:
-                regdict["ArrivalDate"]=reg.getAccommodation().getArrivalDate().strftime("%d-%B-%Y")
-
-        events = reg.getSocialEvents()
-        items =[]
-        for item in events:
-            items.append("%s (%s)"%(item.getCaption(), item.getNoPlaces()))
-        regdict["SocialEvents"] = "<br>".join(items)
-
-        regdict["ReasonParticipation"]=reg.getReasonParticipation() or ""
-
-        regdict["RegistrationDate"]=  _("""--  _("date unknown")--""")
-        if reg.getRegistrationDate() is not None:
-            regdict["RegistrationDate"]=reg.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
-
-        sessions = reg.getSessionList()
-        sesslist =[]
-        for sess in sessions:
-            sesslist.append(sess.getTitle())
-        regdict["Sessions"] ="<br>".join(sesslist)
-
-        for strf in self._conf.getRegistrationForm().getStatusesList():
-            cap=  _("""<span style="white-space:nowrap">--  _("not set") --</span>""")
-            st=reg.getStatusById(strf.getId())
-            if st.getStatusValue() is not None:
-                cap=st.getStatusValue().getCaption()
-            regdict["s-%s"%st.getId()]=cap
-
-        for group in reg.getMiscellaneousGroupList():
-                regdict[group.getId()]=group.getTitle()
-                for fld in group.getResponseItemList():
-                    regdict["%s-%s"%(group.getId(),fld.getId())]=fld.getValue()
-
-        res =[]
-        res.append("""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('registrant%s')" type="checkbox" name="registrant" value="%s"></td>
+        regdict = registration.RegistrantMapping(reg)
+        res = ("""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('registrant%s')" type="checkbox" name="registrant" value="%s"></td>
                     """%(reg.getId(),self.htmlText(reg.getId())))
         if "Id" in self._groupsorder["PersonalData"]:
-            res.append("""<td valign="top" nowrap class="CRLabstractLeftDataCell">%s</td>
-                          <td valign="top" nowrap class="CRLabstractDataCell"><a href=%s>%s</a></td>
-                       """%(reg.getId(), quoteattr(str(url)), self.htmlText(fullName)))
-        else:
-            res.append("""<td valign="top" nowrap class="CRLabstractDataCell"><a href=%s>%s</a></td>
-                    """%(quoteattr(str(url)), self.htmlText(fullName)))
+            res += ("""<td valign="top" nowrap class="CRLabstractLeftDataCell">%s</td>
+                       """%reg.getId())
+        res += ("""<td valign="top" nowrap class="CRLabstractDataCell"><a href=%s>%s</a></td>
+                   """%(quoteattr(str(url)), self.htmlText(fullName)))
         # Fisrtly the "PersonalData"
-        for key in self._groupsorder["PersonalData"]:
-            if key == "Name" or key == "Id":
-                continue
-            v = "&nbsp;"
-            if regdict.has_key(key) and regdict[key].strip() != "":
-                v = regdict[key]
-            res.append( """<td valign="top"  class="CRLabstractDataCell">%s</td>"""%v)
-        for groupkey in self._groupsorder.keys():
-            if groupkey == "PersonalData":
-                continue
-            for key in  self._groupsorder[groupkey]:
-                v = "&nbsp;"
-                if regdict.has_key(key) and str(regdict[key]).strip() != "":
-                    v = regdict[key]
-                res.append( """<td valign="top"  class="CRLabstractDataCell">%s</td>"""%v)
+        res += "".join(["""<td valign="top"  class="CRLabstractDataCell">%s</td>"""%regdict[key] for key in self._groupsorder["PersonalData"] if key != "Name" and key != "Id"])
+        res += "".join(["""<td valign="top"  class="CRLabstractDataCell">%s</td>"""%regdict[key] for groupkey in self._groupsorder.keys() if groupkey != "PersonalData" for key in self._groupsorder[groupkey] ])
         html = """
             <tr id="registrant%s" style="background-color: transparent;" onmouseout="javascript:onMouseOut('registrant%s')" onmouseover="javascript:onMouseOver('registrant%s')">
                 %s
             </tr>
-                """%(reg.getId(),reg.getId(),reg.getId(), "".join(res))
+                """%(reg.getId(),reg.getId(),reg.getId(), res)
         return html
 
     def _getDisplayOptionsHTML(self):
@@ -453,7 +384,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             ]
 
         extraInfo = ""
-        if self._conf.getRegistrationForm().getStatusesList():
+        if self._conf.getRegistrationForm().getStatusesList(False):
             extraInfo = _("""<table align="center" cellspacing="0" width="100%%">
                                 <tr>
                                     <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px">  _("Statuses") <img src=%s border="0" alt="Select all" onclick="javascript:selectStatuses()"><img src=%s border="0" alt="Unselect all" onclick="javascript:unselectStatuses()"></td>
@@ -504,19 +435,14 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars( self )
 
         sortingField = self._sortingCrit.getField()
-
         vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
-        l=[]
-        cl = self._conf.getRegistrantsList(True)
+        cl = self._conf.getRegistrantsList(False)
         f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
-        regl=[]
-        eventItems = self._conf.getRegistrationForm().getSocialEventForm().getSocialEventList()
         vars["eve"]=""
         vars["columns"]=self._getRegColumnHTML(sortingField)
-        for reg in f.apply(cl):
-            l.append(self._getRegistrantsHTML(reg))
-            regl.append(reg.getId())
-
+        filtered = f.apply(cl)
+        l = [self._getRegistrantsHTML(reg) for reg in filtered]
+        regl = [reg.getId() for reg in filtered]
         if self._order =="up":
             l.reverse()
             regl.reverse()

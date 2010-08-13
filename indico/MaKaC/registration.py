@@ -37,6 +37,8 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
+from MaKaC.webinterface.common.countries import CountryHolder
+import re
 
 import string
 
@@ -2614,6 +2616,9 @@ class SessionsForm(BaseForm):
             lv.sort(RegistrationSession._cmpTitle)
         return lv
 
+    def getSessions(self):
+        return self._sessions
+
     def addSession(self, ses):
         if not self._sessions.has_key(ses.getId()):
             self._sessions[ses.getId()] = ses
@@ -3830,3 +3835,105 @@ class RegistrantStatus(Persistent):
 
     def setStatusValue(self, v):
         self._value=v
+
+class RegistrantMapping(object):
+
+    def __init__(self, registrant):
+        self._registrant = registrant
+        self._regDict = {
+                        "FirstName" :           self._registrant.getFirstName,
+                        "LastName" :            self._registrant.getSurName,
+                        "Institution" :         self._registrant.getInstitution,
+                        "Position" :            self._registrant.getPosition,
+                        "Phone" :               self._registrant.getPhone,
+                        "City" :                self._registrant.getCity,
+                        "Address" :             self._registrant.getAddress,
+                        "Email" :               self._registrant.getEmail,
+                        "isPayed" :             self._registrant.isPayedText,
+                        "idpayment" :           self._registrant.getIdPay,
+                        "Country" :             self._getCountry,
+                        "amountToPay" :         self._getAmountToPay,
+                        "Accomodation" :        self._getAccomodation,
+                        "SocialEvents" :        self._getSocialEvents,
+                        "ReasonParticipation" : self._getReasonParticipation,
+                        "RegistrationDate" :    self._getRegistrationDate,
+                        "Sessions" :            self._getSessions,
+                        "DepartureDate" :       self._getDepartureDate,
+                        "ArrivalDate" :         self._getArrivalDate
+                        }
+
+    def __getitem__(self, key):
+        if self._regDict.has_key(key):
+            return self._regDict[key]()
+        elif re.match("s-[0-9]+$", key):
+            return self._getStatus(key[2:])
+        elif re.match("[0-9]+$", key):
+            return self._getGroup(key)
+        elif re.match("[0-9]+-[0-9]+$", key):
+            dashPos = key.find('-')
+            return self._getItem(key[:dashPos], key[dashPos + 1:])
+        else:
+            return "&nbsp;"
+
+    def _getCountry(self):
+        return CountryHolder().getCountryById(self._registrant.getCountry())
+
+    def _getAmountToPay(self):
+        return "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency())
+
+    def _getAccomodation(self):
+        if self._registrant.getAccommodation() is not None:
+            if self._registrant.getAccommodation().getAccommodationType() is not None:
+                return self._registrant.getAccommodation().getAccommodationType().getCaption()
+        return ""
+
+    def _getDepartureDate(self):
+        if self._registrant.getAccommodation() is not None:
+            if self._registrant.getAccommodation().getDepartureDate() is not None:
+                return self._registrant.getAccommodation().getDepartureDate().strftime("%d-%B-%Y")
+        return ""
+
+    def _getArrivalDate(self):
+        if self._registrant.getAccommodation() is not None:
+            if self._registrant.getAccommodation().getArrivalDate() is not None:
+                return self._registrant.getAccommodation().getArrivalDate().strftime("%d-%B-%Y")
+        return ""
+
+    def _getSocialEvents(self):
+        events = self._registrant.getSocialEvents()
+        items = ["%s (%s)"%(item.getCaption(), item.getNoPlaces()) for item in events ]
+        return "<br>".join(items)
+
+    def _getReasonParticipation(self):
+        return self._registrant.getReasonParticipation() or ""
+
+    def _getRegistrationDate(self):
+
+        if self._registrant.getRegistrationDate() is not None:
+            return self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
+        else:
+            return _("""--  _("date unknown")--""")
+
+    def _getSessions(self):
+        sessions = self._registrant.getSessionList()
+        return "<br>".join([sess.getTitle() for sess in sessions])
+
+    def _getStatus(self, id):
+        st = self._registrant.getStatusById(id)
+        if st.getStatusValue() is not None:
+            return st.getStatusValue().getCaption()
+        else:
+            return  _("""<span style="white-space:nowrap">--  _("not set") --</span>""")
+
+    def _getGroup(self, groupId):
+        if self._registrant.getMiscellaneousGroupById(groupId):
+            return self._registrant.getMiscellaneousGroupById(groupId).getTitle()
+        else:
+            return ""
+
+    def _getItem(self, groupId, itemId):
+        if self._registrant.getMiscellaneousGroupById(groupId) and \
+           self._registrant.getMiscellaneousGroupById(groupId).getResponseItemById(itemId):
+            return self._registrant.getMiscellaneousGroupById(groupId).getResponseItemById(itemId).getValue()
+        else:
+            return ""
