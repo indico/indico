@@ -257,6 +257,11 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
         """ Entry Conference id """
     getConferenceId.produce = lambda s: s.getOwner().getConference().getId()
 
+    def getContribDuration(self):
+        """ Default duration for contribs """
+    getContribDuration.produce = lambda s: s.getOwner().getSession().getContribDuration()
+    getContribDuration.convert = Conversion.timedelta
+
 
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
 
@@ -295,18 +300,18 @@ class ILinkedTimeSchEntryMgmtFossil(ILinkedTimeSchEntryFossil):
     getId.name = "scheduleEntryId"
 
 
-#class IConferenceScheduleDisplayFossil(IFossil):
-#
-#    def getEntries(self):
-#        """ Schedule Entries """
-#    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
-#                         "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
-#                         "ContribSchEntry": IContribSchEntryDisplayFossil}
-#
-#class IConferenceScheduleMgmtFossil(IFossil):
-#
-#    def getEntries(self):
-#        """ Schedule Entries """
-#    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
-#                         "BreakTimeSchEntry": IBreakTimeSchEntryMgmtFossil,
-#                         "ContribSchEntry": IContribSchEntryMgmtFossil}
+class IConferenceScheduleDisplayFossil(IFossil):
+
+    def getEntries(self):
+        """ Schedule Entries """
+    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
+                         "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
+                         "ContribSchEntry": IContribSchEntryDisplayFossil}
+
+class IConferenceScheduleMgmtFossil(IFossil):
+
+    def getEntries(self):
+        """ Schedule Entries """
+    getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                         "BreakTimeSchEntry": IBreakTimeSchEntryMgmtFossil,
+                         "ContribSchEntry": IContribSchEntryMgmtFossil}

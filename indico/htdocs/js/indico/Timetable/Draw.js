@@ -593,6 +593,17 @@ type("TimetableBlockNormalDisplay", ["TimetableBlockNormal", "TimetableBlockDisp
 
 type("TimetableBlockNormalManagement", ["TimetableBlockNormal", "TimetableBlockManagementMixin"],
      {
+         _getTitle: function(){
+             var title = this.TimetableBlockNormal.prototype._getTitle.call(this);
+
+             if (this.eventData.entryType == "Session") {
+                 return this.eventData.sessionId + " - " + title;
+             } else if (this.eventData.entryType == "Contribution") {
+                 return this.eventData.contributionId + " - " + title;
+             }
+
+             return title;
+         }
      },
      function(timetable, eventData, blockData, compactMode, printableVersion, detailLevel, managementActions)
      {
@@ -848,7 +859,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     style: {fontWeight: 'normal'}},
                     value.title) :
                     Html.span({}, value.title);
-                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.r ? '-' : value.startDate.time.substr(0,5)),
+                contributions.append(Html.tr({}, Html.td('timetablePopupContributionTime', self.eventData.r || self.eventData.isPoster ? '' : value.startDate.time.substr(0,5)),
                                              Html.td('timetablePopupContributionTitle', element)));
             }
         });
@@ -1019,7 +1030,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
             moveEntryLink.observeClick(function(){
                 self.close();
-                self.managementActions.moveEntryContrib(self.eventData);
+                self.managementActions.moveEntry(self.eventData);
             });
 
             menu.insert(moveEntryLink);
@@ -1632,12 +1643,12 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             //var dayFiltered = this.applyFilters(this.data[this.day]);
             //var dayData = this.layoutChooser.get().drawDay(dayFiltered);
             var dayData = this.layoutChooser.get().drawDay(this.data[this.day]);
-            var height = 100+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
-            this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
-
             var blocks = this._posterBlocks(dayData);
-
             this.canvas.set(Html.div({style: {position: 'relative'}}, blocks));
+
+            var height = this.canvas.dom.clientHeight + 50 + TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
+
+            this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
             this.postDraw();
 
@@ -1678,12 +1689,11 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
 
                 var entryTools = Html.div({style:{cssFloat: "right"}},editLink," | ",deleteLink);
-                var entryInfo = Html.div({},blockData.title );
-                var timeDiv = Html.div("posterBlockTime", blockData.startDate.time.substring(0,5) +' - '+ blockData.endDate.time.substring(0,5));
+                var entryInfo = Html.div({},blockData.contributionId + " - " + blockData.title );
                 var block = Html.div({className:'posterEntry'},
                     entryTools,
                     entryInfo,
-                    Html.div({},timeDiv));
+                    Html.div({}));
                 blockDiv.append(block);
                 self.blocks.push(block);
             });
@@ -1708,5 +1718,6 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
     },
     function(data, canvas, width, wrappingElement, extraButtons, loadingIndicator, managementMode, managementActions) {
         this.TimetableDrawer(data, canvas, width, wrappingElement, 'session', extraButtons, loadingIndicator, managementMode, managementActions, data.isPoster?'poster':null);
+        this.wrappingElement = data.parentTimetable.timetableDrawer.wrappingElement;
     }
 );

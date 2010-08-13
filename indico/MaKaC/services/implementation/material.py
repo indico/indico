@@ -201,7 +201,6 @@ class GetMaterialClassesBase(MaterialDisplayBase):
 
         for mat in self._target.getAllMaterialList():
             matList[mat.getId()] = DictPickler.pickle(mat)
-
         return matList
 
 class GetMaterial(MaterialDisplayBase):
@@ -255,6 +254,18 @@ class GetMaterialProtection(MaterialModifBase):
             return 0
         else:
             return materialId.getAccessProtectionLevel()
+
+
+class SetMainResource(MaterialModifBase):
+
+    def _getAnswer(self):
+        self._target.setMainResource(self._target.getResourceById(self._params['resourceId']))
+
+
+class RemoveMainResource(MaterialModifBase):
+
+    def _getAnswer(self):
+        self._target.setMainResource(None)
 
 
 class EditMaterialClassBase(MaterialModifBase, UserListChange):
@@ -394,6 +405,8 @@ methodMap = {
     "edit": EditMaterialClassBase,
     "delete": DeleteMaterialClassBase,
     "getProtection": GetMaterialProtection,
+    "setMainResource": SetMainResource,
+    "removeMainResource": RemoveMainResource,
 
     # Resource add is quite hacky, and uses a normal RH, because of file upload
     # So, you won't find it here...

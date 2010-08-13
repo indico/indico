@@ -144,12 +144,12 @@ class outputGenerator:
         return self.text
 
 
-    def getFormattedOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
+    def getFormattedOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         """
         conf: conference object
         stylesheet: path to the xsl file
         """
-        self.getOutput(conf, stylesheet, vars, includeSession,includeContribution,includeMaterial,showSession,showDate,showContribution)
+        self.getOutput(conf, stylesheet, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution)
         html = self.text
         if DEVELOPMENT:
             stat_text = _("""<br><br><font size="-2">_("XML creation"): %s<br>_("HTML creation"): %s</font>""") % (self.time_XML,self.time_HTML)

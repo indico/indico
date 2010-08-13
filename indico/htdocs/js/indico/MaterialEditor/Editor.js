@@ -79,12 +79,11 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                 },
                 'remote': function() {
                     self.pm.remove(file);
-                    setTimeout(function() { urlBox.dom.focus();
-                                            urlBox.set('http://'); }, 200);
+                    setTimeout(function() { urlBox.dom.focus(); }, 200);
                     return Html.div({},
                                     Html.label('popUpLabel', $T("URL")),
                                     self.pm.add(urlBox, 'url'),
-                                    Html.div("smallGrey", "Example: http://www.example.com/YourPDFFile.pdf"));
+                                    Html.div("smallGrey", $T("Example: http://www.example.com/YourPDFFile.pdf")));
                 }
             }));
 
@@ -273,13 +272,13 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         this.pm = new IndicoUtil.parameterManager();
         var typeSelector = new TypeSelector(this.pm, this.types, {style:{width: '150px'}},{style:{width: '150px'}, maxlength: '50'});
-        var description = Html.textarea({name: 'description', style:{width:'220px', height: '60px'}});
 
         // local file vs. url
         var locationSelector = new RadioFieldWidget([['local',$T('Local file')],['remote',$T('External resource (hyperlink)')]]);
 
         // draw the resource pane
         var resourcePathPane = this._drawResourcePathPane(locationSelector);
+
         // protection page
         var protectionPane = $B(
             Html.div({}),
@@ -304,10 +303,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                                                       Widget.block(resourcePathPane)))
                                 ],
                                 [
-                                    $T('Description'),
-                                    description
-                                ],
-                                [
                                     $T('Material type'),
                                     Html.div({style:{height: '40px'}}, typeSelector.draw())
                                 ]
@@ -316,6 +311,31 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                         protectionPane);
 
    },
+
+   _drawAdvanced: function() {
+
+       var self = this;
+
+       this.pm = new IndicoUtil.parameterManager();
+
+       var description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
+       var displayName = Html.input("text",{'name':'displayName', style:{width:'220px'}});
+
+       return Html.div({},
+                       IndicoUtil.createFormFromMap(
+                           [
+                               [
+                                $T('Description'),
+                                description
+                               ],
+                               [
+                                   $T('Display Name'),
+                                   Html.div({}, displayName,
+                                                Html.div("smallGrey", $T("'Display name' will be used instead of the original file name")))
+                               ]
+                           ]) );
+
+  },
 
     _upload: function() {
 
@@ -459,8 +479,9 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         var protectionDiv = this._drawProtectionDiv();
 
-        this.tabWidget = new TabWidget([[$T('Upload'), this._drawUpload()],
-                                        [$T("Protection"), protectionDiv]],
+        this.tabWidget = new TabWidget([[$T('Basic'), this._drawUpload()],
+                                        [$T("Protection"), protectionDiv],
+                                        [$T('Advanced'), this._drawAdvanced()]],
                                        400, 300);
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(this,
@@ -861,6 +882,16 @@ var modifyDisabledHelpPopup = function(event) {
                                      $T('Modifying this material is currently not possible because it has been already submitted.'));
 };
 
+var setMainResourceHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+                                     $T('Mark as main resource.'));
+};
+
+var mainResourceHelpPopup = function(event) {
+    IndicoUI.Widgets.Generic.tooltip(this, event,
+                                     $T('Unmark main resource.'));
+};
+
 type("ResourceListWidget", ["ListWidget"], {
 
     _drawItem: function(pair) {
@@ -899,6 +930,48 @@ type("ResourceListWidget", ["ListWidget"], {
             }
         };
 
+        var setMainResource = function() {
+            var killProgress = IndicoUI.Dialogs.Util.progress($T('Setting main resource...'));
+            self.matParams.mainResourceId = resourceId;
+            jsonRpc(Indico.Urls.JsonRpcService,
+                    'material.setMainResource',
+                    resParams,
+                    function(response,error) {
+                        if (exists(error)) {
+                            killProgress();
+                            IndicoUtil.errorReport(error);
+                        } else {
+                            killProgress();
+                            //Crude way to redraw widget
+                            temp = self.getAll();
+                            self.clear();
+                            self.update(temp);
+                        }
+                    }
+                   );
+        };
+
+        var removeMainResource = function() {
+            var killProgress = IndicoUI.Dialogs.Util.progress($T('Setting main resource...'));
+            self.matParams.mainResourceId = null;
+            jsonRpc(Indico.Urls.JsonRpcService,
+                    'material.removeMainResource',
+                    resParams,
+                    function(response,error) {
+                        if (exists(error)) {
+                            killProgress();
+                            IndicoUtil.errorReport(error);
+                        } else {
+                            killProgress();
+                            //Crude way to redraw widget
+                            temp = self.getAll();
+                            self.clear();
+                            self.update(temp);
+                        }
+                    }
+                   );
+        };
+
         var storedDataInfo = function(info) {
             var list = Html.ul();
 
@@ -928,6 +1001,7 @@ type("ResourceListWidget", ["ListWidget"], {
 
         var removeButton;
         var editButton;
+        var setMain;
 
         if (resource.get('reviewingState') < 3) {
             removeButton = Widget.link(command(deleteResource,IndicoUI.Buttons.removeButton()));
@@ -939,6 +1013,14 @@ type("ResourceListWidget", ["ListWidget"], {
             },
                                              IndicoUI.Buttons.editButton())
                                     );
+            if(resourceId != resParams.mainResourceId) {
+                setMain = Widget.link(command(setMainResource,IndicoUI.Buttons.starButton(true)));
+                setMain.dom.onmouseover = setMainResourceHelpPopup;
+            }
+            else {
+                setMain = Widget.link(command(removeMainResource,IndicoUI.Buttons.starButton(false)));
+                setMain.dom.onmouseover = mainResourceHelpPopup;
+            }
         } else {
             removeButton = IndicoUI.Buttons.removeButton(true);
             removeButton.dom.title = '';
@@ -947,6 +1029,10 @@ type("ResourceListWidget", ["ListWidget"], {
             editButton = IndicoUI.Buttons.editButton(true);
             editButton.dom.title = '';
             editButton.dom.onmouseover = modifyDisabledHelpPopup;
+
+            setMain = IndicoUI.Buttons.starButton(true)
+            setMain.dom.title = '';
+            setMain.dom.onmouseover = modifyDisabledHelpPopup;
         }
 
         var information = [
@@ -954,6 +1040,7 @@ type("ResourceListWidget", ["ListWidget"], {
             resource.get('type') == 'stored'?"":[" (",Html.span({style:{fontStyle: 'italic', fontSize: '11px'}}, resource.get('url')),")"],
             removeButton,
             editButton,
+            this.showMainResources ? setMain:Html.div({}),
             Html.div("descriptionLine", resource.get('description'))
         ];
 
@@ -968,12 +1055,13 @@ type("ResourceListWidget", ["ListWidget"], {
         return resourceNode;
     }
 
-}, function(resources, matParams, materialTitle, materialTypes) {
+}, function(resources, matParams, materialTitle, materialTypes, showMainResources) {
     this.matParams = matParams;
     this.resources = resources;
     this.materialName = materialTitle;
     this.materialTypes = materialTypes;
     this.ListWidget();
+    this.showMainResources = showMainResources || false;
 
     var self = this;
 
@@ -1010,6 +1098,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         //we use lowercase because for the default materials it is saved in the server like for example 'Paper',
         //but then in the selectBox it will be like 'paper'
         args.materialIdsList.set(material.get('title').toLowerCase(), materialId);
+        args.mainResourceId = material.get('mainResource')?material.get('mainResource').get('id'):null;
         var deleteMaterial = function() {
             if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
@@ -1075,7 +1164,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         }
 
         args.materialProtection = material.get('protection');
-        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types);
+        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources);
 
         // check whenever a material gets empty (no resources) and delete it
         material.get('resources').observe(
@@ -1230,7 +1319,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     }
 },
 
-     function(args, types, uploadAction, width, height) {
+     function(args, types, uploadAction, width, height, showMainResources) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1241,6 +1330,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          this.RemoteWidget('material.list',
                            args);
          this.args.materialIdsList = $O();
+         this.showMainResources = showMainResources || false;
      }
 );
 

@@ -68,7 +68,12 @@ class RHEPaymentmodifSkipjackPerformDataModif( RHEPaymentModifBase ):
 # two classes to take the callback from skipjack
 class RHEPaymentConfirmSkipjack( RHConferenceBaseDisplay ):
     _requestTag = "confirm"
-    
+
+    def _checkProtection(self):
+        # Just bypass everything else, as we want the payment service
+        # to acknowledge the payment
+        pass
+
     def _checkParams( self, params ):
         #
         #skipjack does not allow for the sending of arbitrary variables.  We are

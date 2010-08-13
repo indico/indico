@@ -7,9 +7,11 @@ from MaKaC.services.implementation.base import ProtectedModificationService, Par
 from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
 import MaKaC.conference as conference
 from MaKaC.common.logger import Logger
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents
+from MaKaC.common.fossilize import fossilize
+from MaKaC.user import PrincipalHolder, Avatar, Group
 
 class CategoryBase(object):
     """
@@ -140,9 +142,53 @@ class GetPastEventsList(CategoryDisplayBase):
 
         return WConferenceListEvents(pastEvents, self._aw).getHTML()
 
+class CategoryProtectionUserList(CategoryModifBase):
+    def _getAnswer(self):
+        #will use IAvatarFossil or IGroupFossil
+        return fossilize(self._categ.getAllowedToAccessList())
+
+class CategoryProtectionAddUsers(CategoryModifBase):
+    def _checkParams(self):
+
+        CategoryModifBase._checkParams(self)
+
+        self._usersData = self._params['value']
+        self._user = self.getAW().getUser()
+
+    def _getAnswer(self):
+
+        for user in self._usersData :
+
+            userToAdd = PrincipalHolder().getById(user['id'])
+
+            if not userToAdd :
+                raise ServiceError("ERR-U0","User does not exist!")
+
+            self._categ.grantAccess(userToAdd)
+
+class CategoryProtectionRemoveUser(CategoryModifBase):
+
+    def _checkParams(self):
+        CategoryModifBase._checkParams(self)
+
+        self._userData = self._params['value']
+
+        self._user = self.getAW().getUser()
+
+    def _getAnswer(self):
+
+        userToRemove = PrincipalHolder().getById(self._userData['id'])
+
+        if not userToRemove :
+            raise ServiceError("ERR-U0","User does not exist!")
+        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+            self._categ.revokeAccess(userToRemove)
 
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
-    "canCreateEvent": CanCreateEvent
+    "canCreateEvent": CanCreateEvent,
+    "protection.getAllowedUsersList": CategoryProtectionUserList,
+    "protection.addAllowedUsers": CategoryProtectionAddUsers,
+    "protection.removeAllowedUser": CategoryProtectionRemoveUser
     }

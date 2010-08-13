@@ -74,6 +74,9 @@ class IContributionParticipationTTMgmtFossil(IFossil):
     used by the timetable management
     """
 
+    def getId(self):
+        pass
+
     def getFullNameNoTitle(self):
         pass
     getFullNameNoTitle.name = "name"

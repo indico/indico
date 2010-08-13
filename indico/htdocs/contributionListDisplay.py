@@ -29,6 +29,9 @@ if DEVELOPMENT:
 def index( req, **params ):
     return conferenceDisplay.RHContributionList( req ).process( params )
 
+def filter( req, **params ):
+    return conferenceDisplay.RHContributionList( req ).process( params )
+
 def contributionsAction( req, **params ):
     return conferenceDisplay.RHContribsActions( req ).process( params )
 

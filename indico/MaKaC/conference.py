@@ -90,6 +90,7 @@ from MaKaC.webinterface import urlHandlers
 
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
+from sets import Set
 
 class CommonObjectBase(object):
     """This class is for holding commonly used methods that are used by several classes.
@@ -208,7 +209,7 @@ class Category(Persistent, CommonObjectBase):
         self._defaultStyle = { "simple_event":"","meeting":"" }
         self._order = 0
         self.__ac = AccessController()
-        self.__confCreationRestricted = 0
+        self.__confCreationRestricted = 1
         self.__confCreators = []
         self._visibility = 999
         self._statistics = {"events":None,"contributions":None,"resources":None,\
@@ -3167,7 +3168,10 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     # Fermi timezone awareness         #
     ####################################
     def setTimezone(self, tz):
-        oldTimezone = self.timezone
+        try:
+            oldTimezone = self.timezone
+        except AttributeError:
+            oldTimezone = tz
         self.timezone = tz
 
         for observer in self.getObservers():
@@ -3364,11 +3368,21 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
             for convener in session.getConvenerList() :
                 key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
                 if dictionary.has_key(key) :
-                    dictionary[key].append(convener)
+                    dictionary[key].add(convener)
                 else :
-                    list = []
-                    list.append(convener)
-                    dictionary[key] = list
+                    set = Set()
+                    set.add(convener)
+                    dictionary[key] = set
+            for slot in session.getSlotList():
+                for convener in slot.getConvenerList() :
+                    key = convener.getEmail()+" "+convener.getFirstName().lower()+" "+convener.getFamilyName().lower()
+                    if dictionary.has_key(key) :
+                        dictionary[key].add(convener)
+                    else :
+                        set = Set()
+                        set.add(convener)
+                        dictionary[key] = set
+
 
         return dictionary
 
@@ -6572,11 +6586,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
             for mat in self.getMaterialList():
                 mat.resetModifyCache(False, True)
 
-    def hasProtectedOwner( self ):
-        if self.getOwner() != None:
-            return self.getOwner().isProtected()
-        return False
-
     def grantModification( self, sb, sendEmail=True ):
         if isinstance(sb, SessionChair):
             ah = AvatarHolder()
@@ -7052,7 +7061,7 @@ class SessionSlot(Persistent, Fossilizable):
             st = self.getStartDate()
             entries = self.getSchedule().getEntries()[:]
             for entry in entries:
-                entry.setStartDate(st,1,0)
+                entry.setStartDate(st,0,0)
                 # add diff to last item end date if and only if the item is
                 # not a break
                 #if not isinstance(entry, BreakTimeSchEntry):
@@ -7163,6 +7172,9 @@ class SessionSlot(Persistent, Fossilizable):
             self._contributionDuration = timedelta(hours=hour,minutes=min)
 
     def getContribDuration(self):
+        """
+        Duration by default for contributions within the slots.
+        """
         try:
             if self._contributionDuration:
                 pass
@@ -8741,6 +8753,18 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
                     _("Contribution"))
             if check == 2:
                 owner.setEndDate(sDate+self.getDuration(),check)
+        # Check that after modifying the start date, the end date is still within the limits of the slot
+        if self.getDuration() and sDate + self.getDuration() > owner.getEndDate():
+            if check==1:
+                raise ParentTimingError("The contribution cannot end after (%s) its parent ends (%s)"%\
+                        (self.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M'),\
+                        owner.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M')),\
+                         _("Contribution"))
+            elif check==2:
+                # update the schedule
+                owner.setEndDate(sDate + self.getDuration(),check)
+                ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
+                                                          owner, owner.getAdjustedEndDate()))
 
     def setStartDate(self, newDate, check=2, moveEntries=0):
         """check parameter:
@@ -11301,6 +11325,12 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         recRes.recover()
         self.notifyModification()
 
+    @Retrieves (['MaKaC.conference.Material',
+                 'MaKaC.conference.Minutes',
+                 'MaKaC.conference.Paper',
+                 'MaKaC.conference.Slides',
+                 'MaKaC.conference.Video',
+                 'MaKaC.conference.Poster'], 'mainResource', isPicklableObject = True)
     def getMainResource(self):
         try:
             if self._mainResource:

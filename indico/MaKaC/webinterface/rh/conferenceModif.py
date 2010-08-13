@@ -1695,9 +1695,9 @@ class RHConfSetVisibility( RHConferenceModifBase ):
         RHConferenceModifBase._checkParams( self, params )
         if params["visibility"] == "PRIVATE":
             self._protectConference = 1
-        elif params["visibility"] == "PUBLIC":
+        elif params["visibility"] == "INHERITING":
             self._protectConference = 0
-        elif params["visibility"] == "ABSOLUTELY PUBLIC":
+        elif params["visibility"] == "PUBLIC":
             self._protectConference = -1
 
     def _process( self ):
@@ -7670,10 +7670,16 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
 # ============================================================================
 
 ##------------------------------------------------------------------------------------------------------------
+class RHConfBadgeBase(RHConferenceModifBase):
+
+    def _checkProtection( self ):
+        if not self._target.canManageRegistration(self.getAW().getUser()):
+            RHConferenceModifBase._checkProtection(self)
+
 """
 Badge Design and Printing classes
 """
-class RHConfBadgePrinting(RHConferenceModifBase):
+class RHConfBadgePrinting(RHConfBadgeBase):
     """ This class corresponds to the screen where templates are
         listed and can be created, edited, deleted and tried.
         It always displays the list of templates; but we can
@@ -7689,7 +7695,7 @@ class RHConfBadgePrinting(RHConferenceModifBase):
     """
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHConfBadgeBase._checkParams(self, params)
         self.__templateId = params.get("templateId",None)
         self.__templateData = params.get("templateData",None)
         self.__deleteTemplateId = params.get("deleteTemplateId",None)
@@ -7737,7 +7743,7 @@ class RHConfBadgePrinting(RHConferenceModifBase):
 
         return p.display()
 
-class RHConfBadgeDesign(RHConferenceModifBase):
+class RHConfBadgeDesign(RHConfBadgeBase):
     """ This class corresponds to the screen where templates are
         designed. We can arrive to this screen from different scenarios:
          -We are creating a new template (templateId = new template id, new = True)
@@ -7745,7 +7751,7 @@ class RHConfBadgeDesign(RHConferenceModifBase):
     """
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHConfBadgeBase._checkParams(self, params)
         self.__templateId = params.get("templateId",None)
         new = params.get("new",'False')
         if new == 'False':
@@ -7762,7 +7768,7 @@ class RHConfBadgeDesign(RHConferenceModifBase):
             p = conferences.WPConfModifBadgeDesign(self, self._target, self.__templateId, self.__new, self.__baseTemplate)
         return p.display()
 
-class RHConfBadgePrintingPDF(RHConferenceModifBase):
+class RHConfBadgePrintingPDF(RHConfBadgeBase):
     """ This class is used to print the PDF from a badge template.
         There are 2 scenarios:
          -We are printing badges for all registrants (registrantList = 'all' or not set).
@@ -7781,7 +7787,7 @@ class RHConfBadgePrintingPDF(RHConferenceModifBase):
             keepPDFOptions: tells if we should keep the other params for the next time
                             by storing them in the database (in the conference object)
         """
-        RHConferenceModifBase._checkParams(self, params)
+        RHConfBadgeBase._checkParams(self, params)
 
         self.__templateId = params.get("templateId",None)
 
@@ -7882,7 +7888,7 @@ class RHConfBadgePrintingPDF(RHConferenceModifBase):
             self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
             return data
 
-class RHConfBadgeSaveTempBackground(RHConferenceModifBase):
+class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
     """ This class is used to save a background as a temporary file,
         before it is archived. Temporary backgrounds are archived
         after pressing the "save" button.
@@ -7905,7 +7911,7 @@ class RHConfBadgeSaveTempBackground(RHConferenceModifBase):
         return os.path.split(fileName)[-1]
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHConfBadgeBase._checkParams(self, params)
         self.__templateId = params.get("templateId",None)
         try:
             self._tempFilePath = self._saveFileToTemp( params["file"].file )
@@ -7944,7 +7950,7 @@ class RHConfBadgeSaveTempBackground(RHConferenceModifBase):
                                   '</body></html>'
                                   ])
 
-class RHConfBadgeGetBackground(RHConferenceModifBase):
+class RHConfBadgeGetBackground(RHConfBadgeBase):
     """ Class used to obtain a background in order to display it
         on the Badge Design screen.
         The background can be obtained from the archived files
@@ -7952,7 +7958,7 @@ class RHConfBadgeGetBackground(RHConferenceModifBase):
     """
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHConfBadgeBase._checkParams(self, params)
         self.__templateId = params.get("templateId",None)
         self.__backgroundId = int(params.get("backgroundId",None))
         self.__width = int(params.get("width","-1"))

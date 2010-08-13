@@ -500,6 +500,56 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
     }
 );
 
+/**
+ * Utility function to display a three buttons popup.
+ * The difference with ConfirmButton is the existence of a third button.
+ * Apart from the title and close button, the three buttons display Save, Don't Save and Cancel
+ * @param {Html or String} title The title of the error popup.
+ * @param {Element} content Anything you want to put inside.
+ * @param {function} handler A function that will be called with an Integer as argument:
+ *                   1 if the user press "Save", 2 for "Don't Save", 0 for "Cancel"
+ */
+type("SaveConfirmPopup", ["ExclusivePopupWithButtons"],
+    {
+         draw: function() {
+             var self = this;
+
+             var saveButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('Save'));
+             saveButton.observeClick(function(){
+                 self.close();
+                 self.handler(1);
+             });
+
+             var dontSaveButton = Html.input('button', {style:{marginLeft: pixels(3), marginRight: pixels(3)}}, $T('Don\'t Save'));
+             dontSaveButton.observeClick(function(){
+                 self.close();
+                 self.handler(2);
+             });
+
+             var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
+             cancelButton.observeClick(function(){
+                 self.close();
+                 self.handler(0);
+             });
+
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                     this.content,
+                     Html.div({}, saveButton, dontSaveButton, cancelButton));
+         }
+    },
+
+    function(title, content, handler) {
+        var self = this;
+
+        this.content = content;
+        this.handler = handler;
+        this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+            self.handler(0);
+            return true;
+        });
+    }
+);
+
 type("WarningPopup", ["AlertPopup"],
     {
         _formatLine: function(line) {

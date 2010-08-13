@@ -1429,13 +1429,13 @@ class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):
 
     def _process(self):
         params = self._getRequestParams()
-        privacy = params.get("visibility","PUBLIC")
+        privacy = params.get("visibility","INHERITING")
         self._protect = 0
         if privacy == "PRIVATE":
             self._protect = 1
-        elif privacy == "PUBLIC":
+        elif privacy == "INHERITING":
             self._protect = 0
-        elif privacy == "ABSOLUTELY PUBLIC":
+        elif privacy == "PUBLIC":
             self._protect = -1
         self._target.setProtection(self._protect)
         self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))

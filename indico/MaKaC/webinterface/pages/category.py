@@ -1884,15 +1884,20 @@ class WCategModifAC(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+
         vars["modifyControlFrame"] = wcomponents.WModificationControlFrame().getHTML(\
                                                     self._categ,\
                                                     vars["addManagersURL"],\
                                                     vars["removeManagersURL"] )
+        if self._categ.isRoot() :
+            type = 'Home'
+        else :
+            type = 'Category'
+
         vars["accessControlFrame"] = wcomponents.WAccessControlFrame().getHTML(\
                                                     self._categ,\
                                                     vars["setVisibilityURL"],\
-                                                    vars["addAllowedURL"],\
-                                                    vars["removeAllowedURL"] )
+                                                    type)
         if not self._categ.isProtected():
             df =  wcomponents.WDomainControlFrame( self._categ )
             vars["accessControlFrame"] += "<br>%s"%df.getHTML( \

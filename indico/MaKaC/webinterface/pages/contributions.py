@@ -281,6 +281,10 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         import contributionReviewing
         vars["reviewingStuffDisplay"]= contributionReviewing.WContributionReviewingDisplay(self._contrib).getHTML({"ShowReviewingTeam" : False})
         vars["reviewingHistoryStuffDisplay"]= contributionReviewing.WContributionReviewingHistory(self._contrib).getHTML({"ShowReviewingTeam" : False})
+        if self._contrib.getSession():
+            vars["sessionType"] = self._contrib.getSession().getScheduleType()
+        else:
+            vars["sessionType"] = 'none'
         return vars
 
 
@@ -449,7 +453,7 @@ class WPContributionModifMaterials( WPContributionModifBase ):
         self._tabMaterials.setActive()
 
     def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target)
+        wc=wcomponents.WShowExistingMaterial(self._target, mode='management')
         return wc.getHTML( pars )
 
 class WPModSearchPrimAuthor ( WPContribModifMain ):
@@ -752,6 +756,10 @@ class WContribModifMain(wcomponents.WTemplated):
             vars["withdrawDisabled"]=True
         vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._contrib,"contribution").getHTML()
         vars["keywords"]=self._contrib.getKeywords()
+        if self._contrib.getSession():
+            vars["sessionType"] = self._contrib.getSession().getScheduleType()
+        else:
+            vars["sessionType"] = 'none'
         return vars
 
 
@@ -980,9 +988,12 @@ class WContribModifAC(wcomponents.WTemplated):
         vars["modifyControlFrame"]=mcf.getHTML(self._contrib,addMgrURL,remMgrURL)
         acf=wcomponents.WAccessControlFrame()
         visURL=urlHandlers.UHContributionSetVisibility.getURL()
-        addAlwURL=urlHandlers.UHContributionSelectAllowed.getURL()
-        remAlwURL=urlHandlers.UHContributionRemoveAllowed.getURL()
-        vars["accessControlFrame"]=acf.getHTML(self._contrib,visURL,addAlwURL,remAlwURL)
+
+        if isinstance(self._contrib.getOwner(), conference.Session):
+            vars["accessControlFrame"]=acf.getHTML(self._contrib, visURL, "InSessionContribution")
+        else :
+            vars["accessControlFrame"]=acf.getHTML(self._contrib, visURL, "Contribution")
+
         if not self._contrib.isProtected():
             df=wcomponents.WDomainControlFrame( self._contrib )
             addDomURL=urlHandlers.UHContributionAddDomain.getURL()
@@ -1343,6 +1354,10 @@ class WContributionDataModification(wcomponents.WTemplated):
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
+        if self._contrib.getSession():
+            vars["sessionType"] = self._contrib.getSession().getScheduleType()
+        else:
+            vars["sessionType"] = 'none'
         return vars
 
 

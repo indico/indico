@@ -8,8 +8,11 @@ import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 
 from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.schedule import IConferenceScheduleDisplayFossil
 
-from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError
+from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportError,\
+    NoReportError
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
@@ -19,6 +22,15 @@ from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, parseDate
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.errors import TimingError
+from MaKaC.fossils.schedule import ILinkedTimeSchEntryMgmtFossil, IBreakTimeSchEntryMgmtFossil, \
+        IContribSchEntryMgmtFossil
+from MaKaC.fossils.contribution import IContributionParticipationTTMgmtFossil, IContributionFossil
+from MaKaC.fossils.conference import IConferenceParticipationFossil,\
+    ISessionFossil
+from MaKaC.common import timezoneUtils
+from MaKaC.common.Conversion import Conversion
+from MaKaC.schedule import BreakTimeSchEntry
+from MaKaC.conference import SessionSlot
 
 import time, datetime, pytz, copy
 
@@ -45,7 +57,8 @@ class ConferenceGetSchedule(conferenceServices.ConferenceDisplayBase):
         conferenceServices.ConferenceDisplayBase._checkParams(self)
 
     def _getAnswer(self):
-        return DictPickler.pickle(self._target.getSchedule())
+        #TODO: tz = timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ() // use it in the fossilize?
+        return self._target.getSchedule().fossilize(IConferenceScheduleDisplayFossil)
 
 class LocationSetter:
     def _setLocationInfo(self, target):
@@ -165,12 +178,15 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         self._setLocationInfo(contribution)
 
         schEntry = contribution.getSchEntry()
-        pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
-        pickledDataSlotSchEntry = self._getSlotEntry()
+        fossilizedData = schEntry.fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
+                                            tz=self._conf.getTimezone())
+        fossilizedDataSlotSchEntry = self._getSlotEntry()
 
-        result = {'id': pickledData['id'],
-                'entry': pickledData,
-                'slotEntry': pickledDataSlotSchEntry,
+        result = {'id': fossilizedData['id'],
+                'entry': fossilizedData,
+                'slotEntry': fossilizedDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
         if self._needsToBeScheduled:
@@ -212,7 +228,10 @@ class SessionSlotScheduleAddContribution(ScheduleAddContribution, sessionService
                                                   check = self._getCheckFlag())
 
     def _getSlotEntry(self):
-        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+        return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
+                                               tz=self._conf.getTimezone())
 
 
 class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.ConferenceModifBase, LocationSetter):
@@ -230,6 +249,12 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
             if convenerValues.has_key("submission") and \
                 convenerValues['submission'] :
                 session.grantModification(convener)
+
+    def __addConveners2Slot(self, slot):
+        for convenerValues in self._conveners:
+            convener = conference.SlotChair()
+            DictPickler.update(convener, convenerValues)
+            slot.addConvener(convener)
 
     def _checkParams(self):
         conferenceServices.ConferenceModifBase._checkParams(self)
@@ -286,6 +311,7 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         session.addSlot(slot)
 
         self.__addConveners(session)
+        self.__addConveners2Slot(slot)
         self._setLocationInfo(session)
 
         logInfo = session.getLogInfo()
@@ -293,15 +319,15 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         self._conf.getLogHandler().logAction(logInfo,"Timetable/Session",self._getUser())
 
         schEntry = slot.getConfSchEntry()
-        pickledData = DictPickler.pickle(schEntry, timezone=conf.getTimezone())
-        pickledData['entries'] = {}
+        fossilizedData = schEntry.fossilize(ILinkedTimeSchEntryMgmtFossil, tz=conf.getTimezone())
+        fossilizedData['entries'] = {}
 
         self.initializeFilteringCriteria(session.getId(), schEntry.getSchedule().getOwner().getId())
 
         return {'day': slot.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
-                'entry': pickledData,
-                'session': DictPickler.pickle(session, timezone=self._conf.getTimezone()),
+                'id': fossilizedData['id'],
+                'entry': fossilizedData,
+                'session': session.fossilize(ISessionFossil, tz=self._conf.getTimezone()),
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
     def initializeFilteringCriteria(self, sessionId, conferenceId):
@@ -379,6 +405,7 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._title = pManager.extract("title", pType=str)
         self._description = pManager.extract("description", pType=str,
                                           allowEmpty=True)
+        self._oldId = None
 
     def _performOperation(self):
 
@@ -393,13 +420,19 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._setLocationInfo(self._brk)
         self._addToSchedule(self._brk)
 
-        pickledDataSlotSchEntry = self._getSlotEntry()
-        pickledData = DictPickler.pickle(self._brk, timezone=self._conf.getTimezone())
-        return {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
-                'slotEntry': pickledDataSlotSchEntry,
+        fossilizedDataSlotSchEntry = self._getSlotEntry()
+        fossilizedData = self._brk.fossilize(IBreakTimeSchEntryMgmtFossil, tz=self._conf.getTimezone())
+
+        res = {'day': self._brk.getAdjustedStartDate().strftime("%Y%m%d"),
+                'id': fossilizedData['id'],
+                'slotEntry': fossilizedDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps()),
-                'entry': pickledData}
+                'entry': fossilizedData}
+
+        if self._oldId and self._oldId != Conversion.locatorString(self._schEntry)+"b"+self._schEntry.getId():
+            res['oldId'] = self._oldId
+
+        return res
 
 class ConferenceScheduleAddBreak(ScheduleEditBreakBase, conferenceServices.ConferenceModifBase):
 
@@ -444,7 +477,10 @@ class SessionSlotScheduleAddBreak(ScheduleEditBreakBase, sessionServices.Session
         self._slot.getSchedule().addEntry(b, check = self._getCheckFlag())
 
     def _getSlotEntry(self):
-        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+        return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
+                                               tz=self._conf.getTimezone())
 
 
 class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.SessionSlotModifCoordinationBase):
@@ -453,11 +489,12 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
         sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
         ScheduleEditBreakBase._checkParams(self)
         self._brk = self._schEntry
+        self._oldStartDate = self._schEntry.getStartDate().date()
+        self._oldId = Conversion.locatorString(self._schEntry)+"b"+self._schEntry.getId()
 
     def _addToSchedule(self, b):
         # if the schedule target day is different from the current
-        if self._schEntry.getStartDate().date() != self._dateTime.date():
-            owner = self._schEntry.getOwner()
+        if self._oldStartDate != self._dateTime.date():
 
             # remove the entry
             self._schEntry.getSchedule().removeEntry(self._schEntry)
@@ -468,7 +505,10 @@ class SessionSlotScheduleEditBreak(ScheduleEditBreakBase, sessionServices.Sessio
             self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
     def _getSlotEntry(self):
-        return DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+        return self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
+                                               tz=self._conf.getTimezone())
 
 
 class SessionSlotScheduleDeleteBreak(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
@@ -512,6 +552,7 @@ class ModifyStartEndDate(ScheduleOperation):
 
     def _performOperation(self):
 
+
         checkFlag = self._getCheckFlag()
 
         # if we want to reschedule other entries, let's store the old parameters
@@ -519,12 +560,23 @@ class ModifyStartEndDate(ScheduleOperation):
         if self._reschedule:
             oldStartDate=copy.copy(self._schEntry.getStartDate())
             oldDuration=copy.copy(self._schEntry.getDuration())
-            i = self._schEntry.getSchedule().getEntries().index(self._schEntry)+1
+            i = self._schEntry.getSchedule().getEntries().index(self._schEntry) + 1
+            while(i < len(self._schEntry.getSchedule().getEntries()) and
+                  self._schEntry.getStartDate() >= self._schEntry.getSchedule().getEntries()[i].getStartDate()):
+                i += 1
             entriesList = self._schEntry.getSchedule().getEntries()[i:]
 
-        self._schEntry.setStartDate(self._startDate, moveEntries=1, check=checkFlag);
         duration = self._endDate - self._startDate
+        owner = self._schEntry.getOwner()
+        if isinstance(owner, SessionSlot) and owner.getSession().getScheduleType() == "poster":
+            # If it is a poster session we must modify the size of all the contributions inside it.
+            for entry in owner.getSchedule().getEntries():
+                entry.setDuration(dur=duration, check=0)
+        # The order to set the start date and duration is important, please keep it like this.
+        # Otherwise, by modifying the startDate we might find entries inside a slot that are
+        # temporarly outside and an exception will be raised.
         self._schEntry.setDuration(dur=duration,check=checkFlag)
+        self._schEntry.setStartDate(self._startDate, moveEntries=1, check=checkFlag)
 
         # In case of 'reschedule', calculate the time difference
         if self._reschedule:
@@ -534,18 +586,18 @@ class ModifyStartEndDate(ScheduleOperation):
             self._schEntry.getSchedule().moveEntriesBelow(diff, entriesList)
 
             # retrieve results
-            pickledData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(),
+            fossilizedData = schedule.ScheduleToJson.process(self._schEntry.getSchedule(), self._conf.getTimezone(),
                                                           None, days = [self._schEntry.getAdjustedStartDate()],
                                                           mgmtMode = True)
-            entryId = pickledData.keys()[0]
-            pickledData = pickledData.values()[0]
+            entryId = fossilizedData.keys()[0]
+            fossilizedData = fossilizedData.values()[0]
         else:
-            entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone(),
+            entryId, fossilizedData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone(),
                                                                         None, mgmtMode = True)
 
         return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
                 'id': entryId,
-                'entry': pickledData,
+                'entry': fossilizedData,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
 
@@ -560,10 +612,13 @@ class SessionSlotScheduleModifyStartEndDate(ModifyStartEndDate, sessionServices.
 
         result = ModifyStartEndDate._performOperation(self)
 
-        pickledDataSlotSchEntry = DictPickler.pickle(self._slot.getConfSchEntry(), timezone=self._conf.getTimezone())
-        pickledDataSession = DictPickler.pickle(self._session, timezone=self._conf.getTimezone())
-        result.update({'slotEntry': pickledDataSlotSchEntry,
-                       'session': pickledDataSession})
+        fossilizedDataSlotSchEntry = self._slot.getConfSchEntry().fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
+                                               tz=self._conf.getTimezone())
+        fossilizedDataSession = self._session.fossilize(ISessionFossil, tz=self._conf.getTimezone())
+        result.update({'slotEntry': fossilizedDataSlotSchEntry,
+                       'session': fossilizedDataSession})
 
         return result
 
@@ -669,14 +724,14 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
             schEntry = self._slot.getSessionSchEntry()
         else:
             schEntry = self._slot.getConfSchEntry()
-        entryId, pickledData = schedule.ScheduleToJson.processEntry(schEntry, self._conf.getTimezone(),
+        entryId, fossilizedData = schedule.ScheduleToJson.processEntry(schEntry, self._conf.getTimezone(),
                                                                     None, mgmtMode = True)
 
         return {'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'id': pickledData['id'],
-                'entry': pickledData,
+                'id': fossilizedData['id'],
+                'entry': fossilizedData,
                 'autoOps': translateAutoOps(self.getAutoOps()),
-                'session': DictPickler.pickle(self._slot.getSession(), timezone=self._conf.getTimezone())}
+                'session': self._slot.getSession().fossilize(ISessionFossil, tz=self._conf.getTimezone())}
 
 class SessionScheduleAddSessionSlot(ScheduleEditSlotBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
@@ -770,7 +825,7 @@ class ConferenceGetAllSpeakers(conferenceServices.ConferenceDisplayBase):
     def _getAnswer(self):
         d = {}
         for contribution in self._target.getContributionList() :
-            for elem in DictPickler.pickle(contribution.getSpeakerList()):
+            for elem in contribution.getSpeakerList().fossilize(IContributionParticipationTTMgmtFossil):
                 elem['id'] = "%s.%s" % (contribution.getId(), elem['id'])
                 d[elem['name']] = elem
         return d.values()
@@ -782,7 +837,7 @@ class ConferenceGetAllConveners(conferenceServices.ConferenceDisplayBase):
     def _getAnswer(self):
         d = {}
         for session in self._target.getSessionList() :
-            for elem in DictPickler.pickle(session.getConvenerList()):
+            for elem in session.getConvenerList().fossilize(IConferenceParticipationFossil):
                 elem['id'] = "%s.%s" % (session.getId(), elem['id'])
                 d[elem['name']] = elem
         return d.values()
@@ -852,7 +907,7 @@ class GetUnscheduledContributions(ScheduleOperation):
                 continue
             unscheduledList.append(contrib)
 
-        return DictPickler.pickle(unscheduledList)
+        return fossilize(unscheduledList, IContributionFossil, tz=self._conf.getTimezone())
 
 class ConferenceGetUnscheduledContributions(GetUnscheduledContributions, conferenceServices.ConferenceModifBase):
 
@@ -893,22 +948,23 @@ class ScheduleContributions(ScheduleOperation):
 
             contrib = self._getContributionId(contribId)
 
-            self._handlePosterContributions(contrib)
+            isPoster = self._handlePosterContributions(contrib)
 
-            d = self._target.getSchedule().calculateDayEndDate(self._date)
+            if not isPoster:
+                d = self._target.getSchedule().calculateDayEndDate(self._date)
+                contrib.setStartDate(d)
 
-            contrib.setStartDate(d)
             schEntry = contrib.getSchEntry()
 
             self._target.getSchedule().addEntry(schEntry, check = self._getCheckFlag())
 
-            pickledData = DictPickler.pickle(schEntry, timezone=self._conf.getTimezone())
-            pickledDataSlotSchEntry = self._getSlotEntry()
+            fossilizedData = schEntry.fossilize(IContribSchEntryMgmtFossil, tz=self._conf.getTimezone())
+            fossilizedDataSlotSchEntry = self._getSlotEntry()
 
             entries.append({'day': schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                            'id': pickledData['id'],
-                            'entry': pickledData,
-                            'slotEntry': pickledDataSlotSchEntry,
+                            'id': fossilizedData['id'],
+                            'entry': fossilizedData,
+                            'slotEntry': fossilizedDataSlotSchEntry,
                             'autoOps': translateAutoOps(self.getAutoOps())
                             })
         return entries
@@ -931,6 +987,9 @@ class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.Se
     def _handlePosterContributions(self, contrib):
         if self._slot.getSession().getScheduleType() == "poster":
             contrib.setStartDate(self._slot.getStartDate())
+            contrib.setDuration(dur=self._slot.getDuration())
+            return True
+        return False
 
     def _getSlotEntry(self):
 
@@ -939,7 +998,10 @@ class SessionSlotScheduleContributions(ScheduleContributions, sessionServices.Se
         else:
             entry = self._slot.getConfSchEntry()
 
-        return DictPickler.pickle(entry, timezone=self._conf.getTimezone())
+        return entry.fossilize({"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil},
+                               tz=self._conf.getTimezone())
 
 class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.ConferenceModifBase):
     def _checkParams(self):
@@ -955,11 +1017,9 @@ class ConferenceScheduleContributions(ScheduleContributions, conferenceServices.
     def _getSlotEntry(self):
         return None
 
-class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationBase):
+class MoveEntryBase(ScheduleOperation):
 
     def _checkParams(self):
-        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
-
         pManager = ParameterManager(self._params, timezone = self._conf.getTimezone())
         self._contribPlace = pManager.extract("value", pType=str, allowEmpty=False)
         self._schEntryId = pManager.extract("scheduleEntryId", pType=int, allowEmpty=False)
@@ -976,12 +1036,12 @@ class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationB
         owner = self._schEntry.getOwner()
 
         if self._contribPlace.strip() != "":
-            oldSch = DictPickler.pickle(self._schEntry)
+            entriesFossilsDict = {"MaKaC.schedule.LinkedTimeSchEntry": ILinkedTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.BreakTimeSchEntry" : IBreakTimeSchEntryMgmtFossil,
+                                               "MaKaC.schedule.ContribSchEntry"   : IContribSchEntryMgmtFossil}
+            oldSch = self._schEntry.fossilize(entriesFossilsDict)
             oldDate = self._schEntry.getStartDate()
             oldSch['startDate'] = formatDateTime(oldDate.astimezone(pytz.timezone(owner.getTimezone())))
-
-            #we need something like 20090405
-            oldDateConc = oldDate.strftime("%Y%m%d")
 
             sessionId,sessionSlotId = self._contribPlace.split(":")
 
@@ -989,17 +1049,26 @@ class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationB
                 # Moving inside a session
                 session = self._conf.getSessionById(sessionId)
 
+                if session.getScheduleType() == "poster" and isinstance(self._schEntry, BreakTimeSchEntry):
+                    raise NoReportError("ERR-S5", _("It is not possible to move a break inside a poster session"))
+
                 if session is not None:
                     slot = session.getSlotById(sessionSlotId)
                     if slot is not None:
-                        pickledDataSession = DictPickler.pickle(session, timezone=self._conf.getTimezone())
+                        fossilizedDataSession = session.fossilize(ISessionFossil, tz=self._conf.getTimezone())
                         # unschedule entry from previous place
                         self._schEntry.getSchedule().removeEntry(self._schEntry)
                         if isinstance(owner, conference.Contribution):
                             owner.setSession(session)
+                        if session.getScheduleType() == "poster":
+                            self._schEntry.setStartDate(slot.getStartDate())
+                            self._schEntry.setDuration(dur=slot.getDuration())
+                        else:
+                            self._schEntry.setStartDate(slot.getSchedule().calculateEndDate())
+                            #self._schEntry.setDuration(dur=session.getContribDuration())
                         # add it to new container
                         slot.getSchedule().addEntry(self._schEntry, check=2)
-                        pickledDataSlotSchEntry = DictPickler.pickle(slot.getConfSchEntry(), timezone=self._conf.getTimezone())
+                        fossilizedDataSlotSchEntry = slot.getConfSchEntry().fossilize(entriesFossilsDict, tz=self._conf.getTimezone())
                     else:
                         raise ServiceError("ERR-S3","Invalid slot ID")
                 else:
@@ -1007,11 +1076,11 @@ class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationB
             else:
                 # Moving inside the top-level timetable
 
-                pickledDataSlotSchEntry = None
+                fossilizedDataSlotSchEntry = None
                 if isinstance(owner, conference.Contribution):
-                    pickledDataSession = DictPickler.pickle(owner.getOwner(), timezone=self._conf.getTimezone())
+                    fossilizedDataSession  = owner.getOwner().fossilize(tz=self._conf.getTimezone())
                 else:
-                    pickledDataSession = None
+                    fossilizedDataSession  = None
 
                 # the target date/time
                 parsedDate = parseDate(sessionSlotId, format="%Y%m%d")
@@ -1032,15 +1101,26 @@ class MoveEntry(ScheduleOperation, sessionServices.SessionSlotModifCoordinationB
                     owner.setSession(None)
                 self._conf.getSchedule().addEntry(self._schEntry, check=2)
 
-        newPickledEntry = DictPickler.pickle(self._schEntry)
-        return {'entry': newPickledEntry,
+        newFossilizedEntry = self._schEntry.fossilize(entriesFossilsDict)
+        return {'entry': newFossilizedEntry,
                 'old': oldSch,
-                'id': newPickledEntry['id'],
+                'id': newFossilizedEntry['id'],
                 'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
-                'session': pickledDataSession,
-                'slotEntry': pickledDataSlotSchEntry,
+                'session': fossilizedDataSession ,
+                'slotEntry': fossilizedDataSlotSchEntry,
                 'autoOps': translateAutoOps(self.getAutoOps())}
 
+class MoveEntry(MoveEntryBase, conferenceServices.ConferenceModifBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceModifBase._checkParams(self)
+        MoveEntryBase._checkParams(self)
+
+class MoveEntryFromSessionBlock(MoveEntryBase, sessionServices.SessionSlotModifCoordinationBase):
+
+    def _checkParams(self):
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
+        MoveEntryBase._checkParams(self)
 
 
 class MoveEntryUpDown(ScheduleOperation):
@@ -1099,6 +1179,7 @@ methodMap = {
     "event.getDayEndDate": ConferenceScheduleGetDayEndDate,
     "event.getUnscheduledContributions": ConferenceGetUnscheduledContributions,
     "event.scheduleContributions": ConferenceScheduleContributions,
+    "event.moveEntry": MoveEntry,
 
     "slot.addContribution": SessionSlotScheduleAddContribution,
     "slot.addBreak": SessionSlotScheduleAddBreak,
@@ -1108,6 +1189,7 @@ methodMap = {
     "slot.getDayEndDate": SessionSlotScheduleGetDayEndDate,
     "slot.getBooking": SessionSlotGetBooking,
     "slot.modifyStartEndDate": SessionSlotScheduleModifyStartEndDate,
+    "slot.moveEntry": MoveEntryFromSessionBlock,
 
     "session.getDayEndDate": SessionScheduleGetDayEndDate,
     "session.addSlot": SessionScheduleAddSessionSlot,
@@ -1127,8 +1209,6 @@ methodMap = {
 
     "getAllSessionConveners": ConferenceGetAllConveners,
     "getAllSpeakers": ConferenceGetAllSpeakers,
-
-    "moveEntry": MoveEntry,
 
     "event.moveEntryUpDown": ConferenceTimetableMoveEntryUpDown,
     "session.moveEntryUpDown": SessionTimetableMoveEntryUpDown,

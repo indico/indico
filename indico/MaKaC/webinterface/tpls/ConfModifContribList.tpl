@@ -1,4 +1,4 @@
-<%! 
+<%!
 location = self._conf.getLocation()
 room = self._conf.getRoom()
 
@@ -114,7 +114,7 @@ var addContribution = function() {
     var dialog = new AddNewContributionDialog(
                        'schedule.event.addContribution',
                        null,
-		       <%= jsonEncode({'conference': self._conf.id }) %>, 
+		       <%= jsonEncode({'conference': self._conf.id }) %>,
 		       <%= jsonEncode({'location': locationName,
 		       'room': roomName,
 		       'address': address }) %>,
@@ -127,7 +127,8 @@ var addContribution = function() {
                        null,
                        function() {
                           window.location.reload();
-                       }
+                       },
+                       <%= jsBoolean(self._conf.getAbstractMgr().isActive()) %>
                        );
 
     dialog.execute();

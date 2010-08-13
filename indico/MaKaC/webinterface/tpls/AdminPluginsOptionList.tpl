@@ -74,6 +74,10 @@
                     <div id="roomChooser"></div>
                     <div id="roomAddButton"></div>
                     <script type="text/javascript">
+                        var callback = function(){
+                            $E('roomChooser').set(roomChooser.draw(),addRoomButton);
+                        }
+
                         var removeRoomHandler = function (roomToRemove,setResult){
                             indicoRequest(
                                     'plugins.removeRooms',
@@ -91,25 +95,6 @@
                                     }
                                 );
                             }
-                        var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {})
-                        var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
-                        addRoomButton.observeClick(
-                            function(setResult){
-                                var selectedValue = roomChooser.select.get();
-                                indicoRequest(
-                                    'plugins.addRooms',
-                                    {
-                                     optionName: "<%= name %>",
-                                     room: selectedValue
-                                     },function(result,error) {
-                                         if (!error) {
-                                             roomList.set(selectedValue,$O(selectedValue));
-                                         } else {
-                                                IndicoUtil.errorReport(error);
-                                         }
-                                    }
-                                );
-                        });
                         var roomList = new RoomListWidget('PeopleList',removeRoomHandler);
                         //var temp = roomChooser.source.get()["CERN:1"];
                         var roomSelectedBefore=<%= option.getValue() %>
@@ -117,8 +102,30 @@
                             roomList.set(room, room);
                         });
                         $E('roomList').set(roomList.draw());
-                        $E('roomChooser').set(roomChooser.draw(),addRoomButton);
-                        $E('roomAddButton').set();
+
+                        <% if rbActive: %>
+
+                            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {}, callback);
+                            var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
+                            addRoomButton.observeClick(
+                                function(setResult){
+                                    var selectedValue = roomChooser.select.get();
+                                    indicoRequest(
+                                        'plugins.addRooms',
+                                        {
+                                         optionName: "<%= name %>",
+                                         room: selectedValue
+                                         },function(result,error) {
+                                             if (!error) {
+                                                 roomList.set(selectedValue,$O(selectedValue));
+                                             } else {
+                                                    IndicoUtil.errorReport(error);
+                                             }
+                                        }
+                                    );
+                            });
+                            $E('roomAddButton').set();
+                        <% end %>
                     </script>
                <% end %>
                 <% else: %>

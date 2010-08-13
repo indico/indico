@@ -231,6 +231,7 @@ class RHSubmitMaterialBase:
         self._link = {}
         self._topdf=params.has_key("topdf")
 
+        self._displayName = params.get("displayName","").strip()
         self._uploadType = params.get("uploadType","")
         self._materialId = params.get("materialId","")
         self._description = params.get("description","")
@@ -326,9 +327,12 @@ class RHSubmitMaterialBase:
 
                 resource = LocalFile()
                 resource.setFileName(self._file["fileName"])
-                resource.setName(resource.getFileName())
                 resource.setFilePath(self._file["filePath"])
                 resource.setDescription(self._description)
+                if self._displayName == "":
+                    resource.setName(resource.getFileName())
+                else:
+                    resource.setName(self._displayName)
 
                 if not type(self._target) is Category:
                     self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (self._file["fileName"],text)},"Files",user)
@@ -338,8 +342,11 @@ class RHSubmitMaterialBase:
 
                 resource = Link()
                 resource.setURL(self._link["url"])
-                resource.setName(resource.getURL())
                 resource.setDescription(self._description)
+                if self._displayName == "":
+                    resource.setName(resource.getURL())
+                else:
+                    resource.setName(self._displayName)
 
                 if not type(self._target) is Category:
                     self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(),text)},"Files",user)

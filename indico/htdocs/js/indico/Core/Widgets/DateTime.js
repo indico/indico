@@ -70,8 +70,23 @@ type("DateTimeSelector", ["RealtimeTextBox"],
              self.askForErrorCheck();
              return true;
          });
+
+         var onSelect = function(cal) {
+             var p = cal.params;
+             var update = (cal.dateClicked || p.electric);
+             if (update && p.inputField) {
+                 p.inputField.value = cal.date.print(p.ifFormat);
+                 if (typeof p.inputField.onchange == "function")
+                     p.inputField.onchange();
+             }
+             if (update && p.displayArea)
+                 p.displayArea.innerHTML = cal.date.print(p.daFormat);
+             if (update && typeof p.onUpdate == "function")
+                 p.onUpdate(cal);
+         };
+
          // set up the calendar widget to appear on click
-         var cal = Calendar.setup({
+         Calendar.setup({
              inputField: this.input.dom,
              button: this.trigger.dom,
              displayArea: this.input,
@@ -81,7 +96,8 @@ type("DateTimeSelector", ["RealtimeTextBox"],
              align: "",
              // notify the selector each time a new date/time is set
              // (since onkeydown/onkeyup won't be called)
-             onUpdate: function() { self.notifyChange(); }
+             onUpdate: function() { self.notifyChange(); },
+             onSelect: onSelect
          });
 
      });

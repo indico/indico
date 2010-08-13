@@ -920,10 +920,10 @@ class WEpaymentBannerModif(WBannerModif):
 
 class WListingsBannerModif(WBannerModif):
 
-    def __init__( self, conf ):
+    def __init__( self, conf, type ):
         path=[{"url": urlHandlers.UHConfModifListings.getURL(conf), "title":_("All listings")}]
 
-        itemType="Pending queues"
+        itemType= type
         title=""
         WBannerModif.__init__(self, path, itemType, title)
 
@@ -1821,77 +1821,85 @@ class WMaterialTable( WTemplated ):
 
 class WAccessControlFrame(WTemplated):
 
-    def getHTML( self, target, setVisibilityURL, addAllowedURL, removeAllowedURL):
+    def getHTML( self, target, setVisibilityURL, type ):
         self.__target = target
-        params = { "setVisibilityURL": setVisibilityURL,\
-                   "addAllowedURL": addAllowedURL, \
-                   "removeAllowedURL": removeAllowedURL }
+
+        params = { "setPrivacyURL": setVisibilityURL,\
+                   "target": target,\
+                   "type": type }
         return  WTemplated.getHTML( self, params )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
+
         if self.__target.getAccessProtectionLevel() == -1:
-            vars["privacy"] = "ABSOLUTELY PUBLIC%s" % WInlineContextHelp('The object will stay public regardless of the protection of its parent (no more inheritance)').getHTML()
-            vars["changePrivacy"] = """make it simply <input type="submit" class="btn" name="visibility" value="PUBLIC">%s<br/>""" % WInlineContextHelp('It will then be public by default but will inherit from the potential protection of its parent').getHTML()
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself%s<br/>""" % WInlineContextHelp('It will then be private').getHTML()
+            vars["privacy"] = "PUBLIC"
+            vars["statusColor"] = "#128F33"
         elif self.__target.isItselfProtected():
-            vars["privacy"] = "PRIVATE%s" % WInlineContextHelp('The object is private by itself').getHTML()
-            vars["changePrivacy"] = """make it simply <input type="submit" class="btn" name="visibility" value="PUBLIC">%s<br/>""" % WInlineContextHelp('It will then be public by default but will inherit from the potential protection of its parent').getHTML()
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
-        elif self.__target.hasProtectedOwner():
-            vars["privacy"] = "PRIVATE by inheritance%s" % WInlineContextHelp('Private because a parent object is private').getHTML()
-            vars["changePrivacy"] = """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself%s<br/>""" % WInlineContextHelp('It will then remain private even if the parent object goes public').getHTML()
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
-        else:
-            vars["privacy"] = "PUBLIC%s" % WInlineContextHelp('the object is currently public because its parent is public but might inherit from the potential protection of its parent if it changes one day').getHTML()
-            vars["changePrivacy"] = """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself<br/>"""
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
+            vars["privacy"] = "PRIVATE"
+            vars["statusColor"] = "#B02B2C"
+        else :
+            vars["privacy"] = "INHERITING"
+            vars["statusColor"] = "#444444"
+
+        vars["isFullyPublic"] = None
+
+        if not isinstance(self.__target, Category) :
+            vars["isFullyPublic"] = self.__target.isFullyPublic()
+
+        if isinstance(self.__target, Category) and self.__target.isRoot():
+            vars["parentName"] = vars["parentPrivacy"] = vars["parentStatusColor"] = ''
+        else :
+            vars["parentName"] = self.__target.getOwner().getTitle()
+
+            if self.__target.hasProtectedOwner():
+                vars["parentPrivacy"] = "PRIVATE"
+                vars["parentStatusColor"] = "#B02B2C"
+            else :
+                vars["parentPrivacy"] = "PUBLIC"
+                vars["parentStatusColor"] = "#128F33"
+
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(), self.__target, vars["addAllowedURL"], vars["removeAllowedURL"],selectable=False )
 
         return vars
 
 
 class WConfAccessControlFrame(WTemplated):
 
-    def getHTML( self, target, setVisibilityURL, addAllowedURL, removeAllowedURL,  setAccessKeyURL):
+    def getHTML( self, target, setVisibilityURL, setAccessKeyURL):
         self.__target = target
-        params = { "setPrivacyURL": setVisibilityURL,\
-                   "addAllowedURL": addAllowedURL, \
-                   "removeAllowedURL": removeAllowedURL, \
-                    "setAccessKeyURL": setAccessKeyURL }
+        params = { "target": target,\
+                   "setPrivacyURL": setVisibilityURL,\
+                   "setAccessKeyURL": setAccessKeyURL,\
+                   "type": "Event" }
         return  WTemplated.getHTML( self, params )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
+
         if self.__target.getAccessProtectionLevel() == -1:
-            vars["privacy"] = "ABSOLUTELY PUBLIC%s" % WInlineContextHelp('The object will stay public regardless of the protection of its parent (no more inheritance)').getHTML()
-            vars["changePrivacy"] = """make it simply <input type="submit" class="btn" name="visibility" value="PUBLIC">%s<br/>""" % WInlineContextHelp('It will then be public by default but will inherit from the potential protection of its parent').getHTML()
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself%s<br/>""" % WInlineContextHelp('It will then be private').getHTML()
+            vars["privacy"] = "PUBLIC"
+            vars["statusColor"] = "#128F33"
         elif self.__target.isItselfProtected():
-            vars["privacy"] = "PRIVATE%s" % WInlineContextHelp('The object is private by itself').getHTML()
-            vars["changePrivacy"] = """make it simply <input type="submit" class="btn" name="visibility" value="PUBLIC">%s<br/>""" % WInlineContextHelp('It will then be public by default but will inherit from the potential protection of its parent').getHTML()
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
-        elif self.__target.hasProtectedOwner():
-            vars["privacy"] = "PRIVATE by inheritance%s" % WInlineContextHelp('Private because a parent object is private').getHTML()
-            vars["changePrivacy"] = """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself%s<br/>""" % WInlineContextHelp('It will then remain private even if the parent object goes public').getHTML()
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
-        else:
-            if not self.__target.isFullyPublic():
-                fullyPublic = " - part of this event is protected"
-            else:
-                fullyPublic = ""
-            vars["privacy"] = "PUBLIC%s%s" % (WInlineContextHelp('the object is currently public because its parent is public but might inherit from the potential protection of its parent if it changes one day').getHTML(), fullyPublic)
-            vars["changePrivacy"] = """make it <input type="submit" class="btn" name="visibility" value="PRIVATE"> by itself<br/>"""
-            vars["changePrivacy"] += """make it <input type="submit" class="btn" name="visibility" value="ABSOLUTELY PUBLIC">%s""" % WInlineContextHelp('The object will stay public regardless of the protection of its parent').getHTML()
+            vars["privacy"] = "PRIVATE"
+            vars["statusColor"] = "#B02B2C"
+        else :
+            vars["privacy"] = "INHERITING"
+            vars["statusColor"] = "#444444"
+
+        vars["isFullyPublic"] = self.__target.isFullyPublic()
+        vars["parentName"] = self.__target.getOwner().getName()
+
+        if self.__target.hasProtectedOwner():
+            vars["parentPrivacy"] = "PRIVATE"
+            vars["parentStatusColor"] = "#B02B2C"
+        else :
+            vars["parentPrivacy"] = "PUBLIC"
+            vars["parentStatusColor"] = "#128F33"
 
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["userTable"] = WPrincipalTable().getHTML( self.__target.getAllowedToAccessList(),
-                                                       self.__target,
-                                                       vars["addAllowedURL"],
-                                                       vars["removeAllowedURL"],
-                                                       selectable=False )
         vars["accessKey"] = self.__target.getAccessKey()
+
         return vars
 
 
@@ -3586,25 +3594,6 @@ class Tab:
         tab=self._subtabControl.newTab( id, caption, url )
         return tab
 
-class WConfModifAC:
-
-    def __init__( self, conference ):
-        self.__conf = conference
-
-    def getHTML( self, params ):
-        ac = WAccessControlFrame().getHTML( self.__conf,\
-                                            params["setVisibilityURL"],\
-                                            params["addAllowedURL"],\
-                                            params["removeAllowedURL"] )
-        dc = ""
-        if not self.__conf.isProtected():
-            dc =  "<br>%s"%WDomainControlFrame( self.__conf ).getHTML( \
-                                                    params["addDomainURL"], \
-                                                    params["removeDomainURL"] )
-        mc = WModificationControlFrame().getHTML( self.__conf,\
-                                                  params["addManagersURL"],\
-                                                  params["removeManagersURL"] )
-        return """%s%s<br>%s"""%( ac, dc, mc )
 
 #class WTrackModifSubTrack( WTemplated ):
 #
@@ -5565,8 +5554,12 @@ class WMaterialListItem(WTemplated):
 
 class WShowExistingMaterial(WTemplated):
 
-    def __init__(self,target):
+    def __init__(self,target, mode='display'):
+        """
+        mode should be 'display' or 'management'
+        """
         self._target=target
+        self._mode = mode
 
     def getVars(self):
         vars=WTemplated.getVars(self)
@@ -5582,6 +5575,7 @@ class WShowExistingMaterial(WTemplated):
         vars["resourcesFileProtectHandler"] = vars.get("resourcesFileProtectHandler", None)
         vars["resourcesLinkModifHandler"] = vars.get("resourcesLinkModifHandler", None)
         vars["resourcesLinkProtectHandler"] = vars.get("resourcesLinkProtectHandler", None)
+        vars['mode'] = self._mode
 
         return vars
 

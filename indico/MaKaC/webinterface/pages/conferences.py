@@ -1027,7 +1027,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                     includeContribution = 1
                 else:
                     includeContribution = 0
-                body = outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,self._params.get("showSession",""),self._params.get("showDate",""))
+                body = outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,1,self._params.get("showSession",""),self._params.get("showDate",""))
             if useManagerCache or useNormalCache:
                 cache.saveCachePage( body )
             if not frame:
@@ -1158,7 +1158,9 @@ class WConferenceTimeTable(wcomponents.WTemplated):
         vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                                                           tz, self._aw,
                                                                           useAttrCache = True))
-        vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
+        eventInfo = DictPickler.pickle(self._conf, timezone=tz)
+        eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        vars['eventInfo'] = simplejson.dumps(eventInfo)
         vars['timetableLayout'] = vars.get('ttLyt','')
         return vars
 
@@ -3131,7 +3133,9 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
         vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
                                                                           days = None, mgmtMode = True))
-        vars['eventInfo'] = simplejson.dumps(DictPickler.pickle(self._conf, timezone=tz))
+        eventInfo = DictPickler.pickle(self._conf, timezone=tz)
+        eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
+        vars['eventInfo'] = simplejson.dumps(eventInfo)
 
         return vars
 
@@ -3742,8 +3746,6 @@ class WConfModifAC:
     def getHTML( self, params ):
         ac = wcomponents.WConfAccessControlFrame().getHTML( self.__conf,\
                                             params["setVisibilityURL"],\
-                                            params["addAllowedURL"],\
-                                            params["removeAllowedURL"],\
                                             params["setAccessKeyURL"] )
         dc = ""
         if not self.__conf.isProtected():
@@ -4557,7 +4559,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
     def __init__(self, conference):
         self.__conf = conference
         self._display = []
-        self._dispopts = [ "Email", "Session" ]
+        self._dispopts = [ "Email", "Session", "Actions" ]
         self._order = ""
 
     def getVars(self):
@@ -4572,6 +4574,16 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         vars["backURL"]=quoteattr(str(urlHandlers.UHConfModifListings.getURL(self.__conf)))
         return vars
 
+    def _getTimetableURL(self, convener):
+        url = urlHandlers.UHSessionModifSchedule.getURL(self.__conf)
+        url.addParam("sessionId",convener.getSession().getId() )
+        if hasattr(convener, "getSlot"):
+            timetable = "#" + str(convener.getSlot().getStartDate().strftime("%Y%m%d")) + ".s%sl%s" %(convener.getSession().getId(), convener.getSlot().getId())
+        else:
+            timetable = "#" + str(convener.getSession().getStartDate().strftime("%Y%m%d"))
+
+        return "%s%s"%(url,timetable)
+
     def _getAllConvenersHTML(self):
         html = ''
 
@@ -4581,6 +4593,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         for key in convenersDictionary.keys() :
             counter = 0
             sessions = []
+            actions = []
 
             for convener in  convenersDictionary[key] :
                 if counter == 0 :
@@ -4591,18 +4604,25 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
                         """    %(convener.getEmail(),\
                         self.htmlText(convener.getFullName()) or "&nbsp;", \
                         self.htmlText(convener.getEmail()) or "&nbsp;" )
-
-                url = urlHandlers.UHSessionModification.getURL(self.__conf)
-                url.addParam("sessionId",convener.getSession().getId() )
-                sesurl = quoteattr(str(url))
-                sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
-                sessions.append("<a href=%s>%s</a>"%(sesurl,sestitle))
+                if isinstance(convener, conference.SlotChair):
+                    sestitle = self.htmlText(convener.getSlot().getTitle()) or "Block %s" % convener.getSlot().getId()
+                    sessions.append("%s"%(self.htmlText(convener.getSession().getTitle()) + ": " + sestitle))
+                    actions.append('<a href="%s">'%self._getTimetableURL(convener) + _('Edit timetable') + '</a>')
+                else:
+                    url = urlHandlers.UHSessionModification.getURL(self.__conf)
+                    url.addParam("sessionId",convener.getSession().getId() )
+                    sesurl = quoteattr(str(url))
+                    sestitle = self.htmlText(convener.getSession().getTitle()) or "&nbsp;"
+                    sessions.append("%s"%(self.htmlText(sestitle)))
+                    actions.append('<a href="%s">'%self._getTimetableURL(convener) + _('Edit timetable') + '</a> | <a href=%s>%s</a>'%(sesurl,_("Edit session")))
 
                 counter = counter + 1
 
             sessionlist = "<br/>".join(sessions)
-            html = html + """<td valign="top"  class="abstractDataCell">%s"""%sessionlist
-            html = html + """</td></tr>"""
+            actionsList = "<br/>".join(actions)
+            html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%sessionlist
+            html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%actionsList
+            html = html + """</tr>"""
         html += _("""
                     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
                     <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
@@ -4612,7 +4632,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 
     def _getColumnsHTML(self, sortingField):
         res =[]
-        columns ={"Email": _("Email"),"Session": _("Session") }
+        columns ={"Email": _("Email"),"Session": _("Session"), "Actions": _("Actions") }
         currentSorting=""
         if sortingField is not None:
             currentSorting=sortingField.getId()
@@ -4637,7 +4657,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
                         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s%s<a href=%s>Name</a></td>"""%(nameImg, checkboxes, nameSortingURL))
         if self._display == []:
             for key in self._dispopts:
-                if key in ["Email","Session"]:
+                if key in ["Email","Session", "Actions"]:
                     url=self._getURL()
                     url.addParam("sortBy",key)
                     img=""
@@ -4692,7 +4712,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
 class WPConfAllSessionsConveners( WPConfModifListings ):
 
     def _getPageContent( self, params ):
-        banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, _("Conveners list")).getHTML()
         p = WConferenceAllSessionsConveners( self._conf )
         return banner+p.getHTML()
 
@@ -4798,7 +4818,7 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
 class WPConfAllSpeakers( WPConfModifListings ):
 
     def _getPageContent( self, params ):
-        banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, _("Speakers list")).getHTML()
         p = WConfModifAllContribParticipants( self._conf, self._conf.getSpeakerIndex() )
         return banner+p.getHTML({"title": _("All speakers list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllSpeakers.getURL(self._conf), \
@@ -8950,7 +8970,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         else:
             vars["trackHeader"] = ""
 
-        url = urlHandlers.UHContributionList.getURL( self._conf )
+        url = urlHandlers.UHContributionListFilter.getURL( self._conf )
         url.setSegment( "contributions" )
         vars["filterPostURL"] = quoteattr( str( url ) )
 
@@ -10395,7 +10415,7 @@ class WPXSLMeetingStaticDisplay( WPStaticMeetingBase ):
                 includeContribution = 1
             else:
                 includeContribution = 0
-            return outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,self._params.get("showSession",""),self._params.get("showDate",""))
+            return outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,1,self._params.get("showSession",""),self._params.get("showDate",""))
         else:
             return "Cannot find the %s stylesheet" % view
 
@@ -11253,7 +11273,7 @@ class WPConfModifPendingQueuesBase( WPConferenceModifBase ):
         self._activeTab=activeTab
 
     def _getPageContent(self, params):
-        banner = wcomponents.WListingsBannerModif(self._conf).getHTML()
+        banner = wcomponents.WListingsBannerModif(self._conf, _("Pending queues")).getHTML()
         return banner+self._getTabContent( params )
 
     def _setActiveSideMenuItem(self):
