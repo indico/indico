@@ -4184,8 +4184,7 @@ class WPrincipalSelection(WUserSelection):
         _title =  _("Search for users and groups")
         ah = user.AvatarHolder()
         resUsers = ah.match(criteria,exact=exact,forceWithoutExtAuth=self._forceWithoutExtAuth)
-        gh = user.GroupHolder()
-        resGroups = gh.match(criteria,forceWithoutExtAuth=self._forceWithoutExtAuth)
+        resGroups = [ group for group in user.GroupHolder().match(criteria, forceWithoutExtAuth=self._forceWithoutExtAuth) if not group.isObsolete()]
         l = []
         for item in resUsers:
             l.append(item)

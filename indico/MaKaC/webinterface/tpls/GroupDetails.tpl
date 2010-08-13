@@ -31,7 +31,7 @@
       </td>
       <form action="<%=modifyURL%>" method="POST">
       <td valign="top" align="right">
-	<input type="submit" class="btn" value="modify" <%=disabledModify%>><br>
+	<input type="submit" class="btn" value="modify"><br>
       </td>
       </form>
     </tr>

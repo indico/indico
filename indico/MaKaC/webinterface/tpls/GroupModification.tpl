@@ -1,27 +1,28 @@
-<form action="%(postURL)s" method="POST">
-  %(locator)s
-  <table align="center" width="95%%">
+<% declareTemplate(newTemplateStyle=True) %>
+<form action="<%=postURL%>" method="POST">
+  <%=locator%>
+  <table align="center" width="95%">
   <tr>
-    <td class="formTitle"><a href="%(backURL)s">&lt;&lt; back</a></td>
+    <td class="formTitle"><a href="<%=backURL%>">&lt;&lt; back</a></td>
   </tr>
   <tr>
     <td>
       <br>
-      <table width="70%%" align="center" border="0" style="border-left: 1px solid #777777">
+      <table width="70%" align="center" border="0" style="border-left: 1px solid #777777">
       <tr>
-        <td colspan="3" class="groupTitle">%(Wtitle)s</td>
+        <td colspan="3" class="groupTitle"><%=Wtitle%></td>
       </tr>
       <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">Name</span></td>
-	<td align="left"><input type="text" name="name" value="%(name)s"></td>
+	<td align="left"><% if allowModif: %><input type="text" name="name" value="<%=name%>"><%end%><%else:%><%=name%><%end%></td>
       </tr>
       <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">email</span></td>
-        <td align="left"><input type="text" name="email" value="%(email)s"></td>
+        <td align="left"><% if allowModif: %><input type="text" name="email" value="<%=email%>"><%end%><%else:%><%=email%><%end%></td>
       </tr>
       <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">Description</span></td>
-        <td align="left"><textarea name="description" cols="43" rows="6">%(description)s</textarea></td>
+        <td align="left"><% if allowModif: %><textarea name="description" cols="43" rows="6"><%=description%></textarea><%end%><%else:%><%=description%><%end%></td>
       </tr>
       <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">Obsolete</span></td>

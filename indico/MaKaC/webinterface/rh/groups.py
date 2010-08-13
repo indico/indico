@@ -34,11 +34,11 @@ class RHGroupsProtected(admins.RHAdminBase):
 
 class RHGroups( RHGroupsProtected ):
     _uh = urlHandlers.UHGroups
-    
+
     def _checkParams(self,params):
         admins.RHAdminBase._checkParams(self,params)
         self._params = params
-        
+
     def _process( self ):
         p = adminPages.WPGroupList( self, self._params )
         return p.display()
@@ -46,24 +46,24 @@ class RHGroups( RHGroupsProtected ):
 
 class RHGroupCreation( RHGroupsProtected ):
     _uh = urlHandlers.UHNewGroup
-    
+
     def _process( self ):
         p = adminPages.WPGroupCreation( self )
         return p.display()
 
 class RHLDAPGroupCreation( RHGroupsProtected ):
     _uh = urlHandlers.UHNewGroup
-    
+
     def _process( self ):
         p = adminPages.WPLDAPGroupCreation( self )
         return p.display()
 
 
 class _GroupUtils:
-    
+
     def setGroupValues( self, grp, grpData ):
         grp.setName( grpData["name"] )
-        grp.setDescription( grpData["description"] ) 
+        grp.setDescription( grpData["description"] )
         grp.setEmail( grpData["email"] )
         grp.setObsolete( grpData.has_key("obsolete") )
     setGroupValues = classmethod( setGroupValues )
@@ -71,16 +71,16 @@ class _GroupUtils:
 
 class RHGroupPerformCreation( RHGroupsProtected ):
     _uh = urlHandlers.UHGroupPerformRegistration
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams(self,params)
         self._grpData = params
-    
+
     def _process( self ):
         grp = user.Group()
         _GroupUtils.setGroupValues( grp, self._grpData )
         gh = user.GroupHolder()
-        gh.add( grp )        
+        gh.add( grp )
         self._redirect( urlHandlers.UHGroupDetails.getURL( grp ) )
 
 
@@ -88,11 +88,11 @@ class RHGroupBase( RHGroupsProtected ):
 
     def _checkProtection( self ):
         if self._group.getMemberList() == []:
-            return 
+            return
         RHProtected._checkProtection( self )
         if not self._group.canModify( self._aw ):
             raise errors.ModificationError("group")
-    
+
     def _checkParams ( self, params ):
         admins.RHAdminBase._checkParams(self,params)
         if "groupId" not in params or params["groupId"].strip() == "":
@@ -103,7 +103,7 @@ class RHGroupBase( RHGroupsProtected ):
 
 class RHGroupDetails( RHGroupBase ):
     _uh = urlHandlers.UHGroupDetails
-    
+
     def _process( self ):
         p = adminPages.WPGroupDetails( self, self._group )
         return p.display()
@@ -111,7 +111,7 @@ class RHGroupDetails( RHGroupBase ):
 
 class RHGroupModification( RHGroupBase ):
     _uh = urlHandlers.UHGroupModification
-    
+
     def _process( self ):
         p = adminPages.WPGroupModification( self, self._group )
         return p.display()
@@ -119,20 +119,22 @@ class RHGroupModification( RHGroupBase ):
 
 class RHGroupPerformModification( RHGroupBase ):
     _uh = urlHandlers.UHGroupPerformModification
-    
+
     def _checkParams( self, params ):
         RHGroupBase._checkParams( self, params )
         self._grpData = params
-    
+
     def _process( self ):
         if not isinstance(self._group, user.CERNGroup):
             _GroupUtils.setGroupValues( self._group, self._grpData )
+        else:
+            self._group.setObsolete(self._grpData.has_key('obsolete'))
         self._redirect( urlHandlers.UHGroupDetails.getURL( self._group ) )
 
 
 class RHGroupSelectMembers( RHGroupBase ):
     _uh = urlHandlers.UHGroupSelectMembers
-    
+
     def _process( self ):
         p = adminPages.WPGroupSelectMembers( self, self._group )
         return p.display( **self._getRequestParams() )
@@ -140,15 +142,15 @@ class RHGroupSelectMembers( RHGroupBase ):
 
 class RHGroupAddMembers( RHGroupBase ):
     _uh = urlHandlers.UHGroupAddMembers
-    
+
     def _checkParams( self, params ):
         self._params = params
         RHGroupBase._checkParams( self, params )
-        self._selMembersIdList = self._normaliseListParam( params.get("selectedPrincipals", []) )  
-    
+        self._selMembersIdList = self._normaliseListParam( params.get("selectedPrincipals", []) )
+
     def _process( self ):
         if not self._params.has_key("cancel") and not isinstance(self._group, user.CERNGroup):
-            ah = user.PrincipalHolder() 
+            ah = user.PrincipalHolder()
             for id in self._selMembersIdList:
                 if id:
                     self._group.addMember( ah.getById( id ) )
@@ -157,13 +159,13 @@ class RHGroupAddMembers( RHGroupBase ):
 
 class RHGroupRemoveMembers( RHGroupBase ):
     _uh = urlHandlers.UHGroupRemoveMembers
-    
+
     def _checkParams( self, params ):
         RHGroupBase._checkParams( self, params )
         self._selMembersIdList = self._normaliseListParam( params.get("selectedPrincipals", []) )
 
     def _process( self ):
-        ah = user.PrincipalHolder() 
+        ah = user.PrincipalHolder()
         for id in self._selMembersIdList:
             self._group.removeMember( ah.getById( id ) )
         self._redirect( urlHandlers.UHGroupDetails.getURL( self._group ) )

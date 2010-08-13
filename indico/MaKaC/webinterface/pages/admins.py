@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.common.PickleJar import DictPickler
 from pytz import timezone
+from MaKaC.user import CERNGroup
 
 import os
 from MaKaC.common.general import *
@@ -1850,12 +1851,15 @@ class WGroupModification(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars["allowModif"] = True
         if self._group == None:
             self.__setNewGroupVars( vars )
             vars["locator"] = ""
         else:
             self.__setGroupVars( self._group, vars )
             vars["locator"] = self._group.getLocator().getWebForm()
+            if isinstance(self._group, CERNGroup):
+                vars["allowModif"] = False
         return vars
 
 
@@ -1889,13 +1893,6 @@ class WGroupDetails(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["disabledSubmit"] = ""
-        vars["disabledAdd"] = ""
-        vars["disabledModify"] = ""
-        if isinstance(self._group, user.CERNGroup):
-            vars["disabledSubmit"] = "disabled"
-            vars["disabledAdd"] = "disabled"
-            vars["disabledModify"] = "disabled"
         vars["name"] = self._group.getName()
         vars["description"] = self._group.getDescription()
         vars["email"] = self._group.getEmail()
