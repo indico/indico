@@ -407,7 +407,7 @@ class CalendarIndex(Persistent):
         date = date2utctimestamp(date)
         res = set()
         for val in self._idxSdate.values(self._idxSdate.minKey(), date):
-            res.union_update( set( val ) )
+            res.update( set( val ) )
         return res
 
     def _getObjectsStartingAfter( self, date ):
@@ -422,7 +422,7 @@ class CalendarIndex(Persistent):
         date = date2utctimestamp(date)
         res = set()
         for val in self._idxSdate.values(date):
-            res.union_update( set( val ) )
+            res.update( set( val ) )
         return res
 
     def _getObjectsEndingBefore( self, date ):
@@ -437,7 +437,7 @@ class CalendarIndex(Persistent):
         date = date2utctimestamp(date)
         res = set()
         for val in self._idxEdate.values(self._idxEdate.minKey(), date):
-            res.union_update( set( val ) )
+            res.update( set( val ) )
         return res
 
     def _getObjectsEndingAfter( self, date ):
@@ -452,7 +452,7 @@ class CalendarIndex(Persistent):
         date = date2utctimestamp(date)
         res = set()
         for val in self._idxEdate.values(date):
-            res.union_update( set( val ) )
+            res.update( set( val ) )
         return res
 
     def getObjectsStartingInDay( self, date ):
