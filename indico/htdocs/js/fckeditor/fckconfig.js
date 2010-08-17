@@ -27,7 +27,7 @@
 FCKConfig.CustomConfigurationsPath = '' ;
 
 //FCKConfig.EditorAreaCSS = FCKConfig.BasePath + 'css/fck_editorarea.css' ;
-FCKConfig.EditorAreaCSS = FCKConfig.BasePath + '../../../css/default.css';
+FCKConfig.EditorAreaCSS = FCKConfig.BasePath + '../../../css/Default.css';
 FCKConfig.EditorAreaStyles = '' ;
 FCKConfig.ToolbarComboPreviewCSS = '' ;
 
