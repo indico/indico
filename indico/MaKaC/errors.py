@@ -164,13 +164,13 @@ class PluginError(MaKaCError):
     pass
 
 
-class htmlScriptError(MaKaCError):
+class HtmlScriptError(MaKaCError):
     """
     """
     pass
 
 
-class htmlForbiddenTag(MaKaCError):
+class HtmlForbiddenTag(MaKaCError):
     """
     """
     pass

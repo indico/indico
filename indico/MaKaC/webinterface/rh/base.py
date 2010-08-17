@@ -47,7 +47,7 @@ from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, htmlScriptError, htmlForbiddenTag, ConferenceClosedError, HostnameResolveError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
@@ -556,10 +556,10 @@ class RH(RequestHandlerBase):
             #Error filling the values of a form
             res = self._processNoReportError( e )
             DBMgr.getInstance().endRequest(False)
-        except htmlScriptError,e:
+        except HtmlScriptError,e:
             res = self._processHtmlScriptError(e)
             DBMgr.getInstance().endRequest(False)
-        except htmlForbiddenTag,e:
+        except HtmlForbiddenTag,e:
             res = self._processRestrictedHTML(e)
             DBMgr.getInstance().endRequest(False)
         except MaKaCError, e:

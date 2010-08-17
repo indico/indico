@@ -38,7 +38,7 @@ var startTag = /^<[!?]?(\w+)((?:\s+[\w\-\:\"\.\/]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[
 //Default parameters
 
 // Empty Elements - HTML 4.01
-var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,isindex,link,meta,param,embed");
+var emptyElements = makeMap("area,base,basefont,br,col,frame,hr,img,input,isindex,link,meta,param,embed");
 
 // Block Elements - HTML 4.01
 var block = makeMap("address,applet,blockquote,button,center,dd,del,dir,div,dl,dt,fieldset,form,frameset,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,p,pre,table,tbody,td,tfoot,th,thead,tr,ul");
@@ -244,7 +244,7 @@ type("HTMLParser", [],
                 return this[ this.length - 1 ];
             };
 
-            this.empty = params && params.empty ? params.empty : empty;
+            this.empty = params && params.empty ? params.empty : emptyElements;
             this.block = params && params.block ? params.block : block;
             this.inline = params && params.inline ? params.inline : inline;
             this.closeSelf = params && params.closeSelf ? params.closeSelf : closeSelf;

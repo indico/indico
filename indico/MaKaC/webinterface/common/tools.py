@@ -221,7 +221,7 @@ tagSearch = re.compile("< *[^<^>^ ]+",re.IGNORECASE|re.DOTALL)
 ##    return True
 
 
-class HarmfulHTMLException:
+class HarmfulHTMLException(Exception):
 
     def __init__(self, msg, pos = 0):
         self.msg = 'Potentially harmful HTML: "%s" found at %s' % (msg, pos)

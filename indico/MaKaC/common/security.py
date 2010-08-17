@@ -21,7 +21,7 @@
 from MaKaC.common import Config
 from MaKaC.common.utils import encodeUnicode
 
-from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag
+from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag
 from MaKaC.webinterface.common.tools import escape_html, restrictedHTML
 
 """
@@ -79,17 +79,17 @@ def sanitizationCheck(target, params, accessWrapper):
 ##            if isinstance(params[param], str):
 ##                ret = scriptDetection(params[param])
 ##                if not restrictedHTML(params[param], level):
-##                    raise htmlForbiddenTag(params[param])
+##                    raise HtmlForbiddenTag(params[param])
 ##            elif isinstance(params[param], list):
 ##                for item in params[param]:
 ##                    if isinstance(item, str):
 ##                        ret = scriptDetection(item)
 ##                        if ret:
-##                            raise htmlScriptError(item)
+##                            raise HtmlScriptError(item)
 ##                        if not restrictedHTML(item, level):
-##                            raise htmlForbiddenTag(item)
+##                            raise HtmlForbiddenTag(item)
 ##            if ret:
-##                raise htmlScriptError(params[param])
+##                raise HtmlScriptError(params[param])
 ##
 ##    elif level == 2:
 ##        #raise error if script but style accepted
@@ -98,19 +98,19 @@ def sanitizationCheck(target, params, accessWrapper):
 ##            if isinstance(params[param], str):
 ##                ret = scriptDetection(params[param], allowStyle=True)
 ##                if ret:
-##                    raise htmlScriptError(params[param])
+##                    raise HtmlScriptError(params[param])
 ##                ret = restrictedHTML(params[param], level)
 ##                if not ret:
-##                    raise htmlForbiddenTag(params[param])
+##                    raise HtmlForbiddenTag(params[param])
 ##            elif isinstance(params[param], list):
 ##                for item in params[param]:
 ##                    if isinstance(item, str):
 ##                        ret = scriptDetection(item, allowStyle=True)
 ##                        if ret:
-##                            raise htmlScriptError(item)
+##                            raise HtmlScriptError(item)
 ##                        ret = restrictedHTML(item, level)
 ##                        if not ret:
-##                            raise htmlForbiddenTag(item)
+##                            raise HtmlForbiddenTag(item)
 
     # raise error if form or iframe tags are used
     elif level == 1:
@@ -119,24 +119,24 @@ def sanitizationCheck(target, params, accessWrapper):
         for param in params.keys():
             if isinstance(params[param], str):
                 if not restrictedHTML(params[param], level):
-                    raise htmlForbiddenTag(params[param])
+                    raise HtmlForbiddenTag(params[param])
             elif isinstance(params[param], list):
                 for item in params[param]:
                     if isinstance(item, str):
                         if not restrictedHTML(item, level):
-                            raise htmlForbiddenTag(item)
+                            raise HtmlForbiddenTag(item)
 
     elif level == 2:
         #raise error if script but style accepted
         for param in params.keys():
             if isinstance(params[param], str):
                 if not restrictedHTML(params[param], level):
-                    raise htmlForbiddenTag(params[param])
+                    raise HtmlForbiddenTag(params[param])
             elif isinstance(params[param], list):
                 for item in params[param]:
                     if isinstance(item, str):
-                        if not restrictedHTML(params[param], level):
-                            raise htmlForbiddenTag(item)
+                        if not restrictedHTML(item, level):
+                            raise HtmlForbiddenTag(item)
 
 
     elif level == 3:
