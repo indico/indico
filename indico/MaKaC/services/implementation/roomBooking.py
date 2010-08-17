@@ -214,3 +214,53 @@ class GetDateWarning( ServiceBase ):
             return _("Warning: weekend chosen" )
 
         return _( "Warning: holidays chosen" )
+
+class RoomBookingMapBase( ServiceBase ):
+    def _param(self, parameterName):
+        try:
+            return self._params[parameterName]
+        except:
+            from MaKaC.services.interface.rpc.common import ServiceError
+            raise ServiceError("ERR-RB0", "Invalid %s." % parameterName)
+
+class RoomBookingMapCreateAspect(RoomBookingMapBase):
+
+    def _checkParams( self ):
+        self._location = Location.parse(self._param("location"))
+        self._aspect = self._param("aspect")
+
+    def _getAnswer( self ):
+        aspect = MapAspect()
+        aspect.updateFromDictionary(self._aspect)
+        self._location.addAspect(aspect)
+        return {}
+
+class RoomBookingMapUpdateAspect(RoomBookingMapBase):
+
+    def _checkParams( self ):
+        self._location = Location.parse(self._param("location"))
+        self._aspect = self._param("aspect")
+
+    def _getAnswer( self ):
+        aspect = self._location.getAspect(self._aspect['id'])
+        aspect.updateFromDictionary(self._aspect)
+        return {}
+
+class RoomBookingMapRemoveAspect(RoomBookingMapBase):
+
+    def _checkParams( self ):
+        self._location = Location.parse(self._param("location"))
+        self._aspectId = self._param("aspectId")
+
+    def _getAnswer( self ):
+        self._location.removeAspect(self._aspectId)
+        return {}
+
+class RoomBookingMapListAspects(RoomBookingMapBase):
+
+    def _checkParams( self ):
+        self._location = Location.parse(self._param("location"))
+
+    def _getAnswer( self ):
+        return [aspect.toDictionary() for aspect in self._location.getAspects()]
+

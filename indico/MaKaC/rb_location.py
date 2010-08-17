@@ -46,6 +46,51 @@ def _ensureZODBBranch( force = False ):
     if force or not root.get( _ROOM_BOOKING_LOCATION_LIST ):
         root[_ROOM_BOOKING_LOCATION_LIST] = [ ]
 
+def mapper(src, dest, properties):
+    if isinstance(src, dict) and not isinstance(dest, dict):
+        # map from dictionary keys to object attributes
+        for prop in properties:
+            setattr(dest, prop, src.get(prop, None))
+    elif not isinstance(src, dict) and isinstance(dest, dict):
+        # map from object attributes to dictionary keys
+        for prop in properties:
+            dest[prop] = getattr(src, prop, None)
+    return dest
+
+class MapAspect(Persistent, object):
+    """
+    Map aspect is a structure of data related to a view of a Google Map of rooms.
+    The rooms that are specific to a certain location can be viewed from several aspects.
+    A map aspect can be percieved as a combination of map coordinates and zoom level.
+    """
+
+    def __str__(self):
+        s = _(""" _("Id"): """) + self.id + "\n"
+        s += _(""" _("Name"): """) + self.name + "\n"
+        return s
+
+    def __cmp__(self, second):
+        return cmp(self.id, second.id)
+
+    id = None                    # str - aspects's ID
+    name = None                  # str - aspects's name
+    defaultOnStartup = False     # bool - is this aspect the default one on start-up
+    centerLatitude = None        # str - the latitude of the aspects's perspective center
+    centerLongitude = None       # str - the longitude of the aspects's perspective center
+    zoomLevel = None             # str - the zoom level of the aspects's perspective
+    topLeftLatitude = None       # str - the latitude of the aspects's left corner
+    topLeftLongitude = None      # str - the longitude of the aspects's left corner
+    bottomRightLatitude = None   # str - the latitude of the aspects's right corner
+    bottomRightLongitude = None  # str - the longitude of the aspects's right corner
+
+    __ATTRIBUTES = ['id', 'name', 'defaultOnStartup', 'centerLatitude', 'centerLongitude', 'zoomLevel',
+                    'topLeftLatitude', 'topLeftLongitude', 'bottomRightLatitude', 'bottomRightLongitude']
+
+    def toDictionary(self):
+        return mapper(self, {}, MapAspect.__ATTRIBUTES)
+
+    def updateFromDictionary(self, aspectDict):
+        return mapper(aspectDict, self, MapAspect.__ATTRIBUTES)
 
 class Location( Persistent, object ):
     """
@@ -83,6 +128,7 @@ class Location( Persistent, object ):
         self.friendlyName = friendlyName
         self.factory = factory
         self._avcSupportEmails = []
+        self._aspects = {}
 
     def __str__( self ):
         s = _(""" _("Location"): """) + self.friendlyName + "\n"
@@ -180,6 +226,29 @@ class Location( Persistent, object ):
                 factories.append( location.factory )
         return factories
 
+    # Aspects management ====================================================
+
+    def addAspect(self, aspect):
+        self.aspects[aspect.id] = aspect
+        self._p_changed = 1
+
+    def removeAspect(self, aspectId):
+        del self.aspects[aspectId]
+        self._p_changed = 1
+
+    def getAspect(self, aspectId):
+        return self.aspects[aspectId]
+
+    def getAspects(self):
+        return sorted(self.aspects.values())
+
+    def _getAspects(self):
+        if getattr(self, '_aspects', None) is None:
+            self._aspects = {}
+        return self._aspects
+
+    aspects = property(_getAspects)
+
     # Properties ============================================================
 
     class GetAllLocations( object ):
@@ -213,7 +282,6 @@ class Location( Persistent, object ):
         if email in emailList:
             emailList.remove( email )
         self._avcSupportEmails = emailList
-
 
 """
 Here is THE place to register your plugin.

@@ -44,6 +44,7 @@ from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.plugins.pluginLoader import PluginLoader
 from MaKaC import plugins
 from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
+from MaKaC.search.cache import MapOfRoomsCache
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -668,9 +669,29 @@ class RHRoomBookingSearch4Users( RHRoomBookingBase ):
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
-    def _businessLogic( self ):
+    def _process(self):
+        page = roomBooking_wp.WPRoomBookingMapOfRooms(self)
+        return page.display()
+
+class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
+
+    def __init__(self, *args, **kwargs):
+        super(RHRoomBookingMapOfRoomsWidget, self).__init__(*args, **kwargs)
+        self._cache = MapOfRoomsCache()
+
+    def _checkParams(self, params):
+        RHRoomBookingBase._checkParams(self, params)
+
+    def _businessLogic(self):
         # get all rooms
-        rooms = RoomBase.getRooms(allFast=True)
+        defaultLocation = Location.getDefaultLocation()
+        rooms = RoomBase.getRooms(location=defaultLocation.friendlyName)
+        aspects = [aspect.toDictionary() for aspect in defaultLocation.getAspects()]
+
+        # specialization for a video conference, CERN-specific
+        possibleEquipment = defaultLocation.factory.getEquipmentManager().getPossibleEquipment()
+        possibleVideoConference = 'Video conference' in possibleEquipment
+        self._forVideoConference = possibleVideoConference and self._getRequestParams().get("avc") == 'y'
 
         # break-down the rooms by buildings
         buildings = {}
@@ -691,16 +712,27 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
                     building['longitude'] = room.longitude
 
                 # add the room to its building
-                building['rooms'].append(room.fossilize())
+                if not self._forVideoConference or room.needsAVCSetup:
+                    building['rooms'].append(room.fossilize())
 
-        # filter the buildings with coordinates and return them
-        buildings_with_coords = [b for b in buildings.values() if b['has_coordinates']]
+        # filter the buildings with rooms and coordinates and return them
+        buildings_with_coords = [b for b in buildings.values() if b['rooms'] and b['has_coordinates']]
+        self._defaultLocation = defaultLocation.friendlyName
+        self._aspects = aspects
         self._buildings = buildings_with_coords
 
     def _process(self):
         self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingMapOfRooms(self)
-        return p.display()
+        page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference)
+
+        params = self._getRequestParams()
+        entry = self._cache.loadObject('', params)
+        if entry:
+            html = entry.getContent()
+        else:
+            html = page.display()
+            self._cache.cacheObject('', html, params)
+        return html
 
 # 2. List of ...
 

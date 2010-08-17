@@ -302,6 +302,9 @@ class UHConfModifAddMaterials( URLHandler ):
 class UHRoomBookingMapOfRooms( URLHandler ):
     _relativeURL = "roomBooking.py/mapOfRooms"
 
+class UHRoomBookingMapOfRoomsWidget( URLHandler ):
+    _relativeURL = "roomBooking.py/mapOfRoomsWidget"
+
 class UHRoomBookingWelcome( URLHandler ):
     _relativeURL = "roomBooking.py"
 

@@ -412,11 +412,28 @@ class Room( Persistent, RoomBase, Fossilizable ):
     def getUrl(self):
         """ Room URL """
         return str(urlHandlers.UHRoomBookingRoomDetails.getURL(target=self))
-        #return 'http://indico.cern.ch/roomBooking.py/roomDetails?roomLocation=CERN&roomID=3'
 
     def getMarkerDescription(self):
         """ Room description for the map marker """
-        return _("Capacity") + ": %s " % self.capacity + _("people")
+        infos = []
+        if self.capacity:
+            infos.append("%s %s" % (self.capacity , _("people")))
+        if self.isReservable:
+            infos.append(_("public"))
+        else:
+            infos.append(_("private"))
+        if self.resvsNeedConfirmation:
+            infos.append(_("needs confirmation"))
+        else:
+            infos.append(_("auto-confirmation"))
+        if self.needsAVCSetup:
+            infos.append(_("video conference"))
+        return ", ".join(infos)
+
+    def getTipPhotoURL(self):
+        """ URL of the tip photo of the room """
+        from MaKaC.webinterface.urlHandlers import UHRoomPhoto
+        return str(UHRoomPhoto.getURL(self._doGetPhotoId(force=True)))
 
     def getIsAutoConfirm(self):
         """ Has the room auto-confirmation of schedule? """

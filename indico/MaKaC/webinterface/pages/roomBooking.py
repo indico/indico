@@ -22,6 +22,7 @@ from MaKaC.common.general import *
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.rb_location import CrossLocationDB
 import MaKaC.common.info as info
 
@@ -222,15 +223,6 @@ class WPRoomBookingSearch4Users( WPRoomBookingBase ):
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 
-    def __init__(self, rh):
-        WPRoomBookingBase.__init__(self, rh)
-        self._rh = rh
-        self.addExtraCSSFile('mapofrooms.css')
-
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + \
-               self._includeJSPackage('RoomBooking')
-
     def _getTitle(self):
         return WPRoomBookingBase._getTitle(self) + " - " + _("Map of rooms")
 
@@ -238,7 +230,31 @@ class WPRoomBookingMapOfRooms(WPRoomBookingBase):
         self._roomMapOpt.setActive(True)
 
     def _getBody(self, params):
-        wc = wcomponents.WRoomBookingMapOfRooms(self._rh)
+        wc = wcomponents.WRoomBookingMapOfRooms()
+        return wc.getHTML(params)
+
+class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
+
+    def __init__(self, rh, aspects, buildings, defaultLocation, forVideoConference):
+        WPNotDecorated.__init__(self, rh)
+        self._aspects = aspects
+        self._buildings = buildings
+        self._defaultLocation = defaultLocation
+        self._forVideoConference = forVideoConference
+        self.addExtraCSSFile('mapofrooms.css')
+
+    def getJSFiles(self):
+        return WPNotDecorated.getJSFiles(self) + \
+               self._includeJSPackage('RoomBooking')
+
+    def _getTitle(self):
+        return WPNotDecorated._getTitle(self) + " - " + _("Map of rooms")
+
+    def _setCurrentMenuItem(self):
+        self._roomMapOpt.setActive(True)
+
+    def _getBody(self, params):
+        wc = wcomponents.WRoomBookingMapOfRoomsWidget(self._aspects, self._buildings, self._defaultLocation, self._forVideoConference)
         return wc.getHTML(params)
 
 # 2. List of ...

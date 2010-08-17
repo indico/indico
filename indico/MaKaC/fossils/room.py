@@ -46,6 +46,9 @@ class IRoomMapFossil(IFossil):
     def responsibleId(self):
         """ ID of the responsible person for the room """
 
+    def getTipPhotoURL(self):
+        """ URL of the tip photo of the room """
+
     def isActive(self):
         """ Is the room active? """
 
@@ -60,3 +63,9 @@ class IRoomMapFossil(IFossil):
 
     def getMarkerDescription(self):
         """ Room description for the map marker """
+
+    def needsAVCSetup(self):
+        """ Setup for for audio and video conference """
+
+    def getAvailableVC(self):
+        """ Available equipment for audio and video conference """

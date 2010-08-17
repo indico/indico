@@ -6119,13 +6119,28 @@ class WRoomBookingSearch4Bookings( WTemplated ):
 
 class WRoomBookingMapOfRooms(WTemplated):
 
-    def __init__(self, rh):
-        self._rh = rh
+    def getVars(self):
+
+        vars = WTemplated.getVars(self)
+        vars["mapOfRoomsWidgetURL"] = urlHandlers.UHRoomBookingMapOfRoomsWidget.getURL( None )
+
+        return vars
+
+class WRoomBookingMapOfRoomsWidget(WTemplated):
+
+    def __init__(self, aspects, buildings, defaultLocation, forVideoConference):
+        self._aspects = aspects
+        self._buildings = buildings
+        self._defaultLocation = defaultLocation
+        self._forVideoConference = forVideoConference
 
     def getVars(self):
         vars = WTemplated.getVars(self)
 
-        vars["buildings"] = self._rh._buildings
+        vars["aspects"] = self._aspects
+        vars["buildings"] = self._buildings
+        vars["defaultLocation"] = self._defaultLocation
+        vars["forVideoConference"] = self._forVideoConference
 
         return vars
 

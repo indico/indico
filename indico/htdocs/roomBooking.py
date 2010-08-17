@@ -33,6 +33,8 @@ def search4Users( req, **params ):
     return roomBooking.RHRoomBookingSearch4Users( req ).process( params )
 def mapOfRooms(req, **params):
     return roomBooking.RHRoomBookingMapOfRooms(req).process(params)
+def mapOfRoomsWidget(req, **params):
+    return roomBooking.RHRoomBookingMapOfRoomsWidget(req).process(params)
 
 # 2. List of...
 def roomList( req, **params ):

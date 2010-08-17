@@ -21,6 +21,11 @@ methodMap = {
     "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
     "roomBooking.getDateWarning" :roomBooking.GetDateWarning,
 
+    "roomBooking.mapaspects.create": roomBooking.RoomBookingMapCreateAspect,
+    "roomBooking.mapaspects.update": roomBooking.RoomBookingMapUpdateAspect,
+    "roomBooking.mapaspects.remove": roomBooking.RoomBookingMapRemoveAspect,
+    "roomBooking.mapaspects.list": roomBooking.RoomBookingMapListAspects,
+
     "resources.timezones.getAll": resources.GetTimezones,
     "resources.languages.getAll": resources.GetLanguages,
 

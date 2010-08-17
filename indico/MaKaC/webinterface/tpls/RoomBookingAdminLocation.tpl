@@ -138,9 +138,90 @@
         <% end %>
       </td>
     </tr>
+
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+      <td class="titleUpCellTD" style="width: 160px;"><span class="titleCellFormat">Room map attributes</span></td>
+      <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
+        <div id="AspectsListHolder"></div>
+      </td>
+    </tr>
+
     </table>
     <br>
 
+<script type="text/javascript">
+
+var newAspectsHandler = function(newAspect, setResult) {
+    indicoRequest(
+        'roomBooking.mapaspects.create',
+        {
+            location: '<%=location.friendlyName%>',
+            aspect: newAspect
+        },
+        function(result,error) {
+            if (!error) {
+                setResult(true);
+            } else {
+                IndicoUtil.errorReport(error);
+                setResult(false);
+            }
+        }
+    );
+}
+
+var editAspectHandler = function(oldAspect, setResult, newAspect) {
+    indicoRequest(
+        'roomBooking.mapaspects.update',
+        {
+            location: '<%=location.friendlyName%>',
+            aspect: newAspect
+        },
+        function(result,error) {
+            if (!error) {
+                setResult(true);
+            } else {
+                IndicoUtil.errorReport(error);
+                setResult(false);
+            }
+        }
+    );
+}
+
+var removeAspectHandler = function(aspect, setResult) {
+    indicoRequest(
+        'roomBooking.mapaspects.remove',
+        {
+            location: '<%=location.friendlyName%>',
+            aspectId: aspect.get('id')
+        },
+        function(result,error) {
+            if (!error) {
+                setResult(true);
+            } else {
+                IndicoUtil.errorReport(error);
+                setResult(false);
+            }
+        }
+    );
+}
+    indicoRequest(
+        'roomBooking.mapaspects.list',
+        {
+            location: '<%= location.friendlyName %>'
+        },
+        function(result,error) {
+            if (!error) {
+                var aspectsListField = new MapAspectListField('AspectsListDiv', 'PeopleList', result,
+                        newAspectsHandler, editAspectHandler, removeAspectHandler);
+                $E('AspectsListHolder').set(aspectsListField.draw());
+            } else {
+                IndicoUtil.errorReport(error);
+            }
+        }
+    );
+
+</script>
 
 <!-- ============== Key Performance Indicators ================= -->
 <!-- =========================================================== -->
@@ -237,3 +318,4 @@
   </td>
 </tr>
 </table>
+

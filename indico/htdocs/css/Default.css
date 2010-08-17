@@ -5719,6 +5719,14 @@ ul.nobulletsListWrapping li
     list-style-type: none;
 }
 
+div.AspectsListDiv {
+    margin-bottom: 10px;
+    height: 100px;
+    width: 350px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+}
+
 div.PeopleListDiv {
     margin-bottom: 10px;
     height: 100px;
