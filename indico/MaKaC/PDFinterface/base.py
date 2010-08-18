@@ -45,7 +45,6 @@ try :
     from PIL import Image as PILImage
     HAVE_PIL = True
 except ImportError, e:
-    from MaKaC.PDFinterface.base import Image as PILImage
     HAVE_PIL = False
 
 ratio = math.sqrt(math.sqrt(2.0))
