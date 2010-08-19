@@ -144,10 +144,10 @@
                             <input type="hidden" name="roomID" id="roomID" value="<%=candResv.room.id%>" />
                             <input type="hidden" name="roomLocation" id="roomLocation" value="<%=candResv.room.locationName%>" />
                             <% if formMode == FormMode.NEW: %>
-                                 <%= _("New")%> <%=bookingMessage%>ing
+                                 <%= _("New")%>&nbsp;<%=bookingMessage%>ing
                             <% end %>
                             <% if formMode == FormMode.MODIF: %>
-                                 <%= _("Modify")%> <%=bookingMessage%>ing
+                                 <%= _("Modify")%>&nbsp;<%=bookingMessage%>ing
                                 <input type="hidden" name="resvID" id="resvID" value="<%=candResv.id%>" />
                             <% end %>
                             </span><br />
