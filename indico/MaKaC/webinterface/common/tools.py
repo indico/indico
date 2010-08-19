@@ -54,7 +54,9 @@ allowedAttrs = ["align", "abbr", "alt",
                 "size", "scope", "shape", "span","start", "summary",
                 "title", "tabindex", "type",
                 "valign", "value", "vspace",
-                "width"]
+                "width",
+                #TODO: We must remove this one and look for a workaround in order to be able to use it
+                "src"]
 
 allowedCssProperties = [ "background-color", "border-top-color", "border-top-style", "border-top-width",
                          "border-top", "border-right-color", "border-right-style",  "border-right-width",

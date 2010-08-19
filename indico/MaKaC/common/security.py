@@ -113,9 +113,9 @@ def sanitizationCheck(target, params, accessWrapper):
 ##                            raise HtmlForbiddenTag(item)
 
     # raise error if form or iframe tags are used
-    elif level == 1:
-        #level 1 or default
-        #raise error if script or style detected
+    elif level in [1,2]:
+        #level 1 or default: raise error if script or style detected
+        #level 2: raise error if script but style accepted
         for param in params.keys():
             if isinstance(params[param], str):
                 if not restrictedHTML(params[param], level):
@@ -125,20 +125,6 @@ def sanitizationCheck(target, params, accessWrapper):
                     if isinstance(item, str):
                         if not restrictedHTML(item, level):
                             raise HtmlForbiddenTag(item)
-
-    elif level == 2:
-        #raise error if script but style accepted
-        for param in params.keys():
-            if isinstance(params[param], str):
-                if not restrictedHTML(params[param], level):
-                    raise HtmlForbiddenTag(params[param])
-            elif isinstance(params[param], list):
-                for item in params[param]:
-                    if isinstance(item, str):
-                        if not restrictedHTML(item, level):
-                            raise HtmlForbiddenTag(item)
-
-
     elif level == 3:
         # Absolutely no checks
         return
