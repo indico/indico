@@ -106,8 +106,6 @@ class WebExOperations(object):
             status = dom.getElementsByTagName( "serv:result" )[0].firstChild.toxml('utf-8')
             if status == "SUCCESS":
                 booking.setWebExKey( dom.getElementsByTagName( "meet:meetingkey" )[0].firstChild.toxml('utf-8') )
-#                booking._url = dom.getElementsByTagName( "serv:attendee" )[0].firstChild.toxml('utf-8')
-#                booking._startURL = dom.getElementsByTagName( "serv:host" )[0].firstChild.toxml('utf-8') 
                 booking._checkStatus()
 
                 if params.has_key('sendAttendeesEmail') and params['sendAttendeesEmail'][0].lower() == 'yes':
@@ -122,28 +120,6 @@ class WebExOperations(object):
                 errorID = dom.getElementsByTagName( "serv:exceptionID" )[0].firstChild.toxml('utf-8')
                 errorReason = dom.getElementsByTagName( "serv:reason" )[0].firstChild.toxml('utf-8')
                 return WebExError( errorID, userMessage = errorReason )
-
-####### Replaces by the sendEmail function
-#            if MailTools.needToSendEmails('WebEx'):
-#                try:
-#                    notification = NewWebExMeetingNotificationAdmin(booking)
-#                    GenericMailer.sendAndLog(notification, booking.getConference(),
-#                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                            booking.getConference().getCreator())
-#                except Exception, e:
-#                    Logger.get('WebEx').error(
-#        	               """Could not send NewWebExMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-#        	               (booking.getId(), booking.getConference().getId(), str(e)))
-                    
-#            if booking._bookingParams["sendMailToManagers"]:
-#                try:
-#                    notification = NewWebExMeetingNotificationManager(booking)
-#                    GenericMailer.sendAndLog(notification, booking.getConference(),
-#                                             "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                                             booking.getConference().getCreator())
-#                except Exception, e:
-#                    Logger.get('WebEx').error(
-#                        """Could not send NewEVOMeetingNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
         except WebExControlledException, e:
             Logger.get('WebEx').debug( "caught exception in function _create" )
             raise WebExException(_("The booking could not be created due to a problem with the WebEx Server\n.It sent the following message: ") + e.message, e)
@@ -225,31 +201,6 @@ class WebExOperations(object):
                 if len(recipients)>0:
                     notification = WebExParticipantNotification( booking, recipients, 'modify' )
                     GenericMailer.send( notification )
-######### Replaced by sendEmail function
-#            if MailTools.needToSendEmails('WebEx'):
-#                Logger.get('WebEx').info("We need to alert WebEx admins; attempting to send emails")
-#                try:
-#                    notification = WebExMeetingModifiedNotificationAdmin(booking)
-#                    GenericMailer.sendAndLog(notification, booking.getConference(),
-#                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                            booking.getConference().getCreator())
-#                except Exception, e:
-#                    Logger.get('WebEx').error(
-#        	               """Could not send WebExMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-#        	               (booking.getId(), booking.getConference().getId(), str(e)))
-
-
-
-#            if booking._bookingParams["sendMailToManagers"]:
-#                try:
-#                    notification = WebExMeetingModifiedNotificationManager(booking)
-#                    GenericMailer.sendAndLog(notification, booking.getConference(),
-#                                         "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                                         booking.getConference().getCreator())
-#                except Exception, e:
-#                    Logger.get('WebEx').error(
-#                        """Could not send WebExMeetingModifiedNotificationManager for booking with id %s , exception: %s""" % (booking._id, str(e)))
-                
         except WebExControlledException, e:
             raise WebExException(_("The booking could not be modified due to a problem with the WebEx Server.\n") )
         return None
@@ -288,18 +239,6 @@ class WebExOperations(object):
             Logger.get('WebEx').info( "In delete function, appears to have been successful" )
 
         if booking._created:
-####### Replaced by sendEmail function in collaboartion
-#            if MailTools.needToSendEmails('WebEx'):
-#                Logger.get('WebEx').info("We need to alert WebEx admins; attempting to send emails")
-#                try:
-#                    notification = WebExMeetingRemovalNotificationAdmin(booking)
-#                    GenericMailer.sendAndLog(notification, booking.getConference(),
-#                            "MaKaC/plugins/Collaboration/WebEx/collaboration.py",
-#                            booking.getConference().getCreator())
-#                except Exception, e:
-#                    Logger.get('WebEx').error(
-#        	               """Could not send WebExMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
-#        	               (booking.getId(), booking.getConference().getId(), str(e)))
             if True:
                 try:
                     Logger.get('WebEx').info("I am in the mailer block")
@@ -314,8 +253,4 @@ class WebExOperations(object):
                         """Could not send notification emails for booking with id %s of event with id %s, exception: %s""" %
                         (booking.getId(), booking.getConference().getId(), str(e)))
         return None
-
-
-
-
 

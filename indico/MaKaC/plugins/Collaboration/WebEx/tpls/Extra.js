@@ -63,17 +63,20 @@ var WebExEndDateHelpPopup = function(event) {
 };
 
 /**
- * Mouseover help popup for the 'Start date' field
+ * Mouseover help popup for the 'WebEx username' field
  */
 
-var WebExWEUsernameHelpPopup = function(event) {
+var WebExUsernameHelp = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px">' + 
             $T('Enter the username you use to log onto your WebEx site.') +
         '<\/div>');
 };
 
-var WebExWEUsernameHelpPopup = function(event) {
+/**
+ * Mouseover help popup for the 'WebEx password' field
+ */
+var WebExPasswordHelp = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px">' + 
             $T('Enter the password you use to log onto your WebEx site.') +
@@ -84,7 +87,7 @@ var WebExWEUsernameHelpPopup = function(event) {
 /**
  * Mouseover help popup for the 'password' field
  */
-var WebExPasswordHelpPopup = function(event) {
+var WebExMeetingPasswordHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px">' + 
             $T('If you want to <strong>protect<\/strong> your WebEx meeting with a password, please input it here. Otherwise, leave this field empty.') +
@@ -100,15 +103,22 @@ var WebExDrawContextHelpIcons = function() {
     
     var endDateHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
     endDateHelpImg.dom.onmouseover = WebExEndDateHelpPopup;
+
+    var WEUsernameelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+    WEUsernameelpImg.dom.onmouseover = WebExUsernameHelp;
+
+    var WEPasswordHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
+    WEPasswordHelpImg.dom.onmouseover = WebExPasswordHelp;
     
     var passwordHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    passwordHelpImg.dom.onmouseover = WebExPasswordHelpPopup;
+    passwordHelpImg.dom.onmouseover = WebExMeetingPasswordHelpPopup;
     
     $E('startDateHelp').set(startDateHelpImg);
     $E('endDateHelp').set(endDateHelpImg);
+    $E('WebExUsernameHelp').set(WEUsernameelpImg);
+    $E('WebExPasswordHelp').set(WEPasswordHelpImg);
     $E('passwordHelp').set(passwordHelpImg);
 }
-
 
 /**
  * Creates a participant (person) data creation / edit pop-up dialog.

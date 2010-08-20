@@ -111,7 +111,6 @@ class WebExError(CSErrorBase):
     fossilizes(IWebExErrorFossil)
 
     def __init__(self, errorID = None, errorType = None, requestURL = None, userMessage = None):
-#        CSErrorBase.__init__(self)
         self._errorID = errorID
         self._errorType = errorType
         self._requestURL = requestURL
@@ -178,7 +177,6 @@ class Participant(Persistent,Fossilizable):
     fossilizes(IParticipantFossil)
     def __init__(self, booking, participantIndicoId, data):
         self._id = participantIndicoId
-#        self._booking = booking
         self._title = data.get("title", '')
         self._familyName = data.get("familyName", '')
         self._firstName = data.get("firstName", '')

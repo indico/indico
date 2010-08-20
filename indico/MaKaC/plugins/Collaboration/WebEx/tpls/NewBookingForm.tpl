@@ -58,7 +58,7 @@
         </td>
         <td>
             <input id="webExUser" type="text" size="16" name="webExUser" value="<%= DefaultWebExUser %>" />
-            <span id="webExUserHelp"></span>
+            <span id="WebExUsernameHelp"></span>
         </td>
     </tr>
     <tr>
@@ -67,7 +67,7 @@
         </td>
         <td>
             <input id="webExPass" type="password" size="16" name="webExPass" value="<%= DefaultWebExPass %>" />
-            <span id="webExPassHelp"></span>
+            <span id="WebExPasswordHelp"></span>
         </td>
     </tr>
     <tr>

@@ -230,7 +230,7 @@ class NewWebExMeetingNotificationManager(WebExEventManagerNotificationBase):
         
         self.setBody("""Dear Conference Manager,<br />
 <br />
-There is a <strong>new EVO meeting</strong> in your conference.<br />
+There is a <strong>new WebEx meeting</strong> in your conference.<br />
 Click <a href="%s">here</a> to see it in Indico.<br />
 <br />
 %s
@@ -238,7 +238,7 @@ Click <a href="%s">here</a> to see it in Indico.<br />
 <br />
 %s
 <br />
-Please note that the auto-join URL will not work until the EVO meeting time arrives.
+Please note that the auto-join URL will not work until the WebEx meeting time arrives.
 """ % ( self._modifLink,
         MailTools.eventDetails(self._conference),
         self._getBookingDetails()
@@ -284,7 +284,7 @@ class WebExMeetingModifiedNotificationManager(WebExEventManagerNotificationBase)
     """
     
     def __init__(self, booking):
-        EVOEventManagerNotificationBase.__init__(self, booking)
+        WebExEventManagerNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] WebEx meeting modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
@@ -314,7 +314,7 @@ class WebExMeetingRemovalNotificationAdmin(WebExAdminNotificationBase):
     def __init__(self, booking):
         WebExAdminNotificationBase.__init__(self, booking)
         
-        self.setSubject("""[Indico] WebEx meeting deleted: %s (event id: %s)"""
+        self.setSubject("""[WebEx] WebEx meeting deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
         
         self.setBody("""Dear WebEx Responsible,<br />

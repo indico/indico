@@ -38,25 +38,17 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["EventTitle"] = self._conf.getTitle()
         vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
         
-#        defaultStartDate = self._conf.getAdjustedStartDate() # - timedelta(0,0,0,0,CollaborationTools.getCollaborationOptionValue("startMinutes"))
-#        nowStartDate = getAdjustedDate(nowutc() - timedelta(0,0,0,0, self._WebExOptions["allowedPastMinutes"].getValue() / 2), self._conf)
-#        vars["DefaultStartDate"] = formatDateTime(max(defaultStartDate, nowStartDate))
-        
         vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
         vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
 
-#        defaultEndDate = self._conf.getAdjustedEndDate()
-#        nowEndDate = nowStartDate + timedelta(0,0,0,0, self._WebExOptions["allowedMinutes"].getValue())
-#        vars["DefaultEndDate"] = formatDateTime(max(defaultEndDate, nowEndDate))
-        vars["DefaultWebExUser"] = ""#self._WebExUser
-        vars["DefaultWebExPass"] = ""#self._WebExPass
+        vars["DefaultWebExUser"] = ""
+        vars["DefaultWebExPass"] = ""
         vars["TimeZone"] = self._conf.getTimezone()
         sessions = "<select name='session'><option value=''>None</option>"
         count = 0
         sessionList = self._conf.getSessionList()
         for session  in sessionList: 
             count = count + 1
-#            Logger.get('WebEx').info( "Session found: %s, %s" % ( str(session.getId()), session.getTitle() ))
             sessions = sessions + "<option value='%s'>%s</option>" % (str(session.getId()), session.getTitle() )
         sessions += "</select>"
 
@@ -104,16 +96,13 @@ class WInformationDisplay(WCSPageTemplateBase):
     
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )
-        
         vars["Booking"] = self._booking
-        
         return vars
     
 class XMLGenerator(object):
     @classmethod
     def getFirstLineInfo(cls, booking, displayTz):
          return booking._bookingParams["meetingTitle"]
-#        return None    
     @classmethod
     def getDisplayName(cls):
         return "WebEx"
@@ -163,6 +152,4 @@ class XMLGenerator(object):
         out.writeTag("line", re.sub(r'(\d{3})(?=\d)',r'\1 ', str(booking._webExKey)[::-1])[::-1])
         out.closeTag("section")
         out.closeTag("information")
-
-
 

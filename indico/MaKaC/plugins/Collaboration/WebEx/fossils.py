@@ -26,9 +26,6 @@ class ICSBookingConfModifFossil(ICSBookingBaseConfModifFossil):
     def getStartURL(self):
         pass
 
-#    def getSessions(self):
-#        pass
-
     def getUrl(self):
         pass
 
@@ -57,7 +54,6 @@ class ICSBookingIndexingFossil(ICSBookingBaseIndexingFossil):
 class IParticipantFossil(IFossil):
     def getId(self):
         pass
-#    getId.name = "participantId"
 
     def getParticipantName(self):
         pass
