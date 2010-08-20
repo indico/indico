@@ -666,7 +666,7 @@ class outputGenerator:
         for pluginName in pluginsWithSessionBookings:
             if PluginsHolder().hasPluginType("Collaboration") and PluginsHolder().getPluginType("Collaboration").hasPlugin(pluginName) and PluginsHolder().getPluginType("Collaboration").getPlugin(pluginName).isActive():
                 Logger.get('output.py-Printing Sessions').info("%s is active. Printing out list of bookings" % pluginName)
-                bookings = csbm.getBookingList(filterByType = "WebEx", notify = False, onlyPublic = True)
+                bookings = csbm.getBookingList(filterByType = pluginName, notify = False, onlyPublic = True)
                 bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
                 for b in bookings:
                     #Logger.get('WebEx').info("Session for booking %s, session id: %s " % ( str(b._getTitle()), str(b.getSessionId()) ) )
