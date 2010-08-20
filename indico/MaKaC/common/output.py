@@ -674,7 +674,7 @@ class outputGenerator:
                         #Logger.get('WebEx').info("Found matching session for video booking!, session id: %s " % ( b.getSessionId() ) )
                         out.openTag("videoBooking")
                         out.writeTag("videoBookingTitle",b._getTitle())
-                        out.writeTag("videoBookingUrl",b.getURL())
+                        out.writeTag("videoBookingUrl",b.getUrl())
                         out.writeTag("videoBookingType",pluginName)
                         out.closeTag("videoBooking")
 
