@@ -409,8 +409,12 @@ class Room( Persistent, RoomBase, Fossilizable ):
                 return False
         return True
 
-    def getUrl(self):
-        """ Room URL """
+    def getBookingUrl(self):
+        """ Room booking URL """
+        return str(urlHandlers.UHRoomBookingBookingForm.getURL(target=self))
+
+    def getDetailsUrl(self):
+        """ Room details URL """
         return str(urlHandlers.UHRoomBookingRoomDetails.getURL(target=self))
 
     def getMarkerDescription(self):
@@ -433,7 +437,10 @@ class Room( Persistent, RoomBase, Fossilizable ):
     def getTipPhotoURL(self):
         """ URL of the tip photo of the room """
         from MaKaC.webinterface.urlHandlers import UHRoomPhoto
-        return str(UHRoomPhoto.getURL(self._doGetPhotoId(force=True)))
+        photoId = self._doGetPhotoId()
+        if not photoId:
+            photoId = "NoPhoto"
+        return str(UHRoomPhoto.getURL(photoId))
 
     def getIsAutoConfirm(self):
         """ Has the room auto-confirmation of schedule? """

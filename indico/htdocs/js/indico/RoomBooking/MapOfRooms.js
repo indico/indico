@@ -169,19 +169,22 @@ type ("RoomMap", ["IWidget"],
         createRoomInfo: function(building, room) {
             var self = this;
             var address = building.number + '/' + room.floor + '-' + room.roomNr;
-            var caption = "Room " + address;
+            var caption = $T("Room") + ' ' + address;
 
             // room address
             var addr = Html.span({className:'mapRoomAddress'}, address).dom;
 
             // "Book" link
-            var book = Html.a({href:room.url, className:'mapBookRoomLink'}, "Book");
+            var book = Html.a({href:room.bookingUrl, target:'_parent', className:'mapBookRoomLink'}, $T("Book"));
 
             // "More" link - for room details
-            var more = Html.a({href:"#", className:'mapRoomInfoLink'}, "More...");
+            var more = Html.a({href:"#", className:'mapRoomInfoLink'}, $T("More") + "...");
+
+            // "Room details" link
+            var details = Html.a({href:room.detailsUrl, target:'_parent', className:'mapRoomDetailsLink'}, $T("Details") + "...");
 
             // room details elements
-            var title = Html.div({className: 'mapRoomTooltipTitle'}, caption);
+            var title = Html.div({className: 'mapRoomTooltipTitle'}, caption, details.dom);
             var img = Html.img({src: room.tipPhotoURL, width: 212, height: 140, className: 'mapRoomTooltipImage'});
             var desc = Html.div({className: 'mapRoomTooltipDescription'}, room.markerDescription);
             var all = Widget.lines([img, desc]);
@@ -675,7 +678,7 @@ type ("RoomMap", ["IWidget"],
         isBrowserIE7: function() {
             var isIE = window.ActiveXObject ? true : false;
             var agent = navigator.userAgent.toLowerCase();
-            return isIE && /msie 7/.test(agent);
+            return isIE && /msie 7/.test(agent) && document.documentMode == 7;
         }
 
     },

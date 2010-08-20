@@ -58,8 +58,11 @@ class IRoomMapFossil(IFossil):
     def getIsAutoConfirm(self):
         """ Has the room auto-confirmation of schedule? """
 
-    def getUrl(self):
-        """ Room URL """
+    def getBookingUrl(self):
+        """ Room booking URL """
+
+    def getDetailsUrl(self):
+        """ Room details URL """
 
     def getMarkerDescription(self):
         """ Room description for the map marker """

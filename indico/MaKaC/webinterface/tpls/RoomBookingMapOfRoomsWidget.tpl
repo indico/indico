@@ -48,6 +48,11 @@ function distanceFilter(mapView, room) {
     return dist != null && dist < 200;
 }
 
+function capacityFilter(mapView, room) {
+    // filter function that filters only the rooms that have the min. specified capacity
+    return mapView.filterInput(4) <= room.capacity;
+}
+
 function buildingFilterActiveIf(mapView) {
     // the building number filter is active only if the 'around the building' filter is not checked
     return !mapView.filterInput(1);
@@ -68,7 +73,7 @@ var filters = [
         "filterFunction": distanceFilter, "enabledIf": buildingFilterEnabledIf},
     {"label": "<%= _("Floor") %>", "filterType": "room", "inputType": "text", "property": "floor", "optional": true, "defaultValue": ""},
     {"label": "<%= _("Description") %>", "filterType": "room", "inputType": "subtext", "property": "comments", "optional": true, "defaultValue": ""},
-    {"label": "<%= _("Capacity") %>", "filterType": "room", "inputType": "text", "property": "capacity", "optional": true, "defaultValue": ""},
+    {"label": "<%= _("Min. capacity") %>", "filterType": "room", "inputType": "text", "filterFunction": capacityFilter, "optional": true, "defaultValue": ""},
 <% if not forVideoConference: %>
     {"label": "<%= _("Video conference") %>", "filterType": "room", "inputType": "boolean", "defaultValue": false, "property": "needsAVCSetup", "optional": true, "defaultValue": false},
 <% end %>

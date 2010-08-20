@@ -26,6 +26,10 @@ div.caption {
     padding-right: 5px;
 }
 
+.mapRoomDetailsLink {
+    float: right;
+}
+
 #filter_canvas {
     width: 200px;
     padding-left: 10px;
