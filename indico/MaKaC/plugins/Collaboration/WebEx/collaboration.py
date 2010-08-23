@@ -165,9 +165,6 @@ class CSBooking(CSBookingBase):
     def getUrl(self):
         return self._url
 
-#    def getURL(self):
-#        return self._url
-
     def getPhoneNum(self):
         return self._phoneNum
 
