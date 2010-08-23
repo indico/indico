@@ -337,18 +337,6 @@ class CSBooking(CSBookingBase):
         self._checkStatus()
         return None
 
-    def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
-         # Rather than define unpredictable behavior to the user, we will refrain from modifying the event times here. 
-         # One thought is to have it maintain the same offset from the event start time, 
-         # but a user might not predict this, etc, so for now we leave the dates alone
-#        self._startDate = self.getAdjustedStartDate('UTC') + timedelta( minutes=int( self._offsetFromEventStart ) )
-#        self._endDate = self.getAdjustedStartDate('UTC') + timedelta( minutes=int( self._originalDuration ) )
-#        result = ExternalOperationsManager.execute(self, "modifyBooking", WebExOperations.modifyBooking, self)
-#getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )
-#        result = ExternalOperationsManager.execute(self, "createBooking", WebExOperations.createBooking, self)
-        Logger.get('WebEx').info( "In notifyEventDateChanges: %s %s %s %s" % (oldStartDate, newStartDate, oldEndDate, newEndDate) )
-
-
     def _modify(self, oldBookingParams):
         """ Modifies a booking in the WebEx server if all conditions are met.
         """
