@@ -669,9 +669,8 @@ class outputGenerator:
                 bookings = csbm.getBookingList(filterByType = pluginName, notify = False, onlyPublic = True)
                 bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
                 for b in bookings:
-                    #Logger.get('WebEx').info("Session for booking %s, session id: %s " % ( str(b._getTitle()), str(b.getSessionId()) ) )
                     if session.getId() == b.getSessionId():
-                        #Logger.get('WebEx').info("Found matching session for video booking!, session id: %s " % ( b.getSessionId() ) )
+                        # A plugin listed in a session should have a booking type, a title, and an associated URL.
                         out.openTag("videoBooking")
                         out.writeTag("videoBookingTitle",b._getTitle())
                         out.writeTag("videoBookingUrl",b.getUrl())
