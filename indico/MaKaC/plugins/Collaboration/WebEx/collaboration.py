@@ -67,7 +67,7 @@ class CSBooking(CSBookingBase):
 
     _needsBookingParamsCheck = True
     _needsToBeNotifiedOnView = True
-#    _canBeNotifiedOfEventDateChanges = True
+    _canBeNotifiedOfEventDateChanges = False
     _allowMultiple = True 
 
     _hasEventDisplay = True
@@ -297,7 +297,7 @@ class CSBooking(CSBookingBase):
         
     def checkCanStart(self, changeMessage = True):
          # Uncomment these 4 lines for testing the start meeting code
-        #self._canBeStarted = True
+        #self._canBeStarted = False
         #self._statusMessage = _("Ready to start!")
         #self._statusClass = "statusMessageOK"
         #return True
