@@ -54,7 +54,7 @@
                     <!--  This column shows whether the talk has a matching LOID associated with it (only makes sense for web lectures, not plain video). -->
                     <td width="50px" valign="top">
                         <% if talk["LOID"] != '': %>
-                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "../images/RecordingManagerMicalaCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "./images/RecordingManagerMicalaCheck.png" %>');">
                             </div>
                         <% end %>
                         <% else: %>
@@ -80,7 +80,7 @@
                     <!--  This column shows whether a link has been created from Indico to the CDS record. -->
                     <td width="50px" valign="top">
                         <% if talk["IndicoLink"] == True: %>
-                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "../images/RecordingManagerIndicoCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "./images/RecordingManagerIndicoCheck.png" %>');">
                             </div>
                         <% end %>
                         <% else: %>
