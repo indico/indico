@@ -67,7 +67,7 @@ class CSBooking(CSBookingBase):
 
     _needsBookingParamsCheck = True
     _needsToBeNotifiedOnView = True
-    _canBeNotifiedOfEventDateChanges = False
+    _canBeNotifiedOfEventDateChanges = True
     _allowMultiple = True 
 
     _hasEventDisplay = True

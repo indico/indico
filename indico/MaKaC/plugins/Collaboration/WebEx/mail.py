@@ -23,6 +23,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.common.utils import formatDateTime
+from MaKaC.plugins.Collaboration.WebEx.common import getWebExOptionValueByName
 
 
 class WebExNotificationBase(GenericNotification):
@@ -223,6 +224,8 @@ class NewWebExMeetingNotificationManager(WebExEventManagerNotificationBase):
     """
     
     def __init__(self, booking):
+        if not getWebExOptionValueByName("sendMailNotifications"):
+            return
         WebExEventManagerNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] New WebEx meeting: %s (event id: %s)"""
@@ -284,6 +287,8 @@ class WebExMeetingModifiedNotificationManager(WebExEventManagerNotificationBase)
     """
     
     def __init__(self, booking):
+        if not getWebExOptionValueByName("sendMailNotifications"):
+            return
         WebExEventManagerNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] WebEx meeting modified: %s (event id: %s)"""
@@ -339,6 +344,8 @@ class WebExMeetingRemovalNotificationManager(WebExEventManagerNotificationBase):
     """
     
     def __init__(self, booking):
+        if not getWebExOptionValueByName("sendMailNotifications"):
+            return
         WebExEventManagerNotificationBase.__init__(self, booking)
         
         self.setSubject("""[Indico] WebEx Meeting deleted %s (event id: %s)"""
