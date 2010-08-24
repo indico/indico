@@ -12,8 +12,9 @@ Contents:
    :maxdepth: 2
 
    ./UserGuide/index.rst
-   ./AdminGuide/index.rst
    ./QuickStartGuides/index.rst
+   ./VideoServicesGuides/index.rst
+   ./AdminGuide/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
 
