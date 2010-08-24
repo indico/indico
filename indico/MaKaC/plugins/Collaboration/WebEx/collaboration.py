@@ -197,16 +197,10 @@ class CSBooking(CSBookingBase):
     
     def getChangesFromWebEx(self):
         return self._bookingChangesHistory
-
-
     
     def getLastCheck(self):
-        if not hasattr(self, "_lastCheck"): #TODO: remove when safe
-            self._lastCheck = nowutc()
-            self._checksDone = []
         return self._lastCheck
 
-    ## overriding methods
     def _getTitle(self):
         return self._bookingParams["meetingTitle"]
 
@@ -293,16 +287,10 @@ class CSBooking(CSBookingBase):
         self._created = True
         
     def checkCanStart(self, changeMessage = True):
-         # Uncomment these 4 lines for testing the start meeting code
-        #self._canBeStarted = False
-        #self._statusMessage = _("Ready to start!")
-        #self._statusClass = "statusMessageOK"
-        #return True
         if self._created:
             now = nowutc()
             self._canBeDeleted = True
             if self.getStartDate() - timedelta(minutes=self._WebExOptions["allowedMinutes"].getValue()) < now and self.getEndDate() + timedelta(self._WebExOptions["allowedMinutes"].getValue()) > now:
-#            if self.getStartDate() < now and self.getEndDate() > now:
                 self._canBeStarted = True
                 self._canBeDeleted = False
                 if changeMessage:
@@ -622,13 +610,6 @@ class CSBooking(CSBookingBase):
                 if self._endDate != getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) ):
                     self._endDate = getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )
                     changesFromWebEx.append("Updated end time to match WebEx entry")
-#                changesFromWebEx.append("Updated time to match WebEx time (displayed in event timezone) <br/>Start: " \
-#                    + getAdjustedDate(WE_time, tz=self._conf.getTimezone()).strftime("%m/%d/%Y %H:%M:%S") \
-#                    + "<br/>End: " \
-#                    + (getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )).strftime("%m/%d/%Y %H:%M:%S") )  
-#            self._startDate = getAdjustedDate(WE_time, tz=self._conf.getTimezone())
-#            self._endDate = getAdjustedDate(WE_time, tz=self._conf.getTimezone()) + timedelta( minutes=int( self._duration ) )
-
         self.checkCanStart()
         self._bookingChangesHistory = changesFromWebEx
     def _sendMail(self, operation):
