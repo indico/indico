@@ -39,7 +39,7 @@
             <span>Start time</span>
         </td>
         <td>
-            <input id="startDate" type="text" size="16" name="startDate" value="<%= DefaultStartDate %>" />
+            <input id="startDate" type="text" size="16" name="startDate" id="startDate" value="<%= DefaultStartDate %>" />
             <span id="startDateHelp"></span>
         </td>
     </tr>
@@ -48,7 +48,7 @@
             <span>Ending time</span>
         </td>
         <td>
-            <input id="endDate" type="text" size="16" name="endDate" value="<%= DefaultEndDate %>" />
+            <input id="endDate" type="text" size="16" name="endDate" id="endDate" value="<%= DefaultEndDate %>" />
             <span id="endDateHelp"></span>
         </td>
     </tr>

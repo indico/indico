@@ -1,6 +1,20 @@
 /**
  * Mouseover help popup for WebExLaunchClientPopup
  */
+var updateSessionTimes = function()
+{
+    var sessionTimes = <%= SessionTimes %>;
+    var selected = document.getElementById('session').selectedIndex;
+    for (i=0; i<sessionTimes.sessions.length; i++)
+    {
+        if (sessionTimes.sessions[i].id == document.getElementById('session')[selected].value)
+        {
+//            alert(document.getElementById('session')[selected].value)
+            document.getElementById('startDate').value = sessionTimes.sessions[i].start
+            document.getElementById('endDate').value = sessionTimes.sessions[i].end
+        }
+    }
+};
 
 var WebExLaunchClientHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,

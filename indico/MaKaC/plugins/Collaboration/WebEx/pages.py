@@ -30,6 +30,8 @@ from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 import re
 
+from MaKaC.common.logger import Logger
+
 class WNewBookingForm(WCSPageTemplateBase):
         
     def getVars(self):
@@ -44,17 +46,15 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["DefaultWebExUser"] = ""
         vars["DefaultWebExPass"] = ""
         vars["TimeZone"] = self._conf.getTimezone()
-        sessions = "<select name='session'><option value=''>None</option>"
+        sessions = "<select name='session' id='session' onchange='updateSessionTimes()'><option value=''>None</option>"
         count = 0
         sessionList = self._conf.getSessionList()
         for session  in sessionList: 
             count = count + 1
             sessions = sessions + "<option value='%s'>%s</option>" % (str(session.getId()), session.getTitle() )
         sessions += "</select>"
-
         vars["SessionList"] = sessions
 
-        
         return vars
 
 class WMain (WJSBase):
@@ -73,7 +73,11 @@ class WExtra (WJSBase):
     
     def getVars(self):
         vars = WJSBase.getVars( self )
-        
+        sessionTimes = ""
+        sessionList = self._conf.getSessionList()
+        for session  in sessionList: 
+            sessionTimes = sessionTimes + """{"id":"%s", "start":"%s", "end":"%s" },""" % (str(session.getId()), formatDateTime(session.getAdjustedStartDate()), formatDateTime(session.getAdjustedEndDate()) )
+        vars["SessionTimes"] = '{ "sessions": [' + sessionTimes[:-1] + ']}'
         vars["AllowedStartMinutes"] = self._WebExOptions["allowedPastMinutes"].getValue()
         if self._conf:
             vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf), format = "%a %d/%m %H:%M")
