@@ -468,9 +468,6 @@ class UHRoomBookingSaveCustomAttributes( URLHandler ):
 class UHRoomBookingDeleteCustomAttribute( URLHandler ):
     _relativeURL = "roomBooking.py/deleteCustomAttribute"
 
-class UHRoomBookingGetDateWarning( URLHandler ):
-    _relativeURL = "roomBooking.py/getDateWarning"
-
 class UHRoomBookingGetRoomSelectList( URLHandler ):
     _relativeURL = "roomBooking.py/getRoomSelectList"
 

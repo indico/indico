@@ -33,7 +33,12 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         }
 
         // textContent would be more appropriate, but IE...
-        var res = Json.read(doc.body.innerHTML);
+        try {
+            var res = Json.read(doc.body.innerHTML);
+        } catch(e) {
+            IndicoUtil.errorReport({'code':'0', 'message':$T('Unexpected exception')});
+            return;
+        }
 
         var self = this;
 

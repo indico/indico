@@ -28,7 +28,7 @@ from MaKaC.common.general import *
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin, RHRoomBookingProtected
 from datetime import datetime, timedelta
-from MaKaC.common.utils import HolidaysHolder, validMail, setValidEmailSeparators
+from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.datetimeParser import parse_date
 
 # The following are room booking related
@@ -1943,34 +1943,6 @@ class RHRoomBookingSendRoomPhoto( RHRoomBookingBase ):
         self._req.content_type = "image/jpeg"
         #self._req.headers_out["Content-Disposition"] = "inline; filename=\"%s\"" % self.fileName
         self._req.sendfile( fullPath )
-
-from MaKaC.common.utils import isWeekend
-
-class RHRoomBookingGetDateWarning( RHRoomBookingBase ):
-
-    def _checkParams( self, params ):
-        try:
-            self._checkParamsRepeatingPeriod( params )
-        except:
-            pass
-
-    def addRandom( self, s ):
-        return s
-        #import random
-        #return str( int( random.random() * 1000 ) ) + " | " + s
-
-    def _process( self ):
-        if not self._startDT or not self._endDT:
-            return self.addRandom( " " )
-
-        if  HolidaysHolder.isWorkingDay( self._startDT ) and \
-            HolidaysHolder.isWorkingDay( self._endDT ):
-            return self.addRandom( " " )
-
-        if isWeekend( self._startDT ) or isWeekend( self._endDT ):
-            return self.addRandom( "Warning: weekend chosen" )
-
-        return self.addRandom( "Warning: holidays chosen" )
 
 
 class RHRoomBookingGetRoomSelectList( RHRoomBookingBase ):

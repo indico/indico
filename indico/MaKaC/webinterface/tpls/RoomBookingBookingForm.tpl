@@ -63,11 +63,13 @@
         // Holidays warning
         if ( isValid && !onSubmit )
         {
-            new Ajax.Updater(
-                'holidays-warning',
-                '<%= urlHandlers.UHRoomBookingGetDateWarning.getURL() %>',
-                { parameters: $(f1).serialize(true) }
-            );
+            var holidaysWarning = indicoSource('roomBooking.getDateWarning', $(f1).serialize(true));
+
+            holidaysWarning.state.observe(function(state) {
+                if (state == SourceState.Loaded) {
+                    $E('holidays-warning').set(holidaysWarning.get());
+                }
+            });
         }
 
 	<% if candResv.room.needsAVCSetup: %>

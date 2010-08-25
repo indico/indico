@@ -28,103 +28,88 @@ from MaKaC.webinterface.common.tools import escape_html, restrictedHTML
 base module for HTML security
 """
 
-def sanitizationCheck(target, params, accessWrapper):
-    # first make sure all params are utf-8
-    for param in params.keys():
-        if isinstance(params[param], str) and params[param] != "":
-            params[param] = encodeUnicode(params[param])
-            if params[param] == "":
-                raise MaKaCError("Your browser is using an encoding which is not recognized by Indico... Please make sure you set your browser encoding to utf-8")
-        elif isinstance(params[param], list):
-            #the params is a list, check inside
-            for i in range(len(params[param])):
-                item = params[param][i]
-                if isinstance(item, str) and item != "":
-                    params[param][i] = encodeUnicode(item)
-                    if params[param][i] == "":
-                        raise MaKaCError("Your browser is using an encoding which is not recognized by Indico... Please make sure you set your browser encoding to utf-8")
+class Sanitization(object):
 
+    @staticmethod
+    def _sanitize(params, level):
+        for i in params:
+            if isinstance(params, dict):
+                param = params[i]
+            else:
+                param = i
+            if isinstance(param, str):
+                if not restrictedHTML(param, level):
+                    raise HtmlForbiddenTag(param)
+            elif isinstance(param, list) or isinstance(param, dict):
+                Sanitization._sanitize(param, level)
 
-    # then check the security level of data sent to the server
-    # if no user logged in, then no html allowed
-    if accessWrapper.getUser():
-        level = Config.getInstance().getSanitizationLevel()
-    elif target and hasattr(target, "canModify") and target.canModify(accessWrapper):
-        # not logged user, but use a modification key
-        level = Config.getInstance().getSanitizationLevel()
-    else:
-        level = 0
+    @staticmethod
+    def _escapeHTML(params):
+        index = 0
+        for i in params:
+            # params can be a list or a dictonary
+            # we need to define k depending if it is a list or a dictonary
+            # in order to be able to do such a operation: params[k] = something.
+            if isinstance(params, dict):
+                param = params[i]
+                k = i
+            else:
+                param = i
+                k = index  # since we are  looping a list, we need to increment the index to
+                index += 1 # get the correct 'k' in the next iteration.
+            if isinstance(param, str):
+                params[k] = escape_html(param)
+            elif isinstance(param, list) or isinstance(param, dict):
+                Sanitization._escapeHTML(param)
 
-    if level not in range(4):
-        level = 1
+    @staticmethod
+    def _encodeUnicode(params):
+        index = 0
+        for i in params:
+            # params can be a list or a dictonary
+            # we need to define k depending if it is a list or a dictonary
+            # in order to be able to do such a operation: params[k] = something.
+            if isinstance(params, dict):
+                param = params[i]
+                k = i
+            else:
+                param = i
+                k = index  # since we are  looping a list, we need to increment the index to
+                index += 1 # get the correct 'k' in the next iteration.
+            if isinstance(param, str) and param != "":
+                params[k] = encodeUnicode(param)
+                if params[k] == "":
+                    raise MaKaCError(_("Your browser is using an encoding which is not recognized by Indico... Please make sure you set your browser encoding to utf-8"))
+            elif isinstance(param, list) or isinstance(param, dict):
+                Sanitization._encodeUnicode(param)
 
-    if level == 0:
-        #Escape all HTML tags
-        for param in params.keys():
-            if isinstance(params[param], str):
-                #the params is a string
-                params[param] = escape_html(params[param])
-            elif isinstance(params[param], list):
-                #the params is a list, check inside
-                for i in range(len(params[param])):
-                    item = params[param][i]
-                    if isinstance(item, str):
-                        params[param][i] = escape_html(item)
+    @staticmethod
+    def sanitizationCheck(target, params, accessWrapper):
+        # first make sure all params are utf-8
+        Sanitization._encodeUnicode(params)
 
-##    elif level == 1:
-##        #level 1 or default
-##        #raise error if script or style detected
-##        ret = None
-##        for param in params.keys():
-##            if isinstance(params[param], str):
-##                ret = scriptDetection(params[param])
-##                if not restrictedHTML(params[param], level):
-##                    raise HtmlForbiddenTag(params[param])
-##            elif isinstance(params[param], list):
-##                for item in params[param]:
-##                    if isinstance(item, str):
-##                        ret = scriptDetection(item)
-##                        if ret:
-##                            raise HtmlScriptError(item)
-##                        if not restrictedHTML(item, level):
-##                            raise HtmlForbiddenTag(item)
-##            if ret:
-##                raise HtmlScriptError(params[param])
-##
-##    elif level == 2:
-##        #raise error if script but style accepted
-##        ret = None
-##        for param in params.keys():
-##            if isinstance(params[param], str):
-##                ret = scriptDetection(params[param], allowStyle=True)
-##                if ret:
-##                    raise HtmlScriptError(params[param])
-##                ret = restrictedHTML(params[param], level)
-##                if not ret:
-##                    raise HtmlForbiddenTag(params[param])
-##            elif isinstance(params[param], list):
-##                for item in params[param]:
-##                    if isinstance(item, str):
-##                        ret = scriptDetection(item, allowStyle=True)
-##                        if ret:
-##                            raise HtmlScriptError(item)
-##                        ret = restrictedHTML(item, level)
-##                        if not ret:
-##                            raise HtmlForbiddenTag(item)
+        # then check the security level of data sent to the server
+        # if no user logged in, then no html allowed
+        if accessWrapper.getUser():
+            level = Config.getInstance().getSanitizationLevel()
+        elif target and hasattr(target, "canModify") and target.canModify(accessWrapper):
+            # not logged user, but use a modification key
+            level = Config.getInstance().getSanitizationLevel()
+        else:
+            level = 0
 
-    # raise error if form or iframe tags are used
-    elif level in [1,2]:
-        #level 1 or default: raise error if script or style detected
-        #level 2: raise error if script but style accepted
-        for param in params.keys():
-            if isinstance(params[param], str):
-                if not restrictedHTML(params[param], level):
-                    raise HtmlForbiddenTag(params[param])
-            elif isinstance(params[param], list):
-                for item in params[param]:
-                    if isinstance(item, str):
-                        if not restrictedHTML(item, level):
-                            raise HtmlForbiddenTag(item)
-    elif level == 3:
-        # Absolutely no checks
-        return
+        if level not in range(4):
+            level = 1
+
+        if level == 0:
+            #Escape all HTML tags
+            Sanitization._escapeHTML(params)
+
+        elif level in [1,2]:
+            #level 1 or default: raise error if script or style detected
+            #level 2: raise error if script but style accepted
+            Sanitization._sanitize(params, level)
+
+        elif level == 3:
+            # Absolutely no checks
+            return

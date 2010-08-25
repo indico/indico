@@ -221,7 +221,7 @@ class ServiceBase(RequestHandlerBase):
         self._checkProtection()
 
         try:
-            security.sanitizationCheck(self._target,
+            security.Sanitization.sanitizationCheck(self._target,
                                    self._params,
                                    self._aw)
         except (HtmlScriptError, HtmlForbiddenTag), e:

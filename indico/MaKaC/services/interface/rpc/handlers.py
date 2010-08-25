@@ -19,6 +19,7 @@ methodMap = {
     "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
     "roomBooking.rooms.fullNameList": roomBooking.RoomBookingFullNameListRooms,
     "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
+    "roomBooking.getDateWarning" :roomBooking.GetDateWarning,
 
     "resources.timezones.getAll": resources.GetTimezones,
     "resources.languages.getAll": resources.GetLanguages,

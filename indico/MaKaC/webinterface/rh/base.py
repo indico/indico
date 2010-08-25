@@ -472,7 +472,7 @@ class RH(RequestHandlerBase):
                         self._reqParams = copy.copy( params )
                         self._checkParams( self._reqParams )
                         self._checkProtection()
-                        security.sanitizationCheck(self._target,
+                        security.Sanitization.sanitizationCheck(self._target,
                                                self._reqParams,
                                                self._aw)
                         if self._doProcess:
