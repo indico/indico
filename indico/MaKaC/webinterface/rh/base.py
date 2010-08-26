@@ -61,6 +61,11 @@ from MaKaC.i18n import _
 
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
+from MaKaC.plugins.base import PluginsHolder
+from MaKaC.user import Group, Avatar
+from MaKaC.accessControl import AdminList
+
+
 class RequestHandlerBase(object):
 
     _uh = None
@@ -760,6 +765,28 @@ class RHProtected( RH ):
     def _checkProtection( self ):
         self._checkSessionUser()
 
+
+class RHRoomBookingProtected( RHProtected ):
+
+    def _checkSessionUser( self ):
+        user = self._getUser()
+        if user == None:
+            self._redirect( self._getLoginURL() )
+            self._doProcess = False
+        else:
+            try:
+                if PluginsHolder().getPluginType("RoomBooking").isActive():
+                    if not AdminList.getInstance().isAdmin(user):
+                        authenticatedUser = False
+                        for entity in PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue():
+                            if isinstance(entity, Group) and entity.containsUser(user) or \
+                               isinstance(entity, Avatar) and entity == user:
+                                    authenticatedUser = True
+                                    break
+                        if not authenticatedUser:
+                            raise AccessError()
+            except KeyError:
+                pass
 
 class RHDisplayBaseProtected( RHProtected ):
 

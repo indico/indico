@@ -1896,6 +1896,7 @@ div.UIPeopleListDiv { /* for lists of users in forms */
 div.PluginOptionPeopleListDiv {
     border: 1px dashed #CCCCCC;
     min-height: 25px;
+    min-width: 320px;
 }
 
 div.UISearchPeopleListDiv, div.UISuggestedPeopleListDiv {

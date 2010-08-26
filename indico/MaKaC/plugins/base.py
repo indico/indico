@@ -691,6 +691,7 @@ class PluginOption(Persistent):
     """
     _extraTypes = {
         'users': list,
+        'usersGroups': list,
         'rooms': list
     }
 

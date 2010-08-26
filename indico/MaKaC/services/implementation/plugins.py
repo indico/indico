@@ -58,7 +58,7 @@ class PluginOptionsAddUsers ( PluginOptionsBase, UserListModificationBase):
         UserListModificationBase._checkParams(self)
         
     def _getAnswer(self):
-        if self._targetOption.getType() == 'users':
+        if self._targetOption.getType() == 'users' or self._targetOption.getType() == 'usersGroups':
             optionValue = self._targetOption.getValue()
             existingUserIds = set([u.getId() for u in optionValue])
             for u in self._avatars:
@@ -77,7 +77,7 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
         UserModificationBase._checkParams(self)
         
     def _getAnswer(self):
-        if self._targetOption.getType() == 'users':
+        if self._targetOption.getType() == 'users' or self._targetOption.getType() == 'usersGroups':
             self._targetOption.getValue().remove(self._targetUser)
             self._targetOption._notifyModification()
         else:

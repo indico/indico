@@ -128,6 +128,54 @@
                         <% end %>
                     </script>
                <% end %>
+               <% elif option.getType() == "usersGroups": %>
+                    <div id="userGroupList<%=name%>" style="margin-bottom: 10px">
+                    </div>
+
+                    <script type="text/javascript">
+                        var newPersonsHandler = function(userList, setResult) {
+                            indicoRequest(
+                                'plugins.addUsers',
+                                {
+                                    optionName: "<%= name %>",
+                                    userList: userList
+                                },
+                                function(result,error) {
+                                    if (!error) {
+                                        setResult(true);
+                                    } else {
+                                        IndicoUtil.errorReport(error);
+                                        setResult(false);
+                                    }
+                                }
+                            );
+                        }
+                        var removePersonHandler = function(user, setResult) {
+                            indicoRequest(
+                                'plugins.removeUser',
+                                {
+                                    optionName: "<%= name %>",
+                                    user: user.get('id')
+                                },
+                                function(result,error) {
+                                    if (!error) {
+                                        setResult(true);
+                                    } else {
+                                        IndicoUtil.errorReport(error);
+                                        setResult(false);
+                                    }
+                                }
+                            );
+                        }
+
+                        var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
+                                                   <%= jsonEncode(fossilize(option.getValue())) %>, true, null,
+                                                   true, true, null, null,
+                                                   false, false, true,
+                                                   newPersonsHandler, userListNothing, removePersonHandler)
+                        $E('userGroupList<%=name%>').set(uf.draw())
+                    </script>
+                <% end %>
                 <% else: %>
                     <% if option.getType() == list: %>
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>

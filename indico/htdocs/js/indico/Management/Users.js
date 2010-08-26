@@ -1372,7 +1372,7 @@ type("UserListWidget", ["ListWidget"],
 
                  var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
                  var groupName = $B(Html.span(), userData.accessor('name'));
-                 return Html.span({}, removeButtonDiv, groupName);
+                 return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
 
              } else {
 

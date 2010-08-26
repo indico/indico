@@ -18,7 +18,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.i18n import _
-pluginTypeDescription = _("Room Booking Plugins")
-ignore = False
-visible = True
+globalOptions = [
+                 ( "AuthorisedUsersGroups", {"description": "Users and Groups authorised for roombooking module",
+                                       "type": 'usersGroups',
+                                       "defaultValue": [],
+                                       "editable": True,
+                                       "visible": True})
+                 ]
