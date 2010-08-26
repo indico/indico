@@ -53,6 +53,19 @@ function capacityFilter(mapView, room) {
     return mapView.filterInput(4) <= room.capacity;
 }
 
+function floorFilter(mapView, room) {
+    // filter function that filters only the rooms that are on the specified floor
+    var roomFloor = room.floor;
+    if (/^(s|S|r|R)$/.test(roomFloor)) {
+        roomFloor = 0;
+    }
+    var inputFloor = mapView.filterInput(2);
+    if (/^(s|S|r|R)$/.test(inputFloor)) {
+        inputFloor = 0;
+    }
+    return roomFloor == inputFloor;
+}
+
 function buildingFilterActiveIf(mapView) {
     // the building number filter is active only if the 'around the building' filter is not checked
     return !mapView.filterInput(1);
@@ -71,7 +84,7 @@ var filters = [
    {"label": "<%= _("Building") %>", "filterType": "building", "inputType": "text", "property": "number", "optional": true, "defaultValue": "", "activeIf": buildingFilterActiveIf},
     {"label": "<%= _("Around the building") %>", "filterType": "building", "inputType": "boolean", "optional": true, "defaultValue": false,
         "filterFunction": distanceFilter, "enabledIf": buildingFilterEnabledIf},
-    {"label": "<%= _("Floor") %>", "filterType": "room", "inputType": "text", "property": "floor", "optional": true, "defaultValue": ""},
+    {"label": "<%= _("Floor") %>", "filterType": "room", "inputType": "text", "filterFunction": floorFilter, "optional": true, "defaultValue": ""},
     {"label": "<%= _("Description") %>", "filterType": "room", "inputType": "subtext", "property": "comments", "optional": true, "defaultValue": ""},
     {"label": "<%= _("Min. capacity") %>", "filterType": "room", "inputType": "text", "filterFunction": capacityFilter, "optional": true, "defaultValue": ""},
 <% if not forVideoConference: %>

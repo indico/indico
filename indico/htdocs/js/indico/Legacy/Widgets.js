@@ -1004,7 +1004,7 @@ IndicoUI.Widgets = {
         },
 
         dateField_sdate: function(showTime, attributes, hiddenFields){
-            return IndicoUI.Widgets.Generic.dateField(showTime, attributes, hiddenFields, {'id':'edate', 'name':'sdate'});
+            return IndicoUI.Widgets.Generic.dateField(showTime, attributes, hiddenFields, {'id':'sdate', 'name':'sdate'});
         },
 
         dateField_edate: function(showTime, attributes, hiddenFields){
