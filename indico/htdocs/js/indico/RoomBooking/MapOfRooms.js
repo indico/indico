@@ -169,7 +169,9 @@ type ("RoomMap", ["IWidget"],
         createRoomInfo: function(building, room) {
             var self = this;
             var address = building.number + '/' + room.floor + '-' + room.roomNr;
-            var caption = $T("Room") + ' ' + address;
+
+            // caption
+            var caption = Html.span({}, $T("Room") + ' ' + address);
 
             // room address
             var addr = Html.span({className:'mapRoomAddress'}, address).dom;
@@ -181,10 +183,12 @@ type ("RoomMap", ["IWidget"],
             var more = Html.a({href:"#", className:'mapRoomInfoLink'}, $T("More") + "...");
 
             // "Room details" link
-            var details = Html.a({href:room.detailsUrl, target:'_parent', className:'mapRoomDetailsLink'}, $T("Details") + "...");
+            var details = Html.a({href:room.detailsUrl, target:'_parent'}, $T("Details") + "...");
+            details = Html.span({className:'mapRoomDetailsLink'}, details);
 
             // room details elements
-            var title = Html.div({className: 'mapRoomTooltipTitle'}, caption, details.dom);
+            title = Html.table({className: 'mapRoomTooltipTitle', width: '100%', cellpadding: 0, cellspacing: 0}, Html.tbody({}, Html.tr({}, Html.td({width: '75%'}, caption.dom), Html.td({width: '25%'}, details.dom))));
+
             var img = Html.img({src: room.tipPhotoURL, width: 212, height: 140, className: 'mapRoomTooltipImage'});
             var desc = Html.div({className: 'mapRoomTooltipDescription'}, room.markerDescription);
             var all = Widget.lines([img, desc]);
@@ -193,7 +197,8 @@ type ("RoomMap", ["IWidget"],
             // when the "More" link is clicked, show a tooltip with room details
             more.observeClick(function(event) {
                 self.closeTooltips();
-                domTT_activate(more.dom, event, 'content', help.dom, 'maxWidth', 223, 'type', 'sticky', 'caption', title.dom, 'closeLink', ' x  ');
+                var closeLink = Html.span({className: 'mapRoomTooltipClose'}, 'x');
+                domTT_activate(more.dom, event, 'content', help.dom, 'maxWidth', 223, 'type', 'sticky', 'caption', title.dom, 'closeLink', closeLink.dom);
             });
 
             var roomInfo = Html.p({className:'mapRoomInfo'}, addr, ' - ', book.dom, more.dom);

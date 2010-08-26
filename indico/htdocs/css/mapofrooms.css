@@ -4,10 +4,10 @@
 }
 
 div.caption {
-    padding: 3px;
     background-color: #F0F0F0 !important;
     border: 1px solid #888888;
     border-bottom: none;
+    height: 19px;
 }
 
 /* Marker info */
@@ -27,7 +27,8 @@ div.caption {
 }
 
 .mapRoomDetailsLink {
-    float: right;
+    padding: 0px;
+    margin: 0px;
 }
 
 #filter_canvas {
@@ -63,6 +64,11 @@ div.caption {
 .mapRoomTooltipTitle {
     font-weight: bold;
     padding-left: 3px;
+    padding-top: 2px;
+}
+
+.mapRoomTooltipClose {
+    padding: 3px;
 }
 
 .mapRoomTooltipImage {
