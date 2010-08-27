@@ -35,6 +35,7 @@
 
 
 	<div class="meetingEventHeader">
+        <a href="http://www.cern.ch/openlab" class="logo"><img src="images/Logo-openlab-White.png" /></a>
 		<h1>
 		<xsl:text disable-output-escaping="yes"></xsl:text><xsl:value-of select="./title" disable-output-escaping="yes"/><xsl:text disable-output-escaping="yes"></xsl:text>
 		</h1>
