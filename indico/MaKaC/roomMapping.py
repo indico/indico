@@ -19,10 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
-from MaKaC.common import filters
+from MaKaC.common import filters, info
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from persistent import Persistent
+from MaKaC.rb_location import CrossLocationQueries
 
 class RoomMapperHolder(ObjectHolder):
     """
@@ -38,7 +39,7 @@ class RoomMapperHolder(ObjectHolder):
             crit["name"] = crit["roommappername"]
         f=RoomMapperFilter(_RoomMapperFilterCriteria(crit),None)
         return f.apply(self.getList(), exact)
-   
+
 class RoomMapper(Persistent):
 
     def __init__(self, data=None):
@@ -121,22 +122,27 @@ class RoomMapper(Persistent):
         return None
 
     def getMapURL(self, roomName):
-        attr=self.applyRegularExpressions(roomName)
-        if attr is not None:
-            return "%s%s"%(self.getBaseMapURL(), attr)
+        if re.match("[0-9]+-([0-9]+|R)-[0-9]+", roomName):
+            return "%s%s"%(self.getBaseMapURL(), roomName[:roomName.find('-')])
         else:
-            return ""
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            if minfo.getRoomBookingModuleActive():
+                rooms = CrossLocationQueries.getRooms(roomName = roomName)
+                rooms = [r for r in rooms if r is not None]
+                if rooms and rooms[0]:
+                    return "%s%s"%(self.getBaseMapURL(), str(rooms[0].building))
+        return ""
     getCompleteMapURL=getMapURL
-        
+
     def getLocator( self ):
         d = Locator()
         d["roomMapperId"] = self.getId()
         return d
-    
+
 class _RoomMapperFFName(filters.FilterField):
     _id="name"
 
-    def satisfies(self,roomMapper, exact=False):  
+    def satisfies(self,roomMapper, exact=False):
         for value in self._values:
             if value.strip() != "":
                 if value.strip() == "*":
