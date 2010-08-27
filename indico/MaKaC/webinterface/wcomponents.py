@@ -3280,17 +3280,19 @@ class WConferenceList(WTemplated):
         MAX_NUMBER_OF_EVENTS_SHOWN = 10
         if numEvents < MAX_NUMBER_OF_EVENTS_SHOWN:
             MAX_NUMBER_OF_EVENTS_SHOWN = numEvents
+
         todayDate = nowutc().date()
         previousMonthDate, nextMonthDate, newerDateUsed, olderDateUsed = todayDate, todayDate, todayDate, todayDate
-        nextMonthDate = todayDate
-
         ## CREATE Present Events dict
         presentEvents = {}
         presentCounter = 0
+        futureEventsToBeDisplayedCounter = 0
         if allEvents.has_key(todayDate.year) and allEvents[todayDate.year].has_key(todayDate.month):
             presentEvents.setdefault(todayDate.year,{}).setdefault(todayDate.month, allEvents[todayDate.year][todayDate.month])
             del allEvents[todayDate.year][todayDate.month]
             presentCounter = len(eventsByMonth[todayDate.year][todayDate.month])
+            futureEventsToBeDisplayedCounter = len([event for event in eventsByMonth[todayDate.year][todayDate.month] if event.startDate.day > todayDate.day])
+
         while presentCounter < MAX_NUMBER_OF_EVENTS_SHOWN:
             previousMonthDate = getPrevMonth(previousMonthDate)
             nextMonthDate = getNextMonth(nextMonthDate)
@@ -3299,6 +3301,7 @@ class WConferenceList(WTemplated):
                 presentEvents.setdefault(nextMonthDate.year,{}).setdefault(nextMonthDate.month, allEvents[nextMonthDate.year][nextMonthDate.month])
                 del allEvents[nextMonthDate.year][nextMonthDate.month] # the events are removed for the later gathering of future events
                 presentCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
+                futureEventsToBeDisplayedCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
                 newerDateUsed = nextMonthDate
             # add prevMonth
             if allEvents.has_key(previousMonthDate.year) and allEvents[previousMonthDate.year].has_key(previousMonthDate.month):
@@ -3326,6 +3329,22 @@ class WConferenceList(WTemplated):
                         futureCounter += len(eventsByMonth[year][month])
                     elif olderDateUsed.year == year and month < olderDateUsed.month:
                         pastCounter += len(eventsByMonth[year][month])
+
+        MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN = 5
+        if futureCounter + futureEventsToBeDisplayedCounter < MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN:
+            MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN = futureCounter + futureEventsToBeDisplayedCounter
+
+        while futureEventsToBeDisplayedCounter < MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN:
+            nextMonthDate = getNextMonth(nextMonthDate)
+            # add nextMonth
+            if allEvents.has_key(nextMonthDate.year) and allEvents[nextMonthDate.year].has_key(nextMonthDate.month):
+                presentEvents.setdefault(nextMonthDate.year,{}).setdefault(nextMonthDate.month, allEvents[nextMonthDate.year][nextMonthDate.month])
+                del allEvents[nextMonthDate.year][nextMonthDate.month] # the events are removed for the later gathering of future events
+                del futureEvents[nextMonthDate.year][nextMonthDate.month]
+                presentCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
+                futureEventsToBeDisplayedCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
+                futureCounter -= len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
+                newerDateUsed = nextMonthDate
 
         return presentEvents, futureEvents, futureCounter, pastCounter, olderDateUsed
 
