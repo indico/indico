@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import os, sys, csv, tempfile, stat
 from datetime import datetime, timedelta
-from mod_python import apache
+from indico.web.wsgi import webinterface_handler_config as apache
 from MaKaC.common import DBMgr
 from MaKaC.rb_factory import Factory
 from MaKaC.common.Configuration import Config

@@ -212,7 +212,8 @@ i.e. try 'easy_install jstools'"""
 
 def _checkModPythonIsInstalled():
     try:
-        import mod_python
+        pass
+        #import mod_python
     except ImportError:
         raw_input('''
 WARNING: mod_python is not installed. You need to install Apache and mod_python
@@ -223,7 +224,7 @@ You can download Apache from:
     http://httpd.apache.org/
 
 
-You can downlod mod_python from:
+You can download mod_python from:
 
     http://www.modpython.org/
 

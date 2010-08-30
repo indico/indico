@@ -31,8 +31,8 @@ import StringIO
 from datetime import datetime, timedelta
 
 try:
-    from mod_python.util import Field
-    from mod_python import apache
+    from indico.web.wsgi.indico_wsgi_handler_utils import Field
+    from indico.web.wsgi import webinterface_handler_config as apache
 except ImportError:
     pass
 from ZODB.POSException import ConflictError, POSKeyError
@@ -422,7 +422,6 @@ class RH(RequestHandlerBase):
     def process( self, params ):
         """
         """
-
         profile = Config.getInstance().getProfile()
         proffilename = ""
         res = ""

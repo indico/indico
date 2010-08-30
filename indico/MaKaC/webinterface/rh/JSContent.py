@@ -1,6 +1,6 @@
 import os, datetime, time, hashlib
 
-from mod_python import apache
+from indico.web.wsgi import webinterface_handler_config as apache
 
 from MaKaC.common import Config
 from MaKaC.common.TemplateExec import TemplateExec

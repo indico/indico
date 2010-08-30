@@ -527,7 +527,7 @@ class RHCategoryOpenService(base.RH):
     def _process(self):
         # throw an error if the category was not found
         if self._target == None:
-            from mod_python import apache
+            from indico.web.wsgi import webinterface_handler_config as apache
             self._req.status = apache.HTTP_NOT_FOUND
             return "Specified category does not exist!"
 

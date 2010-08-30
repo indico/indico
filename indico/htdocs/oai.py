@@ -27,7 +27,7 @@ from MaKaC.common import DBMgr
 from MaKaC.common.logger import Logger
 
 try:
-    from mod_python import apache
+    from indico.web.wsgi import webinterface_handler_config as apache
 except ImportError:
     pass
 
@@ -46,7 +46,8 @@ def __request(req, params, private=False):
     min = int(tsec/60)
     sec = tsec-min*60
 
-    Logger.get('oai/interface').debug("from: %s request: %s responseTime: %s\n" %(req.connection.remote_ip, req.unparsed_uri, "%d:%d:%d"%(min, sec, msec)  ))
+    #Logger.get('oai/interface').debug("from: %s request: %s responseTime: %s\n" %(req.connection.remote_ip, req.unparsed_uri, "%d:%d:%d"%(min, sec, msec)  ))
+    Logger.get('oai/interface').debug("from: %s request: %s responseTime: %s\n" %(req.remote_ip, req.unparsed_uri, "%d:%d:%d"%(min, sec, msec)  ))
 
     req.content_type = "text/xml"   # set content type
     return response

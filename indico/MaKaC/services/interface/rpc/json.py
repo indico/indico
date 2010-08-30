@@ -22,7 +22,7 @@ import simplejson
 from MaKaC.common.fossilize import fossilize, NonFossilizableException
 from MaKaC.fossils.error import ICausedErrorFossil
 try:
-    from mod_python import apache
+    from indico.web.wsgi import webinterface_handler_config as apache
 except ImportError:
     pass
 

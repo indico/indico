@@ -18,5 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-DEVELOPMENT = 0
-__version__="0.98-dev"
+"""
+mod_wsgi Indico application loader.
+"""
+
+from indico.web.wsgi.indico_wsgi_handler import application

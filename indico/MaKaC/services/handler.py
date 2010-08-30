@@ -1,5 +1,5 @@
 try:
-    from mod_python import apache
+    from indico.web.wsgi import webinterface_handler_config as apache
 except ImportError:
     pass
 import MaKaC.services.interface.rpc.json as jsonrpc

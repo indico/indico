@@ -24,13 +24,13 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.i18n import _
 
 class WPError(WPDecorated):
-    
+
     def __init__(self, rh, ex, params):
         WPDecorated.__init__(self, rh)
         self._ex = ex
         self._RHParams = params
-        
-    
+
+
     def _getBody(self, params):
         wc = WError(self._ex)
         msg = []
@@ -44,9 +44,9 @@ class WPError(WPDecorated):
             else:
                 #print * instead of password
                 msg.append("%s: %s"%(k, "*"*len(self._RHParams[k])))
-        
+
         msg.append("%s: %s"%("RequestHandlers", self._rh.__class__))
-        
+
         params["msg"] = "\n".join(msg)
         params["email"] = ""
         if self._getAW().getUser():
@@ -55,11 +55,11 @@ class WPError(WPDecorated):
 
 
 class WError(WTemplated):
-    
+
     def __init__(self, ex):
         self._ex = ex
-    
-    
+
+
     def getVars(self):
         vars = WTemplated.getVars(self)
         vars["errorText"] = "%s"%self._ex
@@ -67,21 +67,33 @@ class WError(WTemplated):
         return vars
 
 
+class WErrorWSGI(WTemplated):
+
+    def __init__(self, ex):
+        self._ex = ex
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        vars["errorTitle"] = "%s"%self._ex[0]
+        vars["errorText"] = "%s"%self._ex[1]
+        return vars
+
+
 class WPReportSended(WPDecorated):
-    
-    
+
+
     def __init__( self, rh):
         WPDecorated.__init__(self, rh)
-    
+
     def _getBody(self, params):
         wc = WReportSended()
         return wc.getHTML(params)
 
 
 class WReportSended(WTemplated):
-       
+
     def getVars(self):
         vars = WTemplated.getVars(self)
-        
+
         return vars
 

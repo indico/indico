@@ -19,11 +19,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.webinterface.rh import conferenceModif
-from MaKaC.webinterface.rh import conferenceDisplay
 
 def index( req, **params ):
     return conferenceModif.RHConfModifLog( req ).process( params )
 
 def logItem( req, **params ):
     return conferenceModif.RHConfModifLogItem( req ).process( params )
-    
