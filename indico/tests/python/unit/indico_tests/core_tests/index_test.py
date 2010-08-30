@@ -24,7 +24,9 @@ Tests for `indico.core.index` module
 
 import unittest, zope.interface
 
-from indico.core.index.base import IIIndex, IOIndex, IUniqueIdProvider
+from indico.core.index.base import IIIndex, IOIndex, IUniqueIdProvider, \
+     ElementNotFoundException, ElementAlreadyInIndexException
+
 
 from MaKaC.common import DBMgr
 
@@ -120,7 +122,8 @@ class DummyObject(Persistent):
 
     def __conform__(self, proto):
         if proto == IDummyAdapter:
-            return 1
+            # 10, 11, 12 ... -> 1 / 20, 21, 22 ... -> 2 ...
+            return self._id / 10
 
 
 class TestIOIndex(unittest.TestCase):
@@ -128,9 +131,42 @@ class TestIOIndex(unittest.TestCase):
     def setUp(self):
         self._idx = IOIndex(IDummyAdapter)
 
-    def testIndexing(self):
+    def _indexSomeElements(self):
+        objs = []
         for i in range(0, 200):
             obj = DummyObject(i)
+            objs.append(obj)
             self._idx.index_obj(obj)
 
-        # ... finish this ...
+        return objs
+
+    def testIndexing(self):
+        objs = self._indexSomeElements()
+
+        self.assertEqual(list(self._idx[1]), objs[10:20])
+        self.assertEqual(len(self._idx), 200)
+
+
+    def testUnindexing(self):
+        objs = self._indexSomeElements()
+
+        for obj in objs:
+            self._idx.unindex_obj(obj)
+
+        self.assertEqual(len(self._idx), 0)
+
+        for i in range(0,20):
+            self.assertRaises(KeyError, self._idx.get, i)
+
+    def testUnindexingNonExisting(self):
+        self.assertRaises(ElementNotFoundException,
+                          self._idx.unindex_obj,
+                          DummyObject(1))
+
+    def testIndexingTwice(self):
+        obj = DummyObject(1)
+        self._idx.index_obj(obj)
+        self.assertRaises(ElementAlreadyInIndexException,
+                          self._idx.index_obj,
+                          obj)
+

@@ -62,6 +62,19 @@ class TestPeriodicTask(PeriodicTask):
         terminated[self._id] += 1
 
 
+class TestPeriodicFailTask(PeriodicTask):
+    def __init__(self, myid, freq, **kwargs):
+        super(TestPeriodicFailTask, self).__init__(freq, **kwargs)
+        self._id = myid
+
+    def run(self):
+
+        terminated[self._id] += 1
+
+        if terminated[self._id] % 2 == 0:
+            raise Exception('I fail! %s' % terminated[self._id])
+
+
 class Worker(threading.Thread):
 
     def __init__(self, myid, task_t, time, **kwargs):
@@ -298,10 +311,42 @@ class _TestScheduler(unittest.TestCase):
                             'finished': 30,
                             'failed': 0})
 
+    def testPeriodicFailTasks(self):
+        """
+        Creating 1 periodic task that fails every second time
+        """
+
+        now = datetime.now()
+
+        s = ((now.second / 10) + 1) % 6
+
+        seconds = [s*10]
+
+        # get intervals of 10 seconds
+        for i in range(0,3):
+            s = s + 1
+            seconds.append((s % 6) * 10)
+
+        self._startSomeWorkers([TestPeriodicFailTask],
+                               [rrule.MINUTELY],
+                               bysecond = tuple(seconds))
+
+        # All workers will have finished
+        self.assertEqual(self._checkWorkersFinished(40, value=4),
+                         True)
+
+        self._shutdown()
+
+        self._assertStatus({'state': False,
+                            'waiting': 1,
+                            'running': 0,
+                            'spooled': 0,
+                            'finished': 2,
+                            'failed': 2})
+
  # TODO:
  # some tasks running (test resume)
  # some tasks spooled (test resume)
- # periodic tasks
 
     def tearDown(self):
 

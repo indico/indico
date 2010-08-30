@@ -91,7 +91,6 @@ class BaseTask(TimedEvent):
 
         self.running = False
         self.onRunningListSince = None
-        self.status = base.TASK_STATUS_NONE
 
     # Time methods
 
@@ -114,8 +113,9 @@ class BaseTask(TimedEvent):
     def getOnRunningListSince(self):
         return self.onRunningListSince
 
-
     def setStatus(self, newstatus):
+        if hasattr(self, '_v_logger'):
+            self._v_logger.info("set status %s" % newstatus)
         self.status = newstatus
 
     def getStatus(self):
@@ -163,9 +163,11 @@ class BaseTask(TimedEvent):
 
     def start(self):
 
-        self.run()
-        self.running = False
-        self.endedOn = nowutc()
+        try:
+            self.run()
+        finally:
+            self.running = False
+            self.endedOn = nowutc()
 
     def tearDown(self):
         '''If a task needs to do something once it has run and been removed from runningList
@@ -203,45 +205,55 @@ class PeriodicTask(BaseTask):
         """
         super(PeriodicTask, self).__init__()
 
-        self._frequency = frequency
-        self._interval = kwargs
         self._nextOccurrence = None
         self._lastFinishedOn = None
         self._occurrences = IOBTree()
         self._occurrenceCount = 0
         self._repeat = True
 
+        if 'dtstart' not in kwargs:
+            kwargs['dtstart'] = nowutc()
+
+
+        self._rule = rrule.rrule(
+            frequency,
+            **kwargs
+            )
+
+        self._nextOccurrence = self._rule.after(kwargs['dtstart'],
+                                                inc = True)
+
+
+
     def start(self):
         super(PeriodicTask, self).start()
 
     def tearDown(self):
         super(PeriodicTask, self).tearDown()
-        # precision of seconds, don't use this for real time response systems
 
-        # We reinject ourselves into the Queue
-        self.reset()
+    def setNextOccurrence(self, dateAfter = None):
 
-    def setNextOccurrence(self):
+        if not self._nextOccurrence:
+            # if it's None already, it means there's no "future"
+            return
 
-        l = list(rrule.rrule(
-            self._frequency,
-            dtstart = nowutc(),
-            count = 2,
-            **self._interval
-            ))
+        if not dateAfter:
+            dateAfter = nowutc()
 
-        if l:
-            self._nextOccurrence = l[0] if l[0] != self._nextOccurrence else l[1]
-        else:
-            self._nextOccurrence = None
+        # find next date after
+        nextOcc = self._rule.after(self._nextOccurrence,
+                                   inc = False)
 
-        return self._nextOccurrence
+        # repeat process till a satisfactory date is found
+        # or there is nothing left to check
+        while nextOcc and nextOcc < dateAfter:
+            nextOcc = self._rule.after(nextOcc,
+                                       inc = False)
+
+        self._nextOccurrence = nextOcc
+        return nextOcc
 
     def getStartOn(self):
-        # if it's the first time, compute the next occurrence
-        if not self._nextOccurrence:
-            self.setNextOccurrence()
-
         return self._nextOccurrence
 
     def getLastFinishedOn(self):

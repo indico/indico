@@ -23,7 +23,18 @@ type('TaskActions', [],
                                alert('done!');
                                this._table.refresh();
                            });
+         },
+
+         runFailedTask: function(task) {
+             this._request('scheduler.tasks.runFailed',
+                           {id: task.id},
+                           function(result) {
+                               // add some kind of decent notification bar?
+                               alert('done!');
+                               this._table.refresh();
+                           });
          }
+
      },
      function(table) {
          this._table = table;
@@ -48,13 +59,17 @@ type('TaskTable', ['RemoteTableWidget'],
                                     this._drawLineOptions(task))]);
          },
 
+         _formatDateTime: function(dateTime, format){
+             return Util.DateTime.friendlyDateTime(dateTime, format);
+         },
+
          _taskLine: function(task) {
              return [Html.td({}, task.id),
                      Html.td({}, task.typeId),
-                     Html.td({}, Util.formatDateTime(task.startOn,
-                                                     IndicoDateTimeFormats.Default)),
-                     Html.td({}, Util.formatDateTime(task.createdOn,
-                                                     IndicoDateTimeFormats.Default))];
+                     Html.td({}, this._formatDateTime(task.startOn,
+                                                      IndicoDateTimeFormats.Default)),
+                     Html.td({}, this._formatDateTime(task.createdOn,
+                                                      IndicoDateTimeFormats.Default))];
          },
 
          _drawToolbar: function() {
@@ -83,16 +98,22 @@ type('TaskTable', ['RemoteTableWidget'],
 
              chooser.set('stopMode');
 
-             return Html.ul("horizontalMenu",
-                 Html.li({}, Widget.link(chooser)),
-                 Html.li({}, Widget.link(command(function() {
-                     // do the actual refresh
-                     self.source.refresh();
+             return Html.div({style: {height: '50px'}},
+                             Html.ul({className: "horizontalMenu",
+                                      style: {cssFloat: 'left', height: '20px'}},
+                                     Html.li({},
+                                             Widget.link(chooser)),
+                                     Html.li({}, Widget.link(command(function() {
+                                         // do the actual refresh
+                                         self.source.refresh();
 
-                     // reset refresh time counter
-                     self._timeLeft.set(self._refreshTime);
-                 }, $T('Refresh now')))),
-                 Html.li({}, refreshCount));
+                                         // reset refresh time counter
+                                         self._timeLeft.set(self._refreshTime);
+                                     }, $T('Refresh now')))),
+                                     Html.li({}, refreshCount)),
+                             Html.div({style:{cssFloat: 'left', marginTop: '4px',
+                                              padding:'4px'}},
+                                      this._progress));
          },
 
          _drawLineOptions: function() {
@@ -117,12 +138,21 @@ type('TaskTable', ['RemoteTableWidget'],
              }, 1000);
          },
 
+         _runIndicator: function() {
+             this._progress.dom.style.display = 'inline';
+         },
+
+         _stopIndicator: function() {
+             this._progress.dom.style.display = 'none';
+         },
+
          refresh: function() {
              this.source.refresh();
          }
 
      },
      function(method, args, refreshTime) {
+         this._progress = progressIndicator(true);
 
          this._refreshTime = refreshTime || 5;
          this.RemoteTableWidget("schedTaskList", method, args || {});
@@ -155,25 +185,25 @@ type('FinishedTaskTable', ['TaskTable'],
              if (task._fossil == 'taskOccurrence') {
                  return [Html.td({}, task.task.id + ":" + task.id),
                          Html.td({}, task.task.typeId),
-                         Html.td({}, Util.formatDateTime(
+                         Html.td({}, this._formatDateTime(
                              task.startedOn,
                              IndicoDateTimeFormats.Default)),
-                         Html.td({}, Util.formatDateTime(
+                         Html.td({}, this._formatDateTime(
                              task.endedOn,
                              IndicoDateTimeFormats.Default)),
-                         Html.td({}, Util.formatDateTime(
+                         Html.td({}, this._formatDateTime(
                              task.task.createdOn,
                              IndicoDateTimeFormats.Default))];
              } else {
                  return [Html.td({}, task.id),
                          Html.td({}, task.typeId),
-                         Html.td({}, Util.formatDateTime(
+                         Html.td({}, this._formatDateTime(
                              task.startedOn,
                              IndicoDateTimeFormats.Default)),
-                         Html.td({}, Util.formatDateTime(
+                         Html.td({}, this._formatDateTime(
                              task.endedOn,
                              IndicoDateTimeFormats.Default)),
-                         Html.td({}, Util.formatDateTime(
+                         Html.td({}, this._formatDateTime(
                              task.createdOn,
                              IndicoDateTimeFormats.Default))];
              }
@@ -186,6 +216,20 @@ type('FinishedTaskTable', ['TaskTable'],
 
 type('FailedTaskTable', ['FinishedTaskTable'],
      {
+         _runTask: function(task) {
+             this._actions.runFailedTask(task);
+         },
+
+         _drawLineOptions: function(task) {
+             var self = this;
+
+             return task._fossil == 'taskOccurrence' ? '' :
+                 Html.div({}, Widget.link(
+                     command(
+                         function() {
+                             self._runTask(task);
+                         }, "Run now")));
+         }
      },
      function(method, criteria) {
          this.FinishedTaskTable(method, criteria);
@@ -229,7 +273,7 @@ type('WaitingTaskTable', ['TaskTable'],
              return Html.tr({},
                             Html.th({},'ID'),
                             Html.th({},'Task type'),
-                            Html.th({},'Scheduled execution date'),
+                            Html.th({},'Scheduled execution'),
                             Html.th({},'Creation date'),
                             Html.th({}, 'Options'));
          },

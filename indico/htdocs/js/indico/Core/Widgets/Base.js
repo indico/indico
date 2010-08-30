@@ -725,10 +725,12 @@ type("RemoteWidget", [],
              self.source.state.observe(function(value) {
                  if (value == SourceState.Loaded) {
                      canvas.set(self.drawContent(content));
+                     self._stopIndicator();
                  } else if(value == SourceState.Loading || value == SourceState.Committing){
-                     self.runIndicator(canvas);
+                     self._runIndicator(canvas);
                  } else if (value == SourceState.Error) {
                      self._error(self.source.error.get());
+                     self._stopIndicator();
                  }
              });
              return canvas;
@@ -736,18 +738,27 @@ type("RemoteWidget", [],
 
          draw: function(content) {
              var canvas = this.run(content);
-             this.runIndicator(canvas);
+             this._runIndicator(canvas);
              return canvas;
          },
 
-         runIndicator: function(canvas) {
+         _runIndicator: function(canvas) {
              if (!this.noIndicator) {
                  canvas.set(progressIndicator(false, true));
              }
+         },
+
+         _stopIndicator: function(canvas) {
          }
+
+
      },
      function(method, args, noIndicator) {
+
          this.noIndicator = noIndicator;
+
+         // progress indicator disabled for now
+         this._stopIndicator();
          this.source = indicoSource(method, args);
      });
 

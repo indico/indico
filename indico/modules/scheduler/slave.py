@@ -79,13 +79,15 @@ class _Worker(object):
 
             except Exception, e:
                 nextRunIn = i * 10 # secs
-                self._logger.warning("Task %s failed with exception '%s'. "
-                                     "Retrying for the %dth time in %d secs.." %
-                                     (self._task.id, e, i + 1, nextRunIn))
+                self._logger.warning("Task %s failed with exception '%s'. " %
+                                     (self._task.id, e))
 
                 self._logger.exception('Error message')
 
                 if  i < self._config.task_max_tries:
+                    self._logger.warning("Retrying for the %dth time in %d secs.." %
+                                         (i + 1, nextRunIn))
+
                     # if i is still low enough, we sleep progressively more
                     # so that if the error is caused by concurrency we don't make
                     # the problem worse by hammering the server.

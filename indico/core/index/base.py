@@ -43,6 +43,23 @@ class NonIndexableException(Exception):
     """
 
 
+class ElementNotFoundException(Exception):
+    """
+    Thrown when an element is not found in the index
+    """
+
+
+class InconsistentIndexException(Exception):
+    """
+    Thrown when the index seems inconsistent
+    """
+
+class ElementAlreadyInIndexException(Exception):
+    """
+    Thrown when the element is inserted a second time in the index
+    """
+
+
 class IOIndex(Persistent):
     """
     Maps integer values to objects
@@ -59,6 +76,13 @@ class IOIndex(Persistent):
         self._rev_index = OOBTree()
         self._num_objs = Length(0)
         self._adapter = adapter
+
+    def _gc_entry(self, v):
+        """
+        'Garbage collect' empty set entries
+        """
+        if len(self._fwd_index[v]) == 0:
+            del self._fwd_index[v]
 
     def index_obj(self, obj):
 
@@ -77,7 +101,7 @@ class IOIndex(Persistent):
             self._rev_index[uid]  = ts
 
         if value in self._rev_index[uid]:
-            return
+            raise ElementAlreadyInIndexException()
         else:
             self._rev_index[uid].add(value)
 
@@ -87,12 +111,36 @@ class IOIndex(Persistent):
             self._fwd_index[value] = vset
 
         if obj in vset:
-            raise Exception('Inconsistent Index!')
+            raise InconsistentIndexException("%s already in fwd[%s]", (obj, value))
         else:
             vset.insert(obj)
             self._num_objs.change(1)
 
         return (uid, value)
+
+    def unindex_obj(self, obj):
+
+        uid = obj.getUniqueId()
+
+        if uid in self._rev_index:
+            values = self._rev_index[uid]
+            del self._rev_index[uid]
+
+            for v in values:
+                if v in self._fwd_index:
+                    vset = self._fwd_index[v]
+                    if obj in vset:
+                        vset.remove(obj)
+                        self._gc_entry(v)
+                    else:
+                        raise InconsistentIndexException("%s not in fwd[%s]",
+                                                         (obj, v))
+                else:
+                    raise InconsistentIndexException("%s not in fwd index" % v)
+        else:
+            raise ElementNotFoundException(uid)
+
+        self._num_objs.change(-1)
 
     def values(self, *args):
         res = OOTreeSet()
@@ -116,6 +164,14 @@ class IOIndex(Persistent):
     def maxKey(self):
         return self._fwd_index.maxKey()
 
+    def __len__(self):
+        return self._num_objs()
+
+    def __getitem__(self, item):
+        return self._fwd_index[item]
+
+    def get(self, item):
+        return self._fwd_index[item]
 
 class IIIndex(FieldIndex):
 

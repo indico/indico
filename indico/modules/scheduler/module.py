@@ -147,19 +147,21 @@ class SchedulerModule(Module):
         if not occurrence:
             occurrence = task
 
-        #if not nocheck:
-        #    self._assertTaskStatus(task, moveFrom)
+        if not nocheck:
+            self._assertTaskStatus(task, moveFrom)
 
         if moveFrom == base.TASK_STATUS_RUNNING:
             # actually remove it from list
             self._runningList.remove(task)
-
             self._p_changed = True
         elif moveFrom == base.TASK_STATUS_QUEUED:
             idx_timestamp = int_timestamp(task.getStartOn())
             self._waitingQueue.dequeue(idx_timestamp, task)
+        elif moveFrom == base.TASK_STATUS_FAILED:
+            self._failedIndex.unindex_obj(task)
 
         # index it either in finished or failed
+        # (or queue it up again)
         if status == base.TASK_STATUS_FINISHED:
             self._finishedIndex.index_obj(occurrence)
         elif status == base.TASK_STATUS_FAILED:
@@ -175,7 +177,11 @@ class SchedulerModule(Module):
 
         # get an int timestamp
         timestamp = int_timestamp(task.getStartOn())
+
         self._waitingQueue.enqueue(timestamp, task)
+
+        # make it "officially" queued
+        task.setStatus(base.TASK_STATUS_QUEUED)
 
         logging.getLogger('scheduler').debug(
             'Added task %s to waitingList..' % task.id)

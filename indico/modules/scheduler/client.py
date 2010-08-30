@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.modules.scheduler import SchedulerModule
+from indico.modules.scheduler import SchedulerModule, base
 
 class Client(object):
 
@@ -89,3 +89,12 @@ class Client(object):
         """
 
         return self._schedMod.getTaskIndex()[tid]
+
+    def startFailedTask(self, task):
+        """
+        Starts a failed task
+        """
+
+        self._schedMod.moveTask(task,
+                                base.TASK_STATUS_FAILED,
+                                base.TASK_STATUS_QUEUED)

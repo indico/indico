@@ -55,11 +55,7 @@ class SchedulerApp(object):
 
 def _setup(args):
 
-    global pid_file
-
     cfg = Config.getInstance()
-
-    pid_file = "%s/scheduler.pid" % cfg.getLogDir()
 
     # logging setup
     handler = logging.FileHandler(os.path.join(cfg.getLogDir(), 'scheduler.log'), 'a')
@@ -69,6 +65,7 @@ def _setup(args):
 
     root_logger = logging.getLogger('')
     root_logger.addHandler(handler)
+    root_logger.setLevel(logging.DEBUG)
 
     if args.mode == 'processes':
         mp_logger = multiprocessing.get_logger()

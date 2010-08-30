@@ -18,22 +18,27 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.common.general import *
+from zope.interface import Interface
 
-from MaKaC.webinterface.rh import users
+class IIndexableByStartDateTime(Interface):
 
-if DEVELOPMENT:
-    users = reload(users)
+    def getAdjustedStartDate(self):
+        """
+        Returns a tz-aware datetime
+        """
 
 
-def index(req, **params):
-    return users.RHUserIdentityCreation( req ).process( params )
+class IIndexableByEndDateTime(Interface):
 
-def create(req, **params):
-    return users.RHUserIdentityCreation( req ).process( params )
+    def getAdjustedEndDate(self):
+        """
+        Returns a tz-aware datetime
+        """
 
-def remove(req, **params):
-    return users.RHUserRemoveIdentity( req ).process( params )
 
-def changePassword(req, **params):
-    return users.RHUserIdentityChangePassword( req ).process( params )
+class IIndexableByArbitraryDateTime(Interface):
+
+    def getIndexingDateTime():
+        """
+        Return an arbitrary tz-aware datetime (class will decide what)
+        """

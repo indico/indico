@@ -169,7 +169,7 @@ var Util = {
     },
 
     dateTimeJSToIndico: function(obj){
-        return {date:  obj.getFullYear()+ '/'+ zeropad(obj.getMonth()+1) + '/' + zeropad(obj.getDate()),
+        return {date:  obj.getFullYear()+ '-'+ zeropad(obj.getMonth()+1) + '-' + zeropad(obj.getDate()),
                 time: zeropad(obj.getHours())+':'+zeropad(obj.getMinutes())+':'+zeropad(obj.getSeconds())};
     }
 
@@ -196,6 +196,23 @@ Util.Validation = {
     }
 
 
+};
+
+Util.DateTime = {
+    friendlyDateTime: function(dateTime, format) {
+        if (!dateTime) {
+            return Html.em({},'none');
+        } else {
+            var now = Util.dateTimeJSToIndico(new Date());
+            var dateStr = Util.formatDateTime(dateTime,
+                                         format).split(' ');
+
+            var day = dateTime.date == now.date ?
+                Html.span({}, "today"):Html.span({}, dateStr[0]);
+
+            return Html.span({}, day, ' ', dateStr[1]);
+        }
+    }
 };
 
 Protection = {

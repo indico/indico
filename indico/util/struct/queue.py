@@ -86,20 +86,13 @@ class PersistentWaitingQueue(Persistent):
         self._container[t].add(obj)
         self._elem_counter.change(1)
 
-
-    def _dequeue(self, t, obj):
-        """
-        Thread-unsafe version - use `dequeue()` instead
-        """
-        self._container[t].remove(obj)
-        self._gc_bin(t)
-        self._elem_counter.change(-1)
-
     def dequeue(self, t, obj):
         """
         Remove an element from the queue
         """
-        self._dequeue(t, obj)
+        self._container[t].remove(obj)
+        self._gc_bin(t)
+        self._elem_counter.change(-1)
 
     def _next_timestamp(self):
         """
@@ -138,7 +131,7 @@ class PersistentWaitingQueue(Persistent):
         """
         pair = self.peek()
         if pair:
-            self._dequeue(*pair)
+            self.dequeue(*pair)
 
             # return the element
             return pair

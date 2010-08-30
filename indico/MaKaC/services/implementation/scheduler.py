@@ -27,7 +27,8 @@ from MaKaC.services.interface.rpc.common import ServiceError
 
 from indico.modules import ModuleHolder
 from indico.modules.scheduler import Client
-from indico.util import fossilize
+from indico.modules.scheduler.tasks import OneShotTask, PeriodicTask
+from indico.util import fossilize, date_time
 
 
 class SchedulerModuleAdminService(AdminService):
@@ -88,16 +89,19 @@ class GetFinishedTaskList(SchedulerModuleAdminService):
 
         idx = self.schedModule.getFinishedIndex()
 
-        # 1 day
-        ts = idx.maxKey() - 24*60*60
+        if len(idx) > 0:
+            # 1 day
+            ts = idx.maxKey() - 24*60*60
 
-        return fossilize.fossilize(
-            idx.itervalues(ts))
+            return fossilize.fossilize(
+                idx.itervalues(ts))
+        else:
+            return {}
 
 
-class DeleteTask(SchedulerModuleAdminService):
+class TaskAdminService(SchedulerModuleAdminService):
     """
-    Deletes a task
+    Common to all tasks
     """
 
     def _checkParams(self):
@@ -110,11 +114,25 @@ class DeleteTask(SchedulerModuleAdminService):
         self._client = Client()
         self._task = self._client.getTask(tid)
 
+
+class DeleteTask(TaskAdminService):
+    """
+    Deletes a task
+    """
+
     def _getAnswer(self):
         self._client.dequeue(self._task)
 
 
+class RunFailedTask(TaskAdminService):
+    """
+    Runs a (failed) task now
+    """
 
+    def _getAnswer(self):
+
+        self._task.setStartOn(date_time.nowutc())
+        self._client.startFailedTask(self._task)
 
 methodMap = {
     "summary": GetSchedulerSummary,
@@ -122,5 +140,6 @@ methodMap = {
     "tasks.listRunning": GetRunningTaskList,
     "tasks.listFailed": GetFailedTaskList,
     "tasks.listFinished": GetFinishedTaskList,
-    "tasks.delete" : DeleteTask
+    "tasks.delete" : DeleteTask,
+    "tasks.runFailed" : RunFailedTask
     }

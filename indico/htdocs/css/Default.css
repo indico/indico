@@ -2654,18 +2654,14 @@ ul.horizontalMenu
     padding: 0;
     display: inline;
     list-style-type: none;
-}
-
-ul.horizontalMenu
-{
-    display: inline;
     font-size: 13px;
 }
+
 ul.horizontalMenu li{
     display: inline;
     position: relative;
     padding: 2px 6px;
-    border-left: 1px solid #DDDDDD;
+    border-right: 1px solid #DDDDDD;
     line-height: 1.5;
 }
 
@@ -6331,4 +6327,22 @@ div.invalid {
 
 body.cke_show_borders {
     height: auto;
+}
+
+table.schedTaskList {
+    margin-top: 20px;
+    border-collapse:collapse;
+}
+
+table.schedTaskList td {
+    padding-top: 2px;
+    padding-left: 20px;
+    padding-right: 0px;
+}
+
+table.schedTaskList th {
+    padding-left: 20px;
+    padding-right: 0px;
+    color: #555;
+    border-bottom: 1px solid #EBEBEB;
 }

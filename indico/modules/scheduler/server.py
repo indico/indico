@@ -339,7 +339,6 @@ class Scheduler(object):
         """
         Submits a new task
         """
-        task.setStatus(base.TASK_STATUS_QUEUED)
 
         with self._op.commit():
             SchedulerModule.getDBInstance().addTaskToWaitingQueue(task,
@@ -349,15 +348,14 @@ class Scheduler(object):
 
     def _deleteTaskFromQueue(self, task):
         """
-        Submits a new task
         """
 
         with self._op.commit():
-            self._schedModule.moveTask(task, task.getStatus(),
-                                       base.TASK_STATUS_FAILED)
             if isinstance(task, tasks.PeriodicTask):
                 # don't let periodic tasks respawn
                 task.dontComeBack()
+            self._schedModule.moveTask(base.TASK_STATUS_QUEUED,
+                                       base.TASK_STATUS_FAILED)
 
         self._logger.info("Task %s dequeued" % task)
 
@@ -389,8 +387,18 @@ class Scheduler(object):
 
                 # if the task is supposed to be run again
                 if task.shouldComeBack():
+
+                    # reset "ended on"
+                    task.setEndedOn(None)
+
                     # calculate next occurrence
                     task.setNextOccurrence()
+
+                    # move the occurrence to the correct place
+                    self._schedModule.moveTask(task,
+                                               base.TASK_STATUS_RUNNING,
+                                               status,
+                                               occurrence = occurrence)
 
                     # do not index the task again
                     self._addTaskToQueue(task, index = False)
@@ -398,16 +406,13 @@ class Scheduler(object):
                     self._logger.info('Task %s rescheduled for %s' %
                                       (task, task.getStartOn()))
 
-                    # move the occurrence to the correct place
-                    self._schedModule.moveTask(task,
-                                               base.TASK_STATUS_RUNNING,
-                                               status,
-                                               occurrence = occurrence)
             else:
                 # move the task to the correct place
                 self._schedModule.moveTask(task,
                                            base.TASK_STATUS_RUNNING,
                                            status)
+
+            task.setStatus(status)
 
 
     def _checkAWOLTasks(self):
