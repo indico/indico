@@ -2386,6 +2386,10 @@ span.clickableText:hover
     background: transparent;
 }
 
+span.mandatoryField
+{
+    color: #FF0000;
+}
 
 
 a.evtTitle

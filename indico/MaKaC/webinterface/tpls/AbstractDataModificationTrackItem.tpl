@@ -5,7 +5,7 @@
     <td>
         <table width="80%%" align="center">
             <tr>
-                <td><font size="-1">%(description)s</font></td>
+                <td>%(description)s</td>
             </tr>
         </table>
     </td>

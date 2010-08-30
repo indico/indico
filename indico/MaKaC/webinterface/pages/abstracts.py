@@ -526,7 +526,7 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                 type = f.getType()
                 isMandatory = f.isMandatory()
                 if isMandatory:
-                    mandatoryText = """<font color="red">*</font>"""
+                    mandatoryText = """<span class="mandatoryField">*</span>"""
                 else:
                     mandatoryText = ""
                 nbRows = 10
@@ -537,22 +537,35 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                 else:
                     maxLengthJS = maxLengthText = ""
                 if type == "textarea":
-                    field = """<textarea name="%s" cols="85" rows="%s" %s>%s</textarea>""" % ( "f_%s"%id, nbRows, maxLengthText, value )
+                    field = """<textarea name="%s" cols="100" rows="%s" %s>%s</textarea>""" % ( "f_%s"%id, nbRows, maxLengthText, value )
                 elif type == "input":
-                    field = """<input name="%s" value="%s" size="30" %s>""" % ("f_%s"%id, value, maxLengthText)
+                    field = """<input name="%s" value="%s" size="100" %s>""" % ("f_%s"%id, value, maxLengthText)
+#                html+="""
+#                    <tr>
+#                        <td align="left" colspan="2">
+#                            %s<font color="gray">%s</font>
+#                        </td>
+#                    </tr>
+#                    <tr>
+#                        <td>%s</td>
+#                        <td>
+#                            %s
+#                        </td>
+#                    </tr>
+#                """ % ( mandatoryText, caption, maxLengthJS, field )
                 html+="""
                     <tr>
-                        <td align="left" colspan="2">
-                            %s<font color="gray">%s</font>
-                        </td>
+                        <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td>%s</td>
+                        <td align="right" valign="top">
+                            <span class="dataCaptionFormat">%s</span>&nbsp;%s
+
                         <td>
                             %s
                         </td>
                     </tr>
-                """ % ( mandatoryText, caption, maxLengthJS, field )
+                """ % ( caption, mandatoryText, field )
         return html
 
     def getVars( self ):
@@ -573,7 +586,7 @@ class WAbstractDataModification( wcomponents.WTemplated ):
         cfaMgr = self._conf.getAbstractMgr()
         vars["tracksMandatory"] = ""
         if cfaMgr.areTracksMandatory():
-            vars["tracksMandatory"] = """<font color="red">*</font>"""
+            vars["tracksMandatory"] = """<span class="mandatoryField">*</span>"""
         tracks = []
         multipleTracks = cfaMgr.getMultipleTracks()
         for track in self._conf.getTrackList():
