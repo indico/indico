@@ -1,8 +1,8 @@
-import os, logging.config
-import logging.handlers
+import os, string
+import logging.handlers, logging.config
+import ConfigParser
 
 from MaKaC.common.Configuration import Config
-import ConfigParser
 
 class ExtraIndicoFilter(logging.Filter):
 
@@ -14,7 +14,7 @@ class ExtraIndicoFilter(logging.Filter):
 class LoggerUtils:
 
     @classmethod
-    def configFromFile(self, fname, defaultArgs, filters):
+    def configFromFile(cls, fname, defaultArgs, filters):
         """
         Read the logging configuration from the logging.conf file.
         Fetch default values if the logging.conf file is not set.
@@ -29,17 +29,25 @@ class LoggerUtils:
         else:
             cp.read(fname)
 
-        formatters = logging.config._create_formatters(cp)
+        try:
+            formatters = logging.config._create_formatters(cp)
+        except:
+            #TODO: this is just for backwards compatibility. It should be removed in v0.98 with p2.6
+            formatters = cls._create_formatters(cp)
 
         logging._acquireLock()
         try:
             logging._handlers.clear()
             del logging._handlerList[:]
-            handlers = self._install_handlers(cp, defaultArgs, formatters, filters)
+            handlers = cls._install_handlers(cp, defaultArgs, formatters, filters)
             try:
                 logging.config._install_loggers(cp, handlers)
-            except TypeError:
-                logging.config._install_loggers(cp, handlers, False)
+            except:
+                #TODO: this is just for backwards compatibility. It should be removed in v0.98 with p2.6
+                try:
+                    logging.config._install_loggers(cp, handlers, False)
+                except:
+                    cls._install_loggers(cp, handlers)
 
         finally:
             logging._releaseLock()
@@ -99,6 +107,91 @@ class LoggerUtils:
         for h, t in fixups:
             h.setTarget(handlers[t])
         return handlers
+
+    @classmethod
+    def _create_formatters(cls, cp):
+        #TODO: this is just for backwards compatibility. It should be removed in v0.98 with p2.6
+        flist = cp.get("formatters", "keys")
+        if len(flist):
+            flist = string.split(flist, ",")
+            formatters = {}
+            for form in flist:
+                sectname = "formatter_%s" % form
+                opts = cp.options(sectname)
+                if "format" in opts:
+                    fs = cp.get(sectname, "format", 1)
+                else:
+                    fs = None
+                if "datefmt" in opts:
+                    dfs = cp.get(sectname, "datefmt", 1)
+                else:
+                    dfs = None
+                f = logging.Formatter(fs, dfs)
+                formatters[form] = f
+            return formatters
+        return {}
+
+    @classmethod
+    def _install_loggers(cls, cp, handlers):
+        #TODO: this is just for backwards compatibility. It should be removed in v0.98 with p2.6
+        llist = cp.get("loggers", "keys")
+        llist = string.split(llist, ",")
+        llist.remove("root")
+        sectname = "logger_root"
+        root = logging.root
+        log = root
+        opts = cp.options(sectname)
+        if "level" in opts:
+            level = cp.get(sectname, "level")
+            log.setLevel(logging._levelNames[level])
+        for h in root.handlers[:]:
+            root.removeHandler(h)
+        hlist = cp.get(sectname, "handlers")
+        if len(hlist):
+            hlist = string.split(hlist, ",")
+            for hand in hlist:
+                log.addHandler(handlers[hand])
+        #and now the others...
+        #we don't want to lose the existing loggers,
+        #since other threads may have pointers to them.
+        #existing is set to contain all existing loggers,
+        #and as we go through the new configuration we
+        #remove any which are configured. At the end,
+        #what's left in existing is the set of loggers
+        #which were in the previous configuration but
+        #which are not in the new configuration.
+        existing = root.manager.loggerDict.keys()
+        #now set up the new ones...
+        for log in llist:
+            sectname = "logger_%s" % log
+            qn = cp.get(sectname, "qualname")
+            opts = cp.options(sectname)
+            if "propagate" in opts:
+                propagate = cp.getint(sectname, "propagate")
+            else:
+                propagate = 1
+            logger = logging.getLogger(qn)
+            if qn in existing:
+                existing.remove(qn)
+            if "level" in opts:
+                level = cp.get(sectname, "level")
+                logger.setLevel(logging._levelNames[level])
+            for h in logger.handlers[:]:
+                logger.removeHandler(h)
+            logger.propagate = propagate
+            logger.disabled = 0
+            hlist = cp.get(sectname, "handlers")
+            if len(hlist):
+                hlist = string.split(hlist, ",")
+                for hand in hlist:
+                    logger.addHandler(handlers[hand])
+        #Disable any old loggers. There's no point deleting
+        #them as other threads may continue to hold references
+        #and by disabling them, you stop them doing any logging.
+        for log in existing:
+            root.manager.loggerDict[log].disabled = 1
+
+
 
 class Logger:
     """

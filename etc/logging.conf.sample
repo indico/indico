@@ -38,7 +38,7 @@ formatter=mailFormatter
 #args=('','',[],'')
 
 [formatter_mailFormatter]
-format=%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d:%(funcName)s -- %(message)s
+format=%(asctime)s %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s
 datefmt=
 
 [formatter_defaultFormatter]
