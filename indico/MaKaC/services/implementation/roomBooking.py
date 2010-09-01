@@ -6,11 +6,14 @@ from MaKaC.services.interface.rpc.common import ServiceError
 import time
 from datetime import datetime
 from MaKaC.services.implementation.base import ServiceBase
-from MaKaC.rb_location import Location
+
+from MaKaC.rb_reservation import ReservationBase
+from MaKaC.rb_location import Location, MapAspect
 from MaKaC.rb_location import CrossLocationQueries
 import MaKaC.common.info as info
 from MaKaC.common.utils import HolidaysHolder, isWeekend
 from MaKaC.errors import NoReportError
+from MaKaC.webinterface.rh.roomBooking import RoomBookingAvailabilityParamsMixin
 
 class RoomBookingListLocations( ServiceBase ):
 
@@ -50,6 +53,27 @@ class RoomBookingListRooms( ServiceBase ):
             res[room.name] = room.name
 
         return sorted(res)
+
+class RoomBookingAvailabilitySearchRooms( ServiceBase, RoomBookingAvailabilityParamsMixin ):
+
+    def _checkParams(self):
+        try:
+            self._location = self._params["location"];
+        except:
+            from MaKaC.services.interface.rpc.common import ServiceError
+            raise ServiceError("ERR-RB0", "Invalid location.")
+
+        self._checkParamsRepeatingPeriod(self._params)
+
+    def _getAnswer(self):
+        p = ReservationBase()
+        p.startDT = self._startDT
+        p.endDT = self._endDT
+        p.repeatability = self._repeatability
+
+        rooms = CrossLocationQueries.getRooms(location=self._location, resvExample=p, available=True)
+
+        return [room.id for room in rooms]
 
 class RoomBookingFullNameListRooms( RoomBookingListRooms):
 

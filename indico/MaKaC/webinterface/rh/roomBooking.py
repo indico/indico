@@ -51,38 +51,7 @@ class CandidateDataFrom( object ):
 
 # 0. Base classes
 
-
-class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
-    """
-    All room booking related hanlders are derived from this class.
-    This gives them:
-    - several general use methods
-    - login-protection
-    - auto connecting/disconnecting from room booking db
-    """
-
-    def _checkProtection( self ):
-        RHRoomBookingProtected._checkProtection(self)
-
-    def _clearSessionState( self ):
-        session = self._websession
-
-        session.setVar( "actionSucceeded", None )
-        session.setVar( "deletionFailed", None )
-        session.setVar( "formMode", None )
-
-        session.setVar( "candDataInSession", None )
-        session.setVar( "candDataInParams", None )
-        session.setVar( "afterCalPreview", None )
-
-        session.setVar( "showErrors", False )
-        session.setVar( "errors", None )
-        session.setVar( "thereAreConflicts", None )
-
-        session.setVar( "roomID", None )
-        session.setVar( "roomLocation", None )
-        session.setVar( "resvID", None )
-
+class RoomBookingAvailabilityParamsMixin:
     def _checkParamsRepeatingPeriod( self, params ):
         """
         Extracts startDT, endDT and repeatability
@@ -187,6 +156,38 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
             self._today=True
             self._startDT = datetime.today().replace(hour=0,minute=0,second=0)
             self._endDT = self._startDT.replace(hour=23,minute=59,second=59)
+
+class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin, RHProtected ):
+    """
+    All room booking related hanlders are derived from this class.
+    This gives them:
+    - several general use methods
+    - login-protection
+    - auto connecting/disconnecting from room booking db
+    """
+
+    def _checkProtection( self ):
+        RHProtected._checkProtection(self)
+
+    def _clearSessionState( self ):
+        session = self._websession
+
+        session.setVar( "actionSucceeded", None )
+        session.setVar( "deletionFailed", None )
+        session.setVar( "formMode", None )
+
+        session.setVar( "candDataInSession", None )
+        session.setVar( "candDataInParams", None )
+        session.setVar( "afterCalPreview", None )
+
+        session.setVar( "showErrors", False )
+        session.setVar( "errors", None )
+        session.setVar( "thereAreConflicts", None )
+
+        session.setVar( "roomID", None )
+        session.setVar( "roomLocation", None )
+        session.setVar( "resvID", None )
+
     # Room
 
     def _saveRoomCandidateToSession( self, c ):

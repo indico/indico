@@ -6136,11 +6136,19 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars(self)
+        websession = self._rh._websession
 
         vars["aspects"] = self._aspects
         vars["buildings"] = self._buildings
         vars["defaultLocation"] = self._defaultLocation
         vars["forVideoConference"] = self._forVideoConference
+
+        vars["roomBookingRoomListURL"] = urlHandlers.UHRoomBookingRoomList.getURL( None )
+        vars["startDT"] = websession.getVar( "defaultStartDT" )
+        vars["endDT"] = websession.getVar( "defaultEndDT" )
+        vars["startT"] = websession.getVar( "defaultStartDT" ).time().strftime( "%H:%M" )
+        vars["endT"] = websession.getVar( "defaultEndDT" ).time().strftime( "%H:%M" )
+        vars["repeatability"] = websession.getVar( "defaultRepeatability" )
 
         return vars
 

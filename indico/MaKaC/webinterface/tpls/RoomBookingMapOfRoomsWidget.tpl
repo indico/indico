@@ -21,7 +21,76 @@
     </tr>
 </table>
 
+<form id="mapOfRoomAvailabilityForm" method="post" action="<%= roomBookingRoomListURL %>">
+<p>
+    <input id="isAvailable" class="mapFilterCheckbox" type="checkbox">
+    <span class="mapFilterLabel">Is available:</span>
+</p>
+
+<table>
+    <tr id="sdatesTR" >
+        <td class="subFieldWidth" align="right" ><small> <%= _("Start Date")%>&nbsp;&nbsp;</small></td>
+        <td class="blacktext">
+            <span id="sDatePlace"></span>
+            <input type="hidden" value="<%= startDT.day %>" name="sDay" id="sDay"/>
+            <input type="hidden" value="<%= startDT.month %>" name="sMonth" id="sMonth"/>
+            <input type="hidden" value="<%= startDT.year %>" name="sYear" id="sYear"/>
+        </td>
+      </tr>
+     <tr id="edatesTR" >
+        <td class="subFieldWidth" align="right" ><small> <%= _("End Date")%>&nbsp;&nbsp;</small></td>
+        <td>
+            <span id="eDatePlace"></span>
+            <input type="hidden" value="<%= endDT.day %>" name="eDay" id="eDay"/>
+            <input type="hidden" value="<%= endDT.month %>" name="eMonth" id="eMonth"/>
+            <input type="hidden" value="<%= endDT.year %>" name="eYear" id="eYear"/>
+        </td>
+    </tr>
+    <tr id="hoursTR" >
+        <td align="right" ><small> <%= _("Hours")%>&nbsp;&nbsp;</small></td>
+        <td align="left" class="blacktext">
+            <input name="sTime" id="sTime" maxlength="5" size="5" type="text" value="<%= startT %>" onchange="" /> &nbsp;&mdash;&nbsp;
+            <input name="eTime" id="eTime" maxlength="5" size="5" type="text" value="<%= endT %>" onchange="" />
+            <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
+        </td>
+    </tr>
+    <tr id="repTypeTR" >
+        <td align="right" ><small> <%= _("Type")%>&nbsp;&nbsp;</small></td>
+        <td align="left" class="blacktext" >
+            <select name="repeatability" id="repeatability">
+            <% sel = [ "", "", "", "", "", "" ]; %>
+            <% if repeatability == None: %>
+            <%     sel[5] = 'selected="selected"' %>
+            <% end %>
+            <% if repeatability != None: %>
+            <%     sel[repeatability] = 'selected="selected"' %>
+            <% end %>
+                <option <%= sel[5] %> value="None"> <%= _("Single day")%></option>
+                <option <%= sel[0] %> value="0"> <%= _("Repeat daily")%></option>
+                <option <%= sel[1] %> value="1"> <%= _("Repeat once a week")%></option>
+                <option <%= sel[2] %> value="2"> <%= _("Repeat once every two weeks")%></option>
+                <option <%= sel[3] %> value="3"> <%= _("Repeat once every three weeks")%></option>
+                <option <%= sel[4] %> value="4"> <%= _("Repeat every month")%></option>
+            </select>
+        </td>
+    </tr>
+</table>
+<input type="hidden" name="location" value="<%= defaultLocation %>" />
+</form>
+
+<div style="display:none">
+</div>
+
 <script type="text/javascript">
+
+function fieldValues(ids) {
+    values = {}
+    for (var i in ids) {
+        id = ids[i];
+        values[id] = $E(id).dom.value;
+    }
+    return values;
+}
 
 function distance(location1, location2) {
     if (!location1 || !location2) {
@@ -96,8 +165,107 @@ var filters = [
     {"label": "<%= _("Is active") %>", "filterType": "room", "inputType": "boolean", "property": "isActive", "optional": true, "defaultValue":true}
 ];
 
+function initializeAvailabilityFields() {
+
+    /* In case the date changes, we need to check whether the start date is greater than the end date,
+    and if it's so we need to change it */
+    startDate = IndicoUI.Widgets.Generic.dateField_sdate(false, null, ['sDay', 'sMonth', 'sYear']);
+    startDate.observe(function(value) {
+        if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
+            endDate.set(startDate.get());
+            endDate.dom.onchange();
+        }
+    });
+    $E('sDatePlace').set(startDate);
+
+    endDate = IndicoUI.Widgets.Generic.dateField_edate(false, null, ['eDay', 'eMonth', 'eYear']);
+    endDate.observe(function(value) {
+        if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
+            startDate.set(endDate.get());
+            startDate.dom.onchange();
+        }
+    });
+    $E('eDatePlace').set(endDate);
+
+    isAvailable = $E('isAvailable');
+    function onIsAvailableChange() {
+        var isEnabled = isAvailable.dom.checked;
+        $E('sdate').dom.disabled = !isEnabled;
+        $E('edate').dom.disabled = !isEnabled;
+        $E('sTime').dom.disabled = !isEnabled;
+        $E('eTime').dom.disabled = !isEnabled;
+        $E('repeatability').dom.disabled = !isEnabled;
+    }
+    isAvailable.observeChange(onIsAvailableChange);
+    isAvailable.observeClick(onIsAvailableChange);
+
+}
+
+function availabilityFilterFunction(filtersCallback) {
+    if(isAvailable.dom.checked) {
+        function indicoCallback(ids, error) {
+            if (!error) {
+                function roomIdFilter(room) {
+                    return contains(ids, room.id);
+                }
+                filtersCallback([], [roomIdFilter]);
+            } else {
+                IndicoUtil.errorReport(error);
+                setResult(false);
+            }
+        }
+
+        params = fieldValues(['sDay', 'eDay', 'sMonth', 'eMonth', 'sYear', 'eYear', 'sTime', 'eTime', 'repeatability']);
+        params['location'] = '<%= defaultLocation %>';
+        indicoRequest('roomBooking.rooms.availabilitySearch', params, indicoCallback);
+    } else {
+        filtersCallback([], []);
+    }
+}
+
+
+function setDefaultAvailabilityValues() {
+    isAvailable.dom.checked = false;
+    isAvailable.dispatchEvent('change');
+
+   <% if startDT.day != '': %>
+        startDate.set('<%= startDT.day %>/<%= startDT.month %>/<%= startDT.year %>');
+    <% end %>
+
+    <% if endDT.day != '': %>
+        endDate.set('<%= endDT.day %>/<%= endDT.month %>/<%= endDT.year %>');
+    <% end %>
+}
+
+function overrideCalendar() {
+    var width = 182;
+    var extraSpace = 7;
+    var availableWidth = document.body.clientWidth;
+    Calendar.prototype.originalShowAt = Calendar.prototype.showAt;
+    Calendar.prototype.showAt = function (x, y) {
+        if (isAvailable.dom.checked) {
+            if (x + width + extraSpace > availableWidth) {
+                x = availableWidth - width - extraSpace;
+            }
+            this.originalShowAt(x, y);
+        }
+    };
+}
+
 IndicoUI.executeOnLoad(function(){
-    var roomMap = new RoomMap($E('map_canvas').dom, $E('positions_canvas').dom, $E('filter_canvas').dom, positions, buildings, filters);
+    overrideCalendar();
+    initializeAvailabilityFields();
+
+    var mapCanvas = $E('map_canvas').dom;
+    var aspectsCanvas = $E('positions_canvas').dom;
+    var filtersCanvas = $E('filter_canvas').dom;
+    var customWidgets = [{
+        widget: $E('mapOfRoomAvailabilityForm').dom,
+        getFilters: availabilityFilterFunction,
+        resetFields: setDefaultAvailabilityValues
+    }];
+
+    var roomMap = new RoomMap(mapCanvas, aspectsCanvas, filtersCanvas, positions, buildings, filters, customWidgets);
 });
 
 </script>

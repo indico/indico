@@ -17,6 +17,7 @@ methodMap = {
 
     "roomBooking.locations.list": roomBooking.RoomBookingListLocations,
     "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
+    "roomBooking.rooms.availabilitySearch": roomBooking.RoomBookingAvailabilitySearchRooms,
     "roomBooking.rooms.fullNameList": roomBooking.RoomBookingFullNameListRooms,
     "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
     "roomBooking.getDateWarning" :roomBooking.GetDateWarning,

@@ -1,26 +1,37 @@
 include("http://maps.google.com/maps/api/js?sensor=false");
 
+function contains(collection, item) {
+    for(var i = 0; i < collection.length; i++){
+        if(collection[i] == item){
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * A Google Map of rooms.
  */
 type ("RoomMap", ["IWidget"],
     {
-        initialize: function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters) {
-            this.initData(aspects, buildings, filters);
+        initialize: function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets) {
+            this.initData(aspects, buildings, filters, customWidgets);
             this.createMap(mapCanvas);
             this.initializeBounds();
             this.createAspectChangeLinks(aspectsCanvas);
             this.createBuildingMarkers();
             this.createFilters(filterCanvas);
+            this.embedWidgets();
             this.setDefaultFilterValues();
             this.updateFiltersState();
             this.filterMarkers();
         },
 
-        initData: function(aspects, buildings, filters) {
+        initData: function(aspects, buildings, filters, customWidgets) {
             this.aspects = aspects;
             this.buildings = buildings;
             this.filters = filters;
+            this.customWidgets = customWidgets;
 
             // save a reference to the building number filter
             for (var i = 0; i < filters.length; i++) {
@@ -289,7 +300,7 @@ type ("RoomMap", ["IWidget"],
         getFilterPropertyOptions: function(filter) {
             var options = [];
             function addOption(option) {
-                if (options.indexOf(option) < 0) options.push(option);
+                if (contains(options, option)) options.push(option);
             }
 
             for (var i = 0; i < this.buildings.length; i++) {
@@ -404,6 +415,9 @@ type ("RoomMap", ["IWidget"],
             for (var i = 0; i < this.filters.length; i++) {
                 this.setDefaultFilterValue(this.filters[i]);
             }
+            for (var i = 0; i < this.customWidgets.length; i++) {
+                this.customWidgets[i].resetFields();
+            }
         },
 
         createGroupWidget: function(filter) {
@@ -452,8 +466,11 @@ type ("RoomMap", ["IWidget"],
             var title = Html.div({className: 'mapFilterTitle'}, $T("Search criteria")+":");
             lines.push(title);
 
-            var widgets = this.createFilterWidgets(this.filters);
-            lines.push(widgets);
+            var filterWidgets = this.createFilterWidgets(this.filters);
+            lines.push(filterWidgets);
+
+            this.customWidgetsHolder = Html.div('mapCustomWidgetsHolder', "");
+            lines.push(this.customWidgetsHolder);
 
             var self = this;
 
@@ -537,12 +554,12 @@ type ("RoomMap", ["IWidget"],
             if (inputType == 'list_contains') {
                 return function(obj) {
                     // search for element in the list
-                    return obj[propertyName].indexOf(expectedValue) > -1;
+                    return contains(obj[propertyName], expectedValue);
                 }
             } else if (inputType == 'subtext') {
                 return function(obj) {
                     // search for substring in the string
-                    return obj[propertyName].indexOf(expectedValue) > -1;
+                    return contains(obj[propertyName], indexOf(expectedValue));
                 }
             } else {
                 return function(obj) {
@@ -631,21 +648,54 @@ type ("RoomMap", ["IWidget"],
             }
         },
 
+        addCustomWidgetFiltersToCriteria: function(buildingCriteria, roomCriteria, filterCallback) {
+            var counter = 0;
+            var total = this.customWidgets.length;
+
+            function filtersCallback(buildingFilters, roomFilters) {
+                counter++;
+                for (var k = 0; k < buildingFilters.length; k++) {
+                    buildingCriteria.push(buildingFilters[k]);
+                }
+                for (var k = 0; k < roomFilters.length; k++) {
+                    roomCriteria.push(roomFilters[k]);
+                }
+            }
+
+            for (var i = 0; i < total; i++) {
+                this.customWidgets[i].getFilters(filtersCallback);
+            }
+
+            function waitResponses() {
+                if(counter == total) {
+                    filterCallback();
+                } else {
+                    setTimeout(waitResponses, 50);
+                }
+            }
+            setTimeout(waitResponses, 50);
+        },
+
         filterMarkers: function() {
             this.buttons.dom.appendChild(this.progress);
             var mapView = this;
-            setTimeout(function() {
-                var buildingCriteria = [];
-                var roomCriteria = [];
-                mapView.resetFilteringCycle();
-                mapView.closeTooltips();
-                mapView.closeInfoBaloon();
-                mapView.addFiltersToCriteria(mapView.filters, buildingCriteria, roomCriteria);
+            var buildingCriteria = [];
+            var roomCriteria = [];
+
+            function filterCallback() {
                 mapView.filterBuildingsByCriteria(buildingCriteria, roomCriteria);
                 mapView.showMarkers();
                 mapView.showResultsInfo();
                 mapView.updateAspectsInfo();
                 mapView.buttons.dom.removeChild(mapView.progress);
+            }
+
+            setTimeout(function() {
+                mapView.resetFilteringCycle();
+                mapView.closeTooltips();
+                mapView.closeInfoBaloon();
+                mapView.addFiltersToCriteria(mapView.filters, buildingCriteria, roomCriteria);
+                mapView.addCustomWidgetFiltersToCriteria(buildingCriteria, roomCriteria, filterCallback);
             }, 0);
         },
 
@@ -684,6 +734,13 @@ type ("RoomMap", ["IWidget"],
             var isIE = window.ActiveXObject ? true : false;
             var agent = navigator.userAgent.toLowerCase();
             return isIE && /msie 7/.test(agent) && document.documentMode == 7;
+        },
+
+        embedWidgets: function() {
+            for (var i = 0; i < this.customWidgets.length; i++) {
+                var widget = this.customWidgets[i].widget;
+                this.customWidgetsHolder.dom.appendChild(widget);
+            }
         }
 
     },
@@ -692,8 +749,8 @@ type ("RoomMap", ["IWidget"],
      * Constructor of the RoomMap
      */
 
-    function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters) {
-        this.initialize(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters);
+    function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets) {
+        this.initialize(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets);
         this.values = {};
         this.extraComponents = [];
     }
