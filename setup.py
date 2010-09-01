@@ -563,13 +563,15 @@ if __name__ == '__main__':
     dataFiles = _getDataFiles(x)
 
     foundPackages = find_packages(where = 'indico',
-                                  exclude = ('htdocs','tests*','web*'))
+                                  exclude = ('htdocs*','tests*','web*'))
 
 
     # add our namespace package
     foundPackages += list('indico.%s' % pkg for pkg in
                          find_packages(where = 'indico',
-                                       exclude = ('htdocs','MaKaC*')))
+                                       exclude = ('htdocs*','MaKaC*')))
+
+    foundPackages.append('indico')
 
 
     setup(name = "cds-indico",
