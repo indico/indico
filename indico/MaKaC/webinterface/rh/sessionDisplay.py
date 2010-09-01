@@ -21,7 +21,8 @@
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.general import *
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected 
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
+    RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSubmitMaterialBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from MaKaC.errors import ModificationError
@@ -38,9 +39,9 @@ class RHSessionDisplayBase( RHSessionBase, RHDisplayBaseProtected ):
         RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHSessionDisplay( RHSessionDisplayBase ):
+class RHSessionDisplay( RoomBookingDBMixin, RHSessionDisplayBase ):
     _uh = urlHandlers.UHSessionDisplay
-    
+
     def _checkParams( self, params ):
         RHSessionDisplayBase._checkParams( self, params )
         self._activeTab=params.get("tab","")
@@ -58,7 +59,7 @@ class RHSessionDisplay( RHSessionDisplayBase ):
                         sortingCrit=self._sortingCrit)
 
 class RHSessionToiCal(RHSessionDisplay):
-    
+
     def _process( self ):
         filename = "%s - Session.ics"%self._session.getTitle()
         ical = SessionToiCal(self._session.getConference(), self._session)
@@ -69,9 +70,9 @@ class RHSessionToiCal(RHSessionDisplay):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
-     
+
 class RHSessionToMarcXML(RHSessionDisplay):
-    
+
     def _process( self ):
         filename = "%s - Session.xml"%self._session.getTitle().replace("/","")
         from MaKaC.common.xmlGen import XMLGen
@@ -89,7 +90,7 @@ class RHSessionToMarcXML(RHSessionDisplay):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
-        
+
 
 class RHSessionDisplayRemoveMaterial( RHSessionDisplay ):
     _uh = urlHandlers.UHSessionDisplayRemoveMaterial
@@ -98,13 +99,13 @@ class RHSessionDisplayRemoveMaterial( RHSessionDisplay ):
         RHSessionDisplay._checkProtection(self)
         if not self._target.canModify( self.getAW() ):
             raise MaKaCError("you are not authorised to manage material for this session")
-    
+
     def _checkParams( self, params ):
         RHSessionDisplay._checkParams( self, params )
         self._materialIds = self._normaliseListParam( params.get("deleteMaterial", []) )
         self._confirmed=params.has_key("confirm") or params.has_key("cancel")
         self._remove=params.has_key("confirm")
-        
+
     def _process( self ):
         if self._materialIds != []:
             if self._confirmed:
@@ -148,7 +149,7 @@ class RHWriteMinutes( RHSessionDisplayBase ):
                 self._checkSessionUser()
             else:
                 raise ModificationError()
-    
+
     def _preserveParams(self):
         preservedParams = self._getRequestParams().copy()
         self._websession.setVar("minutesPreservedParams",preservedParams)
@@ -171,7 +172,7 @@ class RHWriteMinutes( RHSessionDisplayBase ):
         self._cancel = params.has_key("cancel")
         self._save = params.has_key("OK")
         self._text = params.get("text", "")#.strip()
-        
+
     def _process( self ):
         wf=self.getWebFactory()
         if self._save:

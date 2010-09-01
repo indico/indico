@@ -24,7 +24,8 @@ import os.path
 import MaKaC.conference as conference
 import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected 
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
+    RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHSubContributionBase, RHSubmitMaterialBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.ICALinterface.conference import ContribToiCal
@@ -44,9 +45,9 @@ class RHSubContributionDisplayBase( RHSubContributionBase, RHDisplayBaseProtecte
         RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHSubContributionDisplay( RHSubContributionDisplayBase ):
+class RHSubContributionDisplay( RoomBookingDBMixin, RHSubContributionDisplayBase ):
     _uh = urlHandlers.UHSubContributionDisplay
-    
+
     def _process( self ):
         p = subContributions.WPSubContributionDisplay( self, self._subContrib )
         wf=self.getWebFactory()
@@ -55,7 +56,7 @@ class RHSubContributionDisplay( RHSubContributionDisplayBase ):
         return p.display()
 
 class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
-    
+
     def _process( self ):
         filename = "%s - Subcontribution.xml"%self._subContrib.getTitle().replace("/","")
         from MaKaC.common.xmlGen import XMLGen
@@ -73,7 +74,7 @@ class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
-        
+
 class RHWriteMinutes( RHSubContributionDisplayBase ):
 
     def _checkProtection(self):
@@ -89,7 +90,7 @@ class RHWriteMinutes( RHSubContributionDisplayBase ):
                 self._checkSessionUser()
             else:
                 raise ModificationError()
-    
+
     def _preserveParams(self):
         preservedParams = self._getRequestParams().copy()
         self._websession.setVar("minutesPreservedParams",preservedParams)
@@ -112,7 +113,7 @@ class RHWriteMinutes( RHSubContributionDisplayBase ):
         self._cancel = params.has_key("cancel")
         self._save = params.has_key("OK")
         self._text = params.get("text", "")#.strip()
-        
+
     def _process( self ):
         wf=self.getWebFactory()
         if self._save:
@@ -141,7 +142,7 @@ class RHSubmitMaterial(RHSubContributionDisplayBase):
                 self._checkSessionUser()
             else:
                 raise ModificationError()
-    
+
     #def _checkProtection(self):
     #    if self.getAW().getUser() is None:
     #        self._checkSessionUser()
@@ -152,7 +153,7 @@ class RHSubmitMaterial(RHSubContributionDisplayBase):
         RHSubContributionDisplayBase._checkParams(self,params)
         if not hasattr(self, "_rhSubmitMaterial"):
             self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
-        self._rhSubmitMaterial._checkParams(params) 
+        self._rhSubmitMaterial._checkParams(params)
 
     def _process(self):
         wf=self.getWebFactory()

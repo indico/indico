@@ -90,7 +90,7 @@ class RHCategoryStatistics( RHCategDisplayBase ):
         p = category.WPCategoryStatistics( self, self._target, wfReg, stats )
         return p.display()
 
-class RHCategOverviewDisplay( RHCategDisplayBase ):
+class RHCategOverviewDisplay( RoomBookingDBMixin, RHCategDisplayBase ):
 
     def _checkParams( self, params ):
         id = params.get("selCateg", "")
