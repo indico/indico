@@ -31,8 +31,8 @@ class ExampleTest(SeleniumTestCase):
     def testCreateDeleteLecture(self):
         sel = self.selenium
         sel.open("/indico//index.py")
-        sel.click("createEventLink")
-        sel.click("link=Lecture")
+        sel.click("//li[@id='createEventMenu']/span")
+        sel.click("link=Create lecture")
         self.waitPageLoad(sel)
         sel.type("login", "dummyuser")
         sel.type("password", "dummyuser")
