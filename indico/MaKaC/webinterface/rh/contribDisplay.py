@@ -24,7 +24,8 @@ import sys
 import MaKaC.conference as conference
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
+    RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHContributionBase, RHSubmitMaterialBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.ICALinterface.conference import ContribToiCal
@@ -45,7 +46,7 @@ class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
         RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHContributionDisplay( RHContributionDisplayBase ):
+class RHContributionDisplay( RoomBookingDBMixin, RHContributionDisplayBase ):
     _uh = urlHandlers.UHContributionDisplay
 
     def _process( self ):

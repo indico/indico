@@ -1343,7 +1343,8 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
         // Step 3: choose to fit or not the inner entries
         var fitInnerTitle = Html.div("rescheduleTitle", $T("Step 3: Choose to fit sessions to their content"));
 
-        this.fitInnerCheckBox = Html.checkbox({id:'fitInnerCheckBox', name:'fitInnerCheckBox'}, false);
+        this.fitInnerCheckBox = Html.checkbox({}, false);
+        this.fitInnerCheckBox.dom.name = 'fitInnerCheckBox';
 
         var fitInnerLabel = Html.label({htmlFor:'fitInnerCheckBox', className:'rescheduleLabelTitle'},
                 "Fit all the sessions contained on " + this.__getCurrentDayText() + " to their content.");

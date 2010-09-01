@@ -963,7 +963,7 @@ class RHAbstractBookPerform(RHConferenceBaseDisplay):
         return data
 
 
-class RHConfParticipantsNewPending(RHConferenceBaseDisplay):
+class RHConfParticipantsNewPending(RHConferenceDisplay):
     _uh = urlHandlers.UHConfParticipantsNewPending
 
     def _process( self ):
@@ -973,17 +973,14 @@ class RHConfParticipantsNewPending(RHConferenceBaseDisplay):
         if self._conf.getStartDate() < timezoneUtils.nowutc() :
             errorList.append("This event began on %s"%self._conf.getStartDate())
             errorList.append("You cannot apply for participation after the event began")
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            url.addParam("errorMsg", errorList)
-            self._redirect(url)
 
         if not self._conf.getParticipation().isAllowedForApplying() :
             errorList.append("Participation in this event is restricted to persons invited")
             errorList.append("If you insist on taking part in this event, please contact the event manager")
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            url.addParam("errorMsg", errorList)
-            self._redirect(url)
 
+        if errorList:
+            self._reqParams["errorMsg"] = errorList
+            return RHConferenceDisplay._process(self)
 
         params["formAction"] = str(urlHandlers.UHConfParticipantsAddPending.getURL(self._conf))
         user = self._getUser()
@@ -1011,7 +1008,7 @@ class RHConfParticipantsNewPending(RHConferenceBaseDisplay):
         return p.display(**params)
 
 
-class RHConfParticipantsAddPending(RHConferenceBaseDisplay):
+class RHConfParticipantsAddPending(RHConferenceDisplay):
     _uh = urlHandlers.UHConfParticipantsAddPending
 
     def _process( self ):
@@ -1042,10 +1039,12 @@ class RHConfParticipantsAddPending(RHConferenceBaseDisplay):
                 else:
                     errorList.append("The participant cannot be added.")
 
-        url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        url.addParam("errorMsg", errorList)
-        url.addParam("infoMsg", infoList)
-        self._redirect(url)
+        if infoList:
+            self._reqParams["infoMsg"] = infoList
+        if errorList:
+            self._reqParams["errorMsg"] = errorList
+
+        return RHConferenceDisplay._process(self)
 
 
 class RHConfParticipantsRefusal(RHConferenceBaseDisplay):

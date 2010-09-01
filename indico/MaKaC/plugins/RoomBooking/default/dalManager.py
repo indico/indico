@@ -49,7 +49,7 @@ class DALManager( DALManagerBase ):
             return True
         else:
             return False
-         
+
     @staticmethod
     def theInstance():
         if not DALManager._instance:
@@ -72,6 +72,7 @@ class DALManager( DALManagerBase ):
 
     @staticmethod
     def getRoot(name=""):
+
         if name == "":
             return DALManager.root
         elif DALManager.root != None:
@@ -90,7 +91,7 @@ class DALManager( DALManagerBase ):
                 return DALManager.root[name]
         else:
             raise MaKaCError("Cannot connect to the room booking database")
-            
+
     @staticmethod
     def connect():
         if not DALManager.isConnected():
@@ -99,7 +100,7 @@ class DALManager( DALManagerBase ):
             else:
                 DALManager.connection = DALManager.theInstance().db.open()
             DALManager.root = DALManager.connection.root()
-        
+
     @staticmethod
     def disconnect():
         if DALManager.usesMainIndicoDB():
@@ -108,14 +109,14 @@ class DALManager( DALManagerBase ):
             DALManager.connection.close()
         DALManager.root = None
         DALManager.connection = None
-    
+
     @staticmethod
     def commit():
         if DALManager.usesMainIndicoDB():
             return
         if DALManager.isConnected():
             DALManager.connection.transaction_manager.get().commit()
-        
+
     @staticmethod
     def rollback():
         if DALManager.usesMainIndicoDB():
@@ -135,4 +136,4 @@ class DALManager( DALManagerBase ):
         if DALManager.usesMainIndicoDB():
             return
         DALManager.theInstance().db.pack(days=days)
-        
+

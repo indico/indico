@@ -71,7 +71,6 @@ from MaKaC.conference import ContributionParticipation, Contribution, CustomRoom
 from MaKaC.conference import SessionChair
 from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.webinterface.wcomponents import WErrorMessage
 from MaKaC.common import pendingQueues
 from MaKaC.common import mail
 import httplib
@@ -2119,7 +2118,8 @@ class RHConfModifParticipants( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._errorMsg = params.get("errorMsg","")
+        self._errorMsg = ""
+        self._infoMsg = ""
 
     def _process( self ):
         if self._conf.isClosed():
@@ -2127,7 +2127,7 @@ class RHConfModifParticipants( RHConferenceModifBase ):
             return p.display()
         else:
             p = conferences.WPConfModifParticipants( self, self._target )
-            return p.display(errorMsg=self._errorMsg)
+            return p.display(errorMsg=self._errorMsg, infoMsg=self._infoMsg)
 
 
 class RHConfModifParticipantsObligatory(RHConferenceModifBase):
@@ -2187,7 +2187,7 @@ class RHConfModifParticipantsPending(RHConferenceModifBase):
         return p.display()
 
 
-class RHConfModifParticipantsAction(RHConferenceModifBase):
+class RHConfModifParticipantsAction(RHConfModifParticipants):
     _uh = urlHandlers.UHConfModifParticipantsAction
 
     def _process( self ):
@@ -2285,10 +2285,10 @@ class RHConfModifParticipantsAction(RHConferenceModifBase):
                     else :
                         GenericMailer.sendAndLog(GenericNotification(data),self._conf,"participants",self._getUser())
                         infoList.append( _("The message has been send to  %s %s.")%(participant.getFirstName(), participant.getFamilyName()))
-        url = RHConfModifParticipants._uh.getURL(self._conf)
-        url.addParam("errorMsg",errorList)
-        url.addParam("infoMsg",infoList)
-        self._redirect(url)
+        if errorList:
+            self._infoMsg = infoList
+            self._errorMsg = errorList
+        return RHConfModifParticipants._process(self)
 
 
 
@@ -2311,7 +2311,7 @@ class RHConfModifParticipantsSelectToAdd(RHConferenceModifBase):
         return p.display(**params)
 
 
-class RHConfModifParticipantsAddSelected(RHConferenceModifBase):
+class RHConfModifParticipantsAddSelected(RHConfModifParticipants):
     _uh = urlHandlers.UHConfModifParticipantsAddSelected
 
     def _process( self ):
@@ -2357,9 +2357,9 @@ class RHConfModifParticipantsAddSelected(RHConferenceModifBase):
                         errorList.append( _("""The participant identified by email '%s'
                         is already in the participants' list""")%participant.getEmail())
 
-        url = RHConfModifParticipants._uh.getURL(self._conf)
-        url.addParam("errorMsg", errorList)
-        self._redirect(url)
+        if errorList:
+            self._errorMsg = errorList
+        return RHConfModifParticipants._process(self)
 
 
 class RHConfModifParticipantsNewToAdd(RHConferenceModifBase):
@@ -2372,7 +2372,7 @@ class RHConfModifParticipantsNewToAdd(RHConferenceModifBase):
         return p.display(**params)
 
 
-class RHConfModifParticipantsAddNew(RHConferenceModifBase):
+class RHConfModifParticipantsAddNew(RHConfModifParticipants):
     _uh = urlHandlers.UHConfModifParticipantsAddNew
 
     def _process( self ):
@@ -2404,9 +2404,9 @@ class RHConfModifParticipantsAddNew(RHConferenceModifBase):
                         errorList.append( _("""The participant identified by email '%s'
                         is already in the participants' list""")%participant.getEmail())
 
-        url = RHConfModifParticipants._uh.getURL(self._conf)
-        url.addParam("errorMsg", errorList)
-        self._redirect(url)
+        if errorList:
+            self._errorMsg = errorList
+        return RHConfModifParticipants._process(self)
 
 
 class RHConfModifParticipantsSelectToInvite(RHConferenceModifBase):
@@ -2420,11 +2420,10 @@ class RHConfModifParticipantsSelectToInvite(RHConferenceModifBase):
         return p.display(**params)
 
 
-class RHConfModifParticipantsInviteSelected(RHConferenceModifBase):
+class RHConfModifParticipantsInviteSelected(RHConfModifParticipants):
     _uh = urlHandlers.UHConfModifParticipantsInviteSelected
 
     def _process( self ):
-        params = {}
         errorList = []
         eventManager = self._getUser()
         selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals",[]))
@@ -2464,10 +2463,9 @@ class RHConfModifParticipantsInviteSelected(RHConferenceModifBase):
                         errorList.append( _("""The participant identified by email '%s'
                         is already in the participants' list""")%participant.getEmail())
 
-        url = RHConfModifParticipants._uh.getURL(self._conf)
-        url.addParam("errorMsg", errorList)
-        self._redirect(url)
-
+        if errorList:
+            self._errorMsg = errorList
+        return RHConfModifParticipants._process(self)
 
 class RHConfModifParticipantsNewToInvite(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifParticipantsNewToInvite
@@ -2479,7 +2477,7 @@ class RHConfModifParticipantsNewToInvite(RHConferenceModifBase):
         return p.display(**params)
 
 
-class RHConfModifParticipantsInviteNew(RHConferenceModifBase):
+class RHConfModifParticipantsInviteNew(RHConfModifParticipants):
     _uh = urlHandlers.UHConfModifParticipantsInviteNew
 
     def _process( self ):
@@ -2501,9 +2499,9 @@ class RHConfModifParticipantsInviteNew(RHConferenceModifBase):
                         errorList.append( _("""The participant identified by email '%s'
                         is already in the participants' list""")%participant.getEmail())
 
-        url = RHConfModifParticipants._uh.getURL(self._conf)
-        url.addParam("errorMsg", errorList)
-        self._redirect(url)
+        if errorList:
+            self._errorMsg = errorList
+        return RHConfModifParticipants._process(self)
 
 
 class RHConfModifParticipantsEdit(RHConferenceModifBase):

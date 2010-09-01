@@ -237,14 +237,19 @@ class WOverviewContribBase( wcomponents.WTemplated ):
         loc = ""
         if self._contrib.getOwnLocation() != None:
             loc = self._contrib.getLocation().getName()
-        if loc != "":
-            loc = "(%s)"%loc
         room = ""
         if self._contrib.getOwnRoom() != None:
+            if loc != "":
+                loc = "%s: "%loc
             room = self._contrib.getRoom().getName()
-        if room != "":
-            room = "(%s)"%room
-        return "%s %s"%(loc, room)
+            url = linking.RoomLinker().getURL( self._contrib.getRoom(), \
+                                                   self._contrib.getLocation() )
+            if url != "":
+                room = """<a href="%s" style="font-size: 0.9em">%s</a>"""%(url, room)
+        if loc != "" or room != "":
+            return "(%s %s)"%(loc, room)
+        else:
+            return ""
 
     def getHTML( self, params={} ):
         return wcomponents.WTemplated.getHTML( self, params )
@@ -317,11 +322,13 @@ class WOverviewSessionBase( wcomponents.WTemplated ):
             loc = self._session.getLocation().getName()
         room = ""
         if self._session.getOwnRoom() != None:
+            if loc != "":
+                loc = "%s: "%loc
             url = linking.RoomLinker().getURL( self._session.getRoom(), \
                                                    self._session.getLocation() )
             room = self._session.getRoom().getName()
             if url != "":
-                room = """<a href="%s"><font size="-2" color="blue">%s</font></a>"""%(url, room)
+                room = """<a href="%s" style="font-size: 0.9em">%s</a>"""%(url, room)
         if loc != "" or room != "":
             return "(%s %s)"%(loc, room)
         else:
@@ -456,6 +463,8 @@ class WOverviewConfBase( wcomponents.WTemplated ):
             loc = self._conf.getLocation().getName()
         room = ""
         if self._conf.getRoom() != None:
+            if loc != "":
+                loc = "%s: "%loc
             url = linking.RoomLinker().getURL( self._conf.getRoom(), \
                                                     self._conf.getLocation() )
             room = self._conf.getRoom().getName()

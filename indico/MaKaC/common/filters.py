@@ -257,10 +257,7 @@ class SimpleFilter:
         """
         result = []
         if self._filter:
-            #self._filter.optimise()
-            for item in targetList:
-                if self._filter.satisfies( item ):
-                    result.append( item )
+            result = [item for item in targetList if self._filter.satisfies( item )]
         else:
             result = targetList
         if self._sorting:

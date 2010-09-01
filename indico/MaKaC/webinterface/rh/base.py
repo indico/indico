@@ -772,7 +772,7 @@ class RHDisplayBaseProtected( RHProtected ):
             else:
                 target = self._target
             if not isinstance(self._target, Category):
-                if target.getAccessKey() != "" or target.getConference().getAccessKey() != "":
+                if target.getAccessKey() != "" or target.getConference() and target.getConference().getAccessKey() != "":
                     raise AccessError()
             if self._getUser() == None:
                 self._checkSessionUser()

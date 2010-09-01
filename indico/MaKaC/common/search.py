@@ -61,8 +61,8 @@ def searchGroups(group="", searchExt=False):
         criteria = {
             "name": group
         }
-        # search groups
-        groups = GroupHolder().match(criteria, forceWithoutExtAuth=(not searchExt))
+        # search not obsolete groups
+        groups = [ group for group in GroupHolder().match(criteria, forceWithoutExtAuth=(not searchExt)) if not group.isObsolete()]
         return groups
     else:
         return []

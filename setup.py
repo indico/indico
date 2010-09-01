@@ -242,7 +242,7 @@ class develop_indico(Command):
             print 'Creating new etc/indico.conf..'
             shutil.copy('etc/indico.conf.sample', local)
 
-        for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf') if not os.path.exists(x)]:
+        for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf', 'etc/logging.conf') if not os.path.exists(x)]:
             shutil.copy('%s.sample' % f, f)
 
         print """\nIndico needs to store some information in the filesystem (database, cache, temporary files, logs...)

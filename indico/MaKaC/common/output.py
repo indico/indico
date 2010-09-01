@@ -295,6 +295,15 @@ class outputGenerator:
         if conf.getSupportEmail() != '':
             out.writeTag("supportEmail", conf.getSupportEmail(), [["caption", displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getSupportEmailCaption()]])
 
+        keywords = conf.getKeywords()
+        keywords = keywords.replace("\r\n", "\n")
+        keywordsList = filter (lambda a: a != '', keywords.split("\n"))
+        if keywordsList:
+            out.openTag("keywords")
+            for keyword in keywordsList:
+                out.writeTag("keyword",keyword.strip())
+            out.closeTag("keywords")
+
         rnh = conf.getReportNumberHolder()
         rns = rnh.listReportNumbers()
         if len(rns) != 0:
@@ -706,9 +715,13 @@ class outputGenerator:
         if (contribution.canModify( self.__aw ) or contribution.canUserSubmit(self.__aw.getUser())) and vars and modificons:
             out.writeTag("materialLink", True)
         keywords = contribution.getKeywords()
-        keywords.replace("\r\n", "\n")
-        for keyword in keywords.split("\n"):
-            out.writeTag("keyword",keyword.strip())
+        keywords = keywords.replace("\r\n", "\n")
+        keywordsList = filter (lambda a: a != '', keywords.split("\n"))
+        if keywordsList:
+            out.openTag("keywords")
+            for keyword in keywordsList:
+                out.writeTag("keyword",keyword.strip())
+            out.closeTag("keywords")
         rnh = contribution.getReportNumberHolder()
         rns = rnh.listReportNumbers()
         if len(rns) != 0:
@@ -1186,7 +1199,7 @@ class outputGenerator:
 
         out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = conf.getKeywords()
-        keywords.replace("\r\n", "\n")
+        keywords = keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("marc:subfield",keyword,[["code","a"]])
         out.closeTag("marc:datafield")
@@ -1460,7 +1473,7 @@ class outputGenerator:
 
         out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = cont.getKeywords()
-        keywords.replace("\r\n", "\n")
+        keywords = keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("marc:subfield",keyword,[["code","a"]])
         out.closeTag("marc:datafield")
@@ -1614,7 +1627,7 @@ class outputGenerator:
 
         out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = subCont.getKeywords()
-        keywords.replace("\r\n", "\n")
+        keywords = keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
             out.writeTag("marc:subfield",keyword,[["code","a"]])
         out.closeTag("marc:datafield")

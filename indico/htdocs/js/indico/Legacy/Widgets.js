@@ -885,7 +885,7 @@ IndicoUI.Widgets = {
 
             var onSelect = function(cal) {
                 var p = cal.params;
-                var update = (cal.dateClicked || p.electric);
+                var update = (cal.dateClicked || exists(cal.activeDiv._range)); // if there is _range we are updating the time
                 if (update && p.inputField) {
                     p.inputField.value = cal.date.print(p.ifFormat);
                     if (typeof p.inputField.onchange == "function")

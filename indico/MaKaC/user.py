@@ -69,6 +69,7 @@ class Group(Persistent, Fossilizable):
         self.description = ""
         self.email = ""
         self.members = []
+        self.obsolete = False
 
     def setId( self, newId ):
         self.id = str(newId)
@@ -104,6 +105,14 @@ class Group(Persistent, Fossilizable):
         except:
             self.email = ""
         return self.email
+
+    def isObsolete(self):
+        if not hasattr(self, "obsolete"):
+            self.obsolete = False
+        return self.obsolete
+
+    def setObsolete(self, obsolete):
+        self.obsolete = obsolete
 
     def addMember( self, newMember ):
         if newMember == self:

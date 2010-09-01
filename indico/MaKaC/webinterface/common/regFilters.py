@@ -39,11 +39,15 @@ class AccommFilterField( filters.FilterField ):
     def satisfies( self, reg ):
         """
         """
-        if reg.getAccommodation().getAccommodationType() is None:
-            return self._showNoValue
-        if reg.getAccommodation().getAccommodationType() not in reg.getRegistrationForm().getAccommodationForm().getAccommodationTypesList():
-            return self._showNoValue
-        return reg.getAccommodation().getAccommodationType().getId() in self._values
+        accomTypesList = len(reg.getRegistrationForm().getAccommodationForm().getAccommodationTypesList())
+        if accomTypesList != len(self._values):
+            if reg.getAccommodation().getAccommodationType() is None:
+                return self._showNoValue
+            if reg.getAccommodation().getAccommodationType() not in accomTypesList:
+                return self._showNoValue
+            return reg.getAccommodation().getAccommodationType().getId() in self._values
+        else:
+            return True
 
 
 class SessionFilterField( filters.FilterField ):
@@ -54,16 +58,18 @@ class SessionFilterField( filters.FilterField ):
     def satisfies( self, reg ):
         """
         """
-
-        if reg.getSessionList():
-            for sess in reg.getSessionList():
-                if sess.getId() in self._values:
-                    return True
-                elif sess not in reg.getRegistrationForm().getSessionsForm().getSessionList():
-                    return self._showNoValue
+        if len(reg.getRegistrationForm().getSessionsForm().getSessions().values()) != len(self._values):
+            if reg.getSessionList():
+                for sess in reg.getSessionList():
+                    if sess.getId() in self._values:
+                        return True
+                    elif sess not in reg.getRegistrationForm().getSessionsForm().getSessionList():
+                        return self._showNoValue
+            else:
+                return self._showNoValue
+            return False
         else:
-            return self._showNoValue
-        return False
+            return True
 
 class SessionFirstPriorityFilterField( filters.FilterField ):
     """
@@ -94,16 +100,17 @@ class EventFilterField(filters.FilterField):
     def satisfies(self, reg):
         """
         """
-
-        if reg.getSocialEvents():
-            for event in reg.getSocialEvents():
-                if event.getId() in self._values:
-                    return True
-                elif event.getSocialEventItem() not in reg.getRegistrationForm().getSocialEventForm().getSocialEventList():
-                    return self._showNoValue
-        else:
-            return self._showNoValue
-        return False
+        if (reg.getRegistrationForm().getSocialEventForm().getSocialEventList()) != len(self._values):
+            if reg.getSocialEvents():
+                for event in reg.getSocialEvents():
+                    if event.getId() in self._values:
+                        return True
+                    elif event.getSocialEventItem() not in reg.getRegistrationForm().getSocialEventForm().getSocialEventList():
+                        return self._showNoValue
+            else:
+                return self._showNoValue
+            return False
+        return True
 
 class StatusesFilterField(filters.FilterField):
     """
@@ -117,11 +124,18 @@ class StatusesFilterField(filters.FilterField):
 
     def __init__(self,conf,values,showNoValue=True ):
         filters.FilterField.__init__(self, conf, values, showNoValue)
-        self._confStatusSet = set([status.getCaption()+"-"+status.getId() for status in self._conf.getRegistrationForm().getStatusesList()])
+        self._confStatusSet = set([status.getCaption()+"-"+status.getId() for status in self._conf.getRegistrationForm().getStatusesList(False)])
 
     def satisfies(self, reg):
         """
         """
+        ### If all the status values are selected, there is no need for filtering
+        values = 0
+        for status in self._conf.getRegistrationForm().getStatusesList(False):
+            values += len(status.getStatusValues()) + 1
+        if len(self._values) == values:
+            return True
+
         statusDict = reg.getStatuses()
 
         if statusDict:
@@ -174,15 +188,7 @@ class NameSF(RegistrantSortingField):
     _id="Name"
 
     def compare( self, r1, r2 ):
-        """
-        """
-        res1 = r1.getFamilyName().upper()
-        if r1.getFirstName() != "":
-            res1 = "%s, %s"%( res1, r1.getFirstName() )
-        res2 = r2.getFamilyName().upper()
-        if r2.getFirstName() != "":
-            res2 = "%s, %s"%( res2, r2.getFirstName() )
-        return cmp( res1, res2 )
+        return cmp( r1.getFamilyName().upper() + r1.getFirstName(), r2.getFamilyName().upper() + r2.getFirstName() )
 
 class PositionSF( RegistrantSortingField ):
     _id = "Position"

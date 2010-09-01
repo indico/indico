@@ -513,7 +513,8 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
 
     # copy the db config files
     for f in [xx for xx in ('%s/zdctl.conf' % targetDirs['etc'],
-                            '%s/zodb.conf' % targetDirs['etc']) if not os.path.exists(xx)]:
+                            '%s/zodb.conf' % targetDirs['etc'],
+                            '%s/logging.conf' %targetDirs['etc']) if not os.path.exists(xx)]:
         shutil.copy('%s.sample' % f, f)
 
     # Shall we create a DB?

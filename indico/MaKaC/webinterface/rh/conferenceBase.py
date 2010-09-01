@@ -73,7 +73,7 @@ class RHConferenceSite( RHCustomizable ):
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         wr = webFactoryRegistry.WebFactoryRegistry()
         self._wf = wr.getFactory( self._conf )
-        if self._wf is not None:
+        if self._wf is not None or self._conf is None:
             return urlHandlers.UHSignIn.getURL( url )
         else:
             return urlHandlers.UHConfSignIn.getURL( self._target, url )
