@@ -3339,12 +3339,9 @@ class WConferenceList(WTemplated):
             # add nextMonth
             if allEvents.has_key(nextMonthDate.year) and allEvents[nextMonthDate.year].has_key(nextMonthDate.month):
                 presentEvents.setdefault(nextMonthDate.year,{}).setdefault(nextMonthDate.month, allEvents[nextMonthDate.year][nextMonthDate.month])
-                #del allEvents[nextMonthDate.year][nextMonthDate.month] # the events are removed for the later gathering of future events
                 del futureEvents[nextMonthDate.year][nextMonthDate.month]
-                #presentCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
                 futureEventsToBeDisplayedCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
                 futureCounter -= len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
-                #newerDateUsed = nextMonthDate
 
         return presentEvents, futureEvents, futureCounter, pastCounter, olderDateUsed
 
