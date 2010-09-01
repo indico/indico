@@ -563,7 +563,7 @@ if __name__ == '__main__':
     dataFiles = _getDataFiles(x)
 
     foundPackages = find_packages(where = 'indico',
-                                  exclude = ('htdocs','tests*'))
+                                  exclude = ('htdocs','tests*','web*'))
 
 
     # add our namespace package
