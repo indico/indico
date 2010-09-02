@@ -42,6 +42,8 @@ from MaKaC.i18n import _
 from pytz import timezone
 from pytz import all_timezones
 
+from MaKaC.rb_location import CrossLocationDB
+
 class toExec:
     """
     Get the list of task and for each one, check if its time to run it
@@ -99,6 +101,11 @@ class toExec:
             ### Get the connection in order to avoid that to threads share the same one
             conn = db.DBMgr().getInstance()
             conn.startRequest()
+
+            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+
+            if minfo.getRoomBookingModuleActive():
+                CrossLocationDB.connect()
             ###
             taskList = HelperTaskList().getTaskListInstance()
             tasks = taskList.getTasks()
@@ -185,11 +192,18 @@ class toExec:
                         tracebackList = traceback.format_list( traceback.extract_tb( tb ) )
                         self._printOutput("*****---->[ERROR]:%s\nTraceback:%s"%(e,"\n".join(tracebackList)))
                         self._sendErrorEmail(e)
+
+            if minfo.getRoomBookingModuleActive():
+                CrossLocationDB.commit()
+                CrossLocationDB.disconnect()
+
             conn.endRequest()
+
             self._printOutput("***end execute***\n\n")
             self._closeLog()
         except Exception, e:
             ty, ex, tb = sys.exc_info()
+
             tracebackList = traceback.format_list( traceback.extract_tb( tb ) )
             self._printOutput("*****---->[ERROR]:%s\nTraceback:%s"%(e,"\n".join(tracebackList)))
             self._sendErrorEmail(e)
