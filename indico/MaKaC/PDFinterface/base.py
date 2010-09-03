@@ -408,7 +408,6 @@ class PDFBase:
 
     def _drawLogo(self, c, drawTitle = True):
         if HAVE_PIL:
-            clean = False
             logo = self._conf.getLogo()
             imagePath = ""
             if logo:
@@ -420,17 +419,13 @@ class PDFBase:
                     ratio =  float(height)/width
                     width = self._PAGE_WIDTH
                     height = self._PAGE_WIDTH * ratio
-                    fd, imagePath = tempfile.mkstemp( suffix="IndicoLogo." + imagePath[-3:], dir = Config.getInstance().getUploadedFilesTempDir() )
-                    img.resize((width, height)).save(imagePath)
-                    clean = True
-                c.drawInlineImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, self._PAGE_HEIGHT - 1.5 * inch - height)
+                    img = img.resize((width, height))
+                c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, self._PAGE_HEIGHT - 1.5 * inch - height)
                 if drawTitle:
                     c.drawCentredString( self._PAGE_WIDTH*0.75, self._PAGE_HEIGHT - inch , escape(self._conf.getTitle()))
-                if clean:
-                    os.close(fd)
-                    os.remove(imagePath)
                 return True
         return False
+
 
 
 def _doNothing(canvas, doc):
