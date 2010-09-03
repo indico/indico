@@ -687,7 +687,19 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         super(RHRoomBookingMapOfRoomsWidget, self).__init__(*args, **kwargs)
         self._cache = MapOfRoomsCache()
 
+    def _setGeneralDefaultsInSession( self ):
+        now = datetime.now()
+
+        # if it's saturday or sunday, postpone for monday as a default
+        if now.weekday() in [5,6]:
+            now = now + timedelta( 7 - now.weekday() )
+
+        websession = self._websession
+        websession.setVar( "defaultStartDT", datetime( now.year, now.month, now.day, 8, 30 ) )
+        websession.setVar( "defaultEndDT", datetime( now.year, now.month, now.day, 17, 30 ) )
+
     def _checkParams(self, params):
+        self._setGeneralDefaultsInSession()
         RHRoomBookingBase._checkParams(self, params)
         self._roomID = params.get('roomID')
 
@@ -706,6 +718,12 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         buildings = {}
         for room in rooms:
             if room.building:
+
+                # FIXME: a hack to check if the room's comments are OK for serialization
+                try:
+                    unicode(room.comments)
+                except:
+                    room.comments = ''
 
                 # if it's the first room in that building, initialize the building
                 building = buildings.get(room.building, None)
@@ -853,6 +871,8 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
         rooms.sort()
 
         self._rooms = rooms
+
+        self._mapAvailable = Location.getDefaultLocation().isMapAvailable()
 
     def _process( self ):
         self._businessLogic()

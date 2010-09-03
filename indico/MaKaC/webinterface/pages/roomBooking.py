@@ -23,7 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.base import WPNotDecorated
-from MaKaC.rb_location import CrossLocationDB
+from MaKaC.rb_location import CrossLocationDB, Location
 import MaKaC.common.info as info
 
 #import MaKaC.common.info as info
@@ -147,7 +147,8 @@ class WPRoomBookingBase( WPMainBase ):
 
         self._leftMenu.addSection( self._roomsOpt )
         self._roomsOpt.addItem( self._roomSearchOpt )
-        self._roomsOpt.addItem( self._roomMapOpt )
+        if Location.getDefaultLocation().isMapAvailable():
+            self._roomsOpt.addItem( self._roomMapOpt )
         self._roomsOpt.addItem( self._myRoomListOpt )
         self._leftMenu.addSection( self._bookingsOpt )
         self._bookingsOpt.addItem( self._bookARoomOpt )

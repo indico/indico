@@ -6120,7 +6120,10 @@ class WRoomBookingSearch4Bookings( WTemplated ):
 class WRoomBookingMapOfRooms(WTemplated):
 
     def __init__(self, **params):
-        self._params = params if params is not None else {}
+        if params is not None:
+            self._params = params
+        else:
+            self._params = {}
         WTemplated.__init__(self)
 
     def getVars(self):
@@ -6172,6 +6175,7 @@ class WRoomBookingRoomList( WTemplated ):
         vars=WTemplated.getVars( self )
 
         vars["rooms"] = self._rh._rooms
+        vars["mapAvailable"] = self._rh._mapAvailable
         #vars["roomPhotoUH"] = urlHandlers.UHSendRoomPhoto
         vars["standalone"] = self._standalone
         vars["title"] = self._title

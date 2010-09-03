@@ -247,6 +247,9 @@ class Location( Persistent, object ):
             self._aspects = {}
         return self._aspects
 
+    def isMapAvailable(self):
+        return len(self._getAspects()) > 0
+
     aspects = property(_getAspects)
 
     # Properties ============================================================

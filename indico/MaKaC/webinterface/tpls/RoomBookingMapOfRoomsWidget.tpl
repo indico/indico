@@ -159,19 +159,19 @@ var positions = <%= jsonEncode(aspects) %>;
 var buildings = <%= jsonEncode(buildings) %>;
 
 var filters = [
-   {"label": "<%= _("Building") %>", "filterType": "building", "inputType": "text", "property": "number", "optional": true, "defaultValue": "", "activeIf": buildingFilterActiveIf},
-    {"label": "<%= _("Around the building") %>", "filterType": "building", "inputType": "boolean", "optional": true, "defaultValue": false,
-        "filterFunction": distanceFilter, "enabledIf": buildingFilterEnabledIf},
-    {"label": "<%= _("Floor") %>", "filterType": "room", "inputType": "text", "filterFunction": floorFilter, "optional": true, "defaultValue": ""},
-    {"label": "<%= _("Description") %>", "filterType": "room", "inputType": "subtext", "property": "comments", "optional": true, "defaultValue": ""},
-    {"label": "<%= _("Min. capacity") %>", "filterType": "room", "inputType": "text", "filterFunction": capacityFilter, "optional": true, "defaultValue": ""},
+   {label: "<%= _("Building") %>", filterType: "building", inputType: "text", property: "number", optional: true, defaultValue: "", activeIf: buildingFilterActiveIf},
+    {label: "<%= _("Around the building") %>", filterType: "building", inputType: "boolean", optional: true, defaultValue: false,
+        filterFunction: distanceFilter, enabledIf: buildingFilterEnabledIf},
+    {label: "<%= _("Floor") %>", filterType: "room", inputType: "text", filterFunction: floorFilter, optional: true, defaultValue: ""},
+    {label: "<%= _("Description") %>", filterType: "room", inputType: "subtext", property: "comments", optional: true, defaultValue: ""},
+    {label: "<%= _("Min. capacity") %>", filterType: "room", inputType: "text", filterFunction: capacityFilter, optional: true, defaultValue: ""},
 <% if not forVideoConference: %>
-    {"label": "<%= _("Video conference") %>", "filterType": "room", "inputType": "boolean", "defaultValue": false, "property": "needsAVCSetup", "optional": true, "defaultValue": false},
+    {label: "<%= _("Video conference") %>", filterType: "room", inputType: "boolean", defaultValue: false, property: "needsAVCSetup", optional: true, defaultValue: false},
 <% end %>
-    {"label": "<%= _("Only public rooms") %>", "filterType": "room", "inputType": "boolean", "property": "isReservable", "optional": true, "defaultValue":false},
-    {"label": "<%= _("Auto confirm") %>", "filterType": "room", "inputType": "boolean", "property": "isAutoConfirm", "optional": true, "defaultValue":false},
-    {"label": "<%= _("Only mine") %>", "filterType": "room", "inputType": "boolean", "property": "responsibleId", "optional": true, "defaultValue":false, "checkedValue": <%= user.id %>},
-    {"label": "<%= _("Is active") %>", "filterType": "room", "inputType": "boolean", "property": "isActive", "optional": true, "defaultValue":true}
+    {label: "<%= _("Only public rooms") %>", filterType: "room", inputType: "boolean", property: "isReservable", optional: true, defaultValue:false},
+    {label: "<%= _("Auto confirm") %>", filterType: "room", inputType: "boolean", property: "isAutoConfirm", optional: true, defaultValue:false},
+    {label: "<%= _("Only mine") %>", filterType: "room", inputType: "boolean", property: "responsibleId", optional: true, defaultValue:false, checkedValue: <%= user.id %>},
+    {label: "<%= _("Is active") %>", filterType: "room", inputType: "boolean", property: "isActive", optional: true, defaultValue:true}
 ];
 
 function initializeAvailabilityFields() {
