@@ -63,6 +63,7 @@
                         <% onClickDetails = 'onclick="window.location=\'%s\'"' % myDetails %>
                         <% bookMe = bookingFormUH.getURL( room ) %>
                         <% modifyMe = urlHandlers.UHRoomBookingRoomForm.getURL( room ) %>
+                        <% showMeOnMap = urlHandlers.UHRoomBookingMapOfRooms.getURL( roomID = room.id ) %>
 					    <tr style="height: 60px" id="<%= room.id %>" onmouseover="handleMouseOverResv(<%=room.id%>)" onmouseout="handleMouseOutResv(<%=room.id%>)">
 					        <td <%=onClickDetails%> >
 					            <% if room.photoId != None: %>
@@ -87,6 +88,7 @@
                                 <% if room.canModify( user ): %>
                                     <a href="<%= modifyMe %>"> <%= _("modify")%></a> <br />
                                 <% end %>
+                                <a href="<%= showMeOnMap %>"> <%= _("show on map")%></a> <br />
                             </td>
 					    </tr>
 					<% end %>

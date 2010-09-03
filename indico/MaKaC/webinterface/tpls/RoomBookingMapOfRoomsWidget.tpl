@@ -145,6 +145,15 @@ function buildingFilterEnabledIf(mapView) {
     return mapView.filterInput(0);
 }
 
+var startupRoomFilters = [];
+var startupBuildingFilters = [];
+
+<% if roomID: %>
+startupRoomFilters.push(function(room) {
+    return room.id == <%= roomID %>;
+});
+<% end %>
+
 var positions = <%= jsonEncode(aspects) %>;
 
 var buildings = <%= jsonEncode(buildings) %>;
@@ -265,7 +274,7 @@ IndicoUI.executeOnLoad(function(){
         resetFields: setDefaultAvailabilityValues
     }];
 
-    var roomMap = new RoomMap(mapCanvas, aspectsCanvas, filtersCanvas, positions, buildings, filters, customWidgets);
+    var roomMap = new RoomMap(mapCanvas, aspectsCanvas, filtersCanvas, positions, buildings, filters, customWidgets, startupRoomFilters, startupBuildingFilters);
 });
 
 </script>

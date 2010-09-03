@@ -14,8 +14,8 @@ function contains(collection, item) {
  */
 type ("RoomMap", ["IWidget"],
     {
-        initialize: function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets) {
-            this.initData(aspects, buildings, filters, customWidgets);
+        initialize: function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets, startupRoomFilters, startupBuildingFilters) {
+            this.initData(aspects, buildings, filters, customWidgets, startupRoomFilters, startupBuildingFilters);
             this.createMap(mapCanvas);
             this.initializeBounds();
             this.createAspectChangeLinks(aspectsCanvas);
@@ -24,14 +24,16 @@ type ("RoomMap", ["IWidget"],
             this.embedWidgets();
             this.setDefaultFilterValues();
             this.updateFiltersState();
-            this.filterMarkers();
+            this.filterMarkers(true);
         },
 
-        initData: function(aspects, buildings, filters, customWidgets) {
+        initData: function(aspects, buildings, filters, customWidgets, startupRoomFilters, startupBuildingFilters) {
             this.aspects = aspects;
             this.buildings = buildings;
             this.filters = filters;
             this.customWidgets = customWidgets;
+            this.startupRoomFilters = startupRoomFilters;
+            this.startupBuildingFilters = startupBuildingFilters;
 
             // save a reference to the building number filter
             for (var i = 0; i < filters.length; i++) {
@@ -134,6 +136,7 @@ type ("RoomMap", ["IWidget"],
             var self = this;
             // execute this every time the user clicks on some aspect and changes the visible map area
             return function() {
+                self.activeAspect = aspect;
                 self.closeTooltips();
                 self.map.setCenter(new google.maps.LatLng(aspect.centerLatitude, aspect.centerLongitude));
                 self.map.setZoom(parseInt(aspect.zoomLevel));
@@ -159,18 +162,18 @@ type ("RoomMap", ["IWidget"],
                 var link = Html.a({'href': '#', className: this.constructAspectCss(false)}, aspect.name);
                 var itemClassName = i == 0 ? 'first ' : i == this.aspects.length - 1 ? 'last ' : '';
                 var item = Html.li({className:itemClassName + this.constructBrowserSpecificCss()}, link.dom);
-                var aspectChangeFunction = this.createAspectChangeFunction(aspect, link);
+                aspect.applyAspect = this.createAspectChangeFunction(aspect, link);
 
                 // store the link for the aspect
                 aspect.link = link;
 
                 // if the aspect is a default one, apply it on start
                 if (aspect.defaultOnStartup) {
-                    aspectChangeFunction();
+                    aspect.applyAspect();
                 }
 
                 // on click, apply the clicked aspect on the map
-                link.observeClick(aspectChangeFunction);
+                link.observeClick(aspect.applyAspect);
 
                 links.appendChild(item.dom);
             }
@@ -237,15 +240,15 @@ type ("RoomMap", ["IWidget"],
             return buildingInfo.dom;
         },
 
-        showMarkers: function() {
+        showMarkers: function(isStartup) {
             var bounds = this.map.getBounds();
             var inBoundsCount = 0;
 
             // 'alone' building - a bulding that is displayed alone on the screen
-            var aloneBuilding = null;
+            this.aloneBuilding = null;
 
             // 'exact' building - a building whose number was entered in the building filter
-            var exactBuilding = null;
+            this.exactBuilding = null;
 
             // if a building number filter exists, get its value
             var exactBuildingNumber = null;
@@ -255,18 +258,17 @@ type ("RoomMap", ["IWidget"],
 
             for (var i = 0; i < this.buildings.length; i++) {
                 var building = this.buildings[i];
-                this.boundCounters[i] = 0;
 
                 // if the building is filtered as visible on map
                 if (building.showOnMap) {
                     // if only 1 building is visible - that's the 'alone' building
                     if (this.visibleBuildingsCount == 1) {
-                        aloneBuilding = building;
+                        this.aloneBuilding = building;
                     }
 
                     // if the building number is entered in the building filter, that's the 'exact' building
                     if (exactBuildingNumber != null && building.number == exactBuildingNumber) {
-                        exactBuilding = building;
+                        this.exactBuilding = building;
                     }
 
                     // initialize the marker aspect and info
@@ -283,18 +285,11 @@ type ("RoomMap", ["IWidget"],
                 // show only the filtered buildings
                 building.marker.setVisible(building.showOnMap);
             }
+        },
 
-            // if an 'exact' building if found, show it in the center of the map
-            if (exactBuilding != null) {
-                var center = new google.maps.LatLng(exactBuilding.latitude, exactBuilding.longitude);
-                this.map.setCenter(center);
-            }
-
-            // if an 'alone' building if found, show its info baloon
-            if (aloneBuilding != null) {
-                aloneBuilding.marker.onClick();
-            }
-
+        centerBuilding: function(building) {
+            var center = new google.maps.LatLng(building.latitude, building.longitude);
+            this.map.setCenter(center);
         },
 
         getFilterPropertyOptions: function(filter) {
@@ -476,13 +471,14 @@ type ("RoomMap", ["IWidget"],
 
             var filterButton = Html.button('mapButton', $T("Filter"));
             filterButton.observeClick(function() {
-                self.filterMarkers();
+                self.filterMarkers(false);
             });
 
             var resetButton = Html.button('mapButton', $T("Reset"));
             resetButton.observeClick(function() {
                 self.setDefaultFilterValues();
-                self.filterMarkers();
+                self.filterMarkers(false);
+                self.resetAspectPosition();
             });
 
             this.buttons = Html.div({}, filterButton, resetButton);
@@ -676,7 +672,69 @@ type ("RoomMap", ["IWidget"],
             setTimeout(waitResponses, 50);
         },
 
-        filterMarkers: function() {
+        addStartupFiltersToCriteria: function(buildingCriteria, roomCriteria) {
+            for (var k = 0; k < this.startupBuildingFilters.length; k++) {
+                buildingCriteria.push(this.startupBuildingFilters[k]);
+            }
+            for (var k = 0; k < this.startupRoomFilters.length; k++) {
+                roomCriteria.push(this.startupRoomFilters[k]);
+            }
+        },
+
+        resetAspectPosition: function() {
+            this.activeAspect.applyAspect();
+        },
+
+        adjustProperAspect: function() {
+            // check if the default aspect has results, and find the aspect with max. number of results
+            var isDefaultAspectEmpty = false;
+            var maxResultsAspect;
+            var maxResults = 0;
+            for (var i = 0; i < this.aspects.length; i++) {
+                // check if the default aspect is empty
+                if (this.aspects[i] == this.activeAspect && this.boundCounters[i] == 0) {
+                    isDefaultAspectEmpty = true;
+                }
+
+                // find the aspect with max. number of results
+                if (maxResults < this.boundCounters[i]) {
+                    maxResults = this.boundCounters[i];
+                    maxResultsAspect = this.aspects[i];
+                }
+            }
+
+            // if the default aspect hasn't results, show the aspect with max. number of results
+            if (isDefaultAspectEmpty && maxResults > 0) {
+                maxResultsAspect.applyAspect();
+            }
+        },
+
+        adjustMapCenter: function(isStartup) {
+            // if an 'exact' building if found, show it in the center of the map
+            if (this.exactBuilding != null) {
+                this.centerBuilding(this.exactBuilding);
+            }
+
+            // if an 'alone' building if found at start-up, show it in the center of the map
+            if (isStartup && this.aloneBuilding != null) {
+                this.centerBuilding(this.aloneBuilding);
+            }
+        },
+
+        adjustMarkerInfo: function() {
+            // if an 'alone' building if found, show its info baloon
+            if (this.aloneBuilding != null) {
+                this.aloneBuilding.marker.onClick();
+            }
+        },
+
+        postFilterAdjustments: function(isStartup) {
+            this.adjustProperAspect();
+            this.adjustMapCenter(isStartup);
+            this.adjustMarkerInfo();
+        },
+
+        filterMarkers: function(isStartup) {
             this.buttons.dom.appendChild(this.progress);
             var mapView = this;
             var buildingCriteria = [];
@@ -684,9 +742,10 @@ type ("RoomMap", ["IWidget"],
 
             function filterCallback() {
                 mapView.filterBuildingsByCriteria(buildingCriteria, roomCriteria);
-                mapView.showMarkers();
+                mapView.showMarkers(isStartup);
                 mapView.showResultsInfo();
                 mapView.updateAspectsInfo();
+                mapView.postFilterAdjustments(isStartup);
                 mapView.buttons.dom.removeChild(mapView.progress);
             }
 
@@ -694,6 +753,9 @@ type ("RoomMap", ["IWidget"],
                 mapView.resetFilteringCycle();
                 mapView.closeTooltips();
                 mapView.closeInfoBaloon();
+                if (isStartup) {
+                    mapView.addStartupFiltersToCriteria(buildingCriteria, roomCriteria);
+                }
                 mapView.addFiltersToCriteria(mapView.filters, buildingCriteria, roomCriteria);
                 mapView.addCustomWidgetFiltersToCriteria(buildingCriteria, roomCriteria, filterCallback);
             }, 0);
@@ -749,8 +811,8 @@ type ("RoomMap", ["IWidget"],
      * Constructor of the RoomMap
      */
 
-    function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets) {
-        this.initialize(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets);
+    function(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets, startupRoomFilters, startupBuildingFilters) {
+        this.initialize(mapCanvas, aspectsCanvas, filterCanvas, aspects, buildings, filters, customWidgets, startupRoomFilters, startupBuildingFilters);
         this.values = {};
         this.extraComponents = [];
     }

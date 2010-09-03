@@ -670,8 +670,15 @@ class RHRoomBookingSearch4Users( RHRoomBookingBase ):
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
+    def _checkParams(self, params):
+        super(RHRoomBookingMapOfRooms, self)._checkParams(self)
+        self._roomID = params.get('roomID')
+
     def _process(self):
-        page = roomBooking_wp.WPRoomBookingMapOfRooms(self)
+        params = {}
+        if self._roomID:
+            params['roomID'] = self._roomID
+        page = roomBooking_wp.WPRoomBookingMapOfRooms(self, **params)
         return page.display()
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
@@ -682,6 +689,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
     def _checkParams(self, params):
         RHRoomBookingBase._checkParams(self, params)
+        self._roomID = params.get('roomID')
 
     def _businessLogic(self):
         # get all rooms
@@ -724,7 +732,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
     def _process(self):
         self._businessLogic()
-        page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference)
+        page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference, self._roomID)
 
         params = self._getRequestParams()
         entry = self._cache.loadObject('', params)

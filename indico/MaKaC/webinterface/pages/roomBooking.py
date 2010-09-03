@@ -223,6 +223,11 @@ class WPRoomBookingSearch4Users( WPRoomBookingBase ):
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 
+    def __init__(self, rh, **params):
+        self._rh = rh
+        self._params = params
+        WPRoomBookingBase.__init__(self, rh)
+
     def _getTitle(self):
         return WPRoomBookingBase._getTitle(self) + " - " + _("Map of rooms")
 
@@ -230,17 +235,18 @@ class WPRoomBookingMapOfRooms(WPRoomBookingBase):
         self._roomMapOpt.setActive(True)
 
     def _getBody(self, params):
-        wc = wcomponents.WRoomBookingMapOfRooms()
+        wc = wcomponents.WRoomBookingMapOfRooms(**self._params)
         return wc.getHTML(params)
 
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
 
-    def __init__(self, rh, aspects, buildings, defaultLocation, forVideoConference):
+    def __init__(self, rh, aspects, buildings, defaultLocation, forVideoConference, roomID):
         WPNotDecorated.__init__(self, rh)
         self._aspects = aspects
         self._buildings = buildings
         self._defaultLocation = defaultLocation
         self._forVideoConference = forVideoConference
+        self._roomID = roomID
         self.addExtraCSSFile('mapofrooms.css')
 
     def getJSFiles(self):
@@ -254,7 +260,7 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
         self._roomMapOpt.setActive(True)
 
     def _getBody(self, params):
-        wc = wcomponents.WRoomBookingMapOfRoomsWidget(self._aspects, self._buildings, self._defaultLocation, self._forVideoConference)
+        wc = wcomponents.WRoomBookingMapOfRoomsWidget(self._aspects, self._buildings, self._defaultLocation, self._forVideoConference, self._roomID)
         return wc.getHTML(params)
 
 # 2. List of ...
