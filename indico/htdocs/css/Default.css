@@ -887,6 +887,22 @@ a.confSubSection:hover {
     color: #523D04;
 }
 
+.subDataCaptionFormat {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #777777;
+}
+
+.tdNotSelected {
+    background: #ECECEC;
+}
+
+.tdSelected {
+    background: #CDEB8B;
+}
+
+
+
 .horizontalLine {
    border-top: 1px solid #AAA;
    padding-left: 20px;

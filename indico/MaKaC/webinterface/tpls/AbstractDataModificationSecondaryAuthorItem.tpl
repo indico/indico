@@ -1,21 +1,21 @@
 
-<tr><td>
-<table style="border-left:2px solid #777777;border-top:2px solid #777777;" width="100%%">
-	<tr>
-        <td bgcolor="#E5E5E5">
-            <input type="checkbox" name="selected_secondary_authors" value=%(auth_id)s>
+<tr><td style="padding-bottom: 20px;">
+<table style="-moz-border-radius: 5px 5px 5px 5px; border:1px solid #999999;" width="100%%" cellspacing="0" cellpadding="0">
+    <tr>
+        <td bgcolor="#E5E5E5" style="-moz-border-radius-bottomleft: 5px; -moz-border-radius-topleft: 5px;">
+            <input type="checkbox" name="selected_secondary_authors" value="%(auth_id)s">
         </td>
-        <td bgcolor="white">
-            <input type="hidden" name="auth_id" value=%(auth_id)s>
+        <td bgcolor="white" style="-moz-border-radius-bottomright: 5px; -moz-border-radius-topright: 5px;">
+            <input type="hidden" name="auth_id" value="%(auth_id)s">
             %(anchor)s
-            <table width="100%%">
+            <table width="100%%" border="0" style="padding:10px;">
                 <tr>
                     <td>
-                        <table cellspacing="0" cellpadding="0">
+                        <table cellspacing="0" cellpadding="2" border="0">
                             <tr>
-                                <td><font size="-1" color="gray"> <%= _("Title")%></font></td>
-                                <td><font color="red">*</font><font size="-1" color="gray"> <%= _("Family name")%></font></td>
-                                <td><font color="red">*</font><font size="-1" color="gray"> <%= _("First name")%></font></td>
+                                <td><span class="subDataCaptionFormat"> <%= _("Title")%></span></td>
+                                <td><span class="subDataCaptionFormat"> <%= _("Family name")%></span><span class="mandatoryField">&nbsp;*</span></td>
+                                <td><span class="subDataCaptionFormat"> <%= _("First name")%></span><span class="mandatoryField">&nbsp;*</span></td>
                             </tr>
                             <tr>
                                 <td>
@@ -23,36 +23,55 @@
                                         %(titleItems)s
                                     </select>
                                 </td>
-                                <td><input type="text" size="55" name="auth_surName" value=%(auth_surName)s></td>
-                                <td><input type="text" size="30" name="auth_firstName" value=%(auth_firstName)s></td>
-                            </tr>        
+                                <td><input type="text" size="30" name="auth_surName" value=%(auth_surName)s></td>
+                                <td><input type="text" size="20" name="auth_firstName" value=%(auth_firstName)s></td>
+                            </tr>
                         </table>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <table cellspacing="0" cellpadding="0">
+                        <table cellspacing="0" cellpadding="2" style="padding:3px;">
                             <tr>
-                                <td><font color="red">*</font><font size="-1" color="gray"> <%= _("Affiliation")%></font></td>
-                                <td><font size="-1" color="gray"> <%= _("Email")%></font></td>
-                                <td><font size="-1" color="gray"> <%= _("Phone")%></font></td>
+                                <td><span class="subDataCaptionFormat"> <%= _("Affiliation")%></span><span class="mandatoryField">&nbsp;*</span></td>
+                                <td><span class="subDataCaptionFormat"> <%= _("Email")%></span><span class="mandatoryField">&nbsp;*</span></td>
+
                             </tr>
                             <tr>
-                                <td><input type="text" size="40" name="auth_affiliation" value=%(auth_affiliation)s></td>
-                                <td><input type="text" size="40" name="auth_email" value=%(auth_email)s></td>
-                                <td><input type="text" size="14" name="auth_phone" value=%(auth_phone)s></td>
+                                <td><input type="text" size="28" name="auth_affiliation" value=%(auth_affiliation)s></td>
+                                <td><input type="text" size="30" name="auth_email" value=%(auth_email)s></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
-                <input type="hidden" name="auth_address" value="">
+                <tr>
+                    <td>
+                        <table cellpacing="0" cellpadding="2">
+                            <tr>
+                                <td><span class="subDataCaptionFormat"><%= _("Phone")%></span></td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" size="14" name="auth_phone" value=%(auth_phone)s></td>
+                                <td bgcolor="white" nowrap id="tdSecondaryPresenter<%= auth_id %>" class="<% if auth_speaker == 'checked': %>tdSelected<%end%><%else:%>tdNotSelected<%end%>" style="-moz-border-radius: 5px 5px 5px 5px; padding-right:6px; width:100%%;">
+                                    <input type="checkbox" id="secondary_auth_speaker<%= auth_id %>" name="auth_speaker" value="%(auth_id)s" %(auth_speaker)s onClick="switchSecondaryAuthorBackground('<%= auth_id %>')"> <%= _("This co-author will be also a <b>presenter</b>")%>
+                               </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <input type="hidden" name="auth_address" value="%(auth_id)s">
             </table>
-            
         </td>
-        <td bgcolor="white" nowrap>
-            <input type="checkbox" name="auth_speaker" value=%(auth_id)s %(auth_speaker)s> <%= _("presenter")%>
-        </td>
+
     </tr>
 </table>
-<br>
 </td></tr>
+<script>
+    function switchSecondaryAuthorBackground(id) {
+        if ($E('secondary_auth_speaker'+id).get()) {
+            $E('tdSecondaryPresenter'+id).dom.className = "tdSelected"
+        }else {
+            $E('tdSecondaryPresenter'+id).dom.className = "tdNotSelected"
+        }
+    }
+</script>

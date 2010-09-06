@@ -464,7 +464,7 @@ class WAbstractDataModificationAuthorItem( wcomponents.WTemplated ):
         vars["anchor"] = ""
         if self._authorData["auth_focus"]:
             vars["anchor"] = """<a name="interest"></a>"""
-        vars["auth_id"] = quoteattr( str( self._authorData["auth_id"] ) )
+        vars["auth_id"] = str( self._authorData["auth_id"] )
         vars["titleItems"] = TitlesRegistry().getSelectItemsHTML(self._authorData["auth_title"])
         vars["auth_surName"] = quoteattr( str( self._authorData["auth_surName"] ) )
         vars["auth_firstName"] = quoteattr( str( self._authorData["auth_firstName"] ) )
@@ -537,36 +537,24 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                 else:
                     maxLengthJS = maxLengthText = ""
                 if type == "textarea":
-                    field = """<textarea name="%s" cols="100" rows="%s" %s>%s</textarea>""" % ( "f_%s"%id, nbRows, maxLengthText, value )
+                    field = """<textarea name="%s" width="100%%" rows="%s" %s style="width:100%%">%s</textarea>""" % ( "f_%s"%id, nbRows, maxLengthText, value )
                 elif type == "input":
-                    field = """<input name="%s" value="%s" size="100" %s>""" % ("f_%s"%id, value, maxLengthText)
-#                html+="""
-#                    <tr>
-#                        <td align="left" colspan="2">
-#                            %s<font color="gray">%s</font>
-#                        </td>
-#                    </tr>
-#                    <tr>
-#                        <td>%s</td>
-#                        <td>
-#                            %s
-#                        </td>
-#                    </tr>
-#                """ % ( mandatoryText, caption, maxLengthJS, field )
+                    field = """<input name="%s" value="%s" style="width:100%%" %s>""" % ("f_%s"%id, value, maxLengthText)
+
                 html+="""
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td align="right" valign="top">
-                            <span class="dataCaptionFormat">%s</span>&nbsp;%s
-
-                        <td>
+                        <td align="right" valign="top"  style="white-space:nowrap">
+                            <span class="dataCaptionFormat">%s</span>&nbsp;%s<br><br>
                             %s
                         </td>
+                        <td width="100%%">%s</td>
                     </tr>
-                """ % ( caption, mandatoryText, field )
+                """ % ( caption, mandatoryText, maxLengthJS, field )
         return html
+
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -609,9 +597,10 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                 selected = "selected"
             types.insert( 0 , _("""<option value=""%s>--_("not specified")--</option>""")%selected )
             vars["types"] = _("""
+                            <tr><td>&nbsp;</td></tr>
                             <tr>
-                                <td align="right" valign="top">
-                                    <font color="gray" size="-1">_("Presentation type")</font>
+                                <td align="right" valign="top" style="white-space:nowrap;">
+                                    <span class="dataCaptionFormat">_("Presentation type")</span>&nbsp;
                                 </td>
                                 <td>
                                     <select name="type">

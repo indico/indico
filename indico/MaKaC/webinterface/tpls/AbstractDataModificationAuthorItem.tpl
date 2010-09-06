@@ -2,8 +2,8 @@
     %(anchor)s
     <tr>
         <td bgcolor="white">
-            <input type="hidden" name="auth_id" value=%(auth_id)s>
-            <input type="checkbox" name="selected_authors" value=%(auth_id)s>
+            <input type="hidden" name="auth_id" value="%(auth_id)s">
+            <input type="checkbox" name="selected_authors" value="%(auth_id)s">
         </td>
         <td bgcolor="white" width="100%%">
             <table width="100%%">
@@ -23,7 +23,7 @@
                                 </td>
                                 <td><input type="text" size="60" name="auth_surName" value=%(auth_surName)s></td>
                                 <td><input type="text" size="30" name="auth_firstName" value=%(auth_firstName)s></td>
-                            </tr>        
+                            </tr>
                         </table>
                     </td>
                 </tr>
@@ -45,11 +45,11 @@
                 </tr>
                 <input type="hidden" name="auth_address" value="">
             </table>
-            
+
         </td>
         <td bgcolor="white" nowrap>
-            <input type="checkbox" name="auth_primary" value=%(auth_id)s %(auth_primary)s><%= _("Primary author")%><br>
-            <input type="checkbox" name="auth_speaker" value=%(auth_id)s %(auth_speaker)s><%= _("Presenter")%>
+            <input type="checkbox" name="auth_primary" value="%(auth_id)s" %(auth_primary)s><%= _("Primary author")%><br>
+            <input type="checkbox" name="auth_speaker" value="%(auth_id)s" %(auth_speaker)s><%= _("Presenter")%>
         </td>
     </tr>
 

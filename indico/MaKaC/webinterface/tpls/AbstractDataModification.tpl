@@ -1,25 +1,25 @@
 
-<form action=%(postURL)s method="POST">
+<form action=%(postURL)s method="POST" width="100%%">
     <table width="100%%" align="center">
         <tr>
             <td>
-                <table width="95%%" class="groupTable" align="center">
+                <table width="100%%" class="groupTable" align="center">
 					<tr>
-                        <td class="groupTitle"><%= _("Main data")%></td>
+                        <td class="groupTitle"><%= _("Abstract")%></td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <td>
-                            <table align="center">
+                            <table align="center" width="100%%">
                                 <tr>
-                                    <td align="right" valign="top">
+                                    <td align="right" valign="top" white-space="nowrap">
                                         <span class="dataCaptionFormat"><%= _("Title")%></span>
                                         <span class="mandatoryField">*</span>
                                     </td>
-                                    <td>
-                                        <input type="text" size="100" name="title" value=%(title)s>
+                                    <td width="100%%">
+                                        <input type="text" name="title" value=%(title)s style="width:100%%">
                                     </td>
                                 </tr>
                                 %(additionalFields)s
@@ -34,8 +34,8 @@
 			</td>
         </tr>
         <tr>
-            <td>
-                <table align="center" width="95%%" class="groupTable">
+           <td>
+                <table align="center" width="100%%" class="groupTable">
                     <tr>
                         <td class="groupTitle"><%= _("Primary Authors")%></td>
                     </tr>
@@ -127,9 +127,9 @@
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td>
-                            <table align="center" width="80%%">
-                                <textarea name="comments" rows="8" cols="100">%(comments)s</textarea>
+                        <td width="100%%">
+                            <table align="center" width="100%%">
+                                <textarea name="comments" rows="8" style="width:100%%;">%(comments)s</textarea>
                             </table>
                         </td>
                     </tr>
