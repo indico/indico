@@ -4,7 +4,7 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
             <td><input type="text" name="title" size="90" value=%(title)s></td>
-        </tr> 
+        </tr>
         %(additionalFields)s
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Primary authors")%></span></td>

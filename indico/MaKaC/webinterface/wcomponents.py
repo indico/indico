@@ -4830,7 +4830,7 @@ class WConfModAbstractEditData(WTemplated):
                 html += """<input type="hidden" name="%s" value=%s>""" % (id,quoteattr(value))
             else:
                 caption = f.getName()
-                maxLength = f.getMaxLength()
+                maxLength = int(f.getMaxLength())
                 isMandatory = f.isMandatory()
                 if isMandatory:
                     mandatoryText = """<font color="red">*</font>"""
