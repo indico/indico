@@ -776,7 +776,7 @@ class RHRoomBookingProtected( RHProtected ):
         else:
             try:
                 if PluginsHolder().getPluginType("RoomBooking").isActive():
-                    if not AdminList.getInstance().isAdmin(user):
+                    if not AdminList.getInstance().isAdmin(user) and PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue() != []:
                         authenticatedUser = False
                         for entity in PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue():
                             if isinstance(entity, Group) and entity.containsUser(user) or \
