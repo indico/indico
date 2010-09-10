@@ -73,7 +73,7 @@
                         <h1>%(errorTitle)s</h1>
                         <div id="errorBoxText">
                             %(errorText)s<br />
-                            <%= _("Click the next link to go to the main page:") %>
+                            <%= _("Click the following link to go to the main page:") %>
                         </div>
                         <div id="errorBoxLink">
                             <a href="<%= Config.getInstance().getBaseURL() %>/index.py"><%= _("Indico main page") %></a>

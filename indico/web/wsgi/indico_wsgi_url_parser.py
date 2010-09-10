@@ -29,7 +29,7 @@ DIR_HTDOCS = Config.getInstance().getHtdocsDir()
 DIR_SERVICES = os.path.dirname(handler.__file__)
 
 """
-rewritablePages stores the modules and handlers for every page we want,
+urlMapping stores the modules and handlers for every page we want,
 in the form (hash, tuple)
 @hash: matching directory
 @tuple[0]: module, a pair in the form "(containingDir, file)"
@@ -39,13 +39,26 @@ in the form (hash, tuple)
 
 Add the especial pages here.
 """
-rewritablePages = {'':  ((DIR_HTDOCS, 'index.py'), 'index', '', None), \
-    'services':         ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
-    'event':            ((DIR_HTDOCS, 'events.py'), 'index', 'genericRewrite', \
-                            {'queryReplacement': 'tag'}), \
-    'categ':            ((DIR_HTDOCS, 'categoryDisplay.py'), 'index', 'genericRewrite', \
-                            {'queryReplacement': 'categId'})
+urlMapping = {'':   ((DIR_HTDOCS, 'index.py'), 'index', '', None), \
+    'services':     ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
+    'event':        ((DIR_HTDOCS, 'events.py'), 'index', 'genericRewrite', \
+                        {'queryReplacement': 'tag'}), \
+    'categ':        ((DIR_HTDOCS, 'categoryDisplay.py'), 'index', 'genericRewrite', \
+                        {'queryReplacement': 'categId'})
 }
+
+def is_static_path(path):
+    """
+    Returns True if path corresponds to an existing file under DIR_HTDOCS.
+    @param path: the path.
+    @type path: string
+    @return: True if path corresponds to an existing file under DIR_HTDOCS.
+    @rtype: bool
+    """
+    path = os.path.abspath(DIR_HTDOCS + path)
+    if path.startswith(DIR_HTDOCS) and os.path.isfile(path):
+        return path
+    return None
 
 def is_mp_legacy_publisher_path(req):
     """
@@ -57,13 +70,13 @@ def is_mp_legacy_publisher_path(req):
     @rtype: tuple
     """
     path = req.URLFields['PATH_INFO'].split('/')
-
-    # First, we try to assign an existing redirection
     startingDir = ''
     if len(path) > 1:
         startingDir = path[1]
-    if rewritablePages.has_key(startingDir):
-        module, handler, function, params = rewritablePages[startingDir]
+
+    # First, we try to assign an existing redirection
+    if urlMapping.has_key(startingDir):
+        module, handler, function, params = urlMapping[startingDir]
         if callable(getattr(WSGIRedirection, function, None)):
             rwPage = WSGIRedirection(req, module, handler, startingDir)
             getattr(rwPage, function)(params)
@@ -76,7 +89,7 @@ def is_mp_legacy_publisher_path(req):
             possible_handler = '/'.join(path[index + 1:]).strip()
             if not possible_handler:
                 possible_handler = 'index'
-            if os.path.exists(possible_module) and possible_module.startswith(DIR_HTDOCS):
+            if os.path.exists(possible_module):
                 return (possible_module, possible_handler)
 
     # If all fails, then we will load a static resource
@@ -98,7 +111,7 @@ class WSGIRedirection(object):
 
     def _pathRewrite(self, fileName):
         """
-        These lines obtain the web base directory from the PATH_INFO,
+        Obtain the web base directory from the PATH_INFO,
         and then add the module to the path:
         '/indico/DIR/...' => '/indico' => '/indico/fileName'
         """
@@ -130,6 +143,4 @@ class WSGIRedirection(object):
         """
         self._pathRewrite(self._module[1])
         self._queryRewrite(params['queryReplacement'])
-
-
 

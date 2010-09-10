@@ -29,33 +29,20 @@ import sys
 import os
 from wsgiref.util import FileWrapper, guess_scheme
 
-from MaKaC.common import Config
+sys.path.append('/home/dcampora/eclipse/plugins/org.python.pydev.debug_1.5.9.2010063001/pysrc')
+
 from indico.web.wsgi.webinterface_handler_config import \
      HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
      HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR, \
     REMOTE_HOST, REMOTE_NOLOOKUP
 from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage
-from indico.web.wsgi.indico_wsgi_rewrite import is_mp_legacy_publisher_path
+from indico.web.wsgi.indico_wsgi_url_parser import is_mp_legacy_publisher_path, \
+    is_static_path
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.
     # You can't write to stdout in mod_wsgi, but instead to stderr
     sys.stdout = sys.stderr
-
-
-os.environ['PYTHON_EGG_CACHE'] = os.path.join(Config.getInstance().getUploadedFilesTempDir(), 'egg-cache')
-DIR_HTDOCS = Config.getInstance().getHtdocsDir()
-# The DIR_PYDEVPATH has to be modified to put the debugger to work
-# eg: DIR_PYDEVPATH = '/home/jdoe/eclipse/plugins/org.python.pydev.debug_1.5.9.2010063001/pysrc'
-DIR_PYDEVPATH = DIR_HTDOCS
-
-PATH = [os.path.join(DIR_HTDOCS, '../'), \
-        DIR_HTDOCS, \
-        DIR_PYDEVPATH]
-for p in PATH:
-    if p not in sys.path:
-        sys.path.append(p)
-
 
 def application(environ, start_response):
     """
@@ -71,6 +58,8 @@ def application(environ, start_response):
 
     try:
         try:
+            #if condition:
+            #    wsgi_publisher(possible_module, possible_handler)
             if possible_module is not None:
                 mp_legacy_publisher(req, possible_module, possible_handler)
             else:
@@ -91,12 +80,15 @@ def application(environ, start_response):
                 return ('%s' % indicoErrorWebpage(status),)
             else:
                 req.flush()
-        except Exception, e:
-            if not req.response_sent_p:
-                req.status = HTTP_INTERNAL_SERVER_ERROR
-                req.headers_out['content-type'] = 'text/html'
-                start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-            return ('Indico error page: Internal server error')
+        # If we reach this block, there was probably
+        # an error importing a legacy python module
+        except Exception:
+            from indico.web.wsgi.indico_wsgi_handler_utils import registerException
+            req.status = HTTP_INTERNAL_SERVER_ERROR
+            req.headers_out['content-type'] = 'text/html'
+            start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+            registerException()
+            return ('%s' % indicoErrorWebpage(500),)
     finally:
         for (callback, data) in req.get_cleanups():
             callback(data)
@@ -115,26 +107,21 @@ def indicoErrorWebpage(status):
     wsError = WErrorWSGI(errorTitleText)
     return wsError.getHTML()
 
-def is_static_path(path):
-    """
-    Returns True if path corresponds to an existing file under DIR_HTDOCS.
-    @param path: the path.
-    @type path: string
-    @return: True if path corresponds to an existing file under DIR_HTDOCS.
-    @rtype: bool
-    """
-    path = os.path.abspath(DIR_HTDOCS + path)
-    if path.startswith(DIR_HTDOCS) and os.path.isfile(path):
-        return path
-    return None
-
 def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
+    from indico.web.wsgi.indico_wsgi_handler_utils import registerException
     the_module = open(possible_module).read()
     module_globals = {}
-    exec(the_module, module_globals)
+    try:
+        exec(the_module, module_globals)
+    except Exception:
+        # Log which file caused the exec error (traceback won't do it for
+        # some reason) and relaunch the exception
+        registerException('Error exec the module %s' % possible_module)
+        raise Exception
+
     if possible_handler in module_globals and callable(module_globals[possible_handler]):
         from indico.web.wsgi.indico_wsgi_handler_utils import _check_result
         ## the req.form must be casted to dict because of Python 2.4 and earlier
@@ -160,7 +147,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 expected_defaults = list(inspected_args[3])
                 expected_args.reverse()
                 expected_defaults.reverse()
-                """ TODO register_exception(req=req, prefix="Wrong GET parameter set in calling a legacy publisher handler for %s: expected_args=%s, found_args=%s" % (possible_handler, repr(expected_args), repr(req.form.keys())), alert_admin=CFG_DEVEL_SITE) """
+                # Write the exception to Apache error log file
+                registerException("Wrong GET parameter set in calling a legacy publisher handler for %s: expected_args=%s, found_args=%s" % (possible_handler, repr(expected_args), repr(req.form.keys())))
                 cleaned_form = {}
                 for index, arg in enumerate(expected_args):
                     if arg == 'req':
@@ -276,8 +264,8 @@ class SimulatedModPythonRequest(object):
                 self.__write(self.__buffer)
             except IOError, err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
-                    #TODO: Alert somebody?
-                    pass
+                    from indico.web.wsgi.indico_wsgi_handler_utils import registerException
+                    registerException()
                 else:
                     raise
             self.__buffer = ''
@@ -293,18 +281,17 @@ class SimulatedModPythonRequest(object):
             if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
                 self.__headers['Allow'] = ', '.join(self.__allowed_methods)
             ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
-            #print self.__low_level_headers
             self.__write = self.__start_response(self.__status, self.__low_level_headers)
             self.__response_sent_p = True
-            #print "Response sent: %s" % self.__headers
 
     def get_parsed_uri(self):
+        # The parsed_uri tuple is as follows
         # (scheme, hostinfo, user, password, hostname, port, path, query, fragment)
-        return [self.URLFields['URL_SCHEME'], \
+        return (self.URLFields['URL_SCHEME'], \
                 self.URLFields['HTTP_HOST'], None, None, \
                 self.URLFields['SERVER_NAME'], self.URLFields['SERVER_PORT'], \
                 self.URLFields['SCRIPT_NAME'] + self.URLFields['PATH_INFO'], \
-                self.URLFields['QUERY_STRING'], None]
+                self.URLFields['QUERY_STRING'], None)
 
     def get_unparsed_uri(self):
         url = self.URLFields['SCRIPT_NAME'] + self.URLFields['PATH_INFO']
@@ -314,7 +301,6 @@ class SimulatedModPythonRequest(object):
 
     def get_uri(self):
         return self.URLFields['SCRIPT_NAME'] + self.URLFields['PATH_INFO']
-        # return quote(self.__environ.get('SCRIPT_NAME', '')) + quote(self.__environ.get('PATH_INFO',''))
 
     def get_headers_in(self):
         return self.__headers_in
@@ -327,7 +313,6 @@ class SimulatedModPythonRequest(object):
 
     def get_args(self):
         return self.URLFields['QUERY_STRING']
-        #return self.__environ['QUERY_STRING']
 
     def get_remote_ip(self):
         return self.__environ.get('REMOTE_ADDR')
@@ -375,9 +360,8 @@ class SimulatedModPythonRequest(object):
                         break
         except IOError, err:
             if "failed to write data" in str(err) or "client connection closed" in str(err):
-                ## Let's just log this exception without alerting the admin:
-                """ TODO register_exception(req=self) """
-                pass
+                from indico.web.wsgi.indico_wsgi_handler_utils import registerException
+                registerException()
             else:
                 raise
         return self.__bytes_sent
@@ -396,7 +380,6 @@ class SimulatedModPythonRequest(object):
 
     def get_hostname(self):
         return self.URLFields['HTTP_HOST']
-        #return self.__environ.get('HTTP_HOST', '')
 
     def set_filename(self, filename):
         self.__filename = filename
@@ -428,9 +411,6 @@ class SimulatedModPythonRequest(object):
         return self.__allowed_methods
 
     def readline(self, hint=None):
-        #try:
-        #    return self.__environ['wsgi.input'].readline(hint)
-        #except TypeError:
         ## the hint param is not part of wsgi pep, although
         ## it's great to exploit it in when reading FORM
         ## with large files, in order to avoid filling up the memory

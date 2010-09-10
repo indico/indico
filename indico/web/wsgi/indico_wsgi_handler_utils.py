@@ -604,3 +604,16 @@ def _check_result(req, result):
         req.log_error("publisher: %s returned nothing." % `object`)
         return apache.HTTP_INTERNAL_SERVER_ERROR
 
+def registerException(errorText=""):
+    """
+    Write down the error in the error log file
+    """
+    import sys
+    import traceback
+    if errorText == "":
+        traceback.print_exc()
+    else:
+        print sys.stderr, "%s" % errorText
+
+
+

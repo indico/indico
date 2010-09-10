@@ -211,24 +211,7 @@ i.e. try 'easy_install jstools'"""
 
 
 def _checkModPythonIsInstalled():
-    try:
-        pass
-        #import mod_python
-    except ImportError:
-        raw_input('''
-WARNING: mod_python is not installed. You need to install Apache and mod_python
-         before you can run Indico.
-
-You can download Apache from:
-
-    http://httpd.apache.org/
-
-
-You can download mod_python from:
-
-    http://www.modpython.org/
-
-Press any key to continue...''')
+    pass
 
 
 def _guessApacheUidGid():
