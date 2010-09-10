@@ -158,6 +158,13 @@ def escape_html(text, escape_quotes=False):
         text = text.replace("'", '&#34;')
     return text
 
+def escape_tags_short_url(text):
+    """
+    Escapes the tag short url permitting only some characters
+    """
+    text = re.sub('[^a-zA-Z0-9_\-\.]', '', text)
+    return text
+
 def unescape_html(text):
     """ Replaces instances of escaped entities by their characters
         &nbsp; => (space)

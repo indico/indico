@@ -403,6 +403,7 @@ class UtilPersons:
 class UtilsConference:
 
     def setValues(c, confData):
+        from indico.MaKaC.webinterface.common.tools import escape_tags_short_url
         c.setTitle( confData["title"] )
         c.setDescription( confData["description"] )
         c.setOrgText(confData.get("orgText",""))
@@ -411,6 +412,7 @@ class UtilsConference:
         c.setChairmanText( confData.get("chairText", "") )
         if "shortURLTag" in confData.keys():
             tag = confData["shortURLTag"].strip()
+            tag = escape_tags_short_url(tag)
             if c.getUrlTag() != tag:
                 from MaKaC.common.url import ShortURLMapper
                 sum = ShortURLMapper()

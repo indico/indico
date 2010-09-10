@@ -117,14 +117,14 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Short URL tag</span></td>
             <td bgcolor="white" width="100%%">
-               <span class="blacktext"><em> <%=Config.getInstance().getShortEventURL() %></em></span><input type="text" name="shortURLTag" value=%(shortURLTag)s size="30">
+                <span class="blacktext"><em> <%=Config.getInstance().getShortEventURL() %></em></span>
+                <span id="shortTag"></span>
             </td>
         </tr>
         <% end %>
         <tr align="left">
-            <td align="center" width="100%%" colspan="2" class="buttonBar">
-		<input type="submit" class="btn" value="<%= _("ok")%>">
-		<input type="submit" class="btn" value="<%= _("cancel")%>" name="cancel">
+            <td class="buttonBar" align="center" width="100%%" colspan="2">
+            <span id="submitPlace"></span>
             </td>
         </tr>
     </table>
@@ -134,6 +134,8 @@
 
         IndicoUI.executeOnLoad(function()
 	{
+        var parameterManager = new IndicoUtil.parameterManager();
+
         var startDate = IndicoUI.Widgets.Generic.dateField(true,null,['sDay', 'sMonth', 'sYear','sHour', 'sMinute']);
         $E('sDatePlace').set(startDate);
 
@@ -157,6 +159,26 @@
             endDate.set('<%= eDay %>/<%= eMonth %>/<%= eYear %><%= " " %><%if len (eHour) == 1:%>0<%= eHour %><%end%><%else:%><%= eHour %><%end%>:<% if len (eMinute) == 1:%>0<%= eMinute %><%end%><%else:%><%= eMinute %><%end%>');
         <% end %>
 
+        var shortTags = Html.input('text', {name: "shortURLTag", size: "30"}, %(shortURLTag)s);
+        $E('shortTag').set(shortTags);
+
+        var submitButton = Html.input('button', {className: 'btn'}, $T("ok"));
+        var cancelButton = Html.input('button', {className: 'btn', name: 'cancel'}, $T("cancel"));
+        $E('submitPlace').set(submitButton, cancelButton);
+
+        submitButton.observeClick(function(){
+            if (parameterManager.check()) {
+                document.getElementById('eventModificationForm').submit();
+            }
+        });
+
+        cancelButton.observeClick(function(){
+            document.getElementById('eventModificationForm').submit();
+        });
+
+        parameterManager.add(shortTags, 'shortURL', true);
+
 		injectValuesInForm($E('eventModificationForm'));
 	});
+
 </script>

@@ -392,14 +392,24 @@ var IndicoUtil = {
     },
 
     /**
-    * Determines if a string is in a valid time format (hh:mm)
-    * @param {String} s The input string
-    * @return {Booleab} true if the string is a valid time string, false otherwise
-    */
-   isTime: function(s) {
-       var regExp = new RegExp("(^([0-9]|[0-1][0-9]|[2][0-3]):([0-5][0-9])$)");
-       return regExp.test(s);
-   },
+     * Determines if a string is in a valid time format (hh:mm)
+     * @param {String} s The input string
+     * @return {Booleab} true if the string is a valid time string, false otherwise
+     */
+    isTime: function(s) {
+        var regExp = new RegExp("(^([0-9]|[0-1][0-9]|[2][0-3]):([0-5][0-9])$)");
+        return regExp.test(s);
+    },
+
+    /**
+     * Determines if a string contains invalid characters for short URLs
+     * @param {String} s The input string
+     * @return {Booleab} true if the string is a valid string, false otherwise
+     */
+    parseShortURL: function(s) {
+        var regExp = new RegExp("[^A-Za-z0-9\._-]");
+        return !regExp.test(s);
+    },
 
     /**
      * Marks an input field (text, checkbox or select) as invalid.
@@ -548,9 +558,14 @@ var IndicoUtil = {
                 }
                 else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
                     error = Html.span({}, "That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38");
-                } else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
+                }
+                else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
                     error = Html.span({}, "Time format is not valid. It should be hh:mm");
-                } else if (exists(extraCheckFunction)) {
+                }
+                else if (dataType == 'shortURL' && !IndicoUtil.parseShortURL(component.get())) {
+                    error = Html.span({}, "The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and .");
+                }
+                else if (exists(extraCheckFunction)) {
                     error = extraCheckFunction(component.get());
                 }
                 //--------------------------------
