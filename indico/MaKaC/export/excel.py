@@ -21,6 +21,8 @@
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.common import utils
 
+import csv
+
 class ExcelGenerator:
     """It helps to create an Excel CSV file. The way to work with this class
     is the following:
@@ -47,40 +49,38 @@ class ExcelGenerator:
     def __init__(self):
         self._lines=[]
         self._currentLine=[]
+        self._writer = csv.writer(self, quoting=csv.QUOTE_NONNUMERIC)
 
     def addValue(self, value):
         """Add a new cell value to the current line"""
-        self._currentLine.append(ExcelGenerator.excelFormatting(value))
+        value = ExcelGenerator.excelFormatting(value)
+        self._currentLine.append(value)
+
+    def write(self, value):
+        self._lines.append(value)
 
     def addNumberAsString(self, value):
         """Add a new cell value (which it has to be interpreted like
         a string not like a number) to the current line"""
-        if value.strip()!="":
-            self._currentLine.append("=%s"%ExcelGenerator.excelFormatting(value).replace(",",";"))
-
-        else:
-            self._currentLine.append("")
+        if value.strip() != "":
+            value = '="%s"' % ExcelGenerator.excelFormatting(value)
+        self._currentLine.append(value)
 
     def newLine(self):
         """Creates a new line for the excel file"""
-        self._lines.append(";".join(self._currentLine))
-        self._currentLine=[]
+        self._writer.writerow(self._currentLine)
+        self._currentLine = []
 
     def getExcelContent(self):
-        if self._currentLine!=[]:
+        if self._currentLine != []:
             self.newLine()
-        return "\r\n".join(self._lines)
+        return ''.join(self._lines)
 
     def excelFormatting(text):
-        if text.strip()!="":
-            text=utils.utf8Tolatin1(text)
-            text=text.replace('"','""')
-            text="\"%s\""%text
+        if text.strip() != "":
+            text = utils.utf8Tolatin1(text)
         return text
     excelFormatting=staticmethod(excelFormatting)
-
-
-
 
 class RegistrantsListToExcel:
 
@@ -160,7 +160,7 @@ class RegistrantsListToExcel:
                 elif key == "Address":
                     excelGen.addValue(reg.getAddress())
                 elif key == "Phone":
-                    excelGen.addValue(reg.getPhone())
+                    excelGen.addNumberAsString(reg.getPhone())
                 elif key == "Sessions":
                     p7 = []
                     for ses in reg.getSessionList():
@@ -280,8 +280,8 @@ class ParticipantsListToExcel:
         excelGen.addValue("Name")
         excelGen.addValue("Email")
         excelGen.addValue("Affiliation")
-        excelGen.addValue("Phone")
-        excelGen.addValue("Fax")
+        excelGen.addNumberAsString("Phone")
+        excelGen.addNumberAsString("Fax")
         excelGen.newLine()
 
         if self._partList == None:
