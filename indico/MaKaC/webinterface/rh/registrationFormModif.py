@@ -649,6 +649,10 @@ class _TmpSectionField:
         self._mandatory=params.has_key("mandatory")
         self._billable=params.has_key("billable")
         self._price=params.get("price","")
+        if params.get("inputtype"):
+            self._input.setInputType(params.get("inputtype"))
+        if params.get("dateFormat"):
+            self._input.dateFormat = params.get("dateFormat")
         if params.get("addradioitem","").strip()!="":
             ri=RadioItem(self._input)
             cap=params.get("newradioitem")
@@ -675,6 +679,21 @@ class _TmpSectionField:
                 rs=[rs]
             for id in rs:
                 self._input.setDefaultItemById(id)
+        elif params.get("changeradioitem","").strip()!="":
+            rs=params.get("radioitems",[])
+            if type(rs)!=list:
+                rs=[rs]
+            for id in rs:
+                caption = params.get("newradioitem")
+                billable = params.get("newbillable")
+                price = params.get("newprice")
+                self._input.changeItemById(id, caption=caption, billable=billable, price=price)
+        elif params.get("removeradioitemprice","").strip()!="":
+            rs=params.get("radioitems",[])
+            if type(rs)!=list:
+                rs=[rs]
+            for id in rs:
+                self._input.removePriceById(id)
         elif not params.has_key("save") or self._input is None:
             self._input=FieldInputs.getAvailableInputKlassById(params.get("input","text"))(self)
 
