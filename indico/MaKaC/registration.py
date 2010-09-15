@@ -1431,7 +1431,7 @@ class RadioGroupInput(FieldInputType):
             tmp["isEnabled"]=i.isEnabled()
             d["radioitems"].append(tmp)
         d["defaultItem"]=self.getDefaultItem()
-        d["inputType"] = self._inputType
+        d["inputType"] = self.getInputType()
         return d
 
     def setValues(self, data):
@@ -1487,6 +1487,14 @@ class RadioGroupInput(FieldInputType):
     def setInputType(self, inputType):
         self._inputType = inputType
 
+    def getInputType(self):
+        try:
+            if self._inputType:
+                pass
+        except AttributeError:
+            self._inputType = "radiogroup"
+        return self._inputType
+
     def getItemsList(self, sort=True):
         vs=self._items.values()
         if sort:
@@ -1524,7 +1532,7 @@ class RadioGroupInput(FieldInputType):
         for item in self.getItemsList():
             rgi.addItem(item.clone(rgi))
         rgi.setDefaultItem(self.getDefaultItem())
-        rgi.setInputType(self._inputType)
+        rgi.setInputType(self.getInputType())
         return rgi
 
     def _getRadioItemGenerator(self):
@@ -1602,7 +1610,7 @@ class RadioGroupInput(FieldInputType):
         return "".join(tmp)
 
     def _getModifHTML(self, item, registrant):
-        if self._inputType == 'radiogroup':
+        if self.getInputType() == 'radiogroup':
             return self._getRadioGroupModifHTML(item, registrant)
         else:
             return self._getDropDownModifHTML(item, registrant)
@@ -1638,7 +1646,7 @@ class RadioGroupInput(FieldInputType):
         item.setQuantity(quantity)
 
     def _getSpecialOptionsHTML(self):
-        if self._inputType == 'radiogroup':
+        if self.getInputType() == 'radiogroup':
             radioSelected = ' selected="selected"'
             dropdownSelected = ''
         else:

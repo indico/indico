@@ -79,6 +79,7 @@ class ExcelGenerator:
     def excelFormatting(text):
         if text.strip() != "":
             text = utils.utf8Tolatin1(text)
+            text = text.replace('\x0d', '')
         return text
     excelFormatting=staticmethod(excelFormatting)
 
