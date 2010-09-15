@@ -916,19 +916,19 @@ class outputGenerator:
         if isinstance(mat, Minutes):
             out.writeTag("minutesText",mat.getText())
 
-        types = {"pdf"   :{"mapsTo" : "pdf",   "imgURL" : "images/pdf_small.png",  "imgAlt" : "pdf file"},
-                 "doc"   :{"mapsTo" : "doc",   "imgURL" : "images/word.png",       "imgAlt" : "word file"},
-                 "docx"  :{"mapsTo" : "doc",   "imgURL" : "images/word.png",       "imgAlt" : "word file"},
-                 "ppt"   :{"mapsTo" : "ppt",   "imgURL" : "images/powerpoint.png", "imgAlt" : "powerpoint file"},
-                 "pptx"  :{"mapsTo" : "ppt",   "imgURL" : "images/powerpoint.png", "imgAlt" : "powerpoint file"},
-                 "sxi"   :{"mapsTo" : "odp",   "imgURL" : "images/impress.png",    "imgAlt" : "presentation file"},
-                 "odp"   :{"mapsTo" : "odp",   "imgURL" : "images/impress.png",    "imgAlt" : "presentation file"},
-                 "sxw"   :{"mapsTo" : "odt",   "imgURL" : "images/writer.png",     "imgAlt" : "writer file"},
-                 "odt"   :{"mapsTo" : "odt",   "imgURL" : "images/writer.png",     "imgAlt" : "writer file"},
-                 "sxc"   :{"mapsTo" : "ods",   "imgURL" : "images/calc.png",       "imgAlt" : "spreadsheet file"},
-                 "ods"   :{"mapsTo" : "ods",   "imgURL" : "images/calc.png",       "imgAlt" : "spreadsheet file"},
-                 "other" :{"mapsTo" : "other", "imgURL" : "images/file_small.png", "imgAlt" : "unknown type file"},
-                 "link"  :{"mapsTo" : "link",  "imgURL" : "images/link.png",       "imgAlt" : "link"}}
+        types = {"pdf"   :{"mapsTo" : "pdf",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "pdf_small.png"),  "imgAlt" : "pdf file"},
+                 "doc"   :{"mapsTo" : "doc",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "word.png"),       "imgAlt" : "word file"},
+                 "docx"  :{"mapsTo" : "doc",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "word.png"),       "imgAlt" : "word file"},
+                 "ppt"   :{"mapsTo" : "ppt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "powerpoint.png"), "imgAlt" : "powerpoint file"},
+                 "pptx"  :{"mapsTo" : "ppt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "powerpoint.png"), "imgAlt" : "powerpoint file"},
+                 "sxi"   :{"mapsTo" : "odp",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "impress.png"),    "imgAlt" : "presentation file"},
+                 "odp"   :{"mapsTo" : "odp",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "impress.png"),    "imgAlt" : "presentation file"},
+                 "sxw"   :{"mapsTo" : "odt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "writer.png"),     "imgAlt" : "writer file"},
+                 "odt"   :{"mapsTo" : "odt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "writer.png"),     "imgAlt" : "writer file"},
+                 "sxc"   :{"mapsTo" : "ods",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "calc.png"),       "imgAlt" : "spreadsheet file"},
+                 "ods"   :{"mapsTo" : "ods",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "calc.png"),       "imgAlt" : "spreadsheet file"},
+                 "other" :{"mapsTo" : "other", "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "file_small.png"), "imgAlt" : "unknown type file"},
+                 "link"  :{"mapsTo" : "link",  "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "link.png"),       "imgAlt" : "link"}}
 
         if len(mat.getResourceList()) > 0:
             out.openTag("files")

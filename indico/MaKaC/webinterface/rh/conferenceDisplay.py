@@ -1031,13 +1031,16 @@ class RHConfParticipantsAddPending(RHConferenceDisplay):
             if participation.alreadyParticipating(pending) != 0:
                 errorList.append("The participant identified by email '%s' is already in the participants' list"
                                  % pending.getEmail())
-                errorList.append("Please check if you are not already added to the meeting.")
+                errorList.append(_("Please check if you are not already added to the meeting."))
             else:
                 if participation.addPendingParticipant(pending):
-                    infoList.append("The participant identified by email '%s' has been added to the list of pending participants"
+                    if participation.getAutoAccept():
+                        infoList.append(_("The request for participation has been accepted"))
+                    else:
+                        infoList.append("The participant identified by email '%s' has been added to the list of pending participants"
                                     % pending.getEmail())
                 else:
-                    errorList.append("The participant cannot be added.")
+                    errorList.append(_("The participant cannot be added."))
 
         if infoList:
             self._reqParams["infoMsg"] = infoList
