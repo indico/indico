@@ -34,7 +34,6 @@ def create(req, **params):
 
 def remove(req, **params):
     return users.RHUserRemoveIdentity( req ).process( params )
-    
+
 def changePassword(req, **params):
     return users.RHUserIdentityChangePassword( req ).process( params )
-    
