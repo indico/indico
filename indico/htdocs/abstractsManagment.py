@@ -32,3 +32,6 @@ def newAbstract( req, **params ):
 
 def participantList( req, **params ):
     return conferenceModif.RHAbstractsParticipantList( req ).process( params )
+
+def mergeAbstracts( req, **params ):
+    return conferenceModif.RHAbstractsMerge( req ).process( params )
