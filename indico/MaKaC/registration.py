@@ -42,6 +42,8 @@ import re
 
 import string
 
+PRICE_PATTERN = re.compile(r'^(\d+(?:[\.\,]\d+)?)$')
+
 def stringToDate( str ):
     months = {  "January":1, "February":2, "March":3, "April":4, "May":5, "June":6, "July":7, "August":8, "September":9, "October":10, "November":11, "December":12 }
     [ day, month, year ] = str.split("-")
@@ -1391,8 +1393,14 @@ class RadioItem(Persistent):
             self.setPrice(False)
         return self._price
 
-    def setPrice(self,v):
-        self._price=v
+    def setPrice(self, price):
+        if price:
+            match = PRICE_PATTERN.match(price)
+            if match:
+                price = match.group(1)
+            else:
+                raise MaKaCError(_('The price is in incorrect format!'))
+        self._price = price
 
     def clone(self, parent):
         ri=RadioItem(parent)
@@ -1956,8 +1964,14 @@ class GeneralField(Persistent):
             self._price = 0
         return self._price
 
-    def setPrice(self,price):
-        self._price=price
+    def setPrice(self, price):
+        if price:
+            match = PRICE_PATTERN.match(price)
+            if match:
+                price = match.group(1)
+            else:
+                raise MaKaCError(_('The price is in incorrect format!'))
+        self._price = price
 
     def getId(self):
         return self._id
