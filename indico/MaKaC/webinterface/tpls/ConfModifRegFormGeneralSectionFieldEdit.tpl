@@ -42,13 +42,19 @@
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Caption")%></span></td>
       <td bgcolor="white" class="blacktext" width="100%%">
-      <input type="text" name="caption" size="60" value=%(caption)s>
+      <input type="text" name="caption" size="60" maxlength="60" =%(caption)s>
       </td>
     </tr>
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Type of field")%></span></td>
       <td bgcolor="white" class="blacktext" width="100%%">
       %(inputtypes)s
+      </td>
+    </tr>
+    <tr>
+      <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
+      <td bgcolor="white" class="blacktext" width="100%%">
+        <textarea name="description" rows="4" cols="30">%(description)s</textarea>
       </td>
     </tr>
     <tr>

@@ -994,6 +994,9 @@ class FieldInputType(Persistent):
                            """)%(checked,price)
         return "".join(html)
 
+    def _getDescriptionHTML(self, description):
+        return """<span class="inputDescription">%s</span>""" % description
+
     def clone(self, gf):
         fi=FieldInputs().getAvailableInputKlassById(self.getId())(gf)
         return fi
@@ -1007,6 +1010,7 @@ class TextInput(FieldInputType):
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
@@ -1029,6 +1033,8 @@ class TextInput(FieldInputType):
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1104,6 +1110,7 @@ class TextareaInput(FieldInputType):
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
@@ -1123,6 +1130,8 @@ class TextareaInput(FieldInputType):
         tmp = """&nbsp;%s<br><textarea name="%s" cols="60" rows="4" %s >%s</textarea>"""%(caption, htmlName, disable, v)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1153,6 +1162,7 @@ class NumberInput(FieldInputType):
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
@@ -1176,6 +1186,8 @@ class NumberInput(FieldInputType):
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1210,6 +1222,7 @@ class LabelInput(FieldInputType):
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
@@ -1233,6 +1246,8 @@ class LabelInput(FieldInputType):
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1266,6 +1281,7 @@ class CheckboxInput(FieldInputType):
         disable=""
         checked=""
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         price = self._parent.getPrice()
         billable = self._parent.isBillable()
         currency = self._parent.getParent().getRegistrationForm().getCurrency()
@@ -1289,6 +1305,8 @@ class CheckboxInput(FieldInputType):
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp, price, currency)
         else:
             tmp= """%s </td> """%tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1318,6 +1336,7 @@ class YesNoInput(FieldInputType):
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
@@ -1348,6 +1367,8 @@ class YesNoInput(FieldInputType):
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
 
@@ -1580,8 +1601,10 @@ class RadioGroupInput(FieldInputType):
 
     def _getRadioGroupModifHTML(self, item, registrant):
         caption = self._parent.getCaption()
-        billable = self._parent.isBillable()
-        currency = self._parent.getParent().getRegistrationForm().getCurrency()
+        description = self._parent.getDescription()
+        price= self._parent.getCaption()
+        billable=self._parent.isBillable()
+        currency=self._parent.getParent().getRegistrationForm().getCurrency()
         value = ""
         if item is not None:
             billable = item.isBillable()
@@ -1608,6 +1631,9 @@ class RadioGroupInput(FieldInputType):
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;%s</td></tr> """ % (val.getPrice(), currency))
             else:
                  tmp.append(""" </td></tr> """)
+
+        if description:
+            tmp.append("""<tr><td></td><td colspan="2">%s</td></tr>""" % (self._getDescriptionHTML(description)))
         return "".join(tmp)
 
     def _getDropDownModifHTML(self, item, registrant):
@@ -1950,6 +1976,7 @@ class GeneralField(Persistent):
             self._input = FieldInputs.getAvailableInputKlassById("text")(self)
             self._input.setValues(data)
             self._mandatory = False
+            self._description = ""
             self._billable =False
             self._price = "0"
         else:
@@ -1969,6 +1996,7 @@ class GeneralField(Persistent):
         self.setMandatory(data.has_key("mandatory"))
         self.setBillable(data.has_key("billable"))
         self.setPrice(data.get("price",""))
+        self.setDescription(data.get("description",""))
 
     def getValues(self):
         values = {}
@@ -1977,6 +2005,7 @@ class GeneralField(Persistent):
         values["mandatory"] = self.isMandatory()
         values["billable"]=self.isBillable()
         values["price"]=self.getPrice()
+        values["description"]=self.getDescription()
         return values
 
     def isBillable(self):
@@ -2016,6 +2045,12 @@ class GeneralField(Persistent):
 
     def setCaption(self, caption):
         self._caption = caption
+
+    def getDescription(self):
+        return self._description
+
+    def setDescription(self, description):
+        self._description = description
 
     def getInput(self):
         return self._input
