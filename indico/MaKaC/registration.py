@@ -499,16 +499,16 @@ class Notification(Persistent):
                 session2 = _("""--_("not selected")--""")
                 if len(sessionList)>1:
                     session2 = sessionList[1].getTitle()
-                text =  _("""%s:
-                        - _("First priority"): %s
-                        - _("Other option"): %s
-                        """)%(sessionForm.getTitle(), session1, session2)
+                text =  _("""%s
+- _("First priority"): %s
+- _("Other option"): %s
+""")%(self._printTitle(sessionForm.getTitle()), session1, session2)
             else:
                 sessionListText=[]
                 for s in sessionList:
-                    sessionListText.append("\n\t\t\t%s"%s.getTitle())
-                text = """%s: %s
-                        """%(sessionForm.getTitle(), "".join(sessionListText))
+                    sessionListText.append("\n%s" % s.getTitle())
+                text = """%s%s
+"""%(self._printTitle(sessionForm.getTitle()), "".join(sessionListText))
         return text
 
     def _printAccommodation(self, accommodationForm, accommodation):
@@ -517,11 +517,9 @@ class Notification(Persistent):
             accoType = _("""--_("not selected")--""")
             if accommodation.getAccommodationType() is not None:
                 accoType = accommodation.getAccommodationType().getCaption()
-            text = _("""%s:
-                        - _("Arrival date"): %s
-                        - _("Departure date"): %s
-                        - _("Accommodation type"): %s
-                    """)%(accommodationForm.getTitle(), \
+            text = _("""%s- _("Arrival date"): %s
+- _("Departure date"): %s
+- _("Accommodation type"): %s""")%(self._printTitle(accommodationForm.getTitle()), \
                             accommodation.getArrivalDate().strftime("%d %B %Y"), \
                             accommodation.getDepartureDate().strftime("%d %B %Y"), \
                             accoType)
@@ -535,62 +533,77 @@ class Notification(Persistent):
                 se.append( _("- %s [%s place(s) needed]")%(item.getCaption(), item.getNoPlaces()))
             text = ""
             if se != []:
-                text = """%s:
-                        %s
-                        """%(socialEventForm.getTitle(), "\r\n".join(se) or _("""--_("No social events selected")--"""))
+                text = """%s
+%s
+"""%(self._printTitle(socialEventForm.getTitle()), "\n".join(se) or _("""--_("No social events selected")--"""))
         return text
 
     def _printReasonParticipation(self, reasonParticipationForm, reasonParticipation):
         text = ""
         if reasonParticipationForm.isEnabled():
-            text = """%s: %s
-                    """%(reasonParticipationForm.getTitle(), reasonParticipation)
+            text = """%s%s
+                    """%(self._printTitle(reasonParticipationForm.getTitle()), reasonParticipation)
         return text
+
+    def _printTitle(self, title):
+        sep = '-----------------------------------'
+        return "\n%s\n%s\n%s\n\n" % (sep, title, sep)
+
+    def _formatValue(self, value):
+        value = value.strip()
+        if len(value) > 50:
+            value = '\n\n%s\n' % value
+        return value
 
     def _printMiscellaneousInfo(self, gs, mig):
         text=[]
         if gs.isEnabled():
             if mig is not None:
                 noitems=True
-                text.append("""%s:\r\n\t\t\t"""%(mig.getTitle()))
+                text.append(self._printTitle(mig.getTitle()))
                 #Mods to support sorting fields
                 #for f in gs.getFields():
                 for f in gs.getSortedFields():
                     mii=mig.getResponseItemById(f.getId())
                     if mii is not None:
                         noitems=False
-                        value=": %s"%mii.getValue()
+                        value = mii.getValue()
                         if isinstance(mii.getGeneralField().getInput(), LabelInput) and mii.isBillable():
-                            value=": %s %s"%(mii.getPrice(), mii.getCurrency())
+                            value = "%s %s" % (mii.getPrice(), mii.getCurrency())
                         elif isinstance(mii.getGeneralField().getInput(), LabelInput):
-                            value=""
-                        text.append("""- %s%s\r\n\t\t\t"""%(mii.getCaption(), value))
+                            value = ""
+                        caption = mii.getCaption()
+                        text.append("""- %s: %s\n""" % (caption, self._formatValue(value)))
                 if noitems:
-                    text.append("""-- no values --\r\n\t\t\t""")
-                text.append("\r\n             ")
+                    text.append("""-- no values --\n""")
+                text.append("\n")
         return "".join(text)
 
     def _printAllSections(self, regForm, rp):
         sects = []
         for formSection in regForm.getSortedForms():
             if formSection.getId() == "reasonParticipation":
-                sects.append("""
-             %s"""%self._printReasonParticipation(formSection, rp.getReasonParticipation()))
+                sects.append("""\n%s""" % self._printReasonParticipation(formSection, rp.getReasonParticipation()))
             elif formSection.getId() == "sessions":
-                sects.append("""
-             %s"""%self._printSessions(formSection, rp.getSessionList()))
+                sects.append("""\n%s""" % self._printSessions(formSection, rp.getSessionList()))
             elif formSection.getId() == "accommodation":
-                sects.append("""
-             %s"""%self._printAccommodation(formSection, rp.getAccommodation()))
+                sects.append("""\n%s""" % self._printAccommodation(formSection, rp.getAccommodation()))
             elif formSection.getId() == "socialEvents":
-                sects.append("""
-             %s"""%self._printSocialEvents(formSection, rp.getSocialEvents()))
+                sects.append("""\n%s""" % self._printSocialEvents(formSection, rp.getSocialEvents()))
             elif formSection.getId() == "furtherInformation":
                 pass
             else:
-                sects.append("""
-             %s"""%self._printMiscellaneousInfo(formSection, rp.getMiscellaneousGroupById(formSection.getId())))
+                sects.append("""%s""" % self._printMiscellaneousInfo(formSection, rp.getMiscellaneousGroupById(formSection.getId())))
         return "".join(sects)
+
+    def _cleanBody(self, body):
+        # format the line-breaks in unix-style
+        body = re.sub(r'\r\n', '\n', body)
+
+        # clean the extra lines and space
+        body = re.sub(r'\n(\s*\n){2,}', '\n\n', body)
+
+        return body
 
     def _getPDInfoText(self, regForm, rp):
         personalData = regForm.getPersonalData()
@@ -625,8 +638,7 @@ class Notification(Persistent):
             elif key == "personalHomepage":
                 fieldValue = rp.getPersonalHomepage()
             if pdfield.isEnabled():
-                text += """
-             %s: %s""" % (_(fieldTitle),fieldValue)
+                text += """\n%s: %s""" % (_(fieldTitle), fieldValue)
         return text
 
     def sendEmailNewRegistrant(self, regForm, rp):
@@ -642,31 +654,34 @@ class Notification(Persistent):
             paymentWarning = "."
 
         subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
-        body=_("""
-             _("Event"): %s
-             _("Registrant Id"): %s%s
+        body = _("""
+_("Event"): %s
+_("Registrant Id"): %s%s
 %s
-             """)%(   url,rp.getId(), \
-                     self._getPDInfoText(regForm,rp), \
-                     self._printAllSections(regForm, rp) )
+""") % (url, rp.getId(), \
+                     self._getPDInfoText(regForm, rp), \
+                     self._printAllSections(regForm, rp))
+
         # send mail to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-             There is a new registrant in '%s'. See information below:
+There is a new registrant in '%s'. See information below:
 
-                      %s
-                      """)%(strip_ml_tags(regForm.getConference().getTitle()), \
+%s
+""")%(strip_ml_tags(regForm.getConference().getTitle()), \
                               body)
+            bodyOrg = self._cleanBody(bodyOrg)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send mail to participant
         if rp.getEmail().strip() != "":
             bodyReg = _("""
-             Congratulations, your registration to %s was successful%s See your information below:
+Congratulations, your registration to %s was successful%s See your information below:
 
-                      %s
-             %s
-                      """)% (strip_ml_tags(regForm.getConference().getTitle()),paymentWarning,body,epaymentLink)
+%s
+%s
+""")% (strip_ml_tags(regForm.getConference().getTitle()),paymentWarning,body,epaymentLink)
+            bodyReg = self._cleanBody(bodyReg)
             to=rp.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
