@@ -3,16 +3,25 @@
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Propose to be accepted")%></td>
         </tr>
+        <% if len(tracks) > 0: %>
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Proposed track")%></span>
             </td>
             <td><select name="track">%(tracks)s</select></td>
         </tr>
+        <% end %>
+        <% else: %>
+        <tr>
+            <td colspan="2">
+                <span class="titleCellFormat"> <b>This abstract has not been included in any track, if you want to include it now click <a href=%(changeTrackURL)s>here</a></b> </span>
+            </td>
+        </tr>
+        <% end %>
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Proposed contribution type")%></span>
-            </td> 
+            </td>
             <td>
                 <select name="contribType">%(contribTypes)s</select>
             </td>

@@ -1347,6 +1347,8 @@ class WConfModAbstractPropToAcc(wcomponents.WTemplated):
         vars["tracks"]=self._getTracksHTML()
         vars["contribTypes"]=self._getContribTypesHTML()
         vars["comment"]=""
+        vars["changeTrackURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
+
         return vars
 
 

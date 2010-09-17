@@ -14,7 +14,7 @@
 		%(contribTypes)s
 		<tr>
 			<td nowrap colspan="2"><span class="titleCellFormat"> <%= _("Please enter below a comment which justifies your request")%>:</span>
-                <table> 
+                <table>
                     <tr>
                         <td>
                             <textarea cols="50" rows="5" name="comment"></textarea>
