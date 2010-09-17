@@ -17,9 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.common.PickleJar import DictPickler
 from pytz import timezone
 from MaKaC.user import CERNGroup
+from MaKaC.fossils.user import IAvatarFossil
 
 import os
 from MaKaC.common.general import *
@@ -51,6 +51,9 @@ import re
 from MaKaC.i18n import _
 from MaKaC.modules.base import ModulesHolder
 from MaKaC.plugins.pluginLoader import PluginLoader
+
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.modules import INewsItemFossil
 
 class WPAdminsBase( WPMainBase ):
 
@@ -353,7 +356,7 @@ class WPUpdateNews( WPHomepageCommon ):
         wc = WUpdateNews()
         newsModule = ModulesHolder().getById("news")
 
-        newslist = DictPickler.pickle(newsModule.getNewsItemsList(), tz)
+        newslist = fossilize(newsModule.getNewsItemsList(),INewsItemFossil, tz=tz)
         newsTypesList = newsModule.getNewsTypesAsDict()
         recentDays = newsModule.getRecentDays()
 
@@ -459,7 +462,7 @@ class WAdminPlugins (wcomponents.WTemplated):
 
         vars["PluginType"] = PluginsHolder().getPluginType(self._pluginType)
         vars["InitialPlugin"] = self._initialPlugin
-        vars["Favorites"] = DictPickler.pickle(self._user.getPersonalInfo().getBasket().getUsers())
+        vars["Favorites"] = fossilize(self._user.getPersonalInfo().getBasket().getUsers().values(), IAvatarFossil)
         vars["rbActive"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 
         return vars

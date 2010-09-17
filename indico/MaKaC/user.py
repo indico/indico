@@ -18,7 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil, IGroupFossil
+from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
+                            IGroupFossil, IPersonalInfoFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from random import random
 
@@ -40,7 +41,6 @@ from MaKaC.i18n import _
 
 from datetime import datetime, timedelta
 
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
 
 #import ldap
@@ -61,8 +61,6 @@ class Group(Persistent, Fossilizable):
     """
     groupType = "Default"
 
-    @Retrieves(['MaKaC.user.CERNGroup',
-                'MaKaC.user.Group'], 'isGroup', lambda x: True)
     def __init__(self, groupData=None):
         self.id = ""
         self.name = ""
@@ -74,8 +72,6 @@ class Group(Persistent, Fossilizable):
     def setId( self, newId ):
         self.id = str(newId)
 
-    @Retrieves(['MaKaC.user.CERNGroup',
-                'MaKaC.user.Group'], 'id')
     def getId( self ):
         return self.id
 
@@ -83,8 +79,6 @@ class Group(Persistent, Fossilizable):
         self.name = newName.strip()
         GroupHolder().notifyGroupNameChange( self )
 
-    @Retrieves(['MaKaC.user.CERNGroup',
-                'MaKaC.user.Group'], 'name')
     def getName( self ):
         return self.name
 
@@ -97,8 +91,6 @@ class Group(Persistent, Fossilizable):
     def setEmail( self, newEmail ):
         self.email = newEmail.strip()
 
-    @Retrieves(['MaKaC.user.CERNGroup',
-                'MaKaC.user.Group'], 'email')
     def getEmail( self ):
         try:
             return self.email
@@ -916,7 +908,6 @@ class Avatar(Persistent, Fossilizable):
     def setId(self, id):
         self.id = str(id)
 
-    @Retrieves('MaKaC.user.Avatar', 'id')
     def getId(self):
         return self.id
 
@@ -927,7 +918,6 @@ class Avatar(Persistent, Fossilizable):
     def getName(self):
         return self.name
 
-    @Retrieves('MaKaC.user.Avatar', 'firstName')
     def getFirstName(self):
         return self.name
 
@@ -937,7 +927,6 @@ class Avatar(Persistent, Fossilizable):
     def getSurName(self):
         return self.surName
 
-    @Retrieves('MaKaC.user.Avatar', 'familyName')
     def getFamilyName(self):
         return self.surName
 
@@ -947,7 +936,6 @@ class Avatar(Persistent, Fossilizable):
             surName = "%s, "%self.getSurName().upper()
         return "%s%s"%(surName, self.getName())
 
-    @Retrieves('MaKaC.user.Avatar', 'name')
     def getStraightFullName(self):
         name = ""
         if self.getName() != "":
@@ -975,7 +963,6 @@ class Avatar(Persistent, Fossilizable):
     def getOrganisations(self):
         return self.organisation
 
-    @Retrieves('MaKaC.user.Avatar', 'affiliation')
     def getOrganisation( self ):
         return self.organisation[0]
 
@@ -984,7 +971,6 @@ class Avatar(Persistent, Fossilizable):
     def setTitle(self, title):
         self.title = title
 
-    @Retrieves('MaKaC.user.Avatar', 'title')
     def getTitle( self ):
         return self.title
 
@@ -1026,7 +1012,6 @@ class Avatar(Persistent, Fossilizable):
     def getAddresses(self):
         return self.address
 
-    @Retrieves('MaKaC.user.Avatar', 'address')
     def getAddress( self ):
         return self.address[0]
 
@@ -1040,7 +1025,6 @@ class Avatar(Persistent, Fossilizable):
     def getEmails( self ):
         return [self.email] + self.getSecondaryEmails()
 
-    @Retrieves('MaKaC.user.Avatar', 'email')
     def getEmail( self ):
         return self.email
 
@@ -1077,7 +1061,6 @@ class Avatar(Persistent, Fossilizable):
         self.telephone.append( newTel )
         self._p_changed = 1
 
-    @Retrieves('MaKaC.user.Avatar', 'telephone')
     def getTelephone( self ):
         return self.telephone[0]
     getPhone = getTelephone
@@ -1100,7 +1083,6 @@ class Avatar(Persistent, Fossilizable):
         self.fax[item] = fax
         self._p_changed = 1
 
-    @Retrieves('MaKaC.user.Avatar', 'fax')
     def getFax(self):
         return self.fax[0]
 
@@ -1844,14 +1826,15 @@ class TimedLinkedEvents(Persistent):
 
         return False
 
-class PersonalInfo(Persistent):
+class PersonalInfo(Persistent, Fossilizable):
+
+    fossilizes(IPersonalInfoFossil)
 
     def __init__(self):
         self._basket = PersonalBasket()
         self._tabAdvancedMode = False # Basic set of tabs
         self._p_changed = 1
 
-    @Retrieves('MaKaC.user.PersonalInfo', 'tabAdvancedMode')
     def getTabAdvancedMode( self ):
         # TabAdvancedMode refers to whether the user is in "Advanced Options"
         # mode or not
@@ -1861,7 +1844,6 @@ class PersonalInfo(Persistent):
             self.setTabAdvancedMode(False) # (default)
         return self._tabAdvancedMode
 
-    @Updates('MaKaC.user.PersonalInfo', 'tabAdvancedMode')
     def setTabAdvancedMode( self, mode ):
         self._tabAdvancedMode = mode
         self._p_changed = 1

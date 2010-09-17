@@ -22,7 +22,6 @@ from persistent import Persistent
 from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
 from MaKaC.plugins.base import PluginsHolder
 from random import Random
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from datetime import timedelta
 import socket

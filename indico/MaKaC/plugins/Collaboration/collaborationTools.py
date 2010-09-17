@@ -27,7 +27,7 @@ from MaKaC.common.Configuration import Config
 from MaKaC.conference import Contribution, Conference
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
     IQueryResultFossil
-from MaKaC.fossils.conference import IConferenceMinimalFossil
+from MaKaC.fossils.conference import IConferenceFossil
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -309,7 +309,7 @@ class CollaborationTools(object):
         """ Utility function that updates IQueryResultFossil's getResults method
             with the proper dict in order to fossilize bookings for the VS Overview page
         """
-        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceMinimalFossil}
+        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil}
         for pluginName in cls.getCollaborationPluginType().getPlugins():
             classObject = cls.getCSBookingClass(pluginName)
             fossilClassObject = cls.getIndexingFossil(pluginName)

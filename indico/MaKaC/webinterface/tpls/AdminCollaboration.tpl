@@ -1,5 +1,4 @@
 <div class="container">
-<% from MaKaC.common.PickleJar import DictPickler %>
 
 <div class="categoryTitle"><%= _("Video Services Overview")%></div>
 

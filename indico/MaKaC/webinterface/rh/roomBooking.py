@@ -26,7 +26,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.locators as locators
 from MaKaC.common.general import *
 from MaKaC.common.Configuration import Config
-from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RoomBookingDBMixin, RHRoomBookingProtected
 from datetime import datetime, timedelta
 from MaKaC.common.utils import HolidaysHolder, validMail, setValidEmailSeparators
 from MaKaC.common.datetimeParser import parse_date
@@ -51,7 +51,7 @@ class CandidateDataFrom( object ):
 # 0. Base classes
 
 
-class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
+class RHRoomBookingBase( RoomBookingDBMixin, RHRoomBookingProtected ):
     """
     All room booking related hanlders are derived from this class.
     This gives them:
@@ -61,7 +61,7 @@ class RHRoomBookingBase( RoomBookingDBMixin, RHProtected ):
     """
 
     def _checkProtection( self ):
-        RHProtected._checkProtection(self)
+        RHRoomBookingProtected._checkProtection(self)
 
     def _clearSessionState( self ):
         session = self._websession

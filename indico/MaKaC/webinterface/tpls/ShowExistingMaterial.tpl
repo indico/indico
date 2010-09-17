@@ -18,7 +18,8 @@ var showMainResourceOption = false;
 var mode = '<%= mode %>';
 
 <% import MaKaC.conference as conference %>
-<% from MaKaC.common.PickleJar import DictPickler %>
+<% from MaKaC.common.fossilize import fossilize %>
+<% from MaKaC.conference import IMaterialFossil %>
 
 
 <% if isinstance(self._target, conference.SubContribution): %>
@@ -84,7 +85,7 @@ var mode = '<%= mode %>';
     var targetType = 'category';
 <% end %>
 
-var matList = <%= DictPickler.pickle(materialList) %>;
+var matList = <%= fossilize(materialList, IMaterialFossil) %>
 
 var mlist = new MaterialListWidget(args, matList, uploadAction, null, null, showMainResourceOption);
 

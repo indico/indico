@@ -21,7 +21,6 @@
 
 from MaKaC.plugins.Collaboration.base import CSErrorBase
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.conference import ConferenceHolder, Contribution
 from MaKaC.common.logger import Logger
@@ -877,17 +876,12 @@ class RecordingManagerError(CSErrorBase):
         self._operation = operation
         self._inner = inner
 
-    @Retrieves(['MaKaC.plugins.Collaboration.RecordingManager.common.RecordingManagerError'], 'origin')
     def getOrigin(self):
         return 'RecordingManager'
 
-    @Retrieves(['MaKaC.plugins.Collaboration.RecordingManager.common.RecordingManagerError'],
-               'operation')
     def getOperation(self):
         return self._operation
 
-    @Retrieves(['MaKaC.plugins.Collaboration.RecordingManager.common.RecordingManagerError'],
-               'inner')
     def getInner(self):
         return str(self._inner)
 

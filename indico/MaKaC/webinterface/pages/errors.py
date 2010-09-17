@@ -205,7 +205,7 @@ class WPAccessError( WPDecorated ):
         WPDecorated. __init__( self, rh )
 
     def _getBody( self, params ):
-        if self._rh._target.getAccessKey() != "" or ( (not type(self._rh._target) is Category) and self._rh._target.getConference().getAccessKey() != ""):
+        if self._rh._target and (self._rh._target.getAccessKey() != "" or ( (not type(self._rh._target) is Category) and self._rh._target.getConference().getAccessKey() != "")):
             msg = ""
             sess = self._rh._getSession()
             keys = sess.getVar("accessKeys")

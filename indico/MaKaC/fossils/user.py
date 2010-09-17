@@ -66,3 +66,8 @@ class IAvatarAllDetailsFossil(IAvatarFossil):
 
     def getFax(self):
         """ Avatar fax """
+
+class IPersonalInfoFossil(IFossil):
+
+    def getTabAdvancedMode(self):
+        """ Tab Advanced Mode """

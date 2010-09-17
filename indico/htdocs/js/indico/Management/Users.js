@@ -803,7 +803,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 /**
  * Creates a form field whose value is a single user
  *
- * @param {Object} initialUser A user that will appear initially. Example: <%= jsonEncode(DictPickler.pickle(AvatarHolder().getById(1))) %>
+ * @param {Object} initialUser A user that will appear initially. Example: <%= AvatarHolder().getById(1).fossilize(IAvatarFossil) %>
  *
  * @param {String} hiddenFieldName The name attribute for the hidden field that will be drawn along with the rest of the widget.
  *                                 This hidden field will have the currently selected user's id.
@@ -812,7 +812,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
  * @param {Boolean} allowChoose If true, a 'Choose User' dialog will be present when pressing on the "choose" button.
  *
  * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
- * @param {list} suggestedUsers A list of users that will be offered as options to be added. Example: <%= jsonEncode(DictPickler.pickle([AvatarHolder().getById(3), AvatarHolder().getById(4)])) %>
+ * @param {list} suggestedUsers A list of users that will be offered as options to be added. Example: <%= jsonEncode(fossilize([AvatarHolder().getById(3), AvatarHolder().getById(4)], IAvatarFossil)) %>
  *                              If left to null, there will be suggested Users. For an empty list of users, use {}
  *
  * @param {Integer} conferenceId If different from null, authors from that conference will be included in the search results.
@@ -1372,7 +1372,7 @@ type("UserListWidget", ["ListWidget"],
 
                  var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
                  var groupName = $B(Html.span(), userData.accessor('name'));
-                 return Html.span({}, removeButtonDiv, groupName);
+                 return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
 
              } else {
 
@@ -1722,7 +1722,7 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
 
         if (!exists(IndicoGlobalVars['favorite-user-ids'])) {
             IndicoGlobalVars['favorite-user-ids'] = {};
-            IndicoGlobalVars['favorite-user-list'] = [];
+            /*IndicoGlobalVars['favorite-user-list'] = [];*/
         }
         if (!exists(IndicoGlobalVars.userFavouritesWatchValues)) {
             IndicoGlobalVars.userFavouritesWatchValues = {};

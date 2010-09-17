@@ -6,7 +6,8 @@ from MaKaC.modules.base import ModulesHolder
 from MaKaC.modules.news import NewsItem
 from MaKaC.common.utils import formatDateTime
 from MaKaC.services.interface.rpc.common import ServiceError
-from MaKaC.common.PickleJar import DictPickler
+
+from MaKaC.fossils.modules import INewsItemFossil
 
 class NewsRecentDays(TextModificationBase, AdminService):
     """ Set number of days that a news item is considered recent
@@ -41,7 +42,7 @@ class NewsAdd(AdminService):
         ni=NewsItem(self._title, self._content, self._type)
         newsModule.addNewsItem(ni)
         tz = self.getAW().getUser().getTimezone() #this is an admin service so user is always logged in (or _checkProtection detects it before)
-        return DictPickler.pickle(ni, tz)
+        return ni.fossilize(INewsItemFossil, tz=tz)
 
 class NewsDelete(AdminService):
 
@@ -76,7 +77,7 @@ class NewsSave(AdminService):
             item.setType(self._type)
             item.setContent(self._content)
             tz = self.getAW().getUser().getTimezone() #this is an admin service so user is always logged in (or _checkProtection detects it before)
-            return DictPickler.pickle(item, tz)
+            return item.fossilize(INewsItemFossil, tz=tz)
         else:
             raise Exception("News item does not exist")
 

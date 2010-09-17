@@ -18,20 +18,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import MaKaC.webinterface.rh.conferenceModif as conferenceModif
-
-
-def index( req, **params ):
-    return conferenceModif.RHAbstractList( req ).process( params )
-
-def abstractsActions( req, **params ):
-    return conferenceModif.RHAbstractsActions( req ).process( params )
-
-def newAbstract( req, **params ):
-    return conferenceModif.RHNewAbstract( req ).process( params )
-
-def participantList( req, **params ):
-    return conferenceModif.RHAbstractsParticipantList( req ).process( params )
-
-def mergeAbstracts( req, **params ):
-    return conferenceModif.RHAbstractsMerge( req ).process( params )
+globalOptions = [
+                 ( "AuthorisedUsersGroups", {"description": "Users and Groups authorised for roombooking module",
+                                       "type": 'usersGroups',
+                                       "defaultValue": [],
+                                       "editable": True,
+                                       "visible": True})
+                 ]

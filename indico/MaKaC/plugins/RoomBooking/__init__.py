@@ -21,4 +21,4 @@
 from MaKaC.i18n import _
 pluginTypeDescription = _("Room Booking Plugins")
 ignore = False
-visible = False
+visible = True

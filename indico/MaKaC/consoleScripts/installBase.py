@@ -302,7 +302,7 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
 
     print "\nWe need to 'sudo' in order to set the permissions of some directories..."
 
-    dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache', 'archive'])
+    dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache', 'archive'] if directories.has_key(x))
     if dbInstalledBySetupPy:
         dirs2check.append(dbInstalledBySetupPy)
 

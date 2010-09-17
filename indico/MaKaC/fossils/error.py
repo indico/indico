@@ -45,3 +45,24 @@ class INoReportErrorFossil(ICausedErrorFossil):
         """
         Additional error information (can be shown on the client side)
         """
+
+class IWarningFossil(IFossil):
+
+    def getTitle(self):
+        """ Title of the Warning """
+
+    def getProblems(self):
+        """ Content of the Warning """
+    getProblems.name = "content"
+
+class IResultWithWarningFossil(IFossil):
+
+    def getResult(self):
+        """ Result """
+
+    def getWarning(self):
+        """ Warning """
+    getWarning.result = IWarningFossil
+
+    def hasWarning(self):
+        """ Whether the result has a Warning or not """

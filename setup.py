@@ -269,6 +269,8 @@ Please specify the directory where you'd like it to be placed.
 
         self._update_conf_dir_paths(local, directories)
 
+        directories.pop('htdocs') #avoid modifying the htdocs folder permissions (it brings problems with git)
+
         from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, _updateDbConfigFiles, _updateMaKaCEggCache
 
         user = ''

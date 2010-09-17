@@ -26,8 +26,6 @@ try:
 except ImportError:
     pass
 
-from MaKaC.common.PickleJar import DictPickler
-
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 from MaKaC.services.interface.rpc.common import CausedError

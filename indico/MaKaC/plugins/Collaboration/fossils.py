@@ -27,7 +27,7 @@
 
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.fossils.conference import IConferenceMinimalFossil
+from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.Conversion import Conversion
 
 
@@ -141,7 +141,7 @@ class ICSBookingBaseIndexingFossil(ICSBookingBaseFossil):
 
     def getConference(self):
         """ Returns a fossil of the Conference this booking is attached to """
-    getConference.result = IConferenceMinimalFossil
+    getConference.result = IConferenceFossil
 
     def getModificationURL(self):
         pass

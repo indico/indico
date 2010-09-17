@@ -19,7 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.conference import Category
-from MaKaC.common.PickleJar import DictPickler
 
 import sys, traceback, time, os
 
@@ -368,7 +367,7 @@ class TextModificationBase( object ):
         else:
             setResult = self._handleSet()
             if isinstance(setResult, Warning):
-                return DictPickler.pickle(ResultWithWarning(self._value, setResult))
+                return ResultWithWarning(self._value, setResult).fossilize()
             else:
                 return self._value
 

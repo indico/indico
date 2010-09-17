@@ -1,28 +1,25 @@
 
-<form action=%(postURL)s method="POST">
+<form action=%(postURL)s method="POST" width="100%%">
     <table width="100%%" align="center">
         <tr>
-            <td style="padding-left:25px"><font color="gray"> <%= _("Please note that fields marked with * are mandatory.")%> </font><br><br>
-            </td>
-        </tr>
-        <tr>
             <td>
-                <table width="95%%" align="center" border="0" style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
+                <table width="100%%" class="groupTable" align="center">
 					<tr>
-                        <td class="groupTitle" style="background:#E5E5E5; color:gray">&nbsp;&nbsp;&nbsp;<%= _("Main data")%></td>
+                        <td class="groupTitle"><%= _("Abstract")%></td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <td>
-                            <table align="center">
+                            <table align="center" width="100%%">
                                 <tr>
-                                    <td align="right" valign="top">
-                                        <font color="red">*</font><font color="gray"><%= _("Title")%></font> 
+                                    <td align="right" valign="top" white-space="nowrap">
+                                        <span class="dataCaptionFormat"><%= _("Title")%></span>
+                                        <span class="mandatoryField">*</span>
                                     </td>
-                                    <td>
-                                        <input type="text" size="100" name="title" value=%(title)s>
+                                    <td width="100%%">
+                                        <input type="text" name="title" value=%(title)s style="width:100%%">
                                     </td>
                                 </tr>
                                 %(additionalFields)s
@@ -37,10 +34,10 @@
 			</td>
         </tr>
         <tr>
-            <td>
-                <table align="center" width="95%%" border="0" style="border-left: 1px solid #777777;" cellpadding="0" cellspacing="0">
+           <td>
+                <table align="center" width="100%%" class="groupTable">
                     <tr>
-                        <td class="groupTitle" colspan="8" style="background:#E5E5E5; color:gray">&nbsp;&nbsp;&nbsp;<%= _("Primary Authors")%></td>
+                        <td class="groupTitle"><%= _("Primary Authors")%></td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
@@ -69,9 +66,9 @@
         </tr>
         <tr>
             <td>
-                <table align="center" width="95%%" border="0" style="border-left: 1px solid #777777;" cellpadding="0" cellspacing="0">
+                <table align="center" width="95%%" class="groupTable">
                     <tr>
-                        <td class="groupTitle" colspan="8" style="background:#E5E5E5; color:gray">&nbsp;&nbsp;&nbsp;<%= _("Co-Authors")%></td>
+                        <td class="groupTitle"><%= _("Co-Authors")%></td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
@@ -100,16 +97,16 @@
         </tr>
         <tr>
             <td>
-                <table align="center" width="95%%" border="0" style="border-left: 1px solid #777777;" cellpadding="0" cellspacing="0">
+                <table align="center" width="95%%" class="groupTable">
                     <tr>
-                        <td class="groupTitle" colspan="8" style="background:#E5E5E5; color:gray">&nbsp;&nbsp;&nbsp;%(tracksMandatory)s<%= _("Track classification")%></td>
+                        <td class="groupTitle"><%= _("Track classification")%>&nbsp;%(tracksMandatory)s</td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <td>
-                            <table align="center" width="80%%">
+                            <table class="groupTable" align="center" width="80%%">
                                 %(tracks)s
                             </table>
                         </td>
@@ -122,17 +119,17 @@
         </tr>
         <tr>
             <td>
-                <table align="center" width="95%%" border="0" style="border-left: 1px solid #777777;border-bottom: 1px solid #777777;" cellpadding="0" cellspacing="0">
+                <table align="center" width="95%%" class="groupTable">
                     <tr>
-                        <td class="groupTitle" colspan="8" style="background:#E5E5E5; color:gray">&nbsp;&nbsp;&nbsp;<%= _("Comments")%></td>
+                        <td class="groupTitle"><%= _("Comments")%></td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td>
-                            <table align="center" width="80%%">
-                                <textarea name="comments" rows="8" cols="80">%(comments)s</textarea>
+                        <td width="100%%">
+                            <table align="center" width="100%%">
+                                <textarea name="comments" rows="8" style="width:100%%;">%(comments)s</textarea>
                             </table>
                         </td>
                     </tr>
@@ -141,11 +138,6 @@
                     </tr>
 				</table>
 			</td>
-        </tr>
-        <tr>
-            <td style="padding-left:25px"><br>
-                <font color="gray"> <%= _("Please note that fields marked with * are mandatory.")%> </font><br>
-            </td>
         </tr>
         <tr>
             <td align="center">

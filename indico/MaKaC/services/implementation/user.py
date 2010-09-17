@@ -27,7 +27,8 @@ from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import info
 
 import time
-from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
+from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil,\
+                            IPersonalInfoFossil
 from MaKaC.common.fossilize import fossilize
 
 from MaKaC.rb_location import CrossLocationQueries
@@ -183,7 +184,7 @@ class UserGetPersonalInfo(LoggedOnlyService):
 
 
     def _getAnswer( self):
-        return DictPickler.pickle(self._target.getPersonalInfo())
+        return self._target.getPersonalInfo().fossilize(IPersonalInfoFossil)
 
 
 class UserGetEmail(LoggedOnlyService):
@@ -216,7 +217,7 @@ class UserSetPersonalInfo(LoggedOnlyService):
         pInfo = self._target.getPersonalInfo()
 
         DictPickler.update(pInfo, self._info)
-        return DictPickler.pickle(pInfo)
+        return pInfo.fossilize(IPersonalInfoFossil)
 
 
 class UserGetTimezone(ServiceBase):

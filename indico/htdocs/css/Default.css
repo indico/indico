@@ -887,6 +887,22 @@ a.confSubSection:hover {
     color: #523D04;
 }
 
+.subDataCaptionFormat {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #777777;
+}
+
+.tdNotSelected {
+    background: #ECECEC;
+}
+
+.tdSelected {
+    background: #CDEB8B;
+}
+
+
+
 .horizontalLine {
    border-top: 1px solid #AAA;
    padding-left: 20px;
@@ -1896,6 +1912,7 @@ div.UIPeopleListDiv { /* for lists of users in forms */
 div.PluginOptionPeopleListDiv {
     border: 1px dashed #CCCCCC;
     min-height: 25px;
+    min-width: 320px;
 }
 
 div.UISearchPeopleListDiv, div.UISuggestedPeopleListDiv {
@@ -2385,6 +2402,10 @@ span.clickableText:hover
     background: transparent;
 }
 
+span.mandatoryField
+{
+    color: #FF0000;
+}
 
 
 a.evtTitle

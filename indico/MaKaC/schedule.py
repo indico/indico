@@ -31,8 +31,6 @@ from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.utils import daysBetween
-from MaKaC.common.PickleJar import Retrieves
-from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -90,8 +88,6 @@ class TimeSchedule(Schedule, Persistent):
     def notifyModification(self):
         self.getOwner().notifyModification()
 
-    @Retrieves(['MaKaC.schedule.TimeSchedule',
-                'MaKaC.schedule.ConferenceSchedule'], 'entries', isPicklableObject=True)
     def getEntries( self ):
         return self._entries
 
@@ -236,16 +232,12 @@ class TimeSchedule(Schedule, Persistent):
     def getStartDate( self ,tz='UTC'):
         return self.getOwner().getAdjustedStartDate(tz)
 
-    @Retrieves(['MaKaC.schedule.TimeSchedule',
-                'MaKaC.schedule.ConferenceSchedule'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate( self, tz=None ):
         return self.getOwner().getAdjustedStartDate(tz)
 
     def getEndDate( self, tz='UTC'):
         return self.getOwner().getAdjustedEndDate(tz)
 
-    @Retrieves(['MaKaC.schedule.TimeSchedule',
-                'MaKaC.schedule.ConferenceSchedule'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate( self, tz=None):
         return self.getOwner().getAdjustedEndDate(tz)
 
@@ -473,10 +465,6 @@ class SchEntry(Persistent, Fossilizable):
     """base schedule entry class. Do NOT instantiate
     """
 
-    @Retrieves(['MaKaC.schedule.SchEntry',
-                'MaKaC.schedule.ContribSchEntry',
-                'MaKaC.schedule.LinkedTimeSchEntry'], 'id',
-               Conversion.locatorString)
     def __init__(self):
         self._sch=None
         self.title = ""
@@ -527,16 +515,12 @@ class SchEntry(Persistent, Fossilizable):
         if data.has_key("description"):
             self.setDescription(data["description"])
 
-    @Retrieves(['MaKaC.schedule.SchEntry',
-                'MaKaC.schedule.BreakTimeSchEntry'], 'title')
     def getTitle( self ):
         return self.title
 
     def setTitle( self, newTitle ):
         self.title = newTitle.strip()
 
-    @Retrieves(['MaKaC.schedule.SchEntry',
-                'MaKaC.schedule.BreakTimeSchEntry'], 'description')
     def getDescription( self ):
         return self.description
 
@@ -952,29 +936,6 @@ class LinkedTimeSchEntry(TimeSchEntry):
 
     fossilizes(ILinkedTimeSchEntryDisplayFossil,
                ILinkedTimeSchEntryMgmtFossil)
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'title', lambda x: x.getOwner().getSession().getTitle())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'slotTitle', lambda x: x.getOwner().getTitle())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'id', Conversion.locatorString)
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionId', lambda x: x.getOwner().getSession().getId())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'sessionSlotId', lambda x: x.getOwner().getId())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'entryType', lambda x: 'Session')
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getSession().getAllMaterialList()))
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'color', lambda x: x.getOwner().getColor())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'textColor', lambda x: x.getOwner().getTextColor())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'isPoster', lambda x: x.getOwner().getSession().getScheduleType() == 'poster')
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getOwner().getRoom()))
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getOwner().getLocation()))
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getOwner().getLocation()))
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'inheritLoc', lambda x: x.getOwner().getOwnLocation() is None)
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'inheritRoom', lambda x: x.getOwner().getOwnRoom() is None)
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'description', lambda x: x.getOwner().getSession().getDescription())
-    @Retrieves (['MaKaC.schedule.LinkedTimeSchEntry'], 'conveners', lambda x: x.getOwner().getOwnConvenerList(), isPicklableObject=True)
-    @Retrieves(['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'conferenceId',
-               lambda x: x.getOwner().getConference().getId())
-    @Retrieves (['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'scheduleEntryId',
-                lambda x: x.getId())
-    @Retrieves (['MaKaC.schedule.ContribSchEntry','MaKaC.schedule.LinkedTimeSchEntry'], 'scheduleEntryType',
-                lambda x: type(x).__name__)
 
     def __init__(self,owner):
         SchEntry.__init__(self)
@@ -984,8 +945,6 @@ class LinkedTimeSchEntry(TimeSchEntry):
     def getStartDate( self ):
         return self.__owner.getStartDate()
 
-    @Retrieves(['MaKaC.schedule.LinkedTimeSchEntry',
-                'MaKaC.schedule.ContribSchEntry'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate( self, tz=None ):
         return self.__owner.getAdjustedStartDate(tz)
 
@@ -999,12 +958,9 @@ class LinkedTimeSchEntry(TimeSchEntry):
     def getEndDate( self ):
         return self.__owner.getEndDate()
 
-    @Retrieves(['MaKaC.schedule.LinkedTimeSchEntry',
-                'MaKaC.schedule.ContribSchEntry'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate( self, tz=None ):
         return self.__owner.getAdjustedEndDate(tz)
 
-    @Retrieves('MaKaC.schedule.LinkedTimeSchEntry', 'duration', Conversion.timedelta)
     def getDuration(self):
         return self.__owner.getDuration()
 
@@ -1014,7 +970,6 @@ class LinkedTimeSchEntry(TimeSchEntry):
         else:
             return self.getOwner().setDuration(hours,minutes,check=check)
 
-    @Retrieves(['MaKaC.schedule.ContribSchEntry'], 'title')
     def getTitle( self ):
         return self.__owner.getTitle()
 
@@ -1083,7 +1038,6 @@ class IndTimeSchEntry(TimeSchEntry):
     def getStartDate( self ):
         return self.startDate
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate( self, tz=None ):
         if not tz:
             tz = self.getTimezone()
@@ -1101,13 +1055,11 @@ class IndTimeSchEntry(TimeSchEntry):
             return None
         return self.startDate+self.duration
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate( self, tz=None ):
         if not tz:
             tz = self.getTimezone()
         return self.getEndDate().astimezone(timezone(tz))
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'duration', Conversion.timedelta)
     def getDuration(self):
         return self.duration
 
@@ -1141,17 +1093,6 @@ class IndTimeSchEntry(TimeSchEntry):
 class BreakTimeSchEntry(IndTimeSchEntry):
 
     fossilizes(IBreakTimeSchEntryFossil, IBreakTimeSchEntryMgmtFossil)
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'entryType', lambda x: 'Break')
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'conferenceId', lambda x: x.getOwner().getConference().getId())
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionId', Conversion.parentSession)
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'sessionSlotId', Conversion.parentSlot)
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'scheduleEntryId', lambda x: x.getId())
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'room', lambda x: Conversion.roomName(x.getRoom()))
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'location', lambda x: Conversion.locationName(x.getLocation()))
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'address', lambda x: Conversion.locationAddress(x.getLocation()))
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritLoc', lambda x: x.getOwnLocation() is None)
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'inheritRoom', lambda x: x.getOwnRoom() is None)
-    @Retrieves (['MaKaC.schedule.BreakTimeSchEntry'], 'id', lambda x:Conversion.locatorString(x)+"b"+x.getId())
 
     def __init__(self):
         IndTimeSchEntry.__init__(self)
@@ -1417,7 +1358,6 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         self._color=newColor
     setBgColor=setColor
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'color')
     def getColor(self):
         try:
             if self._color:
@@ -1430,7 +1370,6 @@ class BreakTimeSchEntry(IndTimeSchEntry):
     def setTextColor(self,newColor):
         self._textColor=newColor
 
-    @Retrieves(['MaKaC.schedule.BreakTimeSchEntry'], 'textColor')
     def getTextColor(self):
         try:
             if self._textColor:
@@ -1461,14 +1400,6 @@ class ContribSchEntry(LinkedTimeSchEntry):
     fossilizes(IContribSchEntryDisplayFossil,
                IContribSchEntryMgmtFossil )
 
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'entryType', lambda x: 'Contribution')
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionId', Conversion.parentSession)
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'sessionSlotId', Conversion.parentSlot)
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'contributionId', lambda x: x.getOwner().getId())
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'material', lambda x: DictPickler.pickle(x.getOwner().getAllMaterialList()))
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'description', lambda x: x.getOwner().getDescription())
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'], 'presenters', lambda x: x.getOwner().getSpeakerList(), isPicklableObject=True)
-
     def __init__(self, owner):
         LinkedTimeSchEntry.__init__(self, owner)
 
@@ -1484,11 +1415,9 @@ class ContribSchEntry(LinkedTimeSchEntry):
             newStatus=ContribStatusSch(self.getOwner())
         self.getOwner().setStatus(newStatus)
 
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'],'room', Conversion.roomName)
     def getRoom(self):
         return self.getOwner().getRoom()
 
-    @Retrieves (['MaKaC.schedule.ContribSchEntry'],'location', Conversion.locationName)
     def getLocation(self):
         return self.getOwner().getLocation()
 

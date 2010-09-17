@@ -26,9 +26,10 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, isTimezoneAware,\
     setAdjustedDate
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.Conversion import Conversion
 from MaKaC.modules.base import ModulesHolder
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.modules import INewsItemFossil
 
 class NewsModule(modules.Module):
     """
@@ -85,9 +86,11 @@ class NewsModule(modules.Module):
     @classmethod
     def getNewsTypesAsDict(self):
         return dict(NewsModule._newsTypes)
-    
-class NewsItem(Persistent):
-    
+
+class NewsItem(Persistent, Fossilizable):
+
+    fossilizes(INewsItemFossil)
+
     def __init__(self, title = "", content="", type = ""):
         self._id = None
         self._creationDate = nowutc()
@@ -96,7 +99,6 @@ class NewsItem(Persistent):
         self._type = type
         self._new = True
 
-    @Retrieves(['MaKaC.modules.news.NewsItem'], 'id')
     def getId(self):
         return self._id
 
@@ -108,32 +110,27 @@ class NewsItem(Persistent):
             self._creationDate = setAdjustedDate(self._creationDate, tz = 'UTC')
         return self._creationDate
 
-    @Retrieves(['MaKaC.modules.news.NewsItem'], 'creationDate', Conversion.datetime)
     def getAdjustedCreationDate(self, tz = 'UTC'):
         return getAdjustedDate(self.getCreationDate(), tz = tz)
 
-    @Retrieves(['MaKaC.modules.news.NewsItem'], 'text')
     def getContent(self):
         return self._content
 
     def setContent(self, content):
         self._content=content
 
-    @Retrieves(['MaKaC.modules.news.NewsItem'], 'title')
     def getTitle(self):
         return self._title
 
     def setTitle(self, title):
         self._title = title
 
-    @Retrieves(['MaKaC.modules.news.NewsItem'], 'type')
     def getType(self):
         return self._type
 
     def setType(self, type):
         self._type = type
 
-    @Retrieves(['MaKaC.modules.news.NewsItem'], 'humanReadableType')
     def getHumanReadableType(self):
         return NewsModule.getNewsTypesAsDict()[self._type]
 

@@ -2,7 +2,7 @@
 
 # maybe all of this should be moved to the W* class?
 
-from MaKaC.fossils.conference import IConferenceMinimalFossil
+from MaKaC.fossils.conference import IConferenceFossil
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.displayMgr as displayMgr
@@ -229,7 +229,7 @@ function removeItem(number, form)
     form.submit();
 }
 
-var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceMinimalFossil, tz=confObj.getTimezone())) %>;
+var confFossile = <%= jsonEncode(confObj.fossilize(IConferenceFossil, tz=confObj.getTimezone())) %>;
 
 <%= macros.genericField(macros.FIELD_TEXT, 'inPlaceEditTitle', 'event.main.changeTitle', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh) %>
 

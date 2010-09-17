@@ -28,10 +28,14 @@ from MaKaC.fossils.contribution import IContributionParticipationFossil,\
     IContributionWithSubContribsFossil,\
     IContributionParticipationTTDisplayFossil, \
     IContributionParticipationTTMgmtFossil
-from MaKaC.fossils.conference import IConferenceMinimalFossil,\
-    ISessionFossil, ISessionSlotFossil, IMaterialFossil,\
-    IConferenceParticipationFossil, IResourceFossil, ILinkFossil,\
-    ILocalFileFossil, IConferenceParticipationMinimalFossil
+from MaKaC.fossils.conference import IConferenceMinimalFossil, \
+    IConferenceEventInfoFossil, IConferenceFossil,\
+    ISessionFossil, ISessionSlotFossil, IMaterialMinimalFossil,\
+    IMaterialFossil, IConferenceParticipationFossil,\
+    IResourceMinimalFossil, ILinkMinimalFossil, ILocalFileMinimalFossil,\
+    IResourceFossil, ILinkFossil, ILocalFileFossil,\
+    ILocalFileExtendedFossil, IConferenceParticipationMinimalFossil,\
+    ICategoryFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 import re, os
@@ -80,11 +84,8 @@ from MaKaC.common.cache import CategoryCache, EventCache
 from MaKaC.common import mail
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.i18n import _
-from MaKaC.common.PickleJar import Retrieves
 from MaKaC.common.PickleJar import Updates
 from MaKaC.common.PickleJar import if_else
-from MaKaC.common.PickleJar import DictPickler
-from MaKaC.common.Conversion import Conversion
 
 from MaKaC.webinterface import urlHandlers
 
@@ -194,7 +195,9 @@ class CategoryManager( ObjectHolder ):
 
 
 
-class Category(Persistent, CommonObjectBase):
+class Category(Persistent, CommonObjectBase, Fossilizable):
+
+    fossilizes(ICategoryFossil)
 
     def __init__( self ):
 
@@ -770,7 +773,6 @@ class Category(Persistent, CommonObjectBase):
     def setOrder( self, order ):
         self._order = order
 
-    @Retrieves(["MaKaC.conference.Category"], 'id')
     def getId( self ):
         return self.id
 
@@ -844,7 +846,6 @@ class Category(Persistent, CommonObjectBase):
 
         self.notifyOAIModification()
 
-    @Retrieves(["MaKaC.conference.Category"], 'name')
     def getName( self ):
         return self.name
 
@@ -1571,9 +1572,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
 
     fossilizes(IConferenceParticipationFossil, IConferenceParticipationMinimalFossil)
 
-    @Retrieves(['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'isConfParticipation', lambda x: True)
     def __init__(self):
         self._firstName=""
         self._surName=""
@@ -1613,9 +1611,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
     def setId(self, newId):
         self._id = newId
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'id')
     def getId( self ):
         return self._id
 
@@ -1663,9 +1658,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._firstName=tmp
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'firstName')
     def getFirstName( self ):
         return self._firstName
 
@@ -1679,9 +1671,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._surName=tmp
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'familyName')
     def getFamilyName( self ):
         return self._surName
 
@@ -1695,9 +1684,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._email=newMail.strip()
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'email')
     def getEmail( self ):
         return self._email
 
@@ -1708,9 +1694,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._affiliation=newAffil.strip()
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'affiliation')
     def getAffiliation(self):
         return self._affiliation
 
@@ -1721,9 +1704,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._address=newAddr.strip()
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'address')
     def getAddress(self):
         return self._address
 
@@ -1734,9 +1714,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._phone=newPhone.strip()
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'phone')
     def getPhone(self):
         return self._phone
 
@@ -1747,9 +1724,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._title=newTitle.strip()
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'title')
     def getTitle(self):
         return self._title
 
@@ -1760,15 +1734,9 @@ class ConferenceParticipation(Persistent, Fossilizable):
         self._fax=newFax.strip()
         self._notifyModification()
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'fax')
     def getFax(self):
         return self._fax
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'fullName')
     def getFullName( self ):
         res = self.getFamilyName()
         if self.getFirstName() != "":
@@ -1780,9 +1748,6 @@ class ConferenceParticipation(Persistent, Fossilizable):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
-    @Retrieves (['MaKaC.conference.ConferenceParticipation',
-                 'MaKaC.conference.SessionChair',
-                 'MaKaC.conference.SlotChair'], 'name')
     def getFullNameNoTitle( self ):
         res = self.getFamilyName()
         if self.getFirstName() != "":
@@ -2032,15 +1997,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         (ex: contributions, sessions, ...).
     """
 
-    fossilizes(IConferenceMinimalFossil)
-
-    #TODO: Move to fossilize! (Some conference fossiles already available)
-
-    @Retrieves ('MaKaC.conference.Conference', 'displayURL', lambda conf: str(urlHandlers.UHConferenceDisplay.getURL(conf)))
-    @Retrieves ('MaKaC.conference.Conference', 'modifURL', lambda conf: str(urlHandlers.UHConferenceModification.getURL(conf)))
-    @Retrieves(['MaKaC.conference.Conference'], 'sessions', lambda conf: DictPickler.pickle(Conversion.sessionList(conf)))
-    @Retrieves(['MaKaC.conference.Conference'], 'isConference', lambda x : x.getType() == 'conference')
-
+    fossilizes(IConferenceFossil, IConferenceMinimalFossil, IConferenceEventInfoFossil)
 
     def __init__(self, creator, id="", creationDate = None, modificationDate = None):
         """Class constructor. Initialise the class attributes to the default
@@ -2721,7 +2678,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         creator.linkTo(self, "creator")
         self.__creator = creator
 
-    @Retrieves(["MaKaC.conference.Conference"], 'id')
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
         return self.id
@@ -3017,7 +2973,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     # Fermi timezone awareness        #
     ###################################
 
-    @Retrieves(['MaKaC.conference.Conference'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
@@ -3125,7 +3080,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     # Fermi timezone awareness       #
     ##################################
 
-    @Retrieves(['MaKaC.conference.Conference'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
@@ -3219,7 +3173,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     # Fermi timezone awareness(end)    #
     ####################################
 
-    @Retrieves("MaKaC.conference.Conference", 'title')
     def getTitle(self):
         """returns (String) the title of the conference"""
         return self.title
@@ -3405,8 +3358,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     def getOwnLocation( self ):
         return self.getLocation()
 
-    @Retrieves(['MaKaC.conference.Conference'], 'location', Conversion.locationName)
-    @Retrieves(['MaKaC.conference.Conference'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if len(self.places)>0:
             return self.places[0]
@@ -3425,7 +3376,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
     def getOwnRoom( self ):
         return self.getRoom()
 
-    @Retrieves(['MaKaC.conference.Conference'], 'room', Conversion.roomName)
     def getRoom( self ):
         if len(self.rooms)>0:
             return self.rooms[0]
@@ -3448,7 +3398,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         """
         return self.places
 
-    @Retrieves(['MaKaC.conference.Conference'], 'favoriteRooms')
     def getFavoriteRooms(self):
         roomList = []
         roomList.extend(self.getRoomList())
@@ -5474,7 +5423,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
 
     fossilizes(ISessionFossil)
 
-    @Retrieves(['MaKaC.conference.Session'], 'numSlots', lambda x : len(x.getSlotList()))
 
     def __init__(self, **sessionData):
         """Class constructor. Initialise the class attributes to the default
@@ -5711,7 +5659,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
     def getOwner( self ):
         return self.getConference()
 
-    @Retrieves (['MaKaC.conference.Session'],'id')
     def getId( self ):
         return self.id
 
@@ -6005,7 +5952,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
         self.title = newTitle
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Session'],'title')
     def getTitle( self ):
         return self.title
 
@@ -6027,7 +5973,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
     def setCode(self,newCode):
         self._code=str(newCode).strip()
 
-    @Retrieves (['MaKaC.conference.Session'],'color')
     def getColor(self):
         try:
             if self._color:
@@ -6066,7 +6011,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
     def getStartDate(self):
         return self.startDate
 
-    @Retrieves(['MaKaC.conference.Session'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
@@ -6260,8 +6204,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
         """
         return self.getConference()
 
-    @Retrieves(['MaKaC.conference.Session'], 'location', Conversion.locationName)
-    @Retrieves(['MaKaC.conference.Session'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -6285,7 +6227,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
             self.places.append( newLocation )
         self.notifyModification()
 
-    @Retrieves(['MaKaC.conference.Session'], 'room', Conversion.roomName)
     def getRoom( self ):
         if self.getOwnRoom():
             return self.getOwnRoom()
@@ -6331,7 +6272,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
                 newConv.setDataFromAvatar(oc)
                 self._addConvener(newConv)
 
-    @Retrieves (['MaKaC.conference.Session'], 'sessionConveners', isPicklableObject=True)
     def getConvenerList(self):
         self._resetConveners()
         return self._conveners
@@ -6692,7 +6632,6 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
             return self.materials[ matId ]
         return None
 
-    @Retrieves (['MaKaC.conference.Session'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 
@@ -7256,7 +7195,6 @@ class SessionSlot(Persistent, Fossilizable):
     def getName(self):
         return "slot %s"%self.getId()
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'description')
     def getDescription(self):
         return self.getSession().getDescription()
 
@@ -7357,7 +7295,6 @@ class SessionSlot(Persistent, Fossilizable):
     def getStartDate( self ):
         return self.startDate
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'startDate', Conversion.datetime)
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
@@ -7370,7 +7307,6 @@ class SessionSlot(Persistent, Fossilizable):
             return None
         return self.startDate+self.duration
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'endDate', Conversion.datetime)
     def getAdjustedEndDate( self, tz=None ):
         if not tz:
             tz = self.getConference().getTimezone()
@@ -7455,8 +7391,6 @@ class SessionSlot(Persistent, Fossilizable):
         """
         return self.session
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'location', Conversion.locationName)
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'address', Conversion.locationAddress)
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -7480,7 +7414,6 @@ class SessionSlot(Persistent, Fossilizable):
             self.places.append( newLocation )
         self.notifyModification()
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'room', Conversion.roomName)
     def getRoom( self ):
         if self.getOwnRoom():
             return self.getOwnRoom()
@@ -7570,7 +7503,6 @@ class SessionSlot(Persistent, Fossilizable):
                 return conv
         return None
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'convenerList', isPicklableObject=True)
     def getOwnConvenerList(self):
         try:
             if self._conveners:
@@ -7584,14 +7516,12 @@ class SessionSlot(Persistent, Fossilizable):
             self._conveners.pop()
         self.notifyModification()
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'color')
     def getColor(self):
         res=""
         if self.getSession() is not None:
             res=self.getSession().getColor()
         return res
 
-    @Retrieves(['MaKaC.conference.SessionSlot'], 'textColor')
     def getTextColor(self):
         res=""
         if self.getSession() is not None:
@@ -7693,7 +7623,6 @@ class ContributionParticipation(Persistent, Fossilizable):
     def setId(self, newId):
         self._id = newId
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'id')
     def getId( self ):
         return self._id
 
@@ -7736,7 +7665,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._index()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'firstName')
     def getFirstName( self ):
         return self._firstName
 
@@ -7754,7 +7682,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._index()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'familyName')
     def getFamilyName( self ):
         return self._surName
 
@@ -7772,7 +7699,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._index()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'email')
     def getEmail( self ):
         return self._email
 
@@ -7781,7 +7707,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._affiliation = newAffil.strip()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'affiliation')
     def getAffiliation( self ):
         if self._affiliation.lower() == "unknown":
             return ""
@@ -7792,7 +7717,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._address = newAddr.strip()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'address')
     def getAddress( self ):
         return self._address
 
@@ -7801,7 +7725,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._phone = newPhone.strip()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'telephone')
     def getPhone( self ):
         return self._phone
 
@@ -7810,7 +7733,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._title = newTitle.strip()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'title')
     def getTitle( self ):
         return self._title
 
@@ -7819,7 +7741,6 @@ class ContributionParticipation(Persistent, Fossilizable):
         self._fax = newFax.strip()
         self._notifyModification()
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'fax')
     def getFax( self ):
         try:
             if self._fax:
@@ -7835,7 +7756,6 @@ class ContributionParticipation(Persistent, Fossilizable):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'fullName')
     def getFullName( self ):
         res = self.getFamilyName().upper()
         if self.getFirstName() != "":
@@ -7847,7 +7767,6 @@ class ContributionParticipation(Persistent, Fossilizable):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
-    @Retrieves ('MaKaC.conference.ContributionParticipation', 'name')
     def getFullNameNoTitle( self ):
         res = self.getFamilyName().upper()
         if self.getFirstName() != "":
@@ -8064,8 +7983,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'reviewManager', isPicklableObject=True)
     def getReviewManager(self):
         if not hasattr(self, "_reviewManager"):
             self._reviewManager = ReviewManager(self)
@@ -8572,8 +8489,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
     def setId( self, newId ):
         self._setId(newId)
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'id')
     def getId( self ):
         return self.id
 
@@ -8586,8 +8501,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         self.title = newTitle.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'title')
     def getTitle( self ):
         if self.title.strip() == "":
             return "(no title)"
@@ -8626,8 +8539,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
     def getConference( self ):
         return self.parent
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'session', isPicklableObject=True)
     def getSession( self ):
         try:
             if self._session:
@@ -8679,8 +8590,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             return self.getSchEntry().getSchedule().getOwner()
         return self.getOwner()
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'location', lambda l: l and l.getName())
     def getLocation( self ):
         if self.getOwnLocation():
             return self.getOwnLocation()
@@ -8696,8 +8605,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         self.place = newLocation
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'room', lambda r: r and r.getName())
     def getRoom( self ):
         if self.getOwnRoom():
             return self.getOwnRoom()
@@ -9202,8 +9109,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             self._speakers = []
         return part in self._speakers
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'speakerList', isPicklableObject=True)
     def getSpeakerList ( self ):
         """
         """
@@ -9477,7 +9382,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             return self.materials[ matId ]
         return None
 
-    @Retrieves (['MaKaC.conference.Contribution'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 
@@ -9700,8 +9604,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'track', isPicklableObject=True)
     def getTrack( self ):
         try:
             if self._track:
@@ -9727,9 +9629,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
     def setType( self, newType ):
         self._type = newType
 
-    @Retrieves (['MaKaC.conference.Contribution',
-                 'MaKaC.conference.AcceptedContribution'],'type',
-                isPicklableObject = True)
     def getType( self ):
         try:
             if self._type:
@@ -9927,14 +9826,12 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         else:
             return maxDatetime()
 
-    @Retrieves(['MaKaC.conference.Contribution'], 'color')
     def getColor(self):
         res=""
         if self.getSession() is not None:
             res=self.getSession().getColor()
         return res
 
-    @Retrieves(['MaKaC.conference.Contribution'], 'textColor')
     def getTextColor(self):
         res=""
         if self.getSession() is not None:
@@ -10771,7 +10668,6 @@ class SubContribution(Persistent, Fossilizable, CommonObjectBase):
             return self.materials[ matId ]
         return None
 
-    @Retrieves (['MaKaC.conference.SubContribution'],'material', isPicklableObject=True)
     def getMaterialList( self ):
         return self.materials.values()
 
@@ -11009,7 +10905,7 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
             by their unique relative id.
     """
 
-    fossilizes(IMaterialFossil)
+    fossilizes(IMaterialMinimalFossil, IMaterialFossil)
 
     def __init__( self, materialData=None ):
         self.id = "not assigned"
@@ -11113,12 +11009,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
     def setId( self, newId ):
         self.id = str(newId).strip()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'],'id')
     def getId( self ):
         return self.id
 
@@ -11170,12 +11060,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.title = newTitle.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'],'title')
     def getTitle( self ):
         return self.title
 
@@ -11183,12 +11067,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.description = newDescription.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'description')
     def getDescription( self ):
         return self.description
 
@@ -11196,21 +11074,9 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.type = newType.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'type')
     def getType( self ):
         return self.type
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'subjectToReviewing')
     def isSubjectToReviewing(self):
         """ Returns if a material is subject to reviewing.
             This only has sense if the material belongs to a contribuion. Otherwise, the returned value is None.
@@ -11225,12 +11091,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         else:
             return None
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'reviewingState')
     def getReviewingState(self):
         """ Returns the reviewing state of a material.
             The state is represented by an integer:
@@ -11294,11 +11154,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.notifyModification()
         Logger.get('storage').debug("Finished storing resource %s for material %s" % (newRes.getId(), self.getLocator()))
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'],'resources', isPicklableObject = True)
     def getResourceList( self ):
         list = self.__resources.values()
         list.sort(utils.sortFilesByName)
@@ -11325,12 +11180,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         recRes.recover()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'mainResource', isPicklableObject = True)
     def getMainResource(self):
         try:
             if self._mainResource:
@@ -11370,26 +11219,12 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         # tells if a material is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'protection')
-
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
 
     def isItselfProtected( self ):
         return self.__ac.isItselfProtected()
 
-
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'protectedOwner')
     def hasProtectedOwner( self ):
         if self.getOwner() != None:
             return self.getOwner().isProtected()
@@ -11400,12 +11235,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self.updateFullyPublic()
         self._p_changed = 1
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'hidden')
     def isHidden( self ):
         return self.__ac.isHidden()
 
@@ -11418,12 +11247,6 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         self._p_changed = 1
         self.resetAccessCache()
 
-    @Retrieves (['MaKaC.conference.Material',
-                 'MaKaC.conference.Minutes',
-                 'MaKaC.conference.Paper',
-                 'MaKaC.conference.Slides',
-                 'MaKaC.conference.Video',
-                 'MaKaC.conference.Poster'], 'accessKey')
     def getAccessKey( self ):
         return self.__ac.getAccessKey()
 
@@ -11712,7 +11535,6 @@ class Minutes(Material):
             return ""
         return self.file.readBin()
 
-    @Retrieves (['MaKaC.conference.Minutes'],'resources', isPicklableObject = True)
     def getResourceList( self ):
         res = Material.getResourceList( self )
         if self.file:
@@ -11760,11 +11582,8 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
             current resource is included.
     """
 
-    fossilizes(IResourceFossil)
+    fossilizes(IResourceMinimalFossil, IResourceFossil)
 
-    @Retrieves (['MaKaC.conference.Link',
-                 'MaKaC.conference.LocalFile'], 'type', lambda r: if_else(type(r) == Link , 'external', 'stored'))
-    @Retrieves ('MaKaC.conference.LocalFile', 'url', lambda r: str(urlHandlers.UHFileAccess.getURL(r)))
     def __init__( self, resData = None ):
         self.id = "not assigned"
         self.name = ""
@@ -11801,8 +11620,6 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
     def setId( self, newId ):
         self.id = newId.strip()
 
-    @Retrieves (['MaKaC.conference.Link',
-                 'MaKaC.conference.LocalFile'],'id')
     def getId( self ):
         return self.id
 
@@ -11853,8 +11670,6 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
         self.name = newName.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Link',
-                 'MaKaC.conference.LocalFile'], 'name')
     def getName( self ):
         return self.name
 
@@ -11864,8 +11679,6 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
         self.description = newDesc.strip()
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Link',
-                 'MaKaC.conference.LocalFile'], 'description')
     def getDescription( self ):
         return self.description
 
@@ -11904,8 +11717,6 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
         # tells if a resource is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
-    @Retrieves (['MaKaC.conference.Link',
-                 'MaKaC.conference.LocalFile'], 'protection')
     def getAccessProtectionLevel( self ):
         return self.__ac.getAccessProtectionLevel()
 
@@ -12075,9 +11886,6 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
         return False
 
 
-    @Retrieves (['MaKaC.conference.Resource',
-                 'MaKaC.conference.Link',
-                 'MaKaC.conference.LocalFile'], 'reviewingState')
     def getReviewingState(self):
         """ Returns the reviewing state of a resource, which is the reviewing state of the material to which it belongs.
             The state is represented by an integer:
@@ -12103,7 +11911,7 @@ class Link(Resource):
         url -- (string) Contains the URL to the internet target resource.
     """
 
-    fossilizes(ILinkFossil)
+    fossilizes(ILinkMinimalFossil, ILinkFossil)
 
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )
@@ -12114,7 +11922,6 @@ class Link(Resource):
         self.url = newURL.strip()
         self.notifyModification()
 
-    @Retrieves ('MaKaC.conference.Link','url')
     def getURL( self ):
         return self.url
 
@@ -12142,7 +11949,7 @@ class LocalFile(Resource):
             inside the repository where it is archived.
     """
 
-    fossilizes(ILocalFileFossil)
+    fossilizes(ILocalFileMinimalFossil, ILocalFileFossil, ILocalFileExtendedFossil)
 
     def __init__( self, resData = None ):
         Resource.__init__( self, resData )
@@ -12175,11 +11982,9 @@ class LocalFile(Resource):
             newFileName = newFileName.split("\\")[-1]
         self.fileName = newFileName.strip().replace(" ", "_")
 
-    @Retrieves ('MaKaC.conference.LocalFile','file.fileName')
     def getFileName( self ):
         return self.fileName
 
-    @Retrieves ('MaKaC.conference.LocalFile','file.fileType')
     def getFileType( self ):
         fileExtension = os.path.splitext( self.getFileName() )[1]
         if fileExtension != "":
@@ -12197,7 +12002,6 @@ class LocalFile(Resource):
             raise Exception( _("File does not exist : %s")%filePath.strip())
         self.filePath = filePath.strip()
 
-    @Retrieves ('MaKaC.conference.LocalFile','file.creationDate', lambda r: r.strftime("%d.%m.%Y %H:%M:%S"))
     def getCreationDate( self):
         return self.__repository.getCreationDate(self.__archivedId)
 
@@ -12206,7 +12010,6 @@ class LocalFile(Resource):
             return self.filePath
         return self.__repository.getFilePath(self.__archivedId)
 
-    @Retrieves ('MaKaC.conference.LocalFile','file.fileSize')
     def getSize( self ):
         if not self.isArchived():
             return int(os.stat(self.getFilePath())[stat.ST_SIZE])
@@ -12454,7 +12257,6 @@ class Track(Persistent):
     def setId( self, newId ):
         self.id = str(newId)
 
-    @Retrieves (['MaKaC.conference.Track'],'id')
     def getId( self ):
         return self.id
 
@@ -12462,7 +12264,6 @@ class Track(Persistent):
         self.title = newTitle
         self.notifyModification()
 
-    @Retrieves (['MaKaC.conference.Track'],'title')
     def getTitle( self ):
         return self.title
 
@@ -12801,14 +12602,12 @@ class ContributionType(Persistent):
         self._description = description
         self._conference = conference
 
-    @Retrieves(["MaKaC.conference.ContributionType"], 'id')
     def getId(self):
         return self._id
 
     def setId(self, id):
         self._id = id
 
-    @Retrieves(["MaKaC.conference.ContributionType"], 'name')
     def getName(self):
         return self._name
 

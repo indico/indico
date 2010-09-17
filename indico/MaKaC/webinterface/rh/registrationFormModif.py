@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import MaKaC.webinterface.urlHandlers as urlHandlers 
+import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from MaKaC.registration import AccommodationType, SocialEventItem, RegistrationSession, GeneralSectionForm, GeneralField, FieldInputs, RadioItem, Status, StatusValue
@@ -28,7 +28,7 @@ from MaKaC.common import utils
 from MaKaC.i18n import _
 
 class RHRegistrationFormModifBase( conferenceModif.RHConferenceModifBase ):
-    
+
     def _checkProtection( self ):
         if not self._target.canManageRegistration(self.getAW().getUser()):
             conferenceModif.RHConferenceModifBase._checkProtection(self)
@@ -36,7 +36,7 @@ class RHRegistrationFormModifBase( conferenceModif.RHConferenceModifBase ):
             raise ConferenceClosedError(self._target.getConference())
         if not self._conf.hasEnabledSection("regForm"):
             raise MaKaCError( _("The registration form was disabled by the conference managers"))
-        
+
 
 class RHRegistrationPreview ( RHRegistrationFormModifBase ):
 
@@ -46,17 +46,17 @@ class RHRegistrationPreview ( RHRegistrationFormModifBase ):
 
 class RHRegistrationFormModif( RHRegistrationFormModifBase ):
     _uh = urlHandlers.UHConfModifRegForm
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegForm( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifChangeStatus( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._newStatus = params["changeTo"]
-    
+
     def _process( self ):
         regForm = self._conf.getRegistrationForm()
         if self._newStatus == "True":
@@ -64,9 +64,9 @@ class RHRegistrationFormModifChangeStatus( RHRegistrationFormModifBase ):
         else:
             regForm.deactivate()
         self._redirect(urlHandlers.UHConfModifRegForm.getURL(self._conf))
-            
+
 class RHRegistrationFormModifDataModification( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormDataModification( self, self._conf )
         return p.display()
@@ -76,7 +76,7 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
-        
+
     def _process( self ):
         if not self._cancel:
             regForm = self._conf.getRegistrationForm()
@@ -119,13 +119,13 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
         self._redirect(urlHandlers.UHConfModifRegForm.getURL(self._conf))
 
 class RHRegistrationFormModifSessions( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormSessions( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifSessionsDataModif( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormSessionsDataModif( self, self._conf )
         return p.display()
@@ -135,7 +135,7 @@ class RHRegistrationFormModifSessionsPerformDataModif( RHRegistrationFormModifBa
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             ses = self._conf.getRegistrationForm().getSessionsForm()
@@ -143,7 +143,7 @@ class RHRegistrationFormModifSessionsPerformDataModif( RHRegistrationFormModifBa
         self._redirect(urlHandlers.UHConfModifRegFormSessions.getURL(self._conf))
 
 class RHRegistrationFormModifSessionsAdd( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormSessionsAdd( self, self._conf )
         return p.display()
@@ -154,7 +154,7 @@ class RHRegistrationFormModifSessionsPerformAdd( RHRegistrationFormModifBase ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
         self._sessionIds = self._normaliseListParam(params.get("sessionIds", []))
-    
+
     def _process( self ):
         if not self._cancel:
             sesForm = self._conf.getRegistrationForm().getSessionsForm()
@@ -173,7 +173,7 @@ class RHRegistrationFormModifSessionsRemove( RHRegistrationFormModifBase ):
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._sessionsIds = self._normaliseListParam(params.get("sessionIds", []))
-    
+
     def _process( self ):
         ses = self._conf.getRegistrationForm().getSessionsForm()
         for name in self._sessionsIds:
@@ -181,13 +181,13 @@ class RHRegistrationFormModifSessionsRemove( RHRegistrationFormModifBase ):
         self._redirect(urlHandlers.UHConfModifRegFormSessions.getURL(self._conf))
 
 class RHRegistrationFormModifAccommodation( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormAccommodation( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifAccommodationDataModif( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormAccommodationDataModif( self, self._conf )
         return p.display()
@@ -197,7 +197,7 @@ class RHRegistrationFormModifAccommodationPerformDataModif( RHRegistrationFormMo
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             acco = self._conf.getRegistrationForm().getAccommodationForm()
@@ -205,20 +205,20 @@ class RHRegistrationFormModifAccommodationPerformDataModif( RHRegistrationFormMo
         self._redirect(urlHandlers.UHConfModifRegFormAccommodation.getURL(self._conf))
 
 class RHRegistrationFormModifAccommodationTypeAdd( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormAccommodationTypeAdd( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifAccommodationTypePerformAdd( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
         self._caption = params.get("caption", "")
         if not self._cancel and self._caption.strip() == "":
             raise FormValuesError("You must introduce a caption")
-    
+
     def _process( self ):
         if not self._cancel:
             acco = self._conf.getRegistrationForm().getAccommodationForm()
@@ -231,12 +231,12 @@ class RHRegistrationFormModifAccommodationTypePerformAdd( RHRegistrationFormModi
 class RHRegistrationFormModifAccommodationTypeRemove( RHRegistrationFormModifBase ):
     _uh = urlHandlers.UHConfModifRegFormAccommodationTypeRemove
     _accoTypeIds = []
-    
-    def __init__(self, req):   
+
+    def __init__(self, req):
         RHRegistrationFormModifBase.__init__(self,req)
         self._confirm = ""
         self._cancel = ""
-        
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._accoTypeIds = self._normaliseListParam(params.get("accommodationType", []))
@@ -248,7 +248,7 @@ class RHRegistrationFormModifAccommodationTypeRemove( RHRegistrationFormModifBas
             if self._cancel:
                 pass
             elif self._confirm:
-                acco = self._conf.getRegistrationForm().getAccommodationForm()            
+                acco = self._conf.getRegistrationForm().getAccommodationForm()
                 for id in self._accoTypeIds:
                     accoType = acco.getAccommodationTypeById(id)
                     acco.removeAccommodationType(accoType)
@@ -269,7 +269,7 @@ class RHRegistrationFormAccommodationTypeModify( RHRegistrationFormModifBase ):
         RHRegistrationFormModifBase._checkParams( self, params )
         accoTypeId = params.get("accoTypeId", "")
         self._accoType = self._conf.getRegistrationForm().getAccommodationForm().getAccommodationTypeById(accoTypeId)
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormAccommodationTypeModify( self, self._conf, self._accoType )
         return p.display()
@@ -281,20 +281,20 @@ class RHRegistrationFormAccommodationTypePerformModify( RHRegistrationFormModifB
         accoTypeId = params.get("accoTypeId", "")
         self._accoType = self._conf.getRegistrationForm().getAccommodationForm().getAccommodationTypeById(accoTypeId)
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             self._accoType.setValues(self._getRequestParams())
         self._redirect(urlHandlers.UHConfModifRegFormAccommodation.getURL(self._conf))
 
 class RHRegistrationFormModifFurtherInformation( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormFurtherInformation( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifFurtherInformationDataModif( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormFurtherInformationDataModif( self, self._conf )
         return p.display()
@@ -304,7 +304,7 @@ class RHRegistrationFormModifFurtherInformationPerformDataModif( RHRegistrationF
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             fi = self._conf.getRegistrationForm().getFurtherInformationForm()
@@ -312,13 +312,13 @@ class RHRegistrationFormModifFurtherInformationPerformDataModif( RHRegistrationF
         self._redirect(urlHandlers.UHConfModifRegFormFurtherInformation.getURL(self._conf))
 
 class RHRegistrationFormModifReasonParticipation( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormReasonParticipation( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifReasonParticipationDataModif( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormReasonParticipationDataModif( self, self._conf )
         return p.display()
@@ -328,7 +328,7 @@ class RHRegistrationFormModifReasonParticipationPerformDataModif( RHRegistration
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             rp = self._conf.getRegistrationForm().getReasonParticipationForm()
@@ -336,13 +336,13 @@ class RHRegistrationFormModifReasonParticipationPerformDataModif( RHRegistration
         self._redirect(urlHandlers.UHConfModifRegFormReasonParticipation.getURL(self._conf))
 
 class RHRegistrationFormModifSocialEvent( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormSocialEvent( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifSocialEventDataModif( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormSocialEventDataModif( self, self._conf )
         return p.display()
@@ -352,7 +352,7 @@ class RHRegistrationFormModifSocialEventPerformDataModif( RHRegistrationFormModi
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             se = self._conf.getRegistrationForm().getSocialEventForm()
@@ -360,20 +360,20 @@ class RHRegistrationFormModifSocialEventPerformDataModif( RHRegistrationFormModi
         self._redirect(urlHandlers.UHConfModifRegFormSocialEvent.getURL(self._conf))
 
 class RHRegistrationFormModifSocialEventAdd( RHRegistrationFormModifBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormSocialEventAdd( self, self._conf )
         return p.display()
 
 class RHRegistrationFormModifSocialEventPerformAdd( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
         self._caption = params.get("caption", "")
         if not self._cancel and self._caption.strip() == "":
             raise FormValuesError("You must introduce a caption")
-    
+
     def _process( self ):
         if not self._cancel:
             se = self._conf.getRegistrationForm().getSocialEventForm()
@@ -387,18 +387,18 @@ class RHRegistrationFormModifSocialEventPerformAdd( RHRegistrationFormModifBase 
 class RHRegistrationFormModifSocialEventRemove( RHRegistrationFormModifBase ):
     _uh = urlHandlers.UHConfModifRegFormSocialEventRemove
     _socialEventIds = []
-        
+
     def __init__(self,params):
         RHRegistrationFormModifBase.__init__(self,params)
         self._cancel = ""
         self._confirm = ""
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._socialEventIds = self._normaliseListParam(params.get("socialEvents", []))
         self._confirm = params.has_key( "confirm" )
         self._cancel = params.has_key( "cancel" )
-    
+
     def _process( self ):
         if self._socialEventIds != []:
             if self._cancel:
@@ -425,7 +425,7 @@ class RHRegistrationFormSocialEventItemModify( RHRegistrationFormModifBase ):
         RHRegistrationFormModifBase._checkParams( self, params )
         socialEventId = params.get("socialEventId", "")
         self._socialEventItem = self._conf.getRegistrationForm().getSocialEventForm().getSocialEventById(socialEventId)
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormSocialEventItemModify( self, self._conf, self._socialEventItem )
         return p.display()
@@ -437,55 +437,55 @@ class RHRegistrationFormSocialEventItemPerformModify( RHRegistrationFormModifBas
         socialEventId = params.get("socialEventId", "")
         self._socialEventItem = self._conf.getRegistrationForm().getSocialEventForm().getSocialEventById(socialEventId)
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             self._socialEventItem.setValues(self._getRequestParams())
         self._redirect(urlHandlers.UHConfModifRegFormSocialEvent.getURL(self._conf))
 
 class RHRegistrationFormModifEnableSection( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._section = params.get("section", "")
-    
+
     def _process( self ):
         section = self._conf.getRegistrationForm().getSectionById(self._section)
         if section is not None:
             section.setEnabled(not section.isEnabled())
-        self._redirect(urlHandlers.UHConfModifRegForm.getURL(self._conf))
+        self._redirect(str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#sections", True)
 
 
 class RHRegistrationFormModifEnablePersonalField( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._personalfield = params.get("personalfield", "")
-    
+
     def _process( self ):
         pdfield = self._conf.getRegistrationForm().getPersonalData().getDataItem(self._personalfield)
         if pdfield is not None:
             pdfield.setEnabled(not pdfield.isEnabled())
         url = str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#personalfields"
-        self._redirect(url)
+        self._redirect(url, True)
 
 
 class RHRegistrationFormModifSwitchPersonalField( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._personalfield = params.get("personalfield", "")
-    
+
     def _process( self ):
         pdfield = self._conf.getRegistrationForm().getPersonalData().getDataItem(self._personalfield)
         if pdfield is not None:
             pdfield.setMandatory(not pdfield.isMandatory())
         url = str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#personalfields"
-        self._redirect(url)
-        
+        self._redirect(url, True)
+
 
 class RHRegistrationFormActionSection( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._action=None
@@ -493,9 +493,9 @@ class RHRegistrationFormActionSection( RHRegistrationFormModifBase ):
             self._action=_ActionNewSection(self, self._conf)
         if params.has_key("removeSection"):
             self._action=_ActionRemoveSection(self, self._conf, params)
-        if params.has_key("oldpos") and params["oldpos"]!='':    
+        if params.has_key("oldpos") and params["oldpos"]!='':
             self._action = _ActionMoveSection( self, self._conf, params)
-        
+
     def _process( self ):
         if self._action is not None:
             r=self._action.perform()
@@ -508,7 +508,7 @@ class _ActionNewSection:
     def __init__(self, rh, conf):
         self._rh=rh
         self._conf=conf
-    
+
     def perform( self ):
         self._conf.getRegistrationForm().addGeneralSectionForm(GeneralSectionForm(self._conf.getRegistrationForm()))
 
@@ -518,7 +518,7 @@ class _ActionRemoveSection:
         self._conf=conf
         self._rh=rh
         self._params=params
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self._rh, params )
         self._confirm = params.has_key( "confirm" )
@@ -527,7 +527,7 @@ class _ActionRemoveSection:
         self._sections = []
         for id in self.sects:
             self._sections.append(self._conf.getRegistrationForm().getGeneralSectionFormById(id))
-    
+
     def perform( self ):
         self._checkParams(self._params)
         if not self._cancel and self._sections!=[]:
@@ -573,18 +573,18 @@ class _ActionMoveField:
 
 class _RemoveFields:
     def __init__(self,gsf,fields):
-        self._gsf = gsf 
+        self._gsf = gsf
         self._fields = fields
 
-    def perform(self):   
+    def perform(self):
         if type(self._fields) == type('string'):
             field = self._gsf.getFieldById(self._fields)
             self._gsf.removeField(field)
-        elif self._fields is not None: 
+        elif self._fields is not None:
             for fieldID in self._fields:
                 field = self._gsf.getFieldById(fieldID)
                 self._gsf.removeField(field)
-            
+
 
 
 class RHRegistrationFormModifGeneralSectionBase( RHRegistrationFormModifBase ):
@@ -594,27 +594,27 @@ class RHRegistrationFormModifGeneralSectionBase( RHRegistrationFormModifBase ):
         self._generalSectionForm=self._conf.getRegistrationForm().getGeneralSectionFormById(params.get("sectionFormId",""))
 
 class RHRegistrationFormModifGeneralSection( RHRegistrationFormModifGeneralSectionBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormGeneralSection( self, self._generalSectionForm )
         return p.display()
 
 class RHRegistrationFormModifGeneralSectionDataModif( RHRegistrationFormModifGeneralSectionBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPConfModifRegFormGeneralSectionDataModif( self, self._generalSectionForm )
         return p.display()
 
 class RHRegistrationFormModifGeneralSectionPerformDataModif( RHRegistrationFormModifGeneralSectionBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifGeneralSectionBase._checkParams( self, params )
-        self._cancel = params.has_key("cancel") 
+        self._cancel = params.has_key("cancel")
     def _process( self ):
         if not self._cancel:
             self._generalSectionForm.setValues(self._getRequestParams())
         self._redirect(urlHandlers.UHConfModifRegFormGeneralSection.getURL(self._generalSectionForm))
-     
+
 class _TmpSectionField:
 
     def __init__(self, params={}, generalField=None):
@@ -622,13 +622,13 @@ class _TmpSectionField:
         self._mandatory=""
         self._input=None
         self._billable =""
-        self._price = ""                
+        self._price = ""
         if generalField is not None:
             self._caption=generalField.getCaption()
             self._mandatory=generalField.isMandatory()
             self._input=generalField.getInput().clone(self)
             self._billable =generalField.isBillable()
-            self._price = generalField.getPrice()            
+            self._price = generalField.getPrice()
         else:
             self.map(params)
 
@@ -639,16 +639,16 @@ class _TmpSectionField:
         if self.isMandatory():
             d['mandatory']='True'
         if self.isBillable():
-            d['billable']='True'                      
+            d['billable']='True'
         d['input']=self.getInput().getId()
         d.update(self.getInput().getValues())
         return d
-        
+
     def map(self, params):
         self._caption=params.get("caption","")
         self._mandatory=params.has_key("mandatory")
         self._billable=params.has_key("billable")
-        self._price=params.get("price","")                
+        self._price=params.get("price","")
         if params.get("addradioitem","").strip()!="":
             ri=RadioItem(self._input)
             cap=params.get("newradioitem")
@@ -680,16 +680,16 @@ class _TmpSectionField:
 
     def isBillable(self):
         return self._billable
-    
+
     def setBillable(self,v):
         self._billable=v
-        
+
     def getPrice(self):
         return self._price
-    
+
     def setPrice(self,price):
-        self._price=price     
-        
+        self._price=price
+
     def getCaption(self):
         return self._caption
 
@@ -709,7 +709,7 @@ class _TmpSectionField:
         self._mandatory = v
 
 class RHRegistrationFormModifGeneralSectionFieldAdd( RHRegistrationFormModifGeneralSectionBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifGeneralSectionBase._checkParams( self, params )
         self._firstTime=params.get('firstTime','yes')!='no'
@@ -720,18 +720,18 @@ class RHRegistrationFormModifGeneralSectionFieldAdd( RHRegistrationFormModifGene
             tmpField=self._getSession().getVar("tmpSectionField")
         else:
             self._getSession().removeVar("tmpSectionField")
-            tmpField=_TmpSectionField(self._getRequestParams(), None) 
+            tmpField=_TmpSectionField(self._getRequestParams(), None)
             self._getSession().setVar("tmpSectionField",tmpField)
         p = registrationForm.WPConfModifRegFormGeneralSectionFieldAdd( self, self._generalSectionForm, tmpField )
         return p.display()
 
 class RHRegistrationFormModifGeneralSectionFieldPerformAdd( RHRegistrationFormModifGeneralSectionBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifGeneralSectionBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
         self._save = params.has_key("save")
-    
+
     def _process( self ):
         if not self._cancel:
             # setup the server variable with the values for the section field
@@ -763,7 +763,7 @@ class RHRegistrationFormModifGeneralSectionFieldModif( RHRegistrationFormModifGe
         RHRegistrationFormModifGeneralSectionBase._checkParams( self, params )
         self._sectionField = self._generalSectionForm.getFieldById(params.get("sectionFieldId", ""))
         self._firstTime=params.get('firstTime','yes')!='no'
-    
+
     def _process( self ):
         # setup the server variable with the values for the section field
         if self._firstTime:
@@ -778,13 +778,13 @@ class RHRegistrationFormModifGeneralSectionFieldModif( RHRegistrationFormModifGe
 
 
 class RHRegistrationFormModifGeneralSectionFieldPerformModif( RHRegistrationFormModifGeneralSectionBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifGeneralSectionBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
         self._save = params.has_key("save")
         self._sectionField = self._generalSectionForm.getFieldById(params.get("sectionFieldId", ""))
-    
+
     def _process( self ):
         if not self._cancel:
             # setup the server variable with the values for the section field
@@ -810,7 +810,7 @@ class RHRegistrationFormModifGeneralSectionFieldPerformModif( RHRegistrationForm
 
 
 class RHRegistrationFormModifGeneralSectionFieldProcess( RHRegistrationFormModifGeneralSectionBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifGeneralSectionBase._checkParams( self, params )
 
@@ -839,8 +839,8 @@ class RHRegistrationFormModifGeneralSectionFieldProcess( RHRegistrationFormModif
             self._action=_ActionConfirm()
         if params.has_key("oldpos") and params["oldpos"] != '':
             self._action=_ActionMoveField(self,self._conf,self._generalSectionForm,params)
-        
-    
+
+
     def _process( self ):
         #
         # Mods to support field sorting.
@@ -864,7 +864,7 @@ class RHRegistrationFormModifGeneralSectionFieldProcess( RHRegistrationFormModif
 
 
 class RHRegistrationFormActionStatuses( RHRegistrationFormModifBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self, params )
         self._action=None
@@ -872,7 +872,7 @@ class RHRegistrationFormActionStatuses( RHRegistrationFormModifBase ):
             self._action=_ActionNewStatus(self, self._conf, params)
         if params.has_key("removeStatuses"):
             self._action=_ActionRemoveStatuses(self, self._conf, params)
-        
+
     def _process( self ):
         if self._action is not None:
             r=self._action.perform()
@@ -886,7 +886,7 @@ class _ActionNewStatus:
         self._rh=rh
         self._conf=conf
         self._params=params
-    
+
     def perform( self ):
         if self._params.get("caption","").strip() !="":
             self._conf.getRegistrationForm().addStatus(Status(self._conf.getRegistrationForm(), self._params))
@@ -897,7 +897,7 @@ class _ActionRemoveStatuses:
         self._conf=conf
         self._rh=rh
         self._params=params
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifBase._checkParams( self._rh, params )
         self._confirm = params.has_key( "confirm" )
@@ -906,7 +906,7 @@ class _ActionRemoveStatuses:
         self._statuses = []
         for id in self.statusesIds:
             self._statuses.append(self._conf.getRegistrationForm().getStatusById(id))
-    
+
     def perform( self ):
         self._checkParams(self._params)
         if not self._cancel and self._statuses!=[]:
@@ -950,7 +950,7 @@ class _TmpStatus:
         if self._defaultValue is not None:
             d["defaultvalue"]=self._defaultValue.getId()
         return d
-        
+
     def map(self, params):
         self._caption=params.get("caption","")
         if params.get("addvalue","").strip()!="":
@@ -1009,7 +1009,7 @@ class RHRegistrationFormStatusModif( RHRegistrationFormModifStatusBase ):
     def _checkParams(self, params):
         RHRegistrationFormModifStatusBase._checkParams(self, params)
         self._firstTime=params.get('firstTime','yes')!='no'
-    
+
     def _process( self ):
         if self._firstTime:
             self._getSession().removeVar("tmpStatus")
@@ -1021,12 +1021,12 @@ class RHRegistrationFormStatusModif( RHRegistrationFormModifStatusBase ):
         return p.display()
 
 class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBase ):
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormModifStatusBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
         self._save = params.has_key("save")
-    
+
     def _process( self ):
         if not self._cancel:
             # setup the server variable with the values for the section field

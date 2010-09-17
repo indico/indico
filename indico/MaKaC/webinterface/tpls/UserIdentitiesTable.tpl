@@ -8,10 +8,11 @@
             <tr>
                 <td>
                     <input type="submit" class="btn" value="<%= _("delete selected accounts")%>" name="action">
+                    </form>
                 </td>
 
                 <td>
-                <form style="margin: 0; padding: 0;" action="%(addIdentityURL)s" method="POST">                    				
+                <form style="margin: 0; padding: 0;" action="%(addIdentityURL)s" method="POST">
                     <input type="submit" class="btn" value="<%= _("create a new account")%>" name="action">
                 </form>
 
@@ -21,4 +22,3 @@
         </td>
     </tr>
 </table>
-</form>

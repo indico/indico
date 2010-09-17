@@ -2861,7 +2861,7 @@ class RHContribParticipantsSendEmail( RHConferenceModifBase  ):
 #######################################################################################
 
 
-class RHConfPerformCloning( RHConferenceModifBase ):
+class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase ):
     """
     New version of clone functionality -
     fully replace the old one, based on three different actions,
@@ -3148,7 +3148,7 @@ class RHConfAddAlarm( RHConferenceModifBase ):
             p = conferences.WPConfAddAlarm( self, self._conf )
         return p.display()
 
-class RHCreateAlarm( RHConferenceModifBase ):
+class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
