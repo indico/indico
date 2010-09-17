@@ -152,6 +152,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
                              "dark": True} )
 
     def _defineSectionMenu( self ):
+
         awUser = self._getAW().getUser()
         self._sectionMenu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         self._overviewOpt = self._sectionMenu.getLinkByName("overview")
@@ -231,6 +232,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         self._myContribsOpt.setVisible(len(lc)>0)
         self._trackMgtOpt.setVisible(False)
         tracks = self._conf.getCoordinatedTracks( awUser )
+
+
+
         if tracks:
             if len(tracks)>1:
                 self._trackMgtOpt.setCaption( _("Manage my tracks"))
@@ -450,14 +454,14 @@ class WConfDisplayFrame(wcomponents.WTemplated):
             mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
             vars["supportEmail"] = """<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>"""%(mailto,
                                                 Config.getInstance().getSystemIconURL("smallEmail"),
-                                                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
+                                                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False).getSupportEmailCaption())
         p={"closeMenuURL": vars["closeMenuURL"], \
             "menuStatus": vars["menuStatus"], \
             "supportEmail": vars["supportEmail"] \
             }
         vars["menu"] = ConfDisplayMenu( self._menu ).getHTML(p)
 
-        dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
+        dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
         format = dm.getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]

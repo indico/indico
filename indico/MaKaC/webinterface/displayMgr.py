@@ -824,7 +824,7 @@ class SystemLinkData:
                 "parent": "CFA"}, \
             "manageTrack": { \
                 "caption": _("Manage my track"), \
-                "URL": "aa", \
+                "URL": str(urlHandlers.UHTrackModifAbstracts.getURL(conf)), \
                 "staticURL": "", \
                 "parent": "programme"}, \
             "timetable": { \
