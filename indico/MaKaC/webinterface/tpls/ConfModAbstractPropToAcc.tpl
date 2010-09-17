@@ -14,7 +14,7 @@
         <% else: %>
         <tr>
             <td colspan="2">
-                <span class="titleCellFormat"> <b>This abstract has not been included in any track, if you want to include it now click <a href=%(changeTrackURL)s>here</a></b> </span>
+                <span class="titleCellFormat"> <b><%= _("This abstract has not been included in any track, if you want to include it now click")%> <a href=%(changeTrackURL)s><%= _("here")%></a></b> </span>
             </td>
         </tr>
         <% end %>
