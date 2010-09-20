@@ -2,7 +2,7 @@
 <script type="text/javascript">
   var saveIsFocused = false;
   var addIsFocused = false;
-  var pricePattern = /^\d+([\.\,]\d+)?$/;
+  var pricePattern = /^\d+([\.]\d+)?$/;
   function controle(){
     if (saveIsFocused
         && document.WConfModifRegFormGeneralSectionFieldEdit.billable != null
