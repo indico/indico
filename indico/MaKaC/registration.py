@@ -1067,12 +1067,12 @@ class TelephoneInput(FieldInputType):
 
     def _getModifHTML(self, item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         htmlName = self.getHTMLName()
 
         v = ""
         if item is not None:
             v = item.getValue()
-            caption = self._parent.getCaption()
             htmlName = item.getHTMLName()
 
         disable = ""
@@ -1080,6 +1080,8 @@ class TelephoneInput(FieldInputType):
         tmp = """&nbsp;%s <input type="text" name="%s" value="%s" size="30" %s >%s""" % (caption, htmlName, v , disable, format)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1802,6 +1804,7 @@ class CountryInput(FieldInputType):
 
     def _getModifHTML(self, item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         htmlName = self.getHTMLName()
         value = ""
         if item is not None:
@@ -1821,6 +1824,8 @@ class CountryInput(FieldInputType):
         tmp = "&nbsp;%s %s " % (caption, inputHTML)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1871,22 +1876,23 @@ class DateInput(FieldInputType):
         return "_genfield_%s_%s_" % (self.getParent().getParent().getId(), self.getParent().getId())
 
     def _getModifHTML(self, item, registrant):
-        from MaKaC.webinterface.wcomponents import WDateField
-
+        caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         if item is not None:
             date = item.getValue()
-            caption = self._parent.getCaption()
             htmlName = item.getHTMLName()
         else:
             date = None
-            caption = self._parent.getCaption()
             htmlName = self.getHTMLName()
 
+        from MaKaC.webinterface.wcomponents import WDateField
         inputHTML = WDateField(htmlName, date, self.dateFormat, True).getHTML()
 
         tmp = "&nbsp;%s %s " % (caption, inputHTML)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
+        if description:
+            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
