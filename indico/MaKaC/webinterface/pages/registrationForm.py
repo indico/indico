@@ -224,6 +224,8 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             if regForm.getEndRegistrationDate() is not None:
                 d = regForm.getEndRegistrationDate().strftime("%A %d %B %Y")
             vars["endDate"]=d
+            vars["extraTimeAmount"] = regForm.getEndExtraTimeAmount()
+            vars["extraTimeUnit"] = regForm.getEndExtraTimeUnit()
             d = ""
             if regForm.getModificationEndDate() is not None:
                 d = regForm.getModificationEndDate().strftime("%A %d %B %Y")
@@ -324,6 +326,8 @@ class WConfModifRegFormDataModification( wcomponents.WTemplated ):
         if regForm.isMandatoryAccount():
             vars["mandatoryAccount"]= _("CHECKED")
         vars["Currency"]="""<select name="%s">%s</select>"""%("Currency", CurrencyRegistry.getSelectItemsHTML(regForm.getCurrency()))
+        vars["extraTimeAmount"] = regForm.getEndExtraTimeAmount()
+        vars["extraTimeUnit"] = regForm.getEndExtraTimeUnit()
         return vars
 
 class WPConfModifRegFormSectionsBase(WPConfModifRegFormBase):
@@ -2535,7 +2539,7 @@ class WConfRegistrationFormClosed(wcomponents.WTemplated):
         if nowutc()<regForm.getStartRegistrationDate():
             vars["title"]= _("Registration is not open yet")
             vars["msg"]= _("Sorry but the registration is not open yet:")
-        elif regForm.getEndRegistrationDate()<nowutc():
+        elif regForm.getAllowedEndRegistrationDate()<nowutc():
             vars["title"]= _("Registration is closed")
             vars["msg"]= _("Sorry but the registration is now closed:")
         vars["startDate"] = self._conf.getRegistrationForm().getStartRegistrationDate().strftime("%A %d %B %Y")

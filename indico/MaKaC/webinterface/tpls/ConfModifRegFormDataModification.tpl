@@ -50,6 +50,13 @@
                 <input type="hidden" value="<%= eDay %>" name="eDay" id="eDay"/>
                 <input type="hidden" value="<%= eMonth %>" name="eMonth" id="eMonth"/>
                 <input type="hidden" value="<%= eYear %>" name="eYear" id="eYear"/>
+                <%= _("Allow")%>
+                <input name="extraTimeAmount" type="text" value="<%= extraTimeAmount %>" size="3" maxlength="3" />
+                <select name="extraTimeUnit">
+                    <option value="days" <% if extraTimeUnit == 'days': %>selected="selected"<%end%>><%= _("days") %></option>
+                    <option value="weeks" <% if extraTimeUnit == 'weeks': %>selected="selected"<%end%>><%= _("weeks") %></option>
+                </select>
+                <%= _("after")%>
       </td>
     </tr>
     <tr>

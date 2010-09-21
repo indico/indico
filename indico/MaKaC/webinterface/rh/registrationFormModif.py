@@ -77,6 +77,15 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
 
+        try:
+            self._extraTimeAmount = int(params.get("extraTimeAmount"))
+        except ValueError:
+            raise FormValuesError(_("The extra allowed time amount is not a valid integer number!"))
+
+        self._extraTimeUnit = params.get("extraTimeUnit")
+        if self._extraTimeUnit not in ['days', 'weeks']:
+            raise FormValuesError(_("The extra allowed time unit is not valid!"))
+
     def _process( self ):
         if not self._cancel:
             regForm = self._conf.getRegistrationForm()
@@ -107,6 +116,8 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
                 raise FormValuesError("End date must be after end date!", "RegistrationForm")
             regForm.setStartRegistrationDate(sDate)
             regForm.setEndRegistrationDate(eDate)
+            regForm.setEndExtraTimeAmount(self._extraTimeAmount)
+            regForm.setEndExtraTimeUnit(self._extraTimeUnit)
             regForm.setModificationEndDate(meDate)
             regForm.setAnnouncement(params["announcement"])
             regForm.setTitle( params["title"] )

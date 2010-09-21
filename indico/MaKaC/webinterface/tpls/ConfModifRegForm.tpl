@@ -29,6 +29,9 @@
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Registration end date")%></span></td>
     <td class="blacktext">
       %(endDate)s
+      <% if extraTimeAmount: %>
+      (<%= _("Allow")%>&nbsp;<%= extraTimeAmount %>&nbsp;<%= extraTimeUnit %>&nbsp;<%= _("after")%>)
+      <% end %>
     </td>
   </tr>
   <tr>

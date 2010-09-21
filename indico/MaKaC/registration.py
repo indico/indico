@@ -74,6 +74,8 @@ class RegistrationForm(Persistent):
             self.endRegistrationDate = groupData.get("endRegistrationDate", None)
             if self.endRegistrationDate is None:
                 self.setEndRegistrationDate(nowutc())
+            self._endExtraTimeAmount = 0
+            self._endExtraTimeUnit = 'days'
             self.modificationEndDate = groupData.get("modificationEndDate", None)
             #if self.modificationEndDate is None:
             #    self.setModificationEndDate(nowutc())
@@ -113,6 +115,8 @@ class RegistrationForm(Persistent):
         registrationPeriodEnd = self.getConference().getStartDate() - self.getEndRegistrationDate()
         registrationPeriodStart = self.getConference().getStartDate() - self.getStartRegistrationDate()
         form.setEndRegistrationDate(conference.getStartDate() - registrationPeriodEnd)
+        form.setEndExtraTimeAmount(self.getEndExtraTimeAmount())
+        form.setEndExtraTimeUnit(self.getEndExtraTimeUnit())
         form.setStartRegistrationDate(conference.getStartDate() - registrationPeriodStart)
         if self.getModificationEndDate():
             registrationPeriodModifEndDate = self.getConference().getStartDate() - self.getModificationEndDate()
@@ -237,6 +241,33 @@ class RegistrationForm(Persistent):
     def getEndRegistrationDate( self ):
         return timezone(self.getTimezone()).localize(self.endRegistrationDate)
 
+    def getAllowedEndRegistrationDate( self ):
+        if self.getEndExtraTimeUnit() == 'days':
+            delta = timedelta(days=self.getEndExtraTimeAmount())
+        else:
+            delta = timedelta(weeks=self.getEndExtraTimeAmount())
+        return timezone(self.getTimezone()).localize(self.endRegistrationDate + delta)
+
+    def setEndExtraTimeAmount(self, value):
+        self._endExtraTimeAmount = value
+
+    def getEndExtraTimeAmount(self):
+        try:
+            return self._endExtraTimeAmount
+        except AttributeError:
+            self._endExtraTimeAmount = 0
+            return self._endExtraTimeAmount
+
+    def setEndExtraTimeUnit(self, value):
+        self._endExtraTimeUnit = value
+
+    def getEndExtraTimeUnit(self):
+        try:
+            return self._endExtraTimeUnit
+        except AttributeError:
+            self._endExtraTimeUnit = 'days'
+            return self._endExtraTimeUnit
+
     def setModificationEndDate( self, ed ):
         if ed:
             self.modificationEndDate = datetime(ed.year,ed.month,ed.day,23,59,59)
@@ -263,7 +294,7 @@ class RegistrationForm(Persistent):
         if date is None:
             date=nowutc()
         sd = self.getStartRegistrationDate()
-        ed = self.getEndRegistrationDate()
+        ed = self.getAllowedEndRegistrationDate()
         return date <= ed and date >= sd
 
     def setContactInfo( self, ci ):
