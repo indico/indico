@@ -1053,7 +1053,7 @@ class TextInput(FieldInputType):
 
 class TelephoneInput(FieldInputType):
     _id = "telephone"
-    _PATTERN = re.compile(r'^\+?(\d|\s)+$')
+    _PATTERN = re.compile(r'^\s*\+?\s*\d+(\s*\-?\s*\d+)*\s*$')
 
     def getName(cls):
         return "Telephone"
@@ -1070,7 +1070,8 @@ class TelephoneInput(FieldInputType):
             htmlName = item.getHTMLName()
 
         disable = ""
-        tmp = """&nbsp;%s <input type="text" name="%s" value="%s" size="60" %s >""" % (caption, htmlName, v , disable)
+        format = """&nbsp;<span class="inputDescription">(+) 999 99 99 99</span>"""
+        tmp = """&nbsp;%s <input type="text" name="%s" value="%s" size="30" %s >%s""" % (caption, htmlName, v , disable, format)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         return tmp
@@ -1082,7 +1083,9 @@ class TelephoneInput(FieldInputType):
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
 
         if v.strip() != '' and not TelephoneInput._PATTERN.match(v):
-            raise FormValuesError(_("The field \"%s\" is in wrong format. Please fill it in the correct format (+XXX XXXX XXX).") % self.getParent().getCaption())
+            raise FormValuesError(_("The field \"%s\" is in wrong format. Please fill it in the correct format: (+) 999 99 99 99") % self.getParent().getCaption())
+
+        v = re.sub(r'\s+|\-+', '', v)
 
         item.setQuantity(0)
         item.setValue(v)
