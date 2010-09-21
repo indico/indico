@@ -1227,7 +1227,7 @@ class LabelInput(FieldInputType):
         tmp = """&nbsp;%s"""%(caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
         return tmp
@@ -1283,7 +1283,7 @@ class CheckboxInput(FieldInputType):
         tmp=  """<input type="checkbox" name="%s" %s %s> %s"""%(htmlName, checked,disable, caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp, price, currency)
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp, price, currency)
         else:
             tmp= """%s </td> """%tmp
         return tmp
@@ -1320,7 +1320,7 @@ class YesNoInput(FieldInputType):
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
         caption=self._parent.getCaption()
-        v="no"
+        v=""
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
@@ -1339,10 +1339,10 @@ class YesNoInput(FieldInputType):
             checkedYes="selected"
         elif v=="no":
             checkedNo="selected"
-        tmp=  """&nbsp;%s <select name="%s" %s><option value="yes" %s>yes</option><option value="no" %s>no</option></select>"""%(caption, htmlName,disable, checkedYes, checkedNo)
+        tmp=  """&nbsp;%s <select name="%s" %s><option value=""></option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>"""%(caption, htmlName,disable, checkedYes, checkedNo)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
         return tmp
@@ -1357,6 +1357,10 @@ class YesNoInput(FieldInputType):
             # if the registrant has already payed, Indico blocks all the modifications about new/removed items
             return
         v=params.get(self.getHTMLName())
+
+        if self.getParent().isMandatory() and v.strip() == "":
+            raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
+
         if v=="yes":
             item.setQuantity(1)
         else:
@@ -1598,7 +1602,7 @@ class RadioGroupInput(FieldInputType):
                 checked = "checked"
             tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" name="%s"  value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
             if val.isBillable():
-                tmp.append("""&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td></tr> """ % (val.getPrice(), currency))
+                tmp.append("""&nbsp;&nbsp;%s&nbsp;%s</td></tr> """ % (val.getPrice(), currency))
             else:
                  tmp.append(""" </td></tr> """)
         return "".join(tmp)
@@ -1632,7 +1636,7 @@ class RadioGroupInput(FieldInputType):
                     selected = ''
 
                 if radioItem.isBillable():
-                    price = """&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td></tr> """ % (radioItem.getPrice(), currency)
+                    price = """&nbsp;&nbsp;%s&nbsp;%s """ % (radioItem.getPrice(), currency)
                 else:
                     price = ''
 
