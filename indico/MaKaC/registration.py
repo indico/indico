@@ -549,8 +549,11 @@ class Notification(Persistent):
         sep = '-----------------------------------'
         return "\n%s\n%s\n%s\n\n" % (sep, title, sep)
 
-    def _formatValue(self, value):
-        value = value.strip()
+    def _formatValue(self, fieldInput, value):
+        try:
+            value = fieldInput.getValueDisplay(value)
+        except:
+            value = str(value).strip()
         if len(value) > 50:
             value = '\n\n%s\n' % value
         return value
@@ -567,13 +570,20 @@ class Notification(Persistent):
                     mii=mig.getResponseItemById(f.getId())
                     if mii is not None:
                         noitems=False
-                        value = mii.getValue()
-                        if isinstance(mii.getGeneralField().getInput(), LabelInput) and mii.isBillable():
-                            value = "%s %s" % (mii.getPrice(), mii.getCurrency())
-                        elif isinstance(mii.getGeneralField().getInput(), LabelInput):
-                            value = ""
                         caption = mii.getCaption()
-                        text.append("""- %s: %s\n""" % (caption, self._formatValue(value)))
+                        value = mii.getValue()
+                        fieldInput = mii.getGeneralField().getInput()
+
+                        isLabel = isinstance(fieldInput, LabelInput)
+                        if isLabel and mii.isBillable():
+                            value = "%s %s" % (mii.getPrice(), mii.getCurrency())
+                        elif isLabel:
+                            value = ""
+
+                        if isLabel and not value:
+                            text.append("""- %s\n""" % caption)
+                        else:
+                            text.append("""- %s: %s\n""" % (caption, self._formatValue(fieldInput, value)))
                 if noitems:
                     text.append("""-- no values --\n""")
                 text.append("\n")
