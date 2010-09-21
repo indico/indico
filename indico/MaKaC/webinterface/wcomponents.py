@@ -64,6 +64,7 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 
+import re
 
 class WTemplated:
     """This class provides a basic implementation of a web component (an
@@ -6077,8 +6078,6 @@ class WRoomBookingSearch4Bookings( WTemplated ):
 
         return vars
 
-# 2. List of...
-
 class WRoomBookingRoomList( WTemplated ):
 
     def __init__( self, rh, standalone = False ):
@@ -7126,4 +7125,28 @@ class WFilterCriteria(WTemplated):
 
         vars["content"] =  list((name, self._drawFieldOptions(name, form))
                                 for (name, form) in self._options)
+        return vars
+
+class WDateField(WTemplated):
+
+    def __init__(self, name, date, format, isDisabled=False):
+        self._withTime = format.find('%H') >= 0
+        self._name = name
+        self._format = format
+
+        if date:
+            self._date = date
+        else:
+            self._date = datetime.now()
+
+        self._isDisabled = isDisabled
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        vars['name'] = self._name
+        vars['date'] = self._date
+        vars['dateDisplay'] = datetime.strftime(self._date, self._format)
+        vars['isDisabled'] = self._isDisabled
+        vars['withTime'] = self._withTime
+        vars['format'] = re.sub('%', '%%', self._format)
         return vars

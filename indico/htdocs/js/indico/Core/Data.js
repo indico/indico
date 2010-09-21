@@ -112,7 +112,7 @@ var Util = {
         }
 
         // set seconds at zero (sometimes they're not specified)
-        var results = {'%S': 0};
+        var results = {'%Y': 0, '%m': 1, '%d': 1, '%H': 0, '%M': 0, '%S': 0};
 
         // store the results, relative to the token order
         for (var i = 1; i < m.length; ++i) {

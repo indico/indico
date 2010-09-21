@@ -42,6 +42,8 @@ import re
 
 import string
 
+PRICE_PATTERN = re.compile(r'^(\d+(?:[\.\,]\d+)?)$')
+
 def stringToDate( str ):
     months = {  "January":1, "February":2, "March":3, "April":4, "May":5, "June":6, "July":7, "August":8, "September":9, "October":10, "November":11, "December":12 }
     [ day, month, year ] = str.split("-")
@@ -497,16 +499,16 @@ class Notification(Persistent):
                 session2 = _("""--_("not selected")--""")
                 if len(sessionList)>1:
                     session2 = sessionList[1].getTitle()
-                text =  _("""%s:
-                        - _("First priority"): %s
-                        - _("Other option"): %s
-                        """)%(sessionForm.getTitle(), session1, session2)
+                text =  _("""%s
+- _("First priority"): %s
+- _("Other option"): %s
+""")%(self._printTitle(sessionForm.getTitle()), session1, session2)
             else:
                 sessionListText=[]
                 for s in sessionList:
-                    sessionListText.append("\n\t\t\t%s"%s.getTitle())
-                text = """%s: %s
-                        """%(sessionForm.getTitle(), "".join(sessionListText))
+                    sessionListText.append("\n%s" % s.getTitle())
+                text = """%s%s
+"""%(self._printTitle(sessionForm.getTitle()), "".join(sessionListText))
         return text
 
     def _printAccommodation(self, accommodationForm, accommodation):
@@ -515,11 +517,9 @@ class Notification(Persistent):
             accoType = _("""--_("not selected")--""")
             if accommodation.getAccommodationType() is not None:
                 accoType = accommodation.getAccommodationType().getCaption()
-            text = _("""%s:
-                        - _("Arrival date"): %s
-                        - _("Departure date"): %s
-                        - _("Accommodation type"): %s
-                    """)%(accommodationForm.getTitle(), \
+            text = _("""%s- _("Arrival date"): %s
+- _("Departure date"): %s
+- _("Accommodation type"): %s""")%(self._printTitle(accommodationForm.getTitle()), \
                             accommodation.getArrivalDate().strftime("%d %B %Y"), \
                             accommodation.getDepartureDate().strftime("%d %B %Y"), \
                             accoType)
@@ -533,62 +533,77 @@ class Notification(Persistent):
                 se.append( _("- %s [%s place(s) needed]")%(item.getCaption(), item.getNoPlaces()))
             text = ""
             if se != []:
-                text = """%s:
-                        %s
-                        """%(socialEventForm.getTitle(), "\r\n".join(se) or _("""--_("No social events selected")--"""))
+                text = """%s
+%s
+"""%(self._printTitle(socialEventForm.getTitle()), "\n".join(se) or _("""--_("No social events selected")--"""))
         return text
 
     def _printReasonParticipation(self, reasonParticipationForm, reasonParticipation):
         text = ""
         if reasonParticipationForm.isEnabled():
-            text = """%s: %s
-                    """%(reasonParticipationForm.getTitle(), reasonParticipation)
+            text = """%s%s
+                    """%(self._printTitle(reasonParticipationForm.getTitle()), reasonParticipation)
         return text
+
+    def _printTitle(self, title):
+        sep = '-----------------------------------'
+        return "\n%s\n%s\n%s\n\n" % (sep, title, sep)
+
+    def _formatValue(self, value):
+        value = value.strip()
+        if len(value) > 50:
+            value = '\n\n%s\n' % value
+        return value
 
     def _printMiscellaneousInfo(self, gs, mig):
         text=[]
         if gs.isEnabled():
             if mig is not None:
                 noitems=True
-                text.append("""%s:\r\n\t\t\t"""%(mig.getTitle()))
+                text.append(self._printTitle(mig.getTitle()))
                 #Mods to support sorting fields
                 #for f in gs.getFields():
                 for f in gs.getSortedFields():
                     mii=mig.getResponseItemById(f.getId())
                     if mii is not None:
                         noitems=False
-                        value=": %s"%mii.getValue()
+                        value = mii.getValue()
                         if isinstance(mii.getGeneralField().getInput(), LabelInput) and mii.isBillable():
-                            value=": %s %s"%(mii.getPrice(), mii.getCurrency())
+                            value = "%s %s" % (mii.getPrice(), mii.getCurrency())
                         elif isinstance(mii.getGeneralField().getInput(), LabelInput):
-                            value=""
-                        text.append("""- %s%s\r\n\t\t\t"""%(mii.getCaption(), value))
+                            value = ""
+                        caption = mii.getCaption()
+                        text.append("""- %s: %s\n""" % (caption, self._formatValue(value)))
                 if noitems:
-                    text.append("""-- no values --\r\n\t\t\t""")
-                text.append("\r\n             ")
+                    text.append("""-- no values --\n""")
+                text.append("\n")
         return "".join(text)
 
     def _printAllSections(self, regForm, rp):
         sects = []
         for formSection in regForm.getSortedForms():
             if formSection.getId() == "reasonParticipation":
-                sects.append("""
-             %s"""%self._printReasonParticipation(formSection, rp.getReasonParticipation()))
+                sects.append("""\n%s""" % self._printReasonParticipation(formSection, rp.getReasonParticipation()))
             elif formSection.getId() == "sessions":
-                sects.append("""
-             %s"""%self._printSessions(formSection, rp.getSessionList()))
+                sects.append("""\n%s""" % self._printSessions(formSection, rp.getSessionList()))
             elif formSection.getId() == "accommodation":
-                sects.append("""
-             %s"""%self._printAccommodation(formSection, rp.getAccommodation()))
+                sects.append("""\n%s""" % self._printAccommodation(formSection, rp.getAccommodation()))
             elif formSection.getId() == "socialEvents":
-                sects.append("""
-             %s"""%self._printSocialEvents(formSection, rp.getSocialEvents()))
+                sects.append("""\n%s""" % self._printSocialEvents(formSection, rp.getSocialEvents()))
             elif formSection.getId() == "furtherInformation":
                 pass
             else:
-                sects.append("""
-             %s"""%self._printMiscellaneousInfo(formSection, rp.getMiscellaneousGroupById(formSection.getId())))
+                sects.append("""%s""" % self._printMiscellaneousInfo(formSection, rp.getMiscellaneousGroupById(formSection.getId())))
         return "".join(sects)
+
+    def _cleanBody(self, body):
+        # format the line-breaks in unix-style
+        body = re.sub(r'\r\n', '\n', body)
+
+        # clean the extra lines and space
+        body = re.sub(r'\n(\s*\n){2,}', '\n\n', body)
+
+        return body
 
     def _getPDInfoText(self, regForm, rp):
         personalData = regForm.getPersonalData()
@@ -623,8 +638,7 @@ class Notification(Persistent):
             elif key == "personalHomepage":
                 fieldValue = rp.getPersonalHomepage()
             if pdfield.isEnabled():
-                text += """
-             %s: %s""" % (_(fieldTitle),fieldValue)
+                text += """\n%s: %s""" % (_(fieldTitle), fieldValue)
         return text
 
     def sendEmailNewRegistrant(self, regForm, rp):
@@ -640,31 +654,34 @@ class Notification(Persistent):
             paymentWarning = "."
 
         subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
-        body=_("""
-             _("Event"): %s
-             _("Registrant Id"): %s%s
+        body = _("""
+_("Event"): %s
+_("Registrant Id"): %s%s
 %s
-             """)%(   url,rp.getId(), \
-                     self._getPDInfoText(regForm,rp), \
-                     self._printAllSections(regForm, rp) )
+""") % (url, rp.getId(), \
+                     self._getPDInfoText(regForm, rp), \
+                     self._printAllSections(regForm, rp))
+
         # send mail to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-             There is a new registrant in '%s'. See information below:
+There is a new registrant in '%s'. See information below:
 
-                      %s
-                      """)%(strip_ml_tags(regForm.getConference().getTitle()), \
+%s
+""")%(strip_ml_tags(regForm.getConference().getTitle()), \
                               body)
+            bodyOrg = self._cleanBody(bodyOrg)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send mail to participant
         if rp.getEmail().strip() != "":
             bodyReg = _("""
-             Congratulations, your registration to %s was successful%s See your information below:
+Congratulations, your registration to %s was successful%s See your information below:
 
-                      %s
-             %s
-                      """)% (strip_ml_tags(regForm.getConference().getTitle()),paymentWarning,body,epaymentLink)
+%s
+%s
+""")% (strip_ml_tags(regForm.getConference().getTitle()),paymentWarning,body,epaymentLink)
+            bodyReg = self._cleanBody(bodyReg)
             to=rp.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
@@ -1024,6 +1041,47 @@ class TextInput(FieldInputType):
     def _getSpecialOptionsHTML(self):
         return ""
 
+class TelephoneInput(FieldInputType):
+    _id = "telephone"
+    _PATTERN = re.compile(r'^\+?(\d|\s)+$')
+
+    def getName(cls):
+        return "Telephone"
+    getName = classmethod(getName)
+
+    def _getModifHTML(self, item, registrant):
+        caption = self._parent.getCaption()
+        htmlName = self.getHTMLName()
+
+        v = ""
+        if item is not None:
+            v = item.getValue()
+            caption = self._parent.getCaption()
+            htmlName = item.getHTMLName()
+
+        disable = ""
+        tmp = """&nbsp;%s <input type="text" name="%s" value="%s" size="60" %s >""" % (caption, htmlName, v , disable)
+        tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
+        tmp = """%s </td> """ % tmp
+        return tmp
+
+    def _setResponseValue(self, item, params, registrant):
+        v = params.get(self.getHTMLName(), "")
+
+        if self.getParent().isMandatory() and v.strip() == "":
+            raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
+
+        if v.strip() != '' and not TelephoneInput._PATTERN.match(v):
+            raise FormValuesError(_("The field \"%s\" is in wrong format. Please fill it in the correct format (+XXX XXXX XXX).") % self.getParent().getCaption())
+
+        item.setQuantity(0)
+        item.setValue(v)
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
+
+    def _getSpecialOptionsHTML(self):
+        return ""
+
 class TextareaInput(FieldInputType):
     _id="textarea"
 
@@ -1350,8 +1408,14 @@ class RadioItem(Persistent):
             self.setPrice(False)
         return self._price
 
-    def setPrice(self,v):
-        self._price=v
+    def setPrice(self, price):
+        if price:
+            match = PRICE_PATTERN.match(price)
+            if match:
+                price = match.group(1)
+            else:
+                raise MaKaCError(_('The price is in incorrect format!'))
+        self._price = price
 
     def clone(self, parent):
         ri=RadioItem(parent)
@@ -1377,6 +1441,7 @@ class RadioGroupInput(FieldInputType):
         self._items={}
         self._radioItemGenerator = Counter()
         self._defaultItem=None
+        self._inputType = "radiogroup"
 
     def getValues(self):
         d={}
@@ -1389,6 +1454,7 @@ class RadioGroupInput(FieldInputType):
             tmp["isEnabled"]=i.isEnabled()
             d["radioitems"].append(tmp)
         d["defaultItem"]=self.getDefaultItem()
+        d["inputType"] = self.getInputType()
         return d
 
     def setValues(self, data):
@@ -1405,6 +1471,8 @@ class RadioGroupInput(FieldInputType):
                 self.addItem(ri)
         if data.has_key("defaultItem"):
             self.setDefaultItem(data.get("defaultItem",None))
+        if data.has_key("inputType"):
+            self._inputType = data.get("inputType")
 
     def getDefaultItem(self):
         try:
@@ -1423,6 +1491,32 @@ class RadioGroupInput(FieldInputType):
     def setDefaultItemById(self, id):
         if self._items.has_key(id):
             self.setDefaultItem(self._items[id].getCaption())
+
+    def changeItemById(self, id, caption=None, billable=None, price=None):
+        if self._items.has_key(id):
+            item = self._items[id]
+            if caption:
+                item.setCaption(caption)
+            if billable and price:
+                item.setBillable(billable)
+                item.setPrice(price)
+
+    def removePriceById(self, id):
+        if self._items.has_key(id):
+            item = self._items[id]
+            item.setBillable(False)
+            item.setPrice("")
+
+    def setInputType(self, inputType):
+        self._inputType = inputType
+
+    def getInputType(self):
+        try:
+            if self._inputType:
+                pass
+        except AttributeError:
+            self._inputType = "radiogroup"
+        return self._inputType
 
     def getItemsList(self, sort=True):
         vs=self._items.values()
@@ -1461,48 +1555,88 @@ class RadioGroupInput(FieldInputType):
         for item in self.getItemsList():
             rgi.addItem(item.clone(rgi))
         rgi.setDefaultItem(self.getDefaultItem())
+        rgi.setInputType(self.getInputType())
         return rgi
 
     def _getRadioItemGenerator(self):
         return self._radioItemGenerator
 
-    def _getModifHTML(self,item, registrant):
-
+    def _getRadioGroupModifHTML(self, item, registrant):
         caption = self._parent.getCaption()
-        price= self._parent.getCaption()
-        billable=self._parent.isBillable()
-        currency=self._parent.getParent().getRegistrationForm().getCurrency()
+        billable = self._parent.isBillable()
+        currency = self._parent.getParent().getRegistrationForm().getCurrency()
         value = ""
         if item is not None:
-            price = item.getPrice()
             billable = item.isBillable()
             currency = item.getCurrency()
             caption = item.getCaption()
             value = item.getValue()
-        tmp = """&nbsp;%s """%(caption)
-        tmp= [""" <td>%s</td><td align="right" align="bottom">"""%tmp]
+        tmp = """&nbsp;%s """ % (caption)
+        tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
         tmp.append(""" </td> """)
         for val in self.getItemsList():
-            disable=""
+            disable = ""
             if not val.isEnabled():
-                disable="disabled=\"true\""
-            if ( registrant is not None and (val.isBillable() or billable) and registrant.getPayed()):
-                disable="disabled=\"true\""
+                disable = "disabled=\"true\""
+            if (registrant is not None and (val.isBillable() or billable) and registrant.getPayed()):
+                disable = "disabled=\"true\""
                 #pass
-            checked=""
-            if val.getCaption()==value:
-                checked="checked"
+            checked = ""
+            if val.getCaption() == value:
+                checked = "checked"
             elif not value and val.getCaption() == self.getDefaultItem():
-                checked="checked"
-            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" name="%s"  value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >"""%(self.getHTMLName(), val.getId(), checked,disable, val.getCaption()))
+                checked = "checked"
+            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" name="%s"  value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
             if val.isBillable():
-                tmp.append("""&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td></tr> """%(val.getPrice(),currency))
+                tmp.append("""&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td></tr> """ % (val.getPrice(), currency))
             else:
                  tmp.append(""" </td></tr> """)
+        return "".join(tmp)
+
+    def _getDropDownModifHTML(self, item, registrant):
+        caption = self._parent.getCaption()
+        billable = self._parent.isBillable()
+        currency = self._parent.getParent().getRegistrationForm().getCurrency()
+        value = ""
+        if item is not None:
+            billable = item.isBillable()
+            currency = item.getCurrency()
+            caption = item.getCaption()
+            value = item.getValue()
+
+        if not value:
+            value = self.getDefaultItem()
+
+        tmp = """&nbsp;%s""" % (caption)
+        tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
+        tmp.append(""" </td> """)
+
+        tmp.append("""<td><select name="%s">""" % self.getHTMLName())
+        for radioItem in self.getItemsList():
+            if radioItem.isEnabled() and not (registrant is not None and (radioItem.isBillable() or billable) and registrant.getPayed()):
+
+                selected = ""
+                if radioItem.getCaption() == value:
+                    selected = ' selected="selected"'
+                else:
+                    selected = ''
+
+                if radioItem.isBillable():
+                    price = """&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td></tr> """ % (radioItem.getPrice(), currency)
+                else:
+                    price = ''
+
+                tmp.append("""<option value="%s"%s>%s%s</option>""" % (radioItem.getId(), selected, radioItem.getCaption(), price))
+
+        tmp.append("""</select></td>""")
 
         return "".join(tmp)
 
-
+    def _getModifHTML(self, item, registrant):
+        if self.getInputType() == 'radiogroup':
+            return self._getRadioGroupModifHTML(item, registrant)
+        else:
+            return self._getDropDownModifHTML(item, registrant)
 
     def _setResponseValue(self, item, params, registrant):
         v=params.get(self.getHTMLName(),"")
@@ -1534,12 +1668,27 @@ class RadioGroupInput(FieldInputType):
         item.setPrice(price)
         item.setQuantity(quantity)
 
-
     def _getSpecialOptionsHTML(self):
-        html=["""<tr>
-          <td class="titleCellTD"><span class="titleCellFormat">Radio items</span></td>
+        if self.getInputType() == 'radiogroup':
+            radioSelected = ' selected="selected"'
+            dropdownSelected = ''
+        else:
+            radioSelected = ''
+            dropdownSelected = ' selected="selected"'
+        html=[_("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Type of input")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
-                <table>"""]
+              <select name="inputtype">
+                <option value="radiogroup"%(radioSelected)s>Radio group</option>
+                <option value="dropdown"%(dropdownSelected)s>Drop-down menu</option>
+              </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">Items</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+                <table>""") % dict(radioSelected=radioSelected, dropdownSelected=dropdownSelected)]
         html.append( _("""<tr>
                             <td valign="top" align="left">
                             <table>
@@ -1568,6 +1717,8 @@ class RadioGroupInput(FieldInputType):
                                 <input type="submit" class="btn" name="removeradioitem" value="_("remove")"><br>
                                 <input type="submit" class="btn" name="disableradioitem" value="_("enable/disable")"><br>
                                 <input type="submit" class="btn" name="defaultradioitem" value="_("set as default")"><br>
+                                <input type="submit" class="btn" name="changeradioitem" value="_("change")"><br>
+                                <input type="submit" class="btn" name="removeradioitemprice" value="_("remove price")"><br>
                             </td>
                         </tr>
                 """))
@@ -1596,6 +1747,155 @@ class RadioGroupInput(FieldInputType):
         html.append("""</table></td></tr>""")
         return "".join(html)
 
+class CountryInput(FieldInputType):
+    _id="country"
+
+    def getName(cls):
+        return "Country"
+    getName=classmethod(getName)
+
+    def getValueDisplay(self, value):
+        return CountryHolder().getCountryById(value)
+
+    def _getModifHTML(self, item, registrant):
+        caption = self._parent.getCaption()
+        htmlName = self.getHTMLName()
+        value = ""
+        if item is not None:
+            value = item.getValue()
+            caption = self._parent.getCaption()
+            htmlName = item.getHTMLName()
+        disable = ""
+
+        inputHTML = _("""<option value="">--  _("Select a country") --</option>""")
+        for countryKey in CountryHolder().getCountrySortedKeys():
+            selected = ""
+            if value == countryKey:
+                selected = "selected"
+            inputHTML += """<option value="%s" %s>%s</option>""" % (countryKey, selected, CountryHolder().getCountryById(countryKey))
+        inputHTML = """<select name="%s" %s>%s</select>""" % (htmlName, disable, inputHTML)
+
+        tmp = "&nbsp;%s %s " % (caption, inputHTML)
+        tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
+        tmp = """%s </td> """ % tmp
+        return tmp
+
+    def _setResponseValue(self, item, params, registrant):
+        v = params.get(self.getHTMLName(), "")
+        if self.getParent().isMandatory() and v.strip() == "":
+            raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
+
+        item.setQuantity(0)
+        item.setValue(v)
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
+
+    def _getSpecialOptionsHTML(self):
+        return ""
+
+class DateInput(FieldInputType):
+    _id = "date"
+
+    def __init__(self, field):
+        FieldInputType.__init__(self, field)
+        self.dateFormat = ''
+
+    def getName(cls):
+        return "Date"
+    getName = classmethod(getName)
+
+    def getValues(self):
+        d = {}
+        d["dateFormat"] = self.dateFormat
+        return d
+
+    def setValues(self, data):
+        if data.has_key("dateFormat"):
+            self.dateFormat = data.get("dateFormat")
+
+    def clone(self, gf):
+        di = FieldInputType.clone(self, gf)
+        di.dateFormat = self.dateFormat
+        return di
+
+    def getValueDisplay(self, value):
+        if type(value) == datetime:
+            return value.strftime(self.dateFormat)
+        else:
+            return value
+
+    def getHTMLName(self):
+        return "_genfield_%s_%s_" % (self.getParent().getParent().getId(), self.getParent().getId())
+
+    def _getModifHTML(self, item, registrant):
+        from MaKaC.webinterface.wcomponents import WDateField
+
+        if item is not None:
+            date = item.getValue()
+            caption = self._parent.getCaption()
+            htmlName = item.getHTMLName()
+        else:
+            date = None
+            caption = self._parent.getCaption()
+            htmlName = self.getHTMLName()
+
+        inputHTML = WDateField(htmlName, date, self.dateFormat, True).getHTML()
+
+        tmp = "&nbsp;%s %s " % (caption, inputHTML)
+        tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
+        tmp = """%s </td> """ % tmp
+        return tmp
+
+    def _setResponseValue(self, item, params, registrant):
+        day = params.get('%sDay' % self.getHTMLName(), 1)
+        month = params.get('%sMonth' % self.getHTMLName(), 1)
+        year = params.get('%sYear' % self.getHTMLName())
+
+        hour = params.get('%sHour' % self.getHTMLName(), 13)
+        minute = params.get('%sMin' % self.getHTMLName(), 0)
+
+        if self.getParent().isMandatory():
+            if not day and not month and not year:
+                raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
+
+        if not year:
+            year = datetime.now().year
+
+        date = datetime(int(year), int(month), int(day), int(hour), int(minute))
+
+        item.setValue(date)
+        item.setMandatory(self.getParent().isMandatory())
+        item.setHTMLName(self.getHTMLName())
+
+    def _getSpecialOptionsHTML(self):
+        formats = ['%d/%m/%Y %H:%M', '%d.%m.%Y %H:%M',
+                   '%m/%d/%Y %H:%M', '%m.%d.%Y %H:%M',
+                   '%Y/%m/%d %H:%M', '%Y.%m.%d %H:%M',
+                   '%d/%m/%Y', '%d.%m.%Y',
+                   '%m/%d/%Y', '%m.%d.%Y',
+                   '%Y/%m/%d', '%Y.%m.%d',
+                   '%m/%Y', '%m.%Y',
+                   '%Y']
+
+        html = [_("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Date format")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <select name="dateFormat">""")]
+
+        now = datetime.now()
+        for format in formats:
+            if self.dateFormat == format:
+                selected = ' selected="selected"'
+            else:
+                selected = ''
+            display = datetime.strftime(now, format)
+            html.append("""<option value="%s"%s>%s</option>""" % (format, selected, display))
+
+        html.append(_("""</select>
+          </td>
+        </tr>"""))
+        return "".join(html)
 
 class FieldInputs:
 
@@ -1605,7 +1905,11 @@ class FieldInputs:
                       NumberInput.getId():NumberInput, \
                       RadioGroupInput.getId():RadioGroupInput, \
                       CheckboxInput.getId():CheckboxInput, \
-                      YesNoInput.getId(): YesNoInput }
+                      YesNoInput.getId(): YesNoInput, \
+                      CountryInput.getId(): CountryInput, \
+                      DateInput.getId(): DateInput, \
+                      TelephoneInput.getId(): TelephoneInput, \
+                     }
 
     def getAvailableInputs(cls):
         return cls._availableInputs
@@ -1675,8 +1979,14 @@ class GeneralField(Persistent):
             self._price = 0
         return self._price
 
-    def setPrice(self,price):
-        self._price=price
+    def setPrice(self, price):
+        if price:
+            match = PRICE_PATTERN.match(price)
+            if match:
+                price = match.group(1)
+            else:
+                raise MaKaCError(_('The price is in incorrect format!'))
+        self._price = price
 
     def getId(self):
         return self._id

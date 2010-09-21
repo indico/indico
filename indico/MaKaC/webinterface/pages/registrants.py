@@ -1161,6 +1161,13 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                     """)%(quoteattr(str(urlHandlers.UHConfModifRegistrantReasonPartModify.getURL(self._registrant))), self.htmlText( self._registrant.getReasonParticipation() ))
         return ""
 
+    def _getItemValueDisplay(self, responseItem):
+        value = responseItem.getValue()
+        try:
+            return responseItem.getGeneralField().getInput().getValueDisplay(value)
+        except:
+            return value
+
     def _getMiscInfoItemsHTML(self, gsf):
         miscGroup=self._registrant.getMiscellaneousGroupById(gsf.getId())
         html=["""<table>"""]
@@ -1175,14 +1182,14 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                 miscItem=miscGroup.getResponseItemById(f.getId())
             v= _("""--_("no value selected")--""")
             if miscItem is not None:
-                v=miscItem.getValue()
+                v = self._getItemValueDisplay(miscItem)
             html.append("""
                     <tr>
                        <td align="left" style="max-width: 25%%" valign="top"><b>%s:</b></td>
                        <td align="left" valign="top">%s</td>
                     </tr>
                     <tr><td>&nbsp;</td></tr>
-                    """%(f.getCaption(), v) )
+                    """%(f.getCaption(), v))
         if miscGroup is not None:
             for miscItem in miscGroup.getResponseItemList():
                     f=gsf.getFieldById(miscItem.getId())
@@ -1193,7 +1200,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                                        <td align="left">%s <font color="red">(cancelled)</font></td>
                                     </tr>
                                     <tr><td>&nbsp;</td></tr>
-                                    """) %(miscItem.getCaption(), miscItem.getValue()) )
+                                    """) %(miscItem.getCaption(), self._getItemValueDisplay(miscItem)) )
         if len(html)==1:
             html.append( _("""
                         <tr><td><font color="black"><i> --_("No fields")--</i></font></td></tr>

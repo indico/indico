@@ -835,8 +835,9 @@ IndicoUI.Widgets = {
          * @param {Array or String} hiddenFields An array of 5 field ids where the day/month/year/hours/minutes will be written,
          *                                       or a single element id where the full string will be put.
          * @param {XElement} trigger Input element triggering calendar (optional).
+         * @param {String} format Format for displaying and parsing the date/time (optional).
          */
-        input2dateField: function(elem, showTime, hiddenFields, trigger) {
+        input2dateField: function(elem, showTime, hiddenFields, trigger, format) {
             if (showTime === undefined) {
                 showTime = false;
             }
@@ -849,9 +850,17 @@ IndicoUI.Widgets = {
 
                 var d;
                 if (showTime) {
-                    d = IndicoUtil.parseDateTime(elem.get());
+                    if (exists(format)) {
+                        d = Util.parseJSDateTime(elem.get(), format);
+                    } else {
+                        d = IndicoUtil.parseDateTime(elem.get());
+                    }
                 } else {
-                    d = parseDate(elem.get());
+                    if (exists(format)) {
+                        d = getDate(Util.parseJSDateTime(elem.get(), format));
+                    } else {
+                        d = parseDate(elem.get());
+                    }
                 }
 
                 var ret = false;
@@ -876,11 +885,13 @@ IndicoUI.Widgets = {
             if (hiddenFields) {
                 elem.observe(elem.processDate);
             }
-            var  format;
-            if (showTime) {
-                format = "%d/%m/%Y %H:%M";
-            } else {
-                format = "%d/%m/%Y";
+
+            if (!exists(format)) {
+                if (showTime) {
+                    format = "%d/%m/%Y %H:%M";
+                } else {
+                    format = "%d/%m/%Y";
+                }
             }
 
             var onSelect = function(cal) {
@@ -928,7 +939,7 @@ IndicoUI.Widgets = {
          * @param {Dictionary} elemInfo Additional parameters attached to the input element (optional).
          * @return {XElement} The text input field with the calendar attached.
          */
-        dateField: function(showTime, attributes, hiddenFields, elemInfo){
+        dateField: function(showTime, attributes, hiddenFields, elemInfo, format){
             attributes = attributes || {};
             elemInfo = elemInfo || {};
             extend(elemInfo, attributes);
@@ -936,7 +947,7 @@ IndicoUI.Widgets = {
             var trigger = Html.img({src: imageSrc("calendarWidget")});
             var tab = Html.div("dateField", elem, trigger);
 
-            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields, trigger);
+            IndicoUI.Widgets.Generic.input2dateField(elem, showTime, hiddenFields, trigger, format);
 
             elem.set("");
             //Redirecting method invocation from 'tab' to 'elem'
