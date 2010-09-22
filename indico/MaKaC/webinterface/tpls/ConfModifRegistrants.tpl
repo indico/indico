@@ -86,6 +86,19 @@
         isSelected("registrantsItems")
     }
 
+    var staticURLState = false;
+    var staticURLSwitch = function() {
+        if (staticURLState) {
+            IndicoUI.Effect.disappear($E('staticURL'));
+            IndicoUI.Effect.disappear($E('staticURLLink'));
+        } else {
+            IndicoUI.Effect.appear($E('staticURL'));
+            IndicoUI.Effect.appear($E('staticURLLink'));
+            $E('staticURL').dom.select();
+        }
+        staticURLState = !staticURLState;
+    }
+
     window.onload = function(){
         isSelected("registrantsItems")
     }
@@ -126,12 +139,16 @@
                 <a id="index_display" onclick="showDisplay()" class="CAIndexUnselected" font-size="16">
                     <%= _("Columns to display")%>
                 </a>
+                <span style="padding: 0px 6px 0px 6px">|</span>
+                <a id="index_display" onclick="staticURLSwitch()" class="CAIndexUnselected" font-size="16">
+                    <%= _("Static URL for this result")%>
+                </a>
             </div>
             </form>
             </td>
         </tr>
         <tr>
-            <td colspan="10" align="left" width="100%%">
+            <td colspan="1000" align="left" width="100%%">
               <form action=%(filterPostURL)s method="post" name="displayOptionForm">
                 <input type="hidden" name="operationType" value="display" />
                 %(displayMenu)s
@@ -146,10 +163,16 @@
 	   </tr>
 
         <tr>
+            <td colspan="1000" align="left" width="100%%">
+                <input type="text" id="staticURL" size="74" style="display: none;" readonly="readonly" value="<%= filterUrl %>" />
+                <a id="staticURLLink" style="display: none; margin-left: 5px;" href="<%= filterUrl %>"><%= _("Go to URL")%></a>
+            </td>
+        </tr>
+
+        <tr>
           <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
             <form action=%(actionPostURL)s method="post" name="registrantsForm" onSubmit="return atLeastOneSelected()">
 	      <table>
-                <tr>
                 <tr>
                   <td colspan="10">
                     <div>
@@ -159,6 +182,7 @@
                   </td>
                 </tr>
 
+                <tr>
                 <td valign="bottom" align="left" class="eventModifButtonBar">
                   <input type="submit" class="btn" name="newRegistrant" onclick="newUser = true;" value="<%= _("Add new")%>">
                 </td>
