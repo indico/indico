@@ -27,10 +27,16 @@ under the corresponding GNU GPL license.
 
 import sys
 import os
+from MaKaC.common import Config
+
+DIR_HTDOCS = Config.getInstance().getHtdocsDir()
+PATH = [os.path.join(DIR_HTDOCS, '../'), \
+        DIR_HTDOCS]
+for p in PATH:
+    if p not in sys.path:
+        sys.path.append(p)
+
 from wsgiref.util import FileWrapper, guess_scheme
-
-sys.path.append('/home/dcampora/eclipse/plugins/org.python.pydev.debug_1.5.9.2010063001/pysrc')
-
 from indico.web.wsgi.webinterface_handler_config import \
      HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
      HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR, \
@@ -38,6 +44,7 @@ from indico.web.wsgi.webinterface_handler_config import \
 from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage
 from indico.web.wsgi.indico_wsgi_url_parser import is_mp_legacy_publisher_path, \
     is_static_path
+
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.

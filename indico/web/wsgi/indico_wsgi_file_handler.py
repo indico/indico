@@ -191,6 +191,22 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 ret[key] = value
         return ret
 
+    if UseXSendFile:
+        ## If XSendFile is supported by the server, let's use it.
+        if os.path.exists(fullpath):
+            if fullname is None:
+                fullname = os.path.basename(fullpath)
+            req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+            req.headers_out["X-Sendfile"] = fullpath
+            if mime is None:
+                (mime, encoding) = _mimes.guess_type(fullpath)
+                if mime is None:
+                    mime = "application/octet-stream"
+            req.content_type = mime
+            return ""
+        else:
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+
     headers = get_normalized_headers(req.headers_in)
     if headers['if-match']:
         if etag is not None and etag not in headers['if-match']:
@@ -249,3 +265,5 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             return normal_streaming(size)
     else:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+
+UseXSendFile = False

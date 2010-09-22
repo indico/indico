@@ -37,7 +37,7 @@ in the form (hash, tuple)
 @tuple[2]: preprocessing function (if there's no function, '')
 @tuple[3]: parameters for the preprocessing function (dictionary)
 
-Add the especial pages here.
+Add pages that need url parsing here.
 """
 urlMapping = {'':   ((DIR_HTDOCS, 'index.py'), 'index', '', None), \
     'services':     ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
