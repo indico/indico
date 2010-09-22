@@ -39,7 +39,7 @@ class Json:
         self.json = encode(content)
 
 def encode(obj):
-    return simplejson.dumps(obj, ensure_ascii=False)
+    return simplejson.dumps(obj, ensure_ascii=True)
 
 def decode(str):
     return unicodeToUtf8(simplejson.loads(str))
