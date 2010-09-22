@@ -48,6 +48,9 @@ class PluginsHolder (ObjectHolder):
         if len(self._getIdx()) == 0: #no plugins
             self.loadAllPlugins()
 
+    def getRHMap(self):
+        return {'urlHandler': 'indico.MaKaC.plugins.myPlugin.hiGuys.index'}
+
     def getGlobalPluginOptions(self):
         """ Returns server-wide options relative to the whole plugin system.
         """
@@ -131,8 +134,6 @@ class PluginsHolder (ObjectHolder):
         """ Returns the PluginType object for the given name
         """
         return self.getById(name)
-
-
 
 
 class PluginBase(Persistent):

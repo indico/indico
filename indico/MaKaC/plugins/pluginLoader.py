@@ -229,7 +229,6 @@ class PluginLoader(object):
                     cls.loadSubModules(pluginModule, pluginPath)
 
             elif ext == ".py" and itemName != "__init__":
-
                 pluginTypeSubModule = cls.importName(pluginTypePackageName, itemName)
 
                 if pluginTypeSubModule:

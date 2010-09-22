@@ -72,12 +72,23 @@ def application(environ, start_response):
             if possible_module is not None:
                 mp_legacy_publisher(req, possible_module, possible_handler)
             else:
-                possible_static_path = is_static_path(environ['PATH_INFO'])
-                if possible_static_path is not None:
-                    from indico.web.wsgi.indico_wsgi_file_handler import stream_file
-                    stream_file(req, possible_static_path)
+                # Let's try to load a plugin
+                from indico.MaKaC.plugins.base import PluginsHolder
+                path = req.URLFields['PATH_INFO'].split('/')
+
+                pluginMap = PluginsHolder().getRHMap()
+                if path[0] != '' and pluginMap.has_key(path[0]):
+                    importList = pluginMap.get(path[0]).split('.')
+                    b = __import__('.'.join(importList[1:]), None, None, importList[0])
+                    b( req ).process( **params )
                 else:
-                    raise SERVER_RETURN, HTTP_NOT_FOUND
+                    # Finally, it might be a static file
+                    possible_static_path = is_static_path(environ['PATH_INFO'])
+                    if possible_static_path is not None:
+                        from indico.web.wsgi.indico_wsgi_file_handler import stream_file
+                        stream_file(req, possible_static_path)
+                    else:
+                        raise SERVER_RETURN, HTTP_NOT_FOUND
             req.flush()
         #Exception treatment
         except SERVER_RETURN, status:
@@ -125,7 +136,6 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
-
     the_module = open(possible_module).read()
     module_globals = {}
 
