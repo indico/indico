@@ -39,8 +39,8 @@ class AccommFilterField( filters.FilterField ):
     def satisfies( self, reg ):
         """
         """
-        accomTypesList = len(reg.getRegistrationForm().getAccommodationForm().getAccommodationTypesList())
-        if accomTypesList != len(self._values):
+        accomTypesList = reg.getRegistrationForm().getAccommodationForm().getAccommodationTypesList()
+        if len(accomTypesList) != len(self._values):
             if reg.getAccommodation().getAccommodationType() is None:
                 return self._showNoValue
             if reg.getAccommodation().getAccommodationType() not in accomTypesList:

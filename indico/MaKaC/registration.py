@@ -4180,7 +4180,7 @@ class RegistrantMapping(object):
                         "idpayment" :           self._registrant.getIdPay,
                         "Country" :             self._getCountry,
                         "amountToPay" :         self._getAmountToPay,
-                        "Accomodation" :        self._getAccomodation,
+                        "Accommodation" :        self._getAccomodation,
                         "SocialEvents" :        self._getSocialEvents,
                         "ReasonParticipation" : self._getReasonParticipation,
                         "RegistrationDate" :    self._getRegistrationDate,
