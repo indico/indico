@@ -819,7 +819,7 @@ class RHRegistrationFormModifGeneralSectionFieldPerformModif( RHRegistrationForm
             # setup the server variable with the values for the section field
             tmpSectionField=self._getSession().getVar("tmpSectionField")
             if tmpSectionField == None:
-                tmpSectionField=_TmpSectionField(sectionField=self._sectionField)
+                tmpSectionField=_TmpSectionField(generalField=self._sectionField)
             else:
                 tmpSectionField.map(self._getRequestParams())
             self._getSession().setVar("tmpSectionField", tmpSectionField)
