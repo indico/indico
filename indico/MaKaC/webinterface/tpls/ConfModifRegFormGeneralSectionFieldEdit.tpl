@@ -42,7 +42,7 @@
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Caption")%></span></td>
       <td bgcolor="white" class="blacktext" width="100%%">
-      <input type="text" name="caption" size="60" maxlength="60" =%(caption)s>
+      <input type="text" name="caption" size="60" maxlength="60" value=<%= caption %> />
       </td>
     </tr>
     <tr>
