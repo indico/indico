@@ -1662,6 +1662,9 @@ class RadioGroupInput(FieldInputType):
         tmp.append(""" </td> """)
 
         tmp.append("""<td><select name="%s">""" % self.getHTMLName())
+
+        tmp.append("""<option value=""></option>""")
+
         for radioItem in self.getItemsList():
             if radioItem.isEnabled() and not (registrant is not None and (radioItem.isBillable() or billable) and registrant.getPayed()):
 
