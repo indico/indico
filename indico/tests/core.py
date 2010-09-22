@@ -181,6 +181,7 @@ class TestManager(object):
                        " Starting fake DB in standard port")
             TestManager._stopProductionDB()
             self._startFakeDB(params[0], params[1])
+            TestManager._setDebugMode()
             TestManager._createDummyUser()
         else:
             self._info("No DB is needed")
@@ -376,5 +377,23 @@ class TestManager(object):
         index.unindexUser(avatar)
         index = indexes.IndexesHolder().getById("status")
         index.unindexUser(avatar)
+
+        DBMgr.getInstance().endRequest()
+
+
+    @staticmethod
+    def _setDebugMode():
+        """
+        Sets the Debug Mode for the DB
+        """
+        from MaKaC.common import HelperMaKaCInfo
+
+        TestManager._info("Starting up debug mode")
+
+        DBMgr.getInstance().startRequest()
+
+        #debug mode
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        minfo.setDebugActive()
 
         DBMgr.getInstance().endRequest()

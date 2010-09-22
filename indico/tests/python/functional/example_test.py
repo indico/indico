@@ -21,7 +21,7 @@
 # For now, disable Pylint
 # pylint: disable-all
 
-import time
+import time, unittest
 from seleniumTestCase import SeleniumTestCase
 
 class ExampleTest(SeleniumTestCase):
@@ -30,6 +30,15 @@ class ExampleTest(SeleniumTestCase):
 
     def testCreateDeleteLecture(self):
         sel = self.selenium
+
+        # Test fix - login
+        sel.open("/indico/signIn.py")
+        sel.type("login", "dummyuser")
+        sel.type("password", "dummyuser")
+        sel.click("loginButton")
+        sel.wait_for_page_to_load("30000")
+
+        # Start test
         sel.open("/indico//index.py")
         sel.click("//li[@id='createEventMenu']/span")
         sel.click("link=Create lecture")
@@ -63,6 +72,14 @@ class ExampleTest(SeleniumTestCase):
 
     def testConference(self):
         sel = self.selenium
+
+        # Test fix - login
+        sel.open("/indico/signIn.py")
+        sel.type("login", "dummyuser")
+        sel.type("password", "dummyuser")
+        sel.click("loginButton")
+        sel.wait_for_page_to_load("30000")
+
         sel.open("/indico/index.py")
         sel.click("//li[@id='createEventMenu']/span")
         sel.click("link=Create conference")

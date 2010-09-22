@@ -318,7 +318,9 @@ class test_indico(Command):
                     ('grid', None, "Use Selenium Grid"),
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
-                    ('parallel', None, "Parallel test execution (for --functional)"),
+                    ('parallel', None, "Parallel test execution using Selenium Grid (for --functional)"),
+                    ('threads=', None, "Parallel test execution with several threads (for --functional)"),
+                    ('repeat=', None, "Number of repetitions (for --functional)"),
                     ('silent', None, "Don't output anything in the console, just generate the report")]
     boolean_options = []
 
@@ -336,6 +338,8 @@ class test_indico(Command):
     html = False
     record = False
     parallel = False
+    threads = False
+    repeat = False
     log = False
 
     def initialize_options(self):
@@ -377,6 +381,8 @@ class test_indico(Command):
                    'coverage': self.coverage,
                    'record': self.record,
                    'parallel': self.parallel,
+                   'threads': self.threads,
+                   'repeat': self.repeat,
                    'log': self.log}
 
         # get only options that are active
@@ -413,9 +419,11 @@ Do you want to stop it using this command '%s' and run the tests?
 (We will restart your produduction after the tests with this command '%s')""" % \
 (TestConfig.getInstance().getStopDBCmd(), TestConfig.getInstance().getStartDBCmd())
 
-                userInput = raw_input("Press enter or type 'yes' to accept: ")
+                userInput = raw_input("Type 'yes' to accept, 'no' to exit or 'usedb' to use current DB. [yes]: ")
                 if userInput == 'yes' or userInput == '':
                     fakeDBPolicy = 3
+                elif userInput == 'usedb':
+                    fakeDBPolicy = 0
                 else:
                     print "Exiting testing framework..."
                     sys.exit(1)

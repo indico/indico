@@ -176,6 +176,7 @@ class UnitTestRunner(BaseTestRunner):
                 "/tests/python/unit"):
                 args.append(folder)
 
+
         result = nose.run(argv = args)
 
         #if coverage:
@@ -210,7 +211,9 @@ class FunctionalTestRunner(BaseTestRunner):
 
     _runnerOptions = {'silent': Option,
                       'record': Option,
-                      'specify': Option}
+                      'specify': Option,
+                      'threads': Option,
+                      'repeat': Option}
 
 
     def __init__(self, **kwargs):
@@ -243,7 +246,20 @@ class FunctionalTestRunner(BaseTestRunner):
                     "/tests/python/functional"):
                     args.append(folder)
 
-            result = nose.run(argv = args)
+            # Execute the tests
+            result = True
+            repeat = int(self.options.valueOf('repeat'))
+            threads = int(self.options.valueOf('threads'))
+            if repeat < 1:
+                repeat = 0
+
+            for i in range(1, repeat+1):
+                if threads > 1:
+                    testResult = self._runParallel(args,threads)
+                else:
+                    testResult = nose.run(argv = args)
+                result = result and testResult
+                self._info("Test #%d: %s\n" % (i, testResult and 'OK' or 'Error'))
 
         except Exception, e:
             raise e
@@ -324,6 +340,46 @@ class FunctionalTestRunner(BaseTestRunner):
         stops the selenium server
         """
         self.child.kill()
+
+    def _runParallel(self, args, numThreads):
+        self._info("Starting %s threads" % numThreads)
+
+        # launch all threads
+        threadInstances = {}
+        for i in range(0, int(numThreads)):
+            threadInstances[i] = FunctionalTestThreadRunner(args)
+            threadInstances[i].start()
+
+        # give it some time to start up
+        time.sleep(1)
+
+        # wait so that there are no more runner threads executing
+        while(len(list(thread for thread in threading.enumerate()
+                       if isinstance(thread, FunctionalTestThreadRunner))) > 0):
+            time.sleep(1)
+
+        # check the result
+        theResult = True
+        for tindex in threadInstances:
+            theResult = theResult and threadInstances[tindex].getThreadData()
+
+        return theResult
+
+class FunctionalTestThreadRunner(threading.Thread):
+    """
+    A thread for the parallel version of functional testing
+    """
+
+    def __init__(self, args):
+        threading.Thread.__init__(self)
+        self.result = None
+        self.args = args
+
+    def run(self):
+        self.result = nose.run(argv = self.args)
+
+    def getThreadData(self):
+        return self.result
 
 
 class GridEnvironmentRunner(threading.Thread):
