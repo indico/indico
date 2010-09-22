@@ -1129,11 +1129,16 @@ class TextareaInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed() ):
             disable="disabled=\"true\""
             #pass
-        tmp = """&nbsp;%s<br><textarea name="%s" cols="60" rows="4" %s >%s</textarea>"""%(caption, htmlName, disable, v)
+
+        if description:
+            desc = """%s<br/>""" % self._getDescriptionHTML(description)
+        else:
+            desc = ''
+
+        tmp = """&nbsp;%s<br>%s<textarea name="%s" cols="60" rows="4" %s >%s</textarea>"""%(caption, desc, htmlName, disable, v)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
-        if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
