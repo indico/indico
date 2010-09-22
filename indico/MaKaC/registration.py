@@ -2053,6 +2053,10 @@ class GeneralField(Persistent):
         self._caption = caption
 
     def getDescription(self):
+        try:
+            if self._description: pass
+        except AttributeError:
+            self._description = ''
         return self._description
 
     def setDescription(self, description):
