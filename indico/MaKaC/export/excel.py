@@ -98,6 +98,9 @@ class RegistrantsListToExcel:
             value = str(value).strip()
         return value
 
+    def _isNumberAsString(self, fieldInput, value):
+        return fieldInput.getName() == 'Telephone'
+
     def getExcelFile(self):
         excelGen=ExcelGenerator()
         excelGen.addValue("Name")
@@ -229,7 +232,10 @@ class RegistrantsListToExcel:
                             i=group.getResponseItemById(ids[1])
                             if i is not None:
                                 value = self._formatGenericValue(i.getGeneralField().getInput(), i.getValue())
-                                excelGen.addValue(value)
+                                if self._isNumberAsString(i.getGeneralField().getInput(), i.getValue()):
+                                    excelGen.addNumberAsString(value)
+                                else:
+                                    excelGen.addValue(value)
                                 continue
                     excelGen.addValue("")
             excelGen.newLine()
