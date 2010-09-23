@@ -1390,6 +1390,7 @@ class WConfModAbstractPropToRej(wcomponents.WTemplated):
         vars["postURL"]=quoteattr(str(urlHandlers.UHConfModAbstractPropToRej.getURL(self._abstract)))
         vars["tracks"]=self._getTracksHTML()
         vars["comment"]=""
+        vars["changeTrackURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
         return vars
 
 

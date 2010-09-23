@@ -3,14 +3,21 @@
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Propose to be rejected")%></td>
         </tr>
+        <% if len(tracks) > 0: %>
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Proposed track")%></span>
             </td>
-            <td>
-                <select name="track">%(tracks)s</select>
+            <td><select name="track">%(tracks)s</select></td>
+        </tr>
+        <% end %>
+        <% else: %>
+        <tr>
+            <td colspan="2">
+                <span class="titleCellFormat"> <b><%= _("This abstract has not been included in any track, if you want to include it now click")%> <a href=%(changeTrackURL)s><%= _("here")%></a></b> </span>
             </td>
         </tr>
+        <% end %>
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Comment")%></span>
