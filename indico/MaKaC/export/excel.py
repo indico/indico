@@ -91,6 +91,13 @@ class RegistrantsListToExcel:
         self._regList = list
         self._display = display
 
+    def _formatGenericValue(self, fieldInput, value):
+        try:
+            value = fieldInput.getValueDisplay(value)
+        except:
+            value = str(value).strip()
+        return value
+
     def getExcelFile(self):
         excelGen=ExcelGenerator()
         excelGen.addValue("Name")
@@ -221,7 +228,8 @@ class RegistrantsListToExcel:
                         if group is not None:
                             i=group.getResponseItemById(ids[1])
                             if i is not None:
-                                excelGen.addValue(str(i.getValue()))
+                                value = self._formatGenericValue(i.getGeneralField().getInput(), i.getValue())
+                                excelGen.addValue(value)
                                 continue
                     excelGen.addValue("")
             excelGen.newLine()
