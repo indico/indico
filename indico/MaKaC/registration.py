@@ -854,21 +854,21 @@ Please use this information for your payment (except for e-payment):\n
         fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
         subject= _("""Registration modified for '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
         body= _("""
-              _("Registrant Id"): %s
-              _("Title"): %s
-              _("Family Name"): %s
-              _("First Name"): %s
-              _("Position"): %s
-              _("Institution"): %s
-              _("Address"): %s
-              _("City"): %s
-              _("Country"): %s
-              _("Phone"): %s
-              _("Fax"): %s
-              _("Email"): %s
-              _("Personal Homepage"): %s
+_("Registrant Id"): %s
+_("Title"): %s
+_("Family Name"): %s
+_("First Name"): %s
+_("Position"): %s
+_("Institution"): %s
+_("Address"): %s
+_("City"): %s
+_("Country"): %s
+_("Phone"): %s
+_("Fax"): %s
+_("Email"): %s
+_("Personal Homepage"): %s
 %s
-             """)%(   rp.getId(), \
+""")%(   rp.getId(), \
                      rp.getTitle(), \
                      rp.getFamilyName(), \
                      rp.getFirstName(), \
@@ -884,11 +884,11 @@ Please use this information for your payment (except for e-payment):\n
                      self._printAllSections(regForm, rp) )
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-             A registrant has modified his/her registration for '%s'. See information below:
+A registrant has modified his/her registration for '%s'. See information below:
 
-                      %s
-                      """)%(strip_ml_tags(regForm.getConference().getTitle()), \
-                              body)
+%s
+""")%(strip_ml_tags(regForm.getConference().getTitle()), body)
+            bodyOrg = self._cleanBody(bodyOrg)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
 
@@ -1368,12 +1368,7 @@ class CheckboxInput(FieldInputType):
         if v=="yes":
             checked="checked=\"checked\""
 
-        if self._parent.isMandatory():
-            param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
-        else:
-            param = ''
-
-        tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s%s""" % (htmlName, htmlName, checked, disable, caption, param)
+        tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s""" % (htmlName, htmlName, checked, disable, caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp, price, currency)
@@ -1441,7 +1436,7 @@ class YesNoInput(FieldInputType):
             checkedYes="selected"
         elif v=="no":
             checkedNo="selected"
-        tmp = """%s <select id="%s" name="%s" %s><option value=""></option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, checkedNo, param)
+        tmp = """%s <select id="%s" name="%s" %s><option value="">-- Choose a value --</option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, checkedNo, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
@@ -1762,7 +1757,7 @@ class RadioGroupInput(FieldInputType):
 
         tmp.append("""<td><select id="%s" name="%s">""" % (self.getHTMLName(), self.getHTMLName()))
 
-        tmp.append("""<option value=""></option>""")
+        tmp.append("""<option value="">-- Choose a value --</option>""")
 
         for radioItem in self.getItemsList():
             if radioItem.isEnabled() and not (registrant is not None and (radioItem.isBillable() or billable) and registrant.getPayed()):
@@ -2019,12 +2014,12 @@ class DateInput(FieldInputType):
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
-        day = params.get('%sDay' % self.getHTMLName(), 1)
-        month = params.get('%sMonth' % self.getHTMLName(), 1)
+        day = params.get('%sDay' % self.getHTMLName(), 1) or 1
+        month = params.get('%sMonth' % self.getHTMLName(), 1) or 1
         year = params.get('%sYear' % self.getHTMLName())
 
-        hour = params.get('%sHour' % self.getHTMLName(), 0)
-        minute = params.get('%sMin' % self.getHTMLName(), 0)
+        hour = params.get('%sHour' % self.getHTMLName(), 0) or 0
+        minute = params.get('%sMin' % self.getHTMLName(), 0) or 0
 
         if year:
             date = datetime(int(year), int(month), int(day), int(hour), int(minute))
