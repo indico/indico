@@ -4423,9 +4423,17 @@ class RegistrantMapping(object):
         else:
             return ""
 
+    def _formatValue(self, fieldInput, value):
+        try:
+            value = fieldInput.getValueDisplay(value)
+        except:
+            value = str(value).strip()
+        return value
+
     def _getItem(self, groupId, itemId):
         if self._registrant.getMiscellaneousGroupById(groupId) and \
            self._registrant.getMiscellaneousGroupById(groupId).getResponseItemById(itemId):
-            return self._registrant.getMiscellaneousGroupById(groupId).getResponseItemById(itemId).getValue()
+            item = self._registrant.getMiscellaneousGroupById(groupId).getResponseItemById(itemId)
+            return self._formatValue(item.getGeneralField().getInput(), item.getValue())
         else:
             return ""
