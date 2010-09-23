@@ -457,10 +457,11 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
         vars = wcomponents.WTemplated.getVars( self )
 
-        vars["filterUrl"] = self._filterUrl
+        # '%' escaping for template engine (just until we have a decent one)
+        vars["filterUrl"] = str(self._filterUrl).replace('%', '%%')
 
         sortingField = self._sortingCrit.getField()
-        vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
+        vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)).replace('%','%%'))
         cl = self._conf.getRegistrantsList(False)
         f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
         vars["eve"]=""
