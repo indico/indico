@@ -1058,7 +1058,13 @@ class TextInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed() ):
             disable="disabled=\"true\""
             #pass
-        tmp = """&nbsp;%s <input type="text" name="%s" value="%s" size="60" %s >"""%(caption, htmlName, v ,disable)
+
+        if self._parent.isMandatory():
+            param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
+        else:
+            param = ''
+
+        tmp = """&nbsp;%s <input type="text" id="%s" name="%s" value="%s" size="60" %s >%s""" % (caption, htmlName, htmlName, v , disable, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
@@ -1090,7 +1096,8 @@ class TextInput(FieldInputType):
 
 class TelephoneInput(FieldInputType):
     _id = "telephone"
-    _PATTERN = re.compile(r'^\s*\+?\s*\d+(\s*\-?\s*\d+)*\s*$')
+    _REGEX = r'^\s*\+?\s*\d+(\s*\-?\s*\d+)*\s*$'
+    _PATTERN = re.compile(_REGEX)
 
     def getName(cls):
         return "Telephone"
@@ -1107,8 +1114,20 @@ class TelephoneInput(FieldInputType):
             htmlName = item.getHTMLName()
 
         disable = ""
+
+        if self._parent.isMandatory():
+            param = """<script>
+            addParam($E('%s'), 'text', false, function(value) {
+              if (!/%s/.test(value)) {
+                return "Invalid phone number format";
+              }
+            });
+            </script>""" % (htmlName, TelephoneInput._REGEX)
+        else:
+            param = ''
+
         format = """&nbsp;<span class="inputDescription">(+) 999 99 99 99</span>"""
-        tmp = """&nbsp;%s <input type="text" name="%s" value="%s" size="30" %s >%s""" % (caption, htmlName, v , disable, format)
+        tmp = """&nbsp;%s <input type="text" id="%s" name="%s" value="%s" size="30" %s >%s%s""" % (caption, htmlName, htmlName, v , disable, format, param)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:
@@ -1166,7 +1185,12 @@ class TextareaInput(FieldInputType):
         else:
             desc = ''
 
-        tmp = """&nbsp;%s<br>%s<textarea name="%s" cols="60" rows="4" %s >%s</textarea>"""%(caption, desc, htmlName, disable, v)
+        if self._parent.isMandatory():
+            param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
+        else:
+            param = ''
+
+        tmp = """&nbsp;%s<br>%s<textarea id="%s" name="%s" cols="60" rows="4" %s >%s</textarea>%s""" % (caption, desc, htmlName, htmlName, disable, v, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
 
@@ -1214,11 +1238,16 @@ class NumberInput(FieldInputType):
             currency=item.getCurrency()
             htmlName=item.getHTMLName()
 
+        if self._parent.isMandatory():
+            param = """<script>addParam($E('%s'), 'unsigned_int', false);</script>""" % htmlName
+        else:
+            param = """<script>addParam($E('%s'), 'unsigned_int', true);</script>""" % htmlName
+
         disable=""
         if ( registrant is not None and billable and registrant.getPayed()):
             disable="disabled=\"true\""
             #pass
-        tmp = """&nbsp;<input type="text" name="%s" value="%s" %s size="6">&nbsp;&nbsp;%s """%(htmlName, v,disable,caption)
+        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s size="6">&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, disable, caption, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
@@ -1337,7 +1366,13 @@ class CheckboxInput(FieldInputType):
             #pass
         if v=="yes":
             checked="checked=\"checked\""
-        tmp=  """<input type="checkbox" name="%s" %s %s> %s"""%(htmlName, checked,disable, caption)
+
+        if self._parent.isMandatory():
+            param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
+        else:
+            param = ''
+
+        tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s%s""" % (htmlName, htmlName, checked, disable, caption, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp, price, currency)
@@ -1390,6 +1425,12 @@ class YesNoInput(FieldInputType):
             htmlName=item.getHTMLName()
             caption=item.getCaption()
         disable=""
+
+        if self._parent.isMandatory():
+            param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
+        else:
+            param = ''
+
         checkedYes=""
         checkedNo=""
         if ( registrant is not None and billable and registrant.getPayed()):
@@ -1399,7 +1440,7 @@ class YesNoInput(FieldInputType):
             checkedYes="selected"
         elif v=="no":
             checkedNo="selected"
-        tmp=  """&nbsp;%s <select name="%s" %s><option value=""></option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>"""%(caption, htmlName,disable, checkedYes, checkedNo)
+        tmp = """&nbsp;%s <select id="%s" name="%s" %s><option value=""></option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, checkedNo, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
@@ -1649,10 +1690,15 @@ class RadioGroupInput(FieldInputType):
             currency = item.getCurrency()
             caption = item.getCaption()
             value = item.getValue()
-        tmp = """&nbsp;%s """ % (caption)
+
+        tmp = """&nbsp;%s""" % (caption)
         tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
         tmp.append(""" </td> """)
+
+        counter = 0
         for val in self.getItemsList():
+            counter += 1
+            itemId = "%s_%s" % (self.getHTMLName(), counter)
             disable = ""
             if not val.isEnabled():
                 disable = "disabled=\"true\""
@@ -1664,7 +1710,7 @@ class RadioGroupInput(FieldInputType):
                 checked = "checked"
             elif not value and val.getCaption() == self.getDefaultItem():
                 checked = "checked"
-            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" name="%s"  value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
+            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" id="%s" name="%s" value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
             if val.isBillable():
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;%s</td></tr> """ % (val.getPrice(), currency))
             else:
@@ -1672,6 +1718,21 @@ class RadioGroupInput(FieldInputType):
 
         if description:
             tmp.append("""<tr><td></td><td colspan="2">%s</td></tr>""" % (self._getDescriptionHTML(description)))
+
+        if self._parent.isMandatory():
+            validator = """
+            for (var i=1; i<=%s; i++) {
+                var item = $E('%s_' + i);
+                if (item.dom.checked) {
+                  return true;
+                }
+            }
+            alert('You must select option for "%s"!');
+            return false;
+            """ % (counter, self.getHTMLName(), caption)
+            script = """<script>addValidator(function() {%s});</script>""" % validator
+            tmp.append(script)
+
         return "".join(tmp)
 
     def _getDropDownModifHTML(self, item, registrant):
@@ -1688,11 +1749,16 @@ class RadioGroupInput(FieldInputType):
         if not value:
             value = self.getDefaultItem()
 
+        if self._parent.isMandatory():
+            param = """<script>addParam($E('%s'), 'text', false);</script>""" % self.getHTMLName()
+        else:
+            param = ''
+
         tmp = """&nbsp;%s""" % (caption)
         tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
         tmp.append(""" </td> """)
 
-        tmp.append("""<td><select name="%s">""" % self.getHTMLName())
+        tmp.append("""<td><select id="%s" name="%s">""" % (self.getHTMLName(), self.getHTMLName()))
 
         tmp.append("""<option value=""></option>""")
 
@@ -1712,7 +1778,7 @@ class RadioGroupInput(FieldInputType):
 
                 tmp.append("""<option value="%s"%s>%s%s</option>""" % (radioItem.getId(), selected, radioItem.getCaption(), price))
 
-        tmp.append("""</select></td>""")
+        tmp.append("""</select>%s</td>""" % param)
 
         return "".join(tmp)
 
@@ -1852,13 +1918,18 @@ class CountryInput(FieldInputType):
             htmlName = item.getHTMLName()
         disable = ""
 
+        if self._parent.isMandatory():
+            param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
+        else:
+            param = ''
+
         inputHTML = _("""<option value="">--  _("Select a country") --</option>""")
         for countryKey in CountryHolder().getCountrySortedKeys():
             selected = ""
             if value == countryKey:
                 selected = "selected"
             inputHTML += """<option value="%s" %s>%s</option>""" % (countryKey, selected, CountryHolder().getCountryById(countryKey))
-        inputHTML = """<select name="%s" %s>%s</select>""" % (htmlName, disable, inputHTML)
+        inputHTML = """<select id="%s" name="%s" %s>%s</select>%s""" % (htmlName, htmlName, disable, inputHTML, param)
 
         tmp = "&nbsp;%s %s " % (caption, inputHTML)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
@@ -1925,9 +1996,17 @@ class DateInput(FieldInputType):
             htmlName = self.getHTMLName()
 
         from MaKaC.webinterface.wcomponents import WDateField
-        inputHTML = WDateField(htmlName, date, self.dateFormat, True).getHTML()
+        inputHTML = WDateField(caption, htmlName, date, self.dateFormat, True, self._parent.isMandatory()).getHTML()
 
-        tmp = "&nbsp;%s %s " % (caption, inputHTML)
+        dateFormat = self.dateFormat
+        dateFormat = re.sub('%d', 'DD', dateFormat)
+        dateFormat = re.sub('%m', 'MM', dateFormat)
+        dateFormat = re.sub('%Y', 'YYYY', dateFormat)
+        dateFormat = re.sub('%H', 'hh', dateFormat)
+        dateFormat = re.sub('%M', 'mm', dateFormat)
+
+        format = """&nbsp;<span class="inputDescription">%s</span>""" % dateFormat
+        tmp = "&nbsp;%s %s %s" % (caption, inputHTML, format)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:
@@ -1939,19 +2018,17 @@ class DateInput(FieldInputType):
         month = params.get('%sMonth' % self.getHTMLName(), 1)
         year = params.get('%sYear' % self.getHTMLName())
 
-        hour = params.get('%sHour' % self.getHTMLName(), 13)
+        hour = params.get('%sHour' % self.getHTMLName(), 0)
         minute = params.get('%sMin' % self.getHTMLName(), 0)
 
-        if self.getParent().isMandatory():
-            if not day and not month and not year:
-                raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
+        if year:
+            date = datetime(int(year), int(month), int(day), int(hour), int(minute))
+            item.setValue(date)
+        elif not self._parent.isMandatory():
+            item.setValue(None)
+        else:
+            raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
 
-        if not year:
-            year = datetime.now().year
-
-        date = datetime(int(year), int(month), int(day), int(hour), int(minute))
-
-        item.setValue(date)
         item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
 

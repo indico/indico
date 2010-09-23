@@ -1,12 +1,36 @@
 <script>
+  var validators = [];
+  var parameterManager = new IndicoUtil.parameterManager();
+  var addParam = parameterManager.add;
+
+  function addValidator(validator) {
+      validators.push(validator);
+  }
+
   function enableAll(f) {
     for (i = 0; i < f.elements.length; i++) {
       f.elements[i].disabled=false
     }
   }
+
+  function formSubmit(f) {
+      if (!parameterManager.check()) {
+          return false;
+      }
+
+      for (var i in validators) {
+          var validator = validators[i];
+          if (!validator()) {
+              return false;
+          }
+      }
+
+      enableAll(f);
+      return true;
+  }
 </script>
 
-<form action=%(postURL)s method="POST" onSubmit="enableAll(this);">
+<form action=%(postURL)s method="POST" onSubmit="return formSubmit(this);">
 <table width="70%%" align="center">
 	<tr><td>&nbsp;</td></tr>
     <tr>

@@ -843,11 +843,6 @@ IndicoUI.Widgets = {
             }
 
             elem.processDate = function(){
-                // TODO: Error on invalid date
-                if (elem.get() === '') {
-                    return;
-                }
-
                 var d;
                 if (showTime) {
                     if (exists(format)) {
@@ -857,7 +852,10 @@ IndicoUI.Widgets = {
                     }
                 } else {
                     if (exists(format)) {
-                        d = getDate(Util.parseJSDateTime(elem.get(), format));
+                        d = Util.parseJSDateTime(elem.get(), format);
+                        if (d != null) {
+                            d = getDate(d);
+                        }
                     } else {
                         d = parseDate(elem.get());
                     }
@@ -867,7 +865,7 @@ IndicoUI.Widgets = {
                 if (d) {
                     if (isArray(hiddenFields)) {
                         $E(hiddenFields[0]).set(!showTime?d[0]:d.getDate());
-                        $E(hiddenFields[1]).set(!showTime?d[1]:d.getMonth()+1);
+                        $E(hiddenFields[1]).set(!showTime?d[1]:d.getMonth() + 1);
                         $E(hiddenFields[2]).set(!showTime?d[2]:d.getFullYear());
                         if (showTime) {
                             $E(hiddenFields[3]).set(d.getHours());
@@ -877,6 +875,18 @@ IndicoUI.Widgets = {
                         $E(hiddenFields).set(elem.get());
                     }
                     ret = true;
+                } else {
+                    if (isArray(hiddenFields)) {
+                        $E(hiddenFields[0]).set('');
+                        $E(hiddenFields[1]).set('');
+                        $E(hiddenFields[2]).set('');
+                        if (showTime) {
+                            $E(hiddenFields[3]).set('');
+                            $E(hiddenFields[4]).set('');
+                        }
+                    } else if (hiddenFields) {
+                        $E(hiddenFields).set('');
+                    }
                 }
 
                 return ret;

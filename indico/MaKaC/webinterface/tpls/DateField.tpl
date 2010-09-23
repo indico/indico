@@ -1,9 +1,20 @@
 <span id="<%= name %>DatePlace"></span>
+
+<% if date: %>
 <input type="hidden" value="<%= date.day %>" name="<%= name %>Day" id="<%= name %>Day"/>
 <input type="hidden" value="<%= date.month %>" name="<%= name %>Month" id="<%= name %>Month"/>
 <input type="hidden" value="<%= date.year %>" name="<%= name %>Year" id="<%= name %>Year"/>
 <input type="hidden" value="<%= date.hour %>" name="<%= name %>Hour" id="<%= name %>Hour" />
 <input type="hidden" value="<%= date.minute %>" name="<%= name %>Min" id="<%= name %>Min" />
+<% end %>
+<% else: %>
+<input type="hidden" value="" name="<%= name %>Day" id="<%= name %>Day"/>
+<input type="hidden" value="" name="<%= name %>Month" id="<%= name %>Month"/>
+<input type="hidden" value="" name="<%= name %>Year" id="<%= name %>Year"/>
+<input type="hidden" value="" name="<%= name %>Hour" id="<%= name %>Hour" />
+<input type="hidden" value="" name="<%= name %>Min" id="<%= name %>Min" />
+<% end %>
+
 <script type="text/javascript">
 IndicoUI.executeOnLoad(function() {
     var format = '<%= format %>';
@@ -15,5 +26,19 @@ IndicoUI.executeOnLoad(function() {
     <% end %>
     $E('<%= name %>DatePlace').set(<%= name %>Date);
     <%= name %>Date.set('<%= dateDisplay %>');
+
+    <% if isMandatory: %>
+    if (exists(addValidator)) {
+        var year = $E('<%= name %>Year');
+        addValidator(function() {
+            value = year.get();
+            var ok = value != '' && value > 1900;
+            if (!ok) {
+                alert('You must enter a valid date in the field "<%= caption %>"!');
+            }
+            return ok;
+        });
+    }
+    <% end %>
 });
 </script>
