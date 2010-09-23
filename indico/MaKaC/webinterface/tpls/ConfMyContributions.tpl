@@ -3,39 +3,44 @@
 <% if User is not None: %>
     <% contributions = Conference.getContribsForSubmitter(User) %>
     <% if len(contributions) > 0: %>
-        <table style="border-left:1px solid #777777;border-top:1px solid #777777;" width="70%%" align="center" cellspacing="0">
+        <table class="groupTable" width="70%%" align="center" cellspacing="0">
         <tr>
-            <td class="groupTitle" colspan="4" style="background:#E5E5E5; color:gray; border-top:2px solid #FFFFFF; border-left:2px solid #FFFFFF">&nbsp;&nbsp;&nbsp;Contributions</td>
+            <td class="groupTitle" colspan="4" style="padding-top:25px;">Contributions</td>
         </tr>
         <tr>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> 
-                Id
+        <td style="padding-top:10px;">
+            <table class="infoTable" cellspacing="6">
+                <tr>
+                    <td nowrap class="data">
+                        <b>Id</b>
+                    </td>
+                    <td nowrap class="data">
+                        <b>Name</b>
+                    </td>
+                    <% if Conference.hasEnabledSection("paperReviewing"): %>
+                    <td nowrap class="data">
+                        <b>Reviewing Status</b>
+                    </td>
+                    <% end %>
+                    </tr>
+                <% for c in contributions: %>
+                <tr>
+                    <td class="content" valign="top">
+                        <%=str(c.getId())%>
+                    </td>
+                    <td class="content" valign="top">
+                        <a href="<%=urlHandlers.UHContributionDisplay.getURL(c)%>"><%=c.getTitle()%></a>
+                    </td>
+                    <% if Conference.hasEnabledSection("paperReviewing"): %>
+                    <td class="content" valign="top">
+                        <%="<br>".join(c.getReviewManager().getLastReview().getReviewingStatus())%>
+                    </td>
+                    <% end %>
+                </tr>
+                <% end %>
+            </table>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> 
-                Name
-            </td>
-            <% if Conference.hasEnabledSection("paperReviewing") and not ConfReviewingChoice == 1: %>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> 
-                <%= _("Reviewing Status")%>
-            </td>
-            <% end %>
-        </tr>
-        <% for c in contributions: %>
-        <tr>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;" valign="top">
-                <%=str(c.getId())%>
-            </td>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;" valign="top">
-                <a href="<%=urlHandlers.UHContributionDisplay.getURL(c)%>"><%=c.getTitle()%></a>
-            </td>
-            <% if Conference.hasEnabledSection("paperReviewing") and not ConfReviewingChoice == 1: %>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;" valign="top">
-                <%="<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True))%>
-            </td>
-            <% end %>
-        </tr>
-        <tr><td></td></tr>
-        <% end %>
-        </table>
+            </tr>
+            </table>
     <% end %>
 <% end %>

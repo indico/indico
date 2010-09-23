@@ -44,6 +44,7 @@ class Config:
     __instance = None
 
     __systemIcons = { "new": "newleft.png",
+                 "conf_edit": "edit_13.png",
                  "modify": "link_shadow.png",
                  "submit": "file_shadow.png",
                  "view": "view.png",

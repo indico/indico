@@ -8884,26 +8884,22 @@ class WConfMyStuffMySessions(wcomponents.WTemplated):
         if len(ls)<=0:
             return ""
         res=[]
-        iconURL=Config.getInstance().getSystemIconURL("modify")
+        iconURL=Config.getInstance().getSystemIconURL("conf_edit")
         for s in ls:
             modURL=urlHandlers.UHSessionModification.getURL(s)
             dispURL=urlHandlers.UHSessionDisplay.getURL(s)
             res.append("""
                 <tr>
-                    <td>&nbsp;&nbsp;</td>
-                    <td nowrap><a href=%s><img src=%s border="0" alt=""></a></td>
-                    <td width="100%%"><a href=%s>%s</a></td>
+                    <td nowrap class="infoTD"><a href=%s><img src=%s border="0" alt=""></a></td>
+                    <td class="infoTD" width="100%%"><a href=%s>%s</a></td>
                 </tr>"""%(quoteattr(str(modURL)),
                             quoteattr(str(iconURL)),
                             quoteattr(str(dispURL)),
                             self.htmlText(s.getTitle())))
-        return """<br>
-            <table style="border-left:1px solid #777777;border-top:1px solid #777777;" width="70%%" align="center" cellspacing="0">
+        return """
+            <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top:15px;">
                 <tr>
-                    <td class="groupTitle" colspan="4" style="background:#E5E5E5; color:gray; border-top:2px solid #FFFFFF; border-left:2px solid #FFFFFF">&nbsp;&nbsp;&nbsp;Sessions</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;</td>
+                    <td class="groupTitle" colspan="4">Sessions</td>
                 </tr>
                 <tr>
                     <td>%s</td>
@@ -8972,24 +8968,20 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
         if len(lt)<=0:
             return ""
         res=[]
-        iconURL=Config.getInstance().getSystemIconURL("modify")
+        iconURL=Config.getInstance().getSystemIconURL("conf_edit")
         for t in lt:
             modURL=urlHandlers.UHTrackModifAbstracts.getURL(t)
             res.append("""
                 <tr>
-                    <td>&nbsp;&nbsp;</td>
-                    <td nowrap><a href=%s><img src=%s border="0" alt=""></a></td>
-                    <td width="100%%">%s</td>
+                    <td nowrap class="infoTD"><a href=%s><img src=%s border="0" alt=""></a></td>
+                    <td class="infoTD" width="100%%">%s</td>
                 </tr>"""%(quoteattr(str(modURL)),
                             quoteattr(str(iconURL)),
                             self.htmlText(t.getTitle())))
-        return """<br>
-            <table style="border-left:1px solid #777777;border-top:1px solid #777777;" width="70%%" align="center" cellspacing="0">
+        return """
+            <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top: 25px;">
                 <tr>
-                    <td class="groupTitle" colspan="4" style="background:#E5E5E5; color:gray; border-top:2px solid #FFFFFF; border-left:2px solid #FFFFFF">&nbsp;&nbsp;&nbsp;Tracks</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;</td>
+                    <td class="groupTitle" colspan="4">Tracks</td>
                 </tr>
                 <tr>
                     <td>%s</td>
@@ -9007,6 +8999,7 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
         vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
         return vars
 
+class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
 
     def _getBody(self,params):

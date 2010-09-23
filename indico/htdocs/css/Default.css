@@ -6473,4 +6473,27 @@ table.schedTaskList th {
 
 #mapOfRoomAvailabilityForm #sTime, #eTime {
     width: 35px;
+
+.infoTD {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+.infoTable {
+    -moz-border-radius: 5px 5px 5px 5px;
+    border:1px solid #999999;
+}
+
+table.infoTable td.data {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #523D04;
+    border-right:5px solid #FFFFFF;
+    border-left:5px solid #FFFFFF;
+    border-bottom: 1px groove #A4A4A4;
+}
+
+table.infoTable td.content {
+    border-right:5px solid #FFFFFF;
+    border-left:5px solid #FFFFFF;
 }
