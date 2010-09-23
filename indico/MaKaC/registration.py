@@ -1190,7 +1190,8 @@ class TextareaInput(FieldInputType):
         else:
             param = ''
 
-        tmp = """%s<br>%s<textarea id="%s" name="%s" cols="60" rows="4" %s >%s</textarea>%s""" % (caption, desc, htmlName, htmlName, disable, v, param)
+        # default COL size should be 50 instead of 60, because the layout is destroyed otherwise
+        tmp = """%s<br>%s<textarea id="%s" name="%s" cols="50" rows="4" %s >%s</textarea>%s""" % (caption, desc, htmlName, htmlName, disable, v, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
 
