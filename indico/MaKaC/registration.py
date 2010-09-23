@@ -1737,6 +1737,7 @@ class RadioGroupInput(FieldInputType):
 
     def _getDropDownModifHTML(self, item, registrant):
         caption = self._parent.getCaption()
+        description = self._parent.getDescription()
         billable = self._parent.isBillable()
         currency = self._parent.getParent().getRegistrationForm().getCurrency()
         value = ""
@@ -1779,6 +1780,9 @@ class RadioGroupInput(FieldInputType):
                 tmp.append("""<option value="%s"%s>%s%s</option>""" % (radioItem.getId(), selected, radioItem.getCaption(), price))
 
         tmp.append("""</select>%s</td>""" % param)
+
+        if description:
+            tmp.append("""<tr><td></td><td colspan="2">%s</td></tr>""" % (self._getDescriptionHTML(description)))
 
         return "".join(tmp)
 
