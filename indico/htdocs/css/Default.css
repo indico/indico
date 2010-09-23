@@ -6305,3 +6305,7 @@ div.dateField input {
     color: #888;
     margin-left: 0px;
 }
+
+.beforeRegistrationInput {
+    width: 7px;
+}

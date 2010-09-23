@@ -974,9 +974,9 @@ class FieldInputType(Persistent):
         """
         Method that display the form web which represents this object.
         """
-        mandatory="<td>&nbsp;&nbsp;</td>"
+        mandatory='<td class="beforeRegistrationInput"></td>'
         if (item is not None and item.isMandatory())or self.getParent().isMandatory():
-            mandatory = """<td valign="top"><font color="red">* </font></td>"""
+            mandatory = """<td class="beforeRegistrationInput" valign="top"><font color="red">*</font></td>"""
         return "<table><tr>%s%s</tr></table>"%(mandatory, self._getModifHTML(item, registrant))
 
     def _getModifHTML(self,item, registrant):
