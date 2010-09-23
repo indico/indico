@@ -664,10 +664,17 @@ class _TmpSectionField:
         self._mandatory=params.has_key("mandatory")
         self._billable=params.has_key("billable")
         self._price=params.get("price","")
+
         if params.get("inputtype"):
             self._input.setInputType(params.get("inputtype"))
         if params.get("dateFormat"):
             self._input.dateFormat = params.get("dateFormat")
+        if params.has_key('length'):
+            self._input.setLength(params.get('length'))
+        if params.has_key('numberOfRows'):
+            self._input.setNumberOfRows(params.get('numberOfRows'))
+        if params.has_key('numberOfColumns'):
+            self._input.setNumberOfColumns(params.get('numberOfColumns'))
         if params.get("addradioitem","").strip()!="":
             ri=RadioItem(self._input)
             cap=params.get("newradioitem")

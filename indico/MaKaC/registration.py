@@ -1039,6 +1039,10 @@ class TextInput(FieldInputType):
         return "Text"
     getName=classmethod(getName)
 
+    def __init__(self, field):
+        FieldInputType.__init__(self, field)
+        self._length = ''
+
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
@@ -1058,13 +1062,15 @@ class TextInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed() ):
             disable="disabled=\"true\""
             #pass
-
         if self._parent.isMandatory():
             param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
         else:
             param = ''
-
-        tmp = """%s <input type="text" id="%s" name="%s" value="%s" size="60" %s >%s""" % (caption, htmlName, htmlName, v , disable, param)
+        if self.getLength():
+            length = 'size="%s"' % self.getLength()
+        else:
+            length = 'size="60"'
+        tmp = """%s <input type="text" id="%s" name="%s" value="%s" %s %s >%s""" % (caption, htmlName, htmlName, v , disable, length, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
@@ -1091,8 +1097,39 @@ class TextInput(FieldInputType):
         #item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
         item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
+
     def _getSpecialOptionsHTML(self):
-        return ""
+        return _("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Size in chars")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <input type="text" name="length" value="%s" />
+          </td>
+        </tr>""" % self.getLength())
+
+    def clone(self, gf):
+        ti = FieldInputType.clone(self, gf)
+        ti.setLength(self.getLength())
+        return ti
+
+    def getValues(self):
+        d = {}
+        d["length"] = self.getLength()
+        return d
+
+    def setValues(self, data):
+        if data.has_key("length"):
+            self.setLength(data.get("length"))
+
+    def getLength(self):
+        try:
+            if self._length: pass
+        except AttributeError:
+            self._length = ''
+        return self._length
+
+    def setLength(self, value):
+        self._length = value
 
 class TelephoneInput(FieldInputType):
     _id = "telephone"
@@ -1102,6 +1139,10 @@ class TelephoneInput(FieldInputType):
     def getName(cls):
         return "Telephone"
     getName = classmethod(getName)
+
+    def __init__(self, field):
+        FieldInputType.__init__(self, field)
+        self._length = ''
 
     def _getModifHTML(self, item, registrant):
         caption = self._parent.getCaption()
@@ -1114,7 +1155,6 @@ class TelephoneInput(FieldInputType):
             htmlName = item.getHTMLName()
 
         disable = ""
-
         if self._parent.isMandatory():
             param = """<script>
             addParam($E('%s'), 'text', false, function(value) {
@@ -1125,9 +1165,12 @@ class TelephoneInput(FieldInputType):
             </script>""" % (htmlName, TelephoneInput._REGEX)
         else:
             param = ''
-
+        if self.getLength():
+            length = 'size="%s"' % self.getLength()
+        else:
+            length = 'size="30"'
         format = """&nbsp;<span class="inputDescription">(+) 999 99 99 99</span>"""
-        tmp = """%s <input type="text" id="%s" name="%s" value="%s" size="30" %s >%s%s""" % (caption, htmlName, htmlName, v , disable, format, param)
+        tmp = """&nbsp;%s <input type="text" id="%s" name="%s" value="%s" %s %s>%s%s""" % (caption, htmlName, htmlName, v , disable, length, format, param)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:
@@ -1151,7 +1194,37 @@ class TelephoneInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
-        return ""
+        return _("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Size in chars")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <input type="text" name="length" value="%s" />
+          </td>
+        </tr>""" % self.getLength())
+
+    def clone(self, gf):
+        ti = FieldInputType.clone(self, gf)
+        ti.setLength(self.getLength())
+        return ti
+
+    def getValues(self):
+        d = {}
+        d["length"] = self.getLength()
+        return d
+
+    def setValues(self, data):
+        if data.has_key("length"):
+            self.setLength(data.get("length"))
+
+    def getLength(self):
+        try:
+            if self._length: pass
+        except AttributeError:
+            self._length = ''
+        return self._length
+
+    def setLength(self, value):
+        self._length = value
 
 class TextareaInput(FieldInputType):
     _id="textarea"
@@ -1159,6 +1232,11 @@ class TextareaInput(FieldInputType):
     def getName(cls):
         return "Textarea"
     getName=classmethod(getName)
+
+    def __init__(self, field):
+        FieldInputType.__init__(self, field)
+        self._numberOfRows = ''
+        self._numberOfColumns = ''
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
@@ -1189,9 +1267,14 @@ class TextareaInput(FieldInputType):
             param = """<script>addParam($E('%s'), 'text', false);</script>""" % htmlName
         else:
             param = ''
+        cols = self.getNumberOfColumns()
+        if not cols:
+            cols = 60
+        rows = self.getNumberOfRows()
+        if not rows:
+            rows = 4
 
-        # default COL size should be 50 instead of 60, because the layout is destroyed otherwise
-        tmp = """%s<br>%s<textarea id="%s" name="%s" cols="50" rows="4" %s >%s</textarea>%s""" % (caption, desc, htmlName, htmlName, disable, v, param)
+        tmp = """&nbsp;%s<br>%s<textarea id="%s" name="%s" cols="%s" rows="%s" %s >%s</textarea>%s"""%(caption, desc, htmlName, htmlName, cols, rows, disable, v, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
 
@@ -1215,13 +1298,70 @@ class TextareaInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
-        return ""
+        html = [_("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Number of rows")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <input type="text" name="numberOfRows" value="%s" />
+          </td>
+        </tr>""") % self.getNumberOfRows()]
+
+        html.append(_("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Row length")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <input type="text" name="numberOfColumns" value="%s" />
+          </td>
+        </tr>""") % self.getNumberOfColumns())
+        return "".join(html)
+
+    def clone(self, gf):
+        ti = FieldInputType.clone(self, gf)
+        ti.setNumberOfRows(self.getNumberOfRows())
+        ti.setNumberOfColumns(self.getNumberOfColumns())
+        return ti
+
+    def getValues(self):
+        d = {}
+        d["numberOfRows"] = self.getNumberOfRows()
+        d["numberOfColumns"] = self.getNumberOfColumns()
+        return d
+
+    def setValues(self, data):
+        if data.has_key("numberOfRows"):
+            self.setNumberOfRows(data.get("numberOfRows"))
+        if data.has_key("numberOfColumns"):
+            self.setNumberOfColumns(data.get("numberOfColumns"))
+
+    def getNumberOfRows(self):
+        try:
+            if self._numberOfRows: pass
+        except AttributeError:
+            self._numberOfRows = ''
+        return self._numberOfRows
+
+    def setNumberOfRows(self, value):
+        self._numberOfRows = value
+
+    def getNumberOfColumns(self):
+        try:
+            if self._numberOfColumns: pass
+        except AttributeError:
+            self._numberOfColumns = ''
+        return self._numberOfColumns
+
+    def setNumberOfColumns(self, value):
+        self._numberOfColumns = value
 
 class NumberInput(FieldInputType):
     _id="number"
     def getName(cls):
         return "Number"
     getName=classmethod(getName)
+
+    def __init__(self, field):
+        FieldInputType.__init__(self, field)
+        self._length = ''
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
@@ -1248,7 +1388,11 @@ class NumberInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed()):
             disable="disabled=\"true\""
             #pass
-        tmp = """<input type="text" id="%s" name="%s" value="%s" %s size="6">&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, disable, caption, param)
+        if self.getLength():
+            length = 'size="%s"' % self.getLength()
+        else:
+            length = 'size="6"'
+        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s />&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, disable, length, caption, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
@@ -1281,6 +1425,39 @@ class NumberInput(FieldInputType):
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
         item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
+
+    def _getSpecialOptionsHTML(self):
+        return _("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Size in chars")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <input type="text" name="length" value="%s" />
+          </td>
+        </tr>""" % self.getLength())
+
+    def clone(self, gf):
+        ni = FieldInputType.clone(self, gf)
+        ni.setLength(self.getLength())
+        return ni
+
+    def getValues(self):
+        d = {}
+        d["length"] = self.getLength()
+        return d
+
+    def setValues(self, data):
+        if data.has_key("length"):
+            self.setLength(data.get("length"))
+
+    def getLength(self):
+        try:
+            if self._length: pass
+        except AttributeError:
+            self._length = ''
+        return self._length
+
+    def setLength(self, value):
+        self._length = value
 
 class LabelInput(FieldInputType):
     _id="label"
