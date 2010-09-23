@@ -1064,7 +1064,7 @@ class TextInput(FieldInputType):
         else:
             param = ''
 
-        tmp = """&nbsp;%s <input type="text" id="%s" name="%s" value="%s" size="60" %s >%s""" % (caption, htmlName, htmlName, v , disable, param)
+        tmp = """%s <input type="text" id="%s" name="%s" value="%s" size="60" %s >%s""" % (caption, htmlName, htmlName, v , disable, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
@@ -1127,7 +1127,7 @@ class TelephoneInput(FieldInputType):
             param = ''
 
         format = """&nbsp;<span class="inputDescription">(+) 999 99 99 99</span>"""
-        tmp = """&nbsp;%s <input type="text" id="%s" name="%s" value="%s" size="30" %s >%s%s""" % (caption, htmlName, htmlName, v , disable, format, param)
+        tmp = """%s <input type="text" id="%s" name="%s" value="%s" size="30" %s >%s%s""" % (caption, htmlName, htmlName, v , disable, format, param)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:
@@ -1190,7 +1190,7 @@ class TextareaInput(FieldInputType):
         else:
             param = ''
 
-        tmp = """&nbsp;%s<br>%s<textarea id="%s" name="%s" cols="60" rows="4" %s >%s</textarea>%s""" % (caption, desc, htmlName, htmlName, disable, v, param)
+        tmp = """%s<br>%s<textarea id="%s" name="%s" cols="60" rows="4" %s >%s</textarea>%s""" % (caption, desc, htmlName, htmlName, disable, v, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
 
@@ -1247,7 +1247,7 @@ class NumberInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed()):
             disable="disabled=\"true\""
             #pass
-        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s size="6">&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, disable, caption, param)
+        tmp = """<input type="text" id="%s" name="%s" value="%s" %s size="6">&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, disable, caption, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
@@ -1307,7 +1307,7 @@ class LabelInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed()):
             disable="disabled=\"true\""
             #pass
-        tmp = """&nbsp;%s"""%(caption)
+        tmp = """%s"""%(caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
@@ -1440,7 +1440,7 @@ class YesNoInput(FieldInputType):
             checkedYes="selected"
         elif v=="no":
             checkedNo="selected"
-        tmp = """&nbsp;%s <select id="%s" name="%s" %s><option value=""></option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, checkedNo, param)
+        tmp = """%s <select id="%s" name="%s" %s><option value=""></option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, checkedNo, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
@@ -1691,7 +1691,7 @@ class RadioGroupInput(FieldInputType):
             caption = item.getCaption()
             value = item.getValue()
 
-        tmp = """&nbsp;%s""" % (caption)
+        tmp = """%s""" % (caption)
         tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
         tmp.append(""" </td> """)
 
@@ -1755,7 +1755,7 @@ class RadioGroupInput(FieldInputType):
         else:
             param = ''
 
-        tmp = """&nbsp;%s""" % (caption)
+        tmp = """%s""" % (caption)
         tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
         tmp.append(""" </td> """)
 
@@ -1935,7 +1935,7 @@ class CountryInput(FieldInputType):
             inputHTML += """<option value="%s" %s>%s</option>""" % (countryKey, selected, CountryHolder().getCountryById(countryKey))
         inputHTML = """<select id="%s" name="%s" %s>%s</select>%s""" % (htmlName, htmlName, disable, inputHTML, param)
 
-        tmp = "&nbsp;%s %s " % (caption, inputHTML)
+        tmp = "%s %s " % (caption, inputHTML)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:
@@ -2010,7 +2010,7 @@ class DateInput(FieldInputType):
         dateFormat = re.sub('%M', 'mm', dateFormat)
 
         format = """&nbsp;<span class="inputDescription">%s</span>""" % dateFormat
-        tmp = "&nbsp;%s %s %s" % (caption, inputHTML, format)
+        tmp = "%s %s %s" % (caption, inputHTML, format)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:
