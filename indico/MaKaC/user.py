@@ -27,7 +27,7 @@ import ZODB
 from persistent import Persistent
 from accessControl import AdminList
 import MaKaC,os
-from MaKaC.common import filters, indexes
+from MaKaC.common import filters, indexes, logger
 from sets import Set
 from MaKaC.common.Configuration import Config
 from MaKaC.common.Locators import Locator
@@ -281,7 +281,11 @@ class CERNGroup(Group):
             conn.request("POST", "/winservices-soap/generic/Authentication.asmx/UserIsMemberOfGroup", params, headers)
         except Exception, e:
             raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
-        response = conn.getresponse()
+        try:
+            response = conn.getresponse()
+        except Exception, e:
+            logger.Logger.get("NICE").info("Error getting response from winservices: %s\nusername: %s\ngroupname: %s"%(e, id, self.name))
+            raise
         data = response.read()
         conn.close()
         try:
