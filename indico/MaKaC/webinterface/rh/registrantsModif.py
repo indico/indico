@@ -399,8 +399,15 @@ class RHRegistrantListEmail:
         self._regList = reglist
         self._rh = rh
 
+    def _checkParams(self, params):
+        self._from = params.get('from', '')
+        self._cc = params.get('cc', '')
+        self._subject = params.get('subject', '')
+        self._body = params.get('body', '')
+
     def email(self):
-        p=registrants.WPEMail(self._rh, self._conf, self._regList)
+        self._checkParams(self._rh.getRequestParams())
+        p=registrants.WPEMail(self._rh, self._conf, self._regList, self._from, self._cc, self._subject, self._body)
         return p.display()
 
 class RHRegistrantModifBase( conferenceModif.RHConferenceModifBase ):

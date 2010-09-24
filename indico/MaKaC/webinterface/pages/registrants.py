@@ -646,12 +646,14 @@ class WRegPreviewMail(wcomponents.WTemplated):
         vars["params"]=[]
         for regId in regsIds:
             vars["params"].append("""<input type="hidden" name="regsIds" value="%s">"""%(regId))
+            vars["params"].append("""<input type="hidden" name="registrant" value="%s">"""%(regId))
         vars["params"].append("""<input type="hidden" name="from" value=%s>"""%(quoteattr(fromAddr)))
         vars["params"].append("""<input type="hidden" name="subject" value=%s>"""%(quoteattr(subject)))
         vars["params"].append("""<input type="hidden" name="body" value=%s>"""%(quoteattr(body)))
         vars["params"].append("""<input type="hidden" name="cc" value=%s>"""%(quoteattr(cc)))
         vars["params"]="".join(vars["params"])
         vars["postURL"]=urlHandlers.UHRegistrantsSendEmail.getURL(self._conf)
+        vars["backURL"]=urlHandlers.UHConfModifRegistrantListAction.getURL(self._conf)
         return vars
 
 
@@ -667,10 +669,14 @@ class WPPreviewEmail( WPConfModifRegistrantListBase ):
 
 
 class WEmailToRegistrants(wcomponents.WTemplated):
-    def __init__(self,conf,user,reglist):
+    def __init__(self, conf, user, reglist, fromA, cc, subject, body):
         self._conf = conf
+        self._from = fromA
+        self._cc = cc
+        self._subject = subject
+        self._body = body
         try:
-            self._fromemail = user.getEmail()
+            self._fromemail = self._from or user.getEmail()
         except:
             self._fromemail = ""
         self._regList = reglist
@@ -695,14 +701,14 @@ class WEmailToRegistrants(wcomponents.WTemplated):
                 toEmails.append(reg.getEmail())
                 toIds.append("""<input type="hidden" name="regsIds" value="%s">"""%reg.getId())
         vars["from"] = self._fromemail
-        vars["cc"] = ""
+        vars["cc"] = self._cc
         vars["toEmails"]= ", ".join(toEmails)
         if vars["toEmails"] == "":
             vars["toEmails"] = "No registrants have been selected"
         vars["toIds"]= "".join(toIds)
         vars["postURL"]=urlHandlers.UHRegistrantsSendEmail.getURL(self._conf)
-        vars["subject"]=""
-        vars["body"]=""
+        vars["subject"] = self._subject
+        vars["body"] = self._body
         vars["vars"]=self._getAvailableTagsHTML()
         return vars
 
@@ -723,12 +729,16 @@ class WPRegistrantModifRemoveConfirmation(WPConfModifRegistrantListBase):
         return wc.getHTML(msg,url,{"registrants":self._regList})
 
 class WPEMail ( WPConfModifRegistrantListBase ):
-    def __init__(self, rh, conf, reglist):
+    def __init__(self, rh, conf, reglist, fromA, cc, subject, body):
         WPConfModifRegistrantListBase.__init__(self, rh, conf)
         self._regList = reglist
+        self._from = fromA
+        self._cc = cc
+        self._subject = subject
+        self._body = body
 
     def _getTabContent(self,params):
-        wc = WEmailToRegistrants(self._conf, self._getAW().getUser(), self._regList)
+        wc = WEmailToRegistrants(self._conf, self._getAW().getUser(), self._regList, self._from, self._cc, self._subject, self._body)
         return wc.getHTML()
 
 class WConfModifRegistrantsInfo(wcomponents.WTemplated):
