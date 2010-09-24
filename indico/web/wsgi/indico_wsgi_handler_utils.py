@@ -597,6 +597,8 @@ def _check_result(req, result):
             if req.status in (apache.HTTP_NOT_FOUND, ):
                 raise apache.SERVER_RETURN, req.status
         else:
+            # It might be interesting in future not to use the write callable
+            # with all the web pages. <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
             req.write(result)
 
         return apache.OK

@@ -29,7 +29,7 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import PluginError
-
+from MaKaC.common import DBMgr
 
 class PluginsHolder (ObjectHolder):
     """ A PluginsHolder object is the "gateway" to all the methods for getting plugin meta-data stored in the DB.
@@ -49,7 +49,8 @@ class PluginsHolder (ObjectHolder):
             self.loadAllPlugins()
 
     def getRHMap(self):
-        return {'urlHandler': 'indico.MaKaC.plugins.myPlugin.hiGuys.index'}
+        # Replace with the real dict obtained while exploring the directories
+        return {'algo': 'indico.MaKaC.webinterface.rh.welcome.RHWelcome'}
 
     def getGlobalPluginOptions(self):
         """ Returns server-wide options relative to the whole plugin system.
@@ -134,6 +135,51 @@ class PluginsHolder (ObjectHolder):
         """ Returns the PluginType object for the given name
         """
         return self.getById(name)
+
+class RHMap( object ):
+    """ Stores the RHMap for every python process
+    If there's no Map attribute, we fetch it from the database,
+    otherwise just return it.
+    """
+    ## Stores the unique Singleton instance-
+    _iInstance = None
+
+    ## Class used with this Python singleton design pattern
+    #  @todo Add all variables, and methods needed for the Singleton class below
+    class Singleton:
+        def __init__(self):
+            if not hasattr(self, '_map'):
+                DBMgr.getInstance().startRequest()
+                self._map=PluginsHolder().getRHMap()
+                DBMgr.getInstance().endRequest()
+
+    ## The constructor
+    #  @param self The object pointer.
+    def __init__( self ):
+        # Check whether we already have an instance
+        if RHMap._iInstance is None:
+            # Create and remember instanc
+            RHMap._iInstance = RHMap.Singleton()
+
+        # Store instance reference as the only member in the handle
+        self._EventHandler_instance = RHMap._iInstance
+
+
+    ## Delegate access to implementation.
+    #  @param self The object pointer.
+    #  @param attr Attribute wanted.
+    #  @return Attribute
+    def __getattr__(self, aAttr):
+        return getattr(self._iInstance, aAttr)
+
+
+    ## Delegate access to implementation.
+    #  @param self The object pointer.
+    #  @param attr Attribute wanted.
+    #  @param value Vaule to be set.
+    #  @return Result of operation.
+    def __setattr__(self, aAttr, aValue):
+        return setattr(self._iInstance, aAttr, aValue)
 
 
 class PluginBase(Persistent):

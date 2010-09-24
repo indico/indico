@@ -37,15 +37,17 @@ for p in PATH:
         sys.path.append(p)
 
 from wsgiref.util import FileWrapper, guess_scheme
+from indico.MaKaC.plugins.base import RHMap
+
 from indico.web.wsgi.webinterface_handler_config import \
      HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
      HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR, \
     REMOTE_HOST, REMOTE_NOLOOKUP
 from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage, \
      registerException
-from indico.web.wsgi.indico_wsgi_url_parser import is_mp_legacy_publisher_path, \
-    is_static_path
-
+from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage
+from indico.web.wsgi.indico_wsgi_rewrite import is_mp_legacy_publisher_path
+from indico.web.wsgi.indico_wsgi_handler_utils import _check_result
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.
@@ -73,14 +75,11 @@ def application(environ, start_response):
                 mp_legacy_publisher(req, possible_module, possible_handler)
             else:
                 # Let's try to load a plugin
-                from indico.MaKaC.plugins.base import PluginsHolder
+                # Replace URLFields with environ
                 path = req.URLFields['PATH_INFO'].split('/')
-
-                pluginMap = PluginsHolder().getRHMap()
-                if path[0] != '' and pluginMap.has_key(path[0]):
-                    importList = pluginMap.get(path[0]).split('.')
-                    b = __import__('.'.join(importList[1:]), None, None, importList[0])
-                    b( req ).process( **params )
+                pluginMap = RHMap()._map
+                if path[1] != '' and pluginMap.has_key(path[1]):
+                    plugin_publisher(req, path[1])
                 else:
                     # Finally, it might be a static file
                     possible_static_path = is_static_path(environ['PATH_INFO'])
@@ -131,6 +130,39 @@ def indicoErrorWebpage(status):
                           "An unexpected error ocurred.")
     wsError = WErrorWSGI(errorTitleText)
     return wsError.getHTML()
+
+def is_static_path(path):
+    """
+    Returns True if path corresponds to an existing file under DIR_HTDOCS.
+    @param path: the path.
+    @type path: string
+    @return: True if path corresponds to an existing file under DIR_HTDOCS.
+    @rtype: bool
+    """
+    path = os.path.abspath(DIR_HTDOCS + path)
+    if path.startswith(DIR_HTDOCS) and os.path.isfile(path):
+        return path
+    return None
+
+def plugin_publisher(req, path):
+    """
+    Publishes the plugin described in path
+    """
+    pluginMap = RHMap()._map
+    form = dict(req.form)
+    for key, value in form.items():
+        ## FIXME: this is a backward compatibility workaround
+        ## because most of the old administration web handler
+        ## expect parameters to be of type str.
+        ## When legacy publisher will be removed all this
+        ## pain will go away anyway :-)
+        if isinstance(value, str):
+            form[key] = str(value)
+
+    importList = pluginMap[path].split('.')
+    funcName = importList.pop()
+    callingFunction = __import__('.'.join(importList[1:]), None, None, importList[0])
+    _check_result(req, getattr(callingFunction,funcName)( req ).process( form ))
 
 def mp_legacy_publisher(req, possible_module, possible_handler):
     """
