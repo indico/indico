@@ -159,18 +159,19 @@ ApacheGroup = "nogroup"
 # FileConverter        = {"conversion_server": "localhost", "response_url": "http://localhost/getConvertedFile.py"}
 
 
-
 #------------------------------------------------------------------------------
 # X-SENDFILE
 #------------------------------------------------------------------------------
-# Indico supports X-sendfile, a way to send files faster if your server
-# supports it. By default, this isn't active. If you want to activate it,
-# you should replace the line with:
+# Indico supports the use of the X-Sendfile header:
+#
+# http://blog.lighttpd.net/articles/2006/07/02/x-sendfile
+#
+# If your webserver supports this feature and you want to activate it,
+# you should set it to 'True'. Default value is 'False'
 #
 #     UseXSendFile = True
 
 UseXSendFile = False
-
 
 
 #------------------------------------------------------------------------------

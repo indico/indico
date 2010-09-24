@@ -269,3 +269,4 @@ class UpcomingEventsModule(modules.Module):
         Logger.get('upcoming_events').info("Regenerated upcoming event cache")
 
         return resultList
+

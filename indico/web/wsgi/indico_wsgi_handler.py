@@ -41,7 +41,8 @@ from indico.web.wsgi.webinterface_handler_config import \
      HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
      HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR, \
     REMOTE_HOST, REMOTE_NOLOOKUP
-from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage
+from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage, \
+     registerException
 from indico.web.wsgi.indico_wsgi_url_parser import is_mp_legacy_publisher_path, \
     is_static_path
 
@@ -55,7 +56,8 @@ def application(environ, start_response):
     """
     Entry point for wsgi.
     """
-    ## Needed for mod_wsgi, see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
+    ## Needed for mod_wsgi
+    ## see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
     req = SimulatedModPythonRequest(environ, start_response)
 
     possible_module, possible_handler = is_mp_legacy_publisher_path(req)
@@ -83,17 +85,20 @@ def application(environ, start_response):
             if status not in (OK, DONE):
                 req.status = status
                 req.headers_out['content-type'] = 'text/html'
-                start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+                start_response(req.get_wsgi_status(),
+                               req.get_low_level_headers(),
+                               sys.exc_info())
                 return ('%s' % indicoErrorWebpage(status),)
             else:
                 req.flush()
         # If we reach this block, there was probably
         # an error importing a legacy python module
         except Exception:
-            from indico.web.wsgi.indico_wsgi_handler_utils import registerException
             req.status = HTTP_INTERNAL_SERVER_ERROR
             req.headers_out['content-type'] = 'text/html'
-            start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+            start_response(req.get_wsgi_status(),
+                           req.get_low_level_headers(),
+                           sys.exc_info())
             registerException()
             return ('%s' % indicoErrorWebpage(500),)
     finally:
@@ -108,9 +113,11 @@ def indicoErrorWebpage(status):
     """
     from MaKaC.webinterface.pages.error import WErrorWSGI
     from MaKaC.i18n import _
-    errorTitleText = (_("Page not found"), _("The page you were looking for doesn't exist."))
+    errorTitleText = (_("Page not found"),
+                      _("The page you were looking for doesn't exist."))
     if status != 404:
-        errorTitleText = (_("%s" % (HTTP_STATUS_MAP.get(status, "Unknown error"))), "An unexpected error ocurred.")
+        errorTitleText = (_("%s" % (HTTP_STATUS_MAP.get(status, "Unknown error"))),
+                          "An unexpected error ocurred.")
     wsError = WErrorWSGI(errorTitleText)
     return wsError.getHTML()
 
@@ -118,18 +125,20 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
-    from indico.web.wsgi.indico_wsgi_handler_utils import registerException
+
     the_module = open(possible_module).read()
     module_globals = {}
+
     try:
         exec(the_module, module_globals)
-    except Exception:
+    except:
         # Log which file caused the exec error (traceback won't do it for
         # some reason) and relaunch the exception
-        registerException('Error exec the module %s' % possible_module)
-        raise Exception
+        registerException('Error executing the module %s' % possible_module)
+        raise
 
-    if possible_handler in module_globals and callable(module_globals[possible_handler]):
+    if possible_handler in module_globals and \
+           callable(module_globals[possible_handler]):
         from indico.web.wsgi.indico_wsgi_handler_utils import _check_result
         ## the req.form must be casted to dict because of Python 2.4 and earlier
         ## otherwise any object exposing the mapping interface can be
@@ -147,7 +156,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         try:
             return _check_result(req, module_globals[possible_handler](req, **form))
         except TypeError, err:
-            if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):
+            if ("%s() got an unexpected keyword argument" % possible_handler) in \
+                   str(err) or ('%s() takes at least' % possible_handler) in str(err):
                 import inspect
                 inspected_args = inspect.getargspec(module_globals[possible_handler])
                 expected_args = list(inspected_args[0])
@@ -155,7 +165,11 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 expected_args.reverse()
                 expected_defaults.reverse()
                 # Write the exception to Apache error log file
-                registerException("Wrong GET parameter set in calling a legacy publisher handler for %s: expected_args=%s, found_args=%s" % (possible_handler, repr(expected_args), repr(req.form.keys())))
+                registerException("Wrong GET parameter set in calling a legacy "
+                                  "publisher handler for %s: expected_args=%s, "
+                                  "found_args=%s" % \
+                                  (possible_handler, repr(expected_args),
+                                   repr(req.form.keys())))
                 cleaned_form = {}
                 for index, arg in enumerate(expected_args):
                     if arg == 'req':
@@ -164,7 +178,9 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                         cleaned_form[arg] = form.get(arg, expected_defaults[index])
                     else:
                         cleaned_form[arg] = form.get(arg, None)
-                return _check_result(req, module_globals[possible_handler](req, **cleaned_form))
+                return _check_result(req,
+                                     module_globals[possible_handler](req,
+                                                                      **cleaned_form))
             else:
                 raise
     else:
@@ -270,8 +286,8 @@ class SimulatedModPythonRequest(object):
             try:
                 self.__write(self.__buffer)
             except IOError, err:
-                if "failed to write data" in str(err) or "client connection closed" in str(err):
-                    from indico.web.wsgi.indico_wsgi_handler_utils import registerException
+                if "failed to write data" in str(err) \
+                       or "client connection closed" in str(err):
                     registerException()
                 else:
                     raise
@@ -285,10 +301,12 @@ class SimulatedModPythonRequest(object):
 
     def send_http_header(self):
         if not self.__response_sent_p:
-            if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
+            if self.__allowed_methods and self.__status.startswith('405 ') or \
+                   self.__status.startswith('501 '):
                 self.__headers['Allow'] = ', '.join(self.__allowed_methods)
             ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
-            self.__write = self.__start_response(self.__status, self.__low_level_headers)
+            self.__write = self.__start_response(self.__status,
+                                                 self.__low_level_headers)
             self.__response_sent_p = True
 
     def get_parsed_uri(self):
@@ -333,7 +351,9 @@ class SimulatedModPythonRequest(object):
         return self.__environ['REQUEST_METHOD'] == 'HEAD'
 
     def set_status(self, status):
-        self.__status = '%s %s' % (status, HTTP_STATUS_MAP.get(int(status), 'Explanation not available'))
+        self.__status = '%s %s' % (status,
+                                   HTTP_STATUS_MAP.get(int(status),
+                                                       'Explanation not available'))
 
     def get_status(self):
         return int(self.__status.split(' ')[0])
@@ -366,8 +386,8 @@ class SimulatedModPythonRequest(object):
                         self.__write(chunk[:the_len])
                         break
         except IOError, err:
-            if "failed to write data" in str(err) or "client connection closed" in str(err):
-                from indico.web.wsgi.indico_wsgi_handler_utils import registerException
+            if "failed to write data" in str(err) or \
+                   "client connection closed" in str(err):
                 registerException()
             else:
                 raise
@@ -392,7 +412,9 @@ class SimulatedModPythonRequest(object):
         self.__filename = filename
         if self.__disposition_type is None:
             self.__disposition_type = 'inline'
-        self.__headers['content-disposition'] = '%s; filename=%s' % (self.__disposition_type, self.__filename)
+        self.__headers['content-disposition'] = '%s; filename=%s' % \
+                                                (self.__disposition_type,
+                                                 self.__filename)
 
     def set_encoding(self, encoding):
         if encoding:

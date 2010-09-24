@@ -85,7 +85,8 @@ def is_mp_legacy_publisher_path(req):
     # Else, we try to find the called module
     for index, component in enumerate(path):
         if component.endswith('.py'):
-            possible_module = os.path.abspath(DIR_HTDOCS + os.path.sep + os.path.sep.join(path[:index + 1]))
+            possible_module = os.path.abspath(DIR_HTDOCS + os.path.sep + \
+                                              os.path.sep.join(path[:index + 1]))
             possible_handler = '/'.join(path[index + 1:]).strip()
             if not possible_handler:
                 possible_handler = 'index'

@@ -29,6 +29,10 @@ from indico.web.wsgi import webinterface_handler_config as apache
 from indico.web.wsgi.webinterface_handler_config import \
     SERVER_RETURN, HTTP_NOT_FOUND
 
+# Legacy imports
+
+from MaKaC.common import Config
+
 _mimes = MimeTypes(strict=False)
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
 _mimes.encodings_map.update({'.bz2' : 'bzip2'})
@@ -191,7 +195,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 ret[key] = value
         return ret
 
-    if UseXSendFile:
+
+    if Config.getInstance().getUseXSendFile():
         ## If XSendFile is supported by the server, let's use it.
         if os.path.exists(fullpath):
             if fullname is None:
@@ -266,4 +271,3 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
     else:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
-UseXSendFile = False

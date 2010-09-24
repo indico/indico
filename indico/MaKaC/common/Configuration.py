@@ -425,10 +425,11 @@ class Config:
             'ApacheUser'                : 'nobody',
             'ApacheGroup'               : 'nogroup',
             'Profile'                   : False,
+            'UseXSendFile'              : False,
 
             # Room Booking Related
             'LightboxCssStylesheetName' : "lightbox/lightbox.css",
-            'LightboxJavascriptName'    : "lightbox/lightbox.js",
+            'LightboxJavascriptName'    : "lightbox/lightbox.js"
             }
 
 

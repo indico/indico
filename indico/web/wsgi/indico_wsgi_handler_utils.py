@@ -59,6 +59,7 @@ from indico.web.wsgi.webinterface_handler_config import \
      SERVER_RETURN, \
      HTTP_LENGTH_REQUIRED, \
      HTTP_BAD_REQUEST
+from MaKaC.common.logger import Logger
 
 # Cache for values of PythonPath that have been seen already.
 _path_cache = {}
@@ -608,12 +609,6 @@ def registerException(errorText=""):
     """
     Write down the error in the error log file
     """
-    import sys
-    import traceback
-    if errorText == "":
-        traceback.print_exc()
-    else:
-        print sys.stderr, "%s" % errorText
-
+    Logger.get('wsgi').exception('WSGI Exception')
 
 
