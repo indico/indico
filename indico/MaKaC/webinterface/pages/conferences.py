@@ -878,6 +878,9 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         self._view = view
         self._conf = conference
         self._type = type
+        self._firstDay = params.get("firstDay")
+        self._lastDay = params.get("lastDay")
+        self._daysPerRow = params.get("daysPerRow")
         self._parentCateg = None
         categId = rh._getSession().getVar("currentCategoryId")
         if categId != None:
@@ -1028,6 +1031,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                     includeContribution = 1
                 else:
                     includeContribution = 0
+                pars.update({'firstDay':self._firstDay, 'lastDay':self._lastDay, 'daysPerRow':self._daysPerRow})
                 body = outGen.getFormattedOutput(self._conf,stylepath,pars,1,includeContribution,1,1,self._params.get("showSession",""),self._params.get("showDate",""))
             if useManagerCache or useNormalCache:
                 cache.saveCachePage( body )
