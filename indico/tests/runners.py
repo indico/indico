@@ -230,6 +230,7 @@ class FunctionalTestRunner(BaseTestRunner):
                 return ('[ERR] Could not start functional tests because selenium'
                         ' server cannot be started.\n')
 
+
             args = ['nose', '--nologcapture', '--logging-clear-handlers',
                     '-v']
 
@@ -246,20 +247,21 @@ class FunctionalTestRunner(BaseTestRunner):
                     "/tests/python/functional"):
                     args.append(folder)
 
+
             # Execute the tests
             result = True
             repeat = int(self.options.valueOf('repeat'))
             threads = int(self.options.valueOf('threads'))
             if repeat < 1:
-                repeat = 0
+                repeat = 1
 
-            for i in range(1, repeat+1):
+            for i in range(0, repeat):
                 if threads > 1:
                     testResult = self._runParallel(args,threads)
                 else:
                     testResult = nose.run(argv = args)
                 result = result and testResult
-                self._info("Test #%d: %s\n" % (i, testResult and 'OK' or 'Error'))
+                self._info("Test #%d: %s\n" % (i+1, testResult and 'OK' or 'Error'))
 
         except Exception, e:
             raise e

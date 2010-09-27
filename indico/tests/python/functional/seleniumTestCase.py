@@ -45,36 +45,37 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
     def setUp(self):
         self.verificationErrors = []
         self.confId = None
-        self.selenium = None
+        sel = None
 
         gridData = GridEnvironmentRunner.getGridData()
 
         if gridData:
-            self.selenium = selenium(gridData.host,
-                                     gridData.port,
-                                     gridData.env,
-                                     self.getRootUrl())
+            sel = selenium(gridData.host,
+                           gridData.port,
+                           gridData.env,
+                           self.getRootUrl())
         else:
-            self.selenium = selenium("localhost", 4444, "*firefox",
-                                     self.getRootUrl())
+            sel = selenium("localhost", 4444, "*firefox",
+                           self.getRootUrl())
 
-        self.selenium.start()
-        self.selenium.window_maximize()
+        sel.start()
+        sel.window_maximize()
+
+        # convenient to set the browser in a known state
+        # from twill import commands as tc
+        # tc.clear_cookies()
 
         # Handy functions from selenium and twill you might need
         # set up the time between each selenium's commands (in milliseconds)
         # self.selenium.set_speed(5000)
 
-        # convenient to set the browser in a known state
-        # from twill import commands as tc
-        # tc.clear_cookies()
+        self.selenium = sel
 
     def tearDown(self):
         #if a confId is specified we'll try to delete the conf
         # in case the test failed
         if self.confId:
             self.deleteConference(self.confId)
-
 
         self.selenium.stop()
 
@@ -136,7 +137,7 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
         Wait for a page to load (give it some time to load the JS too)
         """
         sel.wait_for_page_to_load(timeout)
-        time.sleep(3)
+        time.sleep(2)
 
     def failUnless(self, func, *args):
         """
@@ -158,3 +159,22 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
             return
 
         raise exception
+
+class LoggedInSeleniumTestCase(SeleniumTestCase):
+
+    def setUp(self):
+
+        super(LoggedInSeleniumTestCase, self).__init__()
+
+        if not sel.is_text_present("Logout"):
+            sel = self._selenium
+
+            # Login
+            sel.open("/indico/signIn.py")
+            sel.type("login", "dummyuser")
+            sel.type("password", "dummyuser")
+            sel.click("loginButton")
+            sel.wait_for_page_to_load("30000")
+
+
+

@@ -1,6 +1,7 @@
 
 from indico.tests.python.functional.seleniumTestCase import SeleniumTestCase
 import unittest, time, re
+from nose import SkipTest
 
 class WSGIParallelConference_test(SeleniumTestCase):
 
@@ -10,16 +11,11 @@ class WSGIParallelConference_test(SeleniumTestCase):
     def testConferenceTest(self):
         sel = self.selenium
 
-        # Test fix - Login
-        sel.open("/indico/signIn.py")
-        sel.type("login", "dummyuser")
-        sel.type("password", "dummyuser")
-        sel.click("loginButton")
-        sel.wait_for_page_to_load("30000")
+        raise SkipTest
 
         # Start test
         sel.open("/indico/index.py")
-        sel.click("//div[1]/div[3]/div[2]/div/div[2]/div/div/ul/li/span[2]/a")
+        sel.click("//a[@link=\"TEST Category\"]")
         sel.wait_for_page_to_load("30000")
         sel.click("manageEventButton")
         sel.wait_for_page_to_load("30000")
