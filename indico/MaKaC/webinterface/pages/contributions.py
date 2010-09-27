@@ -287,7 +287,6 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         vars["submitBtn"]=self._getSubmitButtonHTML()
         vars["submitURL"]=quoteattr('FIXME')
         vars["modifIcon"] = self._getModifIconHTML()
-        vars["submitIcon"] = self._getSubmitIconHTML()
         vars["Contribution"] = self._contrib
         import contributionReviewing
         vars["ConfReview"] = self._contrib.getConference().getConfReview()

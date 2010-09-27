@@ -8889,13 +8889,12 @@ class WConfMyStuffMySessions(wcomponents.WTemplated):
             modURL=urlHandlers.UHSessionModification.getURL(s)
             dispURL=urlHandlers.UHSessionDisplay.getURL(s)
             res.append("""
-                <tr>
-                    <td nowrap class="infoTD"><a href=%s><img src=%s border="0" alt=""></a></td>
-                    <td class="infoTD" width="100%%"><a href=%s>%s</a></td>
-                </tr>"""%(quoteattr(str(modURL)),
-                            quoteattr(str(iconURL)),
-                            quoteattr(str(dispURL)),
-                            self.htmlText(s.getTitle())))
+                <tr class="infoTR">
+                    <td class="infoTD" width="100%%">%s</td>
+                    <td nowrap class="infoTD"><a href=%s>Edit</a><span class="horizontalSeparator">|</span><a href=%s>View</a></td>
+                </tr>"""%(self.htmlText(s.getTitle()),
+                            quoteattr(str(modURL)),
+                            quoteattr(str(dispURL))))
         return """
             <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top:15px;">
                 <tr>
@@ -8910,7 +8909,7 @@ class WConfMyStuffMySessions(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]="%s"%(self._getSessionsHTML())
+        vars["items"]=self._getSessionsHTML()
         return vars
 
 class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
@@ -8936,7 +8935,7 @@ class WConfMyStuffMyContributions(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]="%s"%(self._getContribsHTML())
+        vars["items"]=self._getContribsHTML()
 
         import reviewing
         vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
@@ -8972,12 +8971,11 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
         for t in lt:
             modURL=urlHandlers.UHTrackModifAbstracts.getURL(t)
             res.append("""
-                <tr>
-                    <td nowrap class="infoTD"><a href=%s><img src=%s border="0" alt=""></a></td>
+                <tr class="infoTR">
                     <td class="infoTD" width="100%%">%s</td>
-                </tr>"""%(quoteattr(str(modURL)),
-                            quoteattr(str(iconURL)),
-                            self.htmlText(t.getTitle())))
+                    <td nowrap class="infoTD"><a href=%s>Edit</a></td>
+                </tr>"""%(self.htmlText(t.getTitle()),
+                          quoteattr(str(modURL))))
         return """
             <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top: 25px;">
                 <tr>
@@ -8991,8 +8989,7 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]="%s%s%s"%(self._getSessionsHTML(),
-            self._getTracksHTML(),self._getContribsHTML())
+        vars["items"]=self._getTracksHTML()
 
         import reviewing
         vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
@@ -9009,8 +9006,6 @@ class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._myStuffOpt)
-
-
 
 class WConfMyStuff(wcomponents.WTemplated):
 

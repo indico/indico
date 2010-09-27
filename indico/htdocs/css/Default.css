@@ -6475,8 +6475,11 @@ table.schedTaskList th {
     width: 35px;
 
 .infoTD {
-    padding-top: 5px;
-    padding-left: 5px;
+    padding: 4px 4px 4px 10px;
+}
+
+.infoTR:hover {
+    background-color: #ECECEC;
 }
 
 .infoTable {
@@ -6488,12 +6491,10 @@ table.infoTable td.data {
     font-size: 13px;
     font-family: Verdana, Arial;
     color: #523D04;
-    border-right:5px solid #FFFFFF;
-    border-left:5px solid #FFFFFF;
+    padding: 7px;
     border-bottom: 1px groove #A4A4A4;
 }
 
 table.infoTable td.content {
-    border-right:5px solid #FFFFFF;
-    border-left:5px solid #FFFFFF;
+    padding: 7px;
 }
