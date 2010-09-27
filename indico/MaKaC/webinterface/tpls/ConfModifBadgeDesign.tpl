@@ -854,12 +854,14 @@
     updateRulers();
 
     // This function displays the items, if any have been loaded, on the screen
-    displayItems()
+    displayItems();
 
     if (<%=editingTemplate%> && <%=hasBackground%>) {
        backgroundId = <%=backgroundId%>
        displayBackground("<%=backgroundURL%>")
     }
+
+    changeTemplateSize();
 
   </script>
 
