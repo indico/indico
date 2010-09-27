@@ -532,6 +532,9 @@ class Config:
     def getProfile(self):
         return self._yesOrNoVariable('Profile')
 
+    def getUseXSendFile(self):
+        return self._yesOrNoVariable('UseXSendFile')
+
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single
            instance is created. All the clients should use this method for

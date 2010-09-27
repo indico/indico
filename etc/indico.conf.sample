@@ -167,11 +167,11 @@ ApacheGroup = "nogroup"
 # http://blog.lighttpd.net/articles/2006/07/02/x-sendfile
 #
 # If your webserver supports this feature and you want to activate it,
-# you should set it to 'True'. Default value is 'False'
+# you should set it to 'yes'. Default value is 'no'
 #
-#     UseXSendFile = True
+#     UseXSendFile = "yes"
 
-UseXSendFile = False
+UseXSendFile = "no"
 
 
 #------------------------------------------------------------------------------
