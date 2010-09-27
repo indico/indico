@@ -153,7 +153,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 
         return filterCrit
 
-    def _checkAction( self, params, filtersActive, sessionData, operation ):
+    def _checkAction(self, params, filtersActive, sessionData, operation, isBookmark):
         """
         Decides what to do with the request parameters, depending
         on the type of operation that is requested
@@ -180,6 +180,13 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
             sessionData = self._resetFilters(sessionData)
         else:
             self._filterUsed = True
+
+        # if this is accessed through a direct link, the session is empty, so set default values
+        if isBookmark:
+            sessionData = self._resetFilters(sessionData)
+            if operation !=  'resetFilters':
+                sessionData = self._updateFilters(sessionData, params)
+            sessionData['disp'] = params.get('disp',[])
 
         # preserve the order and sortBy parameters, whatever happens
         sessionData['order'] = params.get('order', 'down')
@@ -229,7 +236,8 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         else:
             self._sessionFilterName="session"
 
-        sessionData = self._checkAction(params, filtersActive, sessionData, operation)
+        isBookmark = params.has_key("isBookmark")
+        sessionData = self._checkAction(params, filtersActive, sessionData, operation, isBookmark)
 
         # Maintain the state abotu filter usage
         sessionData['filtersActive'] = self._filterUsed;

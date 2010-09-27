@@ -47,7 +47,6 @@ class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
         WPConfModifRegistrantListBase.__init__(self, rh, conference)
         self._filterUsed = filterUsed
 
-
     def _getTabContent( self, params ):
         filterCrit=params.get("filterCrit",None)
         sortingCrit=params.get("sortingCrit",None)
@@ -56,18 +55,42 @@ class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
         sessionFilterName=params.get("sessionFilterName", "session")
         websession = self._rh._getSession()
 
-        wc = WConfModifRegistrants(self._conf,filterCrit,sortingCrit,display, websession, order, sessionFilterName, self._filterUsed)
+        filterParams = {}
+        fields = getattr(filterCrit, '_fields')
+        for field in fields.values():
+            id = field.getId()
+            showNoValue = field.getShowNoValue()
+            values = field.getValues()
+            if showNoValue:
+                filterParams['%sShowNoValue' % id] = '--none--'
+            filterParams[id] = values
+
+        requestParams = self._rh.getRequestParams()
+
+        operationType = requestParams.get('operationType')
+        if operationType != 'resetFilters':
+            operationType = 'filter'
+        urlParams = dict(isBookmark='y', operationType=operationType)
+
+        urlParams.update(self._rh.getRequestParams())
+        if not requestParams.has_key('disp'):
+            urlParams['disp'] = display
+        urlParams.update(filterParams)
+        filterUrl = self._rh._uh.getURL(None, **urlParams)
+
+        wc = WConfModifRegistrants(self._conf, filterCrit, sortingCrit, display, websession, filterUrl, order, sessionFilterName, self._filterUsed)
         return wc.getHTML()
 
 class WConfModifRegistrants( wcomponents.WTemplated ):
 
-    def __init__( self, conference,filterCrit, sortingCrit, display, websession, order="down", sessionFilterName="session", filterUsed = False ):
+    def __init__( self, conference,filterCrit, sortingCrit, display, websession, filterUrl, order="down", sessionFilterName="session", filterUsed = False ):
 
         self._conf = conference
-        self._filterCrit=filterCrit
-        self._sortingCrit=sortingCrit
+        self._filterCrit = filterCrit
+        self._sortingCrit = sortingCrit
         self._order = order
         self._sessionFilterName = sessionFilterName
+        self._filterUrl = filterUrl
         self._display = display
         self._filterUsed = filterUsed
         self._setDispOpts()
@@ -434,8 +457,11 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
         vars = wcomponents.WTemplated.getVars( self )
 
+        # '%' escaping for template engine (just until we have a decent one)
+        vars["filterUrl"] = str(self._filterUrl).replace('%', '%%')
+
         sortingField = self._sortingCrit.getField()
-        vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
+        vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)).replace('%','%%'))
         cl = self._conf.getRegistrantsList(False)
         f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
         vars["eve"]=""

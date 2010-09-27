@@ -1319,11 +1319,13 @@ class WConfModifRegFormGeneralSectionFieldEdit( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         vars["caption"] = ""
+        vars["description"] = ""
         vars["mandatory"] =  """ checked="checked" """
         #vars["billable"]= """ checked="checked" """
         #vars["price"]=""
         if self._generalField is not None:
             vars["caption"] = quoteattr(self._generalField.getCaption())
+            vars["description"] = self._generalField.getDescription()
             #vars["price"]= quoteattr(self._generalField.getPrice())
             if not self._generalField.isMandatory():
                 vars["mandatory"] =  ""

@@ -6299,3 +6299,9 @@ div.dateField input {
 .titleUpCellTD{
     width:20%;
 }
+
+.inputDescription {
+    font-size: 11px;
+    color: #888;
+    margin-left: 10px;
+}

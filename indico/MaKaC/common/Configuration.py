@@ -424,8 +424,8 @@ class Config:
             'RepositoryIdentifier'      : '',
             'ApacheUser'                : 'nobody',
             'ApacheGroup'               : 'nogroup',
-            'Profile'                   : False,
-            'UseXSendFile'              : False,
+            'Profile'                   : 'no',
+            'UseXSendFile'              : 'no',
 
             # Room Booking Related
             'LightboxCssStylesheetName' : "lightbox/lightbox.css",
@@ -520,12 +520,17 @@ class Config:
             raise AttributeError
 
 
-    def getSmtpUseTLS(self):
-        if self._configVars['SmtpUseTLS'] == 'yes':
+    def _yesOrNoVariable(self, varName):
+        if self._configVars[varName] == 'yes':
             return True
         else:
             return False
 
+    def getSmtpUseTLS(self):
+        return self._yesOrNoVariable('SmtpUseTLS')
+
+    def getProfile(self):
+        return self._yesOrNoVariable('Profile')
 
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single

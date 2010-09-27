@@ -620,12 +620,14 @@ class _TmpSectionField:
     def __init__(self, params={}, generalField=None):
         self._caption=""
         self._mandatory=""
+        self._description=""
         self._input=None
         self._billable =""
         self._price = ""
         if generalField is not None:
             self._caption=generalField.getCaption()
             self._mandatory=generalField.isMandatory()
+            self._description = generalField.getDescription()
             self._input=generalField.getInput().clone(self)
             self._billable =generalField.isBillable()
             self._price = generalField.getPrice()
@@ -635,6 +637,7 @@ class _TmpSectionField:
     def getValues(self):
         d={}
         d['caption']=self.getCaption()
+        d['description']=self.getDescription()
         d['price']=self.getPrice();
         if self.isMandatory():
             d['mandatory']='True'
@@ -646,6 +649,7 @@ class _TmpSectionField:
 
     def map(self, params):
         self._caption=params.get("caption","")
+        self._description = params.get("description","")
         self._mandatory=params.has_key("mandatory")
         self._billable=params.has_key("billable")
         self._price=params.get("price","")
@@ -714,6 +718,12 @@ class _TmpSectionField:
 
     def setCaption(self, caption):
         self._caption = caption
+
+    def getDescription(self):
+        return self._description
+
+    def setDescription(self, description):
+        self._description = description
 
     def getInput(self):
         return self._input
@@ -809,7 +819,7 @@ class RHRegistrationFormModifGeneralSectionFieldPerformModif( RHRegistrationForm
             # setup the server variable with the values for the section field
             tmpSectionField=self._getSession().getVar("tmpSectionField")
             if tmpSectionField == None:
-                tmpSectionField=_TmpSectionField(sectionField=self._sectionField)
+                tmpSectionField=_TmpSectionField(generalField=self._sectionField)
             else:
                 tmpSectionField.map(self._getRequestParams())
             self._getSession().setVar("tmpSectionField", tmpSectionField)
