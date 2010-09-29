@@ -154,6 +154,9 @@ class ChatroomStorage(Component):
             #the title has been changed. Get rid of the old index and substitute it for the new one
             root = DBUtils.getChatRoot()
             root['indexByCRName'][oldTitle].remove(newRoom)
+            #if there are no more rooms with the same name, we don't want the index
+            if len( root['indexByCRName'][oldTitle] ) is 0:
+                root['indexByCRName'].pop(oldTitle)
             if not root['indexByCRName'].has_key(newRoom.getTitle()):
                 root['indexByCRName'][newRoom.getTitle()] = OOTreeSet()
             root['indexByCRName'][newRoom.getTitle()].insert(newRoom)

@@ -235,8 +235,8 @@ class PluginLoader(object):
                 if pluginTypeSubModule:
                     cls.pluginTypeModules[pluginTypeName].__dict__[itemName] = pluginTypeSubModule
                 #EL IF FUERA!
-                if itemName == 'components':
-                    cls.addImplementedComponents(pluginTypeSubModule.__dict__.values())
+                #if itemName == 'components':
+                cls.addImplementedComponents(pluginTypeSubModule.__dict__.values())
 
                 if itemName == 'handlers':
                     #we get the dictionary containing the AJAX methods of the plugin
@@ -289,8 +289,8 @@ class PluginLoader(object):
 
                 foundSubModules[itemName] = subModule
                 #Y aqui!
-                if itemName == 'components':
-                    cls.addImplementedComponents(subModule.__dict__.values())
+                #if itemName == 'components':
+                cls.addImplementedComponents(subModule.__dict__.values())
 
                 if itemName == 'handlers':
                     #we get the dictionary containing the AJAX methods of the plugin
@@ -314,7 +314,12 @@ class PluginLoader(object):
         that the element is a class that implements the base class Component and the interface IListener'''
         for cl in classList:
             #we have the .py file in obj, now we get its data and check if the class inherits from listener or contributor
-            if (hasattr(cl, 'mro') and Component in cl.mro()) and (IListener.implementedBy(cl) or IContributor.implementedBy(cl)):
-            #if hasattr(cl, 'isListener') and IListener.implementedBy(cl):
-                from MaKaC.plugins.base import PluginsHolder
-                PluginsHolder().getComponentsManager().addComponent(cl)
+            try:
+                if (hasattr(cl, 'mro') and Component in cl.mro()) and (IListener.implementedBy(cl) or IContributor.implementedBy(cl)):
+                #if hasattr(cl, 'isListener') and IListener.implementedBy(cl):
+                    from MaKaC.plugins.base import PluginsHolder
+                    PluginsHolder().getComponentsManager().addComponent(cl)
+            except Exception,e:
+                    #we might have an exception because some classes return True for hasattr(cl, 'mro') but then throw an exception when calling
+                    #cl.mro(). Since we are not supposed to do anything in this cases, we just pass to the next case
+                    continue
