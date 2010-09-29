@@ -1605,7 +1605,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
         inputHTML = ""
         if item.getId() == "email":
             if self._currentUser is None or self._conf.canManageRegistration(self._currentUser):
-                inputHTML = """<input type="text" name="%s" value="%s" size="40">"""%(item.getId(), value)
+                inputHTML = """<input type="text" id="%s" name="%s" value="%s" size="40">"""%(item.getId(), item.getId(), value)
             else:
                 inputHTML = """<input type="hidden" name="%s" value="%s">%s"""%(item.getId(), value, value)
         elif item.getInput() == "hidden":
@@ -1617,7 +1617,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
                     if value == title:
                         selected = "selected"
                     inputHTML += """<option value="%s" %s>%s</option>"""%(title, selected, title)
-                inputHTML = """<select name="%s">%s</select>"""%(item.getId(), inputHTML)
+                inputHTML = """<select id="%s" name="%s">%s</select>"""%(item.getId(), item.getId(), inputHTML)
             elif item.getId() == "country":
                 inputHTML= _("""<option value="">--  _("Select a country") --</option>""")
                 for ck in CountryHolder().getCountrySortedKeys():
@@ -1625,10 +1625,15 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
                     if value == ck:
                         selected = "selected"
                     inputHTML += """<option value="%s" %s>%s</option>"""%(ck, selected, CountryHolder().getCountryById(ck))
-                inputHTML = """<select name="%s">%s</select>"""%(item.getId(), inputHTML)
+                inputHTML = """<select id="%s" name="%s">%s</select>"""%(item.getId(), item.getId(), inputHTML)
 
         else:
-            inputHTML = """<input type="%s" name="%s" size="40" value="%s">"""%(item.getInput(), item.getId(), value)
+            inputHTML = """<input type="%s" id="%s" name="%s" size="40" value="%s">"""%(item.getInput(), item.getId(), item.getId(), value)
+        if item.isMandatory():
+            addParam = """<script>addParam($E('%s'), 'text', false);</script>""" % item.getId()
+        else:
+            addParam = ''
+        inputHTML = "%s%s"%(inputHTML, addParam)
         mandatory="&nbsp; &nbsp;"
         if item.isMandatory():
             mandatory = """<font color="red">* </font>"""
@@ -1713,12 +1718,22 @@ class WConfRegFormSessionsDisplay(WConfRegFormSessionsBase):
 
 class WConfRegFormSessions2PrioritiesDisplay(WConfRegFormSessionsBase):
 
-    def _getSessionsHTML(self, sessions, selectName, sessionValue):
+    def _getSessionsHTML(self, sessions, selectName, sessionValue, mandatory=False):
         selected = ""
         if sessionValue is None:
             selected = "selected"
-        html = [ _("""<select name="%s">
-                        <option value="nosession" %s>--_("None selected")--</option>""")%(selectName, selected)]
+        if mandatory:
+            addParam = """<script>addParam($E('%s'), 'text', false, function(value) {
+                                                                       if (value === "nosession") {
+                                                                          return Html.span({}, "Please choose an option");
+                                                                       }else {
+                                                                       return null;
+                                                                       }
+                                                                    });</script>""" % selectName
+        else:
+            addParam = ''
+        html = [ _("""<select id="%s" name="%s">
+                        <option value="nosession" %s>--_("Select a session")--</option>""")%(selectName, selectName, selected)]
         for ses in sessions.getSessionList(True):
             selected = ""
             if ses == sessionValue:
@@ -1726,7 +1741,7 @@ class WConfRegFormSessions2PrioritiesDisplay(WConfRegFormSessionsBase):
             html.append("""
                     <option value="%s" %s>%s</option>
                     """%(ses.getId(), selected, ses.getTitle()) )
-        html = """%s</select>"""%("".join(html))
+        html = """%s</select>%s"""%("".join(html), addParam)
         return html
 
     def getVars(self):
@@ -1734,7 +1749,7 @@ class WConfRegFormSessions2PrioritiesDisplay(WConfRegFormSessionsBase):
         ses1 = None
         if len(self._selectedSessions)>0:
             ses1 = self._selectedSessions[0]
-        vars ["sessions1"] = self._getSessionsHTML(self._sessionForm, "session1", ses1)
+        vars ["sessions1"] = self._getSessionsHTML(self._sessionForm, "session1", ses1, True)
         ses2 = None
         if len(self._selectedSessions)>1:
             ses2 = self._selectedSessions[1]
@@ -1789,9 +1804,9 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         if currentDate is None:
             selected = "selected"
         html = [ _("""
-                <select name="%s">
+                <select id="%s" name="%s">
                 <option value="nodate" %s>--_("select a date")--</option>
-                """)%(name, selected)]
+                """)%(name, name, selected)]
         for date in dates:
             selected = ""
             if currentDate is not None and currentDate.strftime("%d-%B-%Y") == date.strftime("%d-%B-%Y"):
@@ -1799,7 +1814,15 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
             html.append("""
                         <option value=%s %s>%s</option>
                         """%(quoteattr(str(date.strftime("%d-%m-%Y"))), selected, date.strftime("%d-%B-%Y")))
-        html.append("</select>")
+
+        addParam = """<script>addParam($E('%s'), 'text', false, function(value) {
+                                                                       if (value === "nodate") {
+                                                                          return Html.span({}, "Please choose an option");
+                                                                       }else {
+                                                                       return null;
+                                                                       }
+                                                                    });</script>""" % name
+        html.append("</select>%s"%addParam)
         return "".join(html)
 
     def _getAccommodationTypesHTML(self, currentAccoType):
@@ -1814,7 +1837,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                     if atype.getNoPlacesLeft() > 0:
                         placesLeft = " <font color='green'><i>[%s place(s) left]</i></font>"%atype.getNoPlacesLeft()
                     html.append("""<tr>
-                                        <td align="left" style="padding-left:10px"><input type="radio" name="accommodationType" value="%s" %s>%s%s</td>
+                                        <td align="left" style="padding-left:10px"><input type="radio" id="accommodationType" name="accommodationType" value="%s" %s>%s%s</td>
                                     </tr>
                                 """%(atype.getId(), selected, atype.getCaption(), placesLeft ) )
                 else:
@@ -1828,6 +1851,8 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                                  <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>
                                </tr>
                             """)%(atype.getCaption() ) )
+
+        html.append("""<script>addParam($E('accommodationType'), 'radio', false);</script>""")
         if currentAccoType is not None and currentAccoType.isCancelled() and currentAccoType not in self._accommodation.getAccommodationTypesList():
             html.append( _("""<tr>
                                 <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>

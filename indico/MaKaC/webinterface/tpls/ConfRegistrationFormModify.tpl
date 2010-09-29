@@ -15,6 +15,7 @@
 
   function formSubmit(f) {
       if (!parameterManager.check()) {
+          alert($T("The form contains some errors. Please, correct them and submit again."));
           return false;
       }
 

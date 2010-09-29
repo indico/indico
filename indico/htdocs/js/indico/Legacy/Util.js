@@ -479,7 +479,7 @@ var IndicoUtil = {
         var classList = {}; //original class (style) value for each element to check
         var eventList = {}; //all the 'error' events for each element to check
 
-        var radioButtonChecks = {}; //
+        //var radioButtonChecks = {}; //
         var radioButtonLabelStopObserving = {};
 
         /**
@@ -622,7 +622,7 @@ var IndicoUtil = {
 
         this.checkRadioButton = function(component) {
             var name = component.dom.name;
-            if (!exists(radioButtonChecks[name])) {
+            /*if (!exists(radioButtonChecks[name])) {
                 radioButtonChecks[name] = false;
                 var radioButtons = $N(name);
                 each (radioButtons, function(rb) {
@@ -631,7 +631,15 @@ var IndicoUtil = {
                     }
                 });
             }
-            return radioButtonChecks[name];
+            return radioButtonChecks[name];*/
+            var radioButtonChecks = false;
+            var radioButtons = $N(name);
+            each (radioButtons, function(rb) {
+                if (rb.dom.checked) {
+                    radioButtonChecks = true;
+                }
+            });
+            return radioButtonChecks;
         };
 
         /**
