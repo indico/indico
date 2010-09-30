@@ -259,6 +259,8 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["changeStatus"] = _("ENABLE")
             vars["startDate"] = ""
             vars["endDate"] = ""
+            vars["extraTimeAmount"] = ""
+            vars["extraTimeUnit"] = ""
             vars["modificationEndDate"]=""
             vars["announcement"] = ""
             vars["disabled"] = 'disabled = "disabled"'
