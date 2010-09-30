@@ -7,7 +7,6 @@ import gettext, locale
 import operator
 
 # TODO: Use a standard library for this, possibly pycountry
-# note that pycountry imports lxml, and libxml2 doesn't seem to like that
 languageNames = {
     'en_US': 'English',
     'fr_FR': 'Français'
@@ -55,7 +54,7 @@ def install(name, lang, unicode, localedir=None):
         # TODO: look for a fix for this
         # locales in windows have different names
         pass
-    
+
     gettext.install(name, localedir, unicode)
     try:
         Lan = gettext.translation("messages", localedir, languages=[lang])
@@ -81,7 +80,7 @@ def langList():
 
     #langName = LanName.split('_')[0]
 
-    for language in LangList:       
+    for language in LangList:
         restranslated.append((language, languageNames[language]))
     restranslated=sorted(restranslated,key=operator.itemgetter(1))
     return restranslated

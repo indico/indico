@@ -427,8 +427,7 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
         isLibxml = True
         warningText = ""
         try:
-            import libxml2
-            import libxslt
+            import lxml
         except:
             isLibxml = False
         # create the html factory
@@ -449,7 +448,7 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
             p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:
             if view != "static":
-                warningText = "libxml2 and libxslt python modules need to be installed if you want to use a stylesheet-driven display - switching to static display"
+                warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
             if wf != None:
                 p = wf.getConferenceDisplayPage( self, self._target, self._reqParams )
             else:

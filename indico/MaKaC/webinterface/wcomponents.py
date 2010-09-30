@@ -54,7 +54,7 @@ from MaKaC.common.TemplateExec import TemplateExec
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
 
-from libxml2 import parserError
+from lxml import etree
 
 from MaKaC.i18n import _
 from MaKaC.i18n import langList
@@ -198,11 +198,11 @@ class WTemplated:
         else:
             try:
                 return ContextHelp().merge(self.tplId, tempHTML, helpText)
-            except parserError, e:
+            except etree.LxmlError, e:
                 if tempHTML.strip() == '':
                     raise MaKaCError(_("Template " + str(self.tplId) + " produced empty output, and it has a .wohl file. Error: " + str(e)))
                 else:
-                    raise e
+                    raise
 
 
     def htmlText(param):

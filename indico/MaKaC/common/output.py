@@ -24,13 +24,11 @@ from MaKaC.plugins.base import PluginsHolder
 
 from MaKaC.common.logger import Logger
 
-try:
-    import libxml2
-    import libxslt
-except ImportError:
-    pass
 import string,re
 import simplejson
+import StringIO
+
+from lxml import etree
 
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
@@ -62,24 +60,16 @@ class XSLTransformer:
 
     def __init__(self, stylesheet):
         # instanciate stylesheet object
-        styledoc = libxml2.parseFile(stylesheet)
-        self.__style = libxslt.parseStylesheetDoc(styledoc)
+        styledoc = etree.parse(stylesheet)
+        self.__style = etree.XSLT(styledoc)
 
     def process (self, xml):
-        try:
-            doc = libxml2.parseDoc(xml)
-        except:
-            return _("""_("error parsing xml"):\n <pre>%s</pre>""") % xml.replace("<","&lt;")
+
+        doc = etree.parse(StringIO.StringIO(xml))
         # compute the transformation
-        result = self.__style.applyStylesheet(doc, None)
-        output = self.__style.saveResultToString(result)
-        # free memory
-        self.__style.freeStylesheet()
-        doc.freeDoc()
-        result.freeDoc()
-        #libxslt.cleanupGlobals() # this line causes mod_python to segfault
-        libxml2.cleanupParser()
-        return output
+        result = self.__style(doc)
+
+        return etree.tostring(result)
 
 class outputGenerator:
     """
@@ -133,11 +123,9 @@ class outputGenerator:
             self.text = xml
         else:
             # instanciate the XSL tool
-            try:
-                parser = XSLTransformer(stylesheet)
-                self.text = parser.process(xml)
-            except Exception, e:
-                self.text = _("Cannot parse stylesheet: %s") % str(e)
+            parser = XSLTransformer(stylesheet)
+            self.text = parser.process(xml)
+
         end_time_HTML = time.time()
         self.time_XML = end_time_XML - start_time_XML
         self.time_HTML = end_time_HTML - start_time_HTML
