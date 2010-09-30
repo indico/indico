@@ -77,6 +77,8 @@ class ExcelGenerator:
         return ''.join(self._lines)
 
     def excelFormatting(text):
+        if text is None:
+            text = ""
         if text.strip() != "":
             text = utils.utf8Tolatin1(text)
             text = text.replace('\x0d', '')
