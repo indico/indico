@@ -582,7 +582,7 @@ class Notification(Persistent):
 
     def _formatValue(self, fieldInput, value):
         try:
-            value = fieldInput.getValueDisplay(value)
+            value = str(fieldInput.getValueDisplay(value))
         except:
             value = str(value).strip()
         if len(value) > 50:
