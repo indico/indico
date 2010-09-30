@@ -1380,9 +1380,9 @@ class NumberInput(FieldInputType):
             htmlName=item.getHTMLName()
 
         if self._parent.isMandatory():
-            param = """<script>addParam($E('%s'), 'unsigned_int', false);</script>""" % htmlName
+            param = """<script>addParam($E('%s'), 'non_negative_int', false);</script>""" % htmlName
         else:
-            param = """<script>addParam($E('%s'), 'unsigned_int', true);</script>""" % htmlName
+            param = """<script>addParam($E('%s'), 'non_negative_int', true);</script>""" % htmlName
 
         disable=""
         if ( registrant is not None and billable and registrant.getPayed()):
