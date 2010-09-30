@@ -3,6 +3,7 @@ Created on Apr 22, 2010
 
 @author: cesar
 '''
+from MaKaC.common.utils import *
 from MaKaC.plugins.notificationComponents import Component
 from MaKaC.plugins.notificationComponents import IListener
 from MaKaC.plugins.notificationComponents import IManagementEventsListener
@@ -32,6 +33,26 @@ class EventCollaborationListener(Component):
             obj.notifyEventDateChanges(params['oldDate'], params['newDate'], None, None)
         except Exception, e:
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
+
+    @classmethod
+    def notifyStartTimeChange(self, obj, sdate):
+        """ No one is calling this method in the class Conference. Probably this is completely unnecessary"""
+        bookingManager = obj.getCSBookingManager()
+        bookingManager.notifyEventDateChanges(sdate, obj.startDate, None, None)
+
+    @classmethod
+    def notifyEndTimeChange(self, obj, edate):
+        """ No one is calling this method in the class Conference. Probably this is completely unnecessary"""
+        bookingManager = obj.getCSBookingManager()
+        bookingManager.notifyEventDateChanges(None, None, edate, obj.endDate)
+
+    @classmethod
+    def notifySetTimezone(self, obj, oldTimezone):
+        bookingManager = obj.getCSBookingManager()
+        #ATTENTION! At this moment this method notifyTimezoneChange in the class CSBookingManager
+        #just returns [], so if you're expecting it to do something just implement whatever you
+        #want to do with it
+        bookingManager.notifyTimezoneChange(oldTimezone, obj.timezone)
 
     @classmethod
     def notifyEndDateChange(cls, obj, params={}):

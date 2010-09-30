@@ -1,7 +1,7 @@
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from MaKaC.plugins.InstantMessaging.pages import WPChatDisplayIndex, WPInstantMessagingDisplayIndex
+from MaKaC.plugins.InstantMessaging.pages import WPConfModifChat, WPConferenceInstantMessaging
 
 
 class RHChatModifBase(RHConferenceModifBase):
@@ -29,7 +29,7 @@ class RHChatFormModif(RHChatModifBase):
                 self._activeTabName = self._tabs[0]
 
     def _process( self ):
-        p = WPChatDisplayIndex( self, self._conf )
+        p = WPConfModifChat( self, self._conf )
         return p.display()
 
 
@@ -39,5 +39,5 @@ class RHInstantMessagingDisplay(RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkParams(self, params)
 
     def _process( self ):
-        p = WPInstantMessagingDisplayIndex( self, self._conf )
+        p = WPConferenceInstantMessaging( self, self._conf )
         return p.display()

@@ -2813,14 +2813,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
             self._observers = []
         return self._observers
 
-    def addObserver(self, observer):
-        self.getObservers().append(observer)
-        self._p_changed=1
-
-    def removeObserver(self, observer):
-        self.getObservers().remove(observer)
-        self._p_changed=1
-
     def setDates( self, sDate, eDate=None, check=1, moveEntries=0 ):
         """
         Set the start/end date for a conference
@@ -2961,15 +2953,16 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getObservers():
+            try:
+                self._notify('notifyStartTimeChange', sdate)
+            #for observer in self.getObservers():
+                    #observer.notifyEventDateChanges(sdate, self.startDate, None, None)
+            except Exception, e:
                 try:
-                    observer.notifyEventDateChanges(sdate, self.startDate, None, None)
-                except Exception, e:
-                    try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a start date change from %s to %s for conference %s: %s"%
-                                                       (observer.getObserverName(), formatDateTime(sdate), formatDateTime(self.startDate), self.getId(), str(e)))
-                    except Exception, e2:
-                        Logger.get('Conference').error("Exception while notifying a start time change: %s (origin: %s)"%(str(e2), str(e)))
+                    Logger.get('Conference').error("Exception while notifying the observer of a start date change from %s to %s for conference %s: %s"%
+                                                    (formatDateTime(sdate), formatDateTime(self.startDate), self.getId(), str(e)))
+                except Exception, e2:
+                    Logger.get('Conference').error("Exception while notifying a start time change: %s (origin: %s)"%(str(e2), str(e)))
 
     def getStartDate(self):
         """returns (datetime) the starting date of the conference"""
@@ -3068,15 +3061,16 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
-            for observer in self.getObservers():
+            try:
+                self._notify('notifyEndTimeChange', edate)
+            #for observer in self.getObservers():
+            except Exception, e:
+                #observer.notifyEventDateChanges(None, None, edate, self.endDate)
                 try:
-                    observer.notifyEventDateChanges(None, None, edate, self.endDate)
-                except Exception, e:
-                    try:
-                        Logger.get('Conference').error("Exception while notifying the observer %s of a end timet change from %s to %s for conference %s: %s" %
-                                                       (observer.getObserverName(), formatDateTime(edate), formatDateTime(self.endDate), self.getId(), str(e)))
-                    except Exception, e2:
-                        Logger.get('Conference').error("Exception while notifying a end time change: %s (origin: %s)"%(str(e2), str(e)))
+                    Logger.get('Conference').error("Exception while notifying the observer of a end timet change from %s to %s for conference %s: %s" %
+                                                    (formatDateTime(edate), formatDateTime(self.endDate), self.getId(), str(e)))
+                except Exception, e2:
+                    Logger.get('Conference').error("Exception while notifying a end time change: %s (origin: %s)"%(str(e2), str(e)))
 
     def getEndDate(self):
         """returns (datetime) the ending date of the conference"""
@@ -3133,16 +3127,16 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         except AttributeError:
             oldTimezone = tz
         self.timezone = tz
-
-        for observer in self.getObservers():
+        #for observer in self.getObservers():
+        try:
+            #observer.notifyTimezoneChange(oldTimezone, tz)
+            self._notify('notifySetTimezone', oldTimezone)
+        except Exception, e:
             try:
-                observer.notifyTimezoneChange(oldTimezone, tz)
-            except Exception, e:
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer %s of a timezone change from %s to %s for conference %s: %s" %
-                                                   (observer.getObserverName(), str(oldTimezone), str(tz), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a timezone change: %s (origin: %s)"%(str(e2), str(e)))
+                Logger.get('Conference').error("Exception while notifying the observer of a timezone change from %s to %s for conference %s: %s" %
+                                                (str(oldTimezone), str(tz), self.getId(), str(e)))
+            except Exception, e2:
+                Logger.get('Conference').error("Exception while notifying a timezone change: %s (origin: %s)"%(str(e2), str(e)))
 
     def getTimezone(self):
         try:

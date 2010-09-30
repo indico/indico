@@ -16,96 +16,9 @@ from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins.InstantMessaging.bot import *
 from MaKaC.common.Conversion import Conversion
 from MaKaC.conference import ConferenceHolder
+from MaKaC.plugins.helpers import DBHelpers
 
 
-
-class DBUtils:
-    @classmethod
-    def getChatRoot(cls):
-         #pick the plugin
-        pfh = PluginFieldsHelper('InstantMessaging', 'Jabber')
-        #and the element from which objects will be hanging in the DB
-        return pfh.getStorage()
-
-    @classmethod
-    def getCounter(cls):
-        root = cls.getChatRoot()
-
-        if not root.has_key('counter'):
-            raise ServiceError( message=_('Expected index not found while accessing the database (counter)'))
-
-        return root['counter']
-
-    @classmethod
-    def newID(cls, conf):
-        return cls.getCounter().newCount()
-
-    @classmethod
-    def getChatroomList(cls, conf):
-        root = cls.getChatRoot()
-        conf = str(conf.getId())
-
-        if not root.has_key('indexByConf'):
-            raise ServiceError( message=_('Expected index not found while accessing the database (indexByConf)'))
-        confRooms = root['indexByConf']
-        if not confRooms.has_key(conf):
-            raise ServiceError( message=_('Conference not found in database: %s' %conf))
-
-        return confRooms[conf]
-
-    @classmethod
-    def getChatroom(cls, id):
-        root = cls.getChatRoot()
-
-        if not root.has_key('indexByID'):
-            raise ServiceError( message=_('Expected index not found while accessing the database (indexByID)'))
-        room = root['indexByID']
-        if not room.has_key(id):
-            raise ServiceError( message=_('Chat room not found in database: %s' %id))
-
-        return room[id]
-
-    @classmethod
-    def roomsToShow(cls, conf):
-        """ For the given conference, will return True if there is any chat room to be shown
-            in the conference page, and will return False if there are not
-        """
-        try:
-            chatrooms = cls.getChatroomList(conf)
-        except Exception,e:
-            return False
-        #there are no chatrooms, there's nothing to show
-        if len(chatrooms) is 0:
-            return False
-        for chatroom in chatrooms:
-            if chatroom.getShowRoom():
-                return True
-        #all the rooms were set to be hidden from the users
-        return False
-
-    @classmethod
-    def getShowableRooms(cls, conf):
-        chatrooms = []
-        try:
-            for room in cls.getChatroomList(conf):
-                if room.getShowRoom():
-                    chatrooms.append(room)
-        except Exception,e:
-            return []
-        return chatrooms
-
-    @classmethod
-    def getRoomsByUser(cls, user):
-        """ Will return the chat rooms created by the requested user """
-        root = cls.getChatRoot()
-        userID = str(user['id'])
-        if not root.has_key('indexByUser'):
-            return []
-        rooms = root['indexByUser']
-        if not rooms.has_key(userID):
-            return []
-
-        return rooms[userID]
 
 
 
@@ -236,7 +149,7 @@ class EditChatroom( ChatRoomBase ):
                   'conference':ConferenceHolder().getById(self._conferenceID) \
                   }
         try:
-            self._room = DBUtils().getChatroom(self._id)
+            self._room = DBHelpers().getChatroom(self._id)
             oldRoom = Chatroom(self._room.getTitle(), self._room.getOwner(), ConferenceHolder().getById(self._conferenceID))
 
             self._room.setValues(values)
@@ -322,7 +235,7 @@ class DeleteChatroom( ChatRoomBase ):
         ChatRoomBase._checkParams(self)
         pm = ParameterManager(self._params.get('chatroomParams'))
         self._id = pm.extract('id', pType=str, allowEmpty = False)
-        self._room = DBUtils().getChatroom(self._id)
+        self._room = DBHelpers().getChatroom(self._id)
         self.error = False
         self._user = self._getUser()
 
@@ -373,7 +286,7 @@ class GetRoomPreferences( ChatRoomBase ):
                         }
 
         try:
-            self._room = DBUtils().getChatroom(self._id)
+            self._room = DBHelpers().getChatroom(self._id)
         except Exception, e:
             raise ServiceError( message=_('Error trying to get the chat room preferences'))
 
@@ -400,7 +313,7 @@ class GetRoomsByUser( ServiceBase ):
         self._user = self._params['usr']
 
     def _getAnswer( self ):
-        return fossilize(DBUtils().getRoomsByUser(self._user))
+        return fossilize(DBHelpers().getRoomsByUser(self._user))
 
 
 
@@ -418,7 +331,7 @@ class AddConference2Room( ServiceBase, Observable ):
         try:
             for roomID in self._rooms:
                 try:
-                    room = DBUtils.getChatroom(roomID)
+                    room = DBHelpers.getChatroom(roomID)
                 except Exception, e:
                     raise NoReportError('Some of the rooms were deleted from the other conference(s) they belonged to. Please refresh your browser')
                 room.setConference(ConferenceHolder().getById(self._conference))

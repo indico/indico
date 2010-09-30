@@ -8,6 +8,7 @@ from MaKaC.user import Avatar, AvatarHolder
 
 from MaKaC.conference import Conference, ConferenceHolder
 from MaKaC.plugins.InstantMessaging.handlers import *
+from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.base import Observable, PluginsHolder
 
 from MaKaC.common.db import DBMgr
@@ -70,44 +71,44 @@ class TestAddRemoveCR(unittest.TestCase, Observable):
         cr6ID = cr6.getId()
 
         #checks for indexByConf
-        assert (len(DBUtils.getChatroomList(c1))==3)
-        assert (len(DBUtils.getChatroomList(c2))==3)
+        assert (len(DBHelpers.getChatroomList(c1))==3)
+        assert (len(DBHelpers.getChatroomList(c2))==3)
 
         #checks for indexByID
-        assert(DBUtils.getChatroom(cr1ID).getId()==cr1ID)
-        assert(DBUtils.getChatroom(cr2ID).getId()==cr2ID)
-        assert(DBUtils.getChatroom(cr3ID).getId()==cr3ID)
-        assert(DBUtils.getChatroom(cr4ID).getId()==cr4ID)
-        assert(DBUtils.getChatroom(cr5ID).getId()==cr5ID)
-        assert(DBUtils.getChatroom(cr6ID).getId()==cr6ID)
+        assert(DBHelpers.getChatroom(cr1ID).getId()==cr1ID)
+        assert(DBHelpers.getChatroom(cr2ID).getId()==cr2ID)
+        assert(DBHelpers.getChatroom(cr3ID).getId()==cr3ID)
+        assert(DBHelpers.getChatroom(cr4ID).getId()==cr4ID)
+        assert(DBHelpers.getChatroom(cr5ID).getId()==cr5ID)
+        assert(DBHelpers.getChatroom(cr6ID).getId()==cr6ID)
 
         #insert created chatrooms
         self._conference = c2.getId()
-        cr1 = DBUtils.getChatroom(cr1ID)
+        cr1 = DBHelpers.getChatroom(cr1ID)
         cr1.setConference(c2)
         self._notify('addConference2Room', cr1)
-        cr2 = DBUtils.getChatroom(cr2ID)
+        cr2 = DBHelpers.getChatroom(cr2ID)
         cr2.setConference(c2)
         self._notify('addConference2Room', cr2)
-        cr3 = DBUtils.getChatroom(cr3ID)
+        cr3 = DBHelpers.getChatroom(cr3ID)
         cr3.setConference(c2)
         self._notify('addConference2Room', cr3)
 
         self._conference = c1.getId()
-        cr4 = DBUtils.getChatroom(cr4ID)
+        cr4 = DBHelpers.getChatroom(cr4ID)
         cr4.setConference(c1)
         self._notify('addConference2Room', cr4)
-        cr5 = DBUtils.getChatroom(cr5ID)
+        cr5 = DBHelpers.getChatroom(cr5ID)
         cr5.setConference(c1)
         self._notify('addConference2Room', cr5)
-        cr6 = DBUtils.getChatroom(cr6ID)
+        cr6 = DBHelpers.getChatroom(cr6ID)
         cr6.setConference(c1)
         self._notify('addConference2Room', cr6)
 
         #checks for conference dictionary inside each Chatroom object
         assert(len(dbRoot['indexByUser'][u.getId()])==6)
         for cr in dbRoot['indexByUser'][u.getId()]:
-            assert(len(DBUtils.getChatroom(cr.getId()).getConferences())==2)
+            assert(len(DBHelpers.getChatroom(cr.getId()).getConferences())==2)
 
         names = {cr1.getTitle():'chatroom1', cr2.getTitle():'chatroom2', cr3.getTitle():'chatroom3', cr4.getTitle():'chatroom4', cr5.getTitle():'chatroom5', cr6.getTitle():'chatroom6'}
         assert(len(dbRoot['indexByCRName'])==6)
@@ -123,8 +124,8 @@ class TestAddRemoveCR(unittest.TestCase, Observable):
         self._notify('deleteChatroom', cr3)
         self._notify('deleteChatroom', cr1)
         #conferences inside the chat rooms are consistent
-        assert( len(DBUtils.getChatroom(cr3ID).getConferences())==1 and DBUtils.getChatroom(cr3ID).getConferences().has_key(c2.getId()) )
-        assert( len(DBUtils.getChatroom(cr1ID).getConferences())==1 and DBUtils.getChatroom(cr1ID).getConferences().has_key(c2.getId()) )
+        assert( len(DBHelpers.getChatroom(cr3ID).getConferences())==1 and DBHelpers.getChatroom(cr3ID).getConferences().has_key(c2.getId()) )
+        assert( len(DBHelpers.getChatroom(cr1ID).getConferences())==1 and DBHelpers.getChatroom(cr1ID).getConferences().has_key(c2.getId()) )
 
         cr3.setTitle('editedRoom')
         cr3.setDescription('ou yeh')
@@ -132,8 +133,8 @@ class TestAddRemoveCR(unittest.TestCase, Observable):
         assert( dbRoot['indexByCRName'].has_key('editedRoom') and not dbRoot['indexByCRName'].has_key('chatroom3'))
 
         #consistent in indexByConf
-        assert(DBUtils.getChatroomList(c2).has_key(cr3) and not DBUtils.getChatroomList(c1).has_key(cr3))
-        assert(DBUtils.getChatroomList(c2).has_key(cr1) and not DBUtils.getChatroomList(c1).has_key(cr1))
+        assert(DBHelpers.getChatroomList(c2).has_key(cr3) and not DBHelpers.getChatroomList(c1).has_key(cr3))
+        assert(DBHelpers.getChatroomList(c2).has_key(cr1) and not DBHelpers.getChatroomList(c1).has_key(cr1))
 
         #consistent in indexByID
         assert(len(dbRoot['indexByID'])==6)
@@ -151,14 +152,14 @@ class TestAddRemoveCR(unittest.TestCase, Observable):
         self._notify('deleteChatroom', cr2)
         self._notify('deleteChatroom', cr5)
         #conferences inside the chat rooms are consistent
-        assert( len(DBUtils.getChatroom(cr6ID).getConferences())==1 and DBUtils.getChatroom(cr6ID).getConferences().has_key(c1.getId()) )
-        assert( len(DBUtils.getChatroom(cr2ID).getConferences())==1 and DBUtils.getChatroom(cr2ID).getConferences().has_key(c1.getId()) )
-        assert( len(DBUtils.getChatroom(cr5ID).getConferences())==1 and DBUtils.getChatroom(cr5ID).getConferences().has_key(c1.getId()) )
+        assert( len(DBHelpers.getChatroom(cr6ID).getConferences())==1 and DBHelpers.getChatroom(cr6ID).getConferences().has_key(c1.getId()) )
+        assert( len(DBHelpers.getChatroom(cr2ID).getConferences())==1 and DBHelpers.getChatroom(cr2ID).getConferences().has_key(c1.getId()) )
+        assert( len(DBHelpers.getChatroom(cr5ID).getConferences())==1 and DBHelpers.getChatroom(cr5ID).getConferences().has_key(c1.getId()) )
 
         #consistent in indexByConf
-        assert(DBUtils.getChatroomList(c1).has_key(cr6) and not DBUtils.getChatroomList(c2).has_key(cr6))
-        assert(DBUtils.getChatroomList(c1).has_key(cr2) and not DBUtils.getChatroomList(c2).has_key(cr2))
-        assert(DBUtils.getChatroomList(c1).has_key(cr5) and not DBUtils.getChatroomList(c2).has_key(cr5))
+        assert(DBHelpers.getChatroomList(c1).has_key(cr6) and not DBHelpers.getChatroomList(c2).has_key(cr6))
+        assert(DBHelpers.getChatroomList(c1).has_key(cr2) and not DBHelpers.getChatroomList(c2).has_key(cr2))
+        assert(DBHelpers.getChatroomList(c1).has_key(cr5) and not DBHelpers.getChatroomList(c2).has_key(cr5))
 
         #consistent in indexByID
         assert(len(dbRoot['indexByID'])==6)
@@ -177,13 +178,13 @@ class TestAddRemoveCR(unittest.TestCase, Observable):
         self._notify('deleteChatroom', cr5)
         self._notify('deleteChatroom', cr6)
         #conferences inside the chat rooms are consistent
-        assert( len(DBUtils.getChatroom(cr4ID).getConferences())==1 and DBUtils.getChatroom(cr4ID).getConferences().has_key(c2.getId()) )
+        assert( len(DBHelpers.getChatroom(cr4ID).getConferences())==1 and DBHelpers.getChatroom(cr4ID).getConferences().has_key(c2.getId()) )
 
         #consistent in indexByConf
-        assert(DBUtils.getChatroomList(c2).has_key(cr4) and not dbRoot['indexByConf'].has_key(c1))
-        assert(not DBUtils.getChatroomList(c2).has_key(cr2))
-        assert(not DBUtils.getChatroomList(c2).has_key(cr5))
-        assert(not DBUtils.getChatroomList(c2).has_key(cr6))
+        assert(DBHelpers.getChatroomList(c2).has_key(cr4) and not dbRoot['indexByConf'].has_key(c1))
+        assert(not DBHelpers.getChatroomList(c2).has_key(cr2))
+        assert(not DBHelpers.getChatroomList(c2).has_key(cr5))
+        assert(not DBHelpers.getChatroomList(c2).has_key(cr6))
 
         #consistent in indexByID
         assert(len(dbRoot['indexByID'])==3)

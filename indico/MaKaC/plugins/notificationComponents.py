@@ -1,8 +1,6 @@
 import zope.interface
 
 class Component(object):
-    #def isListener(self):
-    #    return True
     pass
 
 class IListener(zope.interface.Interface):
@@ -20,6 +18,15 @@ class IManagementEventsListener(zope.interface.Interface):
         pass
 
     def notifyStartDateChange(self, obj, params):
+        pass
+
+    def notifyStartTimeChange(self, obj, sdate):
+        pass
+
+    def notifyEndTimeChange(self, obj, edate):
+        pass
+
+    def notifySetTimezone(self, obj, oldTimezone):
         pass
 
     def notifyEndDateChange(self, obj, params):
@@ -58,10 +65,21 @@ class INavigationContributor(zope.interface.Interface):
 
     def confDisplaySMFillDict(self, obj, params):
         """ Conference Display Side Menu Fill Dictionary.
-            There is a dictionary called self._linkData in the displayMgr file in which the elements to be showed in the conference display side menu are inserted.
-            This method insers an element in this dictionary"""
+            This dictionary is used to store all your new items on the side menu. You may want to add your own items here.
+            In the core, there is a dictionary called self._linkData in which the elements to be showed in the conference display side menu are inserted.
+            This method must insert the element in this dictionary as follows:
 
-    def confDisplaySMFillOrderedKeys(self, obj, params):
+                sideMenuItemsDict = params['dict']
+                conf = params['conf']
+
+                sideMenuItemsDict["instantMessaging"] =  { \
+                        "caption": _("Instant Messaging"), \
+                        "URL": str(urlHandlers.UHConferenceInstantMessaging.getURL(conf)), \
+                        "staticURL": "", \
+                        "parent": ""}
+            """
+
+    def confDisplaySMFillOrderedKeys(self, obj, list):
         """ Conference Display Side Menu Fill Ordered Keys.
             Right next to the dictionary there is a list with the ordered keys, we need to include them also
         """

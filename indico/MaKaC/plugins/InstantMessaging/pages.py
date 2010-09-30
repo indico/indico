@@ -5,10 +5,10 @@ from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
 from MaKaC.plugins.base import PluginsHolder, PluginFieldsHelper
 from MaKaC.common.fossilize import fossilize
-from MaKaC.plugins.InstantMessaging.handlers import DBUtils
+from MaKaC.plugins.helpers import DBHelpers
 
 
-class WPChatDisplayIndex(WPConferenceModifBase):
+class WPConfModifChat(WPConferenceModifBase):
 
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
@@ -44,13 +44,13 @@ class WPChatDisplayIndex(WPConferenceModifBase):
     def _getPageContent(self, params):
         if len(self._tabNames) > 0:
             self._createTabCtrl()
-            wc = WChatDisplayIndex(self._conf, self._activeTabName, self._tabNames, self._aw)
+            wc = WConfModifChat(self._conf, self._activeTabName, self._tabNames, self._aw)
             return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(wc.getHTML({}))
         else:
             return _("No available plugins, or no active plugins")
 
 
-class WPInstantMessagingDisplayIndex(WPConferenceDefaultDisplayBase):
+class WPConferenceInstantMessaging(WPConferenceDefaultDisplayBase):
 
     def __init__(self, rh, conf):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
@@ -58,12 +58,12 @@ class WPInstantMessagingDisplayIndex(WPConferenceDefaultDisplayBase):
         self._aw = rh.getAW()
 
     def _getBody(self, params):
-        wc = WInstantMessagingDisplayIndex(self._conf, self._aw)
+        wc = WConferenceInstantMessaging(self._conf, self._aw)
         return wc.getHTML({})
 
 
 
-class WChatDisplayIndex(wcomponents.WTemplated):
+class WConfModifChat(wcomponents.WTemplated):
 
     def __init__(self, conference, activeTab, tabNames, aw):
         self._conf = conference
@@ -76,7 +76,7 @@ class WChatDisplayIndex(wcomponents.WTemplated):
         vars = WTemplated.getVars( self )
         vars["Conference"] = self._conf
         try:
-            vars["Chatrooms"] = fossilize( list(DBUtils.getChatroomList(self._conf)) )
+            vars["Chatrooms"] = fossilize( list(DBHelpers.getChatroomList(self._conf)) )
             if len(vars['Chatrooms']) is 0:
                 vars['Chatrooms'] = None
         except Exception, e:
@@ -90,7 +90,7 @@ class WChatDisplayIndex(wcomponents.WTemplated):
 
 
 
-class WInstantMessagingDisplayIndex(wcomponents.WTemplated):
+class WConferenceInstantMessaging(wcomponents.WTemplated):
 
     def __init__(self, conference, aw):
         self._conf = conference
@@ -102,7 +102,7 @@ class WInstantMessagingDisplayIndex(wcomponents.WTemplated):
 
         vars["Conference"] = self._conf
         try:
-            vars["Chatrooms"] = DBUtils.getShowableRooms(self._conf)
+            vars["Chatrooms"] = DBHelpers.getShowableRooms(self._conf)
         except Exception, e:
             vars["Chatrooms"] = None
 

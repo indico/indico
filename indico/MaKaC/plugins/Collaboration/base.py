@@ -74,17 +74,10 @@ class CSBookingManager(Persistent, Observer):
         # an index of video services managers for each plugin. key: plugin name, value: list of users
         self._managers = {}
 
-        #we register as an observer of the conference
-        self._conf.addObserver(self)
-
     def getOwner(self):
         """ Returns the Conference (the meeting) that owns this CSBookingManager object.
         """
         return self._conf
-
-    def restoreAsObserver(self):
-        if not self in self._conf.getObservers():
-            self._conf.addObserver(self)
 
     def isCSAllowed(self, user = None):
         """ Returns if the associated event should display a Video Services tab
