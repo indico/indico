@@ -112,7 +112,8 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base =  ['pytz', 'zope.index', 'zope.interface', 'simplejson', 'suds', 'cds-indico-extras']
+    base =  ['pytz', 'zope.index', 'zope.interface', 'simplejson', 'suds',
+             'lxml', 'cds-indico-extras']
     if sys.version_info[1] < 5: #for Python older than 2.5
         base.append('hashlib') # hashlib isn't a part of Python older than 2.5
         base.append('ZODB3>=3.8,<3.9.0a')
