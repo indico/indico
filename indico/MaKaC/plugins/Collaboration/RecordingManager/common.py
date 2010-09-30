@@ -340,11 +340,22 @@ def getOrphans():
         flagSuccess = False
         result += "MySQL error %d: %s" % (e.args[0], e.args[1])
 
+    idTaskRecording = MicalaCommunication.getIdTask("recording")
+
     if flagSuccess == True:
         try:
             cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
             # Query Lectures table for all records in which IndicoID is blank or NULL
-            cursor.execute("SELECT idLecture, LOID, IndicoID FROM Lectures WHERE NOT IndicoID OR IndicoID IS NULL ORDER BY LOID")
+            cursor.execute("""SELECT L.idLecture AS idLecture, L.LOID AS LOID, L.IndicoID AS IndicoID, M.Hostname AS Hostname, V.RoomName AS RoomName, L.Duration AS Duration
+                FROM Lectures L, LectureLatestStatus LS, Status S, Machines M, Venues V
+                WHERE LS.idLecture = L.idLecture
+                AND LS.idTask = %s
+                AND LS.idStatus = S.idStatus
+                AND S.idMachine = M.idMachine
+                AND M.idVenue = V.idVenue
+                AND (NOT L.IndicoID OR L.IndicoID IS NULL)
+                ORDER BY L.LOID""",
+                (idTaskRecording,))
             connection.commit()
             rows = cursor.fetchall()
             cursor.close()
@@ -358,6 +369,10 @@ def getOrphans():
                 lecture["time"] = formatLOID(lecture["LOID"])[0]
                 lecture["date"] = formatLOID(lecture["LOID"])[1]
                 lecture["box"]  = formatLOID(lecture["LOID"])[2]
+                lecture["niceDuration"] = formatDuration(lecture["Duration"])
+                idLecture = MicalaCommunication.getIdLecture(lecture["LOID"])
+                idTaskPreview = MicalaCommunication.getIdTask("building preview")
+                lecture["preview"] = MicalaCommunication.isTaskComplete(idLecture, idTaskPreview)
             result = rows
 
     return {"success": flagSuccess, "result": result}
@@ -858,6 +873,25 @@ def formatLOID(LOID):
     recording_device = LOID.split('-')[1]
 
     return(time, date, recording_device)
+
+def formatDuration(duration):
+    """Given the number of seconds, format duration nicely in a human readable string."""
+
+    if duration is None or duration == "":
+        return "unknown duration"
+
+    seconds = duration % 60
+    hours   = int(duration / 3600)
+    minutes = int( (duration - 3600 * hours) / 60 )
+
+    if duration < 60:
+        niceDuration = "%d seconds" % seconds
+    elif duration < 3600:
+        niceDuration = "%d minutes" % minutes
+    else:
+        niceDuration = "%d hours %02d minutes" % (hours, minutes)
+
+    return niceDuration
 
 def chooseBGColor(talk):
     """Given a talk dictionary, check if it has an LOID, CDS record, and IndicoLink.
