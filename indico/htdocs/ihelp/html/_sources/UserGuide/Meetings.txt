@@ -290,6 +290,22 @@ The Compact style:
 
 |image138|
 
+You can pass extra parameters to this compact style in order to choose the amount of days to display in one row and the start
+and end date. The parameters are:
+
+* daysPerRow: number of days that you want to show per row (as a table row).
+* firstDay: first day to be shown (must have the format 1-January-2010)
+* lastDay: last day to be shown (must have the format 3-January-2010)
+
+Let's suppose you have a 2 weeks meeting:
+
+http://indico.cern.ch/conferenceDisplay.py?confId=XXXX&view=nicecompact (where XXXX is the ID of your meeting)
+
+and you want to display in the 1st row the 1st week and just underneath the second week, you can do it adding the extra paramenter daysPerRow as follows:
+
+http://indico.cern.ch/conferenceDisplay.py?confId=XXXX&view=nicecompact&daysPerRow=7 (where XXXX is the ID of your meeting)
+
+
 --------------
 
 Parellel Style

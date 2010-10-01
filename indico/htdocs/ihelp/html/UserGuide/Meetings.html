@@ -261,6 +261,17 @@ of available styles.</li>
 <h3>3.4.5. Compact Style<a class="headerlink" href="#compact-style" title="Permalink to this headline">¶</a></h3>
 <p>The Compact style:</p>
 <p><img alt="image138" src="../_images/meetd5.png" /></p>
+<p>You can pass extra parameters to this compact style in order to choose the amount of days to display in one row and the start
+and end date. The parameters are:</p>
+<ul class="simple">
+<li>daysPerRow: number of days that you want to show per row (as a table row).</li>
+<li>firstDay: first day to be shown (must have the format 1-January-2010)</li>
+<li>lastDay: last day to be shown (must have the format 3-January-2010)</li>
+</ul>
+<p>Let&#8217;s suppose you have a 2 weeks meeting:</p>
+<p><a class="reference external" href="http://indico.cern.ch/conferenceDisplay.py?confId=XXXX&amp;view=nicecompact">http://indico.cern.ch/conferenceDisplay.py?confId=XXXX&amp;view=nicecompact</a> (where XXXX is the ID of your meeting)</p>
+<p>and you want to display in the 1st row the 1st week and just underneath the second week, you can do it adding the extra paramenter daysPerRow as follows:</p>
+<p><a class="reference external" href="http://indico.cern.ch/conferenceDisplay.py?confId=XXXX&amp;view=nicecompact&amp;daysPerRow=7">http://indico.cern.ch/conferenceDisplay.py?confId=XXXX&amp;view=nicecompact&amp;daysPerRow=7</a> (where XXXX is the ID of your meeting)</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="parellel-style">
