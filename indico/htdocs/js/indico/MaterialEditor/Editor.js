@@ -270,8 +270,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
         var self = this;
 
-        this.pm = new IndicoUtil.parameterManager();
-        var typeSelector = new TypeSelector(this.pm, this.types, {style:{width: '150px'}},{style:{width: '150px'}, maxlength: '50'});
 
         // local file vs. url
         var locationSelector = new RadioFieldWidget([['local',$T('Local file')],['remote',$T('External resource (hyperlink)')]]);
@@ -282,13 +280,10 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         // protection page
         var protectionPane = $B(
             Html.div({}),
-            typeSelector,
+            this.typeSelector,
             function(value) {
                 return self._drawProtectionPane(value);
             });
-
-        // make typeSelector available to the object
-        this.typeSelector = typeSelector;
 
         return Html.div({},
                         IndicoUtil.createFormFromMap(
@@ -304,7 +299,8 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                                 ],
                                 [
                                     $T('Material type'),
-                                    Html.div({style:{height: '40px'}}, typeSelector.draw())
+                                    Html.div({style:{height: '40px'}},
+                                             this.typeSelector.draw())
                                 ]
 
                             ]),
@@ -315,8 +311,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
    _drawAdvanced: function() {
 
        var self = this;
-
-       this.pm = new IndicoUtil.parameterManager();
 
        var description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
        var displayName = Html.input("text",{'name':'displayName', style:{width:'220px'}});
@@ -509,6 +503,16 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
                         function() {
                             self.close();
                         });
+
+    this.pm = new IndicoUtil.parameterManager();
+
+    var typeSelector = new TypeSelector(this.types,
+                                        {style:{width: '150px'}},
+                                        {style:{width: '150px'}, maxlength: '50'});
+    // make typeSelector available to the object
+    this.typeSelector = typeSelector;
+    this.typeSelector.plugParameterManager(this.pm);
+
 });
 
 

@@ -3956,7 +3956,7 @@ ul.keywordList li.multipleLinesListItem_last {
 
 .invalid {
     -moz-appearance: none;
-    background-color: #FFB9B9;
+    background-color: #FFB9B9 !important;
 }
 
 .invalidLabel {
@@ -6266,6 +6266,11 @@ div.dateField input {
     vertical-align: middle;
     width: 115px;
 }
+
+div.invalid {
+    background: white;
+}
+
 
 /*
     Widget checkbox options

@@ -18,27 +18,20 @@
 <script type="text/javascript">
 IndicoUI.executeOnLoad(function() {
     var format = '<%= format %>';
-    <% if withTime: %>
-        var <%= name %>Date = IndicoUI.Widgets.Generic.dateField(true, null, ['<%= name %>Day', '<%= name %>Month', '<%= name %>Year', '<%= name %>Hour', '<%= name %>Min'], null, format);
-    <% end %>
-    <% else: %>
-        var <%= name %>Date = IndicoUI.Widgets.Generic.dateField(false, null, ['<%= name %>Day', '<%= name %>Month', '<%= name %>Year', '<%= name %>Hour', '<%= name %>Min'], null, format);
-    <% end %>
-    $E('<%= name %>DatePlace').set(<%= name %>Date);
-    <%= name %>Date.set('<%= dateDisplay %>');
 
-    <% if isMandatory: %>
-    if (exists(addValidator)) {
-        var year = $E('<%= name %>Year');
-        addValidator(function() {
-            value = year.get();
-            var ok = value != '' && value > 1900;
-            if (!ok) {
-                alert('You must enter a valid date in the field "<%= caption %>"!');
-            }
-            return ok;
-        });
-    }
-    <% end %>
+    <% wtime = jsBoolean(not withTime) %>
+    <% mandatory = jsBoolean(isMandatory) %>
+
+    var <%= name %>Date = new DateTimeSelectorWFields({}, format,
+        <%= mandatory %>, <%= wtime %>,
+        ['<%= name %>Day', '<%= name %>Month', '<%= name %>Year',
+         '<%= name %>Hour', '<%= name %>Min']);
+
+    $E('<%= name %>DatePlace').set(<%= name %>Date.draw());
+    <%= name %>Date.plugParameterManager(parameterManager);
+
+    <%= name %>Date.set('<%= dateDisplay %>', true);
+
+
 });
 </script>

@@ -933,7 +933,7 @@ type("HistoryListener", [],
 type("ErrorAware", [],
      {
          _setElementErrorState: function(element, text) {
-             this._stopErrorList = IndicoUtil.markInvalidField(element, text)[1];
+             return IndicoUtil.markInvalidField(element, text)[1];
          },
 
          setError: function(text) {
@@ -976,15 +976,18 @@ type("ErrorAware", [],
                  this.setError(null);
                  return null;
              }
+         },
+
+         plugParameterManager: function(parameterManager) {
+             this.parameterManager = parameterManager;
+             var self = this;
+
+             parameterManager.add(self, null, null,
+                                  function(){
+                                      return self.askForErrorCheck();
+                                  });
+
          }
      },
-     function(parameterManager) {
-         this.parameterManager = parameterManager;
-
-         var self = this;
-
-         parameterManager.add(self, null, null,
-                              function(){
-                                  return self.askForErrorCheck();
-                              });
+     function() {
      });

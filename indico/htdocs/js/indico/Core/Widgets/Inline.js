@@ -439,7 +439,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
 type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
      {
          _setErrorState: function(text) {
-             this._setElementErrorState(this.input, text);
+             this._stopErrorList = this._setElementErrorState(this.input, text);
          },
 
          _checkErrorState: function() {
@@ -941,9 +941,9 @@ type("ShowablePasswordField", ["IWidget", "ErrorAware"], {
 
     _setErrorState: function(text) {
         if (this.show) {
-            this._setElementErrorState(this.clearTextField, text);
+            this._stopErrorList = this._setElementErrorState(this.clearTextField, text);
         } else {
-            this._setElementErrorState(this.passwordField, text);
+            this._stopErrorList = this._setElementErrorState(this.passwordField, text);
         }
     },
 
@@ -1123,9 +1123,14 @@ type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
 
     getSelectBox: function() {
         return this.select;
+    },
+
+    plugParameterManager: function(parameterManager) {
+        this.text.plugParameterManager(parameterManager);
+        this.ErrorAware.prototype.plugParameterManager.call(this, parameterManager);
     }
 },
-     function(parameterManager, types, selParams, textParams){
+     function(types, selParams, textParams){
          selParams = selParams || {};
          textParams = textParams || {};
 
@@ -1149,12 +1154,10 @@ type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
          };
 
          this.selectOn = true;
-         this.pm = parameterManager;
          this.types = types;
 
          this.observers = [];
 
-         this.ErrorAware(parameterManager);
      }
     );
 

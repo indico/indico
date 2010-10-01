@@ -2182,8 +2182,8 @@ class DateInput(FieldInputType):
         dateFormat = re.sub('%H', 'hh', dateFormat)
         dateFormat = re.sub('%M', 'mm', dateFormat)
 
-        format = """&nbsp;<span class="inputDescription">%s</span>""" % dateFormat
-        tmp = "%s %s %s" % (caption, inputHTML, format)
+        dformat = """&nbsp;<span class="inputDescription">%s</span>""" % dateFormat
+        tmp = "%s %s %s" % (caption, inputHTML, dformat)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:

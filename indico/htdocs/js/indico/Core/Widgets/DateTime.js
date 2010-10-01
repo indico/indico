@@ -1,10 +1,12 @@
-
-type("DateTimeSelector", ["RealtimeTextBox"],
+type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
      {
+         /*
+          * direct: conversion should be bypassed (real value)
+          * function returns server-compliant datetime string, null in case of empty input
+          * or undefined in case of parsing error
+          */
          get: function(direct) {
 
-             // let the programmer choose if for some reason
-             // conversion should be bypassed
              var value = RealtimeTextBox.prototype.get.call(this);
 
              if (value && !direct) {
@@ -14,10 +16,12 @@ type("DateTimeSelector", ["RealtimeTextBox"],
                  if (dateTime) {
                      return Util.formatDateTime(dateTime, IndicoDateTimeFormats.Server);
                  } else {
-                     return null;
+                     return undefined;
                  }
-             } else {
+             } else if (direct) {
                  return value;
+             } else {
+                 return null;
              }
          },
 
@@ -40,25 +44,46 @@ type("DateTimeSelector", ["RealtimeTextBox"],
              }
          },
 
+         _setErrorState: function(text) {
+
+             var self = this;
+
+             this._stopErrorList = this._setElementErrorState(this.input, text);
+
+             if (text !== null) {
+                 if (this.tab.dom.className.slice(-7) != "invalid") {
+                     this.tab.dom.className += " invalid";
+                 }
+             }
+
+             this._stopErrorList.push(function() {
+                 if (self.tab.dom.className.slice(-7) == "invalid") {
+                     self.tab.dom.className = self.tab.dom.className.substring(
+                         0, self.tab.dom.className.length-8);
+                 }
+             });
+         },
 
          _setElementErrorState: function(element, text) {
              // use "passive" mode, so that fields can be verified live
-             this._stopErrorList = IndicoUtil.markInvalidField(element, text, true)[1];
+             return IndicoUtil.markInvalidField(element, text, true)[1];
          },
 
          _checkErrorState: function() {
 
              var value = this.get();
 
-             if (!value) {
+             if (this.mandatory ? !value : value === undefined) {
                  return $T('Date is invalid');
              } else {
                  return null;
              }
          }
      },
-     function(args, format) {
+     function(args, format, mandatory) {
          this.displayFormat = format || IndicoDateTimeFormats.Default;
+         this.mandatory = mandatory || false;
+
          this.RealtimeTextBox(args);
 
          this.input;
@@ -254,4 +279,46 @@ type("DateTimeDurationWidget", ["IWidget"],
          this.data = new WatchObject();
          this.data.set('dateTime', defaultDateTime);
          this.data.set('duration', defaultDur);
+     });
+
+/*
+ * A DateTimeSelector that keeps its data saved in hidden fields
+ * (ideal for form submissions, etc...)
+ */
+type("DateTimeSelectorWFields", ["DateTimeSelector"],
+     {
+         _setHiddenFields: function(value) {
+             var dtValue = Util.parseJSDateTime(value, IndicoDateTimeFormats.Server)
+
+             if (!dtValue) {
+                 // in case the value can't be parsed, set it to empty
+                 each(this._fields, function(fname) {
+                     $E(fname).set('');
+                 });
+                 return;
+             }
+
+             $E(this._fields[0]).set(dtValue.getDate());
+             $E(this._fields[1]).set(dtValue.getMonth() + 1);
+             $E(this._fields[2]).set(dtValue.getFullYear());
+
+             if (!this._dateOnly) {
+                 $E(this._fields[3]).set(dtValue.getHours());
+                 $E(this._fields[4]).set(dtValue.getMinutes());
+             }
+         }
+     },
+     // fields : array: d m y [H M]
+     // dateOnly: true if no hour is to be passed
+     function(args, format, mandatory, dateOnly, fields) {
+         this.DateTimeSelector(args, format, mandatory);
+         this._fields = fields;
+         this._dateOnly = dateOnly;
+
+         var self = this;
+
+         // on change, update hidden fields
+         this.observe(function(value) {
+             self._setHiddenFields(value)
+         });
      });
