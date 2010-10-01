@@ -36,12 +36,7 @@ type ("ExistingChatroomsList", ["SelectableListWidget"],
 	    _drawItem: function(pair) {
 		    var self = this;
 		    var elem = pair.get(); // elem is a WatchObject
-
-		    /*var speakers = translate(elem.get('speakerList'), function(speaker) {
-		        return speaker.familyName;
-		    }).join(", ");*/
 		    var selected = false;
-
 		    var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
 		    var item = Html.div({},  elem.get('title') );
 
@@ -54,8 +49,6 @@ type ("ExistingChatroomsList", ["SelectableListWidget"],
 
 	},
 
-
-
     /**
      * Constructor for FoundPeopleList
      */
@@ -63,8 +56,7 @@ type ("ExistingChatroomsList", ["SelectableListWidget"],
 	    var self = this;
 	    this.selected = new WatchList();
 
-	    //USAR OTRO ESTILO O AL MENOS CAMBIARLE EL NOMBRE A ESE!
-	    this.SelectableListWidget(observer, false, 'UnscheduledContribList');
+	    this.SelectableListWidget(observer, false, 'chatList');
 
 	    // Sort by name and add to the list
 	    var items = {};
@@ -88,7 +80,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 	         _preload: [
 	             function(hook) {
 	            	 var self = this;
-	 		         self.chatrooms = [];//$O();
+	 		         self.chatrooms = [];
 			         var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching information..."));
 			         indicoRequest(
 	                    'jabber.getRoomsByUser',
@@ -99,7 +91,6 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 	                    	if (!error) {
 	                            killProgress();
 	                            //we don't want to display the chat rooms that are already in the conference
-
 	                            if(result.length>0){
 		                            self.chatrooms = result.filter(function(chatroom){
 		                            					 var notExists = true;
@@ -111,7 +102,6 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 			                            				 return notExists;
 		                            				 });
 	                            }
-
 	                            self._processDialogState();
 	                            hook.set(true);
 	                        } else {
@@ -126,7 +116,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 	         _processDialogState: function() {
 	             var self = this;
 
-	             if (this.chatrooms.length === 0 /*|| exists(this.chatrooms.isEmpty()) && this.chatrooms.isEmpty()*/) {
+	             if (this.chatrooms.length === 0) {
 	                 // draw instead the creation dialog
 	                 var dialog = createObject(
 	                	 ChatroomPopup,
@@ -140,12 +130,10 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 	                 // exit, do not draw this dialog
 	                 return;
 	             } else {
-
 	                 this.ExclusivePopupWithButtons($T("Add Chat Room"),
 	                                     function() {
 	                                         self.close();
 	                                     });
-
 	             }
 
 	         },
@@ -164,7 +152,6 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 	             var args ={};
 	             args.rooms = rooms;
 	             args.conference = self.conf;
-
 
 	             indicoRequest('jabber.addConference2Room', args,
 	            		 		function(result, error){
@@ -212,7 +199,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 	                             }, $T("Create a new chat room")))),
 	                         Html.li({},
 	                             $T("Re-use one (or more) created by you"),
-	                             Html.div("UnscheduledContribListDiv",
+	                             Html.div("chatListDiv",
 	                             chatroomList.draw()))));
 
 	             this.button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add selected")));
@@ -271,10 +258,6 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             }
         },
 
-        /**
-         * Opens the popup, but does NOT call postdraw()
-         * Necessary so that we can call plugin's onCreate() or onEdit() between draw() and postdraw()
-         */
         open: function() {
             $E(document.body).append(this.draw());
             this.isopen = true;
@@ -343,7 +326,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var buttonDiv = Html.div({}, saveButton, cancelButton);
 
             var width = 600;
-            var height = 300
+            var height = 200
 
             this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, height);
 
@@ -386,10 +369,10 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             // We check if there are errors
             var checkOK = this.parameterManager.check();
 
-            // If there are no errors, the chatroom is sent to the server
+            // If there are no errors, the chat room is sent to the server
             if (checkOK) {
             	var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving your chatroom..."));
-            	//ejabberd doesn't like spaces in chatroom's name, so we take them off
+            	//ejabberd doesn't like spaces in chat room's name, so we take them off
             	this.values.title = this.values.title.split(' ').join('');
 
                     if (this.popupType === 'create') {
@@ -401,10 +384,10 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                             },
                             function(result,error) {
                                 if (!error) {
-                                    // If the server found no problems, a chatroom object is returned in the result.
+                                    // If the server found no problems, a chat room object is returned in the result.
                                     // We add it to the watchlist and create an iframe.
                                     hideAllInfoRows(false);
-                                    showInfo[result.id] = true; // we initialize the show info boolean for this chatroom
+                                    showInfo[result.id] = true; // we initialize the show info boolean for this chat room
                                     chatrooms.append(result);
                                     showAllInfoRows(false);
                                     addIFrame(result);
@@ -474,16 +457,15 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
         if(popupType === 'edit'){
         	this.chatroomID = chatroom.id
         }
-        this.extraComponents = [];
     }
 );
 
 /**
-* Utility function to "refresh" the display of a chatroom and show its updated value if it changed.
+* Utility function to "refresh" the display of a chat room and show its updated value if it changed.
 */
 var refreshChatroom = function(chatroom, doHighlight) {
     doHighlight = any(doHighlight, true);
-    var index = getChatroomIndexById(chatroom.id/*title*/);
+    var index = getChatroomIndexById(chatroom.id);
     hideAllInfoRows(false);
     chatrooms.removeAt(index);
     chatrooms.insert(chatroom, index+"");
@@ -504,16 +486,16 @@ var disableCustomId = function(newHost) {
 };
 
 /**
- * Given a chatroom id, it returns the index of the chatroom with that id in the "var chatrooms = $L();" object.
- * Example: chatrooms is a Watchlist of chatroom object who ids are [1,2,10,12].
+ * Given a chat room id, it returns the index of the chat room with that id in the "var chatrooms = $L();" object.
+ * Example: chat rooms is a Watchlist of chat room object who ids are [1,2,10,12].
  *          getchatroomIndexById('10') will return 2.
- * @param {String} id The id of a chatroom object.
- * @return {int} the index of the chatroom object with the given id, inside the watchlist "chatrooms".
+ * @param {String} id The id of a chat room object.
+ * @return {int} the index of the chat room object with the given id, inside the watchlist "chatrooms".
  */
 var getChatroomIndexById = function(id) {
     for (var i=0; i < chatrooms.length.get(); i++) {
     	chatroom = chatrooms.item(i);
-        if (chatroom.id/*title*/ == id) {
+        if (chatroom.id == id) {
             return i;
         }
     }
@@ -591,7 +573,7 @@ var showInfo = function(chatroom) {
 };
 
 var checkCRStatus = function(chatroom){
-	//Refreshes the data of the chatroom
+	//Refreshes the data of the chat room
     if(chatroom.showRoom == true){
 		chatroom.showRoom = ["on"]
 	}
@@ -640,9 +622,9 @@ var checkCRStatus = function(chatroom){
 }
 
 /**
- * Builds a table row element from a chatroom object, pickled from an Indico's CSchatroom object
+ * Builds a table row element from a chat room object, pickled from an Indico's CSchatroom object
  * @param {Object} chatroom A chatroom object.
- * @return {XElement} an Html.row() XElement with the row representing the chatroom.
+ * @return {XElement} an Html.row() XElement with the row representing the chat room.
  */
 var chatroomTemplate = function(chatroom) {
     var row = Html.tr({id: "chatroomRow" + chatroom.id});
@@ -711,9 +693,9 @@ var chatroomTemplate = function(chatroom) {
 };
 
 /**
- * -Function that will be called when the user presses the "Show" button of a chatroom.
- * -A new row will be created in the table of chatrooms in order to show this information.
- * -Drawback: the row will be destroyed when a new chatroom is added or a chatroom is edited.
+ * -Function that will be called when the user presses the "Show" button of a chat room.
+ * -A new row will be created in the table of chat rooms in order to show this information.
+ * -Drawback: the row will be destroyed when a new chat room is added or a chat room is edited.
  */
 var showChatroomInfo = function(chatroom) {
     if (showInfo[chatroom.id]) { // true if info already being shown
@@ -751,7 +733,7 @@ var showAllInfoRows = function(showAll) {
 };
 
 /**
- * Hides the information text of a chatroom by removing its row from the table
+ * Hides the information text of a chat room by removing its row from the table
  */
 var hideInfoRow = function (chatroom) {
     var existingInfoRow = $E("infoRow" + chatroom.id);
@@ -762,12 +744,11 @@ var hideInfoRow = function (chatroom) {
 };
 
 /**
- * Shows the information text of a chatroom by adding its row to the table and updating it
+ * Shows the information text of a chat room by adding its row to the table and updating it
  */
 var showInfoRow = function(chatroom) {
     var newRow = Html.tr({id: "infoRow" + chatroom.id, display: "none"} );
     var newCell = Html.td({id: "infoCell" + chatroom.id, colspan: 16, colSpan: 16, className : "chatInfoCell"});
-    //newRow.append(Html.tr({style:{paddingBottom:pixels(30)}}));
     newRow.append(newCell);
     var nextRowDom = $E('chatroomRow'+chatroom.id).dom.nextSibling;
     if (nextRowDom) {
@@ -780,7 +761,7 @@ var showInfoRow = function(chatroom) {
 };
 
 /**
- * Sets the HTML inside the information text of a chatroom
+ * Sets the HTML inside the information text of a chat room
  */
 var updateInfoRow = function(chatroom) {
     var existingInfoCell = $E("infoCell" + chatroom.id);
@@ -795,9 +776,9 @@ var updateInfoRow = function(chatroom) {
 };
 
 /**
- * Requests the list of chatrooms from the server,
- * and put them into the "chatrooms" watchlist.
- * As a consequence the chatrooms table where 1 chatroom = 1 row is initialized.
+ * Requests the list of chat rooms from the server,
+ * and put them into the "chat rooms" watchlist.
+ * As a consequence the chat rooms table where 1 chat room = 1 row is initialized.
  */
 var displayChatrooms = function() {
     var killProgress = IndicoUI.Dialogs.Util.progress("Loading list of chatrooms...");
@@ -857,7 +838,6 @@ var removeIFrame = function(chatroom) {
 
 var createChatroom = function(conferenceId) {
     var popup = new AddChatroomDialog(conferenceId);
-
     return true;
 }
 

@@ -1,7 +1,12 @@
 import zope.interface
 
 class Component(object):
-    pass
+    def __init__(self):
+        #the lowest one
+        self.priority=10
+
+    def getPriority(self):
+        return self.priority
 
 class IListener(zope.interface.Interface):
     pass
@@ -54,30 +59,24 @@ class IInstantMessagingListener(zope.interface.Interface):
 
     def addConference2Room(self, obj, params):
         """ When someone wants to re use a chat room for a different conference we need to add the conference
-            to the conferences list in the chatroom, but also to add the chat room in the IndexByConf index """
+            to the conferences list in the chat room, but also to add the chat room in the IndexByConf index """
 
 
 class INavigationContributor(zope.interface.Interface):
-    """Events that fill the sidemenu of a conference with the activated plugins"""
+    """Events that fill the sidemenu of a conference with the activated plugins.
+       You may want a reference to know how to implement these methods. You can check the components file for
+       Jabber (MaKaC.plugins.InstantMessaging.Jabber)
+    """
 
     def fillManagementSideMenu(self, obj, params):
         """ Inserts an element in the conference management's side menu"""
 
     def confDisplaySMFillDict(self, obj, params):
         """ Conference Display Side Menu Fill Dictionary.
-            This dictionary is used to store all your new items on the side menu. You may want to add your own items here.
-            In the core, there is a dictionary called self._linkData in which the elements to be showed in the conference display side menu are inserted.
-            This method must insert the element in this dictionary as follows:
-
-                sideMenuItemsDict = params['dict']
-                conf = params['conf']
-
-                sideMenuItemsDict["instantMessaging"] =  { \
-                        "caption": _("Instant Messaging"), \
-                        "URL": str(urlHandlers.UHConferenceInstantMessaging.getURL(conf)), \
-                        "staticURL": "", \
-                        "parent": ""}
-            """
+            This dictionary is used to store all your new items on the side menu of the conference display.
+            In the core, there is a dictionary called self._linkData in which the elements to be showed
+            in the conference display side menu are inserted.
+        """
 
     def confDisplaySMFillOrderedKeys(self, obj, list):
         """ Conference Display Side Menu Fill Ordered Keys.

@@ -3,9 +3,9 @@ from MaKaC.webinterface import wcomponents, urlHandlers
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
-from MaKaC.plugins.base import PluginsHolder, PluginFieldsHelper
+from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.fossilize import fossilize
-from MaKaC.plugins.helpers import DBHelpers
+from MaKaC.plugins.helpers import DBHelpers, PluginFieldsHelper
 
 
 class WPConfModifChat(WPConferenceModifBase):

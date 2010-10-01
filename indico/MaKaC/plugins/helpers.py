@@ -1,8 +1,33 @@
 from BTrees.OOBTree import OOBTree
 from BTrees.OOBTree import OOTreeSet
 from MaKaC.common.Counter import Counter
-from MaKaC.plugins.base import PluginFieldsHelper
+from MaKaC.plugins.base import PluginsHelper
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.common.logger import Logger
+
+
+class PluginFieldsHelper(PluginsHelper):
+    """Provides a simple interface to access fields of a given plugin"""
+
+    def __init__(self, pluginType, plugin):
+        PluginsHelper.__init__(self, pluginType, plugin)
+
+    def getOption(self, optionName):
+        try:
+            return self._plugin.getOption(optionName).getValue()
+        except Exception, e:
+            Logger.get('Plugins').error("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
+            raise Exception("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
+
+    def getAttribute(self, attribute):
+        try:
+            return getattr(self._plugin, attribute)
+        except AttributeError:
+            Logger.get('Plugins').error("No attribute %s in plugin %s" % (attribute, self._plugin))
+            raise Exception("No attribute %s in plugin %s" % (attribute, self._plugin))
+
+    def getStorage(self):
+        return self._plugin.getStorage()
 
 class DBHelpers:
     @classmethod

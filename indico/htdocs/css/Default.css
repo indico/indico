@@ -4235,6 +4235,34 @@ td.titleChat {
     -moz-border-radius-topright:10px;
 }
 
+div.chatListDiv {
+    margin-bottom: 10px;
+    height:200px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+    margin-top: 10px;
+}
+
+ul.chatList {
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+
+}
+
+ul.chatList li {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+ul.chatList li.selected {
+    background-color: #CDEB8B;
+}
+
 div.chatTable {
     color: #523D04;
 	-moz-box-shadow: 4px 4px 4px #444444;

@@ -9,14 +9,14 @@ from MaKaC.common.timezoneUtils import nowutc,getAdjustedDate, DisplayTZ
 from MaKaC.conference import ConferenceHolder
 from persistent import Persistent
 from persistent.mapping import PersistentMapping
-from MaKaC.plugins.base import PluginsHolder, Observable, PluginFieldsHelper
+from MaKaC.plugins.base import PluginsHolder, Observable
 from MaKaC.common.fossilize import Fossilizable, fossilizes, fossilize
 from MaKaC.plugins.InstantMessaging.Jabber import fossils
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins.InstantMessaging.bot import *
 from MaKaC.common.Conversion import Conversion
 from MaKaC.conference import ConferenceHolder
-from MaKaC.plugins.helpers import DBHelpers
+from MaKaC.plugins.helpers import DBHelpers, PluginFieldsHelper
 
 
 
@@ -35,7 +35,8 @@ class ChatRoomBase ( ServiceBase, Observable ):
                            'sameName': _('There is already a chat room in the server with that name, please choose another one'), \
                            'creating': _('There was an error while creating the chat room in the local server. Please try again later'), \
                            'editing': _('There was an error while editing the chat room in the local server. Please try again later'), \
-                           'deleting': _('There was an error while deleting the chat room in the local server. Please try again later'), \
+                           'deleting': _('There was an error while deleting the chat room in the Jabber server. Please try to do it manually from your client' \
+                                            ' or contact the administrators'), \
                            'connecting': _('There was an error while connecting to the Jabber server. Maybe the username or password are not correct'), \
                            'CRdeletedFromClient': _('Someone deleted the chat room from the Jabber server since this page was loaded. We recommend you to delete the chatroom from Indico as well')
                           }
@@ -73,6 +74,43 @@ class ChatRoomBase ( ServiceBase, Observable ):
         else:
             self._showPass = True
 
+    def createRoomJabber(self, jid, password, room):
+        """ Creates the room in the Jabber server """
+        try:
+            self._bot = IndicoJabberBotCreateRoom(jid, password, room)
+        except Exception, e:
+            raise NoReportError( self._messages['creating'])
+        if hasattr(self._bot, '_error') and self._bot._error:
+            raise NoReportError( self._messages['creating'])
+        elif not hasattr(self._bot, '_error'):
+            raise NoReportError( self._messages['connecting'])
+        return True
+
+    def editRoomJabber(self, jid, password, room):
+        """ Edits the room in the Jabber server """
+        try:
+            self._bot = IndicoJabberBotEditRoom(jid, password, room)
+        except Exception, e:
+            raise NoReportError( self._messages['editing'])
+        if hasattr(self._bot, '_error') and self._bot._error:
+            raise NoReportError( self._messages['editing'])
+        elif not hasattr(self._bot, '_error'):
+            raise NoReportError( self._messages['connecting'])
+        return True
+
+    def deleteRoomJabber(self, jid, password, room, message):
+        """ Deletes the room in the Jabber server """
+        message = "%s has requested to delete this room. The host for the new chat room is %s, please reconnect there" %(self._user.getName(), self._host)
+        try:
+            self._bot = IndicoJabberBotDeleteRoom(jid, password, room, message)
+        except Exception, e:
+            raise NoReportError( self._messages['deleting'])
+        if hasattr(self._bot, '_error') and self._bot._error:
+            raise NoReportError( self._messages['deleting'])
+        elif not hasattr(self._bot, '_error'):
+            raise NoReportError( self._messages['connecting'])
+        return True
+
 
 
 class CreateChatroom( ChatRoomBase ):
@@ -105,16 +143,8 @@ class CreateChatroom( ChatRoomBase ):
             raise ServiceError( message=str(e) )
 
         if self._room.getCreateRoom():
-            #if we're not creating the room we don't need to call the bot
-            try:
-                self._bot = IndicoJabberBotCreateRoom(self._botJID, self._botPass, self._room)
-            except Exception, e:
-                raise NoReportError( self._messages['creating'])
-            if hasattr(self._bot, '_error') and self._bot._error:
-                raise NoReportError( self._messages['creating'])
-            elif not hasattr(self._bot, '_error'):
-                raise NoReportError( self._messages['connecting'])
-
+            #if we're not creating the room in our server we don't need to call the bot
+            self.createRoomJabber(self._botJID, self._botPass, self._room)
 
         Logger.get('InstantMessaging (Jabber)').info("The room %s has been created by the user %s at %s hours" %(self._title, self._user.getName(), self._room.getModificationDate()))
 
@@ -153,6 +183,7 @@ class EditChatroom( ChatRoomBase ):
             oldRoom = Chatroom(self._room.getTitle(), self._room.getOwner(), ConferenceHolder().getById(self._conferenceID))
 
             self._room.setValues(values)
+            #edit the chat room in indico
             self._notify('editChatroom', {'oldTitle': oldRoom.getTitle(), 'newRoom':self._room})
         except ServiceError, e:
             raise ServiceError( message=_('Problem while accessing the database: %s' %e))
@@ -161,7 +192,7 @@ class EditChatroom( ChatRoomBase ):
 
         modified = False
         if oldRoom.getTitle() != self._room.getTitle() and oldRoom.getCreateRoom() and self._room.getCreateRoom():
-            #before, the chat room was in the Jabber server. After editing it is still the Jabber server, but the title has changed.
+            #before, the chat room was in the Jabber server. After editing, it is still in the Jabber server, but the title has changed.
             #This means that we'll have to delete the old room and create the new one with the new title
             message = "%s has requested to delete this room. The new chat room name is %s, please reconnect there" %(self._user.getName(), self._title)
             modified = self.deleteRoomJabber(self._botJID, self._botPass, oldRoom, message)
@@ -186,44 +217,8 @@ class EditChatroom( ChatRoomBase ):
         if modified:
             Logger.get('InstantMessaging (Jabber)').info("The room %s has been modified by the user %s at %s hours" %(self._title, self._user.getName(), self._room.getModificationDate()))
 
-
         return self._room.fossilizeMultiConference(values['conference'])
 
-    def createRoomJabber(self, jid, password, room):
-        #create the room in the Jabber server
-        try:
-            self._bot = IndicoJabberBotCreateRoom(jid, password, room)
-        except Exception, e:
-            raise NoReportError( self._messages['creating'])
-        if hasattr(self._bot, '_error') and self._bot._error:
-            raise NoReportError( self._messages['creating'])
-        elif not hasattr(self._bot, '_error'):
-            raise NoReportError( self._messages['connecting'])
-        return True
-
-    def editRoomJabber(self, jid, password, room):
-        try:
-            self._bot = IndicoJabberBotEditRoom(jid, password, room)
-        except Exception, e:
-            raise NoReportError( self._messages['editing'])
-        if hasattr(self._bot, '_error') and self._bot._error:
-            raise NoReportError( self._messages['editing'])
-        elif not hasattr(self._bot, '_error'):
-            raise NoReportError( self._messages['connecting'])
-        return True
-
-    def deleteRoomJabber(self, jid, password, room, message):
-        #delete the existing room in the Jabber server
-        message = "%s has requested to delete this room. The host for the new chat room is %s, please reconnect there" %(self._user.getName(), self._host)
-        try:
-            self._bot = IndicoJabberBotDeleteRoom(jid, password, room, message)
-        except Exception, e:
-            raise NoReportError( self._messages['deleting'])
-        if hasattr(self._bot, '_error') and self._bot._error:
-            raise NoReportError( self._messages['deleting'])
-        elif not hasattr(self._bot, '_error'):
-            raise NoReportError( self._messages['connecting'])
-        return True
 
 
 class DeleteChatroom( ChatRoomBase ):
@@ -236,12 +231,10 @@ class DeleteChatroom( ChatRoomBase ):
         pm = ParameterManager(self._params.get('chatroomParams'))
         self._id = pm.extract('id', pType=str, allowEmpty = False)
         self._room = DBHelpers().getChatroom(self._id)
-        self.error = False
         self._user = self._getUser()
 
     def _getAnswer( self ):
         message = _("%s has requested to delete this room. Please address this person for further information" %self._user.getName())
-
         #delete room from Indico
         try:
             self._notify('deleteChatroom', self._room)
@@ -249,24 +242,12 @@ class DeleteChatroom( ChatRoomBase ):
             raise ServiceError( message=_('Problem deleting indexes in the database for chat room %s: %s' %(self._room.getTitle(), e)))
 
         #delete room from our Jabber server (if neccesary)
-        if self._room.getCreateRoom() and len(self._room.getConferences()) is 1:
-            try:
-                self._bot = IndicoJabberBotDeleteRoom(self._botJID, self._botPass, self._room, message)
-            except Exception, e:
-                raise NoReportError( self._messages['deleting'])
-            if hasattr(self._bot, '_error') and self._bot._error:
-                self.error = True
-            elif not hasattr(self._bot, '_error'):
-                raise NoReportError( self._messages['connecting'])
-
-        self.error = False
+        if self._room.getCreateRoom() and len(self._room.getConferences()) is 0:
+            self.deleteRoomJabber(self._botJID, self._botPass, self._room, message)
 
         Logger.get('InstantMessaging (Jabber)').info("The room %s has been deleted by the user %s at %s hours" %(self._title, self._user.getName(), nowutc()))
-        result = {'result':True, 'error':None}
-        if self.error:
-            result['error'] = True
 
-        return result
+        return True
 
 
 class GetRoomPreferences( ChatRoomBase ):

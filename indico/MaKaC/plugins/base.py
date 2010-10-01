@@ -112,6 +112,8 @@ class ComponentsManager(Persistent):
         #we don't want to have the 2 same components in the list, so we check it
         if not isInList:
             self.__eventComponentsDict[event].append(componentClass())
+            #we order the list according to each method's priority
+            self.__eventComponentsDict[event].sort(cmp=lambda x,y: cmp(x.getPriority(), y.getPriority()))
             changed = True
         if changed:
             self._notifyModification()
@@ -221,30 +223,6 @@ class PluginsHelper(object):
         except Exception, e:
             Logger.get('Plugins').error("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
             raise Exception("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
-
-
-class PluginFieldsHelper(PluginsHelper):
-    """Provides a simple interface to access fields of a given plugin"""
-
-    def __init__(self, pluginType, plugin):
-        PluginsHelper.__init__(self, pluginType, plugin)
-
-    def getOption(self, optionName):
-        try:
-            return self._plugin.getOption(optionName).getValue()
-        except Exception, e:
-            Logger.get('Plugins').error("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
-            raise Exception("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
-
-    def getAttribute(self, attribute):
-        try:
-            return getattr(self._plugin, attribute)
-        except AttributeError:
-            Logger.get('Plugins').error("No attribute %s in plugin %s" % (attribute, self._plugin))
-            raise Exception("No attribute %s in plugin %s" % (attribute, self._plugin))
-
-    def getStorage(self):
-        return self._plugin.getStorage()
 
 
 class PluginsHolder (ObjectHolder):
