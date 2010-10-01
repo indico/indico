@@ -1107,7 +1107,7 @@ class RHConferenceToiCal(RHConferenceBaseDisplay):
     def _process( self ):
         filename = "%s - Event.ics"%cleanHTMLHeaderFilename(self._target.getTitle())
         ical = ConferenceToiCal(self._target.getConference())
-        data = ical.getBody()
+        data = ical.getDetailedBody()
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
