@@ -443,38 +443,38 @@ class outputGenerator:
             firstDay = vars.get("firstDay", None)
             lastDay = vars.get("lastDay", None)
 
-        if daysPerRow or firstDay or lastDay:
-            if firstDay:
-                firstDay = timezone(tz).localize(stringToDate(firstDay)).date()
-                nonEmptyDays = filter(lambda day: day >= firstDay, nonEmptyDays)
+            if daysPerRow or firstDay or lastDay:
+                if firstDay:
+                    firstDay = timezone(tz).localize(stringToDate(firstDay)).date()
+                    nonEmptyDays = filter(lambda day: day >= firstDay, nonEmptyDays)
 
-            if lastDay:
-                lastDay = timezone(tz).localize(stringToDate(lastDay)).date()
-                nonEmptyDays = filter(lambda day: day <= lastDay, nonEmptyDays)
+                if lastDay:
+                    lastDay = timezone(tz).localize(stringToDate(lastDay)).date()
+                    nonEmptyDays = filter(lambda day: day <= lastDay, nonEmptyDays)
 
-            if daysPerRow:
-                daysPerRow = int(daysPerRow)
+                if daysPerRow:
+                    daysPerRow = int(daysPerRow)
 
-            if not daysPerRow or daysPerRow > len(nonEmptyDays):
-                daysPerRow = len(nonEmptyDays)
+                if not daysPerRow or daysPerRow > len(nonEmptyDays):
+                    daysPerRow = len(nonEmptyDays)
 
-            if daysPerRow > 0:
-                numOfRows = int(ceil(len(nonEmptyDays) / float(daysPerRow)))
-                for row in range(0, numOfRows):
-                    fromDate = nonEmptyDays[row * daysPerRow]
-                    toIndex = (row + 1) * daysPerRow - 1
-                    if toIndex >= len(nonEmptyDays):
-                        toIndex = len(nonEmptyDays) - 1
-                    toDate = nonEmptyDays[toIndex]
-                    out.openTag("line")
-                    out.writeTag("fromDate", "%d%s%s" % (fromDate.year, string.zfill(fromDate.month, 2), string.zfill(fromDate.day, 2)))
-                    out.writeTag("toDate", "%d%s%s" % (toDate.year, string.zfill(toDate.month, 2), string.zfill(toDate.day, 2)))
-                    out.closeTag("line")
-        else:
-            out.openTag("line")
-            out.writeTag("fromDate", "%d%s%s" % (adjusted_startDate.year, string.zfill(adjusted_startDate.month, 2), string.zfill(adjusted_startDate.day, 2)))
-            out.writeTag("toDate", "%d%s%s" % (adjusted_endDate.year, string.zfill(adjusted_endDate.month, 2), string.zfill(adjusted_endDate.day, 2)))
-            out.closeTag("line")
+                if daysPerRow > 0:
+                    numOfRows = int(ceil(len(nonEmptyDays) / float(daysPerRow)))
+                    for row in range(0, numOfRows):
+                        fromDate = nonEmptyDays[row * daysPerRow]
+                        toIndex = (row + 1) * daysPerRow - 1
+                        if toIndex >= len(nonEmptyDays):
+                            toIndex = len(nonEmptyDays) - 1
+                        toDate = nonEmptyDays[toIndex]
+                        out.openTag("line")
+                        out.writeTag("fromDate", "%d%s%s" % (fromDate.year, string.zfill(fromDate.month, 2), string.zfill(fromDate.day, 2)))
+                        out.writeTag("toDate", "%d%s%s" % (toDate.year, string.zfill(toDate.month, 2), string.zfill(toDate.day, 2)))
+                        out.closeTag("line")
+            else:
+                out.openTag("line")
+                out.writeTag("fromDate", "%d%s%s" % (adjusted_startDate.year, string.zfill(adjusted_startDate.month, 2), string.zfill(adjusted_startDate.day, 2)))
+                out.writeTag("toDate", "%d%s%s" % (adjusted_endDate.year, string.zfill(adjusted_endDate.month, 2), string.zfill(adjusted_endDate.day, 2)))
+                out.closeTag("line")
 
         mList = conf.getAllMaterialList()
         for mat in mList:
