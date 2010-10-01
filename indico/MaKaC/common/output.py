@@ -438,9 +438,10 @@ class outputGenerator:
         nonEmptyDays = list(nonEmptyDays)
         nonEmptyDays.sort()
 
-        daysPerRow = vars.get("daysPerRow", None)
-        firstDay = vars.get("firstDay", None)
-        lastDay = vars.get("lastDay", None)
+        if vars:
+            daysPerRow = vars.get("daysPerRow", None)
+            firstDay = vars.get("firstDay", None)
+            lastDay = vars.get("lastDay", None)
 
         if daysPerRow or firstDay or lastDay:
             if firstDay:
