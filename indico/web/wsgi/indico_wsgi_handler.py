@@ -29,6 +29,8 @@ import sys
 import os
 from MaKaC.common import Config
 
+# Path update
+
 DIR_HTDOCS = Config.getInstance().getHtdocsDir()
 PATH = [os.path.join(DIR_HTDOCS, '../'), \
         DIR_HTDOCS]
@@ -36,8 +38,9 @@ for p in PATH:
     if p not in sys.path:
         sys.path.append(p)
 
+###
+
 from wsgiref.util import FileWrapper, guess_scheme
-from indico.MaKaC.plugins.base import RHMap
 
 from indico.web.wsgi.webinterface_handler_config import \
      HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
@@ -45,9 +48,11 @@ from indico.web.wsgi.webinterface_handler_config import \
     REMOTE_HOST, REMOTE_NOLOOKUP
 from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage, \
      registerException
-from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage
 from indico.web.wsgi.indico_wsgi_rewrite import is_mp_legacy_publisher_path
 from indico.web.wsgi.indico_wsgi_handler_utils import _check_result
+
+# Legacy imports
+from MaKaC.plugins.base import RHMap
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.
@@ -150,19 +155,11 @@ def plugin_publisher(req, path):
     """
     pluginMap = RHMap()._map
     form = dict(req.form)
-    for key, value in form.items():
-        ## FIXME: this is a backward compatibility workaround
-        ## because most of the old administration web handler
-        ## expect parameters to be of type str.
-        ## When legacy publisher will be removed all this
-        ## pain will go away anyway :-)
-        if isinstance(value, str):
-            form[key] = str(value)
 
     importList = pluginMap[path].split('.')
     funcName = importList.pop()
     callingFunction = __import__('.'.join(importList[1:]), None, None, importList[0])
-    _check_result(req, getattr(callingFunction,funcName)( req ).process( form ))
+    _check_result(req, getattr(callingFunction, funcName)( req ).process( form ))
 
 def mp_legacy_publisher(req, possible_module, possible_handler):
     """
@@ -186,14 +183,6 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
         form = dict(req.form)
-        for key, value in form.items():
-            ## FIXME: this is a backward compatibility workaround
-            ## because most of the old administration web handler
-            ## expect parameters to be of type str.
-            ## When legacy publisher will be removed all this
-            ## pain will go away anyway :-)
-            if isinstance(value, str):
-                form[key] = str(value)
 
         try:
             return _check_result(req, module_globals[possible_handler](req, **form))

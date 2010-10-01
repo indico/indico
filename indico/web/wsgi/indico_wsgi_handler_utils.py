@@ -86,17 +86,18 @@ parse_qsl = cgi.parse_qsl
 # Fixes memory error when upload large files such as 700+MB ISOs.
 readBlockSize = 65368
 
-""" The classes below are a (almost) a drop-in replacement for the
-    standard cgi.py FieldStorage class. They should have pretty much the
-    same functionality.
+"""
+The classes below are a (almost) a drop-in replacement for the
+standard cgi.py FieldStorage class. They should have pretty much the
+same functionality.
 
-    These classes differ in that unlike cgi.FieldStorage, they are not
-    recursive. The class FieldStorage contains a list of instances of
-    Field class. Field class is incapable of storing anything in it.
+These classes differ in that unlike cgi.FieldStorage, they are not
+recursive. The class FieldStorage contains a list of instances of
+Field class. Field class is incapable of storing anything in it.
 
-    These objects should be considerably faster than the ones in cgi.py
-    because they do not expect CGI environment, and are
-    optimized specifically for Apache and mod_python.
+These objects should be considerably faster than the ones in cgi.py
+because they do not expect CGI environment, and are
+optimized specifically for Apache and mod_python.
 """
 
 class Field:
@@ -134,7 +135,9 @@ class Field:
         self.headers = headers
 
     def __repr__(self):
-        """Return printable representation."""
+        """
+        Return printable representation.
+        """
         return "Field(%s, %s)" % (`self.name`, `self.value`)
 
     def __getattr__(self, name):
@@ -153,7 +156,8 @@ class Field:
 
 
 class StringField(str):
-    """ This class is basically a string with
+    """
+    This class is basically a string with
     added attributes for compatibility with std lib cgi.py. Basically, this
     works the opposite of Field, as it stores its data in a string, but creates
     a file on demand. Field creates a value on demand and stores data in a file.
@@ -168,7 +172,9 @@ class StringField(str):
     # I wanted __init__(name, value) but that does not work (apparently, you
     # cannot subclass str with a constructor that takes >1 argument)
     def __init__(self, value):
-        '''Create StringField instance. You'll have to set name yourself.'''
+        """
+        Create StringField instance. You'll have to set name yourself.
+        """
         str.__init__(self)
         self.value = value
 
@@ -179,7 +185,9 @@ class StringField(str):
         return self.file
 
     def __repr__(self):
-        """Return printable representation (to pass unit tests)."""
+        """
+        Return printable representation (to pass unit tests).
+        """
         return "Field(%s, %s)" % (`self.name`, `self.value`)
 
 
@@ -410,7 +418,9 @@ class FieldStorage:
             self.list.append(field)
 
     def add_field(self, key, value):
-        """Insert a field as key/value pair"""
+        """
+        Insert a field as key/value pair
+        """
         item = StringField(value)
         item.name = key
         self.list.append(item)
@@ -479,7 +489,9 @@ class FieldStorage:
         return self.clen <= self.count
 
     def __getitem__(self, key):
-        """Dictionary style indexing."""
+        """
+        Dictionary style indexing.
+        """
         found = self.list.table()[key]
         if len(found) == 1:
             return found[0]
@@ -493,7 +505,9 @@ class FieldStorage:
             return default
 
     def keys(self):
-        """Dictionary style keys() method."""
+        """
+        Dictionary style keys() method.
+        """
         return self.list.table().keys()
 
     def __iter__(self):
@@ -503,32 +517,42 @@ class FieldStorage:
         return repr(self.list.table())
 
     def has_key(self, key):
-        """Dictionary style has_key() method."""
+        """
+        Dictionary style has_key() method.
+        """
         return (key in self.list.table())
 
     __contains__ = has_key
 
     def __len__(self):
-        """Dictionary style len(x) support."""
+        """
+        Dictionary style len(x) support.
+        """
         return len(self.list.table())
 
     def getfirst(self, key, default=None):
-        """ return the first value received """
+        """
+        Return the first value received
+        """
         try:
             return self.list.table()[key][0]
         except KeyError:
             return default
 
     def getlist(self, key):
-        """ return a list of received values """
+        """
+        Return a list of received values
+        """
         try:
             return self.list.table()[key]
         except KeyError:
             return []
 
     def items(self):
-        """Dictionary-style items(), except that items are returned in the same
-        order as they were supplied in the form."""
+        """
+        Dictionary-style items(), except that items are returned in the same
+        order as they were supplied in the form.
+        """
         return [(item.name, item) for item in self.list]
 
     def __delitem__(self, key):
@@ -542,10 +566,10 @@ class FieldStorage:
 
 
 def parse_header(line):
-    """Parse a Content-type like header.
+    """
+    Parse a Content-type like header.
 
     Return the main content-type and a dictionary of options.
-
     """
 
     plist = map(lambda a: a.strip(), line.split(';'))
