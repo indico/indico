@@ -208,7 +208,7 @@ class MicalaCommunication(object):
         cleanedLectureSpeakers = cls.cleanSQLData(lectureSpeakers)
 
 #        Logger.get('RecMan').debug("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""" %
-                       (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
+#                       (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
 
         cursor.execute("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""", \
                        (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
