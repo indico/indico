@@ -1126,7 +1126,6 @@ type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
     },
 
     plugParameterManager: function(parameterManager) {
-        this.text.plugParameterManager(parameterManager);
         this.ErrorAware.prototype.plugParameterManager.call(this, parameterManager);
     }
 },
