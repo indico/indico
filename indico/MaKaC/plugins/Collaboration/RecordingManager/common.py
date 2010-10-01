@@ -31,8 +31,6 @@ except ImportError:
     Logger.get("RecMan").debug("Cannot import MySQLdb")
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
-
-
 import time
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.output import outputGenerator, XSLTransformer
@@ -543,7 +541,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
     # Retrieve the entire basic XML string
     return xmlGen.getXml()
 
-def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
+def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, contentType, videoFormat, languages):
     '''Retrieve a MARC XML string for the given conference, then web upload it to CDS.'''
 
     # Initialize success flag, and result string to which we will append any errors.
@@ -630,6 +628,7 @@ def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
             # first need to get DB ids for stuff
             idMachine = MicalaCommunication.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
             idTask    = MicalaCommunication.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
+            idLecture = "" # declare idLecture outside of blocks (is this necessary or just a perl thing?)
             # Look for the current talk in the Lectures table of the micala database
             # If it is a plain_video talk, look for its IndicoID;
             # if it is a web_lecture talk, use its LODBID
@@ -645,6 +644,10 @@ def createCDSRecord(aw, IndicoID, LODBID, contentType, videoFormat, languages):
                 # because we just read the database to get the LODBID.
                 idLecture = LODBID
 
+            # update the current lecture record with the title and speaker name
+            MicalaCommunication.updateLectureInfo(idLecture, lectureTitle, lectureSpeakers)
+
+            # Inform the micala DB that the CDS record creation task has started.
             MicalaCommunication.reportStatus('START', '', idMachine, idTask, idLecture)
         except Exception, e:
             flagSuccess = False

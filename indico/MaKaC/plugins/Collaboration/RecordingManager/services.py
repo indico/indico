@@ -28,13 +28,15 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
 
     def _checkParams(self):
         CollaborationPluginServiceBase._checkParams(self) #puts the Conference in self._conf
-        self._IndicoID    = self._params.get('IndicoID',    None)
-        self._LOID        = self._params.get('LOID',        None)
-        self._LODBID      = self._params.get('LODBID',      None)
-        self._confId      = self._params.get('conference',  None)
-        self._videoFormat = self._params.get('videoFormat', None)
-        self._contentType = self._params.get('contentType', None)
-        self._languages   = self._params.get('languages',   None)
+        self._IndicoID        = self._params.get('IndicoID',        None)
+        self._LOID            = self._params.get('LOID',            None)
+        self._LODBID          = self._params.get('LODBID',          None)
+        self._lectureTitle    = self._params.get('lectureTitle',    None)
+        self._lectureSpeakers = self._params.get('lectureSpeakers', None)
+        self._confId          = self._params.get('conference',      None)
+        self._videoFormat     = self._params.get('videoFormat',     None)
+        self._contentType     = self._params.get('contentType',     None)
+        self._languages       = self._params.get('languages',       None)
 
         if not self._contentType:
             raise RecordingManagerException(_("No content type supplied (plain video or web lecture)"))
@@ -77,6 +79,8 @@ class RMCreateCDSRecordService(CollaborationPluginServiceBase):
         resultCreateCDSRecord = createCDSRecord(self._aw,
                                                 self._IndicoID,
                                                 self._LODBID,
+                                                self._lectureTitle,
+                                                self._lectureSpeakers,
                                                 self._contentType,
                                                 self._videoFormat,
                                                 self._languages)
