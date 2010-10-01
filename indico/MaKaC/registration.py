@@ -2210,14 +2210,21 @@ class DateInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
-        formats = ['%d/%m/%Y %H:%M', '%d.%m.%Y %H:%M',
-                   '%m/%d/%Y %H:%M', '%m.%d.%Y %H:%M',
-                   '%Y/%m/%d %H:%M', '%Y.%m.%d %H:%M',
-                   '%d/%m/%Y', '%d.%m.%Y',
-                   '%m/%d/%Y', '%m.%d.%Y',
-                   '%Y/%m/%d', '%Y.%m.%d',
-                   '%m/%Y', '%m.%Y',
-                   '%Y']
+        formats = [('%d/%m/%Y %H:%M', 'DD/MM/YYYY hh:mm'),
+                   ('%d.%m.%Y %H:%M', 'DD.MM.YYYY hh:mm'),
+                   ('%m/%d/%Y %H:%M', 'MM/DD/YYYY hh:mm'),
+                   ('%m.%d.%Y %H:%M', 'MM.DD.YYYY hh:mm'),
+                   ('%Y/%m/%d %H:%M', 'YYYY/MM/DD hh:mm'),
+                   ('%Y.%m.%d %H:%M', 'YYYY.MM.DD hh:mm'),
+                   ('%d/%m/%Y', 'DD/MM/YYYY'),
+                   ('%d.%m.%Y', 'DD.MM.YYYY'),
+                   ('%m/%d/%Y', 'MM/DD/YYYY'),
+                   ('%m.%d.%Y', 'MM.DD.YYYY'),
+                   ('%Y/%m/%d', 'YYYY/MM/DD'),
+                   ('%Y.%m.%d', 'YYYY.MM.DD'),
+                   ('%m/%Y', 'MM/YYYY'),
+                   ('%m.%Y', 'MM.YYYY'),
+                   ('%Y', 'YYYY')]
 
         html = [_("""
         <tr>
@@ -2225,13 +2232,11 @@ class DateInput(FieldInputType):
           <td bgcolor="white" class="blacktext" width="100%%">
               <select name="dateFormat">""")]
 
-        now = datetime.now()
-        for format in formats:
+        for format, display in formats:
             if self.dateFormat == format:
                 selected = ' selected="selected"'
             else:
                 selected = ''
-            display = datetime.strftime(now, format)
             html.append("""<option value="%s"%s>%s</option>""" % (format, selected, display))
 
         html.append(_("""</select>
