@@ -1239,14 +1239,14 @@ class ConferenceReviewingNotification(GenericNotification):
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been chosen as %s for the conference "%s" (id: %s)"""
                         % (role, conference.getTitle(), str(conference.getId())))
-        self.setBody("""Dear Indico user,
+        self.setBody("""Dear Sir or Madam,
 
         You have been chosen as %s of the conference "%s" (id: %s), in order to help with the abstract / contribution reviewing process.
         You can go to the conference main page:
         %s
-        After loggin in, you will find a link under 'My Conference' where you can click to perform your new functions.
+        After logging in, you will find a link under 'My Conference' on which you can click to perform your new functions.
 
-        Thank you for using our system.
+        Best regards
         """ % ( role, conference.getTitle(), str(conference.getId()), urlHandlers.UHConferenceDisplay.getURL(conference)
         ))
 

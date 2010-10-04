@@ -14,7 +14,7 @@
     <span id="SendHelp" style="display:<%=display%>">
         <% inlineContextHelp(_('First you should add the materials and then by clicking on this button you will send them for reviewing. They will be locked until the end of the process')) %>
     </span>
-</form>                                   
+</form>
 <script type="text/javascript">
 
 <% import MaKaC.conference as conference %>
@@ -27,10 +27,10 @@ var args = {
         contribId: '<%= self._target.getId() %>',
         parentProtected: <%= jsBoolean(self._target.getAccessController().isProtected()) %>
     };
-   
+
     var uploadAction = Indico.Urls.UploadAction.contribution;
     var visibility = '';
-                                 <% if  self._target.getConference().getConfReview().getChoice() == 3: %> 
+                                 <% if  self._target.getConference().getConfReview().getChoice() == 3: %>
                                     <% if not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
                                         visibility = 'visible';
                                     <% end %>
@@ -47,14 +47,14 @@ var args = {
                                     <% end %>
                                 <% end %>
                                 <% if  self._target.getConference().getConfReview().getChoice() == 4: %>
-                                    <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>                              
+                                    <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>
                                         visibility = 'visible';
                                     <% end %>
                                     <% else: %>
                                         visibility = 'hidden';
                                     <% end %>
                                 <% end %>
-       
+
 var mlist = new ReviewingMaterialListWidget(args, <%= jsonEncode(list([k, k.title()] for k in MaterialFactoryRegistry._allowedMaterials['reviewing'])) %>, uploadAction,null, null, visibility,$E("SendBtn"));
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
