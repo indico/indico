@@ -47,9 +47,8 @@ from indico.web.wsgi.webinterface_handler_config import \
      HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR, \
     REMOTE_HOST, REMOTE_NOLOOKUP
 from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage, \
-     registerException
-from indico.web.wsgi.indico_wsgi_rewrite import is_mp_legacy_publisher_path
-from indico.web.wsgi.indico_wsgi_handler_utils import _check_result
+     registerException, _check_result
+from indico.web.wsgi.indico_wsgi_url_parser import is_mp_legacy_publisher_path
 
 # Legacy imports
 from MaKaC.plugins.base import RHMap
