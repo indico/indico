@@ -704,10 +704,10 @@ class UHCFARemoveReferee( URLHandler ):
 
 class UHConfAbstractManagment( URLHandler ):
     _relativeURL = "abstractsManagment.py"
-    
+
 class UHConfAbstractList(URLHandler):
-    _relativeURL = "abstractsManagment.py/abstractList"
- 
+    _relativeURL = "abstractsManagment.py"
+
 class UHConfAbstractManagmentCloseMenu( URLHandler ):
     _relativeURL = "abstractsManagment.py/closeMenu"
 
@@ -3211,20 +3211,20 @@ class UHSessionModCoordinatorsAdd(URLHandler):
 
 class UHConfMyStuff(URLHandler):
     _relativeURL="myconference.py"
-    
-    
+
+
 class UHConfMyStuffMySessions(URLHandler):
     _relativeURL="myconference.py/mySessions"
-      
-    
+
+
 class UHConfMyStuffMyTracks(URLHandler):
     _relativeURL="myconference.py/myTracks"
-        
-    
+
+
 class UHConfMyStuffMyContributions(URLHandler):
     _relativeURL="myconference.py/myContributions"
-    
-    
+
+
 class UHConfModSlotRem(URLHandler):
     _relativeURL="confModifSchedule.py/remSlot"
 
@@ -4350,7 +4350,7 @@ class UHRemoveQuestion( URLHandler ):
 
 class UHSetTemplate( URLHandler ):
     _relativeURL = "confModifReviewing.py/setTemplate"
-    
+
 class UHAddCriteria( URLHandler ):
     _relativeURL = "confModifReviewing.py/addCriteria"
 
@@ -4368,13 +4368,13 @@ class UHConfModifReviewingAbstractSetup ( URLHandler ):
 
 class UHConfModifReviewingControl ( URLHandler ):
     _relativeURL = "confModifReviewingControl.py"
-    
+
 class UHConfModifReviewingAbstractsControl ( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py"
 
 class UHConfModifUserCompetences ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py"
-    
+
 class UHConfModifUserCompetencesAbstracts ( URLHandler ):
     _relativeURL = "confModifUserCompetences.py/Abstracts"
 
@@ -4419,7 +4419,7 @@ class UHConfRemoveReviewer( URLHandler ):
 
 class UHConfSelectAbstractReviewer( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py/selectAbstractReviewer"
-    
+
 class UHConfAddAbstractReviewer( URLHandler ):
     _relativeURL = "confModifAbstractsReviewingControl.py/addAbstractReviewer"
 
@@ -4437,10 +4437,10 @@ class UHConfRemoveReferee( URLHandler ):
 
 class UHConfModifListContribToJudge( URLHandler ):
     _relativeURL = "confListContribToJudge.py"
-    
+
 class UHConfModifListContribToJudgeAsReviewer( URLHandler ):
     _relativeURL = "confListContribToJudge.py/asReviewer"
-    
+
 class UHConfModifListContribToJudgeAsEditor( URLHandler ):
     _relativeURL = "confListContribToJudge.py/asEditor"
 
@@ -4459,8 +4459,8 @@ class UHContribModifReviewingMaterials ( URLHandler ):
     _relativeURL = "contributionReviewing.py/contributionReviewingMaterials"
 
 class UHContributionReviewingJudgements ( URLHandler ):
-    _relativeURL = "contributionReviewing.py/contributionReviewingJudgements"    
-    
+    _relativeURL = "contributionReviewing.py/contributionReviewingJudgements"
+
 class UHContributionSubmitForRewiewing( URLHandler ):
     _relativeURL = "contributionReviewing.py/submitForReviewing"
 

@@ -4947,11 +4947,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         # way of enabling/disabling those features, we always make them
         # available for the time being, but we keep the previous code for
         # further improvements
-        #return section in self.getSections()
-        if section in ["paperReviewing"] :
-            return False
-        else :
-            return True
+        return True
 
     def enableSection(self, section):
         if ConfSectionsMgr().hasSection(section) and not self.hasEnabledSection(section):

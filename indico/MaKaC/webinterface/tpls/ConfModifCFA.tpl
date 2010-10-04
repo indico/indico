@@ -93,25 +93,6 @@
 	<tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
-    <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification templates")%></span></td>
-        <form action=%(remNotifTplURL)s method="POST">
-        <td bgcolor="white" width="100%%" class="blacktext">
-            <table width="98%%" border="0" align="left">
-                %(notifTpls)s
-            </table>
-        </td>
-        <td valign="bottom" align="right">
-            <input type="submit" class="btn" value="<%= _("remove")%>">
-        </form>
-        <form action=%(addNotifTplURL)s method="POST">
-            <input type="submit" class="btn" value="<%= _("add")%>">
-        </td>
-		</form>
-    </tr>
-	<tr>
-        <td colspan="3" class="horizontalLine">&nbsp;</td>
-    </tr>
 </table>
 <br>
 

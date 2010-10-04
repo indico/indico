@@ -70,7 +70,6 @@ from MaKaC.modules.base import ModulesHolder
 import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
-import MaKaC.reviewing as reviewing
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -248,19 +247,19 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
         #paper reviewing related
         self._paperReviewingMgtOpt=self._sectionMenu.getLinkByName("managepaperreviewing")
         self._paperReviewingMgtOpt.setVisible(False)
-        
+
         self._assignContribOpt=self._sectionMenu.getLinkByName("assigncontributions")
         self._assignContribOpt.setVisible(False)
-        
+
         self._judgeListOpt=self._sectionMenu.getLinkByName("judgelist")
         self._judgeListOpt.setVisible(False)
         self._judgereviewerListOpt=self._sectionMenu.getLinkByName("judgelistreviewer")
         self._judgereviewerListOpt.setVisible(False)
         self._judgeeditorListOpt=self._sectionMenu.getLinkByName("judgelisteditor")
         self._judgeeditorListOpt.setVisible(False)
-        
 
-        if awUser != None and self._conf.hasEnabledSection('paperReviewing'):
+
+        if awUser != None:
 
             conferenceRoles = awUser.getLinkedTo()["conference"]
 
@@ -276,28 +275,28 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase ):
             if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
                 showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"]
                 showreviewerarea = self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
-                showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"]  
+                showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"]
 
-               
+
                 if showrefereearea and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
                     self._assignContribOpt.setVisible(True)
                     self._judgeListOpt.setVisible(True)
-            
+
                 if showreviewerarea and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
                     self._judgereviewerListOpt.setVisible(True)
-            
+
                 if showeditorarea and (self._conf.getConfReview().getChoice()==3 or self._conf.getConfReview().getChoice()==4):
                     self._judgeeditorListOpt.setVisible(True)
 
-        
+
         #collaboration related
         self._collaborationOpt = self._sectionMenu.getLinkByName("collaboration")
         self._collaborationOpt.setVisible(False)
         csbm = self._conf.getCSBookingManager()
         if csbm is not None and csbm.hasBookings() and csbm.isCSAllowed():
             self._collaborationOpt.setVisible(True)
-                
-                  
+
+
 
     def _defineToolBar(self):
         pass
@@ -2092,19 +2091,19 @@ class WPConferenceModifBase( main.WPMainBase ):
 
         self._programMenuItem = wcomponents.SideMenuItem(_("Programme"),
             urlHandlers.UHConfModifProgram.getURL( self._conf ))
-        self._generalSection.addItem( self._programMenuItem)               
-                       
+        self._generalSection.addItem( self._programMenuItem)
+
         self._abstractMenuItem = wcomponents.SideMenuItem(_("Call for Abstracts"),
             urlHandlers.UHConfModifCFA.getURL( self._conf ))
         self._generalSection.addItem( self._abstractMenuItem)
-        
+
         self._contribListMenuItem = wcomponents.SideMenuItem(_("Contributions"),
             urlHandlers.UHConfModifContribList.getURL( self._conf ))
         self._generalSection.addItem( self._contribListMenuItem)
-        
+
         self._reviewingMenuItem = wcomponents.SideMenuItem(_("Reviewing"),
             urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
-        self._generalSection.addItem( self._reviewingMenuItem) 
+        self._generalSection.addItem( self._reviewingMenuItem)
 
         self._regFormMenuItem = wcomponents.SideMenuItem(_("Registration"),
             urlHandlers.UHConfModifRegForm.getURL( self._conf ))
@@ -2144,7 +2143,7 @@ class WPConferenceModifBase( main.WPMainBase ):
         self._toolsMenuItem = wcomponents.SideMenuItem(_("Tools"),
             urlHandlers.UHConfModifTools.getURL( self._conf ) )
         self._advancedOptionsSection.addItem( self._toolsMenuItem)
-            
+
         self._layoutMenuItem = wcomponents.SideMenuItem(_("Layout"),
             urlHandlers.UHConfModifDisplay.getURL(self._conf))
         self._advancedOptionsSection.addItem( self._layoutMenuItem)
@@ -2190,13 +2189,13 @@ class WPConferenceModifBase( main.WPMainBase ):
         if not (self._conf.hasEnabledSection("regForm") and (canModify or isRegistrar)):
             self._regFormMenuItem.setVisible(False)
 
-#        if not (self._conf.getType() == "conference" and self._conf.hasEnabledSection('paperReviewing') and (canModify or isReviewingStaff)):
-#            self._reviewingMenuItem.setVisible(False)
-#        else: #reviewing tab is enabled
-#            if isReviewingStaff and not canModify:
-#                self._reviewingMenuItem.setVisible(True)
+        if not (self._conf.getType() == "conference" and (canModify or isReviewingStaff)):
+            self._reviewingMenuItem.setVisible(False)
+        else: #reviewing tab is enabled
+            if isReviewingStaff and not canModify:
+                self._reviewingMenuItem.setVisible(True)
         # For now we don't want the paper reviewing to be displayed
-        self._reviewingMenuItem.setVisible(False)
+        #self._reviewingMenuItem.setVisible(False)
 
 
         if not (canModify or
@@ -5449,52 +5448,6 @@ class WConfModifCFA( wcomponents.WTemplated ):
         vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
         return vars
 
-class WAbstractsReviewingNotifTpl( wcomponents.WTemplated ):
-    def __init__( self, conference ):
-        self._conf = conference
-        
-    def _getNotifTplsHTML(self):
-        res=[]
-        for tpl in self._conf.getAbstractMgr().getNotificationTplList():
-            res.append("""
-                <tr>
-                    <td bgcolor="white" nowrap>
-                        <a href=%s><img src=%s border="0" alt=""></a>
-                        <a href=%s><img src=%s border="0" alt=""></a>
-                        <input type="checkbox" name="selTpls" value=%s>
-                    </td>
-                    <td bgcolor="white" align="left" nowrap><a href=%s>%s</a></td>
-                    <td>&nbsp;<td>
-                    <td bgcolor="white" align="left" width="90%%"><font size="-1">%s</font></td>
-                </tr>"""%(quoteattr(str(urlHandlers.UHConfModCFANotifTplUp.getURL(tpl))),\
-                            quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))),\
-                            quoteattr(str(urlHandlers.UHConfModCFANotifTplDown.getURL(tpl))),\
-                            quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),\
-                            quoteattr(str(tpl.getId())), \
-                            quoteattr(str(urlHandlers.UHAbstractModNotifTplDisplay.getURL(tpl))), \
-                            self.htmlText(tpl.getName()), \
-                            self.htmlText(tpl.getDescription())))
-        return "".join(res)
-    
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        abMgr = self._conf.getAbstractMgr()
-        vars["notifTpls"]=""
-        vars["addNotifTplURL"]=""
-        vars["remNotifTplURL"]=""
-        vars["modifDeadline"]=""
-        vars["disabled"]=True
-        if abMgr.getCFAStatus():
-            vars["disabled"]=False
-            modifDL = abMgr.getModificationDeadline()
-            if modifDL:
-                if nowutc() > modifDL:
-                        vars["modifDeadline"]="expired"
-                vars["notifTpls"]=self._getNotifTplsHTML()
-                vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
-                vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
-        return vars
-
 
 
 
@@ -5565,488 +5518,6 @@ class WPConfModifCFAAddField( WPConferenceModifAbstractBase ):
     def _getTabContent( self, params ):
         wc = WConfModifCFAAddField( self._conf, self._fieldId )
         return wc.getHTML()
-
-class NotifTplToAddrWrapper:
-    _id=""
-    _label=""
-    _klass=None
-
-    def getId(cls):
-        return cls._id
-    getId=classmethod(getId)
-
-    def getLabel(cls):
-        return _(cls._label)
-    getLabel=classmethod(getLabel)
-
-    def getToAddrKlass(cls):
-        return cls._klass
-    getToAddrKlass=classmethod(getToAddrKlass)
-
-    def addToAddr(cls,tpl):
-         tpl.addToAddr(cls._klass())
-    addToAddr=classmethod(addToAddr)
-
-    def isSelectedByDefault(cls):
-        return False
-    isSelectedByDefault = classmethod(isSelectedByDefault)
-
-
-class NotifTplToAddrSubmitterWrapper(NotifTplToAddrWrapper):
-
-    _id="submitter"
-    _klass=review.NotifTplToAddrSubmitter
-    _label="Submitters"
-
-    def isSelectedByDefault(cls):
-        return True
-    isSelectedByDefault = classmethod(isSelectedByDefault)
-
-class NotifTplToAddrPrimaryAuthorsWrapper(NotifTplToAddrWrapper):
-
-    _id="primaryAuthors"
-    _label= "Primary authors"
-    _klass=review.NotifTplToAddrPrimaryAuthors
-
-
-class NotifTplToAddrsFactory:
-
-    _avail_toAddrs={
-        NotifTplToAddrSubmitterWrapper.getId():NotifTplToAddrSubmitterWrapper,\
-        NotifTplToAddrPrimaryAuthorsWrapper.getId():NotifTplToAddrPrimaryAuthorsWrapper}
-
-    def getToAddrList(cls):
-        return cls._avail_toAddrs.values()
-    getToAddrList=classmethod(getToAddrList)
-
-    def getToAddrById(cls,id):
-        return cls._avail_toAddrs.get(id,None)
-    getToAddrById=classmethod(getToAddrById)
-
-
-class WConfModCFANotifTplNew(wcomponents.WTemplated):
-
-    def __init__(self,conf):
-        self._conf=conf
-
-    def _getErrorHTML(self,errorMsgList):
-        if len(errorMsgList)==0:
-            return ""
-        res=[]
-        for error in errorMsgList:
-            res.append(self.htmlText(error))
-        return """
-                <tr align="center">
-                    <td bgcolor="white" nowrap colspan="3" style="color:red; padding-bottom:10px; padding-top:10px">
-                        <br>
-                        <b><font color="red">%s</font></b>
-                        <br>
-                        <br>
-                    </td>
-                </tr>"""%"<br>".join(res)
-
-    def _getAvailableTagsHTML(self):
-        res=[]
-        for var in EmailNotificator.getVarList():
-            res.append("""
-                <tr>
-                    <td width="100%%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px;">%s</td>
-                    <td>%s</td>
-                </tr>"""%(self.htmlText(var.getLabel()),self.htmlText(var.getDescription())))
-        return "".join(res)
-
-    def _getToAddrsHTML(self):
-        res=[]
-        for toAddr in NotifTplToAddrsFactory.getToAddrList():
-            res.append("""<input name="toAddrs" type="checkbox" value=%s>%s<br>"""%(quoteattr(toAddr.getId()),self.htmlText(toAddr.getLabel())))
-        return "&nbsp;".join(res)
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)))
-        vars["errors"]=self._getErrorHTML(vars.get("errorList",[]))
-        vars["title"]=quoteattr(str(vars.get("title","")))
-        vars["description"]=self.htmlText(vars.get("description",""))
-        vars["subject"]=quoteattr(str(vars.get("subject","")))
-        vars["body"]=self.htmlText(vars.get("body",""))
-        vars["fromAddr"]=quoteattr(str(vars.get("fromAddr","")))
-        vars["CCAddrs"]=quoteattr(str(",".join(vars.get("ccList",[]))))
-        vars["toAddrs"] = self._getToAddrsHTML()
-        vars["vars"]=self._getAvailableTagsHTML()
-        vars["availableConditions"]= NotifTplConditionsFactory.getConditionList()
-        return vars
-
-
-class WConfModCFANotifTplEditData(wcomponents.WTemplated):
-
-    def __init__(self,notifTpl):
-        self._notifTpl=notifTpl
-
-    def _getErrorHTML(self,errorMsgList):
-        if len(errorMsgList)==0:
-            return ""
-        res=[]
-        for error in errorMsgList:
-            res.append(self.htmlText(error))
-        return """
-                <tr align="center">
-                    <td bgcolor="white" nowrap colspan="3" style="color:red; padding-bottom:10px; padding-top:10px">
-                        <br>
-                        <b><font color="red">%s</font></b>
-                        <br>
-                        <br>
-                    </td>
-                </tr>"""%"<br>".join(res)
-
-    def _getAvailableTagsHTML(self):
-        res=[]
-        for var in EmailNotificator.getVarList():
-            res.append("""
-                <tr>
-                    <td width="100%%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px;">%s</td>
-                    <td>%s</td>
-                </tr>"""%(self.htmlText(var.getLabel()),self.htmlText(var.getDescription())))
-        return "".join(res)
-
-    def _getToAddrsHTML(self):
-        res=[]
-        for toAddr in NotifTplToAddrsFactory.getToAddrList():
-            checked = ""
-            if self._notifTpl:
-                if self._notifTpl.hasToAddr(toAddr.getToAddrKlass()):
-                    checked = "checked"
-            else:
-                if toAddr.isSelectedByDefault():
-                    checked = "checked"
-            res.append("""<input name="toAddrs" type="checkbox" value=%s %s>%s<br>"""%(quoteattr(toAddr.getId()),checked,self.htmlText(toAddr.getLabel())))
-        return "&nbsp;".join(res)
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
-        vars["errors"]=self._getErrorHTML(vars.get("errorList",[]))
-        if not vars.has_key("title"):
-            vars["title"]=quoteattr(str(self._notifTpl.getName()))
-        else:
-            vars["title"]=quoteattr(str(vars["title"]))
-        if not vars.has_key("description"):
-            vars["description"]=self.htmlText(self._notifTpl.getDescription())
-        else:
-            vars["description"]=self.htmlText(vars["description"])
-        if not vars.has_key("subject"):
-            vars["subject"]=quoteattr(str(self._notifTpl.getTplSubject()))
-        else:
-            vars["subject"]=quoteattr(str(vars["subject"]))
-        if not vars.has_key("body"):
-            vars["body"]=self.htmlText(self._notifTpl.getTplBody())
-        else:
-            vars["body"]=self.htmlText(vars["body"])
-        if not vars.has_key("fromAddr"):
-            vars["fromAddr"]=quoteattr(str(self._notifTpl.getFromAddr()))
-        else:
-            vars["fromAddr"]=quoteattr(str(vars["fromAddr"]))
-        vars["toAddrs"] = self._getToAddrsHTML()
-        if not vars.has_key("ccList"):
-            vars["CCAddrs"]=quoteattr(str(",".join(self._notifTpl.getCCAddrList())))
-        else:
-            vars["CCAddrs"]=quoteattr(str(",".join(vars["ccList"])))
-        vars["vars"]=self._getAvailableTagsHTML()
-        return vars
-
-class WPModCFANotifTplNew(WPConfModifCFA):
-
-    def _getTabContent(self,params):
-        wc = WConfModCFANotifTplNew(self._conf)
-        params["errorList"]=params.get("errorList",[])
-        return wc.getHTML(params)
-
-
-class WPModCFANotifTplBase(WPConferenceModifBase):
-
-    def __init__(self, rh, notifTpl):
-        WPConferenceModifBase.__init__(self, rh, notifTpl.getConference())
-        self._notifTpl = notifTpl
-
-    def _createTabCtrl( self ):
-        self._tabCtrl = wcomponents.TabControl()
-        self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
-                urlHandlers.UHAbstractModNotifTplDisplay.getURL( self._notifTpl ) )
-        self._tabPreview = self._tabCtrl.newTab( "preview", _("Preview"), \
-                urlHandlers.UHAbstractModNotifTplPreview.getURL( self._notifTpl ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
-        self._setActiveTab()
-
-    def _setActiveTab( self ):
-        pass
-
-    def _setActiveSideMenuItem(self):
-        self._abstractMenuItem.setActive()
-
-#    def _applyFrame( self, body ):
-#        frame = wcomponents.WNotifTPLModifFrame( self._notifTpl, self._getAW() )
-#        p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
-#            "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
-#            "confModifURLGen": urlHandlers.UHConfModifCFA.getURL}
-#        return frame.getHTML( body, **p )
-
-    def _getPageContent( self, params ):
-        self._createTabCtrl()
-        banner = wcomponents.WNotifTplBannerModif(self._notifTpl).getHTML()
-        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-        return banner + body
-
-    def _getTabContent( self, params ):
-        return "nothing"
-
-
-class WPModCFANotifTplDisplay(WPModCFANotifTplBase):
-
-    def __init__(self, rh, notifTpl):
-        WPModCFANotifTplBase.__init__(self, rh, notifTpl)
-        self._conf = self._notifTpl.getConference()
-
-    def _setActiveTab( self ):
-        self._tabMain.setActive()
-
-    def _getTabContent(self, params):
-        wc = WConfModCFANotifTplDisplay(self._conf, self._notifTpl)
-        return wc.getHTML()
-
-
-class WPModCFANotifTplEdit(WPModCFANotifTplBase):
-
-    def __init__(self, rh, notifTpl):
-        WPConferenceModifBase.__init__(self, rh, notifTpl.getConference())
-        self._notifTpl=notifTpl
-
-
-    def _getTabContent(self, params):
-        wc=WConfModCFANotifTplEditData(self._notifTpl)
-        params["errorList"]=params.get("errorList",[])
-        return wc.getHTML(params)
-
-
-
-class WPModCFANotifTplPreview(WPModCFANotifTplBase):
-
-    def _setActiveTab(self):
-        self._tabPreview.setActive()
-
-    def _getTabContent(self, params):
-        wc = WConfModCFANotifTplPreview(self._notifTpl)
-        return wc.getHTML()
-
-
-class WConfModCFANotifTplPreview(wcomponents.WTemplated):
-
-    def __init__(self,notifTpl):
-        self._notifTpl=notifTpl
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        conf=self._notifTpl.getConference()
-        if conf.getAbstractMgr().getAbstractList():
-            abstract = conf.getAbstractMgr().getAbstractList()[0]
-            notif=EmailNotificator().apply(abstract,self._notifTpl)
-            vars["from"]=notif.getFromAddr()
-            vars["to"]=notif.getToList()
-            vars["cc"]=notif.getCCList()
-            vars["subject"]=notif.getSubject()
-            vars["body"] = notif.getBody()
-        else:
-            vars["from"] = _("""<center> _("No preview avaible")</center>""")
-            vars["to"] = _("""<center> _("No preview avaible")</center>""")
-            vars["cc"]= _("""<center> _("No preview avaible")</center>""")
-            vars["subject"] = _("""<center> _("No preview avaible")</center>""")
-            vars["body"] = _("""<center> _("An abstract must be submitted to display the preview")</center>""")
-        vars["cfaURL"]=quoteattr(str(urlHandlers.UHConfModifCFA.getURL(conf)))
-        return vars
-
-class NotifTplConditionWrapper:
-    _id=""
-    _label=""
-    _klass=None
-
-    def getId(cls):
-        return cls._id
-    getId=classmethod(getId)
-
-    def getLabel(cls):
-        return _(cls._label)
-    getLabel=classmethod(getLabel)
-
-    def getConditionKlass(cls):
-        return cls._klass
-    getConditionKlass=classmethod(getConditionKlass)
-
-    def addCondition(cls,tpl,**data):
-        pass
-    addCondition=classmethod(addCondition)
-
-    def needsDialog(cls,**data):
-        return False
-    needsDialog=classmethod(needsDialog)
-
-    def getDialogKlass(cls):
-        return None
-    getDialogKlass=classmethod(getDialogKlass)
-
-
-class NotifTplCondAcceptedWrapper(NotifTplConditionWrapper):
-
-    _id="accepted"
-    _label= _("in status ACCEPTED")
-    _klass=review.NotifTplCondAccepted
-
-    @classmethod
-    def addCondition(cls,tpl,**data):
-        cType=data.get("contribType","--any--")
-        t=data.get("track","--any--")
-        tpl.addCondition(cls._klass(track=t,contribType=cType))
-
-    @classmethod
-    def needsDialog(cls,**data):
-        if data.has_key("contribType") and data["contribType"]!="":
-            return False
-        return True
-
-    @classmethod
-    def getDialogKlass(cls):
-        return WPModNotifTplCondAcc
-
-
-class NotifTplCondRejectedWrapper(NotifTplConditionWrapper):
-
-    _id="rejected"
-    _label= _("in status REJECTED")
-    _klass=review.NotifTplCondRejected
-
-    @classmethod
-    def addCondition(cls,tpl,**data):
-        tpl.addCondition(cls._klass())
-
-class NotifTplCondMergedWrapper(NotifTplConditionWrapper):
-
-    _id="merged"
-    _label= _("in status MERGED")
-    _klass=review.NotifTplCondMerged
-
-    @classmethod
-    def addCondition(cls,tpl,**data):
-        tpl.addCondition(cls._klass())
-
-
-class NotifTplConditionsFactory:
-
-    _avail_conds={
-        NotifTplCondAcceptedWrapper.getId():NotifTplCondAcceptedWrapper,\
-        NotifTplCondRejectedWrapper.getId():NotifTplCondRejectedWrapper,\
-        NotifTplCondMergedWrapper.getId():NotifTplCondMergedWrapper}
-
-    def getConditionList(cls):
-        return cls._avail_conds.values()
-    getConditionList=classmethod(getConditionList)
-
-    def getConditionById(cls,id):
-        return cls._avail_conds.get(id,None)
-    getConditionById=classmethod(getConditionById)
-
-
-class WConfModNotifTplCondAcc(wcomponents.WTemplated):
-
-    def __init__(self,tpl):
-        self._notifTpl=tpl
-
-    def _getContribTypeItemsHTML(self):
-        res=["""<option value="--any--">--any--</option>""",
-                """<option value="--none--">--none--</option>"""]
-        for t in self._notifTpl.getConference().getContribTypeList():
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(t.getId()),self.htmlText(t.getName())))
-        return "".join(res)
-
-    def _getTrackItemsHTML(self):
-        res=["""<option value="--any--">--any--</option>""",
-                """<option value="--none--">--none--</option>"""]
-        for t in self._notifTpl.getConference().getTrackList():
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(t.getId()),self.htmlText(t.getTitle())))
-
-        return "".join(res)
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=urlHandlers.UHConfModNotifTplConditionNew.getURL(self._notifTpl)
-        vars["condType"]=quoteattr(str(NotifTplCondAcceptedWrapper.getId()))
-        vars["contribTypeItems"]=self._getContribTypeItemsHTML()
-        vars["trackItems"]=self._getTrackItemsHTML()
-        return vars
-
-
-class WPModNotifTplCondAcc(WPModCFANotifTplBase):
-
-    def _getTabContent( self, params ):
-        wc=WConfModNotifTplCondAcc(self._notifTpl)
-        return wc.getHTML()
-
-
-class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
-
-    def __init__(self, conf, notifTpl):
-        self._conf = conf
-        self._notifTpl = notifTpl
-
-    def _getConditionItemsHTML(self):
-        res=[]
-        for cond in NotifTplConditionsFactory.getConditionList():
-            res.append("<option value=%s>%s</option>"""%(quoteattr(cond.getId()),self.htmlText(cond.getLabel())))
-        return "".join(res)
-
-    def _getConditionsHTML(self):
-        res=[]
-        for cond in self._notifTpl.getConditionList():
-            caption=""
-            if isinstance(cond,review.NotifTplCondAccepted):
-                track=cond.getTrack()
-                if track is None or track=="":
-                    track="--none--"
-                elif track not in ["--none--","--any--"]:
-                    track=track.getTitle()
-                cType=cond.getContribType()
-                if cType is None or cType=="":
-                    cType="--none--"
-                elif cType not in ["--none--","--any--"]:
-                    cType=cType.getName()
-                caption= _("""ACCEPTED - type: %s - track: %s""")%(self.htmlText(cType),self.htmlText(track))
-            elif isinstance(cond,review.NotifTplCondRejected):
-                caption= _("""REJECTED""")
-            elif isinstance(cond,review.NotifTplCondMerged):
-                caption= _("""MERGED""")
-            res.append(""" <input type="image" src="%s" onclick="javascript:this.form.selCond.value = '%s'; this.form.submit();return false;"> %s"""%(Config.getInstance().getSystemIconURL( "remove" ), cond.getId(), caption))
-        return "<br>".join(res)
-
-    def _getToAddrsHTML(self):
-        res=[]
-        for toAddr in NotifTplToAddrsFactory.getToAddrList():
-            if self._notifTpl.hasToAddr(toAddr.getToAddrKlass()):
-                res.append("%s"%self.htmlText(toAddr.getLabel()))
-        return ", ".join(res)
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["name"] = self._notifTpl.getName()
-        vars["description"] = self._notifTpl.getDescription()
-        vars["from"] = self._notifTpl.getFromAddr()
-        vars["toAddrs"] = self._getToAddrsHTML()
-        vars["CCAddrs"]=",".join(self._notifTpl.getCCAddrList())
-        vars["subject"] = self._notifTpl.getTplSubject()
-        vars["body"] = self._notifTpl.getTplBody()
-        vars["conditions"]=self._getConditionsHTML()
-        vars["availableConditions"]=self._getConditionItemsHTML()
-        vars["remConditionsURL"]=quoteattr(str(urlHandlers.UHConfModNotifTplConditionRem.getURL(self._notifTpl)))
-        vars["newConditionURL"]=quoteattr(str(urlHandlers.UHConfModNotifTplConditionNew.getURL(self._notifTpl)))
-        vars["modifDataURL"]=quoteattr(str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
-        return vars
-
 
 class WCFADataModification(wcomponents.WTemplated):
 
@@ -6246,7 +5717,7 @@ class WAbstracts( wcomponents.WTemplated ):
         url = urlHandlers.UHConfAbstractManagment.getURL(self._conf)
         return url
 
-    
+
     def _getTrackFilterItemList( self ):
         checked = ""
         field=self._filterCrit.getField("track")
@@ -9392,7 +8863,7 @@ class WConfMyStuffMySessions(wcomponents.WTemplated):
     def __init__(self,aw,conf):
         self._aw=aw
         self._conf=conf
-        
+
     def _getSessionsHTML(self):
         if self._aw.getUser() is None:
             return ""
@@ -9428,62 +8899,62 @@ class WConfMyStuffMySessions(wcomponents.WTemplated):
                     <td>%s</td>
                 </tr>
             </table>
-            """%"".join(res)   
-            
-            
+            """%"".join(res)
+
+
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]="%s"%(self._getSessionsHTML())        
-        return vars       
-    
+        vars["items"]="%s"%(self._getSessionsHTML())
+        return vars
+
 class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
-    
+
     def _getBody(self,params):
         wc=WConfMyStuffMySessions(self._getAW(),self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._myStuffOpt)
 
 
 class WConfMyStuffMyContributions(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,conf):
         self._aw=aw
         self._conf=conf
-        
+
     def _getContribsHTML(self):
-        return WConfMyContributions(self._aw, self._conf).getHTML({})   
-    
+        return WConfMyContributions(self._aw, self._conf).getHTML({})
+
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]="%s"%(self._getContribsHTML())  
-    
+        vars["items"]="%s"%(self._getContribsHTML())
+
         import reviewing
         vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
         vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
         return vars
-        
+
 class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
-    
+
     def _getBody(self,params):
         wc=WConfMyStuffMyContributions(self._getAW(),self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._myStuffOpt)  
-        
-        
+        self._sectionMenu.setCurrentItem(self._myStuffOpt)
+
+
 class WConfMyStuffMyTracks(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,conf):
         self._aw=aw
         self._conf=conf
-        
+
     def _getTracksHTML(self):
         if self._aw.getUser() is None or not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             return ""
@@ -9515,7 +8986,7 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
                 </tr>
             </table>
             """%"".join(res)
-    
+
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["items"]="%s%s%s"%(self._getSessionsHTML(),
@@ -9525,21 +8996,21 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
         vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
         vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
         return vars
-    
+
     navigationEntry = navigation.NEMyStuff
-    
+
     def _getBody(self,params):
         wc=WConfMyStuffMyTracks(self._getAW(),self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._myStuffOpt)
-              
-        
+
+
 
 class WConfMyStuff(wcomponents.WTemplated):
-    
+
     def __init__(self,aw,conf):
         self._aw=aw
         self._conf=conf

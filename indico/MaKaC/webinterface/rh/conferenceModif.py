@@ -3534,11 +3534,11 @@ class RHConfModifCFA(RHConfModifCFABase):
     def _process( self ):
         p = conferences.WPConfModifCFA( self, self._target )
         return p.display()
-    
+
 class RHNotifTpl(RHConfModifCFABase):
-    
+
     def _process(self):
-        p = reviewing.WPConfModifAbstractsReviewingNotifTpl(self, self._target)
+        p = reviewing.WPConfModifAbstractsReviewingNotifTplList(self, self._target)
         return p.display()
 
 
@@ -3566,7 +3566,7 @@ class RHCFANotifTplNew(RHConfModifCFABase):
     def _process(self):
         error = []
         if self._cancel:
-            self._redirect(urlHandlers.UHConfModifCFA.getURL( self._conf )  )
+            self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL( self._conf )  )
             return
         elif self._save:
             if len(self._toList)<=0:
@@ -3583,7 +3583,7 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                 tpl.setFromAddr(self._fromAddr)
                 tpl.setCCAddrList(self._ccList)
                 for toAddr in self._toList:
-                    toAddrWrapper=conferences.NotifTplToAddrsFactory.getToAddrById(toAddr)
+                    toAddrWrapper=reviewing.NotifTplToAddrsFactory.getToAddrById(toAddr)
                     if toAddrWrapper:
                         toAddrWrapper.addToAddr(tpl)
                 self._conf.getAbstractMgr().addNotificationTpl(tpl)
@@ -3591,7 +3591,7 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                 url.addParams({"condType":self._tplCondition})
                 self._redirect(url)
                 return
-        p=conferences.WPModCFANotifTplNew(self,self._target)
+        p=reviewing.WPModCFANotifTplNew(self,self._target)
         return p.display(title=self._title,\
                         description=self._description,\
                         subject=self._subject,\
@@ -3613,7 +3613,7 @@ class RHCFANotifTplRem(RHConfModifCFABase):
         for id in self._tplIds:
             tpl = absMgr.getNotificationTplById(id)
             absMgr.removeNotificationTpl(tpl)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
+        self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL(self._conf))
 
 
 class RHNotificationTemplateModifBase(RHConfModifCFABase):
@@ -3629,27 +3629,27 @@ class RHCFANotifTplUp(RHNotificationTemplateModifBase):
 
     def _process(self):
         self._conf.getAbstractMgr().moveUpNotifTpl(self._target)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
+        self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL(self._conf))
 
 
 class RHCFANotifTplDown(RHNotificationTemplateModifBase):
 
     def _process(self):
         self._conf.getAbstractMgr().moveDownNotifTpl(self._target)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
+        self._redirect(urlHandlers.UHAbstractReviewingNotifTpl.getURL(self._conf))
 
 
 class RHCFANotifTplDisplay(RHNotificationTemplateModifBase):
 
     def _process(self):
-        p = conferences.WPModCFANotifTplDisplay(self, self._target)
+        p = reviewing.WPModCFANotifTplDisplay(self, self._target)
         return p.display()
 
 
 class RHCFANotifTplPreview(RHNotificationTemplateModifBase):
 
     def _process(self):
-        p = conferences.WPModCFANotifTplPreview(self, self._target)
+        p = reviewing.WPModCFANotifTplPreview(self, self._target)
         return p.display()
 
 
@@ -3676,7 +3676,7 @@ class RHCFANotifTplEdit(RHNotificationTemplateModifBase):
         elif self._save:
             if len(self._toList)<=0:
                 error.append( _("""At least one "To Address" must be seleted """))
-                p=conferences.WPModCFANotifTplEdit(self, self._target)
+                p=reviewing.WPModCFANotifTplEdit(self, self._target)
                 return p.display(errorList=error, \
                                     title=self._title, \
                                     subject=self._subject, \
@@ -3693,13 +3693,13 @@ class RHCFANotifTplEdit(RHNotificationTemplateModifBase):
                 self._notifTpl.setCCAddrList(self._ccList)
                 self._notifTpl.clearToAddrs()
                 for toAddr in self._toList:
-                    toAddrWrapper=conferences.NotifTplToAddrsFactory.getToAddrById(toAddr)
+                    toAddrWrapper=reviewing.NotifTplToAddrsFactory.getToAddrById(toAddr)
                     if toAddrWrapper:
                         toAddrWrapper.addToAddr(self._notifTpl)
                 self._redirect(urlHandlers.UHAbstractModNotifTplDisplay.getURL(self._target))
                 return
         else:
-            p=conferences.WPModCFANotifTplEdit(self, self._target)
+            p=reviewing.WPModCFANotifTplEdit(self, self._target)
             return p.display()
 
 
@@ -3726,7 +3726,7 @@ class RHNotifTplConditionNew(RHNotificationTemplateModifBase):
 
     def _process(self):
         if self._action=="OK":
-            condWrapper=conferences.NotifTplConditionsFactory.getConditionById(self._condType)
+            condWrapper=reviewing.NotifTplConditionsFactory.getConditionById(self._condType)
             if condWrapper:
                 if condWrapper.needsDialog(**self._otherData):
                     pKlass=condWrapper.getDialogKlass()
