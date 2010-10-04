@@ -4,7 +4,7 @@
 
 <br>
 <table width="85%%" align="center" border="0">
-    <tr> 
+    <tr>
         <td id="revControlPRMHelp"  colspan="3" class="groupTitle" style="padding-top: 15px;"><%= _("Step 1: Assign Managers of Paper Reviewing Module")%></td>
     </tr>
     <tr>
@@ -21,8 +21,8 @@
          <td style="padding-top: 15px;">%(paperReviewManagerTable)s</td>
         <td width="80%%" style="padding-top: 15px;"><div id="PRMList"></div></td>
     </tr>
-    </tr>    
-</table> 
+    </tr>
+</table>
 <br>
 
 <script type="text/javascript">
@@ -60,7 +60,7 @@
                                 }
                             );
                         }
-                        
+
                         var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
                                                    <%= jsonEncode(DictPickler.pickle(ConfReview.getPaperReviewManagersList())) %>,
                                                    null,null,

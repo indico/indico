@@ -30,7 +30,7 @@ from MaKaC.errors import MaKaCError
 #class to display the page
 class RHConfModifReviewingControl( RHConfModifReviewingPRMAMBase ):
     _uh = urlHandlers.UHConfModifReviewingControl
-    
+
     def _checkParams( self, params ):
         RHConfModifReviewingPRMAMBase._checkParams( self, params )
 
@@ -43,7 +43,7 @@ class RHConfModifReviewingControl( RHConfModifReviewingPRMAMBase ):
 
 class RHConfModifReviewingAbstractsControl( RHConfModifReviewingPRMAMBase ):
     _uh = urlHandlers.UHConfModifReviewingAbstractsControl
-    
+
     def _checkParams( self, params ):
         RHConfModifReviewingPRMAMBase._checkParams( self, params )
 
@@ -53,7 +53,7 @@ class RHConfModifReviewingAbstractsControl( RHConfModifReviewingPRMAMBase ):
         else:
             p = reviewing.WPConfModifReviewingAbstractsControl( self, self._target)
         return p.display()
-   
+
 class RHConfModifReviewingBase(RHConferenceModifBase):
     """ Base class that checks if reviewing module is active
     """
@@ -71,7 +71,7 @@ class RHConfSelectPaperReviewManager( RHConfModifReviewingBase ):
     so this class inherits from RHConferenceModifBase
     """
     _uh = urlHandlers.UHConfSelectPaperReviewManager
-    
+
     def _process( self ):
         p = reviewing.WPConfSelectPaperReviewManager( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -124,7 +124,7 @@ class RHConfRefereeBase( RHConfModifReviewingPRMBase ):
 
 class RHConfSelectReferee( RHConfRefereeBase ):
     _uh = urlHandlers.UHConfSelectReferee
-    
+
     def _process( self ):
         p = reviewing.WPConfSelectReferee( self, self._target)
         return p.display( **self._getRequestParams() )
@@ -168,7 +168,7 @@ class RHConfEditorBase( RHConfModifReviewingPRMBase ):
 
 class RHConfSelectEditor( RHConfEditorBase ):
     _uh = urlHandlers.UHConfSelectEditor
-    
+
     def _process( self ):
         p = reviewing.WPConfSelectEditor( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -212,7 +212,7 @@ class RHConfReviewerBase( RHConfModifReviewingPRMBase ):
 
 class RHConfSelectReviewer( RHConfReviewerBase ):
     _uh = urlHandlers.UHConfSelectReviewer
-    
+
     def _process( self ):
         p = reviewing.WPConfSelectReviewer (self, self._target )
         return p.display( **self._getRequestParams() )
@@ -245,7 +245,7 @@ class RHConfRemoveReviewer( RHConfReviewerBase ):
                     else:
                         self._target.getAccessController().revokeModificationEmail(id)
         self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
-        
+
 #Abstract Manager classes
 class RHConfSelectAbstractManager( RHConfModifReviewingBase ):
     """
@@ -253,7 +253,7 @@ class RHConfSelectAbstractManager( RHConfModifReviewingBase ):
     so this class inherits from RHConferenceModifBase
     """
     _uh = urlHandlers.UHConfSelectAbstractManager
-    
+
     def _process( self ):
         p = reviewing.WPConfSelectAbstractManager( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -299,7 +299,7 @@ class RHConfRemoveAbstractManager( RHConfModifReviewingBase ):
 #Abstract Reviewer classes
 class RHConfSelectAbstractReviewer( RHConfModifReviewingAMBase ):
     _uh = urlHandlers.UHConfSelectAbstractReviewer
-    
+
     def _process( self ):
         p = reviewing.WPConfSelectAbstractReviewer( self, self._target )
         return p.display( **self._getRequestParams() )

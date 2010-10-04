@@ -1051,6 +1051,7 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         vars["editorTable"] = editor
         vars["reviewerTable"] = reviewer
         vars["refereeTable"] = refereeTable
+        return vars
 
 class WConfModifAbstractsReviewingControl(wcomponents.WTemplated):
     """ Template for the previous class. Uses the next class as templates
