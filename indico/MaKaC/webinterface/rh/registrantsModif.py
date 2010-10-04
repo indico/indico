@@ -546,7 +546,9 @@ class RHRegistrantTransactionPerformModify( RHRegistrantModifBase ):
                 d["Currency"]=self._registrant.getRegistrationForm().getCurrency()
                 tr=epayment.TransactionPayLaterMod(d)
                 self._registrant.setTransactionInfo(tr)
-            else :self._registrant.setTransactionInfo(None)
+            else :
+                self._registrant.setTransactionInfo(None)
+                self._registrant.setPayed(False)
             #self._registrant.setSessions(self._sessions)
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
