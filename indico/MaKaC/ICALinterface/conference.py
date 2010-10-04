@@ -114,8 +114,8 @@ class ConferenceToiCal(ICALBase):
         text = self._printHeader()
         for contrib in self._conf.getContributionList():
             text+=ContribToiCal(self._conf,contrib).getCore()
-            for subcontrib in contrib.getSubContributionList():
-                text+=ContribToiCal(self._conf,subcontrib).getCore()
+            #for subcontrib in contrib.getSubContributionList():
+            #    text+=ContribToiCal(self._conf,subcontrib).getCore()
         text  += self._printFooter()
         return text
 
