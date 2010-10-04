@@ -174,7 +174,7 @@ class ChatroomMailer(Component):
     @classmethod
     def createChatroom(cls, obj, room):
         pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
-        userList = pf.getOption('additionalEmails')
+        userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
@@ -185,7 +185,7 @@ class ChatroomMailer(Component):
     def editChatroom(self, obj, params):
         room = params['newRoom']
         pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
-        userList = pf.getOption('additionalEmails')
+        userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
@@ -199,7 +199,7 @@ class ChatroomMailer(Component):
     @classmethod
     def deleteChatroom(cls, obj, room):
         pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
-        userList = pf.getOption('additionalEmails')
+        userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
@@ -213,7 +213,7 @@ class ChatroomMailer(Component):
     def addConference2Room(self, obj, room):
         confId = obj._conference
         pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
-        userList = pf.getOption('additionalEmails')
+        userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
@@ -233,6 +233,8 @@ class ChatroomsNotification(GenericNotification):
         self.setToList(userList)
 
     def create(self, room, conference=None):
+        """ If conference is None it means we're creating the chat room for the first time
+        if not it means we're re-using an existing chat room """
         if conference is None:
             conference = room.getConference()
         self.setSubject('[Indico] Chat room succesfully created')
@@ -244,7 +246,6 @@ Thank you for using our system.""" %(room.getTitle(), conference.getTitle(), con
         return self
 
     def edit(self, room, conference):
-        conference = room.getConference()
         self.setSubject("""[Indico] Chat room succesfully edited""")
         self.setBody("""    Dear Indico user,
 The chat room with name %s has been successfully edited in the conference %s (id: %s)
@@ -254,7 +255,6 @@ Thank you for using our system.""" %(room.getTitle(), conference.getTitle(), con
         return self
 
     def delete(self, room, conference):
-        conference = room.getConference()
         self.setSubject("""[Indico] Chat room succesfully deleted""")
         self.setBody("""    Dear Indico user,
 The chat room with name %s has been successfully deleted from the conference %s (id: %s)
