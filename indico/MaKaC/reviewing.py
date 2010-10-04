@@ -76,9 +76,9 @@ class ConferenceReview(Persistent):
         self._defaultEditorDueDate = None
         self._defaultReviwerDueDate = None
         self._defaultAbstractReviwerDueDate = None
-        
-        #auto e-mails 
-        self._enablePRMEmailNotif = True       
+
+        #auto e-mails
+        self._enablePRMEmailNotif = True
         self._enableRefereeEmailNotif = False
         self._enableEditorEmailNotif = False
         self._enableReviewerEmailNotif = False
@@ -92,7 +92,7 @@ class ConferenceReview(Persistent):
         self._enableAuthorSubmittedMatEditorEmailNotif = False
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
 
-        from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry 
+        from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
         self._reviewableMaterials = MaterialFactoryRegistry._allowedMaterials['reviewing']
         #from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
         self._nonReviewableMaterials = []#this is not used any more, since we have new material type used only for reviewing
@@ -107,8 +107,8 @@ class ConferenceReview(Persistent):
         self._userCompetencesByTag = {} #dictionary with the users for each competence. key: competence, value: list of users
         self._reviewingMaterials = {}
         self.notifyModification()
-    
-    
+
+
     def getConference(self):
         """ Returns the parent conference of the ConferenceReview object
         """
@@ -125,7 +125,7 @@ class ConferenceReview(Persistent):
 
     def getEndSubmissionDate(self):
         return self._endSubmissionDate
-    
+
     def setDefaultRefereeDueDate(self, date):
         self._defaultRefereeDueDate = date
 
@@ -175,7 +175,7 @@ class ConferenceReview(Persistent):
             return None
         else:
             return getAdjustedDate(self._defaultAbstractReviwerDueDate, self.getConference())
-    
+
     #auto e-mails methods for assign/remove reviewing team to the conference notification
     def getEnablePRMEmailNotif(self):
         try :
@@ -190,7 +190,7 @@ class ConferenceReview(Persistent):
 
     def disablePRMEmailNotif(self):
         self._enablePRMEmailNotif = False
-    
+
     def getEnableRefereeEmailNotif(self):
         try :
             if self._enableRefereeEmailNotif  :
@@ -204,8 +204,8 @@ class ConferenceReview(Persistent):
 
     def disableRefereeEmailNotif(self):
         self._enableRefereeEmailNotif = False
-        
-        
+
+
     def getEnableEditorEmailNotif(self):
         try :
             if self._enableEditorEmailNotif  :
@@ -219,8 +219,8 @@ class ConferenceReview(Persistent):
 
     def disableEditorEmailNotif(self):
         self._enableEditorEmailNotif = False
-        
-    
+
+
     def getEnableReviewerEmailNotif(self):
         try :
             if self._enableReviewerEmailNotif  :
@@ -234,8 +234,8 @@ class ConferenceReview(Persistent):
 
     def disableReviewerEmailNotif(self):
         self._enableReviewerEmailNotif = False
-       
-      
+
+
     #auto e-mails methods for assign/remove reviewers to/from contributions notification
     def getEnableRefereeEmailNotifForContribution(self):
         try :
@@ -249,8 +249,8 @@ class ConferenceReview(Persistent):
         self._enableRefereeEmailNotifForContribution = True
 
     def disableRefereeEmailNotifForContribution(self):
-        self._enableRefereeEmailNotifForContribution = False        
-        
+        self._enableRefereeEmailNotifForContribution = False
+
     def getEnableEditorEmailNotifForContribution(self):
         try :
             if self._enableEditorEmailNotifForContribution  :
@@ -263,8 +263,8 @@ class ConferenceReview(Persistent):
         self._enableEditorEmailNotifForContribution = True
 
     def disableEditorEmailNotifForContribution(self):
-        self._enableEditorEmailNotifForContribution = False        
-    
+        self._enableEditorEmailNotifForContribution = False
+
     def getEnableReviewerEmailNotifForContribution(self):
         try :
             if self._enableReviewerEmailNotifForContribution  :
@@ -292,8 +292,8 @@ class ConferenceReview(Persistent):
         self._enableRefereeJudgementEmailNotif = True
 
     def disableRefereeJudgementEmailNotif(self):
-        self._enableRefereeJudgementEmailNotif = False        
-        
+        self._enableRefereeJudgementEmailNotif = False
+
     def getEnableEditorJudgementEmailNotif(self):
         try :
             if self._enableEditorJudgementEmailNotif  :
@@ -306,8 +306,8 @@ class ConferenceReview(Persistent):
         self._enableEditorJudgementEmailNotif = True
 
     def disableEditorJudgementEmailNotif(self):
-        self._enableEditorJudgementEmailNotif = False        
-    
+        self._enableEditorJudgementEmailNotif = False
+
     def getEnableReviewerJudgementEmailNotif(self):
         try :
             if self._enableReviewerJudgementEmailNotif  :
@@ -336,7 +336,7 @@ class ConferenceReview(Persistent):
 
     def disableAuthorSubmittedMatRefereeEmailNotif(self):
         self._enableAuthorSubmittedMatRefereeEmailNotif = False
-        
+
     def getEnableAuthorSubmittedMatEditorEmailNotif(self):
         try :
             if self._enableAuthorSubmittedMatEditorEmailNotif  :
@@ -350,7 +350,7 @@ class ConferenceReview(Persistent):
 
     def disableAuthorSubmittedMatEditorEmailNotif(self):
         self._enableAuthorSubmittedMatEditorEmailNotif = False
-        
+
     def getEnableAuthorSubmittedMatReviewerEmailNotif(self):
         try :
             if self._enableAuthorSubmittedMatReviewerEmailNotif  :
@@ -364,7 +364,7 @@ class ConferenceReview(Persistent):
 
     def disableAuthorSubmittedMatReviewerEmailNotif(self):
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
-               
+
 
     #Reviewing mode methods
     def setChoice(self, choice):
@@ -573,8 +573,8 @@ class ConferenceReview(Persistent):
             self.notifyModification()
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReferee, 'Referee', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newReferee)
-            
+                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newReferee)
+
 
     def removeReferee(self, referee):
         """ Remove a referee from the conference.
@@ -595,7 +595,7 @@ class ConferenceReview(Persistent):
             self.notifyModification()
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(referee, 'Referee', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", referee)
+                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", referee)
         else:
             raise MaKaCError("Cannot remove a referee who is not yet referee")
 
@@ -660,7 +660,7 @@ class ConferenceReview(Persistent):
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingNotification(newEditor, 'Layout Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newEditor)
+                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newEditor)
 
     def removeEditor(self, editor):
         """ Remove a editor from the conference.
@@ -681,7 +681,7 @@ class ConferenceReview(Persistent):
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(editor, 'Layout Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", editor)
+                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", editor)
         else:
             raise MaKaCError("Cannot remove an editor who is not yet editor")
 
@@ -746,8 +746,8 @@ class ConferenceReview(Persistent):
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReviewer, 'Content Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newReviewer)
-        
+                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newReviewer)
+
     def removeReviewer(self, reviewer):
         """ Remove a reviewer from the conference.
             reviewer has to be an Avatar object.
@@ -767,7 +767,7 @@ class ConferenceReview(Persistent):
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(reviewer, 'Content Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", reviewer)
+                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", reviewer)
         else:
             raise MaKaCError("Cannot remove a reviewer who is not yet reviewer")
 
@@ -832,7 +832,7 @@ class ConferenceReview(Persistent):
             self.notifyModification()
         if self._enablePRMEmailNotif == True:
             notification = ConferenceReviewingNotification(newPaperReviewManager, 'Paper Review Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newPaperReviewManager)
+            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newPaperReviewManager)
 
     def removePaperReviewManager(self, paperReviewManager):
         """ Remove a paper review manager from the conference.
@@ -853,7 +853,7 @@ class ConferenceReview(Persistent):
             self.notifyModification()
             if self._enablePRMEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(paperReviewManager, 'Paper Review Manager', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", paperReviewManager)
+                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", paperReviewManager)
         else:
             raise MaKaCError("Cannot remove a paper review manager who is not yet paper review manager")
 
@@ -883,7 +883,7 @@ class ConferenceReview(Persistent):
                 self._userCompetences[newAbstractManager] = []
             self.notifyModification()
             notification = ConferenceReviewingNotification(newAbstractManager, 'Abstract Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newAbstractManager)
+            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newAbstractManager)
 
     def removeAbstractManager(self, abstractManager):
         """ Remove a abstract manager from the conference.
@@ -903,7 +903,7 @@ class ConferenceReview(Persistent):
             abstractManager.unlinkTo(self._conference, "abstractManager")
             self.notifyModification()
             notification = ConferenceReviewingRemoveNotification(abstractManager, 'Abstract Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", abstractManager)
+            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", abstractManager)
         else:
             raise MaKaCError("Cannot remove a abstract manager who is not yet abstract manager")
 
@@ -933,7 +933,7 @@ class ConferenceReview(Persistent):
                 self._userCompetences[newAbstractReviewer] = []
             self.notifyModification()
             notification = ConferenceReviewingNotification(newAbstractReviewer, 'Abstract Reviewer', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", newAbstractReviewer)
+            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newAbstractReviewer)
 
     def removeAbstractReviewer(self, abstractReviewer):
         """ Remove a abstract reviewer from the conference.
@@ -953,7 +953,7 @@ class ConferenceReview(Persistent):
             abstractReviewer.unlinkTo(self._conference, "abstractReviewer")
             self.notifyModification()
             notification = ConferenceReviewingRemoveNotification(abstractReviewer, 'Abstract Reviewer', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "MaKaC/reviewing.py", abstractReviewer)
+            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", abstractReviewer)
         else:
             raise MaKaCError("Cannot remove an abstract reviewer who is not yet abstract reviewer")
 
@@ -1019,9 +1019,9 @@ class ConferenceReview(Persistent):
             extension = Template.formats[format]
         else:
             extension = ".template"
-        
+
         #id = self.getNewTemplateId()
-            
+
         fileName = "Contribution_template_" + id + "_c" + self._conference.id + extension
 
         file = conference.LocalFile()
@@ -1058,8 +1058,8 @@ class ConferenceReview(Persistent):
         """
         del self._templates[id]
         self.notifyModification()
-        
-        
+
+
     #competences methods
     def isInReviewingTeam(self, user):
         return user in self._paperReviewManagersList or \
@@ -1218,7 +1218,7 @@ class Template(Persistent):
 
     def getFile(self):
         return self.__file
-    
+
 
     def getLocator( self ):
         """Gives back (Locator) a globaly unique identification encapsulated
@@ -1227,7 +1227,7 @@ class Template(Persistent):
         loc = self.__conf.getLocator()
         loc["reviewingTemplateId"] = self.getId()
         return loc
-    
+
 
 class ConferenceReviewingNotification(GenericNotification):
     """ Template to build an email notification to a newly appointed PRM / Referee / Editor / Reviewer / Abstract Manager / Abstract Reviewer

@@ -126,7 +126,7 @@ class ReviewManager(Persistent):
             #e-mail notification will be send when referee is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfReview()._enableRefereeEmailNotifForContribution == True: 
                 notification = ContributionReviewingNotification(referee, 'Referee', self._contribution)
-                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", referee)
+                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", referee)
     
     def removeReferee(self):
         """ Removes the referee for this contribution.
@@ -143,7 +143,7 @@ class ReviewManager(Persistent):
         #e-mail notification will be send when referee is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
         if self.getConfReview()._enableRefereeEmailNotifForContribution == True:
             notification = ContributionReviewingRemoveNotification(self._referee, 'Referee', self._contribution)
-            GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", self._referee)
+            GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", self._referee)
         self._referee = None
 
     def isReferee(self, user):
@@ -178,7 +178,7 @@ class ReviewManager(Persistent):
             #e-mail notification will be send when editor is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfReview()._enableEditorEmailNotifForContribution == True:
                 notification = ContributionReviewingNotification(editor, 'Layout Reviewer', self._contribution)
-                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", editor)
+                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", editor)
         else:
             raise MaKaCError("Please choose a editor before assigning an editor")
 
@@ -192,7 +192,7 @@ class ReviewManager(Persistent):
         #e-mail notification will be send when editor is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
         if self.getConfReview()._enableEditorEmailNotifForContribution == True:
             notification = ContributionReviewingRemoveNotification(self._editor, 'Layout Reviewer', self._contribution)
-            GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", self._editor)
+            GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", self._editor)
         self._editor = None
 
     def isEditor(self, user):
@@ -225,7 +225,7 @@ class ReviewManager(Persistent):
                 #e-mail notification will be send when reviewer is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfReview()._enableReviewerEmailNotifForContribution == True:
                 notification = ContributionReviewingNotification(reviewer, 'Content Reviewer', self._contribution)
-                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", reviewer)
+                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", reviewer)
         else:
             raise MaKaCError("Please choose a referee before assigning a reviewer")
 
@@ -242,7 +242,7 @@ class ReviewManager(Persistent):
             #e-mail notification will be send when reviewer is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfReview()._enableReviewerEmailNotifForContribution == True:
                 notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
-                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", reviewer)
+                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", reviewer)
         
         
     def removeAllReviewers(self):
@@ -255,7 +255,7 @@ class ReviewManager(Persistent):
             #e-mail notification will be send when reviewers are removed from contribution only if the manager enable the option in 'Automatic e-mails' section
             if self.getConfReview()._enableReviewerEmailNotifForContribution == True:
                 notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
-                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "MaKaC/reviewing.py", reviewer)
+                GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", reviewer)
         del(self._reviewersList[:])
 
     def getReviewersList(self):
@@ -372,23 +372,23 @@ class Judgement(Persistent):
             if widthdrawn:
                 if isinstance(self, RefereeJudgement) and self.getConfReview()._enableRefereeJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
+                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
                 if isinstance(self, EditorJudgement) and self.getConfReview()._enableEditorJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
+                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
                 if isinstance(self, ReviewerJudgement) and self.getConfReview()._enableReviewerJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
+                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
             else:
                 if isinstance(self, RefereeJudgement) and self.getConfReview()._enableRefereeJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
+                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
                 if isinstance(self, EditorJudgement) and self.getConfReview()._enableEditorJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
+                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
                 if isinstance(self, ReviewerJudgement) and self.getConfReview()._enableReviewerJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
-                    GenericMailer.sendAndLog(notification, self._review.getConference(), "MaKaC/reviewing.py", author)
+                    GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
         
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
@@ -568,30 +568,30 @@ class Review(Persistent):
         
             if self._reviewManager.hasReferee() and self.getConfReview()._enableAuthorSubmittedMatRefereeEmailNotif == True:
                 notification = MaterialsSubmittedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
-                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getReferee())
+                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getReferee())
             
             if self._reviewManager.hasEditor() and self.getConfReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
                 notification = MaterialsSubmittedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
-                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getEditor())
+                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getEditor())
 
             for reviewer in self._reviewManager.getReviewersList():
                 if self.getConfReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
                     notification = MaterialsSubmittedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
-                    GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", reviewer)
+                    GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
         
         else:
             if self._reviewManager.hasReferee() and self.getConfReview()._enableAuthorSubmittedMatRefereeEmailNotif == True:
                 notification = MaterialsChangedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
-                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getReferee())
+                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getReferee())
             
             if self._reviewManager.hasEditor() and self.getConfReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
                 notification = MaterialsChangedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
-                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", self._reviewManager.getEditor())
+                GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getEditor())
 
             for reviewer in self._reviewManager.getReviewersList():
                 if self.getConfReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
                     notification = MaterialsChangedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
-                    GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "MaKaC/reviewing.py", reviewer)
+                    GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
         
     def getVersion(self):
         """ Returns the version number for this review. The version number is an integer, starting by 0.
@@ -722,7 +722,7 @@ class Review(Persistent):
 #        authorList = self._reviewManager.getContribution().getAuthorList()
 #        for author in authorList:
 #            notification = ContributionReviewingJudgementNotification(author, judgement, self._reviewManager.getContribution())
-#            GenericMailer.sendAndLog(notification, self.getConference(), "MaKaC/reviewing.py", author)
+#            GenericMailer.sendAndLog(notification, self.getConference(), "Reviewing", author)
 
 
     #dates methods

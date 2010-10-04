@@ -17,6 +17,7 @@ Contents:
    ./AdminGuide/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
+   ./PaperReviewingGuides/index.rst
 
 
 .. Indices and tables

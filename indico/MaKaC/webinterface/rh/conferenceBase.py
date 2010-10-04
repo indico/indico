@@ -244,7 +244,7 @@ class RHSubmitMaterialBase:
         self._visibility = int(params.get("visibility", 0))
         self._password = params.get("password","")
 
-        from MaKaC.services.interface.rpc import json        
+        from MaKaC.services.interface.rpc import json
         self._userList = json.decode(params.get("userList", "[]"))
 
         if self._uploadType == "file":
@@ -405,7 +405,6 @@ class RHSubmitMaterialBase:
 
         # We will need to pickle the data back into JSON
 
-        errorList=[]
         user = rh.getAW().getUser()
 
         try:
@@ -427,7 +426,6 @@ class RHSubmitMaterialBase:
             text = ""
 
         errorList=self._getErrorList()
-        resource = None
 
         if len(errorList) > 0:
             status = "ERROR"
