@@ -403,7 +403,7 @@ class UtilPersons:
 class UtilsConference:
 
     def setValues(c, confData):
-        from indico.MaKaC.webinterface.common.tools import escape_tags_short_url
+        from MaKaC.webinterface.common.tools import escape_tags_short_url
         c.setTitle( confData["title"] )
         c.setDescription( confData["description"] )
         c.setOrgText(confData.get("orgText",""))

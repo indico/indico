@@ -50,7 +50,7 @@ class PluginsHolder (ObjectHolder):
 
     def getRHMap(self):
         # Replace with the real dict obtained while exploring the directories
-        return {'algo': 'indico.MaKaC.webinterface.rh.welcome.RHWelcome'}
+        return {'algo': 'MaKaC.webinterface.rh.welcome.RHWelcome'}
 
     def getGlobalPluginOptions(self):
         """ Returns server-wide options relative to the whole plugin system.
