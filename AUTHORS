@@ -1,44 +1,48 @@
-CDS Indico AUTHORS
+Indico AUTHORS
 ===============================================
 
-$Id: AUTHORS,v 1.3 2008/04/24 17:00:17 jose Exp $
+Current contributors:
 
-The CDS Indico Development Group consists of several people:
+  * Thomas Baron (2004-)
+  * José Benito Gonzalez (2004-2006, 2008-)
+  * José Pedro Ferreira (2007-)
+  * Cesar Muñoz (2009-)
+  * Leszek Syroka (2010-)
+  * Alexis Castilla Hernández (2010-)
 
- - 2004- Thomas Baron <thomas.baron@cern.ch> (CERN)
-   Project Leader and Programming
+Past contributors:
 
- - 2004- David Bourillot (CERN)
-   Programming
+  * Alexandre Delhay (2007)
+  * Cvetelina Angelova (2009-2010)
+  * David Bourillot (2004-2008)
+  * David Martin Clavo (2006, 2008-2010)
+  * Davide Galimberti (2010)
+  * Daniel Hugo Cámpora Pérez (2010)
+  * Emilio Villar Castillo (2006)
+  * Erik Ragnerstam (2009)
+  * Erik Simon (2002-2004)
+  * Ewa Banaszek
+  * Hector Sanchez (2002-2004)
+  * Ian Rolewicz (2010)
+  * Jean-Yves Le Meur (2002-2004)
+  * Jim Fromm (FNAL, 2007)
+  * Jeremy Herr (CERN, 2010)
+  * Jeremy Nguyen Xuan (2009)
+  * João Fernandes (CERN, 2006)
+  * Juan Alonso (2009)
+  * Marion Albertini (2007-2008)
+  * Martin Tverdal (2009)
+  * Nicolas Michel (2007)
+  * Nikolche Mihajlovski (2010)
+  * Pascal Vogt (2008)
+  * Pierre-Luc Hemery (2008)
+  * Piia-Maria Sinkkonnen (2008)
+  * Piotr Wlodarek (2006-2007)
+  * Tomas Novotny (2007)
+  * Vanessa Turney (2005)
 
- - 2004-2006 Jose Benito Gonzalez Lopez (CERN)
-   Programming
 
- - 2002-2004 Jean-Yves Le Meur <jean-yves.le.meur@cern.ch> (CERN)
-   Project Leader
-
- - 2002-2004 Hector Sanchez <hector.sanchez@cern.ch> (CERN)
-   Original Programming
-
- - 2002-2004 Erik Simon <erik.simon@cern.ch> (CERN)
-   Original Programming
-
-Moreover, several other people have worked on various modules of the project:
-
- - 2007- Jim Fromm (Fermilab)
-   Timezone awareness
-
- - 2006-2007 Piotr Wlodarek
-   Room Booking Module
-
- - 2007 Jose Pedro Ferreira
- - 2006 Nicolas Michel
- - 2006- Joao Fernandes
- - 2006 David Martin Clavo
- - 2006 Emilio Villar Castillo
- - 2005 Vanessa Turney
- 
-
-       - CDS Indico Development Group
-         <indico-support@cern.ch>
-         <http://cdsware.cern.ch/indico>
+Indico Team
+-----------
+<indico-team@cern.ch>
+<http://indico-software.org>

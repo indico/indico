@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id: modules.py,v 1.00 2010/06/22 15:21:49 irolewic Exp $
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
