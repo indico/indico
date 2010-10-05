@@ -61,6 +61,10 @@ class WPConferenceInstantMessaging(WPConferenceDefaultDisplayBase):
         wc = WConferenceInstantMessaging(self._conf, self._aw)
         return wc.getHTML({})
 
+    def _defineSectionMenu( self ):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+        self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName("instantMessaging"))
+
 
 
 class WConfModifChat(wcomponents.WTemplated):

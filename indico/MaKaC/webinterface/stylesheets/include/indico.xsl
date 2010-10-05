@@ -755,7 +755,7 @@
 						<span style="margin-left: 20px;"></span>
 						<span class="CRDisplayMoreInfo" id="CRMoreInfo{./id}">More Info</span>
 						<span style="margin-left:8px;margin-right:8px;">|</span>
-						<span><a href="xmpp://{./name}@{./server}"> Join now! </a></span>
+						<span><a href="xmpp:{./name}@{./server}?join"> Join now! </a></span>
 
 		                  <!-- Start of a chat room info line -->
 		                  <div id="collaborationInfoLine{./id}" style="visibility: hidden; overflow: hidden;">

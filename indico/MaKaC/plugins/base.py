@@ -740,7 +740,7 @@ class PluginType (PluginBase):
         self.__id = id
 
     def getName(self):
-        return self.__name if self.__name is not None else self.__id
+        return self.__name if hasattr(self, '_PluginType__name') and self.__name is not None else self.__id
 
     def getDescription(self):
         return self.__description
