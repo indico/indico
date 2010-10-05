@@ -100,13 +100,12 @@ class IndicoJabberBotEditRoom(IndicoJabberBotBase):
 
     def handleXMPPConnected(self, event):
         muc = self.xmpp.plugin['xep_0045']
-
         try:
             muc.joinMUC(room = self._jid, nick = self._nick)
         except Exception, e:
             self._error = True
             self.xmpp.disconnect()
-        #import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
+
         form = self.xmpp.plugin['xep_0004'].makeForm()
 
         form.addField('FORM_TYPE', value='http://jabber.org/protocol/muc#roomconfig')
@@ -114,10 +113,11 @@ class IndicoJabberBotEditRoom(IndicoJabberBotBase):
         form.addField(var = 'muc#roomconfig_roomname', value = self._room.getTitle())
 
         #FYI: If a field is empty ejabberd will answer with a bad request error, so if the field's value is empty do not send it!
-        if self._room.getDescription():
+        if self._room.getDescription() and self._room.getDescription() != '':
             form.addField(var = 'muc#roomconfig_roomdesc', value = self._room.getDescription())
         form.addField(var = 'muc#roomconfig_passwordprotectedroom', value = str(self._protected))
-        if self._protected:
+        if self._protected and self._room.getPassword() != '':
+            #import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
             form.addField(var = 'muc#roomconfig_roomsecret', value = self._room.getPassword())
 
         form.addField(var = 'muc#roomconfig_persistentroom', value = '1')

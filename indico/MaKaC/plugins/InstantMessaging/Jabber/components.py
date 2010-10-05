@@ -32,7 +32,7 @@ class ChatSMContributor(Component):
 
     @classmethod
     def fillManagementSideMenu(cls, obj, params={}):
-        params['Instant Messaging'] = wcomponents.SideMenuItem(_("Instant Messaging"), urlHandlers.UHConfModifChat.getURL( obj._conf ))
+        params['Instant Messaging'] = wcomponents.SideMenuItem(_("Chat Rooms"), urlHandlers.UHConfModifChat.getURL( obj._conf ))
 
     @classmethod
     def getActiveNavigationItem(cls, obj, params={}):
@@ -44,7 +44,7 @@ class ChatSMContributor(Component):
         conf = params['conf']
 
         sideMenuItemsDict["instantMessaging"] =  { \
-                "caption": _("Instant Messaging"), \
+                "caption": _("Chat Rooms"), \
                 "URL": str(urlHandlers.UHConferenceInstantMessaging.getURL(conf)), \
                 "staticURL": "", \
                 "parent": ""}
@@ -178,8 +178,11 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        cn = ChatroomsNotification(room, userList)
-        GenericMailer.sendAndLog(cn.create(room), room.getConference(), "MaKaC/plugins/InstantMessaging/Jabber/components.py", room.getOwner())
+        try:
+            cn = ChatroomsNotification(room, userList)
+            GenericMailer.sendAndLog(cn.create(room), room.getConference(), "MaKaC/plugins/InstantMessaging/Jabber/components.py", room.getOwner())
+        except Exception, e:
+            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
 
     @classmethod
     def editChatroom(self, obj, params):
@@ -189,12 +192,14 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        cn = ChatroomsNotification(room, userList)
-        GenericMailer.sendAndLog(cn.edit(room, ConferenceHolder().getById(obj._conferenceID)), \
-                                 ConferenceHolder().getById(obj._conferenceID), \
-                                 "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
-                                 room.getOwner())
-
+        try:
+            cn = ChatroomsNotification(room, userList)
+            GenericMailer.sendAndLog(cn.edit(room, ConferenceHolder().getById(obj._conferenceID)), \
+                                     ConferenceHolder().getById(obj._conferenceID), \
+                                     "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                     room.getOwner())
+        except Exception, e:
+            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
 
     @classmethod
     def deleteChatroom(cls, obj, room):
@@ -203,11 +208,14 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        cn = ChatroomsNotification(room, userList)
-        GenericMailer.sendAndLog(cn.delete(room, ConferenceHolder().getById(obj._conferenceID)),\
-                                 ConferenceHolder().getById(obj._conferenceID), \
-                                 "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
-                                 room.getOwner())
+        try:
+            cn = ChatroomsNotification(room, userList)
+            GenericMailer.sendAndLog(cn.delete(room, ConferenceHolder().getById(obj._conferenceID)),\
+                                     ConferenceHolder().getById(obj._conferenceID), \
+                                     "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                     room.getOwner())
+        except Exception, e:
+            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
 
     @classmethod
     def addConference2Room(self, obj, room):
@@ -217,11 +225,14 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        cn = ChatroomsNotification(room, userList)
-        GenericMailer.sendAndLog(cn.create(room, ConferenceHolder().getById(obj._conference)), \
-                                           ConferenceHolder().getById(obj._conference), \
-                                           "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
-                                           room.getOwner())
+        try:
+            cn = ChatroomsNotification(room, userList)
+            GenericMailer.sendAndLog(cn.create(room, ConferenceHolder().getById(obj._conference)), \
+                                               ConferenceHolder().getById(obj._conference), \
+                                               "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                               room.getOwner())
+        except Exception, e:
+            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
 
 
 class ChatroomsNotification(GenericNotification):

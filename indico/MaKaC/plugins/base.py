@@ -136,7 +136,10 @@ class ComponentsManager(Persistent):
             #    Logger.get('PluginNotifier').error('the method %s is not definend by the interface %s'%(method, interface))
 
     def getAllSubscribers(self, method):
-        return self.__eventComponentsDict[method]
+        if self.__eventComponentsDict.has_key(method):
+            return self.__eventComponentsDict[method]
+        else:
+            return []
 
     def getAssociatedPlugin(self, component):
         ''' returns the plugin the component belongs to, according to the component path'''

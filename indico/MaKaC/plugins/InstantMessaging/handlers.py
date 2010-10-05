@@ -48,7 +48,6 @@ class ChatRoomBase ( ServiceBase, Observable ):
         pm = ParameterManager(self._params.get('chatroomParams'))
         self._title = pm.extract('title', pType=str, allowEmpty = False)
         self._description = pm.extract('description', pType=str, allowEmpty = True)
-
         self._createRoom = pm.extract('createRoom', pType=str, allowEmpty = True)
         if self._createRoom == 'yes':
             self._createRoom = True
@@ -91,8 +90,10 @@ class ChatRoomBase ( ServiceBase, Observable ):
         try:
             self._bot = IndicoJabberBotEditRoom(jid, password, room)
         except Exception, e:
+            Logger.get('InstantMessaging (Jabber)').info("Exception while editing: %s" %e)
             raise NoReportError( self._messages['editing'])
         if hasattr(self._bot, '_error') and self._bot._error:
+            Logger.get('InstantMessaging (Jabber)').info("Exception while editing: Apparently there was a problem with the XMPP library")
             raise NoReportError( self._messages['editing'])
         elif not hasattr(self._bot, '_error'):
             raise NoReportError( self._messages['connecting'])
@@ -138,7 +139,7 @@ class CreateChatroom( ChatRoomBase ):
         except ServiceError, e:
             raise ServiceError( message=self._messages['sameId'] )
         except NoReportError, e:
-            raise NoReportError(self._messages['sameName'])
+            raise NoReportError(self._messages['sameName'], explanation='roomExists')
         except Exception, e:
             raise ServiceError( message=str(e) )
 
@@ -188,7 +189,8 @@ class EditChatroom( ChatRoomBase ):
         except ServiceError, e:
             raise ServiceError( message=_('Problem while accessing the database: %s' %e))
         except Exception, e:
-            raise NoReportError( self._messages['editing'])
+            Logger.get('InstantMessaging (Jabber)').info("Exception while editing: %s" %e)
+            raise NoReportError( self._messages['editing'], explanation='roomExists')
 
         modified = False
         if oldRoom.getTitle() != self._room.getTitle() and oldRoom.getCreateRoom() and self._room.getCreateRoom():

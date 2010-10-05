@@ -92,7 +92,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 	                            killProgress();
 	                            //we don't want to display the chat rooms that are already in the conference
 	                            if(result.length>0){
-		                            self.chatrooms = result.filter(function(chatroom){
+		                            self.chatrooms = filter(result,function(chatroom){
 		                            					 var notExists = true;
 			                            				 each(chatroom.conferences, function(conf){
 			                            					 if(conf == self.conf){
@@ -268,25 +268,45 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var self = this;
 
             // We get the form HTML
-            var createCHRadioButton = Html.radio({id:"createCH", name:"createRoom", value:"yes", onclick:"disableCustomId(defaultHost)"},true);
+            var createCHRadioButton = Html.radio({id:"createCH", name:"createRoom"},true);
+            /* for some stupid reason, IE doesn't like that you directly put the value and assign the onclick event in the definition
+             * above, so it's necessary to do it 'manually'. Steve Ballmer, I hate you.
+             */
+            createCHRadioButton.dom.value = "yes";
+            createCHRadioButton.observeClick(function(){
+												disableCustomId(defaultHost);
+											});
             var createCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "Default ");
             createCHRadioButtonLabel.dom.htmlFor = "createCH";
 
-            var defineCHRadioButton = Html.radio({id:"defineCH", name:"createRoom", value:"no", onclick:"enableCustomId(customHost)"});
+            var defineCHRadioButton = Html.radio({id:"defineCH", name:"createRoom"});
+            defineCHRadioButton.dom.value = "no";
+            defineCHRadioButton.observeClick(function(){
+												enableCustomId(customHost);
+											});
             var defineCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "Custom");
             defineCHRadioButtonLabel.dom.htmlFor = "defineCH";
 
             var defineCHText = Html.edit({size:"35", name:"host", id:"host"});
             this.parameterManager.add(defineCHText, 'text', false);
 
+            self.errorLabel=Html.label({style:{float: 'right'}});
+
             this.basicTabForm = Html.div({style:{textAlign: 'left'}},
             	IndicoUtil.createFormFromMap([
             	    [$T('Server used'), Html.div({}, Html.tr({}, createCHRadioButton, createCHRadioButtonLabel), Html.tr({}, defineCHRadioButton, defineCHRadioButtonLabel))],
             	    [$T('Server'), defineCHText],
-                    [$T('Chat room name'), this.parameterManager.add(Html.edit({style: {width: '300px'}, name: 'title'}, conferenceName+eventDate), 'text', false)],
+                    [$T('Chat room name'), Html.td({},this.parameterManager.add(Html.edit({style: {width: '300px'}, name: 'title'}, conferenceName+eventDate), 'text', false), self.errorLabel)],
                     [$T('Description'), Html.textarea({cols: 40, rows: 2, name: 'description'}) ]
                 ])
             );
+
+            var hideCH = Html.checkbox({id:"hideCH"}, true);
+            //You don't like this? Me neither. Give thanks to Bill Gates and IE *sigh*
+            hideCH.dom.name = "showRoom";
+            var showPwd = Html.checkbox({id:"showPwd"}, false);
+            showPwd.dom.name = "showPass";
+
             var passwordField = new ShowablePasswordField('roomPass', '', false, 'CHpass').draw();
             this.advancedTabForm = Html.div({},
             	IndicoUtil.createFormFromMap([
@@ -297,14 +317,13 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             	IndicoUtil.createFormFromMap([
             	    [Html.div({className: 'chatAdvancedTabCheckboxDiv', style: {marginTop:pixels(5)}},
             	    		Html.tr({},
-            	    			Html.checkbox({id:"hideCH", name:"showRoom"}, true),
+                                hideCH,
 	            	    		$T('Show chat room information to the users')
             	    		),
             	    		Html.tr({},
-            	    				Html.checkbox({id:"showPwd", name:"showPass"}, false),
-            	    				$T('Show the chat room\'s password to the users ')
-            	    		       )
-            	    		)
+                                showPwd,
+                                $T('Show the chat room\'s password to the users ')
+                            ))
             	    ]
             	])
             );
@@ -365,7 +384,14 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
 
         __save: function(){
             var self = this;
+
+            /* We need to scan again the components due to the password widget. Otherwise,
+             * if we switch from the hidden value to the other one the text written
+             * won't be sent
+             */
+            this.components = IndicoUtil.findFormFields(this.basicTabForm, this.advancedTabForm);
             IndicoUtil.getFormValues(this.components, this.values);
+
             // We check if there are errors
             var checkOK = this.parameterManager.check();
 
@@ -396,9 +422,15 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                                     hightlightChatroom(result);
                                     self.close();
                                 } else {
-                                    killProgress();
-                                    self.close();
-                                    IndicoUtil.errorReport(error);
+                                    if(error.explanation == 'roomExists'){
+                                        killProgress();
+	                                    //debugger
+                                    }
+                                    else{
+	                                    killProgress();
+	                                    self.close();
+	                                    IndicoUtil.errorReport(error);
+                                    }
                                 }
                             }
                         );
@@ -476,13 +508,17 @@ var refreshChatroom = function(chatroom, doHighlight) {
 };
 
 var enableCustomId = function(newHost) {
-	$E('host').set(newHost);
-    IndicoUI.Effect.enableDisableTextField($E('host'), true);
+	if ($E('host') != null){
+		$E('host').set(newHost);
+	    IndicoUI.Effect.enableDisableTextField($E('host'), true);
+	}
 };
 
 var disableCustomId = function(newHost) {
-	$E('host').set(newHost);
-    IndicoUI.Effect.enableDisableTextField($E('host'), false);
+	if ($E('host') != null){
+		$E('host').set(newHost);
+		IndicoUI.Effect.enableDisableTextField($E('host'), false);
+	}
 };
 
 /**

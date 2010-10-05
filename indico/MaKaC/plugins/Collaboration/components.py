@@ -48,6 +48,7 @@ class EventCollaborationListener(Component):
 
     @classmethod
     def notifySetTimezone(self, obj, oldTimezone):
+        #import pydevd;pydevd.settrace()
         bookingManager = obj.getCSBookingManager()
         #ATTENTION! At this moment this method notifyTimezoneChange in the class CSBookingManager
         #just returns [], so if you're expecting it to do something just implement whatever you
