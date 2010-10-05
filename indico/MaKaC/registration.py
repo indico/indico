@@ -1412,7 +1412,7 @@ class NumberInput(FieldInputType):
             return
         if self.getParent().isMandatory() and v.strip()=="":
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it.")%self.getParent().getCaption())
-        if self.getParent().isMandatory() and (not v.isalnum() or int(v)<1):
+        if self.getParent().isMandatory() and (not v.isalnum() or int(v)<0):
             raise FormValuesError( _("The field \"%s\" is mandatory. Please fill it with a number.")%self.getParent().getCaption())
         if ( not v.isalnum() or int(v)<1):
             quantity = 0
