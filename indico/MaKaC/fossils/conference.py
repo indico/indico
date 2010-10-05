@@ -211,6 +211,7 @@ class IMaterialFossil(IMaterialMinimalFossil):
 
     def getMainResource(self):
         """ The main resource"""
+    getMainResource.result = {"MaKaC.conference.Link": ILinkFossil, "MaKaC.conference.LocalFile": ILocalFileExtendedFossil}
 
 
 class ISessionFossil(IFossil):
