@@ -6450,6 +6450,12 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
         """
         if self.canAccess( aw ):
             return True
+        ### TODO: Replace this code when plugins allow extension points+notifications ##################
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
+            RCCollaborationPluginAdmin.hasRights(user = aw.getUser(), plugins = "any"):
+            return True
+        ################################################################################################
         for contrib in self.getContributionList():
             if contrib.canView( aw ):
                 return True
@@ -9204,6 +9210,12 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         """
         if self.canAccess( aw ):
             return True
+        ### TODO: Replace this code when plugins allow extension points+notifications ##################
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
+            RCCollaborationPluginAdmin.hasRights(user = aw.getUser(), plugins = "any"):
+            return True
+        ################################################################################################
         for sc in self.getSubContributionList():
             if sc.canView( aw ):
                 return True
