@@ -1104,10 +1104,19 @@ class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
 
 class RHConferenceToiCal(RHConferenceBaseDisplay):
 
+    def _checkParams( self, params ):
+        RHConferenceBaseDisplay._checkParams( self, params )
+        self._detailLevel = params.get("detailLevel","top")
+
     def _process( self ):
         filename = "%s - Event.ics"%cleanHTMLHeaderFilename(self._target.getTitle())
         ical = ConferenceToiCal(self._target.getConference())
-        data = ical.getDetailedBody()
+
+        if self._detailLevel == "contributions":
+            data = ical.getDetailedBody()
+        else:
+            data = ical.getBody()
+
         self._req.headers_out["Content-Length"] = "%s"%len(data)
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
