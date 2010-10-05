@@ -320,6 +320,6 @@ class PluginLoader(object):
                     from MaKaC.plugins.base import PluginsHolder
                     PluginsHolder().getComponentsManager().addComponent(cl)
             except Exception,e:
-                    #we might have an exception because some classes return True for hasattr(cl, 'mro') but then throw an exception when calling
-                    #cl.mro(). Since we are not supposed to do anything in this cases, we just pass to the next case
-                    continue
+                #we might have an exception because some classes return True for hasattr(cl, 'mro') but then throw an exception when calling
+                #cl.mro(). Since we are not supposed to do anything in this cases, we just pass to the next case
+                continue

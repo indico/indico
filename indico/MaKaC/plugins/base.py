@@ -311,7 +311,7 @@ class PluginsHolder (ObjectHolder):
         """ Removes all the plugin information from the DB
         """
         for item in self.getValuesToList():
-            if item.getId() != "globalPluginOptions":
+            if isinstance(item, PluginType):
                 self.remove(item)
         self._getTree("counters")[PluginsHolder.counterName] = Counter()
 
@@ -321,7 +321,7 @@ class PluginsHolder (ObjectHolder):
             includeNonPresent: if True, non present PluginTypes will be included. A PluginType is present if it has a physical folder on
             disk, inside MaKaC/plugins
         """
-        pluginTypes = [pt for pt in self.getList() if pt.getId() != "globalPluginOptions" and
+        pluginTypes = [pt for pt in self.getList() if isinstance(pt, PluginType) and
                                                       (pt.isPresent() or includeNonPresent) and
                                                       (pt.isVisible() or includeNonVisible)]
         if doSort:
