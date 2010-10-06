@@ -1345,7 +1345,8 @@ type("UserListWidget", ["ListWidget"],
                              self.editProcess(userData, function(result) {
                                  if (result) {
                                      userData.update(newData.getAll());
-                                     if (!startsWith(userData.get('id'), 'newUser')) {
+                                     if (!startsWith('' + userData.get('id'),
+                                                     'newUser')) {
                                          userData.set('id', 'edited' + userData.get('id'));
                                      }
                                  }
