@@ -148,12 +148,25 @@ def is_static_path(path):
         return path
     return None
 
+def _convert_to_string(form):
+    for key, value in form.items():
+        ## FIXME: this is a backward compatibility workaround
+        ## because most of the old administration web handler
+        ## expect parameters to be of type str.
+        ## When legacy publisher will be removed all this
+        ## pain will go away anyway :-)
+        if isinstance(value, str):
+            form[key] = str(value)
+
+
 def plugin_publisher(req, path):
     """
     Publishes the plugin described in path
     """
     pluginMap = RHMap()._map
     form = dict(req.form)
+
+    _convert_to_string(form)
 
     importList = pluginMap[path].split('.')
     funcName = importList.pop()
@@ -182,6 +195,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
         form = dict(req.form)
+
+        _convert_to_string(form)
 
         try:
             return _check_result(req, module_globals[possible_handler](req, **form))
