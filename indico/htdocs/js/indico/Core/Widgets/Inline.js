@@ -33,6 +33,26 @@ type("InlineRemoteWidget", ["InlineWidget"],
 
          draw: function() {
              var self = this;
+             var t;
+             t = setTimeout("$E(\""+"message" + "\").set(\'\u00A0\')",2000);
+             var canvas = Html.span({}, 'loading...');
+             canvas.set(self.drawContent());
+             var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
+             message.dom.id = "message";
+             if (t){ clearTimeout(t);}
+             var table = Html.table();
+             table.dom.style.display = 'inline';
+             var tbody = Html.tbody();
+             table.set(tbody);
+             var row1 = Html.tr();
+             var cell2 = Html.td();
+                    cell2.append(canvas);
+                    row1.append(cell2);
+             cellMessage = Html.td();
+             cellMessage.dom.style.verticalAlign = "middle";
+             cellMessage.dom.rowSpan = 2;
+             cellMessage.append(message);
+             row1.append(cellMessage);
 
              var content = this._handleContent();
 
@@ -1545,3 +1565,63 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
             this.InlineEditWidget(method, attributes, initValue);
             this.__parameterManager = new IndicoUtil.parameterManager();
         });
+
+type('AutocheckTextBox', ['RealtimeTextBox'],
+		/*
+		 * A usual text box that, when the startWatching method is called,
+		 * will inform the user in case that what he writes is the same string
+		 * the text box had when startWatching was called.
+		 */
+		{
+		    /*
+		     * Called each time a new character is typed
+		     * strips white spaces, and calls for a request if needed
+		     */
+		    _textTyped: function(key) {
+
+		        var self = this;
+		        var text = trim(this.get());
+		        if(text.length > 1) {
+                    if(text != self.originalText){
+                        self.component.dom.style.display = "none";
+                    }
+                    else{
+                        self.component.dom.style.display = null;
+		            }
+
+		        }
+		    },
+
+		    setOriginalText: function(text){
+                this.originalText = text;
+		    },
+
+		    startWatching: function(isRepeated, originalText){
+                var self = this;
+
+                //we set the text with which we will compare before doing the observe
+                self.setOriginalText(originalText == null?self.get():originalText);
+                if (isRepeated){
+                    self.component.dom.style.display = null;
+                }
+                else{
+                    self.component.dom.style.display = "none";
+                }
+
+                self.observe(function(key, event) {
+                    self._textTyped(key);
+                    return true;
+                });
+		    }
+		},
+
+		    function(args, component){
+				/* component: the component (usually a simple label) that you want to
+				inform the user that the original text field is repeated */
+
+				args.autocomplete = 'off';
+				this.RealtimeTextBox(args);
+				this.setOriginalText(this.get());
+				this.component = component;
+		     }
+	);

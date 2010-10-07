@@ -290,13 +290,16 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var defineCHText = Html.edit({size:"35", name:"host", id:"host"});
             this.parameterManager.add(defineCHText, 'text', false);
 
-            self.errorLabel=Html.label({style:{float: 'right'}});
+            self.errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Please use another name');
+
+            self.crName = new AutocheckTextBox({style: {width: '300px'}, name: 'title'}, self.errorLabel);
+            self.crName.set(conferenceName+eventDate);
 
             this.basicTabForm = Html.div({style:{textAlign: 'left'}},
             	IndicoUtil.createFormFromMap([
             	    [$T('Server used'), Html.div({}, Html.tr({}, createCHRadioButton, createCHRadioButtonLabel), Html.tr({}, defineCHRadioButton, defineCHRadioButtonLabel))],
             	    [$T('Server'), defineCHText],
-                    [$T('Chat room name'), Html.td({},this.parameterManager.add(Html.edit({style: {width: '300px'}, name: 'title'}, conferenceName+eventDate), 'text', false), self.errorLabel)],
+                    [$T('Chat room name'), Html.td({},this.parameterManager.add(self.crName.draw(), 'text', false), self.errorLabel)],
                     [$T('Description'), Html.textarea({cols: 40, rows: 2, name: 'description'}) ]
                 ])
             );
@@ -424,7 +427,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                                 } else {
                                     if(error.explanation == 'roomExists'){
                                         killProgress();
-	                                    //debugger
+                                        self.crName.startWatching(true);
                                     }
                                     else{
 	                                    killProgress();
@@ -450,9 +453,15 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                                     killProgress();
                                     self.close();
                                 } else {
-                                    killProgress();
-                                    self.close();
-                                    IndicoUtil.errorReport(error);
+                                    if(error.explanation == 'roomExists'){
+                                        killProgress();
+                                        self.crName.startWatching(true);
+                                    }
+                                    else{
+	                                    killProgress();
+	                                    self.close();
+	                                    IndicoUtil.errorReport(error);
+                                    }
                                 }
                             }
                         );
@@ -609,31 +618,7 @@ var showInfo = function(chatroom) {
 };
 
 var checkCRStatus = function(chatroom){
-	//Refreshes the data of the chat room
-    if(chatroom.showRoom == true){
-		chatroom.showRoom = ["on"]
-	}
-    else if(chatroom.showRoom == false)
-    	chatroom.showRoom = []
-
-	if(chatroom.showPass == true){
-		chatroom.showPass = ["on"]
-	}
-	else if(chatroom.showPass == false)
-		chatroom.showPass = []
-	/*
-	 * The first time, with the data picked from the server, chatroom.createRoom will be either true or false.
-	 * However, if we open the edit dialog more than once without changing saving, chatroom.createRoom may be set to "no".
-	 * That means that a condition like if(chatroom.createRoom) would return true given the case chatroom.createRoom=="no"
-	 */
-	if(chatroom.createRoom == true || chatroom.createRoom == "yes"){
-		chatroom.createRoom = "yes";
-		chatroom.host = "";
-	}
-	else{
-		chatroom.createRoom = "no";
-		chatroom.host = chatroom.host;
-	}
+    arrangeRoomData(chatroom);
 
 	var killProgress = IndicoUI.Dialogs.Util.progress($T("Requesting..."));
     indicoRequest(
@@ -877,12 +862,11 @@ var createChatroom = function(conferenceId) {
     return true;
 }
 
-/**
- * @param {object} chatroom The chatroom object corresponding to the "edit" button that was pressed.
- * @param {string} conferenceId the conferenceId of the current event
- */
-var editChatroom = function(chatroom, conferenceId) {
-	//Refreshes the data of the chatroom
+var arrangeRoomData = function(chatroom){
+	/*
+	 * The values expected in the checkboxes and radiobuttons are different from what the server
+	 * returns, so we need to transform it.
+	 */
     if(chatroom.showRoom == true){
 		chatroom.showRoom = ["on"]
 	}
@@ -908,11 +892,19 @@ var editChatroom = function(chatroom, conferenceId) {
 		chatroom.host = chatroom.host;
 	}
 
+}
+
+/**
+ * @param {object} chatroom The chatroom object corresponding to the "edit" button that was pressed.
+ * @param {string} conferenceId the conferenceId of the current event
+ */
+var editChatroom = function(chatroom, conferenceId) {
+    arrangeRoomData(chatroom);
+
     var popup = new ChatroomPopup('edit', chatroom, conferenceId);
     popup.open();
     popup.postDraw();
 }
-
 
 var removeChatroom = function(chatroom, conferenceId) {
 
@@ -920,31 +912,7 @@ var removeChatroom = function(chatroom, conferenceId) {
 
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing your chat room..."));
 
-    	//Refreshes the data of the chatroom
-        if(chatroom.showRoom == true){
-    		chatroom.showRoom = ["on"]
-    	}
-        else if(chatroom.showRoom == false)
-        	chatroom.showRoom = []
-
-    	if(chatroom.showPass == true){
-    		chatroom.showPass = ["on"]
-    	}
-    	else if(chatroom.showPass == false)
-    		chatroom.showPass = []
-    	/*
-    	 * The first time, with the data picked from the server, chatroom.createRoom will be either true or false.
-    	 * However, if we open the edit dialog more than once without changing saving, chatroom.createRoom may be set to "no".
-    	 * That means that a condition like if(chatroom.createRoom) would return true given the case chatroom.createRoom=="no"
-    	 */
-    	if(chatroom.createRoom == true || chatroom.createRoom == "yes"){
-    		chatroom.createRoom = "yes";
-    		chatroom.host = "";
-    	}
-    	else{
-    		chatroom.createRoom = "no";
-    		chatroom.host = chatroom.host;
-    	}
+        arrangeRoomData(chatroom);
 
         indicoRequest(
             'jabber.deleteRoom',
@@ -977,3 +945,4 @@ var removeChatroom = function(chatroom, conferenceId) {
             Html.div({style:{paddingTop:pixels(10), paddingBottom:pixels(10)}}, $T("Are you sure you want to remove that ") + $T(" chat room?")),
             confirmHandler);
 };
+
