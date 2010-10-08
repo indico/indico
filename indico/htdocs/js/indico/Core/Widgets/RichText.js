@@ -1,15 +1,15 @@
 var executeOnload = false;
 var __globalEditorTable = {};
 var languages = {'en_US' : 'en', 'fr_FR' : 'fr'};
-var userLanguage;
+var userLanguage = 'en_US';
 
-jsonRpc(Indico.Urls.JsonRpcService, "user.session.language.get",{}, function(result, error)
+/*jsonRpc(Indico.Urls.JsonRpcService, "user.session.language.get",{}, function(result, error)
         {
             if (!error)
                 userLanguage = result;
             else
                 userLanguage = 'en_US';
-        });
+        });*/
 
 type("RichTextWidget", ["IWidget", "Accessor"],
      {
