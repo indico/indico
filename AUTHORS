@@ -1,44 +1,10 @@
-CDS Indico AUTHORS
-===============================================
+Indico AUTHORS
+==============
 
-$Id: AUTHORS,v 1.3 2008/04/24 17:00:17 jose Exp $
+ See everyone that has been working on Indico in our wiki page:
 
-The CDS Indico Development Group consists of several people:
+ http://indico-software.org/wiki/Team
 
- - 2004- Thomas Baron <thomas.baron@cern.ch> (CERN)
-   Project Leader and Programming
-
- - 2004- David Bourillot (CERN)
-   Programming
-
- - 2004-2006 Jose Benito Gonzalez Lopez (CERN)
-   Programming
-
- - 2002-2004 Jean-Yves Le Meur <jean-yves.le.meur@cern.ch> (CERN)
-   Project Leader
-
- - 2002-2004 Hector Sanchez <hector.sanchez@cern.ch> (CERN)
-   Original Programming
-
- - 2002-2004 Erik Simon <erik.simon@cern.ch> (CERN)
-   Original Programming
-
-Moreover, several other people have worked on various modules of the project:
-
- - 2007- Jim Fromm (Fermilab)
-   Timezone awareness
-
- - 2006-2007 Piotr Wlodarek
-   Room Booking Module
-
- - 2007 Jose Pedro Ferreira
- - 2006 Nicolas Michel
- - 2006- Joao Fernandes
- - 2006 David Martin Clavo
- - 2006 Emilio Villar Castillo
- - 2005 Vanessa Turney
- 
-
-       - CDS Indico Development Group
-         <indico-support@cern.ch>
-         <http://cdsware.cern.ch/indico>
+Indico Development Group
+<indico-team@cern.ch>
+<http://indico-software.org>

@@ -1,6 +1,7 @@
 /*
- * HTML Parser By John Resig (ejohn.org) extended and modified by Leszek Syroka.
- * Original code by Erik Arvidsson, Mozilla Public License
+ * HTML Parser By John Resig (ejohn.org) which is based on Erik Arvidsson SimpleHtmlParser
+ * extended and modified by Indico Team.
+ * Original code by Erik Arvidsson, GPLv2
  * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
  *
  * // Use like so:
