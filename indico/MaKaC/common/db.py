@@ -92,26 +92,27 @@ class DBMgr:
             cls._instance=DBMgr(*args, **kwargs)
         return cls._instance
 
+    @staticmethod
+    def _getUniqueIdentifier():
+        return threading._get_ident()
+
     def _getConnObject(self):
-        tid=threading._get_ident()
-        if self._conn.has_key(tid):
-            return self._conn[tid]
-        return None
+        tid = DBMgr._getUniqueIdentifier()
+        return self._conn[tid]
 
     def _delConnObject(self):
-        tid=threading._get_ident()
+        tid = DBMgr._getUniqueIdentifier()
         del self._conn[tid]
 
     def startRequest( self ):
         """Initialise the DB and starts a new transaction.
         """
 
-        conn = self._getConnObject()
-        if conn is None:
-            self._conn[threading._get_ident()]=self._db.open()
-            Logger.get('dbmgr').debug('Allocated connection for thread %s - table size is %s' % (threading._get_ident(), len(self._conn)))
-        else:
-            Logger.get('dbmgr').debug('Reused connection for thread %s - table size is %s' % (threading._get_ident(), len(self._conn)))
+        tid = DBMgr._getUniqueIdentifier()
+
+        self._conn[tid] = self._db.open()
+        Logger.get('dbmgr').debug('Allocated connection for %s - table size is %s' % \
+                                  (tid, len(self._conn)))
 
     def endRequest( self, commit=True ):
         """Closes the DB and commits changes.
