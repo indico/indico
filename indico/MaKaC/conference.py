@@ -10033,6 +10033,11 @@ class SubContribParticipation(Persistent, Fossilizable):
         self._title = ""
         self._fax = ""
 
+    def getConference(self):
+        if self._subContrib is not None:
+            return self._subContrib.getConference()
+        return None
+
     def _notifyModification( self ):
         if self._subContrib != None:
             self._subContrib.notifyModification()
