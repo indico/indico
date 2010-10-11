@@ -55,7 +55,7 @@ allowedAttrs = ["align", "abbr", "alt",
                 "title", "tabindex", "type",
                 "valign", "value", "vspace",
                 "width",
-                "src"]
+                "src", "target"]
 
 allowedCssProperties = [ "background-color", "border-top-color", "border-top-style", "border-top-width",
                          "border-top", "border-right-color", "border-right-style",  "border-right-width",
@@ -244,6 +244,14 @@ class RestrictedHTMLParser( HTMLParser ):
         if sanitizationLevel not in range(0,3):
             sanitizationLevel = self._defaultSanitizationLevel
         self._sanitizationLevel = sanitizationLevel
+
+    def error(self, message):
+        # TODO: remove this dependency with HTMLParser. Use a lib that allows
+        # parsing of malformed HTML. The reason for this checking is that when
+        # there is a paramter (non HTML) containing a '&', it fails.
+        if message.startswith("EOF in middle of entity or char ref"):
+            return
+        raise HTMLParseError(message, self.getpos())
 
     def handle_inlineStyle(self, style):
         # disallow urls
