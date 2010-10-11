@@ -242,7 +242,7 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Actions")%></span></td>
                                 <td>
-	                               	<input type="hidden" name="conf" value="<%= conf %>" />
+	                               	<input type="hidden" name="conf" value="<%= conf.getId() %>" />
 									<input type="hidden" name="standalone" value="<%= standalone %>" />
 	                               	<input type="submit" class="btn" value="<%= _("Re-check for conflicts")%>" onclick="if (!validate_period(document.forms[0], true, <%= allowPast %>)) { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); return false; }"/>
 	                               	<input type="submit" class="btn"  <% if formMode==FormMode.MODIF: %> value="Save" <%%> value="<%= bookingMessage %>" onclick="if (forms_are_valid( true )) { submit_booking(); } else { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); }; return false;" />
