@@ -13,7 +13,7 @@
                     </tr>
                     <tr>
                         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Content")%></span></td>
-                        <td style="border:1px solid #000000"><textarea id="content" name="content" cols="80" rows="40">%(content)s</textarea></td>
+                        <td ><textarea id="content" name="content" cols="80" rows="40">%(content)s</textarea></td>
                     </tr>
                     <tr>
                         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Note")%></span></td>
