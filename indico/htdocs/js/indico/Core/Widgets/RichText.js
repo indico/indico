@@ -16,7 +16,14 @@ type("RichTextWidget", ["IWidget", "Accessor"],
          draw: function() {
              selfReference = this;
              this.div = Html.div({'id': 'text' + this.divId, style : {height: this.height + 75, width: this.width}});
-             window.setTimeout("initializeEditor('text' + selfReference.divId , selfReference.text , selfReference.callbacks, selfReference.width, selfReference.height, selfReference.toolbarSet)",50);
+             window.setTimeout(function() {
+                 initializeEditor('text' + selfReference.divId ,
+                                  selfReference.text ,
+                                  selfReference.callbacks,
+                                  selfReference.width,
+                                  selfReference.height,
+                                  selfReference.toolbarSet);
+             },50);
              return this.div;
          },
 
@@ -81,9 +88,10 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
 
             _handleDisplayMode: function(value) {
                 var iframeId = "descFrame" + Html.generateId();
-                var iframe = Html.iframe({id: iframeId,name: iframeId, style:{width: pixels(600),
-                                                                              height:pixels(100),
-                                                                              border: "1px dotted #ECECEC"}});
+                var iframe = Html.iframe({id: iframeId,name: iframeId,
+                                          style:{width: pixels(600),
+                                                 height:pixels(100),
+                                                 border: "1px dotted #ECECEC"}});
 
                 var loadFunc = function() {
                     var doc;
@@ -107,6 +115,10 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
                  }
 
                 return iframe;
+            },
+
+            _handleBackToEditMode: function() {
+                this.description.set(this._savedValue);
             },
 
             _getNewValue: function() {
@@ -133,7 +145,9 @@ function initializeEditor( editorId, text, callbacks, width, height, toolbarSet 
                 });
     }
     catch (error) {
-        window.setTimeout("initializeEditor(editorId, text, callbacks, width, height)",50);
+        window.setTimeout(function() {
+            initializeEditor(editorId, text, callbacks, width, height);
+        },50);
     }
 
 }

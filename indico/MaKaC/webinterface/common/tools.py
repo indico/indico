@@ -51,11 +51,10 @@ allowedAttrs = ["align", "abbr", "alt",
                 "lang",
                 "name", "noshade", "nowrap",
                 "rel", "rev", "rowspan", "rules",
-                "size", "scope", "shape", "span","start", "summary",
-                "title", "tabindex", "type",
+                "size", "scope", "shape", "span", "src", "start", "summary",
+                "tabindex", "target", "title", "type",
                 "valign", "value", "vspace",
-                "width",
-                "src", "target"]
+                "width", "wrap"]
 
 allowedCssProperties = [ "background-color", "border-top-color", "border-top-style", "border-top-width",
                          "border-top", "border-right-color", "border-right-style",  "border-right-width",
@@ -101,6 +100,7 @@ allowedCssKeywords = ['auto', 'aqua',
                       'small', 'smaller', 'solid', 'silver',
                       'teal', 'top', 'transparent',
                       'underline',
+                      'visible',
                       'white',
                       'x-small', 'xx-small', 'x-large', 'xx-large',
                       'yellow']
@@ -227,6 +227,9 @@ class HarmfulHTMLException(Exception):
     def __init__(self, msg, pos = 0):
         self.msg = 'Potentially harmful HTML: "%s" found at %s' % (msg, pos)
 
+    def __str__(self):
+        return self.msg
+
 class RestrictedHTMLParser( HTMLParser ):
 
     _defaultSanitizationLevel = 1
@@ -257,8 +260,10 @@ class RestrictedHTMLParser( HTMLParser ):
         # disallow urls
         style = re.compile('url\s*\(\s*[^\s)]+?\s*\)\s*').sub(' ', style)
         # gauntlet
-        if not re.match("""^([\-:,;#%.\sa-zA-Z0-9!]|\w-\w|'[\s\w]+'|"[\s\w]+"|\([\d,\s]+\))*$""", style): raise HarmfulHTMLException(style, self.getpos())
-        if not re.match("^\s*([-\w]+\s*:[^:;]*(;\s*|$))*$", style): raise HarmfulHTMLException(style, self.getpos())
+        if not re.match("""^([\-:,;#%.\sa-zA-Z0-9!]|\w-\w|'[\s\w]+'|"[\s\w]+"|\([\d,\s]+\))*$""", style):
+            raise HarmfulHTMLException(style, self.getpos())
+        if not re.match("^\s*([-\w]+\s*:[^:;]*(;\s*|$))*$", style):
+            raise HarmfulHTMLException(style, self.getpos())
         for prop, value in re.findall("([-\w]+)\s*:\s*([^:;]*)", style):
             if not value: continue
             if prop.lower() in allowedCssProperties or \

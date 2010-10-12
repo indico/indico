@@ -25,6 +25,7 @@ CKEDITOR.editorConfig = function( config )
 
     config.toolbar_IndicoMinimal =
      [
+        ['Source','-','Preview','Templates'],
          ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
          ['Outdent', 'Indent', '-', 'NumberedList','BulletedList','Blockquote','-','Link','Unlink','Anchor'],
          ['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
