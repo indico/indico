@@ -12,13 +12,13 @@
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
         <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-			<input type="text" name="title" value=%(title)s size="91">
+			<input id="notificationTplTitle" type="text" name="title" value=%(title)s style="width: 61%%;" onfocus="selected('notificationTplTitle')">
 		</td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
         <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-			<textarea name="description" rows="5" cols="70">%(description)s</textarea>
+			<textarea id="notificationTplDescription" name="description" rows="5" style="width: 61%%;" onfocus="selected('notificationTplDescription')">%(description)s</textarea>
 		</td>
     </tr>
 	<tr>
@@ -32,7 +32,7 @@
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("From address")%></span></td>
         <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-            <input type="text" name="fromAddr" size="91" value=%(fromAddr)s>
+            <input id="notificationTplAddress" type="text" name="fromAddr" style="width: 61%%;" value=%(fromAddr)s onfocus="selected('notificationTplAddress')">
         </td>
     </tr>
 	<tr>
@@ -43,35 +43,28 @@
 	<tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("CC addresses")%></span></td>
         <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-            <input type="text" name="CCAddrs" size="91" value=%(CCAddrs)s>
+            <input id="notificationTplCCAddress" type="text" name="CCAddrs" style="width: 61%%;" value=%(CCAddrs)s onfocus="selected('notificationTplCCAddress')">
         </td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Subject")%></span></td>
-        <td bgcolor="white" width="1%%">&nbsp;
-			<input type="text" name="subject" size="64" value=%(subject)s>
+        <td bgcolor="white" width="100%%">&nbsp;
+			<input id="notificationTplSubject" type="text" name="subject" style="width: 97%%;" value=%(subject)s onfocus="selected('notificationTplSubject')">
 		</td>
-        <td align="center" valign="middle" rowspan="2">
-            <table width="75%%" class="legend" cellspacing="1" cellpadding="1">
-				<tr><td>&nbsp;</td></tr>
-				<tr>
-					<td style="padding-left:5px;padding-right:5px;color:#5294CC"><b> <%= _("Available tags")%></b></td>
-				</tr>
-				%(vars)s
-				<tr><td>&nbsp;</td></tr>
-				<tr>
-					<td style="padding-left:5px;padding-right:5px;">
-						<font color="red"> <%= _("Important")%></font>:  <%= _("The character '%%' is reserved. To write this character, use '%%%%'")%>.
-                    </td>
-				</tr>
-				<tr><td>&nbsp;</td></tr>
+        <td align="center" valign="top" rowspan="2" style="padding-left: 5px; padding-top:3px;">
+            <table width="75%%" class="legend" cellspacing="0" cellpadding="2">
+                <tr>
+                    <td class="titleTd"><b> <%= _("Available tags")%>:</b></td>
+                </tr>
+                %(vars)s
             </table>
         </td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Body")%></span></td>
         <td bgcolor="white">&nbsp;
-		<textarea name="body" rows="26" cols="80">%(body)s</textarea></td>
+		  <textarea id="notificationTplBody" name="body" rows="26" style="width: 97%%;" onfocus="selected('notificationTplBody')">%(body)s</textarea>
+        </td>
     </tr>
 	<tr><td colspan="3"><br></td></tr>
 	<tr style="border-top: 1px dashed rgb(119, 119, 119); background-color: rgb(236, 236, 236);">
@@ -82,4 +75,5 @@
     </tr>
 </table>
 </form>
+
 

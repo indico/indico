@@ -525,10 +525,10 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
         res=[]
         for var in EmailNotificator.getVarList():
             res.append("""
-                <tr>
-                    <td width="100%%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px;">%s</td>
-                    <td>%s</td>
-                </tr>"""%(self.htmlText(var.getLabel()),self.htmlText(var.getDescription())))
+                <tr class="legendTr">
+                    <td width="100%%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px; text-align:left;">|%s|</td>
+                    <td class="legendTd" onClick="insertTag('|%s|')">Insert</td>
+                </tr>"""%(self.htmlText(var.getName()), self.htmlText(var.getName())))
         return "".join(res)
 
     def _getToAddrsHTML(self):
@@ -578,10 +578,10 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
         res=[]
         for var in EmailNotificator.getVarList():
             res.append("""
-                <tr>
-                    <td width="100%%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px;">%s</td>
-                    <td>%s</td>
-                </tr>"""%(self.htmlText(var.getLabel()),self.htmlText(var.getDescription())))
+                <tr class="legendTr">
+                    <td width="100%%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px; text-align:left;">|%s|</td>
+                    <td class="legendTd" onClick="insertTag('|%s|')">Insert</td>
+                </tr>"""%(self.htmlText(var.getName()), self.htmlText(var.getName())))
         return "".join(res)
 
     def _getToAddrsHTML(self):
@@ -610,11 +610,11 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
         else:
             vars["description"]=self.htmlText(vars["description"])
         if not vars.has_key("subject"):
-            vars["subject"]=quoteattr(str(self._notifTpl.getTplSubject()))
+            vars["subject"]=quoteattr(str(self._notifTpl.getTplSubjectShow(EmailNotificator.getVarList())))
         else:
             vars["subject"]=quoteattr(str(vars["subject"]))
         if not vars.has_key("body"):
-            vars["body"]=self.htmlText(self._notifTpl.getTplBody())
+            vars["body"]=self.htmlText(self._notifTpl.getTplBodyShow(EmailNotificator.getVarList()))
         else:
             vars["body"]=self.htmlText(vars["body"])
         if not vars.has_key("fromAddr"):
@@ -635,6 +635,10 @@ class WPModCFANotifTplNew(WPConfModifAbstractsReviewingNotifTplBase):
         wc = WConfModCFANotifTplNew(self._conf)
         params["errorList"]=params.get("errorList",[])
         return wc.getHTML(params)
+
+    def getJSFiles(self):
+        return WPConfModifAbstractsReviewingNotifTplBase.getJSFiles(self) + \
+           self._includeJSPackage('Abstracts')
 
 class WPModCFANotifTplBase(WPConfModifReviewingBase):
 
@@ -698,6 +702,10 @@ class WPModCFANotifTplEdit(WPModCFANotifTplBase):
         wc=WConfModCFANotifTplEditData(self._notifTpl)
         params["errorList"]=params.get("errorList",[])
         return wc.getHTML(params)
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+            self._includeJSPackage('Abstracts')
 
 
 
@@ -910,8 +918,8 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
         vars["from"] = self._notifTpl.getFromAddr()
         vars["toAddrs"] = self._getToAddrsHTML()
         vars["CCAddrs"]=",".join(self._notifTpl.getCCAddrList())
-        vars["subject"] = self._notifTpl.getTplSubject()
-        vars["body"] = self._notifTpl.getTplBody()
+        vars["subject"] = self._notifTpl.getTplSubjectShow(EmailNotificator.getVarList())
+        vars["body"] = self._notifTpl.getTplBodyShow(EmailNotificator.getVarList())
         vars["conditions"]=self._getConditionsHTML()
         vars["availableConditions"]=self._getConditionItemsHTML()
         vars["remConditionsURL"]=quoteattr(str(urlHandlers.UHConfModNotifTplConditionRem.getURL(self._notifTpl)))

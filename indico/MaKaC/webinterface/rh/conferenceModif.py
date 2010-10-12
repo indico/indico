@@ -3602,8 +3602,8 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                 tpl=review.NotificationTemplate()
                 tpl.setName(self._title)
                 tpl.setDescription(self._description)
-                tpl.setTplSubject(self._subject)
-                tpl.setTplBody(self._body)
+                tpl.setTplSubject(self._subject, EmailNotificator.getVarList())
+                tpl.setTplBody(self._body, EmailNotificator.getVarList())
                 tpl.setFromAddr(self._fromAddr)
                 tpl.setCCAddrList(self._ccList)
                 for toAddr in self._toList:
@@ -3711,8 +3711,8 @@ class RHCFANotifTplEdit(RHNotificationTemplateModifBase):
             else:
                 self._notifTpl.setName(self._title)
                 self._notifTpl.setDescription(self._description)
-                self._notifTpl.setTplSubject(self._subject)
-                self._notifTpl.setTplBody(self._body)
+                self._notifTpl.setTplSubject(self._subject, EmailNotificator.getVarList())
+                self._notifTpl.setTplBody(self._body, EmailNotificator.getVarList())
                 self._notifTpl.setFromAddr(self._fromAddr)
                 self._notifTpl.setCCAddrList(self._ccList)
                 self._notifTpl.clearToAddrs()

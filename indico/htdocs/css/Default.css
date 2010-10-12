@@ -1037,11 +1037,6 @@ a.confSubSection:hover {
    padding: 1px;
 }
 
-.legend {
-   border: 1px solid #5294CC;
-   background:#F6F6F6;
-}
-
 .confDisplayTitle {
    font-size: 24px;
    color: #5294CC;
@@ -3949,7 +3944,7 @@ ul.keywordList li.multipleLinesListItem {
     position: relative;
     padding: 0 0 0 0;
     padding-bottom: 5px;
-    color: #606060;        
+    color: #606060;
 }
 
 ul.keywordList li.multipleLinesListItem_last {
@@ -3984,9 +3979,9 @@ ul.keywordList li.multipleLinesListItem_last {
  .popUpButton {
    margin: 0px;
    margin-top: 1px;
-   margin-right: 1px; 
+   margin-right: 1px;
    /*color:  #234173;
-   text-decoration: none;   
+   text-decoration: none;
    background-color: #D9D9D9;
    border: 1px solid #fff;
    border-top-color: #eee;
@@ -6454,6 +6449,7 @@ table.schedTaskList th {
     padding-right: 0px;
     color: #555;
     border-bottom: 1px solid #EBEBEB;
+}
 
 /*
     Map of rooms - availability filter form
@@ -6473,6 +6469,7 @@ table.schedTaskList th {
 
 #mapOfRoomAvailabilityForm #sTime, #eTime {
     width: 35px;
+}
 
 .infoTD {
     padding: 4px 4px 4px 10px;
@@ -6497,4 +6494,33 @@ table.infoTable td.data {
 
 table.infoTable td.content {
     padding: 7px;
+}
+
+/*
+    Available tags in Notification Templates
+*/
+
+table.legend {
+   border: 1px solid #5294CC;
+   background:#F6F6F6;
+   padding-bottom: 5px;
+   padding-top: 2px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
+
+table.legend tr.legendTr:hover {
+    background-color: #FFE8B3;
+}
+
+table.legend td.titleTd {
+    padding:5px;
+    color:#5294CC;
+    text-align: left;
+}
+
+table.legend td.legendTd {
+    padding-right: 10px;
+    color:#3054BF;
+    cursor: pointer;
 }

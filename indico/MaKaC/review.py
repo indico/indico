@@ -3066,17 +3066,23 @@ class NotificationTemplate(Persistent):
     def getDescription(self):
         return self._description
 
-    def setTplSubject(self,newSubject):
-        self._tplSubject=newSubject.strip()
+    def setTplSubject(self,newSubject, varList):
+        self._tplSubject=self.parseTplContent(newSubject, varList).strip()
 
     def getTplSubject(self):
         return self._tplSubject
 
-    def setTplBody(self,newBody):
-        self._tplBody=newBody.strip()
+    def getTplSubjectShow(self, varList):
+        return self.parseTplContentUndo(self._tplSubject, varList)
+
+    def setTplBody(self,newBody, varList):
+        self._tplBody=self.parseTplContent(newBody, varList).strip()
 
     def getTplBody(self):
         return self._tplBody
+
+    def getTplBodyShow(self, varList):
+        return self.parseTplContentUndo(self._tplBody, varList)
 
     def getCCAddrList(self):
         try:
@@ -3227,6 +3233,22 @@ class NotificationTemplate(Persistent):
                 return True
         return False
 
+    def parseTplContent(self, content, varList):
+        # replace the % in order to avoid exceptions
+        result = content.replace("%", "%%")
+        # find the vars and make the expressions, it is necessary to do in reverse in order to find the longest tags first
+        for var in varList:
+            result = result.replace("|"+var.getName()+"|", "%("+var.getName()+")s")
+        return result
+
+    def parseTplContentUndo(self, content, varList):
+        # The body content is shown without "%()" and with "%" in instead of "%%" but it is not modified
+        result = content
+        for var in varList:
+            result = result.replace("%("+var.getName()+")s", "|"+var.getName()+"|")
+        # replace the %% by %
+        result = result.replace("%%", "%")
+        return result
 
 class NotifTplToAddr(Persistent):
     """
