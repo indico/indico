@@ -219,7 +219,7 @@
 
 	verifyDates();
 
-	var editor = new RichTextWidget(500, 200,"IndicoMinimal");
+	var editor = new RichTextWidget(500, 200,'','rich',"IndicoMinimal");
 	$E('descriptionBox').set(editor.draw());
 	});
 

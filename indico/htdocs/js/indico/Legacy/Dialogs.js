@@ -582,7 +582,7 @@ extend(IndicoUI.Dialogs,
                var compileMinutes = exists(compile)?compile:false;
                var killProgress = null;
 
-               var rtWidget = new RichTextWidget(700,400,'IndicoFull');
+               var rtWidget = new RichTextWidget(700, 400, '', 'rich', 'IndicoFull');
 
                var saveButton;
                var intToStr = function(id) {
