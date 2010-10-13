@@ -30,7 +30,6 @@ class ChatRoomBase ( ServiceBase, Observable ):
         oh = PluginFieldsHelper('InstantMessaging', 'Jabber')
         self._botJID = oh.getOption('indicoUsername') + '@' + oh.getOption('chatServerHost')
         self._botPass = oh.getOption('indicoPassword')
-
         self._messages = { 'sameId': _('There is already a chat room with the same id'), \
                            'sameName': _('There is already a chat room in the server with that name, please choose another one'), \
                            'creating': _('There was an error while creating the chat room in the local server. Please try again later'), \

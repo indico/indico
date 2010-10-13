@@ -1,10 +1,23 @@
 from BTrees.OOBTree import OOBTree
 from BTrees.OOBTree import OOTreeSet
+from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.Counter import Counter
-from MaKaC.plugins.base import PluginsHelper
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.common.logger import Logger
 
+
+class PluginsHelper(object):
+    def __init__(self, pluginType, plugin):
+        self._pluginType = pluginType
+        self._plugin = plugin
+        try:
+            self._plugin = PluginsHolder().getPluginType(pluginType).getPlugin(plugin)
+        except Exception, e:
+            Logger.get('Plugins').error("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
+            raise Exception("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
+
+    def isActive(self):
+        return self._plugin.isActive()
 
 class PluginFieldsHelper(PluginsHelper):
     """Provides a simple interface to access fields of a given plugin"""
@@ -30,6 +43,7 @@ class PluginFieldsHelper(PluginsHelper):
         return self._plugin.getStorage()
 
 class DBHelpers:
+
     @classmethod
     def getChatRoot(cls):
          #pick the plugin

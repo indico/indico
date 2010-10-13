@@ -4580,7 +4580,7 @@ class WConferenceClone(wcomponents.WTemplated):
         return vars
 
 
-class WPConfClone( WPConfModifToolsBase ):
+class WPConfClone( WPConfModifToolsBase, Observable ):
 
     def _setActiveTab( self ):
         self._tabCloneEvent.setActive()
@@ -4597,6 +4597,8 @@ class WPConfClone( WPConfModifToolsBase ):
                                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                                      <li><input type="checkbox" name="cloneRegistration" id="cloneRegistration" value="1" >_("Registration")</li>
                                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>""") }
+        #let the plugins add their own elements
+        self._notify('addCheckBox2CloneConf', pars)
         return p.getHTML( pars )
 
 #---------------------------------------------------------------------------------------

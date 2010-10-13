@@ -217,16 +217,6 @@ class AJAXMethodMap(Persistent):
         self._notifyModification()
 
 
-class PluginsHelper(object):
-    def __init__(self, pluginType, plugin):
-        self._pluginType = pluginType
-        self._plugin = plugin
-        try:
-            self._plugin = PluginsHolder().getPluginType(pluginType).getPlugin(plugin)
-        except Exception, e:
-            Logger.get('Plugins').error("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
-            raise Exception("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
-
 
 class PluginsHolder (ObjectHolder):
     """ A PluginsHolder object is the "gateway" to all the methods for getting plugin meta-data stored in the DB.

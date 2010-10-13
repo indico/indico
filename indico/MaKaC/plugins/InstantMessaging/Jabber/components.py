@@ -8,14 +8,17 @@ from MaKaC.plugins.notificationComponents import IContributor
 from MaKaC.plugins.notificationComponents import INavigationContributor
 from MaKaC.plugins.notificationComponents import IListener
 from MaKaC.plugins.notificationComponents import IInstantMessagingListener
+from MaKaC.plugins.base import Observable
 
 from BTrees.OOBTree import OOBTree
 from BTrees.OOBTree import OOTreeSet
+from MaKaC.i18n import _
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.Counter import Counter
 from MaKaC.webinterface import wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.plugins.helpers import *
+from MaKaC.plugins.InstantMessaging.handlers import Chatroom
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
@@ -23,7 +26,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 import zope.interface
 
 
-class ChatSMContributor(Component):
+class ChatSMContributor(Component, Observable):
 
     zope.interface.implements(IContributor, INavigationContributor)
 
@@ -39,7 +42,7 @@ class ChatSMContributor(Component):
         pass
 
     @classmethod
-    def confDisplaySMFillDict(self, obj, params):
+    def confDisplaySMFillDict(cls, obj, params):
         sideMenuItemsDict = params['dict']
         conf = params['conf']
 
@@ -50,19 +53,19 @@ class ChatSMContributor(Component):
                 "parent": ""}
 
     @classmethod
-    def confDisplaySMFillOrderedKeys(self, obj, list):
+    def confDisplaySMFillOrderedKeys(cls, obj, list):
         list.append("instantMessaging")
 
 
     @classmethod
-    def confDisplaySMShow(self, obj, params):
+    def confDisplaySMShow(cls, obj, params):
         obj._instantMessaging = obj._sectionMenu.getLinkByName("instantMessaging")
         if not DBHelpers.roomsToShow(obj._conf):
             obj._instantMessaging.setVisible(False)
 
 
     @classmethod
-    def meetingAndLectureDisplay(self, obj, params):
+    def meetingAndLectureDisplay(cls, obj, params):
         out = params['out']
         conf = params['conf']
         if DBHelpers.roomsToShow(conf):
@@ -81,6 +84,30 @@ class ChatSMContributor(Component):
 
                 out.closeTag("chatroom")
             out.closeTag("chatrooms")
+
+    @classmethod
+    def addCheckBox2CloneConf(cls, obj, list):
+        """ we show the clone checkbox if:
+            * The Jabber Plugin is active.
+            * There are rooms in the event created by the user who wants to clone
+        """
+        #list of creators of the chat rooms
+        import pydevd;pydevd.settrace()
+        ownersList = [cr.getOwner() for cr in DBHelpers().getChatroomList(obj._conf)]
+        if PluginsHelper('InstantMessaging', 'Jabber').isActive() and obj._rh._aw._currentUser in ownersList:
+            list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneChatrooms" id="cloneChatrooms" value="1" />_("Chat Rooms")</li>""")
+
+    @classmethod
+    def cloneEvent(cls, confToClone, params):
+        """ we'll clone only the chat rooms created by the user who is cloning the conference """
+        conf = params['conf']
+        user = params['user']
+        crList = DBHelpers().getChatroomList(confToClone)
+        ownersList = [cr.getOwner() for cr in crList]
+        if PluginsHelper('InstantMessaging', 'Jabber').isActive():
+             for cr in crList:
+                 if user is cr.getOwner():
+                     cls()._notify('addConference2Room', {'room':cr, 'conf':conf})
 
 
 class ChatroomStorage(Component):
@@ -155,9 +182,12 @@ class ChatroomStorage(Component):
             raise ServiceError(message=str(e))
 
     @classmethod
-    def addConference2Room(self, obj, room):
-        """ When we re use a chat room for another conference(s), this is the method called"""
-        confId = obj._conference#
+    def addConference2Room(self, obj, params):
+        """ When we re use a chat room for another conference(s), this is the method called.
+            It may be called from the AJAX service, but also from the clone event. Since we
+            don't know it, we have to check the parameters accordingly"""
+        room, confId = parseParams(params, obj)
+
         try:
             confIndex = IndexByConfHelper(confId)
             confIndex.add(room)
@@ -218,8 +248,8 @@ class ChatroomMailer(Component):
             raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
 
     @classmethod
-    def addConference2Room(self, obj, room):
-        confId = obj._conference
+    def addConference2Room(self, obj, params):
+        room, confId = parseParams(params, obj)
         pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
         userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
@@ -227,8 +257,8 @@ class ChatroomMailer(Component):
 
         try:
             cn = ChatroomsNotification(room, userList)
-            GenericMailer.sendAndLog(cn.create(room, ConferenceHolder().getById(obj._conference)), \
-                                               ConferenceHolder().getById(obj._conference), \
+            GenericMailer.sendAndLog(cn.create(room, ConferenceHolder().getById(confId)), \
+                                               ConferenceHolder().getById(confId), \
                                                "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
                                                room.getOwner())
         except Exception, e:
@@ -274,3 +304,12 @@ by the user %s.
 Thank you for using our system.""" %(room.getTitle(), conference.getTitle(), conference.getId(), room.getOwner().getFullName()))
         return self
 
+
+def parseParams(params, obj):
+    if isinstance(params, Chatroom):
+        room = params
+        confId = obj._conference#
+    else:
+        room = params['room']
+        confId = params['conf'].getId()
+    return room, confId

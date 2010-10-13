@@ -4361,8 +4361,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         from MaKaC.webinterface import displayMgr
         return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self).getDefaultStyle()
 
-    def clone( self, startDate, options, eventManager=None ):
-
+    def clone( self, startDate, options, eventManager=None, userPerformingClone = None ):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)
         cat = self.getOwnerList()[0]
         managing = options.get("managing",None)
@@ -4490,6 +4489,9 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         if options.get("participants",False) :
             self.getParticipation().clone(conf, options, eventManager)
         conf.notifyModification()
+
+        #we inform the plugins in case they want to add anything to the new conference
+        self._notify('cloneEvent', {'conf': conf, 'user': userPerformingClone})
         return conf
 
     def newAlarm(self, dtStart):

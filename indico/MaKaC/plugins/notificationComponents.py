@@ -89,6 +89,15 @@ class INavigationContributor(zope.interface.Interface):
     def meetingAndLectureDisplay(self, obj, params):
         """ Adds our element to the list of elements to be showed in the main menu of a meeting or a lecture"""
 
+    def addCheckBox2CloneConf(self, obj, list):
+        """ Adds a checkbox in the page to clone an event. When an event is cloned, you may want
+            to clone part of your plugin data. In this method you will add a checkbox to the list in
+            case it's neccesary
+            Remember to import _ in your components file in order to use internationalization!"""
+
+    def cloneEvent(self, confToClone, conf):
+        """ Performs the operations needed while cloning an event """
+
     def getActiveNavigationItem(self, obj, params):
         pass
 
