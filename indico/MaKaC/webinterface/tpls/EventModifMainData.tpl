@@ -253,7 +253,7 @@ $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', <
 
 $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}).draw());
 
-$E('inPlaceEditDescription').set(new RichTextInlineEditWidget('event.main.changeDescription', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, confFossile.description).draw());
+$E('inPlaceEditDescription').set(new ParsedRichTextInlineEditWidget('event.main.changeDescription', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, confFossile.description).draw());
 
 <% if evtType == 'conference':%>
     $E('inPlaceEditAdditionalInfo').set(new RichTextInlineEditWidget('event.main.changeAdditionalInfo', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, <%= jsonEncode(additionalInfo) %>, 600, 45).draw());
