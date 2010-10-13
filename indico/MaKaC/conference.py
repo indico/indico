@@ -93,7 +93,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from sets import Set
 
-from indico.modules.scheduler import Scheduler, tasks
+from indico.modules.scheduler import Client, tasks
 
 class CommonObjectBase(object):
     """This class is for holding commonly used methods that are used by several classes.
@@ -2064,7 +2064,10 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         else:
             self._modificationDS = nowutc() #modification timestamp
         self._OAImodificationDS = self._modificationDS
+
         self.alarmList = {}
+        self.__alarmCounter = Counter()
+
         self.abstractMgr = review.AbstractMgr(self)
         self._logo = None
         self._trackCoordinators = TCIndex() #index for the track coordinators
@@ -4494,27 +4497,34 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
         conf.notifyModification()
         return conf
 
-    def newAlarm(self):
-        al = tasks.AlarmTask(self)
+    def newAlarm(self, dtStart):
+        confRelId = self._getNextAlarmId()
+        al = tasks.AlarmTask(self, confRelId, dtStart)
+
         self.addAlarm(al)
         return al
 
     def removeAlarm(self, alarm):
-        if alarm in self.alarmList.values():
-            del self.alarmList[alarm.getId()]
+        confRelId = alarm.getConfRelativeId()
+
+        if confRelId in self.alarmList:
+            del self.alarmList[confRelId]
             self._p_changed = 1
 
-            tl = Scheduler.getInstance()
+            tl = Client()
             tl.dequeue(alarm)
+        else:
+            raise Exception("alarm not in list!")
 
-            alarm.delete()
+    def _getNextAlarmId(self):
+        return self.__alarmCounter.newCount()
 
     def addAlarm(self, alarm):
-        tl = Scheduler.getInstance()
+        tl = Client()
 
         tl.enqueue(alarm)
 
-        self.alarmList[alarm.getId()] = alarm
+        self.alarmList[alarm.getConfRelativeId()] = alarm
         self._p_changed = 1
 
     def recoverAlarm(self, alarm):

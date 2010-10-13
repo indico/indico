@@ -5136,6 +5136,8 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
 
     def _getTabContent( self, params ):
 
+        confTZ = timezone(self._conf.getTimezone())
+
         p = WSetAlarm(self._conf, self._getAW())
 
         vars = { \
@@ -5146,7 +5148,7 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
             "confTitle": self._conf.getTitle() }
         vars["selec1"] = vars["selec2"] = vars["selec3"] = ""
         year = month = day = hour = dayBefore = hourBefore = -1
-        if self._alarm.getTimeBefore():
+        if self._alarm.getTimeBefore() > timedelta(0):
             #the date is calculated from the conference startdate
             if self._alarm.getTimeBefore() < timedelta(days=1):
                 vars["selec3"] = "checked"
@@ -5159,11 +5161,12 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
         else:
             #the date is global
             vars["selec1"] = "checked"
-            if self._alarm.getStartDate() != None:
-                startyear = year = int(self._alarm.getStartDate().year)
-                month = int(self._alarm.getStartDate().month)
-                day = int(self._alarm.getStartDate().day)
-                hour = int(self._alarm.getStartDate().hour)
+            startOn = self._alarm.getStartOn().astimezone(confTZ)
+            if startOn != None:
+                startyear = year = int(startOn.year)
+                month = int(startOn.month)
+                day = int(startOn.day)
+                hour = int(startOn.hour)
         vars["dayOptions"] = ""
         for i in range(1,32):
             sel = ""

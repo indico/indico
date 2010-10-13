@@ -48,7 +48,7 @@ class Counter(Persistent):
         current = self.__count
         self.__count += 1
         return str(current)
-    
+
     def previewNextCount(self):
         """ Returns the next identifier as a string, without changing the inner state
         """

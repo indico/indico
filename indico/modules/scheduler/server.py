@@ -258,9 +258,9 @@ class Scheduler(object):
         except base.SchedulerQuitException, e:
             self._logger.info('Scheduler was shut down: %s' % e)
             return 0
-        except Exception, e:
+        except Exception:
             self._logger.exception('Unexpected error')
-            raise e
+            raise
         finally:
             self._logger.info('Setting running status as False')
             with self._op.commit():
@@ -354,7 +354,8 @@ class Scheduler(object):
             if isinstance(task, tasks.PeriodicTask):
                 # don't let periodic tasks respawn
                 task.dontComeBack()
-            self._schedModule.moveTask(base.TASK_STATUS_QUEUED,
+            self._schedModule.moveTask(task,
+                                       base.TASK_STATUS_QUEUED,
                                        base.TASK_STATUS_FAILED)
 
         self._logger.info("Task %s dequeued" % task)

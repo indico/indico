@@ -2147,8 +2147,13 @@ class WAlarmFrame(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["locator"] = self.__target.getLocator().getWebForm()
+        dtFormat = "%Y-%m-%d %H:%M"
+
         stri = ""
         for al in self.__target.getAlarmList():
+            confTZ = timezone(self.__target.getTimezone())
+            dateStart = al.getStartOn().astimezone(confTZ)
+
             addr = ""
             if len(al.getToAddrList()) > 0 :
                 addr = " <br> ".join(al.getToAddrList()) + " <br> "
@@ -2158,19 +2163,22 @@ class WAlarmFrame(WTemplated):
             if al.getToAllParticipants() :
                 addr = "to all participants"
             if al.getEndedOn() != None:
-                sent = " (Sent the %s)"%al.getStartedOn().strftime("%Y-%m-%d %HH")
+                sent = " (Sent the %s)" % \
+                       al.getStartedOn().astimezone(confTZ).strftime(dtFormat)
             else:
                 sent = ""
             sd = ""
             if al.getTimeBefore() is not None:
                 tb = al.getTimeBefore()
                 d = tb.days
-                if d != 0:
-                    sd = "D-%s (%s)" % (d,al.getStartedOn().strftime("%Y-%m-%d %HH"))
+                if d < 0:
+                    sd = dateStart.strftime(dtFormat)
+                elif d != 0:
+                    sd = "D-%s (%s)" % (d,dateStart.strftime(dtFormat))
                 else:
-                    sd = "H-%s (%s)" % (tb.seconds/3600,al.getStartedOn().strftime("%Y-%m-%d %HH"))
-            elif al.getStartedOn() is not None:
-                sd = al.getStartedOn().strftime("%Y-%m-%d %HH")
+                    sd = "H-%s (%s)" % (tb.seconds/3600,dateStart.strftime(dtFormat))
+            elif dateStart is not None:
+                sd = dateStart.strftime(dtFormat)
             else:
                 sd = "not set"
             stri = stri +  _("""<tr> <td nowrap>%s</td> <td width=\"60%%\"><a href=\"%s\">%s</a>%s</td> <td nowrap>%s</td>  <td align=\"center\"><a href=\"%s\"> _("Delete")</a></td>   </tr>""")%(\

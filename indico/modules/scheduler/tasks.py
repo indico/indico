@@ -18,9 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import copy
-import logging
-import time
+import copy, logging, time, os
 from dateutil import rrule
 
 from datetime import timedelta
@@ -31,7 +29,7 @@ import zope.interface
 # Required by specific tasks
 from MaKaC.user import Avatar
 from MaKaC.i18n import _
-from MaKaC.common.Configuration import Config
+from MaKaC.common import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 # end required
@@ -344,8 +342,8 @@ class FoundationSyncTask(PeriodicUniqueTask):
 class SendMailTask(OneShotTask):
     """
     """
-    def __init__(self, **kwargs):
-        super(SendMailTask, self).__init__(**kwargs)
+    def __init__(self, startDateTime):
+        super(SendMailTask, self).__init__(startDateTime)
         self.fromAddr = ""
         self.toAddr = []
         self.toUser = []
@@ -354,9 +352,12 @@ class SendMailTask(OneShotTask):
         self.text = ""
         self.smtpServer = Config.getInstance().getSmtpServer()
 
-    def run(self):
+    def run(self, check = False):
         import smtplib
         from MaKaC.webinterface.mail import GenericMailer, GenericNotification
+
+        # prepare the mail
+        self._prepare(check = check);
 
         addrs = [smtplib.quoteaddr(x) for x in self.toAddr]
         ccaddrs = [smtplib.quoteaddr(x) for x in self.ccAddr]
@@ -379,10 +380,6 @@ class SendMailTask(OneShotTask):
 
     def getFromAddr(self):
         return self.fromAddr
-
-    def initialiseToAddr( self ):
-        self.toAddr = []
-        self._p_changed=1
 
     def addToAddr(self, addr):
         if not addr in self.toAddr:
@@ -446,14 +443,18 @@ class AlarmTask(SendMailTask):
     """
     implement an alarm componment
     """
-    def __init__(self, conf, **kwargs):
-        super(AlarmTask, self).__init__(**kwargs)
+    def __init__(self, conf, confRelId, startDateTime):
+        super(AlarmTask, self).__init__(startDateTime)
         self.conf = conf
         self.timeBefore = None
         self.text = ""
         self.note = ""
         self.confSumary = False
         self.toAllParticipants = False
+        self._confRelId = confRelId
+
+    def getConfRelativeId(self):
+        return self._confRelId
 
     def getToAllParticipants(self):
         try:
@@ -475,42 +476,12 @@ class AlarmTask(SendMailTask):
         alarm.setConfSumary(self.getConfSumary())
         alarm.setNote(self.getNote())
         alarm.setText(self.getText())
-        if self.getTimeBefore():
-            alarm.setTimeBefore(copy.copy(self.getTimeBefore()))
-        else:
-            alarm.setStartDate(copy.copy(self.getStartDate()))
+        alarm.setStartOn(copy.copy(self.getStartOn()))
         alarm.setToAllParticipants(self.getToAllParticipants())
         return alarm
 
-    def getStartDate(self):
-        if self.timeBefore:
-            return self.conf.getStartDate() - self.timeBefore
-        else:
-            return task.getStartDate(self)
-
-    def getAdjustedStartDate(self,tz=None):
-        if not tz:
-            tz = self.conf.getTimezone()
-        if tz not in common_timezones:
-           tz = 'UTC'
-        if self.timeBefore:
-            return self.conf.getStartDate().astimezone(timezone(tz)) - self.timeBefore
-        else:
-            if task.getStartDate(self):
-                return task.getStartDate(self).astimezone(timezone(tz))
-            return None
-        if self.getStartDate():
-            return self.getStartDate().astimezone(timezone(tz))
-        return None
-
-    def setTimeBefore(self, timeDelta):
-        #we don't need startDate if timeBefore is set
-        self.timeBefore = timeDelta
-        self.startDate = None
-        self._p_changed=1
-
     def getTimeBefore(self):
-        return self.timeBefore
+        return self.getConference().getStartDate() - self.getStartOn()
 
     def addToUser(self, user):
         super(AlarmTask, self).addToUser(user)
@@ -527,7 +498,7 @@ class AlarmTask(SendMailTask):
 
     def getLocator(self):
         d = self.conf.getLocator()
-        d["alarmId"] = self.getId()
+        d["alarmId"] = self.getConfRelativeId()
         return d
 
     def canAccess(self, aw):
@@ -581,14 +552,16 @@ class AlarmTask(SendMailTask):
     def getConfSumary(self):
         return self.confSumary
 
-    def run(self):
+    def _prepare(self, check = True):
 
-        # Date checkings...
-        from MaKaC.conference import ConferenceHolder
-        if not ConferenceHolder().hasKey(self.conf.getId()) or \
-                self.conf.getStartDate() <= nowutc():
-           self.conf.removeAlarm(self)
-           return True
+        # Date checks...
+        if check:
+            from MaKaC.conference import ConferenceHolder
+            if not ConferenceHolder().hasKey(self.conf.getId()) or \
+                   self.conf.getStartDate() <= nowutc():
+                self.conf.removeAlarm(self)
+                return True
+
         # Email
         self.setSubject("Event reminder: %s"%self.conf.getTitle())
         try:
