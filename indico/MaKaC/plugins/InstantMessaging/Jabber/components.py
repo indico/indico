@@ -92,22 +92,30 @@ class ChatSMContributor(Component, Observable):
             * There are rooms in the event created by the user who wants to clone
         """
         #list of creators of the chat rooms
-        import pydevd;pydevd.settrace()
         ownersList = [cr.getOwner() for cr in DBHelpers().getChatroomList(obj._conf)]
         if PluginsHelper('InstantMessaging', 'Jabber').isActive() and obj._rh._aw._currentUser in ownersList:
             list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneChatrooms" id="cloneChatrooms" value="1" />_("Chat Rooms")</li>""")
+
+    @classmethod
+    def fillCloneDict(self, obj, params):
+        options = params['options']
+        paramNames = params['paramNames']
+        options['chatrooms'] = 'cloneChatrooms' in paramNames
 
     @classmethod
     def cloneEvent(cls, confToClone, params):
         """ we'll clone only the chat rooms created by the user who is cloning the conference """
         conf = params['conf']
         user = params['user']
-        crList = DBHelpers().getChatroomList(confToClone)
-        ownersList = [cr.getOwner() for cr in crList]
-        if PluginsHelper('InstantMessaging', 'Jabber').isActive():
-             for cr in crList:
-                 if user is cr.getOwner():
-                     cls()._notify('addConference2Room', {'room':cr, 'conf':conf})
+        options = params['options']
+
+        if options.get("chatrooms", True):
+            crList = DBHelpers().getChatroomList(confToClone)
+            ownersList = [cr.getOwner() for cr in crList]
+            if PluginsHelper('InstantMessaging', 'Jabber').isActive():
+                 for cr in crList:
+                     if user is cr.getOwner():
+                         cls()._notify('addConference2Room', {'room':cr, 'conf':conf})
 
 
 class ChatroomStorage(Component):
@@ -208,11 +216,12 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        try:
-            cn = ChatroomsNotification(room, userList)
-            GenericMailer.sendAndLog(cn.create(room), room.getConference(), "MaKaC/plugins/InstantMessaging/Jabber/components.py", room.getOwner())
-        except Exception, e:
-            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
+        if not len(userList) is 0:
+            try:
+                cn = ChatroomsNotification(room, userList)
+                GenericMailer.sendAndLog(cn.create(room), room.getConference(), "MaKaC/plugins/InstantMessaging/Jabber/components.py", room.getOwner())
+            except Exception, e:
+                raise ServiceError(message=e)
 
     @classmethod
     def editChatroom(self, obj, params):
@@ -222,14 +231,15 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        try:
-            cn = ChatroomsNotification(room, userList)
-            GenericMailer.sendAndLog(cn.edit(room, ConferenceHolder().getById(obj._conferenceID)), \
-                                     ConferenceHolder().getById(obj._conferenceID), \
-                                     "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
-                                     room.getOwner())
-        except Exception, e:
-            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
+        if not len(userList) is 0:
+            try:
+                cn = ChatroomsNotification(room, userList)
+                GenericMailer.sendAndLog(cn.edit(room, ConferenceHolder().getById(obj._conferenceID)), \
+                                         ConferenceHolder().getById(obj._conferenceID), \
+                                         "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                         room.getOwner())
+            except Exception, e:
+                raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
 
     @classmethod
     def deleteChatroom(cls, obj, room):
@@ -238,14 +248,15 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        try:
-            cn = ChatroomsNotification(room, userList)
-            GenericMailer.sendAndLog(cn.delete(room, ConferenceHolder().getById(obj._conferenceID)),\
-                                     ConferenceHolder().getById(obj._conferenceID), \
-                                     "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
-                                     room.getOwner())
-        except Exception, e:
-            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
+        if not len(userList) is 0:
+            try:
+                cn = ChatroomsNotification(room, userList)
+                GenericMailer.sendAndLog(cn.delete(room, ConferenceHolder().getById(obj._conferenceID)),\
+                                         ConferenceHolder().getById(obj._conferenceID), \
+                                         "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                         room.getOwner())
+            except Exception, e:
+                raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
 
     @classmethod
     def addConference2Room(self, obj, params):
@@ -255,14 +266,15 @@ class ChatroomMailer(Component):
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
 
-        try:
-            cn = ChatroomsNotification(room, userList)
-            GenericMailer.sendAndLog(cn.create(room, ConferenceHolder().getById(confId)), \
-                                               ConferenceHolder().getById(confId), \
-                                               "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
-                                               room.getOwner())
-        except Exception, e:
-            raise NoReportError('There was an error while contacting the mail server. No notifications were sent')
+        if not len(userList) is 0:
+            try:
+                cn = ChatroomsNotification(room, userList)
+                GenericMailer.sendAndLog(cn.create(room, ConferenceHolder().getById(confId)), \
+                                                   ConferenceHolder().getById(confId), \
+                                                   "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                                   room.getOwner())
+            except Exception, e:
+                raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
 
 
 class ChatroomsNotification(GenericNotification):

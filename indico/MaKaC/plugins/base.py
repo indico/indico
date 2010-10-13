@@ -131,7 +131,7 @@ class ComponentsManager(Persistent):
                     raise NoReportError(str(e))
                 except Exception, e:
                     Logger.get('PluginNotifier').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
-                    raise Exception("Exception while calling subscriber %s: %s" % str(subscriber.__class__), e)
+                    raise Exception("Exception while calling subscriber %s: %s" % (str(subscriber.__class__), e))
             #else:
             #    Logger.get('PluginNotifier').error('the method %s is not definend by the interface %s'%(method, interface))
 

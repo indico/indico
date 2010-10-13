@@ -4491,7 +4491,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         conf.notifyModification()
 
         #we inform the plugins in case they want to add anything to the new conference
-        self._notify('cloneEvent', {'conf': conf, 'user': userPerformingClone})
+        self._notify('cloneEvent', {'conf': conf, 'user': userPerformingClone, 'options': options})
         return conf
 
     def newAlarm(self, dtStart):

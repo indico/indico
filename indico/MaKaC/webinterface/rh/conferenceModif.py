@@ -78,6 +78,7 @@ from MaKaC import booking
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
+from MaKaC.plugins.base import Observable
 
 from MaKaC.rb_location import CrossLocationDB, Location, CrossLocationQueries
 
@@ -2863,7 +2864,7 @@ class RHContribParticipantsSendEmail( RHConferenceModifBase  ):
 #######################################################################################
 
 
-class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase. Observable ):
+class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observable ):
     """
     New version of clone functionality -
     fully replace the old one, based on three different actions,
@@ -2917,7 +2918,7 @@ class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase. Observabl
                     "managing"      : self._getUser()
                     }
         #we notify the event in case any plugin wants to add their options
-        self._notify('fillCloneDict', options)
+        self._notify('fillCloneDict', {'options': options, 'paramNames': paramNames})
         if self._cancel:
             self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
         elif self._confirm:

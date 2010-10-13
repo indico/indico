@@ -136,12 +136,11 @@ class CreateChatroom( ChatRoomBase ):
         try:
             self._notify('createChatroom', self._room)
         except ServiceError, e:
-            raise ServiceError( message=self._messages['sameId'] )
+            raise ServiceError( message=self._messages['sameId']+e )
         except NoReportError, e:
             raise NoReportError(self._messages['sameName'], explanation='roomExists')
         except Exception, e:
             raise ServiceError( message=str(e) )
-
         if self._room.getCreateRoom():
             #if we're not creating the room in our server we don't need to call the bot
             self.createRoomJabber(self._botJID, self._botPass, self._room)

@@ -68,9 +68,11 @@ class INavigationContributor(zope.interface.Interface):
        Jabber (MaKaC.plugins.InstantMessaging.Jabber)
     """
 
+    #Conference management related
     def fillManagementSideMenu(self, obj, params):
         """ Inserts an element in the conference management's side menu"""
 
+    #Conference display related
     def confDisplaySMFillDict(self, obj, params):
         """ Conference Display Side Menu Fill Dictionary.
             This dictionary is used to store all your new items on the side menu of the conference display.
@@ -78,23 +80,32 @@ class INavigationContributor(zope.interface.Interface):
             in the conference display side menu are inserted.
         """
 
+    #Conference display related
     def confDisplaySMFillOrderedKeys(self, obj, list):
         """ Conference Display Side Menu Fill Ordered Keys.
             Right next to the dictionary there is a list with the ordered keys, we need to include them also
         """
 
+    #Conference display related
     def confDisplaySMShow(self, obj, params):
         """ Adds our element to the list of elements to be showed in the side menu of the conference main page"""
 
+    #Meetings and lectures display related
     def meetingAndLectureDisplay(self, obj, params):
         """ Adds our element to the list of elements to be showed in the main menu of a meeting or a lecture"""
 
+    #Event cloning related
     def addCheckBox2CloneConf(self, obj, list):
         """ Adds a checkbox in the page to clone an event. When an event is cloned, you may want
             to clone part of your plugin data. In this method you will add a checkbox to the list in
             case it's neccesary
             Remember to import _ in your components file in order to use internationalization!"""
 
+    #Event cloning related
+    def fillCloneDict(self, obj, params):
+        """ Fills a dictionary with the checkboxes to be checked when cloning an event"""
+
+    #Event cloning related
     def cloneEvent(self, confToClone, conf):
         """ Performs the operations needed while cloning an event """
 
