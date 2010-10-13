@@ -8,7 +8,7 @@
   <td align="left" colspan="2" bgcolor="white" style="padding-bottom:10px">
      <%= _("Selected categories to be moved")%>:
     <ul>%(selectedItems)s</ul>
-     <%= _("Please, select the destination category where to move the ones mentioned above (use the blue arrows to navigate in the category tree)")%>:<br>
+     <%= _("Please, select the destination category where to move the ones mentioned above (use the '+' icon to navigate in the category tree)")%>:<br>
     %(categTree)s
   </td>
 </tr>

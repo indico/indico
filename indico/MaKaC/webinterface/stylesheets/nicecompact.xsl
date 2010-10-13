@@ -108,12 +108,20 @@
 </table>
 
 <center>
-<table cellspacing="1" cellpadding="0" bgcolor="white" border="0">
+
+<table cellspacing="1" cellpadding="0" bgcolor="white" border="0" width="100%">
+
+<xsl:for-each select="./line">
+
+<xsl:variable name="fromDay" select="substring(./fromDate,0,11)"/>
+<xsl:variable name="toDay" select="substring(./toDate,0,11)"/>
 
 <tr>
 <td></td>
-<xsl:for-each select="./session|./contribution|./break">
+<xsl:for-each select="../session|../contribution|../break">
 <xsl:variable name="day" select="substring(./startDate,0,11)"/>
+<xsl:variable name="daynum" select="concat(substring($day,1,4),substring($day,6,2),substring($day,9,2))"/>
+<xsl:if test="$daynum &gt;= $fromDay and $daynum &lt;= $toDay">
 <xsl:if test="count(preceding::session[position()=1 and substring(startDate,0,11)=$day]) = 0 and count(preceding::contribution[position()=1 and substring(startDate,0,11)=$day]) = 0 and count(preceding::break[position()=1 and substring(startDate,0,11)=$day]) = 0">
 	<td class="headerselected" align="center" bgcolor="#000060"><font size="-2" color="white">
 	<b>
@@ -122,6 +130,7 @@
 	</xsl:call-template>
 	</b><br/>
 	</font></td>
+</xsl:if>
 </xsl:if>
 </xsl:for-each>
 </tr>
@@ -133,16 +142,16 @@
 	<td align="center" class="headerselected" bgcolor="#000060">
 	<font size="-2" color="white"><b>
 	AM
-	</b></font>
+    </b></font>
 	</td>
 	</tr>
 	</table>
 </td>
 
-
-
-<xsl:for-each select="./session|./contribution|./break">
+<xsl:for-each select="../session|../contribution|../break">
 <xsl:variable name="day" select="substring(./startDate,0,11)"/>
+<xsl:variable name="daynum" select="concat(substring($day,1,4),substring($day,6,2),substring($day,9,2))"/>
+<xsl:if test="$daynum &gt;= $fromDay and $daynum &lt;= $toDay">
 <xsl:if test="count(preceding::session[position()=1 and substring(startDate,0,11)=$day]) = 0 and count(preceding::contribution[position()=1 and substring(startDate,0,11)=$day]) = 0 and count(preceding::break[position()=1 and substring(startDate,0,11)=$day]) = 0">
 	<td valign="top" bgcolor="gray">
 	<xsl:if test="count(/iconf/session[substring(startDate,0,11)=$day and substring(startDate,12,2) &lt; 13]|/iconf/contribution[substring(startDate,0,11)=$day and substring(startDate,12,2) &lt; 13]|/iconf/break[substring(startDate,0,11)=$day and substring(startDate,12,2) &lt; 13])>0">
@@ -154,10 +163,9 @@
 	</xsl:if>
 	</td>
 </xsl:if>
+</xsl:if>
 </xsl:for-each>
 </tr>
-
-
 
 <tr>
 <td valign="top" class="headerselected" bgcolor="#000060">
@@ -173,8 +181,10 @@
 </td>
 
 
-<xsl:for-each select="./session|./contribution|./break">
+<xsl:for-each select="../session|../contribution|../break">
 <xsl:variable name="day" select="substring(./startDate,0,11)"/>
+<xsl:variable name="daynum" select="concat(substring($day,1,4),substring($day,6,2),substring($day,9,2))"/>
+<xsl:if test="$daynum &gt;= $fromDay and $daynum &lt;= $toDay">
 <xsl:if test="count(preceding::session[position()=1 and substring(startDate,0,11)=$day]) = 0 and count(preceding::contribution[position()=1 and substring(startDate,0,11)=$day]) = 0 and count(preceding::break[position()=1 and substring(startDate,0,11)=$day]) = 0">
 	<td valign="top" bgcolor="gray">
 	<xsl:if test="count(/iconf/session[substring(startDate,0,11)=$day and substring(startDate,12,2) &gt;= 13]|/iconf/contribution[substring(startDate,0,11)=$day and substring(startDate,12,2) &gt;= 13]|/iconf/break[substring(startDate,0,11)=$day and substring(startDate,12,2) &gt;= 13])>0">
@@ -186,9 +196,14 @@
 	</xsl:if>
 	</td>
 </xsl:if>
+</xsl:if>
 </xsl:for-each>
 </tr>
+
+</xsl:for-each>
+
 </table>
+
 </center>
 
 </xsl:template>

@@ -6449,6 +6449,12 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
         """
         if self.canAccess( aw ):
             return True
+        ### TODO: Replace this code when plugins allow extension points+notifications ##################
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
+            RCCollaborationPluginAdmin.hasRights(user = aw.getUser(), plugins = "any"):
+            return True
+        ################################################################################################
         for contrib in self.getContributionList():
             if contrib.canView( aw ):
                 return True
@@ -9207,6 +9213,12 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         """
         if self.canAccess( aw ):
             return True
+        ### TODO: Replace this code when plugins allow extension points+notifications ##################
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
+            RCCollaborationPluginAdmin.hasRights(user = aw.getUser(), plugins = "any"):
+            return True
+        ################################################################################################
         for sc in self.getSubContributionList():
             if sc.canView( aw ):
                 return True
@@ -10057,6 +10069,11 @@ class SubContribParticipation(Persistent, Fossilizable):
         self._phone = ""
         self._title = ""
         self._fax = ""
+
+    def getConference(self):
+        if self._subContrib is not None:
+            return self._subContrib.getConference()
+        return None
 
     def _notifyModification( self ):
         if self._subContrib != None:

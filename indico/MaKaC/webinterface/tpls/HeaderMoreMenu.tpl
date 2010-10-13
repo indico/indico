@@ -27,7 +27,8 @@ moreMenu.observeClick(function(e) {
     var menu = new PopupMenu(menuItems, [moreMenu], <% if dark: %>'darkPopupList'<% end %><% else: %>null<% end %>);
 
     <% if showExportToICal: %>
-    menuItems['<%= _("Export to iCal") %>'] = '<%= urlHandlers.UHConferenceToiCal.getURL(self._rh._conf) %>';
+    menuItems['<%= _("Export event to iCal") %>'] = '<%= urlHandlers.UHConferenceToiCal.getURL(self._rh._conf, detailLevel = "top") %>';
+    menuItems['<%= _("Export timetable to iCal") %>'] = '<%= urlHandlers.UHConferenceToiCal.getURL(self._rh._conf, detailLevel = "contributions") %>';
     <% end %>
     <% if showExportToPDF: %>
     menuItems['<%= _("Export to PDF") %>'] = '<%= pdfURL %>';

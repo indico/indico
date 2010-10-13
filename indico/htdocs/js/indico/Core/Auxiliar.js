@@ -30,7 +30,7 @@ IndicoUI.Aux = {
             return function(target, source){
 
                 var accessor = getAccessorDeep(source);
-                var field = new RichTextWidget(width, height, {});
+                var field = new RichTextWidget(width, height, '', 'rich');
 
                 var fieldDiv = field.draw();
 
@@ -97,8 +97,3 @@ IndicoUI.Aux = {
         }), context));
     }
 };
-
-// See no other way of doing this with FCK :/
-function FCKeditor_OnComplete(instance) {
-    IndicoUI.Aux.RichTextEditor.completeHandler(instance);
-}

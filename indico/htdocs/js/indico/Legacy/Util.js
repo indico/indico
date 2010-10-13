@@ -426,9 +426,13 @@ var IndicoUtil = {
         // passive - don't check actively for changes / keypresses
 
         if ( startsWith(component.dom.type, 'select')) {
-            component.dom.className+=' invalidSelect';
+            if (component.dom.className.slice(-13) != "invalidSelect") {
+                component.dom.className += ' invalidSelect';
+            }
         } else {
-            component.dom.className+=' invalid';
+            if (component.dom.className.slice(-7) != "invalid") {
+                component.dom.className += ' invalid';
+            }
         }
 
         var tooltip;
@@ -489,8 +493,14 @@ var IndicoUtil = {
         var classList = {}; //original class (style) value for each element to check
         var eventList = {}; //all the 'error' events for each element to check
 
-        var radioButtonChecks = {}; //
+        //var radioButtonChecks = {}; //
         var radioButtonLabelStopObserving = {};
+
+        this.clear = function() {
+            entryList = new WatchList();
+            classList = {};
+            eventList = {};
+        };
 
         /**
          * Check entries for errors
@@ -509,7 +519,10 @@ var IndicoUtil = {
                 var error = null;
 
                 // ErrorAware classes don't want to do this
-                if (!component.ErrorAware) {
+                if (component.ErrorAware) {
+                    component.setError(false);
+
+                } else {
                     //--- Restore original values (if it is the second time, there must
                     //    be components with error styles)  ---
 
@@ -524,16 +537,11 @@ var IndicoUtil = {
                         delete eventList[component.dom.id];
                     }
                     //---------------------------------
-
-                } else {
-                    component.setError(false);
                 }
 
                 //--- Check if there are errors ---
                 if (dataType == "radio" && !allowEmpty && !self.checkRadioButton(component)) {
                     error = Html.span({}, "Please choose an option");
-                } else if (dataType != "radio" && !allowEmpty && trim(component.get()) === '') {
-                    error = Html.span({}, "Field is mandatory");
                 }
                 else if (dataType == 'int' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
                     error = Html.span({}, "Field must be a number");
@@ -567,6 +575,8 @@ var IndicoUtil = {
                 }
                 else if (exists(extraCheckFunction)) {
                     error = extraCheckFunction(component.get());
+                } else if (!allowEmpty && trim(component.get()) === '') {
+                    error = Html.span({}, "Field is mandatory");
                 }
                 //--------------------------------
 
@@ -637,7 +647,7 @@ var IndicoUtil = {
 
         this.checkRadioButton = function(component) {
             var name = component.dom.name;
-            if (!exists(radioButtonChecks[name])) {
+            /*if (!exists(radioButtonChecks[name])) {
                 radioButtonChecks[name] = false;
                 var radioButtons = $N(name);
                 each (radioButtons, function(rb) {
@@ -646,7 +656,15 @@ var IndicoUtil = {
                     }
                 });
             }
-            return radioButtonChecks[name];
+            return radioButtonChecks[name];*/
+            var radioButtonChecks = false;
+            var radioButtons = $N(name);
+            each (radioButtons, function(rb) {
+                if (rb.dom.checked) {
+                    radioButtonChecks = true;
+                }
+            });
+            return radioButtonChecks;
         };
 
         /**

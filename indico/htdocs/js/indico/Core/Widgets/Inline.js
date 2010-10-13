@@ -27,6 +27,10 @@ type("InlineRemoteWidget", ["InlineWidget"],
              // do nothing, overload
          },
 
+         _handleBackToEditMode: function() {
+             // do nothing, overload
+         },
+
          draw: function() {
              var self = this;
              var t;
@@ -65,6 +69,7 @@ type("InlineRemoteWidget", ["InlineWidget"],
                      self._handleError(self.source.error.get());
                      wcanvas.set(content);
                      self.setMode('edit');
+                     self._handleBackToEditMode();
                  } else if (state == SourceState.Loaded) {
                      self._handleLoaded(self.source.get());
                      wcanvas.set(content);
@@ -534,7 +539,7 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor"],
 type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
      {
          _setErrorState: function(text) {
-             this._setElementErrorState(this.input, text);
+             this._stopErrorList = this._setElementErrorState(this.input, text);
          },
 
          _checkErrorState: function() {
@@ -1036,9 +1041,9 @@ type("ShowablePasswordField", ["IWidget", "ErrorAware"], {
 
     _setErrorState: function(text) {
         if (this.show) {
-            this._setElementErrorState(this.clearTextField, text);
+            this._stopErrorList = this._setElementErrorState(this.clearTextField, text);
         } else {
-            this._setElementErrorState(this.passwordField, text);
+            this._stopErrorList = this._setElementErrorState(this.passwordField, text);
         }
     },
 
@@ -1218,9 +1223,13 @@ type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
 
     getSelectBox: function() {
         return this.select;
+    },
+
+    plugParameterManager: function(parameterManager) {
+        this.ErrorAware.prototype.plugParameterManager.call(this, parameterManager);
     }
 },
-     function(parameterManager, types, selParams, textParams){
+     function(types, selParams, textParams){
          selParams = selParams || {};
          textParams = textParams || {};
 
@@ -1244,12 +1253,10 @@ type("TypeSelector", ["IWidget", "WatchAccessor", "ErrorAware"],
          };
 
          this.selectOn = true;
-         this.pm = parameterManager;
          this.types = types;
 
          this.observers = [];
 
-         this.ErrorAware(parameterManager);
      }
     );
 
@@ -1277,7 +1284,9 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
 
              this.saveButton = Widget.button(command(function() {
                      if (self._verifyInput()){
-                         self.source.set(self._getNewValue());
+                         // save it, in case we need to come back to edit mode;
+                         self._savedValue = self._getNewValue();
+                         self.source.set(self._savedValue);
                      }
              }, 'Save'));
 

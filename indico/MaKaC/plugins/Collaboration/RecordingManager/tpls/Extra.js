@@ -433,6 +433,8 @@ function RMCreateCDSRecord() {
                         LODBID: RMselectedLODBID,
                         // LOID is only defined for web_lecture, not plain_video
                         LOID: RMselectedLODBID != undefined && RMselectedLODBID != "" ? RMLOList[RMselectedLODBID]["LOID"] : "",
+                        lectureTitle: RMTalkList[RMselectedTalkId]["title"],
+                        lectureSpeakers: speakers_string,
                         videoFormat: RMvideoFormat,
                         contentType: RMviewMode,
                         languages: languageCodes

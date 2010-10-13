@@ -95,7 +95,7 @@
         </div>
         </div>
     </td>
-    <td width="400px" valign="top">
+    <td width="450px" valign="top">
         <strong>2. <%= _("Select content type: ") %></strong>
         <span id="RMbuttonPlainVideo" class="RMbuttonDisplay" onclick="RMbuttonModeSelect('plain_video')" ><%= _("plain video") %></span>
         &nbsp;<%= _(" or ") %>&nbsp;
@@ -109,31 +109,12 @@
                 <% lectureDBid = orphan["idLecture"] %>
                 <% LOID        = orphan["LOID"] %>
                 <div id="lo<%= lectureDBid %>" class="RMLODisplay" onclick="RMLOSelect(<%= lectureDBid %>)" onmouseover="RMLOBoxOnHover(<%= lectureDBid %>);" onmouseout="RMLOBoxOffHover(<%= lectureDBid %>);">
-                    <table>
-                        <tr width="100%">
-                            <td width="30%" valign="top">
-                                time: <%= orphan["time"] %><br />
-                                date: <%= orphan["date"] %><br />
-                                box:  <%= orphan["box"]  %>
-                            </td>
-                            <td width="70%" align="right">&nbsp;
-<!--
-                                <img src="<%= PreviewURL %><%= LOID %>/video0001.jpg">
-                                <img src="<%= PreviewURL %><%= LOID %>/video0002.jpg"><br />
- -->
-                            </td>
-                        </tr>
-                        <tr width="100%">
-                            <td width="100%" colspan="2">&nbsp;
-<!--
-                            <img src="<%= PreviewURL %><%= LOID %>/content0001.jpg">
-                            <img src="<%= PreviewURL %><%= LOID %>/content0002.jpg">
-                            <img src="<%= PreviewURL %><%= LOID %>/content0003.jpg">
-                            <img src="<%= PreviewURL %><%= LOID %>/content0004.jpg">
- -->
-                             </td>
-                        </tr>
-                    </table>
+                    <%= orphan["date"] %>&nbsp;&nbsp;&nbsp;<%= orphan["time"] %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= orphan["niceDuration"] %><br />
+                    <%= orphan["RoomName"] %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= orphan["Hostname"] %><br />
+                    <% if orphan["preview"]: %>
+                    <img src="<%= PreviewURL %>/<%= LOID %>/camera.gif">
+                    <img src="<%= PreviewURL %>/<%= LOID %>/slides.gif">
+                    <% end %>
                 </div>
             <% end %>
         </div>

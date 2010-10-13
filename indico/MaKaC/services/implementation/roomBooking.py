@@ -1,12 +1,16 @@
 """
 Asynchronous request handlers for room booking
 """
+from MaKaC.services.interface.rpc.common import ServiceError
 
+import time
+from datetime import datetime
 from MaKaC.services.implementation.base import ServiceBase
-
 from MaKaC.rb_location import Location
 from MaKaC.rb_location import CrossLocationQueries
 import MaKaC.common.info as info
+from MaKaC.common.utils import HolidaysHolder, isWeekend
+from MaKaC.errors import NoReportError
 
 class RoomBookingListLocations( ServiceBase ):
 
@@ -98,3 +102,115 @@ class GetBookingBase(object):
 
     def _getAnswer(self):
         return self._getRoomInfo(self._target)
+
+class GetDateWarning( ServiceBase ):
+
+    def _checkParams( self ):
+        """
+        Extracts startDT, endDT and repeatability
+        from the form, if present.
+
+        Assigns these values to self, or Nones if values
+        are not present.
+        """
+
+        sDay = self._params.get( "sDay" )
+        eDay = self._params.get( "eDay" )
+        sMonth = self._params.get( "sMonth" )
+        eMonth = self._params.get( "eMonth" )
+        sYear = self._params.get( "sYear" )
+        eYear = self._params.get( "eYear" )
+
+        if sDay and len( sDay.strip() ) > 0:
+            sDay = int( sDay.strip() )
+
+        if eDay and len( eDay.strip() ) > 0:
+            eDay = int( eDay.strip() )
+
+        if sMonth and len( sMonth.strip() ) > 0:
+            sMonth = int( sMonth.strip() )
+
+#        if sYear and sMonth and sDay:
+#            # For format checking
+#            try:
+#                time.strptime(sDay.strip() + "/" + sMonth.strip() + "/" + sYear.strip() , "%d/%m/%Y")
+#            except ValueError:
+#                raise NoReportError(_("The Start Date must be of the form DD/MM/YYYY and must be a valid date."))
+
+        if eMonth and len( eMonth.strip() ) > 0:
+            eMonth = int( eMonth.strip() )
+
+        if sYear and len( sYear.strip() ) > 0:
+            sYear = int( sYear.strip() )
+
+        if eYear and len( eYear.strip() ) > 0:
+            eYear = int( eYear.strip() )
+
+#        if eYear and eMonth and eDay:
+#            # For format checking
+#            try:
+#                time.strptime(eDay.strip() + "/" + eMonth.strip() + "/" + eYear.strip() , "%d/%m/%Y")
+#            except ValueError:
+#                raise NoReportError(_("The End Date must be of the form DD/MM/YYYY and must be a valid date."))
+
+
+        sTime = self._params.get( "sTime" )
+        if sTime and len( sTime.strip() ) > 0:
+            sTime = sTime.strip()
+        eTime = self._params.get( "eTime" )
+        if eTime and len( eTime.strip() ) > 0:
+            eTime = eTime.strip()
+
+        # process sTime and eTime
+        if sTime and eTime:
+
+            try:
+                time.strptime(sTime, "%H:%M")
+            except ValueError:
+                raise NoReportError(_("The Start Time must be of the form HH:MM and must be a valid time."))
+
+            t = sTime.split( ':' )
+            sHour = int( t[0] )
+            sMinute = int( t[1] )
+
+            try:
+                time.strptime(eTime, "%H:%M")
+            except ValueError:
+                raise NoReportError(_("The End Time must be of the form HH:MM and must be a valid time."))
+
+            t = eTime.split( ':' )
+            eHour = int( t[0] )
+            eMinute = int( t[1] )
+
+        self._startDT = None
+        self._endDT = None
+        if sYear and sMonth and sDay and sTime and eYear and eMonth and eDay and eTime:
+            # Full period specified
+            self._startDT = datetime( sYear, sMonth, sDay, sHour, sMinute )
+            self._endDT = datetime( eYear, eMonth, eDay, eHour, eMinute )
+        elif sYear and sMonth and sDay and eYear and eMonth and eDay:
+            # There are no times
+            self._startDT = datetime( sYear, sMonth, sDay, 0, 0, 0 )
+            self._endDT = datetime( eYear, eMonth, eDay, 23, 59, 59 )
+        elif sTime and eTime:
+            # There are no dates
+            self._startDT = datetime( 1990, 1, 1, sHour, sMinute )
+            self._endDT = datetime( 2030, 12, 31, eHour, eMinute )
+        self._today=False
+        if self._params.get( "day", "" ) == "today":
+            self._today=True
+            self._startDT = datetime.today().replace(hour=0,minute=0,second=0)
+            self._endDT = self._startDT.replace(hour=23,minute=59,second=59)
+
+    def _getAnswer( self ):
+        if not self._startDT or not self._endDT:
+            return ""
+
+        if  HolidaysHolder.isWorkingDay( self._startDT ) and \
+            HolidaysHolder.isWorkingDay( self._endDT ):
+            return ""
+
+        if isWeekend( self._startDT ) or isWeekend( self._endDT ):
+            return _("Warning: weekend chosen" )
+
+        return _( "Warning: holidays chosen" )

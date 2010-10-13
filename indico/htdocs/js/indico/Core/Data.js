@@ -93,6 +93,10 @@ var Util = {
         // default value
         format = format || "%Y/%m/%d %H:%M";
 
+        if (!string) {
+            return null;
+        }
+
         var tokenOrder = [];
 
         // build a regular expression from the format spec

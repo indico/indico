@@ -38,6 +38,7 @@ from MaKaC.i18n import _
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
+import re
 
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
@@ -262,6 +263,8 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams(self, params)
+        agent = self._req.headers_in.get('User-Agent', '')
+        self._linuxAgent = re.match(r'(?i).*?\blinux[^a-zA-Z]*?\b', agent) is not None
         self._selectedRegistrants = self._normaliseListParam(params.get("registrant",[]))
         self._addNew = params.has_key("newRegistrant")
         self._remove = params.has_key("removeRegistrants")
@@ -311,7 +314,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
             for reg in self._selectedRegistrants:
                 if self._conf.getRegistrantById(reg) !=None:
                     regs.append(self._conf.getRegistrantById(reg))
-            r = RHRegistrantListExcel(self,self._conf,regs, self._display)
+            r = RHRegistrantListExcel(self,self._conf,regs, self._display, not self._linuxAgent)
             return r.excel()
         elif self._printBadgesSelected:
             if len(self._selectedRegistrants) > 0:
@@ -376,15 +379,16 @@ class RHRegistrantListPDF:
         return data
 
 class RHRegistrantListExcel:
-    def __init__( self, rh,conf,reglist, disp ):
+    def __init__( self, rh,conf,reglist, disp, excelSpecific):
         self._conf = conf
         self._list = reglist
         self._rh = rh
         self._display = disp
+        self._excelSpecific = excelSpecific
 
     def excel( self ):
         filename = "RegistrantsList.csv"
-        excel = RegistrantsListToExcel(self._conf,list=self._list, display=self._display)
+        excel = RegistrantsListToExcel(self._conf,list=self._list, display=self._display, excelSpecific=self._excelSpecific)
         data = excel.getExcelFile()
         self._rh._req.set_content_length(len(data))
         cfg = Config.getInstance()
@@ -399,8 +403,15 @@ class RHRegistrantListEmail:
         self._regList = reglist
         self._rh = rh
 
+    def _checkParams(self, params):
+        self._from = params.get('from', '')
+        self._cc = params.get('cc', '')
+        self._subject = params.get('subject', '')
+        self._body = params.get('body', '')
+
     def email(self):
-        p=registrants.WPEMail(self._rh, self._conf, self._regList)
+        self._checkParams(self._rh.getRequestParams())
+        p=registrants.WPEMail(self._rh, self._conf, self._regList, self._from, self._cc, self._subject, self._body)
         return p.display()
 
 class RHRegistrantModifBase( conferenceModif.RHConferenceModifBase ):
@@ -535,7 +546,9 @@ class RHRegistrantTransactionPerformModify( RHRegistrantModifBase ):
                 d["Currency"]=self._registrant.getRegistrationForm().getCurrency()
                 tr=epayment.TransactionPayLaterMod(d)
                 self._registrant.setTransactionInfo(tr)
-            else :self._registrant.setTransactionInfo(None)
+            else :
+                self._registrant.setTransactionInfo(None)
+                self._registrant.setPayed(False)
             #self._registrant.setSessions(self._sessions)
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 

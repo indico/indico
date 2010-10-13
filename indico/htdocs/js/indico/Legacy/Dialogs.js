@@ -582,7 +582,7 @@ extend(IndicoUI.Dialogs,
                var compileMinutes = exists(compile)?compile:false;
                var killProgress = null;
 
-               var rtWidget = new RichTextWidget(600,400,{},'','rich','IndicoFull');
+               var rtWidget = new RichTextWidget(700, 400, '', 'rich', 'IndicoFull');
 
                var saveButton;
                var intToStr = function(id) {
@@ -591,6 +591,22 @@ extend(IndicoUI.Dialogs,
                    } else {
                        return null;
                    }
+               };
+
+               var popup = new ExclusivePopupWithButtons(
+                       $T('My minutes'),
+                       function() {
+                           popup.closeMinutesPopup();
+                       });
+
+               var closeMinutes = function(){
+                   popup.close();
+                   rtWidget.destroy();
+
+                   if (wasChanged) {
+                       window.location.reload(true);
+                   }
+
                };
 
                var req = indicoSource('minutes.edit',
@@ -615,27 +631,15 @@ extend(IndicoUI.Dialogs,
                        rtWidget.observe(function(value){
                            changedText.set(true);
                        });
-                   }
-               });
 
-
-               var commitChanges = function(suicideHook, closeMinutes) {
-
-                   if (changedText) {
-                       req.observe(function(_){
+                       if (killProgress) {
                            killProgress();
                            changedText.set(false);
                            wasChanged = true;
                            saveButton.dom.disabled = true;
-                           if (exists(closeMinutes)) {
-                               closeMinutes();
-                           }
-                       });
+                       }
                    }
-
-                   killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
-                   req.set(rtWidget.get());
-               };
+               });
 
                changedText.observe(
                    function(value) {
@@ -645,27 +649,98 @@ extend(IndicoUI.Dialogs,
                    });
 
 
-               var popup = new ExclusivePopup(
-                   $T('My minutes'),
-                   function() {
-                       popup.closeMinutesPopup();
-                   });
-
                popup.draw = function() {
                    var self = this;
                    var content = Html.div({}, rtWidget.draw());
 
-                   saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}, null), $T("Save")));
-                   saveButton.dom.disabled = !compileMinutes;
+                   var commitChanges = function(suicideHook) {
 
-                   var closeMinutes = function(){
-                       self.close();
-                       rtWidget.destroy();
+                       killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+                       try{
+                           var parsingResult = escapeHarmfulHTML(rtWidget.get());
 
-                       if (wasChanged) {
-                           window.location.reload(true);
+                           if( parsingResult[1] > 0) {
+                               //closeMinutes = false;
+
+                               var cleaningFunction = function(confirmed) {
+                                   if(confirmed) {
+                                       if(parsingResult[0]) {
+                                           rtWidget.set(parsingResult[0]);
+                                       }
+                                       //else
+                                       //    rtWidget.set(" ");
+                                   }
+                               };
+
+                               var security;
+                               switch(parsingResult[1]) {
+                                   case 1:
+                                       security = "HTML";
+                                       break;
+                                   case 2:
+                                       security = "HTML and scripts";
+                                       break;
+                                   default:
+                                       security = "code";
+                                       break;
+                               }
+
+                               killProgress();
+                               var popup = new ConfirmPopup($T("Warning!"), Html.div({style: {width:pixels(300), textAlign:'justify'}},
+                                                            $T("Your minutes contains some potentially harmful " + security +
+                                                            ", which cannot be stored in the database. Clean the text manually or use the automatic Indico cleaner.")),
+                                                            cleaningFunction);
+                               popup.draw = function(){
+                                   var self = this;
+
+                                   var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('Clean automatically'));
+                                   okButton.observeClick(function(){
+                                       self.close();
+                                       self.handler(true);
+                                   });
+
+                                   var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Clean manually'));
+                                   cancelButton.observeClick(function(){
+                                       self.close();
+                                       self.handler(false);
+                                   });
+
+                                   return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                                           this.content,
+                                           Html.div({}, okButton, cancelButton));
+                               }
+                               popup.open();
+                           }
+                           else
+                               req.set(parsingResult[0]);
+                       }
+                       catch(error){
+                           if(typeof error == "string" && error.indexOf("Parse Error") != -1){
+                               //closeMinutes = false;
+                               var popup = new WarningPopup($T("Warning!"), $T("Format of your minutes is invalid. Please check the syntax."));
+                               popup.open();
+                           }
+                           else
+                               throw error;
                        }
 
+                       /*if (changedText) {
+                           req.observe(function(_){
+                               killProgress();
+                               changedText.set(false);
+                               wasChanged = true;
+                               saveButton.dom.disabled = true;
+                               if (exists(closeMinutes) && typeof(closeMinutes) == "function") {
+                                   closeMinutes();
+                               }
+                           });
+                       }*/
+                       //killProgress();
+
+                   };
+
+                   var commitChangesAndClose = function(suicideHook) {
+                       commitChanges(suicideHook);
                    };
 
                    self.closeMinutesPopup = function(){
@@ -679,25 +754,24 @@ extend(IndicoUI.Dialogs,
                        };
 
                        if (changedText.get()){
-                           var popupConfirm = new SaveConfirmPopup( $T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}}, $T("You have modified your text since you last saved.")), Html.div({}, $T("Do you want to save your changes?"))), confirmation);
+                           var popupConfirm = new SaveConfirmPopup( $T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}},
+                                                                    $T("You have modified your text since you last saved.")),
+                                                                    Html.div({}, $T("Do you want to save your changes?"))), confirmation);
                            popupConfirm.open();
                        } else {
                            closeMinutes();
                        }
                    };
 
+                   saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}, null), $T("Save")));
+                   saveButton.dom.disabled = !compileMinutes;
 
-                   var commitChangesAndClose = function(suicideHook) {
-                       commitChanges(suicideHook, closeMinutes);
-                   };
-
-                   return this.ExclusivePopup.prototype.draw.call(
+                   return this.ExclusivePopupWithButtons.prototype.draw.call(
                        this,
-                       Html.div({},
-                                content,
-                                Html.div({style:{marginTop: pixels(20)}},
-                                         saveButton,
-                                         Widget.button(command(self.closeMinutesPopup, $T("Close"))))));
+                       content,
+                       Html.div({style:{marginTop: pixels(20)}},
+                                 saveButton,
+                                 Widget.button(command(self.closeMinutesPopup, $T("Close")))));
                };
 
                popup.open();

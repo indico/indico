@@ -1,64 +1,48 @@
 var executeOnload = false;
 var __globalEditorTable = {};
+var languages = {'en_US' : 'en', 'fr_FR' : 'fr'};
+var userLanguage = 'en_US';
+
+/*jsonRpc(Indico.Urls.JsonRpcService, "user.session.language.get",{}, function(result, error)
+        {
+            if (!error)
+                userLanguage = result;
+            else
+                userLanguage = 'en_US';
+        });*/
 
 type("RichTextEditor", ["IWidget", "Accessor"],
      {
          draw: function() {
-             this.div = Html.div({'id': this.divId});
+             var self = this;
+             this.div = Html.div({'id': 'text' + this.divId, style : {height: this.height + 75, width: this.width}});
 
-             this.postDraw();
-
+             setTimeout(function() {
+                 initializeEditor(
+                     self,
+                     'text' + self.divId ,
+                     self.text ,
+                     self.callbacks,
+                     self.width,
+                     self.height,
+                     self.toolbarSet);
+             },50);
              return this.div;
          },
 
          get: function() {
-             if (this.editor && this.editor.GetData) {
-                 return this.editor.GetData();
+             if (this.getEditor() && this.getEditor().getData) {
+                 return this.getEditor().getData();
              } else {
                  return '';
              }
          },
 
-         postDraw: function() {
-             this.div.set('');
-
-             this.div.dom.innerHTML = this.editor.CreateHtml();
-
-             var self = this;
-
-             this.onLoadFunc = function() {
-
-                 if (self.text) {
-                     self.set(self.text);
-                 }
-
-                 each(self.onLoadList,
-                      function(callback) {
-                          callback();
-                      });
-
-                 self.editor.Events.AttachEvent( 'OnSelectionChange',
-                                                 function() {
-                                                     if (!self.observing) {
-                                                         self.startObserving();
-                                                     }
-                                                 } ) ;
-             };
-
-             if (this.editor && this.editor.SetData) {
-                 this.onLoadFunc();
-             } else {
-                 executeOnLoad = true;
-             }
-
-         },
-
          set: function(text) {
              var self = this;
 
-             if (this.editor && this.editor.SetData) {
-                 this.editor.SetData(text);
-                 this.editor.ResetIsDirty();
+             if (this.getEditor() && this.getEditor().setData) {
+                 this.getEditor().setData(text);
              } else {
                  this.text = text;
              }
@@ -68,18 +52,9 @@ type("RichTextEditor", ["IWidget", "Accessor"],
              this.callbacks.append(callback);
          },
 
-         startObserving: function() {
-             this.observing = true;
-             this.editor.ResetIsDirty();
-             if (this.callbacks.length.get() > 0) {
-                 this.fckTimer = window.setInterval("FCKeditor_OnChange('"+this.divId+"')",2000);
-             }
-         },
-
          unbind: function() {
              this.observing = false;
              this.callbacks.clear();
-             window.clearInterval(this.fckTimer);
          },
 
          onLoad: function(callback) {
@@ -88,30 +63,21 @@ type("RichTextEditor", ["IWidget", "Accessor"],
 
          destroy: function() {
              this.unbind();
-             delete __globalEditorTable[this.divId];
-         }
+         },
 
+         getEditor: function() {
+             return CKEDITOR.instances["text" + this.divId];
+         }
      },
-     function(width, height, textAreaParams, toolbarSet) {
+     function(width, height, toolbarSet) {
          this.onLoadList = new WatchList();
          this.callbacks = new WatchList();
          this.width = width;
-         this.height = Browser.IE?height-75:height;
-         this.params = exists(textAreaParams)?textAreaParams:{};
+         this.height = height;
+         this.toolbarSet = toolbarSet?toolbarSet:'IndicoMinimum';
 
          this.divId = Html.generateId();
-
-         this.editor = new FCKeditor(this.divId) ;
-         this.editor.Width = width;
-         this.editor.Height = height;
-         this.editor.ToolbarSet = toolbarSet || 'IndicoMinimal' ;
-         this.editor.BasePath = ScriptRoot + "fckeditor/" ;
-         this.editor.Config.CustomConfigurationsPath = ScriptRoot + "fckeditor/indicoconfig.js"  ;
-         __globalEditorTable[this.divId] = this;
-         var self = this;
-
      });
-
 
 type("RichTextWidget", ["IWidget", "Accessor"],
      {
@@ -124,7 +90,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
          },
 
          observe: function(callback) {
-             var self = this;
+            var self = this;
 
              var observeFunc = function(value) {
 
@@ -132,7 +98,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
                  self.rich.unbind();
 
                  if (value == 'rich') {
-                     self.rich.observe(function() {
+                    self.rich.observe(function() {
                          callback(self.rich);
                      });
                  } else {
@@ -191,16 +157,14 @@ type("RichTextWidget", ["IWidget", "Accessor"],
              this.rich.destroy();
          }
      },
-     function(width, height, textAreaParams, initialText, mode, toolbarSet) {
+     function(width, height, initialText, mode, toolbarSet) {
 
-         if (!textAreaParams.style) {
-             textAreaParams.style = {};
-         }
+         var textAreaParams = { style: {} };
          textAreaParams.style.width = pixels(width);
          textAreaParams.style.height = pixels(height);
 
          this.plain = new RealtimeTextArea(textAreaParams);
-         this.rich = new RichTextEditor(width, height, textAreaParams, toolbarSet);
+         this.rich = new RichTextEditor(width, height, toolbarSet);
          this.richDiv = Html.div({});
          this.currentText = any(initialText, '');
          this.loaded = false;
@@ -255,24 +219,26 @@ type("RichTextWidget", ["IWidget", "Accessor"],
              self.set(self.currentText, true);
          });
 
-     });
+      });
 
 
 type("RichTextInlineEditWidget", ["InlineEditWidget"],
         {
             _handleEditMode: function(value) {
 
-                this.description = new RichTextWidget(600, 400,{},'','rich','IndicoMinimal');
+                this.description = new RichTextWidget(600, 400,
+                                                      '','rich',
+                                                      'IndicoMinimal');
                 this.description.set(value);
                 return this.description.draw();
             },
 
             _handleDisplayMode: function(value) {
-
-                var iframeId = "descFrame";
-                var iframe = Html.iframe({id: iframeId,name: iframeId, style:{width: pixels(600),
-                                                                              height:pixels(100),
-                                                                              border: "1px dotted #ECECEC"}});
+                var iframeId = "descFrame" + Html.generateId();
+                var iframe = Html.iframe({id: iframeId,name: iframeId,
+                                          style:{width: pixels(600),
+                                                 height:pixels(100),
+                                                 border: "1px dotted #ECECEC"}});
 
                 var loadFunc = function() {
                     var doc;
@@ -293,35 +259,57 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
                 } else {
                     // for normal browsers
                     iframe.observeEvent("load", loadFunc);
-                }
+                 }
 
                 return iframe;
+            },
+
+            _handleBackToEditMode: function() {
+                this.description.set(this._savedValue);
             },
 
             _getNewValue: function() {
                 return this.description.get();
             }
         },
-        function(method, attributes, initValue) {
+        function(method, attributes, initValue, width, height) {
+            this.width = width ? width:600;
+            this.height = height ? height:100;
             this.InlineEditWidget(method, attributes, initValue);
         });
 
 
+function initializeEditor( wrapper, editorId, text, callbacks, width, height, toolbarSet ){
+    // "wrapper" is the actual Indico API object that represents an editor
 
-function FCKeditor_OnComplete( editorInstance )
-{
-    __globalEditorTable[editorInstance.Name].editor = editorInstance;
-    __globalEditorTable[editorInstance.Name].onLoadFunc();
-}
+    try {
 
-function FCKeditor_OnChange( id ) {
-    var value = __globalEditorTable[id];
+        CKEDITOR.replace(editorId, {language : userLanguage, width : width, height : height - 75, 'toolbar': toolbarSet});
 
-    if(value.editor.IsDirty()) {
-        each(value.callbacks, function(func) {
-            func();
-        })
-        value.editor.ResetIsDirty();
+        var cki = CKEDITOR.instances[editorId];
+
+        cki.setData(text);
+        cki.on ('key', function(e)
+                {
+                    each(callbacks, function(func) {
+                        func();
+                    })
+                });
+
+        // process onLoad events for each individual instance (wrapper)
+        cki.on ('instanceReady', function(e)
+                {
+                    each(wrapper.onLoadList, function(callback) {
+                                 callback();
+                    });
+
+                });
+
+    }
+    catch (error) {
+        setTimeout(function() {
+            initializeEditor(wrapper, editorId, text, callbacks, width, height);
+        },50);
     }
 
 }

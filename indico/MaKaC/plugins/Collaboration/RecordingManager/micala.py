@@ -1,6 +1,7 @@
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.logger import Logger
+import re
 
 try:
     import MySQLdb
@@ -116,6 +117,47 @@ class MicalaCommunication(object):
         return(idLecture)
 
     @classmethod
+    def isTaskComplete(cls, idLecture, idTask):
+        '''Check to see if given task has been completed for the given lecture.'''
+
+        flagComplete = False
+
+        try:
+            connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
+                                         port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
+                                         user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderUser"),
+                                         passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBReaderPW"),
+                                         db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
+        except MySQLdb.Error, e:
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
+
+
+        # Check to see if the given task for the given lecture has status 'COMPLETE'.
+        # If not then an empty set will be returned.
+        cursor = connection.cursor()
+        cursor.execute("""SELECT L.LOID
+        FROM Lectures L, LectureLatestStatus LS, Status S
+           WHERE L.idLecture = %s
+           AND L.idLecture = LS.idLecture
+           AND LS.idTask = %s
+           AND LS.idStatus = S.idStatus
+           AND S.Status = 'COMPLETE'""",
+            (idLecture, idTask))
+        connection.commit()
+
+        result_set = cursor.fetchone()
+
+        if result_set is not None and len(result_set) > 0:
+            flagComplete = True
+        else:
+            flagComplete = False
+
+        cursor.close()
+        connection.close()
+
+        return(flagComplete)
+
+    @classmethod
     def createNewMicalaLecture(cls, lecture_name, contentType):
         '''insert a record into the micala database for a new lecture'''
 
@@ -146,6 +188,36 @@ class MicalaCommunication(object):
         connection.close()
 
         return cls.getIdLecture(lecture_name)
+
+    @classmethod
+    def updateLectureInfo(cls, idLecture, lectureTitle, lectureSpeakers):
+        '''Update basic info in micala DB for convenience in identifying records.'''
+
+        try:
+            connection = MySQLdb.connect(host   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBServer"),
+                                         port   = int(CollaborationTools.getOptionValue("RecordingManager", "micalaDBPort")),
+                                         user   = CollaborationTools.getOptionValue("RecordingManager", "micalaDBUser"),
+                                         passwd = CollaborationTools.getOptionValue("RecordingManager", "micalaDBPW"),
+                                         db     = CollaborationTools.getOptionValue("RecordingManager", "micalaDBName"))
+        except MySQLdb.Error, e:
+            raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
+
+        cursor = connection.cursor()
+
+        cleanedLectureTitle    = cls.cleanSQLData(lectureTitle)
+        cleanedLectureSpeakers = cls.cleanSQLData(lectureSpeakers)
+
+#        Logger.get('RecMan').debug("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""" %
+#                       (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
+
+        cursor.execute("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""", \
+                       (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
+
+        connection.commit()
+
+        connection.close()
+
+        return ()
 
     @classmethod
     def getMatches(cls, confID):
@@ -388,3 +460,15 @@ class MicalaCommunication(object):
                 # current pending lecture still not found in CDS so do nothing.
                 Logger.get('RecMan').debug('%s listed as pending and not found in cds_indico_matches, so it must still be pending.' % pending)
 
+    @classmethod
+    def cleanSQLData(cls, uncleanString):
+        """Get rid of SQL-unfriendly chars."""
+
+        # Truncate the string in case it is longer than 500 chars
+        if len(uncleanString) > 500:
+            uncleanString = uncleanString[0:500]
+
+        # Replace all non-alphanumeric chars with spaces
+        cleanString = re.sub("[^0-9a-zA-Z]", " ", uncleanString)
+
+        return cleanString

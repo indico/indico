@@ -63,11 +63,13 @@
         // Holidays warning
         if ( isValid && !onSubmit )
         {
-            new Ajax.Updater(
-                'holidays-warning',
-                '<%= urlHandlers.UHRoomBookingGetDateWarning.getURL() %>',
-                { parameters: $(f1).serialize(true) }
-            );
+            var holidaysWarning = indicoSource('roomBooking.getDateWarning', $(f1).serialize(true));
+
+            holidaysWarning.state.observe(function(state) {
+                if (state == SourceState.Loaded) {
+                    $E('holidays-warning').set(holidaysWarning.get());
+                }
+            });
         }
 
 	<% if candResv.room.needsAVCSetup: %>
@@ -240,7 +242,7 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Actions")%></span></td>
                                 <td>
-	                               	<input type="hidden" name="conf" value="<%= conf %>" />
+	                               	<input type="hidden" name="conf" value="<%if conf:%><%= conf.getId() %><%end%>" />
 									<input type="hidden" name="standalone" value="<%= standalone %>" />
 	                               	<input type="submit" class="btn" value="<%= _("Re-check for conflicts")%>" onclick="if (!validate_period(document.forms[0], true, <%= allowPast %>)) { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); return false; }"/>
 	                               	<input type="submit" class="btn"  <% if formMode==FormMode.MODIF: %> value="Save" <%%> value="<%= bookingMessage %>" onclick="if (forms_are_valid( true )) { submit_booking(); } else { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); }; return false;" />

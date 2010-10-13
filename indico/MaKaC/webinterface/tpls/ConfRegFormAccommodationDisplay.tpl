@@ -35,7 +35,7 @@
         <td style="padding-left:10px">
             <table align="left">
                 <tr>
-                    <td align="left">&nbsp;<font color="red">* </font><b><%= _("Select your accommodation")%>:</b></td>
+                    <td align="left">&nbsp;<font color="red">* </font><span id="accommodationTypeLabel" style="font-weight: bold;"><%= _("Select your accommodation")%>:</span></td>
                 </tr>
                 %(accommodationTypes)s
             </table>

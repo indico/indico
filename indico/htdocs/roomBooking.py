@@ -108,10 +108,6 @@ def deleteCustomAttribute( req, **params ):
 def sendRoomPhoto( req, **params ):
     return roomBooking.RHRoomBookingSendRoomPhoto(req).process(params)
 
-# AJAX: Returns "Warning: non-working day (weekend or holidays)"
-def getDateWarning( req, **params ):
-    return roomBooking.RHRoomBookingGetDateWarning(req).process(params)
-
 # AJAX: Returns <select></select> list of rooms
 def getRoomSelectList( req, **params ):
     return roomBooking.RHRoomBookingGetRoomSelectList(req).process(params)

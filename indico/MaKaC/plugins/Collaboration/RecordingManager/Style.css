@@ -1,6 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-/* jherr stuff follows... */
+/* Recording Manager stuff follows... */
 
 /* For stuff you don't want to be visible at first */
 div.RMHolderPaneDefaultInvisible {
@@ -74,8 +74,7 @@ div.RMtalkDisplay {
     border-style: solid;
     height: 34px;
     font-family: serif;
-    font-size: -2;
-    line-height: 1;
+    font-size: smaller;
     margin: 0px;
     padding: 2px;
     background-position: right;
@@ -88,8 +87,8 @@ div.RMtalkHover {
     border-style: dashed;
     height: 34px;
     font-family: serif;
-    font-size: -1;
-    line-height: 1;
+    font-size: small;
+/*   line-height: 1; */
     margin: 0px;
     padding: 2px;
     background-position: right;
@@ -102,9 +101,8 @@ div.RMtalkSelected {
     border-style: solid;
     height: 34px;
     font-family: serif;
-    font-size: -1;
+    font-size: small;
     font-weight: normal;
-    line-height: 1;
     margin: 0px;
     padding: 2px;
     background-position: right;
@@ -116,9 +114,9 @@ div.RMLODisplay {
     border: 1px;
     border-color: #FFFFFF;
     border-style: solid;
-    height: 220px;
+    height: 200px;
     font-family: sans-serif;
-    font-size: -1;
+    font-size: small;
     margin: 0px;
     padding: 2px;
 }
@@ -127,9 +125,9 @@ div.RMLOHover {
     background-color: #FFF6DF;
     border-width: 1px;
     border-style: dashed;
-    height: 220px;
+    height: 200px;
     font-family: sans-serif;
-    font-size: -1;
+    font-size: small;
     margin: 0px;
     padding: 2px;
 }
@@ -138,9 +136,9 @@ div.RMLOSelected {
     background-color: #CDEB8B;
     border-width: 1px;
     border-style: solid;
-    height: 220px;
+    height: 200px;
     font-family: sans-serif;
-    font-size: -1;
+    font-size: small;
     margin: 0px;
     padding: 2px;
 }

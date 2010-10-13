@@ -7159,24 +7159,26 @@ class WFilterCriteria(WTemplated):
 
 class WDateField(WTemplated):
 
-    def __init__(self, name, date, format, isDisabled=False):
+    def __init__(self, caption, name, date, format, isDisabled=False, isMandatory=False):
         self._withTime = format.find('%H') >= 0
+        self._caption = caption
         self._name = name
         self._format = format
-
-        if date:
-            self._date = date
-        else:
-            self._date = datetime.now()
-
+        self._isMandatory = isMandatory
+        self._date = date
         self._isDisabled = isDisabled
 
     def getVars(self):
         vars = WTemplated.getVars(self)
         vars['name'] = self._name
+        vars['caption'] = self._caption
         vars['date'] = self._date
-        vars['dateDisplay'] = datetime.strftime(self._date, self._format)
+        if self._date:
+            vars['dateDisplay'] = datetime.strftime(self._date, self._format)
+        else:
+            vars['dateDisplay'] = ''
         vars['isDisabled'] = self._isDisabled
         vars['withTime'] = self._withTime
+        vars['isMandatory'] = self._isMandatory
         vars['format'] = re.sub('%', '%%', self._format)
         return vars

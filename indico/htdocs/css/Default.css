@@ -3966,7 +3966,7 @@ ul.keywordList li.multipleLinesListItem_last {
 
 .invalid {
     -moz-appearance: none;
-    background-color: #FFB9B9;
+    background-color: #FFB9B9 !important;
 }
 
 .invalidLabel {
@@ -6277,6 +6277,11 @@ div.dateField input {
     width: 115px;
 }
 
+div.invalid {
+    background: white;
+}
+
+
 /*
     Widget checkbox options
 */
@@ -6313,5 +6318,17 @@ div.dateField input {
 .inputDescription {
     font-size: 11px;
     color: #888;
-    margin-left: 10px;
+    margin-left: 0px;
+}
+
+.beforeRegistrationInput {
+    width: 7px;
+}
+
+/*
+    Used to display scroll bar in CKEditor properly.
+*/
+
+body.cke_show_borders {
+    height: auto;
 }

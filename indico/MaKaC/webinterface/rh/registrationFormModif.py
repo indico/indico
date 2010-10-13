@@ -77,6 +77,15 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
         RHRegistrationFormModifBase._checkParams( self, params )
         self._cancel = params.has_key("cancel")
 
+        try:
+            self._extraTimeAmount = int(params.get("extraTimeAmount"))
+        except ValueError:
+            raise FormValuesError(_("The extra allowed time amount is not a valid integer number!"))
+
+        self._extraTimeUnit = params.get("extraTimeUnit")
+        if self._extraTimeUnit not in ['days', 'weeks']:
+            raise FormValuesError(_("The extra allowed time unit is not valid!"))
+
     def _process( self ):
         if not self._cancel:
             regForm = self._conf.getRegistrationForm()
@@ -107,6 +116,8 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
                 raise FormValuesError("End date must be after end date!", "RegistrationForm")
             regForm.setStartRegistrationDate(sDate)
             regForm.setEndRegistrationDate(eDate)
+            regForm.setEndExtraTimeAmount(self._extraTimeAmount)
+            regForm.setEndExtraTimeUnit(self._extraTimeUnit)
             regForm.setModificationEndDate(meDate)
             regForm.setAnnouncement(params["announcement"])
             regForm.setTitle( params["title"] )
@@ -653,10 +664,17 @@ class _TmpSectionField:
         self._mandatory=params.has_key("mandatory")
         self._billable=params.has_key("billable")
         self._price=params.get("price","")
+
         if params.get("inputtype"):
             self._input.setInputType(params.get("inputtype"))
         if params.get("dateFormat"):
             self._input.dateFormat = params.get("dateFormat")
+        if params.has_key('length'):
+            self._input.setLength(params.get('length'))
+        if params.has_key('numberOfRows'):
+            self._input.setNumberOfRows(params.get('numberOfRows'))
+        if params.has_key('numberOfColumns'):
+            self._input.setNumberOfColumns(params.get('numberOfColumns'))
         if params.get("addradioitem","").strip()!="":
             ri=RadioItem(self._input)
             cap=params.get("newradioitem")

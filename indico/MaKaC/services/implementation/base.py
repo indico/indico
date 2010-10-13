@@ -29,7 +29,7 @@ from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
 
-from MaKaC.errors import MaKaCError, htmlScriptError, htmlForbiddenTag, TimingError
+from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag, TimingError
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
     ResultWithWarning
 
@@ -221,10 +221,10 @@ class ServiceBase(RequestHandlerBase):
         self._checkProtection()
 
         try:
-            security.sanitizationCheck(self._target,
+            security.Sanitization.sanitizationCheck(self._target,
                                    self._params,
                                    self._aw)
-        except (htmlScriptError, htmlForbiddenTag), e:
+        except (HtmlScriptError, HtmlForbiddenTag), e:
             raise HTMLSecurityError('ERR-X0','HTML Security problem - you might be using forbidden tags: %s ' % str(e))
 
         if self._doProcess:

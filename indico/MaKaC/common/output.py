@@ -40,6 +40,7 @@ from MaKaC.webinterface.linking import RoomLinker
 from Configuration import Config
 from xmlGen import XMLGen
 import os, time
+from math import ceil
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
@@ -365,6 +366,9 @@ class outputGenerator:
 
 #            Logger.get('RecMan').info('HEY now calling _contribToXML()...')
 
+        # Keep track of days that have some slots that will be displayed
+        nonEmptyDays = set()
+
         # This case happens when called by RecordingManager to generate XML for a contribution:
         if showContribution != "all" and conf.getContributionById(showContribution) != None:
             self._contribToXML(conf.getContributionById(showContribution),vars,includeSubContribution,includeMaterial,conf, showSubContribution=showSubContribution,out=out, recordingManagerTags=recordingManagerTags)
@@ -377,12 +381,14 @@ class outputGenerator:
             for entry in entrylist:
                 if type(entry) is schedule.BreakTimeSchEntry: #TODO: schedule.BreakTimeSchEntry doesn't seem to exist!
                     self._breakToXML(entry, out=out)
+                    nonEmptyDays.add(entry.getStartDate().date())
                 elif type(entry) is conference.ContribSchEntry:
                     owner = entry.getOwner()
                     if owner.canView(self.__aw):
                         if includeContribution:
                             if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
                                 self._contribToXML(owner,vars,includeSubContribution,includeMaterial,conf, showSubContribution=showSubContribution,out=out)
+                                nonEmptyDays.add(owner.getStartDate().date())
                 elif type(entry) is schedule.LinkedTimeSchEntry: #TODO: schedule.LinkedTimeSchEntry doesn't seem to exist!
                     owner = entry.getOwner()
                     if type(owner) is conference.Contribution:
@@ -390,14 +396,17 @@ class outputGenerator:
                             if includeContribution:
                                 if showWithdrawed or not isinstance(owner.getCurrentStatus(), conference.ContribStatusWithdrawn):
                                     self._contribToXML(owner,vars,includeSubContribution,includeMaterial,conf, out=out)
+                                    nonEmptyDays.add(owner.getStartDate().date())
                     elif type(owner) is conference.Session:
                         if owner.canView(self.__aw):
                             if includeSession and (showSession == "all" or owner.getId() == showSession):
                                 self._sessionToXML(owner,vars,includeContribution,includeMaterial, showWithdrawed=showWithdrawed, out=out, recordingManagerTags=recordingManagerTags)
+                                nonEmptyDays.add(owner.getStartDate().date())
                     elif type(owner) is conference.SessionSlot:
                         if owner.getSession().canView(self.__aw):
                             if includeSession and (showSession == "all" or owner.getSession().getId() == showSession):
                                 self._slotToXML(owner,vars,includeContribution,includeMaterial, showWithdrawed=showWithdrawed, out=out, recordingManagerTags=recordingManagerTags)
+                                nonEmptyDays.add(owner.getStartDate().date())
         else:
             confSchedule = conf.getSchedule()
             for entry in confSchedule.getEntries():
@@ -406,11 +415,54 @@ class outputGenerator:
                     if owner.canView(self.__aw):
                         if includeContribution:
                             self._contribToXML(owner,vars,includeSubContribution,includeMaterial,conf,showSubContribution=showSubContribution,out=out, recordingManagerTags=recordingManagerTags)
+                            nonEmptyDays.add(owner.getStartDate().date())
             sessionList = conf.getSessionList()
             for session in sessionList: # here is the part that displays all the sessions (for the RecordingManager, anyway). It should be changed to check if showSession has been set.
                 if session.canAccess(self.__aw) and includeSession and (showSession == 'all' or str(session.getId()) == str(showSession)):
 #                    Logger.get('RecMan').info("session id = %s" % session.getId())
                     self._sessionToXML(session, vars, includeContribution, includeMaterial, showWithdrawed=showWithdrawed, useSchedule=False, out=out, recordingManagerTags=recordingManagerTags)
+                    nonEmptyDays.add(session.getStartDate().date())
+
+        nonEmptyDays = list(nonEmptyDays)
+        nonEmptyDays.sort()
+
+        if vars:
+            daysPerRow = vars.get("daysPerRow", None)
+            firstDay = vars.get("firstDay", None)
+            lastDay = vars.get("lastDay", None)
+
+            if daysPerRow or firstDay or lastDay:
+                if firstDay:
+                    firstDay = timezone(tz).localize(stringToDate(firstDay)).date()
+                    nonEmptyDays = filter(lambda day: day >= firstDay, nonEmptyDays)
+
+                if lastDay:
+                    lastDay = timezone(tz).localize(stringToDate(lastDay)).date()
+                    nonEmptyDays = filter(lambda day: day <= lastDay, nonEmptyDays)
+
+                if daysPerRow:
+                    daysPerRow = int(daysPerRow)
+
+                if not daysPerRow or daysPerRow > len(nonEmptyDays):
+                    daysPerRow = len(nonEmptyDays)
+
+                if daysPerRow > 0:
+                    numOfRows = int(ceil(len(nonEmptyDays) / float(daysPerRow)))
+                    for row in range(0, numOfRows):
+                        fromDate = nonEmptyDays[row * daysPerRow]
+                        toIndex = (row + 1) * daysPerRow - 1
+                        if toIndex >= len(nonEmptyDays):
+                            toIndex = len(nonEmptyDays) - 1
+                        toDate = nonEmptyDays[toIndex]
+                        out.openTag("line")
+                        out.writeTag("fromDate", "%d%s%s" % (fromDate.year, string.zfill(fromDate.month, 2), string.zfill(fromDate.day, 2)))
+                        out.writeTag("toDate", "%d%s%s" % (toDate.year, string.zfill(toDate.month, 2), string.zfill(toDate.day, 2)))
+                        out.closeTag("line")
+            else:
+                out.openTag("line")
+                out.writeTag("fromDate", "%d%s%s" % (adjusted_startDate.year, string.zfill(adjusted_startDate.month, 2), string.zfill(adjusted_startDate.day, 2)))
+                out.writeTag("toDate", "%d%s%s" % (adjusted_endDate.year, string.zfill(adjusted_endDate.month, 2), string.zfill(adjusted_endDate.day, 2)))
+                out.closeTag("line")
 
         mList = conf.getAllMaterialList()
         for mat in mList:
@@ -888,7 +940,6 @@ class outputGenerator:
                     MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
 
         out.closeTag("subcontribution")
-
 
     def _materialToXML(self,mat, vars, out=None):
         if not out:

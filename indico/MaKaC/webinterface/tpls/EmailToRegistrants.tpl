@@ -1,4 +1,4 @@
-<form action=%(postURL)s method="POST">
+<form action=%(postURL)s method="POST" onSubmit="if (!wasCanceled) return parameterManager.check();">
     %(toIds)s
     <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
@@ -7,7 +7,7 @@
         </tr>
         <tr>
             <td><%= _("From")%>: </td>
-            <td colspan="2"><input type="text" name="from" size="50" value="%(from)s"></text></td>
+            <td colspan="2"><input type="text" id="from" name="from" size="50" value="%(from)s"></text></td>
         </tr>
         <tr>
             <td>
@@ -17,11 +17,11 @@
         </tr>
         <tr>
             <td valign="top"><%= _("Cc")%>: </td>
-  	        <td colspan="2"><input type="text" name="cc" size="50" value="%(cc)s"></text> <font color="red"><%= _("Beware, addresses in this field will receive one mail per registrant")%></font></td>
+  	        <td colspan="2"><input type="text" id="cc" name="cc" size="50" value="%(cc)s"></text> <font color="red"><%= _("Beware, addresses in this field will receive one mail per registrant")%></font></td>
         </tr>
         <tr>
             <td><%= _("Subject")%>:</td>
-	        <td><input type="text" name="subject" size="64" value="%(subject)s"></text></td>
+	        <td><input type="text" id="subject" name="subject" size="64" value="%(subject)s"></text></td>
             <td align="center" valign="middle" rowspan="2">
             <table width="75%%" class="legend" cellspacing="1" cellpadding="1">
 				<tr><td>&nbsp;</td></tr>
@@ -41,15 +41,23 @@
         </tr>
        <tr>
             <td valign="top"><%= _("Body")%>:</td>
-	    <td colspan="2"><textarea name="body" rows="26" cols="50">%(body)s</textarea></td>
+	    <td colspan="2"><textarea id="body" name="body" rows="26" cols="50">%(body)s</textarea></td>
         </tr>
         <tr><td>&nbsp;</td></tr>
         <tr>
             <td colspan="3" align="center">
                 <input type="submit" class="btn" name="preview" value="<%= _("preview")%>">
                 <input type="submit" class="btn" name="OK" value="<%= _("send")%>">
-                <input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
+                <input type="submit" class="btn" name="cancel" onClick="wasCanceled=true;" value="<%= _("cancel")%>">
             </td>
         </tr>
     </table>
 </form>
+
+<<script type="text/javascript">
+  var parameterManager = new IndicoUtil.parameterManager();
+  var wasCanceled = false;
+  parameterManager.add($E('from'), 'text', false);
+  parameterManager.add($E('subject'), 'text', false);
+  parameterManager.add($E('body'), 'text', false);
+</script>

@@ -3496,6 +3496,7 @@ class RHProgramTrackUp(RHConferenceModifBase):
         self._track=self._target.getTrackById(params.get("trackId",""))
 
     def _process( self ):
+        self._disableCaching()
         self._target.moveUpTrack(self._track)
         self._redirect(urlHandlers.UHConfModifProgram.getURL(self._conf))
 
@@ -3507,6 +3508,7 @@ class RHProgramTrackDown(RHConferenceModifBase):
         self._track=self._target.getTrackById(params.get("trackId",""))
 
     def _process( self ):
+        self._disableCaching()
         self._target.moveDownTrack(self._track)
         self._redirect(urlHandlers.UHConfModifProgram.getURL(self._conf))
 

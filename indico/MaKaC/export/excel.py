@@ -59,10 +59,10 @@ class ExcelGenerator:
     def write(self, value):
         self._lines.append(value)
 
-    def addNumberAsString(self, value):
+    def addNumberAsString(self, value, excelSpecific=True):
         """Add a new cell value (which it has to be interpreted like
-        a string not like a number) to the current line"""
-        if value.strip() != "":
+        a string not like a number) to the current line. Needed just for Excel (not for OpenOffice)."""
+        if excelSpecific and value.strip() != "":
             value = '="%s"' % ExcelGenerator.excelFormatting(value)
         self._currentLine.append(value)
 
@@ -77,6 +77,8 @@ class ExcelGenerator:
         return ''.join(self._lines)
 
     def excelFormatting(text):
+        if text is None:
+            text = ""
         if text.strip() != "":
             text = utils.utf8Tolatin1(text)
             text = text.replace('\x0d', '')
@@ -85,11 +87,22 @@ class ExcelGenerator:
 
 class RegistrantsListToExcel:
 
-    def __init__(self, conf,list=None, display=["Institution", "Phone", "City", "Country"]):
+    def __init__(self, conf,list=None, display=["Institution", "Phone", "City", "Country"], excelSpecific=True):
         self._conf = conf
         self._regForm = conf.getRegistrationForm()
         self._regList = list
         self._display = display
+        self._excelSpecific = excelSpecific
+
+    def _formatGenericValue(self, fieldInput, value):
+        try:
+            value = fieldInput.getValueDisplay(value)
+        except:
+            value = str(value).strip()
+        return value
+
+    def _isNumberAsString(self, fieldInput, value):
+        return fieldInput.getName() == 'Telephone'
 
     def getExcelFile(self):
         excelGen=ExcelGenerator()
@@ -161,7 +174,7 @@ class RegistrantsListToExcel:
                 elif key == "Address":
                     excelGen.addValue(reg.getAddress())
                 elif key == "Phone":
-                    excelGen.addNumberAsString(reg.getPhone())
+                    excelGen.addNumberAsString(reg.getPhone(), self._excelSpecific)
                 elif key == "Sessions":
                     p7 = []
                     for ses in reg.getSessionList():
@@ -221,7 +234,11 @@ class RegistrantsListToExcel:
                         if group is not None:
                             i=group.getResponseItemById(ids[1])
                             if i is not None:
-                                excelGen.addValue(str(i.getValue()))
+                                value = self._formatGenericValue(i.getGeneralField().getInput(), i.getValue())
+                                if self._isNumberAsString(i.getGeneralField().getInput(), i.getValue()):
+                                    excelGen.addNumberAsString(value, self._excelSpecific)
+                                else:
+                                    excelGen.addValue(value)
                                 continue
                     excelGen.addValue("")
             excelGen.newLine()
@@ -230,10 +247,11 @@ class RegistrantsListToExcel:
 
 class AbstractListToExcel:
 
-    def __init__(self, conf,list=None, display=["ID","Title","Primary Authors","Track Name","Contribution Type"]):
+    def __init__(self, conf,list=None, display=["ID","Title","Primary Authors","Track Name","Contribution Type"], excelSpecific=True):
         self._conf = conf
         self._abstractList = list
         self._displayList = display
+        self._excelSpecific = excelSpecific
 
     def getExcelFile(self):
         excelGen=ExcelGenerator()
@@ -266,23 +284,24 @@ class AbstractListToExcel:
                     ctname=""
                     if contribType is not None:
                         ctname=contribType.getName()
-                    excelGen.addNumberAsString(ctname)
+                    excelGen.addNumberAsString(ctname, self._excelSpecific)
             excelGen.newLine()
         return excelGen.getExcelContent()
 
 class ParticipantsListToExcel:
 
-    def __init__(self, conf,list=None):
+    def __init__(self, conf,list=None, excelSpecific=True):
         self._conf = conf
         self._partList = list
+        self._excelSpecific = excelSpecific
 
     def getExcelFile(self):
         excelGen=ExcelGenerator()
         excelGen.addValue("Name")
         excelGen.addValue("Email")
         excelGen.addValue("Affiliation")
-        excelGen.addNumberAsString("Phone")
-        excelGen.addNumberAsString("Fax")
+        excelGen.addNumberAsString("Phone", self._excelSpecific)
+        excelGen.addNumberAsString("Fax", self._excelSpecific)
         excelGen.newLine()
 
         if self._partList == None:
@@ -292,7 +311,7 @@ class ParticipantsListToExcel:
             excelGen.addValue(reg.getFullName())
             excelGen.addValue(reg.getEmail())
             excelGen.addValue(reg.getAffiliation())
-            excelGen.addNumberAsString(reg.getTelephone())
-            excelGen.addNumberAsString(reg.getFax())
+            excelGen.addNumberAsString(reg.getTelephone(), self._excelSpecific)
+            excelGen.addNumberAsString(reg.getFax(), self._excelSpecific)
             excelGen.newLine()
         return excelGen.getExcelContent()

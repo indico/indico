@@ -22,14 +22,25 @@
     </tr>
 </table>
 <br>
-<form action=%(postURL)s method="POST">    
-    %(params)s
-    <table width="80%%" align="center" border="0">
+
+
+    <table width="50%%" align="center" border="0">
         <tr>
-            <td colspan="3" align="center">
-                <input type="submit" class="btn" name="OK" value="<%= _("send")%>">
-                <input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
+            <td align="right">
+                <form action=%(postURL)s method="POST">
+                    %(params)s
+                    <input type="submit" class="btn" name="OK" value="<%= _("send")%>">
+                    <input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
+                </form>
+            </td>
+            <td>
+                <form action=%(backURL)s method="POST">
+                    %(params)s
+                    <input type="submit" class="btn" name="emailSelected" value="back" />
+                </form>
             </td>
         </tr>
     </table>
-</form>
+
+
+

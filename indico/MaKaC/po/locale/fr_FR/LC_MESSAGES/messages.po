@@ -9427,10 +9427,10 @@ msgstr "Modifier le fuseau horaire de toutes les conférences"
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/CategoryReallocation.tpl:11
 msgid ""
 "Please, select the destination category where to move the ones mentioned "
-"above (use the blue arrows to navigate in the category tree)"
+"above (use the '+' icon to navigate in the category tree)"
 msgstr ""
 "Veuillez sélectionner la catégorie cible dans laquelle doivent être déplacés "
-"les objets mentionnés ci-dessus (utilisez les flèches bleues pour naviguer "
+"les objets mentionnés ci-dessus (utilisez les '+' pour naviguer "
 "dans l'arborescence de la catégorie)"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/wcomponents.py:4553
@@ -16642,10 +16642,10 @@ msgstr "Envoyé le"
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/ConferenceReallocation.tpl:9
 msgid ""
 "Please, select the destination category where to move the conferences "
-"mentioned above (use the blue arrows to navigate in the category tree)"
+"mentioned above (use the '+' icon to navigate in the category tree)"
 msgstr ""
 "Veuillez selectionner la catégorie cible dans laquelle vous voulez déplacer "
-"les conférences mentionnées ci-dessus (utiliser les flèches bleues pour "
+"les conférences mentionnées ci-dessus (utiliser les '+' pour "
 "naviguer dans l'arborescence de la catégorie)"
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/tpls/RoomBookingRoomDetails.tpl:117

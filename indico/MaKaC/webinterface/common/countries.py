@@ -200,7 +200,7 @@ class CountryHolder:
     _countries['SE'] = "SWEDEN"
     _countries['CH'] = "SWITZERLAND"
     _countries['SY'] = "SYRIEN ARAB REPUBLIC"
-    _countries['TW'] = "TAIWAN, PROVINCE OF CHINA"
+    _countries['TW'] = "TAIWAN"
     _countries['TJ'] = "TAJIKISTAN"
     _countries['TH'] = "THAILAND"
     _countries['TG'] = "TOGO"
