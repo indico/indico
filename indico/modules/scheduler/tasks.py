@@ -38,7 +38,7 @@ from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.date_time import nowutc, int_timestamp
+from indico.util.date_time import int_timestamp
 from indico.modules.scheduler.fossils import ITaskFossil, ITaskOccurrenceFossil
 from indico.modules.scheduler import base
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
@@ -52,9 +52,13 @@ class TimedEvent(Persistent, Fossilizable):
     zope.interface.implements(IUniqueIdProvider,
                               IIndexableByArbitraryDateTime)
 
+
     def getIndexingDateTime(self):
+        return int_timestamp(self._getCurrentDateTime())
+
+    def _getCurrentDateTime(self):
         # just get current date/time
-        return int_timestamp(nowutc())
+        return base.TimeSource.get().getCurrentTime()
 
     def __conform__(self, proto):
 
@@ -75,7 +79,7 @@ class BaseTask(TimedEvent):
     fossilizes(ITaskFossil)
 
     def __init__(self, expiryDate=None):
-        self.createdOn = nowutc()
+        self.createdOn = self._getCurrentDateTime()
         self.expiryDate = expiryDate
         self.typeId = self.__class__.__name__
         self.id = None
@@ -145,17 +149,21 @@ class BaseTask(TimedEvent):
         This information will be saved regardless of the task being repeated or not
         """
 
-        tsDiff = int_timestamp(nowutc()) - int_timestamp(self.getStartOn())
+        curTime = self._getCurrentDateTime()
+        tsDiff = int_timestamp(curTime) - int_timestamp(self.getStartOn())
 
         if tsDiff < 0:
-            self.getLogger().debug('Task %s will wait for some time. (%s) > (%s)' % (self.id, self.getStartOn(), nowutc()))
-            time.sleep(tsDiff)
+            self.getLogger().debug('Task %s will wait for some time. (%s) > (%s)' % \
+                                   (self.id, self.getStartOn(), curTime))
+            base.TimeSource.get().sleep(tsDiff)
 
-        if self.expiryDate and nowutc() > self.expiryDate:
-            self.getLogger().warning('Task %s will not be executed, expiryDate (%s) < current time (%s)' % (self.id, self.expiryDate, nowutc()))
+        if self.expiryDate and curTime > self.expiryDate:
+            self.getLogger().warning(
+                'Task %s will not be executed, expiryDate (%s) < current time (%s)' % \
+                (self.id, self.expiryDate, curTime))
             return False
 
-        self.startedOn = nowutc()
+        self.startedOn = curTime
         self.running = True
         self.status = base.TASK_STATUS_RUNNING
 
@@ -165,11 +173,13 @@ class BaseTask(TimedEvent):
             self.run()
         finally:
             self.running = False
-            self.endedOn = nowutc()
+            self.endedOn = self._getCurrentDateTime()
 
     def tearDown(self):
-        '''If a task needs to do something once it has run and been removed from runningList
-        overload this method'''
+        """
+        If a task needs to do something once it has run and been removed
+        from runningList, overload this method
+        """
         pass
 
     def __str__(self):
@@ -210,8 +220,7 @@ class PeriodicTask(BaseTask):
         self._repeat = True
 
         if 'dtstart' not in kwargs:
-            kwargs['dtstart'] = nowutc()
-
+            kwargs['dtstart'] = self._getCurrentDateTime()
 
         self._rule = rrule.rrule(
             frequency,
@@ -236,7 +245,7 @@ class PeriodicTask(BaseTask):
             return
 
         if not dateAfter:
-            dateAfter = nowutc()
+            dateAfter = self._getCurrentDateTime()
 
         # find next date after
         nextOcc = self._rule.after(self._nextOccurrence,
@@ -558,7 +567,7 @@ class AlarmTask(SendMailTask):
         if check:
             from MaKaC.conference import ConferenceHolder
             if not ConferenceHolder().hasKey(self.conf.getId()) or \
-                   self.conf.getStartDate() <= nowutc():
+                   self.conf.getStartDate() <= self._getCurrentDateTime():
                 self.conf.removeAlarm(self)
                 return True
 
@@ -606,11 +615,11 @@ Best Regards
 class SampleOneShotTask(OneShotTask):
     def run(self):
         self.getLogger().debug('Now i shall sleeeeeeeep!')
-        time.sleep(1)
+        base.TimeSource.get().sleep(1)
         self.getLogger().debug('%s executed' % self.__class__.__name__)
 
 
 class SamplePeriodicTask(PeriodicTask):
     def run(self):
-        time.sleep(1)
+        base.TimeSource.get().sleep(1)
         self.getLogger().debug('%s executed' % self.__class__.__name__)

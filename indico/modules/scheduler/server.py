@@ -90,6 +90,9 @@ class Scheduler(object):
 
         self._runningWorkers = {}
 
+    def _getCurrentDateTime(self):
+        return base.TimeSource.get().getCurrentTime()
+
     def _readConfig(self, config):
         """
         Reads the config dictionary and verifies the parameters are ok.
@@ -138,7 +141,7 @@ class Scheduler(object):
         """
         while True:
 
-            currentTimestamp = int_timestamp(nowutc())
+            currentTimestamp = int_timestamp(self._getCurrentDateTime())
 
             # this will basically abort the transaction, so, make sure
             # everything important before this was committed
@@ -166,7 +169,7 @@ class Scheduler(object):
                 # it's actually a timestamp, task tuple
                 nextTS, nextTask = res
 
-                self._logger.debug((nextTS, currentTimestamp))
+                self._logger.debug((nextTS, currentTimestamp, self._getCurrentDateTime()))
 
                 # if it's time to execute the task
                 if  (nextTS <= currentTimestamp):
@@ -274,7 +277,7 @@ class Scheduler(object):
             self._schedModule.removeWaitingTask(timestamp, curTask)
 
             # mark the task as being in the running list
-            curTask.setOnRunningListSince(nowutc())
+            curTask.setOnRunningListSince(self._getCurrentDateTime())
 
             # add it to the running list
             self._schedModule.addTaskToRunningList(curTask)
@@ -325,7 +328,7 @@ class Scheduler(object):
 
     def _sleep(self, msg):
         self._logger.debug(msg)
-        time.sleep(self._config.sleep_interval)
+        base.TimeSource.get().sleep(self._config.sleep_interval)
 
     def _readFromDb(self):
         self._logger.debug('_readFromDb()..')
@@ -434,7 +437,7 @@ class Scheduler(object):
                         base.TASK_STATUS_RUNNING,
                         base.TASK_STATUS_QUEUED)
             else:
-                runForSecs = int_timestamp(nowutc()) - \
+                runForSecs = int_timestamp(self._getCurrentDateTime()) - \
                              int_timestamp(task.getOnRunningListSince())
 
                 if runForSecs > self._config.awol_tasks_thresold:

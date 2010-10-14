@@ -23,17 +23,36 @@ Tests for scheduler base classes
 """
 import unittest, threading, multiprocessing
 import time
-from datetime import timedelta, datetime
+from datetime import timedelta
 from dateutil import rrule
 
 from MaKaC.common.db import DBMgr
 
 from indico.util.date_time import nowutc
-from indico.modules.scheduler import Scheduler, SchedulerModule, Client
+from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 from indico.modules.scheduler.tasks import OneShotTask, PeriodicTask
 
 terminated = None
 
+
+class TestTimeSource(base.TimeSource):
+    def __init__(self, factor):
+        self._startTime = nowutc()
+        self._factor = factor
+
+    def getCurrentTime(self):
+        realDiff = nowutc() - self._startTime
+        seconds = (realDiff.seconds + realDiff.microseconds / 1E6)
+
+        fakeDiff = timedelta(seconds = seconds*self._factor)
+
+        return self._startTime + fakeDiff
+
+    def sleep(self, amount):
+        time.sleep(amount/float(self._factor))
+
+
+base.TimeSource.set(TestTimeSource(5))
 
 class TestTask(OneShotTask):
 
@@ -42,13 +61,13 @@ class TestTask(OneShotTask):
         self._id = myid
 
     def run(self):
-        time.sleep(1)
+        base.TimeSource.get().sleep(1)
         terminated[self._id] = 1
 
 
 class TestFailTask(TestTask):
     def run(self):
-        time.sleep(1)
+        base.TimeSource.get().sleep(1)
         terminated[self._id] = 1
         raise Exception('I fail!')
 
@@ -131,9 +150,11 @@ class _TestScheduler(unittest.TestCase):
             while terminated[w] != value:
                 # timeout at 10 sec
                 if timewaited < timeout:
-                    time.sleep(1)
+                    base.TimeSource.get().sleep(1)
                     timewaited += 1
                 else:
+                    # print "bad news... timeout @ %s, value=%s" % \
+                    #       (w, terminated[w])
                     return False
         return True
 
@@ -171,7 +192,8 @@ class _TestScheduler(unittest.TestCase):
         """
 
         self._startSomeWorkers([TestTask],
-                               [nowutc() + timedelta(seconds=2)])
+                               [base.TimeSource.get().getCurrentTime() + \
+                                timedelta(seconds=2)])
         self.assertEqual(self._checkWorkersFinished(10),
                          True)
 
@@ -198,12 +220,14 @@ class _TestScheduler(unittest.TestCase):
         terminated[0] = 0
         terminated[1] = 0
 
-        w1 = Worker(0, TestTask, nowutc() + timedelta(seconds=4))
+        w1 = Worker(0, TestTask, base.TimeSource.get().getCurrentTime() + \
+                    timedelta(seconds=4))
         w1.start()
 
-        time.sleep(1)
+        base.TimeSource.get().sleep(1)
 
-        w2 = Worker(1, TestTask, nowutc() + timedelta(seconds=0))
+        w2 = Worker(1, TestTask, base.TimeSource.get().getCurrentTime() + \
+                    timedelta(seconds=0))
         w2.start()
 
         self._workers[0] = w1
@@ -237,12 +261,13 @@ class _TestScheduler(unittest.TestCase):
 
     def testSeveralFailFinish(self):
         """
-        Creating 10 tasks, 4 of which will fail
+        Creating 5 tasks, 2 of which will fail
         """
 
-        self._startSomeWorkers([TestFailTask for i in range(0, 4)] +
-                               [TestTask for i in range(4, 10)],
-                               [nowutc() + timedelta(seconds=2)]*10)
+        self._startSomeWorkers([TestFailTask] * 2 +
+                               [TestTask] * 3,
+                               [base.TimeSource.get().getCurrentTime() + \
+                                timedelta(seconds=2)]*5)
         self.assertEqual(self._checkWorkersFinished(10),
                          True)
 
@@ -252,8 +277,8 @@ class _TestScheduler(unittest.TestCase):
                             'waiting': 0,
                             'running': 0,
                             'spooled': 0,
-                            'finished': 6,
-                            'failed': 4})
+                            'finished': 3,
+                            'failed': 2})
 
     def testSeveralFailFinishWaiting(self):
         """
@@ -262,8 +287,10 @@ class _TestScheduler(unittest.TestCase):
 
         self._startSomeWorkers([TestFailTask for i in range(0, 3)] +
                                [TestTask for i in range(3, 10)],
-                               [nowutc() + timedelta(seconds=2)]*8 +
-                               [nowutc() + timedelta(minutes=200)]*2)
+                               [base.TimeSource.get().getCurrentTime() + \
+                                timedelta(seconds=2)]*8 +
+                               [base.TimeSource.get().getCurrentTime() + \
+                                timedelta(minutes=200)]*2)
 
         # Not all workers will have finished
         self.assertEqual(self._checkWorkersFinished(10),
@@ -280,10 +307,10 @@ class _TestScheduler(unittest.TestCase):
 
     def testPeriodicTasks(self):
         """
-        Creating 10 periodic tasks
+        Creating 5 periodic tasks
         """
 
-        now = datetime.now()
+        now = base.TimeSource.get().getCurrentTime()
 
         s = ((now.second / 10) + 1) % 6
 
@@ -294,21 +321,21 @@ class _TestScheduler(unittest.TestCase):
             s = s + 1
             seconds.append((s % 6) * 10)
 
-        self._startSomeWorkers([TestPeriodicTask for i in range(0, 10)],
-                               [rrule.MINUTELY] * 10,
+        self._startSomeWorkers([TestPeriodicTask] * 5,
+                               [rrule.MINUTELY] * 5,
                                bysecond = tuple(seconds))
 
         # Not all workers will have finished
-        self.assertEqual(self._checkWorkersFinished(40, value=3),
+        self.assertEqual(self._checkWorkersFinished(60, value=3),
                          True)
 
         self._shutdown()
 
         self._assertStatus({'state': False,
-                            'waiting': 10,
+                            'waiting': 5,
                             'running': 0,
                             'spooled': 0,
-                            'finished': 30,
+                            'finished': 15,
                             'failed': 0})
 
     def testPeriodicFailTasks(self):
@@ -316,7 +343,7 @@ class _TestScheduler(unittest.TestCase):
         Creating 1 periodic task that fails every second time
         """
 
-        now = datetime.now()
+        now = base.TimeSource.get().getCurrentTime()
 
         s = ((now.second / 10) + 1) % 6
 
@@ -332,7 +359,7 @@ class _TestScheduler(unittest.TestCase):
                                bysecond = tuple(seconds))
 
         # All workers will have finished
-        self.assertEqual(self._checkWorkersFinished(40, value=4),
+        self.assertEqual(self._checkWorkersFinished(60, value=4),
                          True)
 
         self._shutdown()

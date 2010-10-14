@@ -184,7 +184,7 @@ class SchedulerModule(Module):
         task.setStatus(base.TASK_STATUS_QUEUED)
 
         logging.getLogger('scheduler').debug(
-            'Added task %s to waitingList..' % task.id)
+            'Added task %s to waitingQueue..' % task.id)
 
     def popNextWaitingTask(self):
         return self._waitingQueue.pop()

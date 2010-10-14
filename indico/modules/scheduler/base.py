@@ -18,8 +18,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import time
 from contextlib import contextmanager
 from ZODB.POSException import ConflictError
+
+from indico.util.date_time import nowutc
 
 TASK_STATUS_NONE, TASK_STATUS_SPOOLED, TASK_STATUS_QUEUED, TASK_STATUS_RUNNING, \
 TASK_STATUS_FAILED, TASK_STATUS_ABORTED, TASK_STATUS_FINISHED = range(0,7)
@@ -57,6 +60,43 @@ class OperationManager(object):
                                    "Something bad must be going on..." %
                                    CONFLICTERROR_MAX_RETRIES)
 
+
+## Time Sources
+
+class TimeSource(object):
+    """
+    A class that represents a time source (a reference clock)
+    This abstraction may look a bit of an overkill, but it is very
+    useful for testing purposes
+    """
+
+    @classmethod
+    def get(cls):
+        return cls._source
+
+    @classmethod
+    def set(cls, source):
+        cls._source = source
+
+    def __init__(self):
+        super(TimeSource, self).__init__()
+
+    def sleep(self, amount):
+        time.sleep(amount)
+
+    def getCurrentTime():
+        """
+        Returns the current datetime
+        """
+        raise Exception('Undefined method! Should be overloaded.')
+
+
+class UTCTimeSource(TimeSource):
+
+    def getCurrentTime(self):
+        return nowutc()
+
+TimeSource._source = UTCTimeSource()
 
 ## Exceptions
 

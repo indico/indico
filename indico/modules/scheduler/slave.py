@@ -91,7 +91,7 @@ class _Worker(object):
                     # if i is still low enough, we sleep progressively more
                     # so that if the error is caused by concurrency we don't make
                     # the problem worse by hammering the server.
-                    time.sleep(nextRunIn)
+                    base.TimeSource.get().sleep(nextRunIn)
 
                 # abort transaction and synchronize
                 self._dbi.sync()
