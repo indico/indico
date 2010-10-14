@@ -52,7 +52,7 @@ class TestTimeSource(base.TimeSource):
         time.sleep(amount/float(self._factor))
 
 
-base.TimeSource.set(TestTimeSource(5))
+base.TimeSource.set(TestTimeSource(4))
 
 class TestTask(OneShotTask):
 
