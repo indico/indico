@@ -7,7 +7,7 @@
 
 
 <div style="padding-left: 10px; padding-top: 10px; padding-bottom: 10px;">
-<em><%= _("The reviewing mode choosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
+<em><%= _("The reviewing mode chosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
 </div>
 <% if not Review.isAuthorSubmitted(): %>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
@@ -48,7 +48,7 @@
                     <% includeTpl ('EditingJudgementDisplay', Editing = Editing, ShowEditor = True) %>
                 <% end %>
                 <% else: %>
-                    <font><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span> 
+                    <font><%= _("Warning: the layout reviewer has not given his judgement yet.")%></span>
                 <% end %>
         </td>
     </tr>
@@ -84,8 +84,8 @@
 <% if ConferenceChoice == 2 or ConferenceChoice == 4:%>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final Judgement")%>
-            <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>    
+        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final judgement")%>
+            <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>
         </td>
     </tr>
         <% if not IsReferee: %>
@@ -133,7 +133,7 @@
                 <span id="submittedmessage"></span>
             </td>
         </tr>
-        <% end %>  
+        <% end %>
 </table>
 <% end %>
 <% end %>
@@ -145,27 +145,27 @@ var observer = function(value) {
                         $E('submitHelpPopUp').set("");
                         $E('submitHelpPopUp').dom.display = 'none';
                         }
-                     
+
 }
-               
+
 var showWidgets = function(firstLoad) {
-                           
+
     new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditJudgement'),
                         'reviewing.contribution.changeJudgement',
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'refereeJudgement'
-                        }, <%= ConfReview.getAllStates() %>, "<%=FinalJudge%>", observer);       
-    
+                        }, <%= ConfReview.getAllStates() %>, "<%=FinalJudge%>", observer);
+
     new IndicoUI.Widgets.Generic.richTextField($E('inPlaceEditComments'),
                            'reviewing.contribution.changeComments',
                            {conference: '<%= Contribution.getConference().getId() %>',
                             contribution: '<%= Contribution.getId() %>',
                             current: 'refereeJudgement'
                            },400,200);
-                           
-    
-    
+
+
+
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
         $E('questionListDisplay').set($T("No reviewing questions proposed for this conference."));
     <% end %>
@@ -173,32 +173,32 @@ var showWidgets = function(firstLoad) {
         $E("questionListDisplay").set('');
         <% for q in ConfReview.getReviewingQuestions(): %>
             var newDiv = Html.div({style:{paddingLeft:'5px', marginLeft:'10px'}});
-            
+
             newDiv.append(Html.span(null,"<%=q%>"));
             newDiv.append(Html.br());
-                        
+
             if (firstLoad) {
                 var initialValue = "<%= Review.getRefereeJudgement().getAnswer(q) %>";
             } else {
                 var initialValue = false;
             }
-            
+
             newDiv.append(new IndicoUI.Widgets.Generic.radioButtonField(
                                                     null,
                                                     'horizontal2',
                                                     <%= str(range(len(ConfReview.reviewingQuestionsAnswers))) %>,
                                                     <%= str(ConfReview.reviewingQuestionsLabels) %>,
                                                     initialValue,
-                                                    'reviewing.contribution.changeCriteria', 
+                                                    'reviewing.contribution.changeCriteria',
                                                     {conference: '<%= Contribution.getConference().getId() %>',
                                                     contribution: '<%= Contribution.getId() %>',
                                                     criterion: '<%= q %>',
                                                     current: 'refereeJudgement'
                                                     }));
-            
+
             $E("questionListDisplay").append(newDiv);
             $E("questionListDisplay").append(Html.br());
-            
+
         <% end %>
     <% end %>
 }
@@ -232,7 +232,7 @@ var showValues = function() {
                 }
             }
         )
-    
+
     indicoRequest('reviewing.contribution.getCriteria',
             {
                 conference: '<%= Contribution.getConference().getId() %>',
@@ -253,17 +253,17 @@ var showValues = function() {
 
                 }
             }
-        )   
+        )
 }
 
 
-<% if Review.getRefereeJudgement().isSubmitted() or not IsReferee:%> 
+<% if Review.getRefereeJudgement().isSubmitted() or not IsReferee:%>
 var submitted = true;
 <% end %>
 <% else: %>
 var submitted = false;
 <% end %>
-       
+
 
 var updatePage = function (){
     if (submitted) {
@@ -282,15 +282,15 @@ var updatePage = function (){
            /* <% if not Review.isAuthorSubmitted(): %>
 		            var submitHelpPopUpText = function(event) {
 		              IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You are not allowed to give final judgement.<br/>You have to wait for the author to submit the materials.</span>");
-		                } 
+		                }
 		    <% end %>*/
 		    <% if not FinalJudge: %>
 	               var submitHelpPopUpText = function(event) {
                       IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>You must give your judgement before sending.</span>");
-                        } 	        
+                        }
 		    <% end %>
             $E('submitHelpPopUp').dom.onmouseover = submitHelpPopUpText;
-        <% end %>        
+        <% end %>
         $E('submittedmessage').set($T('Judgement not sent yet'));
         <% end %>
         showWidgets();
@@ -320,6 +320,6 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
 );
 <% end %>
 
-updatePage(true);                   
-                   
+updatePage(true);
+
 </script>

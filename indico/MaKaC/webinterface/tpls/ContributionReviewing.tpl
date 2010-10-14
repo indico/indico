@@ -6,7 +6,7 @@
 <% format = "%a %d %b %Y at %H\x3a%M" %>
 
 <div style="padding-left: 10px; padding-top: 10px; padding-bottom: 10px">
-<em><%= _("The reviewing mode choosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
+<em><%= _("The reviewing mode chosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
 </div>
 
 <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
@@ -15,7 +15,7 @@
     <tr>
         <td id="assignRefereeHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Referee")%></td>
     </tr>
-   
+
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Referee")%>:</span>
@@ -123,7 +123,7 @@
     </tr>
     <tr>
 	        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Layout reviewer")%>:</span></td>
-	        
+
 	   <% if ContributionReviewManager.hasEditor(): %>
 	         <td width="60%%" class='bottom_line'>
 	         <%= ContributionReviewManager.getEditor().getFullName() %>
@@ -356,7 +356,7 @@
                 </td>
             <% end %>
             </form>
-        </tr>  
+        </tr>
 </table>
 <% end %>
 
@@ -365,7 +365,7 @@
 
 
 <script type="text/javascript">
-    
+
 <% if CanEditDueDates: %>
     <% if ContributionReviewManager.hasReferee(): %>
         new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditRefereeDueDate'),
@@ -384,7 +384,7 @@
                             dueDateToChange: 'Editor'},
                            null, true);
     <% end %>
-                   
+
     <% if ContributionReviewManager.hasReviewers(): %>
         new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditReviewerDueDate'),
                            'reviewing.contribution.changeDueDate',
@@ -395,6 +395,6 @@
     <% end %>
 
 <% end %>
-                   
-                   
+
+
 </script>

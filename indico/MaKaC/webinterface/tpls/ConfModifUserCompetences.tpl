@@ -14,17 +14,17 @@
     <tr>
         <td nowrap class="groupTitle" colspan=5>
             <%= _("Paper Reviewing Team competences")%>
-            <span id="competencesHelp"></span> 
+            <span id="competencesHelp"></span>
         </td>
     </tr>
     <tr>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Id")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Name")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Responsabilities")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Responsibilities")%></td>
         <td colspan=2 nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 10px; padding-bottom: 10px;"><%= _("Competences")%></td>
     </tr>
-   
-    
+
+
     <% for user, competences in ConfReview.getAllUserCompetences(): %>
     <% if ConfReview.getUserReviewingRoles(user): %>
     <% if ConfReview.isPaperReviewManager(user) or ConfReview.isReferee(user) or ConfReview.isEditor(user) or ConfReview.isReviewer(user):%>
@@ -60,7 +60,7 @@ var keyWordfieldList = new Array()
             user: '<%= user.getId() %>'
         }
     );
- <% end %>    
+ <% end %>
 <% end %>
 </script>
 <% end %>

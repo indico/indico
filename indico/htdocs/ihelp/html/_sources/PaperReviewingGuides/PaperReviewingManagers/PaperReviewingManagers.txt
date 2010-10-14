@@ -17,14 +17,14 @@ How to activate the module
 
 -----------------
 
-Manager of the Paper Reviewing Module
+Manager of the paper reviewing module
 -------------------------------------
 
 The manager of the module can modify all the settings and
 is responsible for the paper reviewing process. He
 creates the reviewing team and assigns
 contributions to the team. If you are a manager
-of the Paper Reviewing you can access it by clicking on
+of the Paper Reviewing you can access it by clicking on the
 ``Manage Paper Reviewing`` link, after you are logged in
 (see the following figure).
 
@@ -32,11 +32,11 @@ of the Paper Reviewing you can access it by clicking on
 
 ---------------
 
-Paper Reviewing Management
+Paper reviewing management
 --------------------------
 
-Setup the Module
-~~~~~~~~~~~~~~~~
+Set up the module
+~~~~~~~~~~~~~~~~~
 
 The first step is to choose the type of
 paper reviewing for your conference:
@@ -56,30 +56,30 @@ paper reviewing for your conference:
 The second step is setting up the options depending on the type of
 reviewing you have chosen:
 
-Options for Content reviewing mode
+Options for content reviewing mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 - There are three statuses by default. You can add your own 
-  statuses that will be proposed to the Content Reviewers, when they have to 
-  give opinions about the paper's content, and to the Referee when he has to give a judgement.
+  statuses that will be proposed to the content reviewers, when they have to 
+  give opinions about the paper's content, and to the referee when he has to give a judgement.
 
         |image8|
 
-- As well, there is a way to add also reviewing questions in order to help 
-  Content Reviewers and Referees giving their judgements for 
-  the paper's content. The Referee will be able to see the Content 
-  Reviewers' answers and this will help him with the final judgement.
+- There is also a way to add reviewing questions in order to help 
+  content reviewers and referees give their judgement for 
+  the paper's content. The referee will be able to see the content 
+  reviewers' answers and this will help him with the final judgement.
 
         |image9|
 
 ------------------------
 
-Options for Layout reviewing mode
+Options for layout reviewing mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- You can add questions in order to help Layout Reviewers to give 
-  their judgments. These questions are visible when they 
+- You can add questions in order to help layout reviewers to give 
+  their judgment. These questions are visible when they 
   have to judge the paper. This will guide them to follow the 
   layout criteria given by you (see figure as example).
 
@@ -87,27 +87,27 @@ Options for Layout reviewing mode
 
 ----------------------
 
-Options for Content and Layout reviewing mode
+Options for content and layout reviewing mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- You can set up all the options in previous two sections - 1.3.1.1 / 1.3.1.2.
+- You can set up all the options in the previous two sections - 1.3.1.1 / 1.3.1.2.
 
-- You can set due dates for the Reviewing Team to give their 
+- You can set due dates for the reviewing team to give their 
   judgments. They will not be able to judge the papers after the 
-  deadline. This default dates apply only used for a new contribution.
+  deadline. These default dates apply only for a new contribution.
 
         |image11|
 
-- The system sends automatic e-mails in order to notify the Reviewing 
-  Team or the authors of the papers in several situations. You can enable 
+- The system sends automatic e-mails in order to notify the reviewing 
+  team or the authors of the papers in several situations. You can enable 
   or disable the e-mails by clicking on the check boxes.
 
         |image12|
 
-- The Paper reviewing module allows you to upload your 
+- The paper reviewing module allows you to upload your 
   own layout template which the authors can download and use. This will 
   help them to follow the required layout criteria you impose. The template 
-  can be in form of document file.
+  can be in the form of a document file.
 
         |image13|
 
@@ -115,19 +115,19 @@ Options for Content and Layout reviewing mode
 
 ------------------------
 
-Assign Team
+Assign team
 ~~~~~~~~~~~
 
-Assign Managers
+Assign managers
 ^^^^^^^^^^^^^^^
 
-The Managers of the Paper Reviewing will be responsible for the
+The managers of the paper reviewing will be responsible for the
 reviewing part of the conference. Their responsibility will be to
-designate Referees, Layout and Content Reviewers who will be
-responsible for papers reviewing and editing. The Reviewing Manager
-will be able to set up the options for the Reviewing Module, to
+designate referees, layout and content reviewers who will be
+responsible for paper reviewing and editing. The reviewing manager
+will be able to set up the options for the reviewing module, to
 specify the team's competences and to assign contributions to the
-Referees and Reviewers. You can add Paper Review Manager after 
+referees and reviewers. You can add paper review manager after 
 accessing the ``Team`` tab. 
 
         |image16|
@@ -139,27 +139,27 @@ accessing the ``Team`` tab.
 
 ------------------------
 
-Assign Reviewers
+Assign reviewers
 ^^^^^^^^^^^^^^^^
 
-You can create list of Referees, Layout Reviewers and Content
-Reviewers.
+You can create lists of referees, layout reviewers and content
+reviewers.
 
-When you add a user to be Referee, you are giving him the
-rights to assign contributions to the Layout and Content Reviewers.
-Also, the Referee has to give the final judgment for the
+When you add a user to be a referee, you are giving him the
+rights to assign contributions to the layout and content reviewers.
+Also, the referee has to give the final judgement for the
 contribution - ``to be corrected``, ``accepted`` or ``rejected``. If the
-contribution status is given to be corrected then the Referee will
-be able to correct it by himself if it's needed.
+contribution status is given to be corrected, then the referee will
+be able to correct it by himself if necessary.
 
-The Layout Reviewer has to judge the editing part of the contributions.
+The layout reviewer has to judge the editing part of the contributions.
 He will be able to access only the contributions that are assigned
-to him to judge. When we set up the Layout Reviewing mode, he will have to give
-the final judgement of the contribution. If needed the Layout
-Reviewer can correct the papers by himself.
+to him for judgement. When layout reviewing mode is chosen, he will have to give
+the final judgement of the contribution. If needed the layout
+reviewer can correct the papers by himself.
 
-The Content Reviewers have to give their opinion of contribution's
-content. They will have access only to the contributions that are
+The content reviewers have to give their opinion of the content of the contribution. 
+They will have access only to the contributions that are
 assigned to them.
 
         |image17|
@@ -169,41 +169,41 @@ assigned to them.
 Define competences for team members
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Paper Reviewing Managers can specify team's
-competences, if it is needed. The list of all designed
+The paper reviewing managers can specify the team's
+competences, if necessary. The list of all designated
 users will be offered after you access the ``Competences`` tab.
 
         |image18|
 
 -------------------------
 
-Assign Contributions to the Reviewers
+Assign contributions to the reviewers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  You can assign contributions by clicking on the link: ``Assign Contributions`` (see the figure below). 
 
         |image20|
 
- The Paper Reviewing module gives you the 
+ The paper reviewing module gives you the 
  opportunity to assign more than one contributions 
- to the same Reviewers by selecting them using the check boxes.
+ to the same reviewers by selecting them using the check boxes.
  Depending on the chosen reviewing mode you need to assign different
- team of reviewers (see section 2.1.3.1). 
+ teams of reviewers (see section 1.3.1). 
  
         |image21| 
 
- When you click ``Assign``, a dialog will show up. 
- Use the dialog popup to select the reviewer you wish to assign. 
- If there are defined competences for him, they will be shown close to his name.
+ When you click ``Assign``, a dialogue will appear. 
+ Use the dialogue popup to select the reviewer you wish to assign. 
+ If there are defined competences for him, they will be shown next to his name.
 
         |image22|
         
- If the paper revieiwng mode is "Content reviewing" or "Content and Layout Reviewing", the Referees
- you choose will be the responsibles for assigning Layout and Content Reviewers to this 
- contribution. The Referee has also to give the final judgment for the contribution 
- - ``to be corrected``, ``accepted`` or ``rejected`` and to correct it by himself if needed.
+ If the paper reviewing mode is "Content reviewing" or "Content and Layout Reviewing", the referees
+ you choose will be the responsibles for assigning layout and content reviewers to this 
+ contribution. The referee has also to give the final judgment for the contribution 
+ - ``to be corrected``, ``accepted`` or ``rejected`` and to correct it by himself if necessary.
  
- If you have chosen "Layout Reviewing" the Layout Reviewer should give the final judgement for
+ If you have chosen "Layout Reviewing" the layout reviewer should give the final judgement for
  the contributions.
  
 Review option within Contribution Editor
@@ -213,29 +213,29 @@ How to access the "Reviewing" area for a contribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
  Click on the link ``Contributions`` from the side menu. The list of all contributions will be displaied.
- Click on the contribution's title and after that the ``Reviewing`` tab. 
+ Click on the contribution's title and then the ``Reviewing`` tab. 
         
-Assign Reviewers for a contribution
+Assign reviewers for a contribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- You can assign Reviewers by clicking on ``Assign Team`` tab. A lists of Referees, Layout and Content Reviewers
+ You can assign reviewers by clicking on ``Assign Team`` tab. A lists of referees, layout and content reviewers
  will be offered. Click on the button next to the user's name and then click the ``Assign`` button.
- In order to remove already assigned reviewer use the ``Remove`` button.
+ In order to remove an already assigned reviewer use the ``Remove`` button.
        
         |image23|        
 
 
-Judgements details for a contribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Judgement details for a contribution
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
- You can see the Reviewers judgement details for the current review.
+ You can see the reviewer judgement details for the current review.
  
         |image24|
 
 Reviewing materials for a contribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
- The material which is subject of reviewing is also accessible for the managers, 
+ The material which is a subject of reviewing is also accessible for the managers, 
  from the ``Material to Review`` tab (see next figure).       
         
         |image25|
@@ -244,7 +244,7 @@ Reviewing history for a contribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   If there are more than one reviews for a single contribution, 
-  The system keeps the reviewing history for each contribution. 
+  the system keeps the reviewing history for each contribution. 
   You can access it by clicking on the ``History`` tab.   
         
         |image26|

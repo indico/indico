@@ -4,17 +4,17 @@
     <tr>
         <td nowrap class="groupTitle" colspan=5>
             <%= _("Abstracts Reviewing Team competences")%>
-            <span id="competencesHelp"></span> 
+            <span id="competencesHelp"></span>
         </td>
     </tr>
     <tr>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Id")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Name")%></td>
-        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Responsabilities")%></td>
+        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Responsibilities")%></td>
         <td colspan=2 nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB; padding-top: 10px; padding-bottom: 5px;"><%= _("Competences")%></td>
     </tr>
-   
-    
+
+
     <% for user, competences in ConfReview.getAllUserCompetences(): %>
     <% if ConfReview.isAbstractManager(user) or ConfReview.isAbstractReviewer(user):%>
         <tr valign="top">
@@ -45,6 +45,6 @@ var keyWordfieldList = new Array()
             user: '<%= user.getId() %>'
         }
     );
- <% end %>    
+ <% end %>
 <% end %>
 </script>

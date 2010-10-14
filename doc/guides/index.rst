@@ -14,10 +14,10 @@ Contents:
    ./UserGuide/index.rst
    ./QuickStartGuides/index.rst
    ./VideoServicesGuides/index.rst
+   ./PaperReviewingGuides/index.rst
    ./AdminGuide/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
-   ./PaperReviewingGuides/index.rst
 
 
 .. Indices and tables

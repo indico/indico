@@ -1,11 +1,11 @@
 ==================================================
-Paper Reviewing Module - Authors's Guide
+Paper reviewing module author's guide
 ==================================================
 
-Getting Started
+Getting started
 ---------------
 
- Firstlly, you must log in the system, then you will find a link ``My contributions`` in the left 
+ Firstly, you must log in to the system; you will find a link ``My contributions`` in the left 
  menu under ``My Conference``.
 
         |image1|
@@ -19,39 +19,39 @@ My Contributions Area
         
        |image2|
    
-   By clicking on the name you can access the specific information to the contribution.
+   By clicking on the name you can access the specific information for the contribution.
         
 How to submit the material for the contribution 
 -----------------------------------------------
  
- * The next step will be to submit your materilas. You can do it by clicking on hte contributions's name. 
-   Use ``Add Material`` link, next to ``Reviewing materials``. Here you must add the materials to be reviewed.
-   Only the materials added in this section will be judged by the reviewing team.
+ * The next step will be to submit your material. You can do this by clicking on the contribution name. 
+   Use ``Add Material`` link, next to ``Reviewing materials``. Here you must add the material to be reviewed.
+   Only the material added in this section will be judged by the reviewing team.
         
        |image3|
         
- * Choose the file/s/ for your contribution. You may add a description and convert your file to PDF format. 
+ * Choose the file(s) for your contribution. You may add a description and convert your file to PDF format. 
    After that click on ``Upload``.
  
        |image4|
        
        |image5|
    
-  * You will sent your added materials for reviewing only by clicking on the ``Send`` button. 
-    By doing this you will "lock" your materials until the end of the revieiwng process.
-    You cannot add or remove material any more, except if you have made
+  * You can send your added material for reviewing only by clicking on the ``Send`` button. 
+    By doing this you will "lock" your material until the end of the reviewing process.
+    You cannot add or remove material any more, unless you have made
     a mistake while sending. In this case, use the ``UNDO sending`` button.
     Now you see the ``Reviewing status`` of your contribution.
     
       |image6|
       
-  * The revieiwng process ends if the final judgement for your contribution is ``Accepted`` or ``Rejected``.
+  * The reviewing process ends when the final judgement for your contribution is ``Accepted`` or ``Rejected``.
   
      |image7|
      
-  * The revieiwng process will continue if the final judgement for your contribution is ``To be corrected``.    
-    You will have to send again the materials, after correcting them. Then the reviewing process will start again.
-    You can see the ``Reviewing history`` after clicking on: ``Show history`` link.
+  * The reviewing process will continue if the final judgement for your contribution is ``To be corrected``.    
+    You will have to send the material again, after correction. Then the reviewing process will start again.
+    You can see the ``Reviewing history`` after clicking on the ``Show history`` link.
     
      |image8|
  
