@@ -1,5 +1,5 @@
 <% from MaKaC.reviewing import ConferenceReview %>
-<% from MaKaC.common.PickleJar import DictPickler %>
+<% from MaKaC.common.fossilize import fossilize %>
 
 
 <table width="85%%" align="center" border="0">
@@ -27,7 +27,7 @@
         </td>
     </tr>
     <tr>
-</table> 
+</table>
 
 <table width="83%%" align="right" border="0">
 <% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
@@ -57,7 +57,7 @@
                                 }
                             );
                         }
-                                                
+
                         var removeRefereeHandler = function(user, setResult) {
                         userId = user.get('id');
                         var del = true;
@@ -70,7 +70,7 @@
                                         del = false;
                                     }
                                 }
-                              } 
+                              }
                          <% end%>
                                 if (del)
                                     {
@@ -90,15 +90,16 @@
 			                                }
 			                            );
                                     }
-                             
-                       
+
+
                         }
-                        
-                        var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                                                   <%= jsonEncode(DictPickler.pickle(ConfReview.getRefereesList())) %>,
-                                                   null,null,
-                                                   true, false, false,
-                                                   newRefereeHandler, userListNothing, removeRefereeHandler)
+
+                        var uf = new UserListField('userListDiv', 'userList',
+                                <%= jsonEncode(fossilize(ConfReview.getRefereesList())) %>,
+                                true,null,
+                                true, false, null, null,
+                                false, false, true,
+                                newRefereeHandler, userListNothing, removeRefereeHandler)
                         $E('RefereeList').set(uf.draw())
 </script>
     <tr>
@@ -155,26 +156,27 @@
 		                                }
 		                            );
                                    }
-                            
+
                         }
-                        
-                        var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                                                   <%= jsonEncode(DictPickler.pickle(ConfReview.getReviewersList())) %>,
-                                                   null,null,
-                                                   true, false, false,
-                                                   newReviewerHandler, userListNothing, removeReviewerHandler)
+
+                        var uf = new UserListField('userListDiv', 'userList',
+                                <%= jsonEncode(fossilize(ConfReview.getReviewersList())) %>,
+                                true,null,
+                                true, false, null, null,
+                                false, false, true,
+                                newReviewerHandler, userListNothing, removeReviewerHandler)
                         $E('ReviewerList').set(uf.draw())
 </script>
     </tr>
-<% end %>   
+<% end %>
 <%if ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1:%>
 <% pass %>
 <% end %>
-<% else: %> 
+<% else: %>
     <tr>
         %(editorTable)s
         <td width="80%%" style="padding-top: 15px;"><div id="EditorList"></div></td>
-    </tr>    
+    </tr>
 <script type="text/javascript">
                         var newEditorHandler = function(userList, setResult) {
                             indicoRequest(
@@ -225,13 +227,13 @@
 		                                }
 		                            );
                                   }
-                             
+
                         }
-                        
-                        var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                                                   <%= jsonEncode(DictPickler.pickle(ConfReview.getEditorsList())) %>,
-                                                   null,null,
-                                                   true, false, false,
+                        var uf = new UserListField('userListDiv', 'userList',
+                                                   <%= jsonEncode(fossilize(ConfReview.getEditorsList())) %>,
+                                                   true,null,
+                                                   true, false, null, null,
+                                                   false, false, true,
                                                    newEditorHandler, userListNothing, removeEditorHandler)
                         $E('EditorList').set(uf.draw())
 </script>
@@ -239,7 +241,7 @@
 
     <tr><td style="padding-top: 15px;"></td></tr>
     <tr><td colspan="5" style="padding-top: 15px;">
-     <em><%= _("You can define paper reviewers competences by clicking on 'Competences'")%></em>       
+     <em><%= _("You can define paper reviewers competences by clicking on 'Competences'")%></em>
         </td>
     </tr>
 </table>

@@ -1,5 +1,5 @@
 <% from MaKaC.reviewing import ConferenceReview %>
-<% from MaKaC.common.PickleJar import DictPickler %>
+<% from MaKaC.common.fossilize import fossilize %>
 
 
 <br>
@@ -61,10 +61,11 @@
                             );
                         }
 
-                        var uf = new UserListField('PluginPeopleListDiv', 'PluginPeopleList',
-                                                   <%= jsonEncode(DictPickler.pickle(ConfReview.getPaperReviewManagersList())) %>,
-                                                   null,null,
-                                                   true, false, false,
-                                                   newPRMHandler, userListNothing, removePRMHandler)
+                        var uf = new UserListField('userListDiv', 'userList',
+                                <%= jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) %>,
+                                true,null,
+                                true, false, null, null,
+                                false, false, true,
+                                newPRMHandler, userListNothing, removePRMHandler)
                         $E('PRMList').set(uf.draw())
 </script>

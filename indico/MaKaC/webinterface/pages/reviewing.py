@@ -373,6 +373,7 @@ class WConfModifAbstractReviewingSettings(wcomponents.WTemplated):
 class WPConfModifReviewingControl(WPConfModifReviewingBase):
     """ Tab for reviewing's access control (designing referees, etc.)
     """
+    _userData = ['favorite-user-list', 'favorite-user-ids']
 
     def __init__(self, rh, target):
         WPConfModifReviewingBase.__init__(self, rh, target)
