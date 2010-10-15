@@ -117,7 +117,7 @@ class BaseTask(TimedEvent):
 
     def setStatus(self, newstatus):
         if hasattr(self, '_v_logger'):
-            self._v_logger.info("set status %s" % newstatus)
+            self._v_logger.info("%s set status %s" % (self, newstatus))
         self.status = newstatus
 
     def getStatus(self):
@@ -134,7 +134,7 @@ class BaseTask(TimedEvent):
 
     def initialize(self, newid, newstatus):
         self.id = newid
-        self.status = newstatus
+        self.setStatus(newstatus)
 
     def plugLogger(self, logger):
         self._v_logger = logger
@@ -165,7 +165,7 @@ class BaseTask(TimedEvent):
 
         self.startedOn = curTime
         self.running = True
-        self.status = base.TASK_STATUS_RUNNING
+        self.setStatus(base.TASK_STATUS_RUNNING)
 
     def start(self):
 

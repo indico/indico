@@ -51,21 +51,3 @@ class Worker(threading.Thread):
             time.sleep(1)
 
         self.result = True
-
-class TestOperationManager(unittest.TestCase):
-
-    def setUp(self):
-        self._op = OperationManager(DummyDB())
-
-    def testCommitUsage(self):
-        """
-        exclusiveCommit usage
-        """
-
-        with self._op.commit():
-            self.assertEqual(True, True)
-
-        with self._op.commit(sync = True):
-            self.assertEqual(True, True)
-
-        self.assertEqual(True, True)

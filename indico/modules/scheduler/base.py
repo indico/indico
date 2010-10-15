@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import time
+import time, types
 from contextlib import contextmanager
 from ZODB.POSException import ConflictError
 
@@ -36,30 +36,42 @@ class OperationManager(object):
     Takes care of synchronizing resources
     """
 
-    def __init__(self, dbi, logger = None):
-        self._dbi = dbi
-        self._logger = logger
+    def __init__(self, f):
+        self._f = f
 
-    @contextmanager
-    def commit(self, sync = False):
+    def __get__(self, obj, ownerClass=None):
+        return types.MethodType(self, obj)
+
+    def __call__(self, zelf, *args, **kwargs):
+        # some magic introspection
+        logger = zelf._logger
+        dbi = zelf._dbi
+        sync = False
+
+        logger.debug("START Critical section around  %s" % self._f.__name__)
 
         for i in range(CONFLICTERROR_MAX_RETRIES):
             if sync:
-                self._dbi.sync()
-            yield
+                dbi.sync()
+            retValue = self._f(zelf, *args, **kwargs)
             try:
-                self._dbi.commit()
-            except ConflictError:
-                sync = True
-                self._logger.debug("Commit failed (%d)" % i)
+                dbi.commit()
+            except Exception, e:
+                logger.exception("Commit failed (%d)" % i)
+                if isinstance(e, ConflictError):
+                    sync = True
+                else:
+                    raise
             else:
                 break
         else:
-            if self._logger:
-                self._logger.error("Commit failed %d consecutive times. "
-                                   "Something bad must be going on..." %
-                                   CONFLICTERROR_MAX_RETRIES)
+            logger.error("Commit failed %d consecutive times. "
+                         "Something bad must be going on..." %
+                         CONFLICTERROR_MAX_RETRIES)
 
+        logger.debug("END Critical section")
+
+        return retValue
 
 ## Time Sources
 
