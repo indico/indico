@@ -5000,7 +5000,7 @@ div.balloonPopupArrow {
     background: transparent url('../images/balloon_popup_arrows.png') scroll no-repeat 0 -19px;
     background-repeat: no-repeat;
     background-position: 0 -19px;
-    opacity: 0.95;
+    /*opacity: 0.95;*/
 }
 
 div.yellowBalloon {
