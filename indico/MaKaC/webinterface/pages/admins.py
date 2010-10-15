@@ -466,6 +466,7 @@ class WAdminPlugins (wcomponents.WTemplated):
         vars["InitialPlugin"] = self._initialPlugin
         vars["Favorites"] = fossilize(self._user.getPersonalInfo().getBasket().getUsers().values(), IAvatarFossil)
         vars["rbActive"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+        vars["baseURL"]=Config.getInstance().getBaseURL()
 
         return vars
 

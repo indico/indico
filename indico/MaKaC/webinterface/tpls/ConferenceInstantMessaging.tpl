@@ -45,7 +45,11 @@
    	 	<% end %>
 </table>
 
-
+<% from MaKaC.plugins.helpers import PluginFieldsHelper %>
+<% if PluginFieldsHelper('InstantMessaging', 'Jabber').getOption('ckEditor') != '':%>
+	<%= PluginFieldsHelper('InstantMessaging', 'Jabber').getOption('ckEditor') %>
+<% end %>
+<% else:%>
 <table width="100%" align="center" border="0">
     <tr>
         <td class="groupTitle" style="padding-top:50px"><%= _("How to connect to the chat")%></td>
@@ -61,3 +65,4 @@
 		</td>
 	</tr>
 </table>
+<% end %>

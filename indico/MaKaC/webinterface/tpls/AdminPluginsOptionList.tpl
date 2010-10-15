@@ -27,7 +27,7 @@
 
                     <script type="text/javascript">
                         var newPersonsHandler = function(userList, setResult) {
-                            indicoRequest(
+							indicoRequest(
                                 'plugins.addUsers',
                                 {
                                     optionName: "<%= name %>",
@@ -35,7 +35,7 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                                        setResult(true);
+										setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
                                         setResult(false);
@@ -68,6 +68,33 @@
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userList<%=name%>').set(uf.draw())
                     </script>
+                <% end %>
+                <% elif option.getType() =="ckEditor": %>
+					<div id="editor" style="margin-bottom: 10px"></div>
+					<script type="text/javascript" src="<%=baseURL%>/js/indico/Core/Widgets/RichText.js"></script>
+					<script type="text/javascript">
+						var editor = new RichTextEditor(600, 300, 'IndicoFull');
+						$E('editor').set(editor.draw());
+						var button = Html.input("button",{style:{marginLeft:pixels(5)}}, $T("Save text"));
+						$E('editor').append(button);
+
+						editor.set('<%= escapeHTMLForJS(option.getValue()) %>');
+				        button.observeClick(function(){
+							indicoRequest(
+                                    'plugins.saveJoinCRText',
+                                    {
+                                        optionName: "<%= name %>",
+                                        text: editor.get()
+                                    },
+                                    function(result,error) {
+                                        if (error) {
+                                            IndicoUtil.errorReport(error);
+                                        }
+                                    }
+                            );
+				        });
+
+					</script>
                 <% end %>
                 <% elif option.getType() =="rooms": %>
                     <div id="roomList" class="PeopleListDiv"></div>
@@ -248,7 +275,6 @@
             <% end %>
         </tr>
         <% end %>
-
         <% for option in Object.getOptionList(doSort = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
         <tr>
             <td style="text-align: right; vertical-align:top; padding-right: 10px;width: 50%%;">
@@ -285,7 +311,7 @@
         <% end %>
         <tr>
             <td colspan="2" style="text-align: right;">
-                <input type="submit" name="Save" value="<%= _("Save") %>" />
+                <input type="submit" name="Save" value="<%= _("Save settings") %>" />
             </td>
         </tr>
     </table>

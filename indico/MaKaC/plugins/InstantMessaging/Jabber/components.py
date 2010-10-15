@@ -85,6 +85,8 @@ class ChatSMContributor(Component, Observable):
                 out.closeTag("chatroom")
             out.closeTag("chatrooms")
 
+            out.writeTag("how2connect", PluginFieldsHelper('InstantMessaging', 'Jabber').getOption('ckEditor'))
+
     @classmethod
     def addCheckBox2CloneConf(cls, obj, list):
         """ we show the clone checkbox if:

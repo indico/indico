@@ -979,7 +979,8 @@ class PluginOption(Persistent):
         'users': list,
         'usersGroups': list,
         'rooms': list,
-        'password': str
+        'password': str,
+        'ckEditor': str
     }
 
     def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0):

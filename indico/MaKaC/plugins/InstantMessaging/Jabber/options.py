@@ -50,5 +50,8 @@ globalOptions = [
 
     ("indicoPassword" , {"description" : _("Indico password for Jabber"),
                       "type": 'password',
-                      "defaultValue": ""})
+                      "defaultValue": ""}),
+     ("ckEditor" , {"description" : _("Information about how to connect to the chat with a client (Optional)"),
+                      "type": 'ckEditor',
+                      "defaultValue": ""}),
 ]
