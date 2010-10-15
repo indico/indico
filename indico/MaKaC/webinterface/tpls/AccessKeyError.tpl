@@ -11,10 +11,10 @@
     <tr>
         <td align="center">
 		<form action=<%= url %> method="POST">
-		<%= _("Please enter it here:")%>
+        <%if loginURL:%> <a class="loginHighlighted" style="padding:4px 17px" href="<%= loginURL%>"><strong style="color: white;">Login</strong></a>&nbsp;<%= _("or enter the access key here:")%><%end%>
+        <%else:%><%= _("Please enter it here:")%><%end%>
 		<input name="accessKey" type="password">
 		<input type="submit" class="btn" value="<%= _("go")%>">
-        <%if loginURL:%> <%= _("or just try to")%> <a class="loginHighlighted" style="padding:4px 17px" href="<%= loginURL%>"><strong style="color: white;">login</strong></a><%end%>
 		</form>
         </td>
     </tr>
