@@ -136,7 +136,7 @@ class LogToConsoleTestOption(Option):
         multiprocessing.get_logger().addHandler(h)
 
         logger.addHandler(h)
-        formatter = logging.Formatter("[%(process)d] %(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter("[%(process)d:%(threadName)s] %(asctime)s - %(name)s - %(levelname)s - %(message)s")
         h.setFormatter(formatter)
 
     def shouldExecute(self):

@@ -282,18 +282,18 @@ class _TestScheduler(unittest.TestCase):
 
     def testSeveralFailFinishWaiting(self):
         """
-        Creating 10 tasks, 3 will fail and 2 still be waiting
+        Creating 5 tasks, 2 will fail and 2 still be waiting
         """
 
-        self._startSomeWorkers([TestFailTask for i in range(0, 3)] +
-                               [TestTask for i in range(3, 10)],
+        self._startSomeWorkers([TestFailTask] * 2 +
+                               [TestTask] * 3,
                                [base.TimeSource.get().getCurrentTime() + \
-                                timedelta(seconds=2)]*8 +
+                                timedelta(seconds=2)] * 3 +
                                [base.TimeSource.get().getCurrentTime() + \
-                                timedelta(minutes=200)]*2)
+                                timedelta(minutes=200)] * 2)
 
         # Not all workers will have finished
-        self.assertEqual(self._checkWorkersFinished(10),
+        self.assertEqual(self._checkWorkersFinished(30),
                          False)
 
         self._shutdown()
@@ -302,8 +302,8 @@ class _TestScheduler(unittest.TestCase):
                             'waiting': 2,
                             'running': 0,
                             'spooled': 0,
-                            'finished': 5,
-                            'failed': 3})
+                            'finished': 1,
+                            'failed': 2})
 
     def testPeriodicTasks(self):
         """
@@ -326,7 +326,7 @@ class _TestScheduler(unittest.TestCase):
                                bysecond = tuple(seconds))
 
         # Not all workers will have finished
-        self.assertEqual(self._checkWorkersFinished(60, value=3),
+        self.assertEqual(self._checkWorkersFinished(100, value=3),
                          True)
 
         self._shutdown()
