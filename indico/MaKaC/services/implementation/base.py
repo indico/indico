@@ -225,7 +225,7 @@ class ServiceBase(RequestHandlerBase):
                                    self._params,
                                    self._aw)
         except (HtmlScriptError, HtmlForbiddenTag), e:
-            raise HTMLSecurityError('ERR-X0','HTML Security problem - you might be using forbidden tags: %s ' % str(e))
+            raise HTMLSecurityError('ERR-X0','HTML Security problem. %s ' % str(e))
 
         if self._doProcess:
             answer = self._getAnswer()

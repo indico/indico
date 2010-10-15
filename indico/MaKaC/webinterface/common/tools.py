@@ -225,7 +225,7 @@ tagSearch = re.compile("< *[^<^>^ ]+",re.IGNORECASE|re.DOTALL)
 class HarmfulHTMLException(Exception):
 
     def __init__(self, msg, pos = 0):
-        self.msg = 'Potentially harmful HTML: "%s" found at %s' % (msg, pos)
+        self.msg = _("""Using forbidden HTML: "%s" found at %s""") % (msg, pos)
 
     def __str__(self):
         return self.msg
@@ -298,9 +298,9 @@ def restrictedHTML(txt, sanitizationLevel):
         parser = RestrictedHTMLParser(sanitizationLevel)
         parser.feed(txt)
         parser.close()
-    except (HarmfulHTMLException, HTMLParseError):
-        return False
-    return True
+    except (HarmfulHTMLException, HTMLParseError),e :
+        return e.msg
+    return None
 
 def hasTags(s):
     """ Returns if a given string has any tags

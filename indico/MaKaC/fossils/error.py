@@ -19,11 +19,13 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.common.fossilize import IFossil
+from MaKaC.webinterface.common.tools import escape_html
 
 class ICausedErrorFossil(IFossil):
 
     def getMessage(self):
         pass
+    getMessage.convert = escape_html
 
     def getCode(self):
         pass

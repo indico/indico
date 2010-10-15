@@ -80,8 +80,8 @@ def invokeMethod(method, params, req):
                     retry -= 1
                     time.sleep(10 - retry)
                     continue
-        except CausedError, e:
-            raise e
+        except CausedError:
+            raise
         except Exception, e:
             raise ProcessError("ERR-P0", "Error processing method.")
     finally:
