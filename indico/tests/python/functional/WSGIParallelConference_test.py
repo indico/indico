@@ -9,7 +9,7 @@ class WSGIParallelConference_test(SeleniumTestCase):
         SeleniumTestCase.setUp(self)
 
     def testConferenceTest(self):
-        sel = self.selenium
+        sel = self._selenium
 
         raise SkipTest
 

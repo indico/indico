@@ -561,7 +561,8 @@ if __name__ == '__main__':
         import logging
         import tempfile
         tempLoggingDir = tempfile.mkdtemp()
-        logging.basicConfig(filename=os.path.join(tempLoggingDir, 'logging'), level=logging.DEBUG)
+        logging.basicConfig(filename=os.path.join(tempLoggingDir, 'logging'),
+                            level=logging.DEBUG)
         setIndicoInstallMode(False)
     else:
         setIndicoInstallMode(True)

@@ -66,9 +66,9 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
 
         # Handy functions from selenium and twill you might need
         # set up the time between each selenium's commands (in milliseconds)
-        # self.selenium.set_speed(5000)
+        # self._selenium.set_speed(5000)
 
-        self.selenium = sel
+        self._selenium = sel
 
     def tearDown(self):
         #if a confId is specified we'll try to delete the conf
@@ -76,7 +76,7 @@ class SeleniumTestCase(unittest.TestCase, BaseTestRunner):
         if self.confId:
             self.deleteConference(self.confId)
 
-        self.selenium.stop()
+        self._selenium.stop()
 
         print "Errors array: %s" % self.verificationErrors
         self.assertEqual([], self.verificationErrors)
@@ -163,11 +163,11 @@ class LoggedInSeleniumTestCase(SeleniumTestCase):
 
     def setUp(self):
 
-        super(LoggedInSeleniumTestCase, self).__init__()
+        super(LoggedInSeleniumTestCase, self).setUp()
+
+        sel = self._selenium
 
         if not sel.is_text_present("Logout"):
-            sel = self._selenium
-
             # Login
             sel.open("/indico/signIn.py")
             sel.type("login", "dummyuser")

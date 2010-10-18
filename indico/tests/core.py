@@ -181,10 +181,12 @@ class TestManager(object):
                        " Starting fake DB in standard port")
             TestManager._stopProductionDB()
             self._startFakeDB(params[0], params[1])
-            TestManager._setDebugMode()
             TestManager._createDummyUser()
         else:
             self._info("No DB is needed")
+
+        if fakeDBPolicy > 0:
+            TestManager._setDebugMode()
 
     def _stopManageDB(self, fakeDBPolicy):
         """

@@ -22,23 +22,19 @@
 # pylint: disable-all
 
 import time, unittest
-from seleniumTestCase import SeleniumTestCase
+from seleniumTestCase import LoggedInSeleniumTestCase
 
-class ExampleTest(SeleniumTestCase):
+class ExampleTest(LoggedInSeleniumTestCase):
     def setUp(self):
-        SeleniumTestCase.setUp(self)
+        LoggedInSeleniumTestCase.setUp(self)
 
     def testCreateDeleteLecture(self):
-        sel = self.selenium
+        sel = self._selenium
 
         # Start test
         sel.open("/indico//index.py")
         sel.click("//li[@id='createEventMenu']/span")
         sel.click("link=Create lecture")
-        self.waitPageLoad(sel)
-        sel.type("login", "dummyuser")
-        sel.type("password", "dummyuser")
-        sel.click("loginButton")
         self.waitPageLoad(sel)
         sel.type("title", "lecture test")
         sel.click("advancedOptionsText")
@@ -48,7 +44,7 @@ class ExampleTest(SeleniumTestCase):
         self.waitPageLoad(sel)
 
         #we set the confId, so in case the test fails, Teardown function is going to delete the conf
-        SeleniumTestCase.setConfID(self, sel.get_location())
+        LoggedInSeleniumTestCase.setConfID(self, sel.get_location())
 
         try: self.failUnless(sel.is_text_present, "lecture test")
         except AssertionError, e: self.verificationErrors.append(str(e))
@@ -64,15 +60,11 @@ class ExampleTest(SeleniumTestCase):
 
 
     def testConference(self):
-        sel = self.selenium
+        sel = self._selenium
 
         sel.open("/indico/index.py")
         sel.click("//li[@id='createEventMenu']/span")
         sel.click("link=Create conference")
-        self.waitPageLoad(sel)
-        sel.type("login", "dummyuser")
-        sel.type("password", "dummyuser")
-        sel.click("loginButton")
         self.waitPageLoad(sel)
         sel.type("title", "conference test")
         sel.click("advancedOptionsText")
@@ -82,7 +74,7 @@ class ExampleTest(SeleniumTestCase):
         self.waitPageLoad(sel)
 
         #we set the confId, so in case the test fails, Teardown function is going to delete the conf
-        SeleniumTestCase.setConfID(self, sel.get_location())
+        LoggedInSeleniumTestCase.setConfID(self, sel.get_location())
 
         sel.click("link=Timetable")
         self.waitPageLoad(sel)
@@ -153,7 +145,7 @@ class ExampleTest(SeleniumTestCase):
         self.waitPageLoad(sel)
 
     def tearDown(self):
-        SeleniumTestCase.tearDown(self)
+        LoggedInSeleniumTestCase.tearDown(self)
 
 if __name__ == "__main__":
     unittest.main()
