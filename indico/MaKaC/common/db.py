@@ -133,21 +133,15 @@ class DBMgr:
         self._delConnObject()
 
     def getDBConnection( self ):
-        conn = self._getConnObject()
-        if conn == None:
-            raise Exception( _("request not started"))
-        return conn
+        return self._getConnObject()
 
     def isConnected( self ):
-        if self._getConnObject() == None:
-            return False
-        else:
-            return True
+        tid = DBMgr._getUniqueIdentifier()
+
+        return tid in self._conn
 
     def getDBConnCache(self):
         conn = self._getConnObject()
-        if conn == None:
-            raise Exception( _("request not started"))
         return conn._cache
 
     def getDBClassFactory(self):
