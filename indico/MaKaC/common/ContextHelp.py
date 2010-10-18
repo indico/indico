@@ -1,5 +1,5 @@
 import xml.dom.minidom as minidom
-from lxml import etree, builder
+from lxml import etree, builder, html as lhtml
 from MaKaC.errors import MaKaCError
 from MaKaC.common import Config
 import xml.sax
@@ -429,7 +429,7 @@ class ContextHelp:
             elif wohl[name][0] == "information":
                 count = self.__mergeInformation(wohl[name][1:],snippets, count, doc)
 
-        docSer = etree.tostring(doc)
+        docSer = lhtml.tostring(doc)
 
         if (len(snippets)!=0):
             # stripWrapper is a dirty dirty hack to bypass the problem
