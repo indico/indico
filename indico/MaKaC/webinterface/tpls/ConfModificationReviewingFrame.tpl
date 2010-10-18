@@ -1,8 +1,9 @@
+<% declareTemplate(newTemplateStyle=True) %>
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.common.fossilize import fossilize %>
 
 
-<table width="85%%" align="center" border="0">
+<table width="85%" align="center" border="0">
     <tr>
         <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="padding-top: 15px; padding-bottom: 15px;">
             <%= _("Step 2: Assign Reviewers")%>
@@ -29,14 +30,14 @@
     <tr>
 </table>
 
-<table width="83%%" align="right" border="0">
+<table width="83%" align="right" border="0">
 <% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
 <% pass %>
 <% end %>
 <% else: %>
     <tr>
-        %(refereeTable)s
-        <td width="80%%" style="padding-top: 15px; padding-bottom: 15px;"><div id="RefereeList"></div></td>
+        <td width="80%" nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Referees") %><br><span style="font-size: 8pt"><%= _("responsiblities: Assign, contributions to Reviewers, Give final judgement") %></span></span></td>
+        <td width="80%" style="padding-top: 15px; padding-bottom: 15px;"><div id="RefereeList"></div></td>
     </tr>
 <script type="text/javascript">
 
@@ -53,58 +54,54 @@
                                     } else {
                                         IndicoUtil.errorReport(error);
                                         setResult(false);
-                    }
+                                    }
                                 }
                             );
-                        }
+                        };
 
                         var removeRefereeHandler = function(user, setResult) {
-                        userId = user.get('id');
-                        var del = true;
-                        <% for r in ConfReview.getRefereesList():%>
-                            rId = '<%= r.getId()%>';
-                            if(userId == rId){
-                                numberContr = '<%= len(ConfReview.getJudgedContributions(r))%>';
-                                if (numberContr>0){
-                                    if (!(confirm('This referee has been assigned '+numberContr+' contributions. Do you want to remove the referee anyway?'))){
+                            var userId = user.get('id');
+                            var del = true;
+                            var contribsPerUser = [];
+                            <% for r in ConfReview.getRefereesList():%>
+                            contribsPerUser['<%= r.getId()%>'] = <%= len(ConfReview.getJudgedContributions(r))%>;
+                            <% end %>
+                            if(exists(contribsPerUser[userId])){
+                                if (contribsPerUser[userId] > 0){
+                                    if (!(confirm($T('This referee has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
                                         del = false;
                                     }
                                 }
-                              }
-                         <% end%>
-                                if (del)
-                                    {
-	                                    indicoRequest(
-			                                'reviewing.conference.removeTeamReferee',
+                            }
+                            if (del) {
+                                indicoRequest('reviewing.conference.removeTeamReferee',
 			                                {
 			                                    conference: '<%= Conference %>',
 			                                    user: user.get('id')
 			                                },
 			                                function(result,error) {
 			                                    if (!error) {
-			                                            setResult(true);
+		                                            setResult(true);
 			                                    } else {
 			                                        IndicoUtil.errorReport(error);
 			                                        setResult(false);
 			                                    }
 			                                }
 			                            );
-                                    }
-
-
-                        }
+                            }
+                        };
 
                         var uf = new UserListField('userListDiv', 'userList',
                                 <%= jsonEncode(fossilize(ConfReview.getRefereesList())) %>,
                                 true,null,
                                 true, false, null, null,
                                 false, false, true,
-                                newRefereeHandler, userListNothing, removeRefereeHandler)
-                        $E('RefereeList').set(uf.draw())
+                                newRefereeHandler, userListNothing, removeRefereeHandler);
+                        $E('RefereeList').set(uf.draw());
 </script>
     <tr>
-        %(reviewerTable)s
-        <td width="80%%" style="padding-top: 15px; padding-bottom: 15px;"><div id="ReviewerList"></div></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Content Reviewers") %><br><span style="font-size: 8pt"><%= _("responsibility: judge content verification of contributions") %></span></span></td>
+        <td width="80%" style="padding-top: 15px; padding-bottom: 15px;"><div id="ReviewerList"></div></td>
     </tr>
 <script type="text/javascript">
                         var newReviewerHandler = function(userList, setResult) {
@@ -120,28 +117,26 @@
                                     } else {
                                         IndicoUtil.errorReport(error);
                                         setResult(false);
-                    }
+                                    }
                                 }
                             );
-                        }
+                        };
                         var removeReviewerHandler = function(user, setResult) {
-                        userId = user.get('id');
-                        var del = true;
-                        <% for r in ConfReview.getReviewersList():%>
-                            rId = '<%= r.getId()%>';
-                            if(userId == rId){
-                                numberContr = '<%= len(ConfReview.getReviewedContributions(r))%>';
-                                if (numberContr>0){
-                                    if (!(confirm('This content reviewer has been assigned '+numberContr+' contributions. Do you want to remove the content reviewer anyway?'))){
+                            var userId = user.get('id');
+                            var del = true;
+                            var contribsPerUser = [];
+                            <% for r in ConfReview.getReviewersList():%>
+                            contribsPerUser['<%= r.getId()%>'] = <%= len(ConfReview.getReviewedContributions(r))%>;
+                            <% end %>
+                            if(exists(contribsPerUser[userId])){
+                                if (contribsPerUser[userId] > 0){
+                                    if (!(confirm($T('This content reviewer has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
                                         del = false;
                                     }
                                 }
-                              }
-                        <% end%>
-                                if (del)
-                                    {
-                                        indicoRequest(
-		                                'reviewing.conference.removeTeamReviewer',
+                            }
+                            if (del) {
+                                indicoRequest('reviewing.conference.removeTeamReviewer',
 		                                {
 		                                    conference: '<%= Conference %>',
 		                                    user: user.get('id')
@@ -155,17 +150,16 @@
 		                                    }
 		                                }
 		                            );
-                                   }
-
-                        }
+                            }
+                        };
 
                         var uf = new UserListField('userListDiv', 'userList',
                                 <%= jsonEncode(fossilize(ConfReview.getReviewersList())) %>,
                                 true,null,
                                 true, false, null, null,
                                 false, false, true,
-                                newReviewerHandler, userListNothing, removeReviewerHandler)
-                        $E('ReviewerList').set(uf.draw())
+                                newReviewerHandler, userListNothing, removeReviewerHandler);
+                        $E('ReviewerList').set(uf.draw());
 </script>
     </tr>
 <% end %>
@@ -174,45 +168,42 @@
 <% end %>
 <% else: %>
     <tr>
-        %(editorTable)s
-        <td width="80%%" style="padding-top: 15px;"><div id="EditorList"></div></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Layout Reviewers") %><br><span style="font-size: 8pt"><%= _("responsibility: judge form verification of contributions") %></span></span></td>
+        <td width="80%" style="padding-top: 15px;"><div id="EditorList"></div></td>
     </tr>
 <script type="text/javascript">
                         var newEditorHandler = function(userList, setResult) {
-                            indicoRequest(
-                                'reviewing.conference.assignTeamEditor',
+                            indicoRequest('reviewing.conference.assignTeamEditor',
                                 {
                                     conference: '<%= Conference %>',
                                     userList: userList
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                                setResult(false);
-                    }
+                                        setResult(false);
+                                    }
                                 }
                             );
-                        }
+                        };
                         var removeEditorHandler = function(user, setResult) {
-                        userId = user.get('id');
-                        var del = true;
-                        <% for r in ConfReview.getEditorsList():%>
-                            rId = '<%= r.getId()%>';
-                            if(userId == rId){
-                                numberContr = '<%= len(ConfReview.getEditedContributions(r))%>';
-                                if (numberContr>0){
-                                    if (!(confirm('This layout reviewer has been assigned '+numberContr+' contributions. Do you want to remove the layout reviewer anyway?'))){
+                            var userId = user.get('id');
+                            var del = true;
+                            var contribsPerUser = [];
+                            <% for r in ConfReview.getEditorsList():%>
+                            contribsPerUser['<%= r.getId()%>'] = <%= len(ConfReview.getEditedContributions(r))%>;
+                            <% end %>
+                            if(exists(contribsPerUser[userId])){
+                                if (contribsPerUser[userId] > 0){
+                                    if (!(confirm($T('This layout reviewer has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
                                         del = false;
                                     }
                                 }
-                              }
-                        <% end%>
-                                if (del)
-                                    {
-                                        indicoRequest(
-		                                'reviewing.conference.removeTeamEditor',
+                            }
+                            if (del) {
+                                indicoRequest('reviewing.conference.removeTeamEditor',
 		                                {
 		                                    conference: '<%= Conference %>',
 		                                    user: user.get('id')
@@ -226,16 +217,15 @@
 		                                    }
 		                                }
 		                            );
-                                  }
-
-                        }
+                            }
+                        };
                         var uf = new UserListField('userListDiv', 'userList',
                                                    <%= jsonEncode(fossilize(ConfReview.getEditorsList())) %>,
                                                    true,null,
                                                    true, false, null, null,
                                                    false, false, true,
-                                                   newEditorHandler, userListNothing, removeEditorHandler)
-                        $E('EditorList').set(uf.draw())
+                                                   newEditorHandler, userListNothing, removeEditorHandler);
+                        $E('EditorList').set(uf.draw());
 </script>
 <% end %>
 

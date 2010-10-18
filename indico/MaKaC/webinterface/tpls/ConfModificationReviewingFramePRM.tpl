@@ -1,9 +1,10 @@
+<% declareTemplate(newTemplateStyle=True) %>
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.common.fossilize import fossilize %>
 
 
 <br>
-<table width="85%%" align="center" border="0">
+<table width="85%" align="center" border="0">
     <tr>
         <td id="revControlPRMHelp"  colspan="3" class="groupTitle" style="padding-top: 15px;"><%= _("Step 1: Assign Managers of Paper Reviewing Module")%></td>
     </tr>
@@ -18,8 +19,8 @@
         </td>
     </tr>
     <tr>
-         <td style="padding-top: 15px;">%(paperReviewManagerTable)s</td>
-        <td width="80%%" style="padding-top: 15px;"><div id="PRMList"></div></td>
+         <td style="padding-top: 15px;"><span class="titleCellFormat"><br><%= _("Managers of Paper Reviewing Module") %><br><span style="font-size:8pt;"><%= _("responsibilities: setup, assign contributions to Referees, define team competences") %></span></span></td>
+        <td width="80%" style="padding-top: 15px;"><div id="PRMList"></div></td>
     </tr>
     </tr>
 </table>
@@ -35,14 +36,15 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                                setResult(false);
-                    }
+                                        setResult(false);
+                                    }
                                 }
                             );
-                        }
+                        };
+
                         var removePRMHandler = function(user, setResult) {
                             indicoRequest(
                                 'reviewing.conference.removeTeamPRM',
@@ -52,20 +54,20 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-                        setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
-                    setResult(false);
+                                        setResult(false);
                                     }
                                 }
                             );
-                        }
+                        };
 
                         var uf = new UserListField('userListDiv', 'userList',
                                 <%= jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) %>,
                                 true,null,
                                 true, false, null, null,
                                 false, false, true,
-                                newPRMHandler, userListNothing, removePRMHandler)
-                        $E('PRMList').set(uf.draw())
+                                newPRMHandler, userListNothing, removePRMHandler);
+                        $E('PRMList').set(uf.draw());
 </script>
