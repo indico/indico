@@ -51,7 +51,7 @@ from indico.web.wsgi.indico_wsgi_handler_utils import table, FieldStorage, \
 from indico.web.wsgi.indico_wsgi_url_parser import is_mp_legacy_publisher_path
 
 # Legacy imports
-from MaKaC.plugins.base import RHMap
+from MaKaC.plugins.base import RHMapMemory
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.
@@ -81,7 +81,7 @@ def application(environ, start_response):
                 # Let's try to load a plugin
                 # Replace URLFields with environ
                 path = req.URLFields['PATH_INFO'].split('/')
-                pluginMap = RHMap()._map
+                pluginMap = RHMapMemory()._map
                 if path[1] != '' and pluginMap.has_key(path[1]):
                     plugin_publisher(req, path[1])
                 else:
@@ -163,7 +163,7 @@ def plugin_publisher(req, path):
     """
     Publishes the plugin described in path
     """
-    pluginMap = RHMap()._map
+    pluginMap = RHMapMemory()._map
     form = dict(req.form)
 
     _convert_to_string(form)

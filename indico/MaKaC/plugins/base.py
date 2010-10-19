@@ -218,6 +218,38 @@ class AJAXMethodMap(Persistent):
 
 
 
+class RHMap(Persistent):
+    """ This class is the representation in the DB of the RHMap """
+    def __init__(self):
+        self.__id = "RHMap"
+        self.__map = {}
+
+    def hasUH(self, rh):
+        if not hasattr(rh, '_uh') or rh._uh is None:
+            raise Exception('The RH %s did not implement the _uh attribute, please do it' %str(rh))
+        return True
+
+    def _notifyModification(self):
+        self._p_changed = 1
+
+    def get(self):
+        return self.__map
+
+    def getId(self):
+        return self.__id
+
+    def addRH(self, rh):
+        if self.hasUH(rh):
+            self.__map[rh._uh.getURL().__str__()] = rh
+        self._notifyModification()
+
+    def cleanRHDict(self):
+        """ Attributes in this class are persistent, so when we want to erase them we'll need to explicitely invoke this method
+        """
+        self.__map.clear()
+        self._notifyModification()
+
+
 class PluginsHolder (ObjectHolder):
     """ A PluginsHolder object is the "gateway" to all the methods for getting plugin meta-data stored in the DB.
     """
@@ -238,11 +270,15 @@ class PluginsHolder (ObjectHolder):
             self.loadAllPlugins()
         if not self.hasKey('ajaxMethodMap'):
             self.add(AJAXMethodMap())
-
+        if not self.hasKey('RHMap'):
+            self.add(RHMap())
 
     def getRHMap(self):
+        if not self.hasKey('RHMap'):
+            self.add(RHMap())
+        return self.getById('RHMap')
         # Replace with the real dict obtained while exploring the directories
-        return {'algo': 'MaKaC.webinterface.rh.welcome.RHWelcome'}
+        #return {'algo': 'MaKaC.webinterface.rh.welcome.RHWelcome'}
 
     def getGlobalPluginOptions(self):
         """ Returns server-wide options relative to the whole plugin system.
@@ -265,6 +301,7 @@ class PluginsHolder (ObjectHolder):
         """
         self.getComponentsManager().cleanAll()
         self.getById("ajaxMethodMap").cleanAJAXDict()
+        self.getById("RHMap").cleanRHDict()
         PluginLoader.reloadPlugins()
         self.updateAllPluginInfo()
         self.getComponentsManager().registerAllComponents()
@@ -335,11 +372,14 @@ class PluginsHolder (ObjectHolder):
         """
         return self.getById(name)
 
-class RHMap( object ):
-    """ Stores the RHMap for every python process
+
+
+class RHMapMemory:
+    """ Stores the RHMap for every python process in memory
     If there's no Map attribute, we fetch it from the database,
     otherwise just return it.
     """
+
     ## Stores the unique Singleton instance-
     _iInstance = None
 
@@ -348,21 +388,23 @@ class RHMap( object ):
     class Singleton:
         def __init__(self):
             if not hasattr(self, '_map'):
-                DBMgr.getInstance().startRequest()
-                self._map=PluginsHolder().getRHMap()
-                DBMgr.getInstance().endRequest()
+                if DBMgr.getInstance().isConnected():
+                    self._map=PluginsHolder().getRHMap()
+                else:
+                    #DBMgr.getInstance().startRequest()
+                    self._map=PluginsHolder().getRHMap()
+                    #DBMgr.getInstance().endRequest()
 
     ## The constructor
     #  @param self The object pointer.
     def __init__( self ):
         # Check whether we already have an instance
-        if RHMap._iInstance is None:
-            # Create and remember instanc
-            RHMap._iInstance = RHMap.Singleton()
+        if RHMapMemory._iInstance is None:
+            # Create and remember instance
+            RHMapMemory._iInstance = RHMapMemory.Singleton()
 
         # Store instance reference as the only member in the handle
-        self._EventHandler_instance = RHMap._iInstance
-
+        self._EventHandler_instance = RHMapMemory._iInstance
 
     ## Delegate access to implementation.
     #  @param self The object pointer.

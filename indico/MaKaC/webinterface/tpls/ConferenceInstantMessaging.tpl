@@ -24,7 +24,7 @@
 
 		    <tr style="vertical-align: baseline;">
 				<td></td>
-		        <td> <a href="xmpp:<%= cr.getTitle()%>@<%= server%>?join" ><%= cr.getTitle()%></td>
+		        <td> <%= cr.getTitle()%> </td>
 
 	        	<td style="font-family:monospace;"> <%= server%></td>
 
@@ -41,6 +41,7 @@
    	 			<% else:%>
 		        	<td style="font-style:italic"> - </td>
    	 			<% end %>
+                <td><a href="xmpp:<%= cr.getTitle()%>@<%= server%>?join" >Join now!</td>
 		    </tr>
    	 	<% end %>
 </table>

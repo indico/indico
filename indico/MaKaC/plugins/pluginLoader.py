@@ -24,7 +24,6 @@ from MaKaC.plugins.notificationComponents import IListener
 from MaKaC.plugins.notificationComponents import IContributor
 from MaKaC.common.logger import Logger
 
-
 from MaKaC.errors import PluginError
 
 class PluginLoader(object):
@@ -234,9 +233,7 @@ class PluginLoader(object):
 
                 if pluginTypeSubModule:
                     cls.pluginTypeModules[pluginTypeName].__dict__[itemName] = pluginTypeSubModule
-                #EL IF FUERA!
-                #if itemName == 'components':
-                cls.addImplementedComponents(pluginTypeSubModule.__dict__.values())
+                cls.addComponentsAndRH(pluginTypeSubModule.__dict__.values())
 
                 if itemName == 'handlers':
                     #we get the dictionary containing the AJAX methods of the plugin
@@ -263,7 +260,6 @@ class PluginLoader(object):
             # splitext returns a tuple (name, file extension). Ex: ("conference", ".py")
             # if no extension, the 2nd element of the tuple will be an empty string
             itemName, ext = os.path.splitext(itemName)
-
             #if the item is a directory, we may have found a subpackage (also a submodule)
             if os.path.isdir(os.path.join(modulePath, itemName)):
 
@@ -286,11 +282,9 @@ class PluginLoader(object):
 
                 #this should return a subModule, unless there has been an error during import
                 subModule = cls.importName(module.__name__, itemName)
-
                 foundSubModules[itemName] = subModule
-                #Y aqui!
-                #if itemName == 'components':
-                cls.addImplementedComponents(subModule.__dict__.values())
+
+                cls.addComponentsAndRH(subModule.__dict__.values())
 
                 if itemName == 'handlers':
                     #we get the dictionary containing the AJAX methods of the plugin
@@ -309,9 +303,10 @@ class PluginLoader(object):
                 module.modules[subModuleName] = subModule
 
     @classmethod
-    def addImplementedComponents(cls, classList):
+    def addComponentsAndRH(cls, classList):
         '''we receive a list of the elements contained in a .py file. We`ll have to check
-        that the element is a class that implements the base class Component and the interface IListener'''
+        that the element is a class that implements the base class Component and the interface IListener.
+        Also, we'll add the neccessary items to the RHMap'''
         for cl in classList:
             #we have the .py file in obj, now we get its data and check if the class inherits from listener or contributor
             try:
@@ -319,6 +314,13 @@ class PluginLoader(object):
                 #if hasattr(cl, 'isListener') and IListener.implementedBy(cl):
                     from MaKaC.plugins.base import PluginsHolder
                     PluginsHolder().getComponentsManager().addComponent(cl)
+
+                #fill the RHMap in case the class inherits from RH and its path is in the plugins folder
+                from MaKaC.webinterface.rh.base import RH
+                if (hasattr(cl, 'mro') and RH in cl.mro()) and cl.__module__.find('plugins') != -1:
+                    from MaKaC.plugins.base import PluginsHolder
+                    PluginsHolder().getRHMap().addRH(cl)
+
             except Exception,e:
                 #we might have an exception because some classes return True for hasattr(cl, 'mro') but then throw an exception when calling
                 #cl.mro(). Since we are not supposed to do anything in this cases, we just pass to the next case

@@ -1,6 +1,6 @@
 import sleekxmpp
 
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 
 class IndicoJabberBotBase(object):
 
@@ -30,6 +30,10 @@ class IndicoJabberBotBase(object):
     def handleXMPPConnected(self, event):
         pass
 
+    def treatError(self, error, msg=''):
+        """ Gets the response from the XMPP driver and, in case of error, returns the appropiate message"""
+        return {'error':error, 'reason':msg if msg!= '' else 'There was a problem while connecting our XMPP server. Please try again later'}
+
 
 class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
 
@@ -43,17 +47,30 @@ class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
         try:
             connected = self.xmpp.connect()
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True)
             self.xmpp.disconnect()
         self.xmpp.process(threaded=False)
 
     def handleXMPPConnected(self, event):
+        #mod_discovery, service discovery related
+        disco = self.xmpp.plugin['xep_0030']
+        #mod_muc, multi chat related
         muc = self.xmpp.plugin['xep_0045']
+
+        try:
+            roomExists=disco.getInfo(self._jid)
+        except Exception, e:
+            self._error = self.treatError(True)
+            self.xmpp.disconnect()
+        if roomExists.get('type') != 'error':
+            #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
+            self._error = self.treatError(True, 'roomExists')
+            self.xmpp.disconnect()
 
         try:
             muc.joinMUC(room = self._jid, nick = self._nick)
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True)
             self.xmpp.disconnect()
 
         form = self.xmpp.plugin['xep_0004'].makeForm()
@@ -71,11 +88,10 @@ class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
 
         form.addField(var = 'muc#roomconfig_persistentroom', value = '1')
 
-        self._error = False
         try:
-            self._error = not muc.configureRoom(self._jid, form)
+            self._error = self.treatError(not muc.configureRoom(self._jid, form))
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True)
             self.xmpp.disconnect()
 
         self.xmpp.disconnect()
@@ -94,16 +110,30 @@ class IndicoJabberBotEditRoom(IndicoJabberBotBase):
         try:
             self.xmpp.connect()
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True)
             self.xmpp.disconnect()
         self.xmpp.process(threaded=False)
 
     def handleXMPPConnected(self, event):
+        #mod_discovery, service discovery related
+        disco = self.xmpp.plugin['xep_0030']
+        #mod_muc, multi chat related
         muc = self.xmpp.plugin['xep_0045']
+
+        try:
+            roomExists=disco.getInfo(self._jid)
+        except Exception, e:
+            self._error = self.treatError(True)
+            self.xmpp.disconnect()
+        if roomExists.get('type') != 'error':
+            #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
+            self._error = self.treatError(True, 'roomExists')
+            self.xmpp.disconnect()
+
         try:
             muc.joinMUC(room = self._jid, nick = self._nick)
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True)
             self.xmpp.disconnect()
 
         form = self.xmpp.plugin['xep_0004'].makeForm()
@@ -123,9 +153,9 @@ class IndicoJabberBotEditRoom(IndicoJabberBotBase):
         form.addField(var = 'muc#roomconfig_persistentroom', value = '1')
 
         try:
-            self._error = not muc.configureRoom(self._jid, form)
+            self._error = self.treatError(not muc.configureRoom(self._jid, form))
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True)
             self.xmpp.disconnect()
 
         self.xmpp.disconnect()

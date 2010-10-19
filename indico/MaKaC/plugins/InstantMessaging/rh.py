@@ -2,6 +2,7 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.plugins.InstantMessaging.pages import WPConfModifChat, WPConferenceInstantMessaging
+from MaKaC.webinterface import urlHandlers
 
 
 class RHChatModifBase(RHConferenceModifBase):
@@ -17,8 +18,11 @@ class RHChatModifBase(RHConferenceModifBase):
             if plugin.isActive():
                   self._tabs.append(plugin.getName())
 
+
 class RHChatFormModif(RHChatModifBase):
     """ For the conference modification"""
+    _uh = urlHandlers.UHConfModifChat
+
     def _checkParams(self, params):
         RHChatModifBase._checkParams(self, params)
         if self._activeTabName and not self._activeTabName in self._tabs:
@@ -35,6 +39,8 @@ class RHChatFormModif(RHChatModifBase):
 
 class RHInstantMessagingDisplay(RHConferenceBaseDisplay):
     """ For the conference display"""
+    _uh = urlHandlers.UHConferenceInstantMessaging
+
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
 

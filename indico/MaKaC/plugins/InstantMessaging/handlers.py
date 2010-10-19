@@ -78,8 +78,11 @@ class ChatRoomBase ( ServiceBase, Observable ):
             self._bot = IndicoJabberBotCreateRoom(jid, password, room)
         except Exception, e:
             raise NoReportError( self._messages['creating'])
-        if hasattr(self._bot, '_error') and self._bot._error:
-            raise NoReportError( self._messages['creating'])
+        if hasattr(self._bot, '_error') and self._bot._error['error']:
+            if self._bot._error['reason'] is 'roomExists':
+                raise NoReportError(self._messages['sameName'], explanation='roomExists')
+            else:
+                raise NoReportError(self._error['reason'])
         elif not hasattr(self._bot, '_error'):
             raise NoReportError( self._messages['connecting'])
         return True
@@ -91,9 +94,12 @@ class ChatRoomBase ( ServiceBase, Observable ):
         except Exception, e:
             Logger.get('InstantMessaging (Jabber)').info("Exception while editing: %s" %e)
             raise NoReportError( self._messages['editing'])
-        if hasattr(self._bot, '_error') and self._bot._error:
+        if hasattr(self._bot, '_error') and self._bot._error['error']:
             Logger.get('InstantMessaging (Jabber)').info("Exception while editing: Apparently there was a problem with the XMPP library")
-            raise NoReportError( self._messages['editing'])
+            if self._bot._error['reason'] is 'roomExists':
+                raise NoReportError(self._messages['sameName'], explanation='roomExists')
+            else:
+                raise NoReportError(self._error['reason'])
         elif not hasattr(self._bot, '_error'):
             raise NoReportError( self._messages['connecting'])
         return True

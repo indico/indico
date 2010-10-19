@@ -140,7 +140,7 @@ class ChatroomStorage(Component):
 
         # index by conference id
         confIndex = IndexByConfHelper(conference.getId())
-        room.setId(DBHelpers.newID(room.getConference()))
+        room.setId(DBHelpers.newID())
         confIndex.add(room)
 
         # Index by chat room's name

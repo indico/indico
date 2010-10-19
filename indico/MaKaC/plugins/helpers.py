@@ -61,7 +61,7 @@ class DBHelpers:
         return root['counter']
 
     @classmethod
-    def newID(cls, conf):
+    def newID(cls):
         return cls.getCounter().newCount()
 
     @classmethod
