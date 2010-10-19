@@ -1586,7 +1586,7 @@ type('AutocheckTextBox', ['RealtimeTextBox'],
                         self.component.dom.style.display = "none";
                     }
                     else{
-                        self.component.dom.style.display = null;
+                        self.component.dom.style.display = '';
 		            }
 
 		        }
@@ -1602,7 +1602,7 @@ type('AutocheckTextBox', ['RealtimeTextBox'],
                 //we set the text with which we will compare before doing the observe
                 self.setOriginalText(originalText == null?self.get():originalText);
                 if (isRepeated){
-                    self.component.dom.style.display = null;
+                    self.component.dom.style.display = '';
                 }
                 else{
                     self.component.dom.style.display = "none";

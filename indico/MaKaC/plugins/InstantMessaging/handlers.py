@@ -87,10 +87,13 @@ class ChatRoomBase ( ServiceBase, Observable ):
             raise NoReportError( self._messages['connecting'])
         return True
 
-    def editRoomJabber(self, jid, password, room):
-        """ Edits the room in the Jabber server """
+    def editRoomJabber(self, jid, password, room, checkRoomExists = True):
+        """ Edits the room in the Jabber server. If checkRoomExists is set to true
+            it means that we are changing the chat room name and we want to know if the new
+            name is already taken in the server. If it's false it means that we only want to change
+            some of the parameters in the room, so no need to check the name. """
         try:
-            self._bot = IndicoJabberBotEditRoom(jid, password, room)
+            self._bot = IndicoJabberBotEditRoom(jid, password, room, checkRoomExists)
         except Exception, e:
             Logger.get('InstantMessaging (Jabber)').info("Exception while editing: %s" %e)
             raise NoReportError( self._messages['editing'])
@@ -218,7 +221,7 @@ class EditChatroom( ChatRoomBase ):
 
             #no changes were made in this area, we edit the room in case it's created in the Jabber server
             elif self._room.getCreateRoom():
-                modified = self.editRoomJabber(self._botJID, self._botPass, self._room)
+                modified = self.editRoomJabber(self._botJID, self._botPass, self._room, False)
 
         if modified:
             Logger.get('InstantMessaging (Jabber)').info("The room %s has been modified by the user %s at %s hours" %(self._title, self._user.getName(), self._room.getModificationDate()))

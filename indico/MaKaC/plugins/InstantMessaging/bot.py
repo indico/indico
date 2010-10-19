@@ -99,12 +99,13 @@ class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
 
 class IndicoJabberBotEditRoom(IndicoJabberBotBase):
 
-    def __init__(self, jid, password, room):
+    def __init__(self, jid, password, room, checkRoomExists):
         IndicoJabberBotBase.__init__(self, jid, password)
         self._room = room
         self._protected = 1 if self._room.getPassword() != '' else 0
         self._nick, server = jid.split('@')
         self._jid = self._room.getTitle() + '@conference.' + server
+        self._checkRoomExists = checkRoomExists
         self._error = False
 
         try:
@@ -120,15 +121,16 @@ class IndicoJabberBotEditRoom(IndicoJabberBotBase):
         #mod_muc, multi chat related
         muc = self.xmpp.plugin['xep_0045']
 
-        try:
-            roomExists=disco.getInfo(self._jid)
-        except Exception, e:
-            self._error = self.treatError(True)
-            self.xmpp.disconnect()
-        if roomExists.get('type') != 'error':
-            #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
-            self._error = self.treatError(True, 'roomExists')
-            self.xmpp.disconnect()
+        if self._checkRoomExists:
+            try:
+                roomExists=disco.getInfo(self._jid)
+            except Exception, e:
+                self._error = self.treatError(True)
+                self.xmpp.disconnect()
+            if roomExists.get('type') != 'error':
+                #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
+                self._error = self.treatError(True, 'roomExists')
+                self.xmpp.disconnect()
 
         try:
             muc.joinMUC(room = self._jid, nick = self._nick)
