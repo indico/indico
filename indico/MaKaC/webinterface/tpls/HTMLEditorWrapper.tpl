@@ -3,7 +3,7 @@
 <script type="text/javascript">
 
     var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoFull");
-    editor.set($E('content').dom.value);
+    editor.set($E('content').dom.value, true);
     $E('contentField').set(editor.draw());
 
     function parseForm(form){
