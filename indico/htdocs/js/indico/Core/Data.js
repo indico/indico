@@ -196,7 +196,7 @@ Util.Validation = {
     },
 
     isHtml: function(text) {
-        if (/<.*>[\s\S]*<\/.*>/.exec(text)) {
+        if (/<.*>[\s\S]*<\/.*>|<br\s*\/>/.exec(text)) {
             return true;
         } else {
             return false;
