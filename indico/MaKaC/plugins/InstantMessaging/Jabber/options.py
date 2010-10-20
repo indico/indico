@@ -53,5 +53,19 @@ globalOptions = [
                       "defaultValue": ""}),
      ("ckEditor" , {"description" : _("Information about how to connect to the chat with a client (Optional)"),
                       "type": 'ckEditor',
-                      "defaultValue": ""}),
+                      "defaultValue": "<table width=\"100%\" align=\"center\" border=\"0\">\
+    <tr>\
+        <td class=\"groupTitle\" style=\"padding-top:50px\"><%= _(\"How to connect to the chat\")%></td>\
+    </tr>\
+    <tr>\
+          <td>\
+              <ul>\
+                  <li><%= _(\"Download a messaging client compatible with XMPP (like Pidgin, Gajim, Adium, Spark...You may want to look\") %> <a href=http://xmpp.org/software/clients.shtml> <%= _(\"here\") %></a>) <%=_(\"and install it.\")%></li>\
+                <li><%= _(\"Add the Jabber account that you want to use.\")%></li>\
+                <li><%= _(\"In the menus, try to find something like 'Join a Chat', 'Join Group Chat', or related.\")%></li>\
+                <li><%= _(\"Fill the fields Room and Server with the information above. In case there is only one field for both the room and the server, the format to use is 'room@server'.\")%></li>\
+            </ul>\
+        </td>\
+    </tr>\
+</table>"}),
 ]

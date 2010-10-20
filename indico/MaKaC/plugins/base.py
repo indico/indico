@@ -229,6 +229,12 @@ class RHMap(Persistent):
             raise Exception('The RH %s did not implement the _uh attribute, please do it' %str(rh))
         return True
 
+    def has_key(self, key):
+        return self.__map.has_key(key)
+
+    def copy(self):
+        return self.__map.copy()
+
     def _notifyModification(self):
         self._p_changed = 1
 
@@ -389,11 +395,11 @@ class RHMapMemory:
         def __init__(self):
             if not hasattr(self, '_map'):
                 if DBMgr.getInstance().isConnected():
-                    self._map=PluginsHolder().getRHMap()
+                    self._map=PluginsHolder().getRHMap().copy()
                 else:
-                    #DBMgr.getInstance().startRequest()
-                    self._map=PluginsHolder().getRHMap()
-                    #DBMgr.getInstance().endRequest()
+                    DBMgr.getInstance().startRequest()
+                    self._map=PluginsHolder().getRHMap().copy()
+                    DBMgr.getInstance().endRequest()
 
     ## The constructor
     #  @param self The object pointer.
