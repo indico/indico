@@ -18,11 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-These functions are designed to make changes on the WebEx server. 
-They do not modify any of the booking parameters themselves.  
+These functions are designed to make changes on the WebEx server.
+They do not modify any of the booking parameters themselves.
 (Except after the booking is created, we DO save the WebEx ID (meeting key)
 and the auto-join URL, because we have no way to keep track of that booking
-on the WebEx server otherwise...) 
+on the WebEx server otherwise...)
 """
 
 
@@ -33,20 +33,14 @@ from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.WebEx.common import WebExControlledException, \
     WebExError, WebExWarning, getWebExOptionValueByName, WebExException, \
     makeParticipantXML, sendXMLRequest
-from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAdmin, \
-    WebExMeetingModifiedNotificationAdmin, WebExMeetingRemovalNotificationAdmin, \
-    NewWebExMeetingNotificationManager, WebExMeetingModifiedNotificationManager,\
-    WebExMeetingRemovalNotificationManager, WebExParticipantNotification
+from MaKaC.plugins.Collaboration.WebEx.mail import WebExParticipantNotification
 from MaKaC.common.mail import GenericMailer
 from cgi import escape
-
-from MaKaC.plugins.Collaboration.WebEx.common import getWebExOptionValueByName
 
 class WebExOperations(object):
     """
     This class does all of the calls to the WebEx servers as well as sending
-    notification emails to participants.  The methods are called from the 
+    notification emails to participants.  The methods are called from the
     externalOperations class so that they are not called more than once by mistake
     """
 
@@ -128,13 +122,11 @@ class WebExOperations(object):
     @classmethod
     def modifyBooking( cls, booking ):
         try:
-            arguments = booking.getCreateModifyArguments()
             params = booking.getBookingParams()
             booking.setAccessPassword( params['accessPassword'] )
             start_time = datetime( *strptime( str(booking.getAdjustedStartDate('UTC'))[:-9], "%Y-%m-%d %H:%M" )[0:7])
             end_time = datetime( *strptime( str(booking.getAdjustedEndDate('UTC'))[:-9], "%Y-%m-%d %H:%M" )[0:7])
             diff = end_time - start_time
-            days = diff.days
             minutes, seconds = divmod(diff.seconds, 60)
             duration = minutes + diff.days * 1440
             Logger.get('WebEx').debug( "Found duration %s" % str(duration) )
@@ -165,7 +157,7 @@ class WebExOperations(object):
       <poll>true</poll>
       <audioVideo>true</audioVideo>
     </enableOptions>
-    
+
     <schedule>
       <startDate>%(startDate)s:00</startDate>
       <joinTeleconfBeforeHost>false</joinTeleconfBeforeHost>
@@ -239,18 +231,17 @@ class WebExOperations(object):
             Logger.get('WebEx').info( "In delete function, appears to have been successful" )
 
         if booking._created:
-            if True:
-                try:
-                    Logger.get('WebEx').info("I am in the mailer block")
-                    recipients = []
-                    for k in booking._participants.keys():
-                        recipients.append( booking._participants[k]._email )
-                    if len(recipients)>0:
-                        notification = WebExParticipantNotification( booking, recipients, 'delete' )
-                        GenericMailer.send( notification )
-                except Exception, e:
-                    Logger.get('WebEx').error(
-                        """Could not send notification emails for booking with id %s of event with id %s, exception: %s""" %
-                        (booking.getId(), booking.getConference().getId(), str(e)))
+            try:
+                #Logger.get('WebEx').info("I am in the mailer block")
+                recipients = []
+                for k in booking._participants.keys():
+                    recipients.append( booking._participants[k]._email )
+                if len(recipients)>0:
+                    notification = WebExParticipantNotification( booking, recipients, 'delete' )
+                    GenericMailer.send( notification )
+            except Exception, e:
+                Logger.get('WebEx').error(
+                    """Could not send notification emails for booking with id %s of event with id %s, exception: %s""" %
+                    (booking.getId(), booking.getConference().getId(), str(e)))
         return None
 

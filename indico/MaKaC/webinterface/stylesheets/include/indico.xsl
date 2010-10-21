@@ -934,7 +934,6 @@
                               <xsl:for-each select="./linkLineNewWindow">
                                 <div>
                                     <a href="{./href}" target="_blank">
-<!--                                    <xsl:text disable-output-escaping="yes"><![CDATA[HI]]></xsl:text>-->
                                     <xsl:value-of select="./caption"/>
                                   </a>
                                 </div>

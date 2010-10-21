@@ -21,25 +21,20 @@
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase
 from MaKaC.common.utils import formatDateTime
-from datetime import timedelta
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate,\
     getMaxEndDate
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
 import re
 
-from MaKaC.common.logger import Logger
-
 class WNewBookingForm(WCSPageTemplateBase):
-        
+
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )
-        
+
         vars["EventTitle"] = self._conf.getTitle()
         vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
-        
+
         vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
         vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
 
@@ -49,7 +44,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         sessions = "<select name='session' id='session' onchange='updateSessionTimes()'><option value=''>None</option>"
         count = 0
         sessionList = self._conf.getSessionList()
-        for session  in sessionList: 
+        for session  in sessionList:
             count = count + 1
             sessions = sessions + "<option value='%s'>%s</option>" % (str(session.getId()), session.getTitle() )
         sessions += "</select>"
@@ -58,24 +53,24 @@ class WNewBookingForm(WCSPageTemplateBase):
         return vars
 
 class WMain (WJSBase):
-    
+
     def getVars(self):
         vars = WJSBase.getVars( self )
-        
+
         vars["AllowedStartMinutes"] = self._WebExOptions["allowedPastMinutes"].getValue()
         vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf))
         vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf))
         vars["AllowedMarginMinutes"] = self._WebExOptions["allowedMinutes"].getValue()
-        
+
         return vars
-    
+
 class WExtra (WJSBase):
-    
+
     def getVars(self):
         vars = WJSBase.getVars( self )
         sessionTimes = ""
         sessionList = self._conf.getSessionList()
-        for session  in sessionList: 
+        for session  in sessionList:
             sessionTimes = sessionTimes + """{"id":"%s", "start":"%s", "end":"%s" },""" % (str(session.getId()), formatDateTime(session.getAdjustedStartDate()), formatDateTime(session.getAdjustedEndDate()) )
         vars["SessionTimes"] = '{ "sessions": [' + sessionTimes[:-1] + ']}'
         vars["AllowedStartMinutes"] = self._WebExOptions["allowedPastMinutes"].getValue()
@@ -85,24 +80,24 @@ class WExtra (WJSBase):
         else:
             vars["MinStartDate"] = ''
             vars["MaxEndDate"] = ''
-        
+
         return vars
-    
+
 class WIndexing(WJSBase):
     pass
-    
+
 class WInformationDisplay(WCSPageTemplateBase):
-    
+
     def __init__(self, booking, displayTz):
         WCSPageTemplateBase.__init__(self, booking.getConference(), 'WebEx', None)
         self._booking = booking
         self._displayTz = displayTz
-    
+
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )
         vars["Booking"] = self._booking
         return vars
-    
+
 class XMLGenerator(object):
     @classmethod
     def getFirstLineInfo(cls, booking, displayTz):
@@ -110,7 +105,7 @@ class XMLGenerator(object):
     @classmethod
     def getDisplayName(cls):
         return "WebEx"
-            
+
     @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
         booking.checkCanStart()
@@ -121,7 +116,7 @@ class XMLGenerator(object):
             out.writeTag("launchTooltip", _('Click here to join the WebEx meeting!'))
             out.closeTag("launchInfo")
         out.openTag("information")
-        
+
         if booking.getHasAccessPassword():
             out.openTag("section")
             out.writeTag("title", _('Protection:'))

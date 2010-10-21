@@ -292,14 +292,8 @@ class CollaborationTools(object):
         """
         l = []
         for pluginName in cls.getCollaborationPluginType().getPlugins():
-            Logger.get('Found plugins').info("pluginName = %s" % ( pluginName ) )
-            try:
-                if cls.getCSBookingClass(pluginName)._hasEventSessionDisplay:
-                    Logger.get('Found plugins').info("%s has session display" % ( pluginName ) )
-                    l.append(pluginName)
-            except AttributeError, err:
-                Logger.get('Found plugins').info("AttributeError on pluginName = %s" % ( pluginName ) )
-                pass
+            if cls.getCSBookingClass(pluginName).hasEventSessionDisplay():
+                l.append(pluginName)
         return l
 
     @classmethod
@@ -363,8 +357,10 @@ class MailTools(object):
         if plugin and plugin.hasOption('sendMailNotifications'):
             admins = plugin.getOption('admins').getValue()
             sendMail = plugin.getOption('sendMailNotifications').getValue()
-            addEmails = plugin.getOption('additionalEmails').getValue()
-
+            if plugin.hasOption('additionalEmails'):
+                addEmails = plugin.getOption('additionalEmails').getValue()
+            else:
+                addEmails = CollaborationTools.getCollaborationOptionValue('additionalEmails')
         else:
             # get definitions from the Collaboration plugin type
             admins = CollaborationTools.getCollaborationOptionValue('collaborationAdmins')

@@ -23,16 +23,8 @@
 import httplib
 from persistent import Persistent
 from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
-from urllib2 import HTTPError, URLError
 from datetime import timedelta, datetime
-from time import strptime, strftime
-from BaseHTTPServer import BaseHTTPRequestHandler
-from MaKaC.common.httpTimeout import urlOpenWithTimeout
-from MaKaC.common.url import URL
-from array import array
-from MaKaC.common.timezoneUtils import nowutc, datetimeToUnixTime
-from MaKaC.common.logger import Logger
-from MaKaC.common.PickleJar import Retrieves
+from time import strptime
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.WebEx.fossils import IWebExWarningFossil, IWebExErrorFossil, \
@@ -47,7 +39,7 @@ def unescape(s):
     s = s.replace("&amp;","&")
     return s
 
-def sendXMLRequest(xml):  
+def sendXMLRequest(xml):
     conn = httplib.HTTPSConnection( getWebExOptionValueByName("WEhttpServerLocation") )
     conn.request( "POST", "/WBXService/XMLService", xml )
     r = conn.getresponse()
@@ -66,7 +58,7 @@ def makeParticipantXML( participants ):
     """
     if len(participants) < 1:
         return ""
-    participants_xml = "<participants><attendees>\n"  
+    participants_xml = "<participants><attendees>\n"
     for p in participants.itervalues():
         p_xml = """<attendee>
   <person>
@@ -76,14 +68,14 @@ def makeParticipantXML( participants ):
   </person>
 </attendee>
 """ % { "firstName": escape(p._firstName), "lastName":escape(p._familyName), "email":p._email }
-        participants_xml = participants_xml + p_xml    
+        participants_xml = participants_xml + p_xml
     participants_xml = participants_xml + "</attendees></participants>\n"
     return participants_xml
-        
+
 def findDuration(start, finish):
     """
     This function returns the duration of the meeting in minues
-    Pass in dates of the form self.getAdjustedStartDate('UTC'))[:-9] 
+    Pass in dates of the form self.getAdjustedStartDate('UTC'))[:-9]
     self.getAdjustedEndDate('UTC'))[:-9]
     """
     t1 = makeTime( start )
@@ -92,15 +84,15 @@ def findDuration(start, finish):
     days = diff.days
     minutes,seconds = divmod(diff.seconds, 60)
     return minutes + diff.days * 1440
-    
+
 def makeTime(the_dateTime):
     """
     This function will return a datetime object
-    representing the time passed in in the form created from the 
+    representing the time passed in in the form created from the
     timezone functions like getAdjustedStartDate('UTC')
     """
-    return datetime( *strptime( str(the_dateTime)[0:16], "%Y-%m-%d %H:%M" )[0:7]) 
-   
+    return datetime( *strptime( str(the_dateTime)[0:16], "%Y-%m-%d %H:%M" )[0:7])
+
 def getMinStartDate(conference):
     return conference.getAdjustedStartDate() - timedelta(0,0,0,0, getWebExOptionValueByName("allowedMinutes"))
 
@@ -114,8 +106,8 @@ class WebExError(CSErrorBase):
         self._errorID = errorID
         self._errorType = errorType
         self._requestURL = requestURL
-        self._userMessage = userMessage 
-        
+        self._userMessage = userMessage
+
         if self._errorID == "000000":
             self._errorType = "webex_server_error"
             self._userMessage = "Unknown error happened with WebEx server."
@@ -125,7 +117,7 @@ class WebExError(CSErrorBase):
         elif self._errorID == "030007" or self._errorID == "030008":
             self._errorType = "webex_expired_user"
             self._userMessage = "This WebEx user account is expired or inactive."
-        elif self._errorID == "030002": 
+        elif self._errorID == "030002":
             self._errorType = "webex_invalid_pass"
             self._userMessage = "Invalid password for this WebEx user"
         elif self._errorID == "060001":
@@ -139,14 +131,14 @@ class WebExError(CSErrorBase):
             self._userMessage = "The server returned an access denied error"
         elif self._errorID == "009007" or self._errorID == "009008" or self._errorID == "009009":
             self._errorType = "webex_date_error"
-            self._userMessage = "The WebEx server did not accept the dates chosen."  
+            self._userMessage = "The WebEx server did not accept the dates chosen."
         elif self._errorID == "009010" or self._errorID == "009011" or self._errorType == "webex_record_not_found":
             self._errorType = "webex_record_not_found"
             self._userMessage = "The WebEx server was unable to locate the record."
-        
+
         if self._errorType == None:
             self._errorType = "webex_unknown"
-            
+
     def getOrigin(self):
         return 'WebEx'
 
@@ -156,7 +148,7 @@ class WebExError(CSErrorBase):
 
     def getInfo(self):
         return self._userMessage
-        
+
     def getErrorType(self):
         return self._errorType
 
@@ -169,10 +161,10 @@ class WebExError(CSErrorBase):
             return self._userMessage
         else:
             return "Unknown error"
-    
+
     def getLogMessage(self):
         return "WebEx Error: " + str(self._errorType) + " for request " + str(self._requestURL)
-        
+
 class Participant(Persistent,Fossilizable):
     fossilizes(IParticipantFossil)
     def __init__(self, booking, participantIndicoId, data):
@@ -194,23 +186,23 @@ class Participant(Persistent,Fossilizable):
         return self._id
 
     def getParticipantName(self):
-         return "%s, %s" % ( self.getFamilyName(), self.getFirstName() )
+        return "%s, %s" % ( self.getFamilyName(), self.getFirstName() )
 
     def getTitle(self):
         return self._title
-    
+
     def getFamilyName(self):
         return self._familyName
-    
+
     def getFirstName(self):
         return self._firstName
-    
+
     def getAffiliation(self):
         return self._affiliation
-        
+
     def getEmail(self):
         return self._email
-    
+
     def getDisplayName(self):
         result = []
         if self._title:
@@ -224,24 +216,24 @@ class Participant(Persistent,Fossilizable):
             result.append(self._affiliation)
             result.append(')')
         return ("".join(result))
-    
+
 class OverlappedError(WebExError):
     def __init__(self, overlappedBooking):
         WebExError.__init__(self, 'overlapped')
         self._overlappedBooking = overlappedBooking
-        
+
     def getSuperposedBookingId(self):
         return self._overlappedBooking
-    
+
 class ChangesFromWebExError(WebExError):
     fossilizes(IChangesFromWebExErrorFossil)
     def __init__(self, changes):
         WebExError.__init__(self, 'changesFromWebEx')
         self._changes = changes
-        
+
     def getChanges(self):
         return self._changes
-    
+
 class WebExException(CollaborationException):
     def __init__(self, msg, inner = None):
         CollaborationException.__init__(self, msg, 'WebEx', inner)
@@ -249,7 +241,7 @@ class WebExException(CollaborationException):
 class WebExControlledException(Exception):
     def __init__(self, message):
         self.message = message
-    
+
     def __str__(self):
         return "WebExControlledException. Message = " + self.message
 
@@ -261,7 +253,7 @@ class WebExWarning(Fossilizable):
 
     def getMessage(self):
         return self._msg
-    
+
     def getException(self):
         return self._exception
 

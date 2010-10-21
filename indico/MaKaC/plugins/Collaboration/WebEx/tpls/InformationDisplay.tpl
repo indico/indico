@@ -6,7 +6,7 @@
                 <span><%= _('Protection')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= _("This WebEx meeting is protected by a password.") %>      
+                <%= _("This WebEx meeting is protected by a password.") %>
             </td>
         </tr>
         <% end %>
@@ -15,7 +15,7 @@
                 <span><%= _('Agenda')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking._bookingParams["meetingDescription"] %>      
+                <%= Booking._bookingParams["meetingDescription"] %>
             </td>
         </tr>
         <tr>
@@ -23,7 +23,7 @@
                 <span><%= _('Toll free call in number')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getPhoneNum() %>      
+                <%= Booking.getPhoneNum() %>
             </td>
         </tr>
         <tr>
@@ -31,7 +31,7 @@
                 <span><%= _('Toll call in number')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getPhoneNumToll() %>      
+                <%= Booking.getPhoneNumToll() %>
             </td>
         </tr>
         <tr>
@@ -39,7 +39,7 @@
                 <span><%= _('Call in access code')%>:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getPhoneAccessCode() %>      
+                <%= Booking.getPhoneAccessCode() %>
             </td>
         </tr>
         <tr>

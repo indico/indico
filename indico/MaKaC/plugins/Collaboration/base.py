@@ -1387,6 +1387,8 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Returns if the type of this booking should display something on
             an event display page
         """
+        if not hasattr(self, "_hasEventSessionDisplay"):  #TODO: remove when safe
+            self._hasEventSessionDisplay = False
         return self._hasEventSessionDisplay
 
     def isAdminOnly(self):

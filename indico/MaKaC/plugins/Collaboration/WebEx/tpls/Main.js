@@ -3,12 +3,12 @@
             var popup = new WebExLaunchClientPopup(booking.startURL);
             popup.open();
     },
-        
+
     checkStart : function(booking) {
         booking.permissionToStart = true;
         return true;
     },
-    
+
     checkParams: function() {
         return {
             'meetingTitle' : ['text', false],
@@ -18,24 +18,24 @@
             'startDate' : ['datetime', false, function(startDateString, values){
                 var errors = [];
                 var startDate = IndicoUtil.parseDateTime(startDateString);
-                              
+
                 //check start date is not in the past
                 var startDatePlusExtraTime = new Date();
                 startDatePlusExtraTime.setTime(startDate.getTime() + <%= AllowedStartMinutes %> *60*1000);
                 if (beforeNow(startDatePlusExtraTime)) {
                     errors.push($T("Start date cannot be before the past <%= AllowedStartMinutes %> minutes"));
                 }
-                
+
                 // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
                 if (startDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
                     errors.push($T("Start date cannot be more than <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
-                
+
                 // check start date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
                 if (startDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
                     errors.push($T("Start date cannot be more than <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
-                
+
                 // check start date is not after end date, if end date exists
                 var endDate = IndicoUtil.parseDateTime(values["endDate"]);
                 if (endDate) {
@@ -43,29 +43,29 @@
                         errors.push($T("End date cannot be before start date."));
                     }
                 }
-                
+
                 return errors;
             }],
-            
+
             'endDate' : ['datetime', false, function(endDateString, values){
                 var errors = [];
                 var endDate = IndicoUtil.parseDateTime(endDateString);
-                              
+
                 //check end date is not in the past
                 if (beforeNow(endDate)) {
                     errors.push($T("End date cannot be before the past <%= AllowedStartMinutes %> minutes"));
                 }
-              
+
                 // check end date is not after the maximum start date (event end date + <%= AllowedMarginMinutes %> min )
                 if (endDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
                     errors.push($T("End date cannot be more than <%= AllowedMarginMinutes %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
                 }
-                
+
                 // check start date is not before the minimum start date (event start date - <%= AllowedMarginMinutes %> min )
                 if (endDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
                     errors.push($T("End date cannot be more than <%= AllowedMarginMinutes %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
                 }
-              
+
                 // check start date is not after end date, if start date exists
                 var startDate = IndicoUtil.parseDateTime(values["startDate"]);
                 if (startDate) {
@@ -77,7 +77,7 @@
             }]
         }
     },
-    
+
     errorHandler: function(event, error) {
 //        alert( "Found error:" + error.toSource() );
         if (event == 'create' || event == 'edit' || event == 'checkStatus') {
@@ -106,7 +106,7 @@
                 CSErrorPopup($T("WebEx Error"), [error.info]);
             }
         }
-        
+
         if (event == 'remove') {
             if (error.faultCode == 'cannotDeleteOld') {
                 CSErrorPopup($T("Cannot remove"), [$T("It is not possible to delete an old WebEx meeting")]);
@@ -117,11 +117,11 @@
             else if (error.faultCode == 'cannotDeleteNonExistant') {
                 CSErrorPopup($T("Cannot remove"), [$T("It seems that WebEx meeting was already deleted by another party")]);
             }
-            else 
+            else
                 CSErrorPopup($T("Error during delete"), [$T(error.info)]);
         }
     },
-    
+
     customText: function(booking) {
         if (booking.error && booking.errorMessage) {
             return '<span class="collaborationWarning">' + booking.errorMessage + '<\/span>'
@@ -129,10 +129,10 @@
             return booking.bookingParams.startDate.substring(11) + " to " + booking.bookingParams.endDate.substring(11);
         }
     },
-    
+
     showInfo : function(booking) {
         infoHTML = '<div><table><tbody>';
-        
+
         if (booking.error && booking.errorDetails) {
             infoHTML +=
             '<tr><td colspan="2">'+
@@ -141,27 +141,27 @@
                 '<\/span>' +
             '<\/td><\/tr>'
         }
-        
+
         if (booking.changesFromWebEx.length > 0) {
             infoHTML +=
             '<tr><td colspan="2">'+
                 '<div class="collaborationWarning" style="display: inline;">' +
-                    $T('Changes to WebEx event:') + 
+                    $T('Changes to WebEx event:') +
                     '<ul>'
-            
+
             for (var i=0; i<booking.changesFromWebEx.length; i++) {
                 infoHTML +=
                         '<li>' +
-                            booking.changesFromWebEx[i] +            
+                            booking.changesFromWebEx[i] +
                         '<\/li>'
             }
-            
+
             infoHTML +=
                     '<\/ul>' +
                 '<\/div>' +
             '<\/td><\/tr>'
         }
-        
+
         infoHTML +=
             '<tr><td class="collaborationInfoLeftCol">' + $T('Meeting title:') + '<\/td><td>' +
                 booking.bookingParams.meetingTitle +
@@ -170,72 +170,72 @@
             '<tr><td class="collaborationInfoLeftCol">' + $T('Start date:') + '<\/td><td>' +
                 formatDateStringCS(booking.bookingParams.startDate) +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('End date:') + '<\/td><td>' +
                 formatDateStringCS(booking.bookingParams.endDate) +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('Meeting description:') + '<\/td><td>' +
                 booking.bookingParams.meetingDescription +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('Access password:') + '<\/td><td>' +
-                (booking.bookingParams.hasAccessPassword? $T("Access password hidden") : $T("No access password was defined")) + 
+                (booking.bookingParams.hasAccessPassword? $T("Access password hidden") : $T("No access password was defined")) +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('Visibility') + '<\/td><td>' +
-                (booking.bookingParams.hidden? $T("Hidden") : $T("Visible")) + 
+                (booking.bookingParams.hidden? $T("Hidden") : $T("Visible")) +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('Auto-join URL:') + '<\/td><td>' +
-                (booking.url? booking.url : $T("not assigned yet")) + 
+                (booking.url? booking.url : $T("not assigned yet")) +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('Indico booking ID:') + '<\/td><td>' +
-                booking.id + 
+                booking.id +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('WebEx ID:') + '<\/td><td>' +
-                booking.webExKey + 
+                booking.webExKey +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('WebEx Creator Username:') + '<\/td><td>' +
-                booking.webExUser + 
+                booking.webExUser +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('Booking created on:') + '<\/td><td>' +
                 formatDateTimeCS(booking.creationDate) +
             '<\/td><\/tr>'+
-            
+
             '<tr><td class="collaborationInfoLeftCol">' + $T('Booking last modified on:') + '<\/td><td>' +
                 formatDateTimeCS(booking.modificationDate) +
             '<\/td><\/tr>'+
 
         '<\/tbody><\/table><\/div>'
-            
+
         return infoHTML;
     },
-    
+
     getDateFields : function() {
         return ["startDate", "endDate"]
     },
-    
+
     onCreate: function() {
         pf = new ParticipantListField();
         $E('participantsCell').set(pf.draw());
         WebExDrawContextHelpIcons();
     },
-    
+
     onEdit: function(booking) {
         pf = new ParticipantListField(booking.bookingParams.participants)
         $E('participantsCell').set(pf.draw());
         WebExDrawContextHelpIcons();
     },
-    
+
     onSave: function(values) {
         var participants = pf.getParticipants();
         values["participants"] = participants;
-        
+
         var ips = {}
         var errors = false;
         for (var i = 0; i < participants.length.get(); i++) {
@@ -245,20 +245,20 @@
                 CSErrorPopup("Invalid participants", ["The participant " + (i + 1) + " has an invalid email address"]);
                 errors = true;
             }
-            
+
         }
-        
+
         return !errors;
     },
-    
+
     postCreate: function(booking) {
-        
+
     },
-    
+
     postEdit: function(booking) {
 
     },
-    
+
     postDelete: function(booking) {
         if (booking.warning) {
             var popup = new AlertPopup("Booking deletion", Html.span({},booking.warning.message, Html.br(), booking.message ));

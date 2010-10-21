@@ -44,7 +44,7 @@ from xmlGen import XMLGen
 import os, time
 from math import ceil
 from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, minDatetime
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
@@ -219,27 +219,11 @@ class outputGenerator:
                    out                    = None,
                    recordingManagerTags   = None):
 
-        Logger.get('RecMan').info("in _confToXML()")
-        Logger.get('RecMan').info(" conf = %s" % conf)
-        Logger.get('RecMan').info(" includeSession = %s" % includeSession)
-        Logger.get('RecMan').info(" includeContribution = %s" % includeContribution)
-        Logger.get('RecMan').info(" includeSubContribution = %s" % includeSubContribution)
-
-#        Logger.get('WebEx').info(" Has WebEx plugin? %s" % str( PluginsHolder().getPluginType("Collaboration").hasPlugin("WebEx")))
-#        Logger.get('WebEx').info(" Is WebEx plugin active? %s" % str( PluginsHolder().getPluginType("Collaboration").getPlugin("WebEx").isActive() ))
-
-        #"""if PluginsHolder().getPluginType("Collaboration").hasPlugin("WebEx") and PluginsHolder().getPluginType("Collaboration").getPlugin("WebEx").isActive():
-        #    Logger.get('RecMan').info("WebEx is active. Printing out list of WebEx bookings")
-        #    csbm = conf.getCSBookingManager()
-        #    bookings = csbm.getBookingList(filterByType = "WebEx", notify = False, onlyPublic = True)
-        #    bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
-        #    for b in bookings:
-        #        if b.hasStartDate():
-        #"""
-                
-
-
-
+#        Logger.get('RecMan').info("in _confToXML()")
+#        Logger.get('RecMan').info(" conf = %s" % conf)
+#        Logger.get('RecMan').info(" includeSession = %s" % includeSession)
+#        Logger.get('RecMan').info(" includeContribution = %s" % includeContribution)
+#        Logger.get('RecMan').info(" includeSubContribution = %s" % includeSubContribution)
 #        if recordingManagerTags is not None:
 #            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
 #            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
