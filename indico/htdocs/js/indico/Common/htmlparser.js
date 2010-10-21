@@ -68,20 +68,18 @@ type("HTMLParser", [],
                 var index, chars, match, last = this.html;
 
                 parseStartTag = function ( tag, tagName, rest, unary ) {
-                    tag = tag.toLowerCase();
-                    tagName = tagName.toLowerCase();
-
-                    if ( self.block[ tagName ] ) {
+                    tagNameLower = tagName.toLowerCase();
+                    if ( self.block[ tagNameLower ] ) {
                         while ( self.stack.last() && self.inline[ self.stack.last() ] ) {
                             parseEndTag( "", self.stack.last() );
                         }
                     }
 
-                    if ( self.closeSelf[ tagName ] && self.stack.last() == tagName ) {
+                    if ( self.closeSelf[ tagNameLower ] && self.stack.last() == tagNameLower ) {
                         parseEndTag( "", tagName );
                     }
 
-                    unary = !self.escapeElements[ tagName ] && (self.empty[ tagName ] || !!unary);
+                    unary = !self.escapeElements[ tagNameLower ] && (self.empty[ tagNameLower ] || !!unary);
 
                     if ( !unary )
                         self.stack.push( tagName );
@@ -96,9 +94,9 @@ type("HTMLParser", [],
                                 fillAttrs[name] ? name : "";
 
                             attrs.push({
-                                name: name.toLowerCase(),
-                                value: value.toLowerCase(),
-                                escaped: value.replace(/(^|[^\\])"/g, '$1\\\"').toLowerCase() //"
+                                name: name,
+                                value: value,
+                                escaped: value.replace(/(^|[^\\])"/g, '$1\\\"') //"
                             });
                         });
 
@@ -107,10 +105,8 @@ type("HTMLParser", [],
                 };
 
                 parseEndTag = function( tag, tagName ) {
-                    if(tag)
-                        tag = tag.toLowerCase();
                     if(tagName)
-                        tagName = tagName.toLowerCase();
+                        tagNameLower = tagName.toLowerCase();
 
                     // If no tag name is provided, clean shop
                     if ( !tagName )
@@ -119,7 +115,7 @@ type("HTMLParser", [],
                     // Find the closest opened tag of the same type
                     else
                         for ( var pos = self.stack.length - 1; pos >= 0; pos-- )
-                            if ( self.stack[ pos ] == tagName )
+                            if ( self.stack[ pos ].toLowerCase() == tagNameLower )
                                 break;
 
                     if ( pos >= 0 ) {
@@ -284,7 +280,7 @@ type("inlineCSSParser",[],
                         value = ""
                         for( j in values)
                             value += " " + values[j].replace(/\s/g,'')
-                        if (this.propertyWhitelist[property] && value)
+                        if (this.propertyWhitelist[property.toLowerCase()] && value)
                             result += property + ':' + value + ';';
                         else{
                             security = 1;
@@ -370,11 +366,11 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
 
         parser = new HTMLParser(html, {
             start: function( tag, attrs, unary ) {
-            if( tagWhitelist[tag] ) {
+            if( tagWhitelist[tag.toLowerCase()] ) {
                 results += "<" + tag;
 
                 for ( var i = 0; i < attrs.length; i++ )
-                    if(attrs[i].name == "style" && sanitizationLevel == 2) {
+                    if(attrs[i].name.toLowerCase() == "style" && sanitizationLevel == 2) {
                         try{
                             var cssParser = new inlineCSSParser(attrs[i].escaped, params);
                             var tuple = cssParser.parse();
@@ -390,11 +386,11 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
                         security = max(security, tuple[1]);
                         errorList = errorList.concat(tuple[2])
                     }
-                    else if(attribWhitelist[ attrs[i].name ] || unary && attrs[i].name == '/') {
-                        if(urlProperties[attrs[i].name]){
+                    else if(attribWhitelist[ attrs[i].name.toLowerCase() ] || unary && attrs[i].name == '/') {
+                        if(urlProperties[attrs[i].name.toLowerCase()]){
                             attrs[i].escaped = attrs[i].escaped.replace(/[`\000-\040\177-\240\s]+/g, '');
                             attrs[i].escaped = attrs[i].escaped.replace(/\ufffd/g, "")
-                            if (/^[a-z0-9][-+.a-z0-9]*:/.test(attrs[i].escaped) && !allowedProtocols[attrs[i].escaped.split(':')[0]]) {
+                            if (/^[a-z0-9][-+.a-z0-9]*:/.test(attrs[i].escaped) && !allowedProtocols[attrs[i].escaped.split(':')[0].toLowerCase()]) {
                                 security = 1;
                                 errorList.push(attrs[i].escaped);
                                 continue;
@@ -419,7 +415,7 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
             }
         },
         end: function( tag ) {
-            if(tagWhitelist[tag])
+            if(tagWhitelist[tag.toLowerCase()])
                 results += "</" + tag + ">";
             else if(isEmail(tag) || isUrl(tag))
                 return;
