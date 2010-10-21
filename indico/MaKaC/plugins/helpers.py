@@ -1,56 +1,42 @@
-from BTrees.OOBTree import OOBTree
-from BTrees.OOBTree import OOTreeSet
-from MaKaC.plugins.base import PluginsHolder
-from MaKaC.common.Counter import Counter
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+# -*- coding: utf-8 -*-
+##
+## $id$
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from MaKaC.common.logger import Logger
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.plugins.util import PluginFieldsWrapper
+from MaKaC.plugins.InstantMessaging.indexes import CounterIndex, IndexByConf, IndexByID, IndexByUser
 
 
-class PluginsHelper(object):
-    def __init__(self, pluginType, plugin):
-        self._pluginType = pluginType
-        self._plugin = plugin
-        try:
-            self._plugin = PluginsHolder().getPluginType(pluginType).getPlugin(plugin)
-        except Exception, e:
-            Logger.get('Plugins').error("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
-            raise Exception("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
+class MailHelper:
+    def __init__(self):
+        self.__mails = []
 
-    def isActive(self):
-        return self._plugin.isActive()
+    def newMail(self, function, *args):
+        self.__mails.append({'function': function, 'args': args})
 
-class PluginFieldsHelper(PluginsHelper):
-    """Provides a simple interface to access fields of a given plugin"""
-
-    def __init__(self, pluginType, plugin):
-        PluginsHelper.__init__(self, pluginType, plugin)
-
-    def getOption(self, optionName):
-        try:
-            return self._plugin.getOption(optionName).getValue()
-        except Exception, e:
-            Logger.get('Plugins').error("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
-            raise Exception("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
-
-    def getAttribute(self, attribute):
-        try:
-            return getattr(self._plugin, attribute)
-        except AttributeError:
-            Logger.get('Plugins').error("No attribute %s in plugin %s" % (attribute, self._plugin))
-            raise Exception("No attribute %s in plugin %s" % (attribute, self._plugin))
-
-    def getStorage(self):
-        return self._plugin.getStorage()
+    def sendMails(self):
+        for mail in self.__mails:
+            mail['function'](*mail['args'])
 
 class DBHelpers:
-
-    @classmethod
-    def getChatRoot(cls):
-         #pick the plugin
-        pfh = PluginFieldsHelper('InstantMessaging', 'Jabber')
-        #and the element from which objects will be hanging in the DB
-        return pfh.getStorage()
-
     @classmethod
     def getCounter(cls):
         root = cls.getChatRoot()
@@ -62,32 +48,36 @@ class DBHelpers:
 
     @classmethod
     def newID(cls):
-        return cls.getCounter().newCount()
+        #create it in case it doesn't exist
+        return CounterIndex().get().newCount()
+        #return cls.getCounter().newCount()
 
     @classmethod
     def getChatroomList(cls, conf):
-        root = cls.getChatRoot()
         conf = str(conf.getId())
+        index = IndexByConf(conf).get()
 
-        if not root.has_key('indexByConf'):
-            raise ServiceError( message=_('Expected index not found while accessing the database (indexByConf)'))
-        confRooms = root['indexByConf']
-        if not confRooms.has_key(conf):
+        if not index.has_key(conf):
             raise ServiceError( message=_('Conference not found in database: %s' %conf))
-
-        return confRooms[conf]
+        return index[conf]
 
     @classmethod
     def getChatroom(cls, id):
-        root = cls.getChatRoot()
+        index = IndexByID().get()
 
-        if not root.has_key('indexByID'):
-            raise ServiceError( message=_('Expected index not found while accessing the database (indexByID)'))
-        room = root['indexByID']
-        if not room.has_key(id):
+        if not index.has_key(id):
             raise ServiceError( message=_('Chat room not found in database: %s' %id))
+        return index[id]
 
-        return room[id]
+    @classmethod
+    def getRoomsByUser(cls, user):
+        """ Will return the chat rooms created by the requested user """
+        userID = str(user['id'])
+        index = IndexByUser(userID).get()
+
+        if not index.has_key(userID):
+            return []
+        return index[userID]
 
     @classmethod
     def roomsToShow(cls, conf):
@@ -118,147 +108,29 @@ class DBHelpers:
             return []
         return chatrooms
 
-    @classmethod
-    def getRoomsByUser(cls, user):
-        """ Will return the chat rooms created by the requested user """
-        root = cls.getChatRoot()
-        userID = str(user['id'])
-        if not root.has_key('indexByUser'):
-            return []
-        rooms = root['indexByUser']
-        if not rooms.has_key(userID):
-            return []
-
-        return rooms[userID]
 
 
-class IndexHelpers:
+class LinkGenerator:
+    """ Generates links to xmpp chat rooms """
 
-    def __init__(self, index, storingStructure=OOBTree):
-        self._root = DBHelpers.getChatRoot()
-        self._index = index
-        self._storingStructure = storingStructure
-        self._indexCheck()
+    def __init__(self, chatroom):
+        self._chatroom = chatroom
 
-    def _indexCheck(self):
-        """ If the index doesn't exist we'll need to create it"""
-        if not self._root.has_key(self._index):
-            self._root[self._index] = self._storingStructure()
-        self._indexToAccess = self._root[self._index]
-
-    def _indexCheckDelete(self, element):
-        if len( self._root[self._index][element] ) is 0:
-            self._root[self._index].pop(element)
-
-    def get(self):
-        return self._indexToAccess
-
-    def add(self, element):
+    def generate(self):
         pass
 
-    def delete(self, element):
-        pass
+class WebLinkGenerator(LinkGenerator):
 
+    def __init__(self, chatroom):
+        LinkGenerator.__init__(self, chatroom)
 
-class CounterIndexHelper(IndexHelpers):
-    """ This index just takes the count of the next index that shall be given to a new chat room """
+    def generate(self):
+        return 'http://'+ self._chatroom.getHost()+ '/?r=' +self._chatroom.getTitle()+'@conference.'+self._chatroom.getHost()+'?join'
 
-    def __init__(self):
-        IndexHelpers.__init__(self, 'counter', Counter)
+class DesktopLinkGenerator(LinkGenerator):
 
+    def __init__(self, chatroom):
+        LinkGenerator.__init__(self, chatroom)
 
-class IndexByConfHelper(IndexHelpers):
-    """ Index by conference. Using the conference id as the key, there will be a OOTreeSet inside with all the existing chat rooms for that conference"""
-
-    def __init__(self, conf):
-        IndexHelpers.__init__(self, 'indexByConf')
-        self._conf = conf
-
-    def add(self, element):
-        self._indexCheck()
-
-        # self.get is equivalent to root['indexByConf']
-        if not self.get().has_key(self._conf):
-            self.get()[self._conf] = OOTreeSet()
-
-        self.get()[self._conf].insert(element)
-
-    def delete(self, element):
-        self.get()[self._conf].remove(element)
-
-        self._indexCheckDelete(self._conf)
-
-
-class IndexByUserHelper(IndexHelpers):
-    """ Index by user ID. We use a OOTreeSet to store the chat rooms"""
-
-    def __init__(self, id):
-        IndexHelpers.__init__(self, 'indexByUser')
-        self._id = id
-
-    def add(self, element):
-        self._indexCheck()
-
-        # self.get is equivalent to root['IndexByUser']
-        if not self.get().has_key(self._id):
-            self.get()[self._id] = OOTreeSet()
-
-        self.get()[self._id].insert(element)
-
-    def delete(self, element):
-        self.get()[self._id].remove(element)
-
-        self._indexCheckDelete(self._id)
-
-
-class IndexByCRNameHelper(IndexHelpers):
-    """ Index by chat room name. We allow chat rooms to have the same name if they are in different servers. For each key we use a OOTreeSet to store them"""
-
-    def __init__(self, name):
-        IndexHelpers.__init__(self, 'indexByCRName')
-        self._name = name
-
-    def add(self, element):
-        self._indexCheck()
-
-        # self.get is equivalent to root['IndexByCRName']
-        if self.get().has_key(element.getTitle()):
-            for cr in self.get()[element.getTitle()]:
-                #if there is a chat room repeated in the server (either ours or an external one) we have a problem
-                if cr.getTitle() == element.getTitle() and cr.getHost() == element.getHost():
-                    raise NoReportError( _('There is already a chat room in that server with that name, please choose another one'))
-        else:
-            self.get()[element.getTitle()] = OOTreeSet()
-
-        self.get()[element.getTitle()].insert(element)
-
-    def delete(self, element, indexToRemove=''):
-        #we may want to delete a different index of the one contained in the element
-        #for example, for the chat room edition we want to delete the index of the
-        #previous chat room name
-        if indexToRemove != '':
-            self.get()[indexToRemove].remove(element)
-            self._indexCheckDelete(indexToRemove)
-        else:
-            self.get()[self._name].remove(element)
-            self._indexCheckDelete(self._name)
-
-
-class IndexByIDHelper(IndexHelpers):
-    """ Index by chat room ID. Since there can only exist one index per chat room, for each key there will directly be the Chatroom object"""
-
-    def __init__(self):
-        IndexHelpers.__init__(self, 'indexByID')
-
-    def add(self, element):
-        self._indexCheck()
-
-        # self.get is equivalent to root['IndexByID']
-        if self.get().has_key(element.getId()):
-            raise ServiceError( message=_('There is already a chat room with the same id'))
-
-        self.get()[element.getId()] = element
-
-    def delete(self, element):
-        self.get().pop(element.getId())
-
+    def generate(self):
+        return 'xmpp:'+ self._chatroom.getTitle()+'@'+self._chatroom.getHost()+'?join'

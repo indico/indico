@@ -70,31 +70,17 @@
                     </script>
                 <% end %>
                 <% elif option.getType() =="ckEditor": %>
-					<div id="editor" style="margin-bottom: 10px"></div>
-					<script type="text/javascript" src="<%=baseURL%>/js/indico/Core/Widgets/RichText.js"></script>
-					<script type="text/javascript">
-						var editor = new RichTextEditor(600, 300, 'IndicoFull');
-						$E('editor').set(editor.draw());
-						var button = Html.input("button",{style:{marginLeft:pixels(5)}}, $T("Save text"));
-						$E('editor').append(button);
+                    <input type="hidden" name="<%= name %>" id="<%= name %>" />
 
-						editor.set('<%= escapeHTMLForJS(option.getValue()) %>');
-				        button.observeClick(function(){
-							indicoRequest(
-                                    'plugins.saveJoinCRText',
-                                    {
-                                        optionName: "<%= name %>",
-                                        text: editor.get()
-                                    },
-                                    function(result,error) {
-                                        if (error) {
-                                            IndicoUtil.errorReport(error);
-                                        }
-                                    }
-                            );
-				        });
-
-					</script>
+                    <div id="editor" style="margin-bottom: 10px"></div>
+                    <script type="text/javascript">
+                        var editor = new RichTextEditor(600, 300, 'IndicoFull');
+                            $E('editor').set(editor.draw());
+                            editor.set('<%= escapeHTMLForJS(option.getValue()) %>');
+                            var fillText = function(text){
+                                $E("<%= name %>").dom.value = text;
+                            };
+                    </script>
                 <% end %>
                 <% elif option.getType() =="rooms": %>
                     <div id="roomList" class="PeopleListDiv"></div>
@@ -311,7 +297,7 @@
         <% end %>
         <tr>
             <td colspan="2" style="text-align: right;">
-                <input type="submit" name="Save" value="<%= _("Save settings") %>" />
+                <input type="submit" name="Save" value="<%= _("Save settings") %>" onClick="fillText(editor.get())"/>
             </td>
         </tr>
     </table>

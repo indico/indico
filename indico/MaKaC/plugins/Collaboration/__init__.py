@@ -20,4 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.i18n import _
-pluginTypeDescription = _("Collaboration Tools Plugins")
+
+__metadata__ = {
+    'name': "Collaboration",
+    'description': _("Collaboration Tools Plugins")
+    }

@@ -1,34 +1,48 @@
-'''
-Created on Jul 21, 2010
+# -*- coding: utf-8 -*-
+##
+## $id$
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-@author: cesar
-'''
-from MaKaC.plugins.notificationComponents import Component
-from MaKaC.plugins.notificationComponents import IContributor
-from MaKaC.plugins.notificationComponents import INavigationContributor
-from MaKaC.plugins.notificationComponents import IListener
-from MaKaC.plugins.notificationComponents import IInstantMessagingListener
+from MaKaC.plugins.notificationComponents import Component, IContributor, INavigationContributor, IListener, IInstantMessagingListener
 from MaKaC.plugins.base import Observable
-
-from BTrees.OOBTree import OOBTree
-from BTrees.OOBTree import OOTreeSet
+from MaKaC.plugins.util import PluginsWrapper, PluginFieldsWrapper
+from MaKaC.plugins.helpers import DBHelpers, MailHelper, DesktopLinkGenerator, WebLinkGenerator
+from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
+from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
+from BTrees.OOBTree import OOBTree, OOTreeSet
 from MaKaC.i18n import _
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.Counter import Counter
-from MaKaC.webinterface import wcomponents
-import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.plugins.helpers import *
-from MaKaC.plugins.InstantMessaging.handlers import Chatroom
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.webinterface import wcomponents
+from MaKaC.webinterface.mail import GenericNotification
+import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import zope.interface
+import random
 
 
 class ChatSMContributor(Component, Observable):
 
-    zope.interface.implements(IContributor, INavigationContributor)
+    zope.interface.implements(INavigationContributor)#IContributor, INavigationContributor)
 
     """ChatSideMenuContributor. Fills the side menu of the conference's management menu when
     the chat plugin is active"""
@@ -75,27 +89,41 @@ class ChatSMContributor(Component, Observable):
 
                 out.writeTag("id", chatroom.getId())
                 out.writeTag("name", chatroom.getTitle())
-                out.writeTag("server", 'conference.' + chatroom.getHost() if chatroom.getCreateRoom() else chatroom.getHost())
+                out.writeTag("server", 'conference.' + chatroom.getHost() if chatroom.getCreatedInLocalServer() else chatroom.getHost())
                 out.writeTag("description", chatroom.getDescription())
                 out.writeTag("reqPassword", _('Yes') if len(chatroom.getPassword()) > 0 else _('No'))
                 out.writeTag("showPassword", chatroom.getShowPass())
                 out.writeTag("password", chatroom.getPassword())
-                out.writeTag("createRoom", chatroom.getCreateRoom())
+                out.writeTag("createdInLocalServer", chatroom.getCreatedInLocalServer())
+                out.openTag("links")
+                if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients') or PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'):
+                    out.writeTag("linksToShow", 'true')
+                else:
+                    out.writeTag("linksToShow", 'false')
+                if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients'):
+                    out.writeTag("desktop", DesktopLinkGenerator(chatroom).generate())
+                else:
+                    out.writeTag("desktop", 'false')
+                if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'):
+                    out.writeTag("web", WebLinkGenerator(chatroom).generate())
+                else:
+                    out.writeTag("web", 'false')
+                out.closeTag("links")
 
                 out.closeTag("chatroom")
             out.closeTag("chatrooms")
 
-            out.writeTag("how2connect", PluginFieldsHelper('InstantMessaging', 'Jabber').getOption('ckEditor'))
+            out.writeTag("how2connect", PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor'))
 
     @classmethod
     def addCheckBox2CloneConf(cls, obj, list):
         """ we show the clone checkbox if:
-            * The Jabber Plugin is active.
+            * The XMPP Plugin is active.
             * There are rooms in the event created by the user who wants to clone
         """
         #list of creators of the chat rooms
         ownersList = [cr.getOwner() for cr in DBHelpers().getChatroomList(obj._conf)]
-        if PluginsHelper('InstantMessaging', 'Jabber').isActive() and obj._rh._aw._currentUser in ownersList:
+        if PluginsWrapper('InstantMessaging', 'XMPP').isActive() and obj._rh._aw._currentUser in ownersList:
             list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneChatrooms" id="cloneChatrooms" value="1" />_("Chat Rooms")</li>""")
 
     @classmethod
@@ -110,50 +138,54 @@ class ChatSMContributor(Component, Observable):
         conf = params['conf']
         user = params['user']
         options = params['options']
+        mh = MailHelper()
 
         if options.get("chatrooms", True):
             crList = DBHelpers().getChatroomList(confToClone)
             ownersList = [cr.getOwner() for cr in crList]
-            if PluginsHelper('InstantMessaging', 'Jabber').isActive():
+            if PluginsWrapper('InstantMessaging', 'XMPP').isActive():
                  for cr in crList:
                      if user is cr.getOwner():
-                         cls()._notify('addConference2Room', {'room':cr, 'conf':conf})
+                         cls()._notify('addConference2Room', {'room':cr, 'conf':conf.getId(), 'mailHelper':mh})
+
+        mh.sendMails()
 
 
 class ChatroomStorage(Component):
-    zope.interface.implements(IListener, IInstantMessagingListener)
+    zope.interface.implements(IInstantMessagingListener)#IListener, IInstantMessagingListener)
 
     def __init__(self):
         #it's the first thing to do when having these events
         self.priority=1
 
     @classmethod
-    def createChatroom(cls, obj, room):
+    def createChatroom(cls, obj, params):
         """ Inserts the object in the database according to all the kind of indexing types, in this case:
         -Chat rooms by conference
         -Chat rooms by user
-        -Chat rooms by name (to check if there's already a chat room with that name in our Jabber server)
+        -Chat rooms by name (to check if there's already a chat room with that name in our XMPP server)
         -Chat rooms by ID (to access faster to the object when querying)
         """
+        room = params['room']
+
         conference = room.getConference()
-        CounterIndexHelper()
 
         # index by conference id
-        confIndex = IndexByConfHelper(conference.getId())
+        confIndex = IndexByConf(conference.getId())
         room.setId(DBHelpers.newID())
-        confIndex.add(room)
+        confIndex.index(room)
 
         # Index by chat room's name
-        crNameIndex = IndexByCRNameHelper(room.getTitle())
-        crNameIndex.add(room)
+        crNameIndex = IndexByCRName(room.getTitle())
+        crNameIndex.index(room)
 
         # Index by id
-        idIndex = IndexByIDHelper()
-        idIndex.add(room)
+        idIndex = IndexByID()
+        idIndex.index(room)
 
         # Index by room creator
-        userIndex = IndexByUserHelper(room.getOwner().getId())
-        userIndex.add(room)
+        userIndex = IndexByUser(room.getOwner().getId())
+        userIndex.index(room)
 
     @classmethod
     def editChatroom(self, obj, params):
@@ -162,45 +194,48 @@ class ChatroomStorage(Component):
         #we have an index by the chat room name. If, while editing, someone changes the chat room name, we'll have to update the index
         if oldTitle != newRoom.getTitle():
             #the title has been changed. Get rid of the old index and substitute it for the new one
-            crNameIndex = IndexByCRNameHelper(newRoom.getTitle())
-            crNameIndex.delete(newRoom, oldTitle)
-            crNameIndex.add(newRoom)
+            crNameIndex = IndexByCRName(newRoom.getTitle())
+            crNameIndex.unindex(newRoom, oldTitle)
+            crNameIndex.index(newRoom)
 
     @classmethod
-    def deleteChatroom(cls, obj, chatroom):
+    def deleteChatroom(cls, obj, params):
         """ Deletes the chat room in the database according to all kind of indexing types"""
         try:
+            chatroom = params['room']
+
             confId = obj._conferenceID
             #if we have the same room used in two or more different conferences, we just delete it from the
             #conferences list in the chat room and from the IndexByConf index
             chatroom.getConferences().pop(confId)
-            confIndex = IndexByConfHelper(confId)
-            confIndex.delete(chatroom)
+            confIndex = IndexByConf(confId)
+            confIndex.unindex(chatroom)
 
             if len(chatroom.getConferences()) is 0:
                 #there are no more references to the chat room, we completely delete it
-                crNameIndex = IndexByCRNameHelper(chatroom.getTitle())
-                crNameIndex.delete(chatroom)
+                crNameIndex = IndexByCRName(chatroom.getTitle())
+                crNameIndex.unindex(chatroom)
 
-                idIndex = IndexByIDHelper()
-                idIndex.delete(chatroom)
+                idIndex = IndexByID()
+                idIndex.unindex(chatroom)
 
-                userIndex = IndexByUserHelper(chatroom.getOwner().getId())
-                userIndex.delete(chatroom)
+                userIndex = IndexByUser(chatroom.getOwner().getId())
+                userIndex.unindex(chatroom)
 
         except Exception, e:
             raise ServiceError(message=str(e))
 
     @classmethod
-    def addConference2Room(self, obj, params):
+    def addConference2Room(cls, obj, params):
         """ When we re use a chat room for another conference(s), this is the method called.
             It may be called from the AJAX service, but also from the clone event. Since we
             don't know it, we have to check the parameters accordingly"""
-        room, confId = parseParams(params, obj)
+        room = params['room']
+        confId = params['conf']
 
         try:
-            confIndex = IndexByConfHelper(confId)
-            confIndex.add(room)
+            confIndex = IndexByConf(confId)
+            confIndex.index(room)
 
         except Exception, e:
             raise NoReportError( _('The chat room %s could not be re-used' %room.getTitle()))
@@ -209,11 +244,17 @@ class ChatroomStorage(Component):
 class ChatroomMailer(Component):
     """ Sends emails to the administrators when a chat room related event happens"""
 
-    zope.interface.implements(IListener, IInstantMessagingListener)
+    zope.interface.implements(IInstantMessagingListener)#IListener, IInstantMessagingListener)
 
     @classmethod
-    def createChatroom(cls, obj, room):
-        pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
+    def createChatroom(cls, obj, params):
+        room = params['room']
+        mh = params['mailHelper']
+        ExternalOperationsManager.execute(cls, "create_"+str(cls.__class__), cls.create, obj, room, mh)
+
+    @classmethod
+    def create(cls, obj, room, mh):
+        pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
@@ -221,14 +262,20 @@ class ChatroomMailer(Component):
         if not len(userList) is 0:
             try:
                 cn = ChatroomsNotification(room, userList)
-                GenericMailer.sendAndLog(cn.create(room), room.getConference(), "MaKaC/plugins/InstantMessaging/Jabber/components.py", room.getOwner())
+                mh.newMail(GenericMailer.sendAndLog, cn.create(room), room.getConference(), "MaKaC/plugins/InstantMessaging/XMPP/components.py", room.getOwner())
+
             except Exception, e:
                 raise ServiceError(message=e)
 
     @classmethod
-    def editChatroom(self, obj, params):
+    def editChatroom(cls, obj, params):
         room = params['newRoom']
-        pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
+        mh = params['mailHelper']
+        ExternalOperationsManager.execute(cls, "edit_"+str(cls.__class__), cls.edit, obj, room, mh)
+
+    @classmethod
+    def edit(cls, obj, room, mh):
+        pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
@@ -236,16 +283,22 @@ class ChatroomMailer(Component):
         if not len(userList) is 0:
             try:
                 cn = ChatroomsNotification(room, userList)
-                GenericMailer.sendAndLog(cn.edit(room, ConferenceHolder().getById(obj._conferenceID)), \
+                mh.newMail(GenericMailer.sendAndLog, cn.edit(room, ConferenceHolder().getById(obj._conferenceID)), \
                                          ConferenceHolder().getById(obj._conferenceID), \
-                                         "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                         "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
                                          room.getOwner())
             except Exception, e:
                 raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
 
     @classmethod
-    def deleteChatroom(cls, obj, room):
-        pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
+    def deleteChatroom(cls, obj, params):
+        room = params['room']
+        mh = params['mailHelper']
+        ExternalOperationsManager.execute(cls, "delete_"+str(cls.__class__), cls.delete, obj, room, mh)
+
+    @classmethod
+    def delete(cls, obj, room, mh):
+        pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
@@ -253,17 +306,24 @@ class ChatroomMailer(Component):
         if not len(userList) is 0:
             try:
                 cn = ChatroomsNotification(room, userList)
-                GenericMailer.sendAndLog(cn.delete(room, ConferenceHolder().getById(obj._conferenceID)),\
+                mh.newMail(GenericMailer.sendAndLog, cn.delete(room, ConferenceHolder().getById(obj._conferenceID)),\
                                          ConferenceHolder().getById(obj._conferenceID), \
-                                         "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                         "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
                                          room.getOwner())
             except Exception, e:
                 raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
 
     @classmethod
-    def addConference2Room(self, obj, params):
-        room, confId = parseParams(params, obj)
-        pf = PluginFieldsHelper('InstantMessaging', 'Jabber')
+    def addConference2Room(cls, obj, params):
+        room = params['room']
+        mh = params['mailHelper']
+        confId = params['conf']
+        #without the random number added it would only send 1 mail, because for every new chat room it'd think that there has been a retry
+        ExternalOperationsManager.execute(cls, "add_"+str(cls.__class__)+str(random.random()), cls.add, obj, room, confId, mh)
+
+    @classmethod
+    def add(cls, obj, room, confId, mh):
+        pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
@@ -271,9 +331,9 @@ class ChatroomMailer(Component):
         if not len(userList) is 0:
             try:
                 cn = ChatroomsNotification(room, userList)
-                GenericMailer.sendAndLog(cn.create(room, ConferenceHolder().getById(confId)), \
+                mh.newMail(GenericMailer.sendAndLog, cn.create(room, ConferenceHolder().getById(confId)), \
                                                    ConferenceHolder().getById(confId), \
-                                                   "MaKaC/plugins/InstantMessaging/Jabber/components.py", \
+                                                   "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
                                                    room.getOwner())
             except Exception, e:
                 raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
@@ -317,13 +377,3 @@ by the user %s.
 
 Thank you for using our system.""" %(room.getTitle(), conference.getTitle(), conference.getId(), room.getOwner().getFullName()))
         return self
-
-
-def parseParams(params, obj):
-    if isinstance(params, Chatroom):
-        room = params
-        confId = obj._conference#
-    else:
-        room = params['room']
-        confId = params['conf'].getId()
-    return room, confId

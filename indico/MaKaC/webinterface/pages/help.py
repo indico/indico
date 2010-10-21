@@ -22,7 +22,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.rh.admins import RCAdmin
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 from MaKaC.i18n import _
 
 

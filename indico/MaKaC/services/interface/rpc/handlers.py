@@ -3,7 +3,7 @@ from MaKaC.services.implementation import roomBooking
 from MaKaC.services.implementation import error
 
 from MaKaC.services.interface.rpc import description
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 from MaKaC.common import DBMgr
 
 

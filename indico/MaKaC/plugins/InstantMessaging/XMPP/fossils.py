@@ -22,6 +22,7 @@ from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.fossils.conference import IConferenceMinimalFossil
 
+
 class IChatRoomFossil(IFossil):
 
     def getTitle(self):
@@ -31,27 +32,15 @@ class IChatRoomFossil(IFossil):
         """ Returns the chat room's id"""
     #getId.convert = Conversion.counter
 
-    def getDescription(self):
-        """ Returns the conference's description"""
-
-    def getPassword(self):
-        """ Returns the conference's password in case it's protected"""
-
-    def getCreateRoom(self):
+    def getCreatedInLocalServer(self):
         """ Returns if a new room has been created or just a url was added"""
 
     def getConferences(self):
         """ Returns the conference that the chat room belongs to"""
     getConferences.result = IConferenceMinimalFossil
 
-    def getHost(self):
-        """ Returns the host in case no new room was created """
-
     def getShowRoom(self):
         """ Returns if we want to hide the room or not """
-
-    def getShowPass(self):
-        """ Returns if we want to show the password in the event page or not """
 
     def getOwner(self):
         """ Returns the creator of the room """
@@ -66,3 +55,18 @@ class IChatRoomFossil(IFossil):
         """ Date of modification of the chat room """
     getAdjustedModificationDate.convert = Conversion.datetime
     getAdjustedModificationDate.name = 'modificationDate'
+
+
+class IXMPPChatRoomFossil(IChatRoomFossil):
+
+    def getDescription(self):
+        """ Returns the conference's description"""
+
+    def getPassword(self):
+        """ Returns the conference's password in case it's protected"""
+
+    def getShowPass(self):
+        """ Returns if we want to show the password in the event page or not """
+
+    def getHost(self):
+        """ Returns the host in case no new room was created """

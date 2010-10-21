@@ -27,7 +27,7 @@ from MaKaC.errors import AdminError, MaKaCError, PluginError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.common.cache import CategoryCache, EventCache
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 from MaKaC.i18n import _
 
 class RCAdmin(object):

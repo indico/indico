@@ -22,7 +22,7 @@
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 from MaKaC.trashCan import TrashCanManager
-from MaKaC.plugins.pluginLoader import PluginLoader
+from MaKaC.plugins import PluginLoader
 
 class EPayment(Persistent):
 

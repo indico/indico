@@ -61,7 +61,7 @@ from MaKaC.i18n import _
 
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 from MaKaC.user import Group, Avatar
 from MaKaC.accessControl import AdminList
 
@@ -287,7 +287,7 @@ class RH(RequestHandlerBase):
     def _processError( self, ex ):
         """
         """
-        raise ex
+        raise
 
     def _checkParams( self, params ):
         """

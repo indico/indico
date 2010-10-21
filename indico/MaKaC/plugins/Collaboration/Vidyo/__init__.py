@@ -19,6 +19,9 @@
 
 from MaKaC.i18n import _
 
-pluginType = "Collaboration"
-pluginName = "Vidyo"
-pluginDescription = _("Vidyo videoconferencing system")
+__metadata__ = {
+    'type': "Collaboration",
+    'name': "Vidyo",
+    'description': _("Vidyo videoconferencing system"),
+    'requires': ['suds']
+    }

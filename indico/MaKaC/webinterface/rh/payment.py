@@ -27,7 +27,7 @@ class RHPaymentModule:
 
 
     def process(self, params):
-        from MaKaC.plugins.pluginLoader import PluginLoader
+        from MaKaC.plugins import PluginLoader
         epaymentModules = PluginLoader.getPluginsByType("EPayment")
         module = None
         for mod in epaymentModules:

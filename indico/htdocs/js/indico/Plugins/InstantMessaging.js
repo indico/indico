@@ -32,43 +32,43 @@ var hightlightChatroom = function(chatroom) {
  * @param {Boolean} onlyOne If true, only 1 item can be selected at a time.
  */
 type ("ExistingChatroomsList", ["SelectableListWidget"],
-	{
-	    _drawItem: function(pair) {
-		    var self = this;
-		    var elem = pair.get(); // elem is a WatchObject
-		    var selected = false;
-		    var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
-		    var item = Html.div({},  elem.get('title') );
+    {
+        _drawItem: function(pair) {
+            var self = this;
+            var elem = pair.get(); // elem is a WatchObject
+            var selected = false;
+            var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
+            var item = Html.div({},  elem.get('title') );
 
-		    return item;
-	    },
+            return item;
+        },
 
-	    getList: function() {
-	        return this.getSelectedList();
-	    }
+        getList: function() {
+            return this.getSelectedList();
+        }
 
-	},
+    },
 
     /**
      * Constructor for FoundPeopleList
      */
     function(chatrooms, observer) {
-	    var self = this;
-	    this.selected = new WatchList();
+        var self = this;
+        this.selected = new WatchList();
 
-	    this.SelectableListWidget(observer, false, 'chatList');
+        this.SelectableListWidget(observer, false, 'chatList');
 
-	    // Sort by name and add to the list
-	    var items = {};
-	    each(chatrooms, function(item) {
-	        items[item.title + item.id] = item;
-	    });
-	    var ks = keys(items);
-	    ks.sort();
+        // Sort by name and add to the list
+        var items = {};
+        each(chatrooms, function(item) {
+            items[item.title + item.id] = item;
+        });
+        var ks = keys(items);
+        ks.sort();
 
-	    for (k in ks) {
-	        this.set(k, $O(items[ks[k]]));
-	    }
+        for (k in ks) {
+            this.set(k, $O(items[ks[k]]));
+        }
     }
 );
 
@@ -76,168 +76,168 @@ type ("ExistingChatroomsList", ["SelectableListWidget"],
 
 
 type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
-	     {
-	         _preload: [
-	             function(hook) {
-	            	 var self = this;
-	 		         self.chatrooms = [];
-			         var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching information..."));
-			         indicoRequest(
-	                    'jabber.getRoomsByUser',
-	                    {
-	                        usr: user
-	                    },
-	                    function(result,error) {
-	                    	if (!error) {
-	                            killProgress();
-	                            //we don't want to display the chat rooms that are already in the conference
-	                            if(result.length>0){
-		                            self.chatrooms = filter(result,function(chatroom){
-		                            					 var notExists = true;
-			                            				 each(chatroom.conferences, function(conf){
-			                            					 if(conf == self.conf){
-			                            						 notExists = false;
-			                            					 }
-			                            				 });
-			                            				 return notExists;
-		                            				 });
-	                            }
-	                            self._processDialogState();
-	                            hook.set(true);
-	                        } else {
-	                            killProgress();
-	                            IndicoUtil.errorReport(error);
-	                        }
-	                    }
-	                );
-	             }
-	         ],
+         {
+             _preload: [
+                 function(hook) {
+                     var self = this;
+                      self.chatrooms = [];
+                     var killProgress = IndicoUI.Dialogs.Util.progress($T("Fetching information..."));
+                     indicoRequest(
+                        'XMPP.getRoomsByUser',
+                        {
+                            usr: user
+                        },
+                        function(result,error) {
+                            if (!error) {
+                                killProgress();
+                                //we don't want to display the chat rooms that are already in the conference
+                                if(result.length>0){
+                                    self.chatrooms = filter(result,function(chatroom){
+                                                         var notExists = true;
+                                                         each(chatroom.conferences, function(conf){
+                                                             if(conf == self.conf){
+                                                                 notExists = false;
+                                                             }
+                                                         });
+                                                         return notExists;
+                                                     });
+                                }
+                                self._processDialogState();
+                                hook.set(true);
+                            } else {
+                                killProgress();
+                                IndicoUtil.errorReport(error);
+                            }
+                        }
+                    );
+                 }
+             ],
 
-	         _processDialogState: function() {
-	             var self = this;
+             _processDialogState: function() {
+                 var self = this;
 
-	             if (this.chatrooms.length === 0) {
-	                 // draw instead the creation dialog
-	                 var dialog = createObject(
-	                	 ChatroomPopup,
-	                     self.newArgs);
+                 if (this.chatrooms.length === 0) {
+                     // draw instead the creation dialog
+                     var dialog = createObject(
+                         ChatroomPopup,
+                         self.newArgs);
 
                      dialog.open();
                      dialog.postDraw();
 
-	                 this.open = function() {};
+                     this.open = function() {};
 
-	                 // exit, do not draw this dialog
-	                 return;
-	             } else {
-	                 this.ExclusivePopupWithButtons($T("Add Chat Room"),
-	                                     function() {
-	                                         self.close();
-	                                     });
-	             }
+                     // exit, do not draw this dialog
+                     return;
+                 } else {
+                     this.ExclusivePopupWithButtons($T("Add Chat Room"),
+                                         function() {
+                                             self.close();
+                                         });
+                 }
 
-	         },
+             },
 
-	         existingSelectionObserver: function(selectedList) {
-	             if(selectedList.isEmpty()){
-	                 this.button.disable();
-	             } else {
-	                 this.button.enable();
-	             }
-	         },
+             existingSelectionObserver: function(selectedList) {
+                 if(selectedList.isEmpty()){
+                     this.button.disable();
+                 } else {
+                     this.button.enable();
+                 }
+             },
 
-	         addExisting: function(rooms) {
-	             var self = this;
-	             var killProgress = IndicoUI.Dialogs.Util.progress();
-	             var args ={};
-	             args.rooms = rooms;
-	             args.conference = self.conf;
+             addExisting: function(rooms) {
+                 var self = this;
+                 var killProgress = IndicoUI.Dialogs.Util.progress();
+                 var args ={};
+                 args.rooms = rooms;
+                 args.conference = self.conf;
 
-	             indicoRequest('jabber.addConference2Room', args,
-	            		 		function(result, error){
-	                               killProgress();
-	                                if (!error) {
-	                                    // If the server found no problems, a chatroom object is returned in the result.
-	                                    // We add it to the watchlist and create an iframe.
-	                                    hideAllInfoRows(false);
-	                                    showInfo[result.id] = true; // we initialize the show info boolean for this chatroom
-	                                    each(result, function(cr){
-	                                    	chatrooms.append(cr);
-	                                    });
-	                                    showAllInfoRows(false);
-	                                    addIFrame(result);
-	                                    refreshTableHead();
-	                                    killProgress();
-	                                    each(result, function(cr){
-	                                    	hightlightChatroom(cr);
-	                                    });
-	                                    self.close();
-	                                } else {
-	                                    killProgress();
-	                                    self.close();
-	                                    IndicoUtil.errorReport(error);
-	                                }
-	                      		}
-	             			  );
-	         },
+                 indicoRequest('XMPP.addConference2Room', args,
+                                 function(result, error){
+                                   killProgress();
+                                    if (!error) {
+                                        // If the server found no problems, a chatroom object is returned in the result.
+                                        // We add it to the watchlist and create an iframe.
+                                        hideAllInfoRows(false);
+                                        showInfo[result.id] = true; // we initialize the show info boolean for this chatroom
+                                        each(result, function(cr){
+                                            chatrooms.append(cr);
+                                        });
+                                        showAllInfoRows(false);
+                                        addIFrame(result);
+                                        refreshTableHead();
+                                        killProgress();
+                                        each(result, function(cr){
+                                            hightlightChatroom(cr);
+                                        });
+                                        self.close();
+                                    } else {
+                                        killProgress();
+                                        self.close();
+                                        IndicoUtil.errorReport(error);
+                                    }
+                                  }
+                               );
+             },
 
-	         draw: function() {
-	             var self = this;
+             draw: function() {
+                 var self = this;
 
-			     var chatroomList = new ExistingChatroomsList(self.chatrooms, function(selectedList) {
-			         self.existingSelectionObserver(selectedList);
-			     });
-	             var content = Html.div({},
-	                     $T("You may choose to:"),
-	                     Html.ul({},
-	                         Html.li({style:{marginBottom: '10px'}},
-	                             Widget.link(command(function() {
-	                                 var dialog = createObject(ChatroomPopup, self.newArgs);
-	                                 self.close();
-	                                 dialog.open();
-	                                 dialog.postDraw();
-	                             }, $T("Create a new chat room")))),
-	                         Html.li({},
-	                             $T("Re-use one (or more) created by you"),
-	                             Html.div("chatListDiv",
-	                             chatroomList.draw()))));
+                 var chatroomList = new ExistingChatroomsList(self.chatrooms, function(selectedList) {
+                     self.existingSelectionObserver(selectedList);
+                 });
+                 var content = Html.div({},
+                         $T("You may choose to:"),
+                         Html.ul({},
+                             Html.li({style:{marginBottom: '10px'}},
+                                 Widget.link(command(function() {
+                                     var dialog = createObject(ChatroomPopup, self.newArgs);
+                                     self.close();
+                                     dialog.open();
+                                     dialog.postDraw();
+                                 }, $T("Create a new chat room")))),
+                             Html.li({},
+                                 $T("Re-use one (or more) created by you"),
+                                 Html.div("chatListDiv",
+                                 chatroomList.draw()))));
 
-	             this.button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add selected")));
-	             var tooltip;
-	             this.button.observeEvent('mouseover', function(event){
-	                 if (!self.button.isEnabled()) {
-	                     tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("To add a chat room, please select at least one"), "tooltipError");
-	                 }
-	             });
-	             this.button.observeEvent('mouseout', function(event){
-	                 Dom.List.remove(document.body, tooltip);
-	             });
+                 this.button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add selected")));
+                 var tooltip;
+                 this.button.observeEvent('mouseover', function(event){
+                     if (!self.button.isEnabled()) {
+                         tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("To add a chat room, please select at least one"), "tooltipError");
+                     }
+                 });
+                 this.button.observeEvent('mouseout', function(event){
+                     Dom.List.remove(document.body, tooltip);
+                 });
 
-	             this.button.observeClick(function(){
-	                     var ids = translate(chatroomList.getList().getAll(),
-	                                         function(chatroom) {
-	                    	 					return chatroom.getAll().id;
-	                    	 				 });
-	                     self.addExisting(ids);
-	             });
+                 this.button.observeClick(function(){
+                         var ids = translate(chatroomList.getList().getAll(),
+                                             function(chatroom) {
+                                                 return chatroom.getAll().id;
+                                              });
+                         self.addExisting(ids);
+                 });
 
-	             return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, this.button.draw());
-	         }
-	     },
-	     function(conferenceId) {
-	         var self = this;
+                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, this.button.draw());
+             }
+         },
+         function(conferenceId) {
+             var self = this;
 
-	         this.conf = conferenceId;
-	         this.newArgs = ['create', null, conferenceId];
+             this.conf = conferenceId;
+             this.newArgs = ['create', null, conferenceId];
 
-	         this.PreLoadHandler(
-	             self._preload,
-	             function() {
-	                 self.open();
-	             });
-	         this.execute();
+             this.PreLoadHandler(
+                 self._preload,
+                 function() {
+                     self.open();
+                 });
+             this.execute();
 
-	     }
+         }
 );
 
 
@@ -268,22 +268,22 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var self = this;
 
             // We get the form HTML
-            var createCHRadioButton = Html.radio({id:"createCH", name:"createRoom"},true);
+            var createCHRadioButton = Html.radio({id:"createCH", name:"createdInLocalServer"},true);
             /* for some stupid reason, IE doesn't like that you directly put the value and assign the onclick event in the definition
              * above, so it's necessary to do it 'manually'. Steve Ballmer, I hate you.
              */
-            createCHRadioButton.dom.value = "yes";
+            createCHRadioButton.dom.value = 'true';
             createCHRadioButton.observeClick(function(){
-												disableCustomId(defaultHost);
-											});
+                                                disableCustomId(defaultHost);
+                                             });
             var createCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "Default ");
             createCHRadioButtonLabel.dom.htmlFor = "createCH";
 
-            var defineCHRadioButton = Html.radio({id:"defineCH", name:"createRoom"});
-            defineCHRadioButton.dom.value = "no";
+            var defineCHRadioButton = Html.radio({id:"defineCH", name:"createdInLocalServer"});
+            defineCHRadioButton.dom.value = 'false';
             defineCHRadioButton.observeClick(function(){
-												enableCustomId(customHost);
-											});
+                                                enableCustomId(customHost);
+                                             });
             var defineCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "Custom");
             defineCHRadioButtonLabel.dom.htmlFor = "defineCH";
 
@@ -292,46 +292,57 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
 
             self.errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Please use another name');
 
-            self.crName = new AutocheckTextBox({style: {width: '300px'}, name: 'title'}, self.errorLabel);
+            self.crName = new AutocheckTextBox({style: {width: '300px'}, name: 'title', id:"CRname"}, self.errorLabel);
             self.crName.set(conferenceName+eventDate);
 
             this.basicTabForm = Html.div({style:{textAlign: 'left'}},
-            	IndicoUtil.createFormFromMap([
-            	    [$T('Server used'), Html.div({}, Html.tr({}, createCHRadioButton, createCHRadioButtonLabel), Html.tr({}, defineCHRadioButton, defineCHRadioButtonLabel))],
-            	    [$T('Server'), defineCHText],
-                    [$T('Chat room name'), Html.td({},this.parameterManager.add(self.crName.draw(), 'text', false), self.errorLabel)],
-                    [$T('Description'), Html.textarea({cols: 40, rows: 2, name: 'description'}) ]
+                IndicoUtil.createFormFromMap([
+                [$T('Server used'), Html.div({}, Html.tr({}, createCHRadioButton, createCHRadioButtonLabel), Html.tr({}, defineCHRadioButton, defineCHRadioButtonLabel))],
+                [$T('Server'), defineCHText],
+                    [$T('Chat room name'), Html.td({},this.parameterManager.add(self.crName.draw(), 'text', false, function(text){
+                        // characters not admitted in XMPP standard. Check here in case of updates: http://xmpp.org/extensions/xep-0106.html
+                        if(text.indexOf(' ') != -1 ||
+                           text.indexOf('\'') != -1 ||
+                           text.indexOf('\"') != -1 ||
+                           text.indexOf('&') != -1 ||
+                           text.indexOf('/') != -1 ||
+                           text.indexOf(':') != -1 ||
+                           text.indexOf('<') != -1 ||
+                           text.indexOf('>') != -1 ||
+                           text.indexOf('@') != -1){
+                            return Html.span({}, "You introduced an invalid character in the name, don't use spaces, \', \", &, /, :, <, > or @");
+                        }
+                    }), self.errorLabel)],
+                    [$T('Description'), Html.textarea({cols: 40, rows: 2, name: 'description', id:'description'}) ]
                 ])
             );
 
-            var hideCH = Html.checkbox({id:"hideCH"}, true);
+            var showCH = Html.checkbox({id:"showCH"}, true);
             //You don't like this? Me neither. Give thanks to Bill Gates and IE *sigh*
-            hideCH.dom.name = "showRoom";
+            showCH.dom.name = "showRoom";
             var showPwd = Html.checkbox({id:"showPwd"}, false);
             showPwd.dom.name = "showPass";
 
             var passwordField = new ShowablePasswordField('roomPass', '', false, 'CHpass').draw();
             this.advancedTabForm = Html.div({},
-            	IndicoUtil.createFormFromMap([
-            		[$T('Password'), passwordField  ]]),
-            	Html.div({className: 'chatAdvancedTabTitleLine', style: {marginTop:pixels(10)}},
-            			Html.div({className: 'chatAdvancedTabTitle'}, $T('Information displayed in the event page'))
-            			),
-            	IndicoUtil.createFormFromMap([
-            	    [Html.div({className: 'chatAdvancedTabCheckboxDiv', style: {marginTop:pixels(5)}},
-            	    		Html.tr({},
-                                hideCH,
-	            	    		$T('Show chat room information to the users')
-            	    		),
-            	    		Html.tr({},
+                IndicoUtil.createFormFromMap([
+                    [$T('Password'), passwordField  ]]),
+                Html.div({className: 'chatAdvancedTabTitleLine', style: {marginTop:pixels(10)}},
+                        Html.div({className: 'chatAdvancedTabTitle'}, $T('Information displayed in the event page'))
+                        ),
+                IndicoUtil.createFormFromMap([
+                    [Html.div({className: 'chatAdvancedTabCheckboxDiv', style: {marginTop:pixels(5)}},
+                            Html.tr({},
+                                showCH,
+                                $T('Show chat room information to the users')
+                            ),
+                            Html.tr({},
                                 showPwd,
                                 $T('Show the chat room\'s password to the users ')
                             ))
-            	    ]
-            	])
+                    ]
+                ])
             );
-            // We scan the input nodes inside the dialog
-            this.components = IndicoUtil.findFormFields(this.basicTabForm, this.advancedTabForm);
 
             // We construct the "save" button and what happens when it's pressed
             var saveButton = Html.input('button', null, $T("Save"));
@@ -357,22 +368,16 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
         },
 
         postDraw: function() {
-        	var self = this
+            var self = this
 
-        	if (self.popupType === 'edit') {
-                IndicoUtil.setFormValues(self.components, self.chatroom);
-                if(self.chatroom.createRoom == "no"){
-                	enableCustomId(customHost);
+            if (self.popupType === 'edit') {
+                setValues(self.chatroom);
+                if(!self.chatroom.createdInLocalServer){
+                    enableCustomId(customHost);
                 }
                 else{
-                	disableCustomId(defaultHost);
+                    disableCustomId(defaultHost);
                 }
-            	each(self.components, function(value){
-            		//we get the password component to fill it properly
-            		if(value.id == "CHpass"){
-            			value.value = self.chatroom.password;
-            		}
-            	});
             }
 
             self.tabControl.heightToTallestTab();
@@ -387,29 +392,21 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
 
         __save: function(){
             var self = this;
-
-            /* We need to scan again the components due to the password widget. Otherwise,
-             * if we switch from the hidden value to the other one the text written
-             * won't be sent
-             */
-            this.components = IndicoUtil.findFormFields(this.basicTabForm, this.advancedTabForm);
-            IndicoUtil.getFormValues(this.components, this.values);
+            values = getValues();
 
             // We check if there are errors
             var checkOK = this.parameterManager.check();
 
             // If there are no errors, the chat room is sent to the server
             if (checkOK) {
-            	var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving your chatroom..."));
-            	//ejabberd doesn't like spaces in chat room's name, so we take them off
-            	this.values.title = this.values.title.split(' ').join('');
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving your chatroom..."));
 
                     if (this.popupType === 'create') {
                         indicoRequest(
-                            'jabber.createRoom',
+                            'XMPP.createRoom',
                             {
                                 conference: this.conferenceId,
-                                chatroomParams: this.values
+                                chatroomParams: values
                             },
                             function(result,error) {
                                 if (!error) {
@@ -430,21 +427,21 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                                         self.crName.startWatching(true);
                                     }
                                     else{
-	                                    killProgress();
-	                                    self.close();
-	                                    IndicoUtil.errorReport(error);
+                                        killProgress();
+                                        self.close();
+                                        IndicoUtil.errorReport(error);
                                     }
                                 }
                             }
                         );
 
                     } else if (this.popupType === 'edit') {
-                    	this.values.id = this.chatroom.id;
+                        values.id = this.chatroom.id;
                         indicoRequest(
-                        		'jabber.editRoom',
+                                'XMPP.editRoom',
                             {
                                 conference: this.conferenceId,
-                                chatroomParams: this.values
+                                chatroomParams: values
                             },
                             function(result,error) {
                                 if (!error) {
@@ -458,9 +455,9 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                                         self.crName.startWatching(true);
                                     }
                                     else{
-	                                    killProgress();
-	                                    self.close();
-	                                    IndicoUtil.errorReport(error);
+                                        killProgress();
+                                        self.close();
+                                        IndicoUtil.errorReport(error);
                                     }
                                 }
                             }
@@ -487,16 +484,13 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
         }
 
         this.conferenceId = conferenceId;
-        customHost = chatroom && chatroom.createRoom == "no" ? chatroom.host:'';
+        customHost = chatroom && !chatroom.createdInLocalServer? chatroom.host:'';
         this.ExclusivePopupWithButtons(title, positive);
 
         this.parameterManager = new IndicoUtil.parameterManager();
 
-        // We initialize the dictionary where the values sent to the server
-        // will be sent on save
-        this.values = {};
         if(popupType === 'edit'){
-        	this.chatroomID = chatroom.id
+            this.chatroomID = chatroom.id
         }
     }
 );
@@ -517,17 +511,17 @@ var refreshChatroom = function(chatroom, doHighlight) {
 };
 
 var enableCustomId = function(newHost) {
-	if ($E('host') != null){
-		$E('host').set(newHost);
-	    IndicoUI.Effect.enableDisableTextField($E('host'), true);
-	}
+    if ($E('host') != null){
+        $E('host').set(newHost);
+        IndicoUI.Effect.enableDisableTextField($E('host'), true);
+    }
 };
 
 var disableCustomId = function(newHost) {
-	if ($E('host') != null){
-		$E('host').set(newHost);
-		IndicoUI.Effect.enableDisableTextField($E('host'), false);
-	}
+    if ($E('host') != null){
+        $E('host').set(newHost);
+        IndicoUI.Effect.enableDisableTextField($E('host'), false);
+    }
 };
 
 /**
@@ -539,7 +533,7 @@ var disableCustomId = function(newHost) {
  */
 var getChatroomIndexById = function(id) {
     for (var i=0; i < chatrooms.length.get(); i++) {
-    	chatroom = chatrooms.item(i);
+        chatroom = chatrooms.item(i);
         if (chatroom.id == id) {
             return i;
         }
@@ -560,7 +554,7 @@ var showInfo = function(chatroom) {
 
     infoTbody.append(Html.tr({},
             Html.td("chatInfoLeftCol", $T('Host:')),
-            Html.td({}, chatroom.createRoom?'conference.'+chatroom.host:chatroom.host)));
+            Html.td({}, chatroom.createdInLocalServer?'conference.'+chatroom.host:chatroom.host)));
 
     infoTbody.append(Html.tr({},
         Html.td("chatInfoLeftCol", $T('Description:')),
@@ -571,12 +565,12 @@ var showInfo = function(chatroom) {
         Html.td({}, chatroom.owner.name)));
 
     infoTbody.append(Html.tr({},
-            Html.td("chatInfoLeftCol", $T('Hide chat room:')),
+            Html.td("chatInfoLeftCol", $T('Show chat room:')),
             Html.td({}, chatroom.showRoom?$T('Yes'):$T('No'))));
 
     infoTbody.append(Html.tr({},
-            Html.td("chatInfoLeftCol", $T('Created in local Jabber server:')),
-            Html.td({}, chatroom.createRoom?$T('Yes'):$T('No'))));
+            Html.td("chatInfoLeftCol", $T('Created in local XMPP server:')),
+            Html.td({}, chatroom.createdInLocalServer?$T('Yes'):$T('No'))));
 
     infoTbody.append(Html.tr({},
             Html.td("chatInfoLeftCol", $T('Show password to users:')),
@@ -587,32 +581,32 @@ var showInfo = function(chatroom) {
             Html.td({}, new HiddenText(chatroom.password, "*********",false).draw())));
 
     var day = chatroom.creationDate.date.slice(8,10);
-	var month = chatroom.creationDate.date.slice(5,7);
-	var year = chatroom.creationDate.date.slice(0,4);
+    var month = chatroom.creationDate.date.slice(5,7);
+    var year = chatroom.creationDate.date.slice(0,4);
     infoTbody.append(Html.tr({},
             Html.td("chatInfoLeftCol", $T('Date of creation:')),
             Html.td({},
-            		Html.tr({},day+'-'+month+'-'+year),
-            		Html.tr({},chatroom.creationDate.time.slice(0,8)  )
-            		)
+                    Html.tr({},day+'-'+month+'-'+year),
+                    Html.tr({},chatroom.creationDate.time.slice(0,8)  )
+                    )
     ));
 
     if(chatroom.modificationDate){
-    	day = chatroom.modificationDate.date.slice(8,10);
-    	month = chatroom.modificationDate.date.slice(5,7);
-    	year = chatroom.modificationDate.date.slice(0,4);
+        day = chatroom.modificationDate.date.slice(8,10);
+        month = chatroom.modificationDate.date.slice(5,7);
+        year = chatroom.modificationDate.date.slice(0,4);
         infoTbody.append(Html.tr({},
                 Html.td("chatInfoLeftCol", $T('Last modification:')),
                 Html.td({},
-                		Html.tr({},day+'-'+month+'-'+year),
-                		Html.tr({},chatroom.modificationDate.time.slice(0,8))
-                		)));
+                        Html.tr({},day+'-'+month+'-'+year),
+                        Html.tr({},chatroom.modificationDate.time.slice(0,8))
+                        )));
     }
 
     infoTbody.append(Html.tr({},
-    	    Html.td("chatInfoLeftCol", $T(' Timezone: ')),
-    	    Html.td({},timeZone)
-    	));
+            Html.td("chatInfoLeftCol", $T(' Timezone: ')),
+            Html.td({},timeZone)
+        ));
 
     return Html.div({}, Html.table({}, infoTbody));
 };
@@ -620,9 +614,9 @@ var showInfo = function(chatroom) {
 var checkCRStatus = function(chatroom){
     arrangeRoomData(chatroom);
 
-	var killProgress = IndicoUI.Dialogs.Util.progress($T("Requesting..."));
+    var killProgress = IndicoUI.Dialogs.Util.progress($T("Requesting..."));
     indicoRequest(
-    		'jabber.getRoomPreferences',
+            'XMPP.getRoomPreferences',
         {
             conference: conferenceID,
             chatroomParams: chatroom
@@ -670,7 +664,7 @@ var chatroomTemplate = function(chatroom) {
     row.append(cellShowInfo);
 
 
-    var completeHost = chatroom.createRoom?'conference.'+chatroom.host:chatroom.host;
+    var completeHost = chatroom.createdInLocalServer?'conference.'+chatroom.host:chatroom.host;
     var cellCustom = Html.td({className : "chatCell"});
         cellCustom.dom.innerHTML = chatroom.title + ' (@' + completeHost + ')';
 
@@ -683,29 +677,29 @@ var chatroomTemplate = function(chatroom) {
 
     cellEditRemove.append(editButton);
     cellEditRemove.append(removeButton);
-    if(chatroom.createRoom){
-	    var checkStatusButton = Widget.link(command(
-	            function() {checkStatus(chatroom);} ,
-	            Html.img({
-	                alt: "Refresh chat room data",
-	                title: "Refresh chat room data",
-	                src: imageSrc("reload"),
-	                style: {
-	                    'verticalAlign': 'middle'
-	                }
-	            })
-	        ));
+    if(chatroom.createdInLocalServer){
+        var checkStatusButton = Widget.link(command(
+                function() {checkStatus(chatroom);} ,
+                Html.img({
+                    alt: "Refresh chat room data",
+                    title: "Refresh chat room data",
+                    src: imageSrc("reload"),
+                    style: {
+                        'verticalAlign': 'middle'
+                    }
+                })
+            ));
     }
     else{
-	    var checkStatusButton =
-	            Html.img({
-	                alt: "Refresh not available in external servers",
-	                title: "Refresh not available in external servers",
-	                src: imageSrc("reload_faded"),
-	                style: {
-	                    'verticalAlign': 'middle'
-	                }
-	            });
+        var checkStatusButton =
+                Html.img({
+                    alt: "Refresh not available in external servers",
+                    title: "Refresh not available in external servers",
+                    src: imageSrc("reload_faded"),
+                    style: {
+                        'verticalAlign': 'middle'
+                    }
+                });
     }
     cellEditRemove.append(checkStatusButton);
     row.append(cellEditRemove);
@@ -745,7 +739,7 @@ var hideAllInfoRows = function(markAsHidden) {
  * @param {boolean} showAll If true, all the rows will be shown. Otherwise, only those marked as shown in the showInfoObject
  */
 var showAllInfoRows = function(showAll) {
-	chatrooms.each(function(chatroom) {
+    chatrooms.each(function(chatroom) {
         if (showAll || showInfo[chatroom.id]) {
             showInfoRow(chatroom);
             showInfo[chatroom.id] = true;
@@ -863,35 +857,10 @@ var createChatroom = function(conferenceId) {
 }
 
 var arrangeRoomData = function(chatroom){
-	/*
-	 * The values expected in the checkboxes and radiobuttons are different from what the server
-	 * returns, so we need to transform it.
-	 */
-    if(chatroom.showRoom == true){
-		chatroom.showRoom = ["on"]
-	}
-    else if(chatroom.showRoom == false)
-    	chatroom.showRoom = []
-
-	if(chatroom.showPass == true){
-		chatroom.showPass = ["on"]
-	}
-	else if(chatroom.showPass == false)
-		chatroom.showPass = []
-	/*
-	 * The first time, with the data picked from the server, chatroom.createRoom will be either true or false.
-	 * However, if we open the edit dialog more than once without changing saving, chatroom.createRoom may be set to "no".
-	 * That means that a condition like if(chatroom.createRoom) would return true given the case chatroom.createRoom=="no"
-	 */
-	if(chatroom.createRoom == true || chatroom.createRoom == "yes"){
-		chatroom.createRoom = "yes";
-		chatroom.host = "";
-	}
-	else{
-		chatroom.createRoom = "no";
-		chatroom.host = chatroom.host;
-	}
-
+    chatroom.showRoom.checked = chatroom.showRoom;
+    chatroom.showPass.checked = chatroom.showPass;
+    chatroom.createdInLocalServer.checked = chatroom.createdInLocalServer;
+    chatroom.createdInLocalServer?chatroom.host = defaultHost:chatroom.host = chatroom.host;
 }
 
 /**
@@ -915,7 +884,7 @@ var removeChatroom = function(chatroom, conferenceId) {
         arrangeRoomData(chatroom);
 
         indicoRequest(
-            'jabber.deleteRoom',
+            'XMPP.deleteRoom',
             {
                 conference: conferenceId,
                 chatroomParams: chatroom
@@ -946,3 +915,25 @@ var removeChatroom = function(chatroom, conferenceId) {
             confirmHandler);
 };
 
+var getValues = function(){
+    return {  'title': $E('CRname').dom.value,
+            'createdInLocalServer': $E('createCH').dom.checked,
+            'host': $E('host').dom.value,
+            'description': $E('description').dom.value,
+            'roomPass': $E('CHpass').dom.value,
+            'showRoom': $E('showCH').dom.checked,
+            'showPass': $E('showPwd').dom.checked
+         };
+}
+
+var setValues = function(chatroom){
+    $E('CRname').dom.value = chatroom.title;
+    $E('createCH').dom.checked = chatroom.createdInLocalServer;
+    $E('defineCH').dom.checked = !chatroom.createdInLocalServer;
+    $E('host').dom.value = chatroom.host;
+
+    $E('description').dom.value = chatroom.description;
+    $E('CHpass').dom.value = chatroom.password;
+    $E('showCH').dom.checked = chatroom.showRoom;
+    $E('showPwd').dom.checked = chatroom.showPass;
+}

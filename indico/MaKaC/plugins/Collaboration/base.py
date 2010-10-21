@@ -24,7 +24,7 @@ from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\
     datetimeToUnixTimeInt
 from MaKaC.webinterface import wcomponents, urlHandlers
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 from MaKaC.errors import MaKaCError
 from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.common.timezoneUtils import nowutc

@@ -1,11 +1,33 @@
+# -*- coding: utf-8 -*-
+##
+## $id$
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface import wcomponents, urlHandlers
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.utils import formatDateTime, parseDateTime
-from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
-from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.fossilize import fossilize
-from MaKaC.plugins.helpers import DBHelpers, PluginFieldsHelper
+from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
+from MaKaC.plugins import PluginsHolder
+from MaKaC.plugins.helpers import DBHelpers
+from MaKaC.plugins.util import PluginFieldsWrapper
 
 
 class WPConfModifChat(WPConferenceModifBase):
@@ -85,7 +107,7 @@ class WConfModifChat(wcomponents.WTemplated):
                 vars['Chatrooms'] = None
         except Exception, e:
             vars["Chatrooms"] = None
-        vars['DefaultServer'] = PluginFieldsHelper('InstantMessaging', 'Jabber').getOption('chatServerHost')
+        vars['DefaultServer'] = PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost')
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
         vars["User"] = self._user
         vars["tz"] = DisplayTZ(self._aw,self._conf).getDisplayTZ()

@@ -41,7 +41,7 @@ from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
 from MaKaC.rb_tools import intd, FormMode, doesPeriodsOverlap
 from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
-from MaKaC.plugins.pluginLoader import PluginLoader
+from MaKaC.plugins import PluginLoader
 from MaKaC import plugins
 from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
 from MaKaC.search.cache import MapOfRoomsCache

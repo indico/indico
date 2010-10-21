@@ -18,8 +18,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pluginType = "RoomBooking"
-pluginName = "default"
-pluginDescription = _("""This is the default Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment""")
+__metadata__ = {
+    'type': "RoomBooking",
+    'name': "default",
+    'description': _("This is the default Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")
+    }
 
 modules = {}

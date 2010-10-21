@@ -20,7 +20,7 @@
 
 from datetime import datetime
 from pytz import timezone
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 
 from MaKaC.common.logger import Logger
 

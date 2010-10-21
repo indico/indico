@@ -17,23 +17,28 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """ This purpose of this file is high-level handling of plugins.
     It has functions to store and retrieve information from the plugins that is stored in the database;
     for example, which plugins are active or not, options declared by plugins and their values, etc.
     The functions can be used through methods of the "PluginsHolder" class. See its description for more details.
 """
 
-from MaKaC.plugins.pluginLoader import PluginLoader
 from MaKaC.common.Counter import Counter
-from MaKaC.common.ObjectHolders import ObjectHolder
-from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import PluginError
 from MaKaC.common import DBMgr
 from MaKaC.common.logger import Logger
-import zope.interface
+import zope.interface, types
 from MaKaC.services.interface.rpc.common import NoReportError
+from persistent import Persistent
+
+from MaKaC.plugins.notificationComponents import Component, IListener, IContributor
+from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
+from MaKaC.common.ObjectHolders import ObjectHolder
+from MaKaC.plugins.util import processPluginMetadata
+
 
 class Observable:
     def _notify(self, event, params):
@@ -43,6 +48,7 @@ class Observable:
             raise NoReportError(str(e))
         except Exception, e:
             raise Exception(str(e))
+
 
 class ComponentsManager(Persistent):
     '''
@@ -126,7 +132,7 @@ class ComponentsManager(Persistent):
                 #the event exists
                 f = getattr(subscriber,event)
                 try:
-                    f(obj, params)
+                    result = f(obj, params)
                 except NoReportError, e:
                     raise NoReportError(str(e))
                 except Exception, e:
@@ -182,7 +188,6 @@ class ComponentsManager(Persistent):
 
     def _notifyModification(self):
         self._p_changed = 1
-
 
 
 class AJAXMethodMap(Persistent):
@@ -331,9 +336,9 @@ class PluginsHolder (ObjectHolder):
         for pt in self.getPluginTypes(includeNonPresent=True):
             pt.setPresent(False)
 
-        types = PluginLoader.getPluginTypeList()
+        ptypes = PluginLoader.getPluginTypeList()
 
-        for pluginTypeName in types:
+        for pluginTypeName in ptypes:
 
             if self.hasPluginType(pluginTypeName, mustBePresent=False, mustBeActive=False):
                 pluginType = self.getPluginType(pluginTypeName)
@@ -658,7 +663,6 @@ class PluginBase(Persistent):
         self._p_changed = 1
 
 
-
 class PluginType (PluginBase):
     """ This class represents a plugin type ("COllaboration", "epayment", etc.).
         It will store information about the plugin type in the db.
@@ -681,61 +685,123 @@ class PluginType (PluginBase):
         self._visible = True
         self._active = False
 
+    def _updatePluginInfo(self, pluginModule, metadata):
+
+        #if it already existed, we mark it as present
+        pluginName = metadata['name']
+
+        if self.hasPlugin(pluginName):
+            p = self.getPlugin(pluginName)
+            p.setDescription(metadata['description'])
+            p.setPresent(True)
+
+        #if it didn't exist, we create it
+        else:
+            p = Plugin(pluginName,
+                       pluginModule.__name__,
+                       self,
+                       metadata['description'])
+
+            self.addPlugin(p)
+
+        p.setTestPlugin(metadata['testPlugin'])
+
+        if hasattr(pluginModule, "options") and \
+               hasattr(pluginModule.options, "globalOptions"):
+            p.updateAllOptions(pluginModule.options.globalOptions)
+
+        if hasattr(pluginModule, "actions") and \
+               hasattr(pluginModule.actions, "pluginActions"):
+            p.updateAllActions(pluginModule.actions.pluginActions)
+
+        self._updateComponentInfo(p, pluginModule)
+        self._updateRHMapInfo(p, pluginModule)
+        self._updateHandlerInfo(p, pluginModule)
+
     def updateInfo(self):
-        """ This method will update the information in the DB about this plugin type.
-            It will call the lower-level layer ( MaKaC/plugins/__init__.py ) to retrieve
-            information about its plugins, its options, etc.
+        """
+        Will update the information in the DB about this plugin type.
         """
 
-        #until we detect them, the plugins of this given Type are marked as present
-        for plugin in self.getPluginList(includeNonPresent=True, includeNonActive=True):
+        # until we detect them, the plugins of this given Type are marked as non-present
+        for plugin in self.getPluginList(includeNonPresent=True,
+                                         includeNonActive=True):
             plugin.setPresent(False)
 
-        #we get the list of modules (plugins) of this type
+        # we get the list of modules (plugins) of this type
         pluginModules = PluginLoader.getPluginsByType(self.getId())
 
-        #we loop through the plugins
+        # we loop through the plugins
         for pluginModule in pluginModules:
-            if hasattr(pluginModule, "ignore") and pluginModule.ignore:
+            metadata = processPluginMetadata(pluginModule)
+
+            # skip ignored plugins
+            if metadata['ignore']:
                 continue
-
-            #if it already existed, we mark it as present
-            pluginName = pluginModule.pluginName
-            if self.hasPlugin(pluginName):
-                p = self.getPlugin(pluginName)
-                if hasattr(pluginModule, "pluginDescription"):
-                    p.setDescription(pluginModule.pluginDescription)
-                p.setPresent(True)
-
-            #if it didn't exist, we create it
             else:
-                if hasattr(pluginModule, "pluginDescription"):
-                    description = pluginModule.pluginDescription
-                else:
-                    description = None
+                self._updatePluginInfo(pluginModule, metadata)
 
-                p = Plugin(pluginName, pluginModule.__name__, self, description)
-                self.addPlugin(p)
+        ptypeModule = self.getModule()
+        ptypeMetadata = processPluginMetadata(ptypeModule)
 
-            if hasattr(pluginModule, "testPlugin") and pluginModule.testPlugin:
-                p.setTestPlugin(pluginModule.testPlugin)
+        # basic information
+        self.__name = ptypeMetadata['name']
+        self.__description = ptypeMetadata['description']
+        self.__visible = ptypeMetadata['visible']
 
-            if hasattr(pluginModule, "options") and hasattr(pluginModule.options, "globalOptions"):
-                p.updateAllOptions(pluginModule.options.globalOptions)
-
-            if hasattr(pluginModule, "actions") and hasattr(pluginModule.actions, "pluginActions"):
-                p.updateAllActions(pluginModule.actions.pluginActions)
-
-
+        # components, handlers, options and actions
+        self._updateComponentInfo(self, ptypeModule)
+        self._updateRHMapInfo(self, ptypeModule)
+        self._updateHandlerInfo(self, ptypeModule)
         self.updateAllOptions(self._retrievePluginTypeOptions())
-
         self.updateAllActions(self._retrievePluginTypeActions())
 
-        self.__name = self._retrievePluginTypeName()
 
-        self.__description = self._retrievePluginTypeDescription()
+    def _getAllSubmodules(self, module):
+        accum = []
 
-        self._visible = self._retrieveIsVisible()
+        for obj in module.__dict__.itervalues():
+
+            # check if it's a module and it is inside the parent module
+            if type(obj) == types.ModuleType and \
+                   obj.__name__.startswith(module.__name__):
+                accum += [obj]
+                accum += self._getAllSubmodules(obj)
+
+        return accum
+
+    def _updateComponentInfo(self, plugin, module):
+
+        for smodule in self._getAllSubmodules(module):
+            for obj in smodule.__dict__.values():
+                if type(obj) == type and Component in obj.mro() and \
+                   (IListener.implementedBy(obj) or IContributor.implementedBy(obj)):
+                    PluginsHolder().getComponentsManager().addComponent(obj)
+
+    def _updateRHMapInfo(self, plugin, module):
+        from indico.MaKaC.webinterface.rh.base import RH
+        for smodule in self._getAllSubmodules(module):
+            for obj in smodule.__dict__.values():
+                if type(obj) == type and RH in obj.mro() and obj.__module__.find('plugins') != -1:
+                    PluginsHolder().getRHMap().addRH(obj)
+
+    def _updateHandlerInfo(self, plugin, module):
+        """
+        """
+
+        # TODO: Maybe let handlers be defined anywhere?
+
+        # By default, use module.handlers.methodMap
+        if hasattr(module, 'handlers') and \
+           isinstance(module.handlers, types.ModuleType):
+            if hasattr(module.handlers, 'methodMap') and \
+               type(module.handlers.methodMap) == dict:
+                PluginsHolder().getById('ajaxMethodMap').addMethods2AJAXDict(
+                    module.handlers.methodMap)
+            else:
+                # in case there's no methodMap, skip it and leave a warning
+                Logger.get('plugins.holder').warning("%s has no methodMap? "
+                                                     "(or is it invalid?)" % module)
 
     def _retrievePluginTypeOptions(self):
         hasOptionsModule = hasattr(self.getModule(), "options")
@@ -752,27 +818,6 @@ class PluginType (PluginBase):
             return self.getModule().actions.pluginTypeActions
         else:
             return None
-
-    def _retrievePluginTypeName(self):
-        hasName = hasattr(self.getModule(), "pluginTypeName")
-        if hasName:
-            return self.getModule().pluginTypeName
-        else:
-            return None
-
-    def _retrievePluginTypeDescription(self):
-        hasDescription = hasattr(self.getModule(), "pluginTypeDescription")
-        if hasDescription:
-            return self.getModule().pluginTypeDescription
-        else:
-            return None
-
-    def _retrieveIsVisible(self):
-        hasIsVisible = hasattr(self.getModule(), "visible")
-        if hasIsVisible:
-            return not self.getModule().visible is False
-        else:
-            return True
 
     def getId(self):
         return self.__id
@@ -990,24 +1035,6 @@ class Plugin(PluginBase):
 
     def __str__(self):
         return str(self.__name)
-
-
-class GlobalPluginOptions(Persistent):
-    """ A class that stores global information about all plugins.
-    """
-
-    def __init__(self):
-        self.__id = "globalPluginOptions"
-        self.__reloadAllWhenViewingAdminTab = False
-
-    def getId(self):
-        return self.__id
-
-    def getReloadAllWhenViewingAdminTab(self):
-        return self.__reloadAllWhenViewingAdminTab
-
-    def setReloadAllWhenViewingAdminTab(self, value):
-        self.__reloadAllWhenViewingAdminTab = value
 
 
 class PluginOption(Persistent):
@@ -1231,3 +1258,4 @@ class ActionBase(object):
         """ To be implemented by inheriting classes
         """
         raise PluginError("Action of class " + str(self.__class__.__name__) + " has not implemented the method call()")
+

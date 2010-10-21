@@ -57,7 +57,7 @@
                                 <img class="imglink" alt="<%= _("Click to enable")%>" src="<%=Config.getInstance().getSystemIconURL( 'disabledSection' )%>"/>
                         <% end %>
                         </a>
-                        <a href="<%=urlHandlers.UHAdminTogglePluginType.getURL(pluginType)%>" onclick="return confirm('<%= _('This will reload all the plugins too. Do you want to continue?')%>');"
+                        <a href="<%=urlHandlers.UHAdminTogglePluginType.getURL(pluginType)%>" onclick="return confirm('<%= _('This will reload all the plugins too. Do you want to continue?')%>');">
                             <%= pluginType.getName() %>
                         </a>
                         <% if pluginType.hasDescription(): %>

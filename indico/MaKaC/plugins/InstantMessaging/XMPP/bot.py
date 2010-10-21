@@ -1,8 +1,30 @@
+# -*- coding: utf-8 -*-
+##
+## $id$
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+
 import sleekxmpp
 
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 
-class IndicoJabberBotBase(object):
+class IndicoXMPPBotBase(object):
 
     def __init__(self, jid, password):
         self.xmpp = sleekxmpp.ClientXMPP(jid, password)
@@ -34,11 +56,48 @@ class IndicoJabberBotBase(object):
         """ Gets the response from the XMPP driver and, in case of error, returns the appropiate message"""
         return {'error':error, 'reason':msg if msg!= '' else 'There was a problem while connecting our XMPP server. Please try again later'}
 
+    def run(self):
+        try:
+            self.xmpp.process(threaded=False)
+        except Exception, e:
+            raise Exception(e)
 
-class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
+
+class IndicoXMPPBotRoomExists(IndicoXMPPBotBase):
 
     def __init__(self, jid, password, room):
-        IndicoJabberBotBase.__init__(self, jid, password)
+        IndicoXMPPBotBase.__init__(self, jid, password)
+        self._room = room
+        self._protected = 1 if self._room.getPassword() != '' else 0
+        self._nick, server = jid.split('@')
+        self._jid = self._room.getTitle() + '@conference.' + server
+        try:
+            connected = self.xmpp.connect()
+        except Exception, e:
+            self._error = self.treatError(True, str(e))
+            self.xmpp.disconnect()
+
+    def handleXMPPConnected(self, event):
+        #mod_discovery, service discovery related
+        disco = self.xmpp.plugin['xep_0030']
+        try:
+            roomExists=disco.getInfo(self._jid)
+        except Exception, e:
+            self._error = self.treatError(True, str(e))
+            self.xmpp.disconnect()
+        if roomExists.get('type') != 'error':
+            #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
+            self._error = self.treatError(True, 'roomExists')
+        else:
+            self._error = self.treatError(False)
+        self.xmpp.disconnect()
+
+
+
+class IndicoXMPPBotCreateRoom(IndicoXMPPBotBase):
+
+    def __init__(self, jid, password, room):
+        IndicoXMPPBotBase.__init__(self, jid, password)
         self._room = room
         self._protected = 1 if self._room.getPassword() != '' else 0
         self._nick, server = jid.split('@')
@@ -47,30 +106,18 @@ class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
         try:
             connected = self.xmpp.connect()
         except Exception, e:
-            self._error = self.treatError(True)
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
-        self.xmpp.process(threaded=False)
+        #self.xmpp.process(threaded=False)
 
     def handleXMPPConnected(self, event):
-        #mod_discovery, service discovery related
-        disco = self.xmpp.plugin['xep_0030']
         #mod_muc, multi chat related
         muc = self.xmpp.plugin['xep_0045']
 
         try:
-            roomExists=disco.getInfo(self._jid)
-        except Exception, e:
-            self._error = self.treatError(True)
-            self.xmpp.disconnect()
-        if roomExists.get('type') != 'error':
-            #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
-            self._error = self.treatError(True, 'roomExists')
-            self.xmpp.disconnect()
-
-        try:
             muc.joinMUC(room = self._jid, nick = self._nick)
         except Exception, e:
-            self._error = self.treatError(True)
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
         form = self.xmpp.plugin['xep_0004'].makeForm()
@@ -79,7 +126,7 @@ class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
         self.formDefaults(form)
         form.addField(var = 'muc#roomconfig_roomname', value = self._room.getTitle())
 
-        #FYI: If a field is empty ejabberd will answer with a bad request error, so if the field's value is empty do not send it!
+        #FYI: If a field is empty eXMPPd will answer with a bad request error, so if the field's value is empty do not send it!
         if self._room.getDescription():
             form.addField(var = 'muc#roomconfig_roomdesc', value = self._room.getDescription())
         if self._protected:
@@ -91,16 +138,16 @@ class IndicoJabberBotCreateRoom(IndicoJabberBotBase):
         try:
             self._error = self.treatError(not muc.configureRoom(self._jid, form))
         except Exception, e:
-            self._error = self.treatError(True)
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
         self.xmpp.disconnect()
 
 
-class IndicoJabberBotEditRoom(IndicoJabberBotBase):
+class IndicoXMPPBotEditRoom(IndicoXMPPBotBase):
 
     def __init__(self, jid, password, room, checkRoomExists):
-        IndicoJabberBotBase.__init__(self, jid, password)
+        IndicoXMPPBotBase.__init__(self, jid, password)
         self._room = room
         self._protected = 1 if self._room.getPassword() != '' else 0
         self._nick, server = jid.split('@')
@@ -111,31 +158,18 @@ class IndicoJabberBotEditRoom(IndicoJabberBotBase):
         try:
             self.xmpp.connect()
         except Exception, e:
-            self._error = self.treatError(True)
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
-        self.xmpp.process(threaded=False)
+        #self.xmpp.process(threaded=False)
 
     def handleXMPPConnected(self, event):
-        #mod_discovery, service discovery related
-        disco = self.xmpp.plugin['xep_0030']
         #mod_muc, multi chat related
         muc = self.xmpp.plugin['xep_0045']
-
-        if self._checkRoomExists:
-            try:
-                roomExists=disco.getInfo(self._jid)
-            except Exception, e:
-                self._error = self.treatError(True)
-                self.xmpp.disconnect()
-            if roomExists.get('type') != 'error':
-                #if the type returned is not error it means that it found a chat room with the name we want, therefore that name is not usable
-                self._error = self.treatError(True, 'roomExists')
-                self.xmpp.disconnect()
 
         try:
             muc.joinMUC(room = self._jid, nick = self._nick)
         except Exception, e:
-            self._error = self.treatError(True)
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
         form = self.xmpp.plugin['xep_0004'].makeForm()
@@ -157,16 +191,16 @@ class IndicoJabberBotEditRoom(IndicoJabberBotBase):
         try:
             self._error = self.treatError(not muc.configureRoom(self._jid, form))
         except Exception, e:
-            self._error = self.treatError(True)
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
         self.xmpp.disconnect()
 
 
-class IndicoJabberBotDeleteRoom(IndicoJabberBotBase):
+class IndicoXMPPBotDeleteRoom(IndicoXMPPBotBase):
 
     def __init__(self, jid, password, room, reason):
-        IndicoJabberBotBase.__init__(self, jid, password)
+        IndicoXMPPBotBase.__init__(self, jid, password)
         self._room = room
         self._protected = 1 if self._room.getPassword() != '' else 0
         self._nick, server = jid.split('@')
@@ -177,32 +211,32 @@ class IndicoJabberBotDeleteRoom(IndicoJabberBotBase):
         try:
             self.xmpp.connect()
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
-        self.xmpp.process(threaded=False)
+        #self.xmpp.process(threaded=False)
 
     def handleXMPPConnected(self, event):
         muc = self.xmpp.plugin['xep_0045']
         try:
             muc.joinMUC(room = self._jid, nick = self._nick)
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
         try:
             self.xmpp.sendMessage(self._jid, self._reason, mtype='groupchat')
-            self._error = not muc.destroy(self._jid, self._reason)
+            self._error = self.treatError(not muc.destroy(self._jid, self._reason))
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
         self.xmpp.disconnect()
 
 
-class IndicoJabberBotGetPreferences(IndicoJabberBotBase):
+class IndicoXMPPBotGetPreferences(IndicoXMPPBotBase):
 
     def __init__(self, jid, password, room):
-        IndicoJabberBotBase.__init__(self, jid, password)
+        IndicoXMPPBotBase.__init__(self, jid, password)
         self._room = room
         self._nick, server = jid.split('@')
         self._jid = self._room.getTitle() + '@conference.' + server
@@ -210,16 +244,17 @@ class IndicoJabberBotGetPreferences(IndicoJabberBotBase):
         try:
             self.xmpp.connect()
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
-        self.xmpp.process(threaded=False)
+        #self.xmpp.process(threaded=False)
 
     def handleXMPPConnected(self, event):
         muc = self.xmpp.plugin['xep_0045']
         try:
             self._form = muc.getRoomConfig(self._jid)
         except Exception, e:
-            self._error = True
+            self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
+        self._error = self.treatError(False)
 
         self.xmpp.disconnect()

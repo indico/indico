@@ -18,8 +18,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pluginType = "Collaboration"
-pluginName = "DummyPlugin"
-pluginDescription = "Dummy collaboration plugin used for tests"
-ignore = False
-testPlugin = True
+__metadata__ = {
+    'type': "Collaboration",
+    'name': 'DummyPlugin',
+    'ignore': False,
+    'testPlugin': True,
+    'description': "Dummy collaboration plugin used for tests"
+    }

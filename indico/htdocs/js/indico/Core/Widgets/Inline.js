@@ -33,26 +33,6 @@ type("InlineRemoteWidget", ["InlineWidget"],
 
          draw: function() {
              var self = this;
-             var t;
-             t = setTimeout("$E(\""+"message" + "\").set(\'\u00A0\')",2000);
-             var canvas = Html.span({}, 'loading...');
-             canvas.set(self.drawContent());
-             var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
-             message.dom.id = "message";
-             if (t){ clearTimeout(t);}
-             var table = Html.table();
-             table.dom.style.display = 'inline';
-             var tbody = Html.tbody();
-             table.set(tbody);
-             var row1 = Html.tr();
-             var cell2 = Html.td();
-                    cell2.append(canvas);
-                    row1.append(cell2);
-             cellMessage = Html.td();
-             cellMessage.dom.style.verticalAlign = "middle";
-             cellMessage.dom.rowSpan = 2;
-             cellMessage.append(message);
-             row1.append(cellMessage);
 
              var content = this._handleContent();
 
@@ -107,15 +87,23 @@ type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
              canvas.set(self.drawContent());
              var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
              message.dom.id = "message";
-             if (t){ clearTimeout(t);}
+
+             if (t) {
+                 clearTimeout(t);
+             }
+
              var table = Html.table();
-             table.dom.style.display = 'inline';
              var tbody = Html.tbody();
-             table.set(tbody);
              var row1 = Html.tr();
              var cell2 = Html.td();
-                    cell2.append(canvas);
-                    row1.append(cell2);
+
+             table.dom.style.display = 'inline';
+             table.set(tbody);
+
+
+             cell2.append(canvas);
+             row1.append(cell2);
+
              cellMessage = Html.td();
              cellMessage.dom.style.verticalAlign = "middle";
              cellMessage.dom.rowSpan = 2;
@@ -1582,11 +1570,21 @@ type('AutocheckTextBox', ['RealtimeTextBox'],
 		        var self = this;
 		        var text = trim(this.get());
 		        if(text.length > 1) {
-                    if(text != self.originalText){
-                        self.component.dom.style.display = "none";
+		            if(text != self.originalText){
+                        if (exists(self.functionToHide)){
+                            self.functionToHide(self.component);
+                        }
+                        else{
+                            self.component.dom.style.display = "none";
+                        }
                     }
                     else{
-                        self.component.dom.style.display = '';
+                        if (exists(self.functionToShow)){
+                            self.functionToShow(self.component);
+                        }
+                        else{
+                            self.component.dom.style.display = '';
+                        }
 		            }
 
 		        }
@@ -1602,10 +1600,20 @@ type('AutocheckTextBox', ['RealtimeTextBox'],
                 //we set the text with which we will compare before doing the observe
                 self.setOriginalText(originalText == null?self.get():originalText);
                 if (isRepeated){
-                    self.component.dom.style.display = '';
+                    if (exists(self.functionToShow)){
+                        self.functionToShow(self.component);
+                    }
+                    else{
+                        self.component.dom.style.display = '';
+                    }
                 }
                 else{
-                    self.component.dom.style.display = "none";
+                    if (exists(self.functionToHide)){
+                        self.functionToHide(self.component);
+                    }
+                    else{
+                        self.component.dom.style.display = "none";
+                    }
                 }
 
                 self.observe(function(key, event) {
@@ -1615,13 +1623,18 @@ type('AutocheckTextBox', ['RealtimeTextBox'],
 		    }
 		},
 
-		    function(args, component){
-				/* component: the component (usually a simple label) that you want to
-				inform the user that the original text field is repeated */
-
+		    function(args, component, functionToShow, functionToHide){
+				/* component: The component (usually a simple label) that you want to
+				   inform the user that the original text field is repeated
+				   functionToShow: In case that your component requires some other operations to accomplish what you
+				   want rather than just setting the display to none, you'll need to specify what do you want to do.
+				   functionToHide: the same thing when hiding the component.
+				*/
 				args.autocomplete = 'off';
 				this.RealtimeTextBox(args);
 				this.setOriginalText(this.get());
 				this.component = component;
+				this.functionToShow = functionToShow;
+				this.functionToHide = functionToHide;
 		     }
 	);

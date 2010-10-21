@@ -19,6 +19,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.i18n import _
-pluginTypeDescription = _("Room Booking Plugins")
-ignore = False
-visible = True
+
+__metadata__ = {
+    'name': "RoomBooking",
+    'description': _("Room Booking Plugins")
+    }

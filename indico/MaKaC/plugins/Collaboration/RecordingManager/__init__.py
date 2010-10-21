@@ -20,6 +20,9 @@
 
 from MaKaC.i18n import _
 
-pluginType = "Collaboration"
-pluginName = "RecordingManager"
-pluginDescription = _("Recording Manager")
+__metadata__ = {
+    'type': "Collaboration",
+    'name': "RecordingManager",
+    'description': _("Recording Manager")
+    }
+

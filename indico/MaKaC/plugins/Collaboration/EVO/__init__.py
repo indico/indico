@@ -20,6 +20,8 @@
 
 from MaKaC.i18n import _
 
-pluginType = "Collaboration"
-pluginName = "EVO"
-pluginDescription = _("EVO, the Collaboration network")
+__metadata__ = {
+    'type': "Collaboration",
+    'name': "EVO",
+    'description': _("EVO, the Collaboration network")
+    }

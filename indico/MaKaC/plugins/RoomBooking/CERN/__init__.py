@@ -20,9 +20,12 @@
 
 from MaKaC.i18n import _
 
-pluginType = "RoomBooking"
-pluginName = "CERN"
-pluginDescription = _("""_("This is the CERN Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")""")
+__metadata__ = {
+    'type': "RoomBooking",
+    'name': "CERN",
+    'description': _("This is the CERN Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")
+    }
+
 
 modules = {}
 

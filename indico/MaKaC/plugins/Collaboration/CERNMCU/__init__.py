@@ -20,6 +20,8 @@
 
 from MaKaC.i18n import _
 
-pluginType = "Collaboration"
-pluginName = "CERNMCU"
-pluginDescription = _("Create conferences in CERN's MCU")
+__metadata__ = {
+    'type': "Collaboration",
+    'name': "CERNMCU",
+    'description': _("Create conferences in CERN's MCU")
+    }

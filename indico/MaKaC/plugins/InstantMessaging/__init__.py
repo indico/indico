@@ -20,5 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.i18n import _
-pluginTypeDescription = _("Instant Messaging Plugins")
-pluginTypeName = _("Instant Messaging")
+
+__metadata__ = {
+    'name': "Instant Messaging",
+    'description': _("Instant Messaging Plugins")
+    }

@@ -51,14 +51,14 @@
 /* ------------------------------ GLOBAL VARIABLES ------------------------------- */
 
 var chatrooms = $L(<%= jsonEncode(Chatrooms) %>);
-var defaultHost = '<%= DefaultServer %>';
+var defaultHost = <%= jsonEncode(DefaultServer) %>;
 var customHost = "";
 var createButton;
-var timeZone = '<%= tz %>';
-var conferenceName = '<%= Conference.getTitle() %>';
-var conferenceID = '<%= Conference.getId() %>';
-var eventDate = '<%= EventDate %>'.slice(0,10).replaceAll('/','_');
-var user = <%= User.fossilize() %>;
+var timeZone = <%= jsonEncode(tz) %>;
+var conferenceName = <%= jsonEncode(Conference.getTitle()) %>;
+var conferenceID = <%= jsonEncode(Conference.getId()) %>;
+var eventDate = '<%= EventDate[0:10].replace('/','_') %>';
+var user = <%= jsonEncode(User.fossilize()) %>;
 
 
 

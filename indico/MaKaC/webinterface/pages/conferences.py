@@ -192,10 +192,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase, Observable ):
 
         #instant messaging
         self._notify('confDisplaySMShow', {})
-        #from MaKaC.plugins.InstantMessaging.handlers import DBUtils
-        #self._instantMessaging = self._sectionMenu.getLinkByName("instantMessaging")
-        #if not DBUtils.roomsToShow(self._conf):
-        #    self._instantMessaging.setVisible(False)
 
         #evaluation
         evaluation = self._conf.getEvaluation()

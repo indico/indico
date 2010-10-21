@@ -20,7 +20,7 @@
 
 from MaKaC.services.implementation.base import AdminService
 from MaKaC.services.interface.rpc.common import ServiceError
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
 
 class PluginOptionsBase (AdminService):
@@ -117,21 +117,9 @@ class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
         return True
 
-class PluginOptionsAddText ( PluginOptionsBase ):
-
-    def _checkParams(self):
-        PluginOptionsBase._checkParams(self)
-        self._text = self._params.get('text', '')
-
-    def _getAnswer(self):
-        self._targetOption.setValue(self._text)
-        return True
-
-
 methodMap = {
     "addUsers": PluginOptionsAddUsers,
     "removeUser": PluginOptionsRemoveUser,
     "addRooms": PluginOptionsAddRooms,
     "removeRooms": PluginOptionsRemoveRooms,
-    "saveJoinCRText": PluginOptionsAddText
 }

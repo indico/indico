@@ -135,7 +135,12 @@ class ParameterManager(object):
                 raise ExpectedParameterException(paramName, list, type(value))
         elif pType == bool:
             if not (type(value) == bool or (allowEmpty and value == None)):
-                raise ExpectedParameterException(paramName, list, type(value))
+                if type(value) == str and (value == 'true' or value == 'True'):
+                    value = True
+                elif type(value) == str and (value == 'false' or value == 'False'):
+                    value = False
+                else:
+                    raise ExpectedParameterException(paramName, bool, type(value))
 
         return value
 

@@ -8,7 +8,8 @@ from MaKaC.user import Avatar, AvatarHolder
 
 from MaKaC.conference import Conference, ConferenceHolder
 from MaKaC.plugins.InstantMessaging.handlers import *
-from MaKaC.plugins.helpers import DBHelpers
+from MaKaC.plugins.InstantMessaging.XMPP.handlers import *
+from MaKaC.plugins.helpers import DBHelpers, MailHelper
 from MaKaC.plugins.base import Observable, PluginsHolder
 
 from MaKaC.common.db import DBMgr
@@ -18,7 +19,7 @@ def setup_module():
     DBMgr.getInstance().startRequest()
     PluginsHolder().loadAllPlugins()
     PluginsHolder().getPluginType('InstantMessaging').setActive(True)
-    PluginsHolder().getPluginType('InstantMessaging').getPlugin('Jabber').setActive(True)
+    PluginsHolder().getPluginType('InstantMessaging').getPlugin('XMPP').setActive(True)
     PluginsHolder().getComponentsManager().registerAllComponents()
 
 def teardown_module():
@@ -30,7 +31,7 @@ def teardown_module():
 class TestAddRemoveCR(unittest.TestCase, Observable):
 
     def testBasicAddRemoveCR(self):
-        dbRoot = DBMgr.getInstance().getDBConnection().root()['plugins']['InstantMessaging'].getPlugin('Jabber').getStorage()
+        dbRoot = DBMgr.getInstance().getDBConnection().root()['plugins']['InstantMessaging'].getPlugin('XMPP').getStorage()
 
         u=AvatarHolder().getById('0')
 
@@ -44,15 +45,15 @@ class TestAddRemoveCR(unittest.TestCase, Observable):
         self._conferenceID = c1.getId()
 
         #for the first conference
-        cr1 = Chatroom('chatroom1', u, c1, None)
-        cr2 = Chatroom('chatroom2', u, c1, None)
-        cr3 = Chatroom('chatroom3', u, c1, None)
+        cr1 = XMPPChatroom('chatroom1', u, c1, None)
+        cr2 = XMPPChatroom('chatroom2', u, c1, None)
+        cr3 = XMPPChatroom('chatroom3', u, c1, None)
 
 
         #for the second conference
-        cr4 = Chatroom('chatroom4', u, c2, None)
-        cr5 = Chatroom('chatroom5', u, c2, None)
-        cr6 = Chatroom('chatroom6', u, c2, None)
+        cr4 = XMPPChatroom('chatroom4', u, c2, None)
+        cr5 = XMPPChatroom('chatroom5', u, c2, None)
+        cr6 = XMPPChatroom('chatroom6', u, c2, None)
 
 
         #insert them in the database
@@ -82,28 +83,30 @@ class TestAddRemoveCR(unittest.TestCase, Observable):
         assert(DBHelpers.getChatroom(cr5ID).getId()==cr5ID)
         assert(DBHelpers.getChatroom(cr6ID).getId()==cr6ID)
 
+        mh = MailHelper()
+
         #insert created chatrooms
         self._conference = c2.getId()
         cr1 = DBHelpers.getChatroom(cr1ID)
         cr1.setConference(c2)
-        self._notify('addConference2Room', cr1)
+        self._notify('addConference2Room', {'room': cr1, 'mailHelper': mh, 'conf': self._conference})
         cr2 = DBHelpers.getChatroom(cr2ID)
         cr2.setConference(c2)
-        self._notify('addConference2Room', cr2)
+        self._notify('addConference2Room', {'room': cr2, 'mailHelper': mh, 'conf': self._conference})
         cr3 = DBHelpers.getChatroom(cr3ID)
         cr3.setConference(c2)
-        self._notify('addConference2Room', cr3)
+        self._notify('addConference2Room', {'room': cr3, 'mailHelper': mh, 'conf': self._conference})
 
         self._conference = c1.getId()
         cr4 = DBHelpers.getChatroom(cr4ID)
         cr4.setConference(c1)
-        self._notify('addConference2Room', cr4)
+        self._notify('addConference2Room', {'room': cr4, 'mailHelper': mh, 'conf': self._conference})
         cr5 = DBHelpers.getChatroom(cr5ID)
         cr5.setConference(c1)
-        self._notify('addConference2Room', cr5)
+        self._notify('addConference2Room', {'room': cr5, 'mailHelper': mh, 'conf': self._conference})
         cr6 = DBHelpers.getChatroom(cr6ID)
         cr6.setConference(c1)
-        self._notify('addConference2Room', cr6)
+        self._notify('addConference2Room', {'room': cr6, 'mailHelper': mh, 'conf': self._conference})
 
         #checks for conference dictionary inside each Chatroom object
         assert(len(dbRoot['indexByUser'][u.getId()])==6)

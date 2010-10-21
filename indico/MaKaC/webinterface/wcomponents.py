@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 
 import os,types,string
 from xml.sax.saxutils import escape, quoteattr

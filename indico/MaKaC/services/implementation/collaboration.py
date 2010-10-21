@@ -26,7 +26,7 @@ from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin,\
     RCCollaborationPluginAdmin, RCVideoServicesManager
 from MaKaC.i18n import _
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate
 from MaKaC.common.utils import parseDateTime
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools

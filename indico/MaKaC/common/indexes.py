@@ -33,7 +33,7 @@ from datetime import timedelta
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.logger import Logger
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins import PluginsHolder
 
 from zope.index.text import textindex
 

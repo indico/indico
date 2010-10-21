@@ -19,12 +19,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import os
 import sys
-from MaKaC.plugins.notificationComponents import Component
-from MaKaC.plugins.notificationComponents import IListener
-from MaKaC.plugins.notificationComponents import IContributor
 from MaKaC.common.logger import Logger
+from MaKaC.plugins.util import processPluginMetadata
+
+from persistent import Persistent
 
 from MaKaC.errors import PluginError
+
+class ModuleLoadException(Exception):
+    pass
 
 class PluginLoader(object):
     """ Utility class that has methods to deal with plugins at low level.
@@ -97,8 +100,7 @@ class PluginLoader(object):
             del cls.pluginTypeModules[pluginTypeName]
             cls.pluginModules[pluginTypeName] = {}
             cls.pluginTypesLoaded.remove(pluginTypeName)
-
-        cls.loadPluginType(pluginTypeName)
+        cls.loadPluginType(pluginTypeName.translate(None, ' '))
         cls.pluginTypesLoaded.add(pluginTypeName)
 
     @classmethod
@@ -127,7 +129,7 @@ class PluginLoader(object):
         if not pluginTypeName in cls.pluginTypesLoaded:
             cls.reloadPluginType(pluginTypeName)
 
-        modulesDict = cls.pluginModules[pluginTypeName]
+        modulesDict = cls.pluginModules[pluginTypeName.translate(None, ' ')]
 
         if pluginName in modulesDict:
             return modulesDict[pluginName]
@@ -149,12 +151,19 @@ class PluginLoader(object):
             Return None on failure.
         """
 
-        #may raise ImportError
-        module = __import__(moduleName, globals(), locals(), [name]) #check docs on built-in __import__ to understand :)
+        try:
+            # may raise ImportError (or others caused by the module's code)
+            module = __import__(moduleName, globals(), locals(), [name])
+        except:
+            Logger.get('plugins.loader').exception(
+                "Syntax error loading %s ('%s')" % (moduleName,
+                                                    name))
+            raise ModuleLoadException("Impossible to load %s ('%s')" % \
+                                      (moduleName, name))
 
-        #may raise KeyError
+
+        # may raise KeyError
         objectToReturn = vars(module)[name]
-
         return objectToReturn
 
     @classmethod
@@ -170,15 +179,11 @@ class PluginLoader(object):
 
         # we build the package name of a plugin type, e.g. MaKaC.plugins.Collaboration
         pluginTypePackageName = "MaKaC.plugins.%s" % pluginTypeName
+        metadata = processPluginMetadata(pluginTypeModule)
 
         #we check that the plugin type does not have an "ignore" attribute
-        ignore = False
-        try:
-            ignore = cls.importName(pluginTypePackageName, "ignore")
-        except KeyError:
-            pass
-
-        if ignore is True:
+        if metadata['ignore']:
+            # stop loading here!
             return
 
         #if ignore == False, we store the plugin type module in cls.pluginTypeModules
@@ -206,10 +211,17 @@ class PluginLoader(object):
                 except KeyError:
                     raise Exception("Tried to load the plugin  %s but the module MaKaC.plugins.%s.%s did not exist. Is there an __init__.py?" % (pluginTypeName, pluginTypeName, itemName))
 
-                # we check that it was indeed a module. If it was, we check that there is a
+                # we check that it was indeed a module.
+
+                if pluginModule:
+                    pluginMetadata = processPluginMetadata(pluginModule)
+                else:
+                    # Not a module? Nothing to do here...
+                    return
+                # If it was a module, we check that there is a
                 # "pluginType" variable in the __init__.py of the plugin and that it corresponds
                 # to the plugin type we are currently processing
-                if pluginModule and pluginTypeName == pluginModule.pluginType:
+                if pluginTypeName == pluginMetadata['type']:
                     cls.pluginTypeModules[pluginTypeName].__dict__[itemName] = pluginModule
 
                     #if this is the first plugin for this plugin type, we add
@@ -221,29 +233,22 @@ class PluginLoader(object):
                     #note: we do not use itemName (the name of the folder) and use instead
                     #      the "pluginName" variable in the __init__.py file of the plugin,
                     #      which is its "true" name
-                    cls.pluginModules[pluginTypeName][pluginModule.pluginName] = pluginModule
+                    cls.pluginModules[pluginTypeName][pluginMetadata['name']] = pluginModule
 
                     #we build the path of the plugin
                     pluginPath = os.path.join(pluginTypePath, itemName)
 
                     cls.loadSubModules(pluginModule, pluginPath)
+                else:
+                    Logger.get("plugins.loader").warning("Module of type %s inside %s" %
+                                                         (pluginMetadata['type'],
+                                                          pluginTypeName))
 
             elif ext == ".py" and itemName != "__init__":
                 pluginTypeSubModule = cls.importName(pluginTypePackageName, itemName)
 
                 if pluginTypeSubModule:
                     cls.pluginTypeModules[pluginTypeName].__dict__[itemName] = pluginTypeSubModule
-                cls.addComponentsAndRH(pluginTypeSubModule.__dict__.values())
-
-                if itemName == 'handlers':
-                    #we get the dictionary containing the AJAX methods of the plugin
-                    try:
-                        from MaKaC.plugins.base import PluginsHolder
-                        PluginsHolder().getById("ajaxMethodMap").addMethods2AJAXDict(pluginTypeSubModule.__dict__['methodMap'])
-                    except Exception, e:
-                        Logger.get('PluginLoader').error('There is no methodMap dictionary in one of the handlers.py file: %s' %str(e))
-
-
 
 
     @classmethod
@@ -260,6 +265,7 @@ class PluginLoader(object):
             # splitext returns a tuple (name, file extension). Ex: ("conference", ".py")
             # if no extension, the 2nd element of the tuple will be an empty string
             itemName, ext = os.path.splitext(itemName)
+
             #if the item is a directory, we may have found a subpackage (also a submodule)
             if os.path.isdir(os.path.join(modulePath, itemName)):
 
@@ -281,18 +287,9 @@ class PluginLoader(object):
             elif ext == ".py" and itemName != "__init__":
 
                 #this should return a subModule, unless there has been an error during import
+
                 subModule = cls.importName(module.__name__, itemName)
                 foundSubModules[itemName] = subModule
-
-                cls.addComponentsAndRH(subModule.__dict__.values())
-
-                if itemName == 'handlers':
-                    #we get the dictionary containing the AJAX methods of the plugin
-                    try:
-                        from MaKaC.plugins.base import PluginsHolder
-                        PluginsHolder().getById("ajaxMethodMap").addMethods2AJAXDict(subModule.__dict__['methodMap'])
-                    except Exception, e:
-                        Logger.get('PluginLoader').error('There is no methodMap or endpointMap dictionary in one of the handlers.py file: %s' %str(e))
 
         #once we have found all the submodules, we make sure they are in the __dict__ of the module:
         for subModuleName, subModule in foundSubModules.iteritems():
@@ -302,26 +299,20 @@ class PluginLoader(object):
             if hasattr(module, "modules"):
                 module.modules[subModuleName] = subModule
 
-    @classmethod
-    def addComponentsAndRH(cls, classList):
-        '''we receive a list of the elements contained in a .py file. We`ll have to check
-        that the element is a class that implements the base class Component and the interface IListener.
-        Also, we'll add the neccessary items to the RHMap'''
-        for cl in classList:
-            #we have the .py file in obj, now we get its data and check if the class inherits from listener or contributor
-            try:
-                if (hasattr(cl, 'mro') and Component in cl.mro()) and (IListener.implementedBy(cl) or IContributor.implementedBy(cl)):
-                #if hasattr(cl, 'isListener') and IListener.implementedBy(cl):
-                    from MaKaC.plugins.base import PluginsHolder
-                    PluginsHolder().getComponentsManager().addComponent(cl)
 
-                #fill the RHMap in case the class inherits from RH and its path is in the plugins folder
-                from MaKaC.webinterface.rh.base import RH
-                if (hasattr(cl, 'mro') and RH in cl.mro()) and cl.__module__.find('plugins') != -1:
-                    from MaKaC.plugins.base import PluginsHolder
-                    PluginsHolder().getRHMap().addRH(cl)
+class GlobalPluginOptions(Persistent):
+    """ A class that stores global information about all plugins.
+    """
 
-            except Exception,e:
-                #we might have an exception because some classes return True for hasattr(cl, 'mro') but then throw an exception when calling
-                #cl.mro(). Since we are not supposed to do anything in this cases, we just pass to the next case
-                continue
+    def __init__(self):
+        self.__id = "globalPluginOptions"
+        self.__reloadAllWhenViewingAdminTab = False
+
+    def getId(self):
+        return self.__id
+
+    def getReloadAllWhenViewingAdminTab(self):
+        return self.__reloadAllWhenViewingAdminTab
+
+    def setReloadAllWhenViewingAdminTab(self, value):
+        self.__reloadAllWhenViewingAdminTab = value

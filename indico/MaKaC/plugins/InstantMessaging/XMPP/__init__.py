@@ -19,6 +19,8 @@
 
 from MaKaC.i18n import _
 
-pluginType = "InstantMessaging"
-pluginName = "Jabber"
-pluginDescription = _("XMPP-based messaging system")
+__metadata__ = {
+    'type': "InstantMessaging",
+    'name': "XMPP",
+    'description': _("XMPP-based messaging system")
+    }

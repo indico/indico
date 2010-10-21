@@ -32,7 +32,7 @@ from persistent import Persistent
 from MaKaC.common.Locators import Locator
 import MaKaC
 from MaKaC.i18n import _
-from MaKaC.plugins.pluginLoader import PluginLoader
+from MaKaC.plugins import PluginLoader
 
 
 # ZODB branches name

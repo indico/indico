@@ -655,7 +655,7 @@ if __name__ == '__main__':
           include_package_data = True,
           dependency_links = [
                               EXTRA_RESOURCES_URL
-                              ],
+                              ]
           )
 
     #delete the temp folder used for logging

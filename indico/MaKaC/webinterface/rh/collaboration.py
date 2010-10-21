@@ -24,7 +24,7 @@ from MaKaC.webinterface.pages import conferences
 from MaKaC.webinterface.pages import collaboration
 from MaKaC.webinterface import urlHandlers
 from MaKaC.i18n import _
-from MaKaC.plugins.base import PluginsHolder, Plugin
+from MaKaC.plugins import PluginsHolder, Plugin
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.webinterface.rh.admins import RCAdmin, RHAdminBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
