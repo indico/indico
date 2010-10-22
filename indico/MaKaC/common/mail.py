@@ -75,22 +75,10 @@ class GenericMailer:
     def sendAndLog(notification, conference, module="", user = None):
         GenericMailer.send(notification)
         logData = {}
-        try:
-            logData["fromAddr"] = notification._fromAddr
-        except:
-            logData["fromAddr"] = notification.getFromAddr()
-        try:
-            logData["toList"] = notification._toList
-        except:
-            logData["toList"] = notification.getToList()
-        logData["ccList"] = notification._ccList
-        try:
-            logData["subject"] = notification._subject
-        except:
-            logData["subject"] = notification.getSubject()
-        try:
-            logData["body"] = notification._body
-        except:
-            logData["body"] = notification.getBody()
+        logData["fromAddr"] = notification.getFromAddr()
+        logData["toList"] = notification.getToList()
+        logData["ccList"] = notification.getCCList()
+        logData["subject"] = notification.getSubject()
+        logData["body"] = notification.getBody()
         conference.getLogHandler().logEmail(logData,module,user)
     sendAndLog = staticmethod(sendAndLog)

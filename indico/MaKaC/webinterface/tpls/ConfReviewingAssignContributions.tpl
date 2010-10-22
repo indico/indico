@@ -205,41 +205,41 @@
             <td colspan="8" style="border-bottom: 1px solid grey"></td>
         </tr>
     </thead>
-   
+
    <tbody id="tablebody">
     <% for c in Conference.getContributionListSortedById(): %>
         <% rm = c.getReviewManager() %>
         <% if not isinstance(c.getStatus(), ContribStatusNone): %>
          <tr valign="top">
-            <td></td>          
+            <td></td>
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= c.getId() %>
             </td>
-            
+
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <a href="<%= urlHandlers.UHContributionModifReviewing.getURL(c) %>">
                     <%= c.getTitle() %>
                 </a>
             </td>
-            
+
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <% if c.getType(): %>
                     <%= c.getType().getName() %>
                 <% end %>
             </td>
-            
+
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <% if c.getTrack(): %>
                     <%= c.getTrack().getTitle() %>
                 <% end %>
             </td>
-            
+
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <% if c.getSession(): %>
                     <%= c.getSession().getTitle() %>
                 <% end %>
             </td>
-            
+
             <!--
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
             <% if rm.getLastReview().getRefereeJudgement().isSubmitted(): %>
@@ -258,11 +258,11 @@
                 <ul>
                     <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
                     <li>
-                        <em><%= _("Referee")%>:</em> 
+                        <em><%= _("Referee")%>:</em>
                     </li>
                     <% end %>
                     <li>
-                        <em><%= _("Layout Reviewer")%>:</em> 
+                        <em><%= _("Layout Reviewer")%>:</em>
                     </li>
                     <li>
                         <em><%= _("Content Reviewers")%>:</em>
@@ -270,20 +270,20 @@
                         <% for reviewer in rm.getReviewersList() :%>
                             <li>a</li>
                         <% end %>
-                        </ul> 
+                        </ul>
                     </li>
                 </ul>
             </td>
-            
+
             <td style="border-right:5px solid #FFFFFF; border-left:5px solid #FFFFFF;">
                 <% date = rm.getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
                     <%= _("Deadline not set.")%>
                 <% end %>
                 <% else: %>
-                    <%= date.strftime(dueDateFormat) %>                   
+                    <%= date.strftime(dueDateFormat) %>
                 <% end %>
-            </td>           
+            </td>
         </tr>
         <% end %>
     <% end %>
@@ -348,14 +348,14 @@ var assignPerTrackMenus = function(role, place){
     var order = 'assign';
     if(role=='reviewer'){
        order = 'add';
-    } 
+    }
     assignMenu.observeClick(function(e) {
         var menuItems = {};
-    
+
         menuItems[$T('Track')] = function(){ fetchUsersPerAttribute(order, role, 'track'); };
         menuItems[$T('Session')] = function(){ fetchUsersPerAttribute(order, role, 'session'); };
         menuItems[$T('Type')] = function(){ fetchUsersPerAttribute(order, role, 'type'); };
-    
+
         var menu = new PopupMenu(menuItems, [assignMenu], "popupList");
         var pos = assignMenu.getAbsolutePosition();
         menu.open(pos.x, pos.y + 20);
@@ -423,7 +423,7 @@ var buildShowHideFiltering = function() {
         }, $T('Hide Filtering Criteria'))
     });
     option.set('showFiltering');
-    
+
     $E('showHideFiltering').set(Widget.link(option));
 }
 
@@ -445,7 +445,7 @@ var backgroundColorOnClick = function() {
 
 
 var contributionTemplate = function(contribution) {
-        
+
     var row = Html.tr();
     row.dom.onmouseover = backgroundColorOver;
     row.dom.onmouseout = backgroundColorOut;
@@ -453,12 +453,12 @@ var contributionTemplate = function(contribution) {
     var cell1 = Html.td({style:{"textAlign":"center", "width":"0px"}});
     var id = ("cb" + contribution.id);
     var name = ("selectedContributions");
-    
+
     /*
     //creating the checkbox IE way
-    if (document.all) {    
+    if (document.all) {
     var checkbox = document.createElement('<input name='+name+'>');
-    checkbox.type = "checkbox"; 
+    checkbox.type = "checkbox";
     checkbox.id = id ;
     }
     //the other browsers
@@ -471,9 +471,9 @@ var contributionTemplate = function(contribution) {
     var checkbox = Html.input('checkbox', {id: id, name:name});
     checkbox.dom.value = contribution.id;
      cell1.set(checkbox);
-    
+
     row.append(cell1);
-    
+
     // Cell2: contribution id
     var cell2 = Html.td({style:{"textAlign":"center", "width":"0px"}});
     cell2.set(contribution.id)
@@ -484,54 +484,54 @@ var contributionTemplate = function(contribution) {
     // Sadly this hack is necessary to get the link since getURL() needs a Contribution object (from Indico, not the local one from Javascript)
     // and contributions are loaded asynchronously...
     linkString = "<%= urlHandlers.UHContributionModifReviewing.getURL() %>" + "?contribId=" + contribution.id + "&confId=<%= Conference.getId()%>"
-    var link = Html.a({href: linkString}); 
+    var link = Html.a({href: linkString});
     link.set(contribution.title);
     cell3.set(link);
     row.append(cell3);
 
     // Cell4: contribution type
     var cell4 = Html.td({style:{"marginLeft":"5px"}});
-    cell4.set(contribution.type ? contribution.type.name : "")
+    cell4.set(contribution.type ? contribution.type : "")
     row.append(cell4);
-    
+
     // Cell5: contribution track
     var cell5 = Html.td({style:{"marginLeft":"5px"}});
-    cell5.set(contribution.track ? contribution.track.title : "")
+    cell5.set(contribution.track ? contribution.track : "")
     row.append(cell5);
-    
+
     // Cell6: contribution session
     var cell6 = Html.td({style:{"marginLeft":"5px"}});
-    cell6.set(contribution.session ? contribution.session.title : "")
+    cell6.set(contribution.session ? contribution.session : "")
     row.append(cell6);
 
     /*
     // Cell7: contribution status
     var cell7 = Html.td();
-    
+
     if (contribution.reviewManager.lastReview.refereeJudgement.isSubmitted) {
         var span = Html.span();
         span.dom.style.color = 'green';
         span.set("Judged" + contribution.reviewManager.lastReview.refereeJudgement.judgement);
         cell7.set(span);
-        
+
     } else {
         var ul = Html.ul();
         ul.dom.style.color = 'red';
         ul.dom.style.listStyleType = 'none';
         ul.dom.style.padding = 0;
         ul.dom.style.marginLeft = '5px';
-        
+
         var li = Html.li();
         li.set("Not judged yet");
         ul.append(li);
-        
+
         statusList = contribution.reviewManager.lastReview.reviewingStatus;
         for (j in statusList) {
             var li = Html.li();
             li.set(statusList[j])
             ul.append(li)
         }
-        
+
         cell7.set(ul);
     }
 
@@ -540,38 +540,38 @@ var contributionTemplate = function(contribution) {
 
     // Cell8: reviewing team assigned to the contribution
     var cell8 = Html.td();
-    
+
     var ul = Html.ul();
     ul.dom.style.listStyleType = 'none';
     ul.dom.style.padding = 0;
     ul.dom.style.marginLeft = '5px';
-    
-    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %> 
+
+    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     var li1 = Html.li();
     var span1 = Html.span({}, $T('Referee: '))
     var span2 = contribution.reviewManager.referee ?
-                    Html.span({id: ("creferee" + contribution.id), style:{"fontWeight":"bolder"}},  contribution.reviewManager.referee.name) :
+                    Html.span({id: ("creferee" + contribution.id), style:{"fontWeight":"bolder"}},  contribution.reviewManager.referee) :
                     Html.span({id: ("creferee" + contribution.id)},$T('No referee'));
     li1.set(Widget.block([span1,span2]));
     ul.append(li1);
     <% end %>
-    
+
     <% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
     var li2 = Html.li();
     var span1 = Html.span({}, $T('Layout reviewer: '))
     var span2 = contribution.reviewManager.editor ?
-                    Html.span({id: ("ceditor" + contribution.id), style:{"fontWeight":"bolder"}},  contribution.reviewManager.editor.name) :
+                    Html.span({id: ("ceditor" + contribution.id), style:{"fontWeight":"bolder"}},  contribution.reviewManager.editor) :
                     Html.span({id: ("ceditor" + contribution.id)},$T('No layout reviewer'));
     li2.set(Widget.block([span1,span2]));
     ul.append(li2);
     <% end %>
-    
+
     <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     var li3 = Html.li();
     var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Content reviewers: '));
     li3.append(span);
-    
-    
+
+
     var ulReviewers = Html.ul();
     if (contribution.reviewManager.reviewersList.length > 0){
         for (j in contribution.reviewManager.reviewersList) {
@@ -586,15 +586,18 @@ var contributionTemplate = function(contribution) {
     }
     ul.append(li3);
     <% end %>
-    
+
     cell8.set(ul);
     row.append(cell8);
 
     // Cell9: due date of the contribution
     var cell9 = Html.td();
-    cell9.set(contribution.reviewManager.lastReview.refereeDueDate)
+    if (contribution.reviewManager.lastReview.refereeDueDate == null)
+        cell9.set("");
+    else
+        cell9.set(contribution.reviewManager.lastReview.refereeDueDate.date);
     row.append(cell9);
-    
+
     return row;
 }
 
@@ -616,10 +619,10 @@ var updateContribution = function (id) {
  * ('name' attribute of an 'input' HTML element)
  * The list only contains the checkboxes who are selected.
  * The first checkbox ('--not specified--' one) is discarded.
- * @param {Object} checkboxName 
+ * @param {Object} checkboxName
  */
 var getCheckedBoxes = function(checkboxName) {
-    
+
     var checkBoxes = document.getElementsByName(checkboxName);
     var checkedIds = []
     for (var i=0; i<checkBoxes.length; i++) {
@@ -637,10 +640,10 @@ var getCheckedBoxes = function(checkboxName) {
  * Only the contributios whose checkbox has been selected are returned.
  */
 var getCheckedContributions = function() {
-    
+
     var checkBoxes = document.getElementsByName('selectedContributions');
     var checkedContributions = []
-    
+
     for (var i=0; i<checkBoxes.length; i++) {
         var cb = checkBoxes[i];
         if (cb.checked) {
@@ -701,7 +704,7 @@ var deselectWithoutReviewer = function(contributions) {
  * Returns true if all have a referee, false otherwise.
  * If none have a referee, an alert message appear.
  * If some have a referee and others don't, a dialog will appear offering
- * the choice to only apply the assignment to contributions with referee. 
+ * the choice to only apply the assignment to contributions with referee.
  * @param {Object} contributions
  * @param {Object} order
  * @param {Object} role
@@ -721,22 +724,22 @@ var checkAllHaveReferee = function(contributions, order, role, assignPerAttribut
         );
         return false;
     }
-    
+
     if (contributionsWithoutReferee.length > 0) {
-        
+
         if(assignPerAttribute){
             alert($T("Some of the contributions you checked have a Referee.") +
             $T("You can only add a layout reviewer or a content reviewer if the contribution has a referee."));
             return false;
         } else {
-        title =$T('Contributions without referee');    
-            
+        title =$T('Contributions without referee');
+
         var popup = new ExclusivePopup(title, function(){popup.close();});
-        
+
         popup.draw = function(){
-        
+
             var span1 = Html.span({}, $T("Some of the contributions you checked do not have a Referee."));
-            var span2 = Html.span({}, $T("You can only add an editor or a reviewer if the contribution has a referee.")); 
+            var span2 = Html.span({}, $T("You can only add an editor or a reviewer if the contribution has a referee."));
             var span3 = Html.span({}, $T("Do you want to add that " + role + " only to the contributions with a referee?"));
             var yesButton = Html.button('popUpButton', $T("Yes"));
             yesButton.observeClick(function(){
@@ -744,17 +747,17 @@ var checkAllHaveReferee = function(contributions, order, role, assignPerAttribut
                 fetchUsers(order, role);
                 popup.close();
             });
-                        
+
              var noButton = Html.button('popUpButton', $T("No"));
             noButton.observeClick(function(){
                 popup.close();
-            }); 
+            });
               var buttons = Widget.inline([yesButton, noButton])
               var all = Widget.lines([span1, span2, span3, buttons])
-         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]));  
+         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '130px', width: '420px'}},[all]));
                 };
              popup.open();
-          
+
         return false;
     }
     }
@@ -766,7 +769,7 @@ var checkAllHaveReferee = function(contributions, order, role, assignPerAttribut
  * Returns true if there are no warnings, returns false otherwise.
  * If are checked contributions with no reviewers assigned, an alert message appears.
  * If some have a reviewers and others don't, a dialog will appear offering
- * the choice to only apply the assignment to contributions with reviewer. 
+ * the choice to only apply the assignment to contributions with reviewer.
  * @param {Object} contributions
  * @param {Object} order
  * @param {Object} role
@@ -779,13 +782,13 @@ var removeReviewersAlerts = function(contributions, role) {
         if (contribution.reviewManager.reviewersList.length == 0) {
             contributionsWithoutReviewers.push(contributionId)
         }
-    } 
+    }
     if (contributionsWithoutReviewers.length == contributions.length) {
         alert($T("There is no assigned Content Reviewer to remove.")
         );
         return false;
     }
-    
+
     /*contributionsWithoutEditor = []
     for (i in contributions) {
         contributionId = contributions[i]
@@ -794,20 +797,20 @@ var removeReviewersAlerts = function(contributions, role) {
             contributionsWithoutEditor.push(contributionId)
         }
     }
-    
+
     if (contributionsWithoutEditor.length == contributions.length) {
         alert($T("There is no assigned Layout Reviewer to remove.")
         );
         return false;
     } */
-    
+
     if (contributionsWithoutReviewers.length > 0) {
-        title =$T('Contributions without reviewer');    
-            
+        title =$T('Contributions without reviewer');
+
         var popup = new ExclusivePopup(title, function(){popup.close();});
-        
+
         popup.draw = function(){
-        
+
             var span1 = Html.span({}, $T("The Content Reviewers will be removed only from the contributions that have one."));
             var okButton = Html.button('popUpButton', $T("OK"));
             okButton.observeClick(function(){
@@ -815,21 +818,21 @@ var removeReviewersAlerts = function(contributions, role) {
                 removeUser('allReviewers');
                 popup.close();
             });
-            
+
               var all = Widget.lines([span1, okButton])
               okButton.dom.align = 'center';
-              return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '100px', width: '250px'}},[all]));  
+              return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: '100px', width: '250px'}},[all]));
                 };
              popup.open();
-          
+
         return false;
     }
-    
-    return true;    
+
+    return true;
 }
 
 var removeEditorAlerts = function(contributions, role) {
-    
+
     contributionsWithoutEditor = []
     for (i in contributions) {
         contributionId = contributions[i]
@@ -838,19 +841,19 @@ var removeEditorAlerts = function(contributions, role) {
             contributionsWithoutEditor.push(contributionId)
         }
     }
-    
+
     if (contributionsWithoutEditor.length == contributions.length) {
         alert($T("There is no assigned Layout Reviewer to remove.")
         );
         return false;
-    } 
-    
+    }
+
     return true;
-    
+
 }
 
 var removeNoRefereeAlerts = function(contributions, role) {
-    
+
     contributionsWithoutEditor = []
     for (i in contributions) {
         contributionId = contributions[i]
@@ -859,20 +862,20 @@ var removeNoRefereeAlerts = function(contributions, role) {
             contributionsWithoutEditor.push(contributionId)
         }
     }
-    
+
     if (contributionsWithoutEditor.length == contributions.length) {
         alert($T("There is no assigned Referee to remove.")
         );
         return false;
-    } 
-    
+    }
+
     return true;
-    
+
 }
 
 /**
  * When removing a refereee from one or more contributions this function checks
- * if there are alredy assigned reviewers or editor, or both 
+ * if there are alredy assigned reviewers or editor, or both
  * @param {array} contributions List of contribution ids
  */
 var removeRefereeAlerts = function(contributions){
@@ -880,17 +883,17 @@ var removeRefereeAlerts = function(contributions){
         contributionId = contributions[i]
         contribution = getContribution(contributionId)
     }
-    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) { 
+    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) {
             return false;
-        } 
+        }
     if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor == null){
            return false;
         }
     if(contribution.reviewManager.reviewersList.length == 0 && contribution.reviewManager.editor != null) {
             return false;
         }
-    
-    return true; 
+
+    return true;
 }
 
 /**
@@ -898,7 +901,7 @@ var removeRefereeAlerts = function(contributions){
  * If are checked contributions with alredy assigned reviewers/editor
  * alert message appears that a referee should be assigned
  * @param {array} contributions List of contribution ids
- */    
+ */
 var removeRefereeAlertsMessage = function(contributions){
     for (i in contributions) {
         contributionId = contributions[i]
@@ -906,10 +909,10 @@ var removeRefereeAlertsMessage = function(contributions){
     }
     var warning = $T("You have to assign new referee.")
     var message = $T("")
-    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) {        
+    if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) {
             message = $T("Please note that layout and content have already been assigned for this/these contributions."+ warning)
             return message;
-        } 
+        }
     if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor == null){
            message = $T("Please note that a content reviewer has already been assigned for this/these contributions."+ warning)
            return message;
@@ -918,10 +921,10 @@ var removeRefereeAlertsMessage = function(contributions){
            message = $T("Please note that a layout reviewer has already been assigned for this/these contributions."+ warning)
             return message;
         }
-    
-    return message; 
+
+    return message;
 }
-                       
+
 /**
  * Function that is called when a user (referee, editor, reviewer) is clicked.
  * Depending on what has been sotred in the variable 'action', the user will be
@@ -929,26 +932,27 @@ var removeRefereeAlertsMessage = function(contributions){
  * @param {Object} user The user that has been clicked.
  */
 var userSelected = function(user, contrPerAttribute){
-    
+
     var checkedContributions = getCheckedContributions()
-    
-       
+
+
     if (checkedContributions.length > 0){
         var params = {conference: '<%= Conference.getId() %>',contributions: checkedContributions, user: user.id}
-      } 
-    
-        
+      }
+
+
     if(checkedContributions.length == 0 && contrPerAttribute.length > 0){
         var params = {conference: '<%= Conference.getId() %>',contributions: contrPerAttribute, user: user.id}
         var checkedContributions = contrPerAttribute;
     }
-       
+
     if (checkedContributions.length > 0 || (checkedContributions.length == 0 && contrPerAttribute.length > 0)) {
-        
-       
-        
+
+
+
         switch(action) {
         case 'assign_referee':
+        	var killProgress = IndicoUI.Dialogs.Util.progress();
             indicoRequest(
                 'reviewing.conference.assignReferee',
                 params,
@@ -957,19 +961,22 @@ var userSelected = function(user, contrPerAttribute){
                         for (i in checkedContributions) {
                             contributionId = checkedContributions[i];
                             contribution = getContribution(contributionId);
-                            contribution.reviewManager.referee = user;
+                            contribution.reviewManager.referee = user.name;
                             updateContribution(contributionId);
                             colorify(contributionId,'referee');
                             $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
                         }
+                        killProgress();
                     } else {
+                    	killProgress();
                         IndicoUtil.errorReport(error);
                     }
                 }
             );
             break;
-            
+
         case 'assign_editor':
+        	var killProgress = IndicoUI.Dialogs.Util.progress();
             indicoRequest(
                 'reviewing.conference.assignEditor',
                 params,
@@ -978,19 +985,22 @@ var userSelected = function(user, contrPerAttribute){
                         for (i in checkedContributions) {
                             contributionId = checkedContributions[i]
                             contribution = getContribution(contributionId)
-                            contribution.reviewManager.editor = user
+                            contribution.reviewManager.editor = user.name
                             updateContribution(contributionId)
                             colorify(contributionId,'editor');
                             $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
                         }
+                        killProgress();
                     } else {
+                    	killProgress();
                         IndicoUtil.errorReport(error);
-                    }     
+                    }
                 }
             );
             break;
-            
+
         case 'add_reviewer':
+        	var killProgress = IndicoUI.Dialogs.Util.progress();
             indicoRequest(
                 'reviewing.conference.addReviewer',
                 params,
@@ -999,7 +1009,7 @@ var userSelected = function(user, contrPerAttribute){
                         for (i in checkedContributions) {
                             contributionId = checkedContributions[i]
                             contribution = getContribution(contributionId)
-                            
+
                             var present = false;
                             for (j in contribution.reviewManager.reviewersList) {
                                 if (contribution.reviewManager.reviewersList[j].id == user.id) {
@@ -1015,13 +1025,15 @@ var userSelected = function(user, contrPerAttribute){
                             colorify(contributionId,'reviewer', user.id);
                             $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
                         }
+                        killProgress();
                     } else {
+                    	killProgress();
                         IndicoUtil.errorReport(error);
-                    }  
+                    }
                 }
             );
             break;
-            
+
         case 'remove_reviewer':
             indicoRequest(
                 'reviewing.conference.removeReviewer',
@@ -1032,7 +1044,7 @@ var userSelected = function(user, contrPerAttribute){
                         for (i in checkedContributions) {
                             contributionId = checkedContributions[i]
                             contribution = getContribution(contributionId)
-                            
+
                             notinlist = false;
                             deleted = false;
                             for (j in contribution.reviewManager.reviewersList) {
@@ -1046,21 +1058,21 @@ var userSelected = function(user, contrPerAttribute){
                                     notinlist = true;
                                     notinlist2.push(contributionId)
                                     $E('cb' + contributionId).dom.checked = false;
-                                   
+
                                 }
-                            }                   
+                            }
                         }
                    } else {
                         IndicoUtil.errorReport(error);
-                   } 
+                   }
                 }
             );
             break;
-            
+
         default:
             break;
         }
-                
+
     }
 }
 
@@ -1071,7 +1083,7 @@ var userSelected = function(user, contrPerAttribute){
  * given the filtering parameters.
  */
 var fetchContributions = function() {
-    
+
     contributions.clear();
     contributionsIndexes = []
     indicoRequest('event.contributions.list',
@@ -1109,41 +1121,41 @@ var fetchContributions = function() {
  * @param {string} role The role of the users: 'referee', 'editor', 'reviewer'.
  */
 var fetchUsers = function(order, role) {
-    
+
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length == 0) {
         alert($T("Please select at least 1 contribution"));
         return;
     }
-    
+
     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
         <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
             if (!checkAllHaveReferee(checkedContributions, order, role, false)) {
                 return;
-            } 
+            }
         <% end %>
    }
-   
+
    if (order == 'remove' && role == 'reviewer')  {
         if (!removeReviewersAlerts(checkedContributions, role)) {
             return;
-        } 
+        }
    }
-   
-   
+
+
     indicoRequest(
         'reviewing.conference.userCompetencesList',
         {conference: '<%= Conference.getId() %>', role: role},
         function(result,error) {
             if (!error) {
-                
+
                 action = order + '_' + role;
-                
+
                 var title = '';
                 var new_assign = '';
                 if (role == 'editor') {
                     title = $T('Click on a user name to ') + order + $T(' a layout reviewer:');
-                } 
+                }
                 if (role == 'reviewer') {
                     title = $T('Click on a user name to ') + order + ' a ' + $T('content reviewer:');
                 } else {
@@ -1154,12 +1166,12 @@ var fetchUsers = function(order, role) {
                         title = $T('Click on a user name to assign new ') + role + ':';
                         new_assign = 'True';
                     }
-                } 
-                
+                }
+
                 var popup = new ExclusivePopup(title, function(){popup.close();});
-                
+
                 popup.draw = function(){
-                        var users = $L(); 
+                        var users = $L();
                         var userTemplate = function(user) {
                             var li = Html.li();
                             var userName = Widget.link(command(function(){
@@ -1168,45 +1180,45 @@ var fetchUsers = function(order, role) {
                                 popup.close();
                                 killProgress();
                             }, user.name));
-                        
-                        
+
+
                         var userCompetences = Html.span({style:{marginLeft:'5px'}},
                             user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
                         );
-                        
+
                         li.set(Widget.inline([userName, userCompetences]));
                         return li;
-                    }    
-                    
+                    }
+
                         var userList = Html.ul();
                         bind.element(userList, users, userTemplate);
-                        
+
                         for (i in result) {
                         users.append(result[i]);
-                        }                        
-                         
+                        }
+
                         var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
                           cancelButton.observeClick(function(){
                           popup.close();
                            });
-                       
+
                        var span1 = Html.span({}, "");
                        var message = '';
                        if(new_assign) {
                             span1 = Html.span({}, removeRefereeAlertsMessage(checkedContributions));
-                       }   
+                       }
                        if(role == 'reviewer' && order == 'remove') {
                             if (checkedContributions.length == 1){
-                                    message = $T("The Reviewer you choose will be removed only from the contribution that is assigned to him/her.") 
+                                    message = $T("The Reviewer you choose will be removed only from the contribution that is assigned to him/her.")
                                 } else {
                                     message = $T("The Reviewer you choose will be removed only from the contributions that are assigned to him/her.")
                                 }
                             span1 = Html.span({}, message);
-                       }    
-                        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, userList, cancelButton]));  
+                       }
+                        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, userList, cancelButton]));
                 };
              popup.open();
-              
+
             } else {
                 IndicoUtil.errorReport(error);
             }
@@ -1215,38 +1227,38 @@ var fetchUsers = function(order, role) {
 }
 
 var fetchUsersPerAttribute = function(order, role, attribute) {
-    
+
     var checkedContributions = getCheckedContributions();
-    if (checkedContributions.length > 0) {        
-        deselectAll('selectedContributions');        
-    }         
-    
-            
+    if (checkedContributions.length > 0) {
+        deselectAll('selectedContributions');
+    }
+
+
     indicoRequest(
         'reviewing.conference.userCompetencesList',
         {conference: '<%= Conference.getId() %>', role: role},
         function(result,error) {
-            if (!error) {               
-                
+            if (!error) {
+
                 action = order + '_' + role;
-                
-                var title = ''; 
+
+                var title = '';
                 if (role == 'editor') {
                     title = $T('Follow the steps to ') + order + $T(' a layout reviewer:');
-                } 
+                }
                 if (role == 'reviewer') {
                     title = $T('Follow the steps to ') + order + $T(' a content reviewer:');
-                } 
+                }
                 if (role == 'referee') {
                     title = $T('Follow the steps to ') + order + ' a ' + role + ':';
-                } 
-                
+                }
+
                 var popup = new ExclusivePopup(title, function(){popup.close();});
-                
+
                 popup.draw = function(){
-                
+
                      var AttributeDiv = Html.div();
-                     
+
                      var attributeList = function () {
                         indicoRequest(
                         'reviewing.conference.attributeList',
@@ -1260,12 +1272,12 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
 		                                var name = ("selected"+attribute);
 		                                var checkbox = Html.input('checkbox', {id: id, name: name});
 		                                var attributeName = Html.span({style:{marginLeft:'5px', fontSize: '13px'}}, att.title);
-		                                    
+
 		                                li.set(Widget.inline([checkbox, attributeName]));
-		                                    
+
 		                                return li;
                                     }
-	                                var step1 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 1: Choose a '+ attribute);                                
+	                                var step1 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 1: Choose a '+ attribute);
 	                                var attList = Html.ul();
 	                                bind.element(attList, attributes, attributeTemplate);
                                     if(result.length==0) {
@@ -1276,17 +1288,17 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                     }
 	                                for (i in result) {
 	                                attributes.append(result[i]);
-	                                }	                                                                  
-	                                            
+	                                }
+
                                     AttributeDiv.set(Widget.block([step1,attList]));
                             } else {
                                     IndicoUtil.errorReport(error);
                             }
                         }
-                        ); 
+                        );
                      }
-                     
-                     var getCheckedAttributes = function() {    
+
+                     var getCheckedAttributes = function() {
                             var checkBoxes = document.getElementsByName("selected"+attribute);
                             var checkedAttributes = []
                             for (var i=0; i<checkBoxes.length; i++) {
@@ -1298,10 +1310,10 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                             return checkedAttributes;
                      }
                      var assignButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Assign"));
-                      
-                     var users = $L(); 
+
+                     var users = $L();
                      var contrPerAttribute = [];
-                                           
+
                      var contributionsIdList = function (user, chAtt){
                                     indicoRequest(
                                         'reviewing.conference.contributionsIdPerSelectedAttribute',
@@ -1315,11 +1327,11 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
 													        <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
 													            if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
 													                return;
-													            } 
+													            }
 													        <% end %>
 													   }
                                                     userSelected(user, contrPerAttribute);
-                                            }                                                           
+                                            }
                                             else {
                                                 IndicoUtil.errorReport(error);
                                             }
@@ -1329,26 +1341,26 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                      var userTemplate = function(user) {
                             var li = Html.li({style:{listStyleType:"none", paddingBottom:'3px'}});
                             var name = ("radioBtn");
-                            var radioButton = Html.input('radio', {id: user.id, name: name});  
-                            var userName = Html.label({style:{fontWeight: 'normal'}}, user.name); 
-                        
+                            var radioButton = Html.input('radio', {id: user.id, name: name});
+                            var userName = Html.label({style:{fontWeight: 'normal'}}, user.name);
+
                             var userCompetences = Html.span({style:{marginLeft:'5px', fontSize: '11px'}},
                                 user.competences.length == 0 ? $T('(no competences defined)') : $T('(competences: ') + user.competences.join(', ') + ')'
                             );
-                            
+
                             li.set(Widget.inline([radioButton, userName, userCompetences]));
                             return li;
                      }
-                     var step2 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 2: Click on a user name to assign a '+ role);                    
+                     var step2 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 2: Click on a user name to assign a '+ role);
                      var userList = Html.ul();
                      bind.element(userList, users, userTemplate);
-                        
+
                      for (i in result) {
                         users.append(result[i]);
                      }
-                        
-                     attributeList(); 
-                                           
+
+                     attributeList();
+
                      assignButton.observeClick(function(){
                                 var chAtt = getCheckedAttributes();
                                 if(chAtt.length == 0){
@@ -1359,7 +1371,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
 			                            for (var i=0; i<allBtn.length; i++) {
 			                                var cb = allBtn[i];
 			                                if (cb.checked) {
-			                                   return cb.id  
+			                                   return cb.id
 			                                }
 			                            }
 		                           }
@@ -1378,17 +1390,17 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
 		                               killProgress();
 	                               }
                                 }
-                            });  
-                             
+                            });
+
                      var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
                           cancelButton.observeClick(function(){
                           popup.close();
                      });
-                      
-                     return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList, assignButton, cancelButton])));  
+
+                     return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList, assignButton, cancelButton])));
                 };
               popup.open();
-              
+
               } else {
                   IndicoUtil.errorReport(error);
               }
@@ -1401,15 +1413,15 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
  * @param {Object} role 'referee', 'editor', 'allReviewers'
  */
 var removeUser = function(role) {
-    
+
     var checkedContributions = getCheckedContributions();
     if (checkedContributions.length == 0) {
         alert($T("Please select at least 1 contribution"));
         return;
     }
-   
+
     var params = {conference: '<%= Conference.getId() %>',contributions: checkedContributions}
-    
+
     switch(role) {
     case 'referee':
         indicoRequest(
@@ -1427,11 +1439,11 @@ var removeUser = function(role) {
                         updateContribution(contributionId);
                         colorify(contributionId, 'referee')
                         $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
-                                                
+
                     }
                     if(!removeRefereeAlerts(checkedContributions)){
                       fetchUsers('new_assign', 'referee')
-                    } 
+                    }
                 } else {
                     IndicoUtil.errorReport(error);
                 }
@@ -1527,7 +1539,7 @@ $E('removeAllReviewersButton_bottom').observeClick(function(){ removeUser('allRe
 <% end %>
 
 fetchContributions();
-    
+
 </script>
 <% end %>
 <% end %>

@@ -178,7 +178,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
                 quoteattr(str(materialFactories.ReviewingFactory().getIconURL())),
                 self.htmlText(materialFactories.ReviewingFactory().getTitle())) )
         return self._getHTMLRow("Reviewing Material","<br>".join(rm))
-            
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["contribXML"]=quoteattr(str(urlHandlers.UHContribToXML.getURL(self._contrib)))
@@ -253,11 +253,10 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         #but the 1st line generates a lot of HTML in Python...
         vars["material"]=self._getMaterialHTML()
         vars["revmaterial"]=self._getReviewingMaterialsHTML()
-        
-        from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-        vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib, False).getHTML()
+
+        vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib, showTitle=False).getHTML()
         vars["ReviewingMatList"] = wcomponents.WShowExistingReviewingMaterial(self._contrib, False).getHTML()
-        
+
         vars["duration"]=""
         if self._contrib.getDuration() is not None:
             vars["duration"]=(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%M'")
@@ -379,7 +378,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         #self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
         #        urlHandlers.UHContribModifMaterials.getURL( self._target ) )
         self._tabSubCont = self._tabCtrl.newTab( "subCont", _("Sub Contribution"), \
-                urlHandlers.UHContribModifSubCont.getURL( self._target ) ) 
+                urlHandlers.UHContribModifSubCont.getURL( self._target ) )
         if self._canModify:
             self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
                 urlHandlers.UHContribModifAC.getURL( self._target ) )
@@ -390,7 +389,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         confReviewChoice = self._contrib.getConference().getConfReview().getChoice()
 
         if hasReviewingEnabled and confReviewChoice != 1:
-            
+
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
@@ -400,9 +399,9 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                     urlHandlers.UHContributionEditingJudgement.getURL( self._target ) )
                 elif self._contrib.getReviewManager().isReviewer(self._rh._getUser()):
                     self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
-                    urlHandlers.UHContributionGiveAdvice.getURL( self._target ) )             
-                           
-            
+                    urlHandlers.UHContributionGiveAdvice.getURL( self._target ) )
+
+
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
@@ -412,26 +411,26 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 else:
                     self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
-    
+
             if (confReviewChoice == 3 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
                 (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or confReviewChoice == 3) and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
-                
+
                 self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Judge Layout", \
                 urlHandlers.UHContributionEditingJudgement.getURL(self._target) )
 
             if (confReviewChoice == 2 or confReviewChoice == 4) and \
                 self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
                 not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                
+
                 self._tabGiveAdvice = self._subtabReviewing.newSubTab( "advice", "Judge Content", \
                                       urlHandlers.UHContributionGiveAdvice.getURL(self._target))
-             
+
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isInReviewingTeamforContribution(self._rh._getUser()):
                 self._subTabRevMaterial = self._subtabReviewing.newSubTab( "revmaterial", _("Material to Review"), \
                 urlHandlers.UHContribModifReviewingMaterials.getURL( self._target ) )
-                
+
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()) or \
             len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                 self._subTabReviewingHistory = self._subtabReviewing.newSubTab( "reviewing_history", "History", \
@@ -498,7 +497,7 @@ class WPContributionModifMaterials( WPContributionModifBase ):
         self._tabMaterials.setActive()
 
     def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target, mode='management', show=True)
+        wc=wcomponents.WShowExistingMaterial(self._target, mode='management', showTitle=True)
         return wc.getHTML( pars )
 
 class WPModSearchPrimAuthor ( WPContribModifMain ):

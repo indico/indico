@@ -30,7 +30,7 @@ class IGroupFossil(IFossil):
     def getEmail(self):
         """ Group email """
 
-class IAvatarFossil(IFossil):
+class IAvatarMinimalFossil(IFossil):
 
     def getId(self):
         """ Avatar id"""
@@ -38,6 +38,8 @@ class IAvatarFossil(IFossil):
     def getStraightFullName(self):
         """ Avatar full name, the one usually displayed """
     getStraightFullName.name = "name"
+
+class IAvatarFossil(IAvatarMinimalFossil):
 
     def getEmail( self ):
         """ Avatar email """

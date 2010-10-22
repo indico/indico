@@ -21,6 +21,7 @@
 from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.subcontribution import ISubContributionFossil
+from MaKaC.fossils.reviewing import IReviewManagerFossil
 
 class IContributionFossil(IFossil):
 
@@ -53,13 +54,27 @@ class IContributionFossil(IFossil):
     def getDescription(self):
         pass
 
+    def getReviewManager(self):
+        pass
+    getReviewManager.result = IReviewManagerFossil
+
+    def getTrack( self ):
+        pass
+    getTrack.convert = lambda t: t and t.getTitle()
+
+    def getSession( self ):
+        pass
+    getSession.convert = lambda s: s and s.getTitle()
+
+    def getType(self):
+        pass
+    getType.convert = lambda t: t and t.getName()
 
 class IContributionParticipationTTDisplayFossil(IFossil):
     """
     Minimal Fossil for Contribution Participation to be
     used by the timetable display
     """
-
     def getAffiliation(self):
         pass
 

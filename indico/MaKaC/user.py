@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
-                            IGroupFossil, IPersonalInfoFossil
+                            IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from random import random
 
@@ -426,7 +426,7 @@ class Avatar(Persistent, Fossilizable):
        Basically it contains personal data from them which is relevant for the
        system.
     """
-    fossilizes(IAvatarFossil, IAvatarAllDetailsFossil)
+    fossilizes(IAvatarFossil, IAvatarAllDetailsFossil, IAvatarMinimalFossil)
 
     linkedToBase = {"category":{"creator":[],
                                 "manager":[],

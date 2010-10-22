@@ -29,15 +29,19 @@ from MaKaC.reviewing import ConferenceReview
 import datetime
 from MaKaC.common import Config
 from MaKaC.i18n import _
-
+from MaKaC.fossils.reviewing import IReviewManagerFossil,\
+    IReviewFossil
+from MaKaC.common.fossilize import fossilizes, Fossilizable
 ###############################################
 # Contribution reviewing classes
 ###############################################
 
-class ReviewManager(Persistent):
+class ReviewManager(Persistent, Fossilizable):
     """ This class is the manager for the reviewing. It keeps historical of reviews on a contribution.
         A ReviewManager object is always linked to only 1 contribution and vice-versa.
     """
+
+    fossilizes(IReviewManagerFossil)
 
     def __init__( self, contribution ):
         """ Constructor
@@ -91,20 +95,20 @@ class ReviewManager(Persistent):
 
     def getReviewById(self, reviewId):
         return self._versioning[int(reviewId)]
-    
-    def getSortedVerioning(self):     
+
+    def getSortedVerioning(self):
         versioning = self._versioning
         versioning.sort(key = lambda c: c.getId(), reverse=True)
         return versioning
-    
+
     def isInReviewingTeamforContribution(self, user):
-        """ Returns if the user is in the reviewing team for this contribution 
+        """ Returns if the user is in the reviewing team for this contribution
         """
         return self.isReferee(user) or \
                self.isEditor(user) or \
                self.isReviewer(user)
-              
-    
+
+
     #referee methods
     def getReferee(self):
         """ Returns the referee for this contribution
@@ -124,10 +128,10 @@ class ReviewManager(Persistent):
             self.getConfReview().addRefereeContribution(referee, self._contribution)
             self.getLastReview().setRefereeDueDate(self.getConfReview().getDefaultRefereeDueDate())
             #e-mail notification will be send when referee is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
-            if self.getConfReview()._enableRefereeEmailNotifForContribution == True: 
+            if self.getConfReview()._enableRefereeEmailNotifForContribution == True:
                 notification = ContributionReviewingNotification(referee, 'Referee', self._contribution)
                 GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", referee)
-    
+
     def removeReferee(self):
         """ Removes the referee for this contribution.
             There is no 'referee' argument because there is only 1 referee by contribution.
@@ -243,8 +247,8 @@ class ReviewManager(Persistent):
             if self.getConfReview()._enableReviewerEmailNotifForContribution == True:
                 notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
                 GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", reviewer)
-        
-        
+
+
     def removeAllReviewers(self):
         """ Removes all the reviewers for this contribution
         """
@@ -284,8 +288,8 @@ class ReviewManager(Persistent):
 
 class Judgement(Persistent):
     """ Parent class for RefereeJudgement, EditorJudgement and ReviewerJudgement
-    """        
-        
+    """
+
     def __init__(self, review, author = None, judgement = None, comments = "", submitted = False, submissionDate = None):
         self._review = review #the parent Review object for this Judgement
         self._author = author #the user (Referee, Editor or Reviewer) author of the judgement
@@ -389,7 +393,7 @@ class Judgement(Persistent):
                 if isinstance(self, ReviewerJudgement) and self.getConfReview()._enableReviewerJudgementEmailNotif == True:
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-        
+
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
         """
@@ -408,26 +412,26 @@ class RefereeJudgement(Judgement):
             A new Review object is then created as 'last review'.
         """
         Judgement.setSubmitted(self, submitted)
-        
+
         matReviewing = self.getReviewManager().getContribution().getReviewing()
-        
-        self.getReview().copyMaterials(matReviewing) 
-                                                   
+
+        self.getReview().copyMaterials(matReviewing)
+
         if self._judgement == "To be corrected" or self._judgement in self.getReviewManager().getConference().getConfReview().getStates():
             self.getReviewManager().newReview()
             # remove reviewing materials from the contribution
             self.getReviewManager().getContribution().removeMaterial(matReviewing)
-            
-            
+
+
     def getAnswers(self):
         return zip(self.getConfReview().getReviewingQuestions(), (self.getAnswer(k) for k in self.getConfReview().getReviewingQuestions()))
 
 class EditorJudgement(Judgement):
-        
+
     def setSubmitted(self, submitted):
         """ Sets the final judgement for a review, if the reviewing mode is only layout reviewing
             since this is the Layout Reviewer judgement.
-            The judgement is a string among the pre-defined states (Accept, Reject, To be corrected) 
+            The judgement is a string among the pre-defined states (Accept, Reject, To be corrected)
             If it's the first time that the final judgement is set for this review, the contribution materials
             are copied into the review.
             If the judgement is 'To be corrected', versioning takes place.
@@ -440,7 +444,7 @@ class EditorJudgement(Judgement):
             self.getReviewManager().newReview()
             # remove reviewing materials from the contribution
             self.getReviewManager().getContribution().removeMaterial(matReviewing)
-            
+
     def getAnswers(self):
         return zip(self.getConfReview().getLayoutCriteria(), (self.getAnswer(k) for k in self.getConfReview().getLayoutCriteria()))
 
@@ -448,9 +452,11 @@ class ReviewerJudgement(Judgement):
     def getAnswers(self):
         return zip(self.getConfReview().getReviewingQuestions(), (self.getAnswer(k) for k in self.getConfReview().getReviewingQuestions()))
 
-class Review(Persistent):
+class Review(Persistent, Fossilizable):
     """This class represents the judgement of a contribution made by the referee. It contains judgement and comments
     """
+
+    fossilizes(IReviewFossil)
 
     def __init__( self, version, reviewManager):
         """ Constructor for the class.
@@ -465,11 +471,11 @@ class Review(Persistent):
         self._isAuthorSubmitted = False #boolean that says if the author has submitted his / her materials or not
         self._version = version #the version number for this Review. Different Reviews for the same contribution have increasing version numbers.
         self._materials = [] #'snapshot' of the materials that were analyzed by the reviewing team. Copied from the Contribution materials when judgement is passed.
-        self._authorComments = "" 
-        self._refereeDueDate = None #the Deadline where the referee has to pass his/her judgement 
+        self._authorComments = ""
+        self._refereeDueDate = None #the Deadline where the referee has to pass his/her judgement
         self._editorDueDate = None #the Deadline where the editor has to pass his/her judgement
         self._reviewerDueDate = None #the Deadline where all the reviewers have to pass his/her judgement
-        
+
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
         """
@@ -494,13 +500,13 @@ class Review(Persistent):
         """ Convenience method that returns the Conference to which this Review belongs.
         """
         return self._reviewManager.getContribution().getConference()
-    
+
     def getConfReview(self):
         """ Convenience method that returns the ConferenceReview object of the Conference
             to which the contribution belongs to.
         """
         return self.getConference().getConfReview()
-    
+
     def getOwner(self):
         return self.getContribution()
 
@@ -535,7 +541,7 @@ class Review(Persistent):
                                 status.append(_("Layout judged by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
                             else:
                                 status.append(_("Pending layout reviewer decision"))
-                            
+
                             if self.anyReviewerHasGivenAdvice():
                                 for reviewer in self._reviewManager.getReviewersList():
                                     status.append(_("Content judged by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
@@ -565,11 +571,11 @@ class Review(Persistent):
         self._isAuthorSubmitted = submitted
 
         if submitted:
-        
+
             if self._reviewManager.hasReferee() and self.getConfReview()._enableAuthorSubmittedMatRefereeEmailNotif == True:
                 notification = MaterialsSubmittedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getReferee())
-            
+
             if self._reviewManager.hasEditor() and self.getConfReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
                 notification = MaterialsSubmittedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getEditor())
@@ -578,12 +584,12 @@ class Review(Persistent):
                 if self.getConfReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
                     notification = MaterialsSubmittedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
                     GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
-        
+
         else:
             if self._reviewManager.hasReferee() and self.getConfReview()._enableAuthorSubmittedMatRefereeEmailNotif == True:
                 notification = MaterialsChangedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getReferee())
-            
+
             if self._reviewManager.hasEditor() and self.getConfReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
                 notification = MaterialsChangedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getEditor())
@@ -592,7 +598,7 @@ class Review(Persistent):
                 if self.getConfReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
                     notification = MaterialsChangedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
                     GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
-        
+
     def getVersion(self):
         """ Returns the version number for this review. The version number is an integer, starting by 0.
         """
@@ -610,17 +616,17 @@ class Review(Persistent):
         """ Returns the materials stored in this Review.
         """
         return self._materials
-    
+
     def copyMaterials(self, material):
         """ Copies the materials from the contribution to this review object.
             This is done by cloning the materials, and putting the contribution as owner.
             This way, even if the author deletes materials during another review, they endure in this review.
         """
         self._materials = [material.clone(self)]
-    
+
     def getMaterialById(self, materialId=0):
         """ Returns one of the materials of the review given its id
-        
+
             So far there is just one material (reviewing) with many resources. So, by default we
             get the first element of the list of materials.
         """
@@ -746,7 +752,7 @@ class Review(Persistent):
 
     def getAdjustedRefereeDueDateFormatted(self):
         """ Returns a timezeone-aware Deadline for the referee given the conference's timezone,
-            formatted to a string (this method is necessary due to syntax limitations of @Retrieve ) 
+            formatted to a string (this method is necessary due to syntax limitations of @Retrieve )
         """
         date = self.getAdjustedRefereeDueDate()
         if date:
@@ -779,9 +785,9 @@ class Review(Persistent):
 
     def getReviewerDueDate(self):
         """ Returns the Deadline for all the reviewers.
-        """        
-        return self._reviewerDueDate   
-    
+        """
+        return self._reviewerDueDate
+
     def getAdjustedReviewerDueDate(self):
         """ Returns a timezeone-aware Deadline for all the reviewers given the conference's timezone.
         """
@@ -790,7 +796,7 @@ class Review(Persistent):
         else:
             return getAdjustedDate(self._reviewerDueDate, self.getConference())
 
- 
+
 ######################################
 # Email notification classes
 ######################################
@@ -844,35 +850,35 @@ class ContributionReviewingJudgementNotification(GenericNotification):
     """
 
     def __init__(self, user, judgement, contribution):
-        
+
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
             if contribution.getConference().getConfReview().getChoice() == 3:
-                self.setSubject("""[Indico] Your contribution "%s" (id: %s) has been completely reviewed by the layout reviewer"""    
+                self.setSubject("""[Indico] Your contribution "%s" (id: %s) has been completely reviewed by the layout reviewer"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Indico user,
-            
+
             Your contribution "%s" (id: %s) has been completely reviewed by the assigned layout reviewer.
             The judgement was: %s
-            
+
             The comments of the layout reviewer were:
             "%s"
-            
+
             Thank you for using our system.
             """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
                     judgement.getComments())
             )
             else:
-                self.setSubject("""[Indico] The layout of your contribution "%s" (id: %s) has been reviewed"""    
+                self.setSubject("""[Indico] The layout of your contribution "%s" (id: %s) has been reviewed"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Indico user,
-        
+
         The layout of your contribution "%s" (id: %s) has been reviewed.
         The judgement was: %s
-        
+
         The comments of the layout reviewer were:
         "%s"
 
@@ -888,7 +894,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
 
         The content of your contribution "%s" (id: %s) has been reviewed.
         The judgement was: %s
-        
+
         The comments of the content reviewer were:
         "%s"
 
@@ -911,9 +917,9 @@ class ContributionReviewingJudgementNotification(GenericNotification):
         Thank you for using our system.
         """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement(),
                 judgement.getComments())
-        )  
-     
-                
+        )
+
+
 class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
     """ Template to build an email notification for a contribution submitter
         once the judgement of the contribution has been withdrawn.
@@ -926,21 +932,21 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
         if isinstance(judgement, EditorJudgement):
             if contribution.getConference().getConfReview().getChoice() == 3:
-                self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the layout reviewer"""    
+                self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the layout reviewer"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Indico user,
-        
+
         The judgement for your contribution "%s" (id: %s) has been widthdrawn by the assigned layout reviewer.
         The judgement was: %s
-        
+
         Thank you for using our system.
         """ % ( contribution.getTitle(), str(contribution.getId()), judgement.getJudgement())
         )
             else:
-                self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn"""    
+                self.setSubject("""[Indico] The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Indico user,
-        
+
         The judgement for the layout of your contribution "%s" (id: %s) has been widthdrawn.
         The judgement was: %s
 
@@ -991,7 +997,7 @@ class MaterialsSubmittedNotification(GenericNotification):
         """ % ( contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId()), role))
 
 class MaterialsChangedNotification(GenericNotification):
-    
+
     def __init__(self, user, role, contribution):
         conference = contribution.getConference()
         GenericNotification.__init__(self)
@@ -1004,8 +1010,8 @@ class MaterialsChangedNotification(GenericNotification):
         The author of the contribution %s (id: %s) of the conference %s (id: %s) has removed the 'submitted' mark from his / her materials.
         This means that he may have changed the content of the materials.
         Thus, you should wait until he has marked the materials again to start / continue the reviewing process as a %s.
-        
+
         Thank you for using our system.
         """ % ( contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId()), role))
-        
-        
+
+
