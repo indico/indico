@@ -51,7 +51,7 @@
             </td>
         </tr>
         <!-- Fermi timezone awareness(end) -->
-        <% includeTpl('EventLocationInfo', modifying=False, showParent=False) %>
+        <% includeTpl('EventLocationInfo', modifying=False, showParent=False, conf=False) %>
         <tr>
             <td>&nbsp;</td>
             <td class="contentCellTD" style="font-style: italic; padding-top: 10px;"><span id="advancedOptionsText" class="fakeLink" onclick="showAdvancedOptions()">&nbsp;</span></td>
@@ -213,14 +213,17 @@
                     var popup = new ErrorPopup("<%= _("Missing mandatory data")%>", ["<%= _("Please, choose a category (step 1)")%>"], "");
                     popup.open();
                     return false;
-                }else {
+                }
+                if( editor.clean()){
                     $E('chairperson').set(Json.write(uf.getUsers()));
                     $E('description').set(editor.get());
                     injectFromProtectionChooser();
                 }
+                else
+                    return false;
         });
 
-                var editor = new RichTextWidget(500, 200,'','rich',"IndicoMinimal");
+                var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoMinimal");
 		$E('descriptionBox').set(editor.draw());
 	});
 

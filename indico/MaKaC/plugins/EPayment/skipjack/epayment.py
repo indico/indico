@@ -40,71 +40,71 @@ class SkipjackMod( BaseEPayMod ):
         self._textCallBackCancelled = ""
 
     def getURL(self):
-        try: 
+        try:
            return self._url
         except:
            self._url = ""
            return self._url
-         
+
     def getId(self):
         try:
             if self._id:
                 pass
         except AttributeError, e:
             self._id="Skipjack"
-        return self._id   
+        return self._id
 
-    
+
     def getTextCallBackSuccess(self):
         try:
             return self._textCallBackSuccess
         except:
             self._textCallBackSuccess = ""
         return self._textCallBackSuccess
-    
+
     def setTextCallBackSuccess(self, txt):
         self._textCallBackSuccess = txt
-    
+
     def getTextCallBackCancelled(self):
         try:
             return self._textCallBackCancelled
         except:
             self._textCallBackCancelled = ""
         return self._textCallBackCancelled
-    
+
     def setTextCallBackCancelled(self, txt):
         self._textCallBackCancelled = txt
-    
-    
+
+
     def getDescription(self):
         try:
             return self._description
         except:
             self._description = ""
         return self._description
-    
+
     def setDescription(self, description):
         self._description = description
-    
+
     def getTestMode(self):
         try:
             return self._testMode
         except:
             self._testMode = ""
         return self._testMode
-    
+
     def setTestMode(self, testMode):
         self._testMode = testMode
 
 
     def setValues(self, data):
-        self.setTitle(data.get("title", "epayment"))        
+        self.setTitle(data.get("title", "epayment"))
         self.setUrl(data.get("url", ""))
         self.setDescription(data["description"])
         self.setTextCallBackSuccess(data.get("APResponse", "epayment"))
         self.setTextCallBackCancelled(data.get("CPResponse", "epayment"))
 
-    def getFormHTML(self,prix,Currency,conf,registrant):
+    def getFormHTML(self,prix,Currency,conf,registrant,lang = "en_US"):
         """build the registration form to be send to skipjack"""
         url_confirm=localUrlHandlers.UHPayConfirmSkipjack.getURL()
         url_cancel_return=localUrlHandlers.UHPayCancelSkipjack.getURL(registrant)
@@ -127,15 +127,15 @@ class SkipjackMod( BaseEPayMod ):
              <input type="hidden" name="UserDefined2"  value="%s" />
              </form>""" % (confId, registrantId)
 
-       
+
         return s
-        
+
     def getUrl(self):
-        return self._url  
-      
+        return self._url
+
     def setUrl(self,url):
         self._url=url
-    
+
     def getConfModifEPaymentURL(self, conf):
         return localUrlHandlers.UHConfModifEPaymentSkipjack.getURL(conf)
 
@@ -146,7 +146,7 @@ class TransactionSkipjack(BaseTransaction):
 
     def __init__(self,params):
         BaseTransaction.__init__(self)
-        self._Data=params   
+        self._Data=params
 
     def getId(self):
         try:
@@ -154,7 +154,7 @@ class TransactionSkipjack(BaseTransaction):
                 pass
         except AttributeError, e:
             self._id="skipjack"
-        return self._id 
+        return self._id
 
     def getTransactionHTML(self):
         amt = self._Data["szTransactionAmount"]
@@ -164,7 +164,7 @@ class TransactionSkipjack(BaseTransaction):
                           <tr>
                             <td align="right"><b>Payment with:</b></td>
                             <td align="left">Skipjack</td>
-                          </tr>   
+                          </tr>
                           <tr>
                             <td align="right"><b>OrderNumber:</b></td>
                             <td align="left">%s</td>
@@ -178,10 +178,10 @@ class TransactionSkipjack(BaseTransaction):
                             <td align="left">%s</td>
                           </tr>
                   </table>"""%(self._Data["szOrderNumber"],amt_dollars,amt_cents, self._Data["sjname"])
-    
+
     def getTransactionTxt(self):
-        """this is used for notification email """ 
-        #skipjack returns the amount without a decimal point.                 
+        """this is used for notification email """
+        #skipjack returns the amount without a decimal point.
         amt = self._Data["szTransactionAmount"]
         amt_dollars = str(int(amt) / 100)
         amt_cents = str(amt)[len(str(amt)) - 2:]

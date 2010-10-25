@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.common.security import Sanitization
 
 import simplejson
 from MaKaC.common.fossilize import fossilize, NonFossilizableException
@@ -131,8 +132,10 @@ def process(req):
             Logger.get('rpc').exception('Service request failed. Request text:\r\n%s\r\n\r\n' % str(requestText))
 
             if requestBody:
+                params = requestBody.get("params", [])
+                Sanitization._escapeHTML(params)
                 errorInfo["requestInfo"] = {"method": str(requestBody["method"]),
-                                            "params": requestBody.get("params", [])}
+                                            "params": params}
                 Logger.get('rpc').debug('Arguments: %s' % errorInfo['requestInfo'])
 
 

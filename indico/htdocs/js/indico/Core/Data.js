@@ -193,8 +193,15 @@ Util.Validation = {
     isURL: function(address) {
         // per RFC2396, but forcing xxx: prefix and at least some text after
         return exists(address.match(/^(([^:\/?#]+):)((\/\/)?([^\/?#]+))([^?#]*)(\?([^#]*))?(#(.*))?$/));
-    }
+    },
 
+    isHtml: function(text) {
+        if (/<.*>[\s\S]*<\/.*>|<br\s*\/>/.exec(text)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 };
 

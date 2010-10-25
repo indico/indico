@@ -32,9 +32,11 @@
  */
 
 // Regular Expressions for parsing tags and attributes
-var startTag = /^<[!?]?(\w+)((?:\s+[\w\-\:\"\.\/]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
+var startTag = /^<[!?]?([^\s<>]+)((?:\s+[\w\-\:\"\.\/]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
         endTag = /^<\/(\w+)[^>]*>/,
-        attr = /([\w\-\:\"\.\/]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
+        attr = /([\w\-\:\"\.\/]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g,
+        eMail = /^([a-zA-Z0-9\-_]+.)*[a-zA-Z0-9\-_]+@([a-zA-Z0-9\-_]+.)*[a-zA-Z0-9\-_]+$/;
+
 
 //Default parameters
 
@@ -66,20 +68,18 @@ type("HTMLParser", [],
                 var index, chars, match, last = this.html;
 
                 parseStartTag = function ( tag, tagName, rest, unary ) {
-                    tag = tag.toLowerCase();
-                    tagName = tagName.toLowerCase();
-
-                    if ( self.block[ tagName ] ) {
+                    tagNameLower = tagName.toLowerCase();
+                    if ( self.block[ tagNameLower ] ) {
                         while ( self.stack.last() && self.inline[ self.stack.last() ] ) {
                             parseEndTag( "", self.stack.last() );
                         }
                     }
 
-                    if ( self.closeSelf[ tagName ] && self.stack.last() == tagName ) {
+                    if ( self.closeSelf[ tagNameLower ] && self.stack.last() == tagNameLower ) {
                         parseEndTag( "", tagName );
                     }
 
-                    unary = !self.escapeElements[ tagName ] && (self.empty[ tagName ] || !!unary);
+                    unary = !self.escapeElements[ tagNameLower ] && (self.empty[ tagNameLower ] || !!unary);
 
                     if ( !unary )
                         self.stack.push( tagName );
@@ -94,9 +94,9 @@ type("HTMLParser", [],
                                 fillAttrs[name] ? name : "";
 
                             attrs.push({
-                                name: name.toLowerCase(),
-                                value: value.toLowerCase(),
-                                escaped: value.replace(/(^|[^\\])"/g, '$1\\\"').toLowerCase() //"
+                                name: name,
+                                value: value,
+                                escaped: value.replace(/(^|[^\\])"/g, '$1\\\"') //"
                             });
                         });
 
@@ -105,10 +105,8 @@ type("HTMLParser", [],
                 };
 
                 parseEndTag = function( tag, tagName ) {
-                    if(tag)
-                        tag = tag.toLowerCase();
                     if(tagName)
-                        tagName = tagName.toLowerCase();
+                        tagNameLower = tagName.toLowerCase();
 
                     // If no tag name is provided, clean shop
                     if ( !tagName )
@@ -117,7 +115,7 @@ type("HTMLParser", [],
                     // Find the closest opened tag of the same type
                     else
                         for ( var pos = self.stack.length - 1; pos >= 0; pos-- )
-                            if ( self.stack[ pos ] == tagName )
+                            if ( self.stack[ pos ].toLowerCase() == tagNameLower )
                                 break;
 
                     if ( pos >= 0 ) {
@@ -259,14 +257,12 @@ type("HTMLParser", [],
 //Properties which can appear in a CSS
 var propertyWhitelist = makeMap( Indico.Security.allowedCssProperties );
 
-//Keywords which can appear in a CSS
-var keywordWhitelist = makeMap( Indico.Security.allowedCssKeywords );
-
 type("inlineCSSParser",[],
         {
             parse: function(){
                 var result = "";
                 var security = 0;
+                var errorList = [];
 
                 // disallow urls
                 this.css = this.css.replace(/url\s*\(\s*[^\s)]+?\s*\)\s*/, ' ')
@@ -277,45 +273,34 @@ type("inlineCSSParser",[],
                     throw "Parse Error: " + this.css;
 
                 parts = this.css.split(/;/g);
-                for( i in parts){
+                for( i in parts)
                     if( parts[i].replace(/\s/g,'') != ""){
                         property = parts[i].split(/:/g)[0].replace(/\s/g,'');
                         values = parts[i].split(/:/g)[1].split(/\s/g);
                         value = ""
-                        for( j in values){
-                           if( values[j].replace(/\s/g,''))
-                               if((/^(#[0-9a-f]+|rgb\(\d+%?,\d*%?,?\d*%?\)?|\-?\d{0,2}\.?\d{0,2}(cm|em|ex|in|mm|pc|pt|px|%|,|\))?)$/).test(values[j].replace(/\s/g,'')) ||
-                               this.keywordWhitelist[values[j].replace(/\s/g,'')])
-                                   value += " " + values[j].replace(/\s/g,'')
-                               else
-                                   security = 1;
-                        }
-                        if (this.propertyWhitelist[property] && value){
+                        for( j in values)
+                            value += " " + values[j].replace(/\s/g,'')
+                        if (this.propertyWhitelist[property.toLowerCase()] && value)
                             result += property + ':' + value + ';';
-                        }
                         else{
                             security = 1;
+                            errorList.push(property)
                         }
                     }
-                }
-
-                return [result, security];
-                }
-
+                return [result, security, errorList];
+            }
         },
         /**Cleans text from not proper css properties and values.
          * @param (String) css Text to be parsed.
          * @param (dictionary) params Parser parameters. If not set defaults are used. Take a look at the beginning of the type.
          *                            params.propertyWhitelist - accepted list of properties.
-         *                            params.keywordWhitelistt - list of allowed css keywords.
          * @returns (tuple(string, security)) First element of the tuple is parsed text. Second one indicates which actions was done during parsing:
-         *                                    0 - removing removing not necessary whitespace or empty values.
+         *                                    0 - removing not necessary whitespace or empty values.
          *                                    1 - removing potentially dangerous values and properties.
          **/
         function(css, params){
             this.css = css;
             this.propertyWhitelist = params && params.propertyWhitelist ? params.propertyWhitelist : propertyWhitelist;
-            this.keywordWhitelist = params && params.keywordWhitelist ? params.keywordWhitelist : keywordWhitelist;
         });
 
 
@@ -361,15 +346,31 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
         //Protocols allowed
         var allowedProtocols = params && params.allowedProtocols ? params.allowedProtocols : defaultAllowedProtocols;
 
+        var urlRegexpStr = "^(";
+        for (protocol in allowedProtocols)
+            urlRegexpStr += "|" + protocol;
+        urlRegexpStr += ")://[^<>.][^<>]*$";
+        var urlRegexp = new RegExp(urlRegexpStr)
+
+        function isEmail(value) {
+            return eMail.test(value);
+        }
+
+        function isUrl(value) {
+            return urlRegexp.test(value);
+        }
+
         var security = 0;
+
+        var errorList = [];
 
         parser = new HTMLParser(html, {
             start: function( tag, attrs, unary ) {
-            if( tagWhitelist[tag] ) {
+            if( tagWhitelist[tag.toLowerCase()] ) {
                 results += "<" + tag;
 
                 for ( var i = 0; i < attrs.length; i++ )
-                    if(attrs[i].name == "style" && sanitizationLevel == 2) {
+                    if(attrs[i].name.toLowerCase() == "style" && sanitizationLevel == 2) {
                         try{
                             var cssParser = new inlineCSSParser(attrs[i].escaped, params);
                             var tuple = cssParser.parse();
@@ -383,32 +384,44 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
                         if(tuple[0] != '')
                             results += " " + attrs[i].name + '="' + tuple[0] + '"';
                         security = max(security, tuple[1]);
+                        errorList = errorList.concat(tuple[2])
                     }
-                    else if(attribWhitelist[ attrs[i].name ] || unary && attrs[i].name == '/') {
-                        if(urlProperties[attrs[i].name]){
+                    else if(attribWhitelist[ attrs[i].name.toLowerCase() ] || unary && attrs[i].name == '/') {
+                        if(urlProperties[attrs[i].name.toLowerCase()]){
                             attrs[i].escaped = attrs[i].escaped.replace(/[`\000-\040\177-\240\s]+/g, '');
                             attrs[i].escaped = attrs[i].escaped.replace(/\ufffd/g, "")
-                            if (/^[a-z0-9][-+.a-z0-9]*:/.test(attrs[i].escaped) && !allowedProtocols[attrs[i].escaped.split(':')[0]]) {
+                            if (/^[a-z0-9][-+.a-z0-9]*:/.test(attrs[i].escaped) && !allowedProtocols[attrs[i].escaped.split(':')[0].toLowerCase()]) {
                                 security = 1;
+                                errorList.push(attrs[i].escaped);
                                 continue;
                             }
                         }
                         if( attrs[i].escaped != '')
                             results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
                     }
-                    else
+                    else{
                         security = max(security, 1);
+                        errorList.push(attrs[i].name);
+                    }
 
-                results += (unary ? "/" : "") + ">";
+                results += (unary ? " /" : "") + ">";
             }
-            else
+            else if(isEmail(tag) || isUrl(tag)) {
+                results += "<" + tag + ">";
+            }
+            else {
                 security = max(1, security);
+                errorList.push(tag);
+            }
         },
         end: function( tag ) {
-            if(tagWhitelist[tag])
+            if(tagWhitelist[tag.toLowerCase()])
                 results += "</" + tag + ">";
-            else
+            else if(isEmail(tag) || isUrl(tag))
+                return;
+            else{
                 security = max(1, security);
+            }
         },
         chars: function( text ) {
             results += text;
@@ -418,15 +431,16 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
         },
         escape: function(text, tag) {
             security = max(2, security);
+            errorList.push(tag);
         }
         }, params);
 
         parser.parse();
 
-        return [results, security];
+        return [results, security,errorList];
     }
     else
-        return [html,0];
+        return [html,0,[]];
 };
 
 function HTMLtoXML( html ) {

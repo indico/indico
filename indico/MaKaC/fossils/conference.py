@@ -54,6 +54,11 @@ class IConferenceFossil(IConferenceMinimalFossil):
         """ Room (inside location) """
     getRoom.convert = lambda r: r and r.getName()
 
+    def getRoomBookingList(self):
+        """ Reservations """
+    getRoomBookingList.convert = Conversion.reservationsList
+    getRoomBookingList.name = "bookedRooms"
+
     def getStartDate(self):
         """ Start Date """
     getStartDate.convert = Conversion.datetime
@@ -358,3 +363,8 @@ class IConferenceEventInfoFossil(IConferenceMinimalFossil):
 
     def getFavoriteRooms(self):
         """ Favorite Rooms """
+
+    def getRoomBookingList(self):
+        """ Reservations """
+    getRoomBookingList.convert = Conversion.reservationsList
+    getRoomBookingList.name = "bookedRooms"

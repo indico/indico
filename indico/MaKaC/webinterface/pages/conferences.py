@@ -69,6 +69,7 @@ from MaKaC.i18n import _
 import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
+from MaKaC.common.Conversion import Conversion
 
 from indico.modules import ModuleHolder
 
@@ -7274,6 +7275,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         mins = ((totaldur.seconds)/60)-(hours*60)
         vars["totaldur" ]="""%sh%sm"""%(dayhours,mins)
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+        vars["bookings"] = Conversion.reservationsList(self._conf.getRoomBookingList())
         return vars
 
 class WPModifContribList( WPConferenceModifBase ):

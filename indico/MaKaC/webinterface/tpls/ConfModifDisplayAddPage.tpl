@@ -1,7 +1,7 @@
 
 <table width="100%%">
     <tr>
-        <form action=%(saveLinkURL)s method="POST">
+        <form action=%(saveLinkURL)s method="POST" onsubmit="return parseForm(this)">
         <td bgcolor="white" width="90%%" valign="top" style="padding-left:20px">
                 <table width="60%%" align="left" valign="middle" style="padding-top:20px" border="0">
 					<tr>
@@ -13,7 +13,10 @@
                     </tr>
                     <tr>
                         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Content")%></span></td>
-                        <td style="border:1px solid #000000"><textarea  id="content" name="content" cols="80" rows="40">%(content)s</textarea></td>
+                        <td>
+                            <div id="contentField"></div>
+                            <input type="hidden"  id="content" name="content" value="%(content)s">
+                        </td>
                     </tr>
                     <tr>
                         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Display target")%></span></td>

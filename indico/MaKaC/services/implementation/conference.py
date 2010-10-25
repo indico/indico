@@ -403,7 +403,6 @@ class ConferenceListUsedRooms( ConferenceDisplayBase ):
         Calls _handle() on the derived classes, in order to make it happen. Provides
         them with self._value.
         """
-
         roomList = []
         roomList.extend(self._target.getRoomList())
         roomList.extend(map(lambda x: x._getName(), self._target.getBookedRooms()))

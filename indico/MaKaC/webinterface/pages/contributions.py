@@ -1303,6 +1303,12 @@ class WContributionDataModification(wcomponents.WTemplated):
                     </tr>"""%(caption, "f_%s"%id, self.htmlText(self._contrib.getField(id)))
         return html
 
+    def getContribId(self):
+        if isinstance(self._owner, conference.Session):
+            return "s" +  self._owner.id + "c" + self._contrib.id
+        else:
+            return "c" + self._contrib.id
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         defaultDefinePlace = defaultDefineRoom = ""

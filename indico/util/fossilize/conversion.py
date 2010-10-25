@@ -145,6 +145,15 @@ class Conversion:
         """
         return int(obj.seconds / 60)
 
+    @classmethod
+    def reservationsList(cls, resvs):
+        res = {}
+        for resv in resvs:
+            if not res.has_key(resv.room.getFullName()):
+                res[resv.room.getFullName()] = []
+            res[resv.room.getFullName()].extend([{'startDateTime': cls.datetime(period.startDT), 'endDateTime':  cls.datetime(period.endDT)} for period in resv.splitToPeriods()])
+        return res
+
 #    @classmethod
 #    def resourceType(cls, obj):
 #
@@ -153,3 +162,4 @@ class Conversion:
 #            return 'external'
 #        else:
 #            return 'stored'
+

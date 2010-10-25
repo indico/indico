@@ -84,27 +84,6 @@ allowedCssProperties = [ "background-color", "border-top-color", "border-top-sty
                          "width", "widows", "white-space", "word-spacing", "word-wrap",
                          "z-index"]
 
-allowedCssKeywords = ['auto', 'aqua',
-                      'black', 'block', 'blue', 'bold', 'both', 'bolder', 'bottom', 'brown',
-                      'center', 'collapse',
-                      'dashed', 'dotted',
-                      'fuchsia',
-                      'gray', 'green',
-                      '!important', 'italic', 'inherit',
-                      'left', 'lime', 'large', 'larger', 'length', 'lighter',
-                      'maroon', 'medium', 'middle',
-                      'none', 'navy', 'normal', 'nowrap',
-                      'olive', 'oblique',
-                      'pointer', 'purple',
-                      'red', 'right',
-                      'small', 'smaller', 'solid', 'silver',
-                      'teal', 'top', 'transparent',
-                      'underline',
-                      'visible',
-                      'white',
-                      'x-small', 'xx-small', 'x-large', 'xx-large',
-                      'yellow']
-
 allowedProtocols = [    'afs', 'aim',
                         'callto',
                         'feed', 'ftp',
@@ -127,105 +106,24 @@ urlProperties = ['action',
                  'longdesc',
                  'src',
                  'xlink:href', 'xml:base']
-##
-##notAllowedTags = [ "applet",
-##                   "base", "basefont", "button",
-##                   "embed",
-##                   "form", "frame", "frameset",
-##                   "head",
-##                   "iframe", "input", "isindex",
-##                   "label", "link",
-##                   "meta",
-##                   "noframe", "noscript",
-##                   "object", "optgroup", "option"
-##                   "param",
-##                   "script", "select",
-##                   "textarea",
-##                   "title"]
-##
+
+specialAcceptedTags = [
+               "^([a-zA-Z0-9\-_]+.)*[a-zA-Z0-9\-_]+@([a-zA-Z0-9\-_]+.)*[a-zA-Z0-9\-_]+$", # email
+               "^(" + "|".join(allowedProtocols) + ")://[^<>.][^<>]*$" # url
+               ]
+
+locatestartendtag = re.compile(r"""
+  <([a-zA-Z][^\s<>]*)>
+""", re.VERBOSE)
 
 # Generate the regular expression objects to found the not allowed tags
 tagSearch = re.compile("< *[^<^>^ ]+",re.IGNORECASE|re.DOTALL)
-
-##scriptStr = "\s*(s|&#115;|&#83;)"\
-##            "\s*(c|&#99;|&#67;)"\
-##            "\s*(r|&#114;|&#82;)"\
-##            "\s*(i|&#105;|&#73;)"\
-##            "\s*(p|&#112;|&#80;)"\
-##            "\s*(t|&#112;|&#84)"
-##script = re.compile("< *%s"%scriptStr,re.IGNORECASE|re.DOTALL)
-##
-##iframeStr = "\s*(i|&#105;|&#73;)"\
-##            "\s*(f|&#102;|&#70;)"\
-##            "\s*(r|&#114;|&#82;)"\
-##            "\s*(a|&#97;|&#65;)"\
-##            "\s*(m|&#109;|&#77;)"\
-##            "\s*(e|&#101;|&#69;)"
-##iframe = re.compile("< *%s"%iframeStr,re.IGNORECASE|re.DOTALL)
-##
-##formStr = "\s*(f|&#102;|&#70;)"\
-##          "\s*(o|&#111;|&#79;)"\
-##          "\s*(r|&#114;|&#82;)"\
-##          "\s*(m|&#109;|&#77;)"
-##form = re.compile("< *%s"%formStr,re.IGNORECASE|re.DOTALL)
-##
-##onList = ["onblur","onchange","onclick","ondblclick","onerror","onfocus",
-##          "onkeydown","onkeypress","onkeyup","onload","onmousedown","onmousemove",
-##          "onmouseout","onmouseover","onmouseup","onreset","onresize","onselect",
-##          "onsubmit","onunload"]
-##
-##on = re.compile("<[^>]*(%s)"%"|".join(onList), re.IGNORECASE|re.DOTALL)
-##
-##style = re.compile("<[^>]*style")
-
-##def scriptDetection(txt, allowStyle=False):
-##    #search for "<script> tag
-##    if script.findall(txt):
-##        return True
-##    #search for javascript event manager
-##    if on.findall(txt):
-##        return True
-##    if not allowStyle:
-##        #search for style
-##        if style.findall(txt):
-##            return True
-##    return False
-
-##def restrictedHTML(txt):
-##    if iframe.findall(txt):
-##        return False
-##    if form.findall(txt):
-##        return False
-##    return True
-
-##def restrictedHTML(txt):
-##    #use a black list
-##    notFound = True
-##    for tag in tagSearch.findall(txt):
-##        tag = tag[1:].strip()
-##        if tag:
-##            if tag[0] == "/":
-##                tag = tag[1:].strip()
-##            if tag:
-##                if tag.lower() in notAllowedTags:
-##                    notFound = False
-##    return notFound
-
-##def restrictedHTML(txt):
-##    #use a white list
-##    for tag in tagSearch.findall(txt):
-##        tag = tag[1:].strip()
-##        if tag[0] == "/":
-##            tag = tag[1:].strip()
-##        if not tag.lower() in allowedTags:
-##            return False
-##    return True
 
 
 class HarmfulHTMLException(Exception):
 
     def __init__(self, msg, pos = 0):
-        self.msg = 'Potentially harmful HTML: "%s" found at %s' % (msg, pos)
+        self.msg = _("""Using forbidden HTML: "%s" found at %s""") % (msg, pos)
 
     def __str__(self):
         return self.msg
@@ -254,6 +152,7 @@ class RestrictedHTMLParser( HTMLParser ):
         # there is a paramter (non HTML) containing a '&', it fails.
         if message.startswith("EOF in middle of entity or char ref"):
             return
+
         raise HTMLParseError(message, self.getpos())
 
     def handle_inlineStyle(self, style):
@@ -266,13 +165,8 @@ class RestrictedHTMLParser( HTMLParser ):
             raise HarmfulHTMLException(style, self.getpos())
         for prop, value in re.findall("([-\w]+)\s*:\s*([^:;]*)", style):
             if not value: continue
-            if prop.lower() in allowedCssProperties or \
-               prop.split('-')[0].lower() in ['background', 'border', 'margin', 'padding']:
-                for keyword in value.split():
-                    if not keyword.lower() in allowedCssKeywords and \
-                        not re.match("^(#[0-9a-f]+|rgb\(\d+%?,\d*%?,?\d*%?\)?|\-?\d{0,2}\.?\d{0,2}(cm|em|ex|in|mm|pc|pt|px|%|,|\))?)$", keyword):
-                        raise HarmfulHTMLException(style, self.getpos())
-            else:
+            if not prop.lower() in allowedCssProperties and \
+               not prop.split('-')[0].lower() in ['background', 'border', 'margin', 'padding']:
                 raise HarmfulHTMLException(style, self.getpos())
 
     def handle_starttag(self, tag, attrs):
@@ -292,15 +186,43 @@ class RestrictedHTMLParser( HTMLParser ):
                      allowedProtocols)):
                     raise HarmfulHTMLException(val_unescaped.split(':')[0], self.getpos())
 
+    def _isSpecialTag(self, i):
+        """ Returns -1 if it is not a special tag. Otherwise it returns the end position."""
+
+        tag = locatestartendtag.match(self.rawdata[i:])
+        # check if the tag is a special tag or a real parsing error
+        if tag and tag.groups():
+            tag = tag.groups()[0]
+            for specialTagRE in specialAcceptedTags:
+                if re.match(specialTagRE, tag):
+                    return i+len(tag)+2 # we add 2 because of < and >
+        return -1
+
+    # Internal -- handle starttag, return end or -1 if not terminated
+    def parse_starttag(self, i):
+        try:
+            pos = HTMLParser.parse_starttag(self, i)
+            if pos == -1:
+                pos = self._isSpecialTag(i)
+            return pos
+        except HTMLParseError:
+            pos = self._isSpecialTag(i)
+            if pos != -1:
+                return pos
+            raise
+
+
+
+
 
 def restrictedHTML(txt, sanitizationLevel):
     try:
         parser = RestrictedHTMLParser(sanitizationLevel)
         parser.feed(txt)
         parser.close()
-    except (HarmfulHTMLException, HTMLParseError):
-        return False
-    return True
+    except (HarmfulHTMLException, HTMLParseError),e :
+        return e.msg
+    return None
 
 def hasTags(s):
     """ Returns if a given string has any tags

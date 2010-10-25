@@ -46,29 +46,25 @@ type("RoomBookingWidget", ["IWidget"],
                  Html.span({},
                            this.parentInfo.get('room') + " (" +
                            this.parentInfo.get('location') + ")")):'';
-             return Html.table(
-                 'roomWidget',
-                 Html.tbody(
-                     {},
-                     Html.tr({},
-                             Html.th({}, Html.div('roomWidgetTitle', $T("Location"))),
-                             Html.th({}, Html.div('roomWidgetTitle', $T("Room")))),
-                     Html.tr({},
-                             Html.td({style:{'verticalAlign': 'top'}},
-                                     Html.div({style: {paddingRight: '20px'}}, this.locationChooser.draw())),
-                             Html.td({style:{'verticalAlign': 'top'}},
-                                     Html.div({style: {paddingRight: '20px'}},
-                                              rbActive ?
-                                              this.roomChooser.draw() :
-                                              this.roomChooser))),
-                     Html.tr({},
-                             Html.td({colspan: 2}, this.parentInfo?this.inheritCheckbox:'', this.inheritText)),
-                     Html.tr({style:{height: '6px'}}),
-                     Html.tr({},
-                             Html.th({colspan: 2}, Html.div({className: 'roomWidgetTitle', style: {width: '210px'}}, $T('Address')))),
-                     Html.tr({},
-                             Html.td({colspan: 2}, this.addressArea.draw())
-                            )));
+
+                 return Html.div(
+                         'roomWidget',
+                              Html.div({style:{width:425}},
+                                  Html.div({style:{paddingTop:'10px', paddingRight:'10px', cssFloat: 'left'}},
+                                      Html.div('roomWidgetTitle', $T("Room")),
+                                      Html.div({style: {cssFloat:'left'}},
+                                                          rbActive ?
+                                                          this.roomChooser.draw() :
+                                                          this.roomChooser)),
+                                  Html.div({style:{paddingTop:'10px', cssFloat: 'left'}},
+                                     Html.div('roomWidgetTitle', $T("Location")),
+                                     Html.div({}, this.locationChooser.draw()))),
+                             Html.div({style:{paddingTop:'10px', clear:'left'}},
+                                      this.parentInfo?this.inheritCheckbox:'', this.inheritText),
+                             Html.div({style:{paddingTop:'10px', clear:'left'}},
+                                     Html.div({className: 'roomWidgetTitle', style: {width: '210px'}}, $T('Address')),
+                                     this.addressArea.draw())
+                             );
 
 
          },
@@ -157,7 +153,8 @@ type("RoomBookingWidget", ["IWidget"],
          this.parentInfo = parent;
          this.roomCache = {};
          this.inheritDefault = inheritDefault;
-         this.eventFavorites = $L(eventFavorites || []);
+         //this.eventFavorites = $L(eventFavorites || []);
+         this.eventFavorites = $L([]);
 
          // compute last favorite
          var fav = $L(this.eventFavorites.allItems());
@@ -208,6 +205,215 @@ type("RoomBookingWidget", ["IWidget"],
 
          this._startBind();
      });
+
+type("RoomBookingReservationWidget", ["RoomBookingWidget"],
+        {
+            _convertDate: function(date) {
+                var result;
+
+                if(date.split("/")[0].length != 4){
+                    //converting from dd-mm-yyyy to yyyy-mm-dd
+                    var monthCorrection = date.split("/")[1].length == 1?"0":"";
+                    var dayCorrection = date.split("/")[0].length == 1?"0":"";
+                    result = date.split("/")[2] + "-" + monthCorrection + date.split("/")[1] + "-" + dayCorrection + date.split("/")[0];
+                }
+                else
+                    result = date.replace(/[/]/g,"-");
+                return result;
+            },
+
+            _convertTime: function(sTime) {
+                var sTimeCorrection = sTime.length==4?"0":"";
+                return sTimeCorrection + sTime + ":00";
+            },
+
+            _calculateEndTime: function(sTime, duration) {
+                var eHours = parseInt(sTime.split(":")[0],10);
+                var eMinutes = parseInt(sTime.split(":")[1],10);
+                eHours += parseInt((eMinutes + duration) / 60);
+                eMinutes = (eMinutes + duration) % 60;
+
+                eHours = eHours >= 10?eHours:("0" + eHours);
+                eMinutes = eMinutes >= 10?eMinutes:("0" + eHours);
+
+                return  eHours + ":" + eMinutes + ":00";
+            },
+
+            _getDateTime: function(){
+                if( this.dateTime.accessor('startDate').get() && this.dateTime.accessor('duration').get() ) {
+                    var sDate = this.dateTime.accessor('startDate').get();
+                    var duration = parseInt(this.dateTime.accessor('duration').get());
+
+                    this.date = this._convertDate(sDate.split(" ")[0]);
+                    this.sTime = this._convertTime(sDate.split(" ")[1]);
+                    this.eTime = this._calculateEndTime(sDate.split(" ")[1], duration);
+                } else if( this.dateTime.accessor('startDateTime').get() && this.dateTime.accessor('endDateTime').get()){
+                    var sDate = this.dateTime.accessor('startDateTime').get();
+                    var eDate = this.dateTime.accessor('endDateTime').get();
+
+                    this.date = this._convertDate(sDate.split(" ")[0]);
+                    this.sTime = this._convertTime(sDate.split(" ")[1]);
+                    this.eTime = this._convertTime(eDate.split(" ")[1]);
+                } else if ( this.dateTime.accessor('date').get() && this.dateTime.accessor('startTime').get() && this.dateTime.accessor('endTime').get() ) {
+                    this.date = this.dateTime.accessor('date').get();
+                    this.sTime = this._convertTime(this.dateTime.accessor('startTime').get());
+                    this.eTime = this._convertTime(this.dateTime.accessor('endTime').get());
+                }
+            },
+
+            _isOverlapping: function(start, end) {
+                if(start.length == 7)
+                    start = "0" + start;
+                if(end.length == 7)
+                    end = "0" + end;
+
+                if(this.sTime > start && this.sTime < end ||
+                   this.eTime > start && this.eTime < end ||
+                   this.sTime <= start && this.eTime >= end ||
+                   this.sTime >= start && this.eTime <= end)
+                    return true;
+                else
+                    return false;
+            },
+
+            _isInsideBooking: function(elem) {
+                var insideBooking = false;
+                for(var resvId in this.bookedRooms.get(elem)){
+                    var resv = this.bookedRooms.get(elem)[resvId];
+                    if( this.sTime >= resv.startDateTime.time && this.eTime <= resv.endDateTime.time && this.date == resv.startDateTime.date){
+                        insideBooking = true;
+                        break;
+                    }
+                }
+                return insideBooking
+            },
+
+            _findConflict: function(key) {
+                var conflict = null;
+
+                this._getDateTime();
+                var day = this.timetableData[this.date.replace(/-/g,"")];
+
+                for( var event in day ){
+                    if ( event != this.editedEvent){
+                        if( !(day[event].entries && day[event].entries[this.editedEvent]) && key == day[event].room && this._isOverlapping(day[event].startDate['time'], day[event].endDate['time'])){
+                            conflict = day[event];
+                            break;
+                        }
+                        for(var entry in day[event].entries)
+                            if ( entry != this.editedEvent && key == day[event].entries[entry].room && this._isOverlapping(day[event].entries[entry].startDate['time'], day[event].entries[entry].endDate['time'])){
+                                conflict = day[event].entries[entry];
+                                break;
+                            }
+                        if( conflict )
+                            break;
+                    }
+                }
+                return conflict
+            },
+
+            _favoriteDecorator: function(key, elem){
+                var li;
+                if( this.bookedRooms.get(elem) ){
+                    if( this.timetableData) {
+                        conflict = this._findConflict(key);
+                        if( !conflict ){
+                            if(this._isInsideBooking(elem))
+                                li = Html.li('bottomLine bookedItem', elem);
+                            else{
+                                var infoDiv = Html.div({}, "This room is booked for this conference during");
+                                for(var resvId in this.bookedRooms.get(elem)){
+                                    var resv = this.bookedRooms.get(elem)[resvId];
+                                    infoDiv.append(Html.br());
+                                    infoDiv.append(resv.startDateTime.time.substring(0,5) + " - " + resv.endDateTime.time.substring(0,5) + " at "+ resv.startDateTime.date)
+                                }
+                                li = Html.div({className: 'bookedItemCollisionDiv'},Html.li('bottomLine bookedItemOutsideBooking', elem),infoDiv);
+                            }
+                        }
+                        else {
+                            var info = "This room is already used by " + conflict.title + " between " + conflict.startDate['time'].substring(0,5) + " and " + conflict.endDate['time'].substring(0,5) + ".";
+                            li = Html.div({className: 'bookedItemCollisionDiv'},Html.li('bottomLine bookedItemCollision', elem),Html.div({},info));
+                        }
+                    }
+                    else{
+                        li = Html.li('bottomLine', elem);
+                    }
+                    if(!this.previousElementBooked) {
+                        li = Html.div({},Html.div('bottomLine bookedItemHeader', 'Your booked rooms:'), li);
+                        this.previousElementBooked = true
+                    }
+
+                }
+                else {
+                    li = Html.li('bottomLine', elem);
+                    if(this.previousElementBooked) {
+                        li = Html.div({}, Html.div('bottomLine bookedItemHeader','Other rooms:'), li);
+                        this.previousElementBooked = false
+                    }
+                }
+                 return li;
+             },
+
+             _favoriteSort: function(e1, e2){
+                 this.previousElementBooked = false;
+                 if (this.bookedRooms.get(e1) &&
+                     !this.bookedRooms.get(e2)) {
+                     return -1;
+                 } else if (!this.bookedRooms.get(e1) &&
+                            this.bookedRooms.get(e2)) {
+                     return 1;
+                 } else {
+                     return SortCriteria.Integer(e1, e2);
+                 }
+             },
+
+             setDateTimeInfo: function(info) {
+                 this.dateTime = info;
+             }
+        },
+        function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent){
+
+            this.RoomBookingWidget(locations, info, parent, inheritDefault, [], defaultLocation)
+            this.bookedRooms = $D(bookedRooms || {} );
+            this.dateTime = dateTime;
+            this.timetableData = timetableData;
+            this.editedEvent = editedEvent;
+
+        });
+
+type("RoomBookingVerticalReservationWidget", ["RoomBookingReservationWidget"],
+        {
+            draw: function() {
+                var rbActive = Indico.Settings.RoomBookingModuleActive
+
+                this.inheritText = this.parentInfo?Html.span(
+                    {},
+                    $T('Inherit from parent: '),
+                    Html.span({},
+                              this.parentInfo.get('room') + " (" +
+                              this.parentInfo.get('location') + ")")):'';
+                    return Html.div(
+                            'roomWidget',
+                                 Html.div({style:{paddingTop:'5px'}},
+                                     Html.div('roomVerticalWidgetTitle', $T("Room")),
+                                     Html.div({style: {cssFloat:'left'}},
+                                                         rbActive ?
+                                                         this.roomChooser.draw() :
+                                                         this.roomChooser)),
+                                 Html.div({style:{paddingTop:'5px', clear:'left'}},
+                                    Html.div('roomVerticalWidgetTitle', $T("Location")),
+                                    Html.div({style: {cssFloat:'left'}}, this.locationChooser.draw())),
+                                Html.div({style:{paddingTop:'5px', clear:'left'}},
+                                         this.parentInfo?this.inheritCheckbox:'', this.inheritText)
+                                );
+            }
+
+        },
+        function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent){
+            this.RoomBookingReservationWidget(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, bookedRooms, timetableData, dateTime, editedEvent);
+        });
+
+
 
 type("RoomListWidget", ["ListWidget"],
     {

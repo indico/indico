@@ -163,8 +163,8 @@ htmlhelp_basename = 'Indicodoc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-latex_elements = { "inputenc": "\\usepackage[utf8x]{inputenc}",
-                   "papersize": "a4paper",                    
+latex_elements = { "inputenc": "\\usepackage[utf8]{inputenc}",
+                   "papersize": "a4paper"
                  }
 
 # The paper size ('letter' or 'a4').

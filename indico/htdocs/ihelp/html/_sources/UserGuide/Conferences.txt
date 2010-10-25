@@ -601,10 +601,25 @@ Once you have selected the contributions they will appear inside
 the Contributions tab in the session. You can then use the option
 *Add new* > *Contribution* from the Session timetable and select
 from the contributions you imported. When you have added a contribution
-to your session timetable you can edit the times and duration by clicking
-on the contribution box.
+to your session timetable you can edit the times, duration, room and
+location  by clicking on the contribution box.
 
 |image48|
+
+--------------
+
+Room Booking
+^^^^^^^^^^^^^^^^^^
+
+If there are rooms booked for the conference they will be shown at the
+top of a selection list during creating/editing sessions, slots, breaks
+and contributions. If the name of the booked room is green, it means it
+is not used in any other event in the current conference. Otherwise the
+name will turn red and information about event using this room will be
+shown while pointing this name.
+
+|image101|
+
 
 --------------
 
@@ -1271,3 +1286,4 @@ session. You may also make a PDF of the session.
 .. |image98| image:: UserGuidePics/confsm02.png
 .. |image99| image:: UserGuidePics/confrf01.png
 .. |image100| image:: UserGuidePics/confd21.png
+.. |image101| image:: UserGuidePics/confrb1.png

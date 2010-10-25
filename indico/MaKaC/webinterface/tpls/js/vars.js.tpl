@@ -145,7 +145,6 @@ var Indico = {
     Security:{
         allowedTags: "<%= ",".join(securityTools.allowedTags) %>",
         allowedAttributes: "<%= ",".join(securityTools.allowedAttrs) %>",
-        allowedCssKeywords: "<%= ",".join(securityTools.allowedCssKeywords) %>",
         allowedCssProperties: "<%= ",".join(securityTools.allowedCssProperties) %>",
         allowedProtocols: "<%= ",".join(securityTools.allowedProtocols) %>",
         urlProperties: "<%= ",".join(securityTools.urlProperties) %>",
