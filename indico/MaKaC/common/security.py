@@ -38,8 +38,9 @@ class Sanitization(object):
             else:
                 param = i
             if isinstance(param, str):
-                if not restrictedHTML(param, level):
-                    raise HtmlForbiddenTag(param)
+                res = restrictedHTML(param, level)
+                if res is not None:
+                    raise HtmlForbiddenTag(res)
             elif isinstance(param, list) or isinstance(param, dict):
                 Sanitization._sanitize(param, level)
 

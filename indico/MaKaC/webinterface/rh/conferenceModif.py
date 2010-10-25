@@ -5371,7 +5371,7 @@ class RHContributionListCloseMenu(RHContributionListBase):
         websession.setVar("ContribListMenuStatusConf%s"%self._conf.getId(), "close")
         self._redirect(self._currentURL)
 
-class RHContributionList( RHContributionListBase ):
+class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
     _uh = urlHandlers.UHConfModifContribList
 
     def _checkProtection(self):

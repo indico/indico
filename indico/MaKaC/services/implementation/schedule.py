@@ -65,7 +65,6 @@ class LocationSetter:
         room = self._roomInfo.get('room', None)
         address = self._roomInfo.get('address', None)
         location = self._roomInfo.get('location', None)
-
         if location != None:
             loc = target.getOwnLocation()
             if not loc:
@@ -1165,6 +1164,66 @@ class SessionTimetableMoveEntryUpDown(MoveEntryUpDown, sessionServices.SessionMo
         MoveEntryUpDown._checkParams(self)
 
 
+class EditRoomLocationBase(ScheduleOperation, LocationSetter):
+    def _checkParams(self):
+        self.pManager = ParameterManager(self._params)
+        self._roomInfo = self.pManager.extract("roomInfo", pType=dict, allowEmpty=True)
+        self._isSessionTimetable = self.pManager.extract("sessionTimetable", pType=bool, allowEmpty=True)
+
+    def _performOperation(self):
+        self._entry.setRoom(None)
+        self._entry.setLocation(None)
+        self._setLocationInfo(self._entry)
+        entryId, pickledData = schedule.ScheduleToJson.processEntry(self._schEntry, self._conf.getTimezone(),
+                                                                        None, mgmtMode = True)
+
+        return {'day': self._schEntry.getAdjustedStartDate().strftime("%Y%m%d"),
+                'id': entryId,
+                'entry': pickledData,
+                'autoOps': translateAutoOps(self.getAutoOps())}
+
+
+class EventEditRoomLocation(EditRoomLocationBase, conferenceServices.ConferenceScheduleModifBase):
+
+    def _checkParams(self):
+        conferenceServices.ConferenceScheduleModifBase._checkParams(self)
+        EditRoomLocationBase._checkParams(self)
+        self._entry = self._schEntry
+
+class SessionEditRoomLocation(EditRoomLocationBase, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
+
+    def _checkParams(self):
+        sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
+        EditRoomLocationBase._checkParams(self)
+        self._entry = self._slot
+
+    def _performOperation(self):
+        result = EditRoomLocationBase._performOperation(self)
+
+        pickledDataSlotSchEntry = fossilize(self._slot.getConfSchEntry(), tz=self._conf.getTimezone())
+        pickledDataSession = fossilize(self._session, tz=self._conf.getTimezone())
+        result.update({'slotEntry': pickledDataSlotSchEntry,
+                       'session': pickledDataSession})
+
+        return result
+
+class SessionSlotEditRoomLocation(EditRoomLocationBase, sessionServices.SessionSlotModifCoordinationBase):
+
+    def _checkParams(self):
+        sessionServices.SessionSlotModifCoordinationBase._checkParams(self)
+        EditRoomLocationBase._checkParams(self)
+        self._entry = self._schEntry
+
+    def _performOperation(self):
+        result = EditRoomLocationBase._performOperation(self)
+        pickledDataSlotSchEntry = fossilize(self._slot.getConfSchEntry(), tz=self._conf.getTimezone())
+        pickledDataSession = fossilize(self._session, tz=self._conf.getTimezone())
+        result.update({'slotEntry': pickledDataSlotSchEntry,
+                       'session': pickledDataSession})
+
+        return result
+
+
 methodMap = {
     "get": ConferenceGetSchedule,
 
@@ -1212,5 +1271,9 @@ methodMap = {
 
     "event.moveEntryUpDown": ConferenceTimetableMoveEntryUpDown,
     "session.moveEntryUpDown": SessionTimetableMoveEntryUpDown,
-    "slot.moveEntryUpDown": SessionSlotTimetableMoveEntryUpDown
+    "slot.moveEntryUpDown": SessionSlotTimetableMoveEntryUpDown,
+
+    "event.editRoomLocation": EventEditRoomLocation,
+    "session.editRoomLocation": SessionEditRoomLocation,
+    "slot.editRoomLocation": SessionSlotEditRoomLocation
 }

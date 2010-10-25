@@ -79,6 +79,23 @@ type("RichTextEditor", ["IWidget", "Accessor"],
          this.divId = Html.generateId();
      });
 
+type("ParsedRichTextEditor", ["RichTextEditor"],
+        {
+            clean: function() {
+                    if (this.getEditor() && this.getEditor().getData) {
+                        return cleanText(this.getEditor().getData(), this)
+                    } else {
+                        return false;
+                    }
+            }
+        },
+
+        function(width, height, toolbarSet, sanitizationLevel) {
+            this.RichTextEditor(width, height, toolbarSet);
+            this.sanitizationLevel = sanitizationLevel?sanitizationLevel:2;
+        });
+
+
 type("RichTextWidget", ["IWidget", "Accessor"],
      {
          draw: function() {
@@ -121,7 +138,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
              this.currentText = value;
 
              if (!any(noDetection, false)) {
-                 if ((this.isHtml(value)?'rich':'plain') != this.selected.get()) {
+                 if ((Util.Validation.isHtml(value)?'rich':'plain') != this.selected.get()) {
                      this.switchLink.get()(false);
                  }
              }
@@ -139,14 +156,6 @@ type("RichTextWidget", ["IWidget", "Accessor"],
          synchronizeRich: function() {
              this.currentText = this.plain.get();
              this.rich.set(this.currentText);
-         },
-
-         isHtml: function(text) {
-             if (/<.*>[\s\S]*<\/.*>/.exec(text)) {
-                 return true;
-             } else {
-                 return false;
-             }
          },
 
          postDraw: function() {
@@ -171,7 +180,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
 
          this.selected = new WatchValue();
 
-         var toPlainFunc = function(sync) {
+         this.toPlainFunc = function(sync) {
              self.plain.setStyle('display', 'block');
              self.richDiv.setStyle('display', 'none');
              self.switchLink.set('toRich');
@@ -182,7 +191,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
              }
          };
 
-         var toRichFunc  = function(sync) {
+         this.toRichFunc  = function(sync) {
              self.plain.setStyle('display', 'none');
              self.richDiv.setStyle('display', 'block');
              self.switchLink.set('toPlain');
@@ -197,21 +206,21 @@ type("RichTextWidget", ["IWidget", "Accessor"],
          this.switchLink = new Chooser(
              {
                  toPlain: command(
-                     toPlainFunc,
+                     self.toPlainFunc,
                      $T("switch to plain text")),
                  toRich: command(
-                     toRichFunc,
+                     self.toRichFunc,
                      $T("switch to rich text"))
             });
 
          if (exists(mode) && mode=='rich') {
-             toRichFunc();
+             self.toRichFunc();
          } else if (exists(mode)){
-             toPlainFunc();
-         } else if (self.isHtml(self.currentText)) {
-             toRichFunc();
+             self.toPlainFunc();
+         } else if (Util.Validation.isHtml(self.currentText)) {
+             self.toRichFunc();
          } else {
-             toPlainFunc();
+             self.toPlainFunc();
          }
 
          this.rich.onLoad(function() {
@@ -221,6 +230,38 @@ type("RichTextWidget", ["IWidget", "Accessor"],
 
       });
 
+
+type("ParsedRichTextWidget",['RichTextWidget'],
+        {
+            clean: function(){
+                if(this.activeAccessor == this.rich)
+                    return this.rich.clean();
+                else if(this.activeAccessor == this.plain)
+                    return cleanText(this.plain.get(),this.plain);
+            },
+        },
+        function(width, height, initialText, mode, toolbarSet) {
+            this.RichTextWidget(width, height, initialText, mode, toolbarSet);
+            this.rich = new ParsedRichTextEditor(width, height, toolbarSet);
+
+            var self = this;
+
+            if (exists(mode) && mode=='rich') {
+                self.toRichFunc();
+            } else if (exists(mode)){
+                self.toPlainFunc();
+            } else if (Util.Validation.isHtml(self.currentText)) {
+                self.toRichFunc();
+            } else {
+                self.toPlainFunc();
+            }
+
+            this.rich.onLoad(function() {
+                self.loaded = true;
+                self.set(self.currentText, true);
+            });
+
+         });
 
 type("RichTextInlineEditWidget", ["InlineEditWidget"],
         {
@@ -234,6 +275,7 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
             },
 
             _handleDisplayMode: function(value) {
+                var self = this;
                 var iframeId = "descFrame" + Html.generateId();
                 var iframe = Html.iframe({id: iframeId,name: iframeId,
                                           style:{width: pixels(600),
@@ -251,7 +293,7 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
                     if (value == "") {
                         value = '<em>No description</em>';
                     }
-                    doc.body.innerHTML = '<link href="css/Default.css" type="text/css" rel="stylesheet">' + value;
+                    doc.body.innerHTML = '<link href="css/Default.css" type="text/css" rel="stylesheet">' + (Util.Validation.isHtml(value)?value:escapeHTML(value));
                 };
 
                 if (Browser.IE) {
@@ -276,6 +318,42 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
             this.width = width ? width:600;
             this.height = height ? height:100;
             this.InlineEditWidget(method, attributes, initValue);
+        });
+
+
+type("ParsedRichTextInlineEditWidget", ["RichTextInlineEditWidget"],
+        {
+            _handleEditMode: function(value) {
+
+                this.description = new ParsedRichTextWidget(600, 400,'','rich','IndicoMinimal');
+                this.description.set(value);
+                return this.description.draw();
+            },
+
+            _handleContentEdit: function() {
+                var self = this;
+                this.saveButton = Widget.button(command(function() {
+                        if (self._verifyInput() && self.description.clean()){
+                            self._savedValue = self._getNewValue();
+                            self.source.set(self._savedValue);
+                        }
+                }, 'Save'));
+
+                var editButtons = Html.div({},
+                    this.saveButton,
+                    Widget.button(command(function() {
+                        // back to the start
+                        self.setMode('display');
+                    }, 'Cancel')));
+
+                // there are two possible states for the "switch" area
+                return this._buildFrame(self._handleEditMode(self.value),
+                                        editButtons);
+
+            },
+        },
+        function(method, attributes, initValue, width, height) {
+            this.RichTextInlineEditWidget(method, attributes, initValue, width, height)
         });
 
 
@@ -312,4 +390,86 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, to
         },50);
     }
 
+}
+
+function cleanText(text, target){
+    try{
+        var self = target;
+        killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+        var parsingResult = escapeHarmfulHTML(text);
+        if( parsingResult[1] > 0) {
+
+            var cleaningFunction = function(confirmed) {
+                if(confirmed) {
+                    self.set(parsingResult[0]);
+                }
+            };
+
+            var security;
+            switch(parsingResult[1]) {
+                case 1:
+                    security = "HTML";
+                    break;
+                case 2:
+                    security = "HTML and scripts";
+                    break;
+                default:
+                    security = "code";
+                    break;
+            }
+            killProgress();
+
+            // List of errors
+            var showErrorList = Html.span("fakeLink", $T("here"));
+            showErrorList.observeClick(function(){
+                var ul = Html.ul({id: '',style:{listStyle: 'circle', marginLeft:'-25px'}});
+                each(parsingResult[2], function(value){
+                    ul.append(Html.li('', value));
+                });
+                var popupErrorList = new AlertPopup(Html.span('warningTitle', "List of forbidden elements"), ul);
+                popupErrorList.open();
+            });
+
+            // Warning
+            var popup = new ConfirmPopup($T("Warning!"), Html.div({style: {width:pixels(300), textAlign:'justify'}},
+                                         $T("Your data contains some potentially harmful " + security +
+                                         ", which cannot be stored in the database. Use the automatic Indico cleaner or clean the text manually (see the list of forbidden elements that you are using "), showErrorList, ")."),
+                                         cleaningFunction);
+            popup.draw = function(){
+                var self = this;
+
+                var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('Clean automatically'));
+                okButton.observeClick(function(){
+                    self.close();
+                    self.handler(true);
+                });
+
+                var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Clean manually'));
+                cancelButton.observeClick(function(){
+                    self.close();
+                    self.handler(false);
+                });
+
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                        this.content,
+                        Html.div({}, okButton, cancelButton));
+            }
+            popup.open();
+            return false;
+        }
+        else{
+            killProgress();
+            return true;
+        }
+    } catch(error){
+        if(killProgress)
+            killProgress();
+        if(typeof error == "string" && error.indexOf("Parse Error") != -1){
+            var popup = new WarningPopup($T("Warning!"), $T("Format of your data is invalid. Please check the syntax."));
+            popup.open();
+            return false;
+        }
+        else
+            throw error;
+    }
 }

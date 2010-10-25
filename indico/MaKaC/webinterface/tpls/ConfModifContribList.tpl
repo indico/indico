@@ -128,7 +128,8 @@ var addContribution = function() {
                        function() {
                           window.location.reload();
                        },
-                       <%= jsBoolean(self._conf.getAbstractMgr().isActive()) %>
+                       <%= jsBoolean(self._conf.getAbstractMgr().isActive()) %>,
+                       <%= bookings %>
                        );
 
     dialog.execute();

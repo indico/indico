@@ -657,31 +657,40 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         return div;
     },
 
+    _getRoomLocationInfo: function() {
+        var roomLocationInfo = Html.div({});
+
+        if (this.eventData.room) {
+            roomLocationInfo.append(Html.div('roomPopupTitle', 'Room: '));
+            roomLocationInfo.append(this.eventData.room);
+            roomLocationInfo.append(Html.br());
+        }
+
+        if (this.eventData.location) {
+            roomLocationInfo.append(Html.div('roomPopupTitle', 'Location: '));
+            roomLocationInfo.append(this.eventData.location);
+            roomLocationInfo.append(Html.br());
+        }
+        return roomLocationInfo;
+    },
+
+    _getTimeLocationInfo: function() {
+        return Html.div({}, this._getTime(), this._getRoomLocationInfo())
+    },
+
     _getGeneralInfo: function() {
         var self = this;
 
         var infoContentDiv = Html.div({className: 'timetablePopupInfoContent'});
 
-        infoContentDiv.append(this._getTime());
-
-        if (self.eventData.room) {
-            infoContentDiv.append(Html.strong({style:{fontStyle: 'normal'}}, 'Room: '));
-            infoContentDiv.append(self.eventData.room);
-            infoContentDiv.append(Html.br());
-        }
-
-        if (self.eventData.location) {
-            infoContentDiv.append(Html.strong({style:{fontStyle: 'normal'}}, 'Location: '));
-            infoContentDiv.append(self.eventData.location);
-            infoContentDiv.append(Html.br());
-        }
+        infoContentDiv.append(this._getTimeLocationInfo());
 
         if(self.eventData.conveners &&
            self.eventData.conveners.length > 0)
         {
             //Using plural if there are multiple conveners
             infoContentDiv.append(
-                Html.strong({style:{fontStyle: 'normal'}},
+                Html.div('roomPopupTitle',
                             (self.eventData.conveners.length > 1)?
                             $T('Conveners'):
                             $T('Convener'), ': '));
@@ -884,204 +893,321 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
 
 type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 {
+        _getTimeLocationInfo: function() {
+            var self = this;
+            var timeDiv = Html.div('timeLocationDiv', this._getTime());
+            var locationDiv = Html.div('timeLocationDiv', this._getRoomLocationInfo());
 
-    _getTime: function() {
-        var self = this;
+            var saveButton = Html.input('button', {}, 'Save');
+            var cancelButton = Html.input('button', {}, 'Cancel');
 
-        var editLink = Html.a({className: 'fakeLink', style: {marginLeft: '10px'}}, '[edit]');
-        var timeDiv = Html.div({},
-                               this.eventData.startDate.time.substring(0,5) + ' - ' +
-                               this.eventData.endDate.time.substring(0,5), editLink);
+            var buttonsDiv = Html.div({style:{textAlign:'center', display:'none', padding:'5px'}}, saveButton, cancelButton);
 
-        var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
-                this.eventData.startDate.time.substring(0,5),
-                this.eventData.endDate.time.substring(0,5));
+            saveButton.observeClick(function(){
+                self.saveTimeFunction();
+                self.saveRoomLocationFunction();
+                self.close();
+            });
 
-        var parameterManager = new IndicoUtil.parameterManager();
+            cancelButton.observeClick(function(){
+                buttonsDiv.dom.style.display = 'none';
+                timeDiv.dom.className = 'timeLocationDiv';
+                locationDiv.dom.className = 'timeLocationDiv';
+                self.stopEditingTimeFunction();
+                self.stopEditingRoomLocationFunction();
+            });
 
-        parameterManager.add(startEndTimeField.startTimeField, 'time', false);
-        parameterManager.add(startEndTimeField.endTimeField, 'time', false,
-                             function(value) {
-                                 var sTime = translate(parseTime(startEndTimeField.startTimeField.get()), zeropad).join('');
-                                 var eTime = translate(parseTime(value), zeropad).join('');
-                                 if (eTime <= sTime) {
-                                     return "End time should be after start time!";
-                                 }
-                             });
+            timeDiv.observeClick(function(){
+                self.editTimeFunction();
+                buttonsDiv.dom.style.display = 'block';
+                timeDiv.dom.className = '';
+            });
 
-        var saveButton = Html.input('button', {}, 'Save');
-        saveButton.observeClick(function() {
+            locationDiv.observeClick(function(){
+                self.editRoomLocationFunction();
+                buttonsDiv.dom.style.display = 'block';
+                locationDiv.dom.className = '';
+            });
 
-            if (!parameterManager.check()) {
-                return;
+            return Html.div({}, timeDiv, locationDiv, buttonsDiv);
+        },
+
+        _getTime: function() {
+            var self = this;
+
+            var timeDiv = Html.div({},
+                                   Html.div('roomPopupTitle', 'Duration: '),
+                                   this.eventData.startDate.time.substring(0,5) + ' - ' +
+                                   this.eventData.endDate.time.substring(0,5),
+                                   Html.img({src: imageSrc("edit_16.png")}));
+
+            this.startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
+                    this.eventData.startDate.time.substring(0,5),
+                    this.eventData.endDate.time.substring(0,5));
+
+            this.startEndTimeField.accessor.set('date', this.eventData.startDate.date);
+
+            var parameterManager = new IndicoUtil.parameterManager();
+
+            parameterManager.add(this.startEndTimeField.startTimeField, 'time', false);
+            parameterManager.add(this.startEndTimeField.endTimeField, 'time', false,
+                                 function(value) {
+                                     var sTime = translate(parseTime(self.startEndTimeField.startTimeField.get()), zeropad).join('');
+                                     var eTime = translate(parseTime(value), zeropad).join('');
+                                     if (eTime <= sTime) {
+                                         return "End time should be after start time!";
+                                     }
+                                 });
+
+            this.saveTimeFunction = function() {
+
+                if (!parameterManager.check()) {
+                    return;
+                }
+
+                var startDate = clone(self.eventData.startDate);
+                var endDate = clone(self.eventData.startDate);
+
+                startDate.time = self.startEndTimeField.accessor.get('startTime');
+                endDate.time = self.startEndTimeField.accessor.get('endTime');
+
+                self.managementActions.editEntryStartEndDate(Util.formatDateTime(startDate, IndicoDateTimeFormats.Server),
+                                                             Util.formatDateTime(endDate, IndicoDateTimeFormats.Server),
+                                                             self.eventData,
+                                                             rescheduleCheckbox.get());
+            };
+
+            this.editTimeFunction = function() {
+                timeEditDiv.dom.style.display = 'block';
+                timeDiv.dom.style.display = 'none';
+            };
+
+            this.stopEditingTimeFunction = function() {
+                timeEditDiv.dom.style.display = 'none';
+                timeDiv.dom.style.display = 'block';
+                this.startEndTimeField.accessor.set('startTime', this.eventData.startDate.time.substring(0,5));
+                this.startEndTimeField.accessor.set('endTime', this.eventData.endDate.time.substring(0,5));
+                rescheduleCheckbox.dom.checked = false;
+            };
+
+            var rescheduleCheckbox = Html.checkbox({style:{marginRight: '5px', verticalAlign: 'middle'}});
+
+            var timeEditDiv = Html.div({style: {display: 'none'}},
+                Html.div('roomVerticalWidgetTitle', 'Duration'),
+                Html.div({},self.startEndTimeField.element),
+                Html.div({style: {marginTop: '5px'}}, rescheduleCheckbox, $T('Shift later entries')));
+
+            return Html.div({}, timeDiv, timeEditDiv);
+
+        },
+        _getMenuBar: function() {
+            var self = this;
+
+            var menu = Html.div({className: 'menuBar managementMenuBar'});
+
+            var deleteLink = Html.a('fakeLink', "Delete");
+            deleteLink.observeClick(function() {
+                self.managementActions.deleteEntry(self.eventData);
+                self.close();
+            });
+            menu.insert(deleteLink);
+            menu.insert(" | ");
+
+            var editLink;
+
+            if (self.eventData.entryType == 'Session') {
+                // If it's a session the show the edit menu
+                editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
+                var menuItems = {};
+
+                menuItems[$T('Block timetable')] = function() {
+                    self.managementActions.switchToIntervalTimetable(self.eventData.id);
+                    self.close();
+                };
+                menuItems[$T('Block properties')] = function() {
+                    self.managementActions.editSessionSlot(self.eventData);
+                    self.close();
+                };
+                if (!self.managementActions.isSessionTimetable) {
+                    menuItems[$T('Session properties')] = self.managementActions.editEntry(self.eventData);
+                }
+
+                editLink.observeClick(function() {
+                    var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
+                    var pos = editLink.getAbsolutePosition();
+                    menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
+                });
+
+                var addInterval = Html.a('fakeLink', $T("Add block"));
+                addInterval.observeClick(function() {
+                    self.managementActions.addSessionSlot(self.eventData);
+                    self.close();
+                });
+                menu.insert(addInterval);
+                menu.insert(" | ");
+
+            } else if (self.eventData.entryType == 'Contribution') {
+                editLink = Html.a({
+                    className: 'fakeLink',
+                    style: {fontWeight: 'bold'},
+                    href: self.managementActions.editEntry(self.eventData)
+                }, $T("Edit"));
+            } else {
+                // event is a Break
+
+                editLink = Html.a({
+                    className: 'fakeLink',
+                    style: {fontWeight: 'bold'},
+                    href: '#'
+                }, $T("Edit"));
+
+                editLink.observeClick(function() {
+                    self.managementActions.editEntry(self.eventData);
+                    return false;
+                });
+            }
+            menu.insert(editLink);
+
+
+            // Move Entry link, only available for contribs and breaks
+            if (self.eventData.entryType != 'Session') {
+                menu.insert(" | ");
+
+                moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
+                moveEntryLink.observeClick(function(){
+                    self.close();
+                self.managementActions.moveEntry(self.eventData);
+                });
+
+                menu.insert(moveEntryLink);
+
             }
 
-            var startDate = clone(self.eventData.startDate);
-            var endDate = clone(self.eventData.startDate);
+            if (self.eventData.entryType == 'Session') {
+                // Handles the color picker
+                var colorPicker = new ColorPicker([], true, this.eventData.color, this.eventData.textColor);
+                var colorPickerLink = colorPicker.getLink(function () {
+                    self.addNonCloseTriggeringElement(colorPicker.getCanvas());
+                    return true;
+                });
 
-            startDate.time = startEndTimeField.accessor.get('startTime');
-            endDate.time = startEndTimeField.accessor.get('endTime');
-
-            self.managementActions.editEntryStartEndDate(Util.formatDateTime(startDate, IndicoDateTimeFormats.Server),
-                                                         Util.formatDateTime(endDate, IndicoDateTimeFormats.Server),
-                                                         self.eventData,
-                                                         rescheduleCheckbox.get());
-            self.close();
-        });
-        var cancelButton = Html.input('button', {}, 'Cancel');
-        cancelButton.observeClick(function() {
-            timeEditDiv.dom.style.display = 'none';
-            timeDiv.dom.style.display = 'block';
-        });
-
-        var rescheduleCheckbox = Html.checkbox({style:{marginRight: '5px', verticalAlign: 'middle'}});
-
-        var timeEditDiv = Html.div({style: {display: 'none', fontSize: '9pt'}},
-                Html.div({style: {cssFloat: 'right'}}, saveButton, " ", cancelButton),
-            startEndTimeField.element,
-            Html.div({style: {marginTop: '5px'}}, rescheduleCheckbox, $T('Shift later entries')));
+                colorPicker.observe(function(colors) {
+                    self.managementActions.changeSessionColors(self.eventData, colors.bgColor, colors.textColor);
+                });
+                menu.append(Html.a({}, colorPickerLink));
+            }
 
 
-        editLink.observeClick(function() {
-            // make sure the edit div is at least as high as the timeDiv
-            // to avoid a small 'jump' in the balloon popup
-            timeEditDiv.dom.style.display = 'block';
-            //timeEditDiv.dom.style.height = pixels(timeDiv.dom.offsetHeight);
-            timeDiv.dom.style.display = 'none';
-        });
+            return menu;
+        },
+
+        _getContributionInfo: function() {
+            var self = this;
+
+            if (this.eventData.entryType !== 'Session') {
+                return null;
+            }
+
+            var contributionsDiv = this._getContributionList(4, false);
+
+            if (!contributionsDiv) {
+                contributionsDiv = Html.div({className: 'timetablePopupContributions'}, Html.em({style: {fontWeight: 'normal'}}, $T('This session is empty...')));
+            }
 
 
-        return Html.div('timetablePopupTimeDiv', timeDiv, timeEditDiv);
-
-    },
-    _getMenuBar: function() {
-        var self = this;
-
-        var menu = Html.div({className: 'menuBar managementMenuBar'});
-
-        var deleteLink = Html.a('fakeLink', "Delete");
-        deleteLink.observeClick(function() {
-            self.managementActions.deleteEntry(self.eventData);
-            self.close();
-        });
-        menu.insert(deleteLink);
-        menu.insert(" | ");
-
-        var editLink;
-
-        if (self.eventData.entryType == 'Session') {
-            // If it's a session the show the edit menu
-            editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
-            var menuItems = {};
-
-            menuItems[$T('Block timetable')] = function() {
+            var ttLink = Html.a({className: 'fakeLink'}, "View and edit this block timetable");
+            ttLink.observeClick(function() {
                 self.managementActions.switchToIntervalTimetable(self.eventData.id);
                 self.close();
-            };
-            menuItems[$T('Block properties')] = function() {
-                self.managementActions.editSessionSlot(self.eventData);
-                self.close();
-            };
-            if (!self.managementActions.isSessionTimetable) {
-                menuItems[$T('Session properties')] = self.managementActions.editEntry(self.eventData);
-            }
-
-            editLink.observeClick(function() {
-                var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
-                var pos = editLink.getAbsolutePosition();
-                menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
             });
+            contributionsDiv.append(Html.div({style: {marginTop: '10px', fontWeight: 'bold'}}, ttLink));
 
-            var addInterval = Html.a('fakeLink', $T("Add block"));
-            addInterval.observeClick(function() {
-                self.managementActions.addSessionSlot(self.eventData);
-                self.close();
-            });
-            menu.insert(addInterval);
-            menu.insert(" | ");
+            return contributionsDiv;
+        },
 
-        } else if (self.eventData.entryType == 'Contribution') {
-            editLink = Html.a({
-                className: 'fakeLink',
-                style: {fontWeight: 'bold'},
-                href: self.managementActions.editEntry(self.eventData)
-            }, $T("Edit"));
-        } else {
-            // event is a Break
+        _getRoomLocationInfo: function() {
+            var self = this;
+            this._setInfo();
+            this._setParentInfo();
 
-            editLink = Html.a({
-                className: 'fakeLink',
-                style: {fontWeight: 'bold'},
-                href: '#'
-            }, $T("Edit"));
+            roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Room: '),
+                    self.eventData.room, Html.br(), Html.div('roomPopupTitle', 'Location: '),
+                    self.eventData.location, Html.img({src: imageSrc("edit_16.png")}));
 
-            editLink.observeClick(function() {
-                self.managementActions.editEntry(self.eventData);
+            this.editRoomLocationFunction = function(e){
+                roomLocationDiv.dom.style.display = 'none';
+                roomEditorDiv.dom.style.display = 'block';
+            };
+
+            this.saveRoomLocationFunction = function() {
+                self.managementActions.editRoomLocation(self.roomEditor.info.accessor('room').get(),self.roomEditor.info.accessor('location').get(), self.eventData);
+            };
+
+            this.stopEditingRoomLocationFunction = function() {
+                roomLocationDiv.dom.style.display = 'block';
+                roomEditorDiv.dom.style.display = 'none';
+                self.roomEditor.locationChooser.set(self.eventData.location);
+                self.roomEditor.roomChooser.set(self.eventData.room);
+                self.roomEditor.inheritCheckbox.set(self.eventData.inheritRoom && self.eventData.inheritLoc)
+            };
+
+
+            this.roomEditor = new RoomBookingVerticalReservationWidget(Indico.Data.Locations,
+                                                                       this.info,
+                                                                       this.parentInfo,
+                                                                       nullRoomInfo(this.info),
+                                                                       [],
+                                                                       Indico.Data.DefaultLocation,
+                                                                       this.bookedRooms,
+                                                                       this.timetableData,
+                                                                       this.startEndTimeField.accessor,
+                                                                       this.eventData.id);
+
+            var roomEditorDiv = Html.div({id:'roomEditor'},this.roomEditor.draw());
+            roomEditorDiv.dom.style.display = 'none';
+
+            return Html.div({},roomLocationDiv, roomEditorDiv);
+        },
+
+        clickTriggersClosing: function(target) {
+            //dirty way of finding dropdown list's elements
+            if(target.dom.className.indexOf('bottomLine') != -1 || target.dom.parentNode.parentNode.className == 'optionBoxAdd')
                 return false;
-            });
+            else
+                return this.PopupDialog.prototype.clickTriggersClosing.call(this, target);
+        },
+
+        _setParentInfo: function() {
+            var parent;
+            if(this.managementActions.session)
+                parent = this.managementActions.session;
+            else if(this.eventData.sessionId)
+                parent = this.managementActions.eventInfo.sessions[this.eventData.sessionId];
+            else
+                parent = this.managementActions.eventInfo;
+
+            this.parentInfo = new WatchObject();
+            this.parentInfo.set('room',parent.room);
+            this.parentInfo.set('location',parent.location);
+        },
+
+        _setInfo: function() {
+            this.info = new WatchObject();
+            if(!this.eventData.inheritRoom)
+                this.info.set('room',this.eventData.room);
+            if(!this.eventData.inheritLoc)
+                this.info.set('location',this.eventData.location);
+        },
+
+        postDraw: function() {
+            this.roomEditor.postDraw();
         }
-        menu.insert(editLink);
-
-
-        // Move Entry link, only available for contribs and breaks
-        if (self.eventData.entryType != 'Session') {
-            menu.insert(" | ");
-
-            moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
-            moveEntryLink.observeClick(function(){
-                self.close();
-                self.managementActions.moveEntry(self.eventData);
-            });
-
-            menu.insert(moveEntryLink);
-
-        }
-
-        if (self.eventData.entryType == 'Session') {
-            // Handles the color picker
-            var colorPicker = new ColorPicker([], true, this.eventData.color, this.eventData.textColor);
-            var colorPickerLink = colorPicker.getLink(function () {
-                self.addNonCloseTriggeringElement(colorPicker.getCanvas());
-                return true;
-            });
-
-            colorPicker.observe(function(colors) {
-                self.managementActions.changeSessionColors(self.eventData, colors.bgColor, colors.textColor);
-            });
-            menu.append(Html.a({}, colorPickerLink));
-        }
-
-
-        return menu;
-    },
-
-    _getContributionInfo: function() {
-        var self = this;
-
-        if (this.eventData.entryType !== 'Session') {
-            return null;
-        }
-
-        var contributionsDiv = this._getContributionList(4, false);
-
-        if (!contributionsDiv) {
-            contributionsDiv = Html.div({className: 'timetablePopupContributions'}, Html.em({style: {fontWeight: 'normal'}}, $T('This session is empty...')));
-        }
-
-
-        var ttLink = Html.a({className: 'fakeLink'}, "View and edit this block timetable");
-        ttLink.observeClick(function() {
-            self.managementActions.switchToIntervalTimetable(self.eventData.id);
-            self.close();
-        });
-        contributionsDiv.append(Html.div({style: {marginTop: '10px', fontWeight: 'bold'}}, ttLink));
-
-        return contributionsDiv;
-    }
     },
      function(timetable, block, eventData, blockDiv, closeHandler, managementActions) {
          this.block = block;
          this.managementActions = managementActions;
+         this.bookedRooms = managementActions.eventInfo.bookedRooms;
+         this.timetableData = timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData();
          this.TimetableBlockPopup(timetable, eventData, blockDiv, closeHandler);
      });
 

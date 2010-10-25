@@ -122,8 +122,8 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
 
              var content = Html.div({style:{paddingLeft:pixels(10), paddingRight: pixels(10), paddingBottom:pixels(10)}},
                      Html.div({style:{marginBottom: pixels(10), width:'300px', textAlign: 'center'}}, $T('An error has occurred while processing your request. We advise you to submit an error report, by clicking "Send report".')),
-                     Html.div({style:{color: 'red', marginBottom: pixels(10), width: '300px', maxHeight: '75px', textAlign: 'center', overflow: 'auto'}},
-                              this.error.code+": "+this.error.message),
+                     Html.unescaped.div({style:{color: 'red', marginBottom: pixels(10), width: '300px', maxHeight: '75px', textAlign: 'center', overflow: 'auto'}},
+                              this.error.message),
                      Html.div({style:{marginBottom: pixels(10), textAlign: 'center'}},
                               Html.label({},"Your e-mail: "),
                               $B(Html.input("text",{}), email.accessor())));

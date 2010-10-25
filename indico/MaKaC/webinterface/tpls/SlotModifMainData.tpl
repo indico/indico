@@ -13,7 +13,7 @@
 	    </td>
         </tr>
 
-        <% includeTpl('EventLocationInfo', event=self._rh._slot, modifying=True, parentRoomInfo=roomInfo(self._rh._slot, level='inherited') ,showParent=True) %>
+        <% includeTpl('EventLocationInfo', event=self._rh._slot, modifying=True, parentRoomInfo=roomInfo(self._rh._slot, level='inherited') ,showParent=True, conf = False) %>
 
         <tr>
             <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>

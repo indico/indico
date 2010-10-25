@@ -1,6 +1,6 @@
 <form method="GET" action="%(postURL)s" id="ContributionCreationForm">
 %(locator)s
-<table width="60%%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">    	
+<table width="60%%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
 <tr>
   <td colspan="2">
     <input type="hidden" name="orginURL" value="%(orginURL)s">
@@ -28,7 +28,7 @@ if self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._targe
 <%end%>
 <%
     else:
-%>     
+%>
 <tr>
   <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Description")%></span></td>
   <td bgcolor="white" width="100%%">
@@ -43,8 +43,8 @@ if self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._targe
   </td>
 </tr>
 		%(typeModule)s
-		
-		<% includeTpl('EventLocationInfo', parentRoomInfo=roomInfo(self._rh._target), modifying=False, showParent=True) %>
+
+		<% includeTpl('EventLocationInfo', parentRoomInfo=roomInfo(self._rh._target), modifying=False, showParent=True), conf = False %>
 
 
 		%(boardModule)s

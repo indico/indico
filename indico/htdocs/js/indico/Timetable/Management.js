@@ -6,20 +6,23 @@ type("TimetableManagementActions", [], {
             dayEndDate: 'schedule.slot.getDayEndDate',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
             'delete': 'schedule.session.deleteSlot',
-            moveUpDown: 'schedule.event.moveEntryUpDown'
+            moveUpDown: 'schedule.event.moveEntryUpDown',
+            editRoomLocation: 'schedule.session.editRoomLocation'
         },
         'SessionContribution': {
             add: 'schedule.slot.addContribution',
             modifyStartEndDate: 'schedule.slot.modifyStartEndDate',
             'delete': 'schedule.slot.deleteContribution',
-            moveUpDown: 'schedule.slot.moveEntryUpDown'
+            moveUpDown: 'schedule.slot.moveEntryUpDown',
+            editRoomLocation: 'schedule.slot.editRoomLocation'
         },
         'SessionBreak': {
             add: 'schedule.slot.addBreak',
             edit: 'schedule.slot.editBreak',
             modifyStartEndDate: 'schedule.slot.modifyStartEndDate',
             'delete': 'schedule.slot.deleteBreak',
-            moveUpDown: 'schedule.slot.moveEntryUpDown'
+            moveUpDown: 'schedule.slot.moveEntryUpDown',
+            editRoomLocation: 'schedule.slot.editRoomLocation'
         },
         'SessionEntry': { // common methods for breaks and contributions
             moveEntry: 'schedule.slot.moveEntry'
@@ -30,20 +33,23 @@ type("TimetableManagementActions", [], {
             'delete': 'schedule.event.deleteSession',
             changeColors: 'schedule.session.changeColors',
             modifyStartEndDate: 'schedule.session.modifyStartEndDate',
-            moveUpDown: 'schedule.session.moveEntryUpDown'
+            moveUpDown: 'schedule.session.moveEntryUpDown',
+            editRoomLocation: 'schedule.session.editRoomLocation'
         },
         'Contribution': {
             add: 'schedule.event.addContribution',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
             'delete': 'schedule.event.deleteContribution',
-            moveUpDown: 'schedule.event.moveEntryUpDown'
+            moveUpDown: 'schedule.event.moveEntryUpDown',
+            editRoomLocation: 'schedule.event.editRoomLocation'
         },
         'Break': {
             add: 'schedule.event.addBreak',
             edit: 'schedule.event.editBreak',
             modifyStartEndDate: 'schedule.event.modifyStartEndDate',
             'delete': 'schedule.event.deleteBreak',
-            moveUpDown: 'schedule.event.moveEntryUpDown'
+            moveUpDown: 'schedule.event.moveEntryUpDown',
+            editRoomLocation: 'schedule.event.editRoomLocation'
         },
         'Event': {
             'dayEndDate': 'schedule.event.getDayEndDate',
@@ -179,6 +185,46 @@ type("TimetableManagementActions", [], {
             }
         });
     },
+
+    editRoomLocation: function(room, location, eventData) {
+        var self = this;
+        var info = new WatchObject();
+
+        info.set('scheduleEntry', eventData.scheduleEntryId);
+        info.set('conference', eventData.conferenceId);
+
+        info.set('roomInfo',$O({"location": location,
+                "room": room}));
+
+        info.set('sessionTimetable', this.isSessionTimetable);
+
+        var type = eventData.entryType;
+
+        if (exists(eventData.sessionId)) {
+            info.set('session', eventData.sessionId);
+            info.set('slot', eventData.sessionSlotId);
+
+            if (type != 'Session') {
+                type = 'Session' + eventData.entryType;
+            } else if (!self.isSessionTimetable){
+                type = 'SessionSlot';
+            }
+        }
+
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+        indicoRequest(this.methods[type].editRoomLocation, info, function(result, error){
+            killProgress();
+            if (error)
+                IndicoUtil.errorReport(error);
+            else{
+                var aux = result.entry.entries;
+                self.timetable._updateEntry(result, result.id);
+                if( aux )
+                    self.timetable.data[result.day][result.id].entries = aux;
+            }
+        });
+    },
+
     changeSessionColors: function(eventData, bgColor, textColor) {
         if (eventData.entryType != 'Session') {
             return;
@@ -358,7 +404,8 @@ type("TimetableManagementActions", [], {
             function(result) {
                 self._addEntries(result);
             },
-            this.eventInfo.isCFAEnabled);
+            this.eventInfo.isCFAEnabled,
+            this.eventInfo.bookedRooms);
 
         dialog.execute();
     },
@@ -381,7 +428,8 @@ type("TimetableManagementActions", [], {
             $O(params.roomInfo),
             false,
             days,
-            this.eventInfo.favoriteRooms);
+            this.eventInfo.favoriteRooms,
+            this.eventInfo.bookedRooms);
 
         dialog.execute();
     },
@@ -421,7 +469,8 @@ type("TimetableManagementActions", [], {
             $O(params.roomInfo),
             true,
             days,
-            this.eventInfo.favoriteRooms);
+            this.eventInfo.favoriteRooms,
+            this.eventInfo.bookedRooms);
         editDialog.open();
 
     },
@@ -443,7 +492,9 @@ type("TimetableManagementActions", [], {
             params.selectedDay,
             this.eventInfo.favoriteRooms,
             days,
-            function(result) { self.timetable._updateEntry(result, result.id); });
+            function(result) { self.timetable._updateEntry(result, result.id); },
+            this.eventInfo.bookedRooms,
+            this.timetable);
     },
     addSessionSlot: function(session) {
         var self = this;
@@ -464,7 +515,10 @@ type("TimetableManagementActions", [], {
             params.selectedDay,
             this.eventInfo.favoriteRooms,
             days,
-            function(result) { self.timetable._updateEntry(result, result.id); }
+            function(result) { self.timetable._updateEntry(result, result.id); },
+            false,
+            this.eventInfo.bookedRooms,
+            this.timetable
         );
     },
 
@@ -484,12 +538,14 @@ type("TimetableManagementActions", [], {
             params[key] = value;
         });
 
+        var parentRoomInfo = this.eventInfo.sessions[eventData.sessionId];
+
         IndicoUI.Dialogs.addSessionSlot(
             this.methods[params.type].edit,
             this.methods.Event.dayEndDate,
             params,
             params.roomInfo,
-            $O(params.roomInfo),
+            $O(parentRoomInfo),
             params.startDate,
             params.selectedDay,
             this.eventInfo.favoriteRooms,
@@ -508,7 +564,9 @@ type("TimetableManagementActions", [], {
                  */
                 self.timetable._updateSessionData(result.session.id, ['title'], [result.session.title])
             },
-            true
+            true,
+            this.eventInfo.bookedRooms,
+            this.timetable
         );
     },
 

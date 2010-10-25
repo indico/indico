@@ -170,7 +170,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
          }
      },
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled) {
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms) {
          var self = this;
 
          this.newArgs = Array.prototype.slice.call(arguments, 0);
@@ -324,7 +324,12 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
         info.set('roomInfo', $O(self.roomInfo));
 
-        this.roomEditor = new RoomBookingWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null);
+        if( self.timetable )
+            var ttdata = self.timetable.parentTimetable?self.timetable.parentTimetable.getData():self.timetable.getData()
+        else
+            var ttdata = null
+
+        this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null, self.bookedRooms, ttdata, info);
 
         var presListWidget = new UserListField(
             'VeryShortPeopleListDiv', 'PeopleList',
@@ -546,7 +551,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
       * @param timeStartMethod rpc_method_name if this parameter is null, the date will not be shown in the form.
       */
      function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled) {
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms) {
          this.args = clone(args);
 
          this.dateArgs = clone(args);
@@ -563,6 +568,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
          this.successFunc = successFunc;
          this.favoriteRooms = favoriteRooms;
          this.isCFAEnabled = isCFAEnabled;
+         this.bookedRooms = bookedRooms;
 
          this.previousDate = dayStartDate;
          this.info = new WatchObject();
@@ -719,12 +725,16 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              var cancelButton = Html.input('button', {}, $T("Cancel"));
              cancelButton.dom.style.marginLeft = pixels(10);
 
-             this.roomEditor = new RoomBookingWidget(Indico.Data.Locations,
+             this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations,
                                                      this.info.get('roomInfo'),
                                                      this.parentRoomInfo,
                                                      this.isEdit?nullRoomInfo(this.info.get('roomInfo')):true,
                                                      this.favoriteRooms,
-                                                     null);
+                                                     null,
+                                                     this.bookedRooms,
+                                                     this.managementActions.timetable.parentTimetable?this.managementActions.timetable.parentTimetable.getData():this.managementActions.timetable.getData(),
+                                                     this.info,
+                                                     this.isEdit?this.info.get("id"):null);
 
              cancelButton.observeClick(function(){
                  self.close();
@@ -889,7 +899,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          }
      },
 
-     function(managementActions, args, parentRoomInfo, isEdit, days, favoriteRooms){
+     function(managementActions, args, parentRoomInfo, isEdit, days, favoriteRooms, bookedRooms){
          var self = this;
 
          this.managementActions = managementActions;
@@ -897,6 +907,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
          this.days = days;
          this.parentRoomInfo = parentRoomInfo;
          this.favoriteRooms = favoriteRooms;
+         this.bookedRooms = bookedRooms;
 
          var attributes = {
                  style: {

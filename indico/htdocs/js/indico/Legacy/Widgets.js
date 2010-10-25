@@ -990,8 +990,13 @@ IndicoUI.Widgets = {
             tab.observe = function(fun){
                 elem.observe(fun);
             };
+            tab.observeChange = function(fun){
+                elem.dom.onchange = fun;
+            };
             tab.dom.onchange = function(){
-                elem.dom.onchange();
+                if(typeof(elem.dom.onchange) === 'function') {
+                    elem.dom.onchange();
+                }
             };
             tab.processDate = elem.processDate;
 
