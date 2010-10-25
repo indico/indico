@@ -85,7 +85,7 @@ var mode = '<%= mode %>';
     var targetType = 'category';
 <% end %>
 
-var matList = <%= fossilize(materialList, IMaterialFossil) %>
+var matList = <%= fossilize(materialList, IMaterialFossil) %>;
 
 var mlist = new MaterialListWidget(args, matList, uploadAction, null, null, showMainResourceOption);
 

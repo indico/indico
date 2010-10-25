@@ -30,32 +30,32 @@ var args = {
 
     var uploadAction = Indico.Urls.UploadAction.contribution;
     var visibility = '';
-                                 <% if  self._target.getConference().getConfReview().getChoice() == 3: %>
-                                    <% if not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
-                                        visibility = 'visible';
-                                    <% end %>
-                                    <% else: %>
-                                        visibility = 'hidden';
-                                    <% end %>
-                                <% end %>
-                                <% if self._target.getConference().getConfReview().getChoice() == 2: %>
-                                    <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
-                                        visibility = 'visible';
-                                    <% end %>
-                                    <% else: %>
-                                        visibility = 'hidden';
-                                    <% end %>
-                                <% end %>
-                                <% if  self._target.getConference().getConfReview().getChoice() == 4: %>
-                                    <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>
-                                        visibility = 'visible';
-                                    <% end %>
-                                    <% else: %>
-                                        visibility = 'hidden';
-                                    <% end %>
-                                <% end %>
+     <% if  self._target.getConference().getConfReview().getChoice() == 3: %>
+        <% if not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
+            visibility = 'visible';
+        <% end %>
+        <% else: %>
+            visibility = 'hidden';
+        <% end %>
+    <% end %>
+    <% if self._target.getConference().getConfReview().getChoice() == 2: %>
+        <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
+            visibility = 'visible';
+        <% end %>
+        <% else: %>
+            visibility = 'hidden';
+        <% end %>
+    <% end %>
+    <% if  self._target.getConference().getConfReview().getChoice() == 4: %>
+        <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>
+            visibility = 'visible';
+        <% end %>
+        <% else: %>
+            visibility = 'hidden';
+        <% end %>
+    <% end %>
 
-var mlist = new ReviewingMaterialListWidget(args, <%= jsonEncode(list([k, k.title()] for k in MaterialFactoryRegistry._allowedMaterials['reviewing'])) %>, uploadAction,null, null, visibility,$E("SendBtn"));
+var mlist = new ReviewingMaterialListWidget(args, [["reviewing", "Reviewing"]], uploadAction,null, null, visibility, $E("SendBtn"));
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
 

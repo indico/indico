@@ -1175,11 +1175,12 @@ type("ResourceListWidget", ["ListWidget"], {
         var removeButton;
         var editButton;
         var setMain;
+        var flag;
 
         if (resource.get('reviewingState') < 3) {
             if(resource.get('reviewingState') == 2){
-                var flag = true;
-            } else { var flag = false;}
+                flag = true;
+            } else { flag = false;}
             removeButton = Widget.link(command(deleteResource,IndicoUI.Buttons.removeButton()));
             editButton = Widget.link(command(function() {
                 IndicoUI.Dialogs.Material.editResource(resParams, self.matParams, resource, resourceNode, function(resource) {
@@ -1327,29 +1328,33 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                     self.set(materialId, null);
                 }
             });
+
         var item = [];
-        if(material.get('reviewingState') == 1 || material.get('reviewingState') == 0){
         var matWidgetDiv = matWidget.draw();
-        var protection =
-            Protection.resolveProtection(material.get('protection'),
-                                         material.get('protectedOwner')?1:-1);
+        if(material.get('reviewingState') == 1 || material.get('reviewingState') == 0){
+            var protection =
+                Protection.resolveProtection(material.get('protection'),
+                                             material.get('protectedOwner')?1:-1);
 
-        var protectionIcon = Html.span({}, protection==1?
-                                       Html.img({src: imageSrc('protected'),
-                                                 style: {verticalAlign: 'middle'},
-                                                 alt: "protected",
-                                                 title: $T("This material is protected")})
-                                       :'');
+            var protectionIcon = Html.span({}, protection==1?
+                                           Html.img({src: imageSrc('protected'),
+                                                     style: {verticalAlign: 'middle'},
+                                                     alt: "protected",
+                                                     title: $T("This material is protected")})
+                                           :'');
 
-        var item = [
-            IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
-            protectionIcon,
-            $B(Html.span({verticalAlign: 'middle'}),material.accessor('title')),
-            menu,
-            $B(Html.div("descriptionLine"), material.accessor('description')),
-            matWidgetDiv
-        ];}
-         return item;
+            var item = [
+                IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
+                protectionIcon,
+                $B(Html.span({verticalAlign: 'middle'}),material.accessor('title')),
+                menu,
+                $B(Html.div("descriptionLine"), material.accessor('description')),
+                matWidgetDiv
+            ];
+        } else {
+            item = [matWidgetDiv];
+        }
+        return item;
 
     },
 
@@ -1436,7 +1441,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     }
 },
 
-     function(args, types, uploadAction, width, height, showMainResources) {
+     function(args, types, uploadAction, width, height, showMainResources, listMethod) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1444,154 +1449,16 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          this.types = types;
          this.uploadAction = uploadAction;
          this.ListWidget("materialList");
-         this.RemoteWidget('material.list',
-                           args);
+         if (!exists(listMethod)) {
+             listMethod = 'material.list';
+         }
+         this.RemoteWidget(listMethod, args);
          this.args.materialIdsList = $O();
          this.showMainResources = showMainResources || false;
      }
 );
 
-type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
-
-    _drawItem: function(pair) {
-
-        var self = this;
-
-        var material = pair.get();
-        var args = clone(self.args);
-        var materialId = pair.key;
-        args.materialId = materialId;
-
-        var deleteMaterial = function() {
-            if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
-                jsonRpc(Indico.Urls.JsonRpcService,
-                        'material.delete',
-                        args,
-                        function(response,error) {
-                            if (exists(error)) {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            } else {
-                                self.set(materialId, null);
-                                killProgress();
-
-                                updateMaterialList(self.types, response.newMaterialTypes);
-                            }
-                        }
-                       );
-            }
-        };
-
-
-        var reviewingState = material.get('reviewingState');
-
-        var menu;
-
-        if (material.get('reviewingState') < 3) { // if material can be modified
-            menu = Html.span(
-                {},
-                Widget.link(command(
-                    deleteMaterial,
-                    IndicoUI.Buttons.removeButton()
-                )),
-                Widget.link(command(
-                    function(){
-                        IndicoUI.Dialogs.Material.editMaterial(
-                            self.args,
-                            material,
-                            self);
-                    },
-                    IndicoUI.Buttons.editButton()
-                ))
-                );
-
-        } else { // material cannot be modified: we use grey icons without click popup, just a mouseover help information popup
-            /* var ab = IndicoUI.Buttons.addButton(true);
-            ab.dom.title = '';
-            ab.dom.onmouseover = modifyDisabledHelpPopup;*/
-
-            var rb = IndicoUI.Buttons.removeButton(true);
-            rb.dom.title = '';
-            rb.dom.onmouseover = modifyDisabledHelpPopup;
-
-            var eb = IndicoUI.Buttons.editButton(true);
-            eb.dom.title = '';
-            eb.dom.onmouseover = modifyDisabledHelpPopup;
-
-            menu = Html.span({},rb,eb);
-        }
-
-        args.materialProtection = material.get('protection');
-        var matWidget = new ResourceListWidget(material.get('resources'), args);
-
-        // check whenever a material gets empty (no resources) and delete it
-        material.get('resources').observe(
-            function(event, element) {
-                if (event == 'itemRemoved' &&
-                    material.get('resources').length.get() == 1) {
-                    self.set(materialId, null);
-                }
-            });
-        var item = [];
-
-        if(material.get('reviewingState') > 1){
-	        var matWidgetDiv = matWidget.draw();
-
-	        var item = [matWidgetDiv];
-	    }
-
-        return item;
-
-    },
-
-    draw: function() {
-        return this.RemoteWidget.prototype.draw.call(this);
-    },
-
-     _updateMaterialList: function(material) {
-        // add type to custom list, if not there
-        var i = -1;
-
-        for (var j in this.types) {
-            if (this.types[j][1] == material.get('title')) {
-                i = j;
-                break;
-            }
-        }
-
-        var newElement = [material.get('id'), material.get('title')];
-
-        if (i >= 0) {
-            this.types[i] = newElement;
-        } else {
-            this.types.push(newElement);
-        }
-    },
-
-
-    _loadMaterial: function(id) {
-        var self = this;
-
-        var args = clone(self.args);
-        args.materialId = id;
-
-        var source = indicoSource('material.get', args);
-
-        source.state.observe(function(state) {
-            if (state == SourceState.Loaded) {
-                var material = $O($O(source).getAll());
-                var obj = watchize(clone(material.get('resources')));
-                material.set('resources', null);
-                material.set('resources', obj);
-                self.set(id,
-                         material);
-
-                self._updateMaterialList(material);
-
-            }
-        });
-    },
+type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
 
     drawContent: function() {
 
@@ -1602,26 +1469,26 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
             self.set(key, obj);
         });
 
+        var materialLoadFunction = function(info) {
+            if (self.get(info.material)) {
+                self.get(info.material).get('resources').append(watchize(info));
+            } else {
+                self._loadMaterial(info.material);
+            }
+        };
+
 
         var link = Widget.link(command(function(){
                     IndicoUI.Dialogs.Material.add(self.args,
                                                   self,
                                                   self.types,
                                                   self.uploadAction,
-                                                  function(info) {
-                                                      if (self.get(info.material)) {
-                                                          self.get(info.material).get('resources').append(watchize(info));
-                                                      } else {
-                                                          self._loadMaterial(info.material);
-                                                      }
-                                                  },
+                                                  materialLoadFunction,
                                                   true);
                 }, $T("Upload paper")));
-
-
         return Html.div(
             {},
-            Html.div({style:{textAlign: 'left', visibility: visibility}}, link),
+            Html.div({style:{textAlign: 'left', visibility: self.visibility}}, link),
             Html.div({style:{overflow: 'auto', width: self.width, height: self.height}},
                      this.ListWidget.prototype.draw.call(this))
         );
@@ -1629,14 +1496,9 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
 },
      function(args, types, uploadAction, width, height, visibility, sendToReviewButton) {
          var self = this;
-         this.width = width;
-         this.height = height;
+         this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list');
          this.visibility = visibility;
-         this.args = args;
-         this.types = types;
-         this.uploadAction = uploadAction;
          this.sendToReviewButton = sendToReviewButton;
-         this.ListWidget("materialList");
 
          this.observe(function(){
                 if (self.isEmpty()) {
@@ -1645,10 +1507,6 @@ type("ReviewingMaterialListWidget", ["RemoteWidget", "ListWidget"], {
                     self.sendToReviewButton.dom.disabled = false;
                 }
             });
-
-         this.RemoteWidget('material.list',
-                           args);
-
      }
     );
 

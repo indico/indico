@@ -9379,9 +9379,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         elif mat.getId().lower() == 'poster':
             self.removePoster()
             self.notifyModification()
-        elif mat.getId().lower() == 'reviewing':
-            self.removeReviewing()
-            self.notifyModification()
 
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
@@ -9408,8 +9405,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             return self.getPoster()
         elif matId.lower() == 'minutes':
             return self.getMinutes()
-        elif matId.lower() == 'reviewing':
-            return self.getReviewing()
         elif self.materials.has_key(matId):
             return self.materials[ matId ]
         return None
@@ -9429,8 +9424,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             l.append( self.getPoster() )
         if self.getMinutes():
             l.append( self.getMinutes() )
-        if self.getReviewing():
-            l.append( self.getReviewing() )
         l.sort(lambda x,y: cmp(x.getTitle(),y.getTitle()))
         return l
 
@@ -11171,11 +11164,11 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         """
         if isinstance(self.owner, Contribution):
             conference = self.owner.getConference()
-            if not conference.hasEnabledSection('paperReviewing') or conference.getConfReview().getChoice() == 0: #conference has no reviewing process
+            if conference.getConfReview().getChoice() == 0: #conference has no reviewing process
                 return 0
             else: #conference has reviewing
-                reviewableMaterials = conference.getConfReview().getReviewableMaterials()
-                if self.id in reviewableMaterials: #material is reviewable
+                #if self.id in reviewableMaterials: #material is reviewable
+                if isinstance(self, Reviewing): #material is reviewable
                     lastReview = self.owner.getReviewManager().getLastReview()
                     if lastReview.isAuthorSubmitted(): #author has submitted
                         refereeJudgement = lastReview.getRefereeJudgement()

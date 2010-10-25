@@ -25,11 +25,11 @@ from MaKaC.common.Configuration import Config
 from MaKaC.i18n import _
 
 class WSpecialMaterialCreationBase( wcomponents.WMaterialCreation ):
-    
+
     def __init__( self, owner, factory ):
         wcomponents.WMaterialCreation.__init__(self, owner)
         self._factory = factory
-    
+
     def getVars( self ):
         vars = wcomponents.WMaterialCreation.getVars( self )
         vars["typeMaterial"] = self._factory.getId()
@@ -59,7 +59,7 @@ class MaterialFactory:
     def getIconURL(cls):
         return cls._iconURL
     getIconURL = classmethod( getIconURL )
-    
+
     def get( owner ):
         """returns the material"""
         return None
@@ -67,7 +67,7 @@ class MaterialFactory:
 
     def remove( owner ):
         """performs the deletion of the material from the owner"""
-        return 
+        return
     remove = staticmethod( remove )
 
     def canAdd( target ):
@@ -81,7 +81,7 @@ class MaterialFactory:
     canDelete = staticmethod( canDelete )
 
     def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return cls._modificationURL
     getModificationURL = classmethod(getModificationURL)
@@ -89,9 +89,9 @@ class MaterialFactory:
     def getCreationWC( cls, owner ):
         if not cls._creationWC:
             return None
-        return cls._creationWC(owner, cls) 
+        return cls._creationWC(owner, cls)
     getCreationWC = classmethod( getCreationWC )
-    
+
     def needsCreationPage( cls ):
         return cls._needsCreationPage
     needsCreationPage = classmethod( needsCreationPage )
@@ -110,7 +110,7 @@ class MaterialFactory:
 
 class WPaperCreation( WSpecialMaterialCreationBase ):
     pass
-    
+
 class PaperFactory(MaterialFactory):
 
     _id = "paper"
@@ -119,12 +119,12 @@ class PaperFactory(MaterialFactory):
     _creationWC = WPaperCreation
     _materialKlasses=[conference.Paper]
     _needsCreationPage = False
-        
+
     def get( owner ):
         """returns the material"""
         return owner.getPaper()
     get = staticmethod(get)
-    
+
     def remove( owner ):
         """performs the deletion of the paper from the owner"""
         owner.removePaper()
@@ -134,14 +134,14 @@ class PaperFactory(MaterialFactory):
         #only one paper can be added to a contribution
         return target.getPaper() == None
     canAdd = staticmethod( canAdd )
-    
+
     def canDelete( target ):
         #only a paper which is already set in a contribution can be deleted
         return target.getPaper() != None
     canDelete = staticmethod( canDelete )
-    
+
     def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
     getModificationURL = classmethod(getModificationURL)
@@ -159,18 +159,18 @@ class WSlidesCreation( WSpecialMaterialCreationBase ):
 
 
 class SlidesFactory(MaterialFactory):
-    
+
     _id = "slides"
     _title = "Slides"
     _iconURL = Config.getInstance().getSystemIconURL("slides")
     _materialKlasses=[conference.Slides]
     _needsCreationPage = False
- 
+
     def get( owner ):
         """returns the material"""
         return owner.getSlides()
     get = staticmethod(get)
-    
+
     def remove( owner ):
         """performs the deletion of the slides from the owner"""
         owner.removeSlides()
@@ -180,14 +180,14 @@ class SlidesFactory(MaterialFactory):
         #only one slide can be added to a contribution
         return target.getSlides() == None
     canAdd = staticmethod( canAdd )
-    
+
     def canDelete( target ):
         #only a slide which is already set in a contribution can be deleted
         return target.getSlides() != None
     canDelete = staticmethod( canDelete )
-    
+
     def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
     getModificationURL = classmethod(getModificationURL)
@@ -203,19 +203,19 @@ class WVideoCreation( WSpecialMaterialCreationBase ):
     pass
 
 class VideoFactory(MaterialFactory):
-    
+
     _id = "video"
     _title = "Video"
     _iconURL = Config.getInstance().getSystemIconURL("video")
     _creationWC = WVideoCreation
     _materialKlasses=[conference.Video]
     _needsCreationPage = False
- 
+
     def get( owner ):
         """returns the material"""
         return owner.getVideo()
     get = staticmethod(get)
-    
+
     def remove( owner ):
         """performs the deletion of the video from the owner"""
         owner.removeVideo()
@@ -225,14 +225,14 @@ class VideoFactory(MaterialFactory):
         #only one video can be added to a contribution
         return target.getVideo() == None
     canAdd = staticmethod( canAdd )
-    
+
     def canDelete( target ):
         #only a video which is already set in a contribution can be deleted
         return target.getVideo() != None
     canDelete = staticmethod( canDelete )
-    
+
     def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
     getModificationURL = classmethod(getModificationURL)
@@ -243,23 +243,23 @@ class VideoFactory(MaterialFactory):
         target.setVideo( m )
         return m
     create = classmethod( create )
-    
+
 class WPosterCreation( WSpecialMaterialCreationBase ):
     pass
-    
+
 class PosterFactory(MaterialFactory):
-    
+
     _id = "poster"
     _title = "Poster"
     _iconURL = Config.getInstance().getSystemIconURL("poster")
     _materialKlasses=[conference.Poster]
     _needsCreationPage = False
- 
+
     def get( owner ):
         """returns the material"""
         return owner.getPoster()
     get = staticmethod(get)
-    
+
     def remove( owner ):
         """performs the deletion of the poster from the owner"""
         owner.removePoster()
@@ -269,14 +269,14 @@ class PosterFactory(MaterialFactory):
         #only one poster can be added to a contribution
         return target.getPoster() == None
     canAdd = staticmethod( canAdd )
-    
+
     def canDelete( target ):
         #only a poster which is already set in a contribution can be deleted
         return target.getPoster() != None
     canDelete = staticmethod( canDelete )
-    
+
     def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
     getModificationURL = classmethod(getModificationURL)
@@ -289,18 +289,18 @@ class PosterFactory(MaterialFactory):
     create = classmethod( create )
 
 class MinutesFactory(MaterialFactory):
-    
+
     _id = "minutes"
     _title = "Minutes"
     _iconURL = Config.getInstance().getSystemIconURL("material")
     _needsCreationPage = False
     _materialKlasses=[conference.Minutes]
- 
+
     def get( owner ):
         """returns the material"""
         return owner.getMinutes()
     get = staticmethod(get)
-    
+
     def remove( owner ):
         """performs the deletion of the minutes from the owner"""
         owner.removeMinutes()
@@ -310,25 +310,25 @@ class MinutesFactory(MaterialFactory):
         #only one minutes can be added to a contribution
         return target.getMinutes() == None
     canAdd = staticmethod( canAdd )
-    
+
     def canDelete( target ):
         #only a minutes which is already set in a contribution can be deleted
         return target.getMinutes() != None
     canDelete = staticmethod( canDelete )
-    
+
     def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
     getModificationURL = classmethod(getModificationURL)
-    
+
     def create( target ):
         return target.createMinutes()
     create = staticmethod( create )
 
 class WReviewingCreation( WSpecialMaterialCreationBase ):
     pass
-    
+
 class ReviewingFactory(MaterialFactory):
 
     _id = "reviewing"
@@ -337,7 +337,7 @@ class ReviewingFactory(MaterialFactory):
     _creationWC = WReviewingCreation
     _materialKlasses=[conference.Reviewing]
     _needsCreationPage = False
-        
+
     def get( owner ):
         """returns the material"""
         if isinstance(owner, conference.Contribution):
@@ -346,7 +346,7 @@ class ReviewingFactory(MaterialFactory):
             # we supposed that it is a Review object
             return owner.getMaterialById(0)
     get = staticmethod(get)
-    
+
     def remove( owner ):
         """performs the deletion of the paper from the owner"""
         owner.removeReviewing()
@@ -356,14 +356,14 @@ class ReviewingFactory(MaterialFactory):
         #only one paper can be added to a contribution
         return target.getReviewing() == None
     canAdd = staticmethod( canAdd )
-    
+
     def canDelete( target ):
         #only a paper which is already set in a contribution can be deleted
         return target.getReviewing() != None
     canDelete = staticmethod( canDelete )
-    
+
     def getModificationURL( cls, mat ):
-        """returns the URL for accessing to the modification view of the 
+        """returns the URL for accessing to the modification view of the
             material"""
         return urlHandlers.UHMaterialModification.getURL( mat )
     getModificationURL = classmethod(getModificationURL)
@@ -434,8 +434,7 @@ class MaterialFactoryRegistry:
         'simple_event': [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ],
         'meeting': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
         'conference' : ["paper", "slides", "poster", "minutes"],
-        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
-        'reviewing' : ["reviewing"]
+        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
         }
 
 
@@ -501,12 +500,7 @@ class SessionMFRegistry(MaterialFactoryRegistry):
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):
-                  { PosterFactory._id: PosterFactory, \
-                  ReviewingFactory._id: ReviewingFactory }
-                  
-class CategoryMFRegistry( ContribMFRegistry ):
     pass
-
 
 class SubContributionMFRegistry(MaterialFactoryRegistry):
     pass

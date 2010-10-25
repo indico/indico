@@ -206,6 +206,24 @@ class GetMaterialClassesBase(MaterialDisplayBase):
 
         return matList
 
+class GetReviewingMaterial(GetMaterialClassesBase):
+    """
+    Base class for obtaining a listing of reviewing material classes
+    """
+
+    def _getAnswer(self):
+        """
+        Provides the list of material classes, based on the target
+        resource (conference, session, contribution, etc...)
+        """
+        matList = {}
+
+        rev = self._target.getReviewing()
+        matList[rev.getId()] = rev.fossilize(IMaterialFossil)
+
+        return matList
+
+
 class GetMaterial(MaterialDisplayBase):
     """
     Service for obtaining a material by id
@@ -217,7 +235,6 @@ class GetMaterial(MaterialDisplayBase):
         resource (conference, session, contribution, etc...)
         """
         return self._material.fossilize(IMaterialFossil)
-
 
 class GetMaterialAllowedUsers(MaterialModifBase):
     """
@@ -404,6 +421,7 @@ class DeleteResourceBase(ResourceModifBase):
 methodMap = {
 
     "list": GetMaterialClassesBase,
+    "reviewing.list": GetReviewingMaterial,
     "listAllowedUsers": GetMaterialAllowedUsers,
     "get": GetMaterial,
     "edit": EditMaterialClassBase,
