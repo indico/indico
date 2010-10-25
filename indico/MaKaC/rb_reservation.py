@@ -1188,11 +1188,9 @@ class ReservationBase( object ):
         FINAL (not intented to be overriden)
         Owner in terms of "parent", i.e. conference
         """
-        oryg = self._p_changed
         self.__owner = None
         if owner:
             self.__owner = owner.getId()#Impersistant( owner )
-        self._p_changed = oryg
 
     def getOwner( self ):
         """
