@@ -249,27 +249,29 @@ class outputGenerator:
 
 #        Logger.get('RecMan').info('showContribution: ' + str(showContribution))
 
-        # Access list info (tag 506)
+        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
         # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
+        # And we don't want to try to import a module that's not there.
         if recordingManagerTags is not None:
             # Also check to make sure that the RecordingManager plugin is installed and active
             if (PluginsHolder().hasPluginType("Collaboration") and
                 PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
                 PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
 
-                # Only create the access list and video tags if this conference
-                # is the desired talk.
+                # Only create these tags if this conference is the desired talk.
                 if recordingManagerTags["talkType"] == "conference" and recordingManagerTags["talkId"] == conf.getId():
 #                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
-#                    Logger.get('RecMan').info('showContribution: ' + str(showContribution))
 
                     # Now we know it's safe to import the necessary methods,
                     # because we have verified that the RecordingManager plugin is installed.
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator.generateAccessListXML(out, conf)
-                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
+
+                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, conf)                # MARC 506__a,d,f,2,5
+                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
+                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
+                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, conf)               # MARC 980__a
+                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, conf)                # MARC 693__e
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -609,24 +611,29 @@ class outputGenerator:
         for mat in mList:
             self._materialToXML(mat, vars, out=out)
 
-        # Access list info (tag 506)
+        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
         # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
+        # And we don't want to try to import a module that's not there.
         if recordingManagerTags is not None:
             # Also check to make sure that the RecordingManager plugin is installed and active
             if (PluginsHolder().hasPluginType("Collaboration") and
                 PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
                 PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
 
-                # Only create the access list and video tags if this conference
-                # is the desired talk (the video tags only apply to one talk at a time).
+                # Only create these tags if this conference is the desired talk.
                 if recordingManagerTags["talkType"] == "session" and recordingManagerTags["talkId"] == session.getId():
-#                    Logger.get('RecMan').info('Called _sessionToXML() with RecordingManager')
-                    # only now do we know it's safe to import the necessary method
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator.generateAccessListXML(out, session)
-                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
+#                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
+
+                    # Now we know it's safe to import the necessary methods,
+                    # because we have verified that the RecordingManager plugin is installed.
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
+
+                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, session)             # MARC 506__a,d,f,2,5
+                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
+                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
+                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, session)            # MARC 980__a
+                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, session)             # MARC 693__e
 
         out.closeTag("session")
 
@@ -845,26 +852,30 @@ class outputGenerator:
                 if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
                     self._subContributionToXML(subC,vars,includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
 
-        # Access list info (tag 506)
+        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
         # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
+        # And we don't want to try to import a module that's not there.
         if recordingManagerTags is not None:
             # Also check to make sure that the RecordingManager plugin is installed and active
             if (PluginsHolder().hasPluginType("Collaboration") and
                 PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
                 PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
 
-                # Only create the access list and video tags if this conference
-                # is the desired talk (the video tags only apply to one talk at a time).
+                # Only create these tags if this conference is the desired talk.
                 if recordingManagerTags["talkType"] == "contribution" and recordingManagerTags["talkId"] == contribution.getId():
-#                    Logger.get('RecMan').info('Called _contribToXML() with RecordingManager')
-#                    Logger.get('RecMan').info('showSubContribution: ' + str(showSubContribution))
+#                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('showContribution: ' + str(showContribution))
 
-                    # only now do we know it's safe to import the necessary method
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator.generateAccessListXML(out, contribution)
-                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
+                    # Now we know it's safe to import the necessary methods,
+                    # because we have verified that the RecordingManager plugin is installed.
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
+
+                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, contribution)        # MARC 506__a,d,f,2,5
+                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
+                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
+                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, contribution)       # MARC 980__a
+                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, contribution)        # MARC 693__e
 
         out.closeTag("contribution")
 
@@ -931,25 +942,30 @@ class outputGenerator:
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
 
-        # Access list info (tag 506)
+        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
         # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters.
+        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
+        # And we don't want to try to import a module that's not there.
         if recordingManagerTags is not None:
             # Also check to make sure that the RecordingManager plugin is installed and active
             if (PluginsHolder().hasPluginType("Collaboration") and
                 PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
                 PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
 
-                # Only create the access list and video tags if this conference
-                # is the desired talk (the video tags only apply to one talk at a time).
+                # Only create these tags if this conference is the desired talk.
                 if recordingManagerTags["talkType"] == "subcontribution" and recordingManagerTags["talkId"] == subCont.getId():
 #                    Logger.get('RecMan').info('Called _subContributionToXML() with RecordingManager')
+#                    Logger.get('RecMan').info('showSubContribution: ' + str(showSubContribution))
 
-                    # only now do we know it's safe to import the necessary method
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import MarcAccessListGenerator
-                    MarcAccessListGenerator.generateAccessListXML(out, subCont)
-                    MarcAccessListGenerator.generateVideoXML(out, recordingManagerTags)
-                    MarcAccessListGenerator.generateLanguagesXML(out, recordingManagerTags)
+                    # Now we know it's safe to import the necessary methods,
+                    # because we have verified that the RecordingManager plugin is installed.
+                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
+
+                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, subCont)             # MARC 506__a,d,f,2,5
+                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
+                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
+                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, subCont)            # MARC 980__a
+                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, subCont)             # MARC 693__e
 
         out.closeTag("subcontribution")
 

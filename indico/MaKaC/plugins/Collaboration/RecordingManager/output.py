@@ -1,16 +1,18 @@
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.user import Avatar
 from MaKaC.user import CERNGroup
+from MaKaC.conference import Category
 
 from MaKaC.common.logger import Logger
 
-class MarcAccessListGenerator(object):
+class RecordingManagerMarcTagGenerator(object):
 
     @classmethod
     def generateAccessListXML(cls, out, obj):
         """Generate a comprehensive access list showing all users and e-groups who may access
         this object, taking into account the permissions and access lists of its owners.
-        obj could be a Conference, Session, Contribution, or SubContribution object."""
+        obj could be a Conference, Session, Contribution, or SubContribution object.
+        This will become tag 506 after being XSL transformed."""
 
         allowed_users = obj.getRecursiveAllowedToAccessList()
         if allowed_users is not None and len(allowed_users) > 0:
@@ -71,3 +73,52 @@ class MarcAccessListGenerator(object):
 #                Logger.get('RecMan').info("in generateLanguagesXML(), language = %s" % l)
                 out.writeTag("code", l)
             out.closeTag("languages")
+
+    @classmethod
+    def generateCDSCategoryXML(cls, out, obj):
+        """Determine if this record should belong to any particular CDS categories,
+        based on the recursive list of owners and Recording Manager options.
+        This will become MARC tag 980__a after being XSL transformed."""
+
+        # Each Indico category may be associated with up to 1 CDS categories,
+        # but multiple Indioc categories may be associated with the same CDS category.
+        listCDSCategories = []
+
+        # Get every successive owner of this object up to the root category.
+        # If this object is more than 20 levels deep that would be CRAZY!
+        crazyCounter = 0
+        while obj is not None and crazyCounter < 20:
+            Logger.get('RecMan').debug("obj id: %s, title: \"%s\"" % (obj.getId(), obj.getTitle()))
+
+            # getId() is not unique for all objects across the database. It is unique for all categories, though,
+            # so as long as we are only dealing with categories it's ok.
+            if CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments").has_key(obj.getId()) \
+                and CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()] is not None \
+                and isinstance(obj, Category):
+                if CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()] not in listCDSCategories:
+                    listCDSCategories.append(CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()])
+                    Logger.get('RecMan').debug("  This one matches! Appending \"%s\"" % CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()])
+
+            obj = obj.getOwner()
+            crazyCounter += 1
+
+        # Generate the base XML tags
+        if len(listCDSCategories) > 0:
+            out.openTag("CDSCategories")
+            for category in listCDSCategories:
+                out.writeTag("category", category)
+            out.closeTag("CDSCategories")
+
+    @classmethod
+    def generateExperimentXML(cls, out, obj):
+        """Determine if this record belongs to a particular experiment, based on the recursive list of owners and Recording Manager options.
+        This will become tag 693__e after being XSL transformed."""
+
+        # First populate a list of every recursive owner up to the root category
+
+        # If any member of this list matches any key in the user-defined dictionary in the options, then the value for that key is what to use for the experiment.
+
+        # generate the XML
+
+        pass
+

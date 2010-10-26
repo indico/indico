@@ -187,6 +187,13 @@
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="a">Indico</subfield>
 </datafield>
+<xsl:if test="count(./CDSCategories) != 0">
+<datafield tag="980" ind1=" " ind2=" ">
+<xsl:for-each select="./CDSCategories/category">
+  <subfield code="a"><xsl:value-of select="." disable-output-escaping="yes"/></subfield>
+</xsl:for-each>
+</datafield>
+</xsl:if>
 <xsl:if test="substring(./category,0,26)='Academic Training Lecture'">
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="b">ACAD</subfield>

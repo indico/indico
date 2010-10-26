@@ -162,6 +162,13 @@
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="a">Indico</subfield>
 </datafield>
+<xsl:if test="count(./session/CDSCategories) != 0">
+<datafield tag="980" ind1=" " ind2=" ">
+<xsl:for-each select="./session/CDSCategories/category">
+  <subfield code="a"><xsl:value-of select="." disable-output-escaping="yes"/></subfield>
+</xsl:for-each>
+</datafield>
+</xsl:if>
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="b">TALK</subfield>
 </datafield>

@@ -541,7 +541,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
                      forceCache          = True,
                      recordingManagerTags = tags)
     else:
-        raise RecordingManagerException(_("IndicoID %s is not a conference, session, contribution or subcontribution.") % IndicoID)
+        raise RecordingManagerException(_("IndicoID %s is not a known conference, session, contribution or subcontribution.") % IndicoID)
 
     xmlGen.closeTag("event")
 
@@ -585,12 +585,12 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
         flagSuccess = False
         result += _("Stylesheet does not exist: %s") % stylePath
 
-    # temporary, for my own debugging
+    # Uncomment these lines when debugging to see the basic XML representation that is being created.
 #    f = open('/tmp/base.xml', 'w')
 #    f.write(basexml)
 #    f.close()
 
-    # temporary, for my own debugging
+    # Uncomment these lines when debugging to see the MARC XML being submitted to CDS
 #    f = open('/tmp/marc.xml', 'w')
 #    f.write(marcxml)
 #    f.close()
@@ -607,7 +607,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
     try:
         f = urlopen(req)
         cds_response = f.read()
-
+#        cds_response = "testing" # uncomment for debugging
         # Successful operations should result in a one-line message that looks like this:
         # [INFO] Some message here
         # anything else means there was an error
@@ -622,7 +622,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
         flagSuccess = False
         result += _("Unknown error occured when submitting CDS record: %s.\n") % e
 
-    # temporary, for my own debugging
+    # Uncomment these lines when debugging to see the result returned by CDS
 #    f = open('/tmp/cds_result.txt', 'w')
 #    f.write(cds_response)
 #    f.close()
