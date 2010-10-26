@@ -1,4 +1,3 @@
-
 <table width="100%%"">
     <tr>
         <form action=%(modifyDataURL)s method="POST" onsubmit="return parseForm(this)">
@@ -15,7 +14,7 @@
                         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Content")%></span></td>
                         <td >
                             <div id="contentField"></div>
-                            <input type="hidden"  id="content" name="content" value="%(content)s">
+                            <input type="hidden"  id="content" name="content">
                         </td>
                     </tr>
                     <tr>
@@ -41,3 +40,18 @@
     </tr>
 </table>
 <br>
+<script type="text/javascript">
+    var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoFull");
+    editor.set("%(content)s", true);
+    $E('contentField').set(editor.draw());
+
+    function parseForm(form){
+        with(form){
+            if(editor.clean()){
+                $E('content').set(editor.get());
+                return true;
+            } else
+                return false;
+        }
+    }
+</script>

@@ -5902,20 +5902,6 @@ class WModifReportNumberEdit(WTemplated):
         return vars
 
 
-class WHTMLEditorWrapper(WTemplated):
-
-    def __init__(self, html, conf):
-        self._html=html
-        self._conf=conf
-
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars["baseURL"]=Config.getInstance().getBaseURL()
-        vars["imageUploadURL"]=urlHandlers.UHConfModifDisplayAddPageFile.getURL(self._conf)
-        vars["imageBrowserURL"]=urlHandlers.UHConfModifDisplayAddPageFileBrowser.getURL(self._conf)
-        vars["body"]=self._html
-        return vars
-
 # ============================================================================
 # === ROOM BOOKING RELATED ===================================================
 # ============================================================================

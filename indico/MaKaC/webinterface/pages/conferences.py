@@ -17,14 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.webinterface import wcomponents
 
 import urllib
 import os
 import string
 import random
 import simplejson
-import copy
 
 from datetime import timedelta,datetime
 from xml.sax.saxutils import quoteattr, escape
@@ -54,7 +52,6 @@ from MaKaC.common.output import outputGenerator
 from MaKaC.webinterface.general import strfFileSize
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
-from MaKaC import booking
 from MaKaC.PDFinterface.base import PDFSizes
 from pytz import timezone
 import MaKaC.webinterface.common.timezones as convertTime
@@ -7074,8 +7071,7 @@ class WPConfModifDisplayAddPage( WPConfModifDisplayBase ):
         self._tabDisplayMenu.setActive()
 
     def _getTabContent( self, params ):
-        wc = WConfModifDisplayAddPage( self._conf, self._linkId )
-        return wcomponents.WHTMLEditorWrapper(wc.getHTML(),self._conf).getHTML()
+        return WConfModifDisplayAddPage( self._conf, self._linkId ).getHTML()
 
 
 class WConfModifDisplayAddPage(wcomponents.WTemplated):
@@ -7189,7 +7185,7 @@ class WPConfModifDisplayModifyPage( WPConfModifDisplayBase ):
         wc = WConfModifDisplayModifyPage( self._conf, self._link )
         p = {
                 "modifyDataURL": quoteattr(str(urlHandlers.UHConfModifDisplayModifyData.getURL(self._link))) }
-        return wcomponents.WHTMLEditorWrapper(wc.getHTML( p ),self._conf).getHTML()
+        return wc.getHTML( p )
 
 class WConfModifDisplayModifyPage(wcomponents.WTemplated):
 
@@ -7204,7 +7200,7 @@ class WConfModifDisplayModifyPage(wcomponents.WTemplated):
         vars["saveLinkURL"] = quoteattr(str(urlHandlers.UHConfModifDisplayAddLink.getURL(self._link)))
         vars["name"] = self._link.getCaption()
         vars["value_name"] = quoteattr(self._link.getCaption())
-        vars["content"] = self._link.getPage().getContent()
+        vars["content"] = self._link.getPage().getContent().replace('"','\\"').replace("'","\\'").replace('\r\n','\\n').replace('\n','\\n')
         if self._link.getDisplayTarget() == "_blank":
             vars["newChecked"] = _("""CHECKED""")
             vars["sameChecked"] = ""
