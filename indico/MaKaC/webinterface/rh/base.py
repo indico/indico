@@ -268,7 +268,7 @@ class RH(RequestHandlerBase):
         if noCache:
             self._disableCaching()
         try:
-            self._req.status = apache.HTTP_MOVED_PERMANENTLY
+            self._req.status = apache.HTTP_SEE_OTHER
         except NameError:
             pass
 
