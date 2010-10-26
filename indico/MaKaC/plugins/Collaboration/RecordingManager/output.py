@@ -78,17 +78,17 @@ class RecordingManagerMarcTagGenerator(object):
     def generateCDSCategoryXML(cls, out, obj):
         """Determine if this record should belong to any particular CDS categories,
         based on the recursive list of owners and Recording Manager options.
-        This will become MARC tag 980__a after being XSL transformed."""
+        This will become MARC tag 980__a after XSL transformation."""
 
         # Each Indico category may be associated with up to 1 CDS categories,
-        # but multiple Indioc categories may be associated with the same CDS category.
+        # but multiple Indico categories may be associated with the same CDS category.
         listCDSCategories = []
 
         # Get every successive owner of this object up to the root category.
         # If this object is more than 20 levels deep that would be CRAZY!
         crazyCounter = 0
         while obj is not None and crazyCounter < 20:
-            Logger.get('RecMan').debug("obj id: %s, title: \"%s\"" % (obj.getId(), obj.getTitle()))
+            #Logger.get('RecMan').debug("obj id: %s, title: \"%s\"" % (obj.getId(), obj.getTitle()))
 
             # getId() is not unique for all objects across the database. It is unique for all categories, though,
             # so as long as we are only dealing with categories it's ok.
@@ -97,7 +97,7 @@ class RecordingManagerMarcTagGenerator(object):
                 and isinstance(obj, Category):
                 if CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()] not in listCDSCategories:
                     listCDSCategories.append(CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()])
-                    Logger.get('RecMan').debug("  This one matches! Appending \"%s\"" % CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()])
+                    #Logger.get('RecMan').debug("  This one matches! Appending \"%s\"" % CollaborationTools.getOptionValue("RecordingManager", "CDSCategoryAssignments")[obj.getId()])
 
             obj = obj.getOwner()
             crazyCounter += 1
@@ -111,14 +111,31 @@ class RecordingManagerMarcTagGenerator(object):
 
     @classmethod
     def generateExperimentXML(cls, out, obj):
-        """Determine if this record belongs to a particular experiment, based on the recursive list of owners and Recording Manager options.
-        This will become tag 693__e after being XSL transformed."""
+        """Determine if this record belongs to a particular experiment,
+        based on the recursive list of owners and Recording Manager options.
+        This will become tag 693__e after XSL transformation."""
 
-        # First populate a list of every recursive owner up to the root category
+        # Each Indico category may be associated with 1 experiment.
+        experiment = None
 
-        # If any member of this list matches any key in the user-defined dictionary in the options, then the value for that key is what to use for the experiment.
+        # Get every successive owner of this object up to the root category, stop if match is found.
+        # If this object is more than 20 levels deep that would be CRAZY!
+        crazyCounter = 0
+        while obj is not None and crazyCounter < 20:
+            #Logger.get('RecMan').debug("obj id: %s, title: \"%s\"" % (obj.getId(), obj.getTitle()))
 
-        # generate the XML
+            # getId() is not unique for all objects across the database. It is unique for all categories, though,
+            # so as long as we are only dealing with categories it's ok.
+            if CollaborationTools.getOptionValue("RecordingManager", "CDSExperimentAssignments").has_key(obj.getId()) \
+                and CollaborationTools.getOptionValue("RecordingManager", "CDSExperimentAssignments")[obj.getId()] is not None \
+                and isinstance(obj, Category):
+                experiment = CollaborationTools.getOptionValue("RecordingManager", "CDSExperimentAssignments")[obj.getId()]
+                #Logger.get('RecMan').debug("  This one matches! Experiment is \"%s\"" % experiment)
+                break
 
-        pass
+            obj = obj.getOwner()
+            crazyCounter += 1
 
+        # Generate the base XML tags
+        if experiment is not None:
+            out.writeTag("CDSExperiment", experiment)
