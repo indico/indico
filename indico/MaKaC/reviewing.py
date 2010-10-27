@@ -93,7 +93,6 @@ class ConferenceReview(Persistent):
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
 
         from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
-        self._reviewableMaterials = MaterialFactoryRegistry._allowedMaterials['reviewing']
         #from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
         self._nonReviewableMaterials = []#this is not used any more, since we have new material type used only for reviewing
 
@@ -415,35 +414,6 @@ class ConferenceReview(Persistent):
             (modes 3 and 4)
         """
         return self._choice == 3 or self._choice == 4
-
-    #Choice of reviewable materials methods
-    def getReviewableMaterials(self):
-        """ Returns the list of reviewable materials.
-            Reviewable materials are the only ones subject to versioning and they will be "blocked"
-            when the author submits them, so that they cannot be changed during the reviewing process.
-        """
-        return self._reviewableMaterials
-
-    def getNonReviewableMaterials(self):
-        """ Returns the list of non-reviewable materials
-        """
-        return self._nonReviewableMaterials
-
-    def addReviewableMaterials(self, materials):
-        """ Adds a list of materials to the list of reviewable materials
-        """
-        self._reviewableMaterials.extend(materials)
-        for m in materials:
-            self._nonReviewableMaterials.remove(m)
-        self.notifyModification()
-
-    def removeReviewableMaterials(self, materials):
-        """ Removes a list of materials from the list of reviewable materials
-        """
-        self._nonReviewableMaterials.extend(materials)
-        for m in materials:
-            self._reviewableMaterials.remove(m)
-        self.notifyModification()
 
     #Content reviewing and final judgement new states methods
     def addState(self, state):

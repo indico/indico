@@ -192,16 +192,16 @@ class ConferenceReviewingCriteriaModification(ConferenceReviewingListModificatio
 
     def _handleSet(self):
         self._confReview.setLayoutCriteria(self._value)
-        
-        
-class ConferenceReviewingDeleteTemplate(ConferenceReviewingBase):  
-    
+
+
+class ConferenceReviewingDeleteTemplate(ConferenceReviewingBase):
+
     def _getAnswer(self):
             templateId = self._params.get("templateId")
             self._confReview.deleteTemplate(templateId)
-            return True    
-       
-        
+            return True
+
+
 class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeModificationBase):
 
     def _checkParams(self):
@@ -217,7 +217,7 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
             self._conf.getConfReview().setDefaultReviewerDueDate(self._pTime)
         else:
             raise ServiceError("ERR-REV3a",_("Kind of deadline to change not set"))
-        
+
     def _handleGet(self):
         if self._dueDateToChange == "Referee":
             date = self._conf.getConfReview().getAdjustedDefaultRefereeDueDate()
@@ -227,7 +227,7 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
             date = self._conf.getConfReview().getAdjustedDefaultReviewerDueDate()
         else:
             raise ServiceError("ERR-REV3b",_("Kind of deadline to change not set"))
-        
+
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
@@ -243,148 +243,148 @@ class ConferenceAbstractReviewingDefaultDueDateModification(ConferenceAbstractRe
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
 class ConferenceReviewingAutoEmailsModificationPRM(ConferenceReviewingSetupTextModificationBase ):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enablePRMEmailNotif()
         else:
             self._confReview.disablePRMEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnablePRMEmailNotif()
-       
+
 class ConferenceReviewingAutoEmailsModificationReferee(ConferenceReviewingSetupTextModificationBase ):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableRefereeEmailNotif()
         else:
             self._confReview.disableRefereeEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableRefereeEmailNotif()
-    
+
 class ConferenceReviewingAutoEmailsModificationEditor(ConferenceReviewingSetupTextModificationBase ):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableEditorEmailNotif()
         else:
             self._confReview.disableEditorEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableEditorEmailNotif()
-    
+
 class ConferenceReviewingAutoEmailsModificationReviewer(ConferenceReviewingSetupTextModificationBase ):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableReviewerEmailNotif()
         else:
             self._confReview.disableReviewerEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableReviewerEmailNotif()
-        
+
 class ConferenceReviewingAutoEmailsModificationRefereeForContribution(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableRefereeEmailNotifForContribution()
         else:
             self._confReview.disableRefereeEmailNotifForContribution()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableRefereeEmailNotifForContribution()
-    
+
 class ConferenceReviewingAutoEmailsModificationEditorForContribution(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableEditorEmailNotifForContribution()
         else:
             self._confReview.disableEditorEmailNotifForContribution()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableEditorEmailNotifForContribution()
-    
+
 class ConferenceReviewingAutoEmailsModificationReviewerForContribution(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableReviewerEmailNotifForContribution()
         else:
             self._confReview.disableReviewerEmailNotifForContribution()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableReviewerEmailNotifForContribution()
-    
+
 class ConferenceReviewingAutoEmailsModificationRefereeJudgement(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableRefereeJudgementEmailNotif()
         else:
             self._confReview.disableRefereeJudgementEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableRefereeJudgementEmailNotif()
-    
+
 class ConferenceReviewingAutoEmailsModificationEditorJudgement(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableEditorJudgementEmailNotif()
         else:
             self._confReview.disableEditorJudgementEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableEditorJudgementEmailNotif()
-    
+
 class ConferenceReviewingAutoEmailsModificationReviewerJudgement(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableReviewerJudgementEmailNotif()
         else:
             self._confReview.disableReviewerJudgementEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableReviewerJudgementEmailNotif()
-    
+
 class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReferee(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableAuthorSubmittedMatRefereeEmailNotif()
         else:
             self._confReview.disableAuthorSubmittedMatRefereeEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableAuthorSubmittedMatRefereeEmailNotif()
-    
+
 class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatEditor(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableAuthorSubmittedMatEditorEmailNotif()
         else:
             self._confReview.disableAuthorSubmittedMatEditorEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableAuthorSubmittedMatEditorEmailNotif()
-    
+
 class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer(ConferenceReviewingSetupTextModificationBase):
-    
+
     def _handleSet(self):
         if self._value:
             self._confReview.enableAuthorSubmittedMatReviewerEmailNotif()
         else:
             self._confReview.disableAuthorSubmittedMatReviewerEmailNotif()
-        
+
     def _handleGet(self):
         return self._confReview.getEnableAuthorSubmittedMatReviewerEmailNotif()
-    
+
 
 class ConferenceReviewingCompetenceModification(ListModificationBase, ConferenceReviewingPRMAMBase):
     #Note: don't change the order of the inheritance here!
@@ -408,27 +408,6 @@ class ConferenceReviewingCompetenceModification(ListModificationBase, Conference
     def _handleSet(self):
         self._confReview.setUserCompetences(self._user, self._value)
 
-
-class ConferenceReviewingReviewableMaterialsModification(TwoListModificationBase, ConferenceReviewingPRMBase):
-    #Note: don't change the order of the inheritance here!
-    """ Class to change which materials are to be reviewed
-        Only PRMs can do this so this class inherits from ConferenceReviewingPRMBase.
-        Note: don't change the order of the inheritance!
-    """
-
-    def _handleGet(self):
-        if self._destination == "left": #left select box is the list of non-reviewable materials
-            return self._confReview.getNonReviewableMaterials()
-        if self._destination == "right": #right select box is the list of reviewable materials
-            return self._confReview.getReviewableMaterials()
-
-    def _handleSet(self):
-        if self._destination == "right": #right select box is the list of reviewable materials
-            self._confReview.addReviewableMaterials(self._value)
-        if self._destination == "left": #left select box is the list of non-reviewable materials
-            self._confReview.removeReviewableMaterials(self._value)
-
-
 class ConferenceReviewingContributionsAttributeList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
     #Note: don't change the order of the inheritance here!
     """ Class to return all the tracks or sessions or types of the conference
@@ -438,7 +417,7 @@ class ConferenceReviewingContributionsAttributeList(ListModificationBase, Confer
         self._attribute = self._params.get("attribute", None)
         if self._attribute is None:
             raise ServiceError("ERR-REV5",_("No type/session/track specified"))
-        
+
     def _handleGet(self):
         attributes = []
         for c in self._conf.getContributionList():
@@ -452,15 +431,15 @@ class ConferenceReviewingContributionsAttributeList(ListModificationBase, Confer
                 if c.getSession() is not None and c.getSession() not in attributes:
                     attributes.append(c.getSession())
             else:
-                raise ServiceError("ERR-REV5",_("No attribute specified"))     
-        
+                raise ServiceError("ERR-REV5",_("No attribute specified"))
+
         if self._attribute == 'type':
             return [{"id": attribute.getId(), "title": attribute.getName()}
                 for attribute in attributes]
         else:
             return [{"id": attribute.getId(), "title": attribute.getTitle()}
                 for attribute in attributes]
-            
+
 class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
     #Note: don't change the order of the inheritance here!
     """ Class to return all the contributions ids for the selected track/session/type of the conference
@@ -473,7 +452,7 @@ class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationB
         self._selectedAttribute = self._params.get("selectedAttributes", None)
         if self._selectedAttribute is None:
             raise ServiceError("ERR-REV5",_("No attribute specified"))
-        
+
     def _handleGet(self):
         contributionsPerSelectedAttribute = []
         for c in self._conf.getContributionList():
@@ -491,12 +470,12 @@ class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationB
                         if c.getSession().getId() == att:
                             contributionsPerSelectedAttribute.append(c.getId())
                 else:
-                    raise ServiceError("ERR-REV5",_("No attribute specified"))     
-             
-        
+                    raise ServiceError("ERR-REV5",_("No attribute specified"))
+
+
         return contributionsPerSelectedAttribute
-            
-        
+
+
 class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
     #Note: don't change the order of the inheritance here!
     """ Class to return all the referees / editors / reviewers of the conference,
@@ -511,9 +490,9 @@ class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceRevi
     def _handleGet(self):
         return [{"id": user.getId(), "name": user.getStraightFullName(), "competences": c}
                 for user, c in self._confReview.getAllUserCompetences(True, self._role)]
-        
-        
-        
+
+
+
 class ConferenceReviewingAssignReferee(ConferenceReviewingAssignStaffBasePRM):
     """ Assigns a referee to a list of contributions
     """
@@ -631,24 +610,24 @@ class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceRevie
         for user in self._avatars:
             if not user in self._confReview._paperReviewManagersList:
                 self._confReview.addPaperReviewManager(user)
-                
+
         return True
-    
-class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewingPRMAMBase):   
+
+class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewingPRMAMBase):
     """ Removes paper review manager from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
         ConferenceReviewingPRMAMBase._checkParams(self)
-        
+
     def _checkProtection(self):
         ConferenceReviewingPRMAMBase._checkProtection(self)
-        
+
     def _getAnswer(self):
         self._confReview.removePaperReviewManager(self._targetUser)
-        
+
         return True
-       
+
 class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceReviewingPRMAMBase):
     """ Adds referee to reviewers team for the conference
     """
@@ -663,19 +642,19 @@ class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceR
         for user in self._avatars:
             if not user in self._confReview._refereesList:
                 self._confReview.addReferee(user)
-                
+
         return True
-    
-class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceReviewingPRMAMBase):   
+
+class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceReviewingPRMAMBase):
     """ Removes referee from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
         ConferenceReviewingPRMAMBase._checkParams(self)
-        
+
     def _checkProtection(self):
         ConferenceReviewingPRMAMBase._checkProtection(self)
-        
+
     def _getAnswer(self):
         judgedContribs = self._confReview.getJudgedContributions(self._targetUser)[:]
         for contribution in judgedContribs:
@@ -683,7 +662,7 @@ class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceRevie
             if rm.hasReferee():
                 rm.removeReferee()
         self._confReview.removeReferee(self._targetUser)
-        
+
         return True
 
 
@@ -701,19 +680,19 @@ class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceRe
         for user in self._avatars:
             if not user in self._confReview._editorsList:
                 self._confReview.addEditor(user)
-                
+
         return True
-    
-class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReviewingPRMAMBase):   
+
+class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReviewingPRMAMBase):
     """ Removes editor from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
         ConferenceReviewingPRMAMBase._checkParams(self)
-        
+
     def _checkProtection(self):
         ConferenceReviewingPRMAMBase._checkProtection(self)
-        
+
     def _getAnswer(self):
         editedContribs = self._confReview.getEditedContributions(self._targetUser)[:]
         for contribution in editedContribs:
@@ -721,10 +700,10 @@ class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReview
             if rm.hasEditor():
                 rm.removeEditor()
         self._confReview.removeEditor(self._targetUser)
-        
+
         return True
- 
- 
+
+
 class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, ConferenceReviewingPRMAMBase):
     """ Adds editor to reviewers team for the conference
     """
@@ -739,30 +718,30 @@ class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, Conference
         for user in self._avatars:
             if not user in self._confReview._reviewersList:
                 self._confReview.addReviewer(user)
-                
+
         return True
-    
-class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceReviewingPRMAMBase):   
+
+class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceReviewingPRMAMBase):
     """ Removes editor from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
         ConferenceReviewingPRMAMBase._checkParams(self)
-        
+
     def _checkProtection(self):
         ConferenceReviewingPRMAMBase._checkProtection(self)
-        
+
     def _getAnswer(self):
         if not self._targetUser:
             raise ServiceError("ERR-REV6d",_("user id not set"))
-        
+
         reviewedContribs = self._confReview.getReviewedContributions(self._targetUser)[:]
-        for contribution in reviewedContribs: 
+        for contribution in reviewedContribs:
             rm = contribution.getReviewManager()
             rm.removeReviewer(self._targetUser)
         self._confReview.removeReviewer(self._targetUser)
-        
-        return True     
+
+        return True
 #####################################
 ###  Contribution reviewing classes
 #####################################
@@ -829,7 +808,7 @@ class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModi
             lastReview.setReviewerDueDate(self._pTime)
         else:
             raise ServiceError("ERR-REV3c",_("Kind of deadline to change not set"))
-        
+
     def _handleGet(self):
         lastReview = self._target.getReviewManager().getLastReview()
         if self._dueDateToChange == "Referee":
@@ -840,7 +819,7 @@ class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModi
             date = lastReview.getAdjustedReviewerDueDate()
         else:
             raise ServiceError("ERR-REV3d",_("Kind of deadline to change not set"))
-        
+
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
@@ -915,7 +894,6 @@ methodMap = {
     "conference.changeCompetences": ConferenceReviewingCompetenceModification,
     "conference.changeDefaultDueDate" : ConferenceReviewingDefaultDueDateModification,
     "conference.changeAbstractReviewerDefaultDueDate" : ConferenceAbstractReviewingDefaultDueDateModification,
-    "conference.changeReviewableMaterials" : ConferenceReviewingReviewableMaterialsModification,
     "conference.attributeList" : ConferenceReviewingContributionsAttributeList,
     "conference.contributionsIdPerSelectedAttribute" : ConferenceReviewingContributionsPerSelectedAttributeList,
     "conference.userCompetencesList": ConferenceReviewingUserCompetenceList,
@@ -927,7 +905,7 @@ methodMap = {
     "conference.addReviewer" : ConferenceReviewingAddReviewer,
     "conference.removeReviewer" : ConferenceReviewingRemoveReviewer,
     "conference.removeAllReviewers" : ConferenceReviewingRemoveAllReviewers,
-    
+
     "conference.PRMEmailNotif" : ConferenceReviewingAutoEmailsModificationPRM,
     "conference.RefereeEmailNotif" : ConferenceReviewingAutoEmailsModificationReferee,
     "conference.EditorEmailNotif" : ConferenceReviewingAutoEmailsModificationEditor,
@@ -941,8 +919,8 @@ methodMap = {
     "conference.AuthorSubmittedMatRefereeNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReferee,
     "conference.AuthorSubmittedMatEditorNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatEditor,
     "conference.AuthorSubmittedMatReviewerNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer,
-    
-    
+
+
     "conference.assignTeamPRM" : ConferenceReviewingAssignTeamPRM,
     "conference.removeTeamPRM" : ConferenceReviewingRemoveTeamPRM,
     "conference.assignTeamReferee" : ConferenceReviewingAssignTeamReferee,
@@ -951,7 +929,7 @@ methodMap = {
     "conference.removeTeamEditor" : ConferenceReviewingRemoveTeamEditor,
     "conference.assignTeamReviewer" : ConferenceReviewingAssignTeamReviewer,
     "conference.removeTeamReviewer" : ConferenceReviewingRemoveTeamReviewer,
-    
+
     "contribution.changeDueDate": ContributionReviewingDueDateModification,
     "contribution.changeComments": ContributionReviewingCommentsModification,
     "contribution.changeJudgement": ContributionReviewingJudgementModification,

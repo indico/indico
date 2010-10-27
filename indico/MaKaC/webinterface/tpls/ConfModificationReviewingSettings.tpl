@@ -10,13 +10,13 @@
         <td nowrap id="reviewingModeHelp" class="groupTitle"><%= _("Step 1: Choose type of paper reviewing for the conference")%>
         </td>
     </tr>
-        <em><%= _("Please, follow these steps to set up the Paper Reviewing Module")%></em> 
+        <em><%= _("Please, follow these steps to set up the Paper Reviewing Module")%></em>
 </table>
-        
+
 <table width="90%%" border="0" style="margin-bottom:1em">
     <tr>
         <td>
-        
+
         </td>
     </tr>
     <tr>
@@ -45,27 +45,6 @@
         </td>
     </tr>
 </table>
-<% if ConfReview.hasReviewing(): %>
-    <% display = 'table' %>
-<% end %>
-<% else: %>
-    <% display = 'none' %>
-<% end %>
-<!-- for now we leave the boxes for chosing reviewing material not to display(they are not used any more)
-ToDo: to remove the code which is not using any more, but to know that we have this wonderful Widget  -->
-<table id='materialsTable' width="90%%" align="center" border="0" style="display:none;">
-    <tr>
-        <td id="reviewableMaterialsHelp" colspan="5" class="reviewingsubtitle" style="padding-top: 20px;">
-            <span><%= _("Choose types of materials to be revised")%></span>
-        </td>
-    </tr>
-    <tr>
-        <td>
-           <div id="inPlaceEditReviewableMaterials"  style="padding-top: 5px;"><%=", ".join(ConfReview.getReviewableMaterials()) %></div> 
-        </td>
-    </tr>
-</table>
-
 <% if ConfReview.hasPaperReviewing(): %>
     <% display = 'table' %>
 <% end %>
@@ -77,7 +56,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         <td id="reviewingStatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Add a paper status for paper reviewing")%></td>
     </tr>
     <tr>
-        
+
     </tr>
     <!--
     <tr>
@@ -94,7 +73,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
     </tr>
     -->
     <tr>
-        <td style="width: 400px;">  
+        <td style="width: 400px;">
             <div class="titleCellFormat" style="padding-top: 5px;">
                 <%= _("The default statuses are: ")%><em><%= _("Accept, To be corrected")%></em><%=_(" and ")%><em><%=_("Reject")%></em>.<%= _(" You can define your own statuses")%>
             </div>
@@ -182,7 +161,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
     <% end %>
     <% else: %>
         <% display = 'none' %>
-    <% end %>    
+    <% end %>
     <tr id="refereeDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
         <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat" align="left">
             <%= _("Referee Deadline")%>
@@ -204,7 +183,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
     <% end %>
     <% else: %>
         <% display = 'none' %>
-    <% end %>    
+    <% end %>
     <tr id="editorDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
         <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat">
             <%= _("Layout Reviewer Deadline")%>
@@ -225,14 +204,14 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         <% end %>
         <% else: %>
             <% display = 'none' %>
-        <% end %>   
+        <% end %>
     </tr>
     <% if ConfReview.hasPaperReviewing(): %>
         <% display = 'table-row' %>
     <% end %>
     <% else: %>
         <% display = 'none' %>
-    <% end %>    
+    <% end %>
     <tr id="reviewerDefaultDateRow" style="white-space:nowrap;display: <%=display%>">
         <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat">
             <%= _("Content Reviewer Deadline")%>
@@ -271,7 +250,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="PRMNotif" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="PRMNotifButton">                    
+                <span id="PRMNotifButton">
                 </span>
             </div>
         </td>
@@ -290,7 +269,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
 	   <tr id="refereeNotif" style="white-space:nowrap; display: <%=display%>">
 	    <td style="padding-left: 50px;">
             <div>
-                <span id="refereeNotifButton">                    
+                <span id="refereeNotifButton">
                 </span>
             </div>
         </td>
@@ -298,7 +277,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="refereeNotifForContribution" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="refereeNotifForContributionButton">                    
+                <span id="refereeNotifForContributionButton">
                 </span>
             </div>
         </td>
@@ -306,7 +285,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="authorSubmittedMatRefereeNotif" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="authorSubmittedMatRefereeNotifButton">                    
+                <span id="authorSubmittedMatRefereeNotifButton">
                 </span>
             </div>
         </td>
@@ -319,7 +298,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="reviewerNotif" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="reviewerNotifButton">                   
+                <span id="reviewerNotifButton">
                 </span>
             </div>
         </td>
@@ -327,7 +306,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="reviewerNotifForContribution" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="reviewerNotifForContributionButton">                   
+                <span id="reviewerNotifForContributionButton">
                 </span>
             </div>
         </td>
@@ -335,7 +314,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="authorSubmittedMatReviewerNotif" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="authorSubmittedMatReviewerNotifButton">                   
+                <span id="authorSubmittedMatReviewerNotifButton">
                 </span>
             </div>
         </td>
@@ -354,7 +333,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="editorNotif" style="white-space:nowrap; display: <%=display%>">
           <td style="padding-left: 50px;">
             <div>
-                <span id="editorNotifButton">                    
+                <span id="editorNotifButton">
                 </span>
             </div>
          </td>
@@ -362,7 +341,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="editorNotifForContribution" style="white-space:nowrap; display: <%=display%>">
           <td style="padding-left: 50px;">
             <div>
-                <span id="editorNotifForContributionButton">                    
+                <span id="editorNotifForContributionButton">
                 </span>
             </div>
          </td>
@@ -370,7 +349,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="authorSubmittedMatEditorNotif" style="white-space:nowrap; display: <%=display%>">
           <td style="padding-left: 50px;">
             <div>
-                <span id="authorSubmittedMatEditorNotifButton">                    
+                <span id="authorSubmittedMatEditorNotifButton">
                 </span>
             </div>
          </td>
@@ -395,7 +374,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="refereeJudgementNotif" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="refereeJudgementNotifButton">                    
+                <span id="refereeJudgementNotifButton">
                 </span>
             </div>
         </td>
@@ -403,7 +382,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="reviewerJudgementNotif" style="white-space:nowrap; display: <%=display%>">
         <td style="padding-left: 50px;">
             <div>
-                <span id="reviewerJudgementNotifButton">                   
+                <span id="reviewerJudgementNotifButton">
                 </span>
             </div>
         </td>
@@ -417,7 +396,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
        <tr id="editorJudgementNotif" style="white-space:nowrap; display: <%=display%>">
           <td style="padding-left: 50px;">
             <div>
-                <span id="editorJudgementNotifButton">                    
+                <span id="editorJudgementNotifButton">
                 </span>
             </div>
          </td>
@@ -458,9 +437,9 @@ ToDo: to remove the code which is not using any more, but to know that we have t
                     <td align="right">
                         <%= _("Format")%>
                     </td>
-                    <td id='formatchooser'>                        
+                    <td id='formatchooser'>
                     </td>
-                    
+
                 </tr>
 				<tr>
                     <td align="right">
@@ -477,9 +456,9 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         <td>
             <input type="submit" class="btn" value="<%= _("Upload")%>">
         </td>
-    </tr> --> 
+    </tr> -->
     <tr><a name="UploadTemplate" />
-        <td style="padding-left: 15px;" ><input id='uploadTpl' type="button" value="<%= _('Upload Template')%>"></a>                        
+        <td style="padding-left: 15px;" ><input id='uploadTpl' type="button" value="<%= _('Upload Template')%>"></a>
         </td>
     </tr>
     <tr><td>
@@ -507,7 +486,7 @@ ToDo: to remove the code which is not using any more, but to know that we have t
         <tbody id="templateListTable">
         </tbody>
         <!-- <% keys = ConfReview.getTemplates().keys() %>
-       <% keys.sort() %> 
+       <% keys.sort() %>
         <% for k in keys: %>
             <% t = ConfReview.getTemplates()[k] %>
         <tr id="TemplateRow_<%= k %>">
@@ -517,8 +496,8 @@ ToDo: to remove the code which is not using any more, but to know that we have t
                 </a>
                 <% if CanDelete: %>
                 &nbsp;&nbsp;&nbsp;
-                <a href="<%= urlHandlers.UHDeleteContributionTemplate.getURL(t) %>"> 
-                <a href="#" onclick="deleteTemplate('<%=t.getId()%>', '<%= t.getName() %>',  '<%= k %>')"> 
+                <a href="<%= urlHandlers.UHDeleteContributionTemplate.getURL(t) %>">
+                <a href="#" onclick="deleteTemplate('<%=t.getId()%>', '<%= t.getName() %>',  '<%= k %>')">
                     <img class="imglink" style="vertical-align: bottom; width: 15px; height: 15px;" src="<%= Configuration.Config.getInstance().getSystemIconURL("remove") %>" alt="delete template">
                 </a>
                 <% end %>
@@ -547,18 +526,17 @@ ToDo: to remove the code which is not using any more, but to know that we have t
     <tr><td style="padding-bottom:15px;"></td></tr>
         <tr><td colspan="5" style="padding-top: 20px;">
             <em><%= _("To assign team for Paper Review Module, please click on 'Team' and follow the steps")%></em>
-        </td></tr>    
+        </td></tr>
 </table>
 </form>
 
 <script type="text/javascript">
 
 var observer = function(value) {
-    
+
     if (value == "No reviewing") {
         $E('steptitle').dom.style.display = 'none';
         $E('title').dom.style.display = 'none';
-        $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = 'none';
         $E('reviewingQuestionsTable').dom.style.display = 'none';
         $E('editingCriteriaTable').dom.style.display = 'none';
@@ -591,7 +569,6 @@ var observer = function(value) {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content reviewing team")%>');
         $E('title').dom.style.display = '';
-        $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
         $E('editingCriteriaTable').dom.style.display = 'none';
@@ -619,8 +596,7 @@ var observer = function(value) {
         $E('authorSubmittedMatEditorNotif').dom.style.display = 'none';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
-        
-        //showReviewableMaterials();
+
         showReviewingStates();
         showReviewingQuestions();
         showDefaultReviewerDate();
@@ -631,7 +607,6 @@ var observer = function(value) {
         $E('steptitle').dom.style.display = '';
         $E('title').dom.style.display = '';
         $E('title').set('<%= _("layout reviewing team")%>');
-        $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = 'none';
         $E('reviewingQuestionsTable').dom.style.display = 'none';
         $E('editingCriteriaTable').dom.style.display = '';
@@ -659,8 +634,7 @@ var observer = function(value) {
         $E('authorSubmittedMatEditorNotif').dom.style.display = '';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
         $E('templateTable').dom.style.display = '';
-        
-        //showReviewableMaterials();
+
         showEditingCriteria();
         showDefaultEditorDate();
         //showFormatChooser();
@@ -669,7 +643,6 @@ var observer = function(value) {
         $E('steptitle').dom.style.display = '';
         $E('title').set('<%= _("content and layout reviewing team")%>');
         $E('title').dom.style.display = '';
-        $E('materialsTable').dom.style.display = 'none';
         $E('statusTable').dom.style.display = '';
         $E('reviewingQuestionsTable').dom.style.display = '';
         $E('editingCriteriaTable').dom.style.display = '';
@@ -697,8 +670,7 @@ var observer = function(value) {
         $E('authorSubmittedMatEditorNotif').dom.style.display = '';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
-        
-        //showReviewableMaterials();
+
         showReviewingStates();
         showReviewingQuestions();
         showDefaultReviewerDate();
@@ -714,18 +686,8 @@ new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
                     {conference: '<%= ConfReview.getConference().getId() %>'},
                     <%= ConferenceReview.reviewingModes[1:] %>,
                     "<%= ConfReview.getReviewingMode() %>",
-                    observer);                    
+                    observer);
 
-/*var showReviewableMaterials = function() {
-    new IndicoUI.Widgets.Generic.twoListField($E('inPlaceEditReviewableMaterials'),
-                        10,"200px",<%=ConfReview.getNonReviewableMaterials()%>,<%=ConfReview.getReviewableMaterials()%>,
-                        $T("Non reviewable materials"), $T("Reviewable materials"),
-                        'reviewing.conference.changeReviewableMaterials',
-                        {conference: '<%= ConfReview.getConference().getId() %>'},
-                        '');
-}*/
-
-               
 var showReviewingStates = function() {
     new IndicoUI.Widgets.Generic.keywordField(
         $E('inPlaceEditStates'),
@@ -763,7 +725,7 @@ var showDefaultRefereeDate = function() {
                         dueDateToChange: 'Referee'},
                        null, true);
 }
-               
+
 var showDefaultEditorDate = function() {
     new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultEditorDueDate'),
                        'reviewing.conference.changeDefaultDueDate',
@@ -782,7 +744,7 @@ var showDefaultReviewerDate = function() {
 
 /*var deleteTemplate = function(tempId, tempName, rowId) {
                     var row = $E('TemplateRow_'+rowId);
-                    var params = {conference: '<%= ConfReview.getConference().getId() %>',templateId: tempId} 
+                    var params = {conference: '<%= ConfReview.getConference().getId() %>',templateId: tempId}
                     if (confirm("Are you sure you want to delete '"+ tempName+"'?")) {
                         var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
                         jsonRpc(Indico.Urls.JsonRpcService,
@@ -843,96 +805,96 @@ var TemplateList = function(){
                     var cellDescription = Html.td({id:'TemplateName_'+'<%= t.getId()%>', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, '<%= t.getDescription()%>');
                     row.append(cellName);
                     row.append(cellFormat);
-                    row.append(cellDescription);        
-                    $E('templateListTable').append(row); 
+                    row.append(cellDescription);
+                    $E('templateListTable').append(row);
              <% end %>
-            
-          }  
-  
 
-$E('PRMNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.PRMEmailNotif', 
+          }
+
+
+$E('PRMNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.PRMEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'PRM'}, 
+                                            AutoEmailsToChange: 'PRM'},
                                             'are added to/removed from the conference',
                                             true
 ));
 
-$E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif', 
+$E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Referee'}, 
-                                            'are added to/removed from the conference',
-                                            true
-)); 
-$E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif', 
-                                            {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            AutoEmailsToChange: 'Referee'},
                                             'are added to/removed from the conference',
                                             true
 ));
-$E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif', 
+$E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Editor'}, 
+                                            AutoEmailsToChange: 'Reviewer'},
                                             'are added to/removed from the conference',
                                             true
 ));
-$E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution', 
+$E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Referee'}, 
+                                            AutoEmailsToChange: 'Editor'},
+                                            'are added to/removed from the conference',
+                                            true
+));
+$E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution',
+                                            {conference: '<%= ConfReview.getConference().getId() %>',
+                                            AutoEmailsToChange: 'Referee'},
                                             'have assigned to /unassigned from contributions',
                                             true
 ));
-$E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution', 
+$E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            AutoEmailsToChange: 'Reviewer'},
                                             'have assigned to/unassigned from contributions',
                                             true
 ));
-$E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution', 
+$E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Editor'}, 
+                                            AutoEmailsToChange: 'Editor'},
                                             'have assigned to/unassigned from contributions',
                                             true
 ));
-$E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif', 
+$E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Referee'}, 
+                                            AutoEmailsToChange: 'Referee'},
                                             'Referee',
                                             true
 ));
-$E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif', 
+$E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            AutoEmailsToChange: 'Reviewer'},
                                             'Content Reviewer',
                                             true
 ));
-$E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif', 
+$E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Editor'}, 
+                                            AutoEmailsToChange: 'Editor'},
                                             'Layout Reviewer',
                                             true
 ));
-$E('authorSubmittedMatRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif', 
+$E('authorSubmittedMatRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Referee'}, 
+                                            AutoEmailsToChange: 'Referee'},
                                             'the author submits a paper',
                                             true
 ));
-$E('authorSubmittedMatReviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif', 
+$E('authorSubmittedMatReviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Reviewer'}, 
+                                            AutoEmailsToChange: 'Reviewer'},
                                             'the author submits a paper',
                                             true
 ));
-$E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif', 
+$E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
-                                            AutoEmailsToChange: 'Editor'}, 
+                                            AutoEmailsToChange: 'Editor'},
                                             'the author submits a paper',
                                             true
 ));
 
 
 /* IndicoUI.executeOnLoad(function(){
-    var pm = new IndicoUtil.parameterManager(); 
+    var pm = new IndicoUtil.parameterManager();
     return $E('formatchooser').set(showFormatChooser(pm));
 });
 
@@ -945,8 +907,8 @@ function showFormatChooser(pm){
                 pm.remove(text);
                 pm.add(select);
                var sel = '<select name="format" id="defaultformat">'+
-                         '<option value="Unknown"><%= _("--Select a format--")%></option>'+  
-<% for f in Template.formats: %> 
+                         '<option value="Unknown"><%= _("--Select a format--")%></option>'+
+<% for f in Template.formats: %>
                          '<option value="<%= f %>"><%= f %></option>'+
 <% end %>
                          '</select>';
@@ -977,23 +939,22 @@ function showFormatChooser(pm){
         return Widget.block(chooser);
 }
  */
-                 
+
 <% if ConfReview.hasReviewing(): %>
-    //showReviewableMaterials();
     TemplateList();
-    
+
     $E('uploadTpl').observeClick(function(){ var popup = new UploadTemplateDialog( 'Upload Template',
         {conference: '<%= ConfReview.getConference().getId() %>'}, '350px', '30px',
         <%= jsonEncode(Template.formats.keys()) %>, '<%= urlHandlers.UHSetTemplate.getURL() %>',
         function(value) {
             $E('NoTemplateTable').dom.style.display = 'none';
             $E('templateListTableAll').dom.style.display = '';
-            
+
 	        /* this is a little hack who is needed to get the URL of the new uploaded template*/
 	        //linkDelete = "<%= urlHandlers.UHDeleteContributionTemplate.getURL() %>" + "?reviewingTemplateId=" + value.id + "&confId=<%= ConfReview.getConference().getId()%>";
             //var deleteIcon = Html.img({className: 'imglink',style:{paddingLeft: '20px', verticalAlign: 'bottom', width: '15px', height: '15px'}, alt: 'delete template', src: imageSrc("remove")});
             //var deleteLink = Html.a({href: linkDelete},deleteIcon);
-            
+
             var row = Html.tr();
             var params = {conference: '<%= ConfReview.getConference().getId() %>',templateId: value.id}
             var deleteTemplate = function() {
@@ -1033,12 +994,12 @@ function showFormatChooser(pm){
             row.append(cellName);
             row.append(cellFormat);
             row.append(cellDescription);
-            
-            return $E('templateListTable').append(row);      
-        
+
+            return $E('templateListTable').append(row);
+
             }); popup.open();
             }
-            ); 
+            );
 <% end %>
 <% if ConfReview.hasPaperReviewing(): %>
     showReviewingStates();
