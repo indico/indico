@@ -59,8 +59,13 @@ def getTalks(conference, sort = False):
     recordable_events = []
     talks = []
 
+    speaker_str = ""
+    speaker_list = conference.getChairList()
+    if speaker_list is not None:
+        speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
+
     event_info = {}
-    event_info["speakers"]   = ""
+    event_info["speakers"]   = speaker_str
     event_info["type"]       = "conference"
     event_info["IndicoID"]   = generateIndicoID(conference = conference.getId(),
                                               session         = None,
@@ -85,14 +90,7 @@ def getTalks(conference, sort = False):
             speaker_str = ""
             speaker_list = contribution.getSpeakerList()
             if speaker_list is not None:
-                tag_first_iter = True
-                for speaker in speaker_list:
-                    if tag_first_iter:
-                        speaker_str = "%s %s" % (speaker_list[0].getFirstName(),
-                                                 speaker_list[0].getFamilyName())
-                    else:
-                        speaker_str = "%s, %s %s" % \
-                            (speaker_str, speaker.getFirstName(), speaker.getFamilyName())
+                speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
 
             event_info = {}
             event_info["speakers"]   = speaker_str
@@ -121,14 +119,7 @@ def getTalks(conference, sort = False):
                 speaker_list = subcontribution.getSpeakerList()
 
                 if speaker_list is not None:
-                    tag_first_iter = True
-                    for speaker in speaker_list:
-                        if tag_first_iter:
-                            speaker_str = "%s %s" % (speaker_list[0].getFirstName(),
-                                                     speaker_list[0].getFamilyName())
-                        else:
-                            speaker_str = "%s, %s %s" % \
-                            (speaker_str, speaker.getFirstName(), speaker.getFamilyName())
+                    speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
 
                 event_info["speakers"]   = speaker_str
                 event_info["type"]       = "subcontribution"
