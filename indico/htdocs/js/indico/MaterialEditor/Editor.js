@@ -1092,11 +1092,6 @@ type("ResourceListWidget", ["ListWidget"], {
                                 self.resources.remove(resource);
                                 self.set(resourceId, null);
                                 killProgress();
-
-                                if (response.newMaterialTypes) {
-                                    updateMaterialList(self.materialTypes, response.newMaterialTypes);
-                                }
-
                             }
                         }
                        );
@@ -1276,9 +1271,11 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         //but then in the selectBox it will be like 'paper'
         args.materialIdsList.set(material.get('title').toLowerCase(), materialId);
         args.mainResourceId = material.get('mainResource')?material.get('mainResource').get('id'):null;
+
         var deleteMaterial = function() {
             if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+
                 jsonRpc(Indico.Urls.JsonRpcService,
                         'material.delete',
                         args,
@@ -1384,12 +1381,11 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
     _loadMaterial: function(id) {
         var self = this;
-
+        var source;
         var args = clone(self.args);
         args.materialId = id;
 
-        var source = indicoSource('material.get', args);
-
+        source = indicoSource('material.get', args);
         source.state.observe(function(state) {
 
             if (state == SourceState.Loaded) {
@@ -1470,6 +1466,7 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
         });
 
         var materialLoadFunction = function(info) {
+
             if (self.get(info.material)) {
                 self.get(info.material).get('resources').append(watchize(info));
             } else {
