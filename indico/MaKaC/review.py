@@ -28,11 +28,9 @@ from BTrees.IOBTree import IOBTree
 import BTrees.OIBTree as OIBTree
 from datetime import datetime,timedelta
 import MaKaC
-import MaKaC.user as user
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import MaKaCError
 from MaKaC.accessControl import AdminList
-from MaKaC.common.Counter import Counter
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
