@@ -290,10 +290,10 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             var defineCHText = Html.edit({size:"35", name:"host", id:"host"});
             this.parameterManager.add(defineCHText, 'text', false);
 
-            self.errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Please use another name');
+            self.errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Name already in use');
 
             self.crName = new AutocheckTextBox({style: {width: '300px'}, name: 'title', id:"CRname"}, self.errorLabel);
-            self.crName.set(conferenceName+eventDate);
+            self.crName.set((conferenceName+eventDate).replace(' ', '_'));
 
             this.basicTabForm = Html.div({style:{textAlign: 'left'}},
                 IndicoUtil.createFormFromMap([

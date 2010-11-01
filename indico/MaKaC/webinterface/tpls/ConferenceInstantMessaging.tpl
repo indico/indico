@@ -36,7 +36,7 @@ var showWebLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP')
 
                 <td style="font-family:monospace;"> <%= server%></td>
 
-                <td style="width:200px"><div id='desc<%= cr.getId() %>'> <%= cr.getDescription()%></div></td>
+                <td><div id='desc<%= cr.getId() %>'> <%= cr.getDescription()%></div></td>
 
                 <td> <%= _('Yes') if len(cr.getPassword()) > 0 else _('No')%></td>
 
@@ -44,13 +44,13 @@ var showWebLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP')
                     <td> <%= cr.getPassword()%> </td>
                 <% end %>
                 <% elif not cr.getShowPass() and len(cr.getPassword()) > 0:%>
-                    <td style="font-style:italic"> <%= _('Not displayed')%> </td>
+                    <td style="font-style:italic;"> <%= _('Not displayed')%> </td>
                 <% end %>
                 <% else:%>
-                    <td style="font-style:italic"> - </td>
+                    <td style="font-style:italic;"> - </td>
                 <% end %>
                 <% if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients') or PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'): %>
-                    <td style="font-weight: bold" ><a id="joinLink" class="dropDownMenu highlight" href="#"><%= _("Join now!")%></a></td>
+                    <td style="font-weight: bold;" nowrap><a id="joinLink" class="dropDownMenu highlight" href="#"><%= _("Join now!")%></a></td>
                 <% end %>
                 </tr>
         <% end %>

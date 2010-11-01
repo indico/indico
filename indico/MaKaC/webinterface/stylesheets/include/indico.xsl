@@ -757,7 +757,7 @@
                         <span style="margin-left:8px;margin-right:8px;">|</span>
 
                         <xsl:if test="./links/linksToShow != 'false'">
-                            <span style="font-weight: bold" ><a id="joinLink" class="dropDownMenu highlight" href="#">Join now!</a></span>
+                            <span style="font-weight: bold;"><a id="joinLink" class="dropDownMenu highlight" href="#">Join now!</a></span>
                         </xsl:if>
 
                           <!-- Start of a chat room info line -->

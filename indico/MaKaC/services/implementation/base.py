@@ -28,6 +28,7 @@ from datetime import datetime, date
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
+from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag, TimingError
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
@@ -207,8 +208,11 @@ class ServiceBase(RequestHandlerBase):
 
     def _sendEmails( self ):
         if hasattr( self, "_emailsToBeSent" ):
-            for email in self._emailsToBeSent:
-                GenericMailer.send(GenericNotification(email))
+            ExternalOperationsManager.execute(self, "sendMailsAJAX", self.atomicSendMails)
+
+    def atomicSendMails(self):
+        for email in self._emailsToBeSent:
+            GenericMailer.send(GenericNotification(email))
 
     def _deleteTempFiles( self ):
         if len(self._tempFilesToDelete) > 0:

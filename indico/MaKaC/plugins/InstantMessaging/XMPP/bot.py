@@ -119,8 +119,7 @@ class IndicoXMPPBotCreateRoom(IndicoXMPPBotBase):
         except Exception, e:
             self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
-
-        form = self.xmpp.plugin['xep_0004'].makeForm()
+        form = self.xmpp.plugin['xep_0004'].makeForm(ftype='submit')
 
         form.addField('FORM_TYPE', value='http://jabber.org/protocol/muc#roomconfig')
         self.formDefaults(form)
@@ -172,7 +171,7 @@ class IndicoXMPPBotEditRoom(IndicoXMPPBotBase):
             self._error = self.treatError(True, str(e))
             self.xmpp.disconnect()
 
-        form = self.xmpp.plugin['xep_0004'].makeForm()
+        form = self.xmpp.plugin['xep_0004'].makeForm(ftype='submit')
 
         form.addField('FORM_TYPE', value='http://jabber.org/protocol/muc#roomconfig')
         self.formDefaults(form)

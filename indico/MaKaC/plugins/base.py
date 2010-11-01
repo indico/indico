@@ -231,7 +231,9 @@ class RHMap(Persistent):
 
     def hasUH(self, rh):
         if not hasattr(rh, '_uh') or rh._uh is None:
-            raise Exception('The RH %s did not implement the _uh attribute, please do it' %str(rh))
+            return False
+            #at some point we should raise an Exception or think what can we do about this (for example, base classes won't have this attr neither)
+            #raise Exception('The RH %s did not implement the _uh attribute, please do it' %str(rh))
         return True
 
     def has_key(self, key):
@@ -779,7 +781,7 @@ class PluginType (PluginBase):
                     PluginsHolder().getComponentsManager().addComponent(obj)
 
     def _updateRHMapInfo(self, plugin, module):
-        from indico.MaKaC.webinterface.rh.base import RH
+        from MaKaC.webinterface.rh.base import RH
         for smodule in self._getAllSubmodules(module):
             for obj in smodule.__dict__.values():
                 if type(obj) == type and RH in obj.mro() and obj.__module__.find('plugins') != -1:

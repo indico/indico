@@ -23,6 +23,7 @@ from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
 from MaKaC.plugins.InstantMessaging.handlers import ChatroomBase
 from MaKaC.services.implementation.base import ServiceBase, ParameterManager
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.logger import Logger
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
@@ -95,7 +96,7 @@ class XMPPChatroomService( ChatroomBase ):
             #make operation atomic
             ExternalOperationsManager.execute(self._bot, "roomExistsXMPP", self._bot.run)
         except Exception, e:
-            Logger.get('InstantMessaging (XMPP-XMPP server)').error("Exception while checking if room existed: %s" %e)
+            Logger.get('InstantMessaging (XMPP-XMPP server)').exception("Exception while checking if room existed")
             raise ServiceError(message = self.messages['default'])
         return self.proccessAnswer(self._bot)
 
@@ -146,6 +147,9 @@ class XMPPChatroomService( ChatroomBase ):
             raise ServiceError(message = self.messages['deleting'])
         return self.proccessAnswer(self._bot)
 
+    def _executeExternalOperation(self, bot, operName, messageName):
+        """ we need the instance of the XMPP operation we're going to do, and also its name.
+            Finally, we'll need the name of the error message to show in case something happens"""
 
 
 class CreateChatroom( XMPPChatroomService ):
@@ -172,8 +176,8 @@ class CreateChatroom( XMPPChatroomService ):
         if self._room.getCreatedInLocalServer():
             self.roomExistsXMPP(self._botJID, self._botPass, self._room)
         try:
-            mh = MailHelper()
-            self._notify('createChatroom', {'room': self._room, 'mailHelper':mh})
+            ContextManager.getdefault('mailHelper', MailHelper())
+            self._notify('createChatroom', {'room': self._room})
         except ServiceError, e:
             Logger.get('InstantMessaging (XMPP-Indico server)').error("Exception while notifying observers: %s" %e)
             raise ServiceError( message=self.messages['sameId']+e )
@@ -191,7 +195,7 @@ class CreateChatroom( XMPPChatroomService ):
 
         tz = DisplayTZ(self._aw, self._room.getConference()).getDisplayTZ()
 
-        mh.sendMails()
+        ContextManager.get('mailHelper').sendMails()
         return self._room.fossilize(tz=tz)
 
 
@@ -237,8 +241,8 @@ class EditChatroom( XMPPChatroomService ):
                 self.roomExistsXMPP(self._botJID, self._botPass, self._room)
 
             #edit the chat room in indico
-            mh = MailHelper()
-            self._notify('editChatroom', {'oldTitle': oldRoom.getTitle(), 'newRoom':self._room, 'mailHelper':mh})
+            ContextManager.getdefault('mailHelper', MailHelper())
+            self._notify('editChatroom', {'oldTitle': oldRoom.getTitle(), 'newRoom':self._room})
         except ServiceError, e:
             Logger.get('InstantMessaging (XMPP-Indico server)').error("Exception while editing: %s" %e)
             raise ServiceError( message=_('Problem while accessing the database: %s' %e))
@@ -274,7 +278,7 @@ class EditChatroom( XMPPChatroomService ):
         if modified:
             Logger.get('InstantMessaging (XMPP-Indico server)').info("The room %s has been modified by the user %s at %s hours" %(self._title, self._user.getName(), self._room.getModificationDate()))
 
-        mh.sendMails()
+        ContextManager.get('mailHelper').sendMails()
         return self._room.fossilizeMultiConference(values['conference'])
 
 
@@ -295,8 +299,8 @@ class DeleteChatroom( XMPPChatroomService ):
         message = _("%s has requested to delete this room. Please address this person for further information" %self._user.getName())
         #delete room from Indico
         try:
-            mh = MailHelper()
-            self._notify('deleteChatroom', {'room': self._room, 'mailHelper':mh})
+            ContextManager.getdefault('mailHelper', MailHelper())
+            self._notify('deleteChatroom', {'room': self._room})
         except ServiceError, e:
             Logger.get('InstantMessaging (XMPP-Indico server)').error(message=_('Problem deleting indexes in the database for chat room %s: %s' %(self._room.getTitle(), e)))
             raise ServiceError( message=_('Problem deleting indexes in the database for chat room %s: %s' %(self._room.getTitle(), e)))
@@ -307,7 +311,7 @@ class DeleteChatroom( XMPPChatroomService ):
 
         Logger.get('InstantMessaging (XMPP-Indico server)').info("The room %s has been deleted by the user %s at %s hours" %(self._title, self._user.getName(), nowutc()))
 
-        mh.sendMails()
+        ContextManager.get('mailHelper').sendMails()
         return True
 
 
@@ -368,22 +372,22 @@ class AddConference2Room( ServiceBase, Observable ):
 
     def _getAnswer( self ):
         rooms=[]
-        mh = MailHelper()
+        ContextManager.getdefault('mailHelper', MailHelper())
         try:
             for roomID in self._rooms:
                 try:
                     room = DBHelpers.getChatroom(roomID)
                 except Exception, e:
                     Logger.get('InstantMessaging (XMPP-Indico server)').warning("The user %s tried to re-use the chat room %s, but it was deleted before he clicked the Add button: %s" %(self._aw.getUser().getFullName(), roomID, e))
-                    raise NoReportError('Some of the rooms were deleted from the other conference(s) they belonged to. Please refresh your browser')
+                    raise NoReportError(_('Some of the rooms were deleted from the other conference(s) they belonged to. Please refresh your browser'))
                 room.setConference(ConferenceHolder().getById(self._conference))
-                self._notify('addConference2Room', {'room': room, 'mailHelper': mh, 'conf': self._conference})
+                self._notify('addConference2Room', {'room': room, 'conf': self._conference})
                 rooms.append(room.fossilizeMultiConference(ConferenceHolder().getById(self._conference)))
         except NoReportError, e:
             Logger.get('InstantMessaging (XMPP-Indico server)').error("Error adding chat rooms. User: %s. Chat room: %s. Traceback: %s" %(self._aw.getUser().getFullName(), roomID, e))
             raise ServiceError(message = _('There was an error trying to add the chat rooms. Please refresh your browser and try again'))
 
-        mh.sendMails()
+        ContextManager.get('mailHelper').sendMails()
         return rooms
 
 

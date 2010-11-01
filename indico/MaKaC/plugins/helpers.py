@@ -31,10 +31,12 @@ class MailHelper:
 
     def newMail(self, function, *args):
         self.__mails.append({'function': function, 'args': args})
+        return self.__mails
 
     def sendMails(self):
         for mail in self.__mails:
             mail['function'](*mail['args'])
+        return True
 
 class DBHelpers:
     @classmethod

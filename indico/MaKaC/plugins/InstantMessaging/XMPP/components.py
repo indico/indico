@@ -29,6 +29,7 @@ from BTrees.OOBTree import OOBTree, OOTreeSet
 from MaKaC.i18n import _
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.Counter import Counter
+from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.info import HelperMaKaCInfo
@@ -138,7 +139,7 @@ class ChatSMContributor(Component, Observable):
         conf = params['conf']
         user = params['user']
         options = params['options']
-        mh = MailHelper()
+        ContextManager.getdefault('mailHelper', MailHelper())
 
         if options.get("chatrooms", True):
             crList = DBHelpers().getChatroomList(confToClone)
@@ -146,9 +147,9 @@ class ChatSMContributor(Component, Observable):
             if PluginsWrapper('InstantMessaging', 'XMPP').isActive():
                  for cr in crList:
                      if user is cr.getOwner():
-                         cls()._notify('addConference2Room', {'room':cr, 'conf':conf.getId(), 'mailHelper':mh})
+                         cls()._notify('addConference2Room', {'room':cr, 'conf':conf.getId()})
 
-        mh.sendMails()
+        ContextManager.get('mailHelper').sendMails()
 
 
 class ChatroomStorage(Component):
@@ -249,94 +250,50 @@ class ChatroomMailer(Component):
     @classmethod
     def createChatroom(cls, obj, params):
         room = params['room']
-        mh = params['mailHelper']
-        ExternalOperationsManager.execute(cls, "create_"+str(cls.__class__), cls.create, obj, room, mh)
-
-    @classmethod
-    def create(cls, obj, room, mh):
-        pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
-        userList = list(pf.getOption('additionalEmails'))
-        if pf.getOption('sendMailNotifications'):
-            userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
-
-        if not len(userList) is 0:
-            try:
-                cn = ChatroomsNotification(room, userList)
-                mh.newMail(GenericMailer.sendAndLog, cn.create(room), room.getConference(), "MaKaC/plugins/InstantMessaging/XMPP/components.py", room.getOwner())
-
-            except Exception, e:
-                raise ServiceError(message=e)
+        # we give this operation the name createSomething in the externaloperationsmanager
+        # we will execute the method performOperation in a chat room creation, which will send an email to all the requested users
+        # saying that a chat room was created. We pass the 2 mandatory arguments and finally the arguments required for performOperation
+        # (in this case, only one argument)
+        ExternalOperationsManager.execute(cls, "create_"+str(cls.__class__), cls.performOperation, 'create', room.getConference(), room, room)
 
     @classmethod
     def editChatroom(cls, obj, params):
         room = params['newRoom']
-        mh = params['mailHelper']
-        ExternalOperationsManager.execute(cls, "edit_"+str(cls.__class__), cls.edit, obj, room, mh)
-
-    @classmethod
-    def edit(cls, obj, room, mh):
-        pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
-        userList = list(pf.getOption('additionalEmails'))
-        if pf.getOption('sendMailNotifications'):
-            userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
-
-        if not len(userList) is 0:
-            try:
-                cn = ChatroomsNotification(room, userList)
-                mh.newMail(GenericMailer.sendAndLog, cn.edit(room, ConferenceHolder().getById(obj._conferenceID)), \
-                                         ConferenceHolder().getById(obj._conferenceID), \
-                                         "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
-                                         room.getOwner())
-            except Exception, e:
-                raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
+        conf = ConferenceHolder().getById(obj._conferenceID)
+        ExternalOperationsManager.execute(cls, "edit_"+str(cls.__class__), cls.performOperation, 'edit', conf, room, room, conf)
 
     @classmethod
     def deleteChatroom(cls, obj, params):
         room = params['room']
-        mh = params['mailHelper']
-        ExternalOperationsManager.execute(cls, "delete_"+str(cls.__class__), cls.delete, obj, room, mh)
-
-    @classmethod
-    def delete(cls, obj, room, mh):
-        pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
-        userList = list(pf.getOption('additionalEmails'))
-        if pf.getOption('sendMailNotifications'):
-            userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
-
-        if not len(userList) is 0:
-            try:
-                cn = ChatroomsNotification(room, userList)
-                mh.newMail(GenericMailer.sendAndLog, cn.delete(room, ConferenceHolder().getById(obj._conferenceID)),\
-                                         ConferenceHolder().getById(obj._conferenceID), \
-                                         "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
-                                         room.getOwner())
-            except Exception, e:
-                raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
+        conf = ConferenceHolder().getById(obj._conferenceID)
+        ExternalOperationsManager.execute(cls, "delete_"+str(cls.__class__), cls.performOperation, 'delete', conf, room, room, conf)
 
     @classmethod
     def addConference2Room(cls, obj, params):
         room = params['room']
-        mh = params['mailHelper']
-        confId = params['conf']
+        conf = ConferenceHolder().getById(params['conf'])
         #without the random number added it would only send 1 mail, because for every new chat room it'd think that there has been a retry
-        ExternalOperationsManager.execute(cls, "add_"+str(cls.__class__)+str(random.random()), cls.add, obj, room, confId, mh)
+        ExternalOperationsManager.execute(cls, "add_"+str(cls.__class__)+str(random.random()), cls.performOperation, 'create', conf, room, room, conf)
 
     @classmethod
-    def add(cls, obj, room, confId, mh):
+    def performOperation(cls, operation, conf, room, *args):
+        """ The 4 operations of this class are quite the same, so we pass the name of the operation, the conference they belong to,
+            the chat room for which we are creating the operation and, finally, a list of the arguments needed for the operation"""
+
+        # get the list of users that will receive emails
         pf = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         userList = list(pf.getOption('additionalEmails'))
         if pf.getOption('sendMailNotifications'):
             userList.extend( [user.getEmail() for user in pf.getOption('admins')] )
-
         if not len(userList) is 0:
             try:
                 cn = ChatroomsNotification(room, userList)
-                mh.newMail(GenericMailer.sendAndLog, cn.create(room, ConferenceHolder().getById(confId)), \
-                                                   ConferenceHolder().getById(confId), \
-                                                   "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
-                                                   room.getOwner())
+                ContextManager.get('mailHelper').newMail(GenericMailer.sendAndLog, getattr(cn, operation)(*args), \
+                                         conf, \
+                                         "MaKaC/plugins/InstantMessaging/XMPP/components.py", \
+                                         room.getOwner())
             except Exception, e:
-                raise ServiceError(message='There was an error while contacting the mail server. No notifications were sent: %s'%e)
+                raise ServiceError(message=_('There was an error while contacting the mail server. No notifications were sent: %s'%e))
 
 
 class ChatroomsNotification(GenericNotification):
