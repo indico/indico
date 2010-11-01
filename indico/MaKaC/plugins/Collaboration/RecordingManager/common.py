@@ -308,14 +308,16 @@ def generateIndicoID(conference     = None,
     """
     IndicoID = ""
 
+    # Some old conference IDs are non-numerical, e.g. a034286, but session, contribution
+    # and subcontribution IDs should all be numerical.
     if session is not None:
-        IndicoID = "%ds%d" % (int(conference), int(session))
+        IndicoID = "%ss%s" % (conference, session)
     elif contribution is None:
-        IndicoID = "%d" % (int(conference),)
+        IndicoID = "%s" % (conference,)
     elif subcontribution is not None:
-        IndicoID = "%dc%dsc%d" % (int(conference), int(contribution), int(subcontribution))
+        IndicoID = "%sc%ssc%s" % (conference, contribution, subcontribution)
     else:
-        IndicoID = "%dc%d" % (int(conference), int(contribution))
+        IndicoID = "%sc%s" % (conference, contribution)
 
     return IndicoID
 
@@ -380,10 +382,11 @@ def parseIndicoID(IndicoID):
     a conference, subcontribution etc, and return that info with the individual IDs."""
 
     # regular expressions to match IndicoIDs for conference, session, contribution, subcontribution
-    pConference      = re.compile('(\d+)$')
-    pSession         = re.compile('(\d+)s(\d+)$')
-    pContribution    = re.compile('(\d+)c(\d+)$')
-    pSubcontribution = re.compile('(\d+)c(\d+)sc(\d+)$')
+    # Note: older conferences may be a string like this: a034286 instead of just a number
+    pConference      = re.compile('(\w*\d+)$')
+    pSession         = re.compile('(\w*\d+)s(\d+)$')
+    pContribution    = re.compile('(\w*\d+)c(\d+)$')
+    pSubcontribution = re.compile('(\w*\d+)c(\d+)sc(\d+)$')
 
     # perform the matches (match searches from the beginning of the string,
     # unlike search, which matches anywhere in the string)
