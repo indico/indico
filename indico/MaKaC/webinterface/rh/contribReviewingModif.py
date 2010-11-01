@@ -33,35 +33,46 @@ from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.i18n import _
 
-class RHContributionReviewing(RHContribModifBaseReviewingStaffRights):
-    _uh = urlHandlers.UHContributionModifReviewing
-    
+#Assign Editor classes
+class RHAssignEditorOrReviewerBase(RHContribModifBase):
+
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
-            RHContribModifBaseReviewingStaffRights._checkProtection(self)
+            if not (RCPaperReviewManager.hasRights(self) or RCContributionReferee.hasRights(self)):
+                RHContribModifBase._checkProtection(self);
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-    
+
+class RHContributionReviewing(RHAssignEditorOrReviewerBase):
+    _uh = urlHandlers.UHContributionModifReviewing
+
+    def _checkProtection(self):
+        if self._target.getConference().hasEnabledSection("paperReviewing"):
+            RHAssignEditorOrReviewerBase._checkProtection(self)
+        else:
+            raise MaKaCError(_("Paper Reviewing is not active for this conference"))
+
     def _process(self):
         p = contributionReviewing.WPContributionReviewing(self, self._target)
         return p.display()
 
-class RHContributionReviewingJudgements(RHContribModifBaseReviewingStaffRights):
+class RHContributionReviewingJudgements(RHContribModifBase):
     _uh = urlHandlers.UHContributionReviewingJudgements
-    
+
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
-            RHContribModifBaseReviewingStaffRights._checkProtection(self)
+            if not (RCPaperReviewManager.hasRights(self) or RCContributionReferee.hasRights(self)):
+                RHContribModifBase._checkProtection(self);
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-    
+
     def _process(self):
         p = contributionReviewing.WPContributionReviewingJudgements(self, self._target)
         return p.display()
 
 class RHContribModifReviewingMaterials(RHContribModifBaseReviewingStaffRights):
     _uh = urlHandlers.UHContribModifReviewingMaterials
-    
+
     def _checkProtection(self):
         """ This disables people that are not conference managers or track coordinators to
             delete files from a contribution.
@@ -70,7 +81,7 @@ class RHContribModifReviewingMaterials(RHContribModifBaseReviewingStaffRights):
         for key in self._paramsForCheckProtection.keys():
             if key.find("delete")!=-1:
                 RHContribModifBaseReviewingStaffRights._checkProtection(self)
-    
+
     def _checkParams(self, params):
         RHContribModifBaseReviewingStaffRights._checkParams(self, params)
         if not hasattr(self, "_rhSubmitMaterial"):
@@ -78,9 +89,9 @@ class RHContribModifReviewingMaterials(RHContribModifBaseReviewingStaffRights):
         self._rhSubmitMaterial._checkParams(params)
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
-            del params["day"] 
+            del params["day"]
         self._paramsForCheckProtection = params
-    
+
     def _process(self):
         if self._target.getOwner().isClosed():
             p = WPConferenceModificationClosed( self, self._target )
@@ -91,7 +102,7 @@ class RHContribModifReviewingMaterials(RHContribModifBaseReviewingStaffRights):
 
 #Assign Referee classes
 class RHAssignRefereeBase(RHContribModifBase):
-    
+
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
             if not RCPaperReviewManager.hasRights(self):
@@ -119,10 +130,10 @@ class RHRemoveAssignReferee(RHAssignRefereeBase):
     def _process( self ):
         self._target.getReviewManager().removeReferee()
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-        
+
 class RHRefereeDueDate(RHAssignRefereeBase):
     _uh = urlHandlers.UHRemoveAssignReferee
-            
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         try:
@@ -133,28 +144,17 @@ class RHRefereeDueDate(RHAssignRefereeBase):
                 raise MaKaCError("Please set the date correctly")
         except Exception:
             raise MaKaCError("Please set the date correctly")
-        
+
 
     def _process( self ):
         self._target.getReviewManager().getLastReview().setRefereeDueDate(self._day, self._month, self._year)
-        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )        
-        
-
-#Assign Editor classes
-class RHAssignEditorOrReviewerBase(RHContribModifBase):
-    
-    def _checkProtection(self):
-        if self._target.getConference().hasEnabledSection("paperReviewing"):
-            if not (RCPaperReviewManager.hasRights(self) or RCContributionReferee.hasRights(self)):
-                RHContribModifBase._checkProtection(self);
-        else:
-            raise MaKaCError(_("Paper Reviewing is not active for this conference"))
+        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
 
 
 class RHAssignEditing(RHAssignEditorOrReviewerBase):
     _uh = urlHandlers.UHAssignEditing
-    
+
     def _checkParams( self, params ):
         RHContribModifBase._checkParams( self, params )
         self._editor = int(params.get("editorAssignSelection"))
@@ -177,10 +177,10 @@ class RHRemoveAssignEditing(RHAssignEditorOrReviewerBase):
     def _process( self ):
         self._target.getReviewManager().removeEditor()
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-        
+
 class RHEditorDueDate(RHAssignEditorOrReviewerBase):
     _uh = urlHandlers.UHRemoveAssignReferee
-            
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         try:
@@ -191,10 +191,10 @@ class RHEditorDueDate(RHAssignEditorOrReviewerBase):
                 raise MaKaCError("Please set the date correctly")
         except Exception:
             raise MaKaCError("Please set the date correctly")
-        
+
     def _process( self ):
         self._target.getReviewManager().getLastReview().setEditorDueDate(self._day, self._month, self._year)
-        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )     
+        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
 #Assign Reviewer classes
 class RHAssignReviewing(RHAssignEditorOrReviewerBase):
@@ -228,10 +228,10 @@ class RHRemoveAssignReviewing(RHAssignEditorOrReviewerBase):
         ph = user.PrincipalHolder()
         self._target.getReviewManager().removeReviewer(ph.getById(self._reviewer))
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-        
+
 class RHReviewerDueDate(RHAssignEditorOrReviewerBase):
     _uh = urlHandlers.UHRemoveAssignReferee
-            
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         try:
@@ -242,30 +242,30 @@ class RHReviewerDueDate(RHAssignEditorOrReviewerBase):
                 raise MaKaCError("Please set the date correctly")
         except Exception:
             raise MaKaCError("Please set the date correctly")
-        
+
     def _process( self ):
         self._target.getReviewManager().getLastReview().setReviewerDueDate(self._day, self._month, self._year)
-        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) ) 
+        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
 
 
 #Judgement classes for referee
 class RHFinalJudge(RHContribModifBase):
     _uh = urlHandlers.UHFinalJudge
-    
+
     def _checkProtection(self):
         if not RCContributionReferee.hasRights(self):
             RHContribModifBase._checkProtection(self);
-    
+
     def _checkParams( self, params ):
         RHContribModifBase._checkParams( self, params )
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             raise MaKaCError("You must wait until the author has submitted the materials")
-        
+
         self._questions = params.get("questions")
         self._judgement = params.get("judgement")
         self._comments = params.get("comments")
-        
+
     def _process( self ):
         if self._judgement == None:
             raise MaKaCError("Select a judgement for this contribution")
@@ -282,7 +282,7 @@ class RHFinalJudge(RHContribModifBase):
 
 #Judgement classes for editor
 class RHEditorBase(RHContribModifBase):
-    
+
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
             if not (RCContributionEditor.hasRights(self)):
@@ -292,7 +292,7 @@ class RHEditorBase(RHContribModifBase):
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
 
 
-            
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
@@ -301,7 +301,7 @@ class RHEditorBase(RHContribModifBase):
 
 class RHContributionEditingJudgement(RHEditorBase):
     _uh = urlHandlers.UHContributionEditingJudgement
-    
+
     def _process(self):
         p = contributionReviewing.WPJudgeEditing(self, self._target)
         return p.display()
@@ -309,7 +309,7 @@ class RHContributionEditingJudgement(RHEditorBase):
 
 class RHJudgeEditing(RHEditorBase):
     _uh = urlHandlers.UHJudgeEditing
-    
+
     def _checkParams( self, params ):
         RHEditorBase._checkParams( self, params )
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
@@ -321,9 +321,9 @@ class RHJudgeEditing(RHEditorBase):
         self._comments = params.get("comments")
         self._criteria = params.get("criteria")
         self._editor = self.getAW().getUser()
-        
+
     def _process( self ):
-        
+
         if self._editingJudgement == None:
             raise MaKaCError("Select a judgement for this contribution")
         else:
@@ -334,10 +334,10 @@ class RHJudgeEditing(RHEditorBase):
             lastReview.getEditorJudgement().setJudgement(self._editingJudgement)
             lastReview.getEditorJudgement().setComments(self._comments)
             lastReview.getEditorJudgement().sendNotificationEmail()
-            
+
             if self._target.getParent().getConfReview().getChoice() == 3:
                 self._target.getReviewManager().getLastReview().setFinalJudgement(self._editingJudgement)
-                
+
             if self._editingJudgement == "Accept" or self._editingJudgement == "Reject":
                 self._redirect( urlHandlers.UHContributionEditingJudgement.getURL( self._target ))
             else:
@@ -345,7 +345,7 @@ class RHJudgeEditing(RHEditorBase):
 
 #Judgement classes for reviewer
 class RHReviewerBase(RHContribModifBase):
-    
+
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
             if not (RCContributionReviewer.hasRights(self)):
@@ -355,7 +355,7 @@ class RHReviewerBase(RHContribModifBase):
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
 
 
-            
+
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
@@ -363,11 +363,11 @@ class RHReviewerBase(RHContribModifBase):
 
 class RHContributionGiveAdvice(RHReviewerBase):
     _uh = urlHandlers.UHContributionGiveAdvice
-    
+
     def _checkParams(self, params):
         RHReviewerBase._checkParams(self, params)
         self._editAdvice = params.get("edit", False)
-    
+
     def _process(self):
         p = contributionReviewing.WPGiveAdvice(self, self._target)
         return p.display()
@@ -375,7 +375,7 @@ class RHContributionGiveAdvice(RHReviewerBase):
 
 class RHGiveAdvice(RHReviewerBase):
     _uh = urlHandlers.UHGiveAdvice
-    
+
     def _checkParams( self, params ):
         RHReviewerBase._checkParams( self, params )
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
@@ -387,7 +387,7 @@ class RHGiveAdvice(RHReviewerBase):
         self._adviceJudgement = params.get("adviceJudgement")
         self._comments = params.get("comments")
         self._questions = params.get("questions")
-        
+
     def _process( self ):
         if self._adviceJudgement == None:
             raise MaKaCError("Select a judgement for this contribution")
@@ -400,12 +400,12 @@ class RHGiveAdvice(RHReviewerBase):
             reviewerJudgement.setComments(self._comments)
             reviewerJudgement.setJudgement(self._adviceJudgement)
             reviewerJudgement.sendNotificationEmail()
-            
+
             self._redirect( urlHandlers.UHContributionGiveAdvice.getURL( self._target ))
-            
+
 #Classes for the author
 class RHReviewingAuthorBase(RHContributionMaterialSubmissionRightsBase):
-    
+
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
             RHContributionMaterialSubmissionRightsBase._checkProtection(self)
@@ -414,34 +414,34 @@ class RHReviewingAuthorBase(RHContributionMaterialSubmissionRightsBase):
 
 class RHSubmitForReviewing(RHReviewingAuthorBase):
     _uh = urlHandlers.UHContributionDisplay
-        
+
     def _process (self):
         self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
         self._redirect(urlHandlers.UHContributionDisplay.getURL(self._target))
-        
+
 class RHRemoveSubmittedMarkForReviewing(RHReviewingAuthorBase):
     _uh = urlHandlers.UHContributionDisplay
-        
+
     def _checkParams(self, params):
         RHContributionMaterialSubmissionRightsBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or \
         (self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted() and self._target.getConference().getConfReview().getChoice() == 3):
             raise MaKaCError("This contribution has already been judged. You cannot un-submit the materials")
-        
+
     def _process (self):
         self._target.getReviewManager().getLastReview().setAuthorSubmitted(False)
         self._redirect(urlHandlers.UHContributionDisplay.getURL(self._target))
-        
+
 #class to show reviewing history
 class RHReviewingHistory(RHContribModifBaseReviewingStaffRights):
     _uh = urlHandlers.UHContributionModifReviewing
-    
+
     def _checkProtection(self):
         if self._target.getConference().hasEnabledSection("paperReviewing"):
             RHContribModifBaseReviewingStaffRights._checkProtection(self)
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-    
+
     def _process(self):
         p = contributionReviewing.WPContributionReviewingHistory(self, self._target)
         return p.display()

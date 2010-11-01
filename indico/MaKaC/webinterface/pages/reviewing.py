@@ -54,6 +54,8 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
 
         self._showAssignContributions = self._canModify or self._isPRM or self._conf.getConfReview().isReferee(rh._getUser())
 
+
+
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
