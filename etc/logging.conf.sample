@@ -10,7 +10,7 @@ keys=defaultFormatter,mailFormatter
 # For deactivating a handler, remove its entry from
 # the list below.
 [logger_root]
-level=DEBUG
+level=WARNING
 handlers=indico,other,smtp
 
 # By default, the args are taken from the indico.conf file.
