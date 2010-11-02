@@ -255,7 +255,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         vars["revmaterial"]=self._getReviewingMaterialsHTML()
 
         vars["MaterialList"] = wcomponents.WShowExistingMaterial(self._contrib, showTitle=False).getHTML()
-        vars["ReviewingMatList"] = wcomponents.WShowExistingReviewingMaterial(self._contrib, False).getHTML()
+        vars["ReviewingMatList"] = wcomponents.WShowExistingReviewingMaterial(self._contrib, False, True).getHTML()
 
         vars["duration"]=""
         if self._contrib.getDuration() is not None:

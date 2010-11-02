@@ -1372,7 +1372,8 @@ class RHMaterialsAdd(RHContribModifBaseSpecialSesCoordRights):
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
             return
-        RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
+        if not (RCContributionPaperReviewingStaff.hasRights(self) and not self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
+            RHContribModifBaseSpecialSesCoordRights._checkProtection(self)
 
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)

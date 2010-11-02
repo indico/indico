@@ -31,7 +31,7 @@ var args = {
     var uploadAction = Indico.Urls.UploadAction.contribution;
     var visibility = '';
      <% if  self._target.getConference().getConfReview().getChoice() == 3: %>
-        <% if not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
+        <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
             visibility = 'visible';
         <% end %>
         <% else: %>
@@ -39,7 +39,7 @@ var args = {
         <% end %>
     <% end %>
     <% if self._target.getConference().getConfReview().getChoice() == 2: %>
-        <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
+        <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
             visibility = 'visible';
         <% end %>
         <% else: %>
@@ -47,7 +47,7 @@ var args = {
         <% end %>
     <% end %>
     <% if  self._target.getConference().getConfReview().getChoice() == 4: %>
-        <% if not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>
+        <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>
             visibility = 'visible';
         <% end %>
         <% else: %>
@@ -63,7 +63,7 @@ $E('reviewingMaterialListPlace').set(mlist.draw());
    $E('SendBtnForm').dom.style.display = 'none';
 <% end %>
 
-<% if existingMaterialsTitle == " ": %>
+<% if showSendButton: %>
     $E('SendBtnForm').dom.style.display = '';
 <% end %>
 <% else: %>

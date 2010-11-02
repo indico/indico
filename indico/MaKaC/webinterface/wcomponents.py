@@ -5613,9 +5613,10 @@ class WShowExistingMaterial(WTemplated):
 
 class WShowExistingReviewingMaterial(WTemplated):
 
-    def __init__(self,target,showTitle=True):
+    def __init__(self,target,showTitle=True, showSendButton=False):
         self._target=target
         self._showTitle=showTitle
+        self._showSendButton = showSendButton
 
 
     def getVars(self):
@@ -5631,6 +5632,10 @@ class WShowExistingReviewingMaterial(WTemplated):
         vars["resourcesFileProtectHandler"] = vars.get("resourcesFileProtectHandler", None)
         vars["resourcesLinkModifHandler"] = vars.get("resourcesLinkModifHandler", None)
         vars["resourcesLinkProtectHandler"] = vars.get("resourcesLinkProtectHandler", None)
+        # This var shows you if you are requesting the template from the contribution display (True)
+        # or from the paper reviewing tab in the contribution (False), as consequence you will have (or not)
+        # the "send" button
+        vars["showSendButton"] = self._showSendButton
 
         return vars
 

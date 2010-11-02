@@ -25,13 +25,16 @@ from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.pages import files
 from MaKaC.common import Config
-from MaKaC.errors import MaKaCError, NoReportError
+from MaKaC.errors import MaKaCError, NoReportError, AccessError
 
 from email.Utils import formatdate
+from MaKaC.conference import Reviewing
+from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
+from copy import copy
 
 class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHFileAccess
-    
+
     def _checkParams( self, params ):
         try:
             RHFileBase._checkParams( self, params )
@@ -39,8 +42,15 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
             raise NoReportError("The file you try to access does not exist.%s"%e)
 
     def _checkProtection( self ):
+        if isinstance(self._file.getOwner(), Reviewing):
+            selfcopy = copy(self)
+            selfcopy._target = self._file.getOwner().getContribution()
+            if not (RCContributionPaperReviewingStaff.hasRights(selfcopy) or \
+                selfcopy._target.canUserSubmit(self.getAW().getUser()) or \
+                self._target.canModify( self.getAW() )):
+                raise AccessError()
         RHDisplayBaseProtected._checkProtection( self )
-    
+
     def _process( self ):
 
         self._disableCaching()
@@ -60,14 +70,14 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
 
 class RHFileAccessStoreAccessKey( RHFileBase ):
     _uh = urlHandlers.UHFileEnterAccessKey
-    
+
     def _checkParams( self, params ):
         RHFileBase._checkParams(self, params )
         self._accesskey = params.get( "accessKey", "" ).strip()
-    
+
     def _checkProtection( self ):
         pass
-        
+
     def _process( self ):
         access_keys = self._getSession().getVar("accessKeys")
         if access_keys == None:
@@ -77,10 +87,10 @@ class RHFileAccessStoreAccessKey( RHFileBase ):
         url = urlHandlers.UHFileAccess.getURL( self._target )
         self._redirect( url )
 
-        
+
 class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHVideoWmvAccess
-    
+
     def _checkParams( self, params ):
         try:
             RHLinkBase._checkParams( self, params )
@@ -90,14 +100,14 @@ class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
         return
-    
+
     def _process( self ):
         p = files.WPVideoWmv(self, self._link )
         return p.display()
-    
+
 class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHVideoFlashAccess
-    
+
     def _checkParams( self, params ):
         try:
             RHLinkBase._checkParams( self, params )
@@ -107,7 +117,7 @@ class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
         return
-    
+
     def _process( self ):
         p = files.WPVideoFlash(self, self._link )
         return p.display()
