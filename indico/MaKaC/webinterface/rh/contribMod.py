@@ -136,7 +136,6 @@ class RHContribModifBaseSpecialSesCoordAndReviewingStaffRights(RHContribModifBas
         if not (RCSessionCoordinator.hasRights(self) or RCContributionPaperReviewingStaff.hasRights(self)):
             RHContribModifBase._checkProtection(self);
 
-
 class RHContributionModification(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
     _uh = urlHandlers.UHContributionModification
 
@@ -190,7 +189,7 @@ class RHWithdraw(RHContribModifBaseSpecialSesCoordRights):
         return p.display()
 
 
-class RHContributionAC(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
+class RHContributionAC(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifAC
 
     def _checkParams(self, params):
@@ -689,7 +688,7 @@ class RHContributionDownSC(RHContribModifBaseSpecialSesCoordRights):
         self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
 
 
-class RHContributionTools(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
+class RHContributionTools(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifTools
 
     def _process(self):
