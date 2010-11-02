@@ -18,9 +18,10 @@
   </td>
 </tr>
 <tr>
-  <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Place")%></span></td>
+  <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Default place")%></span></td>
   <td bgcolor="white" class="blacktext">%(place)s</td>
 </tr>
+<!--
 <tr>
   <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Start date")%></span></td>
   <td bgcolor="white" class="blacktext">%(startDate)s</td>
@@ -29,8 +30,9 @@
   <td class="dataCaptionTD"nowrap><span class="dataCaptionFormat"> <%= _("End date")%></span></td>
   <td bgcolor="white" class="blacktext">%(endDate)s</td>
 </tr>
+-->
 <tr>
-  <td class="dataCaptionTD"nowrap><span class="dataCaptionFormat"> <%= _("Contribution duration")%></span></td>
+  <td class="dataCaptionTD"nowrap><span class="dataCaptionFormat"> <%= _("Default contribution duration")%></span></td>
   <td bgcolor="white" class="blacktext">%(entryDuration)s</td>
 </tr>
 %(Type)s
@@ -39,7 +41,7 @@
   <td colspan="3" class="horizontalLine">&nbsp;</td>
 </tr>
 <tr>
-  <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Conveners")%></span></td>
+  <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Default conveners")%></span></td>
   <form action=%(remConvenersURL)s method="POST">
   <td colspan="2">
   <table width="100%%"><tr>
@@ -72,4 +74,4 @@
 <tr>
   <td colspan="3" class="horizontalLine">&nbsp;</td>
 </tr>
-</table>            
+</table>

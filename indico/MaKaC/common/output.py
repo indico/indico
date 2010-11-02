@@ -661,7 +661,7 @@ class outputGenerator:
         else:
             out.writeTag("code","sess%s-%s" % (session.getId(),slotCode))
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
-            out.writeTag("modifyLink",vars["sessionModifyURLGen"](session))
+            out.writeTag("slotId", session.getSortedSlotList().index(slot))
         if (session.canModify( self.__aw ) or session.canCoordinate(self.__aw)) and vars and modificons:
             out.writeTag("minutesLink",True)
             out.writeTag("materialLink", True)

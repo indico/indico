@@ -46,7 +46,7 @@
       </td>
     </tr>
     <tr>
-      <td class="titleCellTD"><span class="titleCellFormat"><%= _("Contribution duration")%></span></td>
+      <td class="titleCellTD"><span class="titleCellFormat"><%= _("Default contribution duration")%></span></td>
       <td bgcolor="white" width="100%%">&nbsp;
       <input type="text" size="2" name="durHour" value=%(durHour)s />:
       <input type="text" size="2" name="durMin" value=%(durMin)s />

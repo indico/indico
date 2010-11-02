@@ -352,7 +352,8 @@ extend(IndicoUI.Dialogs,
                                info.set('roomInfo', $O({location: null, room: null}));
                            }
 
-                           roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations,
+                           if(timetable) {
+                               roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations,
                                                               info.get('roomInfo'),
                                                               parentRoomInfo,
                                                               nullRoomInfo(info.get('roomInfo')),
@@ -362,8 +363,14 @@ extend(IndicoUI.Dialogs,
                                                               timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData(),
                                                               info,
                                                               editOn?params.id:null);
-
-
+                           } else {
+                               roomEditor = new RoomBookingWidget(Indico.Data.Locations,
+                                       info.get('roomInfo'),
+                                       parentRoomInfo,
+                                       nullRoomInfo(info.get('roomInfo')),
+                                       favoriteRooms,
+                                       null);
+                           }
                            cancelButton.observeClick(function(){
                                self.close();
                            });
@@ -704,6 +711,45 @@ extend(IndicoUI.Dialogs,
 
                popup.open();
 
-           }
+           },
+           __addSessionSlot: function(slotId, sessionId, confId){
+               var slot = undefined;
 
+               indicoRequest("schedule.slot.getFossil",
+                             { "slotId" : slotId,
+                               "confId" : confId,
+                               "sessionId": sessionId},
+                               function(slot, error){
+                                   if(!error){
+                                       slot.sessionId = slot.session.id;
+                                       slot.confId = slot.conference.id;
+                                       slot.title = slot.session.title;
+                                       slot.scheduleEntry = slot.sessionSlotId;
+                                       days = [];
+                                       stDay = new Date(slot.conference.startDate.date)
+                                       eDay = new Date(slot.conference.endDate.date)
+                                       while(stDay <= eDay){
+                                           days.push(IndicoUtil.formatDate2(stDay));
+                                           stDay.setDate(stDay.getDate() + 1);
+                                       }
+
+                                       IndicoUI.Dialogs.addSessionSlot(
+                                               'schedule.session.editSlotById',
+                                               'schedule.event.getDayEndDate',
+                                               slot,
+                                               slot,
+                                               $O(slot.session),
+                                               slot.startDate,
+                                               slot.startDate.date.replace(/-/g,"/"),
+                                               [],
+                                               days,
+                                               function(){
+                                                   location.reload(true);
+                                               },
+                                               true,
+                                               [],
+                                               null)
+                                   }
+                               });
+           }
        });
