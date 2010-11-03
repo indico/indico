@@ -658,6 +658,7 @@ extend(IndicoUI.Dialogs,
                    var content = Html.div({}, rtWidget.draw());
 
                    var commitChanges = function(suicideHook) {
+                       killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
                        if(rtWidget.clean()){
                            changedText.set(false);
                            saveButton.dom.disabled = true;
