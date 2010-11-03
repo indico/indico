@@ -64,6 +64,19 @@ class HTTPConnectionWithTimeout(httplib.HTTPConnection):
         if not self.sock:
             raise socket.error, msg
 
+
+class HTTPWithTimeout(httplib.HTTP):
+    """ A custom httplib.HTTP class that allows a timeout to be specified.
+        This is necessary because a timeout cannot be specified in Python 2.5.
+        When we start using Python2.6, this class will be no longer necessary.
+    """
+
+    _connection_class = HTTPConnectionWithTimeout
+
+    def __init__(self, host='', port=None, strict=None, timeout=None):
+        httplib.HTTP.__init__(self, host, port, strict)
+        self._conn._timeout = timeout
+
 class HTTPSConnectionWithTimeout(httplib.HTTPSConnection):
     """ A custom HTTPConnection class that allows a timeout to be specified.
         This is necessary because a timeout cannot be specified in Python 2.5.

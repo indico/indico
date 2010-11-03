@@ -18,10 +18,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import tempfile, os, getopt, sys, base64, socket
-import httplib, mimetypes, urlparse, simplejson
+import tempfile, os, base64, socket
+import mimetypes, urlparse, simplejson
 from MaKaC.common.Configuration import Config
 from MaKaC import conference
+from MaKaC.common.httpTimeout import HTTPWithTimeout
 
 #URL_RESPONSE = "http://pcdh20.cern.ch/indico/getConvertedFile.py"
 #SERVER = 'http://pcdh20.cern.ch/getSegFile.py'#'http://pcuds01.cern.ch/getSegFile.py'
@@ -51,13 +52,13 @@ class FileConverter:
     storeConvertedFile=staticmethod(storeConvertedFile)
 
     def hasAvailableConversionsFor(ext):
-        pass    
+        pass
     hasAvailableConversionsFor=staticmethod(hasAvailableConversionsFor)
 
 class CDSConvFileConverter(FileConverter):
 
     _availableExt=[".ppt", ".doc", ".pptx", ".docx", ".odp", ".sxi" ]
-    
+
     def convert(filepath, converter, material):
         # Material UID
         materialUID="%s"%material.getLocator()
@@ -69,7 +70,7 @@ class CDSConvFileConverter(FileConverter):
             #writeLog("Wrong conversion server URL")
             return
         host = up[1]
-        selector = up[2]        
+        selector = up[2]
         # Checking the file
         localFile = filepath.strip()
         localFile = localFile.replace("\\", "/")
@@ -81,14 +82,12 @@ class CDSConvFileConverter(FileConverter):
         segnum=0
         segsize = SEGMENT_SIZE
         filekey = 'segfile'
-        i = 0
-        
         try :
-            h = httplib.HTTP(host)
+            h = HTTPWithTimeout(host, timeout = 5)
         except Exception, e:
             #writeLog("Error : Can't connect to host:%s"%host)
             return False
-            
+
         while 1:
 
             temp = fic.read(segsize)
@@ -97,10 +96,10 @@ class CDSConvFileConverter(FileConverter):
             BOUNDARY = '----------ThIs_Is_tHe_bouNdaRY_$'
             CRLF = '\r\n'
             L = []
-                    
+
             if len(temp) < segsize:
                 lastseg = 1
-                
+
                 L.append('--' + BOUNDARY)
                 L.append('Content-Disposition: form-data; name="dirresponse"')
                 L.append('')
@@ -157,11 +156,12 @@ class CDSConvFileConverter(FileConverter):
                 #writeLog("Exception while sending file to the CDSconv server")
                 pass
             try:
-                errcode, errmsg, headers = h.getreply()
-            except Exception, e:
+                h.getreply()
+            except socket.timeout:
+                break
+            except Exception:
                 #writeLog(e)
                 pass
-            i = i + 1
             if lastseg == 1 :
                 #print "\n%s\n"%(h.getfile().read())
                 break
@@ -224,7 +224,7 @@ class CDSConvFileConverter(FileConverter):
                             return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
                 else:
                     return CDSConvFileConverter._getMaterialObj(c, locator["materialId"])
-                
+
         return None
     _getMaterial=staticmethod(_getMaterial)
 
@@ -278,7 +278,7 @@ class CDSConvFileConverter(FileConverter):
                 pass
         else:
             #Here it should be processed the received error from the conversion server.
-            #writeLog("Error converting file \"%s\": \n-locator:%s\nmessage:%s"%(params["filename"], params["directory"], params["error_message"])) 
+            #writeLog("Error converting file \"%s\": \n-locator:%s\nmessage:%s"%(params["filename"], params["directory"], params["error_message"]))
             pass
     storeConvertedFile=staticmethod(storeConvertedFile)
 
