@@ -36,7 +36,7 @@
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%>:</span></td>
         <td width="60%%" id="criteriaListDisplay">
         </td>
-    </tr>    
+    </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%>:</span></td>
         <td>
@@ -47,6 +47,9 @@
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong><%= _("Judgement")%>:</strong></span></td>
         <td>
             <div id="inPlaceEditJudgement"><%= Editing.getJudgement() %></div>
+            <div id="commentsMessage">
+                <%= _("The comments and your judgement, will be sent by e-mail to the author(s)")%>
+            </div>
         </td>
     </tr>
     <% if not Editing.getJudgement(): %>
@@ -60,7 +63,7 @@
             <span id="submitbutton"></span>
             <span id="submittedmessage"></span>
 		</td>
-    </tr> 
+    </tr>
 </table>
 <% end %>
 <script type="text/javascript">
@@ -74,56 +77,60 @@ var observer = function(value) {
 }
 
 var showWidgets = function(firstLoad) {
-                           
+
     new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditJudgement'),
                         'reviewing.contribution.changeJudgement',
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'editorJudgement'
                         }, <%= ConferenceReview.predefinedStates %>);
-    
-    new IndicoUI.Widgets.Generic.richTextField($E('inPlaceEditComments'),
-                           'reviewing.contribution.changeComments',
-                           {conference: '<%= Contribution.getConference().getId() %>',
-                            contribution: '<%= Contribution.getId() %>',
-                            current: 'editorJudgement'
-                           },400,200);
-    
+
+    var initialValue = '<%= Editing.getComments() %>';
+    if (initialValue == '') {
+        initialValue = 'No comments';
+    }
+
+    $E('inPlaceEditComments').set(new TextAreaEditWidget('reviewing.contribution.changeComments',
+            {conference: '<%= Contribution.getConference().getId() %>',
+             contribution: '<%= Contribution.getId() %>',
+             current: 'editorJudgement'},initialValue).draw());
+
+
     <% if len (ConfReview.getLayoutCriteria()) == 0 : %>
         $E('criteriaListDisplay').set("No form criteria proposed for this conference.");
     <% end %>
     <% else: %>
         $E("criteriaListDisplay").set('');
-        
+
         <% for c in ConfReview.getLayoutCriteria(): %>
-        
+
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
             newDiv.append(Html.span(null,"<%=c%>"));
             newDiv.append(Html.br());
-            
+
             if (firstLoad) {
                 var initialValue = "<%= Editing.getAnswer(c) %>";
             } else {
                 var initialValue = false;
             }
-    
+
             newDiv.append(new IndicoUI.Widgets.Generic.radioButtonField(
                                                     null,
                                                     'horizontal2',
                                                     <%= str(range(len(ConfReview.reviewingQuestionsAnswers))) %>,
                                                     <%= str(ConfReview.reviewingQuestionsLabels) %>,
                                                     initialValue,
-                                                    'reviewing.contribution.changeCriteria', 
+                                                    'reviewing.contribution.changeCriteria',
                                                     {
                                                         conference: '<%= Contribution.getConference().getId() %>',
                                                         contribution: '<%= Contribution.getId() %>',
                                                         criterion: '<%= c %>',
                                                         current: 'editorJudgement'
                                                     }));
-                                                
+
             $E("criteriaListDisplay").append(newDiv);
             $E("criteriaListDisplay").append(Html.br());
-            
+
         <% end %>
     <% end %>
 }
@@ -157,7 +164,7 @@ var showValues = function() {
                 }
             }
         )
-    
+
     indicoRequest('reviewing.contribution.getCriteria',
             {
                 conference: '<%= Contribution.getConference().getId() %>',
@@ -175,15 +182,15 @@ var showValues = function() {
                             $E('criteriaListDisplay').append(Html.br());
                         }
                     }
-                    
+
                 }
             }
-        )   
+        )
 }
 
 
 
-<% if Editing.isSubmitted():%> 
+<% if Editing.isSubmitted():%>
 var submitted = true;
 <% end %>
 <% else: %>

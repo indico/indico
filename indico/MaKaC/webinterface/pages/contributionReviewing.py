@@ -187,6 +187,11 @@ class WJudgeEditing(wcomponents.WTemplated):
 
 class WPGiveAdvice( WPContributionModifBase ):
 
+    def getJSFiles(self):
+        return WPContributionModifBase.getJSFiles(self) + \
+            self._includeJSPackage('Core') + \
+               self._includeJSPackage('Legacy')
+
     def _setActiveTab( self ):
         self._subtabReviewing.setActive()
         self._tabGiveAdvice.setActive()

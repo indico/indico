@@ -38,17 +38,17 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Judgement")%></span></td>
-        <td>
-            <div id="inPlaceEditJudgement"><%= Advice.getJudgement() %></div>
-        </td>
-    </tr>
-    <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%></span></td>
         <td>
             <div id="inPlaceEditComments"></div>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Judgement")%></span></td>
+        <td>
+            <div id="inPlaceEditJudgement"><%= Advice.getJudgement() %></div>
             <div id="commentsMessage">
-                <%= _("These comments, along with your judgement, will be sent by e-mail to the author(s)")%>
+                <%= _("The comments and your judgement, will be sent by e-mail to the author(s)")%>
             </div>
         </td>
     </tr>
@@ -57,30 +57,33 @@
             <span id="submitbutton"></span>
             <span id="submittedmessage"></span>
         </td>
-    </tr>   
+    </tr>
 </table>
 
 
 <script type="text/javascript">
 
 var showWidgets = function(firstLoad) {
-                           
+
     new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditJudgement'),
                         'reviewing.contribution.changeJudgement',
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'reviewerJudgement'
                         }, <%= ConfReview.getAllStates() %>);
-    
-    new IndicoUI.Widgets.Generic.richTextField($E('inPlaceEditComments'),
-                           'reviewing.contribution.changeComments',
-                           {conference: '<%= Contribution.getConference().getId() %>',
-                            contribution: '<%= Contribution.getId() %>',
-                            current: 'reviewerJudgement'
-                           },400,200);
-                           
-   
-    
+
+    var initialValue = '<%= Advice.getComments() %>';
+    if (initialValue == '') {
+        initialValue = 'No comments';
+    }
+
+    $E('inPlaceEditComments').set(new TextAreaEditWidget('reviewing.contribution.changeComments',
+            {conference: '<%= Contribution.getConference().getId() %>',
+             contribution: '<%= Contribution.getId() %>',
+             current: 'reviewerJudgement'},initialValue).draw());
+
+
+
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
         $E('questionListDisplay').set("No reviewing questions proposed for this conference.");
     <% end %>
@@ -88,32 +91,32 @@ var showWidgets = function(firstLoad) {
         $E("questionListDisplay").set('');
         <% for q in ConfReview.getReviewingQuestions(): %>
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
-            
+
             newDiv.append(Html.span(null,"<%=q%>"));
             newDiv.append(Html.br());
-                        
+
             if (firstLoad) {
                 var initialValue = "<%= Advice.getAnswer(q) %>";
             } else {
                 var initialValue = false;
             }
-            
+
             newDiv.append(new IndicoUI.Widgets.Generic.radioButtonField(
                                                     null,
                                                     'horizontal2',
                                                     <%= str(range(len(ConfReview.reviewingQuestionsAnswers))) %>,
                                                     <%= str(ConfReview.reviewingQuestionsLabels) %>,
                                                     initialValue,
-                                                    'reviewing.contribution.changeCriteria', 
+                                                    'reviewing.contribution.changeCriteria',
                                                     {conference: '<%= Contribution.getConference().getId() %>',
                                                     contribution: '<%= Contribution.getId() %>',
                                                     criterion: '<%= q %>',
                                                     current: 'reviewerJudgement'
                                                     }));
-            
+
             $E("questionListDisplay").append(newDiv);
             $E("questionListDisplay").append(Html.br());
-            
+
         <% end %>
     <% end %>
 }
@@ -147,7 +150,7 @@ var showValues = function() {
                 }
             }
         )
-    
+
     indicoRequest('reviewing.contribution.getCriteria',
             {
                 conference: '<%= Contribution.getConference().getId() %>',
@@ -167,12 +170,12 @@ var showValues = function() {
                     }
                 }
             }
-        )   
+        )
 }
 
 
 
-<% if Advice.isSubmitted():%> 
+<% if Advice.isSubmitted():%>
     var submitted = true;
 <% end %>
 <% else: %>

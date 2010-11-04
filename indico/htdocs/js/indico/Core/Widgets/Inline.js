@@ -1512,3 +1512,35 @@ type("SessionRenameWidget", ["InlineWidget"],
             this.__parameterManager = parameterManager;
             this.info = info;
     });
+
+
+//Textarea widget
+
+type("TextAreaEditWidget", ["InlineEditWidget"],
+        {
+            _handleEditMode: function(value) {
+                // call buildStructure with modification widgets
+				this.textarea = Html.textarea({rows: 7, cols: 50}, value);
+                return this.textarea;
+            },
+
+            _handleDisplayMode: function(value) {
+                // call buildStructure with spans
+            	this.comments = Html.span({}, value);
+            	this.__parameterManager.add(this.comments, 'text', true);
+
+                return this.comments;
+            },
+
+            _getNewValue: function() {
+                return this.textarea.get();
+            },
+
+            _verifyInput: function() {
+                return true;
+            }
+        },
+        function(method, attributes, initValue) {
+            this.InlineEditWidget(method, attributes, initValue);
+            this.__parameterManager = new IndicoUtil.parameterManager();
+        });

@@ -84,7 +84,7 @@
 <% if ConferenceChoice == 2 or ConferenceChoice == 4:%>
 <table width="90%%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final judgement")%>
+        <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final Judgement")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>
         </td>
     </tr>
@@ -157,13 +157,15 @@ var showWidgets = function(firstLoad) {
                         current: 'refereeJudgement'
                         }, <%= ConfReview.getAllStates() %>, "<%=FinalJudge%>", observer);
 
-    new IndicoUI.Widgets.Generic.richTextField($E('inPlaceEditComments'),
-                           'reviewing.contribution.changeComments',
-                           {conference: '<%= Contribution.getConference().getId() %>',
-                            contribution: '<%= Contribution.getId() %>',
-                            current: 'refereeJudgement'
-                           },400,200);
+    var initialValue = '<%= Review.getRefereeJudgement().getComments() %>';
+    if (initialValue == '') {
+    	initialValue = 'No comments';
+    }
 
+    $E('inPlaceEditComments').set(new TextAreaEditWidget('reviewing.contribution.changeComments',
+            {conference: '<%= Contribution.getConference().getId() %>',
+             contribution: '<%= Contribution.getId() %>',
+             current: 'refereeJudgement'},initialValue).draw());
 
 
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
