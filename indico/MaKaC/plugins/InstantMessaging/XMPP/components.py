@@ -39,10 +39,13 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import zope.interface
 
+from indico.core.api import Component
+from indico.core.api.conference import INavigationContributor
+
 
 class ChatSMContributor(Component, Observable):
 
-    zope.interface.implements(INavigationContributor)#IContributor, INavigationContributor)
+    zope.interface.implements(INavigationContributor)
 
     """ChatSideMenuContributor. Fills the side menu of the conference's management menu when
     the chat plugin is active"""
@@ -151,7 +154,7 @@ class ChatSMContributor(Component, Observable):
 
 
 class ChatroomStorage(Component):
-    zope.interface.implements(IInstantMessagingListener)#IListener, IInstantMessagingListener)
+    zope.interface.implements(IInstantMessagingListener)
 
     def __init__(self):
         #it's the first thing to do when having these events
@@ -243,7 +246,7 @@ class ChatroomStorage(Component):
 class ChatroomMailer(Component):
     """ Sends emails to the administrators when a chat room related event happens"""
 
-    zope.interface.implements(IInstantMessagingListener)#IListener, IInstantMessagingListener)
+    zope.interface.implements(IInstantMessagingListener)
 
     @classmethod
     def createChatroom(cls, obj, params):

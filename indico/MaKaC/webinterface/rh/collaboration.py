@@ -68,15 +68,13 @@ class RCCollaborationPluginAdmin(object):
                 user = request._getUser()
 
         if user:
-            collaborationPluginType = PluginsHolder().getPluginType('Collaboration')
+            collaborationPluginType = CollaborationTools.getCollaborationPluginType()
 
-            if plugins == 'any':
-                plugins = []
-                for p in CollaborationTools.getCollaborationPluginType().getPluginList():
-                    plugins.append(p.getName())
+            plist = collaborationPluginType.getPluginList() \
+                      if plugins == 'any' else plugins
 
-            if plugins:
-                for plugin in plugins:
+            if plist:
+                for plugin in plist:
                     if not isinstance(plugin, Plugin):
                         plugin = collaborationPluginType.getPlugin(plugin)
 

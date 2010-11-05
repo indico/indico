@@ -1511,32 +1511,33 @@ class WCSTemplateBase(wcomponents.WTemplated):
         This class also overloads the _setTPLFile method so that Indico knows where each plugin's *.tpl files are.
     """
 
-    def __init__(self, pluginName):
+    def __init__(self, plugin):
         """ Constructor for the WCSTemplateBase class.
             conf: a Conference object
-            pluginName: a string with the corresponding plugin name ("EVO", "DummyPlugin", etc.)
+            plugin: the corresponding plugin
         """
-        self._pluginName = pluginName
+        self._plugin = plugin
+        self._pluginId = plugin.getId()
         self._ph = PluginsHolder()
 
-        self._plugin = CollaborationTools.getPlugin(pluginName)
-        setattr(self, "_" + pluginName + "Options", CollaborationTools.getPlugin(pluginName).getOptions())
+        setattr(self, "_" + self._pluginId + "Options", plugin.getOptions())
 
-    def _setTPLFile(self):
-        dir = os.path.join(Collaboration.__path__[0], self._pluginName, "tpls")
-        file = "%s.tpl"%self.tplId
-        self.tplFile = os.path.join(dir, file)
+    def _setTPLFile(self, extension='tpl'):
+        tplDir = os.path.join(self._plugin.getModule().__path__[0], "tpls")
 
-        hfile = self._getSpecificTPL(os.path.join(dir,self._pluginName,'chelp'), self.tplId,extension='wohl')
-        self.helpFile = os.path.join(dir,'chelp',hfile)
+        fname = "%s.%s" % (self.tplId, extension)
+        self.tplFile = os.path.join(tplDir, fname)
+
+        hfile = self._getSpecificTPL(os.path.join(tplDir,self._pluginId,'chelp'), self.tplId,extension='wohl')
+        self.helpFile = os.path.join(tplDir,'chelp',hfile)
 
 
 class WCSPageTemplateBase(WCSTemplateBase):
     """ Base class for Collaboration templates for the create / modify booking form.
     """
 
-    def __init__(self, conf, pluginName, user):
-        WCSTemplateBase.__init__(self, pluginName)
+    def __init__(self, conf, plugin, user):
+        WCSTemplateBase.__init__(self, plugin)
         self._conf = conf
         self._user = user
 
@@ -1545,16 +1546,15 @@ class WJSBase(WCSTemplateBase):
     """ Base class for Collaboration templates for Javascript code template.
         It overloads _setTPLFile so that indico can find the Main.js, Extra.js and Indexing.js files.
     """
-    def __init__(self, conf, pluginName, user):
-        WCSTemplateBase.__init__(self, pluginName)
+    def __init__(self, conf, plugin, user):
+        WCSTemplateBase.__init__(self, plugin)
         self._conf = conf
         self._user = user
 
     def _setTPLFile(self):
-        dir = os.path.join(Collaboration.__path__[0], self._pluginName, "tpls")
-        file = "%s.js"%self.tplId
-        self.tplFile = os.path.join(dir, file)
+        WCSTemplateBase._setTPLFile(self, extension='js')
         self.helpFile = ''
+
 
 class WCSCSSBase(WCSTemplateBase):
     """ Base class for Collaboration templates for CSS code template
@@ -1562,10 +1562,11 @@ class WCSCSSBase(WCSTemplateBase):
     """
 
     def _setTPLFile(self):
-        dir = os.path.join(Collaboration.__path__[0], self._pluginName)
-        file = "%s.css"%self.tplId
-        self.tplFile = os.path.join(dir, file)
+        tplDir = self._plugin.getModule().__path__[0]
+        fname = "%s.css" % self.tplId
+        self.tplFile = os.path.join(tplDir, fname)
         self.helpFile = ''
+
 
 class CSErrorBase(Fossilizable):
     fossilizes(ICSErrorBaseFossil)

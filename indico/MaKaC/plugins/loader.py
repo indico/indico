@@ -24,7 +24,7 @@ that allow loading plugins from the python path, and cataloguing them accordingl
 """
 
 # system imports
-import os, sys, pkg_resources
+import os, sys, pkg_resources, pkgutil
 
 # database
 from persistent import Persistent
@@ -35,7 +35,7 @@ from MaKaC.errors import PluginError
 
 # package
 from MaKaC.plugins.util import processPluginMetadata
-
+import indico.ext
 
 class ModuleLoadException(Exception):
     pass
@@ -44,8 +44,6 @@ class PluginLoader(object):
     """
     Loads the plugins/types from the source code. Execution of the contained methods
     should be avoided (currently invoked manually), as it is naturally slow.
-
-    TODO: Use setuptools extension points?
     """
 
     # A dictionary where the keys are plugin type names
@@ -57,7 +55,6 @@ class PluginLoader(object):
     _pmodules = {}
 
     _ptypesLoaded = set()
-    _pluginsDir = os.path.abspath(sys.modules["MaKaC.plugins"].__path__[0])
 
     @classmethod
     def loadPlugins(cls):
@@ -66,13 +63,13 @@ class PluginLoader(object):
         plugins into memory.
         """
 
-        #we loop through all the files and folders of indico/MaKaC/plugins/
-        for itemName in os.listdir(cls._pluginsDir):
-            #we only go deeper for folders
-            if os.path.isdir(os.path.join(cls._pluginsDir, itemName)):
-                if not itemName in cls._ptypesLoaded:
-                    cls.loadPluginType(itemName)
-                    cls._ptypesLoaded.add(itemName)
+        # get all available plugin types
+        ptypes = pkg_resources.get_entry_map('cds-indico', group='indico.ext_types')
+
+        for ptid, epoint in ptypes.iteritems():
+            if not ptid in cls._ptypesLoaded:
+                cls.loadPluginType(ptid, epoint.module_name)
+                cls._ptypesLoaded.add(ptid)
 
     @classmethod
     def reloadPlugins(cls):
@@ -94,7 +91,9 @@ class PluginLoader(object):
             cls._pmodules[ptypeId] = {}
             cls._ptypesLoaded.remove(ptypeId)
 
-        cls.loadPluginType(ptypeId)
+        ptypes = pkg_resources.get_entry_map('cds-indico', group='indico.ext_types')
+
+        cls.loadPluginType(ptypeId, ptypes[ptypeId].module_name)
         cls._ptypesLoaded.add(ptypeId)
 
     @classmethod
@@ -118,7 +117,7 @@ class PluginLoader(object):
         return cls._ptypeModules[ptypeId]
 
     @classmethod
-    def getPluginByTypeAndId(cls, ptypeId, pluginName):
+    def getPluginByTypeAndId(cls, ptypeId, pid):
         """
         Returns the module object of a plugin given the names of the plugin and its
         type
@@ -128,12 +127,12 @@ class PluginLoader(object):
 
         modulesDict = cls._pmodules[ptypeId]
 
-        if pluginName in modulesDict:
-            return modulesDict[pluginName]
+        if pid in modulesDict:
+            return modulesDict[pid]
         else:
             raise PluginError("Tried to get a plugin of the type %s with name %s "
                               "but there is no such plugin" % (ptypeId,
-                                                               pluginName))
+                                                               pid))
 
     @classmethod
     def getPluginTypeList(cls):
@@ -144,7 +143,7 @@ class PluginLoader(object):
         return list(cls._ptypesLoaded)
 
     @classmethod
-    def importName(cls, moduleName, name):
+    def importName(cls, moduleName, mayFail = False):
         """
         Import a named object from a module in the context of this function,
         which means you should use fully qualified module paths.
@@ -152,18 +151,19 @@ class PluginLoader(object):
 
         try:
             # may raise ImportError (or others caused by the module's code)
-            module = __import__(moduleName, globals(), locals(), [name])
+            module = __import__(moduleName, globals(), locals())
+        except ImportError:
+            if mayFail:
+                return None
+            else:
+                Logger.get('plugins.loader').exception("Error loading %s" % moduleName)
+                raise ModuleLoadException("Impossible to load %s" % moduleName)
         except:
-            Logger.get('plugins.loader').exception(
-                "Error loading %s ('%s')" % (moduleName,
-                                             name))
-            raise ModuleLoadException("Impossible to load %s ('%s')" % \
-                                      (moduleName, name))
+            Logger.get('plugins.loader').exception("Error loading %s" % moduleName)
+            raise ModuleLoadException("Impossible to load %s" % moduleName)
 
 
-        # may raise KeyError
-        objectToReturn = vars(module)[name]
-        return objectToReturn
+        return sys.modules[moduleName]
 
     @classmethod
     def _checkSetuptoolsDependencies(cls, deplist, name):
@@ -183,19 +183,14 @@ class PluginLoader(object):
         return missing
 
     @classmethod
-    def loadPluginType(cls, ptypeId):
+    def loadPluginType(cls, ptypeId, ptypeModulePath):
         """
         Loads a plugin type, going through its source tree and loading each plugin
         as well.
         """
 
         # we load the plugin type module
-        try:
-            ptypeModule = cls.importName("MaKaC.plugins", ptypeId)
-        except (ImportError, KeyError):
-            raise Exception("Tried to load the plugin type: %s but the module "
-                            "MaKaC.plugins.%s did not exist" % (ptypeId,
-                                                                ptypeId))
+        ptypeModule = cls.importName(ptypeModulePath)
 
         metadata = processPluginMetadata(ptypeModule)
 
@@ -213,107 +208,95 @@ class PluginLoader(object):
         # save missing dependency info, so that the holder will know the module state
         ptypeModule.__missing_deps__ = missingDeps
 
+        cls._pmodules[ptypeId] = {}
+
         # check dependencies
         if len(missingDeps) > 0:
             # if some dependencies are not met, don't load submodules
-            cls._pmodules[ptypeId] = {}
-
             Logger.get('plugins.loader').warning(
                 "Plugin type %s has unmet dependencies. It will be deactivated." %
                 ptypeId)
             return
         else:
-            # absolute path of a plugin type folder
-            ptypePath = os.path.join(cls._pluginsDir, ptypeId)
+            pluginEps = pkg_resources.get_entry_map('cds-indico', group='indico.ext')
 
-            # we loop through all the files and folders of the plugin type folder
-            for itemName in os.listdir(ptypePath):
+            # we loop through all the specified plugins
+            for itemName, epoint in pluginEps.iteritems():
+                mname = epoint.module_name
 
-                # we strip the extension from the item name
-                # splitext returns a tuple (name, file extension)
-                cls._loadPluginFromDir(ptypePath, ptypeId, ptypeModule, itemName)
+                # ignore plugins that don't match our plugin type
+                if not epoint.name.startswith("%s." % ptypeId):
+                    continue
+                else:
+                    pid = itemName[len(ptypeId) + 1:]
+                    # load plugin files
+                    cls._loadPluginFromDir(mname, ptypeId, ptypeModule, pid)
+
+            # load submodules too
+            cls._loadSubModules(ptypeModule)
 
     @classmethod
-    def _loadPluginFromDir(cls, ptypePath, ptypeId, ptypeModule, pid):
+    def _loadPluginFromDir(cls, pModuleName, ptypeId, ptypeModule, pid):
         """
         Loads a possible plugin from a directory
         """
 
-        pid, ext = os.path.splitext(pid)
+        # we attempt to import the module.
+        try:
+            pmodule = cls.importName(pModuleName)
+        except (ImportError, KeyError):
+            raise Exception("Tried to load the plugin  %s but the module "
+                            "%s does not exist. "
+                            "Is there an __init__.py?" %
+                            (pid, pModuleName))
 
-        # in case where we found a folder, i.e. a plugin folder
-        if os.path.isdir(os.path.join(cls._pluginsDir, ptypeId, pid)):
+        ppath = pmodule.__path__[0]
+        pmetadata = processPluginMetadata(pmodule)
 
-            # we attempt to import the folder as a module.
-            # This will only work if there's an __init__.py inside the folder
-            try:
-                pmodule = cls.importName(ptypeModule.__name__, pid)
+        # If it was a module, we check that the "type" field in the metadata
+        # of the plugin corresponds to the plugin type we are currently processing
+        if pmetadata['type'] == ptypeId:
 
-            except (ImportError, KeyError):
-                raise Exception("Tried to load the plugin  %s but the module "
-                                "MaKaC.plugins.%s.%s did not exist. "
-                                "Is there an __init__.py?" %
-                                (ptypeId, ptypeId, pid))
+            missingDeps = cls._checkSetuptoolsDependencies(pmetadata['requires'],
+                                                           pid)
 
-            # we check that it was indeed a module.
-            if pmodule:
-                pmetadata = processPluginMetadata(pmodule)
-            else:
-                # Not a module? Nothing to do here...
-                return
+            # save missing dependency info, so that the holder will know the
+            # module state
+            pmodule.__missing_deps__ = missingDeps
 
-            # If it was a module, we check that the "type" field in the metadata
-            # of the plugin corresponds to the plugin type we are currently processing
-            if pmetadata['type'] == ptypeId:
+            # save the plugin id, so that the holder will know it
+            pmodule.__plugin_id__ = pid
 
-                # if this is the first plugin for this plugin type
-                if not ptypeId in cls._pmodules:
-                    cls._pmodules[ptypeId] = {}
-
-                missingDeps = cls._checkSetuptoolsDependencies(pmetadata['requires'],
-                                                               pid)
-
-                # save missing dependency info, so that the holder will know the
-                # module state
-                pmodule.__missing_deps__ = missingDeps
-
-                # check dependencies
-                if len(missingDeps) > 0:
-                    # if some dependencies are not met, don't load submodules
-                    cls._pmodules[ptypeId][pid] = pmodule
-
-                    Logger.get('plugins.loader').warning(
-                        "Plugin %s has unmet dependencies. It will be deactivated." %
-                        pid)
-                    return
-
-
-                cls._ptypeModules[ptypeId].__dict__[pid] = pmodule
-
-                # we store the module inside the cls._pmodules object
+            # check dependencies
+            if len(missingDeps) > 0:
+                # if some dependencies are not met, don't load submodules
                 cls._pmodules[ptypeId][pid] = pmodule
 
-                #we build the path of the plugin
-                pluginPath = os.path.join(ptypePath, pid)
+                Logger.get('plugins.loader').warning(
+                    "Plugin %s has unmet dependencies. It will be deactivated." %
+                    pid)
+                return
 
-                cls.loadSubModules(pmodule, pluginPath)
-            else:
-                Logger.get("plugins.loader").warning("Module of type %s inside %s" %
-                                                     (pmetadata['type'],
-                                                      ptypeId))
 
-        elif ext == ".py" and pid != "__init__":
-            ptypeSubModule = cls.importName(ptypeModule.__name__, pid)
+            cls._ptypeModules[ptypeId].__dict__[pid] = pmodule
 
-            if ptypeSubModule:
-                cls._ptypeModules[ptypeId].__dict__[pid] = ptypeSubModule
+            # we store the module inside the cls._pmodules object
+            cls._pmodules[ptypeId][pid] = pmodule
 
+            # load submodules too
+            cls._loadSubModules(pmodule)
+        else:
+            Logger.get("plugins.loader").warning("Module of type %s inside %s" %
+                                                 (pmetadata['type'],
+                                                  ptypeId))
 
     @classmethod
-    def loadSubModules(cls, module, modulePath):
+    def _loadSubModules(cls, module):
         """
         Loads the submodules of a plugin (recursively)
         """
+
+        modulePath = module.__path__[0]
 
         #dictionary whose keys are submodule names, and whose values are module objects
         foundSubModules = {}
@@ -327,18 +310,18 @@ class PluginLoader(object):
             # if the item is a directory, we may have found a subpackage
             if os.path.isdir(os.path.join(modulePath, itemName)):
 
-                try:
-                    subModule = cls.importName(module.__name__, itemName)
-                except KeyError:
-                    # we hit a folder that is not a package, such
-                    # plugins are allowed to have those
-                    continue
+                subModule = cls.importName("%s.%s" % (module.__name__, itemName),
+                                           mayFail = True)
 
+                # we hit a folder that is not a package, such
+                # plugins are allowed to have those
+                if subModule == None:
+                    continue
 
                 # we store the submodule in the foundSubModules dictionary
                 foundSubModules[itemName] = subModule
                 # we make a recursive call
-                cls.loadSubModules(subModule, os.path.join(modulePath, itemName))
+                cls._loadSubModules(subModule)
 
             # if the item is a .py file and not __init__, it's a submodule that is
             # not a package
@@ -346,7 +329,7 @@ class PluginLoader(object):
 
                 # this should return a subModule, unless there
                 # has been an error during import
-                subModule = cls.importName(module.__name__, itemName)
+                subModule = cls.importName("%s.%s" % (module.__name__, itemName))
                 foundSubModules[itemName] = subModule
 
         # once we have found all the submodules, we make sure they are in the

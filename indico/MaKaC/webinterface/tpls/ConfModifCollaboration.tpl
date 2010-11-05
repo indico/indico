@@ -45,7 +45,7 @@
  *               Its presence is optional (if it is not present, no custom text will be displayed).
  */
 var codes = {
-<%= ",\n". join(['"' + pluginName + '" \x3a ' + code for pluginName, code in JSCodes.items()]) %>
+<%= ",\n". join(['"' + pluginId + '" \x3a ' + code for pluginId, code in JSCodes.items()]) %>
 }
 
 /**
@@ -53,7 +53,7 @@ var codes = {
  * of the parent event changing dates / timezones.
  */
 var canBeNotifiedOnDateChanges = {
-     <%= ",\n". join(['"' + pluginName + '" \x3a ' + jsBoolean(canBeNotified) for pluginName, canBeNotified in CanBeNotified.items()]) %>
+     <%= ",\n". join(['"' + pluginId + '" \x3a ' + jsBoolean(canBeNotified) for pluginId, canBeNotified in CanBeNotified.items()]) %>
 }
 
 /**

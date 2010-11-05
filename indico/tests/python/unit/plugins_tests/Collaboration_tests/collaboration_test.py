@@ -172,7 +172,7 @@ class TestResponsiveness(unittest.TestCase):
             #ConferenceHolder()._getIdx() is an OOBTree
             size = lastConfId - firstConfId
             self._log("Populating among aproximately " + str(size) + " events, from " + str(firstConfId) + " to " + str(lastConfId) + ", with aproximately " + str(startingBookings) + " bookings")
-            self._log("Initial size of 'all' index: " + str(IndexesHolder().getById("collaboration").getAllBookingsIndex().getCount()))
+            self._log("Initial size of 'all' index: " + str(IndexesHolder().getById("Collaboration").getAllBookingsIndex().getCount()))
 
             self.validConfIds = []
             self.confsWithBookings = []
@@ -201,11 +201,11 @@ class TestResponsiveness(unittest.TestCase):
                     populated += 1
                     self.confsWithBookings.append(confId)
                     if populated % 100 == 0:
-                        self._log(str(populated) + ' events populated. Index size: ' + str (IndexesHolder().getById("collaboration").getAllBookingsIndex().getCount()))
+                        self._log(str(populated) + ' events populated. Index size: ' + str (IndexesHolder().getById("Collaboration").getAllBookingsIndex().getCount()))
 
 
             self._log("Populating finished. " + str(populated) + " events populated with " + str(added) + " bookings")
-            self._log("Size of 'all' index is now: " + str(IndexesHolder().getById("collaboration").getAllBookingsIndex().getCount()))
+            self._log("Size of 'all' index is now: " + str(IndexesHolder().getById("Collaboration").getAllBookingsIndex().getCount()))
             self._log("Performing commit...")
 
             self.cdbmgr.endRequest(True) #True = commmit

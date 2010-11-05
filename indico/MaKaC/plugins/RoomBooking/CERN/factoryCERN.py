@@ -27,24 +27,24 @@ class FactoryCERN( object ):
 
     @staticmethod
     def getName():
-        return MaKaC.plugins.RoomBooking.CERN.pluginName
-        
+        return MaKaC.plugins.RoomBooking.CERN.__metadata__['name']
+
     @staticmethod
     def getDescription():
-        return MaKaC.plugins.RoomBooking.CERN.pluginDescription
-    
+        return MaKaC.plugins.RoomBooking.CERN.__metadata__['description']
+
     @staticmethod
     def newRoom( locationName = "" ):
         import roomCERN
         newRoom = roomCERN.RoomCERN()
         newRoom.locationName = locationName
         return newRoom
-    
+
     @staticmethod
     def newReservation():
         import reservationCERN
         return reservationCERN.ReservationCERN()
-    
+
     @staticmethod
     def newCrbsUser():
         import crbsUserCERN
@@ -64,4 +64,3 @@ class FactoryCERN( object ):
     def getCustomAttributesManager():
         import customAttributesManagerCERN as camc
         return camc.CustomAttributesManagerCERN()
-

@@ -42,7 +42,7 @@
             <input type="text" id="newLocationName" name="newLocationName" value="" size="28" />
             <select name="pluginName">
             <% for plugin in Location.getAvailablePlugins(): %>
-              <option value="<%=plugin.pluginName%>"><%=plugin.pluginName%></option>
+              <option value="<%=plugin.__plugin_id__%>"><%=plugin.__metadata__['name']%></option>
             <% end %>
             </select>
             <input type="submit" class="btn" value="<%= _("Add")%>" />

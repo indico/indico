@@ -33,21 +33,17 @@ from MaKaC.common.logger import Logger
 import zope.interface, types
 from MaKaC.services.interface.rpc.common import NoReportError
 from persistent import Persistent
+import pkg_resources
 
-from MaKaC.plugins.notificationComponents import Component, IListener, IContributor
 from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata
 
+from indico.core.api import Component, IListener, IContributor
 
 class Observable:
     def _notify(self, event, params):
-        try:
-            PluginsHolder().getComponentsManager().notifyComponent(event, self, params)
-        except NoReportError, e:
-            raise NoReportError(str(e))
-        except Exception, e:
-            raise Exception(str(e))
+        PluginsHolder().getComponentsManager().notifyComponent(event, self, params)
 
 
 class ComponentsManager(Persistent):
@@ -80,7 +76,7 @@ class ComponentsManager(Persistent):
             pluginTypeName, possiblePluginName = self.getAssociatedPlugin(component)
 
             #it's a plugin
-            if PluginsHolder().getPluginType(pluginTypeName).hasPlugin(possiblePluginName):
+            if possiblePluginName:
                 isActive = PluginsHolder().getPluginType(pluginTypeName).getPlugin(possiblePluginName).isActive()
                 #if the pluginType that the plugin belongs to is not active we won't register the components for the plugin
                 if not PluginsHolder().getPluginType(pluginTypeName).isActive():
@@ -149,11 +145,19 @@ class ComponentsManager(Persistent):
 
     def getAssociatedPlugin(self, component):
         ''' returns the plugin the component belongs to, according to the component path'''
-        #TODO: what if the path is not makac.plugins?
+
         componentClassModuleName = component.__module__
-        moduleNames = componentClassModuleName[len('MaKaC.plugins.'):].split('.')
-        #return (pluginTypeName, possiblePluginName) we'll have to check if possiblePluginName is a plugin
-        return moduleNames[0], moduleNames[1]
+
+        for epoint in pkg_resources.iter_entry_points('indico.ext'):
+            if component.__module__.startswith(epoint.module_name):
+                moduleId = epoint.name.split('.')
+                return moduleId[0], moduleId[1]
+
+        for epoint in pkg_resources.iter_entry_points('indico.ext_types'):
+            if component.__module__.startswith(epoint.module_name):
+                return epoint.name, None
+        else:
+            raise Exception('Component %s does not belong to any plugin? %s ' % (component, list(ep.module_name for ep in pkg_resources.iter_entry_points('indico.ext'))))
 
     def cleanPlugin(self, name):
         '''receives the name of the plugin, (EVO, CERNMCU...) and unregisters it'''
@@ -312,6 +316,7 @@ class PluginsHolder (ObjectHolder):
     def reloadAllPlugins(self):
         """ Reloads all plugins and updates their information
         """
+
         self.getComponentsManager().cleanAll()
         self.getById("ajaxMethodMap").cleanAJAXDict()
         self.getById("RHMap").cleanRHDict()
@@ -394,10 +399,10 @@ class PluginsHolder (ObjectHolder):
         else:
             return False
 
-    def getPluginType(self, name):
+    def getPluginType(self, ptypeid):
         """ Returns the PluginType object for the given name
         """
-        return self.getById(name)
+        return self.getById(ptypeid)
 
 
 
@@ -689,6 +694,11 @@ class PluginBase(Persistent):
     def isUsable(self):
         return self.__notUsableReason == None
 
+    def getStorage(self):
+        if not hasattr(self, "_storage") or self._storage is None:
+            self._storage = OOBTree()
+        return self._storage
+
 
 class PluginType (PluginBase):
     """ This class represents a plugin type ("COllaboration", "epayment", etc.).
@@ -744,19 +754,17 @@ class PluginType (PluginBase):
         else:
             p.setUsable(True)
 
-        # only set options, actions, components and handlers if plugin is active
-        if p.isActive():
-            if hasattr(pluginModule, "options") and \
-                   hasattr(pluginModule.options, "globalOptions"):
-                p.updateAllOptions(pluginModule.options.globalOptions)
+        if hasattr(pluginModule, "options") and \
+               hasattr(pluginModule.options, "globalOptions"):
+            p.updateAllOptions(pluginModule.options.globalOptions)
 
-            if hasattr(pluginModule, "actions") and \
-                   hasattr(pluginModule.actions, "pluginActions"):
-                p.updateAllActions(pluginModule.actions.pluginActions)
+        if hasattr(pluginModule, "actions") and \
+               hasattr(pluginModule.actions, "pluginActions"):
+            p.updateAllActions(pluginModule.actions.pluginActions)
 
-            self._updateComponentInfo(p, pluginModule)
-            self._updateRHMapInfo(p, pluginModule)
-            self._updateHandlerInfo(p, pluginModule)
+        self._updateComponentInfo(p, pluginModule)
+        self._updateHandlerInfo(p, pluginModule)
+        self._updateRHMapInfo(p, pluginModule)
 
     def updateInfo(self):
         """
@@ -779,7 +787,7 @@ class PluginType (PluginBase):
             if metadata['ignore']:
                 continue
             else:
-                self._updatePluginInfo(pluginModule.__name__.split('.')[-1],
+                self._updatePluginInfo(pluginModule.__plugin_id__,
                                        pluginModule,
                                        metadata)
 
@@ -792,13 +800,11 @@ class PluginType (PluginBase):
         self.__visible = ptypeMetadata['visible']
 
         # components, handlers, options and actions
-        if self.isActive():
-            # components, handlers, options and actions
-            self._updateComponentInfo(self, ptypeModule)
-            self._updateRHMapInfo(self, ptypeModule)
-            self._updateHandlerInfo(self, ptypeModule)
-            self.updateAllOptions(self._retrievePluginTypeOptions())
-            self.updateAllActions(self._retrievePluginTypeActions())
+        self._updateComponentInfo(self, ptypeModule)
+        self._updateRHMapInfo(self, ptypeModule)
+        self._updateHandlerInfo(self, ptypeModule)
+        self.updateAllOptions(self._retrievePluginTypeOptions())
+        self.updateAllActions(self._retrievePluginTypeActions())
 
 
     def _getAllSubmodules(self, module):
@@ -815,6 +821,8 @@ class PluginType (PluginBase):
         return accum
 
     def _updateComponentInfo(self, plugin, module):
+        Logger.get('plugins.holder').info("Updating component info for '%s'" % \
+                                          plugin.getFullId())
 
         for smodule in self._getAllSubmodules(module):
             for obj in smodule.__dict__.values():
@@ -845,9 +853,11 @@ class PluginType (PluginBase):
             else:
                 # in case there's no methodMap, skip it and leave a warning
                 Logger.get('plugins.holder').warning("%s has no methodMap? "
-                                                     "(or is it invalid?)" % module)
+                                                     "(or is it invalid?)" % \
+                                                     module.__name__)
 
     def _retrievePluginTypeOptions(self):
+
         hasOptionsModule = hasattr(self.getModule(), "options")
         hasGlobalOptionsVariable = hasOptionsModule and hasattr(self.getModule().options, "globalOptions")
         if hasOptionsModule and hasGlobalOptionsVariable:
@@ -864,6 +874,9 @@ class PluginType (PluginBase):
             return None
 
     def getId(self):
+        return self.__id
+
+    def getFullId(self):
         return self.__id
 
     def setId(self, id):
@@ -929,7 +942,7 @@ class PluginType (PluginBase):
 
     def getLocator(self):
         l = Locator()
-        l["pluginType"] = self.getName()
+        l["pluginType"] = self.getId()
         return l
 
     def isVisible(self):
@@ -996,6 +1009,9 @@ class Plugin(PluginBase):
 
     def getId(self):
         return self.__id
+
+    def getFullId(self):
+        return "%s.%s" % (self.getOwner().getId(), self.__id)
 
     def getName(self):
         return self.__name
@@ -1066,11 +1082,6 @@ class Plugin(PluginBase):
         l = self.__owner.getLocator()
         l["pluginId"] = self.getId()
         return l
-
-    def getStorage(self):
-        if not hasattr(self, "_storage") or self._storage is None:
-            self._storage = OOBTree()
-        return self._storage
 
     def __str__(self):
         return str(self.__name)

@@ -68,13 +68,13 @@ class CollaborationTools(object):
         return len(cls.getCollaborationPluginType().getPlugins(includeNonActive = False)) > 0
 
     @classmethod
-    def getOptionValue(cls, pluginName, optionName):
+    def getOptionValue(cls, pluginId, optionName):
         """ Returns the value of an option of a plugin (plugins/Collaboration/XXXXX/options.py)
             pluginName: a string with the name of the plugin
             optionName: a string with the name of the option
         """
         ph = PluginsHolder()
-        return ph.getPluginType("Collaboration").getPlugin(pluginName).getOption(optionName).getValue()
+        return ph.getPluginType("Collaboration").getPlugin(pluginId).getOption(optionName).getValue()
 
     @classmethod
     def hasCollaborationOption(cls, optionName):
@@ -94,18 +94,18 @@ class CollaborationTools(object):
                cls.getCollaborationPluginType().getOption('useHTTPS').getValue()
 
     @classmethod
-    def getModule(cls, pluginName):
+    def getModule(cls, pluginId):
         """ Utility function that returns a module object given a plugin name.
-            pluginName: a string such as "EVO", "DummyPlugin", etc.
+            pluginId: a string such as "evo", "DummyPlugin", etc.
         """
-        return cls.getCollaborationPluginType().getPlugin(pluginName).getModule()
+        return cls.getCollaborationPluginType().getPlugin(pluginId).getModule()
 
     @classmethod
-    def getTemplateClass(cls, pluginName, templateName):
+    def getTemplateClass(cls, pluginId, templateName):
         """ Utility function that returns a template class object given a plugin name and the class name.
             Example: templateClass = CollaborationTools.getTemplateClass("EVO", "WNewBookingForm") will return the WNewBookingForm class in the EVO plugin.
         """
-        return cls.getModule(pluginName).pages.__dict__.get(templateName, None)
+        return cls.getModule(pluginId).pages.__dict__.get(templateName, None)
 
     @classmethod
     def getServiceClass(cls, pluginName, serviceName):
@@ -121,23 +121,24 @@ class CollaborationTools(object):
         return cls.getPlugin(pluginName).getGlobalData()
 
     @classmethod
-    def getExtraCSS(cls, pluginName):
+    def getExtraCSS(cls, plugin):
         """ Utility function that returns a string with the extra CSS declared by a plugin.
             Example: templateClass = CollaborationTools.getExtraCSS("EVO").
         """
-        templateClass = cls.getTemplateClass(pluginName, "WStyle")
+        templateClass = cls.getTemplateClass(plugin.getId(), "WStyle")
+
         if templateClass:
-            return templateClass(pluginName).getHTML()
+            return templateClass(plugin).getHTML()
         else:
             return None
 
     @classmethod
-    def getExtraJS(cls, conf, pluginName, user):
+    def getExtraJS(cls, conf, plugin, user):
         """ Utility function that returns a string with the extra JS declared by a plugin.
         """
-        templateClass = cls.getTemplateClass(pluginName, "WExtra")
+        templateClass = cls.getTemplateClass(plugin.getId(), "WExtra")
         if templateClass:
-            return templateClass(conf, pluginName, user).getHTML()
+            return templateClass(conf, plugin, user).getHTML()
         else:
             return None
 
@@ -195,6 +196,7 @@ class CollaborationTools(object):
             If a user is specified, only tabs with plugins that the user can see will be returned:
             -
         """
+
         if tabName:
 
             csbm = conference.getCSBookingManager()
@@ -246,8 +248,8 @@ class CollaborationTools(object):
         """
 
         #we split them into 2 lists
-        singleBookingPlugins = [p for p in pluginList if not cls.getCSBookingClass(p.getName())._allowMultiple]
-        multipleBookingPlugins = [p for p in pluginList if cls.getCSBookingClass(p.getName())._allowMultiple]
+        singleBookingPlugins = [p for p in pluginList if not cls.getCSBookingClass(p.getId())._allowMultiple]
+        multipleBookingPlugins = [p for p in pluginList if cls.getCSBookingClass(p.getId())._allowMultiple]
 
         return singleBookingPlugins, multipleBookingPlugins
 
@@ -267,10 +269,10 @@ class CollaborationTools(object):
             or a Plugin object
         """
         if isinstance(plugin, Plugin):
-            pluginName = plugin.getName()
+            pluginId = plugin.getId()
         else:
-            pluginName = plugin
-        return cls.getCSBookingClass(pluginName)._adminOnly
+            pluginId = plugin
+        return cls.getCSBookingClass(pluginId)._adminOnly
 
     @classmethod
     def pluginsWithEventDisplay(cls):
@@ -289,9 +291,9 @@ class CollaborationTools(object):
             of the collaboration plugins that want to be indexed
         """
         l = []
-        for pluginName in cls.getCollaborationPluginType().getPlugins():
-            if cls.getCSBookingClass(pluginName)._shouldBeIndexed:
-                l.append(pluginName)
+        for plugin in cls.getCollaborationPluginType().getPlugins().values():
+            if plugin.getModule().collaboration.CSBooking._shouldBeIndexed:
+                l.append(plugin)
         return l
 
     @classmethod

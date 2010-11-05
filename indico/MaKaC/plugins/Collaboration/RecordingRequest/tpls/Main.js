@@ -70,7 +70,7 @@
         }
 
         if(!singleBookings['RecordingRequest']) {
-            callFunction('RecordingRequest','clearForm');
+            callFunction('RecordingRequest', 'clearForm');
         }
     }
 }

@@ -18,10 +18,29 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__metadata__ = {
-    'type': "roombooking",
-    'name': "default",
-    'description': _("This is the default Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")
-    }
+from zope.interface import implements
 
-modules = {}
+from indico.core.api import Component
+from indico.core.api.category import ICategoryActionListener
+
+class LiveSyncCoreListener(Component):
+
+    implements(ICategoryActionListener)
+
+    def _add(self, object, actions):
+        """
+        Adds a provided object to the index.
+        Actions: ['moved','deleted',..]
+        """
+        # ...
+
+    def categoryMoved(self, category, oldOwner, newOwner):
+
+        changes = ['moved']
+
+        # protection status changed?
+        if oldOwner.isProtected() != newOwner.isProtected():
+            # notify protection change too
+            changes += ['protection']
+
+        self._add(category, changes)

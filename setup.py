@@ -608,7 +608,7 @@ if __name__ == '__main__':
     dataFiles = _getDataFiles(x)
 
     foundPackages = find_packages(where = 'indico',
-                                  exclude = ('htdocs*', 'tests*', 'core*',
+                                  exclude = ('htdocs*', 'tests*', 'core*', 'ext*',
                                              'modules*', 'util*', 'web*'))
 
     # add our namespace package
@@ -640,12 +640,42 @@ if __name__ == '__main__':
           license = "http://www.gnu.org/licenses/gpl-2.0.txt",
           package_dir = { 'indico': 'indico',
                           'MaKaC' : os.path.join('indico', 'MaKaC')},
-          entry_points = {
-            'console_scripts': [ 'indico_scheduler           = indico.modules.scheduler.daemon_script:main',
-                                 'indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main',
-                                 'indico_ctl           = MaKaC.consoleScripts.indicoCtl:main',
-                                 ]
-          },
+          entry_points = """
+            [console_scripts]
+
+            indico_scheduler = indico.modules.scheduler.daemon_script:main
+            indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
+            indico_ctl = MaKaC.consoleScripts.indicoCtl:main
+
+
+            [indico.ext_types]
+
+            Collaboration = MaKaC.plugins.Collaboration
+            InstantMessaging = MaKaC.plugins.InstantMessaging
+            RoomBooking = MaKaC.plugins.RoomBooking
+            EPayment = MaKaC.plugins.EPayment
+            livesync = indico.ext.livesync
+
+
+            [indico.ext]
+
+            Collaboration.EVO = MaKaC.plugins.Collaboration.EVO
+            Collaboration.Vidyo = MaKaC.plugins.Collaboration.Vidyo
+            Collaboration.CERNMCU = MaKaC.plugins.Collaboration.CERNMCU
+            Collaboration.RecordingManager = MaKaC.plugins.Collaboration.RecordingManager
+            Collaboration.RecordingRequest = MaKaC.plugins.Collaboration.RecordingRequest
+            Collaboration.WebcastRequest = MaKaC.plugins.Collaboration.WebcastRequest
+
+            RoomBooking.CERN = MaKaC.plugins.RoomBooking.CERN
+            RoomBooking.default = MaKaC.plugins.RoomBooking.default
+
+            EPayment.payPal = MaKaC.plugins.EPayment.payPal
+            EPayment.worldPay = MaKaC.plugins.EPayment.worldPay
+            EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
+            EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
+
+            InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
+            """,
           zip_safe = False,
           packages = foundPackages,
           namespace_packages = ['indico'],

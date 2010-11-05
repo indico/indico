@@ -65,8 +65,8 @@ class WPAdminCollaboration(WPMainBase):
         return wcomponents.WSimpleNavigationDrawer("Video Services Admin", urlHandlers.UHAdminCollaboration.getURL)
 
     def _buildExtraJS(self):
-        for pluginName in self._pluginsWithIndexing:
-            extraJS = CollaborationTools.getExtraJS(None, pluginName, self._user)
+        for plugin in self._pluginsWithIndexing:
+            extraJS = CollaborationTools.getExtraJS(None, plugin, self._user)
             if extraJS:
                 self.addExtraJS(extraJS)
 
@@ -166,10 +166,11 @@ class WAdminCollaboration(wcomponents.WTemplated):
             vars["InitialNumberOfPages"] = -1
 
         jsCodes = {}
-        for pluginName in self._pluginsWithIndexing:
-            templateClass = CollaborationTools.getTemplateClass(pluginName, "WIndexing")
+        for plugin in self._pluginsWithIndexing:
+            templateClass = CollaborationTools.getTemplateClass(plugin.getId(),
+                                                                "WIndexing")
             if templateClass:
-                jsCodes[pluginName] = templateClass(None, pluginName, self._user).getHTML()
+                jsCodes[plugin.getId()] = templateClass(None, plugin, self._user).getHTML()
 
         vars["JSCodes"] = jsCodes
 
@@ -229,13 +230,13 @@ class WPConfModifCollaboration(WPConfModifCSBase):
     ######### private methods ###############
     def _buildExtraCSS(self):
         for plugin in self._tabPlugins:
-            extraCSS = CollaborationTools.getExtraCSS(plugin.getName())
+            extraCSS = CollaborationTools.getExtraCSS(plugin)
             if extraCSS:
                 self.addExtraCSS(extraCSS)
 
     def _buildExtraJS(self):
         for plugin in self._tabPlugins:
-            extraJS = CollaborationTools.getExtraJS(self._conf, plugin.getName(), self._getAW().getUser())
+            extraJS = CollaborationTools.getExtraJS(self._conf, plugin, self._getAW().getUser())
             if extraJS:
                 self.addExtraJS(extraJS)
 
@@ -266,10 +267,11 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         csBookingManager = self._conf.getCSBookingManager()
 
         bookingsS = {}
+
         for p in singleBookingPlugins:
-            bookingList = csBookingManager.getBookingList(filterByType = p.getName())
+            bookingList = csBookingManager.getBookingList(filterByType = p.getId())
             if len(bookingList) > 0:
-                bookingsS[p.getName()] = fossilize(bookingList[0]) #will use ICSBookingConfModifBaseFossil or inheriting fossil
+                bookingsS[p.getId()] = fossilize(bookingList[0]) #will use ICSBookingConfModifBaseFossil or inheriting fossil
 
         bookingsM = fossilize(csBookingManager.getBookingList(
             sorted = True,
@@ -294,30 +296,30 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         canBeNotified = {}
 
         for plugin in singleBookingPlugins:
-            pluginName = plugin.getName()
-            templateClass = CollaborationTools.getTemplateClass(pluginName, "WNewBookingForm")
-            singleBookingForms[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
+            pluginId = plugin.getId()
+            templateClass = CollaborationTools.getTemplateClass(pluginId, "WNewBookingForm")
+            singleBookingForms[pluginId] = templateClass(self._conf, plugin, self._user).getHTML()
 
         for plugin in multipleBookingPlugins:
-            pluginName = plugin.getName()
-            templateClass = CollaborationTools.getTemplateClass(pluginName, "WNewBookingForm")
-            newBookingFormHTML = templateClass(self._conf, pluginName, self._user).getHTML()
+            pluginId = plugin.getId()
+            templateClass = CollaborationTools.getTemplateClass(pluginId, "WNewBookingForm")
+            newBookingFormHTML = templateClass(self._conf, plugin, self._user).getHTML()
 
-            advancedTabClass = CollaborationTools.getTemplateClass(pluginName, "WAdvancedTab")
+            advancedTabClass = CollaborationTools.getTemplateClass(pluginId, "WAdvancedTab")
             if advancedTabClass:
-                advancedTabClassHTML = advancedTabClass(self._conf, pluginName, self._user).getHTML()
+                advancedTabClassHTML = advancedTabClass(self._conf, plugin, self._user).getHTML()
             else:
-                advancedTabClassHTML = WConfModifCollaborationDefaultAdvancedTab(self._conf, pluginName, self._user).getHTML()
-            multipleBookingForms[pluginName] = (newBookingFormHTML, advancedTabClassHTML)
+                advancedTabClassHTML = WConfModifCollaborationDefaultAdvancedTab(self._conf, plugin, self._user).getHTML()
+            multipleBookingForms[pluginId] = (newBookingFormHTML, advancedTabClassHTML)
 
         for plugin in plugins:
-            pluginName = plugin.getName()
+            pluginId = plugin.getId()
 
-            templateClass = CollaborationTools.getTemplateClass(pluginName, "WMain")
-            jsCodes[pluginName] = templateClass(self._conf, pluginName, self._user).getHTML()
+            templateClass = CollaborationTools.getTemplateClass(pluginId, "WMain")
+            jsCodes[pluginId] = templateClass(self._conf, plugin, self._user).getHTML()
 
-            bookingClass = CollaborationTools.getCSBookingClass(pluginName)
-            canBeNotified[pluginName] = bookingClass._canBeNotifiedOfEventDateChanges
+            bookingClass = CollaborationTools.getCSBookingClass(pluginId)
+            canBeNotified[pluginId] = bookingClass._canBeNotifiedOfEventDateChanges
 
         vars["SingleBookingForms"] = singleBookingForms
         vars["MultipleBookingForms"] = multipleBookingForms
@@ -331,7 +333,7 @@ class WAdvancedTabBase(WCSPageTemplateBase):
     def getVars(self):
         variables = WCSPageTemplateBase.getVars(self)
 
-        bookingClass = CollaborationTools.getCSBookingClass(self._pluginName)
+        bookingClass = CollaborationTools.getCSBookingClass(self._pluginId)
         variables["CanBeNotified"] = bookingClass._canBeNotifiedOfEventDateChanges
 
         return variables

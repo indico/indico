@@ -34,7 +34,7 @@ class WNewBookingForm(WCSPageTemplateBase):
     def getVars(self):
         vars = WCSPageTemplateBase.getVars( self )
 
-        vars["IsSingleBooking"] = not CollaborationTools.getCSBookingClass(self._pluginName)._allowMultiple
+        vars["IsSingleBooking"] = not CollaborationTools.getCSBookingClass(self._pluginId)._allowMultiple
         vars["Conference"] = self._conf
 
         isLecture = self._conf.getType() == 'simple_event'

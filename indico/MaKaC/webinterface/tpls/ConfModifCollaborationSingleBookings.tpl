@@ -5,21 +5,21 @@
     <% end %>
     
     <% plugin = SingleBookingPlugins[i] %>
-    <% pluginName = plugin.getName() %>
+    <% pluginId = plugin.getId() %>
 
     <% if allPluginCount > 1: %>
         <span class="titleCellFormat"><%= plugin.getDescription() %></span>
-        <div id="<%=pluginName%>showHide" style="display:inline"></div>
+        <div id="<%=pluginId%>showHide" style="display:inline"></div>
         <% initialDisplay = "none" %>
     <% end %>
     <% else: %>
         <% initialDisplay = "block" %>
     <% end %>
 
-    <div id="<%=pluginName%>Div" style="display:<%=initialDisplay%>;">
-        <div id="<%=pluginName%>Info"></div>
-        <div id="<%=pluginName%>Form" style="margin-top: 2em;">
-        <%= SingleBookingForms[pluginName] %>
+    <div id="<%=pluginId%>Div" style="display:<%=initialDisplay%>;">
+        <div id="<%=pluginId%>Info"></div>
+        <div id="<%=pluginId%>Form" style="margin-top: 2em;">
+        <%= SingleBookingForms[pluginId] %>
         </div>
     </div>
     
@@ -27,17 +27,17 @@
 
 <script type="text/javascript">
 
-var singlePluginNames = <%= str([plugin.getName() for plugin in SingleBookingPlugins]) %>
+var singlePluginNames = <%= str([plugin.getId() for plugin in SingleBookingPlugins]) %>
 var singleBookings = {
     <%= ",\n". join(['"' + str(name) + '" \x3a ' + jsonEncode(booking).replace('%','%%') for name, booking in BookingsS.items()]) %>
 }
 
-var send = function(pluginName) {
-    sendRequest(pluginName, '<%= Conference.getId() %>');
+var send = function(pluginId) {
+    sendRequest(pluginId, '<%= Conference.getId() %>');
 }
 
-var withdraw = function(pluginName) {
-    withdrawRequest(pluginName, '<%= Conference.getId() %>');
+var withdraw = function(pluginId) {
+    withdrawRequest(pluginId, '<%= Conference.getId() %>');
 }
 
 /* ------------------------------ STUFF THAT HAPPENS WHEN PAGE IS LOADED -------------------------------*/
@@ -45,21 +45,22 @@ var withdraw = function(pluginName) {
 <% if allPluginCount > 1: %>
 IndicoUI.executeOnLoad(function() {
     <% for plugin in SingleBookingPlugins: %>
-    buildShowHideButton("<%= plugin.getName() %>");
+    buildShowHideButton("<%= pluginId %>");
     <% end %>
 });
 <% end %>
+
+IndicoUI.executeOnLoad(function(){
 
 <% if SingleBookingPlugins: %>
-IndicoUI.executeOnLoad(function(){
     <% for plugin in SingleBookingPlugins: %>
-    if (pluginHasFunction("<%=plugin.getName()%>", "onLoad")) {
-        codes["<%=plugin.getName()%>"]["onLoad"]();
+    if (pluginHasFunction("<%= pluginId %>", "onLoad")) {
+        codes["<%= pluginId %>"]["onLoad"]();
     }
     <% end %>
-});
 <% end %>
 
-IndicoUI.executeOnLoad(loadBookings);
+loadBookings();
+});
 
 </script>
