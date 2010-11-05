@@ -400,13 +400,13 @@ class TemplateExec:
         try:
             newTpl = TemplateExec.__executePythonCode( pythonCode, dictCopy, tplFilename )
         except TemplateExecException, e:
-
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
             except: pass
-            raise TemplateExecException( e )
+            raise
         except Exception, e:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.error.py", "w" ).write( pythonCode )
             except: pass
+
             raise TemplateExecException( e )
         #except:
         #    raise pythonCode
@@ -490,6 +490,7 @@ class TemplateExec:
 #            try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
 #            except: pass
 
+            Logger.get('tplexec').exception('Template execution error')
             TemplateExec.__saveDebugInfo(e, tplFilename)
 
             raise e
