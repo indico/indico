@@ -207,6 +207,8 @@ class PluginLoader(object):
 
         # save missing dependency info, so that the holder will know the module state
         ptypeModule.__missing_deps__ = missingDeps
+        # save id information
+        ptypeModule.__ptype_id__ = ptypeId
 
         cls._pmodules[ptypeId] = {}
 

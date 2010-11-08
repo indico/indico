@@ -18,21 +18,35 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Here are included the listeners and other components that are part of the
+`livesync` plugin type.
+"""
+
+# dependency libs
 from zope.interface import implements
 
+# indico imports
 from indico.core.api import Component
 from indico.core.api.category import ICategoryActionListener
+from indico.core.api.db import IDBUpdateListener, DBUpdateException
+
+from indico.ext.livesync.persistent import ActionWrapper
+from indico.ext.livesync.util import getPluginType
 
 class LiveSyncCoreListener(Component):
 
     implements(ICategoryActionListener)
 
-    def _add(self, object, actions):
+    def _add(self, obj, actions):
         """
         Adds a provided object to the index.
         Actions: ['moved','deleted',..]
         """
-        # ...
+        track = getPluginType().getStorage()['track']
+        wrapper = ActionWrapper(timestamp, obj, actions)
+
+        track.add(timestamp, wrapper)
 
     def categoryMoved(self, category, oldOwner, newOwner):
 

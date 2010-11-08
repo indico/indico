@@ -197,7 +197,7 @@ class CategoryManager( ObjectHolder ):
 
 
 
-class Category(Persistent, CommonObjectBase, Fossilizable):
+class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
 
     fossilizes(ICategoryFossil)
 
@@ -835,18 +835,19 @@ class Category(Persistent, CommonObjectBase, Fossilizable):
         TrashCanManager().add(self)
         return
 
-    def move( self, newCategory ):
-        ow = self.getOwner()
+    def move( self, newOwner ):
+        oldOwner = self.getOwner()
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
 
         catDateIdx.unindexCateg(self)
 
         self.getOwner()._removeSubCategory( self )
-        newCategory._addSubCategory( self )
+        newOwner._addSubCategory( self )
         self._reindex()
         catDateIdx.indexCateg(self)
 
-        self.notifyOAIModification()
+        # self.notifyOAIModification()
+        self._notify('categoryMove', oldOwner, newOwner)
 
     def getName( self ):
         return self.name

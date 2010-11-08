@@ -18,11 +18,16 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__metadata__ = {
-    'name': "Live Sync",
-    'description': "Synchronizes information between Indico and external repositories"
-    }
+"""
+Here are included some general-purpose utils that are used from different parts
+of the module
+"""
 
-from indico.ext.livesync.agent import PushSyncAgent, SyncAgent, ActionWrapper,\
-     SyncManager
+# indico legacy imports
+from MaKaC.plugins.base import PluginsHolder
+
+
+def getPluginType():
+    ptype = PluginsHolder().getPluginType('livesync')
+    return ptype
 

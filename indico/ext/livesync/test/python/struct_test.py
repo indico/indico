@@ -92,12 +92,12 @@ class TestMultiPointerTrack(unittest.TestCase):
         self._mpt.addPointer('p2')
         self._mpt.movePointer('p2', 1)
         self._mpt.movePointer('p1', 1)
-        self.assertEqual(list(self._mpt.pointerIterItems('p1')),
+        self.assertEqual(list(self._mpt.pointerIterValues('p1')),
                          ['b', 'a', 'c'])
         self._mpt.movePointer('p1', 2)
-        self.assertEqual(list(self._mpt.pointerIterItems('p2')),
+        self.assertEqual(list(self._mpt.pointerIterValues('p2')),
                          ['b', 'a', 'c'])
-        self.assertEqual(list(self._mpt.pointerIterItems('p1')), ['c'])
+        self.assertEqual(list(self._mpt.pointerIterValues('p1')), ['c'])
         self._mpt.movePointer('p1', 1)
 
     def testAddPointerStartPos(self):
@@ -168,7 +168,6 @@ class TestSetMultiPointerTrack(unittest.TestCase):
 
 
 class TestSetMultiPointerTrackDB(unittest.TestCase):
-
 
     def setUp(self):
 

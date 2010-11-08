@@ -101,36 +101,37 @@ class MultiPointerTrack(Persistent):
 
         self._append(timestamp, value)
 
-    def _pointerIterator(self, pid, func):
+    def _pointerIterator(self, pid, func, till = None):
         """
         Iterates over the positions that are left (till the end of the track) for
         a given pointer (id). Takes a function that is applied to yielded values
         """
+
         ptrPos = self._pointers[pid]
 
-        it = self._container.iteritems(ptrPos)
+        it = self._container.iteritems(ptrPos, till)
             # consume a single position
         if ptrPos != None:
             it.next()
 
-        for entry in it:
-            for elem in entry[1]:
-                yield elem
+        for ts, entry in it:
+            for elem in entry:
+                yield func((ts,elem))
 
-    def pointerIterValues(self, pid):
+    def pointerIterValues(self, pid, till = None):
         """
         Iterates over the positions that are left (till the end of the track) for
         a given pointer (id) - iterates over values
         """
-        return self._pointerIterator(pid, lambda x: x[1])
+        return self._pointerIterator(pid, lambda x: x[1], till = till)
 
-    def pointerIterItems(self, pid):
+    def pointerIterItems(self, pid, till = None):
         """
         Iterates over the positions that are left (till the end of the track) for
         a given pointer (id) - iterates over key-value pairs (iteritems)
         """
 
-        return self._pointerIterator(pid, lambda x: x)
+        return self._pointerIterator(pid, lambda x: x, till = till)
 
     def movePointer(self, pid, timestamp):
         """
@@ -140,7 +141,7 @@ class MultiPointerTrack(Persistent):
             raise KeyError("Pointer '%s' doesn't seem to exist!" % pid)
         if timestamp < self._container.minKey() or \
                timestamp > self._container.maxKey():
-            raise ValueError("timestamp outside bounds")
+            raise ValueError("timestamp %s outside bounds" % timestamp)
         else:
             self._pointers[pid] = timestamp
 
