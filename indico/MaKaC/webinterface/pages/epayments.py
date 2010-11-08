@@ -74,10 +74,10 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
                 al = minfo.getAdminList()
                 if not al.isAdmin( self._user ):
-                    from MaKaC.plugins.EPayment.CERNYellowPay.options import globalOptions
+                    from MaKaC.plugins.base import PluginsHolder
                     endis="enable"
-                    departmentName = globalOptions[1][1]["defaultValue"]
-                    emailAddress = globalOptions[0][1]["defaultValue"]
+                    departmentName = PluginsHolder().getPluginType("EPayment").getPlugin("CERNYellowPay").getOption("FPDepartmentName").getValue()
+                    emailAddress = PluginsHolder().getPluginType("EPayment").getPlugin("CERNYellowPay").getOption("FPEmaillAddress").getValue()
                     if gs.isEnabled():
                         endis="disable"
                         emailAddress = minfo.getSupportEmail()
