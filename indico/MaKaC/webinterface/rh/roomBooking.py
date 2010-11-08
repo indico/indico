@@ -157,7 +157,7 @@ class RoomBookingAvailabilityParamsMixin:
             self._startDT = datetime.today().replace(hour=0,minute=0,second=0)
             self._endDT = self._startDT.replace(hour=23,minute=59,second=59)
 
-class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin, RHProtected ):
+class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin, RHRoomBookingProtected ):
     """
     All room booking related hanlders are derived from this class.
     This gives them:
@@ -167,7 +167,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
     """
 
     def _checkProtection( self ):
-        RHProtected._checkProtection(self)
+        RHRoomBookingProtected._checkProtection(self)
 
     def _clearSessionState( self ):
         session = self._websession

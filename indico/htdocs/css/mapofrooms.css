@@ -43,6 +43,9 @@ div.caption {
     padding: 0;
     font-weight: bold;
 }
+.mapCustomWidgetsHolder{
+    width:190px;
+}
 
 .mapFilterGroup {
     padding-left: 20px;

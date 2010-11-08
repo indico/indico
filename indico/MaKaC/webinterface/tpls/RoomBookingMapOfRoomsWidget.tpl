@@ -21,15 +21,17 @@
     </tr>
 </table>
 
-<form id="mapOfRoomAvailabilityForm" method="post" action="<%= roomBookingRoomListURL %>">
+<form id="mapOfRoomAvailabilityForm" method="post"  style="width:150px;" action="<%= roomBookingRoomListURL %>">
 <p>
-    <input id="isAvailable" class="mapFilterCheckbox" type="checkbox">
+  <span>
+    <span><input id="isAvailable" class="mapFilterCheckbox" type="checkbox"></span>
     <span class="mapFilterLabel">Is available:</span>
+  </span>
 </p>
 
 <table>
     <tr id="sdatesTR" >
-        <td class="subFieldWidth" align="right" ><small> <%= _("Start Date")%>&nbsp;&nbsp;</small></td>
+        <td class="subFieldWidth" align="right" ><small> <%= _("From")%>&nbsp;</small></td>
         <td class="blacktext">
             <span id="sDatePlace"></span>
             <input type="hidden" value="<%= startDT.day %>" name="sDay" id="sDay"/>
@@ -38,7 +40,7 @@
         </td>
       </tr>
      <tr id="edatesTR" >
-        <td class="subFieldWidth" align="right" ><small> <%= _("End Date")%>&nbsp;&nbsp;</small></td>
+        <td class="subFieldWidth" align="right" ><small> <%= _("To")%>&nbsp;</small></td>
         <td>
             <span id="eDatePlace"></span>
             <input type="hidden" value="<%= endDT.day %>" name="eDay" id="eDay"/>
@@ -47,17 +49,17 @@
         </td>
     </tr>
     <tr id="hoursTR" >
-        <td align="right" ><small> <%= _("Hours")%>&nbsp;&nbsp;</small></td>
+        <td align="right" ><small> <%= _("Hours")%>&nbsp;</small></td>
         <td align="left" class="blacktext">
-            <input name="sTime" id="sTime" maxlength="5" size="5" type="text" value="<%= startT %>" onchange="" /> &nbsp;&mdash;&nbsp;
-            <input name="eTime" id="eTime" maxlength="5" size="5" type="text" value="<%= endT %>" onchange="" />
+            <input name="sTime" id="sTime" maxlength="4" size="4" type="text" value="<%= startT %>" onchange="" /> &nbsp;&mdash;&nbsp;
+            <input name="eTime" id="eTime" maxlength="4" size="4" type="text" value="<%= endT %>" onchange="" />
             <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
         </td>
     </tr>
     <tr id="repTypeTR" >
-        <td align="right" ><small> <%= _("Type")%>&nbsp;&nbsp;</small></td>
+        <td align="right" ><small> <%= _("Type")%>&nbsp;</small></td>
         <td align="left" class="blacktext" >
-            <select name="repeatability" id="repeatability">
+            <select name="repeatability" id="repeatability" style="width:144px; margin-right:6px;">
             <% sel = [ "", "", "", "", "", "" ]; %>
             <% if repeatability == None: %>
             <%     sel[5] = 'selected="selected"' %>

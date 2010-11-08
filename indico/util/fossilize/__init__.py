@@ -265,6 +265,7 @@ class Fossilizable(object):
         for method in interface:
 
             tags = interface[method].getTaggedValueTags()
+            isAttribute = False
 
             # In some cases it is better to use the attribute cache to
             # speed up the fossilization
@@ -276,12 +277,17 @@ class Fossilizable(object):
                 except KeyError:
                     pass
             if not cacheUsed:
-	            # Please use 'produce' as little as possible;
-    	        # there is almost always a more elegant and modular solution!
+                # Please use 'produce' as little as possible;
+                # there is almost always a more elegant and modular solution!
                 if 'produce' in tags:
                     methodResult = interface[method].getTaggedValue('produce')(self)
                 else:
-                    methodResult = getattr(self, method)()
+                    attr = getattr(self, method)
+                    if callable(attr):
+                        methodResult = attr()
+                    else:
+                        methodResult = attr
+                        isAttribute = True
 
                 if hasattr(self, "_p_oid"):
                     try:
@@ -310,6 +316,8 @@ class Fossilizable(object):
             # Re-name the attribute produced by the method
             if 'name' in tags:
                 attrName = interface[method].getTaggedValue('name')
+            elif isAttribute:
+                attrName = method
             else:
                 attrName = self.__extractName(method)
 
