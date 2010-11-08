@@ -41,9 +41,10 @@ from MaKaC.plugins.util import processPluginMetadata
 
 from indico.core.api import Component, IListener, IContributor
 
+
 class Observable:
-    def _notify(self, event, params):
-        PluginsHolder().getComponentsManager().notifyComponent(event, self, params)
+    def _notify(self, event, *params):
+        PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)
 
 
 class ComponentsManager(Persistent):
@@ -120,7 +121,7 @@ class ComponentsManager(Persistent):
         if changed:
             self._notifyModification()
 
-    def notifyComponent(self, event, obj, params):
+    def notifyComponent(self, event, obj, *params):
         for subscriber in self.getAllSubscribers(event):
             #we check if the method is in the method list of the interface
             #make the check
@@ -128,12 +129,12 @@ class ComponentsManager(Persistent):
                 #the event exists
                 f = getattr(subscriber,event)
                 try:
-                    result = f(obj, params)
+                    f(obj, *params)
                 except NoReportError, e:
                     raise NoReportError(str(e))
                 except Exception, e:
                     Logger.get('PluginNotifier').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
-                    raise Exception("Exception while calling subscriber %s: %s" % (str(subscriber.__class__), e))
+                    raise
             #else:
             #    Logger.get('PluginNotifier').error('the method %s is not definend by the interface %s'%(method, interface))
 
