@@ -1195,6 +1195,13 @@ class SessionEditRoomLocation(EditRoomLocationBase, sessionServices.SessionModif
     def _checkParams(self):
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         EditRoomLocationBase._checkParams(self)
+        if not hasattr(self, "_slot"):
+            self._slot = self._session.slots[self._params["slot"]]
+        if not hasattr(self, "_schEntry"):
+            if self._params.get("sessionTimetable", False):
+                self._schEntry = self._slot._sessionSchEntry
+            else:
+                self._schEntry = self._slot._confSchEntry
         self._entry = self._slot
 
     def _performOperation(self):
