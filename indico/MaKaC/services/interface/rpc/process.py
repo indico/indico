@@ -7,6 +7,7 @@ from ZEO.Exceptions import ClientDisconnected
 from MaKaC.webinterface import session
 from MaKaC.services.interface import rpc
 from MaKaC.services.interface.rpc import handlers
+from MaKaC.plugins.base import Observable
 
 from MaKaC.common import DBMgr, Config
 from MaKaC.common.contextManager import ContextManager
@@ -52,48 +53,63 @@ def processRequest(method, params, req):
 
     return result
 
-def invokeMethod(method, params, req):
-    # create the context
-    ContextManager.create()
 
-    DBMgr.getInstance().startRequest()
+class ServiceRunner(object, Observable):
 
-    # room booking database
-    _startRequestSpecific2RH()
-    try:
+    def invokeMethod(self, method, params, req):
+        # create the context
+        ContextManager.create()
+
+        DBMgr.getInstance().startRequest()
+
+        # room booking database
+        _startRequestSpecific2RH()
+
+        # notify components that the request has started
+        self._notify('requestStarted')
+
         try:
-            retry = 10
-            while retry > 0:
-                try:
-                    DBMgr.getInstance().sync()
+            try:
+                retry = 10
+                while retry > 0:
+                    if 10 - retry > 0:
+                        # notify components that the request is being retried
+                        self._notify('requestRetry')
 
-                    result = processRequest(method, params, req)
+                    try:
+                        DBMgr.getInstance().sync()
 
-                    _endRequestSpecific2RH( True )
-                    DBMgr.getInstance().endRequest(True)
-                    break
-                except ConflictError:
-                    _abortSpecific2RH()
-                    DBMgr.getInstance().abort()
-                    retry -= 1
-                    continue
-                except ClientDisconnected:
-                    _abortSpecific2RH()
-                    DBMgr.getInstance().abort()
-                    retry -= 1
-                    time.sleep(10 - retry)
-                    continue
-        except CausedError:
-            raise
-        except Exception, e:
-            raise ProcessError("ERR-P0", "Error processing method.")
-    finally:
-        # destroy the context
-        ContextManager.destroy()
+                        result = processRequest(method, params, req)
 
-#    _endRequestSpecific2RH( False )
+                        # notify components that the request has ended
+                        self._notify('requestFinished')
 
-    return result
+                        _endRequestSpecific2RH( True )
+
+                        DBMgr.getInstance().endRequest(True)
+                        break
+                    except ConflictError:
+                        _abortSpecific2RH()
+                        DBMgr.getInstance().abort()
+                        retry -= 1
+                        continue
+                    except ClientDisconnected:
+                        _abortSpecific2RH()
+                        DBMgr.getInstance().abort()
+                        retry -= 1
+                        time.sleep(10 - retry)
+                        continue
+            except CausedError:
+                raise
+            except Exception, e:
+                raise ProcessError("ERR-P0", "Error processing method.")
+        finally:
+            # destroy the context
+            ContextManager.destroy()
+
+    #    _endRequestSpecific2RH( False )
+
+        return result
 
 def getSession(req):
     sm = session.getSessionManager()

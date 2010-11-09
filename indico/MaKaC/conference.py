@@ -847,7 +847,7 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         catDateIdx.indexCateg(self)
 
         # self.notifyOAIModification()
-        self._notify('categoryMove', oldOwner, newOwner)
+        self._notify('categoryMoved', oldOwner, newOwner)
 
     def getName( self ):
         return self.name
@@ -2115,6 +2115,8 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
             from MaKaC.plugins.Collaboration.base import CSBookingManager
             self._CSBookingManager = CSBookingManager(self)
 
+    def __str__(self):
+        return "<Conference %s@%s>" % (self.getId(), hex(id(self)))
 
     def setUrlTag(self, tag):
         self._sortUrlTag = tag
@@ -2770,7 +2772,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         """
         #we notify the observers that the conference has been deleted
         try:
-            self._notify('notifyDelete', {})
+            self._notify('eventDeleted', {})
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a conference deletion for conference %s: %s" %
@@ -2872,7 +2874,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
 
         # notify observers
         try:
-            self._notify('notifyDateChange', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
+            self._notify('eventDateChanged', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a start and end date change from %s - %s to %s - %s for conference %s: %s" %
@@ -2928,7 +2930,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             try:
-                self._notify('notifyStartDateChange', {'newDate': sDate, 'oldDate': oldSdate})
+                self._notify('startDateChanged', {'newDate': sDate, 'oldDate': oldSdate})
             except Exception, e:
                 try:
                     Logger.get('Conference').error("Exception while notifying the observer of a start date change from %s to %s for conference %s: %s" %
@@ -2954,7 +2956,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             try:
-                self._notify('notifyStartTimeChange', sdate)
+                self._notify('startTimeChanged', sdate)
             #for observer in self.getObservers():
                     #observer.notifyEventDateChanges(sdate, self.startDate, None, None)
             except Exception, e:
@@ -3042,7 +3044,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             try:
-                self._notify('notifyEndDateChange', {'newDate': eDate, 'oldDate': oldEdate})
+                self._notify('endDateChanged', {'newDate': eDate, 'oldDate': oldEdate})
             except Exception, e:
                 try:
                     Logger.get('Conference').error("Exception while notifying the observer of a end date change from %s to %s for conference %s: " %
@@ -3062,7 +3064,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             try:
-                self._notify('notifyEndTimeChange', edate)
+                self._notify('endTimeChanged', edate)
             #for observer in self.getObservers():
             except Exception, e:
                 #observer.notifyEventDateChanges(None, None, edate, self.endDate)
@@ -3130,7 +3132,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
         #for observer in self.getObservers():
         try:
             #observer.notifyTimezoneChange(oldTimezone, tz)
-            self._notify('notifySetTimezone', oldTimezone)
+            self._notify('timezoneChanged', oldTimezone)
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a timezone change from %s to %s for conference %s: %s" %
@@ -3187,7 +3189,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
 
         #we notify the observers that the conference's title has changed
         try:
-            self._notify('notifyTitleChange', {'oldTitle': oldTitle, 'newTitle': title})
+            self._notify('eventTitleChanged', {'oldTitle': oldTitle, 'newTitle': title})
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a conference title change for conference %s: %s" %

@@ -645,7 +645,7 @@ if __name__ == '__main__':
             indico_scheduler = indico.modules.scheduler.daemon_script:main
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
-
+            indico_livesync = indico.ext.livesync.console:main
 
             [indico.ext_types]
 

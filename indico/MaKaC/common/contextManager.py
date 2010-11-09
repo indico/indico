@@ -41,7 +41,7 @@ class ContextManager(object):
         pass
 
 
-    class DummyContext:
+    class DummyContext(object):
         """
         A context that doesn't react, much like a Null Object
         """
@@ -61,6 +61,9 @@ class ContextManager(object):
 
         def __setattr__(self, name, value):
             return None
+
+        def __str__(self):
+            return "<DummyContext>"
 
 
     @classmethod

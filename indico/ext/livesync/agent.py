@@ -67,7 +67,7 @@ class SystemUpdateListener(Component):
         # check if it is empty
         if len(storage) == 0:
             # nice, let's fill it
-            storage['container'] = AgentManager()
+            storage['agent_manager'] = SyncManager()
 
         elif not fromVersion:
             # woops, this has already been done, and it is a fresh install!
@@ -166,6 +166,9 @@ class SyncManager(Persistent):
             # TODO: timestamp conversion (granularity)!
             self._track.add(timestamp, action)
 
+    def getTrack(self):
+        return self._track
+
 
 class ActionWrapper(Persistent):
     """
@@ -199,3 +202,9 @@ class ActionWrapper(Persistent):
                 return ocmp
         else:
             return tscmp
+
+    def __str__(self):
+        return "<ActionWrapper@%s (%s) [%s] %s>" % (hex(id(self)),
+                                                    self._obj,
+                                                    ','.join(self._actions),
+                                                    self._timestamp)

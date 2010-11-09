@@ -56,17 +56,16 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.i18n import _
 
-from MaKaC.common.contextManager import ContextManager
-from MaKaC.i18n import _
-
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from MaKaC.plugins import PluginsHolder
 from MaKaC.user import Group, Avatar
 from MaKaC.accessControl import AdminList
 
+from MaKaC.plugins.base import Observable
 
-class RequestHandlerBase(object):
+class RequestHandlerBase(Observable):
+
 
     _uh = None
 
@@ -444,8 +443,17 @@ class RH(RequestHandlerBase):
         self._startRequestSpecific2RH()     # I.e. implemented by Room Booking request handlers
         textLog.append("%s : Database request started"%(datetime.now() - self._startTime))
         Logger.get('requestHandler').info('[pid=%s] Request %s started (%s)' % (os.getpid(),id(self._req), self._req.unparsed_uri))
+
+        # notify components that the request has started
+        self._notify('requestStarted')
+
         try:
             while retry>0:
+
+                if retry < 10:
+                    # notify components that the request is being retried
+                    self._notify('requestRetry', 10-retry)
+
                 try:
                     Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), self.getHostIP()))
                     try:
@@ -482,6 +490,10 @@ class RH(RequestHandlerBase):
                                 res = result[0]
                             else:
                                 res = self._process()
+
+                        # notify components that the request has finished
+                        self._notify('requestFinished')
+
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
 
                         DBMgr.getInstance().endRequest( True )

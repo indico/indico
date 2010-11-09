@@ -107,7 +107,10 @@ class MultiPointerTrack(Persistent):
         a given pointer (id). Takes a function that is applied to yielded values
         """
 
-        ptrPos = self._pointers[pid]
+        if pid == None:
+            ptrPos = self._container.minKey()
+        else:
+            ptrPos = self._pointers[pid]
 
         it = self._container.iteritems(ptrPos, till)
             # consume a single position
@@ -157,13 +160,16 @@ class MultiPointerTrack(Persistent):
         """
         self._container.__delitem__(item)
 
-    def __iter__(self):
+    def _iter(self, tsfrom, tsto):
         """
         Iterates over the whole structure, element by element (goes inside containers)
         """
-        for entry in self._container.itervalues():
+        for ts, entry in self._container.iteritems(tsfrom, tsto):
             for elem in entry:
-                yield elem
+                yield ts, elem
+
+    def __iter__(self):
+        return self._iter(None, None)
 
 
 class SetMultiPointerTrack(MultiPointerTrack):

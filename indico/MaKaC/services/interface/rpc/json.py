@@ -31,7 +31,7 @@ from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 from MaKaC.services.interface.rpc.common import CausedError
 from MaKaC.services.interface.rpc.common import NoReportError
-from MaKaC.services.interface.rpc.process import invokeMethod
+from MaKaC.services.interface.rpc.process import ServiceRunner
 
 from MaKaC.common.logger import Logger
 
@@ -106,7 +106,8 @@ def process(req):
         if "id" in requestBody:
             responseBody["id"] = requestBody["id"]
 
-        result = invokeMethod(str(requestBody["method"]), requestBody.get("params", []), req)
+        result = ServiceRunner().invokeMethod(str(requestBody["method"]),
+                                              requestBody.get("params", []), req)
 
         # serialize result
         try:

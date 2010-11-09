@@ -21,33 +21,33 @@
 from indico.core.api import IListener, IContributor
 
 
-class IManagementEventsListener(IListener):
+class IEventActionListener(IListener):
     """
     Events that are related to the management of a conference
     """
 
-    def notifyDateChange(self, obj, params):
+    def eventDateChanged(self, obj, params):
         pass
 
-    def notifyStartDateChange(self, obj, params):
+    def eventStartDateChanged(self, obj, params):
         pass
 
-    def notifyStartTimeChange(self, obj, sdate):
+    def eventEndDateChanged(self, obj, params):
         pass
 
-    def notifyEndTimeChange(self, obj, edate):
+    def eventStartTimeChanged(self, obj, sdate):
         pass
 
-    def notifySetTimezone(self, obj, oldTimezone):
+    def eventEndTimeChanged(self, obj, edate):
         pass
 
-    def notifyEndDateChange(self, obj, params):
+    def eventTimezoneChanged(self, obj, oldTimezone):
         pass
 
-    def notifyTitleChange(self, obj, params):
+    def eventTitleChanged(self, obj, params):
         pass
 
-    def notifyDelete(self, obj, params):
+    def eventDeleted(self, obj, params):
         pass
 
 
