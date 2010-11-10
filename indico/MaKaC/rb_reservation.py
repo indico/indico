@@ -1206,7 +1206,9 @@ class ReservationBase( object ):
                 self.__owner=None
         ####---ENDO OF FIXING THE USE OF IMPERSISTANT CLASS-----
         if self.__owner:
-            return ConferenceHolder().getById(self.__owner) #self.__owner.getObject() # Wrapped in Impersistant
+            ch = ConferenceHolder()
+            if ch.hasKey(self.__owner):
+                return ch.getById(self.__owner) #self.__owner.getObject() # Wrapped in Impersistant
 
         return None
 
