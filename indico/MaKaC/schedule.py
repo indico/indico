@@ -330,15 +330,13 @@ class TimeSchedule(Schedule, Persistent):
         if not day.tzinfo:
             day = timezone(self.getTimezone()).localize(day)
         tz = day.tzinfo
-        entries = self.getEntriesOnDay(day)
-        if len(entries) == 0:
-            return timezone(self.getTimezone()).localize(datetime(day.year,day.month,day.day,8,0)).astimezone(tz)
-        else:
-            for entry in entries:
+        for entry in self.getEntries():
+            if entry.inDay( day ):
                 if entry.getStartDate().astimezone(tz).date() >= day.date():
                     return entry.getStartDate().astimezone(tz)
                 else:
                     return day.replace(hour=0,minute=0)
+        return timezone(self.getTimezone()).localize(datetime(day.year,day.month,day.day,8,0)).astimezone(tz)
 
     def getEntryInPos( self, pos ):
         try:

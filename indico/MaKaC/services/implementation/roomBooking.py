@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of CDS Indico.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+
 """
 Asynchronous request handlers for room booking
 """
@@ -14,6 +35,7 @@ import MaKaC.common.info as info
 from MaKaC.common.utils import HolidaysHolder, isWeekend
 from MaKaC.errors import NoReportError
 from MaKaC.webinterface.rh.roomBooking import RoomBookingAvailabilityParamsMixin
+import MaKaC.webinterface.linking as linking
 
 class RoomBookingListLocations( ServiceBase ):
 
@@ -288,3 +310,11 @@ class RoomBookingMapListAspects(RoomBookingMapBase):
     def _getAnswer( self ):
         return [aspect.toDictionary() for aspect in self._location.getAspects()]
 
+class RoomBookingLocationsAndRoomsGetLink( ServiceBase ):
+
+    def _checkParams( self ):
+        self._location = self._params["location"];
+        self._room = self._params["room"];
+
+    def _getAnswer( self ):
+        return linking.RoomLinker().getURLByName( self._room, self._location )

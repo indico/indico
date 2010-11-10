@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""This file contain several classes which contain the logic needed to allow 
+"""This file contain several classes which contain the logic needed to allow
     generating HTML links for some pieces of information about the conferences.
 """
 #import MaKaC.conference as conference
@@ -47,13 +47,19 @@ class RoomLinker:
                 return res[0].getMapURL(room.getName())
         return ""
 
+    def getURLByName( self, room, location=None ):
+        if location is not None and room is not None:
+            res = RoomMapperHolder().match({"name":location},exact=True)
+            if res != []:
+                return res[0].getMapURL(room)
+        return ""
 
 #class RoomLinker:
 #    """This class is a "facade" for all the room linking system. It constains
 #        the necessary logic to know which linker object he must appply in order
 #        to obtain the correct linking for the requests
 #    """
-#    
+#
 #    def __init__( self ):
 #        pass
 #
@@ -92,11 +98,11 @@ class RoomLinker:
 #
 #
 #class CERNCustomRoomLinker:
-#    """This class allows to generate links for CERN rooms from CustomRoom 
+#    """This class allows to generate links for CERN rooms from CustomRoom
 #        objects.
 #    """
-#    #For the future, the conferences should hold CERNRoom objects and there 
-#    #   should be a CERNRoomLinker which could be more accurate 
+#    #For the future, the conferences should hold CERNRoom objects and there
+#    #   should be a CERNRoomLinker which could be more accurate
 #    _mapBaseURL = "http://map.web.cern.ch/map/building?bno="
 #
 #    def __init__( self ):

@@ -23,18 +23,16 @@
 """
 from persistent import Persistent
 from BTrees.IOBTree import IOBTree
-from BTrees.OOBTree import OOBTree
+from BTrees.OOBTree import OOBTree, OOSet
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Configuration import Config
-from MaKaC.common.timezoneUtils import nowutc, date2utctimestamp
+from MaKaC.common.timezoneUtils import nowutc, date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.logger import Logger
-from MaKaC.plugins import PluginsHolder
-
+from MaKaC.plugins.base import PluginsHolder
 from zope.index.text import textindex
 
 class Index(Persistent):
@@ -566,6 +564,148 @@ class CalendarIndex(Persistent):
     #    # Difference:
     #    s1.difference_update( s2 )
     #    return s1
+class CalendarDayIndex(Persistent):
+    def __init__( self ):
+        self._idxDay = IOBTree()
+
+    def getIdxDate( self ):
+        return self._idxDay
+
+    def dump(self):
+        return list(self._idxDay.items())
+
+    def indexConf(self, conf):
+        self._idxDay._p_changed = True
+        days = (conf.getEndDate().date() - conf.getStartDate().date()).days
+        startDate = datetime(conf.getStartDate().year, conf.getStartDate().month, conf.getStartDate().day)
+        for day in range(days + 1):
+            key = int(datetimeToUnixTime(startDate + timedelta(day)))
+            #checking if 2038 problem occurs
+            if type(key) == type(1L):
+                continue
+            if self._idxDay.has_key(key):
+                self._idxDay[key].add(conf)
+            else:
+                self._idxDay[key] = OOSet([conf])
+
+
+    def unindexConf( self, conf):
+        self._idxDay._p_changed = True
+        days = (conf.getEndDate().date() - conf.getStartDate().date()).days
+        startDate = datetime(conf.getStartDate().year, conf.getStartDate().month, conf.getStartDate().day)
+        for dayNumber in range(days + 1):
+            day = int(datetimeToUnixTime(startDate + timedelta(dayNumber)))
+            if type(day) == type(1L):
+                continue
+            if self._idxDay.has_key( day ):
+                if conf in self._idxDay[day]:
+                    self._idxDay[day].remove(conf)
+                if len(self._idxDay[day]) == 0:
+                    del self._idxDay[day]
+
+
+    def getObjectsStartingInDay( self, date ):
+        day = datetime(date.year, date.month, date.day, tzinfo = date.tzinfo)
+        if self._idxDay.has_key(int(datetimeToUnixTime(day))):
+            return set([event for event in self._idxDay[int(datetimeToUnixTime(day))] if event.getStartDate() >= day])
+        else:
+            return set()
+
+    def getObjectsEndingInDay( self, date ):
+        day = datetime(date.year, date.month, date.day, tzinfo = date.tzinfo)
+        if self._idxDay.has_key(int(datetimeToUnixTime(day))):
+            return set([event for event in self._idxDay[int(datetimeToUnixTime(day))] if event.getEndDate() < day + timedelta(1)])
+        else:
+            return set()
+
+    def getObjectsInDay( self, date ):
+        day = datetime(date.year, date.month, date.day)
+        if self._idxDay.has_key(int(datetimeToUnixTime(day))):
+            return set(self._idxDay[int(datetimeToUnixTime(day))])
+        else:
+            return set()
+
+    def getObjectsStartingIn( self, sDate, eDate):
+        sDay = datetime(sDate.year, sDate.month, sDate.day, tzinfo = sDate.tzinfo)
+        eDay = datetime(eDate.year, eDate.month, eDate.day, tzinfo = eDate.tzinfo)
+        res = set()
+        if sDay == eDay:
+            if self._idxDay.has_key(int(datetimeToUnixTime(sDay))):
+                res = set([event for event in self._idxDay[int(datetimeToUnixTime(sDay))] if event.getStartDate() <= eDate and event.getStartDate() >= sDate])
+        elif sDay < eDay:
+            if self._idxDay.has_key(int(datetimeToUnixTime(sDay))):
+                res = set([event for event in self._idxDay[int(datetimeToUnixTime(sDay))] if event.getStartDate() >= sDate])
+            if self._idxDay.has_key(int(datetimeToUnixTime(eDay))):
+                res.update([event for event in self._idxDay[int(datetimeToUnixTime(eDay))] if event.getStartDate() <= eDate and event.getStartDate() >= eDay ])
+            for day in range((eDay - sDay).days - 1):
+                res.update(self.getObjectsStartingInDay( sDay + timedelta(1 + day)))
+        return res
+
+    def getObjectsEndingIn( self, sDate, eDate):
+        sDay = datetime(sDate.year, sDate.month, sDate.day, tzinfo = sDate.tzinfo)
+        eDay = datetime(eDate.year, eDate.month, eDate.day, tzinfo = eDate.tzinfo)
+        res = set()
+        if sDay == eDay:
+            if self._idxDay.has_key(int(datetimeToUnixTime(sDay))):
+                res = set([event for event in self._idxDay[int(datetimeToUnixTime(sDay))] if event.getEndDate() <= eDate and event.getEndDate() >= sDate])
+        elif sDay < eDay:
+            res = set()
+            if self._idxDay.has_key(int(datetimeToUnixTime(sDay))):
+                res = set([event for event in self._idxDay[int(datetimeToUnixTime(sDay))] if event.getEndDate() >= sDate and event.getEndDate() < sDay + timedelta(1)])
+            if self._idxDay.has_key(int(datetimeToUnixTime(eDay))):
+                res.update([event for event in self._idxDay[int(datetimeToUnixTime(eDay))] if event.getEndDate() <= eDate])
+            for day in range((eDay - sDay).days - 1):
+                res.update(self.getObjectsEndingInDay( sDay + timedelta(1 + day)))
+        return res
+
+    def getObjectsIn( self, sDate, eDate ):
+        sDay = datetime(sDate.year, sDate.month, sDate.day)
+        eDay = datetime(eDate.year, eDate.month, eDate.day)
+        res = set()
+        if sDay == eDay:
+            if self._idxDay.has_key(int(datetimeToUnixTime(sDay))):
+                res = set([event for event in self._idxDay[int(datetimeToUnixTime(sDay))] if event.getStartDate() <= eDate and event.getEndDate() >= sDate])
+        elif sDay < eDay:
+            res = set()
+            if self._idxDay.has_key(int(datetimeToUnixTime(sDay))):
+                res = set([event for event in self._idxDay[int(datetimeToUnixTime(sDay))] if event.getEndDate() >= sDate])
+            if self._idxDay.has_key(int(datetimeToUnixTime(eDay))):
+                res.update([event for event in self._idxDay[int(datetimeToUnixTime(eDay))] if event.getStartDate() <= eDate])
+            res.update(self.getObjectsInDays( sDay + timedelta(1), eDay - timedelta(1) ))
+        return res
+
+    def getObjectsInDays( self, sDate, eDate ):
+        sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day)))
+        eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day)))
+        res = set()
+        for day in self._idxDay.values(sDay, eDay):
+            res.update(day)
+        return res
+
+    def getObjectsEndingAfter( self, date ):
+        day = datetime(date.year, date.month, date.day)
+        nextDay = day + timedelta(1)
+        res = set()
+        if self._idxDay.has_key(int(datetimeToUnixTime(day))):
+            res = set([event for event in self._idxDay[int(datetimeToUnixTime(day))] if event.getEndDate() >= date])
+        for day in self._idxDay.values(int(datetimeToUnixTime(nextDay))):
+            res.update(set(day))
+        return res
+
+    def getObjectsStartingAfter( self, date ):
+        stDay = datetime(date.year, date.month, date.day)
+        nextDay = stDay + timedelta(1)
+        previousDay = stDay - timedelta(1)
+        res = set()
+        if self._idxDay.has_key(int(datetimeToUnixTime(stDay))):
+            res = set([event for event in self._idxDay[int(datetimeToUnixTime(stDay))] if event.getStartDate() >= date])
+        for day in self._idxDay.values(int(datetimeToUnixTime(nextDay))):
+            res.update(set(day))
+        for day in self._idxDay.values(max = int(datetimeToUnixTime(previousDay))):
+            res.difference_update(set(day))
+        res.difference_update(set([event for event in self._idxDay[int(datetimeToUnixTime(stDay))] if event.getStartDate() < date]))
+        return res
+
 
 class CategoryDateIndex(Persistent):
 
@@ -577,8 +717,10 @@ class CategoryDateIndex(Persistent):
 
     def unindexConf(self, conf):
         for owner in conf.getOwnerPath():
-            self._idxCategItem[owner.getId()].unindexConf(conf)
-        self._idxCategItem['0'].unindexConf(conf)
+            if self._idxCategItem.has_key(owner.getId()):
+                self._idxCategItem[owner.getId()].unindexConf(conf)
+        if self._idxCategItem.has_key('0'):
+            self._idxCategItem['0'].unindexConf(conf)
 
     def unindexCateg(self, categ):
         for subcat in categ.getSubCategoryList():
@@ -602,8 +744,6 @@ class CategoryDateIndex(Persistent):
         self._idxCategItem[categid] = res
 
     def indexConf(self, conf):
-        categs = conf.getOwnerPath()
-        level = 0
         for categ in conf.getOwnerPath():
             self._indexConf(categ.getId(), conf)
         self._indexConf("0",conf)
@@ -619,6 +759,55 @@ class CategoryDateIndex(Persistent):
         categid = str(categid)
         if self._idxCategItem.has_key(categid):
             return self._idxCategItem[categid].getObjectsStartingIn(sDate, eDate)
+        else:
+            return []
+
+class CategoryDateIndexLtd(CategoryDateIndex):
+    """ Version of CategoryDateIndex whiself.ch indexing events
+        on the base of their visibility
+    """
+    def indexConf(self, conf):
+        level = 0
+        for categ in conf.getOwnerPath():
+            if conf.getFullVisibility() > level:
+                self._indexConf(categ.getId(),conf)
+            level+=1
+        if conf.getFullVisibility() > level:
+            self._indexConf("0",conf)
+
+    def buildIndex(self):
+        self._idxCategItem = OOBTree()
+        from MaKaC.conference import CategoryManager
+        self.indexCateg(CategoryManager().getById('0'))
+
+class CategoryDayIndex(CategoryDateIndex):
+
+    def _indexConf(self, categid, conf):
+        # only the more restrictive setup is taken into account
+        if self._idxCategItem.has_key(categid):
+            res = self._idxCategItem[categid]
+        else:
+            res = CalendarDayIndex()
+        res.indexConf(conf)
+        self._idxCategItem[categid] = res
+
+    def indexConf(self, conf):
+        level = 0
+        for categ in conf.getOwnerPath():
+            if conf.getFullVisibility() > level:
+                self._indexConf(categ.getId(),conf)
+            level+=1
+        if conf.getFullVisibility() > level:
+            self._indexConf("0",conf)
+
+    def buildIndex(self):
+        self._idxCategItem = OOBTree()
+        from MaKaC.conference import CategoryManager
+        self.indexCateg(CategoryManager().getById('0'))
+
+    def getObjectsInDays(self, categid, sDate, eDate):
+        if self._idxCategItem.has_key(categid):
+            return self._idxCategItem[categid].getObjectsInDays(sDate, eDate)
         else:
             return []
 

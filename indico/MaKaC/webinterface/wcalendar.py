@@ -18,11 +18,11 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Contains the logic needed to build calendars  and overviews based on 
-    categories which can tell which conferences are happening between certain 
+"""Contains the logic needed to build calendars  and overviews based on
+    categories which can tell which conferences are happening between certain
     dates for a given set of categories
 """
-import sets
+
 import calendar
 
 from BTrees.OOBTree import OOBTree
@@ -36,10 +36,10 @@ from MaKaC.conference import CategoryManager
 from MaKaC.conference import Category
 from MaKaC.i18n import _
 from pytz import timezone
-from MaKaC.common.timezoneUtils import DisplayTZ,nowutc 
+from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 
 class Day:
-    
+
     def __init__( self, cal, day ):
         self._calendar = cal
         self._day = day
@@ -48,31 +48,34 @@ class Day:
 
     def _getCalendar( self ):
         return self._calendar
-        
+
     def addConference(self,conf,categList,tz):
         for categ in categList:
             if categ not in self._categs:
                 self._categs.append(categ)
         t = conf.getStartDate().astimezone(tz).time()
         if not self._confs.has_key(t):
-            self._confs[t]=sets.Set()
-        self._confs[t].add(conf.getId())
-        
-    def getConferenceIds(self):
-        res=[]
-        for confs in self._confs.values():
-            for conf in confs:
-                res.append(conf)
-        return res
+            self._confs[t]=set()
+        self._confs[t].add(conf)
+
+    #sorting functions that caches calculated start times for every conf
+    def _sortFunc(self, x,y):
+        return cmp(self._cache[x], self._cache[y])
+
+    def _calculateCache(self, confs):
+        self._cache = {}
+        for conf in confs:
+            self._cache[conf] = conf.calculateDayStartTime(self._day).time()
 
     def getConferences(self):
-        res=[]
-        ch=conference.ConferenceHolder()
-        for confId in self.getConferenceIds():
-            res.append(ch.getById(confId))
+        return [conf for confs in self._confs.values() for conf in confs]
+
+    def getConferencesWithStartTime(self):
+        res= [conf for confs in self._confs.values() for conf in confs]
+        self._calculateCache(res)
         if res!=[]:
-            res.sort(lambda x,y: cmp(x.calculateDayStartTime(self._day).time(),y.calculateDayStartTime(self._day).time()))
-        return res
+            res.sort(self._sortFunc)
+        return [(event, self._cache[event]) for event in res]
 
     def getCategories(self):
         return self._categs
@@ -81,7 +84,7 @@ class Day:
         return calendar.weekday( self._day.year, \
                                     self._day.month, \
                                     self._day.day )
-                                    
+
     def getDayNumber( self ):
         return self._day.day
 
@@ -90,16 +93,16 @@ class Day:
 
     def __str__( self ):
         return "CalendarDay at '%s': %s --> %s"%(self._day, self._confs, self._categs)
-        
+
 
 class Calendar:
     """This class represents a calendar which is a set of days which contain
-        information about which conferences whithin certain categories are 
-        happening for each of these days and for a certain access. This class 
-        allows to configure the date interval and the category set to be 
-        considered and provides operations which allow to know about what's 
+        information about which conferences whithin certain categories are
+        happening for each of these days and for a certain access. This class
+        allows to configure the date interval and the category set to be
+        considered and provides operations which allow to know about what's
         happening on each of those days.
-       
+
        Attributes:
         _aw - (accessControl.AccessWrapper) Information about the access for
             which the calendar will be built.
@@ -108,7 +111,7 @@ class Calendar:
         _categList - (List) List of categories to be considered.
         _days - (OOBTree) Index of days which build up the calendar.
     """
-    
+
     def __init__( self, aw, sDate, eDate, categList=[] ):
         self._aw = aw
         self._tz = sDate.tzinfo
@@ -124,8 +127,8 @@ class Calendar:
         except:
             self._icons = {}
             return {}
-            
-    def setIcons(self, categ): 
+
+    def setIcons(self, categ):
         """Retrieves the list of icons in a given category tree
         """
         if categ.getIcon() != None:
@@ -134,7 +137,7 @@ class Calendar:
         for subcat in categ.getSubCategoryList():
             res += self.setIcons(subcat)
         return res
-        
+
     def getStartDate( self ):
         return self._sDate
 
@@ -143,13 +146,13 @@ class Calendar:
 
     def getCategoryList( self ):
         return self._categList
-    
+
     def getLocator( self ):
-        """Returns the generic locator for the current object. This locator 
+        """Returns the generic locator for the current object. This locator
             contains the folloing entries corresponding to values for which
             the calendar is configured:
                 selCateg -> List of category ids.
-                sDate -> Starting date. 
+                sDate -> Starting date.
                 eDate -> Ending date.
         """
         l = Locators.Locator()
@@ -164,16 +167,17 @@ class Calendar:
     def _mapConferenceToDays(self,conf,categList):
         """Registers a given conference for the days on which it is taking place
             whithin the calendar date interval.
-          
+
            Parameters:
             conf - (conference.Conference) Conference to be mapped.
-            categList - (List) List of calendar categories in which the 
+            categList - (List) List of calendar categories in which the
                 specified conference is found.
         """
-            
+
         inc = timedelta(1)
-        d = conf.getStartDate().astimezone(self._tz).replace(hour=0,minute=0,second=0)
-        ed = conf.getEndDate().astimezone(self._tz)
+        d = max(conf.getStartDate().astimezone(self._tz).replace(hour=0,minute=0,second=0),
+                self.getStartDate().astimezone(self._tz).replace(hour=0,minute=0,second=0))
+        ed = min(conf.getEndDate().astimezone(self._tz), self.getEndDate().astimezone(self._tz))
         if ed > self.getEndDate():
             ed = self.getEndDate()
 
@@ -183,43 +187,44 @@ class Calendar:
             norm_date=self.getNormDate(d)
             if not self._days.has_key( norm_date ):
                 self._days[norm_date] = Day( self, d )
-            
+
             self._days[norm_date].addConference( conf, categList, self._tz )
             d += inc
-    
+
     def _initialiseDays( self ):
         """
         """
         self._days = OOBTree()
-        res = sets.Set()
+        res = set()
         self._categIdx = {}
         self._icons={}
-        im = indexes.IndexesHolder()
-        calIdx = im.getIndex("calendar")
-        catIdx = im.getIndex("category")
-        c1 = calIdx.getObjectsIn(self.getStartDate(), self.getEndDate() )
-        icons = []
+        catDayIdx = indexes.IndexesHolder().getIndex("categoryDate")
         for categ in self.getCategoryList():
-            confIds=sets.Set(catIdx.getItems(categ.getId()))
-            confIds.intersection_update(c1)
-            for confId in confIds:
+            confs = catDayIdx.getObjectsInDays(categ.getId(), self.getStartDate(), self.getEndDate())
+            for conf in confs:
+                confId = conf.getId()
                 if not self._categIdx.has_key(confId):
                     self._categIdx[confId]=[]
                 self._categIdx[confId].append(categ)
-            res.union_update(confIds)
-            icons=self.setIcons(categ)
-            for icon in icons:
-                l = list(sets.Set(catIdx.getItems(icon)) & c1)
-                if len(l) > 0:
-                    self._icons[icon] = l
-        ch=conference.ConferenceHolder()
-        for confId in res:
-            self._mapConferenceToDays(ch.getById(confId),self._categIdx[confId])
+            res.update(confs)
+        for conf in res:
+            #getting icon from the nearest owner category
+            owner = conf.getOwner()
+            while owner != None and owner.getId() != "0":
+                if owner.getIcon():
+                    if self._icons.has_key(owner.getId()):
+                        self._icons[owner.getId()].append(conf.getId())
+                    else:
+                        self._icons[owner.getId()] = [conf.getId()]
+                    break
+                owner = owner.getOwner()
+            #mapping conf to days
+            self._mapConferenceToDays(conf ,self._categIdx[conf.getId()])
 
-    
+
 
     def getNormDate(self,date):
-        # we have to normalize, but as we are going over all the days, we have to keep the date 
+        # we have to normalize, but as we are going over all the days, we have to keep the date
         # and just normalize the tzinfo.
         norm_date=date.tzinfo.normalize(date)
         norm_date=norm_date.replace(year=date.year, month=date.month,day=date.day, hour=0)
@@ -241,10 +246,10 @@ class Calendar:
             l.append( self.getDay( d ) )
             d += inc
         return l
-        
+
     def getConferenceCategories( self, conf ):
         return self._categIdx[conf.getId()]
-        
+
     def __str__(self):
         l = []
         if self._days:
@@ -276,7 +281,7 @@ class Month:
 
     def getCalendar( self ):
         return self._cal
-    
+
     def getName( self ):
         return _(self.getNames()[self._month-1])
 
@@ -288,7 +293,7 @@ class Month:
             l.append( self.getCalendar().getDay( sd ) )
             sd += inc
         return l
-    
+
     def __str__( self ):
         l = []
         for day in self.getDayList():
@@ -301,7 +306,7 @@ class Month:
 
 
 class MonthCalendar( Calendar ):
-    
+
     def __init__( self, aw, sDate, nrMonths, nrColumns, categList=[] ):
         self._nrMonths = int(nrMonths)
         self._nrColumns = int(nrColumns)
@@ -324,7 +329,7 @@ class MonthCalendar( Calendar ):
 
     def getNrColumns( self ):
         return self._nrColumns
-        
+
     def getMonthList( self ):
         inc = timedelta(31)
         sd = self.getStartDate()
@@ -337,7 +342,7 @@ class MonthCalendar( Calendar ):
 
 class Overview:
     _allowedDetailLevels = ("conference", "session", "contribution")
-    
+
     def __init__( self, aw, date, categList=[] ):
         self._detailLevel = "conference"
         self._categList = categList
@@ -378,17 +383,17 @@ class Overview:
 
     def getStartDate( self ):
         return self.getDate()
-    
+
     def getEndDate( self ):
         return self.getDate()
 
-    def getConferences( self, date=None ):
+    def getConferencesWithStartTime( self, date=None ):
         if not self._cal:
             self._cal = Calendar( self._aw, self.getStartDate(), \
                                     self.getEndDate(), self.getCategoryList() )
         if not date:
             date = self.getDate()
-        return self._cal.getDay( date ).getConferences()
+        return self._cal.getDay( date ).getConferencesWithStartTime()
 
     def getDayList( self ):
         if not self._cal:
@@ -398,7 +403,7 @@ class Overview:
 
     def getAW( self ):
         return self._aw
-    
+
     def getOverviewNextPeriod( self ):
         """Returns an exact copy of the current overview object for the next
             day"""
@@ -407,7 +412,7 @@ class Overview:
                         self.getCategoryList() )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-    
+
     def getOverviewPrevPeriod( self ):
         """Returns an exact copy of the current overview object for the previous
             day"""
@@ -441,7 +446,7 @@ class Overview:
                         self.getCategoryList() )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-    
+
     def getOverviewPrevBigPeriod( self ):
         """Returns an exact copy of the current overview object for the previous
             day"""
@@ -466,24 +471,24 @@ class Overview:
                         self.getCategoryList() )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-        
+
     def getOverviewOtherCateg( self, categid ):
-        """Returns an exact copy of the current overview object for another 
+        """Returns an exact copy of the current overview object for another
             category"""
         ow = Overview( self.getAW(), \
                         self.getDate(), \
                         [categid] )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-    
+
 
 class WeekOverview( Overview ):
-    
+
     def getLocator( self ):
         l = Overview.getLocator( self )
         l["period"] = "week"
         return l
-    
+
     def getStartDate( self ):
         d = self.getDate()
         inc = timedelta( calendar.weekday( d.year, d.month, d.day ) )
@@ -493,7 +498,7 @@ class WeekOverview( Overview ):
         d = self.getDate()
         inc = timedelta( 6 - calendar.weekday( d.year, d.month, d.day ) )
         return d+inc
-    
+
     def getOverviewNextPeriod( self ):
         """Returns an exact copy of the current overview object for the next
             week"""
@@ -502,7 +507,7 @@ class WeekOverview( Overview ):
                         self.getCategoryList() )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-    
+
     def getOverviewPrevPeriod( self ):
         """Returns an exact copy of the current overview object for the previous
             week"""
@@ -513,16 +518,16 @@ class WeekOverview( Overview ):
         return ow
 
     def getOverviewOtherCateg( self, categid ):
-        """Returns an exact copy of the current overview object for another 
+        """Returns an exact copy of the current overview object for another
             category"""
         ow = WeekOverview( self.getAW(), \
                         self.getDate(), \
                         [categid] )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-        
+
 class NextWeekOverview( Overview ):
-    
+
     def __init__( self, aw, categList=[] ):
         self._detailLevel = "conference"
         self._categList = categList
@@ -535,7 +540,7 @@ class NextWeekOverview( Overview ):
         l = Overview.getLocator( self )
         l["period"] = "week"
         return l
-    
+
     def getStartDate( self ):
         return self._date
 
@@ -543,21 +548,21 @@ class NextWeekOverview( Overview ):
         return self.getStartDate()+timedelta(days=7)
 
     def getOverviewOtherCateg( self, categid ):
-        """Returns an exact copy of the current overview object for another 
+        """Returns an exact copy of the current overview object for another
             category"""
         ow = NextWeekOverview( self.getAW(), \
                         #self.getDate(), \
                         [categid] )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-        
+
 class MonthOverview( Overview ):
-    
+
     def getLocator( self ):
         l = Overview.getLocator( self )
         l["period"] = "month"
         return l
-    
+
     def getStartDate( self ):
         d = self.getDate()
         return d.replace(day=1)
@@ -568,7 +573,7 @@ class MonthOverview( Overview ):
         except:
             d = self.getStartDate().replace(year=self.getDate().year+1,month=1) - timedelta(1)
         return d
-    
+
     def getOverviewNextPeriod( self ):
         """Returns an exact copy of the current overview object for the next
             month"""
@@ -577,7 +582,7 @@ class MonthOverview( Overview ):
                         self.getCategoryList() )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-    
+
     def getOverviewPrevPeriod( self ):
         """Returns an exact copy of the current overview object for the previous
             month"""
@@ -596,7 +601,7 @@ class MonthOverview( Overview ):
                         self.getCategoryList() )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-    
+
     def getOverviewPrevBigPeriod( self ):
         """Returns an exact copy of the current overview object for the previous
             day"""
@@ -606,9 +611,9 @@ class MonthOverview( Overview ):
                         self.getCategoryList() )
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
-        
+
     def getOverviewOtherCateg( self, categid ):
-        """Returns an exact copy of the current overview object for another 
+        """Returns an exact copy of the current overview object for another
             category"""
         ow = MonthOverview( self.getAW(), \
                         self.getDate(), \

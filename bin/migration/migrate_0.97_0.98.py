@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex
 
 """
 Migration script: v0.97 -> v0.98
@@ -124,8 +125,22 @@ def runPluginMigration(dbi):
     dbi.commit()
 
 
+def runCategoryDateIndexMigration(dbi):
+    """
+    Replacing category date indexes.
+    """
+    if not IndexesHolder()._getIdx().has_key("backupCategoryDate"):
+        IndexesHolder()._getIdx()["backupCategoryDate"] = IndexesHolder().getIndex("categoryDate")
+        newIdx = CategoryDayIndex()
+        newIdx.buildIndex()
+        IndexesHolder()._getIdx()["categoryDate"] = newIdx
+    else:
+        print """runCategoryDateIndexMigration: new categoryDate index has NOT been generated because the index backup already exists.
+                If you still want to regenerate it, please, do it manually using bin/migration/CategoryDate.py"""
+
+
 def runMigration():
-    tasks = [runPluginMigration, runTaskMigration, runConferenceMigration]
+    tasks = [runPluginMigration, runTaskMigration, runConferenceMigration, migrateCategoryDateIndex]
 
     print "\nExecuting migration...\n"
 

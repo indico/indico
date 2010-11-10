@@ -38,6 +38,7 @@ import MaKaC.common.info as info
 from MaKaC.common.cache import CategoryCache
 from MaKaC.i18n import _
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
+from MaKaC.webinterface.common.tools import escape_html
 from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 from pytz import timezone
 
@@ -440,13 +441,14 @@ class WOverviewSession:
 
 class WOverviewConfBase( wcomponents.WTemplated ):
 
-    def __init__( self, aw, conference, date, url, icons, details="conference" ):
+    def __init__( self, aw, conference, date, url, icons, details="conference", startTime = None ):
         self._conf = conference
         self._url = url
         self._aw = aw
         self._details = details
         self._date = date
         self._icons = icons
+        self._startTime = startTime
 
 
     def _getChairText( self ):
@@ -466,15 +468,12 @@ class WOverviewConfBase( wcomponents.WTemplated ):
             loc = self._conf.getLocation().getName()
         room = ""
         if self._conf.getRoom() != None:
-            if loc != "":
-                loc = "%s: "%loc
-            url = linking.RoomLinker().getURL( self._conf.getRoom(), \
-                                                    self._conf.getLocation() )
             room = self._conf.getRoom().getName()
-            if url != "":
-                room = """<a href="%s" style="font-size: 0.9em">%s</a>"""%(url, room)
+            url = "javascript:redirectToRoomLoc('" + escape_html(room) + "','" + escape_html(loc) +"')"
+            loc = "%s: "%loc
+            room = """<a href="%s" style="font-size: 0.9em">%s</a>"""%(url, room)
         if loc != "" or room != "":
-            return "(%s %s)"%(loc, room)
+            return "(%s%s)"%(loc, room)
         else:
             return ""
 
@@ -527,7 +526,10 @@ class WOverviewConfBase( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,useServerTZ=1).getDisplayTZ()
-        vars["startTime"] = self._conf.calculateDayStartTime(self._date).strftime("%H:%M")
+        if self._startTime:
+            vars["startTime"] = self._startTime.strftime("%H:%M")
+        else:
+            vars["startTime"] = self._conf.calculateDayStartTime(self._date).strftime("%H:%M")
         vars["timezone"] = tz
         vars["title"] = self._conf.getTitle()
         if self._conf.isProtected():
@@ -554,7 +556,7 @@ class WOverviewConfMinDisplay( WOverviewConfBase ):
 
 class WOverviewConferenceItem:
 
-    def __init__(self, aw, conference, date, displayURL, icons, details="conference"):
+    def __init__(self, aw, conference, date, displayURL, icons, details="conference", startTime = None):
         self._comp = None
         if details=="conference" or conference.canAccess( aw ):
             self._comp = WOverviewConfFullDisplay( aw, \
@@ -562,14 +564,16 @@ class WOverviewConferenceItem:
                                                     date, \
                                                     displayURL, \
                                                     icons, \
-                                                    details )
+                                                    details,
+                                                    startTime )
         else:
             self._comp = WOverviewConfMinDisplay( aw, \
                                                     conference, \
                                                     date, \
                                                     displayURL, \
                                                     icons, \
-                                                    details )
+                                                    details,
+                                                    startTime )
 
     def getHTML( self, params ):
         if not self._comp:
@@ -599,15 +603,17 @@ class WDayOverview(wcomponents.WTemplated):
                 nextsel,\
                 nnextsel)
         l = []
-        confs = self._ow.getConferences()
-        confs.sort(lambda x,y: cmp(x.calculateDayStartTime(self._ow.getDate()).time(),y.calculateDayStartTime(self._ow.getDate()).time()))
-        for conf in confs:
+        confs = self._ow.getConferencesWithStartTime()
+        for tuple in confs:
+            conf = tuple[0]
+            startTime = tuple[1]
             oi = WOverviewConferenceItem( self._ow.getAW(), \
                                             conf, \
                                             self._ow.getDate(), \
                                             vars["displayConfURLGen"]( conf ),\
                                             self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel() )
+                                            self._ow.getDetailLevel(),
+                                            startTime )
             l.append( oi.getHTML( {} ) )
         if len(confs)==0:
             l.append( _("There are no conferences on the selected day"))
@@ -640,15 +646,17 @@ class WWeekOverview(wcomponents.WTemplated):
         while sd <= self._ow.getEndDate():
             vars["date%i"%idx] = sd.strftime( "%a %d/%m" )
             res = []
-            confs = self._ow.getConferences( sd )
-            confs.sort(lambda x,y: cmp(x.calculateDayStartTime(sd).time(),y.calculateDayStartTime(sd).time()))
-            for conf in confs:
+            confs = self._ow.getConferencesWithStartTime( sd )
+            for tuple in confs:
+                conf = tuple[0]
+                stTime = tuple[1]
                 wc = WOverviewConferenceItem( self._ow.getAW(), \
                                             conf, \
                                             sd, \
                                             vars["displayConfURLGen"]( conf ),\
                                             self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel() )
+                                            self._ow.getDetailLevel(),
+                                            stTime )
                 res.append( wc.getHTML( {} ) )
 
             if res==[]:
@@ -680,15 +688,17 @@ class WNextWeekOverview(wcomponents.WTemplated):
         while sd <= self._ow.getEndDate():
             vars["date%i"%idx] = sd.strftime( "%a %d/%m" )
             res = []
-            confs = self._ow.getConferences( sd )
-            confs.sort(lambda x,y: cmp(x.calculateDayStartTime(sd).time(),y.calculateDayStartTime(sd).time()))
-            for conf in confs:
+            confs = self._ow.getConferencesWithStartTime( sd )
+            for tuple in confs:
+                conf = tuple[0]
+                stTime = tuple[1]
                 wc = WOverviewConferenceItem( self._ow.getAW(), \
                                             conf, \
                                             sd, \
                                             vars["displayConfURLGen"]( conf ),\
                                             self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel() )
+                                            self._ow.getDetailLevel(),
+                                            stTime )
                 res.append( wc.getHTML( {} ) )
                 raise wc
             if res==[]:
@@ -710,15 +720,17 @@ class WMonthOverview(wcomponents.WTemplated):
             return """<td>&nbsp;</td>"""
         else:
             res = []
-            confs = day.getConferences()
-            confs.sort(lambda x,y: cmp(x.calculateDayStartTime(day.getDate()).time(),y.calculateDayStartTime(day.getDate()).time()))
-            for conf in confs:
+            confs = day.getConferencesWithStartTime()
+            for tuple in confs:
+                conf = tuple[0]
+                stTime = tuple[1]
                 wc = WOverviewConferenceItem( self._ow.getAW(), \
                                             conf, \
                                             day.getDate(), \
                                             self._displayConfURLGen( conf ),\
                                             self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel() )
+                                            self._ow.getDetailLevel(),
+                                            stTime )
                 res.append( wc.getHTML( {} ) )
             return """
                 <td valign="top" bgcolor="#ECECEC">

@@ -30,6 +30,7 @@ methodMap = {
     "roomBooking.mapaspects.update": roomBooking.RoomBookingMapUpdateAspect,
     "roomBooking.mapaspects.remove": roomBooking.RoomBookingMapRemoveAspect,
     "roomBooking.mapaspects.list": roomBooking.RoomBookingMapListAspects,
+    "roomBooking.locationsAndRooms.getLink" :roomBooking.RoomBookingLocationsAndRoomsGetLink,
 
     "resources.timezones.getAll": resources.GetTimezones,
     "resources.languages.getAll": resources.GetLanguages,
