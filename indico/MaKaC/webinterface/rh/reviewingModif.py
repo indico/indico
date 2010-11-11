@@ -39,21 +39,21 @@ class RCPaperReviewManager:
         """ Returns true if the user is a PRM of the conference
         """
         return request._conf.getConfPaperReview().isPaperReviewManager(request.getAW().getUser())
-    
+
 class RCAbstractManager:
     @staticmethod
     def hasRights(request):
         """ Returns true if the user is an AM of the conference
         """
-        return request._conf.getConfPaperReview().isAbstractManager(request.getAW().getUser())
-    
+        return request._conf.getConfAbstractReview().isAbstractManager(request.getAW().getUser())
+
 class RCReviewingStaff:
     @staticmethod
     def hasRights(request):
         """ Returns true if the user is a PRM, an AM, a referee, an editor, a reviewer or an abstract reviewer of the conference
         """
         return request._conf.getConfPaperReview().isInReviewingTeam(request.getAW().getUser())
-    
+
 class RCReferee:
     @staticmethod
     def hasRights(request):
@@ -67,14 +67,14 @@ class RCEditor:
         """ Returns true if the user is an editor of the conference
         """
         return request._conf.getConfPaperReview().isEditor(request.getAW().getUser())
-    
+
 class RCReviewer:
     @staticmethod
     def hasRights(request):
         """ Returns true if the user is a reviewer of the conference
         """
         return request._conf.getConfPaperReview().isReviewer(request.getAW().getUser())
-    
+
 class RHConfModifReviewingAccess(RHConferenceModifKey):
     """ Class used when the user clicks on the main 'Reviewing' tab
         Depending if the user is PRM or AM, etc. the user will be redirected
@@ -83,7 +83,7 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
         they cannot see some of the subtabs and then they need to be
         redirected to the appropiate subtab.
     """
-    
+
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
         self._isPRM = RCPaperReviewManager.hasRights(self)
@@ -94,18 +94,18 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
         self._isReviewer = RCReviewer.hasRights(self)
 
     def _checkProtection(self):
-        
+
         if not self._isReviewingStaff:
             if self._getUser() == None:
                 self._checkSessionUser()
             else:
                 RHConferenceModifKey._checkProtection(self)
-    
+
     def _process( self ):
-              
+
         if self._redirectURL != "":
             url = self._redirectURL
-        
+
         elif self._conf.canModify(self.getAW()) or self._isPRM:
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isAM:
@@ -113,54 +113,54 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
         elif self._isReviewer:
-            url = urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf )            
+            url = urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf )
         elif self._isEditor:
             url = urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf )
         elif self._isReviewingStaff:
             url= urlHandlers.UHConfModifListContribToJudge.getURL( self._conf )
-            
+
         else: #we leave this else just in case
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
-            
+
         self._redirect( url )
 
 class RHConfModifReviewingPRMBase (RHConferenceModifBase):
     """ Base class that allows only paper review managers to do this request.
         If user is not a paper review manager, they need to be a conference manager.
     """
-    
+
     def _checkProtection(self):
         if self._target.hasEnabledSection("paperReviewing"):
             if not RCPaperReviewManager.hasRights(self):
-                RHConferenceModifBase._checkProtection(self);            
+                RHConferenceModifBase._checkProtection(self);
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-        
-    
-            
+
+
+
 class RHConfModifReviewingAMBase (RHConferenceModifBase):
     """ Base class that allows only abstract managers to do this request.
         If user is not a paper review manager, they need to be a conference manager.
     """
-    
+
     def _checkProtection(self):
         if self._target.hasEnabledSection("paperReviewing"):
             if not RCAbstractManager.hasRights(self):
-                RHConferenceModifBase._checkProtection(self);            
+                RHConferenceModifBase._checkProtection(self);
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
 
 
-            
+
 class RHConfModifReviewingPRMAMBase (RHConferenceModifBase):
     """ Base class that allows only paper review managers OR abstract managers to do this request.
         If user is not a paper review manager, they need to be a conference manager.
     """
-    
+
     def _checkProtection(self):
         if self._target.hasEnabledSection("paperReviewing"):
             if not RCPaperReviewManager.hasRights(self) and not RCAbstractManager.hasRights(self):
-                RHConferenceModifBase._checkProtection(self);            
+                RHConferenceModifBase._checkProtection(self);
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
 
@@ -178,7 +178,7 @@ class RHConfModifReviewingPaperSetup( RHConfModifReviewingPRMBase ):
         else:
             p = WPConfModifReviewingPaperSetup( self, self._target)
         return p.display()
-        
+
 class RHConfModifReviewingAbstractSetup( RHConfModifReviewingAMBase ):
     """ Class used when the user clicks on the Abstract Setup
         subtab of the Reviewing tab
@@ -215,7 +215,7 @@ class RHAddState(RHConfModifReviewingPRMBase):
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
         self._state = params.get("state")
-        
+
     def _process( self ):
         self._conf.getConfPaperReview().addState( self._state )
         self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
@@ -223,11 +223,11 @@ class RHAddState(RHConfModifReviewingPRMBase):
 
 class RHRemoveState(RHConfModifReviewingPRMBase):
     _uh = urlHandlers.UHRemoveState
-    
+
     def _checkParams(self, params):
         RHConfModifReviewingPRMBase._checkParams(self, params)
         self._state = params.get("stateSelection")
-    
+
     def _process(self):
         self._conf.getConfPaperReview().removeState(self._state)
         self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
@@ -245,11 +245,11 @@ class RHAddQuestion(RHConfModifReviewingPRMBase):
 
 class RHRemoveQuestion(RHConfModifReviewingPRMBase):
     _uh = urlHandlers.UHRemoveQuestion
-    
+
     def _checkParams(self, params):
         RHConfModifReviewingPRMBase._checkParams(self, params)
         self._question = params.get("questionSelection")
-    
+
     def _process(self):
         self._conf.getConfPaperReview().removeReviewingQuestion(self._question)
         self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
@@ -267,20 +267,20 @@ class RHAddCriteria(RHConfModifReviewingPRMBase):
 
 class RHRemoveCriteria(RHConfModifReviewingPRMBase):
     _uh = urlHandlers.UHRemoveCriteria
-    
+
     def _checkParams(self, params):
         RHConfModifReviewingPRMBase._checkParams(self, params)
         self._criteria = params.get("criteriaSelection")
-    
+
     def _process(self):
         self._conf.getConfPaperReview().removeLayoutCriteria(self._criteria)
         self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-        
+
 #################################### END of old classes that are not used anymore ###############################
-        
+
 class RHSetTemplate(RHConfModifReviewingPRMBase):
     _uh = urlHandlers.UHSetTemplate
-    
+
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
         self._name = params.get("name")
@@ -294,7 +294,7 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
             self._templatefd = params.get("file").file
         except AttributeError:
             raise MaKaCError("Problem when storing template file")
-        
+
     def _process( self ):
         import random
         self._id = str(random.random()*random.randint(1,32768))
@@ -305,20 +305,20 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
             #self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
             return "<html><head></head><body>%s</body></html>"  % simplejson.dumps({'status': 'OK',
                                      'info': {'name': self._name, 'description': self._description, 'format': self._format, 'id': self._id}})
-        
+
 class RHDownloadTemplate(RHConferenceBaseDisplay):
-    
+
     def _checkProtection(self):
         if self._target.hasEnabledSection("paperReviewing"):
             RHConferenceBaseDisplay._checkProtection(self)
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
 
-    
+
     def _checkParams(self, params):
         RHConferenceBase._checkParams( self, params )
         self._templateId = params.get("reviewingTemplateId")
-    
+
     def _process(self):
         template=self._target.getConfPaperReview().getTemplates()[self._templateId].getFile()
         self._req.headers_out["Content-Length"]="%s"%template.getSize()
@@ -327,14 +327,13 @@ class RHDownloadTemplate(RHConferenceBaseDisplay):
         self._req.content_type="""%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%template.getFileName()
         return template.readBin()
-    
+
 class RHDeleteTemplate(RHConfModifReviewingPRMBase):
-    
+
     def _checkParams(self, params):
         RHConferenceBase._checkParams( self, params )
         self._templateId = params.get("reviewingTemplateId")
-    
+
     def _process(self):
         self._conf.getConfPaperReview().deleteTemplate(self._templateId)
         self._redirect(urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ))
-        

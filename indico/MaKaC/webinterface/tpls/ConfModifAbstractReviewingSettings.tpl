@@ -1,4 +1,4 @@
-<table width="90%%" border="0">
+<table width="90%%" border="0" style="padding-bottom: 10px;">
     <tr>
         <td id="reviewingModeHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px; padding-left: 20px;">
             <%= _("Default date for abstract reviewing")%>
@@ -10,7 +10,7 @@
         </span></td>
         <td class="blacktext" style="padding-top: 15px;">
             <span id="inPlaceEditDefaultAbstractReviewerDueDate">
-                <% date = ConfReview.getAdjustedDefaultAbstractReviewerDueDate() %>
+                <% date = abstractReview.getAdjustedDefaultAbstractReviewerDueDate() %>
                 <% if date is None: %>
                     <%= _("Date has not been set yet.")%>
                 <% end %>
@@ -22,15 +22,15 @@
     </tr>
 </table>
 
-<table>
-  <tr>
-    <th>Column 1 Heading</th>
-    <th>Column 2 Heading</th>
-  </tr>
-  <tr>
-    <td>Row 1: Col 1</td>
-    <td>Row 1: Col 2</td>
-  </tr>
+<table id="reviewingQuestionsTable" width="90%%" border="0" style="padding-bottom: 10px;">
+    <tr>
+        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px; padding-left: 20px;"><%= _("Add questions for abstract reviewing")%></td>
+    </tr>
+    <tr>
+        <td>
+            <div id="inPlaceEditQuestions"  style="padding-top: 5px;"><%= ', '.join(abstractReview.getReviewingQuestions())%></div>
+        </td>
+    </tr>
 </table>
 
 
@@ -38,7 +38,21 @@
 <script type="text/javascript">
 new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultAbstractReviewerDueDate'),
                    'reviewing.conference.changeAbstractReviewerDefaultDueDate',
-                   {conference: '<%= ConfReview.getConference().getId() %>',
+                   {conference: '<%= abstractReview.getConference().getId() %>',
                     dueDateToChange: '<%= _("Abstract Reviewer")%>'},
                    null, true);
+
+
+var showReviewingQuestions = function() {
+    new IndicoUI.Widgets.Generic.keywordField(
+        $E('inPlaceEditQuestions'),
+        'multipleLinesListItem',
+        'reviewing.conference.changeAbstractQuestions',
+        {conference: '<%= abstractReview.getConference().getId() %>'},
+        $T('Remove this question from the list')
+    );
+}
+
+showReviewingQuestions();
+
 </script>

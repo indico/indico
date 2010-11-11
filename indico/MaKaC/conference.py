@@ -48,6 +48,7 @@ from datetime import datetime, timedelta, time
 
 from MaKaC.contributionReviewing import ReviewManager
 from reviewing import ConferencePaperReview as ConferencePaperReview
+from reviewing import ConferenceAbstractReview as ConferenceAbstractReview
 
 from pytz import timezone
 from pytz import all_timezones
@@ -2118,6 +2119,7 @@ class Conference(CommonObjectBase, Locatable):
         self.__posterTemplateManager = PosterTemplateManager(self)
         self._keywords = ""
         self._confPaperReview = ConferencePaperReview(self)
+        self._confAbstractReview = ConferenceAbstractReview(self)
         self._orgText = ""
         self._comments = ""
         self._sortUrlTag = ""
@@ -2171,6 +2173,11 @@ class Conference(CommonObjectBase, Locatable):
         if not hasattr(self, "_confPaperReview"):
             self._confPaperReview = ConferencePaperReview(self)
         return self._confPaperReview
+
+    def getConfAbstractReview(self):
+        if not hasattr(self, "_confAbstractReview"):
+            self._confAbstractReview = ConferenceAbstractReview(self)
+        return self._confAbstractReview
 
     def getOrgText( self ):
         try:

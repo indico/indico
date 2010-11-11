@@ -63,6 +63,7 @@ class ConferenceReviewingBase(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         self._confPaperReview = self._conf.getConfPaperReview()
+        self._confAbstractReview = self._conf.getConfAbstractReview()
 
 class ConferenceReviewingPRMBase(ConferenceReviewingBase):
     """ This base class verifies that the user is a PRM
@@ -182,6 +183,15 @@ class ConferenceReviewingQuestionsModification(ConferenceReviewingListModificati
     def _handleSet(self):
         self._confPaperReview.setReviewingQuestions(self._value)
 
+class ConferenceAbstractReviewingQuestionsModification(ConferenceReviewingListModificationBase):
+
+    def _handleGet(self):
+        return self._confAbstractReview.getReviewingQuestions()
+
+    def _handleSet(self):
+        self._confAbstractReview.setReviewingQuestions(self._value)
+
+
 class ConferenceReviewingCriteriaModification(ConferenceReviewingListModificationBase):
 
     def _handleGet(self):
@@ -229,10 +239,10 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
 class ConferenceAbstractReviewingDefaultDueDateModification(ConferenceAbstractReviewingDateTimeModificationBase):
 
     def _setParam(self):
-        self._conf.getConfPaperReview().setDefaultAbstractReviewerDueDate(self._pTime)
+        self._conf.getConfAbstractReview().setDefaultAbstractReviewerDueDate(self._pTime)
 
     def _handleGet(self):
-        date = self._conf.getConfPaperReview().getAdjustedDefaultAbstractReviewerDueDate()
+        date = self._conf.getConfAbstractReview().getAdjustedDefaultAbstractReviewerDueDate()
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
@@ -576,7 +586,10 @@ class ConferenceReviewingRemoveReviewer(ConferenceReviewingAssignStaffBasePRMRef
 
 
 class ConferenceReviewingRemoveAllReviewers(ConferenceReviewingAssignStaffBasePRMReferee):
-    """ Removes all the reviewers from a list of contributions
+    """ Removes all t<<<<<<< HEAD
+=======
+        #self._reviewableMaterials = MaterialFactoryRegistry._allowedMaterials['reviewing']
+>>>>>>> [FTR] Add questions for abstract reviewinghe reviewers from a list of contributions
     """
     def _getAnswer(self):
         for contribution in self._contributions:
@@ -734,7 +747,6 @@ class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceRevi
         self._confPaperReview.removeReviewer(self._targetUser)
 
         return True
-
 #####################################
 ###  Contribution reviewing classes
 #####################################
@@ -882,6 +894,7 @@ methodMap = {
     "conference.changeReviewingMode": ConferenceReviewingModeModification,
     "conference.changeStates": ConferenceReviewingStatesModification,
     "conference.changeQuestions": ConferenceReviewingQuestionsModification,
+    "conference.changeAbstractQuestions": ConferenceAbstractReviewingQuestionsModification,
     "conference.changeCriteria": ConferenceReviewingCriteriaModification,
     "conference.deleteTemplate" : ConferenceReviewingDeleteTemplate,
     "conference.changeCompetences": ConferenceReviewingCompetenceModification,

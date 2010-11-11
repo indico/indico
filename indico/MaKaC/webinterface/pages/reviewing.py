@@ -368,7 +368,7 @@ class WConfModifAbstractReviewingSettings(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["ConfReview"] = self._conf.getConfPaperReview()
+        vars["abstractReview"] = self._conf.getConfAbstractReview()
         #vars["reviewingQuestions"] = self._conf.getConferenceReview().getAbstractReviewingQuestions()
         return vars
 
