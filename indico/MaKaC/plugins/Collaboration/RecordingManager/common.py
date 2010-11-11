@@ -807,7 +807,7 @@ def getCDSRecords(confId):
             bigcdsid = result.split(" ")[0]
             CDSID = bigcdsid.lstrip("0")
 
-            p = re.compile('INDICO\.([sc\d]+)')
+            p = re.compile('INDICO\.(\w*[sc\d]+)')
             m = p.search(line)
 
             if m:
