@@ -70,7 +70,7 @@
                     <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
                         <td class="displayField" nowrap="" align="right" valign="top">
                             <b><%=_("Material")%>:</b>
-                            <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() : %>
+                            <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() : %>
                                 <% inlineContextHelp(_('Here you should add the general materials for your contribution. They will not be subject of reviewing.')) %>
                             <% end %>
                         </td>
@@ -84,7 +84,7 @@
                     <%= inSession %>
                     <%= inTrack %>
                     <%= subConts %>
-                    <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfReview().hasReviewing() : %>
+                    <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() : %>
                         <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
                         <tr><td align="right" valign="top" class="displayField" nowrap>
                                 <b><%=_("Reviewing materials")%>:</b>
@@ -103,7 +103,7 @@
                                         <%= "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) %>
                                     </td>
                                 </tr>
-                                <% if  Contribution.getConference().getConfReview().getChoice() == 3: %>
+                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == 3: %>
                                     <% if not Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
                                         <% display = 'table' %>
                                     <% end %>
@@ -111,7 +111,7 @@
                                         <% display = 'none' %>
                                     <% end %>
                                 <% end %>
-                                <% if Contribution.getConference().getConfReview().getChoice() == 2: %>
+                                <% if Contribution.getConference().getConfPaperReview().getChoice() == 2: %>
                                     <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
                                         <% display = 'table' %>
                                     <% end %>
@@ -119,7 +119,7 @@
                                         <% display = 'none' %>
                                     <% end %>
                                 <% end %>
-                                <% if  Contribution.getConference().getConfReview().getChoice() == 4: %>
+                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == 4: %>
                                     <% if Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): %>
                                         <% display = 'none' %>
                                     <% end %>

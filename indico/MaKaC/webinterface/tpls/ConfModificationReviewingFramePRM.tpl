@@ -1,4 +1,5 @@
-<% from MaKaC.reviewing import ConferenceReview %>
+<% declareTemplate(newTemplateStyle=True) %>
+<% from MaKaC.reviewing import ConferencePaperReview %>
 <% from MaKaC.common.fossilize import fossilize %>
 
 

@@ -61,5 +61,6 @@ def downloadTemplate(req, **params):
 def deleteTemplate(req, **params):
     return reviewingModif.RHDeleteTemplate(req).process(params)
 
+# Abstract reviewing
 def abstractSetup(req, **params):
     return reviewingModif.RHConfModifReviewingAbstractSetup(req).process(params)

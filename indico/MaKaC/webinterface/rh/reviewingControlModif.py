@@ -89,7 +89,7 @@ class RHConfAddPaperReviewManager( RHConfModifReviewingBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().addPaperReviewManager( ph.getById( id ) )
+                    self._target.getConfPaperReview().addPaperReviewManager( ph.getById( id ) )
         self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
 
 
@@ -106,7 +106,7 @@ class RHConfRemovePaperReviewManager( RHConfModifReviewingBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().removePaperReviewManager( ph.getById( id ) )
+                    self._target.getConfPaperReview().removePaperReviewManager( ph.getById( id ) )
                     av = ph.getById(id)
                     if av:
                         self._target.revokeModification(av)
@@ -119,7 +119,7 @@ class RHConfRefereeBase( RHConfModifReviewingPRMBase ):
 
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
-        if self._conf.getConfReview().getChoice() == 1 or self._conf.getConfReview().getChoice() == 3:
+        if self._conf.getConfPaperReview().getChoice() == 1 or self._conf.getConfPaperReview().getChoice() == 3:
             raise MaKaCError("Reviewing mode does not allow creation or deletion of referees")
 
 class RHConfSelectReferee( RHConfRefereeBase ):
@@ -137,7 +137,7 @@ class RHConfAddReferee( RHConfRefereeBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().addReferee( ph.getById( id ) )
+                    self._target.getConfPaperReview().addReferee( ph.getById( id ) )
         self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
 
 
@@ -150,7 +150,7 @@ class RHConfRemoveReferee( RHConfRefereeBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().removeReferee( ph.getById( id ) )
+                    self._target.getConfPaperReview().removeReferee( ph.getById( id ) )
                     av = ph.getById(id)
                     if av:
                         self._target.revokeModification(av)
@@ -163,7 +163,7 @@ class RHConfEditorBase( RHConfModifReviewingPRMBase ):
 
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
-        if self._conf.getConfReview().getChoice() == 1 or self._conf.getConfReview().getChoice() == 2:
+        if self._conf.getConfPaperReview().getChoice() == 1 or self._conf.getConfPaperReview().getChoice() == 2:
             raise MaKaCError("Reviewing mode does not allow creation or deletion of editors")
 
 class RHConfSelectEditor( RHConfEditorBase ):
@@ -181,7 +181,7 @@ class RHConfAddEditor( RHConfEditorBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().addEditor( ph.getById( id ) )
+                    self._target.getConfPaperReview().addEditor( ph.getById( id ) )
         self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
 
 
@@ -194,7 +194,7 @@ class RHConfRemoveEditor( RHConfEditorBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().removeEditor( ph.getById( id ) )
+                    self._target.getConfPaperReview().removeEditor( ph.getById( id ) )
                     av = ph.getById(id)
                     if av:
                         self._target.revokeModification(av)
@@ -207,7 +207,7 @@ class RHConfReviewerBase( RHConfModifReviewingPRMBase ):
 
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
-        if self._conf.getConfReview().getChoice() == 1 or self._conf.getConfReview().getChoice() == 3:
+        if self._conf.getConfPaperReview().getChoice() == 1 or self._conf.getConfPaperReview().getChoice() == 3:
             raise MaKaCError("Reviewing mode does not allow creation or deletion of reviewers")
 
 class RHConfSelectReviewer( RHConfReviewerBase ):
@@ -225,7 +225,7 @@ class RHConfAddReviewer( RHConfReviewerBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().addReviewer( ph.getById( id ) )
+                    self._target.getConfPaperReview().addReviewer( ph.getById( id ) )
         self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
 
 
@@ -238,7 +238,7 @@ class RHConfRemoveReviewer( RHConfReviewerBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().removeReviewer( ph.getById( id ) )
+                    self._target.getConfPaperReview().removeReviewer( ph.getById( id ) )
                     av = ph.getById(id)
                     if av:
                         self._target.revokeModification(av)
@@ -271,7 +271,7 @@ class RHConfAddAbstractManager( RHConfModifReviewingBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().addAbstractManager( ph.getById( id ) )
+                    self._target.getConfPaperReview().addAbstractManager( ph.getById( id ) )
         self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
 
 
@@ -288,7 +288,7 @@ class RHConfRemoveAbstractManager( RHConfModifReviewingBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().removeAbstractManager( ph.getById( id ) )
+                    self._target.getConfPaperReview().removeAbstractManager( ph.getById( id ) )
                     av = ph.getById(id)
                     if av:
                         self._target.revokeModification(av)
@@ -313,7 +313,7 @@ class RHConfAddAbstractReviewer( RHConfModifReviewingAMBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().addAbstractReviewer( ph.getById( id ) )
+                    self._target.getConfPaperReview().addAbstractReviewer( ph.getById( id ) )
         self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
 
 
@@ -326,7 +326,7 @@ class RHConfRemoveAbstractReviewer( RHConfModifReviewingAMBase ):
             ph = user.PrincipalHolder()
             for id in self._normaliseListParam( params["selectedPrincipals"] ):
                 if id is not None and id != '':
-                    self._target.getConfReview().removeAbstractReviewer( ph.getById( id ) )
+                    self._target.getConfPaperReview().removeAbstractReviewer( ph.getById( id ) )
                     av = ph.getById(id)
                     if av:
                         self._target.revokeModification(av)

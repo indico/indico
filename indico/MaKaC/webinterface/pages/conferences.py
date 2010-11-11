@@ -293,14 +293,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"]
 
 
-                if showrefereearea and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
+                if showrefereearea and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
                     self._assignContribOpt.setVisible(True)
                     self._judgeListOpt.setVisible(True)
 
-                if showreviewerarea and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
+                if showreviewerarea and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
                     self._judgereviewerListOpt.setVisible(True)
 
-                if showeditorarea and (self._conf.getConfReview().getChoice()==3 or self._conf.getConfReview().getChoice()==4):
+                if showeditorarea and (self._conf.getConfPaperReview().getChoice()==3 or self._conf.getConfPaperReview().getChoice()==4):
                     self._judgeeditorListOpt.setVisible(True)
 
 
@@ -8869,7 +8869,7 @@ class WConfMyContributions(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["User"] = self._aw.getUser()
         vars["Conference"] = self._conf
-        vars["ConfReviewingChoice"] = self._conf.getConfReview().getChoice()
+        vars["ConfReviewingChoice"] = self._conf.getConfPaperReview().getChoice()
         return vars
 
 class WConfMyStuffMySessions(wcomponents.WTemplated):

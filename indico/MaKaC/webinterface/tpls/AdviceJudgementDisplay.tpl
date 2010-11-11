@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferenceReview %>
+<% from MaKaC.reviewing import ConferencePaperReview %>
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Content judgement:")%></span>
@@ -25,7 +25,7 @@
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <% for q,a in advice.getAnswers(): %>
-                            <%= q %> : <%= ConferenceReview.reviewingQuestionsAnswers[int(a)] %>
+                            <%= q %> : <%= ConferencePaperReview.reviewingQuestionsAnswers[int(a)] %>
                             <br/>
                         <% end %>
                     </td>
@@ -41,4 +41,4 @@
                     </td>
                 </tr>
                 <% end %>
-                
+

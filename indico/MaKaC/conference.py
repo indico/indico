@@ -47,7 +47,7 @@ import stat
 from datetime import datetime, timedelta, time
 
 from MaKaC.contributionReviewing import ReviewManager
-from reviewing import ConferenceReview as ConferenceReview
+from reviewing import ConferencePaperReview as ConferencePaperReview
 
 from pytz import timezone
 from pytz import all_timezones
@@ -2117,7 +2117,7 @@ class Conference(CommonObjectBase, Locatable):
         self.__badgeTemplateManager = BadgeTemplateManager(self)
         self.__posterTemplateManager = PosterTemplateManager(self)
         self._keywords = ""
-        self._confReview = ConferenceReview(self)
+        self._confPaperReview = ConferencePaperReview(self)
         self._orgText = ""
         self._comments = ""
         self._sortUrlTag = ""
@@ -2167,10 +2167,10 @@ class Conference(CommonObjectBase, Locatable):
             self.setComments()
         return self._comments
 
-    def getConfReview(self):
-        if not hasattr(self, "_confReview"):
-            self._confReview = ConferenceReview(self)
-        return self._confReview
+    def getConfPaperReview(self):
+        if not hasattr(self, "_confPaperReview"):
+            self._confPaperReview = ConferencePaperReview(self)
+        return self._confPaperReview
 
     def getOrgText( self ):
         try:
@@ -10526,7 +10526,7 @@ class Material(CommonObjectBase):
         """
         if isinstance(self.owner, Contribution):
             conference = self.owner.getConference()
-            if conference.getConfReview().getChoice() == 0: #conference has no reviewing process
+            if conference.getConfPaperReview().getChoice() == 0: #conference has no reviewing process
                 return 0
             else: #conference has reviewing
                 #if self.id in reviewableMaterials: #material is reviewable

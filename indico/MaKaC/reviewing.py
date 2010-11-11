@@ -36,9 +36,9 @@ from MaKaC.common.Counter import Counter
 ###############################################
 
 
-class ConferenceReview(Persistent):
+class ConferencePaperReview(Persistent):
     """
-    This class manages the parameters of the conference reviewing.
+    This class manages the parameters of the paper reviewing.
     """
     reviewingModes = ["", "No reviewing", "Content reviewing", "Layout reviewing", "Content and layout reviewing"]
     predefinedStates = ["Accept", "To be corrected", "Reject"]
@@ -59,13 +59,9 @@ class ConferenceReview(Persistent):
         self._refereesList = []
         self._paperReviewManagersList = []
 
-        self._abstractManagerList = []
-        self._abstractReviewersList = []
-
         self._refereeContribution = {} #key: user, value: list of contributions where user is referee
         self._editorContribution = {} #key: user, value: list of contributions where user is editor
         self._reviewerContribution = {} #key: user, value: list of contributions where user is reviewer
-        self._reviewerAsbtract = {} #key: user, value: list of abstracts where user is abstract reviewer
 
         self.setChoice(1) #initial reviewing mode: no reviewing
 
@@ -75,7 +71,6 @@ class ConferenceReview(Persistent):
         self._defaultRefereeDueDate = None
         self._defaultEditorDueDate = None
         self._defaultReviwerDueDate = None
-        self._defaultAbstractReviwerDueDate = None
 
         #auto e-mails
         self._enablePRMEmailNotif = True
@@ -109,7 +104,7 @@ class ConferenceReview(Persistent):
 
 
     def getConference(self):
-        """ Returns the parent conference of the ConferenceReview object
+        """ Returns the parent conference of the ConferencePaperReview object
         """
         return self._conference
 
@@ -160,20 +155,6 @@ class ConferenceReview(Persistent):
             return None
         else:
             return getAdjustedDate(self._defaultReviwerDueDate, self.getConference())
-
-    def setDefaultAbstractReviewerDueDate(self, date):
-        self._defaultAbstractReviwerDueDate = date
-
-    def getDefaultAbstractReviewerDueDate(self):
-        if not hasattr(self, '_defaultAbstractReviwerDueDate'):
-            self._defaultAbstractReviwerDueDate = None
-        return self._defaultAbstractReviwerDueDate
-
-    def getAdjustedDefaultAbstractReviewerDueDate(self):
-        if self.getDefaultAbstractReviewerDueDate() is None:
-            return None
-        else:
-            return getAdjustedDate(self._defaultAbstractReviwerDueDate, self.getConference())
 
     #auto e-mails methods for assign/remove reviewing team to the conference notification
     def getEnablePRMEmailNotif(self):
@@ -374,7 +355,7 @@ class ConferenceReview(Persistent):
             4: "Content and layout reviewing"
         """
         self._choice = choice
-        self._reviewing = ConferenceReview.reviewingModes[choice]
+        self._reviewing = ConferencePaperReview.reviewingModes[choice]
 
     def getChoice(self):
         """ Returns the reviewing mode for the conference, as a number
@@ -392,11 +373,11 @@ class ConferenceReview(Persistent):
 
     def setReviewingMode(self, mode):
         """ Sets the reviewing mode of the conference, as a string.
-            The string has to be one of those in ConferenceReview.reviewingModes
+            The string has to be one of those in ConferencePaperReview.reviewingModes
         """
-        if mode in ConferenceReview.reviewingModes:
+        if mode in ConferencePaperReview.reviewingModes:
             self._reviewing = mode
-            self._choice = ConferenceReview.reviewingModes.index(mode)
+            self._choice = ConferencePaperReview.reviewingModes.index(mode)
 
     def hasReviewing(self):
         """ Convenience method that returns if the Conference has a reviewing mode active or not.
@@ -433,7 +414,7 @@ class ConferenceReview(Persistent):
     def getAllStates(self):
         """ Returns list of default and non-default states
         """
-        return ConferenceReview.predefinedStates + self._states
+        return ConferencePaperReview.predefinedStates + self._states
 
     def removeState(self, state):
         """ Remoevs a state
@@ -555,9 +536,7 @@ class ConferenceReview(Persistent):
             if self._userCompetences.has_key(referee):
                 if not ((referee in self._editorsList) or \
                         (referee in self._paperReviewManagersList) or \
-                        (referee in self._reviewersList) or \
-                        (referee in self._abstractManagerList) or \
-                        (referee in self._abstractReviewersList)):
+                        (referee in self._reviewersList)):
                     self.clearUserCompetences(referee)
                     del(self._userCompetences[referee])
             self._refereesList.remove(referee)
@@ -641,9 +620,7 @@ class ConferenceReview(Persistent):
             if self._userCompetences.has_key(editor):
                 if not ((editor in self._paperReviewManagersList) or \
                         (editor in self._reviewersList) or \
-                        (editor in self._refereesList) or \
-                        (editor in self._abstractManagerList) or \
-                        (editor in self._abstractReviewersList)):
+                        (editor in self._refereesList)):
                     self.clearUserCompetences(editor)
                     del(self._userCompetences[editor])
             self._editorsList.remove(editor)
@@ -727,9 +704,7 @@ class ConferenceReview(Persistent):
             if self._userCompetences.has_key(reviewer):
                 if not ((reviewer in self._editorsList) or \
                         (reviewer in self._paperReviewManagersList) or \
-                        (reviewer in self._refereesList) or \
-                        (reviewer in self._abstractManagerList) or \
-                        (reviewer in self._abstractReviewersList)):
+                        (reviewer in self._refereesList)):
                     self.clearUserCompetences(reviewer)
                     del(self._userCompetences[reviewer])
             self._reviewersList.remove(reviewer)
@@ -813,9 +788,7 @@ class ConferenceReview(Persistent):
             if self._userCompetences.has_key(paperReviewManager):
                 if not ((paperReviewManager in self._editorsList) or \
                         (paperReviewManager in self._reviewersList) or \
-                        (paperReviewManager in self._refereesList) or \
-                        (paperReviewManager in self._abstractManagerList) or \
-                        (paperReviewManager in self._abstractReviewersList)):
+                        (paperReviewManager in self._refereesList)):
                     self.clearUserCompetences(paperReviewManager)
                     del(self._userCompetences[paperReviewManager])
             self._paperReviewManagersList.remove(paperReviewManager)
@@ -837,140 +810,6 @@ class ConferenceReview(Persistent):
         """ Returns the list of paper review managers as a list of users.
         """
         return self._paperReviewManagersList
-
-    #abstract manager methods
-    def addAbstractManager(self, newAbstractManager):
-        """ Adds a new abstract manager to the conference.
-            newAbstractManager has to be an Avatar object.
-            The abstract manager is sent a mail notification.
-        """
-        if newAbstractManager in self.getAbstractManagersList():
-            raise MaKaCError("This abstract manager has already been added to this conference")
-        else:
-            self._abstractManagerList.append(newAbstractManager)
-            newAbstractManager.linkTo(self._conference, "abstractManager")
-            if not self._userCompetences.has_key(newAbstractManager):
-                self._userCompetences[newAbstractManager] = []
-            self.notifyModification()
-            notification = ConferenceReviewingNotification(newAbstractManager, 'Abstract Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newAbstractManager)
-
-    def removeAbstractManager(self, abstractManager):
-        """ Remove a abstract manager from the conference.
-            abstractManager has to be an Avatar object.
-            The abstract manager is sent a mail notification.
-        """
-        if abstractManager in self._abstractManagerList:
-            if self._userCompetences.has_key(abstractManager):
-                if not ((abstractManager in self._editorsList) or \
-                        (abstractManager in self._paperReviewManagersList) or \
-                        (abstractManager in self._refereesList) or \
-                        (abstractManager in self._reviewersList) or \
-                        (abstractManager in self._abstractReviewersList)):
-                    self.clearUserCompetences(abstractManager)
-                    del(self._userCompetences[abstractManager])
-            self._abstractManagerList.remove(abstractManager)
-            abstractManager.unlinkTo(self._conference, "abstractManager")
-            self.notifyModification()
-            notification = ConferenceReviewingRemoveNotification(abstractManager, 'Abstract Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", abstractManager)
-        else:
-            raise MaKaCError("Cannot remove a abstract manager who is not yet abstract manager")
-
-    def isAbstractManager(self, user):
-        """ Returns if a given user is abstract manager of the conference.
-            user has to be an Avatar object.
-        """
-        return user in self._abstractManagerList
-
-    def getAbstractManagersList(self):
-        """ Returns the list of abstract managers as a list of users.
-        """
-        return self._abstractManagerList
-
-    #abstract reviewer methods
-    def addAbstractReviewer(self, newAbstractReviewer):
-        """ Adds a new abstract reviewer to the conference.
-            newAbstractReviewer has to be an Avatar object.
-            The abstract reviewer is sent a mail notification.
-        """
-        if newAbstractReviewer in self.getAbstractReviewersList():
-            raise MaKaCError("This abstract reviewer has already been added to this conference")
-        else:
-            self._abstractReviewersList.append(newAbstractReviewer)
-            newAbstractReviewer.linkTo(self._conference, "abstractReviewer")
-            if not self._userCompetences.has_key(newAbstractReviewer):
-                self._userCompetences[newAbstractReviewer] = []
-            self.notifyModification()
-            notification = ConferenceReviewingNotification(newAbstractReviewer, 'Abstract Reviewer', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newAbstractReviewer)
-
-    def removeAbstractReviewer(self, abstractReviewer):
-        """ Remove a abstract reviewer from the conference.
-            abstractReviwer has to be an Avatar object.
-            The abstract reviewer is sent a mail notification.
-        """
-        if abstractReviewer in self._abstractReviewersList:
-            if self._userCompetences.has_key(abstractReviewer):
-                if not ((abstractReviewer in self._editorsList) or \
-                        (abstractReviewer in self._paperReviewManagersList) or \
-                        (abstractReviewer in self._refereesList) or \
-                        (abstractReviewer in self._reviewersList) or \
-                        (abstractReviewer in self._abstractManagerList)):
-                    self.clearUserCompetences(abstractReviewer)
-                    del(self._userCompetences[abstractReviewer])
-            self._abstractReviewersList.remove(abstractReviewer)
-            abstractReviewer.unlinkTo(self._conference, "abstractReviewer")
-            self.notifyModification()
-            notification = ConferenceReviewingRemoveNotification(abstractReviewer, 'Abstract Reviewer', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", abstractReviewer)
-        else:
-            raise MaKaCError("Cannot remove an abstract reviewer who is not yet abstract reviewer")
-
-    def isAbstractReviewer(self, user):
-        """ Returns if a given user is abstract reviewer of the conference.
-            user has to be an Avatar object.
-        """
-        return user in self._abstractReviewersList
-
-    def getAbstractReviewersList(self):
-        """ Returns the list of abstract reviewers as a list of users.
-        """
-        return self._abstractReviewersList
-
-    def addReviewerAbstract(self, abstractReviewer, abstract):
-        """ Adds the abstract to the list of abstracts for a given abstract reviewer.
-            abstractReviewer has to be an Avatar object.
-        """
-        if self._reviewerAbstract.has_key(abstractReviewer):
-            self._reviewerAbstract[abstractReviewer].append(abstract)
-            self._reviewerAbstract[abstractReviewer].sort(key= lambda c: int(c.getId()))
-        else:
-            self._reviewerAbstract[abstractReviewer] = [abstract]
-        self.notifyModification()
-
-    def removeReviewerAbstract(self, abstractReviewer, abstract):
-        """ Removes the contribution from the list of contributions of this reviewer
-            reviewer has to be an Avatar object.
-        """
-        if self._reviewerAbstract.has_key(abstractReviewer):
-            self._reviewerAbstract[abstractReviewer].remove(abstract)
-        self.notifyModification()
-
-    def isReviewerAbstract(self, abstractReviewer, abstract):
-        """ Returns if a user is reviewer for a given contribution
-            reviewer has to be an Avatar object.
-        """
-        return self._reviewerAbstract.has_key(abstractReviewer) and abstract in self._reviewerAbstract[abstractReviewer]
-
-    def getReviewedAbstracts(self, abstractReviewer):
-        """ Returns the list of abstracts for a given reviewer
-            reviewer has to be an Avatar object.
-        """
-        if self._reviewerAbstract.has_key(abstractReviewer):
-            return self._reviewerAbstract[abstractReviewer]
-        else:
-            return []
 
     # templates methods
     def setTemplate(self, name, description, format, fd, id):
@@ -1036,9 +875,7 @@ class ConferenceReview(Persistent):
                user in self._refereesList or \
                user in self._editorsList or \
                user in self._reviewersList or \
-               user in self._reviewersList or \
-               user in self._abstractManagerList or \
-               user in self._abstractReviewersList
+               user in self._reviewersList
 
     def setUserCompetences(self, user, competences):
         """ Sets a list of competences (a list of strings) to a given user
@@ -1136,10 +973,6 @@ class ConferenceReview(Persistent):
             roles.append('Layout Reviewer')
         if self.isReviewer(user) and (self._choice == 2 or self._choice == 4):
             roles.append('Content Reviewer')
-        if self.isAbstractManager(user):
-            roles.append('Abstracts Manager')
-        if self.isAbstractReviewer(user):
-            roles.append('Abstract Reviewer')
         return roles
 
     def notifyModification(self):
@@ -1237,3 +1070,209 @@ class ConferenceReviewingRemoveNotification(GenericNotification):
         Thank you for using our system.
         """ % ( role, conference.getTitle(), str(conference.getId())
         ))
+
+
+class ConferenceAbstractReview(Persistent):
+    """
+    This class manages the parameters of the abstract reviewing.
+    """
+    reviewingQuestionsAnswers = ["Strongly Disagree", "Disagree", "Weakly Disagree", "Borderline", "Weakly Agree", "Agree", "Strongly Agree"]
+    reviewingQuestionsLabels = ["-3", "", "", "0", "", "", "+3"]
+    initialSelectedAnswer = 3
+
+    def __init__( self, conference):
+        """ Constructor.
+            conference must be a Conference object (not an id).
+        """
+
+        self._conference = conference
+
+        #lists of users with reviewing roles
+        self._abstractManagerList = []
+        self._abstractReviewersList = []
+
+        self._reviewerAbstract = {} #key: user, value: list of abstracts where user is abstract reviewer
+
+        #default dates
+        self._defaultAbstractReviewerDueDate = None
+
+        self._reviewingQuestions = [] #list of content reviewing and final judgement questions
+
+    def getConference(self):
+        """ Returns the parent conference of the ConferencePaperReview object
+        """
+        return self._conference
+
+    def setDefaultAbstractReviewerDueDate(self, date):
+        self._defaultAbstractReviewerDueDate = date
+
+    def getDefaultAbstractReviewerDueDate(self):
+        if not hasattr(self, '_defaultAbstractReviewerDueDate'):
+            self._defaultAbstractReviewerDueDate = None
+        return self._defaultAbstractReviewerDueDate
+
+    def getAdjustedDefaultAbstractReviewerDueDate(self):
+        if self.getDefaultAbstractReviewerDueDate() is None:
+            return None
+        else:
+            return getAdjustedDate(self._defaultAbstractReviewerDueDate, self.getConference())
+
+    # content reviewing and final judgement questions methods
+    def addReviewingQuestion(self, reviewingQuestion):
+        """ Adds this question at the end of the list of questions
+        """
+        self._reviewingQuestions.append(reviewingQuestion)
+        self.notifyModification()
+
+    def getReviewingQuestions(self):
+        """ Returns the list of questions
+        """
+        return self._reviewingQuestions
+
+    def setReviewingQuestions(self, questions):
+        """ Set the whole list of questions
+        """
+        self._reviewingQuestions = questions
+
+    def removeReviewingQuestion(self, reviewingQuestion):
+        """ Removes a question from the list
+        """
+        if reviewingQuestion in self._reviewingQuestions:
+            self._reviewingQuestions.remove(reviewingQuestion)
+            self.notifyModification()
+        else:
+            raise MaKaCError("Cannot remove a question which doesn't exist")
+
+    #abstract manager methods
+    def addAbstractManager(self, newAbstractManager):
+        """ Adds a new abstract manager to the conference.
+            newAbstractManager has to be an Avatar object.
+            The abstract manager is sent a mail notification.
+        """
+        if newAbstractManager in self.getAbstractManagersList():
+            raise MaKaCError("This abstract manager has already been added to this conference")
+        else:
+            self._abstractManagerList.append(newAbstractManager)
+            newAbstractManager.linkTo(self._conference, "abstractManager")
+            if not self._userCompetences.has_key(newAbstractManager):
+                self._userCompetences[newAbstractManager] = []
+            self.notifyModification()
+            notification = ConferenceReviewingNotification(newAbstractManager, 'Abstract Manager', self._conference)
+            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newAbstractManager)
+
+    def removeAbstractManager(self, abstractManager):
+        """ Remove a abstract manager from the conference.
+            abstractManager has to be an Avatar object.
+            The abstract manager is sent a mail notification.
+        """
+        if abstractManager in self._abstractManagerList:
+            if self._userCompetences.has_key(abstractManager):
+                if not ((abstractManager in self._editorsList) or \
+                        (abstractManager in self._paperReviewManagersList) or \
+                        (abstractManager in self._refereesList) or \
+                        (abstractManager in self._reviewersList) or \
+                        (abstractManager in self._abstractReviewersList)):
+                    self.clearUserCompetences(abstractManager)
+                    del(self._userCompetences[abstractManager])
+            self._abstractManagerList.remove(abstractManager)
+            abstractManager.unlinkTo(self._conference, "abstractManager")
+            self.notifyModification()
+            notification = ConferenceReviewingRemoveNotification(abstractManager, 'Abstract Manager', self._conference)
+            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", abstractManager)
+        else:
+            raise MaKaCError("Cannot remove a abstract manager who is not yet abstract manager")
+
+    def isAbstractManager(self, user):
+        """ Returns if a given user is abstract manager of the conference.
+            user has to be an Avatar object.
+        """
+        return user in self._abstractManagerList
+
+    def getAbstractManagersList(self):
+        """ Returns the list of abstract managers as a list of users.
+        """
+        return self._abstractManagerList
+
+    def isAbstractReviewer(self, user):
+        """ Returns if a given user is abstract reviewer of the conference.
+            user has to be an Avatar object.
+        """
+        return user in self._abstractReviewersList
+
+    def getAbstractReviewersList(self):
+        """ Returns the list of abstract reviewers as a list of users.
+        """
+        return self._abstractReviewersList
+
+    def addReviewerAbstract(self, abstractReviewer, abstract):
+        """ Adds the abstract to the list of abstracts for a given abstract reviewer.
+            abstractReviewer has to be an Avatar object.
+        """
+        if self._reviewerAbstract.has_key(abstractReviewer):
+            self._reviewerAbstract[abstractReviewer].append(abstract)
+            self._reviewerAbstract[abstractReviewer].sort(key= lambda c: int(c.getId()))
+        else:
+            self._reviewerAbstract[abstractReviewer] = [abstract]
+        self.notifyModification()
+
+    def removeReviewerAbstract(self, abstractReviewer, abstract):
+        """ Removes the contribution from the list of contributions of this reviewer
+            reviewer has to be an Avatar object.
+        """
+        if self._reviewerAbstract.has_key(abstractReviewer):
+            self._reviewerAbstract[abstractReviewer].remove(abstract)
+        self.notifyModification()
+
+    def isReviewerAbstract(self, abstractReviewer, abstract):
+        """ Returns if a user is reviewer for a given contribution
+            reviewer has to be an Avatar object.
+        """
+        return self._reviewerAbstract.has_key(abstractReviewer) and abstract in self._reviewerAbstract[abstractReviewer]
+
+    def getReviewedAbstracts(self, abstractReviewer):
+        """ Returns the list of abstracts for a given reviewer
+            reviewer has to be an Avatar object.
+        """
+        if self._reviewerAbstract.has_key(abstractReviewer):
+            return self._reviewerAbstract[abstractReviewer]
+        else:
+            return []
+
+    #competences methods
+    def isInReviewingTeam(self, user):
+        return user in self._abstractManagerList or \
+               user in self._abstractReviewersList
+
+
+    def getUserReviewingRoles(self, user):
+        """ Returns the list of roles (PRM, referee, editor, reviewer) that a given user has
+            in this conference, as a list of strings.
+        """
+        roles=[]
+        if self.isAbstractManager(user):
+            roles.append('Abstracts Manager')
+        if self.isAbstractReviewer(user):
+            roles.append('Abstract Reviewer')
+        return roles
+
+    def notifyModification(self):
+        """ Notifies the DB that a list or dictionary attribute of this object has changed
+        """
+        self._p_changed = 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

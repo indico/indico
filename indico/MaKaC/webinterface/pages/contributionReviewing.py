@@ -63,20 +63,20 @@ class WContributionReviewing(wcomponents.WTemplated):
     def getVars( self):
         vars = wcomponents.WTemplated.getVars( self )
 
-        conferenceChoice = self._conf.getConfReview().getChoice()
-        conferenceChoiceStr = self._conf.getConfReview().getReviewingMode()
+        conferenceChoice = self._conf.getConfPaperReview().getChoice()
+        conferenceChoiceStr = self._conf.getConfPaperReview().getReviewingMode()
         reviewManager = self.__target.getReviewManager()
-        canAssignReferee = self._conf.getConfReview().isPaperReviewManager(self._aw.getUser()) or self._conf.canModify(self._aw)
+        canAssignReferee = self._conf.getConfPaperReview().isPaperReviewManager(self._aw.getUser()) or self._conf.canModify(self._aw)
 
         vars["Conference"] = self._conf
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["Contribution"] = self.__target
         vars["ConferenceChoice"] = conferenceChoice
         vars["ConferenceChoiceStr"] = conferenceChoiceStr
         vars["ContributionReviewManager"] = reviewManager
         vars["CanAssignReferee"] = canAssignReferee
         vars["CanAssignEditorOrReviewers"] = reviewManager.isReferee(self._aw.getUser()) or canAssignReferee
-        vars["AvailableReviewers"] =  [r for r in  self._conf.getConference().getConfReview().getReviewersList() \
+        vars["AvailableReviewers"] =  [r for r in  self._conf.getConference().getConfPaperReview().getReviewersList() \
                                        if r not in reviewManager.getReviewersList()]
         vars["CanEditDueDates"] = canAssignReferee
         vars["IsReferee"] = self.__target.getReviewManager().isReferee(self._rh._getUser())
@@ -137,11 +137,11 @@ class WContributionReviewingJudgements(wcomponents.WTemplated):
     def getVars( self):
         vars = wcomponents.WTemplated.getVars( self )
 
-        conferenceChoice = self._conf.getConfReview().getChoice()
-        conferenceChoiceStr = self._conf.getConfReview().getReviewingMode()
+        conferenceChoice = self._conf.getConfPaperReview().getChoice()
+        conferenceChoiceStr = self._conf.getConfPaperReview().getReviewingMode()
         reviewManager = self.__target.getReviewManager()
         vars["Conference"] = self._conf
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["Contribution"] = self.__target
         vars["ConferenceChoice"] = conferenceChoice
         vars["ConferenceChoiceStr"] = conferenceChoiceStr
@@ -178,8 +178,8 @@ class WJudgeEditing(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["Contribution"] = self._contrib
-        vars["ConfReview"] = self._contrib.getConference().getConfReview()
-        vars["ConferenceChoice"] = self._contrib.getConference().getConfReview().getChoice()
+        vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
+        vars["ConferenceChoice"] = self._contrib.getConference().getConfPaperReview().getChoice()
         vars["Editing"] = self._contrib.getReviewManager().getLastReview().getEditorJudgement()
         vars["Review"] = self._contrib.getReviewManager().getLastReview()
 
@@ -215,8 +215,8 @@ class WGiveAdvice(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["Contribution"] = self._contrib
-        vars["ConfReview"] = self._contrib.getConference().getConfReview()
-        vars["ConferenceChoice"] = self._contrib.getConference().getConfReview().getChoice()
+        vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
+        vars["ConferenceChoice"] = self._contrib.getConference().getConfPaperReview().getChoice()
         vars["Advice"] = self._contrib.getReviewManager().getLastReview().getAdviceFrom(self.__reviewer)
         vars["Review"] = self._contrib.getReviewManager().getLastReview()
 
@@ -237,7 +237,7 @@ class WContributionReviewingDisplay(wcomponents.WTemplated):
         vars["Editing"] = self._contribution.getReviewManager().getLastReview().getEditorJudgement()
         vars["AdviceList"] = self._contribution.getReviewManager().getLastReview().getSubmittedReviewerJudgement()
         vars["Review"] = self._contribution.getReviewManager().getLastReview()
-        vars["ConferenceChoice"] = self._contribution.getConference().getConfReview().getChoice()
+        vars["ConferenceChoice"] = self._contribution.getConference().getConfPaperReview().getChoice()
         return vars
 
 class WPContributionReviewingHistory(WPContributionModifBase):
@@ -263,7 +263,7 @@ class WContributionReviewingHistory(wcomponents.WTemplated):
     def getVars( self):
         vars = wcomponents.WTemplated.getVars( self )
 
-        vars["ConferenceChoice"] = self._conf.getConfReview().getChoice()
+        vars["ConferenceChoice"] = self._conf.getConfPaperReview().getChoice()
         vars["Versioning"] = self._contribution.getReviewManager().getSortedVerioning()
 
         return vars

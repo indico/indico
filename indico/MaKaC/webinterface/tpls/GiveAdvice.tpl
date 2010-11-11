@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferenceReview %>
+<% from MaKaC.reviewing import ConferencePaperReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 <% if not Review.isAuthorSubmitted(): %>
@@ -81,7 +81,6 @@ var showWidgets = function(firstLoad) {
             {conference: '<%= Contribution.getConference().getId() %>',
              contribution: '<%= Contribution.getId() %>',
              current: 'reviewerJudgement'},initialValue).draw());
-
 
 
     <% if len (ConfReview.getReviewingQuestions()) == 0 : %>

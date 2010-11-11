@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferenceReview %>
+<% from MaKaC.reviewing import ConferencePaperReview %>
             <table cellspacing="0" cellpadding="2" width="100%%" >
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
@@ -26,7 +26,7 @@
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                         <% for q,a in Editing.getAnswers(): %>
-                            <%= q %> : <%= ConferenceReview.reviewingQuestionsAnswers[int(a)] %>
+                            <%= q %> : <%= ConferencePaperReview.reviewingQuestionsAnswers[int(a)] %>
                             <br/>
                         <% end %>
                     </td>

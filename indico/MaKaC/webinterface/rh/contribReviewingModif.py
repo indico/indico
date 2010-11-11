@@ -162,7 +162,7 @@ class RHAssignEditing(RHAssignEditorOrReviewerBase):
             raise FormValuesError("No editor selected")
 
     def _process( self ):
-        choice = self._target.getConference().getConfReview().getChoice()
+        choice = self._target.getConference().getConfPaperReview().getChoice()
         if choice == 3 or choice == 4:
             ph = user.PrincipalHolder()
             self._target.getReviewManager().setEditor(ph.getById(self._editor))
@@ -207,7 +207,7 @@ class RHAssignReviewing(RHAssignEditorOrReviewerBase):
             raise FormValuesError("No reviewer selected")
 
     def _process( self ):
-        choice = self._target.getConference().getConfReview().getChoice()
+        choice = self._target.getConference().getConfPaperReview().getChoice()
         if choice == 2 or choice == 4:
             ph = user.PrincipalHolder()
             self._target.getReviewManager().addReviewer( ph.getById(self._reviewer))
@@ -296,7 +296,7 @@ class RHEditorBase(RHContribModifBase):
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
-           not self._target.getConference().getConfReview().getChoice() == 3:
+           not self._target.getConference().getConfPaperReview().getChoice() == 3:
             raise MaKaCError("The final judgement has been submitted")
 
 class RHContributionEditingJudgement(RHEditorBase):
@@ -315,7 +315,7 @@ class RHJudgeEditing(RHEditorBase):
         if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
             raise MaKaCError("You must wait until the author has submitted the materials")
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
-            not self._target.getConference().getConfReview().getChoice() == 3:
+            not self._target.getConference().getConfPaperReview().getChoice() == 3:
             raise MaKaCError("This contribution has already been judged by the referee.")
         self._editingJudgement = params.get("editingJudgement")
         self._comments = params.get("comments")
@@ -335,7 +335,7 @@ class RHJudgeEditing(RHEditorBase):
             lastReview.getEditorJudgement().setComments(self._comments)
             lastReview.getEditorJudgement().sendNotificationEmail()
 
-            if self._target.getParent().getConfReview().getChoice() == 3:
+            if self._target.getParent().getConfPaperReview().getChoice() == 3:
                 self._target.getReviewManager().getLastReview().setFinalJudgement(self._editingJudgement)
 
             if self._editingJudgement == "Accept" or self._editingJudgement == "Reject":
@@ -425,7 +425,7 @@ class RHRemoveSubmittedMarkForReviewing(RHReviewingAuthorBase):
     def _checkParams(self, params):
         RHContributionMaterialSubmissionRightsBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or \
-        (self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted() and self._target.getConference().getConfReview().getChoice() == 3):
+        (self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted() and self._target.getConference().getConfPaperReview().getChoice() == 3):
             raise MaKaCError("This contribution has already been judged. You cannot un-submit the materials")
 
     def _process (self):

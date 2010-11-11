@@ -1,4 +1,6 @@
-<% from MaKaC.reviewing import ConferenceReview %>
+<% declareTemplate(newTemplateStyle=True) %>
+
+<% from MaKaC.reviewing import ConferencePaperReview %>
 <% from MaKaC.reviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
@@ -22,7 +24,7 @@
             <span class="titleCellFormat"><%= _("Type of reviewing:")%></span>
         </td>
         <td nowrap style="vertical-align:top; padding-top: 5px;">
-            <span id="inPlaceEditReviewingMode" style="display:inline"><%= ConferenceReview.reviewingModes[choice] %></span>
+            <span id="inPlaceEditReviewingMode" style="display:inline"><%= ConferencePaperReview.reviewingModes[choice] %></span>
         </td>
     </tr>
 </table>
@@ -36,9 +38,9 @@
     <tr>
         <td class="groupTitle">
             <%= _("Step 2: Set up the options for ")%><span id="title">
-            <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[2]: %><%= _("content reviewing team")%><% end %>
-            <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[3]: %><%= _("layout reviewing team")%><% end %>
-            <%if ConferenceReview.reviewingModes[choice]==ConferenceReview.reviewingModes[4]: %><%= _("content and layout reviewing team")%><% end %>
+            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[2]: %><%= _("content reviewing team")%><% end %>
+            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[3]: %><%= _("layout reviewing team")%><% end %>
+            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[4]: %><%= _("content and layout reviewing team")%><% end %>
             </span>
         </td>
     </tr>
@@ -682,9 +684,10 @@ var observer = function(value) {
 new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
                     'reviewing.conference.changeReviewingMode',
                     {conference: '<%= ConfReview.getConference().getId() %>'},
-                    <%= ConferenceReview.reviewingModes[1:] %>,
+                    <%= ConferencePaperReview.reviewingModes[1:] %>,
                     "<%= ConfReview.getReviewingMode() %>",
                     observer);
+
 
 var showReviewingStates = function() {
     new IndicoUI.Widgets.Generic.keywordField(

@@ -62,8 +62,8 @@ class RHConfModifModifyUserCompetences( RHConfModifReviewingPRMAMBase ):
             return p.display()
         else:
             if self._add:
-                self._conf.getConfReview().addUserCompetences(self._user, self._competences)
+                self._conf.getConfPaperReview().addUserCompetences(self._user, self._competences)
             if self._remove:
-                self._conf.getConfReview().removeUserCompetences(self._user, self._competences)
+                self._conf.getConfPaperReview().removeUserCompetences(self._user, self._competences)
             self._redirect(urlHandlers.UHConfModifUserCompetences.getURL(self._conf))
         

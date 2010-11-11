@@ -289,7 +289,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         vars["modifIcon"] = self._getModifIconHTML()
         vars["Contribution"] = self._contrib
         import contributionReviewing
-        vars["ConfReview"] = self._contrib.getConference().getConfReview()
+        vars["ConfReview"] = self._contrib.getConference().getConfPaperReview()
         vars["reviewingStuffDisplay"]= contributionReviewing.WContributionReviewingDisplay(self._contrib).getHTML({"ShowReviewingTeam" : False})
         vars["reviewingHistoryStuffDisplay"]= contributionReviewing.WContributionReviewingHistory(self._contrib).getHTML({"ShowReviewingTeam" : False})
         if self._contrib.getSession():
@@ -385,9 +385,9 @@ class WPContributionModifBase( WPConferenceModifBase  ):
                 urlHandlers.UHContribModifTools.getURL( self._target ) )
 
         hasReviewingEnabled = self._contrib.getConference().hasEnabledSection('paperReviewing')
-        confReviewChoice = self._contrib.getConference().getConfReview().getChoice()
+        paperReviewChoice = self._contrib.getConference().getConfPaperReview().getChoice()
 
-        if hasReviewingEnabled and confReviewChoice != 1:
+        if hasReviewingEnabled and paperReviewChoice != 1:
 
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
@@ -404,22 +404,22 @@ class WPContributionModifBase( WPConferenceModifBase  ):
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
                 self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
                 urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-                if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (confReviewChoice == 3 or confReviewChoice == 1):
+                if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (paperReviewChoice == 3 or paperReviewChoice == 1):
                     self._subTabJudgements = self._subtabReviewing.newSubTab( "final", _("Final Judgement"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
                 else:
                     self._subTabJudgements = self._subtabReviewing.newSubTab( "Judgements", _("Judgements"), \
                     urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
 
-            if (confReviewChoice == 3 or confReviewChoice == 4) and \
+            if (paperReviewChoice == 3 or paperReviewChoice == 4) and \
                 self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
-                (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or confReviewChoice == 3) and \
+                (not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or paperReviewChoice == 3) and \
                 self._contrib.getReviewManager().getLastReview().isAuthorSubmitted():
 
                 self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Judge Layout", \
                 urlHandlers.UHContributionEditingJudgement.getURL(self._target) )
 
-            if (confReviewChoice == 2 or confReviewChoice == 4) and \
+            if (paperReviewChoice == 2 or paperReviewChoice == 4) and \
                 self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
                 not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
 

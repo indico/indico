@@ -46,13 +46,13 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
         self._isAM = RCAbstractManager.hasRights(rh)
         self._canModify = self._conf.canModify(rh.getAW())
 
-        self._showListContribToJudge = self._conf.getConfReview().isReferee(rh._getUser())
+        self._showListContribToJudge = self._conf.getConfPaperReview().isReferee(rh._getUser())
 
-        self._showListContribToJudgeAsReviewer = self._conf.getConfReview().isReviewer(rh._getUser())
+        self._showListContribToJudgeAsReviewer = self._conf.getConfPaperReview().isReviewer(rh._getUser())
 
-        self._showListContribToJudgeAsEditor = self._conf.getConfReview().isEditor(rh._getUser())
+        self._showListContribToJudgeAsEditor = self._conf.getConfPaperReview().isEditor(rh._getUser())
 
-        self._showAssignContributions = self._canModify or self._isPRM or self._conf.getConfReview().isReferee(rh._getUser())
+        self._showAssignContributions = self._canModify or self._isPRM or self._conf.getConfPaperReview().isReferee(rh._getUser())
 
 
 
@@ -101,13 +101,13 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
             self._tabAssignContributions = self._subtabPaperReviewing.newSubTab( "assignContributions", "Assign Contributions",\
                     urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
 
-        if self._showListContribToJudge and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
+        if self._showListContribToJudge and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
             self._tabListContribToJudge = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Referee",\
                     urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) )
-        if self._showListContribToJudgeAsReviewer and (self._conf.getConfReview().getChoice()==2 or self._conf.getConfReview().getChoice()==4):
+        if self._showListContribToJudgeAsReviewer and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
             self._tabListContribToJudgeAsReviewer = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Content Reviewer",\
                     urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
-        if self._showListContribToJudgeAsEditor and (self._conf.getConfReview().getChoice()==3 or self._conf.getConfReview().getChoice()==4):
+        if self._showListContribToJudgeAsEditor and (self._conf.getConfPaperReview().getChoice()==3 or self._conf.getConfPaperReview().getChoice()==4):
             self._tabListContribToJudgeAsEditor = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Layout Reviewer",\
                     urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) )
 
@@ -162,9 +162,9 @@ class WConfModifReviewingPaperSetup(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["states"] = self._conf.getConferenceReview().getStates()
-        vars["reviewingQuestions"] = self._conf.getConferenceReview().getReviewingQuestions()
-        vars["criteria"] = self._conf.getConferenceReview().getLayoutCriteria()
+        vars["states"] = self._conf.getConfPaperReview().getStates()
+        vars["reviewingQuestions"] = self._conf.getConfPaperReview().getReviewingQuestions()
+        vars["criteria"] = self._conf.getConfPaperReview().getLayoutCriteria()
         return vars
 
     def getHTML(self, params):
@@ -202,14 +202,14 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         #choose type of reviewing
-        vars["ConfReview"] = self.__target.getConfReview()
-        vars["choice"] = self.__target.getConfReview().getChoice()
+        vars["ConfReview"] = self.__target.getConfPaperReview()
+        vars["choice"] = self.__target.getConfPaperReview().getChoice()
         vars["CanDelete"] = True
 
         #add new states
         stateAdd = []
         ht = []
-        if self.__target.getConfReview().getChoice() == 2 or self.__target.getConfReview().getChoice() == 4 :
+        if self.__target.getConfPaperReview().getChoice() == 2 or self.__target.getConfPaperReview().getChoice() == 4 :
             stateAdd.append("""
         <td>
             Name of the new status <INPUT type=textarea name="state">
@@ -221,10 +221,10 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
 
 
             """displays states with checkboxes to select those to remove"""
-            if len(self.__target.getConfReview().getStates()) == 0:
+            if len(self.__target.getConfPaperReview().getStates()) == 0:
                 ht = "No personal states defined"
             else:
-                for s in self.__target.getConfReview().getStates():
+                for s in self.__target.getConfPaperReview().getStates():
                     ht.append("""
                     <tr>
                         <td style="border-bottom: 1px solid #5294CC;">
@@ -243,7 +243,7 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
         #add questions
         questionAdd = []
         qs = []
-        if self.__target.getConfReview().getChoice() == 2 or self.__target.getConfReview().getChoice() == 4:
+        if self.__target.getConfPaperReview().getChoice() == 2 or self.__target.getConfPaperReview().getChoice() == 4:
             questionAdd.append("""<td>New question <INPUT type=text size="70" name="question">
             </td>
             <td>
@@ -251,10 +251,10 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
             </td>""")
 
             """displays questions with checkboxes to select those to remove"""
-            if len(self.__target.getConfReview().getReviewingQuestions()) == 0:
+            if len(self.__target.getConfPaperReview().getReviewingQuestions()) == 0:
                 qs = "No question defined"
             else:
-                for i in self.__target.getConfReview().getReviewingQuestions():
+                for i in self.__target.getConfPaperReview().getReviewingQuestions():
                     qs.append("""
                     <tr>
                         <td style="border-bottom: 1px solid #5294CC;">
@@ -273,7 +273,7 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
         criteriaAdd=[]
         cs = []
 
-        if self.__target.getConfReview().getChoice() == 3 or self.__target.getConfReview().getChoice() == 4:
+        if self.__target.getConfPaperReview().getChoice() == 3 or self.__target.getConfPaperReview().getChoice() == 4:
             criteriaAdd.append("""<td>New criteria <INPUT type=textarea name="criteria">
         </td>
         <td>
@@ -283,10 +283,10 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
 
 
             """displays criteria with checkboxes to select those to remove"""
-            if len(self.__target.getConfReview().getLayoutCriteria()) == 0:
+            if len(self.__target.getConfPaperReview().getLayoutCriteria()) == 0:
                 cs = "No criteria defined"
             else:
-                for i in self.__target.getConfReview().getLayoutCriteria():
+                for i in self.__target.getConfPaperReview().getLayoutCriteria():
                     cs.append("""
                     <tr>
                         <td style="border-bottom: 1px solid #5294CC;">
@@ -323,7 +323,7 @@ class WContributionReviewingTemplatesList(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
         return vars
 
 #classes for abstract reviewing setup tab
@@ -368,7 +368,8 @@ class WConfModifAbstractReviewingSettings(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
+        #vars["reviewingQuestions"] = self._conf.getConferenceReview().getAbstractReviewingQuestions()
         return vars
 
 #classes for control tab
@@ -962,7 +963,7 @@ class WConfModifReviewingControl(wcomponents.WTemplated):
         rc=""
         rcPRM=""
 
-        if self._conf.getConfReview().getChoice() != 1 and self._conf.getConfReview().getChoice() == 0:
+        if self._conf.getConfPaperReview().getChoice() != 1 and self._conf.getConfPaperReview().getChoice() == 0:
             return """<table align="center"><tr><td>Type of reviewing has not been chosen yet</td></tr></table>"""
         else:
             rcPRM = WConfModificationReviewingFramePRM().getHTML(self._conf, \
@@ -995,7 +996,7 @@ class WConfModificationReviewingFramePRM(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["Conference"] = self.__target.getId()
-        vars["ConfReview"] = self.__target.getConfReview()
+        vars["ConfReview"] = self.__target.getConfPaperReview()
         return vars
 
 
@@ -1018,7 +1019,7 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["Conference"] = self.__target.getId()
-        vars["ConfReview"] = self.__target.getConfReview()
+        vars["ConfReview"] = self.__target.getConfPaperReview()
         return vars
 
 class WConfModifAbstractsReviewingControl(wcomponents.WTemplated):
@@ -1056,10 +1057,10 @@ class WConfModificationAbstractReviewingFrame(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["abstractManagerTable"] = wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getAbstractManagersList(),
+        vars["abstractManagerTable"] = wcomponents.WPrincipalTable().getHTML( self.__target.getConfPaperReview().getAbstractManagersList(),
                                                                               self.__target, vars["addAbstractManagerURL"],
                                                                               vars["removeAbstractManagerURL"], selectable=False)
-        vars["abstractReviewerTable"] = wcomponents.WPrincipalTable().getHTML( self.__target.getConfReview().getAbstractReviewersList(),
+        vars["abstractReviewerTable"] = wcomponents.WPrincipalTable().getHTML( self.__target.getConfPaperReview().getAbstractReviewersList(),
                                                                                self.__target, vars["addAbstractReviewerURL"],
                                                                                vars["removeAbstractReviewerURL"], selectable=False)
         return vars
@@ -1205,7 +1206,7 @@ class WConfListContribToJudge(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["User"] = self._user
 
         return vars
@@ -1240,7 +1241,7 @@ class WConfListContribToJudgeAsReviewer(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["User"] = self._user
 
         return vars
@@ -1275,7 +1276,7 @@ class WConfListContribToJudgeAsEditor(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
         vars["User"] = self._user
 
         return vars
@@ -1312,8 +1313,8 @@ class WConfReviewingAssignContributions(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["Conference"] = self._conf
-        vars["ConfReview"] = self._conf.getConfReview()
-        vars["IsOnlyReferee"] = self._conf.getConfReview().isReferee(self._aw.getUser()) and not self._conf.canModify(self._aw) and not self._conf.getConfReview().isPaperReviewManager(self._aw.getUser())
+        vars["ConfReview"] = self._conf.getConfPaperReview()
+        vars["IsOnlyReferee"] = self._conf.getConfPaperReview().isReferee(self._aw.getUser()) and not self._conf.canModify(self._aw) and not self._conf.getConfPaperReview().isPaperReviewManager(self._aw.getUser())
 
         return vars
 
@@ -1346,7 +1347,7 @@ class WConfModifUserCompetences(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["Conference"] = self._conf
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
 
         return vars
 
@@ -1379,6 +1380,6 @@ class WConfModifUserCompetencesAbstracts(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["Conference"] = self._conf
-        vars["ConfReview"] = self._conf.getConfReview()
+        vars["ConfReview"] = self._conf.getConfPaperReview()
 
         return vars

@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferenceReview %>
+<% from MaKaC.reviewing import ConferencePaperReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 <% if not Review.isAuthorSubmitted(): %>
@@ -83,7 +83,7 @@ var showWidgets = function(firstLoad) {
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'editorJudgement'
-                        }, <%= ConferenceReview.predefinedStates %>);
+                        }, <%= ConferencePaperReview.predefinedStates %>);
 
     var initialValue = '<%= Editing.getComments() %>';
     if (initialValue == '') {

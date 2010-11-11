@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.reviewing import ConferenceReview
+from MaKaC.reviewing import ConferencePaperReview
 from MaKaC.reviewing import ConferenceReviewingNotification
 from MaKaC.services.implementation.base import ProtectedModificationService,\
     TwoListModificationBase, ParameterManager
@@ -51,7 +51,7 @@ Asynchronous request handlers for conference and contribution reviewing related 
 #####################################
 
 class ConferenceReviewingBase(ConferenceModifBase):
-    """ This base class stores the _confReview attribute
+    """ This base class stores the _confPaperReview attribute
         so that inheriting classes can use it.
     """
     def _checkProtection(self):
@@ -62,7 +62,7 @@ class ConferenceReviewingBase(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-        self._confReview = self._conf.getConfReview()
+        self._confPaperReview = self._conf.getConfPaperReview()
 
 class ConferenceReviewingPRMBase(ConferenceReviewingBase):
     """ This base class verifies that the user is a PRM
@@ -161,46 +161,41 @@ class ConferenceAbstractReviewingDateTimeModificationBase (DateTimeModificationB
 class ConferenceReviewingModeModification(ConferenceReviewingSetupTextModificationBase ):
 
     def _handleSet(self):
-        self._confReview.setReviewingMode( self._value )
+        self._confPaperReview.setReviewingMode( self._value )
 
     def _handleGet(self):
-        return self._confReview.getReviewingMode()
-
+        return self._confPaperReview.getReviewingMode()
 
 class ConferenceReviewingStatesModification(ConferenceReviewingListModificationBase):
 
     def _handleGet(self):
-        return self._confReview.getStates()
+        return self._confPaperReview.getStates()
 
     def _handleSet(self):
-        self._confReview.setStates(self._value)
-
+        self._confPaperReview.setStates(self._value)
 
 class ConferenceReviewingQuestionsModification(ConferenceReviewingListModificationBase):
 
     def _handleGet(self):
-        return self._confReview.getReviewingQuestions()
+        return self._confPaperReview.getReviewingQuestions()
 
     def _handleSet(self):
-        self._confReview.setReviewingQuestions(self._value)
-
+        self._confPaperReview.setReviewingQuestions(self._value)
 
 class ConferenceReviewingCriteriaModification(ConferenceReviewingListModificationBase):
 
     def _handleGet(self):
-        return self._confReview.getLayoutCriteria()
+        return self._confPaperReview.getLayoutCriteria()
 
     def _handleSet(self):
-        self._confReview.setLayoutCriteria(self._value)
-
+        self._confPaperReview.setLayoutCriteria(self._value)
 
 class ConferenceReviewingDeleteTemplate(ConferenceReviewingBase):
 
     def _getAnswer(self):
             templateId = self._params.get("templateId")
-            self._confReview.deleteTemplate(templateId)
+            self._confPaperReview.deleteTemplate(templateId)
             return True
-
 
 class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeModificationBase):
 
@@ -210,35 +205,34 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
 
     def _setParam(self):
         if self._dueDateToChange == "Referee":
-            self._conf.getConfReview().setDefaultRefereeDueDate(self._pTime)
+            self._conf.getConfPaperReview().setDefaultRefereeDueDate(self._pTime)
         elif self._dueDateToChange == "Editor":
-            self._conf.getConfReview().setDefaultEditorDueDate(self._pTime)
+            self._conf.getConfPaperReview().setDefaultEditorDueDate(self._pTime)
         elif self._dueDateToChange == "Reviewer":
-            self._conf.getConfReview().setDefaultReviewerDueDate(self._pTime)
+            self._conf.getConfPaperReview().setDefaultReviewerDueDate(self._pTime)
         else:
             raise ServiceError("ERR-REV3a",_("Kind of deadline to change not set"))
 
     def _handleGet(self):
         if self._dueDateToChange == "Referee":
-            date = self._conf.getConfReview().getAdjustedDefaultRefereeDueDate()
+            date = self._conf.getConfPaperReview().getAdjustedDefaultRefereeDueDate()
         elif self._dueDateToChange == "Editor":
-            date = self._conf.getConfReview().getAdjustedDefaultEditorDueDate()
+            date = self._conf.getConfPaperReview().getAdjustedDefaultEditorDueDate()
         elif self._dueDateToChange == "Reviewer":
-            date = self._conf.getConfReview().getAdjustedDefaultReviewerDueDate()
+            date = self._conf.getConfPaperReview().getAdjustedDefaultReviewerDueDate()
         else:
             raise ServiceError("ERR-REV3b",_("Kind of deadline to change not set"))
 
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
-
 class ConferenceAbstractReviewingDefaultDueDateModification(ConferenceAbstractReviewingDateTimeModificationBase):
 
     def _setParam(self):
-        self._conf.getConfReview().setDefaultAbstractReviewerDueDate(self._pTime)
+        self._conf.getConfPaperReview().setDefaultAbstractReviewerDueDate(self._pTime)
 
     def _handleGet(self):
-        date = self._conf.getConfReview().getAdjustedDefaultAbstractReviewerDueDate()
+        date = self._conf.getConfPaperReview().getAdjustedDefaultAbstractReviewerDueDate()
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
@@ -246,144 +240,144 @@ class ConferenceReviewingAutoEmailsModificationPRM(ConferenceReviewingSetupTextM
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enablePRMEmailNotif()
+            self._confPaperReview.enablePRMEmailNotif()
         else:
-            self._confReview.disablePRMEmailNotif()
+            self._confPaperReview.disablePRMEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnablePRMEmailNotif()
+        return self._confPaperReview.getEnablePRMEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationReferee(ConferenceReviewingSetupTextModificationBase ):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableRefereeEmailNotif()
+            self._confPaperReview.enableRefereeEmailNotif()
         else:
-            self._confReview.disableRefereeEmailNotif()
+            self._confPaperReview.disableRefereeEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableRefereeEmailNotif()
+        return self._confPaperReview.getEnableRefereeEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationEditor(ConferenceReviewingSetupTextModificationBase ):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableEditorEmailNotif()
+            self._confPaperReview.enableEditorEmailNotif()
         else:
-            self._confReview.disableEditorEmailNotif()
+            self._confPaperReview.disableEditorEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableEditorEmailNotif()
+        return self._confPaperReview.getEnableEditorEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationReviewer(ConferenceReviewingSetupTextModificationBase ):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableReviewerEmailNotif()
+            self._confPaperReview.enableReviewerEmailNotif()
         else:
-            self._confReview.disableReviewerEmailNotif()
+            self._confPaperReview.disableReviewerEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableReviewerEmailNotif()
+        return self._confPaperReview.getEnableReviewerEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationRefereeForContribution(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableRefereeEmailNotifForContribution()
+            self._confPaperReview.enableRefereeEmailNotifForContribution()
         else:
-            self._confReview.disableRefereeEmailNotifForContribution()
+            self._confPaperReview.disableRefereeEmailNotifForContribution()
 
     def _handleGet(self):
-        return self._confReview.getEnableRefereeEmailNotifForContribution()
+        return self._confPaperReview.getEnableRefereeEmailNotifForContribution()
 
 class ConferenceReviewingAutoEmailsModificationEditorForContribution(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableEditorEmailNotifForContribution()
+            self._confPaperReview.enableEditorEmailNotifForContribution()
         else:
-            self._confReview.disableEditorEmailNotifForContribution()
+            self._confPaperReview.disableEditorEmailNotifForContribution()
 
     def _handleGet(self):
-        return self._confReview.getEnableEditorEmailNotifForContribution()
+        return self._confPaperReview.getEnableEditorEmailNotifForContribution()
 
 class ConferenceReviewingAutoEmailsModificationReviewerForContribution(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableReviewerEmailNotifForContribution()
+            self._confPaperReview.enableReviewerEmailNotifForContribution()
         else:
-            self._confReview.disableReviewerEmailNotifForContribution()
+            self._confPaperReview.disableReviewerEmailNotifForContribution()
 
     def _handleGet(self):
-        return self._confReview.getEnableReviewerEmailNotifForContribution()
+        return self._confPaperReview.getEnableReviewerEmailNotifForContribution()
 
 class ConferenceReviewingAutoEmailsModificationRefereeJudgement(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableRefereeJudgementEmailNotif()
+            self._confPaperReview.enableRefereeJudgementEmailNotif()
         else:
-            self._confReview.disableRefereeJudgementEmailNotif()
+            self._confPaperReview.disableRefereeJudgementEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableRefereeJudgementEmailNotif()
+        return self._confPaperReview.getEnableRefereeJudgementEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationEditorJudgement(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableEditorJudgementEmailNotif()
+            self._confPaperReview.enableEditorJudgementEmailNotif()
         else:
-            self._confReview.disableEditorJudgementEmailNotif()
+            self._confPaperReview.disableEditorJudgementEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableEditorJudgementEmailNotif()
+        return self._confPaperReview.getEnableEditorJudgementEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationReviewerJudgement(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableReviewerJudgementEmailNotif()
+            self._confPaperReview.enableReviewerJudgementEmailNotif()
         else:
-            self._confReview.disableReviewerJudgementEmailNotif()
+            self._confPaperReview.disableReviewerJudgementEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableReviewerJudgementEmailNotif()
+        return self._confPaperReview.getEnableReviewerJudgementEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReferee(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableAuthorSubmittedMatRefereeEmailNotif()
+            self._confPaperReview.enableAuthorSubmittedMatRefereeEmailNotif()
         else:
-            self._confReview.disableAuthorSubmittedMatRefereeEmailNotif()
+            self._confPaperReview.disableAuthorSubmittedMatRefereeEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableAuthorSubmittedMatRefereeEmailNotif()
+        return self._confPaperReview.getEnableAuthorSubmittedMatRefereeEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatEditor(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableAuthorSubmittedMatEditorEmailNotif()
+            self._confPaperReview.enableAuthorSubmittedMatEditorEmailNotif()
         else:
-            self._confReview.disableAuthorSubmittedMatEditorEmailNotif()
+            self._confPaperReview.disableAuthorSubmittedMatEditorEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableAuthorSubmittedMatEditorEmailNotif()
+        return self._confPaperReview.getEnableAuthorSubmittedMatEditorEmailNotif()
 
 class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer(ConferenceReviewingSetupTextModificationBase):
 
     def _handleSet(self):
         if self._value:
-            self._confReview.enableAuthorSubmittedMatReviewerEmailNotif()
+            self._confPaperReview.enableAuthorSubmittedMatReviewerEmailNotif()
         else:
-            self._confReview.disableAuthorSubmittedMatReviewerEmailNotif()
+            self._confPaperReview.disableAuthorSubmittedMatReviewerEmailNotif()
 
     def _handleGet(self):
-        return self._confReview.getEnableAuthorSubmittedMatReviewerEmailNotif()
+        return self._confPaperReview.getEnableAuthorSubmittedMatReviewerEmailNotif()
 
 
 class ConferenceReviewingCompetenceModification(ListModificationBase, ConferenceReviewingPRMAMBase):
@@ -403,10 +397,10 @@ class ConferenceReviewingCompetenceModification(ListModificationBase, Conference
             raise ServiceError("ERR-REV4",_("No user id specified"))
 
     def _handleGet(self):
-        return self._confReview.getCompetencesByUser(self._user)
+        return self._confPaperReview.getCompetencesByUser(self._user)
 
     def _handleSet(self):
-        self._confReview.setUserCompetences(self._user, self._value)
+        self._confPaperReview.setUserCompetences(self._user, self._value)
 
 class ConferenceReviewingContributionsAttributeList(ListModificationBase, ConferenceReviewingPRMRefereeBase):
     #Note: don't change the order of the inheritance here!
@@ -489,15 +483,13 @@ class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceRevi
 
     def _handleGet(self):
         return [{"id": user.getId(), "name": user.getStraightFullName(), "competences": c}
-                for user, c in self._confReview.getAllUserCompetences(True, self._role)]
-
-
+                for user, c in self._confPaperReview.getAllUserCompetences(True, self._role)]
 
 class ConferenceReviewingAssignReferee(ConferenceReviewingAssignStaffBasePRM):
     """ Assigns a referee to a list of contributions
     """
     def _getAnswer(self):
-        if self._confReview.getChoice() == 1 or self._confReview.getChoice() == 3:
+        if self._confPaperReview.getChoice() == 1 or self._confPaperReview.getChoice() == 3:
             raise ServiceError("ERR-REV6aa",_("can't assign referee"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6a",_("user id not set"))
@@ -525,14 +517,14 @@ class ConferenceReviewingAssignEditor(ConferenceReviewingAssignStaffBasePRMRefer
     """ Assigns an editor to a list of contributions
     """
     def _getAnswer(self):
-        if self._confReview.getChoice() == 1 or self._confReview.getChoice() == 2:
+        if self._confPaperReview.getChoice() == 1 or self._confPaperReview.getChoice() == 2:
             raise ServiceError("ERR-REV6bb",_("can't assign layout reviewer"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6b",_("user id not set"))
 
         for contribution in self._contributions:
             rm = contribution.getReviewManager()
-            if rm.hasReferee() or self._confReview.getChoice() == 3:
+            if rm.hasReferee() or self._confPaperReview.getChoice() == 3:
                 if not rm.isEditor(self._targetUser):
                     if rm.hasEditor():
                         rm.removeEditor()
@@ -556,7 +548,7 @@ class ConferenceReviewingAddReviewer(ConferenceReviewingAssignStaffBasePRMRefere
     """ Adds a reviewer to a list of contributions
     """
     def _getAnswer(self):
-        if self._confReview.getChoice() == 1 or self._confReview.getChoice() == 3:
+        if self._confPaperReview.getChoice() == 1 or self._confPaperReview.getChoice() == 3:
             raise ServiceError("ERR-REV6cc",_("can't assign content reviewer"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6c",_("user id not set"))
@@ -608,8 +600,8 @@ class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceRevie
 
     def _getAnswer(self):
         for user in self._avatars:
-            if not user in self._confReview._paperReviewManagersList:
-                self._confReview.addPaperReviewManager(user)
+            if not user in self._confPaperReview._paperReviewManagersList:
+                self._confPaperReview.addPaperReviewManager(user)
 
         return True
 
@@ -624,7 +616,7 @@ class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewing
         ConferenceReviewingPRMAMBase._checkProtection(self)
 
     def _getAnswer(self):
-        self._confReview.removePaperReviewManager(self._targetUser)
+        self._confPaperReview.removePaperReviewManager(self._targetUser)
 
         return True
 
@@ -640,8 +632,8 @@ class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceR
 
     def _getAnswer(self):
         for user in self._avatars:
-            if not user in self._confReview._refereesList:
-                self._confReview.addReferee(user)
+            if not user in self._confPaperReview._refereesList:
+                self._confPaperReview.addReferee(user)
 
         return True
 
@@ -656,12 +648,12 @@ class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceRevie
         ConferenceReviewingPRMAMBase._checkProtection(self)
 
     def _getAnswer(self):
-        judgedContribs = self._confReview.getJudgedContributions(self._targetUser)[:]
+        judgedContribs = self._confPaperReview.getJudgedContributions(self._targetUser)[:]
         for contribution in judgedContribs:
             rm = contribution.getReviewManager()
             if rm.hasReferee():
                 rm.removeReferee()
-        self._confReview.removeReferee(self._targetUser)
+        self._confPaperReview.removeReferee(self._targetUser)
 
         return True
 
@@ -678,8 +670,8 @@ class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceRe
 
     def _getAnswer(self):
         for user in self._avatars:
-            if not user in self._confReview._editorsList:
-                self._confReview.addEditor(user)
+            if not user in self._confPaperReview._editorsList:
+                self._confPaperReview.addEditor(user)
 
         return True
 
@@ -694,12 +686,12 @@ class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReview
         ConferenceReviewingPRMAMBase._checkProtection(self)
 
     def _getAnswer(self):
-        editedContribs = self._confReview.getEditedContributions(self._targetUser)[:]
+        editedContribs = self._confPaperReview.getEditedContributions(self._targetUser)[:]
         for contribution in editedContribs:
             rm = contribution.getReviewManager()
             if rm.hasEditor():
                 rm.removeEditor()
-        self._confReview.removeEditor(self._targetUser)
+        self._confPaperReview.removeEditor(self._targetUser)
 
         return True
 
@@ -716,8 +708,8 @@ class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, Conference
 
     def _getAnswer(self):
         for user in self._avatars:
-            if not user in self._confReview._reviewersList:
-                self._confReview.addReviewer(user)
+            if not user in self._confPaperReview._reviewersList:
+                self._confPaperReview.addReviewer(user)
 
         return True
 
@@ -735,13 +727,14 @@ class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceRevi
         if not self._targetUser:
             raise ServiceError("ERR-REV6d",_("user id not set"))
 
-        reviewedContribs = self._confReview.getReviewedContributions(self._targetUser)[:]
+        reviewedContribs = self._confPaperReview.getReviewedContributions(self._targetUser)[:]
         for contribution in reviewedContribs:
             rm = contribution.getReviewManager()
             rm.removeReviewer(self._targetUser)
-        self._confReview.removeReviewer(self._targetUser)
+        self._confPaperReview.removeReviewer(self._targetUser)
 
         return True
+
 #####################################
 ###  Contribution reviewing classes
 #####################################
@@ -880,7 +873,7 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
 class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
 
     def _getAnswer( self ):
-        return [str(q) + " : " + ConferenceReview.reviewingQuestionsAnswers[int(a)]
+        return [str(q) + " : " + ConferencePaperReview.reviewingQuestionsAnswers[int(a)]
                 for q,a in self.getJudgementObject().getAnswers()]
 
 

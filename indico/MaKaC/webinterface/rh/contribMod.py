@@ -73,13 +73,13 @@ class RCContributionPaperReviewingStaff(object):
         """ Returns true if the user is a PRM, or a Referee / Editor / Reviewer of the target contribution
         """
         user = request.getAW().getUser()
-        confReview = request._target.getConference().getConfReview()
-        confReviewChoice = confReview.getChoice()
+        confPaperReview = request._target.getConference().getConfPaperReview()
+        paperReviewChoice = confPaperReview.getChoice()
         reviewManager = request._target.getReviewManager()
-        return (confReview.isPaperReviewManager(user) or \
+        return (confPaperReview.isPaperReviewManager(user) or \
                (reviewManager.hasReferee() and reviewManager.isReferee(user)) or \
-               ((confReviewChoice == 3 or confReviewChoice == 4) and reviewManager.hasEditor() and reviewManager.isEditor(user)) or \
-               ((confReviewChoice == 2 or confReviewChoice == 4) and request._target.getReviewManager().isReviewer(user)))
+               ((paperReviewChoice == 3 or paperReviewChoice == 4) and reviewManager.hasEditor() and reviewManager.isEditor(user)) or \
+               ((paperReviewChoice == 2 or paperReviewChoice == 4) and request._target.getReviewManager().isReviewer(user)))
 
 class RCContributionReferee(object):
     @staticmethod

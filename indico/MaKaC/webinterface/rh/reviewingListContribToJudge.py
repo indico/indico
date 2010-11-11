@@ -10,9 +10,9 @@ class RHContribListToJudge(RHConferenceModifBase):
 
     def _checkProtection(self):
         if self._target.hasEnabledSection("paperReviewing"):
-            confReview = self._conf.getConfReview()
+            confPaperReview = self._conf.getConfPaperReview()
             user = self.getAW().getUser()
-            if not (confReview.isReferee(user)):
+            if not (confPaperReview.isReferee(user)):
                 raise MaKaCError(_("Only the referees can access this page"))
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
@@ -30,9 +30,9 @@ class RHContribListToJudgeAsReviewer(RHContribListToJudge):
 
     def _checkProtection(self):
         if self._target.hasEnabledSection("paperReviewing"):
-            confReview = self._conf.getConfReview()
+            confPaperReview = self._conf.getConfPaperReview()
             user = self.getAW().getUser()
-            if not (confReview.isReviewer(user)):
+            if not (confPaperReview.isReviewer(user)):
                 raise MaKaCError(_("Only the content reviewers can access this page"))
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
@@ -46,9 +46,9 @@ class RHContribListToJudgeAsEditor(RHContribListToJudge):
 
     def _checkProtection(self):
         if self._target.hasEnabledSection("paperReviewing"):
-            confReview = self._conf.getConfReview()
+            confPaperReview = self._conf.getConfPaperReview()
             user = self.getAW().getUser()
-            if not (confReview.isEditor(user)):
+            if not (confPaperReview.isEditor(user)):
                 raise MaKaCError(_("Only the layout reviewers can access this page"))
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
