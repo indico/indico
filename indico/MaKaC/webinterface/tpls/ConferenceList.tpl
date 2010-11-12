@@ -1,10 +1,3 @@
-<%!
-def sortAndReturn(list):
-	list.sort()
-	list.reverse()
-	return list
-%>
-
 <% from MaKaC.conference import Conference %>
 <div class="eventList">
 
@@ -97,7 +90,7 @@ def sortAndReturn(list):
         indicoRequest('category.getPastEventsList',
                 {
                     categId: '<%= categ.getId() %>',
-                    fromDate: '<%= oldestMonthDate.strftime("%Y/%m/%m %H:%M") %>'
+                    lastIdx: '<%= numOfEventsInThePast %>'
                 },
                 function(result, error){
                     if (!error) {

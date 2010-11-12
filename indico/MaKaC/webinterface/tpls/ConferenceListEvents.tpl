@@ -1,28 +1,21 @@
-<%! 
-from datetime import datetime
-
-def sortAndReturn(list):
-	list.sort()
-	list.reverse()
-	return list
-
+<%!
+from datetime import  timedelta, datetime
 from MaKaC.common.timezoneUtils import nowutc
 todayDate = nowutc()
 %>
-
-<% for year in sortAndReturn(items.keys()): %>
-	<% for month in sortAndReturn(items[year].keys()): %>
-        <% happeningNowClass = "" %>
-        <% if todayDate.year  == year and todayDate.month  == month: %>
-            <% happeningNowClass = "class='currentMonth'" %>
+<% currentMonth = -1 %>
+<% for item in reversed(items): %>
+        <% itemStartDate = item.getStartDate() %>
+        <% if currentMonth != itemStartDate.month: %>
+            <% currentMonth = itemStartDate.month %>
+    		<h4
+                <% if todayDate.year  == itemStartDate.year and todayDate.month  == itemStartDate.month: %>
+                    <%= "class='currentMonth'" %>
+                <% end %>
+            >
+            <span><%= datetime(itemStartDate.year, itemStartDate.month, 1).strftime("%B %Y") %></span></h4>
         <% end %>
-		<h4 <%=happeningNowClass%>><span><%= datetime(year, month, 1).strftime("%B %Y") %></span></h4>
 		<ul>
-		<% for day in sortAndReturn(items[year][month].keys()): %>			
-			<% for item in sortAndReturn(items[year][month][day].keys()): %>
-				<% includeTpl('ConferenceListItem', aw=aw, lItem=items[year][month][day][item], conferenceDisplayURLGen=conferenceDisplayURLGen) %>
-			<% end %>
-		<% end %>
+            <% includeTpl('ConferenceListItem', aw=aw, lItem=item, conferenceDisplayURLGen=conferenceDisplayURLGen) %>
 		</ul>
-	<% end %>
 <% end %>

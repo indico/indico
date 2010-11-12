@@ -3244,137 +3244,107 @@ class WConferenceList(WTemplated):
         self._aw = aw
         return WTemplated.getHTML( self, params )
 
-    @staticmethod
-    def sortEvents(list):
+    def _findFirstEventFromCurrentMonth(self):
+        currentDate = nowutc()
+        return self._findEventIdx(datetime(currentDate.year, currentDate.month, 1, tzinfo=timezone('utc')))
 
-        # populate a year -> month -> day -> event (4 level) tree in O(N) time
-        # each node is a dictionary, so that O(1) is reached for lookup of leaves
+    def _findPresentEvent(self):
+        currentDate = nowutc()
+        return self._findEventIdx(datetime(currentDate.year, currentDate.month, currentDate.day, tzinfo=timezone('utc')))
 
-        def __addLeaf(map, path, leaf):
+    def _findEventIdx(self, day):
+        st = 0
+        end = len(self._list) - 1
 
-            # stop condition
-            if path == []:
-                map[leaf.getId()] = leaf
-                return;
-
-            if not map.has_key(path[0]):
-                map[path[0]] = {} # virgin node
-
-            # this reminds me of Prolog... beautiful...
-            __addLeaf(map[path[0]], path[1:], leaf)
-
-        fList = {}
-        listByMonth = {}
-        for conf in list:
-            startDate = conf.getStartDate()
-            path = [startDate.year, startDate.month, startDate.day]
-            __addLeaf(fList, path, conf)
-            listByMonth.setdefault(startDate.year,{}).setdefault(startDate.month,[]).append(conf)
-        return fList, listByMonth
-
-    def getPresentPastFutureEvents(self, allEvents, eventsByMonth, numEvents):
-        """
-        @param allEvents: is a dictionary with the format expected by the template ConferenceListItem
-        @param eventsByMonth: is a dictionary with all the events by year and month. E.g. eventsByMonth[2009][1] == [conf1, conf2,...]
-        @return:
-            - a dictionary with the same format as allEvents but just with the events to display
-            - a dictionary with the same format as allEvents but just with the future events
-            - a counter with the number of future events
-            - a counter with the number of past events
-            - the oldest date of the events that are shown by default
-        """
-
-        def getPrevMonth(d):
-            year = d.year
-            prevMonth = (d.month - 1)%12
-            if prevMonth == 0:
-                prevMonth = 12
-                year -= 1
-            return date(year, prevMonth, 1)
-
-
-        def getNextMonth(d):
-            year = d.year
-            nextMonth = (d.month + 1)%12
-            if d.month + 1 == 12:
-                nextMonth = 12
-            elif d.month + 1 > 12:
-                year += 1
-            return date(year, nextMonth, 1)
-
-        MAX_NUMBER_OF_EVENTS_SHOWN = 10
-        if numEvents < MAX_NUMBER_OF_EVENTS_SHOWN:
-            MAX_NUMBER_OF_EVENTS_SHOWN = numEvents
-
-        todayDate = nowutc().date()
-        previousMonthDate, nextMonthDate, newerDateUsed, olderDateUsed = todayDate, todayDate, todayDate, todayDate
-        ## CREATE Present Events dict
-        presentEvents = {}
-        presentCounter = 0
-        futureEventsToBeDisplayedCounter = 0
-        if allEvents.has_key(todayDate.year) and allEvents[todayDate.year].has_key(todayDate.month):
-            presentEvents.setdefault(todayDate.year,{}).setdefault(todayDate.month, allEvents[todayDate.year][todayDate.month])
-            del allEvents[todayDate.year][todayDate.month]
-            presentCounter = len(eventsByMonth[todayDate.year][todayDate.month])
-            futureEventsToBeDisplayedCounter = len([event for event in eventsByMonth[todayDate.year][todayDate.month] if event.startDate.day > todayDate.day])
-
-        while presentCounter < MAX_NUMBER_OF_EVENTS_SHOWN:
-            previousMonthDate = getPrevMonth(previousMonthDate)
-            nextMonthDate = getNextMonth(nextMonthDate)
-            # add nextMonth
-            if allEvents.has_key(nextMonthDate.year) and allEvents[nextMonthDate.year].has_key(nextMonthDate.month):
-                presentEvents.setdefault(nextMonthDate.year,{}).setdefault(nextMonthDate.month, allEvents[nextMonthDate.year][nextMonthDate.month])
-                del allEvents[nextMonthDate.year][nextMonthDate.month] # the events are removed for the later gathering of future events
-                presentCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
-                futureEventsToBeDisplayedCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
-                newerDateUsed = nextMonthDate
-            # add prevMonth
-            if allEvents.has_key(previousMonthDate.year) and allEvents[previousMonthDate.year].has_key(previousMonthDate.month):
-                presentEvents.setdefault(previousMonthDate.year,{}).setdefault(previousMonthDate.month, allEvents[previousMonthDate.year][previousMonthDate.month])
-                del allEvents[previousMonthDate.year][previousMonthDate.month]
-                presentCounter += len(eventsByMonth[previousMonthDate.year][previousMonthDate.month])
-                olderDateUsed = previousMonthDate
-
-        ## CREATE future events dict and future/past counter
-        futureEvents = {}
-        futureCounter = 0
-        pastCounter = 0
-        for year in allEvents.keys():
-            if year > newerDateUsed.year:
-                futureEvents[year] = allEvents[year]
-                for m in eventsByMonth[year].keys():
-                    futureCounter += len(eventsByMonth[year][m])
-            elif year < olderDateUsed.year:
-                for m in eventsByMonth[year].keys():
-                    pastCounter += len(eventsByMonth[year][m])
+        def find(st, end):
+            current = int((st + end) / 2)
+            if end - st > 1:
+                if self._list[current].getStartDate() > day:
+                    return find(st, current)
+                elif self._list[current].getStartDate() < day:
+                    return find(current, end)
+                else:
+                    return current
             else:
-                for month in allEvents[year].keys():
-                    if newerDateUsed.year == year and month > newerDateUsed.month:
-                        futureEvents.setdefault(year,{})[month] = allEvents[year][month]
-                        futureCounter += len(eventsByMonth[year][month])
-                    elif olderDateUsed.year == year and month < olderDateUsed.month:
-                        pastCounter += len(eventsByMonth[year][month])
+                if self._list[current].getStartDate() > day:
+                    if current > 0:
+                        return current - 1
+                    else:
+                        return 0
+                elif self._list[current].getStartDate() < day:
+                    if current + 1< len(self._list):
+                        return current + 1
+                    else:
+                        return current
+                else:
+                    return current
 
-        MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN = 5
-        if futureCounter + futureEventsToBeDisplayedCounter < MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN:
-            MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN = futureCounter + futureEventsToBeDisplayedCounter
+        return find(st, end)
 
-        while futureEventsToBeDisplayedCounter < MIN_NUMBER_OF_FUTURE_EVENTS_SHOWN:
-            nextMonthDate = getNextMonth(nextMonthDate)
-            # add nextMonth
-            if allEvents.has_key(nextMonthDate.year) and allEvents[nextMonthDate.year].has_key(nextMonthDate.month):
-                presentEvents.setdefault(nextMonthDate.year,{}).setdefault(nextMonthDate.month, allEvents[nextMonthDate.year][nextMonthDate.month])
-                del futureEvents[nextMonthDate.year][nextMonthDate.month]
-                futureEventsToBeDisplayedCounter += len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
-                futureCounter -= len(eventsByMonth[nextMonthDate.year][nextMonthDate.month])
+    def getPrevMonth(self,d):
+        year = d.year
+        prevMonth = (d.month - 1)%12
+        if prevMonth == 0:
+            prevMonth = 12
+            year -= 1
+        return datetime(year, prevMonth, 1, tzinfo = timezone('utc'))
 
-        return presentEvents, futureEvents, futureCounter, pastCounter, olderDateUsed
+    def getNextMonth(self,d):
+        year = d.year
+        nextMonth = (d.month + 1)%12
+        if d.month + 1 == 12:
+            nextMonth = 12
+        elif d.month + 1 > 12:
+            year += 1
+        return datetime(year, nextMonth, 1, tzinfo = timezone('utc'))
+
+    def _getEventsFromPreviousMonth(self, stIndex, previousMonthStart):
+        newIndex = stIndex
+        while newIndex >= 0 and self._list[newIndex].getStartDate() >= previousMonthStart:
+            newIndex -= 1
+        return newIndex if newIndex + 1 == len(self._list) else newIndex + 1
+
+    def _getEventsFromCurrentMonth(self, stIndex, currentMonthStart):
+        nextMonthStart = self.getNextMonth(currentMonthStart)
+        newIndex = stIndex
+        while newIndex < len(self._list) and self._list[newIndex].getStartDate() < nextMonthStart:
+            newIndex += 1
+        return newIndex
+
+    def _getFutureEvents(self, stIndex):
+        nextMonthStart = self.getNextMonth(self._list[stIndex + 1].getStartDate())
+        newIndex = stIndex
+        while newIndex < len(self._list) and self._list[newIndex].getStartDate() < nextMonthStart:
+            newIndex += 1
+        return newIndex
+
+    def getPresentPastFutureEvents(self):
+        currentMonth = nowutc()
+        previousMonth = currentMonth
+
+        firstEventIdx = self._findFirstEventFromCurrentMonth()
+        presentEventIdx = self._findPresentEvent()
+        lastEventIdx = firstEventIdx
+
+        maxEventsShown = min([10, len(self._list)])
+        minFutureEventsShown = min([5, len(self._list) - presentEventIdx])
+
+        lastEventIdx = self._getEventsFromCurrentMonth(lastEventIdx,currentMonth)
+
+        while lastEventIdx - firstEventIdx < maxEventsShown:
+            currentMonth = self.getNextMonth(currentMonth)
+            lastEventIdx = self._getEventsFromCurrentMonth(lastEventIdx,currentMonth)
+            previousMonth = self.getPrevMonth(previousMonth)
+            firstEventIdx = self._getEventsFromPreviousMonth(firstEventIdx,previousMonth)
+
+        while len(self._list) > lastEventIdx + 1 and lastEventIdx - presentEventIdx < minFutureEventsShown:
+            lastEventIdx = self._getFutureEvents(lastEventIdx)
+
+        return list(self._list[firstEventIdx:lastEventIdx]), list(self._list[lastEventIdx:]),len(self._list) - lastEventIdx, firstEventIdx
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        allEvents, eventsByMonth = WConferenceList.sortEvents(self._list)
-        #vars["items"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] = allEvents, allEvents, 0, 0
-        vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"], vars["oldestMonthDate"] =  self.getPresentPastFutureEvents(allEvents, eventsByMonth, len(self._list))
+        vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"] =  self.getPresentPastFutureEvents()
         vars["categ"] = self._categ
         vars["ActiveTimezone"] = DisplayTZ(self._aw,self._categ,useServerTZ=1).getDisplayTZ()
         vars["showPastEvents"] = self._showPastEvents

@@ -134,7 +134,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
         vars["img"] = self._target.getIconURL()
         vars["categ"] = self._target;
         subcats = self._target.getSubCategoryList()
-        confs = self._target.getConferenceList(True)
+        confs = self._target.getConferenceList()
         if len(subcats) > 0:
             cl=wcomponents.WCategoryList( self._target )
             params = {"categoryDisplayURLGen": vars["categDisplayURLGen"], "material": self._getMaterialHTML()}
@@ -1494,7 +1494,7 @@ class WCategModifMain(wcomponents.WTemplated):
         vars["removeItemsURL"] = vars["actionSubCategsURL"]
         if not self._categ.getSubCategoryList():
              vars["removeItemsURL"] = vars["actionConferencesURL"]
-             vars["items"] = self.__getConferenceItems( self._categ.getConferenceList(True,3), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
+             vars["items"] = self.__getConferenceItems( reversed(self._categ.getConferenceList()), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
         else:
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()

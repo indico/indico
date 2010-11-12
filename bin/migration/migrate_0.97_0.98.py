@@ -16,7 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex
 
 """
 Migration script: v0.97 -> v0.98
@@ -24,13 +23,14 @@ Migration script: v0.97 -> v0.98
 
 import sys
 import traceback
+from BTrees.OOBTree import OOTreeSet
 
+from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex
 from MaKaC.common import DBMgr
 from MaKaC.common.Counter import Counter
-from MaKaC.conference import ConferenceHolder
+from MaKaC.conference import ConferenceHolder, CategoryManager
 from MaKaC.common.timerExec import HelperTaskList
-from MaKaC.plugins.base import PluginType
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.base import PluginType, PluginsHolder
 
 from indico.ext import livesync
 from indico.util import console
@@ -144,10 +144,20 @@ def runCategoryDateIndexMigration(dbi):
 If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
+def runCategoryConfDictToTreeSet(dbi):
+    """
+    Replacing the conference dictionary in the Category objects by a OOTreeSet.
+    """
+    for categ in CategoryManager()._getIdx().values():
+        categ.conferencesBackup = categ.conferences.values()
+        categ.conferences = OOTreeSet(categ.conferences.values())
+        if len(categ.conferences) != len(categ.conferencesBackup):
+            print categ.getId()
 
 def runMigration():
     tasks = [runPluginMigration, runTaskMigration,
-             runConferenceMigration, runCategoryDateIndexMigration]
+             runConferenceMigration, migrateCategoryDateIndex,
+             runCategoryConfDictToTreeSet]
 
     print "\nExecuting migration...\n"
 

@@ -51,7 +51,7 @@ from pytz import timezone
 from pytz import all_timezones
 
 from persistent import Persistent
-from BTrees.OOBTree import OOBTree
+from BTrees.OOBTree import OOBTree, OOTreeSet
 from BTrees.OIBTree import OIBTree,OISet,union
 import MaKaC
 import MaKaC.common.indexes as indexes
@@ -247,7 +247,7 @@ class Category(CommonObjectBase):
         self.description = ""
         self.subcategories = {}
         self.materials = {}
-        self.conferences = {}
+        self.conferences = OOTreeSet()
         self._numConferences = 0
         self.owner = None
         self._defaultStyle = { "simple_event":"","meeting":"" }
@@ -988,7 +988,7 @@ class Category(CommonObjectBase):
             raise MaKaCError( _("Cannot add event: the current category already contains some sub-categories"), _("Category"))
         if newConf.getId() == "":
             raise MaKaCError( _("Cannot add to a category an event which is not registered"), _("Category"))
-        self.conferences[ newConf.getId() ] = newConf
+        self.conferences.add(newConf)
         newConf.addOwner(self)
         self._incNumConfs(1)
         self.indexConf(newConf)
@@ -1032,7 +1032,7 @@ class Category(CommonObjectBase):
 
         self.unindexConf( conf )
 
-        del self.conferences[ conf.getId() ]
+        self.conferences.remove(conf)
         if delete:
             conf.delete()
         conf.removeOwner( self, notify )
@@ -1051,45 +1051,27 @@ class Category(CommonObjectBase):
             res.append(self.subcategories[id])
         return res
 
-    def getConferenceList( self, dateOrdered = False, sortType=1 ):
+    def getConferenceList( self, sortType=1 ):
         """returns the list of conferences included in the current category.
-            if dateOrdered (bool) is specified and it is True the returned
-            list will be oredered by starting date.
+           Thanks to the used structure the list is sorted by date.
+           We can choose other sorting types:
 
             sortType=1--> By date
             sortType=2--> Alphabetically
+            sortType=3--> Alphabetically - Reversed
         """
-        res = []
-        #ch = ConferenceHolder()
-        #catIdx = indexes.IndexesHolder().getIndex("category")
-        #resid = catIdx.getItems(int(self.getId()))
-        #for id in resid:
-        #    res.append(ch.getById(id))
-        res = self.conferences.values()
-        #TODO: this is not very efficient/elegant. to be improved
-        if dateOrdered:
-            if sortType==1:
-                di = []
-                for conf in res:
-                    di.append("%s%02d%02d-%s"%(conf.getStartDate().year,conf.getStartDate().month,conf.getStartDate().day, conf.getId()))
-                di.sort()
-                res = []
-                for i in di:
-                    id = i.split("-")[1]
-                    res.append( self.conferences[id] )
-            elif sortType==2:
-                res.sort(Conference._cmpTitle)
-            elif sortType==3:
-                di = []
-                for conf in res:
-                    di.append("%s%02d%02d-%s"%(conf.getStartDate().year,conf.getStartDate().month,conf.getStartDate().day, conf.getId()))
-                di.sort()
-                res = []
-                for i in di:
-                    id = i.split("-")[1]
-                    res.append( self.conferences[id] )
-                res.reverse()
+        res = list(self.conferences)
+        if sortType==2:
+            res.sort(Conference._cmpTitle)
+        elif sortType==3:
+            res.sort(Conference._cmpTitle)
+            res = reversed(res)
         return res
+
+    def iterConferences( self):
+        """returns the iterator for conferences.
+        """
+        return self.conferences
 
     def getAllConferenceList(self):
         if self.getConferenceList():
@@ -1111,7 +1093,7 @@ class Category(CommonObjectBase):
         return res
 
     def getPreviousEvent(self, conf):
-        cl=self.getConferenceList(True, 1)
+        cl=self.getConferenceList()
         v=None
         try:
             i=cl.index(conf)
@@ -1122,7 +1104,7 @@ class Category(CommonObjectBase):
         return v
 
     def getNextEvent(self, conf):
-        cl=self.getConferenceList(True, 1)
+        cl=self.getConferenceList()
         v=None
         try:
             i=cl.index(conf)
@@ -1133,28 +1115,16 @@ class Category(CommonObjectBase):
         return v
 
     def getFirstEvent(self, conf=None):
-        cl=self.getConferenceList(True, 1)
+        cl=self.getConferenceList()
         if len(cl)>0 and cl[0]!=conf:
             return cl[0]
         return None
 
     def getLastEvent(self, conf=None):
-        cl=self.getConferenceList(True, 1)
+        cl=self.getConferenceList()
         if len(cl)>0 and cl[-1]!=conf:
             return cl[-1]
         return None
-
-    def getConferenceIdsList( self ):
-        """returns the list of conferences Ids included in the current category.
-        """
-        res = []
-        for conf in self.conferences.values():
-            res.append(conf.getId())
-        return res
-
-    def getConferenceById(self, conferenceId):
-        """ returns tle conference identified with id provided"""
-        return self.conferences.get(conferenceId, None)
 
     def _setNumConferences(self):
         self._numConferences=0
@@ -2187,6 +2157,19 @@ class Conference(CommonObjectBase):
 
     def __str__(self):
         return "<Conference %s@%s>" % (self.getId(), hex(id(self)))
+
+    def __cmp__(self, toCmp):
+        res = cmp(self.getStartDate(), toCmp.getStartDate())
+        if res != 0:
+            return res
+        else:
+            return cmp(self.getId(), toCmp.getId())
+
+    def __eq__(self, toCmp):
+        return self is toCmp
+
+    def __ne__(self, toCmp):
+        return not(self is toCmp)
 
     def setUrlTag(self, tag):
         self._sortUrlTag = tag

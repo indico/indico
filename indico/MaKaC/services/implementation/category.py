@@ -143,22 +143,10 @@ class GetPastEventsList(CategoryDisplayBase):
 
     def _checkParams(self):
         CategoryDisplayBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._fromDate = pm.extract("fromDate", pType=datetime.datetime, allowEmpty=False).date()
+        self._lastIdx = int(self._params.get("lastIdx"))
 
     def _getAnswer( self ):
-
-        allEvents,eventsByMonth = WConferenceList.sortEvents(self._target.getConferenceList())
-
-        ## CREATE future events dict and future/past counter
-        pastEvents = {}
-        for year in allEvents.keys():
-            if year < self._fromDate.year:
-                pastEvents[year] = allEvents[year]
-            elif year == self._fromDate.year:
-                for month in allEvents[year].keys():
-                    if month < self._fromDate.month:
-                        pastEvents.setdefault(year,{})[month] = allEvents[year][month]
+        pastEvents = list(self._target.getConferenceList())[0:self._lastIdx]
         return WConferenceListEvents(pastEvents, self._aw).getHTML()
 
 class SetShowPastEventsForCateg(CategoryDisplayBase):
