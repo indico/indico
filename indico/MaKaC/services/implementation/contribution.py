@@ -48,7 +48,11 @@ class ContributionDisplayBase(ProtectedDisplayService, ContributionBase):
         ContributionBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
 
-class ContributionModifBase(ContributionBase, ProtectedModificationService):
+class ContributionModifBase(ProtectedModificationService, ContributionBase):
+
+    def _checkParams(self):
+        ContributionBase._checkParams(self)
+        ProtectedModificationService._checkParams(self)
 
     def _checkProtection(self):
         if self._target.getSession() != None:

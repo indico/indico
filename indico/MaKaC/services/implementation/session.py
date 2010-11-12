@@ -37,7 +37,7 @@ class SessionBase(conferenceServices.ConferenceBase):
         except Exception, e:
             raise ServiceError("ERR-S4", "Invalid session id.")
 
-class SessionModifBase(SessionBase, ProtectedModificationService):
+class SessionModifBase(ProtectedModificationService, SessionBase):
 
     def _checkParams( self ):
         SessionBase._checkParams(self)
