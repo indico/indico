@@ -23,6 +23,7 @@ import string
 import MaKaC.user as user
 from new import classobj
 from MaKaC.common.utils import utf8rep
+from MaKaC.common.timezoneUtils import nowutc
 
 """
 This file contains classes representing url handlers which are objects which
@@ -2416,6 +2417,27 @@ class UHCategoryOverview( URLHandler ):
         return url
     getURLFromOverview = classmethod( getURLFromOverview )
 
+    @classmethod
+    def getWeekOverviewUrl(cls, categ):
+        url = cls.getURL(categ)
+        p = {"day" : nowutc().day,
+             "month" : nowutc().month,
+             "year" : nowutc().year,
+             "period" : "week",
+             "detail" : "conference"}
+        url.addParams(p)
+        return url
+
+    @classmethod
+    def getMonthOverviewUrl(cls, categ):
+        url = cls.getURL(categ)
+        p = {"day" : nowutc().day,
+             "month" : nowutc().month,
+             "year" : nowutc().year,
+             "period" : "month",
+             "detail" : "conference"}
+        url.addParams(p)
+        return url
 
 class UHTaskList( URLHandler ):
     _relativeURL = "taskList.py"
