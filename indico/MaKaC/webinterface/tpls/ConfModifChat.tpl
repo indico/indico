@@ -50,7 +50,13 @@
 
 /* ------------------------------ GLOBAL VARIABLES ------------------------------- */
 
+<% from MaKaC.plugins.util import PluginFieldsWrapper %>
+
+var showDesktopLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients') )%>;
+var showWebLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient') )%>;
 var chatrooms = $L(<%= jsonEncode(Chatrooms) %>);
+var links = $O(<%= jsonEncode(links) %>);
+
 var defaultHost = <%= jsonEncode(DefaultServer) %>;
 var customHost = "";
 var createButton;

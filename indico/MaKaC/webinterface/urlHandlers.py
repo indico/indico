@@ -1484,6 +1484,9 @@ class UHConfModifCollaboration(OptionallySecureURLHandler):
 class UHConfModifChat(URLHandler):
     _relativeURL = "confModifChat.py"
 
+class UHConfModifChatSeeLogs(URLHandler):
+    _relativeURL = "confModifChat.py/logs"
+
 class UHConfModifCollaborationManagers(URLHandler):
     _relativeURL = "confModifCollaboration.py/managers"
 

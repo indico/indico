@@ -74,7 +74,7 @@ if(joinLink){
             menuItems['Using web client'] = <%=jsonEncode( DesktopLinkGenerator(cr).generate() )%>;
         }
         if (showWebLink){
-            menuItems['Using your desktop client'] = <%=jsonEncode( WebLinkGenerator(cr).generate() )%>;
+            menuItems['Using your desktop client'] = <%=jsonEncode( WebLinkGenerator(cr).generate(True) )%>;
         }
         joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList');
         var pos = joinLink.getAbsolutePosition();

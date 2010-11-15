@@ -26,7 +26,7 @@ from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
 from MaKaC.plugins import PluginsHolder
-from MaKaC.plugins.helpers import DBHelpers
+from MaKaC.plugins.helpers import DBHelpers, DesktopLinkGenerator, WebLinkGenerator
 from MaKaC.plugins.util import PluginFieldsWrapper
 
 
@@ -102,11 +102,25 @@ class WConfModifChat(wcomponents.WTemplated):
         vars = WTemplated.getVars( self )
         vars["Conference"] = self._conf
         try:
-            vars["Chatrooms"] = fossilize( list(DBHelpers.getChatroomList(self._conf)) )
+            chatrooms = list(DBHelpers.getChatroomList(self._conf))
+            vars["Chatrooms"] = fossilize(chatrooms)
             if len(vars['Chatrooms']) is 0:
                 vars['Chatrooms'] = None
         except Exception, e:
             vars["Chatrooms"] = None
+            chatrooms = {}
+        vars['links'] = {}
+        for cr in chatrooms:
+            vars['links'][cr.getId() ] = {}
+            if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients'):
+                vars['links'][cr.getId()]['web'] = DesktopLinkGenerator(cr).generate()
+            if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'):
+                vars['links'][cr.getId()]['desktop'] = WebLinkGenerator(cr).generate(True)
+
+            vars['links'][cr.getId()]['logs'] = urlHandlers.UHConfModifChatSeeLogs.getURL(self._conf)
+            vars['links'][cr.getId()]['logs'].addParam('chatroom', cr.getId())
+            vars['links'][cr.getId()]['logs'] = vars['links'][cr.getId()]['logs'].__str__()
+
         vars['DefaultServer'] = PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost')
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
         vars["User"] = self._user

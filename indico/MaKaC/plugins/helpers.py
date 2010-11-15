@@ -126,8 +126,11 @@ class WebLinkGenerator(LinkGenerator):
     def __init__(self, chatroom):
         LinkGenerator.__init__(self, chatroom)
 
-    def generate(self):
-        return 'http://'+ self._chatroom.getHost()+ '/?r=' +self._chatroom.getTitle()+'@conference.'+self._chatroom.getHost()+'?join'
+    def generate(self, anonymous = False):
+        if anonymous:
+            return 'https://'+ self._chatroom.getHost()+ '/?r=' +self._chatroom.getTitle()+'@conference.'+self._chatroom.getHost()+'?join'
+        else:
+            return 'https://'+ self._chatroom.getHost()+ '/?x=' +self._chatroom.getTitle()+'@conference.'+self._chatroom.getHost()+'?join'
 
 class DesktopLinkGenerator(LinkGenerator):
 
@@ -136,3 +139,36 @@ class DesktopLinkGenerator(LinkGenerator):
 
     def generate(self):
         return 'xmpp:'+ self._chatroom.getTitle()+'@'+self._chatroom.getHost()+'?join'
+
+class LogLinkGenerator(LinkGenerator):
+
+    def __init__(self, chatroom):
+        LinkGenerator.__init__(self, chatroom)
+
+    def generate(self, sDate = None, eDate = None):
+        dates = ''
+        if sDate != None:
+            dates = '&sdate='+sDate
+        elif eDate != None:
+            dates = '&edate='+eDate
+        if eDate != None and sDate != None:
+            dates += '&edate='+eDate
+        return 'https://'+ \
+                PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost') + \
+                '/code.py/?cr=' + \
+                self._chatroom.getTitle() + \
+                '@conference.' + \
+                self._chatroom.getHost() + \
+                dates
+
+class DeleteLogLinkGenerator(LinkGenerator):
+    def __init__(self, chatroom):
+        LinkGenerator.__init__(self, chatroom)
+
+    def generate(self):
+        return 'https://'+ \
+                PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost') + \
+                '/code.py/delete?cr=' + \
+                self._chatroom.getTitle() + \
+                '@conference.' + \
+                self._chatroom.getHost()

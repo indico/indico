@@ -20,10 +20,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins import PluginsHolder
+from MaKaC.conference import ConferenceHolder
+from MaKaC.plugins.helpers import DBHelpers, LogLinkGenerator
 from MaKaC.plugins.InstantMessaging.pages import WPConfModifChat, WPConferenceInstantMessaging
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+import urllib2
 
 
 class RHChatModifBase(RHConferenceModifBase):
@@ -58,6 +61,32 @@ class RHChatFormModif(RHChatModifBase):
         return p.display()
 
 
+class RHChatSeeLogs(RHChatModifBase):
+    """ For the conference modification"""
+    _uh = urlHandlers.UHConfModifChatSeeLogs
+
+    def _checkParams(self, params):
+        RHChatModifBase._checkParams(self, params)
+        self._conf = ConferenceHolder().getById(params['confId'])
+        self._chatroom = DBHelpers.getChatroom(params['chatroom'])
+        self._sdate = params['sdate'] if params.has_key('sdate') else None
+        self._edate = params['edate'] if params.has_key('edate') else None
+        self._forEvent = bool(params['forEvent']) if params.has_key('forEvent') else None
+        self._getAll = not self._sdate and not self._edate and not self._forEvent
+
+    def _process( self ):
+        if self._getAll:
+            url = LogLinkGenerator(self._chatroom).generate()
+        elif self._forEvent:
+            url = LogLinkGenerator(self._chatroom).generate(str(self._conf.getStartDate().date()), str(self._conf.getEndDate().date()))
+        else:
+            url = LogLinkGenerator(self._chatroom).generate(self._sdate, self._edate)
+
+        req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
+        document = urllib2.urlopen(req).read()
+        return document
+
+
 class RHInstantMessagingDisplay(RHConferenceBaseDisplay):
     """ For the conference display"""
     _uh = urlHandlers.UHConferenceInstantMessaging
@@ -68,3 +97,4 @@ class RHInstantMessagingDisplay(RHConferenceBaseDisplay):
     def _process( self ):
         p = WPConferenceInstantMessaging( self, self._conf )
         return p.display()
+

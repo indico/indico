@@ -23,3 +23,9 @@ import MaKaC.plugins.InstantMessaging.rh as chatFormModif
 
 def index(req, **params):
     return chatFormModif.RHChatFormModif( req ).process( params )
+
+def logs(req, **params):
+    return chatFormModif.RHChatSeeLogs( req ).process( params )
+
+def attachLogs(req, **params):
+    return chatFormModif.RHChatAttachLogs2Material( req ).process( params )

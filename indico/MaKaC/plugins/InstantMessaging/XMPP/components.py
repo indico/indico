@@ -106,7 +106,7 @@ class ChatSMContributor(Component, Observable):
                 else:
                     out.writeTag("desktop", 'false')
                 if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'):
-                    out.writeTag("web", WebLinkGenerator(chatroom).generate())
+                    out.writeTag("web", WebLinkGenerator(chatroom).generate(True))
                 else:
                     out.writeTag("web", 'false')
                 out.closeTag("links")

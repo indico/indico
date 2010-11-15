@@ -19,10 +19,12 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import urllib2, datetime, os, tempfile, stat
 from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
 from MaKaC.plugins.InstantMessaging.handlers import ChatroomBase
 from MaKaC.services.implementation.base import ServiceBase, ParameterManager
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.common.Configuration import Config
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.logger import Logger
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
@@ -30,10 +32,10 @@ from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.plugins import Observable
 from MaKaC.plugins.util import PluginFieldsWrapper
-from MaKaC.plugins.helpers import DBHelpers, MailHelper
+from MaKaC.plugins.helpers import DBHelpers, MailHelper, DeleteLogLinkGenerator, LogLinkGenerator
 
 from MaKaC.plugins.InstantMessaging.XMPP.bot import IndicoXMPPBotRoomExists, IndicoXMPPBotCreateRoom, IndicoXMPPBotEditRoom, IndicoXMPPBotDeleteRoom, IndicoXMPPBotGetPreferences
-from MaKaC.conference import ConferenceHolder
+from MaKaC.conference import ConferenceHolder, LocalFile
 
 
 class XMPPChatroomService( ChatroomBase ):
@@ -309,6 +311,11 @@ class DeleteChatroom( XMPPChatroomService ):
         if self._room.getCreatedInLocalServer() and len(self._room.getConferences()) is 0:
             self.deleteRoomXMPP(self._botJID, self._botPass, self._room, message)
 
+        # make the log folder unaccessible in the future
+        url = DeleteLogLinkGenerator(self._chatroom).generate()
+        req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
+        document = urllib2.urlopen(req)
+
         Logger.get('InstantMessaging (XMPP-Indico server)').info("The room %s has been deleted by the user %s at %s hours" %(self._title, self._user.getName(), nowutc()))
 
         ContextManager.get('mailHelper').sendMails()
@@ -391,11 +398,104 @@ class AddConference2Room( ServiceBase, Observable ):
         return rooms
 
 
+class AddLogs2Material( ServiceBase ):
+
+    def __init__(self, params, remoteHost, session):
+        ServiceBase.__init__(self, params, remoteHost, session)
+
+    def _checkParams(self):
+        self._conf = ConferenceHolder().getById(self._params['confId'])
+        self._chatroom = DBHelpers.getChatroom(self._params['crId'])
+        self._sdate = self._params['sdate'] if self._params.has_key('sdate') else None
+        self._edate = self._params['edate'] if self._params.has_key('edate') else None
+        self._forEvent = bool(self._params['forEvent']) if self._params.has_key('forEvent') else None
+        self._getAll = bool(self._params['getAll']) if self._params.has_key('getAll') else None
+        self._matName = self._params['matName']
+        self._repositoryId = None
+
+    def getNewId(self):
+        # get the list of custom materials
+        matList = self._conf.getMaterialList()
+        maxId = -1
+        for material in matList:
+            if material.getId() > maxId:
+                maxId = material.getId()
+        # we want the next id
+        return maxId+1
+
+    def _getNewTempFile( self ):
+        cfg = Config.getInstance()
+        tempPath = cfg.getUploadedFilesTempDir()
+        tempFileName = tempfile.mkstemp( suffix="Indico.tmp", dir = tempPath )[1]
+        return tempFileName
+
+    #XXX: improve routine to avoid saving in temporary file
+    def _saveFileToTemp( self, doc ):
+        fileName = self._getNewTempFile()
+        f = open( fileName, "wb" )
+        f.write( doc )
+        f.close()
+        return fileName
+
+    def _getAnswer( self ):
+        if self._getAll:
+            url = LogLinkGenerator(self._chatroom).generate()
+        elif self._forEvent:
+            url = LogLinkGenerator(self._chatroom).generate(str(self._conf.getStartDate().date()), str(self._conf.getEndDate().date()))
+        else:
+            url = LogLinkGenerator(self._chatroom).generate(self._sdate, self._edate)
+
+        req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
+        document = urllib2.urlopen(req).read()
+
+        # create the file
+        fDict = {}
+        fDict["filePath"]=self._saveFileToTemp(document)
+
+        self._tempFilesToDelete.append(fDict["filePath"])
+
+        fDict["fileName"]= "Logs.html"
+        fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
+        self._file = fDict
+
+        # create the material
+        registry = self._conf.getMaterialRegistry()
+        self._materialId = str(self.getNewId())
+
+        mf = registry.getById(self._materialId)
+        mat = mf.create(self._conf)
+
+        # create the resource
+        resource = LocalFile()
+        resource.setFileName(self._file["fileName"])
+        resource.setFilePath(self._file["filePath"])
+        resource.setDescription("Chat logs for the chat room %s" %self._chatroom.getTitle())
+        resource.setName(resource.getFileName())
+
+        self._conf.getLogHandler().logAction({"subject":"Added file %s%s" % (self._file["fileName"],'')},"Files",self._aw.getUser())
+
+        status = "OK"
+        info = resource
+
+        # forcedFileId - in case there is a conflict, use the file that is
+        # already stored
+        mat.addResource(resource, forcedFileId=self._repositoryId)
+
+
+        # store the repo id, for files
+        if isinstance(resource, LocalFile):
+            self._repositoryId = resource.getRepositoryId()
+
+        protectedObject = resource
+        protectedObject.setProtection(1)
+
+
 methodMap = {
     "XMPP.createRoom": CreateChatroom,
     "XMPP.editRoom": EditChatroom,
     "XMPP.deleteRoom": DeleteChatroom,
     "XMPP.getRoomPreferences": GetRoomPreferences,
     "XMPP.getRoomsByUser": GetRoomsByUser,
-    "XMPP.addConference2Room": AddConference2Room
+    "XMPP.addConference2Room": AddConference2Room,
+    "XMPP.attachLogs": AddLogs2Material
 }

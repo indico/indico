@@ -495,6 +495,56 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
     }
 );
 
+
+/**
+ * Utility function to display a simple alert popup.
+ * You can think of it as an "confirm" replacement.
+ * It will have a title, a close button, an OK button and a Cancel button.
+ * @param {Html or String} title The title of the error popup.
+ * @param {Element} content Anything you want to put inside.
+ * @param {function} handler A function that will be called with a boolean as argument:
+ *                   true if the user pressers "ok", or false if the user presses "cancel"
+ */
+type("LogPopup", ["ExclusivePopupWithButtons"],
+    {
+         draw: function() {
+             var self = this;
+
+             var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('OK'));
+             okButton.observeClick(function(){
+                 result = self.handler(true);
+                 if (result){
+                     self.close();
+                     window.location = result;
+                 }
+             });
+
+             var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
+             cancelButton.observeClick(function(){
+                 self.handler(false);
+                 self.close();
+             });
+
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                     this.content,
+                     Html.div({}, okButton, cancelButton));
+         }
+    },
+
+    function(title, content, handler) {
+        var self = this;
+
+        this.content = content;
+        this.handler = handler;
+        this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+            self.handler(false);
+            return true;
+        });
+    }
+);
+
+
+
 /**
 * Utility function to "refresh" the display of a chat room and show its updated value if it changed.
 */
@@ -704,8 +754,202 @@ var chatroomTemplate = function(chatroom) {
     cellEditRemove.append(checkStatusButton);
     row.append(cellEditRemove);
 
+    var joinNow = Html.td({id:"joinLink", name:"joinLink", className : "dropDownMenu highlight", style:{fontWeight: "bold", whiteSpace: "nowrap"}}, Html.a({href: "#"}, $T("Join now!")) );
+    row.append(joinNow);
+    showLinkMenu(joinNow, chatroom);
+
+    if(chatroom.createdInLocalServer && links.get(chatroom.id)){
+        var logs = Html.td({id:"logsLink", name:"logsLink", className : "dropDownMenu highlight", style:{fontWeight: "bold", whiteSpace: "nowrap"}}, " | ", Html.a({href: "#"}, $T("Logs")) );
+        row.append(logs);
+        showLogOptions(logs, chatroom);
+    }
+
     return row;
 };
+
+var showLinkMenu = function(element, chatroom){
+    var joinLink = $E('joinLink');
+    var joinMenu = null;
+    if(element){
+        element.observeClick(function(e) {
+            // Close the menu if clicking the link when menu is open
+            if (joinMenu != null && joinMenu.isOpen()) {
+                joinMenu.close();
+                joinMenu = null;
+                return;
+            }
+            var menuItems = {};
+            if (showDesktopLink){
+                menuItems['Using web client'] = links.get(chatroom.id).desktop;
+            }
+            if (showWebLink){
+                menuItems['Using your desktop client'] = links.get(chatroom.id).web;
+            }
+            joinMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList');
+            var pos = element.getAbsolutePosition();
+            joinMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);
+            return false;
+        });
+    }
+}
+
+var createBaseForm = function(){
+    var startDate = new DateTimeSelector();
+    var endDate = new DateTimeSelector();
+
+    var getAll = Html.radio({id:"getall", name:"rangetype"});
+    getAll.observe(function(value){
+        if (value){
+            startDate.disable();
+            endDate.disable();
+        }
+    });
+    var forEvent = Html.radio({id:"forevent", name:"rangetype"}, true);
+    forEvent.observe(function(value){
+        if (value){
+            startDate.disable();
+            endDate.disable();
+        }
+    });
+    var ownRange = Html.radio({id:"ownrange", name:"rangetype"});
+    ownRange.observe(function(value){
+        if (value){
+            startDate.enable();
+            endDate.enable();
+        }
+    });
+    startDate.disable();
+    endDate.disable();
+
+    var content = Html.div({style: {marginTop:pixels(7), marginBottom:pixels(7)}},
+                        Html.div({style: {marginTop:pixels(5)}}, forEvent, $T('Get logs for this chat room in this event') ),
+                        Html.div({style: {marginTop:pixels(5)}}, getAll, $T('Get the logs for this chat room in this event and the past ones') ),
+                        Html.div({style: {marginTop:pixels(8)}}, ownRange, $T('Create your own range')),
+                        Html.div(   {style: {marginLeft:pixels(10),marginTop:pixels(15), marginBottom:pixels(5)}},
+                                    Html.span({style: {marginRight:pixels(10)}}, $T("from")),
+                                    startDate.draw(),
+                                    Html.span({style: {margin:pixels(10)}}, $T("to")),
+                                    endDate.draw()
+                                 )
+                      );
+    return {'content': content, 'sdate': startDate, 'edate': endDate, 'getall': getAll, 'forevent': forEvent, 'ownrange': ownRange};
+}
+
+var showLogOptions = function(element, chatroom){
+    var logsLink = $E('logsLink');
+    var logsMenu = null;
+    if(element){
+        element.observeClick(function(e) {
+            // Close the menu if clicking the link when menu is open
+            if (logsMenu != null && logsMenu.isOpen()) {
+                logsMenu.close();
+                logsMenu = null;
+                return;
+            }
+            var menuItems = {};
+
+            var form = createBaseForm();
+
+            menuItems['See logs'] = new LogPopup($T('Select the dates to retrieve the logs'),
+                                                 form.content,
+                                                 function(value){
+                                                    if (value){
+                                                        // replace all the / with - to avoid problems in the URL
+                                                        return buildLogURL(chatroom,
+                                                                          form.sdate.get()?form.sdate.get().replace(/\//g,"-"):null,
+                                                                          form.edate.get()?form.edate.get().replace(/\//g,"-"):null,
+                                                                          form.getall.get(),
+                                                                          form.forevent.get(),
+                                                                          form.ownrange.get());
+                                                     }
+                                                 });
+            var parameterManager = new IndicoUtil.parameterManager();
+
+            var form2 = createBaseForm();
+            var materialName = Html.input('text',{style: {marginLeft:pixels(7)}});
+            parameterManager.add(materialName, 'text', false)
+            var materialContent = form2.content
+            materialContent.addContent(Html.div({style: {fontWeight: "bold", maxWidth:pixels(500),marginTop:pixels(25)}},
+                                       $T('Have in mind that due to security policy logs will be private. If you want to change the protection level you will have to do it manually.'))
+                                      );
+            materialContent.addContent(Html.div({style: {float: 'right',marginTop:pixels(10)}},
+                                       $T("Material name"),
+                                       materialName)
+                                      );
+            menuItems['Attach logs to event material'] = new LogPopup($T('Select the name that logs will have in the material section'),
+                                                                      materialContent,
+                                                                      function(value){
+                                                                          if(value){
+                                                                              checkOk = parameterManager.check();
+                                                                              if(checkOk){
+                                                                                  var killProgress = IndicoUI.Dialogs.Util.progress($T("Adding..."));
+                                                                                  // make ajax request
+                                                                                  indicoRequest(
+                                                                                          'XMPP.attachLogs',
+                                                                                          {
+                                                                                              confId: conferenceID,
+                                                                                              crId: chatroom.id,
+                                                                                              sdate: form2.sdate.get()?form.sdate.get().replace(/\//g,"-"):null,
+                                                                                              edate: form2.edate.get()?form.edate.get().replace(/\//g,"-"):null,
+                                                                                              getAll: form2.getall.get(),
+                                                                                              forEvent: form2.forevent.get(),
+                                                                                              matName: materialName.get()
+                                                                                          },
+                                                                                          function(result,error) {
+                                                                                              if (!error) {
+                                                                                                  // If the server found no problems, we remove the chatroom from the watchlist and remove the corresponding iframe.
+                                                                                                  if (result && result.error) {
+                                                                                                      killProgress();
+                                                                                                  } else {
+
+                                                                                                  }
+                                                                                                  killProgress();
+                                                                                              } else {
+                                                                                                  killProgress();
+                                                                                                  IndicoUtil.errorReport(error);
+                                                                                              }
+                                                                                          }
+                                                                                      );
+                                                                               }
+                                                                           }
+                                                                      });
+                //links.get(chatroom.id).web;
+            logsMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList');
+            var pos = element.getAbsolutePosition();
+            logsMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);
+            return false;
+        });
+    }
+}
+
+var buildLogURL = function(chatroom, sdate, edate, selectAll, forEvent, ownRange){
+    /* Builds the url to make the request to web.py and get the logs
+     * sdate and edate: range of dates to get the logs
+     * selectAll: we want to retrieve all the logs for the chat room
+     * forEvent: we want to retrieve the logs for the current event
+     * ownRange: we want to specify the range of dates
+     */
+    url = links.get(chatroom.id).logs;
+    if (selectAll){
+        return url;
+    }
+    else if (forEvent){
+        url += '&forEvent=true';
+        return url;
+    }
+    else if (ownRange){
+        if ( sdate && !edate){
+            url += '&sdate=' + sdate;
+        }
+        else if ( !sdate && edate){
+            url += '&edate=' + edate;
+        }
+        else if (sdate && edate){
+            url += '&sdate=' + sdate + '&edate=' + edate;
+        }
+    }
+    return url;
+}
 
 /**
  * -Function that will be called when the user presses the "Show" button of a chat room.
