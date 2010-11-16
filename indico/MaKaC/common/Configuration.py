@@ -243,7 +243,16 @@ class Config:
                  "heart": "heart.png",
                  "star": "star.png",
                  "starGrey": "starGrey.png",
-                 "calendarWidget": "calendarWidget.png"
+                 "calendarWidget": "calendarWidget.png",
+                 "American Express": "americanExpress.gif",
+                 "Diners Club": "dinersClub.gif",
+                 "JCB": "JCB.gif",
+                 "Maestro": "maestro.gif",
+                 "MasterCard": "masterCard.gif",
+                 "PAYPAL": "PAYPAL.gif",
+                 "PostFinance + card": "postFinanceCard.gif",
+                 "PostFinance e-finance": "postFinanceEFinance.gif",
+                 "VISA": "VISA.gif",
     }
 
 
