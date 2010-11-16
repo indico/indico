@@ -380,8 +380,10 @@ class _TestScheduler(unittest.TestCase):
         self._smodule.destroyDBInstance()
         DBMgr.getInstance().endRequest()
 
+
 class TestProcessScheduler(_TestScheduler):
     _mode = 'processes'
+
 
 class TestThreadScheduler(_TestScheduler):
     _mode = 'threads'
