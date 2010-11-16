@@ -321,6 +321,7 @@ class test_indico(Command):
                     ('jsspecify=', None, "Use js-test-driver style (TestCaseName.testName)"),
                     ('log=', None, "Log to console, using specified level"),
                     ('grid', None, "Use Selenium Grid"),
+                    ('xml', None, "XML output"),
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
                     ('parallel', None, "Parallel test execution using Selenium Grid (for --functional)"),
@@ -346,6 +347,7 @@ class test_indico(Command):
     threads = False
     repeat = False
     log = False
+    xml = False
 
     def initialize_options(self):
         pass
@@ -388,7 +390,8 @@ class test_indico(Command):
                    'parallel': self.parallel,
                    'threads': self.threads,
                    'repeat': self.repeat,
-                   'log': self.log}
+                   'log': self.log,
+                   'xml':self.xml}
 
         # get only options that are active
         options = dict((k,v) for (k,v) in options.iteritems() if v)

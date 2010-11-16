@@ -154,7 +154,8 @@ class UnitTestRunner(BaseTestRunner):
     _runnerOptions = {'silent': Option,
                       'coverage': CoveragePythonTestOption,
                       'specify': Option,
-                      'log': LogToConsoleTestOption}
+                      'log': LogToConsoleTestOption,
+                      'xml': Option}
 
     def _run(self):
         #coverage = CoverageTestRunner.getInstance()
@@ -166,10 +167,13 @@ class UnitTestRunner(BaseTestRunner):
         args = ['nose', '--nologcapture',  '--logging-clear-handlers', \
                 '--with-id', '-v', '-s']
 
+        if self.options.valueOf('xml'):
+            args += ['--with-xunit', '--xunit-file=build/test-results.xml']
+
         specific = self.options.valueOf('specify')
 
         if specific:
-            args.append("indico.tests.python.unit.%s" % specific)
+            args.append(specific)
         else:
             args.append(os.path.join(self.setupDir, 'python', 'unit'))
             # retrieving tests from plugins folder
@@ -240,7 +244,7 @@ class FunctionalTestRunner(BaseTestRunner):
 
             # if a particular test was specified
             if specific:
-                args.append("indico.tests.python.functional.%s" % specific)
+                args.append(specific)
             else:
                 args.append(os.path.join(self.setupDir, 'python', 'functional'))
                 # retrieving tests from plugins folder
