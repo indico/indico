@@ -664,6 +664,7 @@ extend(IndicoUI.Dialogs,
                            saveButton.dom.disabled = true;
                            req.set(rtWidget.get())
                        }
+                       killProgress()
                    };
 
                    var commitChangesAndClose = function(suicideHook) {
