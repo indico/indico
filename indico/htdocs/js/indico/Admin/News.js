@@ -3,7 +3,7 @@ type("NewsList", ["WatchList"],
         renderNewsItem: function (item) {
             return item.draw();
         },
-    
+
         addItem: function() {
             var addNews = new NewsItem('edit', this);
             this.insert(addNews, '0');
@@ -46,44 +46,42 @@ type("NewsItem", ["ServiceWidget"],
             var params = {"title": this.titleField.get(), "type": this.typeField.get(), "content": this.content.get()};
             this.request(params);
         },
-    
+
         _saveResource: function() {
             var params = {"id":this.id, "title": this.titleField.get(), "type": this.typeField.get(), "content": this.content.get()};
             var self = this;
             var killProgress = IndicoUI.Dialogs.Util.progress();
-            jsonRpc(Indico.Urls.JsonRpcService, 'news.save', params,
-                    function(response, error){
-                        if (exists(error)) {
-                            killProgress();
-                            IndicoUtil.errorReport(error);
-                        }
-                        else {
-                            killProgress();
-                            self._success(response);
-                        }
-                    });
+            if(self.content.clean())
+                jsonRpc(Indico.Urls.JsonRpcService, 'news.save', params,
+                        function(response, error){
+                            if (exists(error))
+                                IndicoUtil.errorReport(error);
+                            else
+                                self._success(response);
+                        });
+            killProgress()
         },
-    
+
         _success: function(response) {
             this.creationDate = response.creationDate;
             this.title = response.title;
             this.type = response.type;
             this.text = response.text;
            this.id = response.id;
-    
+
             this.chooser.set('display');
         },
-    
+
         draw: function() {
             var self = this;
-    
+
             var titleField = Html.input('text',{'className':'newsEditTitle'},'Write a title');
             var typeField = Widget.select(self.parentList.newsTypesList);
             typeField.set('general');
-    
+
             this.titleField = titleField;
             this.typeField = typeField;
-    
+
             var saveButton = null;
             if (self.id) {
                 this.titleField.set(self.title);
@@ -96,7 +94,7 @@ type("NewsItem", ["ServiceWidget"],
                     self._createResource();
                 }, "Save"));
             }
-    
+
             var cancelButton = Widget.button(command(function (){
                if (self.id) {
                     self.chooser.set('display');
@@ -104,16 +102,16 @@ type("NewsItem", ["ServiceWidget"],
                    self.parentList.remove(self);
                }
             }, "Cancel"));
-    
+
             this.chooser = new Chooser(new Lookup({
                 edit: function() {
-                   var content = new RichTextEditor(500,200);
+                   var content = new ParsedRichTextEditor(600,400,'IndicoMinimal');
                    self.content = content;
-    
+
                    if (self.id) {
                        content.set(self.text);
                    }
-    
+
                     return Html.div("newsItemEdit", titleField, typeField, content.draw(),
                                                    saveButton, cancelButton); },
                 display: function() {
@@ -133,9 +131,9 @@ type("NewsItem", ["ServiceWidget"],
                      );
                 }
             }));
-    
+
             this.chooser.set(this.choice);
-    
+
             return this.ServiceWidget.prototype.draw.call(this, Widget.block(this.chooser));
         }
     },
