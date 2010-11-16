@@ -22,10 +22,6 @@
         <td class="blacktext">%(email)s</td>
     </tr>
     <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Language")%></span></td>
-        <td class="blacktext"><%= _(lang)%></td>
-    </tr>
-    <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Address")%></span></td>
         <td class="blacktext"><pre>&nbsp;&nbsp;%(address)s</pre></td>
     </tr>
@@ -37,17 +33,6 @@
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Fax")%></span></td>
         <td class="blacktext">%(fax)s</td>
     </tr>
-    <!-- Fermi timezone awareness -->
-    <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("My Timezone")%></span></td>
-        <td class="blacktext">%(timezone)s</td>
-    </tr>
-    <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Display Timezone")%></span></td>
-        <td class="blacktext">%(displayTZMode)s</td>
-    </tr>
-    <!-- Fermi timezone awareness(end) -->
-
     <tr>
         <td>&nbsp;</td>
         <td class="blacktext">

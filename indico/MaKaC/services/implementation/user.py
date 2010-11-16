@@ -33,6 +33,9 @@ from MaKaC.common.fossilize import fossilize
 
 from MaKaC.rb_location import CrossLocationQueries
 
+from MaKaC.i18n import langList, languageNames
+from MaKaC.webinterface.common.timezones import TimezoneRegistry
+
 class UserComparator(object):
 
     @staticmethod
@@ -210,7 +213,6 @@ class UserSetPersonalInfo(LoggedOnlyService):
         self._info = self._params.get("value", None)
 
     def _getAnswer( self):
-
         if self._info == None:
             return UserGetPersonalInfo(self._params, self._aw.getIP(), self._aw.getSession()).process()
 
@@ -264,6 +266,100 @@ class UserCanBook(LoggedOnlyService):
             return True
         return False
 
+class UserShowPastEvents(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._target = self.getAW().getUser()
+
+    def _getAnswer( self):
+        self._target.setShowPastEvents(True)
+        return True
+
+
+class UserHidePastEvents(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._target = self.getAW().getUser()
+
+    def _getAnswer( self):
+        self._target.setShowPastEvents(False)
+        return True
+
+
+class UserGetLanguages(LoggedOnlyService):
+
+    def _getAnswer( self):
+        userLang = self.getAW().getUser().getLang()
+        languages = [v for k,v in langList() if k != userLang]
+        languages.insert(0, languageNames[userLang])
+        return languages
+
+
+class UserSetLanguage(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._user = self.getAW().getUser()
+        self._lang = self._params.get("lang",None)
+
+    def _getAnswer( self):
+        if self._lang:
+            for k,v in langList():
+                if v == self._lang:
+                    self._user.setLang(k)
+                    return True
+        return False
+
+
+class UserGetTimezones(LoggedOnlyService):
+
+    def _getAnswer( self):
+        userTz = self.getAW().getUser().getTimezone()
+        timezones = [tz for tz in TimezoneRegistry.getList() if tz != userTz]
+        timezones.insert(0, userTz)
+        return timezones
+
+
+class UserSetTimezone(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._user = self.getAW().getUser()
+        self._tz = self._params.get("tz",None)
+
+    def _getAnswer( self):
+        if self._tz and self._tz in TimezoneRegistry.getList():
+            self._user.setTimezone(self._tz)
+            return True
+        return False
+
+
+class UserGetDisplayTimezones(LoggedOnlyService):
+
+    def _getAnswer( self):
+        if self.getAW().getUser().getDisplayTZMode() == "Event Timezone":
+            tzMode = ["Event Timezone", "MyTimezone"]
+        else:
+            tzMode = ["MyTimezone", "Event Timezone"]
+        return tzMode
+
+
+class UserSetDisplayTimezone(LoggedOnlyService):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        self._user = self.getAW().getUser()
+        self._tzMode = self._params.get("tzMode",None)
+
+    def _getAnswer( self):
+        if self._tzMode and self._tzMode in ["Event Timezone", "MyTimezone"]:
+            self._user.setDisplayTZMode(self._tzMode)
+            return True
+        return False
+
+
 methodMap = {
     "event.list": UserListEvents,
     "favorites.addUsers": UserAddToBasket,
@@ -275,5 +371,13 @@ methodMap = {
     "timezone.get": UserGetTimezone,
     "session.timezone.get": UserGetSessionTimezone,
     "session.language.get": UserGetSessionLanguage,
-    "canBook": UserCanBook
+    "canBook": UserCanBook,
+    "showPastEvents": UserShowPastEvents,
+    "hidePastEvents": UserHidePastEvents,
+    "getLanguages": UserGetLanguages,
+    "setLanguage": UserSetLanguage,
+    "getTimezones": UserGetTimezones,
+    "setTimezone": UserSetTimezone,
+    "getDisplayTimezones": UserGetDisplayTimezones,
+    "setDisplayTimezone": UserSetDisplayTimezone,
 }

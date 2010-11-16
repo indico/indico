@@ -1444,9 +1444,10 @@ class WUserPreferences(wcomponents.WTemplated):
     def __init__(self, av):
         self._avatar = av
 
-    def getHTML( self, params ):
-        params['user'] = self._avatar;
-        return wcomponents.WTemplated.getHTML( self, params )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars( self )
+        vars["showPastEvents"] = self._avatar.getShowPastEvents()
+        return vars
 
 class WUserDetails(wcomponents.WTemplated):
 
@@ -1468,21 +1469,6 @@ class WUserDetails(wcomponents.WTemplated):
         vars["lang"] = self.htmlText(u.getLang())
         vars["telephon"] = self.htmlText(u.getTelephones()[0])
         vars["fax"] = self.htmlText(u.getFaxes()[0])
-
-
-        try:
-            vars["timezone"] = self.htmlText(u.getTimezone())
-        except:
-            u.setTimezone("UTC")
-            vars["timezone"] = self.htmlText(u.getTimezone())
-
-        try:
-            vars["displayTZMode"] = self.htmlText(u.getDisplayTZMode())
-        except:
-            u.setDisplayTZMode("MyTimezone")
-            vars["displayTZMode"] = self.htmlText(u.getDisplayTZMode())
-
-
         vars["locator"] = self.htmlText(self._avatar.getLocator().getWebForm())
         vars["identities"] = ""
         vars["status"] = self._avatar.getStatus()
@@ -1536,8 +1522,8 @@ class WPPersonalArea(WPUserBase):
             showing or hiding advacned tabs. These advanced tabs has been turned into
             a side menu. Maybe the tab is needed in the future.
         """
-        #self._tabPreferences = self._tabCtrl.newTab( "preferences", _("Preferences"), \
-        #        urlHandlers.UHUserPreferences.getURL() )
+        self._tabPreferences = self._tabCtrl.newTab( "preferences", _("Preferences"), \
+                urlHandlers.UHUserPreferences.getURL() )
 
         self._tabBaskets = self._tabCtrl.newTab( "baskets", _("Favorites"), \
                 urlHandlers.UHUserBaskets.getURL() )
@@ -1592,12 +1578,6 @@ class WUserModify(wcomponents.WTemplated):
         t = vars.get("title", u.getTitle())
         vars["titles"] = TitlesRegistry().getSelectItemsHTML(t)
         vars["locator"] = u.getLocator().getWebForm()
-        tz = u.getTimezone()
-        vars["timezone"] = TimezoneRegistry.getShortSelectItemsHTML(tz)
-        try:
-            vars["displayTZMode"] = DisplayTimezoneRegistry.getSelectItemsHTML(u.getDisplayTZMode())
-        except:
-            vars["displayTZMode"] = "None"
         vars["Wtitle"] = _("Modifying an existing user")
         vars["name"] = vars.get("name", u.getName())
         vars["surName"] =  vars.get("surName", u.getSurName())
@@ -1609,6 +1589,7 @@ class WUserModify(wcomponents.WTemplated):
         vars["secEmails"] = self._getSecEmailHTML(vars.get("secEmails", u.getSecondaryEmails()))
         vars["telephone"] = vars.get("telephone", u.getTelephones()[0])
         vars["fax"] =  vars.get("fax", u.getFaxes()[0])
+
         return vars
 
     def _getSecEmailHTML(self, secEmails):

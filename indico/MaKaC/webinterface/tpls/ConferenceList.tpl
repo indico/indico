@@ -1,4 +1,4 @@
-<%! 
+<%!
 def sortAndReturn(list):
 	list.sort()
 	list.reverse()
@@ -13,21 +13,21 @@ def sortAndReturn(list):
 			<%= material %>
 		</span>
 	<% end %>
-    
+
     <% if numOfEventsInTheFuture > 0: %>
     <div class="topBar" style="margin-bottom: 10px">
         <div class="content smaller"><span id="futureEventsText">There are <%= numOfEventsInTheFuture %> more events in the <em>future</em>. <span class='fakeLink' onclick='toogleFutureEvents();'>Show them.</span></span></div>
     </div>
     <div id="futureEvents" style="visibility: hidden; overflow:hidden;">
         <% includeTpl('ConferenceListEvents', items=futureItems, aw=self._aw, conferenceDisplayURLGen=conferenceDisplayURLGen) %>
-                
+
     </div>
     <% end %>
     <div>
     <% includeTpl('ConferenceListEvents', items=presentItems, aw=self._aw, conferenceDisplayURLGen=conferenceDisplayURLGen) %>
     </div>
 
-    <% if numOfEventsInThePast > 0: %>    
+    <% if numOfEventsInThePast > 0: %>
     <div id="pastEvents" style="display:none"></div>
 
     <div class="topBar">
@@ -50,34 +50,49 @@ def sortAndReturn(list):
     futureEvents.dom.style.opacity = "0";
     function toogleFutureEvents() {
         if (futureSwitch) {
-            IndicoUI.Effect.slide("futureEvents", futureEventsDivHeight); 
+            IndicoUI.Effect.slide("futureEvents", futureEventsDivHeight);
             $E("futureEventsText").dom.innerHTML = "There are <%= numOfEventsInTheFuture %> more events in the <em>future</em>. <span class='fakeLink' onclick='toogleFutureEvents()'>Show them.</a>";
         }else {
-            IndicoUI.Effect.slide("futureEvents", futureEventsDivHeight); 
+            IndicoUI.Effect.slide("futureEvents", futureEventsDivHeight);
             $E("futureEventsText").dom.innerHTML = '<span class="fakeLink" onclick="toogleFutureEvents()">Hide</span> the events in the future (<%= numOfEventsInTheFuture %>).';
         }
         futureSwitch = !futureSwitch;
-    } 
+    }
     <%end%>
 
     <% if numOfEventsInThePast > 0: %>
     var callDone = false;
     var pastSwitch = false;
+
+    function getPastEventsFromCateg(value){
+        indicoRequest('category.getPastEventsFromCateg',
+                {
+                    categId: '<%= categ.getId() %>',
+                    getPastEvents: value
+                },
+                function(result, error){}
+            )
+    }
+
     function tooglePastEvents() {
         if (!callDone) {
             $E("loadingPast").dom.style.display = "inline";
             fetchPastEvents()
+            getPastEventsFromCateg(true)
         }else {
             if (pastSwitch) {
                 $E("pastEvents").dom.style.display = "none";
                 $E("pastEventsText").dom.innerHTML = "There are <%= numOfEventsInThePast %> more events in the <em>past</em>. <span class='fakeLink' onclick='tooglePastEvents()'>Show them.</a>";
+                getPastEventsFromCateg(false)
             }else {
-                $E("pastEvents").dom.style.display = "inline"; 
+                $E("pastEvents").dom.style.display = "inline";
                 $E("pastEventsText").dom.innerHTML = '<span class="fakeLink" onclick="tooglePastEvents()">Hide</span> the events in the past (<%= numOfEventsInThePast %>).';
+                getPastEventsFromCateg(true)
             }
             pastSwitch = !pastSwitch;
         }
     }
+
 
     function fetchPastEvents() {
         indicoRequest('category.getPastEventsList',
@@ -95,7 +110,11 @@ def sortAndReturn(list):
                 }
             )
     }
+    <% if showPastEvents: %>
+        $E("loadingPast").dom.style.display = "inline";
+        fetchPastEvents()
+    <% end %>
 
     <% end %>
-    
+
 </script>

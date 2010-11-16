@@ -139,7 +139,9 @@ class WCategoryDisplay(wcomponents.WTemplated):
             params = {"categoryDisplayURLGen": vars["categDisplayURLGen"], "material": self._getMaterialHTML()}
             vars["contents"] = cl.getHTML( self._aw, params )
         elif len(confs) > 0:
-            cl = wcomponents.WConferenceList( self._target, self._wfReg )
+            pastEvents = self._aw.getSession().getVar("fetchPastEventsFrom")
+            showPastEvents = pastEvents and self._target.getId() in pastEvents or self._aw.getUser() and self._aw.getUser().getShowPastEvents()
+            cl = wcomponents.WConferenceList( self._target, self._wfReg, showPastEvents)
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"], "material": self._getMaterialHTML()}
             vars["contents"] = cl.getHTML( self._aw, params )
         else:

@@ -487,6 +487,7 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.common import utils
         self.key = utils.newKey() #key to activate the account
         self.registrants = {}
+        self._showPastEvents = False #determines if past events in category overview will be shown
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._lang = minfo.getLang()
@@ -1323,6 +1324,14 @@ class Avatar(Persistent, Fossilizable):
 
     def setLang(self, lang):
         self._lang =lang
+
+    def getShowPastEvents(self):
+        if not hasattr(self, "_showPastEvents"):
+            self._showPastEvents = False
+        return self._showPastEvents
+
+    def setShowPastEvents(self, value):
+        self._showPastEvents = value
 
 
 class AvatarHolder( ObjectHolder ):

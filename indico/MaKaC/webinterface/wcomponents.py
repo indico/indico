@@ -3235,9 +3235,10 @@ class WEmptyCategory(WTemplated):
 
 class WConferenceList(WTemplated):
 
-    def __init__( self, category, wfReg ):
+    def __init__( self, category, wfRegm, showPastEvents ):
         self._categ = category
         self._list = category.getConferenceList()
+        self._showPastEvents = showPastEvents
 
     def getHTML( self, aw, params ):
         self._aw = aw
@@ -3376,6 +3377,7 @@ class WConferenceList(WTemplated):
         vars["presentItems"], vars["futureItems"], vars["numOfEventsInTheFuture"], vars["numOfEventsInThePast"], vars["oldestMonthDate"] =  self.getPresentPastFutureEvents(allEvents, eventsByMonth, len(self._list))
         vars["categ"] = self._categ
         vars["ActiveTimezone"] = DisplayTZ(self._aw,self._categ,useServerTZ=1).getDisplayTZ()
+        vars["showPastEvents"] = self._showPastEvents
 
         return vars
 

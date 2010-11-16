@@ -159,8 +159,22 @@ class GetPastEventsList(CategoryDisplayBase):
                 for month in allEvents[year].keys():
                     if month < self._fromDate.month:
                         pastEvents.setdefault(year,{})[month] = allEvents[year][month]
-
         return WConferenceListEvents(pastEvents, self._aw).getHTML()
+
+class GetPastEventsFromCateg(CategoryDisplayBase):
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        self._getPastEvents = bool(self._params.get("getPastEvents",False))
+
+    def _getAnswer( self ):
+        session = self._aw.getSession()
+        if not session.getVar("fetchPastEventsFrom"):
+            session.setVar("fetchPastEventsFrom",set())
+        if self._getPastEvents:
+            session.getVar("fetchPastEventsFrom").add(self._categ.getId())
+        else:
+            session.getVar("fetchPastEventsFrom").remove(self._categ.getId())
 
 class CategoryProtectionUserList(CategoryModifBase):
     def _getAnswer(self):
@@ -207,6 +221,7 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
+    "getPastEventsFromCateg": GetPastEventsFromCateg,
     "canCreateEvent": CanCreateEvent,
     "protection.getAllowedUsersList": CategoryProtectionUserList,
     "protection.addAllowedUsers": CategoryProtectionAddUsers,

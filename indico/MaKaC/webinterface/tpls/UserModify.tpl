@@ -1,7 +1,7 @@
 <%! from MaKaC.i18n import langList %>
 
 <center>
-<form action="%(postURL)s" method="POST">   
+<form action="%(postURL)s" method="POST">
     %(locator)s
     <table width="80%%">
         <tr>
@@ -51,18 +51,6 @@
             <td align="left">%(secEmails)s</td>
         </tr>
         <tr>
-            <td align="right"><font color="gray"><font color="red">* </font><%= _("Language")%></font></td>
-    	 	<td bgcolor="white" width="100%%" align="left">
-		  <select size=1 name="lang">
-    	           <% for l in langList(): %>
-             	       <option <% if l[0] == lang: %>
-		         selected
-		       <% end %> value="<%= l[0] %>"><%= l[1] %></option>
-                   <% end %>
-         	 </select>
-    		</td>
-        </tr>
-        <tr>
             <td align="right"><font color="gray"><%= _("Address")%></font></td>
             <td align="left"><textarea name="address" rows="5" cols="75">%(address)s</textarea></td>
         </tr>
@@ -74,24 +62,6 @@
             <td align="right"><font color="gray"><%= _("Fax number")%></font></td>
             <td align="left"><input type="text" name="fax" value="%(fax)s" size="25"></td>
         </tr>
-        <!-- Fermi timezone awareness -->
-        <tr>
-            <td align="right"><font color="gray"><%= _("My Timezone")%><font></td>
-            <td align="left">
-                <select name="timezone">
-                    %(timezone)s
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td align="right"><font color="gray"><%= _("Display Timezone")%><font></td>
-            <td align="left">
-                <select name="displayTZMode">
-                    %(displayTZMode)s
-                </select>
-            </td>
-        </tr>
-        <!-- Fermi timezone awareness(end) -->
         <tr>
             <td colspan="2">
                 <center><font color="red"><%= _("You must enter a valid address. A mail will be sent to you to confirm the registration")%></font></center>
