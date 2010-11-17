@@ -14,7 +14,11 @@ reason: <%= reservation.reason %>
 from <%= formatDate(reservation.startDT.date()) %> to <%= formatDate(reservation.endDT.date()) %> between <%= reservation.startDT.strftime("%H:%M") %> and <%= reservation.endDT.strftime("%H:%M") %> <%= exclDays %>
 Access: <%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
 
-This is the final confirmation.
+If you find that you will not be using this room, please cancel this booking by going to this URL and clicking "Cancel Booking":
+
+<%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
+
+so that the room can be booked by somebody else.
 
 NOTE: please be aware that in special (rare) cases the person
 responsible for this room may reject your booking. In that case,
