@@ -24,7 +24,7 @@
                         <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>');" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');">
                             <table cellpadding="0px" cellspacing="0px" border="0">
                             <tr>
-                            <td colspan="2" width="370px">
+                            <td colspan="2" width="370px" style="white-space: nowrap;">
                             <tt><strong><%= {'conference':      "E&nbsp;",
                                      'session':         "S&nbsp;&nbsp;",
                                      'contribution':    "C&nbsp;&nbsp;&nbsp;",

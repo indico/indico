@@ -102,11 +102,13 @@ def getTalks(conference, sort = False):
                                               subcontribution = None)
             event_info["title"]      = contribution.getTitle()
             event_info["titleshort"] = truncateString(event_info["title"], title_length)
-            # NOTE: Sometimes there is no start date?! e.g. 21917. I guess I should deal with this
-            try:
-                event_info["date"]       = int(time.mktime(contribution.getAdjustedStartDate().timetuple()))
-            except AttributeError:
-                event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple())) + 1
+            # Sometimes contributions are not scheduled, so they have no start date.
+            # In this case assign it the value None, and it will be displayed
+            # at the end of the list with the time value "not scheduled"
+            if contribution.getAdjustedStartDate() is not None:
+                event_info["date"]   = int(time.mktime(contribution.getAdjustedStartDate().timetuple()))
+            else:
+                event_info["date"]   = None
 
             event_info["LOID"]       = ""
             event_info["IndicoLink"] = doesExistIndicoLink(contribution)
@@ -132,19 +134,16 @@ def getTalks(conference, sort = False):
                 event_info["titleshort"] = truncateString(event_info["title"], title_length)
                 # Subcontribution objects don't have start dates,
                 # so get the owner contribution's start date
-                # and add the counter ctr_sc to that
-                try:
+                # and add the counter ctr_sc so they appear in order
+                if subcontribution.getOwner().getAdjustedStartDate() is not None:
                     event_info["date"]     = int(time.mktime(subcontribution.getOwner().getAdjustedStartDate().timetuple()) + ctr_sc)
-                except AttributeError:
+                else:
                     event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple())) + ctr_sc
                 event_info["LOID"]       = ""
                 event_info["IndicoLink"] = doesExistIndicoLink(subcontribution)
 
                 recordable_events.append(event_info)
 
-
-    if sort:
-        talks.sort(key = Contribution.contributionStartDateForSort)
 
     for session in conference.getSessionList():
         event_info = {}
@@ -157,7 +156,10 @@ def getTalks(conference, sort = False):
         event_info["title"]      = session.getTitle()
         event_info["titleshort"] = truncateString(event_info["title"], title_length)
         # Get start time as seconds since the epoch so we can sort
-        event_info["date"]       = int(time.mktime(session.getAdjustedStartDate().timetuple()))
+        if session.getAdjustedStartDate() is not None:
+            event_info["date"]   = int(time.mktime(session.getAdjustedStartDate().timetuple()))
+        else:
+            event_info["date"]   = None
         event_info["LOID"]       = ""
         event_info["IndicoLink"] = doesExistIndicoLink(session)
 
@@ -221,9 +223,16 @@ def startTimeCompare(a, b):
     contributions and subcontributions correctly.
     Note: if a session and contribution have the exact same start time,
     then it must be the first contribution in the session, and we
-    want to display the session first, so return the appropriate value to do that.'''
+    want to display the session first, so return the appropriate value to do that.
+    If the date is None, put it at the end.'''
 
-    if a["date"] > b["date"]:
+    if a["date"] is not None and b["date"] is None:
+        return -1
+    elif a["date"] is None and b["date"] is not None:
+        return 1
+    elif a["date"] is None and b["date"] is None:
+        return 0
+    elif a["date"] > b["date"]:
         return 1
     elif a["date"] == b["date"]:
         if a["type"] == "contribution" and b["type"] == "session":
@@ -247,45 +256,48 @@ def truncateString(string, length):
 def formatDate(date_str):
     '''Given number of seconds since the epoch, convert for display in the main Recording Manager interface.'''
 
-    time_struct = time.localtime(date_str)
+    if date_str is not None:
+        time_struct = time.localtime(date_str)
 
-    day_of_week   = [_('Mon'),
-                     _('Tue'),
-                     _('Wed'),
-                     _('Thu'),
-                     _('Fri'),
-                     _('Sat'),
-                     _('Sun')]
-#    month_of_year = [_('January'),
-#                     _('February'),
-#                     _('March'),
-#                     _('April'),
-#                     _('May'),
-#                     _('June'),
-#                     _('July'),
-#                     _('August'),
-#                     _('September'),
-#                     _('October'),
-#                     _('November'),
-#                     _('December')]
-    month_of_year = [_('Jan'),
-                     _('Feb'),
-                     _('Mar'),
-                     _('Apr'),
-                     _('May'),
-                     _('Jun'),
-                     _('Jul'),
-                     _('Aug'),
-                     _('Sep'),
-                     _('Oct'),
-                     _('Nov'),
-                     _('Dec')]
+        day_of_week   = [_('Mon'),
+                         _('Tue'),
+                         _('Wed'),
+                         _('Thu'),
+                         _('Fri'),
+                         _('Sat'),
+                         _('Sun')]
+    #    month_of_year = [_('January'),
+    #                     _('February'),
+    #                     _('March'),
+    #                     _('April'),
+    #                     _('May'),
+    #                     _('June'),
+    #                     _('July'),
+    #                     _('August'),
+    #                     _('September'),
+    #                     _('October'),
+    #                     _('November'),
+    #                     _('December')]
+        month_of_year = [_('Jan'),
+                         _('Feb'),
+                         _('Mar'),
+                         _('Apr'),
+                         _('May'),
+                         _('Jun'),
+                         _('Jul'),
+                         _('Aug'),
+                         _('Sep'),
+                         _('Oct'),
+                         _('Nov'),
+                         _('Dec')]
 
-    return "%02d:%02d, %s %d %s" % (time_struct.tm_hour,
-                                    time_struct.tm_min,
-                                    day_of_week[time_struct.tm_wday],
-                                    time_struct.tm_mday,
-                                    month_of_year[int(time_struct.tm_mon - 1)])
+        return "%02d:%02d, %s %d %s" % (time_struct.tm_hour,
+                                        time_struct.tm_min,
+                                        day_of_week[time_struct.tm_wday],
+                                        time_struct.tm_mday,
+                                        month_of_year[int(time_struct.tm_mon - 1)])
+    else:
+        return "NOT SCHEDULED"
 
 def generateIndicoID(conference     = None,
                     session         = None,
