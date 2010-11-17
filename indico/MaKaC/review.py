@@ -34,6 +34,7 @@ from MaKaC.accessControl import AdminList
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
+#from MaKaC.abstractReviewing import AbstractReview
 
 
 class AbstractSorter:
@@ -1251,6 +1252,7 @@ class Abstract(Persistent):
         self._notifLog=NotificationLog(self)
         self._submitter=None
         self._setSubmitter( submitter )
+        #self._abstractReview = AbstractReview(self)
 
     def clone(self, conference, abstractId):
 
@@ -1982,7 +1984,7 @@ class Abstract(Persistent):
             t = self._trackReallocations.values()[0].getTrack()
             self._removeTrackReallocation(t)
 
-    def proposeToAccept( self, responsible, track, contribType, comment="" ):
+    def proposeToAccept( self, responsible, track, contribType, comment="", answers={} ):
         """
         """
         # the proposal has to be done for a track
@@ -1993,13 +1995,13 @@ class Abstract(Persistent):
         if not self.isProposedForTrack( track ):
             raise MaKaCError( _("Cannot propose to accept an abstract which is not proposed for the specified track"))
         #We keep the track judgement
-        jud = AbstractAcceptance( track, responsible, contribType )
+        jud = AbstractAcceptance( track, responsible, contribType, answers )
         jud.setComment( comment )
         self._addTrackAcceptance( jud )
         #We trigger the state transition
         self.getCurrentStatus().proposeToAccept()
 
-    def proposeToReject( self, responsible, track, comment="" ):
+    def proposeToReject( self, responsible, track, comment="", answers={} ):
         """
         """
         # the proposal has to be done for a track
@@ -2010,7 +2012,7 @@ class Abstract(Persistent):
         if not self.isProposedForTrack( track ):
             raise MaKaCError( _("Cannot propose to reject an abstract which is not proposed for the specified track"))
         #We keep the track judgement
-        jud = AbstractRejection( track, responsible )
+        jud = AbstractRejection( track, responsible, answers )
         jud.setComment( comment )
         self._addTrackRejection( jud )
         #We trigger the state transition
@@ -2294,6 +2296,10 @@ class Abstract(Persistent):
             self._notifLog=NotificationLog(self)
         return self._notifLog
 
+    def getAbstractReview(self):
+        if not hasattr(self, "_abstractReview"):
+            self._abstractReview = AbstractReview(self)
+        return self._abstractReview
 
 class AbstractJudgement( Persistent ):
     """This class represents each of the judgements made by a track about a
@@ -2306,11 +2312,12 @@ class AbstractJudgement( Persistent ):
         it was done and the user who did it will be kept.
     """
 
-    def __init__( self, track, responsible ):
+    def __init__( self, track, responsible, answers ):
         self._track = track
         self._setResponsible( responsible )
         self._date = nowutc()
         self._comment = ""
+        self._answers = answers
 
     def _setResponsible( self, newRes ):
         self._responsible = newRes
@@ -2333,11 +2340,14 @@ class AbstractJudgement( Persistent ):
     def getComment( self ):
         return self._comment
 
+    def getAnswers(self):
+        return self._answers
+
 
 class AbstractAcceptance( AbstractJudgement ):
 
-    def __init__( self, track, responsible, contribType ):
-        AbstractJudgement.__init__( self, track, responsible )
+    def __init__( self, track, responsible, contribType, answers ):
+        AbstractJudgement.__init__( self, track, responsible, answers )
         self._contribType = contribType
 
     def clone(self,track):

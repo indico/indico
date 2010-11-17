@@ -1348,6 +1348,7 @@ class WConfModAbstractPropToAcc(wcomponents.WTemplated):
         vars["contribTypes"]=self._getContribTypesHTML()
         vars["comment"]=""
         vars["changeTrackURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
+        vars["abstractReview"] = self._abstract.getConference().getConfAbstractReview()
 
         return vars
 
@@ -1357,7 +1358,6 @@ class WPModPropToAcc(WPAbstractManagment):
     def _getTabContent( self, params ):
         wc=WConfModAbstractPropToAcc(self._rh.getAW(),self._abstract)
         return wc.getHTML()
-
 
 class WConfModAbstractPropToRej(wcomponents.WTemplated):
 
@@ -1391,6 +1391,7 @@ class WConfModAbstractPropToRej(wcomponents.WTemplated):
         vars["tracks"]=self._getTracksHTML()
         vars["comment"]=""
         vars["changeTrackURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
+        vars["abstractReview"] = self._abstract.getConference().getConfAbstractReview()
         return vars
 
 

@@ -586,10 +586,7 @@ class ConferenceReviewingRemoveReviewer(ConferenceReviewingAssignStaffBasePRMRef
 
 
 class ConferenceReviewingRemoveAllReviewers(ConferenceReviewingAssignStaffBasePRMReferee):
-    """ Removes all t<<<<<<< HEAD
-=======
-        #self._reviewableMaterials = MaterialFactoryRegistry._allowedMaterials['reviewing']
->>>>>>> [FTR] Add questions for abstract reviewinghe reviewers from a list of contributions
+    """ Removes all the reviewers from a list of contributions
     """
     def _getAnswer(self):
         for contribution in self._contributions:
@@ -795,7 +792,6 @@ class ContributionReviewingDateTimeModificationBase (DateTimeModificationBase, C
     #Note: don't change the order of the inheritance here!
     pass
 
-
 class ContributionReviewingDueDateModification(ContributionReviewingDateTimeModificationBase):
 
     def _checkParams(self):
@@ -888,7 +884,36 @@ class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
         return [str(q) + " : " + ConferencePaperReview.reviewingQuestionsAnswers[int(a)]
                 for q,a in self.getJudgementObject().getAnswers()]
 
-
+#####################################
+###  Abstract reviewing classes
+#####################################
+#class AbstractReviewingBase(ConferenceModifBase, ProtectedModificationService):
+#
+#    def getJudgementObject(self):
+#        self._abstractId = self._params.get("Abstract","")
+#        abstractReview = self._target.getAbstractMgr().getAbstractById(self._abstractId).getAbstractReview()
+#        return abstractReview.getTrackCoordinatorJudgement(self._getUser())
+#
+#
+#class AbstractReviewingTextModificationBase (TextModificationBase, AbstractReviewingBase):
+#    #Note: don't change the order of the inheritance here!
+#    pass
+#
+#
+#class AbstractReviewingCriteriaModification(AbstractReviewingTextModificationBase):
+#
+#    def _checkParams(self):
+#        # question
+#        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
+#        AbstractReviewingTextModificationBase._checkParams(self)
+#        self._question = self._params.get("question","")
+#
+#    def _handleSet(self):
+#        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
+#        self.getJudgementObject().setAnswer(self._question, int(self._value))
+#
+#    def _handleGet(self):
+#        return self.getJudgementObject().getAnswer(self._question)
 
 methodMap = {
     "conference.changeReviewingMode": ConferenceReviewingModeModification,
@@ -942,4 +967,6 @@ methodMap = {
     "contribution.changeCriteria": ContributionReviewingCriteriaModification,
     "contribution.getCriteria": ContributionReviewingCriteriaDisplay,
     "contribution.setSubmitted": ContributionReviewingSetSubmitted
+
     }
+#    "abstract.changeCriteria": AbstractReviewingCriteriaModification

@@ -1079,6 +1079,7 @@ class ConferenceAbstractReview(Persistent):
     reviewingQuestionsAnswers = ["Strongly Disagree", "Disagree", "Weakly Disagree", "Borderline", "Weakly Agree", "Agree", "Strongly Agree"]
     reviewingQuestionsLabels = ["-3", "", "", "0", "", "", "+3"]
     initialSelectedAnswer = 3
+    valueDiference = 3 # diference between the label and the value of the radio button (label=0, value=3)
 
     def __init__( self, conference):
         """ Constructor.
@@ -1144,6 +1145,7 @@ class ConferenceAbstractReview(Persistent):
             raise MaKaCError("Cannot remove a question which doesn't exist")
 
     #abstract manager methods
+##################################### NOT USED YET #####################################################
     def addAbstractManager(self, newAbstractManager):
         """ Adds a new abstract manager to the conference.
             newAbstractManager has to be an Avatar object.
@@ -1254,6 +1256,7 @@ class ConferenceAbstractReview(Persistent):
         if self.isAbstractReviewer(user):
             roles.append('Abstract Reviewer')
         return roles
+##########################################################################################
 
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed

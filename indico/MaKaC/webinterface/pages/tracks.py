@@ -963,6 +963,7 @@ class WTrackAbstractPropToAcc( wcomponents.WTemplated ):
         vars["postURL"] = urlHandlers.UHTrackAbstractPropToAcc.getURL( self._track, self._abstract )
         l = []
         conf = self._abstract.getConference()
+        vars["abstractReview"] = conf.getConfAbstractReview()
         for ctype in conf.getContribTypeList():
             selected = ""
             if vars.has_key("contribType"):
@@ -1006,6 +1007,7 @@ class WTrackAbstractPropToRej( wcomponents.WTemplated ):
         vars["abstractTitle"] = self._abstract.getTitle()
         vars["trackTitle"] = self._track.getTitle()
         vars["postURL"] = urlHandlers.UHTrackAbstractPropToRej.getURL( self._track, self._abstract )
+        vars["abstractReview"] = self._abstract.getConference().getConfAbstractReview()
         return vars
 
 

@@ -32,6 +32,7 @@ from MaKaC.common import Config
 import MaKaC.webinterface.common.abstractDataWrapper as abstractDataWrapper
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
+from MaKaC.reviewing import ConferenceAbstractReview
 
 class RCAbstractReviewer(object):
     @staticmethod
@@ -451,6 +452,7 @@ class RHPropToAcc(RHAbstractModifBase):
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action=""
+        self._answers = {}
         if params.has_key("OK"):
             self._action="GO"
             conf=self._target.getConference()
@@ -459,6 +461,11 @@ class RHPropToAcc(RHAbstractModifBase):
                 raise FormValuesError( _("You have to choose a track in order to do the proposal. If there are not tracks to select, please change the track assignment of the abstract from its management page"))
             self._contribType=self._conf.getContribTypeById(params.get("contribType",""))
             self._comment=params.get("comment","")
+            # get answers and make the dictionary
+            c = 0
+            for i in conf.getConfAbstractReview().getReviewingQuestions():
+                c += 1
+                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer)) - ConferenceAbstractReview.valueDiference
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
@@ -466,7 +473,7 @@ class RHPropToAcc(RHAbstractModifBase):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
         if self._action=="GO":
             self._abstract.proposeToAccept(self._getUser(),\
-                self._track,self._contribType,self._comment)
+                self._track,self._contribType,self._comment, self._answers)
             self._redirect(url)
         elif self._action=="CANCEL":
             self._redirect(url)
@@ -488,6 +495,7 @@ class RHPropToRej(RHAbstractModifBase):
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action=""
+        self._answers = {}
         if params.has_key("OK"):
             self._action="GO"
             conf=self._target.getConference()
@@ -496,6 +504,11 @@ class RHPropToRej(RHAbstractModifBase):
                 raise FormValuesError( _("You have to choose a track in order to do the proposal. If there are not tracks to select, please change the track assignment of the abstract from its management page"))
             self._contribType=self._conf.getContribTypeById(params.get("contribType",""))
             self._comment=params.get("comment","")
+            # get answers and make the dictionary
+            c = 0
+            for i in conf.getConfAbstractReview().getReviewingQuestions():
+                c += 1
+                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer)) - ConferenceAbstractReview.valueDiference
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
@@ -503,7 +516,7 @@ class RHPropToRej(RHAbstractModifBase):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
         if self._action=="GO":
             self._abstract.proposeToReject(self._getUser(),\
-                self._track,self._comment)
+                self._track,self._comment, self._answers)
             self._redirect(url)
         elif self._action=="CANCEL":
             self._redirect(url)
