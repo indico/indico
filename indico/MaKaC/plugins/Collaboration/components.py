@@ -20,9 +20,10 @@
 
 
 from MaKaC.common.utils import *
+from MaKaC.conference import Conference
 
 from indico.core.api import Component, IListener
-from indico.core.api.conference import IEventActionListener
+from indico.core.api.events import IObjectLifeCycleListener, ITimeActionListener
 
 from MaKaC.common.logger import Logger
 import zope.interface
@@ -30,13 +31,14 @@ import zope.interface
 
 class EventCollaborationListener(Component):
 
-    zope.interface.implements(IListener, IEventActionListener)
+    zope.interface.implements(IObjectLifeCycleListener,
+                              ITimeActionListener)
 
     """In this case, obj is a conference object. Since all we
        need is already programmed in CSBookingManager, we get the
        object of this class and we call the appropiate method"""
     @classmethod
-    def eventDateChanged(cls, obj, params={}):
+    def dateChanged(cls, obj, params={}):
         obj = obj.getCSBookingManager()
         try:
             obj.notifyEventDateChanges(params['oldStartDate'], params['newStartDate'], params['oldEndDate'], params['newEndDate'])
@@ -44,7 +46,7 @@ class EventCollaborationListener(Component):
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
 
     @classmethod
-    def eventStartDateChanged(cls, obj, params={}):
+    def startDateChanged(cls, obj, params={}):
         obj = obj.getCSBookingManager()
         try:
             obj.notifyEventDateChanges(params['oldDate'], params['newDate'], None, None)
@@ -52,19 +54,19 @@ class EventCollaborationListener(Component):
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
 
     @classmethod
-    def eventStartTimeChanged(self, obj, sdate):
+    def startTimeChanged(self, obj, sdate):
         """ No one is calling this method in the class Conference. Probably this is completely unnecessary"""
         bookingManager = obj.getCSBookingManager()
         bookingManager.notifyEventDateChanges(sdate, obj.startDate, None, None)
 
     @classmethod
-    def eventEndTimeChanged(self, obj, edate):
+    def endTimeChanged(self, obj, edate):
         """ No one is calling this method in the class Conference. Probably this is completely unnecessary"""
         bookingManager = obj.getCSBookingManager()
         bookingManager.notifyEventDateChanges(None, None, edate, obj.endDate)
 
     @classmethod
-    def eventTimezoneChanged(self, obj, oldTimezone):
+    def timezoneChanged(self, obj, oldTimezone):
         bookingManager = obj.getCSBookingManager()
         #ATTENTION! At this moment this method notifyTimezoneChange in the class CSBookingManager
         #just returns [], so if you're expecting it to do something just implement whatever you
@@ -72,7 +74,7 @@ class EventCollaborationListener(Component):
         bookingManager.notifyTimezoneChange(oldTimezone, obj.timezone)
 
     @classmethod
-    def eventEndDateChanged(cls, obj, params={}):
+    def endDateChanged(cls, obj, params={}):
         obj = obj.getCSBookingManager()
         try:
             obj.notifyEventDateChanges(None, None, params['oldDate'], params['newDate'])
@@ -80,7 +82,7 @@ class EventCollaborationListener(Component):
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
 
     @classmethod
-    def eventTitleChanged(cls, obj, params={}):
+    def titleChanged(cls, obj, params={}):
         obj = obj.getCSBookingManager()
         try:
             obj.notifyTitleChange(params['oldTitle'], params['newTitle'])
@@ -89,6 +91,7 @@ class EventCollaborationListener(Component):
 
 
     @classmethod
-    def eventDeleted(cls, obj, params={}):
-        obj = obj.getCSBookingManager()
-        obj.notifyDeletion()
+    def deleted(cls, obj, params={}):
+        if obj.__class__ == Conference:
+            obj = obj.getCSBookingManager()
+            obj.notifyDeletion()

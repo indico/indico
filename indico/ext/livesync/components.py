@@ -28,8 +28,8 @@ from zope.interface import implements
 
 # indico imports
 from indico.core.api import Component
-from indico.core.api.category import ICategoryActionListener
-from indico.core.api.conference import IEventActionListener
+from indico.core.api.events import IAccessControlListener, IObjectLifeCycleListener, \
+     IMetadataChangeListener
 from indico.core.api.db import IDBUpdateListener, DBUpdateException
 from indico.core.api.rh import IServerRequestListener
 from indico.util.date_time import int_timestamp, nowutc
@@ -43,22 +43,13 @@ from indico.ext.livesync.agent import SyncManager
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.logger import Logger
 
-class LiveSyncCoreListener(Component):
 
-    implements(IServerRequestListener,
-               ICategoryActionListener,
-               IEventActionListener)
+class RequestListener(Component):
 
-    def _add(self, obj, actions):
-        """
-        Adds a provided object to the temporary index.
-        Actions: ['moved','deleted',..]
-        """
-        cm_set = ContextManager.get('indico.ext.livesync:actions').setdefault(
-            obj, set([]))
-        cm_set |= set(actions)
+    implements(IServerRequestListener)
 
     # IServerRequestListener
+
     def requestFinished(self, req):
         """
         Inserts the elements from the temporary index into the permanent one
@@ -87,44 +78,91 @@ class LiveSyncCoreListener(Component):
         # reset the context manager
         ContextManager.set('indico.ext.livesync:actions', {})
 
-    # ICategoryActionListener
-    def categoryMoved(self, category, oldOwner, newOwner):
 
-        changes = ['moved']
+class ObjectChangeListener(Component):
 
-        # protection status changed?
-        if oldOwner.isProtected() != newOwner.isProtected():
-            # notify protection change too
-            changes += ['protection']
+    implements(IAccessControlListener,
+               IObjectLifeCycleListener,
+               IMetadataChangeListener)
 
-        self._add(category, changes)
+    def _add(self, obj, actions):
+        """
+        Adds a provided object to the temporary index.
+        Actions: ['moved','deleted',..]
+        """
+        cm_set = ContextManager.get('indico.ext.livesync:actions').setdefault(
+            obj, set([]))
 
-    def _eventInfoChanged(self, event, what):
-        self._add(event, ['%s_changed' % what])
+        cm_set |= set(actions)
 
-    def _eventProtectionChanged(self, event):
-        self._eventInfoChanged(event, 'protection')
+    def _protectionChanged(self, obj, oldValue, newValue):
+        """
+        Generic method, independent of object type
+        """
+        if newValue == 0:
+            # 0 is not an option,as remote services may not know anything
+            # about categories (and 0 means 'inherited')
+            newValue = 1 if obj.isProtected() else -1
 
-    def eventDateChanged(self, event, params):
-        self._eventInfoChanged(event, 'dates')
+        if oldValue == newValue:
+            # protection didn't actually change
+            return
+        else:
+            if newValue == -1:
+                self._add(obj, ['set_public'])
+            else:
+                self._add(obj, ['set_private'])
 
-    def eventStartDateChanged(self, event, params):
-        self._eventInfoChanged(event, 'start_date')
+    def _parentProtectionChanged(self, obj, oldValue, newValue):
+        """
+        This will normally be called when an event/subcategory is moved to a category
+        with a different protection scheme
+        """
 
-    def eventEndDateChanged(self, event, params):
-        self._eventInfoChanged(event, 'end_date')
+        # take this into account only if inheriting from parent
+        if obj.getAccessProtectionLevel() == 0:
+            if newValue == 1:
+                self._add(obj, ['set_private'])
+            else:
+                self._add(obj, ['set_public'])
+        else:
+            # nothing to do, move along
+            pass
 
-    def eventStartTimeChanged(self, event, sdate):
-        self._eventInfoChanged(event, 'start_date')
+    def _objectInfoChanged(self, obj, what):
+        self._add(obj, ['%s_changed' % what])
 
-    def eventEndTimeChanged(self, event, edate):
-        self._eventInfoChanged(event, 'end_date')
+    # IObjectLifeCycleListener
+    def moved(self, obj, fromOwner, toOwner):
+        self._add(obj, ['moved'])
 
-    def eventTimezoneChanged(self, event, oldTZ):
-        self._eventInfoChanged(event, 'timezone')
+        categoryProtection = fromOwner.isProtected()
+        newCategoryProtection = toOwner.isProtected()
 
-    def eventTitleChanged(self, event, params):
-        self._eventInfoChanged(event, 'title')
+        if categoryProtection != newCategoryProtection:
+            self._parentProtectionChanged(obj, categoryProtection,
+                                          newCategoryProtection)
 
-    def eventDeleted(self, event, params):
-        self._add(event, ['deleted'])
+    def created(self, obj, owner):
+        self._objectInfoChanged(owner, 'data')
+        self._add(obj, ['created'])
+
+    def deleted(self, obj, oldOwner):
+        self._add(obj, ['deleted'])
+
+    # IMetadataChangeListener
+    def titleChanged(self, obj, oldTitle, newTitle):
+        self._objectInfoChanged(obj, 'title')
+
+    def infoChanged(self, obj):
+        self._objectInfoChanged(obj, 'data')
+
+    # IAccessControlListener
+    def protectionChanged(self, obj, oldProtection, newProtection):
+        self._protectionChanged(obj, oldProtection, newProtection)
+
+    def accessDomainAdded(self, obj, domain):
+        self._objectInfoChanged(category, 'acl')
+
+    def accessDomainRemoved(self, obj, domain):
+        self._objectInfoChanged(category, 'acl')

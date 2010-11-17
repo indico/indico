@@ -95,17 +95,33 @@ from sets import Set
 
 from indico.modules.scheduler import Client, tasks
 
-class CommonObjectBase(object):
-    """This class is for holding commonly used methods that are used by several classes.
+
+class CoreObject(Persistent):
+    """
+    CoreObjects are Persistent objects that are employed by Indico's core
+    """
+
+    def setModificationDate(self, date = None):
+        """Method called to notify the current conference has been modified.
+        """
+        if not date:
+            date = nowutc()
+        self._modificationDS = date
+
+
+class CommonObjectBase(CoreObject, Observable, Fossilizable):
+    """
+    This class is for holding commonly used methods that are used by several classes.
     It is inherited by the following classes:
-    Category
-    Conference
-    Session
-    Contribution
-    Subcontribution
-    Material
-    Resource
-"""
+      * Category
+      * Conference
+      * Session
+      * Contribution
+      * SubContribution
+      * Material
+      * Resource
+    """
+
     def getRecursiveAllowedToAccessList(self):
         """Returns a set of Avatar resp. CERNGroup objects for those people resp. e-groups allowed to access
         this category as well as all parent objects.
@@ -153,6 +169,7 @@ class CommonObjectBase(object):
         # return set containing whatever avatars/groups we may have collected
         return av_set
 
+
 class CategoryManager( ObjectHolder ):
     idxName = "categories"
     counterName = "CATEGORY"
@@ -197,7 +214,7 @@ class CategoryManager( ObjectHolder ):
 
 
 
-class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
+class Category(CommonObjectBase):
 
     fossilizes(ICategoryFossil)
 
@@ -716,10 +733,6 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         #to be improved
         return self.owner == None
 
-    def notifyOAIModification(self):
-        for conf in self.getAllConferenceList():
-            conf.notifyOAIModification(updateChildren=True)
-
     def getDefaultStyle( self, type ):
         try:
             return self._defaultStyle[type]
@@ -820,6 +833,9 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
     def delete( self, deleteConferences=0 ):
         """removes completely a category (and all its sub-items) from the
             system"""
+
+        oldOwner = self.getOwner()
+
         if self.isRoot():
             raise MaKaCError( _("Root category cannot be deleted"), _("Category"))
         if not deleteConferences:
@@ -833,6 +849,9 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         self.getOwner()._removeSubCategory( self )
         CategoryManager().remove( self )
         TrashCanManager().add(self)
+
+        self._notify('deleted', oldOwner)
+
         return
 
     def move( self, newOwner ):
@@ -846,19 +865,21 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         self._reindex()
         catDateIdx.indexCateg(self)
 
-        # self.notifyOAIModification()
-        self._notify('categoryMoved', oldOwner, newOwner)
+        self._notify('moved', oldOwner, newOwner)
 
     def getName( self ):
         return self.name
 
     def setName( self, newName ):
+        oldName = self.name
         self.name = newName.strip()
 
         # Reindex when name changes
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
         nameIdx.unindex(self.getId())
         nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
+
+        self._notify('titleChanged', oldName, newName)
 
         self.cleanCache()
 
@@ -868,6 +889,14 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
     def setDescription( self, newDesc ):
         self.description = newDesc.strip()
         self.cleanCache()
+
+    def moveConference(self, conf, toCateg):
+        """
+        Moves a conference from this category to another one
+        """
+        self.removeConference( conf )
+        toCateg._addConference( conf )
+        conf._notify('moved', self, toCateg)
 
     def _addSubCategory( self, newSc ):
         #categories can only contain either conferences either other categories
@@ -879,8 +908,8 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         #first, check that the category is registered if not raise an exception
         if len(self.conferences)>0:
             for conf in self.getConferenceList():
-                self.removeConference( conf )
-                newSc._addConference( conf )
+                self.moveConference(conf, newSc)
+
         if len(self.conferences)>0:
             raise MaKaCError( _("Cannot add subcategory: the current category already contains events"), _("Category"))
         newSc.setOwner( self )
@@ -900,13 +929,19 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
             sc.setOwner( None )
             self.cleanCache()
 
-    def newSubCategory( self, sc=None ):
+    def newSubCategory(self, protection):
         cm = CategoryManager()
-        if sc==None:
-            sc = Category()
+        sc = Category()
         cm.add( sc )
+
+        # set the protection
+        sc.setProtection(protection)
+
+        sc._notify('created', self)
+
         self._addSubCategory( sc )
         self.cleanCache()
+
         return sc
 
     def _incNumConfs(self, num=1):
@@ -936,7 +971,6 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         self.indexConf(newConf)
         self.cleanCache()
         newConf.updateFatherProtection()
-        newConf.notifyOAIModification(updateChildren=True)
 
     def getAccessKey(self):
         return ""
@@ -961,6 +995,9 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         conf = Conference( creator, id, creationDate, modificationDate )
         ConferenceHolder().add( conf )
         self._addConference( conf )
+
+        conf._notify('created', self)
+
         return conf
 
     def removeConference( self, conf, notify=True, delete = False ):
@@ -974,8 +1011,6 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
             conf.delete()
         conf.removeOwner( self, notify )
         self._decNumConfs(1)
-        if notify:
-            conf.notifyOAIModification(updateChildren=True)
         self.cleanCache()
 
     def getSubCategoryList( self ):
@@ -1261,10 +1296,17 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
         self.cleanCache()
 
     def setProtection( self, private ):
-        """Allows to change the conference access protection
         """
+        Allows to change the category's access protection
+        """
+
+        oldProtection = 1 if self.isProtected() else -1
+
         self.__ac.setProtection( private )
         self.updateSonsProtection()
+
+        self._notify('protectionChanged', oldProtection, private)
+
         self.cleanCache()
 
     def updateSonsProtection( self ):
@@ -1419,10 +1461,12 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self.resetAccessCache()
+        self._notify('accessDomainAdded', dom)
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
         self.resetAccessCache()
+        self._notify('accessDomainRemoved', dom)
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -1496,6 +1540,7 @@ class Category(Persistent, CommonObjectBase, Fossilizable, Observable):
     def notifyModification( self ):
         """Method called to notify the current category has been modified.
         """
+        self._notify('infoChanged')
         self.cleanCache()
         self._p_changed=1
 
@@ -1993,7 +2038,7 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
-class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
+class Conference(CommonObjectBase):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
         access to other objects representing certain parts of the conferences
@@ -2064,7 +2109,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
             self._modificationDS = modificationDate
         else:
             self._modificationDS = nowutc() #modification timestamp
-        self._OAImodificationDS = self._modificationDS
 
         self.alarmList = {}
         self.__alarmCounter = Counter()
@@ -2584,77 +2628,16 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
     def getAbstractMgr(self):
         return self.abstractMgr
 
-    def notifyModification( self, date=None, updateChildren=False):
+    def notifyModification( self, date = None, raiseEvent = True):
         """Method called to notify the current conference has been modified.
         """
-        if not date:
-            date = nowutc()
-        self._modificationDS = date
-        self.notifyOAIModification(date=date, updateChildren = updateChildren)
+        self.setModificationDate()
+
+        if raiseEvent:
+            self._notify('infoChanged')
+
         self.cleanCache()
         self._p_changed=1
-
-    def notifyOAIModification(self, date=None, updateChildren=False): #, force=False):
-        # ignore call if the id is not set
-        # this is to avoid empty id entries in the index
-        # TODO: better would be to call the method only when the id is set
-        if self.id == '':
-            return
-
-        self.getOAIModificationDate() #init _OAImodificationDS value if it don't exist
-        idxPu = indexes.IndexesHolder().getById("OAIConferenceModificationDate")
-        idxPr = indexes.IndexesHolder().getById("OAIPrivateConferenceModificationDate")
-
-        if self.hasAnyProtection():
-            if self in idxPu.getConferences(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
-                #The conference was public and is now private
-                idxPu.unindexConference(self)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                self._p_changed=1
-                idxPr.indexConference(self)
-            elif self in idxPr.getConferences(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
-                #The conference is already indexed in private
-
-                # if force:
-                idxPr.unindexConference(self)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPr.indexConference(self)
-            else:
-                #The conference wasn't indexed before and is private
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                self._p_changed=1
-                idxPr.indexConference(self)
-        else:
-            if self in idxPr.getConferences(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
-                #The conference was private and is now public
-                idxPr.unindexConference(self)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPu.indexConference(self)
-            elif self in idxPu.getConferences(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
-                #The conference is already indexed in public, reIndex it with new date
-                idxPu.unindexConference(self)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPu.indexConference(self)
-            else:
-                #The conference wasn't indexed before and is public
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPu.indexConference(self)
-
-        if updateChildren:
-            for contrib in self.getContributionList():
-                contrib.notifyOAIModification(date=date)#, force=force)
 
     def getModificationDate( self ):
         """Returns the date in which the conference was last modified"""
@@ -2663,13 +2646,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
     def getAdjustedModificationDate( self, tz ):
         """Returns the date in which the conference was last modified"""
         return self._modificationDS.astimezone(timezone(tz))
-
-    def getOAIModificationDate(self):
-        try:
-            return self._OAImodificationDS
-        except:
-            self._OAImodificationDS = nowutc()
-        return self._OAImodificationDS
 
     def getCreationDate( self ):
         """Returns the date in which the conference was created"""
@@ -2752,27 +2728,21 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
     def getCategoriesPath(self):
         return [self.getOwnerList()[0].getCategoryPath()]
 
-    def unindexContributions(self):
-        # Removes the contributions from the OAI "active" indexes,
-        # adding them to the DeletedObjectHolder
+    def notifyContributions(self):
 
         for c in self.getContributionList():
-            c.unindex()
-
             # take care of subcontributions
             for sc in c.getSubContributionList():
-                sc.unindex()
-                DeletedObjectHolder().add(DeletedObject(sc))
+                sc._notify('deleted', c)
 
-            DeletedObjectHolder().add(DeletedObject(c))
-
+            c._notify('deleted', self)
 
     def delete( self ):
         """deletes the conference from the system.
         """
         #we notify the observers that the conference has been deleted
         try:
-            self._notify('eventDeleted', {})
+            self._notify('deleted', self.getOwner())
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a conference deletion for conference %s: %s" %
@@ -2780,9 +2750,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
             except Exception, e2:
                 Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)" % (str(e2), str(e)))
 
-        self.unindexContributions()
-        #index a DeletedObject to keep track of the conference after the deletion
-        DeletedObjectHolder().add(DeletedObject(self))
+        self.notifyContributions()
 
         #will have to remove it from all the owners (categories) and the
         #   conference registry
@@ -2803,9 +2771,6 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
                 manager.unlinkTo(self, "manager")
 
         TrashCanManager().add(self)
-
-        indexes.IndexesHolder().getById("OAIConferenceModificationDate").unindexConference(self)
-        indexes.IndexesHolder().getById("OAIPrivateConferenceModificationDate").unindexConference(self)
 
     def getConference( self ):
         return self
@@ -2874,7 +2839,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
 
         # notify observers
         try:
-            self._notify('eventDateChanged', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
+            self._notify('dateChanged', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a start and end date change from %s - %s to %s - %s for conference %s: %s" %
@@ -3185,11 +3150,11 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
 
         self.title = title
         self.cleanCategoryCache()
-        self.notifyModification(updateChildren = True)
+        self.notifyModification()
 
         #we notify the observers that the conference's title has changed
         try:
-            self._notify('eventTitleChanged', {'oldTitle': oldTitle, 'newTitle': title})
+            self._notify('titleChanged', oldTitle, title)
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a conference title change for conference %s: %s" %
@@ -3565,6 +3530,8 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
             self.indexSpeaker(spk)
         for sub in newContrib.getSubmitterList():
             self.addContribSubmitter(newContrib,sub)
+
+        newContrib._notify('created', self)
         self.notifyModification()
 
     def hasContribution(self,contrib):
@@ -3769,12 +3736,12 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self.resetAccessCache()
-        self.notifyOAIModification()
+        self._notify('accessDomainAdded', dom)
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
         self.resetAccessCache()
-        self.notifyOAIModification()
+        self._notify('accessDomainRemoved', dom)
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -3820,16 +3787,20 @@ class Conference(Persistent, Fossilizable, CommonObjectBase, Observable):
 
         protectionAfter = self.__ac.isFatherProtected()
 
-        if protectionBefore != protectionAfter:
-            self.notifyOAIModification(updateChildren=True)
-
     def setProtection( self, private ):
-        """Allows to change the conference access protection
         """
+        Allows to change the conference access protection
+        """
+
+        oldValue = 1 if self.isProtected() else -1
+
         self.__ac.setProtection( private )
         self.updateFullyPublic()
         self.cleanCategoryCache()
-        self.notifyOAIModification(updateChildren=True)
+
+        if oldValue != private:
+            # notify listeners
+            self._notify('protectionChanged', oldValue, private)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -5035,9 +5006,6 @@ class DefaultConference(Conference):
      default templates for posters and badges
     """
 
-    def notifyOAIModification(self, date=None, updateChildren=False):
-        pass
-
     def indexConf(self):
         pass
 
@@ -5420,7 +5388,7 @@ class SCIndex(Persistent):
         self._idx._p_changed=1
 
 
-class Session(Persistent, Fossilizable, CommonObjectBase):
+class Session(CommonObjectBase):
     """This class implements a conference session, being the different parts
         in which the conference can be divided and the contributions can be
         organised in. The class contains necessary attributes to store session
@@ -5523,15 +5491,14 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
     def setKeywords(self, keywords):
         self._keywords = keywords
 
-    def notifyModification( self, date=None ):
+    def notifyModification( self, date = None ):
         """Method called to notify the current session has been modified.
         """
-        if not date:
-            date = nowutc()
-        self._modificationDS = date
+        self.setModificationDate(date)
+
         parent = self.getConference()
         if parent:
-            parent.notifyModification()
+            parent.setModificationDate(date)
         self._p_changed=1
 
     def getModificationDate( self ):
@@ -7942,7 +7909,7 @@ class _PrimAuthIdx(_AuthIdx):
             for auth in contrib.getPrimaryAuthorList():
                 self.index(auth)
 
-class Contribution(Persistent, Fossilizable, CommonObjectBase):
+class Contribution(CommonObjectBase):
     """This class implements a conference contribution, being the concrete
         contributes of the conference participants. The class contains
         necessary attributes to store contribution basic meta data and provides
@@ -7991,7 +7958,6 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         self._submitters=[]
         self._submittersEmail=[]
         self._modificationDS = nowutc()
-        self._OAImodificationDS = self._modificationDS
         self._keywords = ""
         self._reviewManager = ReviewManager(self)
 
@@ -8318,104 +8284,17 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
                 cont.addSubContribution(sc.clone(cont, self, options))
         return cont
 
-    def notifyModification( self, date=None, oai=True):
-        if not date:
-            date = nowutc()
-        self._modificationDS = date
-        if oai:
-            self.notifyOAIModification(date=date)
+    def notifyModification( self, date = None, raiseEvent = True):
+
+        self.setModificationDate(date)
+
+        if raiseEvent:
+            self._notify('infoChanged')
+
         parent = self.getParent()
         if parent:
-            parent.notifyModification()
+            parent.setModificationDate()
         self._p_changed = 1
-
-    def notifyOAIModification(self, date=None):#, updateChildren=False):#, force=False):
-        self.getOAIModificationDate() #init _OAImodificationDS value if it don't exist
-        idxPu = indexes.IndexesHolder().getById("OAIContributionModificationDate")
-        idxPr = indexes.IndexesHolder().getById("OAIPrivateContributionModificationDate")
-
-
-        if self.hasAnyProtection():
-            if self in idxPu.getContributions(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
-                #The contribution was public and is now private
-                idxPu.unindexContribution(self)
-                for subContrib in self.getSubContributionList():
-                    idxPu.unindexContribution(subContrib)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                self._p_changed=1
-                idxPr.indexContribution(self)
-
-                for subContrib in self.getSubContributionList():
-                    idxPr.indexContribution(subContrib)
-
-            elif self in idxPr.getContributions(self._OAImodificationDS.strftime("%Y-%m-%d"), self._OAImodificationDS.strftime("%Y-%m-%d")):
-                #The contribution is already indexed in private
-                # if force:
-                idxPr.unindexContribution(self)
-                for subContrib in self.getSubContributionList():
-                    idxPr.unindexContribution(subContrib)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPr.indexContribution(self)
-                for subContrib in self.getSubContributionList():
-                    idxPr.indexContribution(subContrib)
-
-            else:
-                #The contribution wasn't indexed before and is private
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                self._p_changed=1
-                idxPr.indexContribution(self)
-
-                for subContrib in self.getSubContributionList():
-                    idxPr.indexContribution(subContrib)
-
-        else:
-            if self in idxPr.getContributions(self.getOAIModificationDate().strftime("%Y-%m-%d"), self.getOAIModificationDate().strftime("%Y-%m-%d")):
-                #The contribution was private and is now public
-                idxPr.unindexContribution(self)
-                for subContrib in self.getSubContributionList():
-                    idxPr.unindexContribution(subContrib)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPu.indexContribution(self)
-
-                for subContrib in self.getSubContributionList():
-                    idxPu.indexContribution(subContrib)
-
-            elif self in idxPu.getContributions(self.getOAIModificationDate().strftime("%Y-%m-%d"), self.getOAIModificationDate().strftime("%Y-%m-%d")):
-                #The contribution is already indexed in public, reIndex it with new date
-                idxPu.unindexContribution(self)
-
-                for subContrib in self.getSubContributionList():
-                    idxPu.unindexContribution(subContrib)
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPu.indexContribution(self)
-                for subContrib in self.getSubContributionList():
-                    idxPu.indexContribution(subContrib)
-
-            else:
-                #The contribution wasn't indexed before and is public
-                if not date:
-                    date = nowutc()
-                self._OAImodificationDS = date
-                idxPu.indexContribution(self)
-                for subContrib in self.getSubContributionList():
-                    idxPu.indexContribution(subContrib)
-
-    def getOAIModificationDate(self):
-        try:
-            return self._OAImodificationDS
-        except:
-            self._OAImodificationDS = self._modificationDS
-        return self._OAImodificationDS
 
     def getCategoriesPath(self):
         return self.getConference().getCategoriesPath()
@@ -8454,21 +8333,14 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             self._setConference( conf )
             self._setId( id )
 
-    def unindex( self ):
-        indexes.IndexesHolder().getById("OAIContributionModificationDate").unindexContribution(self)
-        indexes.IndexesHolder().getById("OAIPrivateContributionModificationDate").unindexContribution(self)
-
-
     def delete( self ):
         """deletes a contribution and all of its subitems
         """
 
-        self.unindex()
+        oldParent = self.getConference()
 
-        if self.getConference() is not None:
-            #index a DeletedObject to keep track of the contribution after the deletion
-            DeletedObjectHolder().add(DeletedObject(self))
-
+        if oldParent != None:
+            self._notify('deleted', oldParent)
 
             self.setTrack(None)
             self.setSession(None)
@@ -8515,9 +8387,13 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         """used mainly in the web session access key table"""
         return "%st%s" % (self.getConference().getUniqueId(),self.id)
 
-    def setTitle( self, newTitle ):
+    def setTitle( self, newTitle, notify = True ):
+        oldTitle = self.title
         self.title = newTitle.strip()
-        self.notifyModification()
+
+        if notify:
+            self._notify('titleChanged', oldTitle, newTitle)
+            self.notifyModification()
 
     def getTitle( self ):
         if self.title.strip() == "":
@@ -9200,9 +9076,15 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         return False
 
     def setProtection( self, private ):
+
+        oldValue = 1 if self.isProtected() else -1
+
         self.__ac.setProtection( private )
         self.updateFullyPublic()
-        self.notifyOAIModification()
+
+        if oldValue != private:
+            # notify listeners
+            self._notify('protectionChanged', oldValue, private)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -9427,6 +9309,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
     def newSubContribution(self):
         newSub = SubContribution()
         self.addSubContribution(newSub)
+        newSub._notify('created', self)
         return newSub
 
     def addSubContribution( self, newSubCont ):
@@ -9645,12 +9528,12 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self.resetAccessCache()
-        self.notifyOAIModification()
+        self._notify('domainAdded', dom)
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
         self.resetAccessCache()
-        self.notifyOAIModification()
+        self._notify('domainRemoved', dom)
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -9750,7 +9633,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
                 pass
         except AttributeError:
             self._submitters=[] #create the attribute
-            self.notifyModification(oai=False)
+            self.notifyModification(raiseEvent = False)
 
     def _grantSubmission(self,av):
         if av not in self._submitters:
@@ -9759,7 +9642,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             self.getConference().addContribSubmitter(self,av)
         if isinstance(av, MaKaC.user.Avatar):
             av.linkTo(self, "submission")
-        self.notifyModification(oai=False)
+        self.notifyModification(raiseEvent = False)
 
     def _grantSubmissionEmail(self, email):
         if not email in self.getSubmitterEmailList():
@@ -9809,7 +9692,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
             self.getConference().removeContribSubmitter(self,av)
         if isinstance(av, MaKaC.user.Avatar):
             av.unlinkTo(self, "submission")
-        self.notifyModification(oai=False)
+        self.notifyModification(raiseEvent = False)
 
     def revokeSubmission(self,av):
         """Removes submission privileges for the specified user
@@ -9819,7 +9702,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
 
     def revokeAllSubmitters(self):
         self._submitters=[]
-        self.notifyModification(oai=False)
+        self.notifyModification(raiseEvent = False)
 
     def getSubmitterList(self):
         """Gives the list of users granted with submission privileges
@@ -10310,7 +10193,7 @@ class SubContribParticipation(Persistent, Fossilizable):
             res = "%s%s."%(res, self.getFirstName()[0].upper())
         return res
 
-class SubContribution(Persistent, Fossilizable, CommonObjectBase):
+class SubContribution(CommonObjectBase):
     """
     """
 
@@ -10425,18 +10308,9 @@ class SubContribution(Persistent, Fossilizable, CommonObjectBase):
     def notifyModification( self ):
         parent = self.getParent()
         if parent:
-            parent.notifyModification()
-        self.notifyOAIModification()
+            parent.setModificationDate()
+        self._notify('infoChanged')
         self._p_changed = 1
-
-    def notifyOAIModification(self, date=None): #, force=False):
-        return self.getParent().notifyOAIModification()
-
-    def getOAIModificationDate( self ):
-        parent = self.getParent()
-        if parent:
-            return parent.getOAIModificationDate()
-        return nowutc()
 
     def getCategoriesPath(self):
         return self.getConference().getCategoriesPath()
@@ -10900,18 +10774,9 @@ class SubContribution(Persistent, Fossilizable, CommonObjectBase):
             for mat in self.getMaterialList():
                 mat.resetModifyCache(False, True)
 
-
-    def unindex( self ):
-        indexes.IndexesHolder().getById("OAIContributionModificationDate").unindexContribution(self)
-        indexes.IndexesHolder().getById("OAIPrivateContributionModificationDate").unindexContribution(self)
-
-
     def delete(self):
 
-        self.unindex()
-
-        #index a DeletedObject to keep track of the sub-contribution after the deletion
-        DeletedObjectHolder().add(DeletedObject(self))
+        self._notify('deleted', self.getOwner())
 
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])
@@ -10940,7 +10805,7 @@ class SubContribution(Persistent, Fossilizable, CommonObjectBase):
     def setReportNumberHolder(self, rnh):
         self._reportNumberHolder=rnh
 
-class Material(Persistent, Fossilizable, CommonObjectBase):
+class Material(CommonObjectBase):
     """This class represents a set of electronic documents (resources) which can
         be attached to a conference, a session or a contribution.
         A material can be of several types (achieved by specialising this class)
@@ -11052,7 +10917,7 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
     def notifyModification( self ):
         parent = self.getOwner()
         if parent:
-            parent.notifyModification()
+            parent.setModificationDate()
         self._p_changed = 1
 
     def getLocator( self ):
@@ -11655,7 +11520,7 @@ class Minutes(Material):
             Material.recoverResource(self, recRes)
 
 
-class Resource(Persistent, Fossilizable, CommonObjectBase):
+class Resource(CommonObjectBase):
     """This is the base class for representing individual resources which can
         be included in material containers for lately being attached to
         conference objects (i.e. conferences, sessions or contributions). This
@@ -11699,7 +11564,7 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
     def notifyModification( self ):
         parent = self.getOwner()
         if parent:
-            parent.notifyModification()
+            parent.setModificationDate()
         self._p_changed = 1
 
     def getLocator( self ):
@@ -12230,7 +12095,7 @@ class TCIndex( Persistent ):
         self._p_changed = 1
 
 
-class Track(Persistent):
+class Track(CoreObject):
 
     def __init__( self ):
         self.conference = None
@@ -12324,7 +12189,7 @@ class Track(Persistent):
     def notifyModification( self ):
         parent = self.getConference()
         if parent:
-            parent.notifyModification()
+            parent.setModificationDate()
         self._p_changed = 1
 
     def getLocator( self ):
@@ -12603,7 +12468,7 @@ class Track(Persistent):
         return self.getConference().getModifKey()
 
 
-class SubTrack(Persistent):
+class SubTrack(CoreObject):
 
     def __init__( self ):
         self.track = None
@@ -12641,7 +12506,7 @@ class SubTrack(Persistent):
     def notifyModification( self ):
         parent = self.getTrack()
         if parent:
-            parent.notifyModification()
+            parent.setModificationDate()
         self._p_changed = 1
 
     def getLocator( self ):
@@ -12760,210 +12625,3 @@ class BOAConfig(Persistent):
 
     def setText(self,newText):
         self._text=newText.strip()
-
-class DeletedObjectHolder(ObjectHolder):
-
-    idxName = "DeletedObject"
-    counterName = "DELETEDOBJECT"
-
-    def __init__(self):
-        ObjectHolder.__init__(self)
-        self.archivedConferenceObjs = []
-        self.archivedContribObjs = []
-
-    def initIndexes(self):
-        indexes.IndexesHolder().getIndex("OAIDeletedConferenceModificationDate").initIndex()
-        indexes.IndexesHolder().getIndex("OAIDeletedConferenceCategory").initIndex()
-        indexes.IndexesHolder().getIndex("OAIDeletedContributionModificationDate").initIndex()
-        indexes.IndexesHolder().getIndex("OAIDeletedContributionCategory").initIndex()
-
-        indexes.IndexesHolder().getIndex("OAIDeletedPrivateConferenceModificationDate").initIndex()
-        indexes.IndexesHolder().getIndex("OAIDeletedPrivateConferenceCategory").initIndex()
-        indexes.IndexesHolder().getIndex("OAIDeletedPrivateContributionModificationDate").initIndex()
-        indexes.IndexesHolder().getIndex("OAIDeletedPrivateContributionCategory").initIndex()
-
-
-    def add( self, newItem ):
-        ObjectHolder.add( self, newItem )
-        if newItem.wasArchived:
-            if newItem._objClass == Conference:
-                self.archivedConferenceObjs.append(newItem)
-            else:
-                self.archivedContribObjs.append(newItem)
-
-    @classmethod
-    def index(cls, newItem):
-        if newItem._objClass == Conference:
-            cls.getConferenceDateIndex(private=newItem.protected).indexConference(newItem)
-            cls.getConferenceCategoryIndex(private=newItem.protected).indexConference(newItem)
-        elif newItem._objClass == Contribution or newItem._objClass == SubContribution or newItem._objClass == AcceptedContribution:
-            cls.getContributionDateIndex(private=newItem.protected).indexContribution(newItem)
-            cls.getContributionCategoryIndex(private=newItem.protected).indexContribution(newItem)
-        else:
-            raise Exception("Unknown type for indexing: %s" % newItem._objClass)
-
-
-    def get_earliest_datestamp(self):
-        date = []
-        idxConf = DeletedObjectHolder.getConferenceDateIndex(private=True)
-        d = idxConf.getLowerIndex()
-        if d:
-            date.append(d)
-
-        idxCont = DeletedObjectHolder.getContributionDateIndex(private=True)
-        d = idxCont.getLowerIndex()
-        if d:
-            date.append(d)
-
-        idxConf = DeletedObjectHolder.getConferenceDateIndex(private=False)
-        d = idxConf.getLowerIndex()
-        if d:
-            date.append(d)
-
-        idxCont = DeletedObjectHolder.getContributionDateIndex(private=False)
-        d = idxCont.getLowerIndex()
-        if d:
-            date.append(d)
-
-
-        if not date:
-            return None
-        return min(date)
-
-    def getAll(self):
-        l = []
-        l.extend(self.archivedConferenceObjs)
-        l.extend(self.archivedContribObjs)
-        return l
-
-    @classmethod
-    def getConferenceDateIndex(cls, private=False):
-        idxHolder = indexes.IndexesHolder()
-        if private:
-            return idxHolder.getIndex("OAIDeletedPrivateConferenceModificationDate")
-        else:
-            return idxHolder.getIndex("OAIDeletedConferenceModificationDate")
-
-    @classmethod
-    def getContributionDateIndex(cls, private=False):
-        idxHolder = indexes.IndexesHolder()
-        if private:
-            return idxHolder.getIndex("OAIDeletedPrivateContributionModificationDate")
-        else:
-            return idxHolder.getIndex("OAIDeletedContributionModificationDate")
-
-    @classmethod
-    def getConferenceCategoryIndex(cls, private=False):
-        idxHolder = indexes.IndexesHolder()
-        if private:
-            return idxHolder.getIndex("OAIDeletedPrivateConferenceCategory")
-        else:
-            return idxHolder.getIndex("OAIDeletedConferenceCategory")
-
-    @classmethod
-    def getContributionCategoryIndex(cls, private=False):
-        idxHolder = indexes.IndexesHolder()
-        if private:
-            return idxHolder.getIndex("OAIDeletedPrivateContributionCategory")
-        else:
-            return idxHolder.getIndex("OAIDeletedContributionCategory")
-
-
-    def getObjs(self, from_date=None, until_date=None, catId=None, type=[], private=False):
-        confs = []
-        conts = []
-
-        if "conf" in type:
-            idxConf = DeletedObjectHolder.getConferenceDateIndex(private=private)
-            confs.extend(idxConf.getConferences(from_date, until_date))
-        if "cont" in type:
-            idxCont = DeletedObjectHolder.getContributionDateIndex(private=private)
-            conts.extend(idxCont.getContributions(from_date, until_date))
-
-        if catId:
-            if "conf" in type:
-                if confs:
-                    toRemove = []
-                    for conf in confs:
-                        if not conf.wasInCategory(catId):
-                            toRemove.append(conf)
-                    for conf in toRemove:
-                        confs.remove(conf)
-                else:
-                    confIdxCat = DeletedObjectHolder.getConferenceCategoryIndex(private=private)
-                    confs = confIdxCat.getConferences(catId)
-
-            if "cont" in type:
-                if conts:
-                    toRemove = []
-                    for cont in conts:
-                        if not cont.wasInCategory(catId):
-                            toRemove.append(cont)
-                    for cont in toRemove:
-                        conts.remove(cont)
-                else:
-                    contIdxCat = DeletedObjectHolder.getContributionCategoryIndex(private=private)
-                    conts = contIdxCat.getContributions(catId)
-
-        res = []
-        res.extend(confs)
-        res.extend(conts)
-        return res
-
-    def getObjsIds(self, from_date=None, until_date=None, catId=None, type=[], private=False):
-
-        objs = self.getObjs(from_date, until_date, catId, type, private)
-
-        ids = []
-
-        for obj in objs:
-            ids.append(getHierarchicalId(obj))
-
-        return ids
-
-
-class DeletedObject(Persistent):
-    #Object created after a deletion of a conference, contribution or subcontribution to keep track
-
-    def __init__(self, obj):
-        self._OAImodificationDS = nowutc()
-        self._objClass = obj.__class__
-        self.categPath = obj.getConference().getOwnerList()[0].getCategoryPath()
-        self.protected = obj.hasAnyProtection()
-        self.confId = obj.getConference().getId()
-        self.contribId = None
-        self.subContribId = None
-        if self._objClass == Contribution or self._objClass == AcceptedContribution:
-            self.contribId = obj.getId()
-        elif self._objClass == SubContribution:
-            self.contribId = obj.getContribution().getId()
-            self.subContribId = obj.getId()
-
-        DeletedObjectHolder.index(self)
-
-    def hasAnyProtection(self):
-        return self.protected
-
-    def getId(self):
-        if self.subContribId:
-            return "%s:%s:%s"%(self.confId, self.contribId, self.subContribId)
-        elif self.contribId:
-            return "%s:%s"%(self.confId, self.contribId)
-        else:
-            return self.confId
-
-    def getOAIModificationDate(self):
-        return self._OAImodificationDS
-
-    def wasInCategory(self, categId):
-        if categId in self.categPath:
-            return True
-        return False
-
-    def getCategoryPath(self):
-        return self.categPath
-
-    getCategoriesPath = getCategoryPath
-
-    def wasArchived(self):
-        return self.archived

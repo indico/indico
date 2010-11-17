@@ -147,7 +147,8 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
 
         self._addToParent(contribution)
 
-        contribution.setTitle(self._title)
+        contribution.setTitle(self._title, notify = False)
+
         contribution.setKeywords('\n'.join(self._keywords))
 
         contribution.setBoardNumber(self._boardNumber)

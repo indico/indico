@@ -31,37 +31,71 @@ from MaKaC.common import DBMgr
 # plugin imports
 from indico.ext.livesync import SyncManager
 
+def _yesno(message):
+    inp = raw_input("%s [y/N] " % message)
+    if inp == 'y' or inp == 'Y':
+        return True
+    else:
+        return False
 
-def _list(args):
+
+class ConsoleLiveSyncCommand(object):
+
+    def run(self, args):
+
+        self._dbi = DBMgr.getInstance()
+        self._dbi.startRequest()
+
+        self._sm = SyncManager.getDBInstance()
+        self._track = self._sm.getTrack()
+
+        result = self._run(args)
+
+        self._dbi.endRequest(False)
+
+        return result
+
+class ListCommand(ConsoleLiveSyncCommand):
     """
     Lists entries in the MPT
     """
 
-    dbi = DBMgr.getInstance()
+    def _run(self, args):
 
-    dbi.startRequest()
+        if args.pid:
+            it = self._track.pointerIterItems(args.pid, args.toTS)
+        else:
+            it = self._track._iter(args.fromTS, args.toTS)
 
-    sm = SyncManager.getDBInstance()
-    track = sm.getTrack()
+        for ts, elem in it:
+            print ts, elem
 
-    if args.pid:
-        it = track.pointerIterItems(args.pid, args.toTS)
-    else:
-        it = track._iter(args.fromTS, args.toTS)
+        return 0
 
-    for ts, elem in it:
-        print ts, elem
 
-    dbi.endRequest(False)
+class DestroyCommand(ConsoleLiveSyncCommand):
+    """
+    Completely resets the MPT. Please do not do this unless you know what you
+    are doing...
+    """
 
-    return 0
+    def _run(self, args):
+        if not _yesno("Are you sure you want to empty the MPT?"):
+            return 1
+
+        if not _yesno("Really... is this what you want?"):
+            return 1
+
+        self._sm.reset()
+        self._dbi.commit()
+
 
 def main():
     parser = argparse.ArgumentParser(description = sys.modules[__name__].__doc__)
     subparsers = parser.add_subparsers(help="the action to be performed")
 
-    parser_list = subparsers.add_parser("list", help=_list.__doc__)
-    parser_list.set_defaults(func = _list)
+    parser_list = subparsers.add_parser("list", help = ListCommand.__doc__)
+    parser_list.set_defaults(cmd = ListCommand)
 
     from_spec = parser_list.add_mutually_exclusive_group()
 
@@ -77,11 +111,13 @@ def main():
                              dest="toTS",
                              help = "end of timestamp interval" )
 
+    parser_destroy = subparsers.add_parser("destroy", help = DestroyCommand.__doc__)
+    parser_destroy.set_defaults(cmd = DestroyCommand)
 
     args = parser.parse_args()
 
     try:
-        return args.func(args)
+        return args.cmd().run(args)
     except Exception, e:
         traceback.print_exc()
         return -1

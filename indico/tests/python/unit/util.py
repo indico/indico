@@ -23,7 +23,7 @@ Some utils for unit tests
 """
 
 # system imports
-import unittest
+import unittest, sys
 
 # indico imports
 from MaKaC.common.contextManager import ContextManager
@@ -38,23 +38,29 @@ class FeatureLoadingObject(object):
     def _configFeature(self, ftr, obj):
         global _indicoLoadedTestFeatures
 
-        modName, ftrName = ftr.split('.')
+        if type(ftr) == str:
+            modName, ftrName = ftr.split('.')
 
-        ftrClsName = "%s_Feature" % ftrName
+            ftrClsName = "%s_Feature" % ftrName
 
-        mod = __import__('indico.tests.python.unit.%s' % modName,
-                         globals(), locals(), [ftrClsName])
 
-        ftr = mod.__dict__[ftrClsName]
+            mod = __import__('indico.tests.python.unit.%s' % modName,
+                             globals(), locals(), [ftrClsName])
+            ftr = mod.__dict__[ftrClsName]
+        else:
+            pass
+
         ftrObj = ftr()
         ftrObj.start(obj)
 
+        return ftrObj
 
     def _configFeatures(self, obj):
         global _indicoLoadedTestFeatures
 
         self._activeFeatures = []
 
+        # process requirements
         for ftr in self._requires:
             if ftr not in _indicoLoadedTestFeatures:
                 ftrObj = self._configFeature(ftr, obj)
@@ -112,6 +118,7 @@ class ContextManager_Feature(IndicoTestFeature):
         super(ContextManager_Feature, self).destroy(obj)
 
         ContextManager.destroy()
+
 
 class RequestEnvironment_Feature(IndicoTestFeature):
 

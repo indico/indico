@@ -26,6 +26,7 @@ import transaction
 # legacy imports
 from MaKaC.common.db import DBMgr
 from MaKaC.conference import CategoryManager
+from MaKaC.user import AvatarHolder
 
 # indico imports
 from indico.tests.python.unit.util import IndicoTestFeature
@@ -93,6 +94,8 @@ class DummyUser_Feature(IndicoTestFeature):
 
     def start(self, obj):
         super(DummyUser_Feature, self).start(obj)
+
+        obj._dummy = AvatarHolder().getById(0)
 
     def destroy(self, obj):
         super(DummyUser_Feature, self).destroy(obj)

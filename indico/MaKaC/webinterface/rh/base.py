@@ -66,7 +66,6 @@ from MaKaC.plugins.base import Observable
 
 class RequestHandlerBase(Observable):
 
-
     _uh = None
 
     def _checkProtection( self ):
@@ -110,6 +109,7 @@ class RequestHandlerBase(Observable):
 
 
     accessWrapper = property( getAW )
+
 
 class RH(RequestHandlerBase):
     """This class is the base for request handlers of the application. A request

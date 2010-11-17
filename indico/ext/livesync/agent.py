@@ -130,8 +130,16 @@ class SyncManager(Persistent):
         return storage['agent_manager']
 
     def __init__(self):
-        self._agents = mapping.PersistentMapping()
-        self._track = SetMultiPointerTrack()
+        self.reset()
+
+    def reset(self, agentsOnly = False, trackOnly = False):
+        """
+        Resets database structures
+        """
+        if not trackOnly:
+            self._agents = mapping.PersistentMapping()
+        if not agentsOnly:
+            self._track = SetMultiPointerTrack()
 
     def registerNewAgent(self, agent):
         """
@@ -197,7 +205,7 @@ class ActionWrapper(Persistent):
         if tscmp == 0:
             ocmp = cmp(self._obj, action._obj)
             if ocmp == 0:
-                return cmp(self._action, action._action)
+                return cmp(self._actions, action._actions)
             else:
                 return ocmp
         else:

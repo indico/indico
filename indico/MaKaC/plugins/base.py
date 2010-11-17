@@ -829,6 +829,8 @@ class PluginType (PluginBase):
             for obj in smodule.__dict__.values():
                 if type(obj) == type and Component in obj.mro() and \
                    (IListener.implementedBy(obj) or IContributor.implementedBy(obj)):
+                    Logger.get('plugins.holder').debug(
+                        "Registering component %s" % obj)
                     PluginsHolder().getComponentsManager().addComponent(obj)
 
     def _updateRHMapInfo(self, plugin, module):

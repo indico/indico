@@ -125,7 +125,10 @@ class RHCategoryPerformModification( RHCategModifBase ):
             self._target.setTimezone( tz )
             if modifyConfTZ:
                self._target.changeConfTimezones( tz )
-            self._target.setName( params.get("name", "") )
+
+            if params.get("name", "") != self._target.getName():
+                self._target.setName( params.get("name", "") )
+
             self._target.setDescription( params.get("description", "") )
             self._target.setDefaultStyle("simple_event",params.get("defaultSimpleEventStyle", ""),subcat )
             self._target.setDefaultStyle("meeting",params.get("defaultMeetingStyle", ""),subcat)
@@ -133,12 +136,14 @@ class RHCategoryPerformModification( RHCategModifBase ):
                 self._target.setVisibility(params.get("visibility",999))
             if  "delete" in params and self._target.getIcon() is not None:
                 self._target.removeIcon()
-            if "icon" in params and not type(params["icon"]) is types.StringType:
+            if "icon" in params and type(params["icon"]) != str and \
+                   params["icon"].filename.strip() != "":
                 if not hasattr(self, "_filePath"):
                     # do not save the file again if it has already been done (db conflicts)
                     self._filePath = self._saveFileToTemp( params["icon"].file )
                     self._tempFilesToDelete.append(self._filePath)
                 self._fileName = params["icon"].filename
+
                 f = conference.LocalFile()
                 f.setName( "Icon" )
                 f.setDescription( "This is the icon for the category" )
@@ -325,24 +330,30 @@ class RHCategoryPerformCreation( RHCategModifBase ):
     def _process( self ):
         params = self._getRequestParams()
         if not ("cancel" in params):
-            nc = self._target.newSubCategory()
+
+            categAccessProtection = params.get("categProtection", "inherit")
+
+            if categAccessProtection == "private" :
+                protection = 1
+            elif categAccessProtection == "public" :
+                protection = -1
+            else:
+                protection = 0
+
+            nc = self._target.newSubCategory(protection)
+
             nc.setTimezone( params.get("defaultTimezone"))
             nc.setName( params.get("name", "") )
             nc.setDescription( params.get("description", "") )
             nc.setDefaultStyle("simple_event",params.get("defaultSimpleEventStyle", "") )
             nc.setDefaultStyle("meeting",params.get("defaultMeetingStyle", "") )
 
-            categAccessProtection = params.get("categProtection", "inherit")
-
-            if categAccessProtection == "private" :
-                nc.getAccessController().setProtection(1)
+            if protection == 1:
                 allowedUsers = self._getAllowedUsers(params)
                 if allowedUsers :
                     for person in allowedUsers :
                         if isinstance(person, user.Avatar) or isinstance(person, user.Group) or isinstance(person, user.CERNGroup):
                             nc.grantAccess(person)
-            elif categAccessProtection == "public" :
-                nc.getAccessController().setProtection(-1)
 
         self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
 
@@ -524,8 +535,7 @@ class _ActionConferenceReallocation:
         if self._confs == []:
             self._confs = confs
         for conf in self._confs:
-            self._categ.removeConference( conf )
-            self._target._addConference( conf )
+            self._categ.moveConference(conf, self._target)
 
 
 class RHCategoryActionConferences( RHCategModifBase ):

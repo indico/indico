@@ -170,6 +170,7 @@ class MaterialLocalRepository(Persistent):
             try:
                 shutil.copyfile( newFile.getFilePath(), destPath )
             except IOError, e:
+                Logger.get('storage').exception('Problem copying file')
                 raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
 
         self.__files[id] = relativePath
