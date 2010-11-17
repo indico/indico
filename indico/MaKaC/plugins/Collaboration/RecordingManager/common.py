@@ -74,7 +74,8 @@ def getTalks(conference, sort = False):
     event_info["title"]      = conference.getTitle()
     event_info["titleshort"] = truncateString(event_info["title"], 40)
     # this always comes first, so just pretend it's 0 seconds past the epoch
-    event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple()))
+    event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple()))
+
     event_info["LOID"]       = ""
     event_info["IndicoLink"] = doesExistIndicoLink(conference)
 
@@ -103,9 +104,9 @@ def getTalks(conference, sort = False):
             event_info["titleshort"] = truncateString(event_info["title"], title_length)
             # NOTE: Sometimes there is no start date?! e.g. 21917. I guess I should deal with this
             try:
-                event_info["date"]       = int(time.mktime(contribution.getStartDate().timetuple()))
+                event_info["date"]       = int(time.mktime(contribution.getAdjustedStartDate().timetuple()))
             except AttributeError:
-                event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple())) + 1
+                event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple())) + 1
 
             event_info["LOID"]       = ""
             event_info["IndicoLink"] = doesExistIndicoLink(contribution)
@@ -133,9 +134,9 @@ def getTalks(conference, sort = False):
                 # so get the owner contribution's start date
                 # and add the counter ctr_sc to that
                 try:
-                    event_info["date"]     = int(time.mktime(subcontribution.getOwner().getStartDate().timetuple()) + ctr_sc)
+                    event_info["date"]     = int(time.mktime(subcontribution.getOwner().getAdjustedStartDate().timetuple()) + ctr_sc)
                 except AttributeError:
-                    event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple())) + ctr_sc
+                    event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple())) + ctr_sc
                 event_info["LOID"]       = ""
                 event_info["IndicoLink"] = doesExistIndicoLink(subcontribution)
 
@@ -156,7 +157,7 @@ def getTalks(conference, sort = False):
         event_info["title"]      = session.getTitle()
         event_info["titleshort"] = truncateString(event_info["title"], title_length)
         # Get start time as seconds since the epoch so we can sort
-        event_info["date"]       = int(time.mktime(session.getStartDate().timetuple()))
+        event_info["date"]       = int(time.mktime(session.getAdjustedStartDate().timetuple()))
         event_info["LOID"]       = ""
         event_info["IndicoLink"] = doesExistIndicoLink(session)
 
