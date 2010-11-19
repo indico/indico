@@ -114,8 +114,9 @@ IndicoUI.Effect = {
      * @param {string} elementId The id of the element to highlight.
      * @param {string} color The color to be used for the background.
      * @param {number} time A number in milliseconds after which the element will come back to its default color.
+     * @param {bool} elementIsDom elementId can be either an Id or the dom element itself.
      */
-    highLightBackground: function(elementId, color, time) {
+    highLightBackground: function(elementId, color, time, elementIsDom) {
         if (!exists(color)) {
             color = "#FFFF88" //light yellow
         }
@@ -124,6 +125,10 @@ IndicoUI.Effect = {
         }
 
         $E(elementId).dom.style.backgroundColor = color;
+
+        if (elementIsDom){
+            elementId = elementId.id;
+        }
 
         if (time) {
             setTimeout("IndicoUI.Effect.removeHighlightBackground('" + elementId +"')", time);

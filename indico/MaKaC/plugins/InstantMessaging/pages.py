@@ -28,6 +28,7 @@ from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate,
 from MaKaC.plugins import PluginsHolder
 from MaKaC.plugins.helpers import DBHelpers, DesktopLinkGenerator, WebLinkGenerator
 from MaKaC.plugins.util import PluginFieldsWrapper
+from MaKaC.webinterface.rh.conferenceModif import RHMaterialsShow
 
 
 class WPConfModifChat(WPConferenceModifBase):
@@ -125,6 +126,7 @@ class WConfModifChat(wcomponents.WTemplated):
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
         vars["User"] = self._user
         vars["tz"] = DisplayTZ(self._aw,self._conf).getDisplayTZ()
+        vars["MaterialUrl"] = RHMaterialsShow._uh().getURL(self._conf).__str__()
 
         return vars
 

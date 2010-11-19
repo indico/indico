@@ -102,6 +102,14 @@ type("EnumWidget", ["WatchObject", "IWidget"],
                             self.mouseoverObserver(false, pair, listItem, event);
                         });
                     }
+                    if(exists(pair.get().set)){
+                        pair.get().set('domElement', listItem.dom);
+                    }
+                    else{
+                        pair.get().domElement = listItem.dom;
+                    }
+
+                    self._postDraw(pair);
                     return listItem;
                 });
 
@@ -117,6 +125,17 @@ type("EnumWidget", ["WatchObject", "IWidget"],
 
             return this.IWidget.prototype.draw.call(this, returnedDom);
 
+        },
+
+        _postDraw: function(pair){
+            return '';
+        },
+
+        _highlightItem: function(item){
+            var self = this;
+            item = self.get(item).get('domElement');
+            var highlightColor = "#FFFF88";
+            IndicoUI.Effect.highLightBackground(item, highlightColor, 3000, true);
         },
 
         _drawItem: function(pair) {

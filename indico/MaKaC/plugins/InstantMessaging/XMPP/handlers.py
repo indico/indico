@@ -418,8 +418,8 @@ class AddLogs2Material( ServiceBase ):
         matList = self._conf.getMaterialList()
         maxId = -1
         for material in matList:
-            if material.getId() > maxId:
-                maxId = material.getId()
+            if int(material.getId()) > maxId:
+                maxId = int(material.getId())
         # we want the next id
         return maxId+1
 
@@ -448,13 +448,15 @@ class AddLogs2Material( ServiceBase ):
         req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
         document = urllib2.urlopen(req).read()
 
+        if document is '':
+            raise NoReportError(_('No logs were found for these dates'), title='Error')
         # create the file
         fDict = {}
         fDict["filePath"]=self._saveFileToTemp(document)
 
         self._tempFilesToDelete.append(fDict["filePath"])
 
-        fDict["fileName"]= "Logs.html"
+        fDict["fileName"]= self._matName+".html"
         fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
         self._file = fDict
 
@@ -462,8 +464,14 @@ class AddLogs2Material( ServiceBase ):
         registry = self._conf.getMaterialRegistry()
         self._materialId = str(self.getNewId())
 
-        mf = registry.getById(self._materialId)
-        mat = mf.create(self._conf)
+        #mf = registry.getById(self._materialId)
+        mf = registry.getById('logs')
+        mat = mf.get(self._conf)
+        if mat is None:
+            mat = mf.create(self._conf)
+            mat.setProtection(1)
+            mat.setTitle('Logs')
+            mat.setDescription('Chat logs for this event')
 
         # create the resource
         resource = LocalFile()
@@ -488,6 +496,8 @@ class AddLogs2Material( ServiceBase ):
 
         protectedObject = resource
         protectedObject.setProtection(1)
+
+        return mat.getId()
 
 
 methodMap = {

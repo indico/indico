@@ -293,7 +293,8 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             self.errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Name already in use');
 
             self.crName = new AutocheckTextBox({style: {width: '300px'}, name: 'title', id:"CRname"}, self.errorLabel);
-            self.crName.set((conferenceName+eventDate).replace(' ', '_'));
+            //replace all the invalid characters
+            self.crName.set((conferenceName+eventDate).replace(/(\s)|\/|\"|&|\\|:|<|>|@/g,"_"));
 
             this.basicTabForm = Html.div({style:{textAlign: 'left'}},
                 IndicoUtil.createFormFromMap([
@@ -512,10 +513,12 @@ type("LogPopup", ["ExclusivePopupWithButtons"],
 
              var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('OK'));
              okButton.observeClick(function(){
-                 result = self.handler(true);
+                 var result = self.handler(true);
                  if (result){
                      self.close();
-                     window.location = result;
+                 }
+                 else{
+                     self.close();
                  }
              });
 
@@ -876,6 +879,7 @@ var showLogOptions = function(element, chatroom){
                                        $T("Material name"),
                                        materialName)
                                       );
+            var requestOk = false;
             menuItems['Attach logs to event material'] = new LogPopup($T('Select the name that logs will have in the material section'),
                                                                       materialContent,
                                                                       function(value){
@@ -896,24 +900,22 @@ var showLogOptions = function(element, chatroom){
                                                                                               matName: materialName.get()
                                                                                           },
                                                                                           function(result,error) {
-                                                                                              if (!error) {
-                                                                                                  // If the server found no problems, we remove the chatroom from the watchlist and remove the corresponding iframe.
-                                                                                                  if (result && result.error) {
-                                                                                                      killProgress();
-                                                                                                  } else {
-
-                                                                                                  }
-                                                                                                  killProgress();
-                                                                                              } else {
+                                                                                              if (error) {
                                                                                                   killProgress();
                                                                                                   IndicoUtil.errorReport(error);
+                                                                                              }
+                                                                                              else{
+                                                                                                  killProgress();
+
+                                                                                                  requestOk = true;
+                                                                                                  window.location = materialUrl+'#'+result;
+                                                                                                  return materialUrl+'#'+result;
                                                                                               }
                                                                                           }
                                                                                       );
                                                                                }
                                                                            }
                                                                       });
-                //links.get(chatroom.id).web;
             logsMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList');
             var pos = element.getAbsolutePosition();
             logsMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);

@@ -89,6 +89,8 @@ var matList = <%= fossilize(materialList, IMaterialFossil) %>;
 
 var mlist = new MaterialListWidget(args, matList, uploadAction, null, null, showMainResourceOption);
 
+
 $E('materialListPlace').set(mlist.draw());
+
 
 </script>

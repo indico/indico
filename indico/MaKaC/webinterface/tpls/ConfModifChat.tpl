@@ -65,6 +65,7 @@ var conferenceName = <%= jsonEncode(Conference.getTitle()) %>;
 var conferenceID = <%= jsonEncode(Conference.getId()) %>;
 var eventDate = '<%= EventDate[0:10].replace('/','_') %>';
 var user = <%= jsonEncode(User.fossilize()) %>;
+var materialUrl = <%= jsonEncode(MaterialUrl) %>;
 
 
 

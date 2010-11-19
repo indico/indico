@@ -1270,6 +1270,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var args = clone(self.args);
         var materialId = pair.key;
         args.materialId = materialId;
+
         //we use lowercase because for the default materials it is saved in the server like for example 'Paper',
         //but then in the selectBox it will be like 'paper'
         args.materialIdsList.set(material.get('title').toLowerCase(), materialId);
@@ -1354,6 +1355,9 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         } else {
             item = [matWidgetDiv];
         }
+        /*if(self.highlight){
+            self._highlightItem(self.highlight);
+        }*/
         return item;
 
     },
@@ -1389,7 +1393,6 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var source;
         var args = clone(self.args);
         args.materialId = id;
-
         source = indicoSource('material.get', args);
         source.state.observe(function(state) {
 
@@ -1407,9 +1410,15 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         });
     },
 
+    _postDraw: function(pair){
+        var self = this;
+
+        if (self.highlight && self.highlight == pair.key){
+            self._highlightItem(self.highlight);
+        }
+    },
 
     drawContent: function() {
-
         var self = this;
 
         $O(self.source).each(function(value, key){
@@ -1433,6 +1442,8 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                           self.uploadAction,
                                           materialLoadFunction);
         }, $T("Add Material")));
+
+
         return Html.div(
             {},
             Html.div({style:{textAlign: 'left'}}, link),
@@ -1456,6 +1467,9 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          this.RemoteWidget(listMethod, args);
          this.args.materialIdsList = $O();
          this.showMainResources = showMainResources || false;
+         if(window.location.hash){
+             this.highlight = window.location.hash.replace("#","");
+         }
      }
 );
 
@@ -1582,7 +1596,8 @@ IndicoUI.Dialogs.Material = {
     },
 
     editMaterial: function(args, types, material, list) {
-        var dialog = new EditMaterialDialog(args, types, material, list, $T("Edit Material"));
+        //var dialog = new EditMaterialDialog(args, types, material, list, $T("Edit Material"));
+        var dialog = new EditMaterialDialog(args, material, types, list, $T("Edit Material"));
         dialog.execute();
     },
 
