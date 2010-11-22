@@ -35,7 +35,7 @@ from indico.core.api.rh import IServerRequestListener
 from indico.util.date_time import int_timestamp, nowutc
 
 # plugin imports
-from indico.ext.livesync.agent import ActionWrapper
+from indico.ext.livesync.base import ActionWrapper
 from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.agent import SyncManager
 

@@ -23,6 +23,6 @@ __metadata__ = {
     'description': "Synchronizes information between Indico and external repositories"
     }
 
-from indico.ext.livesync.agent import PushSyncAgent, SyncAgent, ActionWrapper,\
-     SyncManager
+from indico.ext.livesync.agent import PushSyncAgent, SyncAgent, SyncManager
+from indico.ext.livesync.base import ActionWrapper
 

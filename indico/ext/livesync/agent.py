@@ -23,16 +23,11 @@ Module containing the persistent classes that will be stored in the DB
 """
 
 # dependency libs
-from zope.interface import implements
 from persistent import Persistent, mapping
 
-# indico imports
-from indico.core.api import Component
-from indico.core.api.db import IDBUpdateListener, DBUpdateException
-
 # plugin imports
-from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.struct import SetMultiPointerTrack
+from indico.ext.livesync.util import getPluginType
 
 
 class QueryException(Exception):
@@ -45,40 +40,6 @@ class AgentExecutionException(Exception):
     """
     Raised by problems in Agent execution
     """
-
-
-class SystemUpdateListener(Component):
-
-    implements(IDBUpdateListener)
-
-    def updateDBStructures(self, object, component, fromVersion, toVersion, root):
-        """
-        Updates the DB for use with livesync
-        """
-
-        if component != 'indico.ext.livesync':
-            # we do not care about other components, only for this plugin type
-            return
-
-        # get our storage
-        ptype = getPluginType()
-        storage = ptype.getStorage()
-
-        # check if it is empty
-        if len(storage) == 0:
-            # nice, let's fill it
-            storage['agent_manager'] = SyncManager()
-
-        elif not fromVersion:
-            # woops, this has already been done, and it is a fresh install!
-            raise DBUpdateException("Storage for plugin type '%s' already exists!" % \
-                                    ptype.getId())
-
-        else:
-            # the storage exists and we are doing an update, not a fresh install
-            # in future versions, migration code will be added here
-            pass
-
 
 class SyncAgent(Persistent):
     """
@@ -178,41 +139,4 @@ class SyncManager(Persistent):
         return self._track
 
 
-class ActionWrapper(Persistent):
-    """
-    "Orderable" wrapper for actions, that encloses information about a performed
-    operation
-    """
 
-    def __init__(self, timestamp, obj, actions):
-        self._timestamp = timestamp
-        self._obj = obj
-        self._actions = actions
-
-    def getObject(self):
-        return self._obj
-
-    def getActions(self):
-        return self._actions
-
-    def __cmp__(self, action):
-        """
-        Comparison takes timestamp into account, then object, then actions
-        """
-
-        tscmp = cmp(self._timestamp, action._timestamp)
-
-        if tscmp == 0:
-            ocmp = cmp(self._obj, action._obj)
-            if ocmp == 0:
-                return cmp(sorted(self._actions), sorted(action._actions))
-            else:
-                return ocmp
-        else:
-            return tscmp
-
-    def __str__(self):
-        return "<ActionWrapper@%s (%s) [%s] %s>" % (hex(id(self)),
-                                                    self._obj,
-                                                    ','.join(self._actions),
-                                                    self._timestamp)
