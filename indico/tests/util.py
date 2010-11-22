@@ -23,11 +23,20 @@ This module defines some utility classes for the testing framework,
 such as a wrapper for ZEOServer that allows a "test" server to be created
 """
 
-import os, time
+import os, time, logging
 from multiprocessing import Process
 from StringIO import StringIO
 
 from ZEO.runzeo import ZEOOptions, ZEOServer
+
+
+class SilentZEOServer(ZEOServer):
+    """
+    A ZEO Server that doesn't write on the console
+    """
+    def setup_default_logging(self):
+        # do nothing, just use whatever handler is available
+        pass
 
 
 class TestZEOServer(Process):
@@ -38,7 +47,7 @@ class TestZEOServer(Process):
         Process.__init__(self)
         self.options = ZEOOptions()
         self.options.realize(['-f', fd, '-a', '%s:%d' % (hostname, port)])
-        self.server = ZEOServer(self.options)
+        self.server = SilentZEOServer(self.options)
 
     def run(self):
         """

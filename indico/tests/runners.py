@@ -144,6 +144,16 @@ class LogToConsoleTestOption(Option):
         return not not self.value
 
 
+class XMLOutputOption(Option):
+
+    def use_xml_output(self, obj, fname, args):
+
+        if self.value:
+            args += ['--with-xunit', '--xunit-file=build/%s-results.xml' % fname]
+        else:
+            args += ['-v']
+
+
 class UnitTestRunner(BaseTestRunner):
     """
     Python Unit Tests
@@ -155,7 +165,7 @@ class UnitTestRunner(BaseTestRunner):
                       'coverage': CoveragePythonTestOption,
                       'specify': Option,
                       'log': LogToConsoleTestOption,
-                      'xml': Option}
+                      'xml': XMLOutputOption }
 
     def _run(self):
         #coverage = CoverageTestRunner.getInstance()
@@ -165,10 +175,10 @@ class UnitTestRunner(BaseTestRunner):
 
         #retrieving tests from tests folder
         args = ['nose', '--nologcapture',  '--logging-clear-handlers', \
-                '--with-id', '-v', '-s']
+                '--with-id', '-s']
 
-        if self.options.valueOf('xml'):
-            args += ['--with-xunit', '--xunit-file=build/test-results.xml']
+        # will set args
+        self._callOptions('use_xml_output', 'unit', args)
 
         specific = self.options.valueOf('specify')
 
@@ -219,7 +229,8 @@ class FunctionalTestRunner(BaseTestRunner):
                       'record': Option,
                       'specify': Option,
                       'threads': Option,
-                      'repeat': Option}
+                      'repeat': Option,
+                      'xml': XMLOutputOption }
 
 
     def __init__(self, **kwargs):
@@ -237,8 +248,10 @@ class FunctionalTestRunner(BaseTestRunner):
                         ' server cannot be started.\n')
 
 
-            args = ['nose', '--nologcapture', '--logging-clear-handlers',
-                    '-v']
+            args = ['nose', '--nologcapture', '--logging-clear-handlers']
+
+            # will set args
+            self._callOptions('use_xml_output', 'functional', args)
 
             specific = self.options.valueOf('specify')
 
@@ -309,13 +322,19 @@ class FunctionalTestRunner(BaseTestRunner):
         self._info("Starting Selenium Server")
 
         try:
+            fout = open('build/selenium.stdout.log','w')
+            ferr = open('build/selenium.stderr.log', 'w')
+
             self.child = subprocess.Popen(["java", "-jar",
                                       os.path.join(self.setupDir,
                                                    'python',
                                                    'functional',
                                                    TestConfig.getInstance().
-                                                   getSeleniumFilename())],
-                                      stdout=None)
+                                                   getSeleniumFilename()),
+                                           '-log', 'build/selenium.log',
+                                           '-browserSideLog'],
+                                        stdout = fout,
+                                        stderr = ferr)
 
         except OSError, e:
             return ("[ERR] Could not start selenium server - command \"java\""
