@@ -18,6 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# system imports
+import contextlib
+
 # ZODB imports
 import ZODB
 from ZODB import ConflictResolution, MappingStorage
@@ -25,8 +28,12 @@ import transaction
 
 # legacy imports
 from MaKaC.common.db import DBMgr
-from MaKaC.conference import CategoryManager
-from MaKaC.user import AvatarHolder
+from MaKaC.conference import CategoryManager, DefaultConference
+
+from MaKaC import user
+from MaKaC.authentication import AuthenticatorMgr
+from MaKaC.common import HelperMaKaCInfo
+from MaKaC.common.info import HelperMaKaCInfo
 
 # indico imports
 from indico.tests.python.unit.util import IndicoTestFeature
@@ -71,17 +78,36 @@ class Database_Feature(IndicoTestFeature):
     def start(self, obj):
         super(Database_Feature, self).start(obj)
 
-        DBMgr.getInstance().startRequest()
+        obj._dbi = DBMgr.getInstance()
 
-        # initialize db root
-        cm = CategoryManager()
-        cm.getRoot()
+        # Reset everything
+        with obj._context('database'):
+            conn = obj._dbi._getConnObject()
+            r = conn.root._root
 
-        obj._home = cm.getById('0')
+            for e in r.keys():
+                del r[e]
 
-    def destroy(self, obj):
-        super(Database_Feature, self).destroy(obj)
-        DBMgr.getInstance().endRequest()
+            # initialize db root
+            cm = CategoryManager()
+            cm.getRoot()
+
+            obj._home = cm.getById('0')
+
+    def _action_startDBReq(obj):
+        obj._dbi.startRequest()
+
+    def _action_stopDBReq(obj):
+        obj._dbi.endRequest()
+
+    def _context_database(self):
+        if DBMgr.getInstance().isConnected():
+            yield
+            return
+
+        self._startDBReq()
+        yield
+        self._stopDBReq()
 
 
 class DummyUser_Feature(IndicoTestFeature):
@@ -94,9 +120,36 @@ class DummyUser_Feature(IndicoTestFeature):
 
     def start(self, obj):
         super(DummyUser_Feature, self).start(obj)
+        with obj._context('database'):
 
-        obj._dummy = AvatarHolder().getById(0)
+            #filling info to new user
+            avatar = user.Avatar()
+            avatar.setName( "fake" )
+            avatar.setSurName( "fake" )
+            avatar.setOrganisation( "fake" )
+            avatar.setLang( "en_US" )
+            avatar.setEmail( "fake@fake.fake" )
 
-    def destroy(self, obj):
-        super(DummyUser_Feature, self).destroy(obj)
+            #registering user
+            ah = user.AvatarHolder()
+            ah.add(avatar)
+
+            #setting up the login info
+            li = user.LoginInfo( "dummyuser", "dummyuser" )
+            ih = AuthenticatorMgr()
+            userid = ih.createIdentity( li, avatar, "Local" )
+            ih.add( userid )
+
+            #activate the account
+            avatar.activateAccount()
+
+            #since the DB is empty, we have to add dummy user as admin
+            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+            al = minfo.getAdminList()
+            al.grant( avatar )
+
+            obj._dummy = avatar
+
+            HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
+
 

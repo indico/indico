@@ -23,26 +23,25 @@ Some utils for unit tests
 """
 
 # system imports
-import unittest, sys
+import unittest, sys, new, contextlib
 
 # indico imports
 from MaKaC.common.contextManager import ContextManager
 
-
-# stores features that have been loaded so far
-_indicoLoadedTestFeatures = []
-
+loadedFeatures = []
 
 class FeatureLoadingObject(object):
 
+    def __init__(self):
+        self._activeFeatures = []
+
     def _configFeature(self, ftr, obj):
-        global _indicoLoadedTestFeatures
+        global loadedFeatures
 
         if type(ftr) == str:
             modName, ftrName = ftr.split('.')
 
             ftrClsName = "%s_Feature" % ftrName
-
 
             mod = __import__('indico.tests.python.unit.%s' % modName,
                              globals(), locals(), [ftrClsName])
@@ -50,42 +49,69 @@ class FeatureLoadingObject(object):
         else:
             pass
 
+        for name, func in ftr.__dict__.iteritems():
+            if name.startswith('_action_'):
+                setattr(obj, name[7:], new.instancemethod(func, obj, obj.__class__))
+
+            elif name.startswith('_context_'):
+                setattr(obj, name, new.instancemethod(func, obj, obj.__class__))
+
         ftrObj = ftr()
-        ftrObj.start(obj)
+
+        if ftr not in loadedFeatures:
+            ftrObj.start(obj)
+            loadedFeatures.append(ftr)
 
         return ftrObj
 
     def _configFeatures(self, obj):
-        global _indicoLoadedTestFeatures
-
-        self._activeFeatures = []
 
         # process requirements
         for ftr in self._requires:
-            if ftr not in _indicoLoadedTestFeatures:
-                ftrObj = self._configFeature(ftr, obj)
-                self._activeFeatures.append(ftrObj)
-                _indicoLoadedTestFeatures.append(ftr)
+            ftrObj = self._configFeature(ftr, obj)
+            self._activeFeatures.append(ftrObj)
 
     def _unconfigFeatures(self, obj):
-        for ftr in self._activeFeatures:
+        global loadedFeatures
+        for ftr in self._activeFeatures[::-1]:
             ftr.destroy(obj)
+
+        del loadedFeatures[:]
+        del self._activeFeatures[:]
 
 
 class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
 
     """
-    IndicoTestcase is a normal TestCase on steroids. It allows you to load
+    IndicoTestCase is a normal TestCase on steroids. It allows you to load
     "features" that will empower your test classes
     """
 
     _requires = []
 
+    def __init__(self, *args):
+        unittest.TestCase.__init__(self, *args)
+        FeatureLoadingObject.__init__(self)
+
     def setUp(self):
         self._configFeatures(self)
 
-    def destroy(self):
+    def _closeEnvironment(self):
         self._unconfigFeatures(self)
+
+    @contextlib.contextmanager
+    def _context(self, *contexts):
+        ctxs = []
+        for ctxname in contexts:
+            ctx = getattr(self, '_context_%s' % ctxname)()
+
+            ctx.next()
+            ctxs.append(ctx)
+
+        yield
+
+        for ctx in ctxs[::-1]:
+            ctx.next()
 
 
 class IndicoTestFeature(FeatureLoadingObject):
@@ -128,12 +154,13 @@ class RequestEnvironment_Feature(IndicoTestFeature):
 
     _requires = []
 
-    def start(self, obj):
-        super(RequestEnvironment_Feature, self).start(obj)
-        obj._do._notify('requestStarted')
+    def _action_endRequest(self):
+        self._do._notify('requestFinished')
 
+    def _action_startRequest(self):
+        self._do._notify('requestStarted')
 
-    def destroy(self, obj):
-        super(RequestEnvironment_Feature, self).destroy(obj)
-        obj._do._notify('requestFinished')
-
+    def _context_request(self):
+        self._startRequest()
+        yield
+        self._endRequest()

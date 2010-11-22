@@ -205,7 +205,7 @@ class ActionWrapper(Persistent):
         if tscmp == 0:
             ocmp = cmp(self._obj, action._obj)
             if ocmp == 0:
-                return cmp(self._actions, action._actions)
+                return cmp(sorted(self._actions), sorted(action._actions))
             else:
                 return ocmp
         else:

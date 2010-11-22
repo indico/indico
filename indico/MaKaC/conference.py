@@ -3156,11 +3156,8 @@ class Conference(CommonObjectBase):
         try:
             self._notify('titleChanged', oldTitle, title)
         except Exception, e:
-            try:
-                Logger.get('Conference').error("Exception while notifying the observer of a conference title change for conference %s: %s" %
-                          (self.getId(), str(e)))
-            except Exception, e2:
-                Logger.get('Conference').error("Exception while notifying a conference title change: %s (origin: %s)" % (str(e2), str(e)))
+            Logger.get('Conference').exception("Exception while notifying the observer of a conference title change for conference %s: %s" %
+                                               (self.getId(), str(e)))
 
 
     def getDescription(self):
@@ -5017,6 +5014,7 @@ class DefaultConference(Conference):
         except IndexError:
             raise MaKaCError(_("""There are no admin users. The "default" conference that stores the template cannot be created.
                                 Please add at least 1 user to the admin list."""))
+
 
 class ConferenceHolder( ObjectHolder ):
     """Specialised ObjectHolder dealing with conference objects. It gives a

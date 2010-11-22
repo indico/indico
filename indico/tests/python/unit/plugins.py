@@ -24,6 +24,7 @@ from indico.tests.python.unit.util import IndicoTestFeature
 # legacy imports
 from MaKaC.plugins.base import Observable, PluginsHolder
 
+from MaKaC.common import DBMgr
 
 class DummyObservable(Observable):
     pass
@@ -35,6 +36,9 @@ class Plugins_Feature(IndicoTestFeature):
 
     def start(self, obj):
         super(Plugins_Feature, self).start(obj)
-        obj._ph = PluginsHolder()
-        obj._ph.reloadAllPlugins()
-        obj._do = DummyObservable()
+        with obj._context('database'):
+            obj._ph = PluginsHolder()
+            obj._ph.reloadAllPlugins()
+            obj._do = DummyObservable()
+
+
