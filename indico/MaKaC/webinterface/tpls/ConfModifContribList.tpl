@@ -136,7 +136,10 @@ else:
                         <td valign="bottom" align="left">
                             <input type="submit" class="btn" name="PROC" value="<%= _("Proceedings")%>">
                         </td>
-                        <td valign="middle" align="left">
+                        <td valign="bottom" align="left">
+                          Export to:
+                        </td>
+                        <td valign="bottom" align="left">
                             <input type="image" src=<%= pdfIconURL%> class="btn" name="PDF" value="<%= _("Create PDF")%>" onclick='this.form.action=<%= contributionsPDFURL %>;this.form.target="_blank";'>
                         </td>
                 </tbody>
@@ -178,7 +181,6 @@ else:
                 <td colspan="40" valign="bottom" align="left">
                     <table>
                         <tbody>
-
                                 <td valign="bottom" align="left" class="eventModifButtonBar">
                                     <input type="submit" class="btn" name="move" value="<%= _("Move")%>">
                                 </td>
@@ -191,7 +193,10 @@ else:
                                 <td valign="bottom" align="left">
                                     <input type="submit" class="btn" name="PROC" value="<%= _("Proceedings")%>">
                                 </td>
-                                <td valign="middle " align="left">
+                                <td valign="bottom" align="left">
+                                  Export to:
+                                </td>
+                                <td valign="bottom" align="left">
                                     <input type="image" src=<%= pdfIconURL%> class="btn" name="PDF" value="<%= _("Create PDF")%>" onclick='this.form.action=<%= contributionsPDFURL %>;this.form.target="_blank";'>
                                 </td>
                         </tbody>

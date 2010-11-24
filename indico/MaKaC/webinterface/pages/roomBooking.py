@@ -298,6 +298,10 @@ class WPRoomBookingBookingList( WPRoomBookingBase ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
 
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+            self._includeJSPackage('RoomBooking')
+
     def _getTitle(self):
         if self._rh._today:
             return WPRoomBookingBase._getTitle(self) + " - " + _("Calendar")
@@ -345,6 +349,10 @@ class WPRoomBookingRoomDetails( WPRoomBookingBase ):
     def _setCurrentMenuItem( self ):
         self._roomSearchOpt.setActive(True)
 
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+            self._includeJSPackage('RoomBooking')
+
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingRoomDetails( self._rh, standalone = True )
         return wc.getHTML( params )
@@ -385,6 +393,10 @@ class WPRoomBookingBookingForm( WPRoomBookingBase ):
 
     def _setCurrentMenuItem( self ):
         self._bookARoomOpt.setActive(True)
+
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+            self._includeJSPackage('RoomBooking')
 
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingBookingForm( self._rh, standalone = True )

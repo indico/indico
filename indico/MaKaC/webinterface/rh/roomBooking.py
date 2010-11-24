@@ -1062,10 +1062,11 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         resvEx = self._resvEx
 
         days = None
-        self._overload = False
+        #self._overload stores type of overload 0 - no overload 1 - too long period selected 2 - too many bookings fetched
+        self._overload = 0
         if resvEx.startDT and resvEx.endDT:
             if ( resvEx.endDT - resvEx.startDT ).days > 400:
-                self._overload = True
+                self._overload = 1
                 self._resvs = []
             else:
                 # Prepare 'days' so .getReservations will use days index
@@ -1073,12 +1074,16 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
                     resvEx.repeatability = RepeatabilityEnum.daily
                 periods = resvEx.splitToPeriods(endDT = resvEx.endDT)
                 days = [ period.startDT.date() for period in periods ]
-                if len( days ) > 32:
-                    days = None # Using day index won't help
 
         if not self._overload:
-            self._resvs = CrossLocationQueries.getReservations( resvExample = resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, days = days )
-
+            self._resvs = []
+            for day in days:
+                for loc in Location.allLocations:
+                    self._resvs += CrossLocationQueries.getReservations( location = loc.friendlyName, resvExample = resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, days = [day] )
+                if len(self._resvs) > 400:
+                    self._overload = 2
+                    break
+            self._resvEx.endDT = datetime( day.year, day.month, day.day, 23, 59, 00 )
 
         p = roomBooking_wp.WPRoomBookingBookingList( self )
         return p.display()
@@ -1841,6 +1846,11 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
 
         counter = 0
         for resv in resvs:
+            # There's a big difference between 'isConfirmed' being None and False. This value needs to be
+            # changed to None and after the search reverted to the previous value. For further information,
+            # please take a look at the comment in rb_reservation.py::ReservationBase.getCollisions method
+            tmpConfirmed = resv.isConfirmed
+            resv.isConfirmed = None
             if resv.getCollisions( sansID = resv.id, boolResult = True ):
                 resv.rejectionReason = "Your PRE-booking conflicted with exiting booking. (Please note it IS possible even if you were the first one to PRE-book the room)."
                 resv.reject()    # Just sets isRejected = True
@@ -1852,6 +1862,7 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
                 info.append("Booking rejected due to conflict with existing booking")
                 histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
                 resv.getResvHistory().addHistoryEntry(histEntry)
+            resv.isConfirmed = tmpConfirmed
         self._websession.setVar( 'prebookingsRejected', True )
         if counter > 0:
             self._websession.setVar( 'title', str( counter ) + " conflicting PRE-bookings have been rejected." )

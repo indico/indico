@@ -1326,6 +1326,14 @@ span.horizontalSeparator {
     margin-top: 6px;
 }
 
+.dayCalendarDiv {
+    position: relative;
+    height: 10px;
+    font-size:0px;
+    margin-top: 6px;
+    float: right;
+}
+
 .calHour {
     position: absolute;
     font-size: 8px;

@@ -263,8 +263,9 @@
                             </tr>
                             <tr>
                                 <td colspan="3">
-                                    <% includeTpl( 'RoomBookingRoomCalendar' ) %>
+                                    <div id="roomBookingCal"></div>
                                 </td>
+
                             </tr>
                         </table>
                     </tr>
@@ -272,3 +273,8 @@
             </td>
         </tr>
     </table>
+
+    <script type="text/javascript">
+    var roomBookingCalendar = new RoomBookingCalendar(<%= barsFossil %>);
+    $E("roomBookingCal").set(roomBookingCalendar.draw());
+    </script>
