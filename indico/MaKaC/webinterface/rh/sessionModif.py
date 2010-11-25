@@ -1175,13 +1175,11 @@ class RHSessionSetVisibility( RHSessionModifBase ):
 
     def _checkParams( self, params ):
         RHSessionModifBase._checkParams( self, params )
-        privacy = params.get("visibility","INHERITING")
-        self._protect = 0
-        if privacy == "PRIVATE":
+        if params.has_key("changeToPrivate"):
             self._protect = 1
-        elif privacy == "INHERITING":
+        elif params.has_key("changeToInheriting"):
             self._protect = 0
-        elif privacy == "PUBLIC":
+        elif params.has_key("changeToPublic"):
             self._protect = -1
 
     def _process( self ):
