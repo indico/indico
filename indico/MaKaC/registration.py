@@ -682,7 +682,10 @@ class Notification(Persistent):
                 text += """\n%s: %s""" % (_(fieldTitle), fieldValue)
         return text
 
-    def sendEmailNewRegistrant(self, regForm, rp):
+    def createEmailNewRegistrant(self, regForm, rp):
+        """
+            Creates an email to be sent to the user after registration
+        """
         fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
         url = urlHandlers.UHConferenceDisplay.getURL(regForm.getConference())
 
@@ -725,7 +728,21 @@ Congratulations, your registration to %s was successful%s See your information b
             bodyReg = self._cleanBody(bodyReg)
             to=rp.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
-            GenericMailer.send(GenericNotification(maildata))
+            return maildata
+        else:
+            return None
+
+    def sendEmailNewRegistrant(self, regForm, rp):
+        """
+            Creates and sends an email to the user after registration.
+            Returns True if suceeded otherwise False.
+        """
+        email = self.createEmailNewRegistrant(regForm, rp)
+        if email:
+            GenericMailer.send(GenericNotification(email))
+            return True
+        else:
+            return False
 
     def sendEmailNewRegistrantDetailsPay(self, regForm,registrant):
         if not registrant.getConference().getModPay().isEnableSendEmailPaymentDetails():
