@@ -26,3 +26,4 @@ The ``scheduler`` module provides Indico with a scheduling API that allows speci
 from indico.modules.scheduler.module import SchedulerModule
 from indico.modules.scheduler.server import Scheduler
 from indico.modules.scheduler.client import Client
+from indico.modules.scheduler.tasks import PeriodicTask, OneShotTask

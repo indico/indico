@@ -70,7 +70,7 @@ class Scheduler(object):
         'awol_tasks_thresold': 6000,
 
         # Number of times to try to run a task before aborting (min 1)
-        'task_max_tries': 10
+        'task_max_tries': 2
         }
 
     def __init__(self, **config):
@@ -152,9 +152,12 @@ class Scheduler(object):
             # clean up the mess
             task.tearDown()
 
+        task.setStatus(status)
+
         # if it's a periodic task, do some extra things
         if isinstance(task, tasks.PeriodicTask):
             # prepare an "occurrence" object
+
             occurrence = tasks.TaskOccurrence(task)
 
             task.addOccurrence(occurrence)
@@ -172,7 +175,8 @@ class Scheduler(object):
                 self._schedModule.moveTask(task,
                                            base.TASK_STATUS_RUNNING,
                                            status,
-                                           occurrence = occurrence)
+                                           occurrence = occurrence,
+                                           nocheck = True)
 
                 # do not index the task again
                 self._db_addTaskToQueue(task, index = False)
@@ -184,10 +188,8 @@ class Scheduler(object):
             # move the task to the correct place
             self._schedModule.moveTask(task,
                                        base.TASK_STATUS_RUNNING,
-                                       status)
-
-        task.setStatus(status)
-
+                                       status,
+                                       niocheck = True)
     ####
 
     def _getCurrentDateTime(self):
@@ -422,12 +424,15 @@ class Scheduler(object):
             task.dontComeBack()
             self._dbi.commit()
 
+        oldStatus = task.getStatus()
+
+        # it doesn't matter if the task is already running again,
+        # get rid of it
         self._db_moveTask(task,
-                          base.TASK_STATUS_QUEUED,
+                          oldStatus,
                           base.TASK_STATUS_FAILED)
 
-        self._logger.info("Task %s dequeued" % task)
-
+        self._logger.info("Task %s dequeued from status %s" % (task, oldStatus))
 
     def _checkAWOLTasks(self):
 

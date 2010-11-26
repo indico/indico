@@ -140,7 +140,7 @@ class BaseTask(TimedEvent):
         self._v_logger = logger
 
     def getLogger(self):
-        if not getattr(self, '_v_logger') or not self._v_logger:
+        if not hasattr(self, '_v_logger') or not self._v_logger:
             self._v_logger = logging.getLogger('task/%s' % self.typeId)
         return self._v_logger
 
@@ -248,14 +248,14 @@ class PeriodicTask(BaseTask):
             dateAfter = self._getCurrentDateTime()
 
         # find next date after
-        nextOcc = self._rule.after(self._nextOccurrence,
+        nextOcc = self._rule.after(max(self._nextOccurrence, dateAfter),
                                    inc = False)
 
         # repeat process till a satisfactory date is found
         # or there is nothing left to check
-        while nextOcc and nextOcc < dateAfter:
-            nextOcc = self._rule.after(nextOcc,
-                                       inc = False)
+        #while nextOcc and nextOcc < dateAfter:
+        #    nextOcc = self._rule.after(nextOcc,
+        #                               inc = False)
 
         self._nextOccurrence = nextOcc
         return nextOcc

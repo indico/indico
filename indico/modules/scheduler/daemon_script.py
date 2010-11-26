@@ -63,13 +63,18 @@ def _setup(args):
         logging.Formatter(
             "%(asctime)s %(process)s %(name)s: %(levelname)-8s %(message)s"))
 
+    if 'log' not in args.__dict__:
+        args.log = 'INFO'
+
+    level = getattr(logging, args.log)
+
     root_logger = logging.getLogger('')
     root_logger.addHandler(handler)
-    root_logger.setLevel(logging.DEBUG)
+    root_logger.setLevel(level)
 
     if args.mode == 'processes':
         mp_logger = multiprocessing.get_logger()
-        mp_logger.setLevel(logging.DEBUG)
+        mp_logger.setLevel(level)
         mp_logger.addHandler(handler)
 
 def _check_running():
@@ -85,6 +90,8 @@ def _check_running():
     return running
 
 def _start(args):
+
+    _setup(args)
 
     running = _check_running()
 
@@ -206,6 +213,12 @@ def main():
                         default = False, required = False,
                         help = "forces standalone mode -  process doesn't "
                         "go to background")
+
+    parser_start.add_argument("--log",
+                        type=str,
+                        default = "INFO", required = False,
+                        help = "set different logging mode")
+
     parser_start.set_defaults(func = _start)
     parser_stop.set_defaults(func = _stop)
     parser_restart.set_defaults(func = _restart)
@@ -225,8 +238,6 @@ def main():
     parser_cmd.set_defaults(func = _cmd)
 
     args = parser.parse_args()
-
-    _setup(args)
 
     try:
         return args.func(args)

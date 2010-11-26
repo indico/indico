@@ -110,7 +110,6 @@ class _Worker(object):
             self._logger.error("Task %s failed too many (%d) times. "
                                "Aborting its execution.." % (self._task.id, i))
 
-        self._logger.info("ending request %s...", self._dbi)
         self._dbi.endRequest()
         self._logger.info("exiting")
 
