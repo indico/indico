@@ -45,13 +45,12 @@ from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerR
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC import roomMapping
 from MaKaC import domain
-from MaKaC.plugins import PluginsHolder
 import MaKaC.common.indexes as indexes
 import MaKaC.webinterface.personalization as personalization
 from cgi import escape
 import re
 from MaKaC.i18n import _
-from MaKaC.plugins import PluginLoader
+from MaKaC.plugins import PluginLoader, PluginsHolder
 
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil

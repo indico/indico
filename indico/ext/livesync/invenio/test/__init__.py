@@ -18,4 +18,3 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.ext.livesync.invenio.agent import InvenioBatchUploaderAgent

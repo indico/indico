@@ -46,9 +46,11 @@ class ActionWrapper(Persistent):
     def __cmp__(self, action):
         """
         Comparison takes timestamp into account, then object, then actions
+        (high timestamps first)
         """
 
-        tscmp = cmp(self._timestamp, action._timestamp)
+        # the 'minus' is intentional
+        tscmp = -cmp(self._timestamp, action._timestamp)
 
         if tscmp == 0:
             ocmp = cmp(self._obj, action._obj)

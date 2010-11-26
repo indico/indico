@@ -22,9 +22,42 @@ import random
 
 # ZODB related imports
 from persistent import Persistent
-from BTrees.IOBTree import IOBTree
+from BTrees.OOBTree import OOBTree
 from BTrees.OOBTree import OOTreeSet, OOSet
 from ZODB.PersistentMapping import PersistentMapping
+
+
+class timestamp(int):
+    """
+    This class is used to reverse the order of the index
+    """
+
+    def __eq__(self, num):
+        if isinstance(num, timestamp):
+            return self.__cmp__(num) == 0
+        else:
+            return False
+
+    def __ne__(self, num):
+        return not self.__eq__(num)
+
+    def __cmp__(self, num):
+        return - int.__cmp__(self, int(num))
+
+    def _assertType(self, obj):
+        if not isinstance(obj, timestamp):
+            raise TypeError('timestamp object expected')
+
+    def __sub__(self, num):
+        self._assertType(num)
+        return timestamp(int.__sub__(self, num))
+
+    def __add__(self, num):
+        self._assertType(num)
+        return timestamp(int.__add__(self, num))
+
+    def __repr__(self):
+        return "^%s" % (int.__repr__(self))
 
 
 class MultiPointerTrack(Persistent):
@@ -37,7 +70,7 @@ class MultiPointerTrack(Persistent):
     """
 
     def __init__(self, elemContainer):
-        self._container = IOBTree()
+        self._container = OOBTree()
         self._pointers = PersistentMapping()
         self._elemContainer = elemContainer
 
@@ -49,11 +82,11 @@ class MultiPointerTrack(Persistent):
         if startPos:
             self.movePointer(pid, startPos)
 
-    def prepareEntry(self, timestamp):
+    def prepareEntry(self, ts):
         """
         Creates an empty sub-structure (elemContainer) for a given timestamp
         """
-        self._container[timestamp] = self._elemContainer()
+        self._container[timestamp(ts)] = self._elemContainer()
 
     def getCurrentPosition(self, pid):
         """
@@ -61,7 +94,7 @@ class MultiPointerTrack(Persistent):
         """
         currentPos = self._pointers[pid]
         # TODO: assertion? check?
-        return self._container[currentPos]
+        return self._container[timestamp(currentPos)]
 
     def getPointerTimestamp(self, pid):
         """
@@ -69,14 +102,14 @@ class MultiPointerTrack(Persistent):
         """
         return self._pointers[pid]
 
-    def __getitem__(self, timestamp):
+    def __getitem__(self, ts):
         """
         Implements __getitem__, so that mpt[timestamp] works
         """
-        if isinstance(timestamp, slice):
-            return self._getSlice(timestamp)
+        if isinstance(ts, slice):
+            return self._getSlice(ts)
         else:
-            return self._container[timestamp]
+            return self._container[timestamp(ts)]
 
     def _getSlice(self, s):
         """
@@ -90,16 +123,18 @@ class MultiPointerTrack(Persistent):
         """
         Return values or ranges (timestamps) of the structure
         """
-        return self._container.values(*args)
 
-    def add(self, timestamp, value):
+        return self._container.values(*list(timestamp(a) for a in args))
+
+    def add(self, intTS, value):
         """
         Adds a value to the container corresponding to a specific timestamp
         """
-        if timestamp not in self._container:
-            self.prepareEntry(timestamp)
+        ts = timestamp(intTS)
+        if ts not in self._container:
+            self.prepareEntry(intTS)
 
-        self._append(timestamp, value)
+        self._append(ts, value)
 
     def _pointerIterator(self, pid, func, till = None):
         """
@@ -111,15 +146,25 @@ class MultiPointerTrack(Persistent):
             ptrPos = self._container.minKey()
         else:
             ptrPos = self._pointers[pid]
+            if ptrPos:
+                ptrPos = timestamp(ptrPos)
 
-        it = self._container.iteritems(ptrPos, till)
+        if till != None:
+            till = timestamp(till)
+            # negative numbers mean "last but one", "last but two", etc...
+            if till == timestamp(-1):
+                # most common case
+                till = self._container.maxKey() - 1
+
+        it = self._container.iteritems(till, ptrPos)
             # consume a single position
-        if ptrPos != None:
-            it.next()
 
         for ts, entry in it:
+            if int(ts) == ptrPos:
+                # finish one element before end
+                raise StopIteration
             for elem in entry:
-                yield func((ts,elem))
+                yield func((int(ts), elem))
 
     def pointerIterValues(self, pid, till = None):
         """
@@ -136,17 +181,23 @@ class MultiPointerTrack(Persistent):
 
         return self._pointerIterator(pid, lambda x: x, till = till)
 
-    def movePointer(self, pid, timestamp):
+    def movePointer(self, pid, pos):
         """
         Moves a given pointer (id) to a given timestamp
         """
         if pid not in self._pointers:
             raise KeyError("Pointer '%s' doesn't seem to exist!" % pid)
-        if timestamp < self._container.minKey() or \
-               timestamp > self._container.maxKey():
-            raise ValueError("timestamp %s outside bounds" % timestamp)
+
+        ts = timestamp(pos)
+
+        # logic should be inverted here, minKey is actually a maxKey,
+        # numerically - since our logics have inverted comparison, it
+        # ends up like this
+        if ts < self._container.minKey() or \
+               ts > self._container.maxKey():
+            raise ValueError("timestamp %s outside bounds" % ts)
         else:
-            self._pointers[pid] = timestamp
+            self._pointers[pid] = pos
 
     def __len__(self):
         """
@@ -181,8 +232,8 @@ class SetMultiPointerTrack(MultiPointerTrack):
     def __init__(self):
         super(SetMultiPointerTrack, self).__init__(OOSet)
 
-    def _append(self, timestamp, val):
-        self._container[timestamp].add(val)
+    def _append(self, ts, val):
+        self._container[ts].add(val)
 
 
 class ListMultiPointerTrack(MultiPointerTrack):
@@ -193,5 +244,5 @@ class ListMultiPointerTrack(MultiPointerTrack):
     def __init__(self):
         super(ListMultiPointerTrack, self).__init__(list)
 
-    def _append(self, timestamp, val):
-        self._container[timestamp].append(val)
+    def _append(self, ts, val):
+        self._container[ts].append(val)

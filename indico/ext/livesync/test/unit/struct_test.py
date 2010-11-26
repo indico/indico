@@ -54,8 +54,8 @@ class TestMultiPointerTrack(unittest.TestCase):
         adding several elements and checking the result
         """
         self._addSome()
-        self.assertEqual(list(self._mpt[1:2]), [['a', 'c', 'a'], ['b', 'a']])
-        self.assertEqual(list(self._mpt[:]), [['a', 'c', 'a'], ['b', 'a'], ['c']])
+        self.assertEqual(list(self._mpt[2:1]), [['b', 'a'], ['a', 'c', 'a']])
+        self.assertEqual(list(self._mpt[:]), [['c'], ['b', 'a'], ['a', 'c', 'a']])
 
     def testDel(self):
         """
@@ -91,12 +91,12 @@ class TestMultiPointerTrack(unittest.TestCase):
         self._mpt.addPointer('p1')
         self._mpt.addPointer('p2')
         self._mpt.movePointer('p2', 1)
-        self._mpt.movePointer('p1', 1)
+        self._mpt.movePointer('p1' ,1)
         self.assertEqual(list(self._mpt.pointerIterValues('p1')),
-                         ['b', 'a', 'c'])
+                         ['c', 'b', 'a'])
         self._mpt.movePointer('p1', 2)
         self.assertEqual(list(self._mpt.pointerIterValues('p2')),
-                         ['b', 'a', 'c'])
+                         ['c', 'b', 'a'])
         self.assertEqual(list(self._mpt.pointerIterValues('p1')), ['c'])
         self._mpt.movePointer('p1', 1)
 
@@ -151,8 +151,8 @@ class TestSetMultiPointerTrack(unittest.TestCase):
         self._addSome()
 
         self.assertEqual(
-            list(e[1] for e in self._mpt),
-            ['a', 'c', 'd', 'b', 'e', 'f'])
+            list(e for ts, e in self._mpt),
+            [(4, 'f'), (1, 'b'), (2, 'e'), (1, 'a'), (1, 'c'), (2, 'd')])
 
     def testPointerIterator(self):
         self._addSome()
@@ -161,7 +161,7 @@ class TestSetMultiPointerTrack(unittest.TestCase):
         self._mpt.addPointer("bar", 2)
 
         self.assertEqual(list(self._mpt.pointerIterValues("foo")),
-                         [(1, 'a'), (1, 'c'), (2, 'd'), (1, 'b'), (2, 'e'), (4, 'f')])
+                         [(4, 'f'), (1, 'b'), (2, 'e'), (1, 'a'), (1, 'c'), (2, 'd')])
 
         self.assertEqual(list(self._mpt.pointerIterValues("bar")),
                          [(4, 'f')])

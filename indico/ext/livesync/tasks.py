@@ -18,3 +18,33 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# global imports
+import logging
+
+# indico imports
+from indico.modules.scheduler import PeriodicTask
+from indico.util.date_time import nowutc, int_timestamp
+
+# plugin imports
+from indico.ext.livesync import SyncManager
+
+class LiveSyncUpdateTask(PeriodicTask):
+    """
+    A task that periodically checks which sources need to be "pushed"
+    """
+
+    def run(self):
+        sm = SyncManager.getDBInstance()
+
+        logger = self.getLogger()
+
+        # go over all the agents
+        for agtName, agent in sm.getAllAgents().iteritems():
+            logger.info("Starting agent '%s'" % agtName)
+            try:
+                # pass the current time and a logger
+                agent.run(int_timestamp(nowutc()))
+            except:
+                logger.exception("Problem running agent '%s'")
+                raise
+            logger.info("Agent '%s' finished" % agtName)

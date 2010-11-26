@@ -138,5 +138,7 @@ class SyncManager(Persistent):
     def getTrack(self):
         return self._track
 
+    def getAllAgents(self):
+        return self._agents
 
 

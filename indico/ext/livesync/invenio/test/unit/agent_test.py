@@ -18,4 +18,27 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.ext.livesync.invenio.agent import InvenioBatchUploaderAgent
+from BTrees.OOBTree import OOSet
+
+from indico.ext.livesync.invenio.agent import InvenioRecordProcessor
+from indico.ext.livesync import ActionWrapper
+
+from indico.tests.python.unit.util import IndicoTestCase
+
+class TestInvenioRecordProcessor(IndicoTestCase):
+
+    def testEventWorkflow(self):
+        self.assertEqual(
+            list(InvenioRecordProcessor.computeRecords(OOSet([
+                ActionWrapper(1, 'evt1', set(['data_changed created'])),
+                ActionWrapper(1, 'evt2', set(['data_changed created'])),
+                ActionWrapper(2, 'evt1', set(['deleted'])),
+                ActionWrapper(2, 'evt2', set(['data_changed']))
+                ]))),
+            [('evt2', 'create')])
+
+
+class TestMetadataGeneration(IndicoTestCase):
+
+    def testConferenceMetadataGeneration():
+

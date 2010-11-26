@@ -26,56 +26,9 @@ Here, the notification parts of the plugin are tested in a global way.
 
 import time, unittest
 
-
-from indico.ext.livesync import SyncManager
-from indico.tests.python.unit.util import IndicoTestCase, IndicoTestFeature
-from indico.util.date_time import nowutc, int_timestamp
+from indico.ext.livesync.test.unit.base import _TestSynchronization
 
 from MaKaC.conference import CategoryManager
-
-class LiveSync_Feature(IndicoTestFeature):
-    _requires = ['plugins.Plugins', 'util.ContextManager']
-
-    def start(self, obj):
-        super(LiveSync_Feature, self).start(obj)
-
-        with obj._context('database'):
-            obj._ph.getPluginType('livesync').toggleActive()
-            obj._do._notify('updateDBStructures', 'indico.ext.livesync', None, None, None)
-
-            obj._sm = SyncManager.getDBInstance()
-
-
-    def destroy(self, obj):
-        super(LiveSync_Feature, self).destroy(obj)
-
-
-class _TestSynchronization(IndicoTestCase):
-
-    _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
-
-    def setUp(self):
-        super(_TestSynchronization, self).setUp()
-
-    def tearDown(self):
-        super(_TestSynchronization, self).tearDown()
-        self._closeEnvironment()
-
-    def _prettyActions(self, asets):
-
-        def friendlyAction(a):
-            return (a._obj, ' '.join(sorted(a._actions)))
-
-        return list(set(friendlyAction(a) for a in s) for s in asets)
-
-    def _nextTS(self):
-        time.sleep(1)
-        return int_timestamp(nowutc())
-
-    def checkActions(self, fromTS, expected):
-        self.assertEqual(self._prettyActions(
-            list(self._sm.getTrack().values(fromTS))),expected)
-
 
 class TestBasicOperations(_TestSynchronization):
 

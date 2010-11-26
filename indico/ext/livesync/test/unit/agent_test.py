@@ -47,6 +47,9 @@ class TestAgent(PushSyncAgent):
 
     def _run(self, manager, data):
 
+        data = list(data)
+        data.reverse()
+
         # send records one by one
         for ts, w in data:
             self._service.inform(
@@ -69,8 +72,8 @@ class RemoteServiceStub(object):
     def inform(self, notif):
         # we trust the actions will be in the correct order
         # in practice, they should be already ordered
-        for action in notif.actions:
 
+        for action in notif.actions:
             if action == 'del':
                 del self._records[notif.id]
 
@@ -151,7 +154,6 @@ class TestPushAgentBehavior(_TestAgentBehavior):
         self.assertEqual(self._srvc2.getAll(),
                          set([('Der Process', 'available'),
                               ('Angels and Demons', 'available')]))
-
 
     def testDeletionNotification(self):
         currentTS = 0

@@ -18,4 +18,16 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.ext.livesync.invenio.agent import InvenioBatchUploaderAgent
+"""
+Metadata generation
+"""
+
+class MetadataGenerator(object):
+    pass
+
+class MetadataWrapper(object):
+    def __init__(self, obj):
+        self._obj = obj
+
+    def generate(self, format, *kwargs):
+        self._availableFormats[format].generate(*kwargs)
