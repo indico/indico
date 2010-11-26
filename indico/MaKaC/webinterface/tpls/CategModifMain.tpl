@@ -1,3 +1,13 @@
+<!-- CONTEXT HELP DIVS -->
+<div id="tooltipPool" style="display: none">
+    <div id="eventsVisibilityHelp" class="tip">
+        <%= _("""<b>Indicates when events from this category are shown in the event overview webpage.</b><br>
+        - <b>Everywhere</b>: events are shown in the event overview webpage for this category and the parent categories<br>
+        - <b>""" + name + """</b>: events are shown only in the overview webpage for this category (""" + name + """)<br>
+        - <b>Nowhere</b>: events are not shown in any overview webpage.""")%>
+    </div>
+</div>
+<!-- END OF CONTEXT HELP DIVS -->
 
 <div class="groupTitle"><%= _("General Settings")%></div>
 
@@ -35,8 +45,8 @@
       <td bgcolor="white" width="100%%" class="blacktext">%(defaultMeetingStyle)s</td>
     </tr>
     <tr>
-      <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Default&nbsp;events visibility")%></span></td>
-      <td bgcolor="white" width="100%%" class="blacktext">%(defaultVisibility)s</td>
+      <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Events visibility")%></span></td>
+      <td bgcolor="white" width="100%%" class="blacktext">%(defaultVisibility)s <% contextHelp('eventsVisibilityHelp') %></td>
     </tr>
     <tr>
       <td colspan="3" class="horizontalLine">&nbsp;</td>
@@ -65,7 +75,7 @@
     <tr><td></td></tr>
     <tr>
       <td colspan="3" class="horizontalLine">&nbsp;</td>
-    </tr>-->    
+    </tr>-->
     </table>
   </td>
 </tr>
