@@ -52,8 +52,6 @@ class TestTimeSource(base.TimeSource):
         time.sleep(amount/float(self._factor))
 
 
-base.TimeSource.set(TestTimeSource(2))
-
 class TestTask(OneShotTask):
 
     def __init__(self, myid, date_time):
@@ -130,6 +128,8 @@ class SchedulerThread(threading.Thread):
 class _TestScheduler(unittest.TestCase):
 
     def setUp(self):
+
+        base.TimeSource.set(TestTimeSource(2))
 
         DBMgr.getInstance()._conn = {}
 
