@@ -29,6 +29,7 @@ from MaKaC.common import Config
 from MaKaC.conference import Category
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
+from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 
@@ -468,3 +469,25 @@ class WRestrictedHTML( WGenericError ):
         vars = WGenericError.getVars( self )
         vars["msg"] = self._msg
         return vars
+
+class WPError404( WPMainBase ):
+
+    def __init__( self, rh, goBack="" ):
+        WPMainBase. __init__( self, rh)
+        self._goBack = goBack
+
+    def _getBody( self, params ):
+        wc = WError404( self._rh, self._goBack )
+        return wc.getHTML()
+
+class WError404( WTemplated ):
+
+    def __init__( self, rh, goBack="" ):
+        self._rh = rh
+        self._goBack = goBack
+
+    def getVars( self ):
+        vars = WTemplated.getVars( self )
+        vars["goBack"] = self._goBack
+        return vars
+
