@@ -6,8 +6,8 @@
 <SCRIPT LANGUAGE="JavaScript">
 <!-- Begin
 function showColor(val) {
-	window.opener.document.forms[%(formId)s].%(colorString)s.value = val;
-	window.opener.document.forms[%(formId)s].%(colorPreviewString)s.style.background = val;
+	window.opener.document.forms["%(formId)s"].%(colorString)s.value = val;
+	window.opener.document.forms["%(formId)s"].%(colorPreviewString)s.style.background = val;
 	window.close();
 }
 //  End -->

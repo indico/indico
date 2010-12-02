@@ -6933,7 +6933,7 @@ class WFormatColorOptionModif(wcomponents.WTemplated):
         url=urlHandlers.UHSimpleColorChart.getURL()
         url.addParam("colorCodeTarget", "colorCode")
         url.addParam("colorPreviewTarget", "colorpreview")
-        url.addParam("formId", self._formId)
+        url.addParam("formId", self._formatOption + "Form")
 
         vars["colorChartURL"] = url
         return vars
