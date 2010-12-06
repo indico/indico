@@ -46,10 +46,12 @@ from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunicat
 from MaKaC.i18n import _
 
 def getTalks(conference, sort = False):
-    """" sort: if True, contributions are sorted by start date (non scheduled contributions at the end)
+    """
+    sort: if True, contributions are sorted by start date (non scheduled contributions
+    at the end)
     """
 
-#    Logger.get('RecMan').debug("in getTalks()")
+    # Logger.get('RecMan').debug("in getTalks()")
 
     # max length for title string
     title_length = 39
@@ -385,8 +387,10 @@ def parseIndicoID(IndicoID):
     """Given an "Indico ID" of the form shown above, determine whether it is
     a conference, subcontribution etc, and return that info with the individual IDs."""
 
-    # regular expressions to match IndicoIDs for conference, session, contribution, subcontribution
-    # Note: older conferences may be a string like this: a034286 instead of just a number
+    # regular expressions to match IndicoIDs for conference, session, contribution,
+    # subcontribution
+    # Note: older conferences may be a string like this: a034286 instead of just a
+    # number
     pConference      = re.compile('(\w*\d+)$')
     pSession         = re.compile('(\w*\d+)s(\d+)$')
     pContribution    = re.compile('(\w*\d+)c(\d+)$')
@@ -400,37 +404,10 @@ def parseIndicoID(IndicoID):
     mSC = pSubcontribution.match(IndicoID)
 
     # Depending on which talk type it is, populate a dictionary containing the name of
-    # the type of talk, the actual object, and the individual conference, session, contribution,
-    # subcontribution IDs.
-    if mE:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'conference'))
-        conference = ConferenceHolder().getById(mE.group(1))
-        return {'type':           'conference',
-                'object':         conference,
-                'conference':     mE.group(1),
-                'session':        '',
-                'contribution':   '',
-                'subcontribution':''}
-    elif mS:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'session'))
-        conference = ConferenceHolder().getById(mS.group(1))
-        return {'type':           'session',
-                'object':         conference.getSessionById(mS.group(2)),
-                'conference':     mS.group(1),
-                'session':        mS.group(2),
-                'contribution':   '',
-                'subcontribution':''}
-    elif mC:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'contribution'))
-        conference = ConferenceHolder().getById(mC.group(1))
-        return {'type':           'contribution',
-                'object':         conference.getContributionById(mC.group(2)),
-                'conference':     mC.group(1),
-                'session':        '',
-                'contribution':   mC.group(2),
-                'subcontribution':''}
-    elif mSC:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'subcontribution'))
+    # the type of talk, the actual object, and the individual conference, session,
+    # contribution, subcontribution IDs.
+    if mSC:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'subcontribution'))
         conference = ConferenceHolder().getById(mSC.group(1))
         contribution = conference.getContributionById(mSC.group(2))
         return {'type':           'subcontribution',
@@ -439,6 +416,33 @@ def parseIndicoID(IndicoID):
                 'session':        '',
                 'contribution':   mSC.group(2),
                 'subcontribution':mSC.group(3)}
+    elif mS:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'session'))
+        conference = ConferenceHolder().getById(mS.group(1))
+        return {'type':           'session',
+                'object':         conference.getSessionById(mS.group(2)),
+                'conference':     mS.group(1),
+                'session':        mS.group(2),
+                'contribution':   '',
+                'subcontribution':''}
+    elif mC:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'contribution'))
+        conference = ConferenceHolder().getById(mC.group(1))
+        return {'type':           'contribution',
+                'object':         conference.getContributionById(mC.group(2)),
+                'conference':     mC.group(1),
+                'session':        '',
+                'contribution':   mC.group(2),
+                'subcontribution':''}
+    elif mE:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'conference'))
+        conference = ConferenceHolder().getById(mE.group(1))
+        return {'type':           'conference',
+                'object':         conference,
+                'conference':     mE.group(1),
+                'session':        '',
+                'contribution':   '',
+                'subcontribution':''}
     else:
         return None
 
