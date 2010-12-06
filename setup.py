@@ -625,11 +625,8 @@ if __name__ == '__main__':
                     'jsbuild': jsbuild,
                     'fetchdeps': fetchdeps_indico,
                     'develop_config': develop_indico,
-<<<<<<< HEAD
                     'test': test_indico,
-=======
                     'egg_filename': egg_filename
->>>>>>> v0.97-series
                     },
 
           version = _versionInit(),
