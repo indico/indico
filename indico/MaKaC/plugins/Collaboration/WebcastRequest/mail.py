@@ -21,9 +21,7 @@ from MaKaC.webinterface.mail import GenericNotification
 
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
-from MaKaC.plugins.Collaboration.WebcastRequest.common import typeOfEvents, \
-    postingUrgency, webcastPurpose, intendedAudience, subjectMatter, lectureOptions, \
-    getCommonTalkInformation
+from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
 
 
 class WebcastRequestNotificationBase(GenericNotification):
@@ -84,78 +82,6 @@ Request details:<br />
         </td>
     </tr>
     <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Lecture options:</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Type of event:</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Posting urgency:</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Number of webcast viewers:</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Number of recording viewers:</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Number of attendees:</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Webcast purpose(s):</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Intended audience(s):</strong>
-        </td>
-        <td style="vertical-align: top; white-space : nowrap;">
-            %s
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align: top; white-space : nowrap;">
-            <strong>Subject matter(s):</strong>
-        </td>
-        <td style="vertical-align: top">
-            %s
-        </td>
-    </tr>
-    <tr>
         <td colspan="2">
             <strong>Additional comments:</strong><br />
             %s
@@ -176,15 +102,6 @@ Request details:<br />
        self._getTalksShortMessage(),
        self._getTalkSelectionComments(),
        bp["permission"],
-       dict(lectureOptions)[bp["lectureOptions"]],
-       dict(typeOfEvents)[bp['lectureStyle']],
-       dict(postingUrgency)[bp['postingUrgency']],
-       bp['numWebcastViewers'],
-       str(bp['numRecordingViewers']),
-       str(bp['numAttendees']),
-       self._getPurposes(),
-       self._getAudiences(),
-       self._getMatters(),
        self._getComments(),
        self._getTalks())
 
@@ -242,39 +159,6 @@ Request details:<br />
         if comments:
             return comments
         return "(User didn't write any comments)"
-
-    def _getLectureOptions(self):
-        options = self._bp['lectureOptions']
-        lodict = dict(lectureOptions)
-        if options:
-            return MailTools.listToStr([lodict[k] for k in options])
-        else:
-            return "No lecture options were selected"
-
-    def _getPurposes(self):
-        purposes = self._bp['webcastPurpose']
-        rpdict = dict(webcastPurpose)
-        if purposes:
-            return MailTools.listToStr([rpdict[k] for k in purposes])
-        else:
-            return "No purposes were selected"
-
-    def _getAudiences(self):
-        audiences = self._bp['intendedAudience']
-        iadict = dict(intendedAudience)
-        if audiences:
-            return MailTools.listToStr([iadict[k] for k in audiences])
-        else:
-            return "No audiences were selected"
-
-    def _getMatters(self):
-        matters = self._bp['subjectMatter']
-        smdict = dict(subjectMatter)
-        if matters:
-            return MailTools.listToStr([smdict[k] for k in matters])
-        else:
-            return "No audiences were selected"
-
 
 class WebcastRequestAdminNotificationBase(WebcastRequestNotificationBase):
     """ Base class to build an email notification to Admins

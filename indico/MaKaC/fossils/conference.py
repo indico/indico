@@ -323,6 +323,16 @@ class ISessionSlotFossil(IFossil):
     getOwnConvenerList.result = IConferenceParticipationFossil
     getOwnConvenerList.name = "conveners"
 
+    def getStartDate(self):
+        """ """
+    getStartDate.produce = lambda s: s.getAdjustedStartDate()
+    getStartDate.convert = Conversion.datetime
+
+    def getEndDate(self):
+        """ """
+    getEndDate.produce = lambda s: s.getAdjustedEndDate()
+    getEndDate.convert = Conversion.datetime
+
 class IConferenceEventInfoFossil(IConferenceMinimalFossil):
     """
     Fossil used to format the 'eventInfo' javascript object used

@@ -20,9 +20,7 @@
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase,\
     CollaborationTools
-from MaKaC.plugins.Collaboration.WebcastRequest.common import lectureOptions,\
-    typeOfEvents, postingUrgency, webcastPurpose, intendedAudience,\
-    subjectMatter, getCommonTalkInformation
+from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
 from MaKaC.conference import Contribution
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
@@ -83,12 +81,6 @@ class WNewBookingForm(WCSPageTemplateBase):
             vars["Contributions"] = []
 
 
-        vars["LectureOptions"] = lectureOptions
-        vars["TypesOfEvents"] = typeOfEvents
-        vars["PostingUrgency"] = postingUrgency
-        vars["WebcastPurpose"] = webcastPurpose
-        vars["IntendedAudience"] = intendedAudience
-        vars["SubjectMatter"] = subjectMatter
         vars["ConsentForm"] = self._WebcastRequestOptions["ConsentForm"].getValue()
 
         return vars

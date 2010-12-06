@@ -45,7 +45,10 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         var self = this;
 
         if (res.status == "ERROR") {
-            IndicoUtil.errorReport(res.info);
+            IndicoUtil.errorReport({
+                code: '0',
+                requestInfo: {},
+                message: res.info });
         } else {
             this.onUpload(res.info);
             // Firefox will keep "loading" if the iframe is destroyed

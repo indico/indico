@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.user import Avatar
+from MaKaC.common.logger import Logger
 
 """
 Part of Room Booking Module (rb_)
@@ -400,13 +401,13 @@ class TemplateExec:
         try:
             newTpl = TemplateExec.__executePythonCode( pythonCode, dictCopy, tplFilename )
         except TemplateExecException, e:
-
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
             except: pass
-            raise TemplateExecException( e )
+            raise
         except Exception, e:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.error.py", "w" ).write( pythonCode )
             except: pass
+
             raise TemplateExecException( e )
         #except:
         #    raise pythonCode
@@ -490,6 +491,7 @@ class TemplateExec:
 #            try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
 #            except: pass
 
+            Logger.get('tplexec').exception('Template execution error')
             TemplateExec.__saveDebugInfo(e, tplFilename)
 
             raise e

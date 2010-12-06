@@ -8685,7 +8685,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
         if self.getDuration() and sDate + self.getDuration() > owner.getEndDate():
             if check==1:
                 raise ParentTimingError("The contribution cannot end after (%s) its parent ends (%s)"%\
-                        (self.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M'),\
+                        ((sDate + self.getDuration()).astimezone(tz).strftime('%Y-%m-%d %H:%M'),\
                         owner.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M')),\
                          _("Contribution"))
             elif check==2:

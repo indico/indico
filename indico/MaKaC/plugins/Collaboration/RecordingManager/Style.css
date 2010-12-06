@@ -153,14 +153,14 @@ div.RMcolumnStatusCDSPending {
     width: 50px;
     height: 28px;
     text-align: center;
-    background-image: url(../images/RecordingManagerCDSPending.png);
+    background-image: url(./images/RecordingManagerCDSPending.png);
 }
 
 div.RMcolumnStatusCDSDone {
     width: 50px;
     height: 28px;
     text-align: center;
-    background-image: url(../images/RecordingManagerCDSCheck.png);
+    background-image: url(./images/RecordingManagerCDSCheck.png);
 }
 
 div.RMcolumnStatusCDSDoneHover {
@@ -168,7 +168,7 @@ div.RMcolumnStatusCDSDoneHover {
     height: 28px;
     text-align: center;
     cursor: pointer;
-    background-image: url(../images/RecordingManagerCDSHover.png);
+    background-image: url(./images/RecordingManagerCDSHover.png);
 }
 
 div.RMlowerPane {

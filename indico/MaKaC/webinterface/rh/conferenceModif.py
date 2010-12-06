@@ -1694,11 +1694,11 @@ class RHConfSetVisibility( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        if params["visibility"] == "PRIVATE":
+        if params.has_key("changeToPrivate"):
             self._protectConference = 1
-        elif params["visibility"] == "INHERITING":
+        elif params.has_key("changeToInheriting"):
             self._protectConference = 0
-        elif params["visibility"] == "PUBLIC":
+        elif params.has_key("changeToPublic"):
             self._protectConference = -1
 
     def _process( self ):

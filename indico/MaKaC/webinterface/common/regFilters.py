@@ -346,7 +346,7 @@ class RegistrationDateSF( RegistrantSortingField ):
         return cmp( rd1, rd2 )
 
 class GeneralFieldSF( RegistrantSortingField ):
-    _id = "<groupID>-<fieldId>"
+    _id = "groupID-fieldId"
 
 
     def compare( self, r1, r2 ):
@@ -369,7 +369,7 @@ class GeneralFieldSF( RegistrantSortingField ):
         return 0
 
 class StatusesSF( RegistrantSortingField ):
-    _id = "s-<statusId>"
+    _id = "s-statusId"
 
 
     def compare( self, r1, r2 ):

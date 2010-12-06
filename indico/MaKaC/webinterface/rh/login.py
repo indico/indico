@@ -46,6 +46,7 @@ class RHSignIn( base.RH ):
         self._userId = params.get( "userId", "").strip()
 
     def _process( self ):
+        self._disableCaching()
         self._tohttps = True
         #Check for automatic login
         auth = AuthenticatorMgr()
@@ -56,7 +57,7 @@ class RHSignIn( base.RH ):
             tz = tzUtil.getSessionTZ()
             self._getSession().setVar("ActiveTimezone",tz)
             self._getSession().setUser( av )
-            self._redirect( url )
+            self._redirect( url, noCache = True )
         if not self._signIn:
             p = signIn.WPSignIn( self )
             return p.display( returnURL = self._returnURL )
@@ -85,7 +86,7 @@ class RHSignIn( base.RH ):
                     url += "&userId=%s"%self._userId
                 else:
                     url += "?userId=%s"%self._userId
-            self._redirect( url )
+            self._redirect( url, noCache = True )
 
 
 class RHSignOut( base.RH ):

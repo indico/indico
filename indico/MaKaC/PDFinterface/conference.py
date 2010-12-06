@@ -2482,6 +2482,7 @@ class RegistrantsListToBadgesPDF:
     """
     __fonts = {'Times New Roman':['Times-Roman','Times-Bold','Times-Italic','Times-Bold-Italic'],
                'Courier':['Courier', 'Courier-Bold', 'Courier-Italic', 'Courier-Bold-Italic'],
+               'Sans':['Sans', 'Sans-Bold', 'Sans-Italic', 'Sans-Bold-Italic'],
                'LinuxLibertine':['LinuxLibertine','LinuxLibertine-Bold','LinuxLibertine-Italic','LinuxLibertine-Bold-Italic'],
                'Kochi-Mincho':['Kochi-Mincho','Kochi-Mincho','Kochi-Mincho','Kochi-Mincho'],
                'Kochi-Gothic':['Kochi-Gothic','Kochi-Gothic','Kochi-Gothic','Kochi-Gothic'],
@@ -2736,6 +2737,7 @@ class LectureToPosterPDF:
     """
     __fonts = {'Times New Roman':['Times-Roman','Times-Bold','Times-Italic','Times-Bold-Italic'],
                'Courier':['Courier', 'Courier-Bold', 'Courier-Italic', 'Courier-Bold-Italic'],
+               'Sans':['Sans', 'Sans-Bold', 'Sans-Italic', 'Sans-Bold-Italic'],
                'LinuxLibertine':['LinuxLibertine','LinuxLibertine-Bold','LinuxLibertine-Italic','LinuxLibertine-Bold-Italic'],
                'Kochi-Mincho':['Kochi-Mincho','Kochi-Mincho','Kochi-Mincho','Kochi-Mincho'],
                'Kochi-Gothic':['Kochi-Gothic','Kochi-Gothic','Kochi-Gothic','Kochi-Gothic'],

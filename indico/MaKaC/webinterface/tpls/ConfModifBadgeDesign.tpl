@@ -701,6 +701,7 @@
             <optgroup label="<%= _('Normal Fonts') %>">
               <option>Times New Roman</option>
               <option>Courier</option>
+              <option>Sans</option>
             </optgroup>
             <optgroup label="<%= _('Special Character Fonts') %>">
               <option>LinuxLibertine</option>

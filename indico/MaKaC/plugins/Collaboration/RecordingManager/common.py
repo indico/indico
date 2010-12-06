@@ -45,10 +45,12 @@ from MaKaC.plugins.Collaboration.RecordingManager.micala import MicalaCommunicat
 from MaKaC.i18n import _
 
 def getTalks(conference, sort = False):
-    """" sort: if True, contributions are sorted by start date (non scheduled contributions at the end)
+    """
+    sort: if True, contributions are sorted by start date (non scheduled contributions
+    at the end)
     """
 
-#    Logger.get('RecMan').debug("in getTalks()")
+    # Logger.get('RecMan').debug("in getTalks()")
 
     # max length for title string
     title_length = 39
@@ -58,8 +60,13 @@ def getTalks(conference, sort = False):
     recordable_events = []
     talks = []
 
+    speaker_str = ""
+    speaker_list = conference.getChairList()
+    if speaker_list is not None:
+        speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
+
     event_info = {}
-    event_info["speakers"]   = ""
+    event_info["speakers"]   = speaker_str
     event_info["type"]       = "conference"
     event_info["IndicoID"]   = generateIndicoID(conference = conference.getId(),
                                               session         = None,
@@ -68,7 +75,8 @@ def getTalks(conference, sort = False):
     event_info["title"]      = conference.getTitle()
     event_info["titleshort"] = truncateString(event_info["title"], 40)
     # this always comes first, so just pretend it's 0 seconds past the epoch
-    event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple()))
+    event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple()))
+
     event_info["LOID"]       = ""
     event_info["IndicoLink"] = doesExistIndicoLink(conference)
 
@@ -84,14 +92,7 @@ def getTalks(conference, sort = False):
             speaker_str = ""
             speaker_list = contribution.getSpeakerList()
             if speaker_list is not None:
-                tag_first_iter = True
-                for speaker in speaker_list:
-                    if tag_first_iter:
-                        speaker_str = "%s %s" % (speaker_list[0].getFirstName(),
-                                                 speaker_list[0].getFamilyName())
-                    else:
-                        speaker_str = "%s, %s %s" % \
-                            (speaker_str, speaker.getFirstName(), speaker.getFamilyName())
+                speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
 
             event_info = {}
             event_info["speakers"]   = speaker_str
@@ -102,11 +103,13 @@ def getTalks(conference, sort = False):
                                               subcontribution = None)
             event_info["title"]      = contribution.getTitle()
             event_info["titleshort"] = truncateString(event_info["title"], title_length)
-            # NOTE: Sometimes there is no start date?! e.g. 21917. I guess I should deal with this
-            try:
-                event_info["date"]       = int(time.mktime(contribution.getStartDate().timetuple()))
-            except AttributeError:
-                event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple())) + 1
+            # Sometimes contributions are not scheduled, so they have no start date.
+            # In this case assign it the value None, and it will be displayed
+            # at the end of the list with the time value "not scheduled"
+            if contribution.getAdjustedStartDate() is not None:
+                event_info["date"]   = int(time.mktime(contribution.getAdjustedStartDate().timetuple()))
+            else:
+                event_info["date"]   = None
 
             event_info["LOID"]       = ""
             event_info["IndicoLink"] = doesExistIndicoLink(contribution)
@@ -120,14 +123,7 @@ def getTalks(conference, sort = False):
                 speaker_list = subcontribution.getSpeakerList()
 
                 if speaker_list is not None:
-                    tag_first_iter = True
-                    for speaker in speaker_list:
-                        if tag_first_iter:
-                            speaker_str = "%s %s" % (speaker_list[0].getFirstName(),
-                                                     speaker_list[0].getFamilyName())
-                        else:
-                            speaker_str = "%s, %s %s" % \
-                            (speaker_str, speaker.getFirstName(), speaker.getFamilyName())
+                    speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
 
                 event_info["speakers"]   = speaker_str
                 event_info["type"]       = "subcontribution"
@@ -139,19 +135,16 @@ def getTalks(conference, sort = False):
                 event_info["titleshort"] = truncateString(event_info["title"], title_length)
                 # Subcontribution objects don't have start dates,
                 # so get the owner contribution's start date
-                # and add the counter ctr_sc to that
-                try:
-                    event_info["date"]     = int(time.mktime(subcontribution.getOwner().getStartDate().timetuple()) + ctr_sc)
-                except AttributeError:
-                    event_info["date"]       = int(time.mktime(conference.getStartDate().timetuple())) + ctr_sc
+                # and add the counter ctr_sc so they appear in order
+                if subcontribution.getOwner().getAdjustedStartDate() is not None:
+                    event_info["date"]     = int(time.mktime(subcontribution.getOwner().getAdjustedStartDate().timetuple()) + ctr_sc)
+                else:
+                    event_info["date"]       = int(time.mktime(conference.getAdjustedStartDate().timetuple())) + ctr_sc
                 event_info["LOID"]       = ""
                 event_info["IndicoLink"] = doesExistIndicoLink(subcontribution)
 
                 recordable_events.append(event_info)
 
-
-    if sort:
-        talks.sort(key = Contribution.contributionStartDateForSort)
 
     for session in conference.getSessionList():
         event_info = {}
@@ -164,7 +157,10 @@ def getTalks(conference, sort = False):
         event_info["title"]      = session.getTitle()
         event_info["titleshort"] = truncateString(event_info["title"], title_length)
         # Get start time as seconds since the epoch so we can sort
-        event_info["date"]       = int(time.mktime(session.getStartDate().timetuple()))
+        if session.getAdjustedStartDate() is not None:
+            event_info["date"]   = int(time.mktime(session.getAdjustedStartDate().timetuple()))
+        else:
+            event_info["date"]   = None
         event_info["LOID"]       = ""
         event_info["IndicoLink"] = doesExistIndicoLink(session)
 
@@ -228,9 +224,16 @@ def startTimeCompare(a, b):
     contributions and subcontributions correctly.
     Note: if a session and contribution have the exact same start time,
     then it must be the first contribution in the session, and we
-    want to display the session first, so return the appropriate value to do that.'''
+    want to display the session first, so return the appropriate value to do that.
+    If the date is None, put it at the end.'''
 
-    if a["date"] > b["date"]:
+    if a["date"] is not None and b["date"] is None:
+        return -1
+    elif a["date"] is None and b["date"] is not None:
+        return 1
+    elif a["date"] is None and b["date"] is None:
+        return 0
+    elif a["date"] > b["date"]:
         return 1
     elif a["date"] == b["date"]:
         if a["type"] == "contribution" and b["type"] == "session":
@@ -254,45 +257,48 @@ def truncateString(string, length):
 def formatDate(date_str):
     '''Given number of seconds since the epoch, convert for display in the main Recording Manager interface.'''
 
-    time_struct = time.localtime(date_str)
+    if date_str is not None:
+        time_struct = time.localtime(date_str)
 
-    day_of_week   = [_('Mon'),
-                     _('Tue'),
-                     _('Wed'),
-                     _('Thu'),
-                     _('Fri'),
-                     _('Sat'),
-                     _('Sun')]
-#    month_of_year = [_('January'),
-#                     _('February'),
-#                     _('March'),
-#                     _('April'),
-#                     _('May'),
-#                     _('June'),
-#                     _('July'),
-#                     _('August'),
-#                     _('September'),
-#                     _('October'),
-#                     _('November'),
-#                     _('December')]
-    month_of_year = [_('Jan'),
-                     _('Feb'),
-                     _('Mar'),
-                     _('Apr'),
-                     _('May'),
-                     _('Jun'),
-                     _('Jul'),
-                     _('Aug'),
-                     _('Sep'),
-                     _('Oct'),
-                     _('Nov'),
-                     _('Dec')]
+        day_of_week   = [_('Mon'),
+                         _('Tue'),
+                         _('Wed'),
+                         _('Thu'),
+                         _('Fri'),
+                         _('Sat'),
+                         _('Sun')]
+    #    month_of_year = [_('January'),
+    #                     _('February'),
+    #                     _('March'),
+    #                     _('April'),
+    #                     _('May'),
+    #                     _('June'),
+    #                     _('July'),
+    #                     _('August'),
+    #                     _('September'),
+    #                     _('October'),
+    #                     _('November'),
+    #                     _('December')]
+        month_of_year = [_('Jan'),
+                         _('Feb'),
+                         _('Mar'),
+                         _('Apr'),
+                         _('May'),
+                         _('Jun'),
+                         _('Jul'),
+                         _('Aug'),
+                         _('Sep'),
+                         _('Oct'),
+                         _('Nov'),
+                         _('Dec')]
 
-    return "%02d:%02d, %s %d %s" % (time_struct.tm_hour,
-                                    time_struct.tm_min,
-                                    day_of_week[time_struct.tm_wday],
-                                    time_struct.tm_mday,
-                                    month_of_year[int(time_struct.tm_mon - 1)])
+        return "%02d:%02d, %s %d %s" % (time_struct.tm_hour,
+                                        time_struct.tm_min,
+                                        day_of_week[time_struct.tm_wday],
+                                        time_struct.tm_mday,
+                                        month_of_year[int(time_struct.tm_mon - 1)])
+    else:
+        return "NOT SCHEDULED"
 
 def generateIndicoID(conference     = None,
                     session         = None,
@@ -307,14 +313,16 @@ def generateIndicoID(conference     = None,
     """
     IndicoID = ""
 
+    # Some old conference IDs are non-numerical, e.g. a034286, but session, contribution
+    # and subcontribution IDs should all be numerical.
     if session is not None:
-        IndicoID = "%ds%d" % (int(conference), int(session))
+        IndicoID = "%ss%s" % (conference, session)
     elif contribution is None:
-        IndicoID = "%d" % (int(conference),)
+        IndicoID = "%s" % (conference,)
     elif subcontribution is not None:
-        IndicoID = "%dc%dsc%d" % (int(conference), int(contribution), int(subcontribution))
+        IndicoID = "%sc%ssc%s" % (conference, contribution, subcontribution)
     else:
-        IndicoID = "%dc%d" % (int(conference), int(contribution))
+        IndicoID = "%sc%s" % (conference, contribution)
 
     return IndicoID
 
@@ -378,11 +386,14 @@ def parseIndicoID(IndicoID):
     """Given an "Indico ID" of the form shown above, determine whether it is
     a conference, subcontribution etc, and return that info with the individual IDs."""
 
-    # regular expressions to match IndicoIDs for conference, session, contribution, subcontribution
-    pConference      = re.compile('(\d+)$')
-    pSession         = re.compile('(\d+)s(\d+)$')
-    pContribution    = re.compile('(\d+)c(\d+)$')
-    pSubcontribution = re.compile('(\d+)c(\d+)sc(\d+)$')
+    # regular expressions to match IndicoIDs for conference, session, contribution,
+    # subcontribution
+    # Note: older conferences may be a string like this: a034286 instead of just a
+    # number
+    pConference      = re.compile('(\w*\d+)$')
+    pSession         = re.compile('(\w*\d+)s(\d+)$')
+    pContribution    = re.compile('(\w*\d+)c(\d+)$')
+    pSubcontribution = re.compile('(\w*\d+)c(\d+)sc(\d+)$')
 
     # perform the matches (match searches from the beginning of the string,
     # unlike search, which matches anywhere in the string)
@@ -392,37 +403,10 @@ def parseIndicoID(IndicoID):
     mSC = pSubcontribution.match(IndicoID)
 
     # Depending on which talk type it is, populate a dictionary containing the name of
-    # the type of talk, the actual object, and the individual conference, session, contribution,
-    # subcontribution IDs.
-    if mE:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'conference'))
-        conference = ConferenceHolder().getById(mE.group(1))
-        return {'type':           'conference',
-                'object':         conference,
-                'conference':     mE.group(1),
-                'session':        '',
-                'contribution':   '',
-                'subcontribution':''}
-    elif mS:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'session'))
-        conference = ConferenceHolder().getById(mS.group(1))
-        return {'type':           'session',
-                'object':         conference.getSessionById(mS.group(2)),
-                'conference':     mS.group(1),
-                'session':        mS.group(2),
-                'contribution':   '',
-                'subcontribution':''}
-    elif mC:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'contribution'))
-        conference = ConferenceHolder().getById(mC.group(1))
-        return {'type':           'contribution',
-                'object':         conference.getContributionById(mC.group(2)),
-                'conference':     mC.group(1),
-                'session':        '',
-                'contribution':   mC.group(2),
-                'subcontribution':''}
-    elif mSC:
-#        Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'subcontribution'))
+    # the type of talk, the actual object, and the individual conference, session,
+    # contribution, subcontribution IDs.
+    if mSC:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'subcontribution'))
         conference = ConferenceHolder().getById(mSC.group(1))
         contribution = conference.getContributionById(mSC.group(2))
         return {'type':           'subcontribution',
@@ -431,6 +415,33 @@ def parseIndicoID(IndicoID):
                 'session':        '',
                 'contribution':   mSC.group(2),
                 'subcontribution':mSC.group(3)}
+    elif mS:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'session'))
+        conference = ConferenceHolder().getById(mS.group(1))
+        return {'type':           'session',
+                'object':         conference.getSessionById(mS.group(2)),
+                'conference':     mS.group(1),
+                'session':        mS.group(2),
+                'contribution':   '',
+                'subcontribution':''}
+    elif mC:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'contribution'))
+        conference = ConferenceHolder().getById(mC.group(1))
+        return {'type':           'contribution',
+                'object':         conference.getContributionById(mC.group(2)),
+                'conference':     mC.group(1),
+                'session':        '',
+                'contribution':   mC.group(2),
+                'subcontribution':''}
+    elif mE:
+        # Logger.get('RecMan').debug("searched %s, matched %s" % (IndicoID, 'conference'))
+        conference = ConferenceHolder().getById(mE.group(1))
+        return {'type':           'conference',
+                'object':         conference,
+                'conference':     mE.group(1),
+                'session':        '',
+                'contribution':   '',
+                'subcontribution':''}
     else:
         return None
 
@@ -533,7 +544,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
                      forceCache          = True,
                      recordingManagerTags = tags)
     else:
-        raise RecordingManagerException(_("IndicoID %s is not a conference, session, contribution or subcontribution.") % IndicoID)
+        raise RecordingManagerException(_("IndicoID %s is not a known conference, session, contribution or subcontribution.") % IndicoID)
 
     xmlGen.closeTag("event")
 
@@ -577,12 +588,12 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
         flagSuccess = False
         result += _("Stylesheet does not exist: %s") % stylePath
 
-    # temporary, for my own debugging
+    # Uncomment these lines when debugging to see the basic XML representation that is being created.
 #    f = open('/tmp/base.xml', 'w')
 #    f.write(basexml)
 #    f.close()
 
-    # temporary, for my own debugging
+    # Uncomment these lines when debugging to see the MARC XML being submitted to CDS
 #    f = open('/tmp/marc.xml', 'w')
 #    f.write(marcxml)
 #    f.close()
@@ -599,7 +610,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
     try:
         f = urlopen(req)
         cds_response = f.read()
-
+#        cds_response = "testing" # uncomment for debugging
         # Successful operations should result in a one-line message that looks like this:
         # [INFO] Some message here
         # anything else means there was an error
@@ -614,7 +625,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
         flagSuccess = False
         result += _("Unknown error occured when submitting CDS record: %s.\n") % e
 
-    # temporary, for my own debugging
+    # Uncomment these lines when debugging to see the result returned by CDS
 #    f = open('/tmp/cds_result.txt', 'w')
 #    f.write(cds_response)
 #    f.close()
@@ -799,7 +810,7 @@ def getCDSRecords(confId):
             bigcdsid = result.split(" ")[0]
             CDSID = bigcdsid.lstrip("0")
 
-            p = re.compile('INDICO\.([sc\d]+)')
+            p = re.compile('INDICO\.(\w*[sc\d]+)')
             m = p.search(line)
 
             if m:

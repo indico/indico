@@ -5,37 +5,57 @@ Categories
 Category
 ---------
 
-A Category is a means of grouping your events or other Categories 
+A Category is a means of grouping your events or other Categories
 together. In Indico *Home* is the top level category from where you
 start. Inside a category you can:
 
 * add events or other sub-categories,
 * set access rights to say who can access or modify,
-* re-allocate the sub-categories, 
-* remove the sub-categories, 
+* re-allocate the sub-categories,
+* remove the sub-categories,
 * and also delete the current category and everything inside it.
 
-These features are accessible through the menu *Manage* (you must be logged in 
+These features are accessible through the menu *Manage* (you must be logged in
 and with modification rights in order to see it), that you can find close to the
-big orange category name. After clicking *Manage* (more specifically its inner 
+big orange category name. After clicking *Manage* (more specifically its inner
 option *Edit category*) you will be accessing the Management area for Category.
 
 
 Creating a Category
 -------------------
 
-From the menu *Manage* (more specifically its inner 
-option *Add subcategory*) you can create a new category. 
+From the menu *Manage* (more specifically its inner
+option *Add subcategory*) you can create a new category.
 You will need to have an Administrator's account or be listed
-in the modification list `(see Protection) <#protection>`_ 
-for the category. 
+in the modification list `(see Protection) <#protection>`_
+for the category.
 
 Also you can create it from the Management area, from the menu
-*General settings* `(See General Settings) <#general-settings>`_  
+*General settings* `(See General Settings) <#general-settings>`_
 and by clicking the button *add subcateg*.
 
 |image1|
 
+Category overview
+-----------------
+
+From the menu *View* you can see the event overview fom the
+category. Events that belongs to the category and its subcategories
+from the specified period will be displayed.
+
+It is possible to exclude some categories from the event overview
+in *General settings* `(See General Settings) <#general-settings>`_ .
+Categories have three event visibility levels:
+
+* *Everywhere* - events are shown in the event overview webpage for this category and the parent categories.
+* *Category name* - events are shown only in the overview webpage for current category.
+* *Nowhere* - events are not shown in any overview webpage.
+
+|image6|
+*Event overview webpage.*
+
+|image7|
+*Calendar overview webpage.*
 
 Category Management Area
 ------------------------
@@ -53,6 +73,7 @@ You can modify the details of the category:
 * Icon
 * Default style (layout) for meetings created within this category `(see Meetings) <Meetings.html>`_
 * Default style (layout) for lectures created within this category `(see Lectures) <Lectures.html>`_
+* Event visibility for this category `(See Category overview) <#category-overview>`_
 
 and you can modify its content:
 
@@ -64,7 +85,7 @@ and you can modify its content:
 
 --------------
 
-Protection 
+Protection
 ~~~~~~~~~~
 
 From the Management Area you can protect your category using the
@@ -91,7 +112,7 @@ be private. The category will be displayed with "(protected)" after
 its name to show it is private.
 
 *Domain Control* The access to the Category can be restricted by domain.
-Therefore, just the users from the chosen domain will be able to access 
+Therefore, just the users from the chosen domain will be able to access
 (e.g. If we choose the domain CERN, just users from inside CERN will
 be able to access the category and its content).
 
@@ -101,7 +122,7 @@ users or groups to the list in order to allow them to add events.
 
 |image4|
 
-`See Protection System <Protection.html>`_  
+`See Protection System <Protection.html>`_
 in order to know more about Protection in Indico.
 
 --------------
@@ -110,7 +131,7 @@ Detail Modification & Sub-Category/Event Organisation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The details of a Category can be modified and sub-categories can
-be organised from the *General settings* tab in the management area. 
+be organised from the *General settings* tab in the management area.
 Details can be modified by clicking on modify inside the main tab.
 Sub-categories and events can be organised in the particular order
 in which you wish to view them by using the order drop down box next
@@ -121,10 +142,10 @@ to each sub-category.
 You can re-allocate a sub-category or event by selecting the one
 you wish to move using the tick box and clicking on re-allocate,
 you will then be asked to where you would like to reallocate this
-sub-category/event. 
+sub-category/event.
 
-To remove a sub-category and anything it contains or an event, 
-select it and click *remove*. If it contains anything you will be 
+To remove a sub-category and anything it contains or an event,
+select it and click *remove*. If it contains anything you will be
 asked if you are sure you want to delete it.
 
 --------------
@@ -145,4 +166,6 @@ will be asked to confirm the deletion first.
 .. |image3| image:: UserGuidePics/categ3.png
 .. |image4| image:: UserGuidePics/categ4.png
 .. |image5| image:: UserGuidePics/categ5.png
+.. |image6| image:: UserGuidePics/categ6.png
+.. |image7| image:: UserGuidePics/categ7.png
 

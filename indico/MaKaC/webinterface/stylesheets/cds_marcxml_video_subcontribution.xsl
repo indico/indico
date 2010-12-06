@@ -117,6 +117,11 @@
 <datafield tag="690" ind1="C" ind2=" ">
   <subfield code="a">CERN</subfield>
 </datafield>
+<xsl:if test="count(./contribution/subcontribution/CDSExperiment) != 0">
+<datafield tag="693" ind1=" " ind2=" ">
+  <subfield code="e"><xsl:value-of select="./contribution/subcontribution/CDSExperiment" disable-output-escaping="yes"/></subfield>
+</datafield>
+</xsl:if>
 <xsl:if test="count(./contribution/subcontribution/speakers) != 0">
 <xsl:for-each select="./contribution/subcontribution/speakers/user">
 <datafield tag="700" ind1=" " ind2=" ">
@@ -162,6 +167,13 @@
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="a">Indico</subfield>
 </datafield>
+<xsl:if test="count(./contribution/subcontribution/CDSCategories) != 0">
+<datafield tag="980" ind1=" " ind2=" ">
+<xsl:for-each select="./contribution/subcontribution/CDSCategories/category">
+  <subfield code="a"><xsl:value-of select="." disable-output-escaping="yes"/></subfield>
+</xsl:for-each>
+</datafield>
+</xsl:if>
 <datafield tag="980" ind1=" " ind2=" ">
   <subfield code="b">TALK</subfield>
 </datafield>

@@ -143,7 +143,8 @@ class WCategoryDisplay(wcomponents.WTemplated):
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"], "material": self._getMaterialHTML()}
             vars["contents"] = cl.getHTML( self._aw, params )
         else:
-            vars["contents"] = _("This category is empty. Please start creating conferences or categories by using the top menu.")
+            cl = wcomponents.WEmptyCategory( self._getMaterialHTML() )
+            vars["contents"] = cl.getHTML( self._aw )
         mgrs=[]
         from MaKaC.user import Avatar
         for mgr in self._target.getManagerList():

@@ -243,7 +243,16 @@ class Config:
                  "heart": "heart.png",
                  "star": "star.png",
                  "starGrey": "starGrey.png",
-                 "calendarWidget": "calendarWidget.png"
+                 "calendarWidget": "calendarWidget.png",
+                 "American Express": "americanExpress.gif",
+                 "Diners Club": "dinersClub.gif",
+                 "JCB": "JCB.gif",
+                 "Maestro": "maestro.gif",
+                 "MasterCard": "masterCard.gif",
+                 "PAYPAL": "PAYPAL.gif",
+                 "PostFinance + card": "postFinanceCard.gif",
+                 "PostFinance e-finance": "postFinanceEFinance.gif",
+                 "VISA": "VISA.gif",
     }
 
 
@@ -479,8 +488,8 @@ class Config:
             'CssBaseURL'                : "%s/css" % self.getBaseURL(),
             'CssConfTemplateBaseURL'    : "%s/css/confTemplates" % self.getBaseURL(),
             'DefaultEventStylesheet'    : self.__defaultEventStylesheet,
-            'ShortCategURL'             : '%s%s' % (self.getBaseURL(), self.getShortCategTag()),
-            'ShortEventURL'             : '%s%s' % (self.getBaseURL(), self.getShortEventTag()),
+            'ShortCategURL'             : '%s/%s' % (self.getBaseURL(), self.getShortCategTag()),
+            'ShortEventURL'             : '%s/%s' % (self.getBaseURL(), self.getShortEventTag()),
             'TPLDir'                    : os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'tpls'),
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].split(':')[0],
             'FileConverterServerURL'    : self.getFileConverter().get("conversion_server", ""),

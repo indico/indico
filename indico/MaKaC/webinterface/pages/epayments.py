@@ -35,18 +35,18 @@ from MaKaC.i18n import _
 from MaKaC.common import HelperMaKaCInfo
 # ----------------- MANAGEMENT AREA ---------------------------
 class WPConfModifEPaymentBase( registrationForm.WPConfModifRegFormBase ):
-    
+
     def _setActiveTab( self ):
         self._tabEPay.setActive()
-        
+
 class WPConfModifEPayment( WPConfModifEPaymentBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifEPayment(self._conf, self._getAW().getUser())
         return wc.getHTML()
 
 class WConfModifEPayment( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference, user ):
         self._conf = conference
         self._user = user
@@ -59,7 +59,7 @@ class WConfModifEPayment( wcomponents.WTemplated ):
         enabledText = _("Click to disable")
         disabledText = _("Click to enable")
         for gs in modPay.getSortedModPay():
-                      
+
             urlStatus = urlHandlers.UHConfModifEPaymentEnableSection.getURL(self._conf)
             urlStatus.addParam("epayment", gs.getId())
             urlModif = gs.getConfModifEPaymentURL(self._conf)
@@ -69,31 +69,6 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 img = notEnabledBulb
                 text = disabledText
 
-            # CERN Plugin: Just admins can see and modify it
-            if gs.getId() == "CERNYellowPay":
-                minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-                al = minfo.getAdminList()
-                if not al.isAdmin( self._user ):
-                    from MaKaC.plugins.EPayment.CERNYellowPay.options import globalOptions
-                    endis="enable"
-                    departmentName = globalOptions[1][1]["defaultValue"]
-                    emailAddress = globalOptions[0][1]["defaultValue"]
-                    if gs.isEnabled():
-                        endis="disable"
-                        emailAddress = minfo.getSupportEmail()
-                        departmentName = "Indico support"
-                    html.insert(0, """
-                        <tr>
-                        <td>
-                            <img src=%s alt="%s" class="imglink">&nbsp;&nbsp;<b>CERN E-Payment</b> <small>
-                            (please, contact <a href="mailto:%s?subject=Indico Epayment - Conference ID: %s">%s</a> to %s 
-                            the CERN e-payment module)</small>
-                        </td>
-                        </tr>
-                        """%(img, text, emailAddress, self._conf.getId(), departmentName, endis))
-                    continue
-            #################################################
-            
             selbox = ""
             html.append("""
                         <tr>
@@ -117,7 +92,7 @@ class WConfModifEPayment( wcomponents.WTemplated ):
             vars["changeTo"] = "False"
             vars["status"] = _("ENABLED")
             vars["changeStatus"] = _("DISABLE")
-            vars["disabled"] = ""   
+            vars["disabled"] = ""
             vars["detailPayment"] = self._conf.getModPay().getPaymentDetails()
             vars["conditionsPayment"] = self._conf.getModPay().getPaymentConditions()
             vars["specificConditionsPayment"] = self._conf.getModPay().getPaymentSpecificConditions()
@@ -127,7 +102,7 @@ class WConfModifEPayment( wcomponents.WTemplated ):
         else:
             vars["changeTo"] = "True"
             vars["status"] = _("DISABLED")
-            vars["changeStatus"] = _("ENABLE") 
+            vars["changeStatus"] = _("ENABLE")
             vars["disabled"] = "disabled"
             vars["detailPayment"] = ""
             vars["conditionsPayment"] = ""
@@ -138,13 +113,13 @@ class WConfModifEPayment( wcomponents.WTemplated ):
         return vars
 
 class WPConfModifEPaymentDataModification( WPConfModifEPaymentBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifEPaymentDataModification(self._conf)
         return wc.getHTML()
 
 class WConfModifEPaymentDataModification( wcomponents.WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -157,5 +132,5 @@ class WConfModifEPaymentDataModification( wcomponents.WTemplated ):
         vars["conditionsEnabled"]= ""
         if self._conf.getModPay().arePaymentConditionsEnabled():
             vars["conditionsEnabled"]= "checked=\"checked\""
-        return vars    
-        
+        return vars
+

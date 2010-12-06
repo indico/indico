@@ -48,7 +48,7 @@
 
     clearForm : function () {
         var formNodes = IndicoUtil.findFormFields($E('WebcastRequestForm'));
-        IndicoUtil.setFormValues(formNodes, {'talkSelectionComments':'', 'numWebcastViewers':'','numRecordingViewers':'', 'numAttendees':'', 'otherComments':''})
+        IndicoUtil.setFormValues(formNodes, {'talkSelectionComments':'', 'otherComments':''})
         if (!isLecture) {
             $E('allTalksRB').dom.checked = true;
             IndicoUI.Effect.disappear($E('contributionsDiv'));
@@ -56,9 +56,6 @@
 
         $E('permissionYesRB').dom.checked = false;
         $E('permissionNoRB').dom.checked = false;
-        $E('lectureOptions').dom.value = "chooseOne";
-        $E('lectureStyle').dom.value = "chooseOne";
-        $E('postingUrgency').dom.value = "never";
     },
 
     onLoad : function() {

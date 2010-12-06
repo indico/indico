@@ -30,7 +30,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.user as user
 import MaKaC.webinterface.mail as mail
-from MaKaC.webinterface.pages.errors import WPAccessError
+from MaKaC.webinterface.pages.errors import WPAccessError, WPError404
 import MaKaC.conference as conference
 from MaKaC.common import Config, DBMgr
 from MaKaC.common.utils import isStringHTML,sortContributionByDate
@@ -532,13 +532,18 @@ class RHConferenceGetPic(RHConferenceBaseDisplay):
 
     def _process(self):
         im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
-        pic=im.getPic(self._picId).getLocalFile()
-        self._req.headers_out["Content-Length"]="%s"%pic.getSize()
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType(pic.getFileType())
-        self._req.content_type="""%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%pic.getFileName()
-        return pic.readBin()
+        if im.getPic(self._picId):
+            pic=im.getPic(self._picId).getLocalFile()
+            self._req.headers_out["Content-Length"]="%s"%pic.getSize()
+            cfg=Config.getInstance()
+            mimetype=cfg.getFileTypeMimeType(pic.getFileType())
+            self._req.content_type="""%s"""%(mimetype)
+            self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%pic.getFileName()
+            return pic.readBin()
+        else:
+            from mod_python import apache
+            self._req.status = apache.HTTP_NOT_FOUND
+            return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
 
 class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):

@@ -23,7 +23,7 @@ from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCS
 from MaKaC.plugins.Collaboration.RecordingManager.common import getTalks, getOrphans
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 import re
-from MaKaC.common.logger import Logger
+#from MaKaC.common.logger import Logger
 
 class WNewBookingForm(WCSPageTemplateBase):
 

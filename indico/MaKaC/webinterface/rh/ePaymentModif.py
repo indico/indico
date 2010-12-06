@@ -104,13 +104,7 @@ class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
     def _process( self ):
         modPay = self._conf.getModPay().getModPayById(self._epayment)
         if modPay is not None:
-            if modPay.getId() == "CERNYellowPay":
-                minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-                al = minfo.getAdminList()
-                if al.isAdmin( self._getUser() ):
-                    modPay.setEnabled(not modPay.isEnabled())
-            else:
-                modPay.setEnabled(not modPay.isEnabled())
+            modPay.setEnabled(not modPay.isEnabled())
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
 ##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):

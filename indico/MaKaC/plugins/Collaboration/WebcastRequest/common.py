@@ -25,59 +25,6 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.WebcastRequest.fossils import IWebcastRequestErrorFossil
 from MaKaC.common.fossilize import fossilizes
 
-lectureOptions = [
-    ("none", "None"),
-    ("slides", "Slides"),
-    ("chalkboard", "Chalkboard"),
-    ("slidesAndChalkboard" , "Slides and Chalkboard")
-]
-
-typeOfEvents = [
-    ("lecturePresentation" , "Lecture / Presentation"),
-    ("courseTutorial", "Course / Tutorial"),
-    ("panelDiscussion" , "Panel discussion"),
-    ("noAudience", "Remote teaching or candidate interview")
-]
-
-postingUrgency = [
-    ("never", "Do not need it"),
-    ("withinHours" , "Within hours"),
-    ("withinDay" , "Within a day"),
-    ("withinWeek" , "Within a week")
-]
-
-webcastPurpose = [
-    ("historicPreservation" , "Preservation of a historically valuable talk"),
-    ("remoteParticipants" , "Dissemination to participants unable to attend in person"),
-    ("trainingCourse" , "Training course"),
-    ("candidateInterview" , "Candidate interview"),
-    ("remoteTeaching" , "Remote teaching"),
-    ("savingTravel" , "Saving money on travel"),
-    ("publicOutreach" , "Public outreach")
-]
-
-intendedAudience = [
-    ("collaborationMembers" , "Members of a particular collaboration or experiment"),
-    ("groupMembers" , "Members of a particular section or group"),
-    ("studentsGrad" , "Graduate students"),
-    ("studentsUndergrad" , "Undergraduate students"),
-    ("studentsHighSchool" , "High school students"),
-    ("studentsElementary" , "Elementary school students"),
-    ("CERNUsers" , "CERN users"),
-    ("CERNStaff" , "CERN staff"),
-    ("technicalPersonnel" , "Technical personnel"),
-    ("teachersHighSchool" , "High school teachers"),
-    ("generalPublic" , "General public")
-]
-
-subjectMatter = [
-    ("physics" , "Physics"),
-    ("computerScience" , "Computer Science"),
-    ("engineering" , "Engineering"),
-    ("safety" , "Safety"),
-    ("techTraining" , "Technical Training")
-]
-
 def getCommonTalkInformation(conference):
     """ Returns a tuple of 3 lists:
         -List of talks (Contribution objects which are not in a Poster session)

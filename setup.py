@@ -29,7 +29,7 @@ import re
 import shutil
 import string
 import sys
-from distutils.sysconfig import get_python_lib
+from distutils.sysconfig import get_python_lib, get_python_version
 from distutils.cmd import Command
 from distutils.command import bdist
 
@@ -547,6 +547,32 @@ i.e. try 'easy_install %s'""" % (package, package)
         except NameError, e:
             print e
 
+
+class egg_filename(Command):
+    description = "Get the file name of the generated egg"
+    user_options = []
+    boolean_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        ei_cmd = self.ei_cmd = self.get_finalized_command("egg_info")
+        self.egg_info = ei_cmd.egg_info
+
+        basename = pkg_resources.Distribution(
+            None, None, ei_cmd.egg_name, ei_cmd.egg_version,
+            get_python_version(),
+            self.distribution.has_ext_modules() and pkg_utils.get_build_platform
+            ).egg_name()
+
+        print basename
+
+
+    def run(self):
+        pass
+
+
 if __name__ == '__main__':
     # Always load source from the current folder
     sys.path = [os.path.abspath('indico')] + sys.path
@@ -599,7 +625,11 @@ if __name__ == '__main__':
                     'jsbuild': jsbuild,
                     'fetchdeps': fetchdeps_indico,
                     'develop_config': develop_indico,
+<<<<<<< HEAD
                     'test': test_indico,
+=======
+                    'egg_filename': egg_filename
+>>>>>>> v0.97-series
                     },
 
           version = _versionInit(),

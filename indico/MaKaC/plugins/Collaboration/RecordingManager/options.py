@@ -135,6 +135,20 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
+    ("CDSCategoryAssignments", {"description" : _("A dictionary whose keys are Indico category IDs and whose corresponding values are the CDS categories to which any records with these Indico IDs as owners should be assigned."),
+                      "type": dict,
+                      "defaultValue": {"3l13": _("Restricted_ATLAS_Talks"),
+                                       "2l76": _("Restricted_CMS_Talks")    },
+                      "editable": True} ),
+
+    ("CDSExperimentAssignments", {"description" : _("A dictionary whose keys are Indico category IDs and whose values are the corresponding experiment names."),
+                      "type": dict,
+                      "defaultValue": {"1l2":  _("ATLAS"),
+                                       "2l76": _("CMS"),
+                                       "1l22": _("LHCb"),
+                                       "1l8":  _("ALICE")    },
+                      "editable": True} ),
+
     ("videoLinkName", {"description" : _("Name of Indico link to CDS"),
                "type": str,
                "defaultValue": "Video in CDS",

@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.common.xmlGen import XMLGen
 import os, sys, csv, tempfile, stat
 from datetime import datetime, timedelta
 from indico.web.wsgi import webinterface_handler_config as apache
@@ -91,6 +92,53 @@ def index(req, **params):
         return "One can only export 10 rooms at most"
 
     #################### process ###################
+    rooms = []
+    for roomID in roomIDs:
+        roomEx = Factory.newRoom()
+        roomEx.id = roomID
+        rooms.append(roomEx)
+
+    resvEx = Factory.newReservation()
+    resvEx.startDT = datetime(sd.year, sd.month, sd.day, 0, 0)
+    resvEx.endDT = datetime(ed.year, ed.month, ed.day, 23, 59)
+    resvs = resvEx.getCollisions(rooms = rooms )
+
+    of = params.get("of", "csv")
+    if of == "xml":
+        result = createXML(resvs, req)
+    else:
+        result = createCSV(resvs, req)
+
+    Factory.getDALManager().disconnect()
+    DBMgr.getInstance().endRequest()
+
+    return result
+
+
+def createXML(resvs, req):
+
+    req.content_type="text/xml"
+
+    xml = XMLGen()
+
+    xml.openTag("bookings")
+
+    for collision in resvs:
+        resv = collision.withReservation
+        xml.openTag("booking")
+        xml.writeTag("room", "%s %s-%s"%(str(resv.room.building), resv.room.floor, str(resv.room.roomNr)))
+        xml.writeTag("startTime", collision.startDT.strftime("%Y-%m-%d %H:%M:%S"))
+        xml.writeTag("endTime", collision.endDT.strftime("%Y-%m-%d %H:%M:%S"))
+        xml.writeTag("reason", resv.reason or "")
+        xml.closeTag("booking")
+
+    xml.closeTag("bookings")
+
+    return xml.getXml()
+
+
+
+def createCSV(resvs, req):
 
     results=[['URL',
              'id',
@@ -105,17 +153,6 @@ def index(req, **params):
              'H323 IP',
              'uses VC equipment'
              ]]
-
-    rooms = []
-    for roomID in roomIDs:
-        roomEx = Factory.newRoom()
-        roomEx.id = roomID
-        rooms.append(roomEx)
-
-    resvEx = Factory.newReservation()
-    resvEx.startDT = datetime(sd.year, sd.month, sd.day, 0, 0)
-    resvEx.endDT = datetime(ed.year, ed.month, ed.day, 23, 59)
-    resvs = resvEx.getCollisions(rooms = rooms )
 
     for collision in resvs:
         resv = collision.withReservation
@@ -137,8 +174,7 @@ def index(req, **params):
                          usesAVC
                          ])
 
-    Factory.getDALManager().disconnect()
-    DBMgr.getInstance().endRequest()
+
 
     #################### create temp file ###################
     cfg = Config.getInstance()
@@ -162,4 +198,3 @@ def index(req, **params):
     data = fr.read()
     fr.close()
     return data
-

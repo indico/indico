@@ -427,14 +427,19 @@ class RHSubmitMaterialBase:
 
         errorList=self._getErrorList()
 
-        if len(errorList) > 0:
-            status = "ERROR"
-            info = errorList
-        else:
-            mat, status, info = self._addMaterialType(text, user)
+        try:
+            if len(errorList) > 0:
+                status = "ERROR"
+                info = errorList
+            else:
+                mat, status, info = self._addMaterialType(text, user)
 
-            if status == "OK":
-                info['material'] = mat.getId();
+                if status == "OK":
+                    info['material'] = mat.getId();
+        except Exception, e:
+            status = "ERROR"
+            info = errorList + ["%s: %s" % (e.__class__.__name__, str(e))]
+            Logger.get('requestHandler').exception('Error uploading file')
 
         # hackish, because of mime types. Konqueror, for instance, would assume text if there were no tags,
         # and would try to open it

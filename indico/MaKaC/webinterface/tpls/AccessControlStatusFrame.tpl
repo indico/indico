@@ -135,17 +135,17 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             <div class="ACModifButtonsDiv">
                 <% if privacy == 'PRIVATE' or privacy == 'INHERITING': %>
                 <div class="ACModifButtonEntry">
-                    <%= _("Make it")%> <input type="submit" class="btn" name="visibility" value="<%= _("PUBLIC")%>"> <%= _("(viewable by all the users, regardless of the access protection of the parent " + termsDict[type]['parentName'])%> '<%= parentName %>').
+                    <%= _("Make it")%> <input type="submit" class="btn" name="changeToPublic" value="<%= _("PUBLIC")%>"> <%= _("(viewable by all the users, regardless of the access protection of the parent " + termsDict[type]['parentName'])%> '<%= parentName %>').
                 </div>
                 <% end %>
                 <% if privacy == 'PUBLIC' or privacy == 'INHERITING': %>
                 <div class="ACModifButtonEntry">
-                    <%= _("Make it")%> <input type="submit" class="btn" name="visibility" value="<%= _("PRIVATE")%>"> <%= _("(viewable only by the users you choose, regardless of the access protection of the parent " + termsDict[type]['parentName'])%> '<%= parentName %>').
+                    <%= _("Make it")%> <input type="submit" class="btn" name="changeToPrivate" value="<%= _("PRIVATE")%>"> <%= _("(viewable only by the users you choose, regardless of the access protection of the parent " + termsDict[type]['parentName'])%> '<%= parentName %>').
                 </div>
                 <% end %>
                 <% if privacy == 'PUBLIC' or privacy == 'PRIVATE': %>
                 <div class="ACModifButtonEntry">
-                    <%= _("Make it")%> <input type="submit" class="btn" name="visibility" value="<%= _("INHERITING")%>"> <%= _("the access protection from its parent " + termsDict[type]['parentName'])%> '<%= parentName %>' (<span class=ACStatus style="color: <%=parentStatusColor%>;"><%= _(parentPrivacy)%></span> <%= _("for the moment).")%>
+                    <%= _("Make it")%> <input type="submit" class="btn" name="changeToInheriting" value="<%= _("INHERITING")%>"> <%= _("the access protection from its parent " + termsDict[type]['parentName'])%> '<%= parentName %>' (<span class=ACStatus style="color: <%=parentStatusColor%>;"><%= _(parentPrivacy)%></span> <%= _("for the moment).")%>
                 </div>
                 <% end %>
             </div>

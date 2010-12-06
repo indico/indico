@@ -100,8 +100,8 @@
             <xsl:when test="$item/modifyLink != '' and $contId != 'null'">
             'Edit contribution': '<xsl:value-of select="$item/modifyLink"/>',
             </xsl:when>
-            <xsl:when test="$item/modifyLink != '' and $sessCode != 'null'">
-            'Edit session': '<xsl:value-of select="$item/modifyLink"/>',
+            <xsl:when test="$item/slotId != 'null' and $item/ID != 'null' and $confId != 'null'">
+            'Edit session': function(){IndicoUI.Dialogs.__addSessionSlot("<xsl:value-of select="$item/slotId"/>", "<xsl:value-of select="$item/ID"/>","<xsl:value-of select="$confId"/>")},
             </xsl:when>
             <xsl:when test="$item/modifyLink != ''">
             'Edit entry': '<xsl:value-of select="$item/modifyLink"/>',

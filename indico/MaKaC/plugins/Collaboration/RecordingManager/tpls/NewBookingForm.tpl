@@ -24,7 +24,7 @@
                         <div id="div<%= IndicoID %>" class="RMtalkDisplay" onclick="RMtalkSelect('<%= IndicoID %>');" onmouseover="RMtalkBoxOnHover('<%= IndicoID %>');" onmouseout="RMtalkBoxOffHover('<%= IndicoID %>');">
                             <table cellpadding="0px" cellspacing="0px" border="0">
                             <tr>
-                            <td colspan="2" width="370px">
+                            <td colspan="2" width="370px" style="white-space: nowrap;">
                             <tt><strong><%= {'conference':      "E&nbsp;",
                                      'session':         "S&nbsp;&nbsp;",
                                      'contribution':    "C&nbsp;&nbsp;&nbsp;",
@@ -54,7 +54,7 @@
                     <!--  This column shows whether the talk has a matching LOID associated with it (only makes sense for web lectures, not plain video). -->
                     <td width="50px" valign="top">
                         <% if talk["LOID"] != '': %>
-                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "../images/RecordingManagerMicalaCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "./images/RecordingManagerMicalaCheck.png" %>');">
                             </div>
                         <% end %>
                         <% else: %>
@@ -80,7 +80,7 @@
                     <!--  This column shows whether a link has been created from Indico to the CDS record. -->
                     <td width="50px" valign="top">
                         <% if talk["IndicoLink"] == True: %>
-                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "../images/RecordingManagerIndicoCheck.png" %>');">
+                            <div class="RMcolumnStatusNone" style="background-image: url('<%= "./images/RecordingManagerIndicoCheck.png" %>');">
                             </div>
                         <% end %>
                         <% else: %>

@@ -1,3 +1,13 @@
+<!-- CONTEXT HELP DIVS -->
+<div id="tooltipPool" style="display: none">
+    <div id="eventsVisibilityHelp" class="tip">
+        <%= _("""<b>Indicates when events from this category are shown in the event overview webpage.</b><br>
+        - <b>Everywhere</b>: events are shown in the event overview webpage for this category and the parent categories<br>
+        - <b>""" + name + """</b>: events are shown only in the overview webpage for this category (""" + name + """)<br>
+        - <b>Nowhere</b>: events are not shown in any overview webpage.""")%>
+    </div>
+</div>
+<!-- END OF CONTEXT HELP DIVS -->
 
 <form action="%(postURL)s" method="POST" ENCTYPE="multipart/form-data">
     %(locator)s
@@ -36,11 +46,12 @@
             <input type=checkbox name="subcats" value=True> <%= _("Same style in all subcategories")%></td>
         </tr>
         <tr>
-            <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Default Visibility")%></span></td>
+            <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Event visibility")%></span></td>
             <td class="blacktext">
               <select name="visibility">
               %(visibility)s
               </select>
+              <% contextHelp('eventsVisibilityHelp') %>
               </td>
         </tr>
         <tr>

@@ -47,15 +47,6 @@ class CSBooking(CSBookingBase):
         "talkSelectionComments": (str, ''),
         "talkSelection": (list, []),
         "permission": (str, ''),
-        "lectureOptions": (str, ''),
-        "lectureStyle": (str, ''),
-        "postingUrgency": (str, ''),
-        "numWebcastViewers": (str, ''),
-        "numRecordingViewers": (str, ''),
-        "numAttendees": (str, ''),
-        "webcastPurpose": (list, []),
-        "intendedAudience" : (list, []),
-        "subjectMatter": (list, []),
         "otherComments": (str, '')}
 
     def __init__(self, type, conf):
@@ -64,10 +55,6 @@ class CSBooking(CSBookingBase):
     def _checkBookingParams(self):
         if not self._bookingParams["permission"]:
             raise WebcastRequestException("permission parameter cannot be left empty")
-        if self._bookingParams["lectureOptions"] == 'chooseOne': #change when list of community names is ok
-            raise WebcastRequestException("lectureOptions parameter cannot be 'chooseOne'")
-        if self._bookingParams["lectureStyle"] == 'chooseOne': #change when list of community names is ok
-            raise WebcastRequestException("lectureStyle parameter cannot be 'chooseOne'")
     #    if self._bookingParams["talks"] == 'choose':
     #       raise WebcastRequestException("You cannot choose choose")
         return False

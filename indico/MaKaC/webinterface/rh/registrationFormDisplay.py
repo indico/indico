@@ -30,15 +30,15 @@ from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
 from MaKaC.authentication import AuthenticatorMgr
 
-        
+
 class RHBaseRegistrationForm( RHConferenceBaseDisplay ):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams(self, params)
         self._regForm = self._conf.getRegistrationForm()
-    
+
     def _processIfActive( self ):
-        """only override this method if the RegForm must be activated for 
+        """only override this method if the RegForm must be activated for
             carrying on the handler execution"""
         return "regForm"
 
@@ -51,25 +51,25 @@ class RHBaseRegistrationForm( RHConferenceBaseDisplay ):
             return p.display()
         else:
             return self._processIfActive()
-        
+
 
 class RHRegistrationForm( RHBaseRegistrationForm ):
     _uh = urlHandlers.UHConfRegistrationForm
-    
+
     def _processIfActive( self ):
         p = registrationForm.WPRegistrationForm(self, self._conf)
         return p.display()
 
 class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
     _uh = urlHandlers.UHConfRegistrationFormSignIn
-    
+
     def _checkParams( self, params ):
         RHBaseRegistrationForm._checkParams( self, params )
         self._returnURL = params.get( "returnURL", "").strip()
         if self._returnURL == "":
             self._returnURL = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        
-    
+
+
     def _processIfActive( self ):
         self._tohttps = True
         #Check for automatic login
@@ -93,7 +93,7 @@ class RHRegistrationFormDisplayBase( RHBaseRegistrationForm ):
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")
         return urlLogin
-        
+
 
     def _checkProtection( self ):
         RHBaseRegistrationForm._checkProtection(self)
@@ -103,7 +103,7 @@ class RHRegistrationFormDisplayBase( RHBaseRegistrationForm ):
 
 class RHRegistrationFormDisplay( RHRegistrationFormDisplayBase ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
-    
+
     def _processIfActive( self ):
         if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf):
             p = registrationForm.WPRegistrationFormAlreadyRegistered(self, self._conf)
@@ -163,7 +163,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
                 return p.display()
         if user is None:
             if self._conf.hasRegistrantByEmail(self._getRequestParams().get("email","")):
-                raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%self._getRequestParams().get("email","--no email--")) 
+                raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%self._getRequestParams().get("email","--no email--"))
         else:
             if user.isRegisteredInConf(self._conf):
                 self._redirect(urlHandlers.UHConfRegistrationForm.getURL(self._conf))
@@ -174,11 +174,14 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         if user is not None:
             user.addRegistrant(rp)
             rp.setAvatar(user)
-        #if not canManageRegistration:
-            # avoid multiple sending in case of db conflict
-        if not hasattr(self, "_emailsent"):
-            self._regForm.getNotification().sendEmailNewRegistrant(self._regForm, rp)
-            self._emailSent = True
+        # avoid multiple sending in case of db conflict
+        if not hasattr(self, "_emailSent"):
+            email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
+            if email:
+                if not hasattr(self, "_emailsToBeSent"):
+                    self._emailsToBeSent = []
+                self._emailsToBeSent.append(email)
+                self._emailSent = True
         if not canManageRegistration:
             self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
         else:
@@ -206,11 +209,11 @@ class RHRegistrationFormconfirmBooking( RHRegistrationFormDisplayBase ):
 
     def _checkParams( self, params ):
         RHBaseRegistrationForm._checkParams(self, params)
-                
+
         self._registrant=None
         regId=params.get("registrantId",None)
         if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)                
+            self._registrant=self._conf.getRegistrantById(regId)
         self._regForm = self._conf.getRegistrationForm()
         if self._conf.getModPay().hasPaymentConditions() and params.get("conditions","false") != "on":
             raise MaKaCError("You cannot pay without accepting the conditions")
@@ -220,13 +223,13 @@ class RHRegistrationFormconfirmBooking( RHRegistrationFormDisplayBase ):
     def _processIfActive( self ):
         if self._registrant is not None:
             # avoid multiple sending in case of db conflict
-            if not hasattr(self, "_emailsent"):
+            if not hasattr(self, "_emailSent"):
                 self._regForm.getNotification().sendEmailNewRegistrantDetailsPay(self._regForm,self._registrant)
                 self._emailSent = True
             url=urlHandlers.UHConfRegistrationFormconfirmBookingDone.getURL(self._conf)
             url.addParam("registrantId",self._registrant.getId())
             self._redirect(url)
-            
+
 class RHRegistrationFormconfirmBookingDone( RHRegistrationFormDisplayBase ):
 
     def _checkParams(self, params):
@@ -240,17 +243,17 @@ class RHRegistrationFormconfirmBookingDone( RHRegistrationFormDisplayBase ):
             raise MaKaCError("You cannot pay without accepting the conditions")
         #else:
         #    self._getSession().removeVar("conditionsAccepted")
-            
-    
+
+
     def _processIfActive( self ):
         if self._registrant is not None:
             p = registrationForm.WPRegistrationFormconfirmBooking(self, self._conf, self._registrant)
             return p.display()
-        
-      
+
+
 class RHRegistrationFormModify( RHRegistrationFormDisplayBase ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
-    
+
     def _process( self ):
         user = self._getUser()
         canManageRegistration = self._conf.canManageRegistration(user)
@@ -270,7 +273,7 @@ class RHRegistrationFormPerformModify( RHRegistrationFormCreation ):
     _uh = urlHandlers.UHConfRegistrationFormModify
 
     def _process( self ):
-        if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf): 
+        if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf):
             if not self._conf.getRegistrationForm().inRegistrationPeriod() and not self._conf.getRegistrationForm().inModificationPeriod():
                 p = registrationForm.WPRegistrationFormClosed(self, self._conf)
                 return p.display()
@@ -278,7 +281,7 @@ class RHRegistrationFormPerformModify( RHRegistrationFormCreation ):
                 rp = self._getUser().getRegistrantById(self._conf.getId())
                 rp.setValues(self._getRequestParams(), self._getUser())
                 # avoid multiple sending in case of db conflict
-                if not hasattr(self, "_emailsent"):
+                if not hasattr(self, "_emailSent"):
                     self._regForm.getNotification().sendEmailModificationRegistrant(self._regForm, rp)
                     self._emailSent = True
                 if rp.doPay():
@@ -290,7 +293,7 @@ class RHRegistrationFormPerformModify( RHRegistrationFormCreation ):
 
 
 class RHRegistrationFormConditions( RHRegistrationFormDisplayBase ):
-    
+
     def _process( self ):
         p = registrationForm.WPRegistrationFormConditions(self, self._conf)
         return p.display()

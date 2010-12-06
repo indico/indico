@@ -242,15 +242,14 @@ class RH(RequestHandlerBase):
         Disables caching, i.e. for materials
         """
 
-        self._req.headers_out["Pragma"] = "no-cache"
-
         # IE doesn't seem to like 'no-cache' Cache-Control headers...
         if (re.match(r'.*MSIE.*', self._req.headers_in.get("User-Agent",""))):
+            # actually, the only way to safely disable caching seems to be this one
             self._req.headers_out["Cache-Control"] = "private"
             self._req.headers_out["Expires"] = "-1"
         else:
             self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
-
+            self._req.headers_out["Pragma"] = "no-cache"
 
     def _redirect( self, targetURL, noCache=False ):
         """Utility for redirecting the client web browser to the specified
@@ -268,7 +267,7 @@ class RH(RequestHandlerBase):
         if noCache:
             self._disableCaching()
         try:
-            self._req.status = apache.HTTP_MOVED_PERMANENTLY
+            self._req.status = apache.HTTP_SEE_OTHER
         except NameError:
             pass
 

@@ -739,12 +739,12 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["Type"]=WSessionModifMainType().getHTML(vars)
             vars["Colors"]=WSessionModifMainColors().getHTML(vars)
             vars["Code"]=WSessionModifMainCode().getHTML(vars)
-            vars["Rowspan"]=9
+            vars["Rowspan"]=7
         else:
             vars["Type"]=""
             vars["Colors"]=""
             vars["Code"]=""
-            vars["Rowspan"]=6
+            vars["Rowspan"]=4
         return vars
 
 

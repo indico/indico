@@ -659,6 +659,11 @@ class SessionSlotScheduleGetDayEndDate(ScheduleOperation, sessionServices.Sessio
         eDate = self._slot.getSchedule().calculateDayEndDate(self._date)
         return eDate.strftime('%Y/%m/%d %H:%M')
 
+class SessionSlotGetFossil(sessionServices.SessionSlotDisplayBase):
+
+    def _getAnswer(self):
+        return fossilize(self._slot)
+
 class SessionSlotGetBooking(ScheduleOperation, sessionServices.SessionSlotDisplayBase, roomBooking.GetBookingBase):
     def _performOperation(self):
         return self._getRoomInfo(self._target)
@@ -706,7 +711,6 @@ class ScheduleEditSlotBase(ScheduleOperation, LocationSetter):
 
         if len(self._slot.getEntries()) != 0 :
             values.update({"move": 1})
-
         self._slot.setValues(values)
 
         self. _addConveners(self._slot)
@@ -776,6 +780,19 @@ class SessionScheduleEditSessionSlot(ScheduleEditSlotBase, sessionServices.Sessi
 
     def _setSessionTitle(self, slot):
         slot.getSession().setTitle(self._sessionTitle)
+
+
+class SessionScheduleEditSessionSlotById(SessionScheduleEditSessionSlot):
+    """
+    Edits session slot. Session slot is identified by its id within a session,
+    not like in the parent's class by schedule id.
+    """
+    def _checkParams(self):
+        if self._params.has_key("scheduleEntry"):
+            del self._params["scheduleEntry"]
+        SessionScheduleEditSessionSlot._checkParams(self)
+        self._slot = self._session.slots[self._params["sessionSlotId"]]
+
 
 class ConferenceSetSessionSlots( conferenceServices.ConferenceTextModificationBase ):
     """
@@ -1195,6 +1212,13 @@ class SessionEditRoomLocation(EditRoomLocationBase, sessionServices.SessionModif
     def _checkParams(self):
         sessionServices.SessionModifUnrestrictedTTCoordinationBase._checkParams(self)
         EditRoomLocationBase._checkParams(self)
+        if not hasattr(self, "_slot"):
+            self._slot = self._session.slots[self._params["slot"]]
+        if not hasattr(self, "_schEntry"):
+            if self._params.get("sessionTimetable", False):
+                self._schEntry = self._slot._sessionSchEntry
+            else:
+                self._schEntry = self._slot._confSchEntry
         self._entry = self._slot
 
     def _performOperation(self):
@@ -1247,12 +1271,14 @@ methodMap = {
     "slot.deleteBreak": SessionSlotScheduleDeleteBreak,
     "slot.getDayEndDate": SessionSlotScheduleGetDayEndDate,
     "slot.getBooking": SessionSlotGetBooking,
+    "slot.getFossil": SessionSlotGetFossil,
     "slot.modifyStartEndDate": SessionSlotScheduleModifyStartEndDate,
     "slot.moveEntry": MoveEntryFromSessionBlock,
 
     "session.getDayEndDate": SessionScheduleGetDayEndDate,
     "session.addSlot": SessionScheduleAddSessionSlot,
     "session.editSlot": SessionScheduleEditSessionSlot,
+    "session.editSlotById": SessionScheduleEditSessionSlotById,
     "session.deleteSlot": SessionScheduleDeleteSessionSlot,
     "session.changeColors": SessionScheduleChangeSessionColors,
     "session.modifyStartEndDate": SessionScheduleModifyStartEndDate,

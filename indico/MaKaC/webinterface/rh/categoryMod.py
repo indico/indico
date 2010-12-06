@@ -598,11 +598,11 @@ class RHCategorySetVisibility( RHCategModifBase ):
 
     def _process( self ):
         params = self._getRequestParams()
-        if params["visibility"] == "PRIVATE":
+        if params.has_key("changeToPrivate"):
             self._target.setProtection( 1 )
-        elif params["visibility"] == "INHERITING":
+        elif params.has_key("changeToInheriting"):
             self._target.setProtection( 0 )
-        elif params["visibility"] == "PUBLIC":
+        elif params.has_key("changeToPublic"):
             # The 'Home' category is handled as a special case.
             # We maintain the illusion for the user of it being either
             # private or public, but actually it can be either private

@@ -1,7 +1,5 @@
 #import syslog
-from MaKaC.common import DBMgr
 import MaKaC.webinterface.rh.base as base
-from indico.web.wsgi import indico_wsgi_handler_utils
 import MaKaC.common.info as info
 
 class RHResetTZ(base.RH):
@@ -12,7 +10,7 @@ class RHResetTZ(base.RH):
         parms = self._getRequestParams()
 
         tz = None
-        if parms["activeTimezone"] == "My":
+        if not parms.has_key("activeTimezone") or parms["activeTimezone"] == "My":
             if self._aw.getUser():
                 tz = self._aw.getUser().getTimezone()
             else:
