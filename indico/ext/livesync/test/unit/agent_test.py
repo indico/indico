@@ -45,7 +45,7 @@ class TestAgent(PushSyncAgent):
         super(TestAgent, self).__init__(aid, name, description, updateTime)
         self._service = service
 
-    def _run(self, manager, data):
+    def _run(self, manager, data, lastTS):
 
         data = list(data)
         data.reverse()
@@ -78,8 +78,6 @@ class RemoteServiceStub(object):
                 del self._records[notif.id]
 
             elif action == 'add':
-                if notif.id in self._records:
-                    raise Exception('record already exists here!')
                 self._records[notif.id] = (notif.name, 'available')
 
             elif action == 'chg':

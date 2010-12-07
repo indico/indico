@@ -124,7 +124,15 @@ class MultiPointerTrack(Persistent):
         Return values or ranges (timestamps) of the structure
         """
 
-        return self._container.values(*list(timestamp(a) for a in args))
+        fargs = []
+
+        for a in args:
+            if a == None:
+                fargs.append(None)
+            else:
+                fargs.append(timestamp(a))
+
+        return self._container.values(*fargs)
 
     def add(self, intTS, value):
         """
@@ -160,11 +168,14 @@ class MultiPointerTrack(Persistent):
             # consume a single position
 
         for ts, entry in it:
-            if int(ts) == ptrPos:
+            if ts == ptrPos:
                 # finish one element before end
                 raise StopIteration
             for elem in entry:
                 yield func((int(ts), elem))
+
+    def mostRecentTS(self):
+        return self._container.minKey()
 
     def pointerIterValues(self, pid, till = None):
         """

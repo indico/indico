@@ -64,7 +64,10 @@ class SyncAgent(Persistent):
 
 class PushSyncAgent(SyncAgent):
 
-    def run(self, currentTS):
+    def run(self, currentTS, logger = None):
+
+        self._v_logger = logger
+
         if not self._manager:
             raise AgentExecutionException("SyncAgent '%s' has no manager!" % self._id)
 
@@ -72,8 +75,14 @@ class PushSyncAgent(SyncAgent):
         data = self._manager.query(agentId = self.getId(),
                                    till = currentTS - 1)
 
+        if logger:
+            logger.info("Querying agent %s for events till %s" % (self.getId(),
+                                                                  currentTS - 1))
+
         # run agent-specific cycle
-        self._lastTry = self._run(self._manager, data)
+        self._lastTry = self._run(self._manager, data, currentTS - 1)
+
+        return self._lastTry
 
     def acknowledge(self):
         self._manager.advance(self.getId(), self._lastTry)
@@ -124,7 +133,7 @@ class SyncManager(Persistent):
         return self._track.pointerIterItems(agentId, till = till)
 
     def advance(self, agentId, newLastTS):
-        self._track.movePointer(agentId, newLastTS)
+        self._track.movePointer(agentId, max(self._track.mostRecentTS(), newLastTS))
 
     def add(self, timestamp, action):
         if type(action) == list:

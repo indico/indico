@@ -65,4 +65,4 @@ class _TestSynchronization(IndicoTestCase):
 
     def checkActions(self, fromTS, expected):
         self.assertEqual(self._prettyActions(
-            list(self._sm.getTrack().values(fromTS))),expected)
+            list(self._sm.getTrack().values(None, fromTS))),expected)

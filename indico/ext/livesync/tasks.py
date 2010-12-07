@@ -43,8 +43,14 @@ class LiveSyncUpdateTask(PeriodicTask):
             logger.info("Starting agent '%s'" % agtName)
             try:
                 # pass the current time and a logger
-                agent.run(int_timestamp(nowutc()))
+                ts = agent.run(int_timestamp(nowutc()), logger = logger)
             except:
-                logger.exception("Problem running agent '%s'")
-                raise
+                logger.exception("Problem running agent '%s'" % agtName)
+                return
+
+            if ts == None:
+                logger.info("'Acknowledge' not sent - no records?")
+            else:
+                logger.info("'Acknowledge' sent (ts=%s)" % ts)
+                agent.acknowledge()
             logger.info("Agent '%s' finished" % agtName)

@@ -113,6 +113,11 @@ class outputGenerator(Observable):
         materialRegistry = obj.getMaterialRegistry()
         return materialRegistry.getMaterialList(obj.getConference())
 
+    def _getRecordCollection(self, obj):
+        if obj.hasAnyProtection():
+            return "INDICOSEARCH.PRIVATE"
+        else:
+            return "INDICOSEARCH.PUBLIC"
 
     def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         # get xml conference
@@ -1120,9 +1125,9 @@ class outputGenerator(Observable):
                   showContribution       = "all",
                   showSubContribution    = "all",
                   out                    = None,
-                  forceCache             = False,
+                  overrideCache             = False,
                   recordingManagerTags   = None):
-        """forceCache = True apparently means force it NOT to use the cache. """
+        """overrideCache = True apparently means force it NOT to use the cache. """
 
         if not out:
             out = self._XMLGen
@@ -1132,7 +1137,7 @@ class outputGenerator(Observable):
                                                     includeMaterial,
                                                     False)
         obj = None
-        if not forceCache:
+        if not overrideCache:
             obj = self.cache.loadObject(version, conf)
         if obj:
             xml = obj.getContent()
@@ -1161,14 +1166,14 @@ class outputGenerator(Observable):
         #return xml
 
 
-    def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, forceCache=False):
+    def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, overrideCache=False):
 
         if not out:
             out = self._XMLGen
         #try to get a cache
         version = "MARC21_ses-%s_cont-%s_mat-%s"%(includeSession,includeContribution,includeMaterial)
         obj = None
-        if not forceCache:
+        if not overrideCache:
             obj = self.cache.loadObject(version, conf)
         if obj:
             xml = obj.getContent()
@@ -1185,13 +1190,13 @@ class outputGenerator(Observable):
         if not out:
             out = self._XMLGen
 
-        out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",conf.getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",conf.getTitle(),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
-        out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",conf.title,[["code","a"]])
+        out.writeTag("leader", "00000nmm  2200000uu 4500")
+        out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",conf.title,[["code","a"]])
 
         # XXX: If there is ROOM and not LOCATION....There will be information missed.
         for l in conf.getLocationList():
@@ -1206,61 +1211,61 @@ class outputGenerator(Observable):
                 loc = loc + ", " + roomName
 
             if l.getName() != "":
-                out.writeTag("marc:subfield",loc,[["code","c"]])
+                out.writeTag("subfield",loc,[["code","c"]])
 
 
-        #out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","9"]])
-        #out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(conf.getEndDate().year, string.zfill(conf.getEndDate().month,2), string.zfill(conf.getEndDate().day,2), string.zfill(conf.getEndDate().hour,2), string.zfill(conf.getEndDate().minute,2)),[["code","z"]])
+        #out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","9"]])
+        #out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(conf.getEndDate().year, string.zfill(conf.getEndDate().month,2), string.zfill(conf.getEndDate().day,2), string.zfill(conf.getEndDate().hour,2), string.zfill(conf.getEndDate().minute,2)),[["code","z"]])
         #tz = conf.getTimezone()
         #sd = conf.getAdjustedStartDate(tz)
         #ed = conf.getAdjustedEndDate(tz)
         sd = conf.getStartDate()
         ed = conf.getEndDate()
-        out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","9"]])
-        out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(ed.year, string.zfill(ed.month,2), string.zfill(ed.day,2), string.zfill(ed.hour,2), string.zfill(ed.minute,2)),[["code","z"]])
+        out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","9"]])
+        out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(ed.year, string.zfill(ed.month,2), string.zfill(ed.day,2), string.zfill(ed.hour,2), string.zfill(ed.minute,2)),[["code","z"]])
 
-        out.writeTag("marc:subfield", self.dataInt.objToId(conf),[["code","g"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield", self.dataInt.objToId(conf),[["code","g"]])
+        out.closeTag("datafield")
 
         for path in conf.getCategoriesPath():
-            out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-            out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
-            out.closeTag("marc:datafield")
+            out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
+            out.writeTag("subfield", ":".join(path), [["code","a"]])
+            out.closeTag("datafield")
 
         ####################################
         # Fermi timezone awareness         #
         ####################################
         #if conf.getStartDate() is not None:
-        #    out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
-        #    out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","d"]])
-        #    out.closeTag("marc:datafield")
+        #    out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
+        #    out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","d"]])
+        #    out.closeTag("datafield")
         #sd = conf.getAdjustedStartDate(tz)
         sd = conf.getStartDate()
         if sd is not None:
-            out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
-            out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","d"]])
-            out.closeTag("marc:datafield")
+            out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
+            out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","d"]])
+            out.closeTag("datafield")
         ####################################
         # Fermi timezone awareness(end)    #
         ####################################
 
-        out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",conf.getDescription(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",conf.getDescription(),[["code","a"]])
+        out.closeTag("datafield")
 
         if conf.getReportNumberHolder().listReportNumbers():
-            out.openTag("marc:datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
             for report in conf.getReportNumberHolder().listReportNumbers():
-                out.writeTag("marc:subfield",report[1],[["code","a"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield",report[1],[["code","a"]])
+            out.closeTag("datafield")
 
 
-        out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
+        out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = conf.getKeywords()
         keywords = keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
-            out.writeTag("marc:subfield",keyword,[["code","a"]])
-        out.closeTag("marc:datafield")
+            out.writeTag("subfield",keyword,[["code","a"]])
+        out.closeTag("datafield")
 
 
         import MaKaC.webinterface.simple_event as simple_event
@@ -1270,9 +1275,9 @@ class outputGenerator(Observable):
             type = "Lecture"
         elif self.webFactory.getFactory(conf) == meeting.WebFactory:
             type = "Meeting"
-        out.openTag("marc:datafield",[["tag","650"],["ind1","2"],["ind2","7"]])
-        out.writeTag("marc:subfield",type,[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","650"],["ind1","2"],["ind2","7"]])
+        out.writeTag("subfield",type,[["code","a"]])
+        out.closeTag("datafield")
         #### t o d o
 
         #out.openTag("datafield",[["tag","650"],["ind1","3"],["ind2","7"]])
@@ -1283,11 +1288,11 @@ class outputGenerator(Observable):
         # tag 700 chair name
         uList = conf.getChairList()
         for chair in uList:
-            out.openTag("marc:datafield",[["tag","906"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","906"],["ind1"," "],["ind2"," "]])
             nom = chair.getFamilyName() + " " + chair.getFirstName()
-            out.writeTag("marc:subfield",nom,[["code","p"]])
-            out.writeTag("marc:subfield",chair.getAffiliation(),[["code","u"]])
-            out.closeTag("marc:datafield")
+            out.writeTag("subfield",nom,[["code","p"]])
+            out.writeTag("subfield",chair.getAffiliation(),[["code","u"]])
+            out.closeTag("datafield")
 
 
         #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
@@ -1305,40 +1310,39 @@ class outputGenerator(Observable):
         # tag 859 email
         uList = conf.getChairList()
         for chair in uList:
-            out.openTag("marc:datafield",[["tag","859"],["ind1"," "],["ind2"," "]])
-            out.writeTag("marc:subfield",chair.getEmail(),[["code","f"]])
-            out.closeTag("marc:datafield")
+            out.openTag("datafield",[["tag","859"],["ind1"," "],["ind2"," "]])
+            out.writeTag("subfield",chair.getEmail(),[["code","f"]])
+            out.closeTag("datafield")
 
         edate = conf.getCreationDate()
         creaDate = datetime( edate.year, edate.month, edate.day )
 
-        out.openTag("marc:datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","%d-%s-%sT"%(creaDate.year, string.zfill(creaDate.month,2), string.zfill(creaDate.day,2)),[["code","x"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield","%d-%s-%sT"%(creaDate.year, string.zfill(creaDate.month,2), string.zfill(creaDate.day,2)),[["code","x"]])
+        out.closeTag("datafield")
 
         edate = conf.getModificationDate()
         modifDate = datetime( edate.year, edate.month, edate.day )
 
-        out.openTag("marc:datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","%d-%s-%sT"%(modifDate.year, string.zfill(modifDate.month,2), string.zfill(modifDate.day,2)),[["code","c"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield","%d-%s-%sT"%(modifDate.year, string.zfill(modifDate.month,2), string.zfill(modifDate.day,2)),[["code","c"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
-        confcont = "Indico"
-        out.writeTag("marc:subfield",confcont,[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield", self._getRecordCollection(conf), [["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","INDICO." + self.dataInt.objToId(conf),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield","INDICO." + self.dataInt.objToId(conf),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
+        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         url = str(urlHandlers.UHConferenceDisplay.getURL(conf))
-        out.writeTag("marc:subfield",url,[["code","u"]])
-        out.writeTag("marc:subfield", "Event details", [["code","y"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield",url,[["code","u"]])
+        out.writeTag("subfield", "Event details", [["code","y"]])
+        out.closeTag("datafield")
 
-    ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, forceCache=False):
+    ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, overrideCache=False):
     ##     if not out:
     ##         out = self._XMLGen
     ##     #try to get a cache
@@ -1356,54 +1360,54 @@ class outputGenerator(Observable):
     ##     if not out:
     ##         out = self._XMLGen
 
-    ##     out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
-    ##     out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield","INDICO%s"%(self.dataInt.objToId(session, separator="."), session.getId()),[["code","a"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.writeTag("leader", "00000nmm  2200000uu 4500")
+    ##     out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
+    ##     out.writeTag("subfield","INDICO%s"%(self.dataInt.objToId(session, separator="."), session.getId()),[["code","a"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield",self.dataInt.objToId(session, separator="."),[["code","a"]])
-    ##     out.writeTag("marc:subfield","Indico",[["code","9"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
+    ##     out.writeTag("subfield",self.dataInt.objToId(session, separator="."),[["code","a"]])
+    ##     out.writeTag("subfield","Indico",[["code","9"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield",session.getTitle(),[["code","a"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.openTag("datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
+    ##     out.writeTag("subfield",session.getTitle(),[["code","a"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield",session.getDuration(),[["code","a"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.openTag("datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
+    ##     out.writeTag("subfield",session.getDuration(),[["code","a"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield", self.dataInt.objToId(session.getConference()),[["code","g"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
+    ##     out.writeTag("subfield", self.dataInt.objToId(session.getConference()),[["code","g"]])
+    ##     out.closeTag("datafield")
 
     ##     for path in session.getConference().getCategoriesPath():
-    ##         out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-    ##         out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
-    ##         out.closeTag("marc:datafield")
+    ##         out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
+    ##         out.writeTag("subfield", ":".join(path), [["code","a"]])
+    ##         out.closeTag("datafield")
 
     ##     l=session.getLocation()
     ##     if (l and l.getName() != "") or session.getStartDate() is not None:
-    ##         out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
+    ##         out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
     ##         if l:
     ##             if l.getName() != "":
-    ##                 out.writeTag("marc:subfield",l.getName(),[["code","r"]])
+    ##                 out.writeTag("subfield",l.getName(),[["code","r"]])
     ##         if session.getStartDate() is not None:
-    ##             out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(session.getStartDate().year, string.zfill(session.getStartDate().month,2), string.zfill(session.getStartDate().day,2), string.zfill(session.getStartDate().hour,2), string.zfill(session.getStartDate().minute,2)),[["code","d"]])
-    ##             out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(session.getEndDate().year, string.zfill(session.getEndDate().month,2), string.zfill(session.getEndDate().day,2), string.zfill(session.getEndDate().hour,2), string.zfill(session.getEndDate().minute,2)),[["code","h"]])
-    ##         out.closeTag("marc:datafield")
+    ##             out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(session.getStartDate().year, string.zfill(session.getStartDate().month,2), string.zfill(session.getStartDate().day,2), string.zfill(session.getStartDate().hour,2), string.zfill(session.getStartDate().minute,2)),[["code","d"]])
+    ##             out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(session.getEndDate().year, string.zfill(session.getEndDate().month,2), string.zfill(session.getEndDate().day,2), string.zfill(session.getEndDate().hour,2), string.zfill(session.getEndDate().minute,2)),[["code","h"]])
+    ##         out.closeTag("datafield")
     ## #
-    ##     out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield",session.getDescription(),[["code","a"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
+    ##     out.writeTag("subfield",session.getDescription(),[["code","a"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
-    ##     out.writeTag("marc:subfield",session.getConference().getTitle(),[["code","a"]])
-    ##     out.closeTag("marc:datafield")
-    ##     out.openTag("marc:datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
-    ##     out.writeTag("marc:subfield","SzGeCERN",[["code","2"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.openTag("datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
+    ##     out.writeTag("subfield",session.getConference().getTitle(),[["code","a"]])
+    ##     out.closeTag("datafield")
+    ##     out.openTag("datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
+    ##     out.writeTag("subfield","SzGeCERN",[["code","2"]])
+    ##     out.closeTag("datafield")
 
 
     ##     # tag 100/700 Convener name
@@ -1414,12 +1418,12 @@ class outputGenerator(Observable):
     ##             code = "100"
     ##         else:
     ##             code = "700"
-    ##         out.openTag("marc:datafield",[["tag",code],["ind1"," "],["ind2"," "]])
+    ##         out.openTag("datafield",[["tag",code],["ind1"," "],["ind2"," "]])
     ##         fullName = user.getFamilyName() + " " + user.getFirstName()
-    ##         out.writeTag("marc:subfield",fullName,[["code","a"]])
-    ##         out.writeTag("marc:subfield","Convener",[["code","e"]])
-    ##         out.writeTag("marc:subfield",user.getAffiliation(),[["code","u"]])
-    ##         out.closeTag("marc:datafield")
+    ##         out.writeTag("subfield",fullName,[["code","a"]])
+    ##         out.writeTag("subfield","Convener",[["code","e"]])
+    ##         out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
+    ##         out.closeTag("datafield")
 
     ##     matList = session.getAllMaterialList()
     ##     for mat in matList:
@@ -1427,36 +1431,36 @@ class outputGenerator(Observable):
     ##             if includeMaterial:
     ##                 self.materialToXMLMarc21(mat, out=out)
 
-    ##     out.openTag("marc:datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-    ##     out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(session.getConference()),[["code","b"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
+    ##     out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(session.getConference()),[["code","b"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
+    ##     out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
     ##     confses = "INDICO." + self.dataInt.objToId(session.getConference(), separator=".")
-    ##     out.writeTag("marc:subfield",confses,[["code","a"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.writeTag("subfield",confses,[["code","a"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
+    ##     out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
     ##     confcont = "INDICO." + self.dataInt.objToId(session.getConference())
-    ##     out.writeTag("marc:subfield",confcont,[["code","a"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.writeTag("subfield",confcont,[["code","a"]])
+    ##     out.closeTag("datafield")
 
-    ##     out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
+    ##     out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
     ##     url = str(urlHandlers.UHSessionDisplay.getURL(session))
-    ##     out.writeTag("marc:subfield",url,[["code","u"]])
-    ##     out.writeTag("marc:subfield", "Session details", [["code","y"]])
-    ##     out.closeTag("marc:datafield")
+    ##     out.writeTag("subfield",url,[["code","u"]])
+    ##     out.writeTag("subfield", "Session details", [["code","y"]])
+    ##     out.closeTag("datafield")
 
 
     #fb
 
-    def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, forceCache=False):
+    def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, overrideCache=False):
         if not out:
             out = self._XMLGen
         #try to get a cache
         version = "MARC21_mat-%s"%(includeMaterial)
         obj = None
-        if not forceCache:
+        if not overrideCache:
             obj = self.cache.loadObject(version, cont)
         if obj:
             xml = obj.getContent()
@@ -1475,74 +1479,74 @@ class outputGenerator(Observable):
             out = self._XMLGen
 
         #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
-        out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
-        out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(cont, separator="."),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("leader", "00000nmm  2200000uu 4500")
+        out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(cont, separator="."),[["code","a"]])
+        out.closeTag("datafield")
     #
-        out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",self.dataInt.objToId(cont, separator="t"),[["code","a"]])
-        out.writeTag("marc:subfield","Indico",[["code","9"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",self.dataInt.objToId(cont, separator="t"),[["code","a"]])
+        out.writeTag("subfield","Indico",[["code","9"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",cont.getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",cont.getTitle(),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",cont.getDuration(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",cont.getDuration(),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield", self.dataInt.objToId(cont.getConference()),[["code","g"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield", self.dataInt.objToId(cont.getConference()),[["code","g"]])
+        out.closeTag("datafield")
 
         for path in cont.getConference().getCategoriesPath():
-            out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-            out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
-            out.closeTag("marc:datafield")
+            out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
+            out.writeTag("subfield", ":".join(path), [["code","a"]])
+            out.closeTag("datafield")
 
         l=cont.getLocation()
         if (l and l.getName() != "") or cont.getStartDate() is not None:
-            out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
             if l:
                 if l.getName() != "":
-                    out.writeTag("marc:subfield",l.getName(),[["code","r"]])
+                    out.writeTag("subfield",l.getName(),[["code","r"]])
             if cont.getStartDate() is not None:
-                out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(cont.getStartDate().year, string.zfill(cont.getStartDate().month,2), string.zfill(cont.getStartDate().day,2), string.zfill(cont.getStartDate().hour,2), string.zfill(cont.getStartDate().minute,2)),[["code","d"]])
-                out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(cont.getEndDate().year, string.zfill(cont.getEndDate().month,2), string.zfill(cont.getEndDate().day,2), string.zfill(cont.getEndDate().hour,2), string.zfill(cont.getEndDate().minute,2)),[["code","h"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(cont.getStartDate().year, string.zfill(cont.getStartDate().month,2), string.zfill(cont.getStartDate().day,2), string.zfill(cont.getStartDate().hour,2), string.zfill(cont.getStartDate().minute,2)),[["code","d"]])
+                out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(cont.getEndDate().year, string.zfill(cont.getEndDate().month,2), string.zfill(cont.getEndDate().day,2), string.zfill(cont.getEndDate().hour,2), string.zfill(cont.getEndDate().minute,2)),[["code","h"]])
+            out.closeTag("datafield")
     #
-        out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",cont.getDescription(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",cont.getDescription(),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
-        out.writeTag("marc:subfield",cont.getConference().getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
+        out.writeTag("subfield",cont.getConference().getTitle(),[["code","a"]])
+        out.closeTag("datafield")
 
 
         if cont.getReportNumberHolder().listReportNumbers():
-            out.openTag("marc:datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
             for report in cont.getReportNumberHolder().listReportNumbers():
-                out.writeTag("marc:subfield",report[1],[["code","a"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield",report[1],[["code","a"]])
+            out.closeTag("datafield")
 
 
-        out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
+        out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = cont.getKeywords()
         keywords = keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
-            out.writeTag("marc:subfield",keyword,[["code","a"]])
-        out.closeTag("marc:datafield")
+            out.writeTag("subfield",keyword,[["code","a"]])
+        out.closeTag("datafield")
 
 
     #
-        out.openTag("marc:datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
-        out.writeTag("marc:subfield","SzGeCERN",[["code","2"]])
+        out.openTag("datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
+        out.writeTag("subfield","SzGeCERN",[["code","2"]])
         if cont.getTrack():
-            out.writeTag("marc:subfield",cont.getTrack().getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield")
+            out.writeTag("subfield",cont.getTrack().getTitle(),[["code","a"]])
+        out.closeTag("datafield")
 
 
         # tag 700 Speaker name
@@ -1568,23 +1572,23 @@ class outputGenerator(Observable):
 
         if auth:
             user = auth
-            out.openTag("marc:datafield",[["tag","100"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","100"],["ind1"," "],["ind2"," "]])
             fullName = auth.getFamilyName() + " " + auth.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]])
+            out.writeTag("subfield",fullName,[["code","a"]])
             for val in list[user]:
-                out.writeTag("marc:subfield",val,[["code","e"]])
-            out.writeTag("marc:subfield",auth.getAffiliation(),[["code","u"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield",val,[["code","e"]])
+            out.writeTag("subfield",auth.getAffiliation(),[["code","u"]])
+            out.closeTag("datafield")
             del list[auth]
 
         for user in list.keys():
-            out.openTag("marc:datafield",[["tag","700"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","700"],["ind1"," "],["ind2"," "]])
             fullName = user.getFamilyName() + " " + user.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]])
+            out.writeTag("subfield",fullName,[["code","a"]])
             for val in list[user]:
-                out.writeTag("marc:subfield",val,[["code","e"]])
-            out.writeTag("marc:subfield",user.getAffiliation(),[["code","u"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield",val,[["code","e"]])
+            out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
+            out.closeTag("datafield")
 
 
 
@@ -1605,37 +1609,36 @@ class outputGenerator(Observable):
 
 
 
-        out.openTag("marc:datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(cont.getConference()),[["code","b"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(cont.getConference()),[["code","b"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
+        out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
         confcont = "INDICO." + self.dataInt.objToId(cont, separator=".")
-        out.writeTag("marc:subfield",confcont,[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield",confcont,[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
-        confcont = "INDICO." + self.dataInt.objToId(cont.getConference())
-        out.writeTag("marc:subfield",confcont,[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield", self._getRecordCollection(cont), [["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
+        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         url = str(urlHandlers.UHContributionDisplay.getURL(cont))
-        out.writeTag("marc:subfield",url,[["code","u"]])
-        out.writeTag("marc:subfield", "Contribution details", [["code","y"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield",url,[["code","u"]])
+        out.writeTag("subfield", "Contribution details", [["code","y"]])
+        out.closeTag("datafield")
 
     ####
     #fb
 
 
-    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, forceCache=False):
+    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, overrideCache=False):
         if not out:
             out = self._XMLGen
         #try to get a cache
         version = "MARC21_mat-%s"%(includeMaterial)
         obj = None
-        if not forceCache:
+        if not overrideCache:
             obj = self.cache.loadObject(version, subCont)
         if obj:
             xml = obj.getContent()
@@ -1654,72 +1657,72 @@ class outputGenerator(Observable):
             out = self._XMLGen
 
         #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
-        out.writeTag("marc:leader", "00000nmm  2200000uu 4500")
-        out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","INDICO.%s"%(self.dataInt.objToId(subCont, separator=".")),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("leader", "00000nmm  2200000uu 4500")
+        out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield","INDICO.%s"%(self.dataInt.objToId(subCont, separator=".")),[["code","a"]])
+        out.closeTag("datafield")
     #
-        out.openTag("marc:datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",self.dataInt.objToId(subCont, separator=["t","sc"]),[["code","a"]])
-        out.writeTag("marc:subfield","Indico",[["code","9"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",self.dataInt.objToId(subCont, separator=["t","sc"]),[["code","a"]])
+        out.writeTag("subfield","Indico",[["code","9"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",subCont.getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",subCont.getTitle(),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",subCont.getDuration(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",subCont.getDuration(),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield", self.dataInt.objToId(subCont.getConference(), separator="."),[["code","g"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield", self.dataInt.objToId(subCont.getConference(), separator="."),[["code","g"]])
+        out.closeTag("datafield")
 
         if subCont.getReportNumberHolder().listReportNumbers():
-            out.openTag("marc:datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","088"],["ind1"," "],["ind2"," "]])
             for report in subCont.getReportNumberHolder().listReportNumbers():
-                out.writeTag("marc:subfield",report[1],[["code","a"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield",report[1],[["code","a"]])
+            out.closeTag("datafield")
 
 
-        out.openTag("marc:datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
+        out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = subCont.getKeywords()
         keywords = keywords.replace("\r\n", "\n")
         for keyword in keywords.split("\n"):
-            out.writeTag("marc:subfield",keyword,[["code","a"]])
-        out.closeTag("marc:datafield")
+            out.writeTag("subfield",keyword,[["code","a"]])
+        out.closeTag("datafield")
 
 
         for path in subCont.getConference().getCategoriesPath():
-            out.openTag("marc:datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-            out.writeTag("marc:subfield", ":".join(path), [["code","a"]])
-            out.closeTag("marc:datafield")
+            out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
+            out.writeTag("subfield", ":".join(path), [["code","a"]])
+            out.closeTag("datafield")
 
         l=subCont.getLocation()
         if (l and l.getName() != "") or subCont.getContribution().getStartDate() is not None:
-            out.openTag("marc:datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
             if l:
                 if l.getName() != "":
-                    out.writeTag("marc:subfield",l.getName(),[["code","r"]])
+                    out.writeTag("subfield",l.getName(),[["code","r"]])
             if subCont.getContribution().getStartDate() is not None:
-                out.writeTag("marc:subfield","%d-%s-%sT%s:%s:00Z" %(subCont.getContribution().getStartDate().year, string.zfill(subCont.getContribution().getStartDate().month,2), string.zfill(subCont.getContribution().getStartDate().day,2), string.zfill(subCont.getContribution().getStartDate().hour,2), string.zfill(subCont.getContribution().getStartDate().minute,2)),[["code","d"]])
+                out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(subCont.getContribution().getStartDate().year, string.zfill(subCont.getContribution().getStartDate().month,2), string.zfill(subCont.getContribution().getStartDate().day,2), string.zfill(subCont.getContribution().getStartDate().hour,2), string.zfill(subCont.getContribution().getStartDate().minute,2)),[["code","d"]])
                 #out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(subCont.getEndDate().year, string.zfill(subCont.getEndDate().month,2), string.zfill(subCont.getEndDate().day,2), string.zfill(subCont.getEndDate().hour,2), string.zfill(subCont.getEndDate().minute,2)),[["code","h"]])
-            out.closeTag("marc:datafield")
+            out.closeTag("datafield")
     #
-        out.openTag("marc:datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield",subCont.getDescription(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield",subCont.getDescription(),[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
-        out.writeTag("marc:subfield",subCont.getConference().getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
+        out.writeTag("subfield",subCont.getConference().getTitle(),[["code","a"]])
+        out.closeTag("datafield")
     #
-        out.openTag("marc:datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
-        out.writeTag("marc:subfield","SzGeCERN",[["code","2"]])
+        out.openTag("datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
+        out.writeTag("subfield","SzGeCERN",[["code","2"]])
         if subCont.getContribution().getTrack():
-            out.writeTag("marc:subfield",subCont.getContribution().getTrack().getTitle(),[["code","a"]])
-        out.closeTag("marc:datafield")
+            out.writeTag("subfield",subCont.getContribution().getTrack().getTitle(),[["code","a"]])
+        out.closeTag("datafield")
 
 
         # tag 700 Speaker name
@@ -1745,23 +1748,23 @@ class outputGenerator(Observable):
 
         if auth:
             user = auth
-            out.openTag("marc:datafield",[["tag","100"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","100"],["ind1"," "],["ind2"," "]])
             fullName = auth.getFamilyName() + " " + auth.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]])
+            out.writeTag("subfield",fullName,[["code","a"]])
             for val in list[user]:
-                out.writeTag("marc:subfield",val,[["code","e"]])
-            out.writeTag("marc:subfield",auth.getAffiliation(),[["code","u"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield",val,[["code","e"]])
+            out.writeTag("subfield",auth.getAffiliation(),[["code","u"]])
+            out.closeTag("datafield")
             del list[auth]
 
         for user in list.keys():
-            out.openTag("marc:datafield",[["tag","700"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield",[["tag","700"],["ind1"," "],["ind2"," "]])
             fullName = user.getFamilyName() + " " + user.getFirstName()
-            out.writeTag("marc:subfield",fullName,[["code","a"]])
+            out.writeTag("subfield",fullName,[["code","a"]])
             for val in list[user]:
-                out.writeTag("marc:subfield",val,[["code","e"]])
-            out.writeTag("marc:subfield",user.getAffiliation(),[["code","u"]])
-            out.closeTag("marc:datafield")
+                out.writeTag("subfield",val,[["code","e"]])
+            out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
+            out.closeTag("datafield")
 
 
 
@@ -1779,25 +1782,24 @@ class outputGenerator(Observable):
 
 
 
-        out.openTag("marc:datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("marc:subfield","INDICO.%s"%self.dataInt.objToId(subCont.getConference()),[["code","b"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield","INDICO.%s"%self.dataInt.objToId(subCont.getConference()),[["code","b"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
+        out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
         confcont = "INDICO." + self.dataInt.objToId(subCont, separator=".")
-        out.writeTag("marc:subfield",confcont,[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield",confcont,[["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
-        confcont = "INDICO." + self.dataInt.objToId(subCont.getConference())
-        out.writeTag("marc:subfield",confcont,[["code","a"]])
-        out.closeTag("marc:datafield")
+        out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
+        out.writeTag("subfield", self._getRecordCollection(subCont), [["code","a"]])
+        out.closeTag("datafield")
 
-        out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
+        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         url = str(urlHandlers.UHSubContributionDisplay.getURL(subCont))
-        out.writeTag("marc:subfield",url,[["code","u"]])
-        out.writeTag("marc:subfield", "Contribution details", [["code","y"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield",url,[["code","u"]])
+        out.writeTag("subfield", "Contribution details", [["code","y"]])
+        out.closeTag("datafield")
 
     def materialToXMLMarc21(self,mat, out=None):
         if not out:
@@ -1835,14 +1837,14 @@ class outputGenerator(Observable):
             out = self._XMLGen
 
         #out.writeTag("name",res.getName())
-        out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        out.writeTag("marc:subfield",res.getDescription(),[["code","a"]])
+        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
+        out.writeTag("subfield",res.getDescription(),[["code","a"]])
         #out.writeTag("description",res.getDescription())
         #out.writeTag("url",res.getURL())
-        out.writeTag("marc:subfield",res.getURL(),[["code","u"]])
-        out.writeTag("marc:subfield", "resource", [["code","x"]])
-        out.writeTag("marc:subfield", res.getOwner().getTitle(), [["code","y"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield",res.getURL(),[["code","u"]])
+        out.writeTag("subfield", "resource", [["code","x"]])
+        out.writeTag("subfield", res.getOwner().getTitle(), [["code","y"]])
+        out.closeTag("datafield")
 
     def resourceFileToXMLMarc21(self,res, out=None):
         if not out:
@@ -1851,20 +1853,20 @@ class outputGenerator(Observable):
         #out.writeTag("name",res.getName())
         #out.writeTag("description",res.getDescription())
         #out.writeTag("type",res.fileType)
-        out.openTag("marc:datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        out.writeTag("marc:subfield",res.getDescription(),[["code","a"]])
+        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
+        out.writeTag("subfield",res.getDescription(),[["code","a"]])
         try:
-            out.writeTag("marc:subfield",res.getSize(),[["code","s"]])
+            out.writeTag("subfield",res.getSize(),[["code","s"]])
         except:
             pass
         #out.writeTag("subfield",res.getURL(),[["code","u"]])
 
         #out.writeTag("subfield",res.getFileName(),[["code","q"]])
         url = str(urlHandlers.UHFileAccess.getURL( res ))
-        out.writeTag("marc:subfield",url,[["code","u"]])
-        out.writeTag("marc:subfield", res.getFileName(), [["code","y"]])
-        out.writeTag("marc:subfield", "resource", [["code","x"]])
-        out.closeTag("marc:datafield")
+        out.writeTag("subfield",url,[["code","u"]])
+        out.writeTag("subfield", res.getFileName(), [["code","y"]])
+        out.writeTag("subfield", "resource", [["code","x"]])
+        out.closeTag("datafield")
         #out.writeTag("duration","1")#TODO:DURATION ISN'T ESTABLISHED
         #cDate = res.getCreationDate()
         #creationDateStr = "%d-%s-%sT%s:%s:00Z" %(cDate.year, string.zfill(cDate.month,2), string.zfill(cDate.day,2), string.zfill(cDate.hour,2), string.zfill(cDate.minute,2))
@@ -1896,12 +1898,12 @@ class XMLCache(MultiLevelCache):
     def isDirty(self, file, object):
 
         # get event OAI date
-        oaiModDate = resolveHierarchicalId(object.getId()).getOAIModificationDate()
+        modDate = resolveHierarchicalId(object.getId())._modificationDS
         fileModDate = timezone("UTC").localize(
             datetime.utcfromtimestamp(os.path.getmtime(file)))
 
         # check file system date vs. event date
-        return (oaiModDate > fileModDate)
+        return (modDate > fileModDate)
 
     def _generatePath(self, entry):
         """

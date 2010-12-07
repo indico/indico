@@ -41,4 +41,4 @@ class TestInvenioRecordProcessor(IndicoTestCase):
 class TestMetadataGeneration(IndicoTestCase):
 
     def testConferenceMetadataGeneration():
-
+        pass

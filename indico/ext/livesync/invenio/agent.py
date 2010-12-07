@@ -22,6 +22,9 @@
 from indico.ext.livesync.agent import PushSyncAgent, AgentExecutionException
 from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
 
+# legacy indico
+from MaKaC import conference
+
 # legacy OAI/XML libs - this should be replaced soon
 from MaKaC.export.oai2 import DataInt
 from MaKaC.common.xmlGen import XMLGen
@@ -29,9 +32,41 @@ from MaKaC.common.xmlGen import XMLGen
 class InvenioRecordProcessor(object):
 
     @classmethod
-    def _computeProtectionChanges(cls, obj, action):
+    def _breakDownCategory(cls, categ, chgSet):
+
+        # categories are never converted to records
+
+        for conf in categ.getAllConferenceList():
+            cls._breakDownConference(conf, chgSet)
+
+    @classmethod
+    def _breakDownConference(cls, conf, chgSet):
+
+        chgSet.add(conf)
+
+        for contrib in conf.getContributionList():
+            cls._breakDownContribution(contrib, chgSet)
+
+    @classmethod
+    def _breakDownContribution(cls, contrib, chgSet):
+
+        chgSet.add(contrib)
+
+        for scontrib in contrib.getSubContributionList():
+            chgSet.add(scontrib)
+
+    @classmethod
+    def _computeProtectionChanges(cls, obj, action, chgSet):
         objType = obj.__class__
 
+        if isinstance(obj, conference.Category):
+            cls._breakDownCategory(obj, chgSet)
+        elif isinstance(obj, conference.Conference):
+            cls._breakDownConference(obj, chgSet)
+        elif isinstance(obj, conference.Contribution):
+            cls._breakDownContribution(obj, chgSet)
+        elif isinstance(obj, conference.SubContribution):
+            chgSet.add(obj)
 
     @classmethod
     def computeRecords(cls, data):
@@ -47,7 +82,9 @@ class InvenioRecordProcessor(object):
 
         result = []
 
-        for aw in data:
+        print 'Computing records...'
+
+        for ts, aw in data:
 
             obj = aw.getObject()
 
@@ -73,12 +110,18 @@ class InvenioRecordProcessor(object):
 
                 elif action in ['set_private', 'set_public']:
                     # protection changes have to be handled more carefully
-                    cls._computeProtectionChanges(obj, action)
+                    cls._computeProtectionChanges(obj, action, protectionChanged)
 
         # TODO - deleted
 
-        for obj in (created | changed):
-            yield obj, 'create'
+        print 'Computed records: %s created, %s changed, %s protection' % \
+                            (len(created), len(changed), len(protectionChanged))
+
+        for obj in (created | changed | protectionChanged):
+            yield aw._timestamp, obj, 'create'
+
+        for obj in (deleted):
+            yield aw._timestamp, obj, 'delete'
 
         # TODO: branching to sub objects (i.e. category protection)
 
@@ -89,41 +132,55 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
     """
 
     def __init__(self, aid, name, description, updateTime, url):
-        super(InvenioBatchUploaderAgent, self).__init__(aid, name, description, updateTime)
+        super(InvenioBatchUploaderAgent, self).__init__(aid, name, description, updateTiame)
         self._url = url
 
     def _getMetadata(self, record):
         """
         Retrieves the metadata for the record
         """
-        di = DataInt(XMLGen())
-        return di.toMarc(record)
+        xg = XMLGen()
+        di = DataInt(xg)
+
+        xg.initXml()
+
+        xg.openTag("collection",[["xmlns","http://www.loc.gov/MARC21/slim"]])
+
+        di.toMarc(record, overrideCache=True)
+
+        xg.closeTag("collection")
+
+        return xg.getXml()
 
     def _upload(self, record, server, data):
-        result = server.upload_marcxml(data, "-ir")
+        result = server.upload_marcxml(data, "-ir").read()
 
-        self.logger.debug('rec %s result: %s' % (record, result))
+        self._v_logger.debug('rec %s result: %s' % (record, result))
 
         if result.startswith('[INFO]'):
             fpath = result.strip().split(' ')[-1]
-            self.logger.info('rec %s stored in server (%s)' % (record, fpath))
+            self._v_logger.info('rec %s stored in server (%s)' % (record, fpath))
         else:
-            self.logger.error('rec %s output: %s' % (record, result))
+            self._v_logger.error('rec %s output: %s' % (record, result))
+            raise Exception('upload failed')
 
-    def _run(self, manager, data):
+    def _run(self, manager, data, lastTS):
 
         server = InvenioConnector(self._url)
 
         # take operations and choose which records to send
-        for record, operation in InvenioRecordProcessor.computeRecords(data):
+
+        crecords = InvenioRecordProcessor.computeRecords(data)
+
+        self._v_logger.info('Starting metadata/upload cycle')
+        for ts, record, operation in crecords:
             # TODO: check operation
-            data = self._getMetadata(record)
+            rdata = self._getMetadata(record)
             try:
-                self._upload(record, server, data)
+                self._upload(record, server, rdata)
             except:
-                self.logger.exception('Error uploading data')
+                self._v_logger.exception('Error uploading data')
                 raise AgentExecutionException("Error uploading data")
                 # bla bla
 
-        self.acknowledge()
-
+        return lastTS

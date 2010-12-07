@@ -117,7 +117,7 @@ class DataInt:
             oid = "%s%s%s%s%s"%(obj.getConference().getId(), separator[0], obj.getContribution().getId(), separator[1], obj.getId())
         else:
             oid = obj.getId()
-        return "%s%s" % (self.getIdPrefix(), oid)
+        return oid
 
     def idToObj(self, origId):
 
@@ -507,47 +507,49 @@ class DataInt:
 
 
 
-    def toMarc(self,obj, out=None):
+    def toMarc(self,obj, out=None, overrideCache=False):
         if not out:
             out = self._XMLGen
         if isinstance(obj,conference.Conference):
-            return self.confToXMLMarc(obj, out=out)
+            self.confToXMLMarc(obj, out=out, overrideCache=overrideCache)
         elif isinstance(obj,conference.Contribution):
-            return self.contToXMLMarc(obj, out=out)
+            self.contToXMLMarc(obj, out=out, overrideCache=overrideCache)
         elif isinstance(obj, conference.SubContribution):
-            return self.subContToXMLMarc(obj, out=out)
-        raise "unknown object type"
+            self.subContToXMLMarc(obj, out=out, overrideCache=overrideCache)
+        else:
+            raise "unknown object type"
+        return out.getXml()
 
-    def confToXMLMarc(self,obj, out=None):
+    def confToXMLMarc(self,obj, out=None, overrideCache=False):
         if not out:
             out = self._XMLGen
         #out.openTag("oai_marc", [["type",""], ["level",""], ["xmlns",self.iconfNamespace],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "%s %s"%(self.iconfNamespace, self.oai_marcXSD)]])
-        out.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
-        self._outGen.confToXMLMarc21(obj, out=out)
-        out.closeTag("marc:record")
+        out.openTag("record")
+        self._outGen.confToXMLMarc21(obj, out=out, overrideCache=overrideCache)
+        out.closeTag("record")
 
-    def sessionToXMLMarc(self,obj, out=None):
+    def sessionToXMLMarc(self,obj, out=None, overrideCache=False):
         if not out:
             out = self._XMLGen
-        out.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
-        self._outGen.sessionToXMLMarc21(obj, out=out)
-        out.closeTag("marc:record")
+        out.openTag("record")
+        self._outGen.sessionToXMLMarc21(obj, out=out, overrideCache=overrideCache)
+        out.closeTag("record")
 
-    def contToXMLMarc(self,obj, out=None):
-        if not out:
-            out = self._XMLGen
-        #out.openTag("oai_marc", [["type",""], ["level",""],["xmlns",self.iconfNamespace],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "%s %s"%(self.iconfNamespace, self.oai_marcXSD)]])
-        out.openTag("marc:record", [["xmlns:marc", "http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
-        self._outGen.contribToXMLMarc21(obj, out=out)
-        out.closeTag("marc:record")
-
-    def subContToXMLMarc(self,obj, out=None):
+    def contToXMLMarc(self,obj, out=None, overrideCache=False):
         if not out:
             out = self._XMLGen
         #out.openTag("oai_marc", [["type",""], ["level",""],["xmlns",self.iconfNamespace],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "%s %s"%(self.iconfNamespace, self.oai_marcXSD)]])
-        out.openTag("marc:record", [["xmlns:marc", "http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
-        self._outGen.subContribToXMLMarc21(obj, out=out)
-        out.closeTag("marc:record")
+        out.openTag("record")
+        self._outGen.contribToXMLMarc21(obj, out=out, overrideCache=overrideCache)
+        out.closeTag("record")
+
+    def subContToXMLMarc(self,obj, out=None, overrideCache=False):
+        if not out:
+            out = self._XMLGen
+        #out.openTag("oai_marc", [["type",""], ["level",""],["xmlns",self.iconfNamespace],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "%s %s"%(self.iconfNamespace, self.oai_marcXSD)]])
+        out.openTag("record")
+        self._outGen.subContribToXMLMarc21(obj, out=out, overrideCache=overrideCache)
+        out.closeTag("record")
 
     #Write here methods for build metadata (!!always using built-in methods!!)
     def toXMLDC(self, obj, out=None):
