@@ -70,6 +70,7 @@ class WError(WTemplated):
 class WErrorWSGI(WTemplated):
 
     def __init__(self, ex):
+        WTemplated.__init__(self)
         self._ex = ex
 
     def getVars(self):

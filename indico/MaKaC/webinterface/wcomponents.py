@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins import PluginsHolder
+from MaKaC.plugins import PluginsHolder, Observable
 
 import os,types,string
 from xml.sax.saxutils import escape, quoteattr
@@ -66,7 +66,7 @@ from MaKaC.common.contextManager import ContextManager
 
 import re
 
-class WTemplated:
+class WTemplated(Observable):
     """This class provides a basic implementation of a web component (an
        object which generates HTML related to a certain feature or
        functionality) which relies in a template file for generating the
@@ -79,6 +79,13 @@ class WTemplated:
     """
     tplId = None
 
+    @classmethod
+    def forModule(cls, module):
+        tplobj = cls()
+        # HACK :/
+        tplobj._dir = os.path.join(module.__path__[0], 'tpls')
+        return tplobj
+
     def __init__( self, tpl_name = None):
         if tpl_name != None:
             self.tplId = tpl_name
@@ -86,6 +93,9 @@ class WTemplated:
         #if ( '_rh' in ','.join( dir( self ) ) ):
         from MaKaC.webinterface.rh.base import RH
         self._rh = RH._currentRH
+
+        cfg = Configuration.Config.getInstance()
+        self._dir = cfg.getTPLDir()
 
     def _getSpecificTPL(self, dir, tplId, extension="tpl"):
         """
@@ -114,18 +124,24 @@ class WTemplated:
             in the configured TPL directory.
         """
         cfg = Configuration.Config.getInstance()
-        dir = cfg.getTPLDir()
+
         file = cfg.getTPLFile( self.tplId )
 
-        if file == "":
-            file = self._getSpecificTPL(dir,self.tplId)
-        self.tplFile = os.path.join(dir, file)
+        # because MANY classes skip the constructor...
+        if hasattr(self, '_dir'):
+            tplDir = self._dir
+        else:
+            tplDir = cfg.getTPLDir()
 
-        hfile = self._getSpecificTPL(os.path.join(dir,'chelp'),
+        if file == "":
+            file = self._getSpecificTPL(tplDir,self.tplId)
+        self.tplFile = os.path.join(tplDir, file)
+
+        hfile = self._getSpecificTPL(os.path.join(tplDir,'chelp'),
                                               self.tplId,
                                               extension='wohl')
 
-        self.helpFile = os.path.join(dir,'chelp',hfile)
+        self.helpFile = os.path.join(tplDir,'chelp',hfile)
 
 
     def getVars( self ):
@@ -283,7 +299,7 @@ class WHeader(WTemplated):
         # TODO: Remove this after CRBS headers are fixed!
         if self._currentuser:
             vars["userInfo"] = """<font size="-1"><a class="topbar" href="%s" target="_blank">%s</a> - <a href="%s">logout</a></font>"""%(urlHandlers.UHUserDetails.getURL(self._currentuser), self._currentuser.getFullName(), vars["logoutURL"])
-            vars["userDetails"] = """class="topbar" href="%s" target="_blank\""""%urlHandlers.UHUserDetails.getURL(self._currentuser)
+            vars["userDetails"] = 'class="topbar" href="%s" target="_blank"'%urlHandlers.UHUserDetails.getURL(self._currentuser)
 
             if self._currentuser.isAdmin():
                 vars["logMeAs"] = vars["loginAsURL"]
@@ -296,19 +312,7 @@ class WHeader(WTemplated):
 
         imgLogo=Configuration.Config.getInstance().getSystemIconURL( "logoIndico" )
         imgLogin=Configuration.Config.getInstance().getSystemIconURL( "login" )
-##
-## TOCHECK: We do not need this anymore since we use the flaog _ishttps in the clase RHSignIn
-##
-#        if Configuration.Config.getInstance().getLoginURL().startswith("https"):
-#
-#            # Set proper PROTOCOL for images requested via SSL
-#            imgLogo=imgLogo.replace("http://", "https://")
-#            imgLogin=imgLogin.replace("http://", "https://")
-#
-#            # Set proper PORT for images requested via SSL
-#            imgLogo = urlHandlers.setSSLPort( imgLogo )
-#            imgLogin = urlHandlers.setSSLPort( imgLogin )
-#
+
         vars["imgLogo"] = imgLogo
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self.__isFrontPage

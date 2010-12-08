@@ -27,7 +27,14 @@ under the corresponding GNU GPL license.
 
 import sys
 import os
+
+# indico imports
+from indico.web.rh import RHHtdocs
+
+# legacy indico imports
 from MaKaC.common import Config
+
+
 
 # Path update
 
@@ -78,24 +85,31 @@ def application(environ, start_response):
             if possible_module is not None:
                 mp_legacy_publisher(req, possible_module, possible_handler)
             else:
-                ###### TO REPLACE after Pedro's integration of LiveSync
-                path = req.URLFields['PATH_INFO']
-                if path.startswith("/"):
-                    path = path[1:]
-                # Let's try to load a plugin
-                # Replace URLFields with environ
-                pluginMap = RHMapMemory()._map
-                if path != '' and pluginMap.has_key(path):
-                    plugin_publisher(req, path, pluginMap[path])
+                from indico.web.wsgi.indico_wsgi_file_handler import stream_file
+
+                url = req.URLFields['PATH_INFO']
+
+                # maybe the url is owned by some plugin?
+                pluginRHMap = RHMapMemory()._map
+
+                for urlRE, rh in pluginRHMap.iteritems():
+                    m = urlRE.match(url)
+                    if m:
+                        if type(rh) == type and RHHtdocs in rh.mro():
+                            # calculate the path to the resource
+                            possible_static_path = rh.calculatePath(**m.groupdict())
+                            break
+                        else:
+                            plugin_publisher(req, url, rh, m.groupdict())
                 else:
                     # Finally, it might be a static file
                     possible_static_path = is_static_path(environ['PATH_INFO'])
-                    if possible_static_path is not None:
-                        from indico.web.wsgi.indico_wsgi_file_handler import stream_file
-                        stream_file(req, possible_static_path)
-                    else:
-                        raise SERVER_RETURN, HTTP_NOT_FOUND
-                ######  END TO REPLACE
+
+                if possible_static_path is not None:
+                    stream_file(req, possible_static_path)
+                else:
+                    raise SERVER_RETURN, HTTP_NOT_FOUND
+
             req.flush()
         #Exception treatment
         except SERVER_RETURN, status:
@@ -163,15 +177,14 @@ def _convert_to_string(form):
             form[key] = str(value)
 
 
-def plugin_publisher(req, path, rh):
+def plugin_publisher(req, path, rh, urlparams):
     """
     Publishes the plugin described in path
     """
-
     form = dict(req.form)
 
     _convert_to_string(form)
-    _check_result(req, rh( req ).process( form ))
+    _check_result(req, rh(req, **urlparams).process( form ))
 
 def mp_legacy_publisher(req, possible_module, possible_handler):
     """

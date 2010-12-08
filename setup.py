@@ -674,6 +674,8 @@ if __name__ == '__main__':
             EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
 
             InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
+
+            livesync.invenio = indico.ext.livesync.invenio
             """,
           zip_safe = False,
           packages = foundPackages,

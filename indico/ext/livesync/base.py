@@ -24,7 +24,16 @@ Base module
 
 # dependency libs
 from persistent import Persistent
+from indico.core.api import IContributor
 
+
+class ILiveSyncAgentProvider(IContributor):
+    """
+    Implemented by classes that provide a LiveSync Agent
+    """
+
+    def pingLiveSyncAgentProviders(self, typeDict):
+        pass
 
 class ActionWrapper(Persistent):
     """

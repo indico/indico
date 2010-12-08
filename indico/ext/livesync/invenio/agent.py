@@ -19,7 +19,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from indico.ext.livesync.agent import PushSyncAgent, AgentExecutionException
+from indico.ext.livesync.agent import PushSyncAgent, AgentExecutionException, \
+     AgentProviderComponent
 from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
 
 # legacy indico
@@ -28,6 +29,7 @@ from MaKaC import conference
 # legacy OAI/XML libs - this should be replaced soon
 from MaKaC.export.oai2 import DataInt
 from MaKaC.common.xmlGen import XMLGen
+
 
 class InvenioRecordProcessor(object):
 
@@ -131,7 +133,7 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
     Invenio WebUpload-compatible LiveSync agent
     """
 
-    def __init__(self, aid, name, description, updateTime, url):
+    def __init__(self, aid, name, description, updateTime, url=None):
         super(InvenioBatchUploaderAgent, self).__init__(aid, name, description, updateTiame)
         self._url = url
 
@@ -184,3 +186,10 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
                 # bla bla
 
         return lastTS
+
+
+# Attention: if this class is not declared, the LiveSync management interface
+# will never know this plugin exists!
+
+class InvenioAgentProviderComponent(AgentProviderComponent):
+    _agentType = InvenioBatchUploaderAgent

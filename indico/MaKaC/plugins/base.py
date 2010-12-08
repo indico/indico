@@ -33,18 +33,19 @@ from MaKaC.common.logger import Logger
 import zope.interface, types
 from MaKaC.services.interface.rpc.common import NoReportError
 from persistent import Persistent
-import pkg_resources
+import pkg_resources, types, inspect, re
 
 from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata
 
 from indico.core.api import Component, IListener, IContributor
+from indico.web import rh as newrh
 
 
 class Observable:
     def _notify(self, event, *params):
-        PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)
+        return PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)
 
 
 class ComponentsManager(Persistent):
@@ -94,6 +95,7 @@ class ComponentsManager(Persistent):
         #Register it. We take the list of the interfaces implemented by the component
         implementedInterfaces = list(zope.interface.implementedBy(component))
         for interface in implementedInterfaces:
+
             #we take the list of the methods in the interface
             for met in list(interface):
                 #if the method is implemented in the component, then we register it
@@ -122,21 +124,19 @@ class ComponentsManager(Persistent):
             self._notifyModification()
 
     def notifyComponent(self, event, obj, *params):
+        results = []
         for subscriber in self.getAllSubscribers(event):
-            #we check if the method is in the method list of the interface
-            #make the check
-            #if(method in list(interface)):
-                #the event exists
-                f = getattr(subscriber,event)
-                try:
-                    f(obj, *params)
-                except NoReportError, e:
-                    raise NoReportError(str(e))
-                except Exception, e:
-                    Logger.get('PluginNotifier').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
-                    raise
-            #else:
-            #    Logger.get('PluginNotifier').error('the method %s is not definend by the interface %s'%(method, interface))
+
+            f = getattr(subscriber,event)
+            try:
+                results.append(f(obj, *params))
+            except NoReportError, e:
+                raise NoReportError(str(e))
+            except Exception, e:
+                Logger.get('PluginNotifier').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
+                raise
+
+        return results
 
     def getAllSubscribers(self, method):
         if self.__eventComponentsDict.has_key(method):
@@ -234,12 +234,11 @@ class RHMap(Persistent):
         self.__id = "RHMap"
         self.__map = {}
 
-    def hasUH(self, rh):
-        if not hasattr(rh, '_uh') or rh._uh is None:
+    def hasURL(self, rh):
+        if hasattr(rh, '_url') and rh._url != None:
+            return True
+        else:
             return False
-            #at some point we should raise an Exception or think what can we do about this (for example, base classes won't have this attr neither)
-            #raise Exception('The RH %s did not implement the _uh attribute, please do it' %str(rh))
-        return True
 
     def has_key(self, key):
         return self.__map.has_key(key)
@@ -257,9 +256,9 @@ class RHMap(Persistent):
         return self.__id
 
     def addRH(self, rh):
-        if self.hasUH(rh):
-            self.__map[rh._uh.getRelativeURL().__str__()] = rh
-        self._notifyModification()
+        if self.hasURL(rh):
+            self.__map[re.compile(rh._url)] = rh
+            self._notifyModification()
 
     def cleanRHDict(self):
         """ Attributes in this class are persistent, so when we want to erase them we'll need to explicitely invoke this method
@@ -829,15 +828,19 @@ class PluginType (PluginBase):
             for obj in smodule.__dict__.values():
                 if type(obj) == type and Component in obj.mro() and \
                    (IListener.implementedBy(obj) or IContributor.implementedBy(obj)):
-                    Logger.get('plugins.holder').debug(
+                    Logger.get('plugins.holder.component').debug(
                         "Registering component %s" % obj)
                     PluginsHolder().getComponentsManager().addComponent(obj)
 
     def _updateRHMapInfo(self, plugin, module):
         from MaKaC.webinterface.rh.base import RH
         for smodule in self._getAllSubmodules(module):
+            Logger.get('plugins.holder.rhmap').debug(
+                "Analyzing %s" % smodule)
             for obj in smodule.__dict__.values():
-                if type(obj) == type and RH in obj.mro() and obj.__module__.find('plugins') != -1:
+                # account for old style and new style class/rh
+                if (type(obj) == types.ClassType and RH in inspect.getmro(obj)) or \
+                   (type(obj) == type and newrh.RH in obj.mro()):
                     PluginsHolder().getRHMap().addRH(obj)
 
     def _updateHandlerInfo(self, plugin, module):

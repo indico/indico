@@ -18,10 +18,14 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__metadata__ = {
-    'name': 'Invenio Batch Uploader',
-    'type': 'livesync',
-    'description': 'LiveSync plugin for Invenio, using BatchUploader'
-    }
+# system lib imports
+import os
 
-from indico.ext.livesync.invenio.agent import InvenioBatchUploaderAgent
+class RH(object):
+    pass
+
+class RHHtdocs(RH):
+
+    @classmethod
+    def calculatePath(cls, filepath):
+        return os.path.join(cls._local_path, filepath)

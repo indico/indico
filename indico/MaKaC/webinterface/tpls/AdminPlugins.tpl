@@ -79,6 +79,14 @@
     <% if PluginType.getOptions() is not None and len(PluginType.getOptions()) > 0: %>
         <% includeTpl('AdminPluginsOptionList', Object = PluginType, ObjectType = "PluginType", Favorites = Favorites, Index = 0, rbActive = rbActive, baseURL = baseURL) %>
     <% end %>
+    <% elif True in self._notify('hasPluginSettings', PluginType.getId(), None): %>
+    <tr>
+        <td>
+
+                <%= ''.join(list(elem for elem in self._notify('getPluginSettingsHTML', PluginType.getId(), None) if elem != None)) %>
+        </td>
+    </tr>
+    <% end %>
     <% else: %>
     <tr>
         <td>
@@ -100,6 +108,9 @@
         <div id="<%=plugin.getName()%>OptionsDiv" style="display:none;">
             <% if plugin.hasAnyOptions(): %>
                 <% includeTpl('AdminPluginsOptionList', Object = plugin, ObjectType = "Plugin", Favorites = Favorites, Index = i, rbActive = rbActive, baseURL = baseURL) %>
+            <% end %>
+            <% elif True in self._notify('hasPluginSettings', PluginType.getId(), plugin.getId()): %>
+                <%= ''.join(list(elem for elem in self._notify('getPluginSettingsHTML', PluginType.getId(), plugin.getId()) if elem != None)) %>
             <% end %>
             <% else: %>
                 <span><%=_("No options defined for this plugin")%></span>

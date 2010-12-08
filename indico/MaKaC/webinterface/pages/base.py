@@ -41,13 +41,21 @@ class WPBase:
         self._extraCSS = []
         self._extraJS = []
 
-    def _includeJSPackage(self, packageName, module = 'indico'):
+    def _includeJSPackage(self, packageName, module = 'indico', path=None):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
         if info.isDebugActive():
             return ['js/%s/%s/Loader.js' % (module, packageName)]
         else:
             return ['js/%s/pack/%s.pack.js' % (module, packageName)]
+
+    def _includeJSFile(self, path, filename):
+        info = HelperMaKaCInfo().getMaKaCInfoInstance()
+
+        if info.isDebugActive():
+            return ['%s/%s.js' % (path, filename)]
+        else:
+            return ['%s/%s.pack.js' % (path, filename)]
 
     def _includePresentationFiles(self):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()

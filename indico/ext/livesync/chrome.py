@@ -18,3 +18,96 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# system lib imports
+import os
+
+# 3rd party lib imports
+import zope.interface
+
+# plugin imports
+from indico.ext.livesync import SyncManager
+import indico.ext.livesync
+
+# indico api imports
+from indico.core.api import Component
+from indico.core.api.plugins import IPluginSettingsContributor
+from indico.web.rh import RHHtdocs
+
+# legacy indico imports
+from MaKaC.webinterface.wcomponents import WTemplated
+from MaKaC.webinterface.rh.admins import RHAdminBase
+from MaKaC.webinterface.urlHandlers import URLHandler
+from MaKaC.webinterface.pages.admins import WPAdminPlugins
+from MaKaC.webinterface import wcomponents
+
+
+class UHAdminLiveSyncManagement(URLHandler):
+    _relativeURL = "livesync/manage"
+
+
+# Request Handlers
+
+class RHLiveSyncHtdocs(RHHtdocs):
+
+    _url = r"^/livesync/htdocs/(?P<filepath>.*)$"
+    _local_path = os.path.join(indico.ext.livesync.__path__[0], 'htdocs')
+
+
+class RHAdminLiveSyncManagement(RHAdminBase):
+
+    _url = r'^/livesync/manage/?$'
+
+    def _process(self):
+        return WPPluginAgentManagement(self, 'livesync', '').display()
+
+
+# Plugin Settings
+
+class PluginSettingsContributor(Component):
+
+    zope.interface.implements(IPluginSettingsContributor)
+
+    def hasPluginSettings(self, obj, ptype, plugin):
+        if ptype == 'livesync' and plugin == None:
+            return True
+        else:
+            return False
+
+    def getPluginSettingsHTML(self, obj, ptype, plugin):
+        if ptype == 'livesync' and plugin == None:
+            return WPluginSettings.forModule(indico.ext.livesync).getHTML()
+        else:
+            return None
+
+
+class WPluginSettings(WTemplated):
+
+    def getVars(self):
+        tplVars = WTemplated.getVars(self)
+        tplVars['adminLiveSyncURL'] = UHAdminLiveSyncManagement.getURL()
+        return tplVars
+
+
+# Settings sub-sections
+
+class WPPluginAgentManagement(WPAdminPlugins):
+
+    def getJSFiles(self):
+        return WPAdminPlugins.getJSFiles(self) + \
+               self._includeJSFile('livesync/htdocs/js', 'livesync')
+
+    def _getPageContent(self, params):
+        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML(
+            WPluginAgentManagement.forModule(indico.ext.livesync).getHTML(params))
+
+
+class WPluginAgentManagement(WTemplated):
+
+    def getVars(self):
+        tplVars = WTemplated.getVars(self)
+
+        smanager = SyncManager.getDBInstance()
+        tplVars['syncManager'] = smanager
+        tplVars['agents'] = smanager.getAllAgents()
+
+        return tplVars

@@ -23,11 +23,16 @@ Module containing the persistent classes that will be stored in the DB
 """
 
 # dependency libs
+import zope. interface
 from persistent import Persistent, mapping
+
+# indico api imports
+from indico.core.api import Component
 
 # plugin imports
 from indico.ext.livesync.struct import SetMultiPointerTrack
 from indico.ext.livesync.util import getPluginType
+from indico.ext.livesync.base import ILiveSyncAgentProvider
 
 
 class QueryException(Exception):
@@ -40,6 +45,7 @@ class AgentExecutionException(Exception):
     """
     Raised by problems in Agent execution
     """
+
 
 class SyncAgent(Persistent):
     """
@@ -60,6 +66,25 @@ class SyncAgent(Persistent):
 
     def getId(self):
         return self._id
+
+    def getName(self):
+        return self._name
+
+    def getDescription(self):
+        return self._name
+
+
+class AgentProviderComponent(Component):
+    """
+    This class only serves the purpose of letting LiveSync know that an
+    agent type exists
+    """
+
+    zope.interface.implements(ILiveSyncAgentProvider)
+
+    # ILiveSyncAgentProvider
+    def providesLiveSyncAgentType(self, obj, types):
+        types[self._agentType.__class__.__name__] = self._agentType.__class__
 
 
 class PushSyncAgent(SyncAgent):
