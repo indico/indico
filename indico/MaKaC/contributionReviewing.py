@@ -661,13 +661,6 @@ class Review(Persistent, Fossilizable):
     def isProtected(self):
         return self.getOwner().isProtected()
 
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if UP:
-            self.getOwner().resetAccessCache(True, False)
-        if DOWN:
-            for mat in self.getMaterials():
-                mat.resetAccessCache(False, True)
-
     def canIPAccess( self, ip ):
         return self.getOwner().canIPAccess(ip)
 

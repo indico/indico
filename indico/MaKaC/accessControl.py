@@ -79,7 +79,12 @@ class AccessController( Persistent, Observable ):
 
     def _getFatherProtection( self ):
         try:
-            return self._fatherProtection
+            for o in self.getOwner().getOwnerList():
+                if o.isProtected():
+                    return 1
+            return 0
+
+            #return self._fatherProtection
         except:
             self._fatherProtection = 0
             return 0

@@ -939,7 +939,6 @@ class Category(CommonObjectBase):
         self.subcategories[ newSc.getId() ] = newSc
         self._incNumConfs(newSc.getNumConferences())
         self.cleanCache()
-        newSc.updateFatherProtection()
 
     def _removeSubCategory( self, sc ):
         """if the given subcategory belongs to the current category it removes
@@ -993,7 +992,6 @@ class Category(CommonObjectBase):
         self._incNumConfs(1)
         self.indexConf(newConf)
         self.cleanCache()
-        newConf.updateFatherProtection()
 
     def getAccessKey(self):
         return ""
@@ -1208,38 +1206,22 @@ class Category(CommonObjectBase):
         self.__ac.grantModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
-        self.resetModifyCache()
         self.cleanCache()
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
-        self.resetModifyCache()
         self.cleanCache()
 
     def canModify( self, aw ):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.canUserModify( aw.getUser() )
-        return self._v_canmodify[aw]
+        return self.canUserModify( aw.getUser() )
 
     def canUserModify( self, av ):
-        try:
-            return self._v_canusermodify[av]
-        except AttributeError:
-            self._v_canusermodify = {}
-        except KeyError:
-            pass
         inherited = 0
         if self.getOwner() != None:
             inherited = self.getOwner().canUserModify( av )
-        self._v_canusermodify[av] = inherited or self.__ac.canModify( av )
-        return self._v_canusermodify[av]
+        return inherited or self.__ac.canModify( av )
 
 
     def getAllowedToAccessList( self ):
@@ -1250,20 +1232,11 @@ class Category(CommonObjectBase):
         return False
 
     def canIPAccess( self, ip ):
-        try:
-            return self._v_canipaccess[ip]
-        except AttributeError:
-            self._v_canipaccess = {}
-        except KeyError:
-            pass
         if not self.__ac.canIPAccess( ip ):
-            self._v_canipaccess[ip] = False
-            return self._v_canipaccess[ip]
+            return False
         if self.getOwner():
-            self._v_canipaccess[ip] = self.getOwner().canIPAccess(ip)
-            return self._v_canipaccess[ip]
-        self._v_canipaccess[ip] = True
-        return self._v_canipaccess[ip]
+            return self.getOwner().canIPAccess(ip)
+        return True
 
     def isProtected( self ):
         return self.__ac.isProtected()
@@ -1283,14 +1256,6 @@ class Category(CommonObjectBase):
             return self.getOwner().hasAnyProtection()
         return False
 
-    def updateFatherProtection( self ):
-        """ Allows to change the parent access protection
-        cached in this object
-        """
-        self.__ac.setFatherProtection( self.getOwner().isProtected() )
-        self.updateSonsProtection()
-        self.cleanCache()
-
     def setProtection( self, private ):
         """
         Allows to change the category's access protection
@@ -1299,17 +1264,8 @@ class Category(CommonObjectBase):
         oldProtection = 1 if self.isProtected() else -1
 
         self.__ac.setProtection( private )
-        self.updateSonsProtection()
-
         self._notify('protectionChanged', oldProtection, private)
-
         self.cleanCache()
-
-    def updateSonsProtection( self ):
-        for categ in self.getSubCategoryList():
-            categ.updateFatherProtection()
-        for conf in self.getConferenceList():
-            conf.updateFatherProtection()
 
     def hasProtectedOwner( self ):
         return self.__ac._getFatherProtection()
@@ -1318,18 +1274,10 @@ class Category(CommonObjectBase):
         """Says whether an avatar can access a category independently of it is
             or not protected or domain filtered
         """
-        try:
-            return self._v_isallowedtoaccess[av]
-        except AttributeError:
-            self._v_isallowedtoaccess = {}
-        except KeyError:
-            pass
         if self.__ac.canUserAccess( av ) or self.canUserModify( av ):
-            self._v_isallowedtoaccess[av] = True
             return True
         if not self.isItselfProtected() and self.getOwner():
-            self._v_isallowedtoaccess[av] = self.getOwner().isAllowedToAccess( av )
-            return self._v_isallowedtoaccess[av]
+            return self.getOwner().isAllowedToAccess( av )
 
     def canView(self,aw):
         if self.canAccess( aw ):
@@ -1342,68 +1290,26 @@ class Category(CommonObjectBase):
                 return True
         return False
 
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canaccess"):
-            del self._v_canaccess
-        if hasattr(self,"_v_isallowedtoaccess"):
-            del self._v_isallowedtoaccess
-        if hasattr(self,"_v_canipaccess"):
-            del self._v_canipaccess
-        if UP and self.getOwner() is not None:
-            self.getOwner().resetAccessCache(True, False)
-        if DOWN:
-            for cat in self.getSubCategoryList():
-                cat.resetAccessCache(False, True)
-            for conf in self.getConferenceList():
-                conf.resetAccessCache(False, True)
-
-
-    def resetModifyCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canmodify"):
-            del self._v_canmodify
-        if hasattr(self,"_v_canusermodify"):
-            del self._v_canusermodify
-        if UP and DOWN:
-            self.resetAccessCache(UP, DOWN)
-        if UP and self.getOwner() is not None:
-            self.getOwner().resetModifyCache(True, False)
-        if DOWN:
-            for cat in self.getSubCategoryList():
-                cat.resetModifyCache(False, True)
-            for conf in self.getConferenceList():
-                conf.resetModifyCache(False, True)
-
     def canAccess( self, aw ):
-        try:
-            return self._v_canaccess[aw]
-        except AttributeError:
-            self._v_canaccess = {}
-        except KeyError:
-            pass
         if not self.hasAnyProtection():
-            self._v_canaccess[aw] = True
             return True
         if not self.isProtected():
             #domain checking only triggered if the category is PUBLIC
-            self._v_canaccess[aw] = self.canIPAccess( aw.getIP() ) or \
+            return self.canIPAccess( aw.getIP() ) or \
                 self.isAllowedToCreateConference(aw.getUser()) or \
                 self.isAllowedToAccess(aw.getUser())
-            return self._v_canaccess[aw]
-        self._v_canaccess[aw] = self.isAllowedToCreateConference(aw.getUser()) or \
+        return self.isAllowedToCreateConference(aw.getUser()) or \
             self.isAllowedToAccess(aw.getUser())
-        return self._v_canaccess[aw]
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
-        self.resetAccessCache()
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
-        self.resetAccessCache()
 
     def isConferenceCreationRestricted( self ):
         return self.__confCreationRestricted
@@ -1456,12 +1362,10 @@ class Category(CommonObjectBase):
 
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
-        self.resetAccessCache()
         self._notify('accessDomainAdded', dom)
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
-        self.resetAccessCache()
         self._notify('accessDomainRemoved', dom)
 
     def getDomainList( self ):
@@ -3386,7 +3290,6 @@ class Conference(CommonObjectBase):
         """sets the access key of the conference"""
         self._accessKey = accessKey
         self.notifyModification()
-        self.resetAccessCache()
 
     def getAccessKey(self):
         try:
@@ -3399,7 +3302,6 @@ class Conference(CommonObjectBase):
         """sets the modification key of the conference"""
         self._modifKey = modifKey
         self.notifyModification()
-        self.resetModifyCache()
 
     def getModifKey(self):
         try:
@@ -3723,30 +3625,19 @@ class Conference(CommonObjectBase):
             return res
 
     def canIPAccess( self, ip ):
-        try:
-            return self._v_canipaccess[ip]
-        except AttributeError:
-            self._v_canipaccess = {}
-        except KeyError:
-            pass
         if not self.__ac.canIPAccess( ip ):
-            self._v_canipaccess[ip] = False
             return False
         for owner in self.getOwnerList():
             if not owner.canIPAccess(ip):
-                self._v_canipaccess[ip] = False
-                return self._v_canipaccess[ip]
-        self._v_canipaccess[ip] = True
-        return self._v_canipaccess[ip]
+                return False
+        return True
 
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
-        self.resetAccessCache()
         self._notify('accessDomainAdded', dom)
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
-        self.resetAccessCache()
         self._notify('accessDomainRemoved', dom)
 
     def getDomainList( self ):
@@ -3784,15 +3675,6 @@ class Conference(CommonObjectBase):
     def hasProtectedOwner( self ):
         return self.__ac._getFatherProtection()
 
-    def updateFatherProtection( self ):
-        protectionBefore = self.__ac.isFatherProtected()
-        self.__ac.setFatherProtection(0)
-        for owner in self.getOwnerList():
-            if owner.isProtected():
-                self.__ac.setFatherProtection(1)
-
-        protectionAfter = self.__ac.isFatherProtected()
-
     def setProtection( self, private ):
         """
         Allows to change the conference access protection
@@ -3812,13 +3694,11 @@ class Conference(CommonObjectBase):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
-        self.resetAccessCache()
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
-        self.resetAccessCache()
 
     def canView( self, aw ):
         """tells whether the specified access wrappers has access to the current
@@ -3837,16 +3717,9 @@ class Conference(CommonObjectBase):
         """tells if a user has privileges to access the current conference
             (independently that it is protected or not)
         """
-        try:
-            return self._v_isallowedtoaccess[av]
-        except AttributeError:
-            self._v_isallowedtoaccess = {}
-        except KeyError:
-            pass
         if not av:
             return False
         if (av in self.getChairList()) or (self.__ac.canUserAccess( av )) or (self.canUserModify( av )):
-            self._v_isallowedtoaccess[av] = True
             return True
 
         # if the conference is not protected by itself
@@ -3854,43 +3727,19 @@ class Conference(CommonObjectBase):
             # then inherit behavior from parent category
             for owner in self.getOwnerList():
                 if owner.isAllowedToAccess( av ):
-                    self._v_isallowedtoaccess[av] = True
                     return True
 
         # track coordinators are also allowed to access the conference
         for track in self.getTrackList():
             if track.isCoordinator( av ):
-                self._v_isallowedtoaccess[av] = True
                 return True
 
         # video services managers are also allowed to access the conference
         if PluginsHolder().hasPluginType("Collaboration"):
             if self.getCSBookingManager().isPluginManagerOfAnyPlugin(av):
-                self._v_isallowedtoaccess[av] = True
                 return True
 
-        self._v_isallowedtoaccess[av] = False
         return False
-
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canaccess"):
-            del self._v_canaccess
-        if hasattr(self,"_v_isallowedtoaccess"):
-            del self._v_isallowedtoaccess
-        if hasattr(self,"_v_cankeyaccess"):
-            del self._v_cankeyaccess
-        if hasattr(self,"_v_canipaccess"):
-            del self._v_canipaccess
-        if UP:
-            for owner in self.getOwnerList():
-                owner.resetAccessCache(True, False)
-        if DOWN:
-            for session in self.getSessionList():
-                session.resetAccessCache(False, False)
-            for cont in self.getContributionList():
-                cont.resetAccessCache(False, True)
-            for mat in self.getMaterialList():
-                mat.resetAccessCache(False, True)
 
     def canAccess( self, aw ):
         """Tells whether an access wrapper is allowed to access the current
@@ -3898,38 +3747,22 @@ class Conference(CommonObjectBase):
             chair or is granted to access the conference, when the client ip is
             not restricted.
         """
-        try:
-            return self._v_canaccess[aw]
-        except AttributeError:
-            self._v_canaccess = {}
-        except KeyError:
-            pass
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
-            self._v_canaccess[aw] =  True
             return True
         #####################################################
 
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
-            self._v_canaccess[aw] = False
             return False
         if not self.isProtected():
-            self._v_canaccess[aw] = True
             return True
         flag = self.isAllowedToAccess( aw.getUser() )
-        self._v_canaccess[aw] = flag or self.canKeyAccess( aw )
-        return self._v_canaccess[aw]
+        return flag or self.canKeyAccess( aw )
 
     def canKeyAccess( self, aw, key=None ):
         sess = aw.getSession()
-        try:
-            return self._v_cankeyaccess[aw]
-        except AttributeError:
-            self._v_cankeyaccess = {}
-        except KeyError:
-            pass
         accessKey = self.getAccessKey()
         if accessKey != "" and sess:
             if key and key == accessKey:
@@ -3938,28 +3771,18 @@ class Conference(CommonObjectBase):
             if keys != None:
                 if keys.has_key(self.getUniqueId()):
                     if keys[self.getUniqueId()] == accessKey:
-                        self._v_cankeyaccess[aw] = True
                         return True
-        self._v_cankeyaccess[aw] = False
         return False
 
     def canKeyModify( self, aw ):
         sess = aw.getSession()
-        try:
-            return self._v_cankeymodify[aw]
-        except AttributeError:
-            self._v_cankeymodify = {}
-        except KeyError:
-            pass
         modifKey = self.getModifKey()
         if modifKey != "" and sess:
             keys = sess.getVar("modifKeys")
             if keys != None:
                 if keys.has_key(self.id):
                     if keys[self.id] == modifKey:
-                        self._v_cankeymodify[aw] = True
                         return True
-        self._v_cankeymodify[aw] = False
         return False
 
     def grantModification( self, prin, sendEmail=True ):
@@ -3987,67 +3810,28 @@ class Conference(CommonObjectBase):
             self.__ac.grantModification( prin )
             if isinstance(prin, MaKaC.user.Avatar):
                 prin.linkTo(self, "manager")
-        self.resetModifyCache()
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
-        self.resetModifyCache()
 
     def canUserModify( self, av ):
         if av == None:
             return False
-        try:
-            return self._v_canusermodify[av]
-        except AttributeError:
-            self._v_canusermodify = {}
-        except KeyError:
-            pass
         if ( av == self.getCreator()) or self.getAccessController().canModify( av ):
-            self._v_canusermodify[av] = True
             return True
         for owner in self.getOwnerList():
             if owner.canUserModify( av ):
-                self._v_canusermodify[av] = True
                 return True
-        self._v_canusermodify[av] = False
         return False
-
-    def resetModifyCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canmodify"):
-            del self._v_canmodify
-        if hasattr(self,"_v_canusermodify"):
-            del self._v_canusermodify
-        if hasattr(self,"_v_cankeymodify"):
-            del self._v_cankeymodify
-        if UP and DOWN:
-            self.resetAccessCache(UP, DOWN)
-        if UP:
-            for owner in self.getOwnerList():
-                owner.resetModifyCache(True, False)
-        if DOWN:
-            for session in self.getSessionList():
-                session.resetModifyCache(False, False)
-            for cont in self.getContributionList():
-                cont.resetModifyCache(False, True)
-            for mat in self.getMaterialList():
-                mat.resetModifyCache(False, True)
-
 
     def canModify( self, aw ):
         """Tells whether an access wrapper is allowed to modify the current
             conference: only if the user is granted to modify the conference and
             he is accessing from an IP address which is not restricted.
         """
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.canUserModify( aw.getUser() )  or self.canKeyModify( aw )
-        return self._v_canmodify[aw]
+        return self.canUserModify( aw.getUser() )  or self.canKeyModify( aw )
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
@@ -6367,20 +6151,11 @@ class Session(CommonObjectBase):
         return self.contributions.values()
 
     def canIPAccess( self, ip ):
-        try:
-            return self._v_canipaccess[ip]
-        except AttributeError:
-            self._v_canipaccess = {}
-        except KeyError:
-            pass
         if not self.__ac.canIPAccess( ip ):
-            self._v_canipaccess[ip] = False
-            return self._v_canipaccess[ip]
+            return False
         if self.getOwner() != None:
-            self._v_canipaccess[ip] = self.getOwner().canIPAccess(ip)
-            return self._v_canipaccess[ip]
-        self._v_canipaccess[ip] = True
-        return self._v_canipaccess[ip]
+            return self.getOwner().canIPAccess(ip)
+        return True
 
     def isProtected( self ):
         # tells if a session is protected or not
@@ -6418,7 +6193,6 @@ class Session(CommonObjectBase):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
-        self.resetAccessCache()
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
@@ -6443,75 +6217,26 @@ class Session(CommonObjectBase):
         return False
 
     def isAllowedToAccess( self, user ):
-        try:
-            return self._v_isallowedtoaccess[user]
-        except AttributeError:
-            self._v_isallowedtoaccess = {}
-        except KeyError:
-            pass
         if not user:
             return False
         if user in self.getCoordinatorList() or self.__ac.canUserAccess( user ) \
             or self.canUserModify( user ) or (not self.isItselfProtected() and self.getOwner().isAllowedToAccess(user)):
-            self._v_isallowedtoaccess[user] = True
             return True
-        self._v_isallowedtoaccess[user] = False
         return False
 
     def canAccess( self, aw ):
-        try:
-            return self._v_canaccess[aw]
-        except AttributeError:
-            self._v_canaccess = {}
-        except KeyError:
-            pass
-
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
-            self._v_canaccess[aw] =  True
             return True
         #####################################################
 
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
-            self._v_canaccess[aw] = False
             return False
         if not self.isProtected():
-            self._v_canaccess[aw] = True
             return True
         flag = self.isAllowedToAccess( aw.getUser() )
-        self._v_canaccess[aw] = flag or self.conference.canKeyAccess( aw )
-        return self._v_canaccess[aw]
-
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canaccess"):
-            del self._v_canaccess
-        if hasattr(self,"_v_isallowedtoaccess"):
-            del self._v_isallowedtoaccess
-        if hasattr(self,"_v_canipaccess"):
-            del self._v_canipaccess
-        if UP:
-            self.getConference().resetAccessCache(True, False)
-        if DOWN:
-            for cont in self.getContributionList():
-                cont.resetModifyCache(False, True)
-            for mat in self.getMaterialList():
-                mat.resetAccessCache(False, True)
-
-    def resetModifyCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canmodify"):
-            del self._v_canmodify
-        if hasattr(self,"_v_canusermodify"):
-            del self._v_canusermodify
-        if UP and DOWN:
-            self.resetAccessCache(UP, DOWN)
-        if UP:
-            self.getConference().resetModifyCache(True, False)
-        if DOWN:
-            for cont in self.getContributionList():
-                cont.resetModifyCache(False, True)
-            for mat in self.getMaterialList():
-                mat.resetModifyCache(False, True)
+        return flag or self.conference.canKeyAccess( aw )
 
     def grantModification( self, sb, sendEmail=True ):
         if isinstance(sb, SessionChair):
@@ -6525,7 +6250,6 @@ class Session(CommonObjectBase):
             if r is not None and r.isActivated():
                 self.__ac.grantModification( r )
                 r.linkTo(self, "manager")
-                self.resetModifyCache()
             elif sb.getEmail() != "":
                 self.__ac.grantModificationEmail(sb.getEmail())
                 #send email once
@@ -6541,38 +6265,21 @@ class Session(CommonObjectBase):
             self.__ac.grantModification( sb )
             if isinstance(sb, MaKaC.user.Avatar):
                 sb.linkTo(self, "manager")
-            self.resetModifyCache()
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
-        self.resetModifyCache()
 
     def canModify( self, aw ):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
-        return self._v_canmodify[aw]
-
+        return self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current session:
             only if the user is granted to modify the session or the user
             can modify the corresponding conference.
         """
-        try:
-            return self._v_canusermodify[av]
-        except AttributeError:
-            self._v_canusermodify = {}
-        except KeyError:
-            pass
-        self._v_canusermodify[av] = self.getConference().canUserModify( av ) or self.__ac.canModify( av )
-        return self._v_canusermodify[av]
+        return self.getConference().canUserModify( av ) or self.__ac.canModify( av )
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
@@ -6648,11 +6355,9 @@ class Session(CommonObjectBase):
 
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
-        self.resetAccessCache()
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
-        self.resetAccessCache()
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -6709,7 +6414,6 @@ class Session(CommonObjectBase):
         self._coordinators[av.getId()]=av
         if self.getConference() is not None:
             self.getConference().addSessionCoordinator(self,av)
-        self.resetModifyCache()
 
     def getCoordinatorEmailList(self):
         try:
@@ -6786,7 +6490,6 @@ class Session(CommonObjectBase):
             av.unlinkTo(self, "coordinator")
         if self.getConference() is not None:
             self.getConference().removeSessionCoordinator(self,av)
-        self.resetModifyCache()
 
     def isCoordinator( self, av ):
         """Tells whether the specified user is a coordinator of the session.
@@ -9035,21 +8738,11 @@ class Contribution(CommonObjectBase):
         self.setSpeakerText( "%s, %s"%(self.getSpeakerText(), newText.strip()) )
 
     def canIPAccess( self, ip ):
-
-        try:
-            return self._v_canipaccess[ip]
-        except AttributeError:
-            self._v_canipaccess = {}
-        except KeyError:
-            pass
         if not self.__ac.canIPAccess( ip ):
-            self._v_canipaccess[ip] = False
-            return self._v_canipaccess[ip]
+            return False
         if self.getOwner() != None:
-            self._v_canipaccess[ip] = self.getOwner().canIPAccess(ip)
-            return self._v_canipaccess[ip]
-        self._v_canipaccess[ip] = True
-        return self._v_canipaccess[ip]
+            return self.getOwner().canIPAccess(ip)
+        return True
 
     def isProtected( self ):
         # tells if a contribution is protected or not
@@ -9096,13 +8789,11 @@ class Contribution(CommonObjectBase):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
-        self.resetAccessCache()
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
-        self.resetAccessCache()
 
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
@@ -9124,112 +8815,47 @@ class Contribution(CommonObjectBase):
     def isAllowedToAccess( self, user ):
         if not user:
             return False
-        try:
-            return self._v_isallowedtoaccess[user]
-        except AttributeError:
-            self._v_isallowedtoaccess = {}
-        except KeyError:
-            pass
-        self._v_isallowedtoaccess[user] = (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user )) or\
+        return (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user )) or\
                 self.__ac.canUserAccess( user ) or\
                 self.canUserModify( user ) or \
                 self.canUserSubmit(user)
-        return self._v_isallowedtoaccess[user]
 
     def canAccess( self, aw ):
-        try:
-            return self._v_canaccess[aw]
-        except AttributeError:
-            self._v_canaccess = {}
-        except KeyError:
-            pass
-
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
-            self._v_canaccess[aw] =  True
             return True
         #####################################################
 
         if self.canModify(aw):
-            self._v_canaccess[aw] =  True
             return True
 
         if not self.canIPAccess(aw.getIP()) and not self.isAllowedToAccess( aw.getUser() ):
-            self._v_canaccess[aw] = False
             return False
         if not self.isProtected():
-            self._v_canaccess[aw] =  True
             return True
         flag = self.isAllowedToAccess( aw.getUser() )
-        self._v_canaccess[aw] = flag or self.getConference().canKeyAccess(aw)
-        return self._v_canaccess[aw]
-
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canaccess"):
-            del self._v_canaccess
-        if hasattr(self,"_v_isallowedtoaccess"):
-            del self._v_isallowedtoaccess
-        if hasattr(self,"_v_canipaccess"):
-            del self._v_canipaccess
-        if UP:
-            self.getParent().resetAccessCache(True, False)
-        if DOWN:
-            for subc in self.getSubContributionList():
-                subc.resetAccessCache(False, True)
-            for mat in self.getMaterialList():
-                mat.resetAccessCache(False, True)
-
-    def resetModifyCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canmodify"):
-            del self._v_canmodify
-        if hasattr(self,"_v_canusermodify"):
-            del self._v_canusermodify
-        if UP and DOWN:
-            self.resetAccessCache(UP, DOWN)
-        if UP:
-            self.getParent().resetModifyCache(True, False)
-        if DOWN:
-            for subc in self.getSubContributionList():
-                subc.resetAccessCache(False, True)
-            for mat in self.getMaterialList():
-                mat.resetModifyCache(False, True)
+        return flag or self.getConference().canKeyAccess(aw)
 
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
-        self.resetModifyCache()
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
-        self.resetModifyCache()
 
     def canModify( self, aw ):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
-        return self._v_canmodify[aw]
+        return self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current contribution:
             only if the user is granted to modify the contribution or the user
             can modify any of its upper objects (i.e. conference or session).
         """
-        try:
-            return self._v_canusermodify[av]
-        except AttributeError:
-            self._v_canusermodify = {}
-        except KeyError:
-            pass
-        self._v_canusermodify[av] = self.getParent().canUserModify( av ) or self.__ac.canModify( av )
-        return self._v_canusermodify[av]
+        return self.getParent().canUserModify( av ) or self.__ac.canModify( av )
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
@@ -9533,12 +9159,10 @@ class Contribution(CommonObjectBase):
 
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
-        self.resetAccessCache()
         self._notify('domainAdded', dom)
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
-        self.resetAccessCache()
         self._notify('domainRemoved', dom)
 
     def getDomainList( self ):
@@ -10476,17 +10100,6 @@ class SubContribution(CommonObjectBase):
 #        return self._order
 
     def canIPAccess( self, ip ):
-        #try:
-        #    return self._v_canipaccess[ip]
-        #except AttributeError:
-        #    self._v_canipaccess = {}
-        #except KeyError:
-        #    pass
-        #if self.getOwner() != None:
-        #    self._v_canipaccess[ip] = self.getOwner().canIPAccess(ip)
-        #    return self._v_canipaccess[ip]
-        #self._v_canipaccess[ip] = True
-        #return self._v_canipaccess[ip]
         return self.getOwner().canIPAccess(ip)
 
     def isProtected( self ):
@@ -10766,22 +10379,6 @@ class SubContribution(CommonObjectBase):
 
     def getMasterSchedule( self ):
         return self.getOwner().getSchedule()
-
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if UP:
-            self.getOwner().resetAccessCache(True, False)
-        if DOWN:
-            for mat in self.getMaterialList():
-                mat.resetAccessCache(False, True)
-
-    def resetModifyCache(self, UP=True, DOWN=True):
-        if UP and DOWN:
-            self.resetAccessCache(UP, DOWN)
-        if UP:
-            self.getOwner().resetModifyCache(True, False)
-        if DOWN:
-            for mat in self.getMaterialList():
-                mat.resetModifyCache(False, True)
 
     def delete(self):
 
@@ -11114,20 +10711,11 @@ class Material(CommonObjectBase):
         TrashCanManager().remove(self)
 
     def canIPAccess( self, ip ):
-        try:
-            return self._v_canipaccess[ip]
-        except AttributeError:
-            self._v_canipaccess = {}
-        except KeyError:
-            pass
         if not self.__ac.canIPAccess( ip ):
-            self._v_canipaccess[ip] = False
             return False
         if self.getOwner() != None:
-            self._v_canipaccess[ip] = self.getOwner().canIPAccess(ip)
-            return self._v_canipaccess[ip]
-        self._v_canipaccess[ip] = True
-        return self._v_canipaccess[ip]
+            return self.getOwner().canIPAccess(ip)
+        return True
 
     def isProtected( self ):
         # tells if a material is protected or not
@@ -11185,7 +10773,6 @@ class Material(CommonObjectBase):
     def setAccessKey( self, pwd="" ):
         self.__ac.setAccessKey(pwd)
         self._p_changed = 1
-        self.resetAccessCache()
 
     def getAccessKey( self ):
         return self.__ac.getAccessKey()
@@ -11195,14 +10782,12 @@ class Material(CommonObjectBase):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
         self._p_changed = 1
-        self.resetAccessCache()
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
         self._p_changed = 1
-        self.resetAccessCache()
 
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
@@ -11214,68 +10799,23 @@ class Material(CommonObjectBase):
             return True
 
     def isAllowedToAccess( self, user ):
-        try:
-            return self._v_isallowedtoaccess[user]
-        except AttributeError:
-            self._v_isallowedtoaccess = {}
-        except KeyError:
-            pass
-        self._v_isallowedtoaccess[user] = (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user )) or self.__ac.canUserAccess( user ) or self.canUserModify(user)
-        return self._v_isallowedtoaccess[user]
+        return (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user )) or self.__ac.canUserAccess( user ) or self.canUserModify(user)
 
     def canAccess( self, aw ):
-        try:
-            return self._v_canaccess[aw]
-        except AttributeError:
-            self._v_canaccess = {}
-        except KeyError:
-            pass
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
-            self._v_canaccess[aw] =  True
             return True
         #####################################################
 
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
         canIPAccess = self.canIPAccess( aw.getIP() )
         if not self.isProtected():
-            self._v_canaccess[aw] = canUserAccess or canIPAccess
+            return canUserAccess or canIPAccess
         else:
             canKeyAccess = self.canKeyAccess(aw)
-            self._v_canaccess[aw]  = canUserAccess or canKeyAccess
-        return self._v_canaccess[aw]
-
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canaccess"):
-            del self._v_canaccess
-        if hasattr(self,"_v_isallowedtoaccess"):
-            del self._v_isallowedtoaccess
-        if hasattr(self,"_v_cankeyaccess"):
-            del self._v_cankeyaccess
-        if hasattr(self,"_v_canipaccess"):
-            del self._v_canipaccess
-        if UP:
-            self.getOwner().resetAccessCache(True, False)
-        if DOWN:
-            for res in self.getResourceList():
-                res.resetAccessCache(False, True)
-
-    def resetModifyCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canmodify"):
-            del self._v_canmodify
-        if hasattr(self,"_v_canusermodify"):
-            del self._v_canusermodify
-        if hasattr(self,"_v_cankeymodify"):
-            del self._v_cankeymodify
-        if UP and DOWN:
-            self.resetAccessCache(UP, DOWN)
-        if UP:
-            self.getOwner().resetModifyCache(True, False)
-        if DOWN:
-            for res in self.getResourceList():
-                res.resetModifyCache(False, True)
+            return canUserAccess or canKeyAccess
 
     def canKeyAccess( self, aw ):
         sess = aw.getSession()
@@ -11295,38 +10835,22 @@ class Material(CommonObjectBase):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
         self._p_changed = 1
-        self.resetModifyCache()
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
         self._p_changed = 1
-        self.resetModifyCache()
 
     def canModify( self, aw ):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.canUserModify( aw.getUser() ) or (self.getConference() and self.getConference().canKeyModify( aw ))
-        return self._v_canmodify[aw]
+        return self.canUserModify( aw.getUser() ) or (self.getConference() and self.getConference().canKeyModify( aw ))
 
     def canUserModify( self, user ):
         """Tells whether a user is allowed to modify the current contribution:
             only if the user is granted to modify the contribution or the user
             can modify any of its upper objects (i.e. conference or session).
         """
-        try:
-            return self._v_canusermodify[user]
-        except AttributeError:
-            self._v_canusermodify = {}
-        except KeyError:
-            pass
-        self._v_canusermodify[user] = self.getOwner().canUserModify( user )
-        return self._v_canusermodify[user]
+        return self.getOwner().canUserModify( user )
 
     def getModifKey( self ):
         return self.getConference().getModifKey()
@@ -11340,12 +10864,10 @@ class Material(CommonObjectBase):
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
         self._p_changed = 1
-        self.resetAccessCache()
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
         self._p_changed = 1
-        self.resetAccessCache()
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -11647,20 +11169,11 @@ class Resource(CommonObjectBase):
         TrashCanManager().remove(self)
 
     def canIPAccess( self, ip ):
-        try:
-            self._v_canipaccess[ip]
-        except AttributeError:
-            self._v_canipaccess = {}
-        except KeyError:
-            pass
         if not self.__ac.canIPAccess( ip ):
-            self._v_canipaccess[ip] = False
-            return self._v_canipaccess[ip]
+            return False
         if self.getOwner() != None:
-            self._v_canipaccess[ip] = self.getOwner().canIPAccess(ip)
-            return self._v_canipaccess[ip]
-        self._v_canipaccess[ip] = True
-        return self._v_canipaccess[ip]
+            return self.getOwner().canIPAccess(ip)
+        return True
 
     def isProtected( self ):
         # tells if a resource is protected or not
@@ -11687,13 +11200,11 @@ class Resource(CommonObjectBase):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
-        self.resetAccessCache()
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
-        self.resetAccessCache()
 
     def canView( self, aw ):
         """tells whether the specified user has access to the current object
@@ -11702,94 +11213,40 @@ class Resource(CommonObjectBase):
         return self.canAccess( aw )
 
     def isAllowedToAccess( self, user ):
-        try:
-            return self._v_isallowedtoaccess[user]
-        except AttributeError:
-            self._v_isallowedtoaccess = {}
-        except KeyError:
-            pass
-        self._v_isallowedtoaccess[user] = self.__ac.canUserAccess( user ) or self.canUserModify( user ) or (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user ))
-        return self._v_isallowedtoaccess[user]
+        return self.__ac.canUserAccess( user ) or self.canUserModify( user ) or (not self.isItselfProtected() and self.getOwner().isAllowedToAccess( user ))
 
     def canAccess( self, aw ):
-        try:
-            return self._v_canaccess[aw]
-        except AttributeError:
-            self._v_canaccess = {}
-        except KeyError:
-            pass
-
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
-            self._v_canaccess[aw] =  True
             return True
         #####################################################
 
 
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
-            self._v_canaccess[aw] = False
             return False
         if not self.isProtected():
-            self._v_canaccess[aw] = True
             return True
         flag = self.isAllowedToAccess( aw.getUser() )
-        self._v_canaccess[aw] = flag or self.canKeyAccess(aw) or self.getOwner().canKeyAccess(aw) or \
+        return flag or self.canKeyAccess(aw) or self.getOwner().canKeyAccess(aw) or \
                 (self.getConference() != None and self.getConference().canKeyAccess(aw) and self.getAccessKey() == "") or \
                 (self.getConference() != None and self.getConference().canKeyAccess(aw) and self.getAccessKey() == self.getConference().getAccessKey())
-        return self._v_canaccess[aw]
-
-    def resetAccessCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canaccess"):
-            del self._v_canaccess
-        if hasattr(self,"_v_isallowedtoaccess"):
-            del self._v_isallowedtoaccess
-        if hasattr(self,"_v_canipaccess"):
-            del self._v_canipaccess
-        if UP:
-            self.getOwner().resetAccessCache(True, False)
-
-    def resetModifyCache(self, UP=True, DOWN=True):
-        if hasattr(self,"_v_canmodify"):
-            del self._v_canmodify
-        if hasattr(self,"_v_canusermodify"):
-            del self._v_canusermodify
-        if UP and DOWN:
-            self.resetAccessCache(UP, DOWN)
-        if UP:
-            self.getOwner().resetModifyCache(True, False)
 
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
-        self.resetModifyCache()
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        self.resetModifyCache()
 
     def canModify( self, aw ):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.canUserModify( aw.getUser() ) or (self.getConference() and self.getConference().canKeyModify( aw ))
-        return self._v_canmodify[aw]
+        return self.canUserModify( aw.getUser() ) or (self.getConference() and self.getConference().canKeyModify( aw ))
 
     def canUserModify( self, user ):
         """Tells whether a user is allowed to modify the current contribution:
             only if the user is granted to modify the contribution or the user
             can modify any of its upper objects (i.e. conference or session).
         """
-        try:
-            return self._v_canusermodify[user]
-        except AttributeError:
-            self._v_canusermodify = {}
-        except KeyError:
-            pass
-        self._v_canusermodify[user] = self.getOwner().canUserModify( user )
-        return self._v_canusermodify[user]
+        return self.getOwner().canUserModify( user )
 
     def getModifKey( self ):
         return self.getConference().getModifKey()
@@ -11805,11 +11262,9 @@ class Resource(CommonObjectBase):
 
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
-        self.resetAccessCache()
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
-        self.resetAccessCache()
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -12166,24 +11621,10 @@ class Track(CoreObject):
         TrashCanManager().remove(self)
 
     def canModify( self, aw ):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.conference.canModify( aw )
-        return self._v_canmodify[aw]
+        return self.conference.canModify( aw )
 
     def canUserModify( self, av ):
-        try:
-            return self._v_canusermodify[av]
-        except AttributeError:
-            self._v_canusermodify = {}
-        except KeyError:
-            pass
-        self._v_canusermodify[av] = self.conference.canUserModify( av )
-        return self._v_canusermodify[av]
+        return self.conference.canUserModify( av )
 
     def canView( self, aw ):
         return self.conference.canView( aw )
@@ -12493,14 +11934,7 @@ class SubTrack(CoreObject):
         TrashCanManager().remove(self)
 
     def canModify( self, aw ):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self.track.canModify( aw )
-        return self._v_canmodify[aw]
+        return self.track.canModify( aw )
 
     def canView( self, aw ):
         return self.track.canView( aw )
@@ -12593,14 +12027,7 @@ class ContributionType(Persistent):
         return lconf
 
     def canModify(self, aw):
-        try:
-            return self._v_canmodify[aw]
-        except AttributeError:
-            self._v_canmodify = {}
-        except KeyError:
-            pass
-        self._v_canmodify[aw] = self._conference.canModify(aw)
-        return self._v_canmodify[aw]
+        return self._conference.canModify(aw)
 
     def delete(self):
         self.setConference(None)

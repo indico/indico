@@ -419,8 +419,6 @@ class MaterialRecovery:
                                                # can here.
                 acrec = AccessControllerRecovery(res.getAccessController())
                 acrec.setValues(r.getAccessController(), incPrintPrefix(incPrintPrefix(pp)))
-                res.resetAccessCache()
-                res.resetModifyCache()
                 i += 1
                 log("%sResource successfully recovered."%incPrintPrefix(pp))
             if recoveredMat.getMainResource():
@@ -429,8 +427,6 @@ class MaterialRecovery:
             # Access control recovery:
             acr = AccessControllerRecovery(self._mat.getAccessController())
             acr.setValues(recoveredMat.getAccessController(), incPrintPrefix(pp))
-            self._mat.resetAccessCache()
-            self._mat.resetModifyCache()
             self._mat.notifyModification()
             self._dbm.commit(True)
             log("%sMaterial values successfully set."%pp)
@@ -1015,8 +1011,6 @@ class ContributionRecovery:
             # Access control recovery:
             acr = AccessControllerRecovery(self._cont.getAccessController())
             acr.setValues(recoveredC.getAccessController(), incPrintPrefix(pp))
-            self._cont.resetAccessCache()
-            self._cont.resetModifyCache()
             self._cont.notifyModification(recoveredC.getModificationDate())
             self._dbm.commit(True)
             log("%sContribution values successfully set."%pp)
@@ -1210,8 +1204,6 @@ class SessionRecovery:
             # Access control recovery:
             acr = AccessControllerRecovery(self._sess.getAccessController())
             acr.setValues(recoveredS.getAccessController(), incPrintPrefix(pp))
-            self._sess.resetAccessCache()
-            self._sess.resetModifyCache()
             self._sess.notifyModification()
             self._dbm.commit(True)
             log("%sSession values successfully set."%pp)
@@ -1696,9 +1688,6 @@ class ConferenceRecovery:
             self._conf.setModifKey(recoveredC.getModifKey())
             acr = AccessControllerRecovery(self._conf.getAccessController())
             acr.setValues(recoveredC.getAccessController(), incPrintPrefix(pp))
-            self._conf.updateFatherProtection()
-            self._conf.resetAccessCache()
-            self._conf.resetModifyCache()
             self._conf.notifyModification(recoveredC.getModificationDate())
             self._dbm.commit(True)
             log("%sConference values successfully set."%pp)
