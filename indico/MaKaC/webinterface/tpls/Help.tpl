@@ -70,6 +70,44 @@
         </div>
         <% end %>
 
+        <% if HasChat: %>
+        <div class="title"><%= _("Chat Guides")%></div>
+            <div class="content">
+
+            <div class="item clearfix">
+                <div class="icons">
+                    <a href="ihelp/pdf/IndicoChatIntro.pdf">
+                        <img src="images/pdf_small.png" alt="PDF version">
+                    </a>
+                </div>
+                <a href="ihelp/html/Chat/Introduction/index.html"><%= _("Introduction to XMPP/Jabber")%></a>
+                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
+
+            </div>
+
+            <div class="item clearfix">
+                <div class="icons">
+                    <a href="ihelp/pdf/IndicoChatPidgin.pdf">
+                        <img src="images/pdf_small.png" alt="PDF version">
+                    </a>
+                </div>
+                <a href="ihelp/html/Chat/Pidgin/index.html"><%= _("Using Pidgin")%></a>
+                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
+
+            </div>
+
+            <div class="item clearfix">
+                <div class="icons">
+                    <a href="ihelp/pdf/IndicoChatAdium.pdf">
+                        <img src="images/pdf_small.png" alt="PDF version">
+                    </a>
+                </div>
+                <a href="ihelp/html/Chat/Adium/index.html"><%= _("Using Adium")%></a>
+                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
+            </div>
+        </div>
+        <% end %>
+
 
     	<div class="title"><%= _("Quick Start Guides")%></div>
         <div class="content">
@@ -98,8 +136,8 @@
                 <a href="ihelp/html/QuickStartGuides/QSGTrackCoordinator/index.html"><%= _("Track Coordinator") %></a>
         	</div>
         </div>
-    
-    	  
+
+
         <div class="title"><%= _("Paper Reviewing Guides")%></div>
         <div class="content">
             <div class="item clearfix">

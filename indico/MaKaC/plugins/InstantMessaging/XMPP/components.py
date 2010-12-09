@@ -20,9 +20,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.plugins.notificationComponents import Component, IContributor, INavigationContributor, IListener, IInstantMessagingListener
-from MaKaC.plugins.base import Observable
+from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.plugins.util import PluginsWrapper, PluginFieldsWrapper
-from MaKaC.plugins.helpers import DBHelpers, MailHelper, DesktopLinkGenerator, WebLinkGenerator
+from MaKaC.plugins.helpers import DBHelpers, MailHelper, DesktopLinkGenerator, WebLinkGenerator, GeneralLinkGenerator
 from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
 from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
 from BTrees.OOBTree import OOBTree, OOTreeSet
@@ -84,6 +84,7 @@ class ChatSMContributor(Component, Observable):
         out = params['out']
         conf = params['conf']
         if DBHelpers.roomsToShow(conf):
+            linksList = PluginsHolder().getPluginType('InstantMessaging').getOption('customLinks').getValue()
             out.openTag("chatrooms")
             for chatroom in DBHelpers.getShowableRooms(conf):
                 out.openTag("chatroom")
@@ -97,20 +98,28 @@ class ChatSMContributor(Component, Observable):
                 out.writeTag("password", chatroom.getPassword())
                 out.writeTag("createdInLocalServer", chatroom.getCreatedInLocalServer())
                 out.openTag("links")
-                if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients') or PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'):
+                if DesktopLinkGenerator(chatroom).isActive() or WebLinkGenerator(chatroom).isActive() or linksList.__len__() > 0:
                     out.writeTag("linksToShow", 'true')
                 else:
                     out.writeTag("linksToShow", 'false')
-                if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients'):
+
+                if DesktopLinkGenerator(chatroom).isActive():
                     out.writeTag("desktop", DesktopLinkGenerator(chatroom).generate())
                 else:
                     out.writeTag("desktop", 'false')
-                if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'):
-                    out.writeTag("web", WebLinkGenerator(chatroom).generate(True))
+
+                if WebLinkGenerator(chatroom).isActive():
+                    out.writeTag("web", WebLinkGenerator(chatroom).generate())
                 else:
                     out.writeTag("web", 'false')
-                out.closeTag("links")
 
+                for link in linksList:
+                    out.openTag("customLink")
+                    out.writeTag("name", link['name'])
+                    out.writeTag("structure", GeneralLinkGenerator(chatroom, link['structure']).generate())
+                    out.closeTag("customLink")
+
+                out.closeTag("links")
                 out.closeTag("chatroom")
             out.closeTag("chatrooms")
 
@@ -157,7 +166,7 @@ class ChatroomStorage(Component):
 
     def __init__(self):
         #it's the first thing to do when having these events
-        self.priority=1
+        self._priority=1
 
     @classmethod
     def createChatroom(cls, obj, params):

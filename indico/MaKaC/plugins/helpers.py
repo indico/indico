@@ -24,6 +24,7 @@ from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.plugins.InstantMessaging.indexes import CounterIndex, IndexByConf, IndexByID, IndexByUser
 
+import string
 
 class MailHelper:
     def __init__(self):
@@ -121,16 +122,36 @@ class LinkGenerator:
     def generate(self):
         pass
 
+class GeneralLinkGenerator(LinkGenerator):
+
+    def __init__(self, chatroom, structure, nick=None):
+        LinkGenerator.__init__(self, chatroom)
+        self._structure = structure
+        self._nick = nick
+
+    def generate(self):
+        # we're not converting to lowercase because it might depend on the protocol
+        linkWithoutNick = string.replace(string.replace(self._structure, '/chatroom/', self._chatroom.getTitle()), '/host/', self._chatroom.getHost())
+        if self._nick:
+            return string.replace(linkWithoutNick, '/nickname/', self._nick)
+        else:
+            return linkWithoutNick
+
 class WebLinkGenerator(LinkGenerator):
 
     def __init__(self, chatroom):
         LinkGenerator.__init__(self, chatroom)
+        self._anon = False
 
-    def generate(self, anonymous = False):
-        if anonymous:
-            return 'https://'+ self._chatroom.getHost()+ '/?r=' +self._chatroom.getTitle()+'@conference.'+self._chatroom.getHost()+'?join'
+    def generate(self):
+        # chat rooms in XMPP are created using only lower case, so we convert all to lowercase
+        if self._anon:
+            return 'https://'+ self._chatroom.getHost()+ '/?r=' +self._chatroom.getTitle().lower()+'@conference.'+self._chatroom.getHost()+'?join'
         else:
-            return 'https://'+ self._chatroom.getHost()+ '/?x=' +self._chatroom.getTitle()+'@conference.'+self._chatroom.getHost()+'?join'
+            return 'https://'+ self._chatroom.getHost()+ '/?x=' +self._chatroom.getTitle().lower()+'@conference.'+self._chatroom.getHost()+'?join'
+
+    def isActive(self):
+        return PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient')
 
 class DesktopLinkGenerator(LinkGenerator):
 
@@ -138,7 +159,11 @@ class DesktopLinkGenerator(LinkGenerator):
         LinkGenerator.__init__(self, chatroom)
 
     def generate(self):
-        return 'xmpp:'+ self._chatroom.getTitle()+'@'+self._chatroom.getHost()+'?join'
+        # chat rooms in XMPP are created using only lower case, so we convert all to lowercase
+        return 'xmpp:'+ self._chatroom.getTitle().lower()+'@'+self._chatroom.getHost()+'?join'
+
+    def isActive(self):
+        return PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients')
 
 class LogLinkGenerator(LinkGenerator):
 

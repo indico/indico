@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.services.implementation.base import AdminService
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
 
@@ -117,9 +117,41 @@ class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
         return True
 
+class PluginOptionsAddLink ( PluginOptionsBase ):
+
+    def _checkParams(self):
+        PluginOptionsBase._checkParams(self)
+        self._linkName = self._params.get('name', None)
+        self._linkStructure = self._params.get('structure', None)
+
+    def _getAnswer(self):
+        links = self._targetOption.getValue()
+        for link in links:
+            if link['name'] == self._linkName:
+                return False
+        links.append({'name': self._linkName, 'structure': self._linkStructure})
+        self._targetOption.setValue(self._targetOption.getValue())
+        return True
+
+class PluginOptionsRemoveLink ( PluginOptionsBase ):
+
+    def _checkParams(self):
+        PluginOptionsBase._checkParams(self)
+        self._linkName = self._params.get('name', None)
+
+    def _getAnswer(self):
+        links = self._targetOption.getValue()
+        for link in links:
+            if link['name'] == self._linkName:
+                links.remove(link)
+        return True
+
+
 methodMap = {
     "addUsers": PluginOptionsAddUsers,
     "removeUser": PluginOptionsRemoveUser,
     "addRooms": PluginOptionsAddRooms,
     "removeRooms": PluginOptionsRemoveRooms,
+    "addLink": PluginOptionsAddLink,
+    "removeLink": PluginOptionsRemoveLink
 }

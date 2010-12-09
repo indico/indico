@@ -757,7 +757,7 @@
                         <span style="margin-left:8px;margin-right:8px;">|</span>
 
                         <xsl:if test="./links/linksToShow != 'false'">
-                            <span style="font-weight: bold;"><a id="joinLink" class="dropDownMenu highlight" href="#">Join now!</a></span>
+                            <span style="font-weight: bold;"><a id="joinLink{./id}" name="{./id}" class="dropDownMenu highlight" href="#">Join now!</a></span>
                         </xsl:if>
 
                           <!-- Start of a chat room info line -->
@@ -864,35 +864,64 @@
                             <xsl:text disable-output-escaping="yes"><![CDATA[
                             });
 
-                                var joinLink = $E('joinLink');
-                                var joinMenu = null;
-                                if(joinLink != null){
-                                    joinLink.observeClick(function(e) {
-                                        // Close the menu if clicking the link when menu is open
-                                        if (joinMenu != null && joinMenu.isOpen()) {
-                                            joinMenu.close();
-                                            joinMenu = null;
-                                            return;
-                                        }
-                                        var menuItems = {};]]></xsl:text>
-                                            <xsl:if test="./links/web != 'false'" disable-output-escaping="yes">
-                                            <xsl:text disable-output-escaping="yes"><![CDATA[
-                                                menuItems['Using web client'] =']]></xsl:text> <xsl:value-of select="./links/web" disable-output-escaping="yes"/>
-                                                <xsl:text disable-output-escaping="yes"><![CDATA[';
-                                            ]]></xsl:text> </xsl:if>
+                                var joinLinkList = [];
+                                ]]></xsl:text>
+                                <xsl:for-each select="../chatroom" disable-output-escaping="yes">
+                                    <xsl:text disable-output-escaping="yes"><![CDATA[
+                                    joinLinkList.push($E('joinLink'+']]></xsl:text>
+                                    <xsl:value-of select="id" disable-output-escaping="yes"/>
+                                    <xsl:text disable-output-escaping="yes"><![CDATA['));
+                                    ]]></xsl:text>
+                                </xsl:for-each>
 
-                                            <xsl:if test="./links/desktop != 'false'" disable-output-escaping="yes">
-                                            <xsl:text disable-output-escaping="yes"><![CDATA[
-                                                menuItems['Using your desktop client'] =']]></xsl:text> <xsl:value-of select="./links/desktop" disable-output-escaping="yes"/>
-                                                <xsl:text disable-output-escaping="yes"><![CDATA[';
-                                            ]]></xsl:text> </xsl:if>
-                                         <xsl:text disable-output-escaping="yes"><![CDATA[
-                                        joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList');
-                                        var pos = joinLink.getAbsolutePosition();
-                                        joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
-                                        return false;
-                                    });
-                                }
+                                <xsl:text disable-output-escaping="yes"><![CDATA[
+
+                                each(joinLinkList, function(joinLink){
+
+                                    var joinMenu = null;
+                                    if(joinLink != null){
+                                        joinLink.observeClick(function(e) {
+                                            // Close the menu if clicking the link when menu is open
+                                            if (joinMenu != null && joinMenu.isOpen()) {
+                                                joinMenu.close();
+                                                joinMenu = null;
+                                                return;
+                                            }
+                                            var menuItems = {};]]></xsl:text>
+                                            <xsl:for-each select="../chatroom" disable-output-escaping="yes">
+                                                <xsl:text disable-output-escaping="yes"><![CDATA[
+                                                if(joinLink.dom.name == ']]></xsl:text>
+                                    <xsl:value-of select="id" disable-output-escaping="yes"/>
+                                    <xsl:text disable-output-escaping="yes"><![CDATA['){]]></xsl:text>
+
+                                                <xsl:if test="./links/web != 'false'" disable-output-escaping="yes">
+                                                <xsl:text disable-output-escaping="yes"><![CDATA[
+                                                    menuItems['Using web client'] =']]></xsl:text> <xsl:value-of select="./links/web" disable-output-escaping="yes"/>
+                                                    <xsl:text disable-output-escaping="yes"><![CDATA[';
+                                                ]]></xsl:text> </xsl:if>
+
+                                                <xsl:if test="./links/desktop != 'false'" disable-output-escaping="yes">
+                                                <xsl:text disable-output-escaping="yes"><![CDATA[
+                                                    menuItems['Using your desktop client'] =']]></xsl:text> <xsl:value-of select="./links/desktop" disable-output-escaping="yes"/>
+                                                    <xsl:text disable-output-escaping="yes"><![CDATA[';
+                                                ]]></xsl:text> </xsl:if>
+
+                                                <xsl:for-each select="./links/customLink"><xsl:text disable-output-escaping="yes"><![CDATA[
+                                                    menuItems['Using  ]]></xsl:text> <xsl:value-of select="name" disable-output-escaping="yes"/>
+                                                    <xsl:text disable-output-escaping="yes"><![CDATA[ '] =']]></xsl:text> <xsl:value-of select="structure" disable-output-escaping="yes"/>
+                                                    <xsl:text disable-output-escaping="yes"><![CDATA[';]]></xsl:text>
+                                                </xsl:for-each>
+
+                                             <xsl:text disable-output-escaping="yes"><![CDATA[
+                                            joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList');
+                                            var pos = joinLink.getAbsolutePosition();
+                                            joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
+                                            return false;
+                                            }]]></xsl:text>
+                                            </xsl:for-each><xsl:text disable-output-escaping="yes"><![CDATA[
+                                        });
+                                    }
+                               });
                           </script>
                           ]]></xsl:text>
 

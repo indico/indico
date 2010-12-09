@@ -29,6 +29,7 @@ from MaKaC.plugins import PluginsHolder
 from MaKaC.plugins.helpers import DBHelpers, DesktopLinkGenerator, WebLinkGenerator
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.webinterface.rh.conferenceModif import RHMaterialsShow
+from MaKaC.plugins.helpers import GeneralLinkGenerator
 
 
 class WPConfModifChat(WPConferenceModifBase):
@@ -116,7 +117,7 @@ class WConfModifChat(wcomponents.WTemplated):
             if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients'):
                 vars['links'][cr.getId()]['web'] = DesktopLinkGenerator(cr).generate()
             if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'):
-                vars['links'][cr.getId()]['desktop'] = WebLinkGenerator(cr).generate(True)
+                vars['links'][cr.getId()]['desktop'] = WebLinkGenerator(cr).generate()
 
             vars['links'][cr.getId()]['logs'] = urlHandlers.UHConfModifChatSeeLogs.getURL(self._conf)
             vars['links'][cr.getId()]['logs'].addParam('chatroom', cr.getId())
@@ -143,11 +144,29 @@ class WConferenceInstantMessaging(wcomponents.WTemplated):
         vars = WTemplated.getVars( self )
 
         vars["Conference"] = self._conf
+
         try:
             vars["Chatrooms"] = DBHelpers.getShowableRooms(self._conf)
         except Exception, e:
             vars["Chatrooms"] = None
+        vars["Links"] = {}
+        linksList = PluginsHolder().getPluginType('InstantMessaging').getOption('customLinks').getValue()
+        for cr in vars["Chatrooms"]:
+            vars["Links"][cr.getId()] = {}
+            for link in linksList:
+                self.addLink(vars["Links"], link['name'], GeneralLinkGenerator(cr, link['structure']).generate(), cr.getId())
+
+            #in case it's neccesary, generate for web clients and desktop clients
+            if DesktopLinkGenerator(cr).isActive():
+                self.addLink(vars["Links"], 'your desktop client', DesktopLinkGenerator(cr).generate(), cr.getId())
+            if WebLinkGenerator(cr).isActive():
+                self.addLink(vars["Links"], 'web client', WebLinkGenerator(cr).generate(), cr.getId())
 
         return vars
 
+    def addLink(self, var, linkName, link, chatroomId):
+        """ Adds a link to the chat room if it's specified to do so"""
+        var[chatroomId][linkName] = {}
+        var[chatroomId][linkName]['name'] = linkName
+        var[chatroomId][linkName]['link'] = link
 

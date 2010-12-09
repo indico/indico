@@ -50,7 +50,7 @@ var showWebLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP')
                     <td style="font-style:italic;"> - </td>
                 <% end %>
                 <% if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients') or PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'): %>
-                    <td style="font-weight: bold;" nowrap><a id="joinLink" class="dropDownMenu highlight" href="#"><%= _("Join now!")%></a></td>
+                    <td style="font-weight: bold;" nowrap><a id="joinLink<%= cr.getId() %>" name = "<%= cr.getId() %>" class="dropDownMenu highlight" href="#"><%= _("Join now!")%></a></td>
                 <% end %>
                 </tr>
         <% end %>
@@ -59,27 +59,34 @@ var showWebLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP')
 <%= PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor') %>
 
 <script type="text/javascript">
-var joinLink = $E('joinLink');
-var joinMenu = null;
-if(joinLink){
-    joinLink.observeClick(function(e) {
-        // Close the menu if clicking the link when menu is open
-        if (joinMenu != null && joinMenu.isOpen()) {
-            joinMenu.close();
-            joinMenu = null;
-            return;
-        }
-        var menuItems = {};
-        if (showDesktopLink){
-            menuItems['Using web client'] = <%=jsonEncode( DesktopLinkGenerator(cr).generate() )%>;
-        }
-        if (showWebLink){
-            menuItems['Using your desktop client'] = <%=jsonEncode( WebLinkGenerator(cr).generate(True) )%>;
-        }
-        joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList');
-        var pos = joinLink.getAbsolutePosition();
-        joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
-        return false;
-    });
-}
+var crIdList = <%= [cr.getId() for cr in Chatrooms] %>;
+var joinLinkList = [];
+each(crIdList, function(crId){
+    joinLinkList.push($E('joinLink'+crId));
+});
+
+each(joinLinkList, function(joinLink){
+    var joinMenu = null;
+    if(joinLink){
+        joinLink.observeClick(function(e) {
+            // Close the menu if clicking the link when menu is open
+            if (joinMenu != null && joinMenu.isOpen()) {
+                joinMenu.close();
+                joinMenu = null;
+                return;
+            }
+            var menuItems = {};
+            var links = <%= Links %>;
+            var crId = joinLink.dom.name;
+            each(links[crId], function(linkType){
+                menuItems['Using ' + linkType.name] = linkType.link;
+            });
+
+            joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList');
+            var pos = joinLink.getAbsolutePosition();
+            joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
+            return false;
+        });
+    }
+});
 </script>

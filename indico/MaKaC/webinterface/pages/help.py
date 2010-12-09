@@ -44,6 +44,7 @@ class WHelp(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
 
         vars["HasCollaboration"] = PluginsHolder().hasPluginType("Collaboration")
+        vars["HasChat"] = PluginsHolder().hasPluginType("InstantMessaging")
         vars["IsAdmin"] = RCAdmin.hasRights(self._rh)
         if PluginsHolder().hasPluginType("Collaboration"):
             from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin

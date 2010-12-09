@@ -515,9 +515,7 @@ type("LogPopup", ["ExclusivePopupWithButtons"],
              okButton.observeClick(function(){
                  var result = self.handler(true);
                  if (result){
-                     self.close();
-                 }
-                 else{
+                     window.location = result;
                      self.close();
                  }
              });
@@ -545,7 +543,6 @@ type("LogPopup", ["ExclusivePopupWithButtons"],
         });
     }
 );
-
 
 
 /**
@@ -870,7 +867,7 @@ var showLogOptions = function(element, chatroom){
 
             var form2 = createBaseForm();
             var materialName = Html.input('text',{style: {marginLeft:pixels(7)}});
-            parameterManager.add(materialName, 'text', false)
+            parameterManager.add(materialName, 'text', false);
             var materialContent = form2.content
             materialContent.addContent(Html.div({style: {fontWeight: "bold", maxWidth:pixels(500),marginTop:pixels(25)}},
                                        $T('Have in mind that due to security policy logs will be private. If you want to change the protection level you will have to do it manually.'))
@@ -907,13 +904,15 @@ var showLogOptions = function(element, chatroom){
                                                                                               else{
                                                                                                   killProgress();
 
-                                                                                                  requestOk = true;
+                                                                                                  // the handler will return a value before this request ends,
+                                                                                                  // so we need to manually change the window location
                                                                                                   window.location = materialUrl+'#'+result;
                                                                                                   return materialUrl+'#'+result;
                                                                                               }
                                                                                           }
                                                                                       );
                                                                                }
+                                                                              else return false;
                                                                            }
                                                                       });
             logsMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList');

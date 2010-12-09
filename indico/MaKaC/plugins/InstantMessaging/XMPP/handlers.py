@@ -312,10 +312,9 @@ class DeleteChatroom( XMPPChatroomService ):
             self.deleteRoomXMPP(self._botJID, self._botPass, self._room, message)
 
         # make the log folder unaccessible in the future
-        url = DeleteLogLinkGenerator(self._chatroom).generate()
+        url = DeleteLogLinkGenerator(self._room).generate()
         req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
         document = urllib2.urlopen(req)
-
         Logger.get('InstantMessaging (XMPP-Indico server)').info("The room %s has been deleted by the user %s at %s hours" %(self._title, self._user.getName(), nowutc()))
 
         ContextManager.get('mailHelper').sendMails()

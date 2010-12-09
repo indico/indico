@@ -21,4 +21,9 @@
 from MaKaC.i18n import _
 
 globalOptions = [
+    ("customLinks", {"description": _("Create your own links to the chat rooms"),
+                            "type": 'links',
+                            "defaultValue": [],
+                            "editable": True,
+                            "visible": True})
 ]

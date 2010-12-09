@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -10,14 +12,15 @@
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '#',
+        URL_ROOT:    '',
         VERSION:     '0.97',
-        COLLAPSE_MODINDEX: false,
+        COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Indico v0.97 documentation" href="#" />
     <link rel="next" title="Indico’s User Guide" href="UserGuide/index.html" />
@@ -49,56 +52,64 @@
   <div class="section" id="welcome-to-indico-s-documentation">
 <h1>Welcome to Indico&#8217;s documentation!<a class="headerlink" href="#welcome-to-indico-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Contents:</p>
+<div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference external" href="UserGuide/index.html">Indico&#8217;s User Guide</a><ul>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/Categories.html">1. Categories</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/Conferences.html">2. Conferences</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/Meetings.html">3. Meetings</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/Lectures.html">4. Lectures</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/UsersGroups.html">5. Users and Groups</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/Export.html">6. Exporting Indico Data</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/RoomBooking.html">7. Conference Room Booking</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/Evaluation.html">8. Event Evaluation</a></li>
-<li class="toctree-l2"><a class="reference external" href="UserGuide/Protection.html">9. Protection System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="UserGuide/index.html">Indico&#8217;s User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/Categories.html">1. Categories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/Conferences.html">2. Conferences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/Meetings.html">3. Meetings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/Lectures.html">4. Lectures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/UsersGroups.html">5. Users and Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/Export.html">6. Exporting Indico Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/RoomBooking.html">7. Conference Room Booking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/Evaluation.html">8. Event Evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="UserGuide/Protection.html">9. Protection System</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="QuickStartGuides/index.html">Indico&#8217;s Quick Start Guides</a><ul>
-<li class="toctree-l2"><a class="reference external" href="QuickStartGuides/QSGAgendaUsers/index.html">1. CDS Agenda users</a></li>
-<li class="toctree-l2"><a class="reference external" href="QuickStartGuides/QSGContributionManager/index.html">2. Contribution Manager&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="QuickStartGuides/QSGSessionCoordinator/index.html">3. Session Coordinator&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="QuickStartGuides/QSGSessionManager/index.html">4. Session Manager&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="QuickStartGuides/QSGSubmitter/index.html">5. Submitter&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="QuickStartGuides/QSGTrackCoordinator/index.html">6. Track Co-ordinator&#8217;s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="QuickStartGuides/index.html">Indico&#8217;s Quick Start Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="QuickStartGuides/QSGAgendaUsers/index.html">1. CDS Agenda users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="QuickStartGuides/QSGContributionManager/index.html">2. Contribution Manager&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="QuickStartGuides/QSGSessionCoordinator/index.html">3. Session Coordinator&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="QuickStartGuides/QSGSessionManager/index.html">4. Session Manager&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="QuickStartGuides/QSGSubmitter/index.html">5. Submitter&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="QuickStartGuides/QSGTrackCoordinator/index.html">6. Track Co-ordinator&#8217;s Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="VideoServicesGuides/index.html">Video Services&#8217; Guides</a><ul>
-<li class="toctree-l2"><a class="reference external" href="VideoServicesGuides/AdminGuide/index.html">1. Administrator Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="VideoServicesGuides/ManagerOverview/index.html">2. Manager Overview</a></li>
-<li class="toctree-l2"><a class="reference external" href="VideoServicesGuides/EventManager/index.html">3. How to manage video services</a></li>
-<li class="toctree-l2"><a class="reference external" href="VideoServicesGuides/UserGuide/index.html">4. How to join a video service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="VideoServicesGuides/index.html">Video Services&#8217; Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="VideoServicesGuides/AdminGuide/index.html">1. Administrator Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="VideoServicesGuides/ManagerOverview/index.html">2. Manager Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="VideoServicesGuides/EventManager/index.html">3. How to manage video services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="VideoServicesGuides/UserGuide/index.html">4. How to join a video service</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="PaperReviewingGuides/index.html">Indico&#8217;s Paper Reviewing Guides</a><ul>
-<li class="toctree-l2"><a class="reference external" href="PaperReviewingGuides/PaperReviewingRoles/index.html">1. Actors and workflows Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="PaperReviewingGuides/PaperReviewingManagers/index.html">2. Manager&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="PaperReviewingGuides/PaperReviewingReferees/index.html">3. Referee&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="PaperReviewingGuides/PaperReviewingEditors/index.html">4. Layout Reviewers&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="PaperReviewingGuides/PaperReviewingReviewers/index.html">5. Content Reviewers&#8217;s Guide</a></li>
-<li class="toctree-l2"><a class="reference external" href="PaperReviewingGuides/PaperReviewingAuthors/index.html">6. Contributions&#8217; authors Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chat/index.html">Chat Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Chat/Introduction/index.html">1. About XMPP/Jabber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Chat/Pidgin/index.html">2. Using Pidgin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Chat/Adium/index.html">3. Using Adium</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="AdminGuide/index.html">Indico&#8217;s Admin Guide</a><ul>
-<li class="toctree-l2"><a class="reference external" href="AdminGuide/AdminGuide.html">1. Starting with Indico</a></li>
-<li class="toctree-l2"><a class="reference external" href="AdminGuide/AdminGuide.html#id1">2. Administration Area</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PaperReviewingGuides/index.html">Indico&#8217;s Paper Reviewing Guides</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="PaperReviewingGuides/PaperReviewingRoles/index.html">1. Actors and workflows Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PaperReviewingGuides/PaperReviewingManagers/index.html">2. Manager&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PaperReviewingGuides/PaperReviewingReferees/index.html">3. Referee&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PaperReviewingGuides/PaperReviewingEditors/index.html">4. Layout Reviewers&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PaperReviewingGuides/PaperReviewingReviewers/index.html">5. Content Reviewers&#8217;s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PaperReviewingGuides/PaperReviewingAuthors/index.html">6. Contributions&#8217; authors Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference external" href="Glossary/Glossary.html">Indico&#8217;s Glossary</a></li>
-<li class="toctree-l1"><a class="reference external" href="FAQ/FAQ.html">Indico&#8217;s FAQ</a><ul>
-<li class="toctree-l2"><a class="reference external" href="FAQ/FAQ.html#downloading-and-installing">Downloading and Installing</a></li>
-<li class="toctree-l2"><a class="reference external" href="FAQ/FAQ.html#general-event">General Event</a></li>
+<li class="toctree-l1"><a class="reference internal" href="AdminGuide/index.html">Indico&#8217;s Admin Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="AdminGuide/AdminGuide.html">1. Starting with Indico</a></li>
+<li class="toctree-l2"><a class="reference internal" href="AdminGuide/AdminGuide.html#id1">2. Administration Area</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Glossary/Glossary.html">Indico&#8217;s Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FAQ/FAQ.html">Indico&#8217;s FAQ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="FAQ/FAQ.html#downloading-and-installing">Downloading and Installing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FAQ/FAQ.html#general-event">General Event</a></li>
 </ul>
 </li>
 </ul>
+</div>
 </div>
 
 
@@ -109,22 +120,22 @@
         <div class="sphinxsidebarwrapper">
    <img src="_static/indico_logo.png" width="200px"/> 
 
-            <h4>Next topic</h4>
-            <p class="topless"><a href="UserGuide/index.html"
-                                  title="next chapter">Indico&#8217;s User Guide</a></p>
-          <div id="searchbox" style="display: none">
-            <h3>Quick search</h3>
-              <form class="search" action="search.html" method="get">
-                <input type="text" name="q" size="18" />
-                <input type="submit" value="Go" />
-                <input type="hidden" name="check_keywords" value="yes" />
-                <input type="hidden" name="area" value="default" />
-              </form>
-              <p class="searchtip" style="font-size: 90%">
-              Enter search terms or a module, class or function name.
-              </p>
-          </div>
-          <script type="text/javascript">$('#searchbox').show(0);</script>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="UserGuide/index.html"
+                        title="next chapter">Indico&#8217;s User Guide</a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -145,8 +156,8 @@
       </ul>
     </div>
     <div class="footer">
-      &copy; Copyright 2010, Indico Team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+        &copy; Copyright 2010, Indico Team.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.5.
     </div>
   </body>
 </html>

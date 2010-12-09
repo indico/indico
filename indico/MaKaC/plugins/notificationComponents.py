@@ -3,10 +3,10 @@ import zope.interface
 class Component(object):
     def __init__(self):
         #the lowest one
-        self.priority=10
+        self._priority=10
 
     def getPriority(self):
-        return self.priority
+        return self._priority
 
 class IListener(zope.interface.Interface):
     pass

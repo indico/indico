@@ -27,7 +27,7 @@
 
                     <script type="text/javascript">
                         var newPersonsHandler = function(userList, setResult) {
-							indicoRequest(
+                            indicoRequest(
                                 'plugins.addUsers',
                                 {
                                     optionName: "<%= name %>",
@@ -35,7 +35,7 @@
                                 },
                                 function(result,error) {
                                     if (!error) {
-										setResult(true);
+                                        setResult(true);
                                     } else {
                                         IndicoUtil.errorReport(error);
                                         setResult(false);
@@ -67,6 +67,101 @@
                                                    false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userList<%=name%>').set(uf.draw())
+                    </script>
+                <% end %>
+                <% elif option.getType() == "links": %>
+                    <div id="links<%=name%>" style="margin-bottom: 10px;">
+                        <span style="font-weight: bold; margin-bottom: 10px;">Existing links</span>
+                    </div>
+                    <script type="text/javascript">
+                        var numElements = <%= option.getValue() %>.length;
+                        if(numElements > 0){
+                            var linksBody = Html.tbody();
+                            var linksTable = Html.table({style: {padding: pixels(10)}}, linksBody);
+                            linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('Link name')),
+                                                                                        Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('Link structure'))) );
+                            each(<%= option.getValue() %>, function(link){
+                                    var removeButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Remove'));
+                                    var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.name),
+                                                                                           Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.structure),
+                                                                                           Html.td({style:{whiteSpace: "nowrap"}},removeButton))
+                                    linksBody.append(newRow);
+                                    removeButton.observeClick(function(){
+                                        var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of link..."));
+                                        indicoRequest(
+                                                'plugins.removeLink',
+                                            {
+                                                optionName: "<%= name %>",
+                                                name: link.name
+                                            },
+                                            function(result,error) {
+                                                if (!error){
+                                                    killProgress();
+                                                    window.location.reload();
+                                                }
+                                                else{
+                                                    killProgress();
+                                                    IndicoUtil.errorReport(error);
+                                                }
+                                            }
+                                        );
+                                    });
+                                });
+                                $E('links<%=name%>').append(linksTable);
+                        }
+                        else{
+                            $E('links<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, $T('No links created yet. Click in Add new link if you want to do so!')));
+                        }
+                        var addButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add new link'));
+
+                        addButton.observeClick(function() {
+                            var errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Name already in use');
+                            var linkName = new AutocheckTextBox({name: 'name', id:"linkname"}, errorLabel);
+                            var linkStructure = Html.input("text", {});
+                            var linksPopup = new ConfirmPopupWithPM($T('Select the name of the link and its structure'),
+                                    IndicoUtil.createFormFromMap([
+                                                                        [$T('Link name'), Html.div({}, linkName.draw(), errorLabel)],
+                                                                        [$T('Link structure'), Html.div({}, linkStructure)],
+                                                                        [Html.ul({style: {fontWeight: "bold"}},$T('The following patterns will be substituted:'),
+                                                                                                       Html.li({style: {fontWeight: "lighter"}},$T('/chatroom/ by the chat room name')),
+                                                                                                       Html.li({style: {fontWeight: "lighter"}},$T('/host/ by the specified host')),
+                                                                                                       Html.li({style: {fontWeight: "lighter"}},$T('/nickname/ by the nick chosen by the user.')))]
+                                                                                                       ]),
+                                                                        function(value){
+                                                                            if(value){
+                                                                                var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of link..."));
+                                                                                indicoRequest(
+                                                                                        'plugins.addLink',
+                                                                                    {
+                                                                                        optionName: "<%= name %>",
+                                                                                        name: linkName.get(),
+                                                                                        structure: linkStructure.dom.value
+                                                                                    },
+                                                                                    function(result,error) {
+                                                                                        if (!error && result) {
+                                                                                            killProgress();
+                                                                                            self.close();
+                                                                                            window.location.reload();
+                                                                                        } else if(!error && !result){
+                                                                                            killProgress();
+                                                                                            linkName.startWatching(true);
+                                                                                        }
+                                                                                        else{
+                                                                                            killProgress();
+                                                                                            self.close();
+                                                                                            IndicoUtil.errorReport(error);
+                                                                                        }
+                                                                                    }
+                                                                                );
+                                                                            }
+                                                                        }
+                                                                );
+                            linksPopup.parameterManager.add(linkName, 'text', false);
+                            linksPopup.parameterManager.add(linkStructure, 'text', false);
+                            linksPopup.open();
+                        });
+
+                        $E('links<%=name%>').append(addButton);
                     </script>
                 <% end %>
                 <% elif option.getType() =="ckEditor": %>
