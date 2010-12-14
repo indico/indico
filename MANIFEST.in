@@ -15,5 +15,6 @@ include indico/__init__.py
 recursive-include indico/htdocs *
 recursive-include indico/MaKaC *
 recursive-include tests *
+recursive-include indico/ext *.py *.tpl *.js *.css
 
 global-exclude *.pyc etc/zdctl.conf etc/zodb.conf etc/indico.conf

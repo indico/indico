@@ -32,8 +32,9 @@ class ILiveSyncAgentProvider(IContributor):
     Implemented by classes that provide a LiveSync Agent
     """
 
-    def pingLiveSyncAgentProviders(self, typeDict):
+    def providesLiveSyncAgentType(self, typeDict):
         pass
+
 
 class ActionWrapper(Persistent):
     """

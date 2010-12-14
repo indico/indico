@@ -26,6 +26,7 @@ import zope.interface
 
 # plugin imports
 from indico.ext.livesync import SyncManager
+from indico.ext.livesync.handlers import AgentTypeInspector
 import indico.ext.livesync
 
 # indico api imports
@@ -107,7 +108,16 @@ class WPluginAgentManagement(WTemplated):
         tplVars = WTemplated.getVars(self)
 
         smanager = SyncManager.getDBInstance()
+
+        avtypes = AgentTypeInspector.getAvailableTypes()
+
         tplVars['syncManager'] = smanager
         tplVars['agents'] = smanager.getAllAgents()
+        tplVars['availableTypes'] = avtypes.keys()
+        tplVars['extraAgentOptions'] = dict((typeName, typeClass._extraOptions) for
+                                            (typeName, typeClass) in
+                                            avtypes.iteritems())
+        tplVars['agentTableData'] = dict((agentId, agent.fossilize()) for \
+                                         (agentId, agent) in smanager.getAllAgents().iteritems())
 
         return tplVars

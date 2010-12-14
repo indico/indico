@@ -28,6 +28,7 @@ from persistent import Persistent, mapping
 
 # indico api imports
 from indico.core.api import Component
+from indico.util.fossilize import IFossil, fossilizes, Fossilizable
 
 # plugin imports
 from indico.ext.livesync.struct import SetMultiPointerTrack
@@ -47,10 +48,30 @@ class AgentExecutionException(Exception):
     """
 
 
-class SyncAgent(Persistent):
+class IAgentFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getName(self):
+        pass
+
+    def getDescription(self):
+        pass
+
+    def getExtraOptions(self):
+        pass
+    getExtraOptions.name = 'specific'
+
+
+class SyncAgent(Fossilizable, Persistent):
     """
     Represents an "agent" (service)
     """
+
+    fossilizes(IAgentFossil)
+
+    _extraOptions = {}
 
     # TODO: Subclass into PushSyncAgent(task)/PullSyncAgent?
 
@@ -71,7 +92,30 @@ class SyncAgent(Persistent):
         return self._name
 
     def getDescription(self):
-        return self._name
+        return self._description
+
+    def getExtraOptions(self):
+        return dict((option, self.getExtraOption(option))
+                    for option in self._extraOptions)
+
+    def getExtraOption(self, optionName):
+        if optionName in self._extraOptions:
+            return getattr(self, "_%s" % optionName)
+        else:
+            raise Exception('unknown option!')
+
+    def setExtraOption(self, optionName, value):
+        if optionName in self._extraOptions:
+            setattr(self, "_%s" % optionName, value)
+        else:
+            raise Exception('unknown option!')
+
+    def setParameters(self, description = None,
+                      name = None):
+        if description:
+            self._description = description
+        if name:
+            self._name = name
 
 
 class AgentProviderComponent(Component):
@@ -84,7 +128,8 @@ class AgentProviderComponent(Component):
 
     # ILiveSyncAgentProvider
     def providesLiveSyncAgentType(self, obj, types):
-        types[self._agentType.__class__.__name__] = self._agentType.__class__
+        if hasattr(self, '_agentType'):
+            types[self._agentType.__name__] = self._agentType
 
 
 class PushSyncAgent(SyncAgent):
@@ -147,6 +192,13 @@ class SyncManager(Persistent):
 
         # impose myself as its manager
         agent.setManager(self)
+
+    def removeAgent(self, agent):
+        """
+        Removes an agent
+        """
+        self._track.removePointer(agent.getId())
+        del self._agents[agent.getId()]
 
     def query(self, agentId = None, till = None):
 

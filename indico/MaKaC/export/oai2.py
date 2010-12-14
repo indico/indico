@@ -353,8 +353,8 @@ class DataInt:
         obj = item
         if isinstance(item, str):
             obj = self.idToObj(item)
-        if isinstance(obj, conference.DeletedObject):
-            return obj.getCategoryPath()
+#        if isinstance(obj, conference.DeletedObject):
+#            return obj.getCategoryPath()
         if isinstance(obj,conference.Contribution) or isinstance(obj, conference.SubContribution):
             obj=obj.getConference()
         li = obj.getOwnerList()
@@ -507,10 +507,21 @@ class DataInt:
 
 
 
-    def toMarc(self,obj, out=None, overrideCache=False):
+    def toMarc(self,obj, out=None, overrideCache=False, deleted=False):
         if not out:
             out = self._XMLGen
-        if isinstance(obj,conference.Conference):
+
+        if deleted:
+            out.openTag("record")
+            out.openTag("header", [["status","deleted"]])
+            out.writeTag("identifier","oai:" + self.namespace + ":" + self.getItemId(obj))
+            out.writeTag("datestamp", obj._modificationDS)
+            for set in self.getItemSetList(obj):
+                out.writeTag("setSpec", self.getSetSpec(set))
+            out.closeTag("header")
+            out.closeTag("record")
+
+        elif isinstance(obj,conference.Conference):
             self.confToXMLMarc(obj, out=out, overrideCache=overrideCache)
         elif isinstance(obj,conference.Contribution):
             self.contToXMLMarc(obj, out=out, overrideCache=overrideCache)
@@ -519,6 +530,7 @@ class DataInt:
         else:
             raise "unknown object type"
         return out.getXml()
+
 
     def confToXMLMarc(self,obj, out=None, overrideCache=False):
         if not out:

@@ -26,7 +26,7 @@ This module is UNFINISHED
 """
 
 # system libs
-from pymarc import Record, Field, marcxml
+#from pymarc import Record, Field, marcxml
 
 # plugin imports
 from indico.ext.livesync.metadata import MetadataWrapper, MetadataGenerator

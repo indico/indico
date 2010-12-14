@@ -16,7 +16,7 @@
       <td><%= agent.getDescription() %></td>
       <td></td>
       <td>
-        <a href="#" onclick="javascript: deleteAgent('<%= agentId %>'); return false;">Delete</a>
+        <a href="#" onclick="javascript: editAgent('<%= agentId %>'); return false;">Edit</a> <a href="#" onclick="javascript: deleteAgent('<%= agentId %>'); return false;">Delete</a>
       </td>
 </tr>
 <% end %>
@@ -26,14 +26,25 @@
 
 <script type="text/javascript">
 
+  var availableTypes = <%= jsonEncode(availableTypes) %>;
+  var agentTableData = <%= jsonEncode(agentTableData) %>;
+  var agentExtraOptions = <%= jsonEncode(extraAgentOptions) %>;
+
   function deleteAgent(agentId) {
       if (confirm($T("Are you sure you want to delete agent ") + agentId + "?")) {
-          window.location.reload();
+          deleteAgentAction(agentId);
       }
   }
 
   function addAgent() {
-      var dialog = new AddAgentDialog();
+      var dialog = new AddAgentDialog(availableTypes, agentExtraOptions);
+      dialog.open();
+  }
+
+  function editAgent(agentId) {
+      var dialog = new EditAgentDialog(availableTypes,
+                                       agentExtraOptions[agentTableData[agentId]._type],
+                                       agentTableData[agentId]);
       dialog.open();
   }
 

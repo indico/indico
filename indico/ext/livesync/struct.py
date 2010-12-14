@@ -82,6 +82,12 @@ class MultiPointerTrack(Persistent):
         if startPos:
             self.movePointer(pid, startPos)
 
+    def removePointer(self, pid):
+        """
+        Removes a pointer from the list
+        """
+        del self._pointers[pid]
+
     def prepareEntry(self, ts):
         """
         Creates an empty sub-structure (elemContainer) for a given timestamp

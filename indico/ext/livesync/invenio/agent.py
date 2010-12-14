@@ -114,12 +114,10 @@ class InvenioRecordProcessor(object):
                     # protection changes have to be handled more carefully
                     cls._computeProtectionChanges(obj, action, protectionChanged)
 
-        # TODO - deleted
-
         print 'Computed records: %s created, %s changed, %s protection' % \
                             (len(created), len(changed), len(protectionChanged))
 
-        for obj in (created | changed | protectionChanged):
+        for obj in (created | changed | protectionChanged) - deleted:
             yield aw._timestamp, obj, 'create'
 
         for obj in (deleted):
@@ -133,11 +131,13 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
     Invenio WebUpload-compatible LiveSync agent
     """
 
+    _extraOptions = {'url' : 'Server URL'}
+
     def __init__(self, aid, name, description, updateTime, url=None):
-        super(InvenioBatchUploaderAgent, self).__init__(aid, name, description, updateTiame)
+        super(InvenioBatchUploaderAgent, self).__init__(aid, name, description, updateTime)
         self._url = url
 
-    def _getMetadata(self, record):
+    def _getMetadata(self, operation, record):
         """
         Retrieves the metadata for the record
         """
@@ -148,7 +148,7 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
 
         xg.openTag("collection",[["xmlns","http://www.loc.gov/MARC21/slim"]])
 
-        di.toMarc(record, overrideCache=True)
+        di.toMarc(record, overrideCache=True, deleted = (operation == 'delete'))
 
         xg.closeTag("collection")
 
@@ -168,6 +168,7 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
 
     def _run(self, manager, data, lastTS):
 
+        uploadedRecords = False
         server = InvenioConnector(self._url)
 
         # take operations and choose which records to send
@@ -177,15 +178,16 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
         self._v_logger.info('Starting metadata/upload cycle')
         for ts, record, operation in crecords:
             # TODO: check operation
-            rdata = self._getMetadata(record)
+            rdata = self._getMetadata(operation, record)
             try:
                 self._upload(record, server, rdata)
+                uploadedRecords = True
             except:
                 self._v_logger.exception('Error uploading data')
                 raise AgentExecutionException("Error uploading data")
                 # bla bla
 
-        return lastTS
+        return lastTS if uploadedRecords else None
 
 
 # Attention: if this class is not declared, the LiveSync management interface

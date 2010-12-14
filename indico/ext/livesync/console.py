@@ -24,12 +24,17 @@ Simple utility script for livesync debugging and administration
 
 # system imports
 import argparse, sys, traceback
+from dateutil.rrule import MINUTELY
 
 # indico legacy imports
 from MaKaC.common import DBMgr
 
+# indico imports
+from indico.modules.scheduler import Client
+
 # plugin imports
 from indico.ext.livesync import SyncManager
+from indico.ext.livesync.tasks import LiveSyncUpdateTask
 
 def _yesno(message):
     inp = raw_input("%s [y/N] " % message)
@@ -90,6 +95,20 @@ class DestroyCommand(ConsoleLiveSyncCommand):
         self._dbi.commit()
 
 
+class AgentCommand(ConsoleLiveSyncCommand):
+    """
+    Executes operations on agents
+    """
+
+    def _run(self, args):
+        if args.command == "init_task":
+            c = Client()
+            task = LiveSyncUpdateTask(MINUTELY, interval = args.interval)
+            c.enqueue(task)
+            self._dbi.commit()
+
+
+
 def main():
     parser = argparse.ArgumentParser(description = sys.modules[__name__].__doc__)
     subparsers = parser.add_subparsers(help="the action to be performed")
@@ -113,6 +132,18 @@ def main():
 
     parser_destroy = subparsers.add_parser("destroy", help = DestroyCommand.__doc__)
     parser_destroy.set_defaults(cmd = DestroyCommand)
+
+    parser_agent = subparsers.add_parser("agent", help = AgentCommand.__doc__)
+    parser_agent.set_defaults(cmd = AgentCommand)
+
+    parser_agent.add_argument("command",
+                              choices=['init_task'],
+                              type=str,
+                              help = "command to be executed")
+
+    parser_agent.add_argument("--interval", "-i", type = int, default = 15,
+                              dest="interval",
+                              help = "interval between runs" )
 
     args = parser.parse_args()
 

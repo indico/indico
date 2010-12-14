@@ -55,6 +55,7 @@ class SystemUpdateListener(Component):
         if len(storage) == 0:
             # nice, let's fill it
             storage['agent_manager'] = SyncManager()
+            return ('indico.ext.livesync', True)
 
         elif not fromVersion:
             # woops, this has already been done, and it is a fresh install!

@@ -44,16 +44,22 @@ class AgentTypeInspector(Observable):
         cls()._notify('providesLiveSyncAgentType', types)
         return types
 
-class AddAgent(AdminService):
+class AgentModificationService(AdminService):
 
     def _checkParams(self):
-        pm = ParameterManager(self._params)
+        self._pm = ParameterManager(self._params)
 
-        self._type = pm.extract('type', pType=str)
-        self._id = pm.extract('id', pType=str)
-        self._name = pm.extract('name', pType=str)
-        self._description = pm.extract('description', pType=str)
+        self._id = self._pm.extract('id', pType=str)
+        self._name = self._pm.extract('name', pType=str)
+        self._description = self._pm.extract('description', pType=str)
         self._specificParams = self._params['specific']
+
+
+class AddAgent(AgentModificationService):
+
+    def _checkParams(self):
+        AgentModificationService._checkParams(self)
+        self._type = self._pm.extract('type', pType=str)
 
     def _getAnswer(self):
         sm = SyncManager.getDBInstance()
@@ -67,8 +73,37 @@ class AddAgent(AdminService):
         sm.registerNewAgent(typeClass(self._id, self._name, self._description,
                                       60, **self._specificParams))
 
-methodMap = {
-    "livesync.addAgent": AddAgent
 
+class EditAgent(AgentModificationService):
+
+    def _getAnswer(self):
+        sm = SyncManager.getDBInstance()
+
+        agent = sm.getAllAgents()[self._id]
+        agent.setParameters(self._description, self._name)
+
+        for param, value in self._specificParams.iteritems():
+            agent.setExtraOption(param, value)
+
+
+class DeleteAgent(AdminService):
+
+    def _checkParams(self):
+        pm = ParameterManager(self._params)
+
+        self._id = pm.extract('id', pType=str)
+        self._sm = SyncManager.getDBInstance()
+        self._agent = self._sm.getAllAgents()[self._id]
+
+
+    def _getAnswer(self):
+        self._sm.removeAgent(self._agent)
+        return True
+
+
+methodMap = {
+    "livesync.addAgent": AddAgent,
+    "livesync.editAgent": EditAgent,
+    "livesync.deleteAgent": DeleteAgent
 }
 
