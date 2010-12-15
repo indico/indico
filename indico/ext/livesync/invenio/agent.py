@@ -106,8 +106,8 @@ class InvenioRecordProcessor(object):
                     created.add(obj)
 
                 elif action in ['data_changed', 'acl_changed', 'moved']:
-                    # if data changed, and there's no other change
-                    if obj not in changed:
+                    # categories are ignored
+                    if not isinstance(obj, conference.Category):
                         changed.add(obj)
 
                 elif action in ['set_private', 'set_public']:

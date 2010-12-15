@@ -513,12 +513,15 @@ class DataInt:
 
         if deleted:
             out.openTag("record")
-            out.openTag("header", [["status","deleted"]])
-            out.writeTag("identifier","oai:" + self.namespace + ":" + self.getItemId(obj))
-            out.writeTag("datestamp", obj._modificationDS)
-            for set in self.getItemSetList(obj):
-                out.writeTag("setSpec", self.getSetSpec(set))
-            out.closeTag("header")
+
+            out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
+            out.writeTag("subfield","INDICO.%s" % self.getItemId(obj),[["code","a"]])
+            out.closeTag("datafield")
+
+            out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
+            out.writeTag("subfield","DELETED",[["code","c"]])
+            out.closeTag("datafield")
+
             out.closeTag("record")
 
         elif isinstance(obj,conference.Conference):
@@ -528,7 +531,7 @@ class DataInt:
         elif isinstance(obj, conference.SubContribution):
             self.subContToXMLMarc(obj, out=out, overrideCache=overrideCache)
         else:
-            raise "unknown object type"
+            raise Exception("unknown object type: %s" % obj.__class__)
         return out.getXml()
 
 
