@@ -17,138 +17,137 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-import os
-import sys
-from MaKaC.common.logger import Logger
-from MaKaC.plugins.util import processPluginMetadata
 
+"""
+This module defines the PluginLoader class, that is responsible for providing methods
+that allow loading plugins from the python path, and cataloguing them accordingly
+"""
+
+# system imports
+import os, sys, pkg_resources
+
+# database
 from persistent import Persistent
 
+# legacy MaKaC imports
+from MaKaC.common.logger import Logger
 from MaKaC.errors import PluginError
+
+# package
+from MaKaC.plugins.util import processPluginMetadata
+
 
 class ModuleLoadException(Exception):
     pass
 
 class PluginLoader(object):
-    """ Utility class that has methods to deal with plugins at low level.
+    """
+    Loads the plugins/types from the source code. Execution of the contained methods
+    should be avoided (currently invoked manually), as it is naturally slow.
 
-        There is an important class variable "_pluginsLoaded" that will store if the plugins have already been loaded in this request.
-        Sometimes a single request will need information about the plugins multiple times, in this way they are only loaded once.
-        Ideally plugins should only be loaded once during the execution time of the Apache Server but different request don't
-        (normally) share memory so this variable will (normally) start with a value of False.
-        However sometimes it happens that the value of this variable can be True at the beginning of a request, and plugins are
-        already loaded into memory. It is not clear when this happens; probably it depends on the execution model of Apache
-        (prefork or multithread). Even with prefork, sometimes Apache (or mod_python) seems to recycle processes from one request
-        to the next and the plugins will be in memory at the beginning of a request.
-
-        Methods that should be used from outside:
-        -loadPlugins: explores the subfolder structure of the MaKaC/plugins folder and loads the plugins into memory.
-                      the modules are stored into the class attribute "pluginList"
-                      the dictionaries with the plugin options, if existant, are stored into the class attribute "pluginTypeOptions"
-                      the plugin descriptions, if existant, are stored into the class attribute "pluginTypeDescriptions"
-        -reloadPlugins: forces to reload the plugins if they are already in memory
-        -reloadPluginType: forces to reload plugins if they are already in memory, but only those of a given type (e.g. "epayment", "Collaboration").
-        -getPluginByTypeAndName: given a type (e.g. "Collaboration"), and a name (e.g. "EVO"), a module object corresponding to that plugin is returned
-        -getPluginType: given a type (e.g. "Collaboration"), a module object corresponding to that plugin type is returned
-        -getTypeList: returns a list of strings with the plugin types (e.g. ["epayment", "Collaboration"]
+    TODO: Use setuptools extension points?
     """
 
-    # A dictionary where the keys are plugin type names (e.g. "Collaboration", "RoomBooking",
+    # A dictionary where the keys are plugin type names
     # and the values are modules (e.g. MaKaC.plugins.Collaboration)
-    pluginTypeModules = {}
+    _ptypeModules = {}
 
-    # A dictionary where the keys are plugin type names (e.g. "Collaboration", "RoomBooking",
-    # and the values are also dictionaries.
-    # These second-level dictionaries have plugin names as keys (e.g. "EVO", "Vidyo"),
-    # and python module objects as values
-    pluginModules = {}
+    # A dictionary where the keys are plugin type names
+    # and the values are plugin module dictionaries (plugin_name:module).
+    _pmodules = {}
 
-    pluginTypesLoaded = set()
-
-    pluginsDir = os.path.abspath(sys.modules["MaKaC.plugins"].__path__[0])
+    _ptypesLoaded = set()
+    _pluginsDir = os.path.abspath(sys.modules["MaKaC.plugins"].__path__[0])
 
     @classmethod
     def loadPlugins(cls):
-        """ Explores the subfolder structure of the MaKaC/plugins folder and loads the plugins into memory.
-            The modules are stored into the class attribute "pluginModules"
-            The dictionaries with the plugin options, if existant, are stored into the class attribute "pluginTypeOptions"
-            The plugin descriptions, if existant, are stored into the class attribute "pluginTypeDescriptions"
+        """
+        Explores the subfolder structure of the MaKaC/plugins folder and loads the
+        plugins into memory.
         """
 
         #we loop through all the files and folders of indico/MaKaC/plugins/
-        for itemName in os.listdir(cls.pluginsDir):
+        for itemName in os.listdir(cls._pluginsDir):
             #we only go deeper for folders
-            if os.path.isdir(os.path.join(cls.pluginsDir, itemName)):
-                if not itemName in cls.pluginTypesLoaded:
+            if os.path.isdir(os.path.join(cls._pluginsDir, itemName)):
+                if not itemName in cls._ptypesLoaded:
                     cls.loadPluginType(itemName)
-                    cls.pluginTypesLoaded.add(itemName)
+                    cls._ptypesLoaded.add(itemName)
 
     @classmethod
     def reloadPlugins(cls):
-        """ Forces to reload the plugins if they are already in memory
         """
-        cls.pluginTypeModules = {}
-        cls.pluginModules = {}
-        cls.pluginTypesLoaded = set()
+        Forces the reload of all plugins if they are already in memory
+        """
+        cls._ptypeModules = {}
+        cls._pmodules = {}
+        cls._ptypesLoaded = set()
         cls.loadPlugins()
 
     @classmethod
-    def reloadPluginType(cls, pluginTypeName):
-        """ Forces to reload plugins if they are already in memory, but only those of a given type (e.g. "epayment", "Collaboration").
+    def reloadPluginType(cls, ptypeId):
         """
-        if pluginTypeName in cls.pluginTypesLoaded:
-            del cls.pluginTypeModules[pluginTypeName]
-            cls.pluginModules[pluginTypeName] = {}
-            cls.pluginTypesLoaded.remove(pluginTypeName)
-        cls.loadPluginType(pluginTypeName.translate(None, ' '))
-        cls.pluginTypesLoaded.add(pluginTypeName)
+        Forces the reload of all plugins in a type if they are already in memory
+        """
+        if ptypeId in cls._ptypesLoaded:
+            del cls._ptypeModules[ptypeId]
+            cls._pmodules[ptypeId] = {}
+            cls._ptypesLoaded.remove(ptypeId)
+
+        cls.loadPluginType(ptypeId)
+        cls._ptypesLoaded.add(ptypeId)
 
     @classmethod
-    def getPluginsByType(cls, pluginTypeName):
-        """ Given a plugin type name (e.g. "Collaboration"), a list of modules corresponding to the plugins of that type is returned.
+    def getPluginsByType(cls, ptypeId):
         """
-        if not pluginTypeName in cls.pluginTypesLoaded:
-            cls.reloadPluginType(pluginTypeName)
-        return cls.pluginModules[pluginTypeName].values()
+        Given a plugin type name (e.g. "Collaboration"), a list of modules
+        corresponding to the plugins of that type is returned.
+        """
+        if not ptypeId in cls._ptypesLoaded:
+            cls.reloadPluginType(ptypeId)
+        return cls._pmodules[ptypeId].values()
 
     @classmethod
-    def getPluginType(cls, pluginTypeName):
-        """ Returns the module of a plugin type given its name
-            e.g. pluginTypeName = "Collaboration" will return the MaKaC.plugins.Collaboration module object
+    def getPluginType(cls, ptypeId):
         """
-        if not pluginTypeName in cls.pluginTypesLoaded:
-            cls.reloadPluginType(pluginTypeName)
+        Returns the module object of a plugin type given its name
+        """
+        if not ptypeId in cls._ptypesLoaded:
+            cls.reloadPluginType(ptypeId)
 
-        return cls.pluginTypeModules[pluginTypeName]
+        return cls._ptypeModules[ptypeId]
 
     @classmethod
-    def getPluginByTypeAndName(cls, pluginTypeName, pluginName):
-        """ Returns the module of a plugin given the names of the plugin and its type,
-            e.g. pluginTypeName = "Collaboration" and pluginName = "EVO"
+    def getPluginByTypeAndId(cls, ptypeId, pluginName):
         """
-        if not pluginTypeName in cls.pluginTypesLoaded:
-            cls.reloadPluginType(pluginTypeName)
+        Returns the module object of a plugin given the names of the plugin and its
+        type
+        """
+        if not ptypeId in cls._ptypesLoaded:
+            cls.reloadPluginType(ptypeId)
 
-        modulesDict = cls.pluginModules[pluginTypeName.translate(None, ' ')]
+        modulesDict = cls._pmodules[ptypeId]
 
         if pluginName in modulesDict:
             return modulesDict[pluginName]
         else:
-            raise PluginError("Tried to get a plugin of the type " + pluginTypeName + " with name " + pluginName + " but there is no plugin called " + pluginName)
+            raise PluginError("Tried to get a plugin of the type %s with name %s "
+                              "but there is no such plugin" % (ptypeId,
+                                                               pluginName))
 
     @classmethod
     def getPluginTypeList(cls):
-        """ Returns a list of strings with the plugin types (e.g. ["epayment", "Collaboration"]
+        """
+        Returns a list of strings with the plugin types (names)
         """
         cls.loadPlugins()
-        return list(cls.pluginTypesLoaded)
+        return list(cls._ptypesLoaded)
 
     @classmethod
     def importName(cls, moduleName, name):
-        """ Import a named object from a module in the context of this function,
-            which means you should use fully qualified module paths.
-
-            Return None on failure.
+        """
+        Import a named object from a module in the context of this function,
+        which means you should use fully qualified module paths.
         """
 
         try:
@@ -156,8 +155,8 @@ class PluginLoader(object):
             module = __import__(moduleName, globals(), locals(), [name])
         except:
             Logger.get('plugins.loader').exception(
-                "Syntax error loading %s ('%s')" % (moduleName,
-                                                    name))
+                "Error loading %s ('%s')" % (moduleName,
+                                             name))
             raise ModuleLoadException("Impossible to load %s ('%s')" % \
                                       (moduleName, name))
 
@@ -167,141 +166,204 @@ class PluginLoader(object):
         return objectToReturn
 
     @classmethod
-    def loadPluginType(cls, pluginTypeName):
+    def _checkSetuptoolsDependencies(cls, deplist, name):
+        """
+        Checks the dependencies for a given plugin/type, using setuptools
+        """
+        missing = []
 
-        #we load the plugin type module
+        for dep in deplist:
+            try:
+                pkg_resources.require(dep)
+            except pkg_resources.DistributionNotFound:
+                Logger.get('plugins.loader').warning("Requirement '%s' not met for %s" %
+                                                     (dep, name))
+                missing.append(dep)
+
+        return missing
+
+    @classmethod
+    def loadPluginType(cls, ptypeId):
+        """
+        Loads a plugin type, going through its source tree and loading each plugin
+        as well.
+        """
+
+        # we load the plugin type module
         try:
-            pluginTypeModule = cls.importName("MaKaC.plugins", pluginTypeName)
-        except ImportError:
-            raise Exception("Tried to load the plugin type: %s but the module MaKaC.plugins.%s did not exist" % (pluginTypeName, pluginTypeName))
-        except KeyError:
-            raise Exception("Tried to load the plugin type: %s but the module MaKaC.plugins.%s did not exist" % (pluginTypeName, pluginTypeName))
+            ptypeModule = cls.importName("MaKaC.plugins", ptypeId)
+        except (ImportError, KeyError):
+            raise Exception("Tried to load the plugin type: %s but the module "
+                            "MaKaC.plugins.%s did not exist" % (ptypeId,
+                                                                ptypeId))
 
-        # we build the package name of a plugin type, e.g. MaKaC.plugins.Collaboration
-        pluginTypePackageName = "MaKaC.plugins.%s" % pluginTypeName
-        metadata = processPluginMetadata(pluginTypeModule)
+        metadata = processPluginMetadata(ptypeModule)
 
-        #we check that the plugin type does not have an "ignore" attribute
+        # check if the plugin should be ignored
         if metadata['ignore']:
             # stop loading here!
             return
 
-        #if ignore == False, we store the plugin type module in cls.pluginTypeModules
-        cls.pluginTypeModules[pluginTypeName] = pluginTypeModule
+        #if ignore == False, we store the plugin type module in cls._ptypeModules
+        cls._ptypeModules[ptypeId] = ptypeModule
 
-        # absolute path of a plugin type folder, e.g. /xxxxx/MaKaC/plugins/Collaboration/
-        pluginTypePath = os.path.join(cls.pluginsDir, pluginTypeName)
+        missingDeps = cls._checkSetuptoolsDependencies(metadata['requires'],
+                                                       ptypeId)
 
-        #we loop through all the files and folders of the plugin type folder
-        for itemName in os.listdir(pluginTypePath):
+        # save missing dependency info, so that the holder will know the module state
+        ptypeModule.__missing_deps__ = missingDeps
 
-            # we strip the extension from the item name
-            # splitext returns a tuple (name, file extension). Ex: ("conference", ".py")
-            # if no extension, the 2nd element of the tuple will be an empty string
-            itemName, ext = os.path.splitext(itemName)
-            # case where we found a folder, i.e. a plugin folder (e.g. /xxxx/MaKaC/plugins/Collaboration/EVO/)
-            if os.path.isdir(os.path.join(cls.pluginsDir, pluginTypeName, itemName)):
+        # check dependencies
+        if len(missingDeps) > 0:
+            # if some dependencies are not met, don't load submodules
+            cls._pmodules[ptypeId] = {}
 
-                # we attempt to import the folder as a module. This will only work if there's an __init__.py inside the folder
-                try:
-                    pluginModule = cls.importName(pluginTypePackageName, itemName)
+            Logger.get('plugins.loader').warning(
+                "Plugin type %s has unmet dependencies. It will be deactivated." %
+                ptypeId)
+            return
+        else:
+            # absolute path of a plugin type folder
+            ptypePath = os.path.join(cls._pluginsDir, ptypeId)
 
-                except ImportError:
-                    raise Exception("Tried to load the plugin  %s but the module MaKaC.plugins.%s.%s did not exist. Is there an __init__.py?" % (pluginTypeName, pluginTypeName, itemName))
-                except KeyError:
-                    raise Exception("Tried to load the plugin  %s but the module MaKaC.plugins.%s.%s did not exist. Is there an __init__.py?" % (pluginTypeName, pluginTypeName, itemName))
+            # we loop through all the files and folders of the plugin type folder
+            for itemName in os.listdir(ptypePath):
 
-                # we check that it was indeed a module.
+                # we strip the extension from the item name
+                # splitext returns a tuple (name, file extension)
+                cls._loadPluginFromDir(ptypePath, ptypeId, ptypeModule, itemName)
 
-                if pluginModule:
-                    pluginMetadata = processPluginMetadata(pluginModule)
-                else:
-                    # Not a module? Nothing to do here...
+    @classmethod
+    def _loadPluginFromDir(cls, ptypePath, ptypeId, ptypeModule, pid):
+        """
+        Loads a possible plugin from a directory
+        """
+
+        pid, ext = os.path.splitext(pid)
+
+        # in case where we found a folder, i.e. a plugin folder
+        if os.path.isdir(os.path.join(cls._pluginsDir, ptypeId, pid)):
+
+            # we attempt to import the folder as a module.
+            # This will only work if there's an __init__.py inside the folder
+            try:
+                pmodule = cls.importName(ptypeModule.__name__, pid)
+
+            except (ImportError, KeyError):
+                raise Exception("Tried to load the plugin  %s but the module "
+                                "MaKaC.plugins.%s.%s did not exist. "
+                                "Is there an __init__.py?" %
+                                (ptypeId, ptypeId, pid))
+
+            # we check that it was indeed a module.
+            if pmodule:
+                pmetadata = processPluginMetadata(pmodule)
+            else:
+                # Not a module? Nothing to do here...
+                return
+
+            # If it was a module, we check that the "type" field in the metadata
+            # of the plugin corresponds to the plugin type we are currently processing
+            if pmetadata['type'] == ptypeId:
+
+                # if this is the first plugin for this plugin type
+                if not ptypeId in cls._pmodules:
+                    cls._pmodules[ptypeId] = {}
+
+                missingDeps = cls._checkSetuptoolsDependencies(pmetadata['requires'],
+                                                               pid)
+
+                # save missing dependency info, so that the holder will know the
+                # module state
+                pmodule.__missing_deps__ = missingDeps
+
+                # check dependencies
+                if len(missingDeps) > 0:
+                    # if some dependencies are not met, don't load submodules
+                    cls._pmodules[ptypeId][pid] = pmodule
+
+                    Logger.get('plugins.loader').warning(
+                        "Plugin %s has unmet dependencies. It will be deactivated." %
+                        pid)
                     return
-                # If it was a module, we check that there is a
-                # "pluginType" variable in the __init__.py of the plugin and that it corresponds
-                # to the plugin type we are currently processing
-                if pluginTypeName == pluginMetadata['type']:
-                    cls.pluginTypeModules[pluginTypeName].__dict__[itemName] = pluginModule
 
-                    #if this is the first plugin for this plugin type, we add
-                    #a new key to the cls.pluginModules dictionary
-                    if not pluginTypeName in cls.pluginModules.keys():
-                        cls.pluginModules[pluginTypeName] = {}
 
-                    #we store the module inside the cls.pluginModules object
-                    #note: we do not use itemName (the name of the folder) and use instead
-                    #      the "pluginName" variable in the __init__.py file of the plugin,
-                    #      which is its "true" name
-                    cls.pluginModules[pluginTypeName][pluginMetadata['name']] = pluginModule
+                cls._ptypeModules[ptypeId].__dict__[pid] = pmodule
 
-                    #we build the path of the plugin
-                    pluginPath = os.path.join(pluginTypePath, itemName)
+                # we store the module inside the cls._pmodules object
+                cls._pmodules[ptypeId][pid] = pmodule
 
-                    cls.loadSubModules(pluginModule, pluginPath)
-                else:
-                    Logger.get("plugins.loader").warning("Module of type %s inside %s" %
-                                                         (pluginMetadata['type'],
-                                                          pluginTypeName))
+                #we build the path of the plugin
+                pluginPath = os.path.join(ptypePath, pid)
 
-            elif ext == ".py" and itemName != "__init__":
-                pluginTypeSubModule = cls.importName(pluginTypePackageName, itemName)
+                cls.loadSubModules(pmodule, pluginPath)
+            else:
+                Logger.get("plugins.loader").warning("Module of type %s inside %s" %
+                                                     (pmetadata['type'],
+                                                      ptypeId))
 
-                if pluginTypeSubModule:
-                    cls.pluginTypeModules[pluginTypeName].__dict__[itemName] = pluginTypeSubModule
+        elif ext == ".py" and pid != "__init__":
+            ptypeSubModule = cls.importName(ptypeModule.__name__, pid)
+
+            if ptypeSubModule:
+                cls._ptypeModules[ptypeId].__dict__[pid] = ptypeSubModule
 
 
     @classmethod
     def loadSubModules(cls, module, modulePath):
+        """
+        Loads the submodules of a plugin (recursively)
+        """
 
         #dictionary whose keys are submodule names, and whose values are module objects
-        #after finding the submodules, we will add them to the __dict__ of the module
         foundSubModules = {}
 
         #we check the files in the module folder
         for itemName in os.listdir(modulePath):
 
             # we strip the extension from the item name
-            # splitext returns a tuple (name, file extension). Ex: ("conference", ".py")
-            # if no extension, the 2nd element of the tuple will be an empty string
             itemName, ext = os.path.splitext(itemName)
 
-            #if the item is a directory, we may have found a subpackage (also a submodule)
+            # if the item is a directory, we may have found a subpackage
             if os.path.isdir(os.path.join(modulePath, itemName)):
 
-                #this will return a module if the subdirectory has an __init__.py inside, otherwise will raise KeyError
                 try:
                     subModule = cls.importName(module.__name__, itemName)
                 except KeyError:
-                    #we hit a folder that is not a package, such
-                    #plugins are allowed to have those
+                    # we hit a folder that is not a package, such
+                    # plugins are allowed to have those
                     continue
 
 
-                #we store the submodule in the foundSubModules dictionary
+                # we store the submodule in the foundSubModules dictionary
                 foundSubModules[itemName] = subModule
-                #we make a recursive call
+                # we make a recursive call
                 cls.loadSubModules(subModule, os.path.join(modulePath, itemName))
 
-            #if the item is a .py file and not __init__, its a submodule that is not a package
+            # if the item is a .py file and not __init__, it's a submodule that is
+            # not a package
             elif ext == ".py" and itemName != "__init__":
 
-                #this should return a subModule, unless there has been an error during import
-
+                # this should return a subModule, unless there
+                # has been an error during import
                 subModule = cls.importName(module.__name__, itemName)
                 foundSubModules[itemName] = subModule
 
-        #once we have found all the submodules, we make sure they are in the __dict__ of the module:
+        # once we have found all the submodules, we make sure they are in the
+        # __dict__ of the module:
         for subModuleName, subModule in foundSubModules.iteritems():
             module.__dict__[subModuleName] = subModule
-            #also, if there is a "modules" variable in the __init__.py of the plugin, we store the submodules there
-            #(needed by epayment plugins, for example)
+
+            # also, if there is a "modules" variable in the __init__.py of the
+            # plugin, we store the submodules there
+            # (needed by legacy epayment modules)
             if hasattr(module, "modules"):
                 module.modules[subModuleName] = subModule
 
 
 class GlobalPluginOptions(Persistent):
-    """ A class that stores global information about all plugins.
+    """
+    A class that stores global information about all plugins.
     """
 
     def __init__(self):

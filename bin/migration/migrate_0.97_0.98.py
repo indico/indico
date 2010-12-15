@@ -53,6 +53,10 @@ def runConferenceMigration():
     DBMgr.getInstance().endRequest()
 
 
+def runPluginMigration():
+
+    # TODO: for each Plugin/PluginType, add __notUsableReason attribute (default None)
+
 def main():
     runTaskMigration()
 

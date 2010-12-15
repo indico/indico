@@ -30,7 +30,8 @@ def processPluginMetadata(obj):
         'type': '',
         'ignore': False,
         'visible': True,
-        'testPlugin': False
+        'testPlugin': False,
+        'requires': []
         }
 
     if not hasattr(obj, '__metadata__'):
@@ -43,12 +44,15 @@ def processPluginMetadata(obj):
 
 
 class PluginsWrapper(object):
-    def __init__(self, pluginType, plugin):
+    def __init__(self, pluginType, plugin=None):
         self._pluginType = pluginType
         self._plugin = plugin
         try:
             from MaKaC.plugins import PluginsHolder
-            self._plugin = PluginsHolder().getPluginType(pluginType).getPlugin(plugin)
+            if self._plugin:
+                self._plugin = PluginsHolder().getPluginType(pluginType).getPlugin(plugin)
+            else:
+                self._pluginType = PluginsHolder().getPluginType(pluginType)
         except Exception, e:
             Logger.get('Plugins').error("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
             raise Exception("Exception while trying to access either the plugin type %s or the plugin %s: %s" % (pluginType, plugin, str(e)))
@@ -59,19 +63,25 @@ class PluginsWrapper(object):
 class PluginFieldsWrapper(PluginsWrapper):
     """Provides a simple interface to access fields of a given plugin"""
 
-    def __init__(self, pluginType, plugin):
+    def __init__(self, pluginType, plugin=None):
         PluginsWrapper.__init__(self, pluginType, plugin)
 
     def getOption(self, optionName):
         try:
-            return self._plugin.getOption(optionName).getValue()
+            if self._plugin:
+                return self._plugin.getOption(optionName).getValue()
+            else:
+                return self._pluginType.getOption(optionName).getValue()
         except Exception, e:
             Logger.get('Plugins').error("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
             raise Exception("Exception while trying to access the option %s in the plugin %s: %s" % (self._pluginType, self._plugin, str(e)))
 
     def getAttribute(self, attribute):
         try:
-            return getattr(self._plugin, attribute)
+            if self._plugin:
+                return getattr(self._plugin, attribute)
+            else:
+                return getattr(self._pluginType, attribute)
         except AttributeError:
             Logger.get('Plugins').error("No attribute %s in plugin %s" % (attribute, self._plugin))
             raise Exception("No attribute %s in plugin %s" % (attribute, self._plugin))

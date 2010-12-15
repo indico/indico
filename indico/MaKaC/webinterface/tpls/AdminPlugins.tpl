@@ -29,7 +29,10 @@
                 <% for plugin in pluginList: %>
                 <tr>
                     <td>
-                        <% if plugin.isActive(): %>
+                        <% if not plugin.isUsable(): %>
+                            <img class="imglink" alt="<%= _("Not in usable state")%>" src="<%=Config.getInstance().getSystemIconURL( 'greyedOutSection' )%>"/>
+                        <% end %>
+                        <% elif plugin.isActive(): %>
                             <a href="<%=urlHandlers.UHAdminTogglePlugin.getURL(plugin)%>">
                                 <img class="imglink" alt="<%= _("Click to disable")%>" src="<%=Config.getInstance().getSystemIconURL( 'enabledSection' )%>"/>
                             </a>
@@ -39,9 +42,17 @@
                                 <img class="imglink" alt="<%= _("Click to enable")%>" src="<%=Config.getInstance().getSystemIconURL( 'disabledSection' )%>"/>
                             </a>
                         <% end %>
+                        <% if not plugin.isUsable(): %>
+                            <%= plugin.getName() %>
+                            <small class="smallRed">
+                                (<%= plugin.getNotUsableReason() %>)
+                            </small>
+                        <% end %>
+                        <% else: %>
                         <a href="<%=urlHandlers.UHAdminTogglePlugin.getURL(plugin)%>">
                             <%= plugin.getName() %>
                         </a>
+                        <% end %>
                         <% if plugin.hasDescription(): %>
                             <span style="margin-left: 2em;">
                                 (<%= plugin.getDescription() %>)

@@ -754,9 +754,9 @@
                         <span><xsl:value-of select="./name" /> </span>
                         <span style="margin-left: 20px;"></span>
                         <span class="CRDisplayMoreInfo" id="CRMoreInfo{./id}">More Info</span>
-                        <span style="margin-left:8px;margin-right:8px;">|</span>
 
                         <xsl:if test="./links/linksToShow != 'false'">
+                            <span style="margin-left:8px;margin-right:8px;">|</span>
                             <span style="font-weight: bold;"><a id="joinLink{./id}" name="{./id}" class="dropDownMenu highlight" href="#">Join now!</a></span>
                         </xsl:if>
 
@@ -894,17 +894,7 @@
                                     <xsl:value-of select="id" disable-output-escaping="yes"/>
                                     <xsl:text disable-output-escaping="yes"><![CDATA['){]]></xsl:text>
 
-                                                <xsl:if test="./links/web != 'false'" disable-output-escaping="yes">
-                                                <xsl:text disable-output-escaping="yes"><![CDATA[
-                                                    menuItems['Using web client'] =']]></xsl:text> <xsl:value-of select="./links/web" disable-output-escaping="yes"/>
-                                                    <xsl:text disable-output-escaping="yes"><![CDATA[';
-                                                ]]></xsl:text> </xsl:if>
 
-                                                <xsl:if test="./links/desktop != 'false'" disable-output-escaping="yes">
-                                                <xsl:text disable-output-escaping="yes"><![CDATA[
-                                                    menuItems['Using your desktop client'] =']]></xsl:text> <xsl:value-of select="./links/desktop" disable-output-escaping="yes"/>
-                                                    <xsl:text disable-output-escaping="yes"><![CDATA[';
-                                                ]]></xsl:text> </xsl:if>
 
                                                 <xsl:for-each select="./links/customLink"><xsl:text disable-output-escaping="yes"><![CDATA[
                                                     menuItems['Using  ]]></xsl:text> <xsl:value-of select="name" disable-output-escaping="yes"/>

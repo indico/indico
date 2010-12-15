@@ -79,14 +79,9 @@
                             var linksBody = Html.tbody();
                             var linksTable = Html.table({style: {padding: pixels(10)}}, linksBody);
                             linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('Link name')),
-                                                                                        Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('Link structure'))) );
+                                                                                        Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('URL'))) );
                             each(<%= option.getValue() %>, function(link){
-                                    var removeButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Remove'));
-                                    var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.name),
-                                                                                           Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.structure),
-                                                                                           Html.td({style:{whiteSpace: "nowrap"}},removeButton))
-                                    linksBody.append(newRow);
-                                    removeButton.observeClick(function(){
+                                    var removeButton = Widget.link(command(function(){
                                         var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of link..."));
                                         indicoRequest(
                                                 'plugins.removeLink',
@@ -105,28 +100,37 @@
                                                 }
                                             }
                                         );
-                                    });
+                                    }, IndicoUI.Buttons.removeButton()));
+                                    var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.name),
+                                                                                           Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.structure),
+                                                                                           Html.td({style:{whiteSpace: "nowrap"}},removeButton))
+                                    linksBody.append(newRow);
+
+
                                 });
                                 $E('links<%=name%>').append(linksTable);
                         }
                         else{
                             $E('links<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, $T('No links created yet. Click in Add new link if you want to do so!')));
                         }
-                        var addButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add new link'));
+                        var addButton = Html.input("button", {style:{marginLeft: pixels(100)}}, $T('Add new link'));
 
                         addButton.observeClick(function() {
-                            var errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Name already in use');
+                            var errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
                             var linkName = new AutocheckTextBox({name: 'name', id:"linkname"}, errorLabel);
                             var linkStructure = Html.input("text", {});
-                            var linksPopup = new ConfirmPopupWithPM($T('Select the name of the link and its structure'),
-                                    IndicoUtil.createFormFromMap([
-                                                                        [$T('Link name'), Html.div({}, linkName.draw(), errorLabel)],
-                                                                        [$T('Link structure'), Html.div({}, linkStructure)],
-                                                                        [Html.ul({style: {fontWeight: "bold"}},$T('The following patterns will be substituted:'),
-                                                                                                       Html.li({style: {fontWeight: "lighter"}},$T('/chatroom/ by the chat room name')),
-                                                                                                       Html.li({style: {fontWeight: "lighter"}},$T('/host/ by the specified host')),
-                                                                                                       Html.li({style: {fontWeight: "lighter"}},$T('/nickname/ by the nick chosen by the user.')))]
-                                                                                                       ]),
+                            var div = Html.div({},IndicoUtil.createFormFromMap([
+                                                                    [$T('Link name'), Html.div({}, linkName.draw(), errorLabel)],
+                                                                    [$T('URL'), Html.div({}, linkStructure)]]),
+                                                  Html.div({},
+                                    (Html.ul({style: {fontWeight: "bold"}},$T('In the URL field, the following patterns will be changed:'),
+                                            Html.li({style: {fontWeight: "lighter"}},$T('*chatroom* by the chat room name')),
+                                            Html.li({style: {fontWeight: "lighter"}},$T('*host* by the specified host')),
+                                            Html.li({style: {fontWeight: "lighter"}},$T('*nickname* by the nick chosen by the user.')))
+                                            )),
+                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, $T('Example: http://*host*/resource/?x=*chatroom*@conference.*host*?join')));
+                            var linksPopup = new ConfirmPopupWithPM($T('Select the name of the link and its URL'),
+                                    div,
                                                                         function(value){
                                                                             if(value){
                                                                                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of link..."));

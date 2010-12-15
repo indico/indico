@@ -58,7 +58,7 @@ class IndexPluginsPerIndexAction(ActionBase):
         pluginIndexes = []
         commonIndexes = {}
         plugins = self._pluginType.getPluginList(doSort = True, includeNonActive = True)
-        pluginNames = [p.getName() for p in plugins]
+        pluginNames = [p.getId() for p in plugins if p.isActive()]
 
         for pluginName in pluginNames:
             csBookingClass = CollaborationTools.getCSBookingClass(pluginName)

@@ -24,6 +24,7 @@ from BTrees.OOBTree import OOBTree, OOTreeSet
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from persistent import Persistent
 from MaKaC.plugins.util import PluginFieldsWrapper
+from MaKaC.i18n import _
 
 class IMIndex(Persistent):
 

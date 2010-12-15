@@ -22,7 +22,9 @@
 from MaKaC.common.logger import Logger
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins.util import PluginFieldsWrapper
+from MaKaC.webinterface import urlHandlers
 from MaKaC.plugins.InstantMessaging.indexes import CounterIndex, IndexByConf, IndexByID, IndexByUser
+from MaKaC.i18n import _
 
 import string
 
@@ -131,11 +133,36 @@ class GeneralLinkGenerator(LinkGenerator):
 
     def generate(self):
         # we're not converting to lowercase because it might depend on the protocol
-        linkWithoutNick = string.replace(string.replace(self._structure, '/chatroom/', self._chatroom.getTitle()), '/host/', self._chatroom.getHost())
+        linkWithoutNick = string.replace(string.replace(self._structure, '*chatroom*', self._chatroom.getTitle()), '*host*', self._chatroom.getHost())
         if self._nick:
-            return string.replace(linkWithoutNick, '/nickname/', self._nick)
+            return string.replace(linkWithoutNick, '*nickname*', self._nick)
         else:
             return linkWithoutNick
+
+def generateCustomLinks(var, chatroom):
+    linkList = PluginFieldsWrapper('InstantMessaging').getOption('customLinks')
+    # if some link type is specified
+    if linkList.__len__() > 0:
+        var['custom'] = []
+        for link in linkList:
+            addLink(var['custom'], link['name'], GeneralLinkGenerator(chatroom, link['structure']).generate(), chatroom.getId())
+
+def generateLogLink(var, chatroom, conf):
+    if XMPPLogsActivated():
+        var['logs'] = urlHandlers.UHConfModifChatSeeLogs.getURL(conf)
+        var['logs'].addParam('chatroom', chatroom.getId())
+        var['logs'] = var['logs'].__str__()
+
+def XMPPLogsActivated():
+    return PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('activateLogs')
+
+def addLink(var, linkName, link, chatroomId):
+    """ Adds a link to the chat room if it's specified to do so"""
+    clink = {}
+    clink['name'] = linkName
+    clink['link'] = link
+    var.append(clink)
+
 
 class WebLinkGenerator(LinkGenerator):
 
@@ -164,6 +191,7 @@ class DesktopLinkGenerator(LinkGenerator):
 
     def isActive(self):
         return PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients')
+
 
 class LogLinkGenerator(LinkGenerator):
 

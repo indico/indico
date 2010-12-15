@@ -33,7 +33,7 @@ from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.common import Config
 import MaKaC.common.info as info
 
-
+from MaKaC.common.logger import Logger
 
 
 ERROR_PATH = Config.getInstance().getTempDir()
@@ -403,6 +403,7 @@ class TemplateExec:
         except TemplateExecException, e:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
             except: pass
+            Logger.get('tplexec').exception('Template error')
             raise
         except Exception, e:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.error.py", "w" ).write( pythonCode )

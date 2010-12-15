@@ -162,6 +162,11 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                                         hideAllInfoRows(false);
                                         showInfo[result.id] = true; // we initialize the show info boolean for this chatroom
                                         each(result, function(cr){
+                                            links.set(cr.id, {});
+                                            links.get(cr.id)['custom'] = cr.custom;
+                                            if(showLogsLink){
+                                                links.get(cr.id)['logs'] = cr.logs;
+                                            }
                                             chatrooms.append(cr);
                                         });
                                         showAllInfoRows(false);
@@ -276,7 +281,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             createCHRadioButton.observeClick(function(){
                                                 disableCustomId(defaultHost);
                                              });
-            var createCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "Default ");
+            var createCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, $T("Default "));
             createCHRadioButtonLabel.dom.htmlFor = "createCH";
 
             var defineCHRadioButton = Html.radio({id:"defineCH", name:"createdInLocalServer"});
@@ -284,13 +289,13 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
             defineCHRadioButton.observeClick(function(){
                                                 enableCustomId(customHost);
                                              });
-            var defineCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, "Custom");
+            var defineCHRadioButtonLabel = Html.label({style:{fontWeight:"normal"}}, $T("Custom"));
             defineCHRadioButtonLabel.dom.htmlFor = "defineCH";
 
             var defineCHText = Html.edit({size:"35", name:"host", id:"host"});
             this.parameterManager.add(defineCHText, 'text', false);
 
-            self.errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, 'Name already in use');
+            self.errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
 
             self.crName = new AutocheckTextBox({style: {width: '300px'}, name: 'title', id:"CRname"}, self.errorLabel);
             //replace all the invalid characters
@@ -311,7 +316,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                            text.indexOf('<') != -1 ||
                            text.indexOf('>') != -1 ||
                            text.indexOf('@') != -1){
-                            return Html.span({}, "You introduced an invalid character in the name, don't use spaces, \', \", &, /, :, <, > or @");
+                            return Html.span({}, $T("You introduced an invalid character in the name, don't use spaces, \', \", &, /, :, <, > or @"));
                         }
                     }), self.errorLabel)],
                     [$T('Description'), Html.textarea({cols: 40, rows: 2, name: 'description', id:'description'}) ]
@@ -415,6 +420,11 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                                     // We add it to the watchlist and create an iframe.
                                     hideAllInfoRows(false);
                                     showInfo[result.id] = true; // we initialize the show info boolean for this chat room
+                                    links.set(result.id, {});
+                                    links.get(result.id)['custom'] = result.custom;
+                                    if(showLogsLink){
+                                        links.get(result.id)['logs'] = result.logs;
+                                    }
                                     chatrooms.append(result);
                                     showAllInfoRows(false);
                                     addIFrame(result);
@@ -478,10 +488,10 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
     function(popupType, chatroom, conferenceId) {
         this.popupType = popupType;
         if (popupType === 'create') {
-            var title = " Chat room creation";
+            var title = $T(" Chat room creation");
         } else if (popupType === 'edit') {
             this.chatroom = chatroom;
-            var title = ' Chat room modification';
+            var title = $T(' Chat room modification');
         }
 
         this.conferenceId = conferenceId;
@@ -731,8 +741,8 @@ var chatroomTemplate = function(chatroom) {
         var checkStatusButton = Widget.link(command(
                 function() {checkStatus(chatroom);} ,
                 Html.img({
-                    alt: "Refresh chat room data",
-                    title: "Refresh chat room data",
+                    alt: $T("Refresh chat room data"),
+                    title: $T("Refresh chat room data"),
                     src: imageSrc("reload"),
                     style: {
                         'verticalAlign': 'middle'
@@ -743,8 +753,8 @@ var chatroomTemplate = function(chatroom) {
     else{
         var checkStatusButton =
                 Html.img({
-                    alt: "Refresh not available in external servers",
-                    title: "Refresh not available in external servers",
+                    alt: $T("Refresh not available in external servers"),
+                    title: $T("Refresh not available in external servers"),
                     src: imageSrc("reload_faded"),
                     style: {
                         'verticalAlign': 'middle'
@@ -754,12 +764,19 @@ var chatroomTemplate = function(chatroom) {
     cellEditRemove.append(checkStatusButton);
     row.append(cellEditRemove);
 
-    var joinNow = Html.td({id:"joinLink", name:"joinLink", className : "dropDownMenu highlight", style:{fontWeight: "bold", whiteSpace: "nowrap"}}, Html.a({href: "#"}, $T("Join now!")) );
-    row.append(joinNow);
-    showLinkMenu(joinNow, chatroom);
+    if(links.get(chatroom.id).custom){
+        var joinNow = Html.td({id:"joinLink", name:"joinLink", className : "dropDownMenu highlight", style:{fontWeight: "bold", whiteSpace: "nowrap"}}, Html.a({href: "#"}, $T("Join now!")) );
+        row.append(joinNow);
+        showLinkMenu(joinNow, chatroom);
+    }
 
-    if(chatroom.createdInLocalServer && links.get(chatroom.id)){
-        var logs = Html.td({id:"logsLink", name:"logsLink", className : "dropDownMenu highlight", style:{fontWeight: "bold", whiteSpace: "nowrap"}}, " | ", Html.a({href: "#"}, $T("Logs")) );
+    if(links.get(chatroom.id).custom && chatroom.createdInLocalServer && links.get(chatroom.id) && showLogsLink){
+        var sepBar = Html.td({style:{fontWeight: "bold", whiteSpace: "nowrap"}}, " | ");
+        row.append(sepBar);
+    }
+
+    if(chatroom.createdInLocalServer && links.get(chatroom.id) && showLogsLink){
+        var logs = Html.td({id:"logsLink", name:"logsLink", className : "dropDownMenu highlight", style:{fontWeight: "bold", whiteSpace: "nowrap"}}, Html.a({href: "#"}, $T("Logs")) );
         row.append(logs);
         showLogOptions(logs, chatroom);
     }
@@ -779,12 +796,10 @@ var showLinkMenu = function(element, chatroom){
                 return;
             }
             var menuItems = {};
-            if (showDesktopLink){
-                menuItems['Using web client'] = links.get(chatroom.id).desktop;
-            }
-            if (showWebLink){
-                menuItems['Using your desktop client'] = links.get(chatroom.id).web;
-            }
+
+            each(links.get(chatroom.id).custom, function(linkType){
+                menuItems['Using ' + linkType.name] = linkType.link;
+            });
             joinMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList');
             var pos = element.getAbsolutePosition();
             joinMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);
@@ -850,7 +865,7 @@ var showLogOptions = function(element, chatroom){
 
             var form = createBaseForm();
 
-            menuItems['See logs'] = new LogPopup($T('Select the dates to retrieve the logs'),
+            menuItems[$T('See logs')] = new LogPopup($T('Select the dates to retrieve the logs'),
                                                  form.content,
                                                  function(value){
                                                     if (value){
@@ -877,7 +892,7 @@ var showLogOptions = function(element, chatroom){
                                        materialName)
                                       );
             var requestOk = false;
-            menuItems['Attach logs to event material'] = new LogPopup($T('Select the name that logs will have in the material section'),
+            menuItems[$T('Attach logs to event material')] = new LogPopup($T('Select the name that logs will have in the material section'),
                                                                       materialContent,
                                                                       function(value){
                                                                           if(value){
@@ -890,8 +905,8 @@ var showLogOptions = function(element, chatroom){
                                                                                           {
                                                                                               confId: conferenceID,
                                                                                               crId: chatroom.id,
-                                                                                              sdate: form2.sdate.get()?form.sdate.get().replace(/\//g,"-"):null,
-                                                                                              edate: form2.edate.get()?form.edate.get().replace(/\//g,"-"):null,
+                                                                                              sdate: form2.sdate.get()?form2.sdate.get().replace(/\//g,"-"):null,
+                                                                                              edate: form2.edate.get()?form2.edate.get().replace(/\//g,"-"):null,
                                                                                               getAll: form2.getall.get(),
                                                                                               forEvent: form2.forevent.get(),
                                                                                               matName: materialName.get()
@@ -1041,7 +1056,7 @@ var updateInfoRow = function(chatroom) {
  * As a consequence the chat rooms table where 1 chat room = 1 row is initialized.
  */
 var displayChatrooms = function() {
-    var killProgress = IndicoUI.Dialogs.Util.progress("Loading list of chatrooms...");
+    var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading list of chatrooms..."));
     // We bind the watchlist and the table through the template
     bind.element($E("chatroomsTableBody"), chatrooms, chatroomTemplate);
     each(chatrooms, function(chatroom) {
@@ -1056,7 +1071,7 @@ var refreshTableHead = function() {
     var headRow = $E('tableHeadRow');
     if (length == 0) {
         var cell = Html.td();
-        cell.set(Html.span('','Currently no chatrooms have been created'));
+        cell.set(Html.span('',$T('Currently no chatrooms have been created')));
         headRow.set(cell);
     } else {
         headRow.clear();

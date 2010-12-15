@@ -56,7 +56,7 @@ globalOptions = [
                       "type": 'ckEditor',
                       "defaultValue": "<table width=\"100%\" align=\"center\" border=\"0\">\
     <tr>\
-        <td class=\"groupTitle\" style=\"padding-top:50px\">How to connect to the chat</td>\
+        <td class=\"groupTitle\">How to connect to the chat</td>\
     </tr>\
     <tr>\
           <td>\
@@ -70,14 +70,16 @@ globalOptions = [
     </tr>\
 </table>"}),
 
-    ("joinDesktopClients", {"description": _("Show a link to join a chat room through desktop clients, like Pidgin"),
+    ("activateLogs", {"description": _("Make possible to see chat logs and attach them to the material \
+    \
+    REMEMBER, you will need to put in the Jappix dir the code.py file contained in the ext folder, inside the XMPP plugin."),
                             "type": bool,
-                            "defaultValue": True,
-                            "editable": True,
-                            "visible": True}),
-    ("joinWebClient", {"description": _("Show a link to join a chat room through our web client"),
-                            "type": bool,
-                            "defaultValue": True,
+                            "defaultValue": False,
                             "editable": True,
                             "visible": True})
+#    ("joinWebClient", {"description": _("Show a link to join a chat room through our web client"),
+#                            "type": bool,
+#                            "defaultValue": True,
+#                            "editable": True,
+#                            "visible": True})
 ]

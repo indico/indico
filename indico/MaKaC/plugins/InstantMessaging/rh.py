@@ -26,6 +26,7 @@ from MaKaC.plugins.InstantMessaging.pages import WPConfModifChat, WPConferenceIn
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from MaKaC.i18n import _
 import urllib2
 
 
@@ -84,6 +85,8 @@ class RHChatSeeLogs(RHChatModifBase):
 
         req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
         document = urllib2.urlopen(req).read()
+        if document is '':
+            return _('No logs were found for these dates')
         return document
 
 

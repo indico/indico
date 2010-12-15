@@ -6419,6 +6419,12 @@ label.emphasis {
     color: #777;
 }
 
+.smallRed {
+    font-size: 9px;
+    color: #881122;
+}
+
+
 tr.selectedItem td {
     color: #000;
 }

@@ -23,6 +23,7 @@
 import sleekxmpp
 
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.i18n import _
 
 class IndicoXMPPBotBase(object):
 
@@ -54,7 +55,7 @@ class IndicoXMPPBotBase(object):
 
     def treatError(self, error, msg=''):
         """ Gets the response from the XMPP driver and, in case of error, returns the appropiate message"""
-        return {'error':error, 'reason':msg if msg!= '' else 'There was a problem while connecting our XMPP server. Please try again later'}
+        return {'error':error, 'reason':msg if msg!= '' else _('There was a problem while connecting our XMPP server. Please try again later')}
 
     def run(self):
         try:

@@ -50,16 +50,27 @@
                 <tr>
                     <td>
                         <a href="<%=urlHandlers.UHAdminTogglePluginType.getURL(pluginType)%>">
-                        <% if pluginType.isActive(): %>
+                        <% if not pluginType.isUsable(): %>
+                            <img class="imglink" alt="<%= _("Not in usable state")%>" src="<%=Config.getInstance().getSystemIconURL( 'greyedOutSection' )%>"/>
+                        <% end %>
+                        <% elif pluginType.isActive(): %>
                                 <img class="imglink" alt="<%= _("Click to disable")%>" src="<%=Config.getInstance().getSystemIconURL( 'enabledSection' )%>"/>
                         <% end %>
                         <% else: %>
                                 <img class="imglink" alt="<%= _("Click to enable")%>" src="<%=Config.getInstance().getSystemIconURL( 'disabledSection' )%>"/>
                         <% end %>
                         </a>
-                        <a href="<%=urlHandlers.UHAdminTogglePluginType.getURL(pluginType)%>" onclick="return confirm('<%= _('This will reload all the plugins too. Do you want to continue?')%>');">
+                        <% if not pluginType.isUsable(): %>
                             <%= pluginType.getName() %>
-                        </a>
+                            <small class="smallRed">
+                                (<%= pluginType.getNotUsableReason() %>)
+                            </small>
+                        <% end %>
+                        <% else: %>
+                            <a href="<%=urlHandlers.UHAdminTogglePluginType.getURL(pluginType)%>" onclick="return confirm('<%= _('This will reload all the plugins too. Do you want to continue?')%>');">
+                                <%= pluginType.getName() %>
+                            </a>
+                        <% end %>
                         <% if pluginType.hasDescription(): %>
                             <span style="margin-left: 2em;">
                                 (<%= pluginType.getDescription() %>)

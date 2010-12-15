@@ -159,6 +159,7 @@ class Config:
                  "loading": "loading.gif",
                  "enabledSection": "enabledSection.png",
                  "disabledSection": "disabledSection.png",
+                 "greyedOutSection": "greyedOutSection.png",
                  "tick": "tick.png",
                  "cross": "cross.png",
                  "cofee": "coffee.png",

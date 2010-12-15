@@ -20,6 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import urllib2, datetime, os, tempfile, stat
+from MaKaC.webinterface import urlHandlers
 from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
 from MaKaC.plugins.InstantMessaging.handlers import ChatroomBase
 from MaKaC.services.implementation.base import ServiceBase, ParameterManager
@@ -32,7 +33,8 @@ from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.plugins import Observable
 from MaKaC.plugins.util import PluginFieldsWrapper
-from MaKaC.plugins.helpers import DBHelpers, MailHelper, DeleteLogLinkGenerator, LogLinkGenerator
+from MaKaC.plugins.helpers import DBHelpers, MailHelper, DeleteLogLinkGenerator, LogLinkGenerator, generateCustomLinks, generateLogLink, XMPPLogsActivated
+from MaKaC.i18n import _
 
 from MaKaC.plugins.InstantMessaging.XMPP.bot import IndicoXMPPBotRoomExists, IndicoXMPPBotCreateRoom, IndicoXMPPBotEditRoom, IndicoXMPPBotDeleteRoom, IndicoXMPPBotGetPreferences
 from MaKaC.conference import ConferenceHolder, LocalFile
@@ -149,10 +151,14 @@ class XMPPChatroomService( ChatroomBase ):
             raise ServiceError(message = self.messages['deleting'])
         return self.proccessAnswer(self._bot)
 
-    def _executeExternalOperation(self, bot, operName, messageName):
-        """ we need the instance of the XMPP operation we're going to do, and also its name.
-            Finally, we'll need the name of the error message to show in case something happens"""
+def addLinks2FossilizedCR(fossilizedRoom, room):
+    """ Adds the neccesary links to retrieve logs and also to join the chat room through all the links specified by the user"""
+    # add links to join the room
+    generateCustomLinks(fossilizedRoom, room)
+    # add link to retrieve logs
+    generateLogLink(fossilizedRoom, room, room.getConference() if len(room.getConferences()) is 1 else room.getConference().values()[0])
 
+    return True
 
 class CreateChatroom( XMPPChatroomService ):
 
@@ -198,7 +204,10 @@ class CreateChatroom( XMPPChatroomService ):
         tz = DisplayTZ(self._aw, self._room.getConference()).getDisplayTZ()
 
         ContextManager.get('mailHelper').sendMails()
-        return self._room.fossilize(tz=tz)
+        fossilizedRoom = self._room.fossilize(tz=tz)
+        addLinks2FossilizedCR(fossilizedRoom, self._room)
+
+        return fossilizedRoom
 
 
 
@@ -312,10 +321,12 @@ class DeleteChatroom( XMPPChatroomService ):
             self.deleteRoomXMPP(self._botJID, self._botPass, self._room, message)
 
         # make the log folder unaccessible in the future
-        url = DeleteLogLinkGenerator(self._room).generate()
-        req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
-        document = urllib2.urlopen(req)
-        Logger.get('InstantMessaging (XMPP-Indico server)').info("The room %s has been deleted by the user %s at %s hours" %(self._title, self._user.getName(), nowutc()))
+        if len(self._room.getConferences()) is 0:
+            # we only "delete" logs when there are no conferences associated with the chat room
+            url = DeleteLogLinkGenerator(self._room).generate()
+            req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
+            document = urllib2.urlopen(req)
+            Logger.get('InstantMessaging (XMPP-Indico server)').info("The room %s has been deleted by the user %s at %s hours" %(self._title, self._user.getName(), nowutc()))
 
         ContextManager.get('mailHelper').sendMails()
         return True
@@ -344,12 +355,11 @@ class GetRoomPreferences( XMPPChatroomService ):
 
         # this method will fill the self._bot._form attr
         self.roomPreferencesXMPP(self._botJID, self._botPass, self._room)
-
         #get the preferences and check updates
-        for preference in self._bot._form.fields:
-            if preference.var in fieldsToCheck.keys():
+        for preference in self._bot._form.values['fields']:
+            if preference[0] in fieldsToCheck.keys():
                 #we execute setDescription or setPassword with the new value
-                getattr(self._room, 'set'+ fieldsToCheck[preference.var])(preference.value.pop())
+                getattr(self._room, 'set'+ fieldsToCheck[preference[0]])(preference[1].values['value'])
 
         return self._room.fossilize()
 
@@ -388,7 +398,9 @@ class AddConference2Room( ServiceBase, Observable ):
                     raise NoReportError(_('Some of the rooms were deleted from the other conference(s) they belonged to. Please refresh your browser'))
                 room.setConference(ConferenceHolder().getById(self._conference))
                 self._notify('addConference2Room', {'room': room, 'conf': self._conference})
-                rooms.append(room.fossilizeMultiConference(ConferenceHolder().getById(self._conference)))
+                fossilizedRoom = room.fossilizeMultiConference(ConferenceHolder().getById(self._conference))
+                addLinks2FossilizedCR(fossilizedRoom, room)
+                rooms.append(fossilizedRoom)
         except NoReportError, e:
             Logger.get('InstantMessaging (XMPP-Indico server)').error("Error adding chat rooms. User: %s. Chat room: %s. Traceback: %s" %(self._aw.getUser().getFullName(), roomID, e))
             raise ServiceError(message = _('There was an error trying to add the chat rooms. Please refresh your browser and try again'))

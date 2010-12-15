@@ -340,15 +340,28 @@ class PluginsHolder (ObjectHolder):
 
         ptypes = PluginLoader.getPluginTypeList()
 
-        for pluginTypeName in ptypes:
+        for ptypeId in ptypes:
 
-            if self.hasPluginType(pluginTypeName, mustBePresent=False, mustBeActive=False):
-                pluginType = self.getPluginType(pluginTypeName)
-                pluginType.setPresent(True)
+            if self.hasPluginType(ptypeId, mustBePresent=False, mustBeActive=False):
+                ptype = self.getPluginType(ptypeId)
+                ptype.setPresent(True)
             else:
-                pluginType = PluginType(pluginTypeName)
-                self.add(pluginType)
-            pluginType.updateInfo()
+                ptype = PluginType(ptypeId)
+                self.add(ptype)
+
+            ptype.configureFromMetadata(processPluginMetadata(ptype.getModule()))
+            missingDeps = ptype.getModule().__missing_deps__
+
+            # if there are dependencies missing, set as not usable
+            if len(missingDeps) > 0:
+                ptype.setUsable(False, reason = "Dependencies missing: %s " % \
+                                missingDeps)
+                if ptype.isActive():
+                    ptype.setActive(False)
+            else:
+                ptype.setUsable(True)
+
+            ptype.updateInfo()
 
     def clearPluginInfo(self):
         """ Removes all the plugin information from the DB
@@ -372,7 +385,8 @@ class PluginsHolder (ObjectHolder):
         return pluginTypes
 
     def hasPluginType(self, name, mustBePresent=True, mustBeActive=True):
-        """ Returns True if there is a PluginType with the given name.
+        """
+        Returns True if there is a PluginType with the given name.
         """
         if self.hasKey(name):
             pluginType = self.getById(name)
@@ -449,6 +463,8 @@ class PluginBase(Persistent):
         """
         self.__options = {}
         self.__actions = {}
+
+        self.__usable = False
 
     ############## actions related ###############
     @classmethod
@@ -664,13 +680,22 @@ class PluginBase(Persistent):
     def _notifyModification(self):
         self._p_changed = 1
 
+    def setUsable(self, value, reason = ''):
+        self.__notUsableReason = None if value else reason
+
+    def getNotUsableReason(self):
+        return self.__notUsableReason
+
+    def isUsable(self):
+        return self.__notUsableReason == None
+
 
 class PluginType (PluginBase):
     """ This class represents a plugin type ("COllaboration", "epayment", etc.).
         It will store information about the plugin type in the db.
     """
 
-    def __init__(self, name, description=None):
+    def __init__(self, ptypeId, description=None):
         """ Constructor
             -name: a string with the type name. e.g. "Collaboration"
             -description: a human readable description for this plugin type.
@@ -679,46 +704,59 @@ class PluginType (PluginBase):
             Also, it will have associated options, since it inherits from PluginBase.
         """
         PluginBase.__init__(self)
-        self.__id = name
-        self.__name = name
+        self.__id = ptypeId
+        self.__name = ptypeId
         self.__description = description
         self.__present = True
         self.__plugins = {}
         self._visible = True
         self._active = False
 
-    def _updatePluginInfo(self, pluginModule, metadata):
+    def configureFromMetadata(self, metadata):
+        self.__name = metadata['name']
 
-        #if it already existed, we mark it as present
-        pluginName = metadata['name']
+    def _updatePluginInfo(self, pid, pluginModule, metadata):
 
-        if self.hasPlugin(pluginName):
-            p = self.getPlugin(pluginName)
+        if self.hasPlugin(pid):
+            p = self.getPlugin(pid)
             p.setDescription(metadata['description'])
             p.setPresent(True)
 
         #if it didn't exist, we create it
         else:
-            p = Plugin(pluginName,
+            p = Plugin(pid,
                        pluginModule.__name__,
                        self,
                        metadata['description'])
 
             self.addPlugin(p)
 
-        p.setTestPlugin(metadata['testPlugin'])
+        p.configureFromMetadata(processPluginMetadata(p.getModule()))
 
-        if hasattr(pluginModule, "options") and \
-               hasattr(pluginModule.options, "globalOptions"):
-            p.updateAllOptions(pluginModule.options.globalOptions)
+        missingDeps = p.getModule().__missing_deps__
 
-        if hasattr(pluginModule, "actions") and \
-               hasattr(pluginModule.actions, "pluginActions"):
-            p.updateAllActions(pluginModule.actions.pluginActions)
+        if len(missingDeps) > 0:
+            p.setUsable(False, reason = "Dependencies missing: %s " % missingDeps)
 
-        self._updateComponentInfo(p, pluginModule)
-        self._updateRHMapInfo(p, pluginModule)
-        self._updateHandlerInfo(p, pluginModule)
+            if p.isActive():
+                p.setActive(False)
+
+        else:
+            p.setUsable(True)
+
+        # only set options, actions, components and handlers if plugin is active
+        if p.isActive():
+            if hasattr(pluginModule, "options") and \
+                   hasattr(pluginModule.options, "globalOptions"):
+                p.updateAllOptions(pluginModule.options.globalOptions)
+
+            if hasattr(pluginModule, "actions") and \
+                   hasattr(pluginModule.actions, "pluginActions"):
+                p.updateAllActions(pluginModule.actions.pluginActions)
+
+            self._updateComponentInfo(p, pluginModule)
+            self._updateRHMapInfo(p, pluginModule)
+            self._updateHandlerInfo(p, pluginModule)
 
     def updateInfo(self):
         """
@@ -741,7 +779,9 @@ class PluginType (PluginBase):
             if metadata['ignore']:
                 continue
             else:
-                self._updatePluginInfo(pluginModule, metadata)
+                self._updatePluginInfo(pluginModule.__name__.split('.')[-1],
+                                       pluginModule,
+                                       metadata)
 
         ptypeModule = self.getModule()
         ptypeMetadata = processPluginMetadata(ptypeModule)
@@ -752,11 +792,13 @@ class PluginType (PluginBase):
         self.__visible = ptypeMetadata['visible']
 
         # components, handlers, options and actions
-        self._updateComponentInfo(self, ptypeModule)
-        self._updateRHMapInfo(self, ptypeModule)
-        self._updateHandlerInfo(self, ptypeModule)
-        self.updateAllOptions(self._retrievePluginTypeOptions())
-        self.updateAllActions(self._retrievePluginTypeActions())
+        if self.isActive():
+            # components, handlers, options and actions
+            self._updateComponentInfo(self, ptypeModule)
+            self._updateRHMapInfo(self, ptypeModule)
+            self._updateHandlerInfo(self, ptypeModule)
+            self.updateAllOptions(self._retrievePluginTypeOptions())
+            self.updateAllActions(self._retrievePluginTypeActions())
 
 
     def _getAllSubmodules(self, module):
@@ -923,7 +965,7 @@ class Plugin(PluginBase):
     """
 
 
-    def __init__(self, name, moduleName, owner, description=None, active=False):
+    def __init__(self, pid, moduleName, owner, description=None, active=False):
         """ Constructor
             -moduleName: the module name corresponding to this plugin. e.g. "MaKaC.plugins.Collaboration.EVO"
             -owner : the PluginType of this Plugin
@@ -937,7 +979,8 @@ class Plugin(PluginBase):
             the DB in a similar way to options.
         """
         PluginBase.__init__(self)
-        self.__name = name
+        self.__name = pid
+        self.__id = pid
         self.__owner = owner
         self.__present = True
         self.__moduleName = moduleName
@@ -947,8 +990,12 @@ class Plugin(PluginBase):
         self._globalData = self.initializeGlobalData()
         self._storage = OOBTree() # storage.....
 
+    def configureFromMetadata(self, metadata):
+        self.__name = metadata['name']
+        self._testPlugin = metadata['testPlugin']
+
     def getId(self):
-        return self.__name
+        return self.__id
 
     def getName(self):
         return self.__name
@@ -966,10 +1013,10 @@ class Plugin(PluginBase):
         return self.__moduleName
 
     def getModule(self):
-        return PluginLoader.getPluginByTypeAndName(self.getType(), self.getName())
+        return PluginLoader.getPluginByTypeAndId(self.getType(), self.getId())
 
     def getType(self):
-        return self.getOwner().getName()
+        return self.getOwner().getId()
 
     def hasDescription(self):
         return (self.__description is not None) and len(self.__description) > 0
@@ -985,25 +1032,15 @@ class Plugin(PluginBase):
 
     def setActive(self, value):
         self.__active = value
-        if value is True:
-            #register the components related to the plugin
+        if value:
+            # register the components related to the plugin
             PluginsHolder().getComponentsManager().addPlugin(self.getName())
         else:
-            #unregister the components related to the plugin
+            # unregister the components related to the plugin
             PluginsHolder().getComponentsManager().cleanPlugin(self.getName())
 
     def toggleActive(self):
-        if not self.isActive():
-            self.__active = True
-            #register the components related to the plugin
-            PluginsHolder().getComponentsManager().addPlugin(self.getName())
-        else:
-            self.__active = False
-            #unregister the components related to the plugin
-            PluginsHolder().getComponentsManager().cleanPlugin(self.getName())
-
-    def setTestPlugin(self, testPlugin):
-        self._testPlugin = testPlugin
+        self.setActive(not self.isActive())
 
     def isTestPlugin(self):
         if not hasattr(self, "_testPlugin"): #TODO: remove when safe

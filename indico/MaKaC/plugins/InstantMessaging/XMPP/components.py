@@ -22,7 +22,7 @@
 from MaKaC.plugins.notificationComponents import Component, IContributor, INavigationContributor, IListener, IInstantMessagingListener
 from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.plugins.util import PluginsWrapper, PluginFieldsWrapper
-from MaKaC.plugins.helpers import DBHelpers, MailHelper, DesktopLinkGenerator, WebLinkGenerator, GeneralLinkGenerator
+from MaKaC.plugins.helpers import DBHelpers, MailHelper, GeneralLinkGenerator
 from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
 from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
 from BTrees.OOBTree import OOBTree, OOTreeSet
@@ -38,7 +38,6 @@ from MaKaC.webinterface.mail import GenericNotification
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import zope.interface
-import random
 
 
 class ChatSMContributor(Component, Observable):
@@ -98,20 +97,10 @@ class ChatSMContributor(Component, Observable):
                 out.writeTag("password", chatroom.getPassword())
                 out.writeTag("createdInLocalServer", chatroom.getCreatedInLocalServer())
                 out.openTag("links")
-                if DesktopLinkGenerator(chatroom).isActive() or WebLinkGenerator(chatroom).isActive() or linksList.__len__() > 0:
+                if linksList.__len__() > 0:
                     out.writeTag("linksToShow", 'true')
                 else:
                     out.writeTag("linksToShow", 'false')
-
-                if DesktopLinkGenerator(chatroom).isActive():
-                    out.writeTag("desktop", DesktopLinkGenerator(chatroom).generate())
-                else:
-                    out.writeTag("desktop", 'false')
-
-                if WebLinkGenerator(chatroom).isActive():
-                    out.writeTag("web", WebLinkGenerator(chatroom).generate())
-                else:
-                    out.writeTag("web", 'false')
 
                 for link in linksList:
                     out.openTag("customLink")
@@ -281,8 +270,8 @@ class ChatroomMailer(Component):
     def addConference2Room(cls, obj, params):
         room = params['room']
         conf = ConferenceHolder().getById(params['conf'])
-        #without the random number added it would only send 1 mail, because for every new chat room it'd think that there has been a retry
-        ExternalOperationsManager.execute(cls, "add_"+str(cls.__class__)+str(random.random()), cls.performOperation, 'create', conf, room, room, conf)
+        #without the number added it would only send 1 mail, because for every new chat room it'd think that there has been a retry
+        ExternalOperationsManager.execute(cls, "add_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'create', conf, room, room, conf)
 
     @classmethod
     def performOperation(cls, operation, conf, room, *args):

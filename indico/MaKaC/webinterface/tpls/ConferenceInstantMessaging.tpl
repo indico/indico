@@ -1,12 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
-<% from MaKaC.plugins.helpers import WebLinkGenerator, DesktopLinkGenerator %>
 <% from MaKaC.plugins.util import PluginFieldsWrapper %>
-
-<script type="text/javascript">
-var showDesktopLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients') )%>;
-var showWebLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient') )%>;
-</script>
 
 <table width="100%" align="center" border="0" cellpadding="5px">
     <tr>
@@ -49,7 +43,7 @@ var showWebLink = <%=jsonEncode( PluginFieldsWrapper('InstantMessaging', 'XMPP')
                 <% else:%>
                     <td style="font-style:italic;"> - </td>
                 <% end %>
-                <% if PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinDesktopClients') or PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('joinWebClient'): %>
+                <% if PluginFieldsWrapper('InstantMessaging').getOption('customLinks').__len__() > 0: %>
                     <td style="font-weight: bold;" nowrap><a id="joinLink<%= cr.getId() %>" name = "<%= cr.getId() %>" class="dropDownMenu highlight" href="#"><%= _("Join now!")%></a></td>
                 <% end %>
                 </tr>
@@ -78,7 +72,7 @@ each(joinLinkList, function(joinLink){
             var menuItems = {};
             var links = <%= Links %>;
             var crId = joinLink.dom.name;
-            each(links[crId], function(linkType){
+            each(links[crId].custom, function(linkType){
                 menuItems['Using ' + linkType.name] = linkType.link;
             });
 
