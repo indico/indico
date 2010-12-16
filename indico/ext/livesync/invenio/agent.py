@@ -30,45 +30,55 @@ from MaKaC import conference
 from MaKaC.export.oai2 import DataInt
 from MaKaC.common.xmlGen import XMLGen
 
+# some useful constants
+STATUS_DELETED, STATUS_CREATED, STATUS_CHANGED = 1,2,4
+
 
 class InvenioRecordProcessor(object):
 
     @classmethod
-    def _breakDownCategory(cls, categ, chgSet):
+    def _setStatus(cls, chgSet, obj, state):
+        if obj not in chgSet:
+            chgSet[obj] = 0
+
+        chgSet[obj] |= state
+
+    @classmethod
+    def _breakDownCategory(cls, categ, chgSet, state):
 
         # categories are never converted to records
 
         for conf in categ.getAllConferenceList():
-            cls._breakDownConference(conf, chgSet)
+            cls._breakDownConference(conf, chgSet, state)
 
     @classmethod
-    def _breakDownConference(cls, conf, chgSet):
+    def _breakDownConference(cls, conf, chgSet, state):
 
-        chgSet.add(conf)
+        cls._setStatus(chgSet, conf, state)
 
         for contrib in conf.getContributionList():
-            cls._breakDownContribution(contrib, chgSet)
+            cls._breakDownContribution(contrib, chgSet, state)
 
     @classmethod
-    def _breakDownContribution(cls, contrib, chgSet):
+    def _breakDownContribution(cls, contrib, chgSet, state):
 
-        chgSet.add(contrib)
+        cls._setStatus(chgSet, contrib, state)
 
         for scontrib in contrib.getSubContributionList():
-            chgSet.add(scontrib)
+            cls._setStatus(chgSet, scontrib, state)
 
     @classmethod
     def _computeProtectionChanges(cls, obj, action, chgSet):
         objType = obj.__class__
 
         if isinstance(obj, conference.Category):
-            cls._breakDownCategory(obj, chgSet)
+            cls._breakDownCategory(obj, chgSet, STATUS_CHANGED)
         elif isinstance(obj, conference.Conference):
-            cls._breakDownConference(obj, chgSet)
+            cls._breakDownConference(obj, chgSet, STATUS_CHANGED)
         elif isinstance(obj, conference.Contribution):
-            cls._breakDownContribution(obj, chgSet)
+            cls._breakDownContribution(obj, chgSet, STATUS_CHANGED)
         elif isinstance(obj, conference.SubContribution):
-            chgSet.add(obj)
+            cls._setStatus(chgSet, obj, STATUS_CHANGED)
 
     @classmethod
     def computeRecords(cls, data):
@@ -77,53 +87,40 @@ class InvenioRecordProcessor(object):
         of records to be updated (created, changed or deleted)
         """
 
-        deleted = set()
-        changed = set()
-        created = set()
-        protectionChanged = set()
-
+        records = dict()
         result = []
 
-        print 'Computing records...'
-
         for ts, aw in data:
-
             obj = aw.getObject()
 
-            if obj in deleted:
-                # previously deleted?
-                continue
+            if obj in records:
+                if (records[obj] & STATUS_DELETED):
+                    # previously deleted? jump over this one
+                    continue
+            else:
+                records[obj] = 0
 
             for action in aw.getActions():
 
                 if action == 'deleted':
                     # if the record has been deleted, mark it as such
                     # nothing else will matter
-                    deleted.add(obj)
+                    records[obj] |= STATUS_DELETED
 
                 elif action == 'created':
                     # if the record has been created, mark it as such
-                    created.add(obj)
+                    records[obj] |= STATUS_CREATED
 
                 elif action in ['data_changed', 'acl_changed', 'moved']:
                     # categories are ignored
-                    if not isinstance(obj, conference.Category):
-                        changed.add(obj)
+                    records[obj] |= STATUS_CHANGED
 
                 elif action in ['set_private', 'set_public']:
                     # protection changes have to be handled more carefully
-                    cls._computeProtectionChanges(obj, action, protectionChanged)
+                    cls._computeProtectionChanges(obj, action, records)
 
-        print 'Computed records: %s created, %s changed, %s protection' % \
-                            (len(created), len(changed), len(protectionChanged))
-
-        for obj in (created | changed | protectionChanged) - deleted:
-            yield aw._timestamp, obj, 'create'
-
-        for obj in (deleted):
-            yield aw._timestamp, obj, 'delete'
-
-        # TODO: branching to sub objects (i.e. category protection)
+        for record, state in records.iteritems():
+            yield ts, record, state
 
 
 class InvenioBatchUploaderAgent(PushSyncAgent):
@@ -148,7 +145,7 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
 
         xg.openTag("collection",[["xmlns","http://www.loc.gov/MARC21/slim"]])
 
-        di.toMarc(record, overrideCache=True, deleted = (operation == 'delete'))
+        di.toMarc(record, overrideCache=True, deleted = (operation & STATUS_DELETED))
 
         xg.closeTag("collection")
 
@@ -177,7 +174,10 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
 
         self._v_logger.info('Starting metadata/upload cycle')
         for ts, record, operation in crecords:
-            # TODO: check operation
+
+            if isinstance(record, conference.Category):
+                continue
+
             rdata = self._getMetadata(operation, record)
             try:
                 self._upload(record, server, rdata)
