@@ -54,7 +54,7 @@ def processRequest(method, params, req):
     return result
 
 
-class ServiceRunner(object, Observable):
+class ServiceRunner(Observable):
 
     def invokeMethod(self, method, params, req):
         # create the context

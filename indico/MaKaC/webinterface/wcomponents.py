@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins import PluginsHolder, Observable
+from MaKaC.plugins import PluginsHolder, OldObservable
 
 import os,types,string
 from xml.sax.saxutils import escape, quoteattr
@@ -66,7 +66,7 @@ from MaKaC.common.contextManager import ContextManager
 
 import re
 
-class WTemplated(Observable):
+class WTemplated(OldObservable):
     """This class provides a basic implementation of a web component (an
        object which generates HTML related to a certain feature or
        functionality) which relies in a template file for generating the

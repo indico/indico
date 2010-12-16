@@ -43,7 +43,15 @@ from indico.core.api import Component, IListener, IContributor
 from indico.web import rh as newrh
 
 
-class Observable:
+class Observable(object):
+    def _notify(self, event, *params):
+        return PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)
+
+
+class OldObservable:
+    """
+    Version for old style classes
+    """
     def _notify(self, event, *params):
         return PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)
 

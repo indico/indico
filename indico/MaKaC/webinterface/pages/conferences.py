@@ -68,8 +68,7 @@ import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
-from MaKaC.common.PickleJar import DictPickler
-from MaKaC.plugins.base import Observable
+from MaKaC.plugins.base import OldObservable
 from MaKaC.common.logger import Logger
 
 from indico.modules import ModuleHolder
@@ -126,7 +125,7 @@ class WPConferenceDisplayBase( WPConferenceBase ):
         return WPConferenceBase.getJSFiles(self) + \
                self._includeJSPackage('MaterialEditor')
 
-class WPConferenceDefaultDisplayBase( WPConferenceBase, Observable ):
+class WPConferenceDefaultDisplayBase( WPConferenceBase, OldObservable ):
     navigationEntry = None
 
     def _getFooter( self ):
@@ -2048,7 +2047,7 @@ class WPMeetingTimeTable( WPXSLConferenceDisplay ):
         wc = WConferenceTimeTable( self._conf, self._getAW()  )
         return wc.getHTML(params)
 
-class WPConferenceModifBase( main.WPMainBase, Observable ):
+class WPConferenceModifBase( main.WPMainBase, OldObservable ):
 
     _userData = ['favorite-user-ids']
 
@@ -4576,7 +4575,7 @@ class WConferenceClone(wcomponents.WTemplated):
         return vars
 
 
-class WPConfClone( WPConfModifToolsBase, Observable ):
+class WPConfClone( WPConfModifToolsBase, OldObservable ):
 
     def _setActiveTab( self ):
         self._tabCloneEvent.setActive()
