@@ -4044,6 +4044,10 @@ select.invalidSelect {
     color: #ff1122;
 }
 
+.warningText {
+    color: #881122;
+}
+
 .tooltipError {
    max-width: 300px;
    padding: 5px;
