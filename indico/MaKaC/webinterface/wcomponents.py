@@ -2107,7 +2107,8 @@ class WConfModificationControlFrame(WTemplated):
         self.__target = target
         params = { "addManagersURL": addManagersURL, \
                    "removeManagersURL": removeManagersURL, \
-                    "setModifKeyURL": setModifKeyURL }
+                   "setModifKeyURL": setModifKeyURL,
+                   "target": target }
         return  WTemplated.getHTML( self, params )
 
     def getVars( self ):

@@ -719,6 +719,24 @@ class ConferenceProtectionRemoveUser(ConferenceModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._conf.revokeAccess(userToRemove)
 
+class ConferenceProtectionSetAccessKey(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        self._accessKey = self._params.get("accessKey", "")
+
+    def _getAnswer(self):
+        self._conf.setAccessKey(self._accessKey)
+
+class ConferenceProtectionSetModifKey(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        self._modifKey = self._params.get("modifKey", "")
+
+    def _getAnswer(self):
+        self._conf.setModifKey(self._modifKey)
+
 
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
@@ -743,5 +761,7 @@ methodMap = {
     "getParticipationForm": ConferenceParticipationForm,
     "protection.getAllowedUsersList": ConferenceProtectionUserList,
     "protection.addAllowedUsers": ConferenceProtectionAddUsers,
-    "protection.removeAllowedUser": ConferenceProtectionRemoveUser
+    "protection.removeAllowedUser": ConferenceProtectionRemoveUser,
+    "protection.setAccessKey": ConferenceProtectionSetAccessKey,
+    "protection.setModifKey": ConferenceProtectionSetModifKey
     }

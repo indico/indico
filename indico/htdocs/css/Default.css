@@ -4048,6 +4048,10 @@ select.invalidSelect {
     color: #881122;
 }
 
+.successText {
+    color: #118822;
+}
+
 .tooltipError {
    max-width: 300px;
    padding: 5px;
