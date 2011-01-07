@@ -1365,15 +1365,17 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     _updateMaterialList: function(material) {
         // add type to custom list, if not there
         var i = -1;
+        var niceTitle = null;
 
         for (var j in this.types) {
-            if (this.types[j][1] == material.get('title')) {
+            if (this.types[j][1] == material.get('title') || this.types[j][0] == material.get('title')) {
                 i = j;
+                niceTitle = this.types[j][1];
                 break;
             }
         }
 
-        var newElement = [material.get('id'), material.get('title')];
+        var newElement = [material.get('id'), niceTitle ? niceTitle : material.get('title')];
 
         if (i >= 0) {
             this.types[i] = newElement;
