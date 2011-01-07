@@ -6296,6 +6296,22 @@ tr.selectedItem td {
     color: #881122;
 }
 
+.protPrivate {
+    color: #B02B2C;
+}
+
+.protPublic {
+    color: #128F33;
+}
+
+.strongProtPrivate strong {
+    color: #B02B2C;
+}
+
+.strongProtPublic strong {
+    color: #128F33;
+}
+
 div.cloneElements {
     background: #ECECEC url('../images/grey_gradient2.png') scroll repeat-x bottom left;
     padding: 10px 20px 10px 10px;

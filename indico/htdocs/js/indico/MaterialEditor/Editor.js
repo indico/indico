@@ -140,19 +140,19 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         var text = null;
 
         if (args.subContId) {
-            text = $T("Same people as parent Subcontribution");
+            text = $T("Same as for the parent Subcontribution");
         } else if (args.contribId) {
-            text = $T("Same people as parent Contribution");
+            text = $T("Same as for the parent Contribution");
         } else if (args.sessionId) {
-            text = $T("Same people as parent Session");
+            text = $T("Same as for the parent Session");
         } else if (args.confId) {
-            text = $T("Same people as parent Conference");
+            text = $T("Same as for the parent Conference");
         } else if (args.categId) {
-            text = $T("Same people as parent Category");
+            text = $T("Same as for the parent Category");
         }
 
         text = Html.span({}, text, " ",
-                         Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}}," ",
+                         Html.unescaped.span({className: args.parentProtected ? 'strongProtPrivate' : 'strongProtPublic', style: {fontStyle: 'italic'}}," ",
                                    Protection.ParentRestrictionMessages[args.parentProtected?1:-1]));
 
         return text;
@@ -196,9 +196,9 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
 
             selector = new RadioFieldWidget([
-                ['inherit', Html.span({}, $T("Same people as the parent material type ")+"\""+entry.get('title')+"\" ", inheritanceText)],
-                ['private', $T("Only me and the users I specify")],
-                ['public', $T("Everyone")]
+                ['inherit', Html.span({className: protection == -1 ? 'strongProtPublic' : 'strongProtPrivate'}, $T("Same as for the parent material type ")+"\""+entry.get('title')+"\" ", inheritanceText)],
+                ['private', Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+                ['public', Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
 
 
@@ -210,8 +210,8 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
             selector = new RadioFieldWidget([
                 ['inherit', this._parentText(this.args)],
-                ['private', $T("Only me and the users I specify")],
-                ['public', $T("Everyone")]
+                ['private', Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+                ['public', Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
         }
 
