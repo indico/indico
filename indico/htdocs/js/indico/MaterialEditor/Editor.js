@@ -170,7 +170,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
     _drawProtectionPane: function(value) {
 
         var text = null;
-        var entry = this.list.get(value);
+        var entry = this.list.get(value) || this.list.get(value.toLowerCase());
         var selector = null;
 
         if (value == '') {
