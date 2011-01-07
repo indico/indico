@@ -36,6 +36,8 @@ import MaKaC.common.info as info
 
 class RHSignIn( base.RH ):
 
+    _tohttps = True
+
     def _checkParams( self, params ):
         self._signIn = params.get("signIn", "").strip()
         self._login = params.get( "login", "" ).strip()

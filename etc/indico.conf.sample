@@ -29,6 +29,10 @@ DBRealm              = ""
 
 SanitizationLevel    = 2
 
+# AuthenticatedEnforceSecure controls whether HTTPS should be enforced for
+# authentication and while logged in.
+AuthenticatedEnforceSecure = "yes"
+
 
 #------------------------------------------------------------------------------
 # URLs

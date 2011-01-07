@@ -437,6 +437,7 @@ class Config:
             'ApacheGroup'               : 'nogroup',
             'Profile'                   : 'no',
             'UseXSendFile'              : 'no',
+            'AuthenticatedEnforceSecure': 'yes',
 
             # Room Booking Related
             'LightboxCssStylesheetName' : "lightbox/lightbox.css",
@@ -545,6 +546,9 @@ class Config:
 
     def getUseXSendFile(self):
         return self._yesOrNoVariable('UseXSendFile')
+
+    def getAuthenticatedEnforceSecure(self):
+        return self._yesOrNoVariable('AuthenticatedEnforceSecure')
 
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single

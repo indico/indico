@@ -143,7 +143,7 @@ class UHWelcome( URLHandler ):
     _relativeURL = "index.py"
 
 
-class UHSignIn( URLHandler ):
+class UHSignIn( SecureURLHandler ):
     _relativeURL = "signIn.py"
 
     def getURL( cls, returnURL="" ):

@@ -485,6 +485,10 @@ class RH(RequestHandlerBase):
 
                         if self._getUser():
                             Logger.get('requestHandler').debug('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))
+                            if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
+                                self._tohttps = True
+                                if self._checkHttpsRedirect():
+                                    return res
 
                         #if self._getUser() != None and self._getUser().getId() == "893":
                         #    profile = True
@@ -612,12 +616,16 @@ class RH(RequestHandlerBase):
 
 
 
-        #if we have an https request, we replace the links to Indico images by https ones.
-        if self._req.is_https() and self._tohttps and res is not None:
+        #if we have an https request, we replace the links by https ones.
+        if self._req.is_https() and res is not None:
             imagesBaseURL = Config.getInstance().getImagesBaseURL()
             imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
+            baseURL = Config.getInstance().getBaseURL()
+            baseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getBaseSecureURL())
             res = res.replace(imagesBaseURL, imagesBaseSecureURL)
             res = res.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
+            res = res.replace(baseURL, baseSecureURL)
+            res = res.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
 
         # destroy the context
         ContextManager.destroy()
