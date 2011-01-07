@@ -174,8 +174,8 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
         var selector = null;
 
         if (value == '') {
-            return Html.div({});
-
+            return Html.div({style: {textAlign: 'left', fontStyle: 'italic', color: '#881122', marginTop: '10px'}},
+                    $T('Please enter a name for the material type and then select who will be able to access this material type.'));
         } else if (exists(entry)) {
 
             // if the material is already in the tree, protection inheritance must
