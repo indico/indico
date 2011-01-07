@@ -272,7 +272,7 @@ class ProtectedDisplayService(ProtectedService):
         Overloads ProtectedService._checkProtection, assuring that
         the user is authorized to view the target resource
         """
-        if not self._target.canView( self.getAW() ):
+        if not self._target.canAccess( self.getAW() ):
 
             from MaKaC.conference import Link, LocalFile
 
