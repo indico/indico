@@ -1062,9 +1062,8 @@ class RHConfParticipantsAddPending(RHConferenceDisplay):
                 pending.setFax(params.get("fax",""))
             participation = self._conf.getParticipation()
             if participation.alreadyParticipating(pending) != 0:
-                errorList.append("The participant identified by email '%s' is already in the participants' list"
+                errorList.append("There is already a participant with the email address '%s' in this meeting."
                                  % pending.getEmail())
-                errorList.append(_("Please check if you are not already added to the meeting."))
             else:
                 if participation.addPendingParticipant(pending):
                     if participation.getAutoAccept():
