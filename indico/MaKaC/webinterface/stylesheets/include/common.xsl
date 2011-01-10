@@ -156,8 +156,7 @@
 	<span class="{$span}">
 	<xsl:apply-templates select="./name"/>
 	<xsl:if test="./organization != ''">
-		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<xsl:value-of select="./organization" disable-output-escaping="yes"/>)
-	</xsl:if>
+		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<xsl:value-of select="./organization" disable-output-escaping="yes"/>)</xsl:if>
 	</span>
 </xsl:template>
 
@@ -167,8 +166,7 @@
 	<xsl:apply-templates select="./title"/>
 	<xsl:apply-templates select="./name"/>
 	<xsl:if test="./organization != ''">
-		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<xsl:value-of select="./organization" disable-output-escaping="yes"/>)
-	</xsl:if>
+		<xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>(<xsl:value-of select="./organization" disable-output-escaping="yes"/>)</xsl:if>
 	</span>
 </xsl:template>
 
