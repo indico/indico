@@ -574,9 +574,13 @@ type("SaveConfirmPopup", ["ExclusivePopupWithButtons"],
                  self.handler(0);
              });
 
+             window.setTimeout(function() {
+                saveButton.dom.focus();
+             }, 0);
+
              return this.ExclusivePopupWithButtons.prototype.draw.call(this,
                      this.content,
-                     Html.div({}, saveButton, dontSaveButton, cancelButton));
+                     Html.div({align: 'right'}, saveButton, dontSaveButton, cancelButton));
          }
     },
 
