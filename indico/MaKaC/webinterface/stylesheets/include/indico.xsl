@@ -527,9 +527,14 @@
 
   <xsl:template match="convener|speakers">
     <xsl:for-each select="./user|./UnformatedUser">
-      <xsl:apply-templates select=".">
-        <xsl:with-param name="span"/>
-      </xsl:apply-templates>
+      <xsl:if test="name() = 'user'">
+        <xsl:call-template select="." name="fulluser">
+          <xsl:with-param name="span" />
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:if test="name() = 'UnformatedUser'">
+        <xsl:apply-templates select="." />
+      </xsl:if>
       <xsl:if test="count(following-sibling::user) != 0"
         >,<xsl:text disable-output-escaping="yes"> </xsl:text></xsl:if>
     </xsl:for-each>
