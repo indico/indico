@@ -53,6 +53,8 @@ def abstractToPDF( req, **params ):
 def trackProposal( req, **params ):
     return abstractModif.RHAbstractTrackManagment( req ).process( params )
 
+def orderByRating( req, **params ):
+    return abstractModif.RHAbstractTrackOrderByRating( req ).process( params )
 
 def directAccess( req, **params ):
     return abstractModif.RHAbstractDirectAccess( req ).process( params )

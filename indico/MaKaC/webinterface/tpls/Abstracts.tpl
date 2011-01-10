@@ -133,12 +133,12 @@ for (i = 0; i < document.filterOptionForm.acc_type.length; i++)
 
 function selectAllFields()
 {
-
 document.filterOptionForm.showID.checked=true
 document.filterOptionForm.showPrimaryAuthor.checked=true
 document.filterOptionForm.showTracks.checked=true
 document.filterOptionForm.showType.checked=true
 document.filterOptionForm.showStatus.checked=true
+document.filterOptionForm.showRating.checked=true
 document.filterOptionForm.showAccTrack.checked=true
 document.filterOptionForm.showAccType.checked=true
 document.filterOptionForm.showSubmissionDate.checked=true
@@ -151,6 +151,7 @@ document.filterOptionForm.showPrimaryAuthor.checked=false
 document.filterOptionForm.showTracks.checked=false
 document.filterOptionForm.showType.checked=false
 document.filterOptionForm.showStatus.checked=false
+document.filterOptionForm.showRating.checked=false
 document.filterOptionForm.showAccTrack.checked=false
 document.filterOptionForm.showAccType.checked=false
 document.filterOptionForm.showSubmissionDate.checked=false
@@ -167,7 +168,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
         </td>
     </tr>
     <tr>
-       <td nowrap colspan="10">
+       <td nowrap colspan="11">
             <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> <%= filteredNumberAbstracts %> </strong>
             <% if filteredNumberAbstracts == "1": %>
                 <%= _("abstract")%>
@@ -198,7 +199,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
         </td>
     </tr>
     <tr>
-        <td colspan="10" align="left" width="100%">
+        <td colspan="11" align="left" width="100%">
           <form action=<%= filterPostURL %> method="post" name="filterOptionForm">
             <input type="hidden" name="operationType" value="filter" />
             <%= filterMenu %>
@@ -207,7 +208,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
         </td>
     </tr>
     <tr>
-        <td colspan="10" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
+        <td colspan="11" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
             <table>
                 <form action=<%= abstractSelectionAction %> method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
                 <tr>
@@ -233,7 +234,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
         </tbody>
     </td></tr>
     <tr>
-        <td colspan="10" style="border-top: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
+        <td colspan="11" style="border-top: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
             <table>
                 <tr>
                     <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="<%= _("Add new")%>"></td>
@@ -354,4 +355,45 @@ document.filterOptionForm.showSubmissionDate.checked=false
             $E("filterMenu").dom.style.display = "";
         }
     }
+</script>
+<script>
+function showQuestionDetails(questions, answers) {
+	// Create the table and the headers
+    var content = Html.div();
+    var table = Html.table({className:'infoQuestionsTable', cellspacing:'0'});
+    content.append(table);
+    var trHeaders = Html.tr();
+    table.append(trHeaders);
+    var tdQuestion = Html.td({className:'dataHeader'},'Question');
+    var tdValues = Html.td({className:'dataHeader'},'Average');
+    trHeaders.append(tdQuestion);
+    trHeaders.append(tdValues);
+
+    // Create the table with the required data
+    var tr;
+    var tdQ; // the question
+    var tdA; // the answer
+    for (var i=0; i < questions.length ; i++) {
+        tr = Html.tr({className: 'infoTR'});
+        tdQ = Html.td({className: 'content'}, questions[i]);
+        tdA = Html.td({className: 'content'}, answers[i]);
+        table.append(tr);
+        tr.append(tdQ);
+        tr.append(tdA);
+    }
+
+    // Create the last row with the average
+    //var trFooter = Html.tr();
+    //var tdAverage = Html.td();
+    //var tdValue = Html.td();
+    //tdAverage = Html.td({className:'dataFooter'}, 'Total abstract');
+    //tdValue = Html.td({className:'dataFooter'}, average);
+    //table.append(trFooter);
+    //trFooter.append(tdAverage);
+    //trFooter.append(tdValue);
+
+
+    popup = new AlertPopup('Average per question',content);
+    popup.open();
+}
 </script>

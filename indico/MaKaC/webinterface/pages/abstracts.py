@@ -31,6 +31,8 @@ from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
+from MaKaC.common import Configuration
+
 
 class WConfCFADeactivated(wcomponents.WTemplated):
 
@@ -726,6 +728,13 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
             urlHandlers.UHAbstractModNotifLog.getURL( self._abstract))
         self._tabTools=self._tabCtrl.newTab("tools", _("Tools"),\
             urlHandlers.UHAbstractModTools.getURL( self._abstract))
+
+        # Sub tabs for the track judgements
+        self._subTabTrack = self._tabTracks.newSubTab( "byTrack", "Judgement details",\
+                urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract))
+        self._subTabRating = self._tabTracks.newSubTab( "byRating", "Rating per question",\
+                urlHandlers.UHAbstractTrackOrderByRating.getURL(self._abstract))
+
         self._setActiveTab()
 
     def _getPageContent( self, params ):
@@ -1462,10 +1471,12 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
 
         tzUtil = DisplayTZ(self._aw,self._conf)
         tz = tzUtil.getDisplayTZ()
+        judgements = False # this var shows if there is any judgement to show in the table
 
         for track in self._abstract.getTrackListSorted():
             firstJudg=True
             for status in self._abstract.getJudgementsHistoricalByTrack(track):
+                judgements = True
                 if status.__class__ == review.AbstractAcceptance:
                     contribType = ""
                     if status.getContribType() is not None:
@@ -1515,17 +1526,35 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                     firstJudg=False
                 else:
                     trackTitle="&nbsp;"
+                if status.getJudValue() == None:
+                    # There were no questions when the abstract was judgement, the value 0 is wrong for this case
+                    # because it is possible to have answered questions and a final value of 0.
+                    rating = "-"
+                    detailsImg = ""
+                else:
+                    # Get the list of questions and the answers values
+                    questions = status.getAnswersAverage().keys()
+                    answers = status.getAnswersAverage().values()
+                    rating = status.getJudValue()
+                    total = status.getTotalJudValue()
+                    imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
+                    detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s,%s,%s)" style="cursor: pointer;">"""% (imgIcon, questions, answers, rating, total)
+
                 tracks += "<tr bgcolor=\"%s\">"%color
                 tracks += "<td nowrap class=\"blacktext\" style=\"padding-right:10px;background-color:white\"><b>&nbsp;%s</b></td>"%(trackTitle)
                 tracks += "<td nowrap class=\"blacktext\" style=\"padding-right:10px\">&nbsp;%s</td>"%st
                 tracks += "<td nowrap class=\"blacktext\" style=\"padding-right:10px\">&nbsp;%s</td>"%modifier
                 tracks += "<td nowrap class=\"blacktext\" style=\"padding-right:10px\"><font size=\"-2\">&nbsp;%s</font></td>"%modifDate
+                tracks += "<td nowrap class=\"blacktext\" style=\"padding-right:10px\">&nbsp;%s&nbsp;%s</td>"%(rating, detailsImg)
                 tracks += """<td class=\"blacktext\">&nbsp;%s</td>"""%comments
                 tracks += "</tr>"
+
             if self._abstract.getJudgementsHistoricalByTrack(track) != []:
-               tracks+="""
+                tracks+="""
                         <tr><td>&nbsp;</td></tr>
                         """
+        vars["ratingAverage"] = self._abstract.getRating()
+        vars["judgements"] = judgements
         vars["tracks"] = tracks
         return vars
 
@@ -1534,9 +1563,37 @@ class WPAbstractTrackManagment(WPAbstractManagementBase):
 
     def _setActiveTab( self ):
         self._tabTracks.setActive()
+        self._subTabTrack.setActive()
 
     def _getTabContent( self, params ):
         wc = WAbstractTrackManagment( self._getAW(), self._target )
+        return wc.getHTML( params )
+
+
+class WAbstractTrackOrderByRating(wcomponents.WTemplated):
+
+    def __init__( self, aw, abstract ):
+        self._abstract = abstract
+        #self._aw = aw
+        #self._conf = abstract.getOwner().getOwner()
+
+    def getVars( self ):
+        questions = self._abstract.getQuestionsAverage()
+        vars = wcomponents.WTemplated.getVars( self )
+
+        vars["questions"] = questions
+        vars["ratingAverage"] = self._abstract.getRating()
+        return vars
+
+
+class WPAbstractTrackOrderByRating(WPAbstractManagementBase):
+
+    def _setActiveTab( self ):
+        self._tabTracks.setActive()
+        self._subTabRating.setActive()
+
+    def _getTabContent( self, params ):
+        wc = WAbstractTrackOrderByRating( self._getAW(), self._target )
         return wc.getHTML( params )
 
 

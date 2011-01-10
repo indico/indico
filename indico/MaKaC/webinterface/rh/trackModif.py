@@ -428,7 +428,10 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
             c = 0
             for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer)) - ConferenceAbstractReview.valueDiference
+                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+            self._scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
+            self._scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
+            self._numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
@@ -438,7 +441,7 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
             self._redirect( url )
         elif self._action == "GO":
             r = self._getUser()
-            self._abstract.proposeToAccept( r, self._track, self._contribType, self._comment, self._answers )
+            self._abstract.proposeToAccept( r, self._track, self._contribType, self._comment, self._answers, self._scaleLower, self._scaleHigher, self._numberOfAnswers )
             self._redirect( url )
         else:
             p=tracks.WPTrackAbstractPropToAcc(self,self._track,self._abstract)
@@ -459,7 +462,10 @@ class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
             c = 0
             for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer)) - ConferenceAbstractReview.valueDiference
+                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+            self._scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
+            self._scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
+            self._numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
         elif params.has_key("CANCEL"):
             self._action = "CANCEL"
 
@@ -469,7 +475,7 @@ class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
             self._redirect( url )
         elif self._action == "GO":
             r = self._getUser()
-            self._abstract.proposeToReject( r, self._track, self._comment , self._answers)
+            self._abstract.proposeToReject( r, self._track, self._comment , self._answers, self._scaleLower, self._scaleHigher, self._numberOfAnswers)
             self._redirect( url )
         else:
             p = tracks.WPTrackAbstractPropToRej( self, self._track, self._abstract )

@@ -1115,6 +1115,12 @@ class AbstractMgr(Persistent):
     def setSubmissionNotification(self, sn):
         self._submissionNotification=sn
 
+    def recalculateAbstractsRating(self, scaleLower, scaleHigher):
+        ''' recalculate the values of the rating for all the abstracts in the conference '''
+        for abs in self.getAbstractList():
+            abs.recalculateRating(scaleLower, scaleHigher)
+
+
     def notifyModification(self):
         self._p_changed=1
 
@@ -1253,6 +1259,7 @@ class Abstract(Persistent):
         self._submitter=None
         self._setSubmitter( submitter )
         #self._abstractReview = AbstractReview(self)
+        self._rating = 0
 
     def clone(self, conference, abstractId):
 
@@ -1984,7 +1991,18 @@ class Abstract(Persistent):
             t = self._trackReallocations.values()[0].getTrack()
             self._removeTrackReallocation(t)
 
-    def proposeToAccept( self, responsible, track, contribType, comment="", answers={} ):
+    def _removePreviousJud(self, responsible, track):
+        ''' Check if there is a previous judgement and remove it '''
+        toDelete = [] # list of judgements to delete
+        for jud in self.getJudgementsHistoricalByTrack(track):
+            if jud.getResponsible() == responsible:
+                toDelete.append(jud)
+
+        for x in toDelete:
+            self.getTrackJudgementsHistorical()[track.getId()].remove(x)
+
+
+    def proposeToAccept( self, responsible, track, contribType, comment="", answers={}, scaleLower=0, scaleHigher=100, numberOfAnswers=5 ):
         """
         """
         # the proposal has to be done for a track
@@ -1994,14 +2012,16 @@ class Abstract(Persistent):
         #   is in the current abstract
         if not self.isProposedForTrack( track ):
             raise MaKaCError( _("Cannot propose to accept an abstract which is not proposed for the specified track"))
-        #We keep the track judgement
-        jud = AbstractAcceptance( track, responsible, contribType, answers )
+        # check if there is a previous judgement of this author in for this abstract in this track
+        self._removePreviousJud(responsible, track)
+        # Create the new judgement
+        jud = AbstractAcceptance( track, responsible, contribType, answers, scaleLower, scaleHigher, numberOfAnswers )
         jud.setComment( comment )
         self._addTrackAcceptance( jud )
         #We trigger the state transition
         self.getCurrentStatus().proposeToAccept()
 
-    def proposeToReject( self, responsible, track, comment="", answers={} ):
+    def proposeToReject( self, responsible, track, comment="", answers={}, scaleLower=0, scaleHigher=100, numberOfAnswers=5 ):
         """
         """
         # the proposal has to be done for a track
@@ -2011,8 +2031,10 @@ class Abstract(Persistent):
         #   is in the current abstract
         if not self.isProposedForTrack( track ):
             raise MaKaCError( _("Cannot propose to reject an abstract which is not proposed for the specified track"))
-        #We keep the track judgement
-        jud = AbstractRejection( track, responsible, answers )
+        # check if there is a previous judgement of this author in for this abstract in this track
+        self._removePreviousJud(responsible, track)
+        # Create the new judgement
+        jud = AbstractRejection( track, responsible, answers, scaleLower, scaleHigher, numberOfAnswers )
         jud.setComment( comment )
         self._addTrackRejection( jud )
         #We trigger the state transition
@@ -2296,10 +2318,68 @@ class Abstract(Persistent):
             self._notifLog=NotificationLog(self)
         return self._notifLog
 
-    def getAbstractReview(self):
-        if not hasattr(self, "_abstractReview"):
-            self._abstractReview = AbstractReview(self)
-        return self._abstractReview
+    #def getAbstractReview(self):
+    #    if not hasattr(self, "_abstractReview"):
+    #        self._abstractReview = AbstractReview(self)
+    #    return self._abstractReview
+
+    def getRating(self):
+        '''Get the average rating of the abstract which is calculated with the average of each judgement '''
+        self._rating = None
+        # calculate the total valoration
+        judNum = 0
+        ratingSum = 0
+        for track in self.getTrackListSorted():
+            for jud in self.getJudgementsHistoricalByTrack(track):
+                if jud.getJudValue() != None: # it means there is a numeric value for the judgement
+                    ratingSum += jud.getJudValue()
+                    judNum += 1
+
+        # Calculate the average
+        if judNum != 0:
+            self._rating = "%.2f" % (ratingSum/judNum)
+
+        return self._rating
+
+    def getQuestionsAverage(self):
+        '''Get the list of questions answered in the reviews for an abstract '''
+        dTotals = {} # {q1: total_value, q2: total_value ...}
+        dTimes = {} # {q1: times_answered, q2: times_answered}
+        for track in self.getTrackListSorted():
+            for jud in self.getJudgementsHistoricalByTrack(track):
+                for question, value in jud.getAnswersAverage().iteritems():
+                    # check if the question is in d and sum the answers value or insert in d the new question
+                    if dTotals.has_key(question):
+                        dTotals[question] += float(value)
+                        dTimes[question] += 1
+                    else: # first time
+                        dTotals[question] = float(value)
+                        dTimes[question] = 1
+        # get the questions average
+        questionsAverage = {}
+        for q, v in dTotals.iteritems():
+            # insert the element and calculate the average for the value
+            questionsAverage[q] = "%.2f" % (v/dTimes[q])
+        return questionsAverage
+
+    def recalculateRating(self, scaleLower, scaleHigher):
+        ''' Recalculate the values of each judgement with the new scales value '''
+        self._rating = None
+        # calculate the total valoration
+        judNum = 0
+        ratingSum = 0
+        for track in self.getTrackListSorted():
+            for jud in self.getJudgementsHistoricalByTrack(track):
+                # calculate the new values for each judgement
+                jud.recalculateJudgementValues(scaleLower, scaleHigher)
+                if jud.getJudValue() != None: # it means there is a numeric value for the judgement
+                    ratingSum += jud.getJudValue()
+                    judNum += 1
+        # Calculate the average
+        if judNum != 0:
+            self._rating = "%.2f" % (ratingSum/judNum)
+
+
 
 class AbstractJudgement( Persistent ):
     """This class represents each of the judgements made by a track about a
@@ -2311,13 +2391,21 @@ class AbstractJudgement( Persistent ):
       Together with the judgement some useful information like the date when
         it was done and the user who did it will be kept.
     """
+    #ratingUpLimit = 100
 
-    def __init__( self, track, responsible, answers ):
+    def __init__( self, track, responsible, answers, scaleLower, scaleHigher, numberOfAnswers ):
         self._track = track
         self._setResponsible( responsible )
         self._date = nowutc()
         self._comment = ""
         self._answers = answers
+        self._scaleLower = scaleLower
+        self._scaleHigher = scaleHigher
+        self._numberOfAnswers = numberOfAnswers
+        self._answersAverage = self.calculateAnswersAverage() # ex. {q1: 0-100, q2: 0-100}
+        self._judValue = self.calculateJudgementAverage() # judgement average value
+        self._totalJudValue = self.calculateAnswersTotalValue()
+
 
     def _setResponsible( self, newRes ):
         self._responsible = newRes
@@ -2341,17 +2429,125 @@ class AbstractJudgement( Persistent ):
         return self._comment
 
     def getAnswers(self):
+        try:
+            if self._answers:
+                pass
+        except AttributeError:
+            self._answers = {}
         return self._answers
+
+    def calculateJudgementAverage(self):
+        '''Calculate the average value of the given answers'''
+        result = 0
+        if (len(self._answersAverage.values()) != 0):
+            # convert the dictionary values into float types
+            floatList = []
+            for i in self._answersAverage.values():
+                floatList.append(float(i))
+            result = "%.2f" % (sum(floatList) / float(len(floatList))) # calculate the average 0-100
+        else:
+            # there are no questions
+            result = None
+        return result
+
+    def getJudValue(self):
+        try:
+            if self._judValue:
+                self._judValue = float(self._judValue)
+        except AttributeError:
+                self._judValue = None
+        return self._judValue
+
+    def getTotalJudValue(self):
+        try:
+            if self._totalJudValue:
+                self._totalJudValue = float(self._totalJudValue)
+        except AttributeError:
+                self._totalJudValue = None
+        return self._totalJudValue
+
+    def calculateAnswersTotalValue(self):
+        ''' Calculate the sum of all the ratings '''
+        result = 0
+        if len(self._answers) != 0:
+            for ans in self._answers:
+                result += ((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*self._answers[ans] + self.getScaleLower()
+        return "%.2f" % result
+
+    def calculateAnswersAverage(self):
+        ''' Create a dictionary with the values from -lower limit scale- to -higher limit scale- of the answers given '''
+        d = {}
+        if len(self._answers) != 0:
+            for ans in self._answers:
+                d[ans] = "%.2f" % (((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*self._answers[ans] + self.getScaleLower())
+        return d
+
+    def getAnswersAverage(self):
+        try:
+            if self._answersAverage:
+                pass
+        except AttributeError:
+                self._answersAverage = None
+        return self._answersAverage
+
+    def setScaleLower(self, value):
+        ''' Set a new value for the scale lower limit '''
+        self._scaleLower = value
+
+    def setScaleHigher(self, value):
+        ''' Set a new value for the scale higher limit '''
+        self._scaleHigher = value
+
+    def setAnswersAverage(self):
+        ''' Update the answers value '''
+        self._answersAverage = self.calculateAnswersAverage() # ex. {q1: 0-100, q2: 0-100}
+
+    def setJudValue(self):
+        ''' Update the judgement value '''
+        self._judValue = self.calculateJudgementAverage() # judgement average value
+
+    def recalculateJudgementValues(self, scaleLower, scaleHigher):
+        ''' Update the values of the judgement. This function is called when the scale is changed.'''
+        self.setScaleLower(scaleLower)
+        self.setScaleHigher(scaleHigher)
+        self.setAnswersAverage()
+        self.setJudValue()
+
+    def getScaleLower(self):
+        try:
+            if self._scaleLower:
+                pass
+        except AttributeError:
+                self._scaleLower = 0
+        return self._scaleLower
+
+    def getScaleHigher(self):
+        try:
+            if self._scaleHigher:
+                pass
+        except AttributeError:
+                self._scaleHigher = 100
+        return self._scaleHigher
+
+    def getNumberOfAnswers(self):
+        try:
+            if self._numberOfAnswers:
+                pass
+        except AttributeError:
+                self._numberOfAnswers = 5
+        return self._numberOfAnswers
+
 
 
 class AbstractAcceptance( AbstractJudgement ):
 
-    def __init__( self, track, responsible, contribType, answers ):
-        AbstractJudgement.__init__( self, track, responsible, answers )
+    def __init__( self, track, responsible, contribType, answers, scaleLower, scaleHigher, numberOfAnswers ):
+        AbstractJudgement.__init__( self, track, responsible, answers, scaleLower, scaleHigher, numberOfAnswers )
         self._contribType = contribType
 
     def clone(self,track):
-        aa = AbstractAcceptance(track,self.getResponsible(), self.getContribType())
+        aa = AbstractAcceptance(track,self.getResponsible(), self.getContribType(), self.getAnswers(), self.getScaleLower(),
+                                self.getScaleHigher(), self.getNumberOfAnswers())
         return aa
 
     def getContribType( self ):
@@ -2366,7 +2562,8 @@ class AbstractAcceptance( AbstractJudgement ):
 class AbstractRejection( AbstractJudgement ):
 
     def clone(self, track):
-        arj = AbstractRejection(track,self.getResponsible())
+        arj = AbstractRejection(track,self.getResponsible(), self.getAnswers(), self.getScaleLower(),
+                                self.getScaleHigher(), self.getNumberOfAnswers())
         return arj
 
 class AbstractReallocation( AbstractJudgement ):

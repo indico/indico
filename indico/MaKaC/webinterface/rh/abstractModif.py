@@ -465,7 +465,10 @@ class RHPropToAcc(RHAbstractModifBase):
             c = 0
             for i in conf.getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer)) - ConferenceAbstractReview.valueDiference
+                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+            self._scaleLower = conf.getConfAbstractReview().getScaleLower()
+            self._scaleHigher = conf.getConfAbstractReview().getScaleHigher()
+            self._numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
@@ -473,7 +476,7 @@ class RHPropToAcc(RHAbstractModifBase):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
         if self._action=="GO":
             self._abstract.proposeToAccept(self._getUser(),\
-                self._track,self._contribType,self._comment, self._answers)
+                self._track,self._contribType,self._comment, self._answers, self._scaleLower, self._scaleHigher, self._numberOfAnswers)
             self._redirect(url)
         elif self._action=="CANCEL":
             self._redirect(url)
@@ -508,7 +511,10 @@ class RHPropToRej(RHAbstractModifBase):
             c = 0
             for i in conf.getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer)) - ConferenceAbstractReview.valueDiference
+                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+            self._scaleLower = conf.getConfAbstractReview().getScaleLower()
+            self._scaleHigher = conf.getConfAbstractReview().getScaleHigher()
+            self._numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
@@ -516,7 +522,7 @@ class RHPropToRej(RHAbstractModifBase):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
         if self._action=="GO":
             self._abstract.proposeToReject(self._getUser(),\
-                self._track,self._comment, self._answers)
+                self._track,self._comment, self._answers, self._scaleLower, self._scaleHigher, self._numberOfAnswers)
             self._redirect(url)
         elif self._action=="CANCEL":
             self._redirect(url)
@@ -588,6 +594,12 @@ class RHAbstractTrackManagment(RHAbstractModifBase):
 
     def _process( self ):
         p = abstracts.WPAbstractTrackManagment( self, self._target )
+        return p.display( **self._getRequestParams() )
+
+class RHAbstractTrackOrderByRating(RHAbstractModifBase):
+
+    def _process( self ):
+        p = abstracts.WPAbstractTrackOrderByRating( self, self._target )
         return p.display( **self._getRequestParams() )
 
 

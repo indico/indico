@@ -70,6 +70,7 @@ from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import OldObservable
+from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
 
 def stringToDate( str ):
@@ -5717,7 +5718,6 @@ class WFilterCriteriaAbstracts(wcomponents.WFilterCriteria):
         wcomponents.WFilterCriteria.__init__(self, options, filterCrit, extraInfo)
 
     def _drawFieldOptions(self, id, data):
-
         page = WFilterCriterionOptionsAbstracts(id, data)
 
         # TODO: remove when we have a better template system
@@ -5822,6 +5822,11 @@ class WAbstracts( wcomponents.WTemplated ):
             l.append( """<input type="checkbox" name="status" value=%s%s>%s (%s) %s"""%(quoteattr(statusId),checked,imgHTML,self.htmlText(statusCode),self.htmlText(statusCaption)))
         return l
 
+    def _getRatingFilterItemList(self):
+        l = []
+        return l
+
+
     def _getOthersFilterItemList( self ):
         checkedShowMultiple, checkedShowComments = "", ""
         track_field=self._filterCrit.getField("track")
@@ -5840,11 +5845,12 @@ class WAbstracts( wcomponents.WTemplated ):
                             "Tracks": [ _("Tracks"), "checked"],
                             "Type": [ _("Type"), "checked"],
                             "Status": [ _("Status"), "checked"],
+                            "Rating": [ _("Rating"), "checked"],
                             "AccTrack": [ _("Acc. Track"), "checked"],
                             "AccType": [ _("Acc. Type"), "checked"],
                             "SubmissionDate": [ _("Submission Date"), "checked"]}
         l = []
-        for key in ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "AccTrack", "AccType", "SubmissionDate"]:
+        for key in ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate"]:
             l.append("""<input type="checkbox" name="show%s" %s value="checked">%s"""%(key, self._fields[key][1], self._fields[key][0]))
         return l
 
@@ -5862,6 +5868,8 @@ class WAbstracts( wcomponents.WTemplated ):
             l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(typeSortingURL)s> _("Type")</a> %(typeImg)s</td>"""))
         if self._fields["Status"][1] == "checked":
             l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(statusSortingURL)s> _("Status")</a><b> %(statusImg)s</td>"""))
+        if self._fields["Rating"][1] == "checked":
+            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(ratingSortingURL)s> _("Rating")</a><b> %(ratingImg)s</td>"""))
         if self._fields["AccTrack"][1] == "checked":
             l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Track")</td>"""))
         if self._fields["AccType"][1] == "checked":
@@ -5955,6 +5963,20 @@ class WAbstracts( wcomponents.WTemplated ):
                 url.addParam("order","down")
         vars["statusSortingURL"] = quoteattr( str( url ) )
 
+        # sort by rating
+        url = self._getURL()
+        url.addParam("sortBy", "rating")
+        vars["ratingImg"] = ""
+        if sortingField and sortingField.getId() == "rating":
+            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="rating">"""
+            if self._order == "down":
+                vars["ratingImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order","up")
+            elif self._order == "up":
+                vars["ratingImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order","down")
+        vars["ratingSortingURL"] = quoteattr( str( url ) )
+
         url=self._getURL()
         url.addParam("sortBy","number")
         vars["numberImg"]=""
@@ -5991,6 +6013,20 @@ class WAbstracts( wcomponents.WTemplated ):
                 comments = _(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
             accTrack,accType="&nbsp;","&nbsp;"
             urlGen=urlHandlers.UHCFAAbstractManagment.getURL
+
+            # check if the abstract has a review with questions
+            if abstract.getRating() == None:
+                rating = "-"
+                detailsImg = ""
+            else:
+                # Get the list of questions and the answers values
+                questions = abstract.getQuestionsAverage().keys()
+                answers = abstract.getQuestionsAverage().values()
+                rating = abstract.getRating()
+                imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
+                detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questions, answers)
+
+
             m = ["""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('abstracts%s')" type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId(), abstract.getId())]
             if self._fields["ID"][1] == "checked":
                 m.append("""<td class="CRLabstractLeftDataCell" nowrap>%s%s</td>"""%(abstract.getId(), comments))
@@ -6015,6 +6051,8 @@ class WAbstracts( wcomponents.WTemplated ):
                 statusIconURL=AbstractStatusList.getInstance().getIconURL(s.__class__)
                 statusIconHTML = """<img src=%s border="0" alt="">"""%quoteattr(str(statusIconURL))
                 m.append("""<td class="CRLabstractDataCell" nowrap>%s %s</td>"""%(statusIconHTML,status))
+            if self._fields["Rating"][1] == "checked":
+                m.append("""<td class="CRLabstractDataCell">%s&nbsp;%s</td>"""%(rating,detailsImg))
             if self._fields["AccTrack"][1] == "checked":
                 if isinstance(s,review.AbstractStatusAccepted):
                     if s.getTrack() is not None:

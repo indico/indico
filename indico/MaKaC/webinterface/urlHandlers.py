@@ -841,6 +841,9 @@ class UHAbstractManagmentChangeTrack( URLHandler ):
 class UHAbstractTrackProposalManagment( URLHandler ):
     _relativeURL = "abstractManagment.py/trackProposal"
 
+class UHAbstractTrackOrderByRating( URLHandler ):
+    _relativeURL = "abstractManagment.py/orderByRating"
+
 
 class UHCFAAbstractDeletion( URLHandler ):
     _relativeURL = "abstractManagment.py/deleteAbstract"

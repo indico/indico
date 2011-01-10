@@ -1,5 +1,5 @@
 <form action="<%= postURL %>" method="POST">
-    <table align="center" width="50%" border="0" style="border-left: 1px solid #777777">
+    <table align="left" width="50%" border="0" cellspacing="6" cellpadding="2" style="padding-left:15px;">
 		<tr>
 			<td class="groupTitle" colspan="2"> <%= _("Propose to be accepted")%></td>
         </tr>
@@ -12,11 +12,6 @@
 			</td>
 		</tr>
 		<%= contribTypes %>
-        <tr>
-            <td colspan="5" class="groupTitle" style="border: none"><%= _("Questions for abstract review")%>
-                <% inlineContextHelp(_('Here is displayed the judgement given by the Abstract Reviewers.')) %>
-            </td>
-        </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
             <td width="60%%" id="questionListDisplay">
@@ -53,23 +48,36 @@ var showQuestions = function() {
     <% else: %>
         $E("questionListDisplay").set('');
         <% for q in abstractReview.getReviewingQuestions(): %>
-            var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
+            var newDiv = Html.div({style:{marginLeft:'10px'}});
 
             newDiv.append(Html.span(null,"<%=q%>"));
             newDiv.append(Html.br());
 
             newDiv.append(new IndicoUI.Widgets.Generic.radioButtonSimpleField(
                                                     null,
-                                                    'horizontal2',
-                                                    <%= str(range(len(abstractReview.reviewingQuestionsAnswers))) %>,
-                                                    <%= str(abstractReview.reviewingQuestionsLabels) %>,
-                                                    <%= str(abstractReview.initialSelectedAnswer) %>));
+                                                    <%= str(range(abstractReview.getNumberOfAnswers())) %>,
+                                                    <%= str(abstractReview.getRadioButtonsLabels()) %>));
 
             $E("questionListDisplay").append(newDiv);
             $E("questionListDisplay").append(Html.br());
 
         <% end %>
     <% end %>
+
+    var numQuestions = <%= len(abstractReview.getReviewingQuestions()) %>;
+    var numAnswers = <%= abstractReview.getNumberOfAnswers() %>;
+    var rbValues = <%= str(abstractReview.getRadioButtonsTitles()) %>;
+    var groupName = "_GID" // The common name for all the radio buttons
+
+    for (var i=1; i<numQuestions+1; i++) {
+        for (var j=0; j<numAnswers; j++) {
+            $E(groupName+i + "_" + j).dom.onmouseover = function(event) {
+                var value = rbValues[this.defaultValue];
+                IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>"+value+"</span>");
+            };
+        }
+    }
+
 }
 
 showQuestions();

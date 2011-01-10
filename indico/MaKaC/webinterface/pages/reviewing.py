@@ -59,6 +59,23 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
+        if self._isAM or self._canModify:
+            self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
+                urlHandlers.UHConfModifReviewingAbstractSetup.getURL( target = self._conf ) )
+
+        if self._isAM or self._canModify:
+            self._tabAbstractReviewingSetup = self._subtabAbstractsReviewing.newSubTab( "revsetup", "Setup",\
+                    urlHandlers.UHConfModifReviewingAbstractSetup.getURL(target = self._conf) )
+            self._tabAbstractNotifTpl = self._subtabAbstractsReviewing.newSubTab( "notiftpl", "Notification templates",\
+                    urlHandlers.UHAbstractReviewingNotifTpl.getURL(target = self._conf) )
+            # The following tabs are not used yet
+            #self._tabAbstractsReviewingControl = self._subtabAbstractsReviewing.newSubTab( "abscontrol", "Team",\
+            #        urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._conf ) )
+            #self._tabUserCompetencesAbstracts = self._subtabAbstractsReviewing.newSubTab( "abscompetences", "Competences",\
+            #        urlHandlers.UHConfModifUserCompetencesAbstracts.getURL( self._conf ) )
+            self._tabAbstractList = self._subtabAbstractsReviewing.newSubTab( "abstractList", "List of Abstracts",\
+                    urlHandlers.UHConfAbstractList.getURL( self._conf ) )
+
         if self._isPRM or self._canModify:
             self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
                 urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
@@ -79,22 +96,6 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
                     urlHandlers.UHConfModifReviewingControl.getURL( self._conf ) )
             self._tabUserCompetencesReviewing = self._subtabPaperReviewing.newSubTab( "revcompetences", "Competences",\
                     urlHandlers.UHConfModifUserCompetences.getURL( self._conf ) )
-
-        if self._isAM or self._canModify:
-            self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
-                urlHandlers.UHConfModifReviewingAbstractSetup.getURL( target = self._conf ) )
-
-        if self._isAM or self._canModify:
-            self._tabAbstractReviewingSetup = self._subtabAbstractsReviewing.newSubTab( "revsetup", "Setup",\
-                    urlHandlers.UHConfModifReviewingAbstractSetup.getURL(target = self._conf) )
-            self._tabAbstractNotifTpl = self._subtabAbstractsReviewing.newSubTab( "notiftpl", "Notification templates",\
-                    urlHandlers.UHAbstractReviewingNotifTpl.getURL(target = self._conf) )
-            self._tabAbstractsReviewingControl = self._subtabAbstractsReviewing.newSubTab( "abscontrol", "Team",\
-                    urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._conf ) )
-            self._tabUserCompetencesAbstracts = self._subtabAbstractsReviewing.newSubTab( "abscompetences", "Competences",\
-                    urlHandlers.UHConfModifUserCompetencesAbstracts.getURL( self._conf ) )
-            self._tabAbstractList = self._subtabAbstractsReviewing.newSubTab( "abstractList", "List of Abstracts",\
-                    urlHandlers.UHConfAbstractList.getURL( self._conf ) )
 
 
         if self._showAssignContributions:
@@ -137,6 +138,7 @@ class WPConfModifReviewingPaperSetup(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, target)
 
     def _setActiveTab( self ):
+        self._subtabPaperReviewing.setActive()
         self._subTabPaperReviewingSetup.setActive()
 
     def _getTabContent( self, params ):
@@ -382,6 +384,7 @@ class WPConfModifReviewingControl(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, target)
 
     def _setActiveTab( self ):
+        self._subtabPaperReviewing.setActive()
         self._tabPaperReviewingControl.setActive()
 
     def _getTabContent( self, params ):
@@ -1292,6 +1295,7 @@ class WPConfReviewingAssignContributions(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, conference)
 
     def _setActiveTab( self ):
+        self._subtabPaperReviewing.setActive()
         self._tabAssignContributions.setActive()
 
     def _getTabContent( self, params ):
@@ -1327,6 +1331,7 @@ class WPConfModifUserCompetences(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, conference)
 
     def _setActiveTab( self ):
+        self._subtabPaperReviewing.setActive()
         self._tabUserCompetencesReviewing.setActive()
 
     def _getTabContent( self, params ):

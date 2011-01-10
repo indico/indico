@@ -1077,9 +1077,9 @@ class ConferenceAbstractReview(Persistent):
     This class manages the parameters of the abstract reviewing.
     """
     reviewingQuestionsAnswers = ["Strongly Disagree", "Disagree", "Weakly Disagree", "Borderline", "Weakly Agree", "Agree", "Strongly Agree"]
-    reviewingQuestionsLabels = ["-3", "", "", "0", "", "", "+3"]
+    reviewingQuestionsLabels = ["0", "", "", "50", "", "", "100"]
     initialSelectedAnswer = 3
-    valueDiference = 3 # diference between the label and the value of the radio button (label=0, value=3)
+    #valueDiference = 3 # diference between the label and the value of the radio button (label=0, value=3)
 
     def __init__( self, conference):
         """ Constructor.
@@ -1094,29 +1094,21 @@ class ConferenceAbstractReview(Persistent):
 
         self._reviewerAbstract = {} #key: user, value: list of abstracts where user is abstract reviewer
 
-        #default dates
+        #default dates NOT USED YET
         self._defaultAbstractReviewerDueDate = None
 
         self._reviewingQuestions = [] #list of content reviewing and final judgement questions
+        # by default
+        self._numberOfAnswers = 5
+        self._scaleLower = 0
+        self._scaleHigher = 100
+        self._radioButtonsLabels = ["0", "", "50", "", "100"]
+        self._radioButtonsTitles = ["0", "25", "50", "75", "100"]
 
     def getConference(self):
         """ Returns the parent conference of the ConferencePaperReview object
         """
         return self._conference
-
-    def setDefaultAbstractReviewerDueDate(self, date):
-        self._defaultAbstractReviewerDueDate = date
-
-    def getDefaultAbstractReviewerDueDate(self):
-        if not hasattr(self, '_defaultAbstractReviewerDueDate'):
-            self._defaultAbstractReviewerDueDate = None
-        return self._defaultAbstractReviewerDueDate
-
-    def getAdjustedDefaultAbstractReviewerDueDate(self):
-        if self.getDefaultAbstractReviewerDueDate() is None:
-            return None
-        else:
-            return getAdjustedDate(self._defaultAbstractReviewerDueDate, self.getConference())
 
     # content reviewing and final judgement questions methods
     def addReviewingQuestion(self, reviewingQuestion):
@@ -1144,8 +1136,124 @@ class ConferenceAbstractReview(Persistent):
         else:
             raise MaKaCError("Cannot remove a question which doesn't exist")
 
-    #abstract manager methods
+    def setNumberOfAnswers(self, num):
+        """ Set the number of possible answers (radio buttons) """
+        self._numberOfAnswers = num
+
+    def getNumberOfAnswers(self):
+        """ Returns the number of possible answers """
+        try :
+            if self._numberOfAnswers:
+                pass
+        except AttributeError :
+            self._numberOfAnswers = 5
+        return self._numberOfAnswers
+
+    def setRadioButtonsLabels(self):
+        """ Set the labels for the radio buttons """
+        self._radioButtonsLabels = []
+        i = 0
+        while i<self.getNumberOfAnswers():
+            if i == 0: # first label
+                self._radioButtonsLabels.append(str(self.getScaleLower()))
+            elif i == self._numberOfAnswers - 1: # last label
+                self._radioButtonsLabels.append(str(self.getScaleHigher()))
+            # middle label: exist middle radio button, i has the correct value, exist middle value in the scale
+            elif (self.getNumberOfAnswers() % 2 == 1) and  (i ==  (self.getNumberOfAnswers() - 1) / 2):
+                # check if we need float division
+                if ((self.getScaleLower() + self.getScaleHigher()) % 2 == 0):
+                    label = str((self.getScaleLower() + self.getScaleHigher()) / 2)
+                    self._radioButtonsLabels.append(label)
+                else:
+                    label = str((self.getScaleLower() + self.getScaleHigher()) / float(2))
+                    self._radioButtonsLabels.append(label)
+            # Two middles labels
+            #elif (self.getNumberOfAnswers() % 2 == 0) and ((i ==  (self.getNumberOfAnswers() - 1) / 2) or (i == (self.getNumberOfAnswers() / 2))):
+                # check if we need float division
+            #    if ((i*self.getScaleHigher()) % (self.getNumberOfAnswers()-1) == 0):
+            #        label = str(((self.getScaleHigher()-self.getScaleLower())/(self.getNumberOfAnswers()-1))*i + self.getScaleLower())
+            #        self._radioButtonsLabels.append(label)
+            #    else:
+            #        label = "%.1f" % (((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*i + self.getScaleLower())
+            #        self._radioButtonsLabels.append(label)
+            else:
+                self._radioButtonsLabels.append("")
+            #else: All the labels
+            #    self._radioButtonsLabels.append(str((i*self.getScaleHigher())/float(self._numberOfAnswers-1)))
+            i += 1
+
+    def setRadioButtonsTitles(self):
+        """ Set the titles for the radio buttons """
+        self._radioButtonsTitles = []
+        i = 0
+        while i<self.getNumberOfAnswers():
+            # check if we need float division
+            if ((i*self.getScaleHigher()) % (self.getNumberOfAnswers()-1) == 0):
+                title = "%.0f" % (((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*i + self.getScaleLower())
+                self._radioButtonsTitles.append(title)
+            else:
+                title = "%.1f" % (((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*i + self.getScaleLower())
+                self._radioButtonsTitles.append(title)
+            i += 1
+
+    def getRadioButtonsTitles(self):
+        """ Get the titles for the radio buttons """
+        return self._radioButtonsTitles
+
+
+    def getScaleLower(self):
+        try :
+            if self._scaleLower:
+                pass
+        except AttributeError :
+            self._scaleLower = 0
+        return self._scaleLower
+
+    def getScaleHigher(self):
+        try :
+            if self._scaleHigher:
+                pass
+        except AttributeError :
+            self._scaleHigher = 100
+        return self._scaleHigher
+
+
+
+    def getRadioButtonsLabels(self):
+        """ Get the labels for the radio buttons """
+        try :
+            if self._radioButtonsLabels:
+                pass
+        except AttributeError :
+            self._radioButtonsLabels = ["0", "", "50", "", "100"]
+        return self._radioButtonsLabels
+
+    def setScale(self, min, max):
+        """ Set the scale for the rating and labels """
+        self._scaleLower = min
+        self._scaleHigher = max
+
+
 ##################################### NOT USED YET #####################################################
+
+    # date methods
+    def setDefaultAbstractReviewerDueDate(self, date):
+        self._defaultAbstractReviewerDueDate = date
+
+    def getDefaultAbstractReviewerDueDate(self):
+        if not hasattr(self, '_defaultAbstractReviewerDueDate'):
+            self._defaultAbstractReviewerDueDate = None
+        return self._defaultAbstractReviewerDueDate
+
+    def getAdjustedDefaultAbstractReviewerDueDate(self):
+        if self.getDefaultAbstractReviewerDueDate() is None:
+            return None
+        else:
+            return getAdjustedDate(self._defaultAbstractReviewerDueDate, self.getConference())
+
+
+    #abstract manager methods
+
     def addAbstractManager(self, newAbstractManager):
         """ Adds a new abstract manager to the conference.
             newAbstractManager has to be an Avatar object.

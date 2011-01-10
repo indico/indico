@@ -4002,6 +4002,19 @@ class _AbstractIdSF( filters.SortingField ):
             b = a2.getId()
         return cmp( a, b )
 
+class _AbstractRatingSF( filters.SortingField ):
+    _id = "rating"
+
+    def compare( self, a1, a2 ):
+        a = a1.getRating()
+        b = a2.getRating()
+        # check if the rating is none because the abstract has no judgement
+        if a == None:
+            a = -1.0
+        if b == None:
+            b = -1.0
+        return cmp( float(a), float(b) )
+
 
 class AbstractSortingCriteria( filters.SortingCriteria ):
     """
@@ -4011,8 +4024,10 @@ class AbstractSortingCriteria( filters.SortingCriteria ):
                                 abstractFilters.ContribTypeSortingField, \
         _AbstractStatusSF.getId(): _AbstractStatusSF, \
         _AbstractIdSF.getId(): _AbstractIdSF, \
+        _AbstractRatingSF.getId(): _AbstractRatingSF, \
         abstractFilters.SubmissionDateSortingField.getId() : \
-                                    abstractFilters.SubmissionDateSortingField }
+                                    abstractFilters.SubmissionDateSortingField
+                                     }
 
 class RHAbstractListMenuClose(RHConfModifCFABase):
 
@@ -4067,6 +4082,7 @@ class RHAbstractList(RHConfModifCFABase):
                             "Tracks": [ _("Tracks"), "checked"],
                             "Type": [ _("Type"), "checked"],
                             "Status": [ _("Status"), "checked"],
+                            "Rating": [ _("Rating"), "checked"],
                             "AccTrack": [ _("Acc. Track"), "checked"],
                             "AccType": [ _("Acc. Type"), "checked"],
                             "SubmissionDate": [ _("Submission Date"), "checked"]}
@@ -4078,7 +4094,6 @@ class RHAbstractList(RHConfModifCFABase):
         Updates the filter parameters in the websession with those
         coming from the HTTP request
         """
-
         sessionData['track'] = []
         sessionData['acc_track'] = []
         sessionData['type'] = []
@@ -4119,10 +4134,10 @@ class RHAbstractList(RHConfModifCFABase):
                                 "Tracks": [ _("Tracks"), params.get("showTracks","")],
                                 "Type": [ _("Type"), params.get("showType","")],
                                 "Status": [ _("Status"), params.get("showStatus","")],
+                                "Rating": [ _("Rating"), params.get("showRating","")],
                                 "AccTrack": [ _("Acc. Track"), params.get("showAccTrack","")],
                                 "AccType": [ _("Acc. Type"), params.get("showAccType","")],
                                 "SubmissionDate": [ _("Submission Date"), params.get("showSubmissionDate","")]}
-
         return sessionData
 
     def _buildFilteringCriteria(self, sessionData):

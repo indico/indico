@@ -661,8 +661,7 @@ IndicoUI.Widgets = {
          * @param {Dictionary} attributes The attributes that will be passed to the method.
          * @param {Function} handler A custom function that will be called after values are saved. It will receive 2 arguments, 'result' and 'error'
          */
-    radioButtonSimpleField: function(element, kind, options, labels, initialValue, handler) {
-
+    radioButtonSimpleField: function(element, options, labels, initialValue, handler) {
         var groupName = Html.generateId(); // The common name for all the radio buttons
 
         var radioButtons = []; // List of radio buttons
@@ -671,7 +670,8 @@ IndicoUI.Widgets = {
             // For every option we create a radio button
             var rb = Html.radio({
                 name: groupName,
-                id: groupName + "_" + i
+                id: groupName + "_" + i,
+                className: "radioButtonAnswer"
             });
             rb.dom.value = options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
             radioButtons.push(rb);
@@ -688,64 +688,93 @@ IndicoUI.Widgets = {
             }
         }
 
-        if (kind == "vertical" || kind == "horizontal1") {
-            var itemsList = []; // List of HTML elements to be included in the widget block
-            for (var k = 0; k < radioButtons.length; k++) {
-                itemsList.push(radioButtons[k]); //We add a radio button
-                itemsList.push(Html.label({
-                    htmlFor: groupName + "_" + k
-                }, labels[k])); //We add its corresponding label
-                if (kind == "vertical" && k != radioButtons.length-1) { //if the kind of widget is 'vertical', we add a break line
-                    itemsList.push(Html.br());
-                }
-            }
-            itemsList.push(message);
-            var block = Widget.block(itemsList); // We build the block
-            if (element) {
-                element.set(block);
-            }
-            return block;
+        var table = Html.table();
+        table.dom.style.display = 'inline';
+        var tbody = Html.tbody();
+        table.set(tbody);
 
+        var row1 = Html.tr();
+        var row2 = Html.tr();
+
+        for (var l = 0; l < radioButtons.length; l++) {
+            var cell1 = Html.td();
+            cell1.dom.vAlign = 'bottom';
+            cell1.dom.align = 'center';
+            cell1.append(Html.label({
+                htmlFor: groupName + "_" + l
+            }, labels[l]));
+            row1.append(cell1);
+
+            var cell2 = Html.td();
+            cell2.append(radioButtons[l]);
+            row2.append(cell2);
         }
-        else if (kind == "horizontal2") { //in this case we build a table of 2 rows
-            var table = Html.table();
-            table.dom.style.display = 'inline';
-            var tbody = Html.tbody();
-            table.set(tbody);
 
-            var row1 = Html.tr();
-            var row2 = Html.tr();
+        cellMessage = Html.td();
+        cellMessage.dom.style.verticalAlign = "middle";
+        cellMessage.dom.rowSpan = 2;
 
-            for (var l = 0; l < radioButtons.length; l++) {
-                var cell1 = Html.td();
-                cell1.dom.vAlign = 'bottom';
-                cell1.dom.align = 'center';
-                cell1.append(Html.label({
-                    htmlFor: groupName + "_" + l
-                }, labels[l]));
-                row1.append(cell1);
+        tbody.append(row1);
+        tbody.append(row2);
 
-                var cell2 = Html.td();
-                cell2.append(radioButtons[l]);
-                row2.append(cell2);
-            }
-
-            cellMessage = Html.td();
-            cellMessage.dom.style.verticalAlign = "middle";
-            cellMessage.dom.rowSpan = 2;
-
-            tbody.append(row1);
-            tbody.append(row2);
-
-            if (element) {
-                element.set(table);
-            }
-
-            return table;
+        if (element) {
+            element.set(table);
         }
-        else {
-            alert($T("developer error: kind of radioButtonField is not correct, should be 'vertical', 'horizontal1', 'horizontal2'"));
+
+        return table;
+
+
+    },
+
+    radioButtonPreviewQuestion: function(options, labels, numId) {
+        var groupName = "_GID"+numId; // The common name for all the radio buttons
+
+        var radioButtons = []; // List of radio buttons
+
+        for (var i=0; i<options.length; i++) {
+            // For every option we create a radio button
+            var rb = Html.radio({
+                name: groupName,
+                id: groupName + "_" + i,
+                className: "radioButtonAnswer"
+            });
+            rb.dom.value = options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
+            radioButtons.push(rb);
         }
+
+        Logic.onlyOne(radioButtons, false); //Ensures that only 1 radio button will be selected at a given time
+
+        var table = Html.table();
+        table.dom.style.display = 'inline';
+        var tbody = Html.tbody();
+        table.set(tbody);
+
+        var row1 = Html.tr();
+        var row2 = Html.tr();
+
+        for (var l = 0; l < radioButtons.length; l++) {
+            var cell1 = Html.td();
+            cell1.dom.vAlign = 'bottom';
+            cell1.dom.align = 'center';
+            cell1.append(Html.label({
+                htmlFor: groupName + "_" + l
+            }, labels[l]));
+            row1.append(cell1);
+
+            var cell2 = Html.td();
+            cell2.append(radioButtons[l]);
+            row2.append(cell2);
+        }
+
+        cellMessage = Html.td();
+        cellMessage.dom.style.verticalAlign = "middle";
+        cellMessage.dom.rowSpan = 2;
+
+        tbody.append(row1);
+        tbody.append(row2);
+
+        return table;
+
 
     },
 

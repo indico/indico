@@ -887,6 +887,63 @@ class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
 #####################################
 ###  Abstract reviewing classes
 #####################################
+class AbstractReviewingBase(ConferenceModifBase):
+
+    ''' Base Clase for Abstract Reviewing'''
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        self._confAbstractReview = self._conf.getConfAbstractReview()
+
+
+class AbstractReviewingChangeNumAnswers(AbstractReviewingBase):
+
+    ''' Change the number of answers per question '''
+
+    def _checkParams(self):
+        AbstractReviewingBase._checkParams(self)
+        self._value = int(self._params.get("value"))
+
+    def _getAnswer(self):
+        self._confAbstractReview.setNumberOfAnswers(self._value)
+        # update the labels
+        self._confAbstractReview.setRadioButtonsLabels()
+        self._confAbstractReview.setRadioButtonsTitles()
+        return self._value
+
+
+class AbstractReviewingChangeScale(AbstractReviewingBase):
+
+    ''' Change the limits for the ratings '''
+
+    def _checkParams(self):
+        AbstractReviewingBase._checkParams(self)
+        self._value = self._params.get("value")
+        self._min = int(self._value["min"])
+        self._max = int(self._value["max"])
+
+    def _getAnswer(self):
+        self._confAbstractReview.setScale(self._min, self._max)
+        # recalculate the current values for the judgements
+        self._conf.getAbstractMgr().recalculateAbstractsRating(self._min, self._max)
+        # update the labels and titles again
+        self._confAbstractReview.setRadioButtonsLabels()
+        self._confAbstractReview.setRadioButtonsTitles()
+        return self._value
+
+class AbstractReviewingUpdateExampleQuestion(AbstractReviewingBase):
+
+    ''' Get the required data for the example question '''
+
+    def _getAnswer(self):
+        # get the necessary values
+        numAnswers = range(self._confAbstractReview.getNumberOfAnswers())
+        labels = self._confAbstractReview.getRadioButtonsLabels()
+        rbValues = self._confAbstractReview.getRadioButtonsTitles()
+
+        return {"numberAnswers": numAnswers, "labels": labels, "rbValues": rbValues}
+
+
 #class AbstractReviewingBase(ConferenceModifBase, ProtectedModificationService):
 #
 #    def getJudgementObject(self):
@@ -966,7 +1023,11 @@ methodMap = {
     "contribution.changeJudgement": ContributionReviewingJudgementModification,
     "contribution.changeCriteria": ContributionReviewingCriteriaModification,
     "contribution.getCriteria": ContributionReviewingCriteriaDisplay,
-    "contribution.setSubmitted": ContributionReviewingSetSubmitted
+    "contribution.setSubmitted": ContributionReviewingSetSubmitted,
+
+    "abstractReviewing.changeNumberofAnswers": AbstractReviewingChangeNumAnswers,
+    "abstractReviewing.changeScale": AbstractReviewingChangeScale,
+    "abstractReviewing.updateExampleQuestion": AbstractReviewingUpdateExampleQuestion
 
     }
 #    "abstract.changeCriteria": AbstractReviewingCriteriaModification

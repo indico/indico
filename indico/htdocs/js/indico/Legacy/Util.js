@@ -391,6 +391,7 @@ var IndicoUtil = {
         return true;
     },
 
+
     /**
      * Determines if a string is in a valid time format (hh:mm)
      * @param {String} s The input string
@@ -545,6 +546,11 @@ var IndicoUtil = {
                 }
                 else if (dataType == 'int' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
                     error = Html.span({}, "Field must be a number");
+                }
+                else if (dataType == 'int_or_neg' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
+                    if (!(component.get()[0] == '-' && IndicoUtil.isInteger(component.get().slice(1)))) {
+                        error = Html.span({}, "Field must be a number");
+                    }
                 }
                 else if (dataType == 'unsigned_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<=0)) {
                     error = Html.span({}, "Field must be a positive number");

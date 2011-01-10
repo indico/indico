@@ -27,6 +27,10 @@ type("InlineRemoteWidget", ["InlineWidget"],
              // do nothing, overload
          },
 
+         _handleSuccess: function() {
+             // do nothing, overload
+         },
+
          _handleBackToEditMode: function() {
              // do nothing, overload
          },
@@ -54,6 +58,7 @@ type("InlineRemoteWidget", ["InlineWidget"],
                      self._handleLoaded(self.source.get());
                      wcanvas.set(content);
                      self.setMode('display');
+                     self._handleSuccess();
                  } else {
                      wcanvas.set(self._handleLoading());
                  }
@@ -1553,6 +1558,7 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
             this.__parameterManager = new IndicoUtil.parameterManager();
         });
 
+
 type('AutocheckTextBox', ['RealtimeTextBox'],
         /*
          * A usual text box that, when the startWatching method is called,
@@ -1619,21 +1625,184 @@ type('AutocheckTextBox', ['RealtimeTextBox'],
                     self._textTyped(key);
                     return true;
                 });
-            }
+		    }
+		},
+
+		    function(args, component, functionToShow, functionToHide){
+				/* component: The component (usually a simple label) that you want to
+				   inform the user that the original text field is repeated
+				   functionToShow: In case that your component requires some other operations to accomplish what you
+				   want rather than just setting the display to none, you'll need to specify what do you want to do.
+				   functionToHide: the same thing when hiding the component.
+				*/
+				args.autocomplete = 'off';
+				this.RealtimeTextBox(args);
+				this.setOriginalText(this.get());
+				this.component = component;
+				this.functionToShow = functionToShow;
+				this.functionToHide = functionToHide;
+		     }
+	);
+
+
+//Widget to change the scale in abstract reviewing
+type("ScaleEditWidget", ["InlineEditWidget"],
+        {
+            /* builds the basic structure for both display and
+               edit modes */
+            __buildStructure: function(minValue, maxValue) {
+                // keep everything in separate lines
+                return Html.table({},
+                         Html.tbody({},
+                                 Html.tr({},Html.td("supportEntry", "From :"),
+                                         Html.td({}, minValue)),
+                                 Html.tr({},Html.td("supportEntry", "To :"),
+                                         Html.td({}, maxValue))));
+            },
+
+            _handleEditMode: function(value) {
+                // create the fields
+                this.min = Html.edit({size: 2}, value.min);
+                this.max = Html.edit({size: 2}, value.max);
+                // add the fields to the parameter manager
+                this.__parameterManager.add(this.min, 'int_or_neg', false);
+                this.__parameterManager.add(this.max, 'int_or_neg', false);
+                // call buildStructure with modification widgets
+                return this.__buildStructure(this.min, this.max);
+            },
+
+            _handleDisplayMode: function(value) {
+                // call buildStructure with spans
+                return this.__buildStructure(value.min, value.max);
+            },
+
+            _getNewValue: function() {
+                return {min: this.min.get(),
+                        max: this.max.get()};
+            },
+
+            _verifyInput: function() {
+                if (!this.__parameterManager.check()) {
+                    return false;
+                }
+                if (parseInt(this.min.dom.value) >= parseInt(this.max.dom.value)) {
+                    alert("The \"From\" value must be lower than \"To\" value.");
+                    return false;
+                } else if ((parseInt(this.max.dom.value) - parseInt(this.min.dom.value)) > 100) {
+                    alert("The maximun difference between limits is 100 units.");
+                    return false;
+                }
+                return true;
+            },
+
+            _handleSuccess: function() {
+                // previewQuestion is a global var used in ConfModifAbstractRev
+                previewQuestion.draw();
+            },
+        },
+        function(method, attributes, initValue) {
+            this.InlineEditWidget(method, attributes, initValue);
+            this.__parameterManager = new IndicoUtil.parameterManager();
+        });
+
+
+//Widget to change the number of answers (radio buttons) in abstract reviewing
+type("NumberAnswersEditWidget", ["InlineEditWidget"],
+        {
+            /* builds the basic structure for both display and
+               edit modes */
+            __buildStructure: function(num) {
+                // keep everything in separate lines
+                 return Html.table({className:'editLinkInLine'},
+                         Html.tbody({},
+                                 Html.tr({},
+                                         Html.td("supportEntry", "Number of possible answers :"),
+                                         Html.td({}, num))));
+                                 },
+
+            _handleEditMode: function(value) {
+                // create the fields
+                this.num = Html.edit({size: 2}, value);
+                // add the fields to the parameter manager
+                //this.__parameterManager.add(this.num, 'unsigned_int', false);
+                this.__parameterManager.add(this.num, 'unsigned_int', false, function(value){
+
+                    if (value > 20 || value < 2) {
+                        var error = Html.span({}, "Number must be in a range between 2 and 20");
+                        return error;
+                    } else {
+                        return null;
+                    }
+                });
+
+                // call buildStructure with modification widgets
+                return this.__buildStructure(this.num);
+            },
+
+            _handleDisplayMode: function(value) {
+                // call buildStructure with spans
+                return this.__buildStructure(value);
+            },
+
+            _getNewValue: function() {
+                return this.num.get();
+            },
+
+            _verifyInput: function() {
+                if (!this.__parameterManager.check()) {
+                    return false;
+                }
+                return true;
+            },
+
+            _handleSuccess: function() {
+                // previewQuestion is a global var used in ConfModifAbstractRev
+                previewQuestion.draw();
+            },
         },
 
-            function(args, component, functionToShow, functionToHide){
-                /* component: The component (usually a simple label) that you want to
-                   inform the user that the original text field is repeated
-                   functionToShow: In case that your component requires some other operations to accomplish what you
-                   want rather than just setting the display to none, you'll need to specify what do you want to do.
-                   functionToHide: the same thing when hiding the component.
-                */
-                args.autocomplete = 'off';
-                this.RealtimeTextBox(args);
-                this.setOriginalText(this.get());
-                this.component = component;
-                this.functionToShow = functionToShow;
-                this.functionToHide = functionToHide;
-             }
-    );
+        function(method, attributes, initValue) {
+            this.InlineEditWidget(method, attributes, initValue);
+            this.__parameterManager = new IndicoUtil.parameterManager();
+        });
+
+//Widget to show an example of question in abstract reviewing
+type("ExampleQuestionWidget", ["InlineWidget"],
+        {
+            draw: function() {
+                this.numReq += 1;
+                self = this;
+                // Request to get the new values of number of answers and labels
+                indicoRequest(this.method, this.attributes,
+                        function(result, error) {
+                            if (!error) {
+                                var numberAnswers = result.numberAnswers;
+                                var labels = result.labels;
+                                var rbValues = result.rbValues;
+                                var content = Html.div({className:'questionPreview'});
+                                content.append(Html.span(null,question));
+                                content.append(Html.br());
+                                content.append(new IndicoUI.Widgets.Generic.radioButtonPreviewQuestion(
+                                        numberAnswers,
+                                        labels,
+                                        self.numReq));
+                                $E('inPlaceShowExample').set(content);
+                                for (var j=0; j<numberAnswers.length; j++) {
+                                    $E("_GID"+self.numReq+"_" + j).dom.onmouseover = function(event) {
+                                        var value = rbValues[this.defaultValue];
+                                        IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>"+value+"</span>");
+                                    };
+                                }
+			                } else {
+                                IndicoUtil.errorReport(error);
+                            }
+                        });
+                 },
+        },
+
+        function(method, attributes) {
+            this.method = method;
+            this.attributes = attributes;
+            this.numReq = 0;
+            this.InlineWidget();
+        });
