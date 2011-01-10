@@ -173,7 +173,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         var top = Math.floor((this.winDim.height - this.container.dom.offsetHeight) / 2);
 
         this.canvas.dom.style.left = pixels(left);
-        this.canvas.dom.style.top = pixels(top);
+        this.canvas.dom.style.top = top >= 0 ? pixels(top) : 0;
     },
 
     _postDrawAdjustTitle: function() {
@@ -282,6 +282,40 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
         this.ExclusivePopup(title, closeButtonHandler, printable, showPrintButton);
     }
 );
+
+/**
+ * Builds an exclusive popup with a button bar which can grow vertically
+ * Constructor arguments: the same ones as ExclusivePopup
+ */
+type("ExclusivePopupWithButtonsGrowing", ["ExclusivePopupWithButtons"], {
+    /**
+     * Overloads ExclusivePopupWithButtons._adjustContentWrapper
+     */
+    _adjustContentWrapper: function() {
+        this.contentWrapper.setStyle('padding', pixels(0));
+        this.contentWrapper.setStyle('overflowY', 'auto');
+        this.contentWrapper.setStyle('overflowX', 'hidden');
+        this.contentWrapper.setStyle('position', 'relative');
+        if (this.title && this.title !== '') {
+            this.contentWrapper.setStyle('top', pixels(-10));
+        } else {
+            this.contentWrapper.setStyle('top', pixels(10));
+        }
+    },
+
+    lockHeight: function() {
+        var contentHeight = this._calculateContentHeight();
+        this.contentWrapper.setStyle('height', pixels(contentHeight));
+        // always show scroll bar as overflow:auto likes to hide content behind the scrollbar
+        this.contentWrapper.setStyle('overflowY', 'scroll');
+        //this.contentWrapper.setStyle('paddingRight', pixels(8));
+    }
+},
+    function(title, closeButtonHandler, printable, showPrintButton){
+        this.ExclusivePopup(title, closeButtonHandler, printable, showPrintButton);
+    }
+);
+
 
 type("BalloonPopup", ["PopupDialog"], {
     draw: function(x, y) {

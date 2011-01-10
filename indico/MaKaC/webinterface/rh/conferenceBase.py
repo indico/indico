@@ -209,7 +209,7 @@ class RHSubmitMaterialBase:
     def __init__(self, target, rh = None):
         self._target=target
         self._callerRH = rh
-        self._repositoryId = None
+        #self._repositoryId = None
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
@@ -232,8 +232,8 @@ class RHSubmitMaterialBase:
         self._overwrite = False
         #if request has already been handled (DB conflict), then we keep the existing files list
 
-        self._file = {}
-        self._link = {}
+        self._files = []
+        self._links = []
         self._topdf=params.has_key("topdf")
 
         self._displayName = params.get("displayName","").strip()
@@ -248,35 +248,54 @@ class RHSubmitMaterialBase:
         self._userList = json.decode(params.get("userList", "[]"))
 
         if self._uploadType == "file":
-            if type(params["file"]) != str and params["file"].filename.strip() != "":
-                fDict = {}
-                fDict["filePath"]=self._saveFileToTemp(params["file"].file)
+            if isinstance(params["file"], list):
+                files = params["file"]
+                self._displayName = ""
+                self._description = ""
+            else:
+                files = [params["file"]]
 
-                if self._callerRH != None:
-                    self._callerRH._tempFilesToDelete.append(fDict["filePath"])
+            for fileUpload in files:
+                if type(fileUpload) != str and fileUpload.filename.strip() != "":
+                    fDict = {}
+                    fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
 
-                fDict["fileName"]=params["file"].filename
-                fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
-                self._file = fDict
+                    if self._callerRH != None:
+                        self._callerRH._tempFilesToDelete.append(fDict["filePath"])
+
+                    fDict["fileName"] = fileUpload.filename
+                    fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
+                    self._files.append(fDict)
 
         elif self._uploadType == "link":
-            link={}
-            link["url"]=params.get("url","")
-            link["matType"]=params.get("materialType","")
-            self._link = link
+            if isinstance(params["url"], list):
+                urls = params["url"]
+                self._displayName = ""
+                self._description = ""
+            else:
+                urls =  [params["url"]]
+
+            matType = params.get("materialType", "")
+            for url in urls:
+                link = {}
+                link["url"] = url
+                link["matType"] = matType
+                self._links.append(link)
+
 
     def _getErrorList(self):
         res=[]
 
         if self._uploadType == "file":
-            if self._file == {}:
+            if not self._files:
                 res.append("""A file must be submitted.""")
-            if hasattr(self._file, "filePath") and self._file["filePath"].strip()=="":
-                res.append("""A valid file to be submitted must be specified.""")
-            if hasattr(self._file, "size") and self._file["size"] < 10:
-                res.append("""The file %s seems to be empty""" % self._file["fileName"])
+            for fileEntry in self._files:
+                if hasattr(fileEntry, "filePath") and not fileEntry["filePath"].strip():
+                    res.append("""A valid file to be submitted must be specified.""")
+                if hasattr(fileEntry, "size") and fileEntry["size"] < 10:
+                    res.append("""The file %s seems to be empty""" % fileEntry["fileName"])
         elif self._uploadType == "link":
-            if self._link["url"].strip()=="":
+            if not self._links[0]["url"].strip():
                 res.append("""A valid URL must be specified.""")
 
         if self._materialId=="":
@@ -328,75 +347,83 @@ class RHSubmitMaterialBase:
         else:
             protectedAtResourceLevel = True
 
+        resources = []
         if self._uploadType in ['file','link']:
             if self._uploadType == "file":
 
-                resource = LocalFile()
-                resource.setFileName(self._file["fileName"])
-                resource.setFilePath(self._file["filePath"])
-                resource.setDescription(self._description)
-                if self._displayName == "":
-                    resource.setName(resource.getFileName())
-                else:
-                    resource.setName(self._displayName)
+                for fileEntry in self._files:
+                    resource = LocalFile()
+                    resource.setFileName(fileEntry["fileName"])
+                    resource.setFilePath(fileEntry["filePath"])
+                    resource.setDescription(self._description)
+                    if self._displayName == "":
+                        resource.setName(resource.getFileName())
+                    else:
+                        resource.setName(self._displayName)
 
-                if not type(self._target) is Category:
-                    self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (self._file["fileName"],text)},"Files",user)
-                # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
+                    if not type(self._target) is Category:
+                        self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (fileEntry["fileName"], text)}, "Files", user)
+                    resources.append(resource)
+                    # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
 
             elif self._uploadType == "link":
 
-                resource = Link()
-                resource.setURL(self._link["url"])
-                resource.setDescription(self._description)
-                if self._displayName == "":
-                    resource.setName(resource.getURL())
-                else:
-                    resource.setName(self._displayName)
+                for link in self._links:
+                    resource = Link()
+                    resource.setURL(link["url"])
+                    resource.setDescription(self._description)
+                    if self._displayName == "":
+                        resource.setName(resource.getURL())
+                    else:
+                        resource.setName(self._displayName)
 
-                if not type(self._target) is Category:
-                    self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(),text)},"Files",user)
+                    if not type(self._target) is Category:
+                        self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(), text)}, "Files", user)
+                    resources.append(resource)
 
             status = "OK"
-            info = resource
+            info = resources
         else:
             status = "ERROR"
             info = "Unknown upload type"
             return mat, status, info
 
-        # forcedFileId - in case there is a conflict, use the file that is
-        # already stored
-        mat.addResource(resource, forcedFileId=self._repositoryId)
-
-        #apply conversion
-        if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
-            Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
-
-            fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
-
-        self._topdf = False
-
-        # store the repo id, for files
-        if isinstance(resource, LocalFile):
-            self._repositoryId = resource.getRepositoryId()
-
-        if protectedAtResourceLevel:
-            protectedObject = resource
-        else:
-            protectedObject = mat
-            mat.setHidden(self._visibility)
-            mat.setAccessKey(self._password)
-
-        protectedObject.setProtection(self._statusSelection)
-
         from MaKaC.user import AvatarHolder, GroupHolder
 
-        for userElement in self._userList:
-            if 'isGroup' in userElement and userElement['isGroup']:
-                avatar = GroupHolder().getById(userElement['id'])
+        toPdf = self._topdf
+        self._topdf = False
+
+        # forcedFileId - in case there is a conflict, use the file that is
+        # already stored
+        for resource in resources:
+            #mat.addResource(resource, forcedFileId=self._repositoryId)
+            mat.addResource(resource, forcedFileId=None)
+
+            #apply conversion
+            if toPdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
+                Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
+
+                fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
+
+            # store the repo id, for files
+            #if isinstance(resource, LocalFile):
+            #    self._repositoryId = resource.getRepositoryId()
+
+            if protectedAtResourceLevel:
+                protectedObject = resource
             else:
-                avatar = AvatarHolder().getById(userElement['id'])
-            protectedObject.grantAccess(avatar)
+                protectedObject = mat
+                mat.setHidden(self._visibility)
+                mat.setAccessKey(self._password)
+
+                protectedObject.setProtection(self._statusSelection)
+
+            for userElement in self._userList:
+                if 'isGroup' in userElement and userElement['isGroup']:
+                    avatar = GroupHolder().getById(userElement['id'])
+                else:
+                    avatar = AvatarHolder().getById(userElement['id'])
+                protectedObject.grantAccess(avatar)
 
         return mat, status, fossilize(info, {"MaKaC.conference.Link": ILinkFossil,
                                              "MaKaC.conference.LocalFile": ILocalFileExtendedFossil})
@@ -435,7 +462,8 @@ class RHSubmitMaterialBase:
                 mat, status, info = self._addMaterialType(text, user)
 
                 if status == "OK":
-                    info['material'] = mat.getId();
+                    for entry in info:
+                        entry['material'] = mat.getId();
         except Exception, e:
             status = "ERROR"
             info = errorList + ["%s: %s" % (e.__class__.__name__, str(e))]

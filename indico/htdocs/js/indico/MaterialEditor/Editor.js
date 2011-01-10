@@ -7,7 +7,7 @@ function updateMaterialList(oldList, newList) {
 }
 
 
-type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
+type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
 
     _drawButtons: function() {
 
@@ -67,33 +67,78 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
      * locationSelector - the locationSelector that will 'control' the pane
      */
     _drawResourcePathPane: function(locationSelector) {
-
-        var file = Html.input('file', {name: 'file'});
-        var urlBox = Html.edit({name: 'url'});
+        var MAX_MATERIAL_FIELDS = 5;
+        var MAX_GROW_MATERIAL_FIELDS = 3;
+        var files = [Html.input('file', {name: 'file'})];
+        var urlBoxes = [Html.edit({name: 'url'})];
         var toPDFCheckbox = Html.checkbox({style: {verticalAlign: 'middle'}}, true);
+        var currentResourceLocation;
         toPDFCheckbox.dom.name = 'topdf';
 
         var self = this;
 
+        var addInputLink = Widget.link(command(function() {
+            if(files.length == MAX_GROW_MATERIAL_FIELDS || urlBoxes.length == MAX_GROW_MATERIAL_FIELDS) {
+                self.lockHeight();
+            }
+
+            self.tabWidget.disableTab(2);
+            if(currentResourceLocation == 'local') {
+                files.push(Html.input('file', {name: 'file', style: {display: 'block'}}));
+            }
+            else {
+                urlBoxes.push(Html.edit({name: 'url'}));
+            }
+
+            // redraw resourcePathPane. is there an easier way?!
+            resourcePathPane.set(currentResourceLocation);
+        }, Html.span({}, ' ', $T("more"))));
+
         var resourcePathPane = new Chooser(
             new Lookup({
                 'local':  function() {
-                    self.pm.remove(urlBox);
-                    return Html.div({},
-                                    self.pm.add(file, 'text'),
-                                    Html.div({style:{marginTop: '5px'}},
-                                             toPDFCheckbox,
-                                             Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'}
-                                                        , $T("Convert to PDF (when applicable)")))
-                                   );
+                    currentResourceLocation = 'local';
+                    // remove url boxes
+                    for(var i = 0; i < urlBoxes.length; i++) {
+                        self.pm.remove(urlBoxes[i]);
+                    }
+                    // setup Html.div() args with all file upload fields etc.
+                    var args = [{}];
+                    for(var i = 0; i < files.length; i++) {
+                        args.push(self.pm.add(files[i], 'text'));
+                        if(i == 0 && files.length < MAX_MATERIAL_FIELDS) {
+                            args.push(addInputLink);
+                        }
+                    }
+                    args.push(Html.div({style:{marginTop: '5px'}},
+                            toPDFCheckbox,
+                            Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
+                                    $T("Convert to PDF (when applicable)"))));
+
+                    return Html.div.apply(null, args);
                 },
                 'remote': function() {
-                    self.pm.remove(file);
-                    setTimeout(function() { urlBox.dom.focus(); }, 200);
-                    return Html.div({},
-                                    Html.label('popUpLabel', $T("URL")),
-                                    self.pm.add(urlBox, 'url'),
-                                    Html.div("smallGrey", $T("Example: http://www.example.com/YourPDFFile.pdf")));
+                    currentResourceLocation = 'remote';
+                    // remove file upload fields
+                    for(var i = 0; i < files.length; i++) {
+                        self.pm.remove(files[i]);
+                    }
+                    // setup Html.div() args with all url boxes etc.
+                    var args = [{}];
+                    for(var i = 0; i < urlBoxes.length; i++) {
+                        var divArgs = [
+                            {},
+                            Html.label('popUpLabel', $T("URL")),
+                            self.pm.add(urlBoxes[i], 'url')
+                        ];
+                        if(i == 0 && urlBoxes.length < MAX_MATERIAL_FIELDS) {
+                            divArgs.push(addInputLink);
+                        }
+                        args.push(Html.div.apply(null, divArgs));
+                    }
+                    args.push(Html.div("smallGrey", $T("Example: http://www.example.com/YourPDFFile.pdf")));
+                    setTimeout(function() { urlBoxes[0].dom.focus(); }, 200);
+                    return Html.div.apply(null, args);
                 }
             }));
 
@@ -110,9 +155,25 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtons"], {
 
             // set the focus
             if (value == 'local') {
-                file.dom.focus();
+                files[0].dom.focus();
+                if(self.tabWidget) {
+                    if(files.length == 1) {
+                        self.tabWidget.enableTab(2);
+                    }
+                    else {
+                        self.tabWidget.disableTab(2);
+                    }
+                }
             } else {
-                urlBox.dom.focus();
+                urlBoxes[0].dom.focus();
+                if(self.tabWidget) {
+                    if(urlBoxes.length == 1) {
+                        self.tabWidget.enableTab(2);
+                    }
+                    else {
+                        self.tabWidget.disableTab(2);
+                    }
+                }
             }
         });
 
@@ -1419,11 +1480,14 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
             self.set(key, obj);
         });
 
-        var materialLoadFunction = function(info) {
-            if (self.get(info.material)) {
-                self.get(info.material).get('resources').append(watchize(info));
-            } else {
-                self._loadMaterial(info.material);
+        var materialLoadFunction = function(infoList) {
+            for(var i = 0; i < infoList.length; i++) {
+                var info = infoList[i];
+                if (self.get(info.material)) {
+                    self.get(info.material).get('resources').append(watchize(info));
+                } else {
+                    self._loadMaterial(info.material);
+                }
             }
         };
 
