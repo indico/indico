@@ -24,7 +24,7 @@ This script starts an Indico Scheduler instance, forking it off as a background
 process.
 """
 
-import time, sys, os, argparse, logging, cmd
+import time, sys, os, argparse, logging, cmd, multiprocessing
 
 from indico.modules.scheduler import Scheduler, Client, base
 

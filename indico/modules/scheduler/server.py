@@ -463,4 +463,4 @@ class Scheduler(object):
                     self._db_moveTask(
                         task,
                         base.TASK_STATUS_RUNNING,
-                        base.TASK_STATUS_FAIL)
+                        base.TASK_STATUS_FAILED)

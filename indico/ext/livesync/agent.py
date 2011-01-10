@@ -110,8 +110,8 @@ class SyncAgent(Fossilizable, Persistent):
         else:
             raise Exception('unknown option!')
 
-    def setParameters(self, description = None,
-                      name = None):
+    def setParameters(self, description=None,
+                      name=None):
         if description:
             self._description = description
         if name:
@@ -133,28 +133,52 @@ class AgentProviderComponent(Component):
 
 
 class PushSyncAgent(SyncAgent):
+    """
+    Base class for PushSyncAgents
+    """
 
-    def run(self, currentTS, logger = None):
+    def __init__(self, aid, name, description, updateTime):
+        super(PushSyncAgent, self).__init__(aid, name, description, updateTime)
+        self._lastTry = None
+
+    def _run(self, manager, data, currentTS):
+        """
+        Overloaded - will contain the specific agent code
+        """
+        raise Exception("Undefined method")
+
+    def run(self, currentTS, logger=None):
+        """
+        Main method, called when agent needs to be run
+        """
 
         self._v_logger = logger
 
         if not self._manager:
-            raise AgentExecutionException("SyncAgent '%s' has no manager!" % self._id)
+            raise AgentExecutionException("SyncAgent '%s' has no manager!" % \
+                                          self._id)
 
         # query till currentTS - 1, for integrity reasons
-        data = self._manager.query(agentId = self.getId(),
-                                   till = currentTS - 1)
+        data = self._manager.query(agentId=self.getId(),
+                                   till=currentTS - 1)
 
         if logger:
-            logger.info("Querying agent %s for events till %s" % (self.getId(),
-                                                                  currentTS - 1))
+            logger.info("Querying agent %s for events till %s" % \
+                        (self.getId(), currentTS - 1))
 
-        # run agent-specific cycle
-        self._lastTry = self._run(self._manager, data, currentTS - 1)
+        try:
+            # run agent-specific cycle
+            self._lastTry = self._run(self._manager, data, currentTS - 1)
+        except:
+            logger.exception("Problem running agent %s" % self.getId())
+            return None
 
         return self._lastTry
 
     def acknowledge(self):
+        """
+        Called to signal that the information has been correctly processed
+        """
         self._manager.advance(self.getId(), self._lastTry)
 
 
@@ -172,7 +196,7 @@ class SyncManager(Persistent):
     def __init__(self):
         self.reset()
 
-    def reset(self, agentsOnly = False, trackOnly = False):
+    def reset(self, agentsOnly=False, trackOnly=False):
         """
         Resets database structures
         """
@@ -200,19 +224,29 @@ class SyncManager(Persistent):
         self._track.removePointer(agent.getId())
         del self._agents[agent.getId()]
 
-    def query(self, agentId = None, till = None):
+    def query(self, agentId=None, till=None):
+        """
+        Queries the agent for a given timespan
+        """
 
         # TODO: Add more criteria! (for now this will do)
 
         if agentId == None:
             raise QueryException("No criteria specified!")
 
-        return self._track.pointerIterItems(agentId, till = till)
+        return self._track.pointerIterItems(agentId, till=till)
 
     def advance(self, agentId, newLastTS):
-        self._track.movePointer(agentId, max(self._track.mostRecentTS(), newLastTS))
+        """
+        Advances the agent "pointer" to the specified timestamp
+        """
+        self._track.movePointer(agentId,
+                                max(self._track.mostRecentTS(), newLastTS))
 
     def add(self, timestamp, action):
+        """
+        Adds a specific action to the specified timestamp
+        """
         if type(action) == list:
             for a in action:
                 # TODO: bulk add at low level?
@@ -222,9 +256,13 @@ class SyncManager(Persistent):
             self._track.add(timestamp, action)
 
     def getTrack(self):
+        """
+        Rerturns the MPT
+        """
         return self._track
 
     def getAllAgents(self):
+        """
+        Returns the agent dictionary
+        """
         return self._agents
-
-

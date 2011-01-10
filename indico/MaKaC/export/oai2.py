@@ -53,12 +53,12 @@ class DataInt:
     """
 
     def  __init__(self,XG):
-        self.categoryRoot = conference.CategoryManager().getRoot()
+        # self.categoryRoot = conference.CategoryManager().getRoot()
         import MaKaC.accessControl as accessControl
         self.OAIuser = accessControl.AccessWrapper()
         self._XMLGen = XG
         self._config = Config.getInstance()
-        self._info = HelperMaKaCInfo.getMaKaCInfoInstance()
+        #self._info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._outGen = outputGenerator(self.OAIuser, self._XMLGen, dataInt=self)
 
         self.namespace               = self._config.getOAINamespace()
@@ -66,7 +66,7 @@ class DataInt:
         self.iconfXSD                = self._config.getIconfXSD()
         self.oai_marcXSD             = self._config.getBaseURL() + "/oai_marc.xsd"
         self.repositoryName          = self._config.getRepositoryName()
-        self.supportemail            = self._info.getSupportEmail()
+        #self.supportemail            = self._info.getSupportEmail()
         self.repositoryIdentifier    = self._config.getRepositoryIdentifier()
 
     def targetIsVisible(self, target):

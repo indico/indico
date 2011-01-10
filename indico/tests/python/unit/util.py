@@ -89,8 +89,8 @@ class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
 
     _requires = []
 
-    def __init__(self, *args):
-        unittest.TestCase.__init__(self, *args)
+    def __init__(self, *args, **kwargs):
+        unittest.TestCase.__init__(self, *args, **kwargs)
         FeatureLoadingObject.__init__(self)
 
     def setUp(self):

@@ -62,9 +62,9 @@ from MaKaC.plugins import PluginsHolder
 from MaKaC.user import Group, Avatar
 from MaKaC.accessControl import AdminList
 
-from MaKaC.plugins.base import Observable
+from MaKaC.plugins.base import OldObservable
 
-class RequestHandlerBase(Observable):
+class RequestHandlerBase(OldObservable):
 
     _uh = None
 

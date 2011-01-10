@@ -38,6 +38,7 @@ if not skip_imports:
     from MaKaC.common.logger import Logger
     from MaKaC.i18n import _
 
+
 class MaKaCDB(DB):
     """Subclass of ZODB.DB necessary to remove possible existing dependencies
         from IC"""
@@ -50,7 +51,6 @@ class MaKaCDB(DB):
         elif modulename.startswith("IndexedCatalog.BTrees."):
             modulename="BTrees.%s"%modulename[22:]
         return DB.classFactory(self, connection, modulename, globalname)
-
 
 
 class DBMgr:

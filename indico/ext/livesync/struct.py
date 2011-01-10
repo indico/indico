@@ -74,7 +74,10 @@ class MultiPointerTrack(Persistent):
         self._pointers = PersistentMapping()
         self._elemContainer = elemContainer
 
-    def addPointer(self, pid, startPos = None):
+        # initialize first entry
+        #self._container[timestamp(0)] = elemContainer()
+
+    def addPointer(self, pid, startPos=None):
         """
         Registers a new pointer
         """

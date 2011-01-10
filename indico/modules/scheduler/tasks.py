@@ -47,11 +47,11 @@ from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 Defines base classes for tasks, and some specific tasks as well
 """
 
+
 class TimedEvent(Persistent, Fossilizable):
 
     zope.interface.implements(IUniqueIdProvider,
                               IIndexableByArbitraryDateTime)
-
 
     def getIndexingDateTime(self):
         return int_timestamp(self._getCurrentDateTime())
@@ -68,12 +68,11 @@ class TimedEvent(Persistent, Fossilizable):
             return None
 
 
-
 class BaseTask(TimedEvent):
     """
     A base class for tasks.
-    `expiryDate` is the last point in time when the task can run. A task will refuse
-    to run if current time is past `expiryDate`
+    `expiryDate` is the last point in time when the task can run. A task will
+    refuse to run if current time is past `expiryDate`
     """
 
     fossilizes(ITaskFossil)

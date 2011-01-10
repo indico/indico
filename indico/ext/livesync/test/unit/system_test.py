@@ -24,11 +24,9 @@ System tests for indico.ext.livesync
 Here, the notification parts of the plugin are tested in a global way.
 """
 
-import time, unittest
-
+# plugin imports
 from indico.ext.livesync.test.unit.base import _TestSynchronization
 
-from MaKaC.conference import CategoryManager
 
 class TestBasicOperations(_TestSynchronization):
 

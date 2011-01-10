@@ -18,6 +18,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Contains definitions for the plugin's web interface
+"""
+
 # system lib imports
 import os
 
@@ -43,19 +47,27 @@ from MaKaC.webinterface import wcomponents
 
 
 class UHAdminLiveSyncManagement(URLHandler):
+    """
+    Basic URL handler for livesync
+    """
     _relativeURL = "livesync/manage"
 
 
 # Request Handlers
 
 class RHLiveSyncHtdocs(RHHtdocs):
+    """
+    Static file handler for LiveSync plugin
+    """
 
     _url = r"^/livesync/htdocs/(?P<filepath>.*)$"
     _local_path = os.path.join(indico.ext.livesync.__path__[0], 'htdocs')
 
 
 class RHAdminLiveSyncManagement(RHAdminBase):
-
+    """
+    LiveSync management page - request handler
+    """
     _url = r'^/livesync/manage/?$'
 
     def _process(self):
@@ -65,6 +77,10 @@ class RHAdminLiveSyncManagement(RHAdminBase):
 # Plugin Settings
 
 class PluginSettingsContributor(Component):
+    """
+    Plugs to the IPluginSettingsContributor extension point, providing a "plugin
+    settings" web interface
+    """
 
     zope.interface.implements(IPluginSettingsContributor)
 
@@ -98,8 +114,9 @@ class WPPluginAgentManagement(WPAdminPlugins):
                self._includeJSFile('livesync/htdocs/js', 'livesync')
 
     def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML(
-            WPluginAgentManagement.forModule(indico.ext.livesync).getHTML(params))
+        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(
+            WPluginAgentManagement.forModule(
+                indico.ext.livesync).getHTML(params))
 
 
 class WPluginAgentManagement(WTemplated):
@@ -114,10 +131,10 @@ class WPluginAgentManagement(WTemplated):
         tplVars['syncManager'] = smanager
         tplVars['agents'] = smanager.getAllAgents()
         tplVars['availableTypes'] = avtypes.keys()
-        tplVars['extraAgentOptions'] = dict((typeName, typeClass._extraOptions) for
-                                            (typeName, typeClass) in
+        tplVars['extraAgentOptions'] = dict((typeName, typeClass._extraOptions)
+                                            for (typeName, typeClass) in
                                             avtypes.iteritems())
         tplVars['agentTableData'] = dict((agentId, agent.fossilize()) for \
-                                         (agentId, agent) in smanager.getAllAgents().iteritems())
-
+                                         (agentId, agent) in \
+                                         smanager.getAllAgents().iteritems())
         return tplVars

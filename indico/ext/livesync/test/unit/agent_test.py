@@ -106,7 +106,6 @@ class _TestAgentBehavior(unittest.TestCase):
             ObjectStub(3, 'Der Process')
             ]
 
-
 class TestPushAgentBehavior(_TestAgentBehavior):
 
     def setUp(self):

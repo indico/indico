@@ -24,6 +24,7 @@ from indico.ext.livesync import SyncManager
 from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
 from indico.util.date_time import nowutc, int_timestamp
 
+
 class LiveSync_Feature(IndicoTestFeature):
     _requires = ['plugins.Plugins', 'util.ContextManager']
 
@@ -32,10 +33,10 @@ class LiveSync_Feature(IndicoTestFeature):
 
         with obj._context('database'):
             obj._ph.getPluginType('livesync').toggleActive()
-            obj._do._notify('updateDBStructures', 'indico.ext.livesync', None, None, None)
+            obj._do._notify('updateDBStructures', 'indico.ext.livesync',
+                            None, None, None)
 
             obj._sm = SyncManager.getDBInstance()
-
 
     def destroy(self, obj):
         super(LiveSync_Feature, self).destroy(obj)
@@ -65,4 +66,4 @@ class _TestSynchronization(IndicoTestCase):
 
     def checkActions(self, fromTS, expected):
         self.assertEqual(self._prettyActions(
-            list(self._sm.getTrack().values(None, fromTS))),expected)
+            list(self._sm.getTrack().values(None, fromTS))), expected)

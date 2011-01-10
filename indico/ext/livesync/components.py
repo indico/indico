@@ -60,7 +60,7 @@ class RequestListener(Component):
 
         timestamp = int_timestamp(nowutc())
 
-        # if the returned context is a dummy one, there's nothinhg to do
+        # if the returned context is a dummy one, there's nothing to do
         if cm.__class__ == ContextManager.DummyContext:
             return
 
@@ -93,7 +93,9 @@ class ObjectChangeListener(Component):
         cm_set = ContextManager.get('indico.ext.livesync:actions').setdefault(
             obj, set([]))
 
-        cm_set |= set(actions)
+        # the context may not be initialized
+        if cm_set != None:
+            cm_set |= set(actions)
 
     def _protectionChanged(self, obj, oldValue, newValue):
         """

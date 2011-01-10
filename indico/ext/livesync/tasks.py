@@ -18,15 +18,13 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# global imports
-import logging
-
 # indico imports
 from indico.modules.scheduler import PeriodicTask
 from indico.util.date_time import nowutc, int_timestamp
 
 # plugin imports
 from indico.ext.livesync import SyncManager
+
 
 class LiveSyncUpdateTask(PeriodicTask):
     """
@@ -43,14 +41,14 @@ class LiveSyncUpdateTask(PeriodicTask):
             logger.info("Starting agent '%s'" % agtName)
             try:
                 # pass the current time and a logger
-                ts = agent.run(int_timestamp(nowutc()), logger = logger)
+                result = agent.run(int_timestamp(nowutc()), logger=logger)
             except:
                 logger.exception("Problem running agent '%s'" % agtName)
                 return
 
-            if ts == None:
-                logger.info("'Acknowledge' not sent - no records?")
-            else:
-                logger.info("'Acknowledge' sent (ts=%s)" % ts)
+            if result:
+                logger.info("Acknowledged successful operation")
                 agent.acknowledge()
+            else:
+                logger.info("'Acknowledge' not done - no records?")
             logger.info("Agent '%s' finished" % agtName)

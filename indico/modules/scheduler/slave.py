@@ -149,7 +149,6 @@ class ProcessWorker(_Worker, multiprocessing.Process):
         DBMgr.setInstance(DBMgr(hostname, port))
         self._dbi = DBMgr.getInstance()
 
-
     def isAlive(self):
         return self.is_alive()
 
