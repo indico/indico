@@ -219,8 +219,6 @@ class AccessController( Persistent, Observable ):
                     self.grantAccess(av)
                     self.revokeAccessEmail(email)
                     av.linkTo(self.getOwner(), "manager")
-        #self._v_canuseraccess[av] = False
-        #return self._v_canuseraccess[av]
         return False
 
     def getAccessList( self ):
@@ -236,11 +234,15 @@ class AccessController( Persistent, Observable ):
 
     def grantModificationEmail(self, email):
         """looks if the email is in the managersEmail list (list with the users with access to modification)
-        and if it's not it adds the email to the list"""
-        if not email in self.getModificationEmail():
+        and if it's not it adds the email to the list
+            Returns True is email was added to the list, False if it was already there.
+        """
+        if not email.lower() in map(lambda x: x.lower(), self.getModificationEmail()):
             self.getModificationEmail().append(email)
             self._p_changed = 1
-        self._notify('modificationGranted', email)
+            self._notify('modificationGranted', email)
+            return True
+        return False
 
     def revokeModificationEmail(self, email):
         if email in self.getModificationEmail():
@@ -267,20 +269,10 @@ class AccessController( Persistent, Observable ):
 
     def canModify( self, user ):
         """tells whether the specified user has modification privileges"""
-        #try:
-        #    return self._v_canmodify[user]
-        #except AttributeError:
-        #    self._v_canmodify = {}
-        #except KeyError:
-        #    pass
         if AdminList.getInstance().isAdmin( user ):
-            #self._v_canmodify[user] = 1
-            #return self._v_canmodify[user]
             return True
         for principal in self.managers:
             if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( user ):
-                #self._v_canmodify[user] = 1
-                #return self._v_canmodify[user]
                 return True
         ret = False
         if isinstance(user, MaKaC.user.Avatar):
@@ -291,10 +283,6 @@ class AccessController( Persistent, Observable ):
                     ret = True
                     user.linkTo(self.getOwner(), "manager")
         return ret
-
-        #self._v_canmodify[user] = 0
-        #return self._v_canmodify[user]
-        #return False
 
     def getModifierList( self ):
         """returns a list of those principals which have modification

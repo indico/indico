@@ -82,7 +82,6 @@ class TimeSchedule(Schedule, Persistent):
         self._entries=[]
         self._owner=owner
         self._entryGen=Counter()
-        self._v_allowReSchedule=True
         self._allowParallel=True
 
     def notifyModification(self):
@@ -261,22 +260,14 @@ class TimeSchedule(Schedule, Persistent):
                 pass
         except AttributeError:
             self._allowParallel=True
-        try:
-            if self._v_allowReSchedule:
-                pass
-        except AttributeError:
-            self._v_allowReSchedule=True
-        if self._v_allowReSchedule:
-            self._v_allowReSchedule=False
-            self._entries.sort(self.cmpEntries)
-            lastEntry=None
-            for entry in self._entries:
-                if lastEntry is not None:
-                    if not self._allowParallel:
-                        if lastEntry.collides(entry):
-                            entry.setStartDate(lastEntry.getEndDate())
-                lastEntry=entry
-            self._v_allowReSchedule=True
+        self._entries.sort(self.cmpEntries)
+        lastEntry=None
+        for entry in self._entries:
+            if lastEntry is not None:
+                if not self._allowParallel:
+                    if lastEntry.collides(entry):
+                        entry.setStartDate(lastEntry.getEndDate())
+            lastEntry=entry
         self._p_changed = 1
 
     def calculateEndDate( self ):
@@ -402,12 +393,10 @@ class TimeSchedule(Schedule, Persistent):
         """removes any overlaping among schedule entries and make them go one
             after the other without any gap
         """
-        self._v_allowReSchedule=False
         refDate=self.getStartDate('UTC')
         for entry in self._entries:
             entry.setStartDate(refDate)
             refDate=entry.getEndDate()
-        self._v_allowReSchedule=True
 
     def moveUpEntry(self,entry,tz=None):
         pass
@@ -587,7 +576,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
         entriesDay=self.getEntriesOnDay(entry.getAdjustedStartDate())
         if len(entriesDay)<2:
             return
-        self._v_allowReSchedule=False
         entrypos = 0
         if entry in entriesDay:
             entrypos = entriesDay.index(entry)
@@ -605,7 +593,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
             preventry = entriesDay[entrypos-1]
             entry.setStartDate(preventry.getStartDate(), check=0, moveEntries=1)
             preventry.setStartDate(entry.getEndDate(), check=0, moveEntries=1)
-        self._v_allowReSchedule=True
         self.reSchedule()
         self._p_changed = 1
 
@@ -615,7 +602,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
         entriesDay=self.getEntriesOnDay(entry.getAdjustedStartDate())
         if len(entriesDay)<2:
             return
-        self._v_allowReSchedule=False
         entrypos = 0
         if entry in entriesDay:
             entrypos = entriesDay.index(entry)
@@ -632,7 +618,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
             nextentry = entriesDay[entrypos+1]
             nextentry.setStartDate(entry.getStartDate(), check=0, moveEntries=1)
             entry.setStartDate(nextentry.getEndDate(), check=0, moveEntries=1)
-        self._v_allowReSchedule=True
         self.reSchedule()
         self._p_changed = 1
 
@@ -776,7 +761,6 @@ class SlotSchedule(TimeSchedule):
         entries = self.getEntriesOnDay(entry.getAdjustedStartDate())
         if len(entries)<2:
             return
-        self._v_allowReSchedule=False
         entrypos = 0
         if entry in entries:
             entrypos = entries.index(entry)
@@ -794,7 +778,6 @@ class SlotSchedule(TimeSchedule):
             preventry = entries[entrypos-1]
             entry.setStartDate(preventry.getStartDate(),check=0,moveEntries=1)
             preventry.setStartDate(entry.getEndDate(),check=0,moveEntries=1)
-        self._v_allowReSchedule=True
         self.reSchedule()
         self._p_changed = 1
 
@@ -802,7 +785,6 @@ class SlotSchedule(TimeSchedule):
         entries = self.getEntriesOnDay(entry.getAdjustedStartDate())
         if len(entries)<2:
             return
-        self._v_allowReSchedule=False
         entrypos = 0
         if entry in entries:
             entrypos = entries.index(entry)
@@ -819,7 +801,6 @@ class SlotSchedule(TimeSchedule):
             nextentry = entries[entrypos+1]
             nextentry.setStartDate(entry.getStartDate(),check=0,moveEntries=1)
             entry.setStartDate(nextentry.getEndDate(),check=0,moveEntries=1)
-        self._v_allowReSchedule=True
         self.reSchedule()
         self._p_changed = 1
 
@@ -867,16 +848,8 @@ class PosterSlotSchedule(SlotSchedule):
         self._p_changed = 1
 
     def reSchedule(self):
-        try:
-            if self._v_allowReSchedule:
-                pass
-        except AttributeError:
-            self._v_allowReSchedule=True
-        if self._v_allowReSchedule:
-            self._v_allowReSchedule=False
-            for e in self._entries:
-                e.setStartDate(self.getStartDate())
-            self._v_allowReSchedule=True
+        for e in self._entries:
+            e.setStartDate(self.getStartDate())
 
 class SlotSchTypeFactory:
     _sch={"standard":SlotSchedule,"poster":PosterSlotSchedule}

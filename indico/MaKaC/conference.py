@@ -6251,14 +6251,8 @@ class Session(CommonObjectBase):
                 self.__ac.grantModification( r )
                 r.linkTo(self, "manager")
             elif sb.getEmail() != "":
-                self.__ac.grantModificationEmail(sb.getEmail())
-                #send email once
-                try :
-                    self._v_emailSent
-                except:
-                    self._v_emailSent = []
-                if sendEmail and not sb.getEmail() in self._v_emailSent:
-                    self._v_emailSent.append(sb.getEmail())
+                modificationEmailGranted = self.__ac.grantModificationEmail(sb.getEmail())
+                if modificationEmailGranted and sendEmail:
                     notif = pendingQueues._PendingManagerNotification( [sb] )
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )
         else:
@@ -9275,13 +9269,18 @@ class Contribution(CommonObjectBase):
         self.notifyModification(raiseEvent = False)
 
     def _grantSubmissionEmail(self, email):
-        if not email in self.getSubmitterEmailList():
-            self.getSubmitterEmailList().append(email.lower())
+        """
+            Returns True if submission email was granted. False if email was already in the list.
+        """
+        if not email.lower() in map(lambda x: x.lower(), self.getSubmitterEmailList()):
+            self.getSubmitterEmailList().append(email)
+            return True
+        return False
 
     def revokeSubmissionEmail(self, email):
         if email in self.getSubmitterEmailList():
-           self.getSubmitterEmailList().remove(email)
-           self._p_changed=1
+            self.getSubmitterEmailList().remove(email)
+            self._p_changed=1
 
     def grantSubmission(self,sb, sendEmail=True):
         """Grants a user with submission privileges for the contribution
@@ -9300,14 +9299,8 @@ class Contribution(CommonObjectBase):
                 self._grantSubmission(r)
             elif sb.getEmail() != "":
                 self.getConference().getPendingQueuesMgr().addPendingSubmitter(sb, False)
-                self._grantSubmissionEmail(sb.getEmail())
-                #send email once
-                try :
-                    self._v_emailSent
-                except:
-                    self._v_emailSent = []
-                if sendEmail and not sb.getEmail() in self._v_emailSent:
-                    self._v_emailSent.append(sb.getEmail())
+                submissionEmailGranted = self._grantSubmissionEmail(sb.getEmail())
+                if submissionEmailGranted and sendEmail:
                     notif = pendingQueues._PendingSubmitterNotification( [sb] )
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )
                     if self.getConference() is not None:
