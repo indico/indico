@@ -238,7 +238,7 @@ type("ParsedRichTextWidget",['RichTextWidget'],
                     return this.rich.clean();
                 else if(this.activeAccessor == this.plain)
                     return cleanText(this.plain.get(),this.plain);
-            },
+            }
         },
         function(width, height, initialText, mode, toolbarSet) {
             this.RichTextWidget(width, height, initialText, mode, toolbarSet);
@@ -350,7 +350,7 @@ type("ParsedRichTextInlineEditWidget", ["RichTextInlineEditWidget"],
                 return this._buildFrame(self._handleEditMode(self.value),
                                         editButtons);
 
-            },
+            }
         },
         function(method, attributes, initValue, width, height) {
             this.RichTextInlineEditWidget(method, attributes, initValue, width, height)
