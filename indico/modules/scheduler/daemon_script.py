@@ -26,7 +26,7 @@ process.
 
 import time, sys, os, argparse, logging, cmd, multiprocessing
 
-from indico.modules.scheduler import Scheduler, Client, base
+from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 
 # legacy import
 from MaKaC.common.Configuration import Config
@@ -187,7 +187,6 @@ def _cmd(args):
     dbi.endRequest()
 
 def _run(args):
-
     _setup(args)
 
     dbi = DBMgr.getInstance()
@@ -213,6 +212,7 @@ def main():
     parser_restart = subparsers.add_parser('restart', help="restart the daemon")
     parser_show = subparsers.add_parser('show', help="show information")
     parser_cmd = subparsers.add_parser('cmd', help="execute a command")
+    parser_run = subparsers.add_parser('run', help="run a task, from this process")
 
     parser.add_argument("-p", "--fork-processes", dest="mode",
                         action = "store_const", const='processes',
@@ -252,6 +252,12 @@ def main():
                         help = "command to be executed")
 
     parser_cmd.set_defaults(func = _cmd)
+
+    parser_run.add_argument("taskid",
+                        type=int,
+                        help = "task to be executed (id)")
+    parser_run.set_defaults(func = _run)
+
 
     args = parser.parse_args()
 
