@@ -5093,7 +5093,7 @@ class RHConfRemoveCSS( RHConferenceModifBase ):
         sm.useLocalCSS()
         self._redirect( "%s#css"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
 
-class RHConfModifPreviewCSS(RHConferenceModifBase):
+class RHConfModifPreviewCSS(RoomBookingDBMixin, RHConferenceModifBase):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
