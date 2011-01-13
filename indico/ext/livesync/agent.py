@@ -21,9 +21,12 @@
 """
 Module containing the persistent classes that will be stored in the DB
 """
+# standard lib imports
+from threading import Thread
+from Queue import Queue, Empty
 
 # dependency libs
-import zope. interface
+import zope.interface
 from persistent import Persistent, mapping
 
 # indico api imports
@@ -34,6 +37,9 @@ from indico.util.fossilize import IFossil, fossilizes, Fossilizable
 from indico.ext.livesync.struct import SetMultiPointerTrack
 from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.base import ILiveSyncAgentProvider
+
+# legacy indico
+from MaKaC.common import DBMgr
 
 
 class QueryException(Exception):
@@ -137,22 +143,35 @@ class PushSyncAgent(SyncAgent):
     Base class for PushSyncAgents
     """
 
+    # Should specify which worker will be used
+    _workerClass = None
+
     def __init__(self, aid, name, description, updateTime):
         super(PushSyncAgent, self).__init__(aid, name, description, updateTime)
         self._lastTry = None
 
-    def _run(self, manager, data, currentTS):
+    def _run(self, data):
         """
         Overloaded - will contain the specific agent code
         """
         raise Exception("Undefined method")
 
+    def _generateRecords(self, data, lastTS):
+        """
+        Takes the raw data (i.e. "event created", etc) and transforms
+        it into a sequence of 'record/action' pairs.
+
+        Basically ,this function reduces actions to remove server "commands"
+
+        i.e. "modified 1234, deleted 1234" becomes just "delete 1234"
+
+        Overloaded by agents
+        """
+
     def run(self, currentTS, logger=None):
         """
         Main method, called when agent needs to be run
         """
-
-        self._v_logger = logger
 
         if not self._manager:
             raise AgentExecutionException("SyncAgent '%s' has no manager!" % \
@@ -167,13 +186,18 @@ class PushSyncAgent(SyncAgent):
                         (self.getId(), currentTS - 1))
 
         try:
+            records = self._generateRecords(data, currentTS - 1)
             # run agent-specific cycle
-            self._lastTry = self._run(self._manager, data, currentTS - 1)
+            result = self._run(records, logger=logger)
         except:
             logger.exception("Problem running agent %s" % self.getId())
             return None
 
-        return self._lastTry
+        if result:
+            self._lastTry = currentTS - 1
+            return self._lastTry
+        else:
+            return None
 
     def acknowledge(self):
         """
@@ -266,3 +290,140 @@ class SyncManager(Persistent):
         Returns the agent dictionary
         """
         return self._agents
+
+
+class UploaderSlave(Thread):
+    """
+    A generic threaded "work slave" for agents
+    """
+
+    def __init__(self, name, queue, logger):
+        self._keepRunning = True
+        self._logger = logger
+        self._terminate = False
+        self.result = True
+        self._queue = queue
+        self._name = name
+
+        super(UploaderSlave, self).__init__(name=name)
+
+    def run(self):
+
+        DBMgr.getInstance().startRequest()
+
+        self._logger.debug('Worker [%s] started' % self._name)
+        try:
+            while True:
+                taskFetched = False
+                try:
+                    batch = self._queue.get(True, 2)
+                    taskFetched = True
+                    self.result &= self._uploadBatch(batch)
+                except Empty:
+                    pass
+                finally:
+                    if taskFetched:
+                        self._queue.task_done()
+
+                if self._terminate:
+                    break
+        except:
+            self._logger.exception('Worker [%s]:' % self._name)
+            return 1
+        finally:
+            DBMgr.getInstance().endRequest()
+            self._logger.debug('Worker [%s] finished' % self._name)
+        self._logger.debug('Worker [%s] returning %s' % (self._name, self.result))
+
+    def terminate(self):
+        self._terminate = True
+
+    def _uploadBatch(self, batch):
+        """
+        Sends a batch of records
+        Overloaded by agent.
+        """
+        raise Exception("Unimplemented method")
+
+    def _getMetadata(self, records):
+        """
+        Generates the metadata for a batch of records.
+        Should be overloaded.
+        """
+        raise Exception("Unimplemented method")
+
+
+class ThreadedRecordUploader(object):
+    """
+    A record uploading mechanism, based on worker threads
+    """
+
+    DEFAULT_BATCH_SIZE, DEFAULT_NUM_SLAVES = 500, 2
+
+    def __init__(self, slaveClass, logger,
+                 extraSlaveArgs=(),
+                 batchSize=DEFAULT_BATCH_SIZE,
+                 numSlaves=DEFAULT_NUM_SLAVES):
+        self._logger = logger
+        self._slaveClass = slaveClass
+        self._batchSize = batchSize
+        self._numSlaves = numSlaves
+        self._queue = Queue()
+        self._slaves = {}
+        self._currentBatch = []
+        self._extraSlaveArgs = extraSlaveArgs
+
+    def spawn(self):
+        """
+        Starts the uploader (spawns slave threads)
+        """
+        for i in range(0, self._numSlaves):
+            self._slaves[i] = self._slaveClass("Uploader%s" % i,
+                                               self._queue,
+                                               self._logger,
+                                               *self._extraSlaveArgs)
+            self._slaves[i].start()
+
+    def enqueue(self, record):
+        """
+        Adds a record to the queue.
+        We actually accumulate them and queue them in batches.
+        """
+
+        # when BATCH_SIZE is passed, enqueue it
+        if len(self._currentBatch) > (self._batchSize - 1):
+            self._queue.put(self._currentBatch)
+            self._currentBatch = []
+
+        self._currentBatch.append(record)
+
+    def join(self):
+        """
+        Waits for the slave threads to finish working
+        """
+
+        result = True
+
+        # first, if there is an incomplete batch remaining, enqueue it first
+        if self._currentBatch:
+            self._queue.put(self._currentBatch)
+
+        # now, join the queue (wait for them to be uploaded)
+        self._logger.debug('joining queue')
+        self._queue.join()
+        self._logger.debug('joining slaves')
+
+        for slave in self._slaves.values():
+            slave.terminate()
+            slave.join()
+            result &= (not slave.is_alive() and slave.result)
+
+        return result
+
+    def iterateOver(self, iterator):
+        """
+        Consumes an iterator
+        """
+        # take operations and choose which records to send
+        for entry in iterator:
+            self.enqueue(entry)
