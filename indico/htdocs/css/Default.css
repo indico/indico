@@ -708,6 +708,14 @@ a.menuaddlink:hover {
    text-align: left;
 }
 
+.resvTable {
+    border-collapse: collapse;
+}
+
+.resvHover:hover {
+    background-color: #f0f0f0;
+}
+
 /*All used styles*/
 /* TODO: should probably be removed...
 .confTitle {

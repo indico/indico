@@ -1279,7 +1279,8 @@ class WConferenceModifFrame(WTemplated):
         vars = WTemplated.getVars( self )
 
         vars["conf"] = self.__conf
-        vars["date"] = utils.formatDateTime(self.__conf.getAdjustedStartDate(), format="%d %B")
+        vars["startDate"] = utils.formatDateTime(self.__conf.getAdjustedStartDate(), format="%d %B")
+        vars["endDate"] = utils.formatDateTime(self.__conf.getAdjustedEndDate(), format="%d %B")
 
         return vars
 
@@ -6573,10 +6574,11 @@ class WRoomBookingRoomDetails( WTemplated ):
 
 class WRoomBookingDetails( WTemplated ):
 
-    def __init__( self, rh, standalone = False ):
+    def __init__(self, rh, conference = None):
         self._rh = rh
         self._resv = rh._resv
-        self._standalone = standalone
+        self._conf = conference
+        self._standalone = (conference is None)
 
     def getVars( self ):
         vars=WTemplated.getVars( self )
@@ -6592,8 +6594,12 @@ class WRoomBookingDetails( WTemplated ):
 
         if self._standalone:
             vars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
+            vars["modifyBookingUH"] = urlHandlers.UHRoomBookingBookingForm
+            vars["cloneURL"] = urlHandlers.UHRoomBookingCloneBooking.getURL(self._resv)
         else:
             vars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
+            vars["modifyBookingUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
+            vars["cloneURL"] = urlHandlers.UHConfModifRoomBookingCloneBooking.getURL(self._resv, self._conf)
 
         vars["bookMessage"] = "Book"
         if not self._resv.isConfirmed:

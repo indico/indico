@@ -11827,7 +11827,7 @@ class WPConfModifRoomBookingDetails( WPConfModifRoomBookingBase ):
         self._tabExistBookings.setActive()
 
     def _getTabContent( self, params ):
-        wc = wcomponents.WRoomBookingDetails( self._rh )
+        wc = wcomponents.WRoomBookingDetails( self._rh, self._rh._conf )
         return wc.getHTML( params )
 
 # 4. New booking

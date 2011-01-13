@@ -33,21 +33,7 @@
 	<table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
 		<tr>
 			<td style="white-space: nowrap;">
-                <script type="text/javascript">
-                isOver = false
-                function handleMouseOverResv( id ) {
-	                if ( isOver ) return
-	                isOver = true
-	                resvTR = document.getElementById( id )
-	                resvTR.bgColor = '#f0f0f0'
-                }
-                function handleMouseOutResv( id ) {
-                    isOver = false
-                    resvTR = document.getElementById( id )
-                    resvTR.bgColor = ''
-                }
-                </script>
-				<table>
+				<table class="resvTable">
 					<tr>
                         <td width="15%%" class="dataCaptionFormat"> <%= _("Photo")%></td>
                         <td width="20%%" class="dataCaptionFormat"> <%= _("Room name")%></td>
@@ -63,7 +49,7 @@
                         <% onClickDetails = 'onclick="window.location=\'%s\'"' % myDetails %>
                         <% bookMe = bookingFormUH.getURL( room ) %>
                         <% modifyMe = urlHandlers.UHRoomBookingRoomForm.getURL( room ) %>
-					    <tr style="height: 60px" id="<%= room.id %>" onmouseover="handleMouseOverResv(<%=room.id%>)" onmouseout="handleMouseOutResv(<%=room.id%>)">
+					    <tr style="height: 60px" id="<%= room.id %>" class="resvHover">
 					        <td <%=onClickDetails%> >
 					            <% if room.photoId != None: %>
 					                <img src="<%= room.getSmallPhotoURL() %>" />

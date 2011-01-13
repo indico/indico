@@ -1,14 +1,17 @@
 <% from MaKaC.common.timezoneUtils import isToday, isTomorrow, isSameDay %>
 
-<% id = Booking.getId() %>
+<%
+id = Booking.getId()
+firstLineInfo = Booking._getFirstLineInfo(Timezone)
+%>
 
 <div class="collaborationDisplayBookingLine" style="padding-left: 20px">
 
     <div class="collaborationConfDisplayBookingLine">
     <span class="collaborationDisplayBookingType" style="font-style:italic">
         <%= Booking._getTypeDisplayName() %>
+        <% if not Booking.getStartDate(): %>:<% end %>
     </span>
-
     <% if Booking.getStartDate(): %>
         <% if Kind == 'scheduled' and isSameDay(Booking.getStartDate(), Booking.getEndDate(), Timezone): %>
             <span>
@@ -62,12 +65,12 @@
             <% end %>
 
             <%= formatTime(Booking.getAdjustedEndDate(Timezone).time()) %>
-        <% end %>.
+        <% end %>
+        <% if firstLineInfo: %>:<% end %><% else: %>.<% end %>
     <% end %>
 
-    <% firstLineInfo = Booking._getFirstLineInfo(Timezone) %>
     <% if firstLineInfo: %>
-        <%= firstLineInfo %>
+        <strong><%= firstLineInfo %></strong>
     <% end %>
 
     <% displayInfo = Booking._getInformationDisplay(Timezone) %>

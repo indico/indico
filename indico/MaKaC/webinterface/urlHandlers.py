@@ -505,6 +505,19 @@ class UHConfModifRoomBookingRoomDetails( URLHandler ):
 
 class UHConfModifRoomBookingBookingForm( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingBookingForm"
+
+class UHConfModifRoomBookingCloneBooking( URLHandler ):
+    _relativeURL = "conferenceModification.py/roomBookingCloneBooking"
+
+    @classmethod
+    def getURL(cls, target=None, conf=None, **params):
+        url = cls._getURL(**params)
+        if target is not None:
+            url.addParams(target.getLocator())
+        if conf is not None:
+            url.addParams(conf.getLocator())
+        return url
+
 class UHConfModifRoomBookingSaveBooking( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingSaveBooking"
 

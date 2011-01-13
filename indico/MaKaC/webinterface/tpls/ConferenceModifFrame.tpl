@@ -30,7 +30,14 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
     <a href="<%= UHConferenceModification.getURL(conf) %>">
         <span class="bannerTitle bannerTitle_0">
-            <%= conf.getTitle() %> &nbsp;<span style="font-size: 0.8em; font-style: italic;"><%= date %></span>
+            <%= conf.getTitle() %> &nbsp;<span style="font-size: 0.8em; font-style: italic;">
+            <% if startDate == endDate: %>
+                <%= startDate %>
+            <% end %>
+            <% else: %>
+                <%= startDate %> - <%= endDate %>
+            <% end %>
+            </span>
         </span>
     </a>
     <div class="banner_creator">

@@ -84,6 +84,7 @@ from MaKaC.rb_location import CrossLocationDB, Location, CrossLocationQueries
 
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
+from MaKaC.rb_tools import FormMode
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
 
@@ -7388,7 +7389,8 @@ from MaKaC.rb_location import ReservationGUID, RoomGUID, Location
 
 # 0. Base Classes
 
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Rooms
+from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Rooms,\
+    RHRoomBookingCloneBooking
 from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomList
 from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingList
 from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomDetails
@@ -7632,6 +7634,14 @@ class RHConfModifRoomBookingBookingForm( RHConferenceModifRoomBookingBase, RHRoo
         p = conferences.WPConfModifRoomBookingBookingForm( self )
         return p.display()
 
+class RHConfModifRoomBookingCloneBooking(RHConferenceModifBase, RHRoomBookingCloneBooking):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        RHRoomBookingCloneBooking._checkParams(self, params)
+
+    def _process( self ):
+        self._redirect(urlHandlers.UHConfModifRoomBookingBookingForm.getURL(self._room))
+
 class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoomBookingSaveBooking ):
     _uh = urlHandlers.UHConfModifRoomBookingSaveBooking
 
@@ -7665,16 +7675,17 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
             p = conferences.WPConfModifRoomBookingConfirmBooking( self )
             return p.display()
         else:
-            # Add it to event reservations list
-            guid = ReservationGUID( Location.parse( self._candResv.locationName ), self._candResv.id )
-            self._conf.addRoomBookingGuid( guid )
+            if self._formMode == FormMode.NEW:
+                # Add it to event reservations list
+                guid = ReservationGUID( Location.parse( self._candResv.locationName ), self._candResv.id )
+                self._conf.addRoomBookingGuid( guid )
 
-            # Set room for event / session / contribution (always only _one_ available)
-            assign2 = self._assign2Conference or self._assign2Contribution or self._assign2Session
-            if assign2:
-                croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
-                croom.setName( self._candResv.room.name )
-                assign2.setRoom( croom )
+                # Set room for event / session / contribution (always only _one_ available)
+                assign2 = self._assign2Conference or self._assign2Contribution or self._assign2Session
+                if assign2:
+                    croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
+                    croom.setName( self._candResv.room.name )
+                    assign2.setRoom( croom )
 
             # Redirect
             self._candResv.setOwner( self._conf )

@@ -35,25 +35,6 @@
 <table width="100%%" class="filesTab">
 <tr>
 <td>
-
-    <script type="text/javascript">
-    isOver = false
-    function handleMouseOverResv( id ) {
-        if ( isOver )
-        {
-         return;
-        }
-        isOver = true;
-        resvTR = document.getElementById( id );
-        resvTR.bgColor = '#f0f0f0';
-    }
-    function handleMouseOutResv( id ) {
-        isOver = false;
-        resvTR = document.getElementById( id );
-        resvTR.bgColor = '';
-    }
-    </script>
-
     <% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
 
     <% if not overload: %>
