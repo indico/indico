@@ -946,11 +946,11 @@ class RHMaterials(RHSessionModUnrestrictedContribMngCoordBase):
         p = sessions.WPSessionModifMaterials( self, self._target )
         return p.display(**self._getRequestParams())
 
-class RHMaterialsAdd(RHSessionModUnrestrictedContribMngCoordBase):
+class RHMaterialsAdd(RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifMaterials
 
     def _checkParams(self, params):
-        RHSessionModUnrestrictedContribMngCoordBase._checkParams(self, params)
+        RHSessionModCoordinationBase._checkParams(self, params)
         if not hasattr(self, "_rhSubmitMaterial"):
             self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
         self._rhSubmitMaterial._checkParams(params)
