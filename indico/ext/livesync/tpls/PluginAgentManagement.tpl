@@ -5,7 +5,7 @@
 <th>Id</th>
 <th>Name</th>
 <th>Description</th>
-<th>Last result</th>
+<th>Position</th>
 <th></th>
 </tr>
 <% for agentId, agent in agents.iteritems(): %>
@@ -14,7 +14,18 @@
       <td><%= agentId %></td>
       <td><%= agent.getName() %></td>
       <td><%= agent.getDescription() %></td>
-      <td></td>
+      <td>
+      <% if agent.isActive(): %>
+      <%= agent.getLastDT() %> (<%= agent.getLastTS() %>)
+      <% end %>
+      <% elif agent.isRecording(): %>
+      As soon as the export process has finished, click
+      <a href="javascript:activateAgent('<%= agent.getId() %>'); return false;">here</a>.
+      <% end %>
+      <% else: %>
+      Agent not active. Start the <a href="javascript:preActivateAgent('<%= agent.getId() %>'); return false;">activation process</a>.
+      <% end %>
+      </td>
       <td>
         <a href="#" onclick="javascript: editAgent('<%= agentId %>'); return false;">Edit</a> <a href="#" onclick="javascript: deleteAgent('<%= agentId %>'); return false;">Delete</a>
       </td>
@@ -32,13 +43,35 @@
 
   function deleteAgent(agentId) {
       if (confirm($T("Are you sure you want to delete agent ") + agentId + "?")) {
-          deleteAgentAction(agentId);
+          agentRequest('livesync.deleteAgent', agentId)
       }
   }
 
   function addAgent() {
       var dialog = new AddAgentDialog(availableTypes, agentExtraOptions);
       dialog.open();
+  }
+
+  function preActivateAgent(agentId) {
+      new ConfirmPopup($T('Agent activation'),
+                       activateAgentText(agentId),
+                       function(value) {
+                           if (value) {
+                              agentRequest('livesync.preActivateAgent', agentId)
+                           }
+                       }).open();
+  }
+
+  function activateAgent(agentId) {
+      new ConfirmPopup([$T('Activate '), Html.strong({}, agentId)],
+          Html.div({style: {width: '350px'}},
+                   $T('Are you sure you want to activate this agent? ' +
+                      'Please make sure that the export process finished successfully')),
+          function(value) {
+              if (value) {
+                  agentRequest('livesync.activateAgent', agentId);
+              }
+          }).open();
   }
 
   function editAgent(agentId) {

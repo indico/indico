@@ -38,6 +38,12 @@ class LiveSyncUpdateTask(PeriodicTask):
 
         # go over all the agents
         for agtName, agent in sm.getAllAgents().iteritems():
+
+            # skip agents if they're not active
+            if not agent.isActive():
+                logger.warning("Agent '%s' is not active - skipping" % agtName)
+                continue
+
             logger.info("Starting agent '%s'" % agtName)
             try:
                 # pass the current time and a logger

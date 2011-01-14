@@ -18,10 +18,23 @@
 // along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-function deleteAgentAction(agentId) {
+function activateAgentText(agentId) {
+    return Html.div(
+        {style: {width: '350px'}},
+        $T('Activation is done in two simple steps.'),
+        $T('The first step requires the remote service to be synchronized with ' +
+           'Indico. In order to do so, you should run the following command:'),
+        Html.div({style: {fontFamily: 'monospace',
+                          marginTop: '10px',
+                          marginBottom: '10px'}},
+                 'indico_livesync agent export -a '+agentId),
+        Html.div({}, $T("When it finishes, press the 'activate' button in the agent list.")),
+        Html.div({}, $T("Press 'Cancel' if you don't want to proceed with the activation.")))
+};
 
+function agentRequest(method, agentId) {
     indicoRequest(
-        'livesync.deleteAgent',
+        method,
         {'id': agentId},
         function(result, error) {
             if (error) {
@@ -30,9 +43,7 @@ function deleteAgentAction(agentId) {
                 window.location.reload();
             }
         });
-
 }
-
 
 type("AgentModificationDialog", ["ExclusivePopupWithButtons"],
      {

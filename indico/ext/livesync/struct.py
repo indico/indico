@@ -18,12 +18,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import random
-
 # ZODB related imports
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
-from BTrees.OOBTree import OOTreeSet, OOSet
+from BTrees.OOBTree import OOSet
 from ZODB.PersistentMapping import PersistentMapping
 
 
@@ -45,6 +43,9 @@ class timestamp(int):
         return - int.__cmp__(self, int(num))
 
     def _assertType(self, obj):
+        """
+        Make sure this is a timestamp
+        """
         if not isinstance(obj, timestamp):
             raise TypeError('timestamp object expected')
 
@@ -60,12 +61,16 @@ class timestamp(int):
         return "^%s" % (int.__repr__(self))
 
 
+class EmptyTrackException(Exception):
+    pass
+
 class MultiPointerTrack(Persistent):
     """
-    A MultiPointerTrack is a kind of structure that is based on an IOBTree, where
-    each entry contains an ordered set (or list, depending on the implementation)
-    of elements. Then, several "pointers" can be created, which point to different
-    positions of the track (very much like runners in a race track).
+    A MultiPointerTrack is a kind of structure that is based on an IOBTree,
+    where each entry contains an ordered set (or list, depending on the
+    implementation) of elements. Then, several "pointers" can be created,
+    which point to different positions of the track (very much like runners
+    in a race track).
     This class is abstract, implementations should be derived.
     """
 
@@ -143,6 +148,12 @@ class MultiPointerTrack(Persistent):
 
         return self._container.values(*fargs)
 
+    def _append(self, ts, val):
+        """
+        Should be overloaded.
+        """
+        raise Exception("Unimplemented method")
+
     def add(self, intTS, value):
         """
         Adds a value to the container corresponding to a specific timestamp
@@ -153,10 +164,11 @@ class MultiPointerTrack(Persistent):
 
         self._append(ts, value)
 
-    def _pointerIterator(self, pid, func, till = None):
+    def _pointerIterator(self, pid, func, till=None):
         """
-        Iterates over the positions that are left (till the end of the track) for
-        a given pointer (id). Takes a function that is applied to yielded values
+        Iterates over the positions that are left (till the end of the track)
+        for a given pointer (id). Takes a function that is applied to yielded
+        values
         """
 
         if pid == None:
@@ -183,23 +195,39 @@ class MultiPointerTrack(Persistent):
             for elem in entry:
                 yield func((int(ts), elem))
 
-    def mostRecentTS(self):
-        return self._container.minKey()
-
-    def pointerIterValues(self, pid, till = None):
+    def mostRecentTS(self, maximum=None):
         """
-        Iterates over the positions that are left (till the end of the track) for
-        a given pointer (id) - iterates over values
-        """
-        return self._pointerIterator(pid, lambda x: x[1], till = till)
-
-    def pointerIterItems(self, pid, till = None):
-        """
-        Iterates over the positions that are left (till the end of the track) for
-        a given pointer (id) - iterates over key-value pairs (iteritems)
+        Returns most recent timestamp in track (minimum key)
+        If 'maximum' is provided, return it if less recent
         """
 
-        return self._pointerIterator(pid, lambda x: x, till = till)
+        # check that the tree has something
+        if len(self._container) == 0:
+            raise EmptyTrackException()
+
+        mr = self._container.minKey()
+
+        if maximum:
+            maximum = timestamp(maximum)
+            # in timestamp logic, max() returns the oldest
+            return max(mr, maximum)
+        else:
+            return mr
+
+    def pointerIterValues(self, pid, till=None):
+        """
+        Iterates over the positions that are left (till the end of the track)
+        for a given pointer (id) - iterates over values
+        """
+        return self._pointerIterator(pid, lambda x: x[1], till=till)
+
+    def pointerIterItems(self, pid, till=None):
+        """
+        Iterates over the positions that are left (till the end of the track)
+        for a given pointer (id) - iterates over key-value pairs (iteritems)
+        """
+
+        return self._pointerIterator(pid, lambda x: x, till=till)
 
     def movePointer(self, pid, pos):
         """
@@ -209,6 +237,10 @@ class MultiPointerTrack(Persistent):
             raise KeyError("Pointer '%s' doesn't seem to exist!" % pid)
 
         ts = timestamp(pos)
+
+        # check that the tree has something
+        if len(self._container) == 0:
+            raise EmptyTrackException()
 
         # logic should be inverted here, minKey is actually a maxKey,
         # numerically - since our logics have inverted comparison, it
@@ -233,7 +265,8 @@ class MultiPointerTrack(Persistent):
 
     def _iter(self, tsfrom, tsto):
         """
-        Iterates over the whole structure, element by element (goes inside containers)
+        Iterates over the whole structure, element by elements
+        (goes inside containers)
         """
         for ts, entry in self._container.iteritems(tsfrom, tsto):
             for elem in entry:
@@ -245,8 +278,9 @@ class MultiPointerTrack(Persistent):
 
 class SetMultiPointerTrack(MultiPointerTrack):
     """
-    OOSet-based MultiPointerTrack implementation. As OOSets are ordered, order is not
-    lost. Order will depend on the __cmp__ method implemented by the contained objects.
+    OOSet-based MultiPointerTrack implementation. As OOSets are ordered, order
+    is not lost. Order will depend on the __cmp__ method implemented by the
+    contained objects.
     """
 
     def __init__(self):

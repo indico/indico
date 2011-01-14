@@ -147,8 +147,6 @@ class AgentCommand(ConsoleLiveSyncCommand):
 
     def _run(self, args):
 
-        print args
-
         if args.action == 'add_task':
             c = Client()
             task = LiveSyncUpdateTask(MINUTELY, interval=args.interval)

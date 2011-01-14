@@ -22,13 +22,16 @@
 Service handlers for livesync management
 """
 
+# indico imports
+from indico.util.date_time import nowutc, int_timestamp
+
+# plugin imports
 from indico.ext.livesync import SyncManager
 
 # indico legacy imports
 from MaKaC.services.implementation.base import AdminService, ParameterManager, \
      ServiceError
 from MaKaC.plugins.base import Observable
-
 
 
 # JSON Services
@@ -43,6 +46,7 @@ class AgentTypeInspector(Observable):
         types = {}
         cls()._notify('providesLiveSyncAgentType', types)
         return types
+
 
 class AgentModificationService(AdminService):
 
@@ -74,36 +78,50 @@ class AddAgent(AgentModificationService):
                                       60, **self._specificParams))
 
 
-class EditAgent(AgentModificationService):
-
-    def _getAnswer(self):
-        sm = SyncManager.getDBInstance()
-
-        agent = sm.getAllAgents()[self._id]
-        agent.setParameters(self._description, self._name)
-
-        for param, value in self._specificParams.iteritems():
-            agent.setExtraOption(param, value)
-
-
-class DeleteAgent(AdminService):
+class AgentOperationBase(AdminService):
 
     def _checkParams(self):
         pm = ParameterManager(self._params)
-
+        AdminService._checkParams(self)
         self._id = pm.extract('id', pType=str)
         self._sm = SyncManager.getDBInstance()
         self._agent = self._sm.getAllAgents()[self._id]
 
+
+class EditAgent(AgentOperationBase, AgentModificationService):
+
+    def _getAnswer(self):
+        self._agent.setParameters(self._description, self._name)
+
+        for param, value in self._specificParams.iteritems():
+            self._agent.setExtraOption(param, value)
+
+
+class DeleteAgent(AgentOperationBase):
 
     def _getAnswer(self):
         self._sm.removeAgent(self._agent)
         return True
 
 
+class PreActivateAgent(AgentOperationBase):
+
+    def _getAnswer(self):
+        self._agent.preActivate(int_timestamp(nowutc()))
+        return True
+
+
+class ActivateAgent(AgentOperationBase):
+
+    def _getAnswer(self):
+        self._agent.setActive(True)
+        return True
+
+
 methodMap = {
     "livesync.addAgent": AddAgent,
     "livesync.editAgent": EditAgent,
-    "livesync.deleteAgent": DeleteAgent
+    "livesync.deleteAgent": DeleteAgent,
+    "livesync.activateAgent": ActivateAgent,
+    "livesync.preActivateAgent": PreActivateAgent
 }
-

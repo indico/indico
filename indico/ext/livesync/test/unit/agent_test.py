@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
+import unittest, logging
 from indico.ext.livesync import PushSyncAgent, ActionWrapper, SyncManager, \
      ActionWrapper
 
@@ -45,10 +45,12 @@ class TestAgent(PushSyncAgent):
         super(TestAgent, self).__init__(aid, name, description, updateTime)
         self._service = service
 
-    def _run(self, manager, data, lastTS):
-
+    def _generateRecords(self, data, lastTS):
         data = list(data)
         data.reverse()
+        return data
+
+    def _run(self, data, logger=None):
 
         # send records one by one
         for ts, w in data:
@@ -110,6 +112,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
 
     def setUp(self):
 
+        self._logger = logging.getLogger('')
         self._initialize()
 
         # agents will act on behalf of the services (readers)
@@ -118,11 +121,15 @@ class TestPushAgentBehavior(_TestAgentBehavior):
         self._agt2 = TestAgent('testagent2', 'Test Agent 2', 'An agent for testing',
                               1, self._srvc2)
 
-
-
         # Register agents
         self._mgr.registerNewAgent(self._agt1)
         self._mgr.registerNewAgent(self._agt2)
+
+        self._agt1.preActivate(0)
+        self._agt2.preActivate(0)
+        self._agt1.setActive(True)
+        self._agt2.setActive(True)
+
 
     def testSimpleRecordCreation(self):
         currentTS = 0
@@ -133,7 +140,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
 
         currentTS += 1
         # check current available/borrowed books
-        self._agt1.run(currentTS)
+        self._agt1.run(currentTS, logger=self._logger)
         self._agt1.acknowledge()
 
         # nice! all of them are available! service should confirm that...
@@ -145,7 +152,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
                          set([]))
 
         currentTS += 1
-        self._agt2.run(currentTS)
+        self._agt2.run(currentTS, logger=self._logger)
         self._agt2.acknowledge()
 
         self.assertEqual(self._srvc2.getAll(),
@@ -162,14 +169,14 @@ class TestPushAgentBehavior(_TestAgentBehavior):
 
         currentTS += 1
         # check currently available/borrowed books
-        self._agt1.run(currentTS)
+        self._agt1.run(currentTS, logger=self._logger)
         self._agt1.acknowledge()
 
         self._mgr.add(currentTS, [a3])
 
         currentTS += 1
         # check current available/borrowed books
-        self._agt2.run(currentTS)
+        self._agt2.run(currentTS, logger=self._logger)
         self._agt2.acknowledge()
 
         self.assertEqual(self._srvc1.getAll(),
@@ -188,7 +195,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
 
         currentTS += 1
         # check current available/borrowed books
-        self._agt1.run(currentTS)
+        self._agt1.run(currentTS, logger=self._logger)
         self._agt1.acknowledge()
 
         # srvc2 should be out of sync
@@ -201,7 +208,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
         self._mgr.add(currentTS, [a2])
 
         currentTS += 1
-        self._agt2.run(currentTS)
+        self._agt2.run(currentTS, logger=self._logger)
         self._agt2.acknowledge()
 
         # srvc1 should be out of sync
@@ -214,7 +221,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
         self._mgr.add(currentTS, [a2])
 
         currentTS += 1
-        self._agt1.run(currentTS)
+        self._agt1.run(currentTS, logger=self._logger)
         self._agt1.acknowledge()
 
         # srvc2 should be out of sync

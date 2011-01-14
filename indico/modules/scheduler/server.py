@@ -189,7 +189,7 @@ class Scheduler(object):
             self._schedModule.moveTask(task,
                                        base.TASK_STATUS_RUNNING,
                                        status,
-                                       niocheck = True)
+                                       nocheck = True)
     ####
 
     def _getCurrentDateTime(self):

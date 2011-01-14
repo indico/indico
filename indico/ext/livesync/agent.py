@@ -22,6 +22,7 @@
 Module containing the persistent classes that will be stored in the DB
 """
 # standard lib imports
+import datetime
 from threading import Thread
 from Queue import Queue, Empty
 
@@ -31,11 +32,12 @@ from persistent import Persistent, mapping
 
 # indico api imports
 from indico.core.api import Component
-from indico.util.fossilize import IFossil, fossilizes, Fossilizable
+from indico.util.fossilize import IFossil, fossilizes, Fossilizable, conversion
 
 # plugin imports
 from indico.ext.livesync.struct import SetMultiPointerTrack
 from indico.ext.livesync.util import getPluginType
+from indico.ext.livesync.struct import EmptyTrackException
 from indico.ext.livesync.base import ILiveSyncAgentProvider
 
 # legacy indico
@@ -62,8 +64,18 @@ class IAgentFossil(IFossil):
     def getName(self):
         pass
 
+    def isActive(self):
+        pass
+
     def getDescription(self):
         pass
+
+    def getLastTS(self):
+        pass
+
+    def getLastDT(self):
+        pass
+    getLastDT.convert = conversion.Conversion.datetime
 
     def getExtraOptions(self):
         pass
@@ -87,12 +99,43 @@ class SyncAgent(Fossilizable, Persistent):
         self._description = description
         self._updateTime = updateTime
         self._manager = None
+        self._active = False
+        self._recording = True
 
     def setManager(self, manager):
         self._manager = manager
 
+    def isActive(self):
+        return self._active
+
+    def isRecording(self):
+        return self._recording
+
+    def setActive(self, value):
+        self._active = value
+
+    def preActivate(self, ts):
+        track = self._manager.getTrack()
+
+        try:
+            track.movePointer(self._id, track.mostRecentTS(ts))
+        except EmptyTrackException:
+            # if the track is empty, don't bother doing this
+            pass
+
+        # this means everything from the pointer to present will be considered
+        # when the next update is done
+        self._recording = True
+
     def getId(self):
         return self._id
+
+    def getLastTS(self):
+        return self._manager.getTrack().getPointerTimestamp(self._id)
+
+    def getLastDT(self):
+        ts = self.getLastTS()
+        return datetime.datetime.utcfromtimestamp(ts) if ts else None
 
     def getName(self):
         return self._name
@@ -150,7 +193,7 @@ class PushSyncAgent(SyncAgent):
         super(PushSyncAgent, self).__init__(aid, name, description, updateTime)
         self._lastTry = None
 
-    def _run(self, data):
+    def _run(self, data, logger=None):
         """
         Overloaded - will contain the specific agent code
         """
@@ -173,28 +216,34 @@ class PushSyncAgent(SyncAgent):
         Main method, called when agent needs to be run
         """
 
+        if currentTS == None:
+            till = None
+        else:
+            till = currentTS - 1
+
         if not self._manager:
             raise AgentExecutionException("SyncAgent '%s' has no manager!" % \
                                           self._id)
 
         # query till currentTS - 1, for integrity reasons
         data = self._manager.query(agentId=self.getId(),
-                                   till=currentTS - 1)
+                                   till=till)
 
         if logger:
             logger.info("Querying agent %s for events till %s" % \
-                        (self.getId(), currentTS - 1))
+                        (self.getId(), till))
 
         try:
-            records = self._generateRecords(data, currentTS - 1)
+            records = self._generateRecords(data, till)
             # run agent-specific cycle
             result = self._run(records, logger=logger)
         except:
-            logger.exception("Problem running agent %s" % self.getId())
+            if logger:
+                logger.exception("Problem running agent %s" % self.getId())
             return None
 
         if result:
-            self._lastTry = currentTS - 1
+            self._lastTry = till
             return self._lastTry
         else:
             return None
@@ -265,7 +314,7 @@ class SyncManager(Persistent):
         Advances the agent "pointer" to the specified timestamp
         """
         self._track.movePointer(agentId,
-                                max(self._track.mostRecentTS(), newLastTS))
+                                self._track.mostRecentTS(newLastTS))
 
     def add(self, timestamp, action):
         """

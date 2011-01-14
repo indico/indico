@@ -112,6 +112,8 @@ def _start(args):
 
 def _stop(args):
 
+    _setup(args)
+
     running = _check_running()
 
     if not args.force and not running:
@@ -184,6 +186,20 @@ def _cmd(args):
 
     dbi.endRequest()
 
+def _run(args):
+
+    _setup(args)
+
+    dbi = DBMgr.getInstance()
+
+    dbi.startRequest()
+
+    sm = SchedulerModule.getDBInstance()
+    t = sm.getTaskById(args.taskid)
+
+    t.run()
+
+    dbi.endRequest()
 
 def main():
     """
