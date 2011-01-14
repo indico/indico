@@ -114,14 +114,3 @@ class TestUninitializedContextManager(unittest.TestCase):
         "methods called on get() should do nothing"
 
         self.assertEquals(ContextManager.get('utest').doSomething(), None)
-
-    def testGetIgnoresGetItem(self):
-        "__getitem__ should do nothing"
-
-        self.assertEquals(ContextManager.get('utest')['foo'], None)
-
-    def testGetIgnoresSetItem(self):
-        "__setitem__ should be ignored"
-
-        # shouldn't fail
-        ContextManager.get('test')['foo'] = 'ubar'
