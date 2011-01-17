@@ -28,7 +28,7 @@ from dateutil.rrule import MINUTELY
 
 # indico legacy imports
 from MaKaC.common import DBMgr
-from MaKaC.conference import CategoryManager
+from MaKaC.conference import CategoryManager, ConferenceHolder
 
 # indico imports
 from indico.modules.scheduler import Client
@@ -111,13 +111,14 @@ def eventIterator(conference, tabs):
             yield scontrib
 
 
-def categoryIterator(category, tabs):
+def categoryIterator(category, tabs, verbose=True):
 
     clist = category.getSubCategoryList()
     i = 1
     for scateg in clist:
-        print "%s[%d/%d] %s %s" % ('| ' * tabs + '|-', i, len(clist),
-                                   scateg.getId(), scateg.getTitle())
+        if verbose:
+            print "%s[%d/%d] %s %s" % ('| ' * tabs + '|-', i, len(clist),
+                                       scateg.getId(), scateg.getTitle())
         for e in categoryIterator(scateg, tabs + 1):
             yield e
         i += 1
@@ -125,6 +126,23 @@ def categoryIterator(category, tabs):
     for conf in category.getConferenceList():
         yield conf
         for contrib in eventIterator(conf, tabs):
+            yield contrib
+
+
+def conferenceHolderIterator(verbose=True):
+    ch = ConferenceHolder()
+    idx = ch._getIdx()
+
+    total = len(idx.keys())
+
+    i = 1
+    for id, conf in idx.iteritems():
+        if verbose:
+            print "[%d/%d %f%%] %s %s" % (i, total, (float(i) / total * 100.0),
+                                          id, conf.getTitle())
+        i += 1
+        yield conf
+        for contrib in eventIterator(conf, 0):
             yield contrib
 
 
@@ -171,8 +189,12 @@ class AgentCommand(ConsoleLiveSyncCommand):
                 else:
                     monitor = None
 
-                agent._run(_wrapper(categoryIterator(root, 0),
-                                    agent._creationState),
+                if args.fast:
+                    iterator = conferenceHolderIterator(verbose=args.verbose)
+                else:
+                    iterator = categoryIterator(root, 0, verbose=args.verbose)
+
+                agent._run(_wrapper(iterator, agent._creationState),
                            logger=logger,
                            monitor=monitor)
 
@@ -246,6 +268,12 @@ def main():
     parser_agent_export.add_argument("--monitor", "-m", type=str,
                                      metavar="FILE_PATH",
                                      help="File to write monitoring info to" )
+
+    parser_agent_export.add_argument("--verbose", "-v", action='store_true',
+                                     help="Print text messages" )
+
+    parser_agent_export.add_argument("--fast", "-f", action='store_true',
+                                     help="Iterate ConferenceHolder instead of tree" )
 
     args = parser.parse_args()
 
