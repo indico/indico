@@ -22,7 +22,7 @@
 Module containing the persistent classes that will be stored in the DB
 """
 # standard lib imports
-import datetime
+import datetime, time
 from threading import Thread
 from Queue import Queue, Empty
 
@@ -193,7 +193,7 @@ class PushSyncAgent(SyncAgent):
         super(PushSyncAgent, self).__init__(aid, name, description, updateTime)
         self._lastTry = None
 
-    def _run(self, data, logger=None):
+    def _run(self, data, logger=None, monitor=None):
         """
         Overloaded - will contain the specific agent code
         """
@@ -211,7 +211,7 @@ class PushSyncAgent(SyncAgent):
         Overloaded by agents
         """
 
-    def run(self, currentTS, logger=None):
+    def run(self, currentTS, logger=None, monitor=None):
         """
         Main method, called when agent needs to be run
         """
@@ -236,7 +236,7 @@ class PushSyncAgent(SyncAgent):
         try:
             records = self._generateRecords(data, till)
             # run agent-specific cycle
-            result = self._run(records, logger=logger)
+            result = self._run(records, logger=logger, monitor=monitor)
         except:
             if logger:
                 logger.exception("Problem running agent %s" % self.getId())
@@ -353,6 +353,7 @@ class UploaderSlave(Thread):
         self.result = True
         self._queue = queue
         self._name = name
+        self._uploaded = 0
 
         super(UploaderSlave, self).__init__(name=name)
 
@@ -368,6 +369,7 @@ class UploaderSlave(Thread):
                     batch = self._queue.get(True, 2)
                     taskFetched = True
                     self.result &= self._uploadBatch(batch)
+                    self._uploaded += len(batch)
                 except Empty:
                     pass
                 finally:
@@ -407,12 +409,15 @@ class ThreadedRecordUploader(object):
     A record uploading mechanism, based on worker threads
     """
 
-    DEFAULT_BATCH_SIZE, DEFAULT_NUM_SLAVES = 500, 2
+    DEFAULT_BATCH_SIZE, DEFAULT_NUM_SLAVES = 1000, 2
+    MAX_DELAYED_BATCHES = 5
 
     def __init__(self, slaveClass, logger,
                  extraSlaveArgs=(),
                  batchSize=DEFAULT_BATCH_SIZE,
-                 numSlaves=DEFAULT_NUM_SLAVES):
+                 numSlaves=DEFAULT_NUM_SLAVES,
+                 maxDelayed=MAX_DELAYED_BATCHES,
+                 monitor=None):
         self._logger = logger
         self._slaveClass = slaveClass
         self._batchSize = batchSize
@@ -421,6 +426,9 @@ class ThreadedRecordUploader(object):
         self._slaves = {}
         self._currentBatch = []
         self._extraSlaveArgs = extraSlaveArgs
+        self._enqueued = 0
+        self._monitor = monitor
+        self._maxDelayed = maxDelayed
 
     def spawn(self):
         """
@@ -442,7 +450,11 @@ class ThreadedRecordUploader(object):
         # when BATCH_SIZE is passed, enqueue it
         if len(self._currentBatch) > (self._batchSize - 1):
             self._queue.put(self._currentBatch)
+            self._enqueued += len(self._currentBatch)
             self._currentBatch = []
+
+            if self._monitor:
+                self.reportStatus(self._monitor)
 
         self._currentBatch.append(record)
 
@@ -476,3 +488,18 @@ class ThreadedRecordUploader(object):
         # take operations and choose which records to send
         for entry in iterator:
             self.enqueue(entry)
+
+            while (self._queue.qsize() > self._maxDelayed):
+                self._logger.info('Too many delayed batches, sleeping')
+                time.sleep(10)
+
+    def reportStatus(self, stream):
+        totalUp = 0
+        stream.write("%d enqueued\n" % self._enqueued)
+        for i in range(0, self._numSlaves):
+            slave = self._slaves[i]
+            stream.write("\t [wrk %s] %d uploaded\n" % (slave.getName(),
+                                                     slave._uploaded))
+            totalUp += slave._uploaded
+        stream.write("%d uploaded (total)\n\n" % totalUp)
+        stream.flush()

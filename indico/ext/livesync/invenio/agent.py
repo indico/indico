@@ -18,6 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# standard lib imports
+import time
+
 # plugin imports
 from indico.ext.livesync.agent import PushSyncAgent, AgentProviderComponent, \
      UploaderSlave, ThreadedRecordUploader
@@ -69,17 +72,23 @@ class InvenioUploaderSlave(UploaderSlave):
 
         self._logger.debug('getting a batch')
 
+        tstart = time.time()
         # get a batch
         data = self._getMetadata(batch)
 
+        tgen = time.time() - tstart
+
         result = self._server.upload_marcxml(data, "-ir").read()
+
+        tupload = time.time() - (tstart + tgen)
 
         self._logger.debug('rec %s result: %s' % (batch, result))
 
         if result.startswith('[INFO]'):
             fpath = result.strip().split(' ')[-1]
-            self._logger.info('Batch of %s records stored in server (%s)' % \
-                              (len(batch), fpath))
+            self._logger.info('Batch of %d records stored in server (%s) '
+                              '[%f s %f s]- %d batches left' % \
+                              (len(batch), fpath, tgen, tupload, self._queue.qsize()))
         else:
             self._logger.error('Records: %s output: %s' % (batch, result))
             raise Exception('upload failed')
@@ -189,7 +198,7 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
     def _generateRecords(self, data, lastTS):
         return InvenioRecordProcessor.computeRecords(data)
 
-    def _run(self, records, logger=None):
+    def _run(self, records, logger=None, monitor=None):
 
         self._v_logger = logger
 
@@ -198,7 +207,8 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
         # the uploader will manage everything for us...
         uploader = ThreadedRecordUploader(InvenioUploaderSlave,
                                           self._v_logger,
-                                          extraSlaveArgs=(server,))
+                                          extraSlaveArgs=(server,),
+                                          monitor=monitor)
         uploader.spawn()
 
         if self._v_logger:

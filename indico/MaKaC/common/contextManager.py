@@ -141,7 +141,6 @@ class ContextManager(object):
         except cls.NoContextException:
             return cls.DummyContext()
 
-
     @classmethod
     def set(cls, name, value):
         """
@@ -151,4 +150,3 @@ class ContextManager(object):
             cls._getThreadContext()[name] = value
         except cls.NoContextException:
             return cls.DummyContext()
-

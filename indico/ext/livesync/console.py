@@ -136,9 +136,11 @@ def _basicStreamHandler():
 
     return logger
 
+
 def _wrapper(iterator, operation):
     for elem in iterator:
         yield elem, operation
+
 
 class AgentCommand(ConsoleLiveSyncCommand):
     """
@@ -163,9 +165,19 @@ class AgentCommand(ConsoleLiveSyncCommand):
                     raise Exception("Agent '%s' was not found!" % args.agent)
 
                 root = CategoryManager().getById(0)
+
+                if 'monitor' in args:
+                    monitor = open(args.monitor, 'w')
+                else:
+                    monitor = None
+
                 agent._run(_wrapper(categoryIterator(root, 0),
                                     agent._creationState),
-                           logger=logger)
+                           logger=logger,
+                           monitor=monitor)
+
+                if monitor:
+                    monitor.close()
 
         self._dbi.abort()
 
@@ -223,13 +235,17 @@ def main():
     ##                                  help="timestamp to start at" )
 
     parser_agent_export.add_argument("--output", "-o", type=str,
-                                     metavar="FILE",
+                                     metavar="FILE_PATH",
                                      help="file to write to (offline export)" )
 
     parser_agent_export.add_argument("--agent", "-a", type=str,
                                      metavar="AGENT_ID",
                                      required=True,
                                      help="agent to export data with" )
+
+    parser_agent_export.add_argument("--monitor", "-m", type=str,
+                                     metavar="FILE_PATH",
+                                     help="File to write monitoring info to" )
 
     args = parser.parse_args()
 
