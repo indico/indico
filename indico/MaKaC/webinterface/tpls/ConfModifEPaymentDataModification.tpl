@@ -27,6 +27,20 @@ if al.isAdmin( self._rh._getUser() ):
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat">Conditions</span></td>
             <td align="left"><TEXTAREA name="specificConditionsPayment" ROWS="6" COLS="60">%(specificConditionsPayment)s</TEXTAREA></td>
         </tr>
+        <tr>
+            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"><%= _("Payment Summary Email Message")%></span></td>
+            <td align="left">
+                <%=_("Currently this email is")%> <strong>%(receiptMsgPaymentEnabled)s</strong> (<%=_("You can change this in the")%> <a href="%(dataModificationURL)s"><%=_("registration form setup")%></a>)<br>
+                <textarea name="receiptMsgPayment" rows="6" cols="60">%(receiptMsgPayment)s</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"><%= _("Success Email Message")%></span></td>
+            <td align="left">
+                <%=_("Currently this email is")%> <strong>%(successMsgPaymentEnabled)s</strong> (<%=_("You can change this in the")%> <a href="%(dataModificationURL)s"><%=_("registration form setup")%></a>)<br>
+                <textarea name="successMsgPayment" rows="6" cols="60">%(successMsgPayment)s</textarea>
+            </td>
+        </tr>
 		<tr><td>&nbsp;</td></tr>
         <tr>
             <td colspan="2" align="left"><input type="submit" value="OK">&nbsp;<input type="submit" value="<%= _("cancel")%>" name="cancel"></td>

@@ -169,6 +169,26 @@ class EPayment(Persistent):
         else:
             return "%s"%(self.getPaymentSpecificConditions())
 
+    def getPaymentReceiptMsg(self):
+        try:
+            return self.receiptMsg
+        except:
+            self.receiptMsg = EPaymentDefaultValues.getDefaultReceiptMsg()
+        return self.receiptMsg
+
+    def setPaymentReceiptMsg(self, txt):
+        self.receiptMsg = txt
+
+    def getPaymentSuccessMsg(self):
+        try:
+            return self.successMsg
+        except:
+            self.successMsg = EPaymentDefaultValues.getDefaultSuccessMsg()
+        return self.successMsg
+
+    def setPaymentSuccessMsg(self, txt):
+        self.successMsg = txt
+
     def isActivated(self):
         return self.activated
 
@@ -300,6 +320,14 @@ CANCELLATION :
 All refunds requests must be in writing by mail to the Conference Secretary as soon as possible.
 The Conference committee reserves the right to refuse reimbursement of part or all of the fee in the case of late cancellation. However, each case of cancellation would be considered individually.
 """
+
+    @staticmethod
+    def getDefaultSuccessMsg():
+        return """Congratulations, your payment was successful."""
+
+    @staticmethod
+    def getDefaultReceiptMsg():
+        return """Please, see the summary of your order:"""
 
 class BaseEPayMod(Persistent):
 

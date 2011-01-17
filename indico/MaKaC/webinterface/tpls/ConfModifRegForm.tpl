@@ -71,6 +71,25 @@
     </td>
   </tr>
   <tr>
+    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email registrant:")%></span></td>
+    <td bgcolor="white" width="100%%">
+      <table>
+        <tr>
+          <td align="right"><strong><%= _("After registration")%></strong>:</td>
+          <td>%(sendRegEmail)s</td>
+        </tr>
+        <tr>
+          <td align="right"><strong><%= _("With a payment summary")%></strong>:</td>
+          <td>%(sendReceiptEmail)s</td>
+        </tr>
+        <tr>
+          <td align="right"><strong><%= _("After successful payment")%></strong>:</td>
+          <td>%(sendPaidEmail)s</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Must have account")%></span></td>
     <td class="blacktext">
       %(mandatoryAccount)s

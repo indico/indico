@@ -252,6 +252,15 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["mandatoryAccount"] =  _("Yes")
             if not regForm.isMandatoryAccount():
                 vars["mandatoryAccount"] =  _("No")
+            vars["sendRegEmail"] = _("Yes")
+            if not regForm.isSendRegEmail():
+                vars["sendRegEmail"] = _("No")
+            vars["sendReceiptEmail"] = _("Yes")
+            if not regForm.isSendReceiptEmail():
+                vars["sendReceiptEmail"] = _("No")
+            vars["sendPaidEmail"] = _("Yes")
+            if not regForm.isSendPaidEmail():
+                vars["sendPaidEmail"] = _("No")
             vars["Currency"]=regForm.getCurrency()
         else:
             vars["changeTo"] = "True"
@@ -269,6 +278,9 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["title"] = ""
             vars["notification"] = ""
             vars["mandatoryAccount"] = ""
+            vars["sendRegEmail"] = ""
+            vars["sendReceiptEmail"] = ""
+            vars["sendPaidEmail"] = ""
             vars["Currency"]=""
         vars["sections"] = self._getSectionsHTML()
         vars["personalfields"] = self._getPersonalFieldsHTML()
@@ -326,7 +338,16 @@ class WConfModifRegFormDataModification( wcomponents.WTemplated ):
         vars["ccList"] = ", ".join(regForm.getNotification().getCCList())
         vars["mandatoryAccount"]=""
         if regForm.isMandatoryAccount():
-            vars["mandatoryAccount"]= _("CHECKED")
+            vars["mandatoryAccount"]= "CHECKED"
+        vars["sendRegEmail"] = ""
+        vars["sendReceiptEmail"] = ""
+        vars["sendPaidEmail"] = ""
+        if regForm.isSendRegEmail():
+            vars["sendRegEmail"] = "CHECKED"
+        if regForm.isSendReceiptEmail():
+            vars["sendReceiptEmail"] = "CHECKED"
+        if regForm.isSendPaidEmail():
+            vars["sendPaidEmail"] = "CHECKED"
         vars["Currency"]="""<select name="%s">%s</select>"""%("Currency", CurrencyRegistry.getSelectItemsHTML(regForm.getCurrency()))
         vars["extraTimeAmount"] = regForm.getEndExtraTimeAmount()
         vars["extraTimeUnit"] = regForm.getEndExtraTimeUnit()

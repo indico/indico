@@ -5,8 +5,8 @@
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Current status")%></span></td>
         <td bgcolor="white" width="100%%" class="blacktext" colspan="2">
             <form action="%(setStatusURL)s" method="POST">
-                <input name="changeTo" type="hidden" value="%(changeTo)s"> 
-                <b>%(status)s</b> 
+                <input name="changeTo" type="hidden" value="%(changeTo)s">
+                <b>%(status)s</b>
                 <small><input type="submit" value="%(changeStatus)s"></small>
             </form>
         </td>
@@ -40,9 +40,25 @@ if al.isAdmin( self._rh._getUser() ):
     </tr>
 <%end%>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat">Conditions</span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Conditions")%></span></td>
         <td bgcolor="white" width="100%%" class="blacktext">
            <TEXTAREA ROWS="6" COLS="60" disabled="true" >%(specificConditionsPayment)s</TEXTAREA>
+           <br/>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Payment Summary Email Message")%></span></td>
+        <td bgcolor="white" width="100%%" class="blacktext">
+           <textarea rows="6" cols="60" disabled="disabled">%(receiptMsgPayment)s</textarea>
+           <br/>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Success Email Message")%></span></td>
+        <td bgcolor="white" width="100%%" class="blacktext">
+           <textarea rows="6" cols="60" disabled="disabled">%(successMsgPayment)s</textarea>
            <br/>
         </td>
         <td></td>

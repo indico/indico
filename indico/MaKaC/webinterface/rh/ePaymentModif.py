@@ -75,6 +75,8 @@ class RHEPaymentModifPerformDataModification( RHEPaymentModifBase ):
             #modpay.getModPayLater().setValues(params)
             modpay.setPaymentDetails(params.get("detailPayment", ""))
             modpay.setPaymentSpecificConditions(params.get("specificConditionsPayment", ""))
+            modpay.setPaymentSuccessMsg(params.get("successMsgPayment", ""))
+            modpay.setPaymentReceiptMsg(params.get("receiptMsgPayment", ""))
             from MaKaC.common import HelperMaKaCInfo
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
             al = minfo.getAdminList()

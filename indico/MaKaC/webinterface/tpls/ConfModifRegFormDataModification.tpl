@@ -85,7 +85,10 @@
       <td bgcolor="white" width="100%%"><input type="text" size="50" name="contactInfo" value="%(contactInfo)s"></td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Email Notification")%></span></td>
+      <td nowrap class="titleCellTD">
+        <span class="titleCellFormat"> <%= _("Email organisators")%></span><br>
+        <span class="smallLabel"><%= _("(on new registrations)")%></span>
+      </td>
       <td bgcolor="white" width="100%%">
         <table align="left">
         <tr>
@@ -97,7 +100,7 @@
           </td>
         </tr>
         <tr>
-          <td>
+          <td align="right">
           <b> <%= _("Cc List")%>:&nbsp;</b>
           </td>
           <td align="left">
@@ -108,8 +111,23 @@
       </td>
     </tr>
     <tr>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Email registrant...")%></span></td>
+      <td bgcolor="white" width="100%%">
+        <input type="checkbox" size="50" name="sendRegEmail" id="sendRegEmail" %(sendRegEmail)s>
+        <label for="sendRegEmail"><strong><%= _("...after registration")%></strong></label>
+        <br>
+
+        <input type="checkbox" size="50" name="sendReceiptEmail" id="sendReceiptEmail" %(sendReceiptEmail)s>
+        <label for="sendReceiptEmail"><strong><%= _("...with a payment summary")%></strong></label>
+        <br>
+
+        <input type="checkbox" size="50" name="sendPaidEmail" id="sendPaidEmail" %(sendPaidEmail)s>
+        <label for="sendPaidEmail"><strong><%= _("...after successful payment")%></strong></label>
+      </td>
+    </tr>
+    <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Must have an account")%></span></td>
-      <td bgcolor="white" width="100%%"><input type="checkbox" size="50" name="mandatoryAccount" %(mandatoryAccount)s> ( <%= _("Uncheck if an account is not needed")%>)</td>
+      <td bgcolor="white" width="100%%"><input type="checkbox" size="50" name="mandatoryAccount" %(mandatoryAccount)s> (<%= _("Uncheck if an account is not needed")%>)</td>
     </tr>
 
     <tr>

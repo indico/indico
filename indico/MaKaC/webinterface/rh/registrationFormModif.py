@@ -126,6 +126,9 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
             regForm.getNotification().setToList( utils.getEmailList(params.get("toList", "")) )
             regForm.getNotification().setCCList( utils.getEmailList(params.get("ccList", "")) )
             regForm.setMandatoryAccount(params.has_key("mandatoryAccount"))
+            regForm.setSendRegEmail(params.has_key("sendRegEmail"))
+            regForm.setSendReceiptEmail(params.has_key("sendReceiptEmail"))
+            regForm.setSendPaidEmail(params.has_key("sendPaidEmail"))
             regForm.setCurrency(params.get("Currency",""))
         self._redirect(urlHandlers.UHConfModifRegForm.getURL(self._conf))
 

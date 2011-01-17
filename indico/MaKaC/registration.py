@@ -125,6 +125,10 @@ class RegistrationForm(Persistent):
         form.setUsersLimit(self.getUsersLimit())
         form.setActivated(self.isActivated())
         form.setMandatoryAccount(self.isMandatoryAccount())
+        form.setSendRegEmail(self.isSendRegEmail())
+        form.setSendReceiptEmail(self.isSendReceiptEmail())
+        form.setSendPaidEmail(self.isSendPaidEmail())
+        form.setAllSessions()
         form.notification=self.getNotification().clone()
         form.personalData = self.getPersonalData().clone()
         acf = self.getAccommodationForm()
@@ -201,6 +205,39 @@ class RegistrationForm(Persistent):
 
     def setMandatoryAccount(self, v=True):
         self._mandatoryAccount = v
+
+    def isSendRegEmail(self):
+        try:
+            if self._sendRegEmail:
+                pass
+        except AttributeError, e:
+            self._sendRegEmail = True
+        return self._sendRegEmail
+
+    def setSendRegEmail(self, v=True):
+        self._sendRegEmail = v
+
+    def isSendReceiptEmail(self):
+        try:
+            if self._sendReceiptEmail:
+                pass
+        except AttributeError, e:
+            self._sendReceiptEmail = True
+        return self._sendReceiptEmail
+
+    def setSendReceiptEmail(self, v=True):
+        self._sendReceiptEmail = v
+
+    def isSendPaidEmail(self):
+        try:
+            if self._sendPaidEmail:
+                pass
+        except AttributeError, e:
+            self._sendPaidEmail = True
+        return self._sendPaidEmail
+
+    def setSendPaidEmail(self, v=True):
+        self._sendPaidEmail = v
 
     def setTitle( self, newName ):
         self.title = newName.strip()
@@ -722,7 +759,7 @@ There is a new registrant in '%s'. See information below:
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send mail to participant
-        if rp.getEmail().strip() != "":
+        if regForm.isSendRegEmail() and rp.getEmail().strip() != "":
             bodyReg = _("""
 Congratulations, your registration to %s was successful%s See your information below:
 
@@ -815,9 +852,9 @@ Please use this information for your payment (except for e-payment):\n
         #    GenericMailer.send(GenericNotification(maildata))
         # send email to participants
         if registrant.getEmail().strip() != "":
-            bodyReg = _("""
-             Please, see the summary of your order:\n\n%s\n\n%s""")%\
-                                                                                 ("\n".join(booking),body)
+            bodyReg = _("""%s\n\n%s\n\n%s""")%(
+                registrant.getConference().getModPay().getPaymentReceiptMsg(),
+                "\n".join(booking), body)
             to=registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
@@ -829,16 +866,12 @@ Please use this information for your payment (except for e-payment):\n
         idRegistrant=registrant.getIdPay()
 
         subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
-        body= _("""
-        thank you for the payment :\n
-
-- detail of payment  : \n%s
+        body= _("""- detail of payment  : \n%s
 - date conference    : %s
 - name conference    : %s
 - registration id    : %s""")%(registrant.getTransactionInfo().getTransactionTxt(),date,getTitle,idRegistrant)
         booking=[]
         total=0
-        booking.append( _(""" Thank you for this payment """))
         booking.append("""Quantity\t\tItem\t\tunit.price\t\tCost""")
         for gsf in registrant.getMiscellaneousGroupList():
             miscGroup=registrant.getMiscellaneousGroupById(gsf.getId())
@@ -885,10 +918,10 @@ Please use this information for your payment (except for e-payment):\n
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send email to participant
-        if registrant.getEmail().strip() != "":
-            bodyReg =  _("""
-             Congratulations, your registration and your payment were successful. See your informations below:\n\n%s\n\n%s""")%\
-                                                                                 ("\n".join(booking),body)
+        if regForm.isSendPaidEmail() and registrant.getEmail().strip() != "":
+            bodyReg =  _("""%s\n\n%s\n\n%s""")%(registrant.getConference().getModPay().getPaymentSuccessMsg(),
+                                                                "\n".join(booking),
+                                                                body)
             to=registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))

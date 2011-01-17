@@ -121,6 +121,8 @@ class WConfModifEPayment( wcomponents.WTemplated ):
             vars["detailPayment"] = self._conf.getModPay().getPaymentDetails()
             vars["conditionsPayment"] = self._conf.getModPay().getPaymentConditions()
             vars["specificConditionsPayment"] = self._conf.getModPay().getPaymentSpecificConditions()
+            vars["successMsgPayment"] = self._conf.getModPay().getPaymentSuccessMsg()
+            vars["receiptMsgPayment"] = self._conf.getModPay().getPaymentReceiptMsg()
             vars["conditionsEnabled"] = "DISABLED"
             if self._conf.getModPay().arePaymentConditionsEnabled():
                 vars["conditionsEnabled"] = "ENABLED"
@@ -133,6 +135,8 @@ class WConfModifEPayment( wcomponents.WTemplated ):
             vars["conditionsPayment"] = ""
             vars["conditionsEnabled"] = "DISABLED"
             vars["specificConditionsPayment"] = ""
+            vars["successMsgPayment"] = ""
+            vars["receiptMsgPayment"] = ""
         vars["dataModificationURL"]=urlHandlers.UHConfModifEPaymentdetailPaymentModification.getURL(self._conf)
         vars["sections"] = self._getSectionsHTML()
         return vars
@@ -151,11 +155,17 @@ class WConfModifEPaymentDataModification( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         vars["postURL"]=urlHandlers.UHConfModifEPaymentPerformdetailPaymentModification.getURL(self._conf)
+        vars["dataModificationURL"]=urlHandlers.UHConfModifRegFormDataModification.getURL(self._conf)
         vars["detailPayment"]= self._conf.getModPay().getPaymentDetails()
         vars["conditionsPayment"]= self._conf.getModPay().getPaymentConditions()
         vars["specificConditionsPayment"]= self._conf.getModPay().getPaymentSpecificConditions()
         vars["conditionsEnabled"]= ""
         if self._conf.getModPay().arePaymentConditionsEnabled():
             vars["conditionsEnabled"]= "checked=\"checked\""
+        vars["successMsgPayment"] = self._conf.getModPay().getPaymentSuccessMsg()
+        vars["receiptMsgPayment"] = self._conf.getModPay().getPaymentReceiptMsg()
+        regForm = self._conf.getRegistrationForm()
+        vars["successMsgPaymentEnabled"] = regForm.isSendPaidEmail() and _("ENABLED") or _("DISABLED")
+        vars["receiptMsgPaymentEnabled"] = regForm.isSendReceiptEmail() and _("ENABLED") or _("DISABLED")
         return vars
 
