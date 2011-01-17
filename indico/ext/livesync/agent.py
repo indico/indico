@@ -346,7 +346,7 @@ class UploaderSlave(Thread):
     A generic threaded "work slave" for agents
     """
 
-    def __init__(self, name, queue, logger):
+    def __init__(self, name, queue, logger, agent):
         self._keepRunning = True
         self._logger = logger
         self._terminate = False
@@ -354,6 +354,7 @@ class UploaderSlave(Thread):
         self._queue = queue
         self._name = name
         self._uploaded = 0
+        self._agent = agent
 
         super(UploaderSlave, self).__init__(name=name)
 

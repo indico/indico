@@ -45,6 +45,7 @@ def _yesno(message):
     else:
         return False
 
+SIZE_BATCH_PER_FILE = 1000
 
 class ConsoleLiveSyncCommand(object):
 
@@ -165,6 +166,58 @@ class AgentCommand(ConsoleLiveSyncCommand):
     Executes operations on agents
     """
 
+    def _writeFile(self, agent, prefix, nbatch, batch, logger):
+        fname = "%s%06d.out" % (prefix, nbatch)
+
+        logger.info('Generating metadata...')
+
+        with open(fname, 'w') as f:
+            data = agent._getMetadata(batch)
+            logger.info('Writing file %s' % fname)
+            f.write(data)
+
+    def _export(self, args):
+        logger = _basicStreamHandler()
+
+        if _yesno("This will export all the data to the remote service "
+                  "using the agent (takes LONG). Are you sure?"):
+            try:
+                agent = self._sm.getAllAgents()[args.agent]
+            except KeyError:
+                raise Exception("Agent '%s' was not found!" % args.agent)
+
+            root = CategoryManager().getById(0)
+
+            if args.monitor:
+                monitor = open(args.monitor, 'w')
+            else:
+                monitor = None
+
+            if args.fast:
+                iterator = conferenceHolderIterator(verbose=args.verbose)
+            else:
+                iterator = categoryIterator(root, 0, verbose=args.verbose)
+
+            if 'output' in args:
+                nbatch = 0
+                batch = []
+                for record in _wrapper(iterator, agent._creationState):
+                    if len(batch) > SIZE_BATCH_PER_FILE:
+                        self._writeFile(agent, args.output, nbatch, batch, logger)
+                        nbatch += 1
+                        batch = []
+                    batch.append(record)
+
+                if batch:
+                    self._writeFile(agent, args.output, nbatch, batch, logger)
+            else:
+                agent._run(_wrapper(iterator, agent._creationState),
+                           logger=logger,
+                           monitor=monitor)
+
+            if monitor:
+                    monitor.close()
+
     def _run(self, args):
 
         if args.action == 'add_task':
@@ -172,35 +225,7 @@ class AgentCommand(ConsoleLiveSyncCommand):
             task = LiveSyncUpdateTask(MINUTELY, interval=args.interval)
             c.enqueue(task)
         elif args.action == 'export':
-
-            logger = _basicStreamHandler()
-
-            if _yesno("This will export all the data to the remote service "
-                      "using the agent (takes LONG). Are you sure?"):
-                try:
-                    agent = self._sm.getAllAgents()[args.agent]
-                except KeyError:
-                    raise Exception("Agent '%s' was not found!" % args.agent)
-
-                root = CategoryManager().getById(0)
-
-                if 'monitor' in args:
-                    monitor = open(args.monitor, 'w')
-                else:
-                    monitor = None
-
-                if args.fast:
-                    iterator = conferenceHolderIterator(verbose=args.verbose)
-                else:
-                    iterator = categoryIterator(root, 0, verbose=args.verbose)
-
-                agent._run(_wrapper(iterator, agent._creationState),
-                           logger=logger,
-                           monitor=monitor)
-
-                if monitor:
-                    monitor.close()
-
+            self._export(args)
         self._dbi.abort()
 
 
@@ -249,6 +274,7 @@ def main():
 
     parser_agent_add_task.add_argument("--interval", "-i", type=int,
                                        default=15,
+                                       dest="interval",
                                        help="interval between runs" )
 
     ## parser_agent_export.add_argument("--from", "-f", type=int, default=15,
@@ -256,24 +282,29 @@ def main():
     ##                                  metavar="TIMESTAMP",
     ##                                  help="timestamp to start at" )
 
-    parser_agent_export.add_argument("--output", "-o", type=str,
-                                     metavar="FILE_PATH",
-                                     help="file to write to (offline export)" )
-
     parser_agent_export.add_argument("--agent", "-a", type=str,
                                      metavar="AGENT_ID",
+                                     dest="agent",
                                      required=True,
                                      help="agent to export data with" )
 
     parser_agent_export.add_argument("--monitor", "-m", type=str,
                                      metavar="FILE_PATH",
+                                     dest="monitor",
                                      help="File to write monitoring info to" )
 
     parser_agent_export.add_argument("--verbose", "-v", action='store_true',
+                                     dest="verbose",
                                      help="Print text messages" )
 
     parser_agent_export.add_argument("--fast", "-f", action='store_true',
+                                     dest="fast",
                                      help="Iterate ConferenceHolder instead of tree" )
+
+    parser_agent_export.add_argument("--output", "-o", type=str,
+                                     dest="output",
+                                     metavar="FILE_PATH_PREFIX",
+                                     help="Path/prefix for output files" )
 
     args = parser.parse_args()
 

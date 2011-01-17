@@ -42,28 +42,9 @@ class InvenioUploaderSlave(UploaderSlave):
     A worker that uploads data using HTTP
     """
 
-    def __init__(self, name, queue, logger, server):
-        super(InvenioUploaderSlave, self).__init__(name, queue, logger)
+    def __init__(self, name, queue, logger, agent, server):
+        super(InvenioUploaderSlave, self).__init__(name, queue, logger, agent)
         self._server = server
-
-    def _getMetadata(self, records):
-        """
-        Retrieves the MARCXML metadata for the record
-        """
-        xg = XMLGen()
-        di = DataInt(xg)
-
-        xg.initXml()
-
-        xg.openTag("collection", [["xmlns", "http://www.loc.gov/MARC21/slim"]])
-
-        for record, operation in records:
-            di.toMarc(record, overrideCache=True,
-                      deleted=(operation & STATUS_DELETED))
-
-        xg.closeTag("collection")
-
-        return xg.getXml()
 
     def _uploadBatch(self, batch):
         """
@@ -74,7 +55,7 @@ class InvenioUploaderSlave(UploaderSlave):
 
         tstart = time.time()
         # get a batch
-        data = self._getMetadata(batch)
+        data = self._agent._getMetadata(batch)
 
         tgen = time.time() - tstart
 
@@ -194,6 +175,25 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
         super(InvenioBatchUploaderAgent, self).__init__(
             aid, name, description, updateTime)
         self._url = url
+
+    def _getMetadata(self, records):
+        """
+        Retrieves the MARCXML metadata for the record
+        """
+        xg = XMLGen()
+        di = DataInt(xg)
+
+        xg.initXml()
+
+        xg.openTag("collection", [["xmlns", "http://www.loc.gov/MARC21/slim"]])
+
+        for record, operation in records:
+            di.toMarc(record, overrideCache=True,
+                      deleted=(operation & STATUS_DELETED))
+
+        xg.closeTag("collection")
+
+        return xg.getXml()
 
     def _generateRecords(self, data, lastTS):
         return InvenioRecordProcessor.computeRecords(data)
