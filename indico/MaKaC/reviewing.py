@@ -30,6 +30,9 @@ import tempfile
 from MaKaC.common import Config
 import conference
 from MaKaC.common.Counter import Counter
+from MaKaC.fossils.reviewing import IReviewingQuestionFossil
+from MaKaC.common.fossilize import fossilizes, Fossilizable
+from persistent.list import PersistentList
 
 ###############################################
 # Conference-wide classes
@@ -1076,10 +1079,6 @@ class ConferenceAbstractReview(Persistent):
     """
     This class manages the parameters of the abstract reviewing.
     """
-    reviewingQuestionsAnswers = ["Strongly Disagree", "Disagree", "Weakly Disagree", "Borderline", "Weakly Agree", "Agree", "Strongly Agree"]
-    reviewingQuestionsLabels = ["0", "", "", "50", "", "", "100"]
-    initialSelectedAnswer = 3
-    #valueDiference = 3 # diference between the label and the value of the radio button (label=0, value=3)
 
     def __init__( self, conference):
         """ Constructor.
@@ -1097,13 +1096,15 @@ class ConferenceAbstractReview(Persistent):
         #default dates NOT USED YET
         self._defaultAbstractReviewerDueDate = None
 
-        self._reviewingQuestions = [] #list of content reviewing and final judgement questions
+        self._reviewingQuestions = []
         # by default
         self._numberOfAnswers = 5
         self._scaleLower = 0
         self._scaleHigher = 100
         self._radioButtonsLabels = ["0", "", "50", "", "100"]
         self._radioButtonsTitles = ["0", "25", "50", "75", "100"]
+        self._questionCounter = Counter(1)
+        self.notifyModification()
 
     def getConference(self):
         """ Returns the parent conference of the ConferencePaperReview object
@@ -1111,10 +1112,12 @@ class ConferenceAbstractReview(Persistent):
         return self._conference
 
     # content reviewing and final judgement questions methods
-    def addReviewingQuestion(self, reviewingQuestion):
+    def addReviewingQuestion(self, text):
         """ Adds this question at the end of the list of questions
         """
-        self._reviewingQuestions.append(reviewingQuestion)
+        newId = self.getNewQuestionId()
+        question = Question(newId,text)
+        self._reviewingQuestions.append(question)
         self.notifyModification()
 
     def getReviewingQuestions(self):
@@ -1122,19 +1125,44 @@ class ConferenceAbstractReview(Persistent):
         """
         return self._reviewingQuestions
 
-    def setReviewingQuestions(self, questions):
-        """ Set the whole list of questions
-        """
-        self._reviewingQuestions = questions
+    #def setReviewingQuestions(self, questions):
+    #    """ Set the whole list of questions
+    #    """
+    #    self._reviewingQuestions = questions
 
-    def removeReviewingQuestion(self, reviewingQuestion):
+    def removeReviewingQuestion(self, questionId):
         """ Removes a question from the list
         """
-        if reviewingQuestion in self._reviewingQuestions:
-            self._reviewingQuestions.remove(reviewingQuestion)
+        question = self.getQuestionById(questionId)
+
+        if question:
+            self._reviewingQuestions.remove(question)
             self.notifyModification()
         else:
             raise MaKaCError("Cannot remove a question which doesn't exist")
+
+    def editReviewingQuestion(self, questionId, text):
+        """ Edit the text of a question """
+        question = self.getQuestionById(questionId)
+
+        if question:
+            question.setText(text)
+            self.notifyModification()
+        else:
+            raise MaKaCError("Cannot edit a question which doesn't exist")
+
+    def getQuestionNames(self):
+        """ Return the names of the questions which are shown in the webpage """
+        names = []
+        for question in self._reviewingQuestions:
+            names.append(question.getName())
+        return names
+
+    def getQuestionById(self, questionId):
+        """ Return the question with the especified id """
+        for question in self._reviewingQuestions:
+            if (questionId == question.getId()):
+                return question
 
     def setNumberOfAnswers(self, num):
         """ Set the number of possible answers (radio buttons) """
@@ -1233,6 +1261,11 @@ class ConferenceAbstractReview(Persistent):
         self._scaleLower = min
         self._scaleHigher = max
 
+    def getNewQuestionId(self):
+        """ Returns a new an unused questionId
+            Increments the questionId counter
+        """
+        return self._questionCounter.newCount()
 
 ##################################### NOT USED YET #####################################################
 
@@ -1373,8 +1406,34 @@ class ConferenceAbstractReview(Persistent):
 
 
 
+class Question(Persistent, Fossilizable):
 
+    """
+    This class represents a question for the abstracts reviewing.
+    """
 
+    fossilizes(IReviewingQuestionFossil)
+
+    def __init__( self, newId, text):
+        """ Constructor.
+            name is a string which represents the content of the question
+        """
+        self._id = newId
+        self._text = text
+
+    def getId(self):
+        return self._id
+
+    def getText(self):
+        return self._text
+
+    def setText(self, text):
+        self._text = text
+
+    def notifyModification(self):
+        """ Notifies the DB that a list or dictionary attribute of this object has changed
+        """
+        self._p_changed = 1
 
 
 

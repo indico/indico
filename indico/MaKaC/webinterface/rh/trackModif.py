@@ -428,7 +428,7 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
             c = 0
             for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+                self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
             self._scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
             self._scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
             self._numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
@@ -462,7 +462,7 @@ class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
             c = 0
             for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+                self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
             self._scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
             self._scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
             self._numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()

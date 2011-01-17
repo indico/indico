@@ -6625,12 +6625,18 @@ table.infoQuestionsTable td.dataHeader {
     font-family: Verdana, Arial;
     color: #523D04;
     padding: 7px;
-    border-bottom: 1px ridge #A4A4A4;
+    border-bottom: 1px groove #A4A4A4;
     font-weight: bold;
 }
 
 table.infoQuestionsTable td.content {
     padding: 7px;
+}
+
+table.infoQuestionsTable td.questionContent {
+    padding: 7px;
+    max-width: 500px;
+    min-width: 370px;
 }
 
 table.infoQuestionsTable td.dataFooter {
@@ -6647,6 +6653,11 @@ table.infoQuestionsTable td.dataBold {
     color: #523D04;
     padding: 7px;
     font-weight: bold;
+}
+
+.link {
+    cursor: pointer;
+    color: #045FB4;
 }
 
 .editLinkInLine {
@@ -6675,4 +6686,10 @@ table.infoQuestionsTable td.dataBold {
     padding-right: 25px;
     padding-top: 15px;
     padding-bottom: 15px;
+}
+
+.changeScaleWarning {
+    font-weight: bold;
+    color: #881122;
+    padding: 5px 0px 5px 5px;
 }

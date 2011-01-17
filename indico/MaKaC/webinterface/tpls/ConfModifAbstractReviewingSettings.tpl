@@ -32,7 +32,7 @@
     </tr>
     <tr>
         <td>
-            <div id="inPlaceEditQuestions"  style="padding-top: 10px; padding-left: 30px"><%= ', '.join(abstractReview.getReviewingQuestions())%></div>
+            <div id="inPlaceEditQuestions"  style="padding-top: 10px; padding-left: 30px"></div>
         </td>
     </tr>
 </table>
@@ -72,7 +72,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <div id="inPlaceEditScale" style="padding-left: 25px;"></div>
+                            <div id="inPlaceEditScale" style="padding-left: 25px; max-width: 290px;"></div>
                         </td>
                     </tr>
                 </table>
@@ -89,32 +89,15 @@
 
 
 <script type="text/javascript">
-/*new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultAbstractReviewerDueDate'),
-                   'reviewing.conference.changeAbstractReviewerDefaultDueDate',
-                   {conference: '<%= abstractReview.getConference().getId() %>',
-                    dueDateToChange: '<%= _("Abstract Reviewer")%>'},
-                   null, true);*/
+// Component for the review questions
+$E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.abstractReviewing.getQuestions',
+        'add':'reviewing.abstractReviewing.addQuestion', 'remove':'reviewing.abstractReviewing.removeQuestion',
+        'edit': 'reviewing.abstractReviewing.editQuestion'},
+        {conference: '<%= abstractReview.getConference().getId() %>'},'question', 'Questions'));
 
-// Reviewing questions
-var showReviewingQuestions = function() {
-    new IndicoUI.Widgets.Generic.keywordField(
-        $E('inPlaceEditQuestions'),
-        'multipleLinesListItem',
-        'reviewing.conference.changeAbstractQuestions',
-        {conference: '<%= abstractReview.getConference().getId() %>'},
-        $T('Remove this question from the list')
-    );
-}
-
-showReviewingQuestions();
 
 //get the first question or a default one
-var listOfQuestions = <%= abstractReview.getReviewingQuestions() %>;
-if (listOfQuestions.length == 0) {
-    var question = "Do you like Indico?";
-} else {
-    var question = listOfQuestions[0];
-}
+var question = "Do you think it is a very good abstract?";
 
 // Component for example question
 var previewQuestion =  new ExampleQuestionWidget('reviewing.abstractReviewing.updateExampleQuestion',

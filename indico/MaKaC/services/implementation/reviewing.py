@@ -40,7 +40,8 @@ from MaKaC.errors import MaKaCError
 import datetime
 from MaKaC.common.mail import GenericMailer
 from MaKaC.contributionReviewing import ReviewManager
-
+from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.reviewing import IReviewingQuestionFossil
 
 """
 Asynchronous request handlers for conference and contribution reviewing related data
@@ -183,13 +184,13 @@ class ConferenceReviewingQuestionsModification(ConferenceReviewingListModificati
     def _handleSet(self):
         self._confPaperReview.setReviewingQuestions(self._value)
 
-class ConferenceAbstractReviewingQuestionsModification(ConferenceReviewingListModificationBase):
-
-    def _handleGet(self):
-        return self._confAbstractReview.getReviewingQuestions()
-
-    def _handleSet(self):
-        self._confAbstractReview.setReviewingQuestions(self._value)
+#class ConferenceAbstractReviewingQuestionsModification(ConferenceReviewingListModificationBase):
+#
+#    def _handleGet(self):
+#        return self._confAbstractReview.getReviewingQuestions()
+#
+#    def _handleSet(self):
+#        self._confAbstractReview.setReviewingQuestions(self._value)
 
 
 class ConferenceReviewingCriteriaModification(ConferenceReviewingListModificationBase):
@@ -931,6 +932,7 @@ class AbstractReviewingChangeScale(AbstractReviewingBase):
         self._confAbstractReview.setRadioButtonsTitles()
         return self._value
 
+
 class AbstractReviewingUpdateExampleQuestion(AbstractReviewingBase):
 
     ''' Get the required data for the example question '''
@@ -944,39 +946,74 @@ class AbstractReviewingUpdateExampleQuestion(AbstractReviewingBase):
         return {"numberAnswers": numAnswers, "labels": labels, "rbValues": rbValues}
 
 
-#class AbstractReviewingBase(ConferenceModifBase, ProtectedModificationService):
-#
-#    def getJudgementObject(self):
-#        self._abstractId = self._params.get("Abstract","")
-#        abstractReview = self._target.getAbstractMgr().getAbstractById(self._abstractId).getAbstractReview()
-#        return abstractReview.getTrackCoordinatorJudgement(self._getUser())
-#
-#
-#class AbstractReviewingTextModificationBase (TextModificationBase, AbstractReviewingBase):
-#    #Note: don't change the order of the inheritance here!
-#    pass
-#
-#
-#class AbstractReviewingCriteriaModification(AbstractReviewingTextModificationBase):
-#
-#    def _checkParams(self):
-#        # question
-#        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
-#        AbstractReviewingTextModificationBase._checkParams(self)
-#        self._question = self._params.get("question","")
-#
-#    def _handleSet(self):
-#        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
-#        self.getJudgementObject().setAnswer(self._question, int(self._value))
-#
-#    def _handleGet(self):
-#        return self.getJudgementObject().getAnswer(self._question)
+class AbstractReviewingGetQuestions(AbstractReviewingBase):
+
+    ''' Get the current list of questions '''
+
+    def _getAnswer(self):
+        reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+
+class AbstractReviewingAddQuestion(AbstractReviewingBase):
+
+    ''' Add a new question '''
+
+    def _checkParams(self):
+        AbstractReviewingBase._checkParams(self)
+        self._value = self._params.get("value") # value is the question text
+
+    def _getAnswer(self):
+        self._confAbstractReview.addReviewingQuestion(self._value)
+        reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+
+class AbstractReviewingRemoveQuestion(AbstractReviewingBase):
+
+    ''' Remove a question '''
+
+    def _checkParams(self):
+        AbstractReviewingBase._checkParams(self)
+        self._value = self._params.get("value") # value is the question id
+
+    def _getAnswer(self):
+        self._confAbstractReview.removeReviewingQuestion(self._value)
+        reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+
+class AbstractReviewingEditQuestion(AbstractReviewingBase):
+
+    ''' Edit a question '''
+
+    def _checkParams(self):
+        AbstractReviewingBase._checkParams(self)
+        self._id = self._params.get("id") # value is the question id
+        self._text = self._params.get("text")
+
+    def _getAnswer(self):
+        self._confAbstractReview.editReviewingQuestion(self._id, self._text)
+        reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
 
 methodMap = {
     "conference.changeReviewingMode": ConferenceReviewingModeModification,
     "conference.changeStates": ConferenceReviewingStatesModification,
     "conference.changeQuestions": ConferenceReviewingQuestionsModification,
-    "conference.changeAbstractQuestions": ConferenceAbstractReviewingQuestionsModification,
     "conference.changeCriteria": ConferenceReviewingCriteriaModification,
     "conference.deleteTemplate" : ConferenceReviewingDeleteTemplate,
     "conference.changeCompetences": ConferenceReviewingCompetenceModification,
@@ -1027,7 +1064,10 @@ methodMap = {
 
     "abstractReviewing.changeNumberofAnswers": AbstractReviewingChangeNumAnswers,
     "abstractReviewing.changeScale": AbstractReviewingChangeScale,
-    "abstractReviewing.updateExampleQuestion": AbstractReviewingUpdateExampleQuestion
+    "abstractReviewing.updateExampleQuestion": AbstractReviewingUpdateExampleQuestion,
+    "abstractReviewing.getQuestions": AbstractReviewingGetQuestions,
+    "abstractReviewing.addQuestion": AbstractReviewingAddQuestion,
+    "abstractReviewing.removeQuestion": AbstractReviewingRemoveQuestion,
+    "abstractReviewing.editQuestion": AbstractReviewingEditQuestion
 
     }
-#    "abstract.changeCriteria": AbstractReviewingCriteriaModification

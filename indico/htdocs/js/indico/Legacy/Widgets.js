@@ -661,122 +661,121 @@ IndicoUI.Widgets = {
          * @param {Dictionary} attributes The attributes that will be passed to the method.
          * @param {Function} handler A custom function that will be called after values are saved. It will receive 2 arguments, 'result' and 'error'
          */
-    radioButtonSimpleField: function(element, options, labels, initialValue, handler) {
-        var groupName = Html.generateId(); // The common name for all the radio buttons
+	    radioButtonSimpleField: function(element, options, labels, initialValue, handler) {
+	        var groupName = Html.generateId(); // The common name for all the radio buttons
 
-        var radioButtons = []; // List of radio buttons
+	        var radioButtons = []; // List of radio buttons
 
-        for (var i=0; i<options.length; i++) {
-            // For every option we create a radio button
-            var rb = Html.radio({
-                name: groupName,
-                id: groupName + "_" + i,
-                className: "radioButtonAnswer"
-            });
-            rb.dom.value = options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
-            radioButtons.push(rb);
-        }
+	        for (var i=0; i<options.length; i++) {
+	            // For every option we create a radio button
+	            var rb = Html.radio({
+	                name: groupName,
+	                id: groupName + "_" + i,
+	                className: "radioButtonAnswer"
+	            });
+	            rb.dom.value = options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
+	            radioButtons.push(rb);
+	        }
 
-        Logic.onlyOne(radioButtons, false); //Ensures that only 1 radio button will be selected at a given time
+	        Logic.onlyOne(radioButtons, false); //Ensures that only 1 radio button will be selected at a given time
 
-        if (initialValue) {
-            for (var j=0; j<options.length; j++) {
-                // We mark as checked the radio button corresponding to 'initialValue' if there is one
-                if (options[j] == initialValue) {
-                    radioButtons[j].dom.defaultChecked = true; //defaultChecked instead of checked seems to do the trick for IE7
-                }
-            }
-        }
+	        if (initialValue) {
+	            for (var j=0; j<options.length; j++) {
+	                // We mark as checked the radio button corresponding to 'initialValue' if there is one
+	                if (options[j] == initialValue) {
+	                    radioButtons[j].dom.defaultChecked = true; //defaultChecked instead of checked seems to do the trick for IE7
+	                }
+	            }
+	        }
 
-        var table = Html.table();
-        table.dom.style.display = 'inline';
-        var tbody = Html.tbody();
-        table.set(tbody);
+	        var table = Html.table();
+	        table.dom.style.display = 'inline';
+	        var tbody = Html.tbody();
+	        table.set(tbody);
 
-        var row1 = Html.tr();
-        var row2 = Html.tr();
+	        var row1 = Html.tr();
+	        var row2 = Html.tr();
 
-        for (var l = 0; l < radioButtons.length; l++) {
-            var cell1 = Html.td();
-            cell1.dom.vAlign = 'bottom';
-            cell1.dom.align = 'center';
-            cell1.append(Html.label({
-                htmlFor: groupName + "_" + l
-            }, labels[l]));
-            row1.append(cell1);
+	        for (var l = 0; l < radioButtons.length; l++) {
+	            var cell1 = Html.td();
+	            cell1.dom.vAlign = 'bottom';
+	            cell1.dom.align = 'center';
+	            cell1.append(Html.label({
+	                htmlFor: groupName + "_" + l
+	            }, labels[l]));
+	            row1.append(cell1);
 
-            var cell2 = Html.td();
-            cell2.append(radioButtons[l]);
-            row2.append(cell2);
-        }
+	            var cell2 = Html.td();
+	            cell2.append(radioButtons[l]);
+	            row2.append(cell2);
+	        }
 
-        cellMessage = Html.td();
-        cellMessage.dom.style.verticalAlign = "middle";
-        cellMessage.dom.rowSpan = 2;
+	        cellMessage = Html.td();
+	        cellMessage.dom.style.verticalAlign = "middle";
+	        cellMessage.dom.rowSpan = 2;
 
-        tbody.append(row1);
-        tbody.append(row2);
+	        tbody.append(row1);
+	        tbody.append(row2);
 
-        if (element) {
-            element.set(table);
-        }
+	        if (element) {
+	            element.set(table);
+	        }
 
-        return table;
-
-
-    },
-
-    radioButtonPreviewQuestion: function(options, labels, numId) {
-        var groupName = "_GID"+numId; // The common name for all the radio buttons
-
-        var radioButtons = []; // List of radio buttons
-
-        for (var i=0; i<options.length; i++) {
-            // For every option we create a radio button
-            var rb = Html.radio({
-                name: groupName,
-                id: groupName + "_" + i,
-                className: "radioButtonAnswer"
-            });
-            rb.dom.value = options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
-            radioButtons.push(rb);
-        }
-
-        Logic.onlyOne(radioButtons, false); //Ensures that only 1 radio button will be selected at a given time
-
-        var table = Html.table();
-        table.dom.style.display = 'inline';
-        var tbody = Html.tbody();
-        table.set(tbody);
-
-        var row1 = Html.tr();
-        var row2 = Html.tr();
-
-        for (var l = 0; l < radioButtons.length; l++) {
-            var cell1 = Html.td();
-            cell1.dom.vAlign = 'bottom';
-            cell1.dom.align = 'center';
-            cell1.append(Html.label({
-                htmlFor: groupName + "_" + l
-            }, labels[l]));
-            row1.append(cell1);
-
-            var cell2 = Html.td();
-            cell2.append(radioButtons[l]);
-            row2.append(cell2);
-        }
-
-        cellMessage = Html.td();
-        cellMessage.dom.style.verticalAlign = "middle";
-        cellMessage.dom.rowSpan = 2;
-
-        tbody.append(row1);
-        tbody.append(row2);
-
-        return table;
+	        return table;
 
 
-    },
+	    },
+
+	    radioButtonPreviewQuestion: function(options, labels, numId) {
+	        var groupName = "_GID"+numId; // The common name for all the radio buttons
+
+	        var radioButtons = []; // List of radio buttons
+
+	        for (var i=0; i<options.length; i++) {
+	            // For every option we create a radio button
+	            var rb = Html.radio({
+	                name: groupName,
+	                id: groupName + "_" + i,
+	                className: "radioButtonAnswer"
+	            });
+	            rb.dom.value = options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
+	            radioButtons.push(rb);
+	        }
+
+	        Logic.onlyOne(radioButtons, false); //Ensures that only 1 radio button will be selected at a given time
+
+	        var table = Html.table();
+	        table.dom.style.display = 'inline';
+	        var tbody = Html.tbody();
+	        table.set(tbody);
+
+	        var row1 = Html.tr();
+	        var row2 = Html.tr();
+
+	        for (var l = 0; l < radioButtons.length; l++) {
+	            var cell1 = Html.td();
+	            cell1.dom.vAlign = 'bottom';
+	            cell1.dom.align = 'center';
+	            cell1.append(Html.label({
+	                htmlFor: groupName + "_" + l
+	            }, labels[l]));
+	            row1.append(cell1);
+
+	            var cell2 = Html.td();
+	            cell2.append(radioButtons[l]);
+	            row2.append(cell2);
+	        }
+
+	        cellMessage = Html.td();
+	        cellMessage.dom.style.verticalAlign = "middle";
+	        cellMessage.dom.rowSpan = 2;
+
+	        tbody.append(row1);
+	        tbody.append(row2);
+
+	        return table;
+
+	    },
 
         /**
              * Creates a field with two lists of items and two buttons.
@@ -1204,8 +1203,177 @@ IndicoUI.Widgets = {
 
         applyForParticipationForm: function(conf) {
             // TODO
-        }
-    }// end of Generic namespace
+        },
+
+        /* Widget to add, remove, edit and show question in the abstract reviewing
+        @param methods: get, add, remove, edit
+        @param kindOfElement: Title of the element that you want to manage. Example 'question'
+        @param header: Header for the table of elements
+        @return result (return of request): list of items with the fields 'text': content of the item, 'id': element id.
+        @return the content of the component. Table with list of elements and input and button to add new elements to the list
+      */
+        manageListOfElements: function(methods, attributes, kindOfElement, header) {
+
+            var widgetContent = Html.div();
+
+            indicoRequest(methods.get,
+                        attributes,
+                        function(result, error){
+                            if (!error) {
+                                widgetContent.append(drawListOfElements(result));
+                                widgetContent.append(drawFooter());
+                            }
+                        });
+
+            // Draw the widget footer with both, the input and the add button
+            var drawFooter = function() {
+
+                // Remove previous elements
+                if ($E('addElementsDiv')) {
+                    widgetContent.remove($E('addElementsDiv'));
+                }
+
+                var content = Html.div({id: 'addElementsDiv', style:{paddingTop:'10px'}});
+
+                var edit = Html.edit({size: '30'});
+                var addButton = Html.input('button','popUpButton',$T('Add '+kindOfElement));
+
+                addButton.observeClick(function(){
+	                  var element = edit.get();
+	                  if (element != '') {
+                          var attr = attributes;
+                          attr['value'] = element;
+                          indicoRequest(methods.add,
+	                              attr,
+	                              function(result, error){
+	                                  if (!error) {
+                                          widgetContent.append(drawListOfElements(result));
+                                          widgetContent.append(drawFooter());
+	                                  }
+	                              });
+	                      edit.set('');
+	                  }
+                });
+
+                content.append(edit);
+                content.append(addButton);
+
+                return content;
+            };
+
+        // Draw the list of current questions added
+        var drawListOfElements = function(result) {
+            // Initialize the i counter
+            this.i = 0;
+            self = this;
+
+            // Remove previous elements
+            if ($E('elementsDiv')) {
+                widgetContent.remove($E('elementsDiv'));
+            }
+
+            if (result.length) {
+                var content = Html.div({id:'elementsDiv'});
+                var table = Html.table({className:'infoQuestionsTable', cellspacing:'0'});
+                content.append(table);
+
+                // Create the header
+                var trHeaders = Html.tr();
+                table.append(trHeaders);
+                var tdElement = Html.td({className:'dataHeader'},header);
+                var tdEdit = Html.td({className:'dataHeader'},'');
+                var tdRemove = Html.td({className:'dataHeader'},'');
+                trHeaders.append(tdElement);
+                trHeaders.append(tdEdit);
+                trHeaders.append(tdRemove);
+
+                // Create the table with the required data
+                var tr;
+                var spanRemoveList = [];
+                var spanEditList = [];
+
+                for (var i=0; i < result.length ; i++) {
+                    tr = Html.tr({className: 'infoTR'});
+                    tdElement = Html.td({className: 'questionContent'}, result[i].text);
+                    tdElement.dom.id = "TEID_"+result[i].id;
+
+                    // 'Edit' elements and functionality
+                    tdEdit = Html.td({className: 'content'});
+                    var spanEdit = Html.span({className: 'link'},'Edit');
+                    spanEdit.dom.id = "QEID_"+result[i].id; // Set the span id with the question id included
+                    spanEdit.dom.name = result[i].text;
+                    spanEditList.push(spanEdit);
+                    tdEdit.append(spanEdit);
+
+                    spanEditList[i].observeClick(function(event) {
+                        var spanId = event.target.id.split('_')[1];
+                        var previousText = $E('TEID_'+spanId).dom.textContent;
+                        var popupContent = Html.textarea({id:'modifyArea', cols:'40', rows:'7'}, previousText);
+                        var popup = new SavePopup('Edit '+kindOfElement, popupContent,
+                                function(event) {
+                                    var attr = attributes;
+                                    attr['id'] = spanId;
+                                    attr['text'] = popupContent.dom.value;
+                                    indicoRequest(methods.edit,
+                                        attr,
+                                        function(result, error){
+                                            if (!error) {
+                                                widgetContent.append(drawListOfElements(result));
+                                                widgetContent.append(drawFooter());
+                                            }
+                                        });
+                                    });
+                        popup.open();
+                    });
+
+                    // 'Remove' elements and functionality
+                    tdRemove = Html.td({className: 'content'});
+                    var spanRemove = Html.span({className: 'link'},'Remove');
+                    spanRemove.dom.id = "QRID_"+result[i].id; // Set the span id with the question id included
+                    spanRemoveList.push(spanRemove);
+                    tdRemove.append(spanRemove);
+
+                    spanRemoveList[i].observeClick(function(event){
+                        var spanId = event.target.id.split('_')[1];
+
+                        var attr = attributes;
+                        attr['value'] = spanId;
+
+                        var popupContent = Html.span({}, 'Are you sure you want to remove the element?');
+                        var popup = new SavePopup('Remove '+kindOfElement, popupContent,
+                                function(event) {
+                                    var attr = attributes;
+                                    attr['id'] = spanId;
+                                    indicoRequest(methods.remove,
+                                        attr,
+                                        function(result, error){
+                                            if (!error) {
+                                                widgetContent.append(drawListOfElements(result));
+                                                widgetContent.append(drawFooter());
+                                                }
+                                        });
+                                });
+                        popup.open();
+                    });
+
+
+                    table.append(tr);
+                    tr.append(tdElement);
+                    tr.append(tdEdit);
+                    tr.append(tdRemove);
+                }
+            }
+            return content;
+
+          };
+
+          return widgetContent;
+      }
+
+    },// end of Generic namespace
+
+
+
 };
 
 

@@ -465,7 +465,7 @@ class RHPropToAcc(RHAbstractModifBase):
             c = 0
             for i in conf.getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+                self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
             self._scaleLower = conf.getConfAbstractReview().getScaleLower()
             self._scaleHigher = conf.getConfAbstractReview().getScaleHigher()
             self._numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()
@@ -511,7 +511,7 @@ class RHPropToRej(RHAbstractModifBase):
             c = 0
             for i in conf.getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i] = int(params.get("_GID"+str(c),ConferenceAbstractReview.initialSelectedAnswer))
+                self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
             self._scaleLower = conf.getConfAbstractReview().getScaleLower()
             self._scaleHigher = conf.getConfAbstractReview().getScaleHigher()
             self._numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()

@@ -617,6 +617,44 @@ type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
         }
     );
 
+ * It will have a title, a close button, an SAVE button and a Cancel button.
+ * @param {Html or String} title The title of the error popup.
+ * @param {Element} content Anything you want to put inside.
+ * @param {function} handler A function that will be called with a boolean as argument:
+ *                   true if the user pressers "Save", or false if the user presses "Cancel"
+ */
+type("SavePopup", ["ExclusivePopupWithButtons"],
+    {
+         draw: function() {
+             var self = this;
+
+             var saveButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('Save'));
+             saveButton.observeClick(function(){
+                 self.close();
+                 self.handler(true);
+             });
+
+             var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
+             cancelButton.observeClick(function(){
+                 self.close();
+             });
+
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                     this.content,
+                     Html.div({}, saveButton, cancelButton));
+         }
+    },
+
+    function(title, content, handler) {
+        var self = this;
+
+        this.content = content;
+        this.handler = handler;
+        this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+            return true;
+        });
+    }
+);
 
 /**
  * Utility function to display a three buttons popup.

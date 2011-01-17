@@ -1650,30 +1650,37 @@ type("ScaleEditWidget", ["InlineEditWidget"],
         {
             /* builds the basic structure for both display and
                edit modes */
-            __buildStructure: function(minValue, maxValue) {
-                // keep everything in separate lines
-                return Html.table({},
-                         Html.tbody({},
-                                 Html.tr({},Html.td("supportEntry", "From :"),
-                                         Html.td({}, minValue)),
-                                 Html.tr({},Html.td("supportEntry", "To :"),
-                                         Html.td({}, maxValue))));
+
+            __buildStructure: function(minValue, maxValue, warning) {
+                var div = Html.div();
+                var structure = Html.table({},
+                                    Html.tbody({},
+                                        Html.tr({},Html.td("supportEntry", "From :"),
+                                            Html.td({}, minValue)),
+                                        Html.tr({},Html.td("supportEntry", "To :"),
+                                            Html.td({}, maxValue))));
+                div.append(structure)
+                if (warning) { // edit mode
+                    div.append(warning);
+                }
+	            return div;
             },
 
             _handleEditMode: function(value) {
                 // create the fields
                 this.min = Html.edit({size: 2}, value.min);
                 this.max = Html.edit({size: 2}, value.max);
+                this.warning = Html.div({className:'changeScaleWarning'}, "Please note that when the scale is changed all the previous ratings are set to the new scale values.");
                 // add the fields to the parameter manager
                 this.__parameterManager.add(this.min, 'int_or_neg', false);
                 this.__parameterManager.add(this.max, 'int_or_neg', false);
                 // call buildStructure with modification widgets
-                return this.__buildStructure(this.min, this.max);
+                return this.__buildStructure(this.min, this.max, this.warning);
             },
 
             _handleDisplayMode: function(value) {
-                // call buildStructure with spans
-                return this.__buildStructure(value.min, value.max);
+                // call buildStructure
+                return this.__buildStructure(value.min, value.max, null);
             },
 
             _getNewValue: function() {

@@ -2506,12 +2506,17 @@ class AbstractJudgement( Persistent ):
         ''' Update the judgement value '''
         self._judValue = self.calculateJudgementAverage() # judgement average value
 
+    def setAnswersTotalValue(self):
+        ''' Calculate the sum of all the ratings. '''
+        self._totalJudValue = self.calculateAnswersTotalValue()
+
     def recalculateJudgementValues(self, scaleLower, scaleHigher):
         ''' Update the values of the judgement. This function is called when the scale is changed.'''
         self.setScaleLower(scaleLower)
         self.setScaleHigher(scaleHigher)
         self.setAnswersAverage()
         self.setJudValue()
+        self.setAnswersTotalValue()
 
     def getScaleLower(self):
         try:

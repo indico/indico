@@ -54,7 +54,7 @@ var showQuestions = function() {
         <% for q in abstractReview.getReviewingQuestions(): %>
             var newDiv = Html.div({style:{marginLeft:'10px'}});
 
-            newDiv.append(Html.span(null,"<%=q%>"));
+            newDiv.append(Html.span(null,"<%=q.getText()%>"));
             newDiv.append(Html.br());
 
             newDiv.append(new IndicoUI.Widgets.Generic.radioButtonSimpleField(

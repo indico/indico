@@ -54,8 +54,15 @@ class IReviewManagerFossil(IFossil):
     getLastReview.result = IReviewFossil
 
 
+class IReviewingQuestionFossil(IFossil):
+    """
+    Fossil for the reviewing questions
+    """
+    def getId(self):
+        pass
 
-
+    def getText(self):
+        pass
 
 
 
