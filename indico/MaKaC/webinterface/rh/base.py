@@ -47,7 +47,7 @@ from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from xml.sax.saxutils import escape
 
@@ -378,6 +378,20 @@ class RH(RequestHandlerBase):
         p=errors.WPNoReportError(self,e)
         return p.display()
 
+    def _processNotFoundError(self,e):
+        """Process not found error; uses NoReportError template
+        """
+
+        Logger.get('requestHandler').info('Request %s finished with NotFoundError: "%s"' % (id(self._req), e))
+
+        try:
+            self._req.status = apache.HTTP_NOT_FOUND
+        except NameError:
+            pass
+
+        p=errors.WPNoReportError(self,e)
+        return p.display()
+
     def _processParentTimingError(self,e):
         """Treats timing errors occured during the process of a RH.
         """
@@ -548,8 +562,12 @@ class RH(RequestHandlerBase):
             self._endRequestSpecific2RH( False )
             DBMgr.getInstance().endRequest(False)
         except NoReportError, e:
-            #Error filling the values of a form
+            #Error without report option
             res = self._processNoReportError( e )
+            DBMgr.getInstance().endRequest(False)
+        except NotFoundError, e:
+            #File not fond error
+            res = self._processNotFoundError( e )
             DBMgr.getInstance().endRequest(False)
         except HtmlScriptError,e:
             res = self._processHtmlScriptError(e)

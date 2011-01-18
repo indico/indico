@@ -25,7 +25,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.pages import files
 from MaKaC.common import Config
-from MaKaC.errors import MaKaCError, NoReportError
+from MaKaC.errors import NotFoundError
 
 from email.Utils import formatdate
 
@@ -36,7 +36,7 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
         try:
             RHFileBase._checkParams( self, params )
         except:
-            raise NoReportError("The file you try to access does not exist.")
+            raise NotFoundError("The file you try to access does not exist.")
 
     def _checkProtection( self ):
         RHDisplayBaseProtected._checkProtection( self )
@@ -91,7 +91,7 @@ class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
         try:
             RHLinkBase._checkParams( self, params )
         except:
-            raise NoReportError("The file you try to access does not exist.")
+            raise NotFoundError("The file you try to access does not exist.")
 
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
@@ -108,7 +108,7 @@ class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
         try:
             RHLinkBase._checkParams( self, params )
         except:
-            raise NoReportError("The file you try to access does not exist.")
+            raise NotFoundError("The file you try to access does not exist.")
 
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
