@@ -213,6 +213,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
         vars["enablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "enabledSection" )))
         vars["disablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "disabledSection" )))
         if regForm.isActivated():
+            vars["activated"] = True
             vars["changeTo"] = "False"
             vars["status"] =  _("ENABLED")
             vars["changeStatus"] =  _("DISABLE")
@@ -252,6 +253,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["mandatoryAccount"] =  _("Yes")
             if not regForm.isMandatoryAccount():
                 vars["mandatoryAccount"] =  _("No")
+            vars["notificationSender"] = regForm.getNotificationSender()
             vars["sendRegEmail"] = _("Yes")
             if not regForm.isSendRegEmail():
                 vars["sendRegEmail"] = _("No")
@@ -263,6 +265,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
                 vars["sendPaidEmail"] = _("No")
             vars["Currency"]=regForm.getCurrency()
         else:
+            vars["activated"] = False
             vars["changeTo"] = "True"
             vars["status"] =_("DISABLED")
             vars["changeStatus"] = _("ENABLE")
@@ -278,6 +281,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["title"] = ""
             vars["notification"] = ""
             vars["mandatoryAccount"] = ""
+            vars["notificationSender"] = ""
             vars["sendRegEmail"] = ""
             vars["sendReceiptEmail"] = ""
             vars["sendPaidEmail"] = ""
@@ -339,6 +343,7 @@ class WConfModifRegFormDataModification( wcomponents.WTemplated ):
         vars["mandatoryAccount"]=""
         if regForm.isMandatoryAccount():
             vars["mandatoryAccount"]= "CHECKED"
+        vars["notificationSender"] = regForm.getNotificationSender()
         vars["sendRegEmail"] = ""
         vars["sendReceiptEmail"] = ""
         vars["sendPaidEmail"] = ""

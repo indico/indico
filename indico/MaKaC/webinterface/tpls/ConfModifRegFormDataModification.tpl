@@ -85,6 +85,10 @@
       <td bgcolor="white" width="100%%"><input type="text" size="50" name="contactInfo" value="%(contactInfo)s"></td>
     </tr>
     <tr>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Email notification sender address")%></span></td>
+      <td bgcolor="white" width="100%%"><input type="text" size="50" name="notificationSender" value="%(notificationSender)s"></td>
+    </tr>
+    <tr>
       <td nowrap class="titleCellTD">
         <span class="titleCellFormat"> <%= _("Email organisators")%></span><br>
         <span class="smallLabel"><%= _("(on new registrations)")%></span>

@@ -125,6 +125,7 @@ class RegistrationForm(Persistent):
         form.setUsersLimit(self.getUsersLimit())
         form.setActivated(self.isActivated())
         form.setMandatoryAccount(self.isMandatoryAccount())
+        form.setNotificationSender(self.getNotificationSender())
         form.setSendRegEmail(self.isSendRegEmail())
         form.setSendReceiptEmail(self.isSendReceiptEmail())
         form.setSendPaidEmail(self.isSendPaidEmail())
@@ -205,6 +206,20 @@ class RegistrationForm(Persistent):
 
     def setMandatoryAccount(self, v=True):
         self._mandatoryAccount = v
+
+    def setNotificationSender(self, sender):
+        self._notificationSender = sender
+
+    def getNotificationSender(self):
+        sender = None
+        try:
+            if self._notificationSender:
+                sender = self._notificationSender
+        except AttributeError, e:
+            pass
+        if not sender:
+            self._notificationSender = self._conf.getSupportEmail(returnNoReply=True).split(',', 1)[0]
+        return self._notificationSender
 
     def isSendRegEmail(self):
         try:
@@ -727,7 +742,7 @@ class Notification(Persistent):
         """
             Creates an email to be sent to the user after registration
         """
-        fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         url = urlHandlers.UHConferenceDisplay.getURL(regForm.getConference())
 
 #        if rp.getConference().getModPay().isActivated():
@@ -788,7 +803,7 @@ Congratulations, your registration to %s was successful%s See your information b
     def sendEmailNewRegistrantDetailsPay(self, regForm,registrant):
         if not registrant.getConference().getModPay().isEnableSendEmailPaymentDetails():
             return
-        fromAddr=registrant.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         date=registrant.getConference().getStartDate()
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
@@ -861,7 +876,7 @@ Please use this information for your payment (except for e-payment):\n
             GenericMailer.send(GenericNotification(maildata))
 
     def sendEmailNewRegistrantConfirmPay(self, regForm,registrant):
-        fromAddr=registrant.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         date=registrant.getConference().getStartDate()
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
@@ -928,7 +943,7 @@ Please use this information for your payment (except for e-payment):\n
             GenericMailer.send(GenericNotification(maildata))
 
     def sendEmailModificationRegistrant(self, regForm, rp):
-        fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         subject= _("""Registration modified for '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
         body= _("""
 _("Registrant Id"): %s
