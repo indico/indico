@@ -23,7 +23,7 @@ import time
 
 # plugin imports
 from indico.ext.livesync.agent import PushSyncAgent, AgentProviderComponent, \
-     UploaderSlave, ThreadedRecordUploader
+     RecordUploader
 from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
 
 # legacy indico
@@ -37,45 +37,8 @@ from MaKaC.common.xmlGen import XMLGen
 STATUS_DELETED, STATUS_CREATED, STATUS_CHANGED = 1, 2, 4
 
 
-class InvenioUploaderSlave(UploaderSlave):
-    """
-    A worker that uploads data using HTTP
-    """
-
-    def __init__(self, name, queue, logger, agent, server):
-        super(InvenioUploaderSlave, self).__init__(name, queue, logger, agent)
-        self._server = server
-
-    def _uploadBatch(self, batch):
-        """
-        Uploads a batch to the Invenio server
-        """
-
-        self._logger.debug('getting a batch')
-
-        tstart = time.time()
-        # get a batch
-        data = self._agent._getMetadata(batch)
-
-        tgen = time.time() - tstart
-
-        result = self._server.upload_marcxml(data, "-ir").read()
-
-        tupload = time.time() - (tstart + tgen)
-
-        self._logger.debug('rec %s result: %s' % (batch, result))
-
-        if result.startswith('[INFO]'):
-            fpath = result.strip().split(' ')[-1]
-            self._logger.info('Batch of %d records stored in server (%s) '
-                              '[%f s %f s]- %d batches left' % \
-                              (len(batch), fpath, tgen, tupload, self._queue.qsize()))
-        else:
-            self._logger.error('Records: %s output: %s' % (batch, result))
-            raise Exception('upload failed')
-
-        return True
-
+# Attention: if this class is not declared, the LiveSync management interface
+# will never know this plugin exists!
 
 class InvenioRecordProcessor(object):
 
@@ -167,7 +130,6 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
     Invenio WebUpload-compatible LiveSync agent
     """
 
-    _workerClass = InvenioUploaderSlave
     _creationState = STATUS_CREATED
     _extraOptions = {'url': 'Server URL'}
 
@@ -205,26 +167,58 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
         server = InvenioConnector(self._url)
 
         # the uploader will manage everything for us...
-        uploader = ThreadedRecordUploader(InvenioUploaderSlave,
-                                          self._v_logger,
-                                          extraSlaveArgs=(server,),
-                                          monitor=monitor)
-        uploader.spawn()
+
+        uploader = InvenioRecordUploader(logger, self, server)
 
         if self._v_logger:
             self._v_logger.info('Starting metadata/upload cycle')
 
         # iterate over the returned records and upload them
-        uploader.iterateOver(records)
-
-        # wait for uploader to finish
-        result = uploader.join()
-
-        return result
+        return uploader.iterateOver(records)
 
 
-# Attention: if this class is not declared, the LiveSync management interface
-# will never know this plugin exists!
+class InvenioRecordUploader(RecordUploader):
+    """
+    A worker that uploads data using HTTP
+    """
+
+    def __init__(self, logger, agent, server):
+        super(InvenioRecordUploader, self).__init__(logger, agent)
+        self._server = server
+
+    def _uploadBatch(self, batch):
+        """
+        Uploads a batch to the Invenio server
+        """
+
+        self._logger.debug('getting a batch')
+
+        tstart = time.time()
+        # get a batch
+
+        self._logger.info('Generating metadata')
+        data = self._agent._getMetadata(batch)
+        self._logger.info('Metadata ready ')
+
+        tgen = time.time() - tstart
+
+        result = self._server.upload_marcxml(data, "-ir").read()
+
+        tupload = time.time() - (tstart + tgen)
+
+        self._logger.debug('rec %s result: %s' % (batch, result))
+
+        if result.startswith('[INFO]'):
+            fpath = result.strip().split(' ')[-1]
+            self._logger.info('Batch of %d records stored in server (%s) '
+                              '[%f s %f s]' % \
+                              (len(batch), fpath, tgen, tupload))
+        else:
+            self._logger.error('Records: %s output: %s' % (batch, result))
+            raise Exception('upload failed')
+
+        return True
+
 
 class InvenioAgentProviderComponent(AgentProviderComponent):
     _agentType = InvenioBatchUploaderAgent

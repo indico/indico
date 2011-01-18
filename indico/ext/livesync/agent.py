@@ -341,69 +341,46 @@ class SyncManager(Persistent):
         return self._agents
 
 
-class UploaderSlave(Thread):
-    """
-    A generic threaded "work slave" for agents
-    """
+class RecordUploader(object):
 
-    def __init__(self, name, queue, logger, agent):
-        self._keepRunning = True
+    DEFAULT_BATCH_SIZE, DEFAULT_NUM_SLAVES = 1000, 2
+
+    def __init__(self, logger, agent, batchSize=DEFAULT_BATCH_SIZE):
         self._logger = logger
-        self._terminate = False
-        self.result = True
-        self._queue = queue
-        self._name = name
-        self._uploaded = 0
         self._agent = agent
-
-        super(UploaderSlave, self).__init__(name=name)
-
-    def run(self):
-
-        DBMgr.getInstance().startRequest()
-
-        self._logger.debug('Worker [%s] started' % self._name)
-        try:
-            while True:
-                taskFetched = False
-                try:
-                    batch = self._queue.get(True, 2)
-                    taskFetched = True
-                    self.result &= self._uploadBatch(batch)
-                    self._uploaded += len(batch)
-                except Empty:
-                    pass
-                finally:
-                    if taskFetched:
-                        self._queue.task_done()
-
-                if self._terminate:
-                    break
-        except:
-            self._logger.exception('Worker [%s]:' % self._name)
-            return 1
-        finally:
-            DBMgr.getInstance().endRequest()
-            self._logger.debug('Worker [%s] finished' % self._name)
-        self._logger.debug('Worker [%s] returning %s' % (self._name, self.result))
-
-    def terminate(self):
-        self._terminate = True
+        self._batchSize = batchSize
 
     def _uploadBatch(self, batch):
         """
-        Sends a batch of records
-        Overloaded by agent.
+        To be overloaded by uploaders
         """
-        raise Exception("Unimplemented method")
+        raise Exception("Unimplemented method!")
 
-    def _getMetadata(self, records):
+    def iterateOver(self, iterator):
         """
-        Generates the metadata for a batch of records.
-        Should be overloaded.
+        Consumes an iterator
         """
-        raise Exception("Unimplemented method")
 
+        currentBatch = []
+
+        # take operations and choose which records to send
+        for record in iterator:
+
+            if len(currentBatch) > (self._batchSize - 1):
+                self._uploadBatch(currentBatch)
+                currentBatch = []
+
+            currentBatch.append(record)
+
+        if currentBatch:
+            self._uploadBatch(currentBatch)
+
+        return True
+
+###################
+# This code is now unused.
+#
+#
 
 class ThreadedRecordUploader(object):
     """
@@ -528,3 +505,72 @@ class ThreadedRecordUploader(object):
             totalUp += slave._uploaded
         stream.write("%d uploaded (total)\n\n" % totalUp)
         stream.flush()
+
+
+class UploaderSlave(Thread):
+    """
+    A generic threaded "work slave" for agents
+    """
+
+    def __init__(self, name, queue, logger, agent):
+        self._keepRunning = True
+        self._logger = logger
+        self._terminate = False
+        self.result = True
+        self._queue = queue
+        self._name = name
+        self._uploaded = 0
+        self._agent = agent
+        self._startTime = time.time()
+        self._currentBatch = []
+        self._dead = False
+
+        super(UploaderSlave, self).__init__(name=name)
+
+    def run(self):
+
+        DBMgr.getInstance().startRequest()
+
+        self._logger.debug('Worker [%s] started' % self._name)
+        try:
+            while True:
+                taskFetched = False
+                try:
+                    self._currentBatch = self._queue.get(True, 2)
+                    taskFetched = True
+                    self._startTime = time.time()
+                    self.result &= self._uploadBatch(self._currentBatch)
+                    self._uploaded += len(self._currentBatch)
+                except Empty:
+                    pass
+                finally:
+                    if taskFetched:
+                        self._queue.task_done()
+
+                if self._terminate:
+                    break
+        except:
+            self._logger.exception('Worker [%s]:' % self._name)
+            return 1
+        finally:
+            DBMgr.getInstance().endRequest()
+            self._logger.debug('Worker [%s] finished' % self._name)
+        self._logger.debug('Worker [%s] returning %s' % (self._name, self.result))
+
+    def terminate(self):
+        self._terminate = True
+
+    def _uploadBatch(self, batch):
+        """
+        Sends a batch of records
+        Overloaded by agent.
+        """
+        raise Exception("Unimplemented method")
+
+    def _getMetadata(self, records):
+        """
+        Generates the metadata for a batch of records.
+        Should be overloaded.
+        """
+        raise Exception("Unimplemented method")
+
