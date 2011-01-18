@@ -38,7 +38,7 @@ from indico.util.fossilize import IFossil, fossilizes, Fossilizable, conversion
 from indico.ext.livesync.struct import SetMultiPointerTrack
 from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.struct import EmptyTrackException
-from indico.ext.livesync.base import ILiveSyncAgentProvider
+from indico.ext.livesync.base import ILiveSyncAgentProvider, MPT_GRANULARITY
 
 # legacy indico
 from MaKaC.common import DBMgr
@@ -100,7 +100,7 @@ class SyncAgent(Fossilizable, Persistent):
         self._updateTime = updateTime
         self._manager = None
         self._active = False
-        self._recording = True
+        self._recording = False
 
     def setManager(self, manager):
         self._manager = manager
@@ -135,7 +135,7 @@ class SyncAgent(Fossilizable, Persistent):
 
     def getLastDT(self):
         ts = self.getLastTS()
-        return datetime.datetime.utcfromtimestamp(ts) if ts else None
+        return datetime.datetime.utcfromtimestamp(ts * MPT_GRANULARITY) if ts else None
 
     def getName(self):
         return self._name
@@ -320,13 +320,7 @@ class SyncManager(Persistent):
         """
         Adds a specific action to the specified timestamp
         """
-        if type(action) == list:
-            for a in action:
-                # TODO: bulk add at low level?
-                self._track.add(timestamp, a)
-        else:
-            # TODO: timestamp conversion (granularity)!
-            self._track.add(timestamp, action)
+        self._track.add(timestamp / MPT_GRANULARITY, action)
 
     def getTrack(self):
         """
@@ -389,14 +383,16 @@ class ThreadedRecordUploader(object):
 
     DEFAULT_BATCH_SIZE, DEFAULT_NUM_SLAVES = 1000, 2
     MAX_DELAYED_BATCHES = 5
+    MAX_THREAD_REQUEST_TIME = 300
 
-    def __init__(self, slaveClass, logger,
+    def __init__(self, slaveClass, agent, logger,
                  extraSlaveArgs=(),
                  batchSize=DEFAULT_BATCH_SIZE,
                  numSlaves=DEFAULT_NUM_SLAVES,
                  maxDelayed=MAX_DELAYED_BATCHES,
                  monitor=None):
         self._logger = logger
+        self._agent = agent
         self._slaveClass = slaveClass
         self._batchSize = batchSize
         self._numSlaves = numSlaves
@@ -416,6 +412,7 @@ class ThreadedRecordUploader(object):
             self._slaves[i] = self._slaveClass("Uploader%s" % i,
                                                self._queue,
                                                self._logger,
+                                               self._agent,
                                                *self._extraSlaveArgs)
             self._slaves[i].start()
 
@@ -494,6 +491,8 @@ class ThreadedRecordUploader(object):
             while (self._queue.qsize() > self._maxDelayed):
                 self._logger.info('Too many delayed batches, sleeping')
                 time.sleep(10)
+
+            self._checkThreadHealth()
 
     def reportStatus(self, stream):
         totalUp = 0

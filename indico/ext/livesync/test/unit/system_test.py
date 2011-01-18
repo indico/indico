@@ -38,16 +38,16 @@ class TestBasicOperations(_TestSynchronization):
         with self._context('database', 'request'):
             conf1 = self._home.newConference(self._dummy)
 
-        self.checkActions(0, [set([(self._home, 'data_changed'),
-                                    (conf1, 'created data_changed')])])
+        self.checkActions(0, set([(self._home, 'data_changed'),
+                                  (conf1, 'created data_changed')]))
 
         ts = self._nextTS()
 
         with self._context('database', 'request'):
             conf2 = self._home.newConference(self._dummy)
 
-        self.checkActions(ts, [set([(self._home, 'data_changed'),
-                                    (conf2, 'created data_changed')])])
+        self.checkActions(ts, set([(self._home, 'data_changed'),
+                                   (conf2, 'created data_changed')]))
 
     def testEventTitleChange(self):
         """
@@ -62,7 +62,7 @@ class TestBasicOperations(_TestSynchronization):
         with self._context('database', 'request'):
             conf1.setTitle('1234 test')
 
-        self.checkActions(ts, [set([(conf1, 'data_changed title_changed')])])
+        self.checkActions(ts, set([(conf1, 'data_changed title_changed')]))
 
     def testEventDelete(self):
         """
@@ -77,7 +77,7 @@ class TestBasicOperations(_TestSynchronization):
         with self._context('database', 'request'):
             conf1.delete()
 
-        self.checkActions(ts, [set([(conf1, 'data_changed deleted')])])
+        self.checkActions(ts, set([(conf1, 'data_changed deleted')]))
 
     def testCategoryCreateDelete(self):
         """
@@ -88,17 +88,17 @@ class TestBasicOperations(_TestSynchronization):
             categ1 = self._home.newSubCategory(1)
             categ2 = categ1.newSubCategory(0)
 
-        self.checkActions(0, [set([(self._home, 'data_changed'),
-                                   (categ1, 'created data_changed set_private'),
-                                   (categ2, 'created')])])
+        self.checkActions(0, set([(self._home, 'data_changed'),
+                                  (categ1, 'created data_changed set_private'),
+                                  (categ2, 'created')]))
 
         ts = self._nextTS()
 
         with self._context('database', 'request'):
             categ1.delete()
 
-        self.checkActions(ts, [set([(categ1, 'deleted'),
-                                    (categ2, 'deleted')])])
+        self.checkActions(ts, set([(categ1, 'deleted'),
+                                   (categ2, 'deleted')]))
 
     def testCategoryMove(self):
         """
@@ -110,17 +110,17 @@ class TestBasicOperations(_TestSynchronization):
             categ2 = self._home.newSubCategory(0)
             categ3 = categ1.newSubCategory(0)
 
-        self.checkActions(0, [set([(self._home, 'data_changed'),
-                                   (categ1, 'created data_changed set_private'),
+        self.checkActions(0, set([(self._home, 'data_changed'),
+                                  (categ1, 'created data_changed set_private'),
                                    (categ2, 'created'),
-                                   (categ3, 'created')])])
+                                   (categ3, 'created')]))
 
         ts = self._nextTS()
 
         with self._context('database', 'request'):
             categ3.move(categ2)
 
-        self.checkActions(ts, [set([(categ3, 'moved set_public')])])
+        self.checkActions(ts, set([(categ3, 'moved set_public')]))
 
     def testEventCreateDeleteInside(self):
         """
@@ -133,20 +133,20 @@ class TestBasicOperations(_TestSynchronization):
             cont2 = conf1.newContribution()
             scont1 = cont1.newSubContribution()
 
-        self.checkActions(0, [set([(self._home, 'data_changed'),
-                                   (conf1, 'created data_changed'),
-                                   (cont1, 'created data_changed'),
-                                   (cont2, 'created'),
-                                   (scont1, 'created')])])
+        self.checkActions(0, set([(self._home, 'data_changed'),
+                                  (conf1, 'created data_changed'),
+                                  (cont1, 'created data_changed'),
+                                  (cont2, 'created'),
+                                  (scont1, 'created')]))
         ts = self._nextTS()
 
         with self._context('database', 'request'):
             conf1.delete()
 
-        self.checkActions(ts, [set([(conf1, 'data_changed deleted'),
+        self.checkActions(ts, set([(conf1, 'data_changed deleted'),
                                    (cont1, 'deleted'),
                                    (cont2, 'deleted'),
-                                   (scont1, 'deleted')])])
+                                   (scont1, 'deleted')]))
 
 
 class TestProtectionChanges(_TestSynchronization):
@@ -171,8 +171,8 @@ class TestProtectionChanges(_TestSynchronization):
             conf2.setProtection(1)
 
         # events should change from public <-> private
-        self.checkActions(ts, [set([(conf1, 'set_public'),
-                                    (conf2, 'set_private')])])
+        self.checkActions(ts, set([(conf1, 'set_public'),
+                                   (conf2, 'set_private')]))
 
     def testIndirectConferenceProtectionChanges(self):
         """
@@ -194,8 +194,8 @@ class TestProtectionChanges(_TestSynchronization):
             categ2.moveConference(conf2, categ1)
 
         # events should change from public <-> private
-        self.checkActions(ts, [set([(conf1, 'data_changed moved set_public'),
-                                    (conf2, 'data_changed moved set_private')])])
+        self.checkActions(ts, set([(conf1, 'data_changed moved set_public'),
+                                   (conf2, 'data_changed moved set_private')]))
 
         ts = self._nextTS()
 
@@ -206,9 +206,9 @@ class TestProtectionChanges(_TestSynchronization):
 
         # categories should be the only ones changed
         # (because events will be changed indirectly)
-        self.checkActions(ts, [set([
+        self.checkActions(ts, set([
             (categ1, 'set_public'),
-            (categ2, 'set_private')])])
+            (categ2, 'set_private')]))
 
 # TODO
 # * Contributions

@@ -41,14 +41,9 @@
         <%= page._getJavaScriptInclude(baseurl + "/js/calendar/calendar-setup.js") %>
 
         <!-- Page Specific CSS files-->
-        <% for CSSFile in extraCSSFiles: %>
-            <link rel="stylesheet" type="text/css" href="<%= baseurl %>/css/<%= CSSFile %>">
+        <% for cssFile in extraCSS: %>
+            <link rel="stylesheet" type="text/css" href="<%= baseurl + '/' + cssFile %>">
         <% end %>
-
-        <!-- Page Specific, directly inserted CSS -->
-        <style type="text/css">
-            <%= "\n".join(extraCSS) %>
-        </style>
 
         <!-- Page Specific, directly inserted Javascript -->
         <script type="text/javascript">

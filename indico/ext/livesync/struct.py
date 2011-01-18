@@ -60,9 +60,13 @@ class timestamp(int):
     def __repr__(self):
         return "^%s" % (int.__repr__(self))
 
+    @classmethod
+    def fromObject(cls, obj):
+        return obj.__timestamp__()
 
 class EmptyTrackException(Exception):
     pass
+
 
 class MultiPointerTrack(Persistent):
     """
@@ -171,13 +175,9 @@ class MultiPointerTrack(Persistent):
         values
         """
 
-        if pid == None:
-            ptrPos = self._container.minKey()
-        else:
-            ptrPos = self._pointers[pid]
-            if ptrPos:
-                ptrPos = timestamp(ptrPos)
+        return self.iterate(self._pointers[pid], till, func)
 
+    def iterate(self, fromPos=None, till=None, func=(lambda x: x)):
         if till != None:
             till = timestamp(till)
             # negative numbers mean "last but one", "last but two", etc...
@@ -185,13 +185,17 @@ class MultiPointerTrack(Persistent):
                 # most common case
                 till = self._container.maxKey() - 1
 
-        it = self._container.iteritems(till, ptrPos)
-            # consume a single position
+        if fromPos != None:
+            fromPos = timestamp(fromPos)
 
+        it = self._container.iteritems(till, fromPos)
+
+        # consume a single position
         for ts, entry in it:
-            if ts == ptrPos:
-                # finish one element before end
+            if fromPos and ts == fromPos:
+                # stop immediately if we're past fromPosGran
                 raise StopIteration
+
             for elem in entry:
                 yield func((int(ts), elem))
 
@@ -213,6 +217,17 @@ class MultiPointerTrack(Persistent):
             return max(mr, maximum)
         else:
             return mr
+
+    def oldestTS(self):
+        """
+        Returns least recent timestamp in track (maximum key)
+        """
+
+        # check that the tree has something
+        if len(self._container) == 0:
+            raise EmptyTrackException()
+
+        return self._container.maxKey()
 
     def pointerIterValues(self, pid, till=None):
         """
@@ -245,8 +260,8 @@ class MultiPointerTrack(Persistent):
         # logic should be inverted here, minKey is actually a maxKey,
         # numerically - since our logics have inverted comparison, it
         # ends up like this
-        if ts < self._container.minKey() or \
-               ts > self._container.maxKey():
+        if ts < (self._container.minKey()) \
+               or (ts > self._container.maxKey()):
             raise ValueError("timestamp %s outside bounds" % ts)
         else:
             self._pointers[pid] = pos
@@ -263,17 +278,15 @@ class MultiPointerTrack(Persistent):
         """
         self._container.__delitem__(item)
 
-    def _iter(self, tsfrom, tsto):
+    def __iter__(self):
         """
         Iterates over the whole structure, element by elements
         (goes inside containers)
         """
-        for ts, entry in self._container.iteritems(tsfrom, tsto):
-            for elem in entry:
-                yield ts, elem
+        return self.iterate()
 
-    def __iter__(self):
-        return self._iter(None, None)
+    def __contains__(self, ts):
+        return timestamp(ts) in self._container
 
 
 class SetMultiPointerTrack(MultiPointerTrack):

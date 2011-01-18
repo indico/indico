@@ -119,7 +119,7 @@ def categoryIterator(category, tabs, verbose=True):
     for scateg in clist:
         if verbose:
             print "%s[%d/%d] %s %s" % ('| ' * tabs + '|-', i, len(clist),
-                                       scateg.getId(), scateg.getTitle())
+                                         scateg.getId(), scateg.getTitle())
         for e in categoryIterator(scateg, tabs + 1):
             yield e
         i += 1
@@ -139,8 +139,9 @@ def conferenceHolderIterator(verbose=True):
     i = 1
     for id, conf in idx.iteritems():
         if verbose:
-            print "[%d/%d %f%%] %s %s" % (i, total, (float(i) / total * 100.0),
-                                          id, conf.getTitle())
+            text = "[%d/%d %f%%] %s %s" % (i, total, (float(i) / total * 100.0),
+                                            id, conf.getTitle())
+            print text[:80].ljust(80),'\r',
         i += 1
 
         yield conf
@@ -149,7 +150,11 @@ def conferenceHolderIterator(verbose=True):
 
 
 def _basicStreamHandler():
+    formatter = logging.Formatter(
+        "%(threadName)s %(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
     handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
     logger = logging.getLogger('')
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
@@ -204,7 +209,7 @@ class AgentCommand(ConsoleLiveSyncCommand):
             else:
                 iterator = categoryIterator(root, 0, verbose=args.verbose)
 
-            if 'output' in args:
+            if args.output:
                 nbatch = 0
                 batch = []
                 for record in _wrapper(iterator, agent._creationState, self._dbi):

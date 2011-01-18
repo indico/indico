@@ -74,12 +74,14 @@ class WPBase:
     def _setTitle( self, newTitle ):
         self._title = newTitle.strip()
 
+    def getCSSFiles(self):
+        return []
+
     def getJSFiles(self):
         return self._includePresentationFiles() + \
                self._includeJSPackage('Core') + \
                self._includeJSPackage('Legacy') + \
                self._includeJSPackage('Common')
-
 
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'
@@ -145,8 +147,7 @@ class WPBase:
                             "baseurl": baseurl,
                             "conf": Config.getInstance(),
                             "page": self,
-                            "extraCSSFiles": self._extraCSSFiles,
-                            "extraCSS": self._extraCSS,
+                            "extraCSS": self.getCSSFiles(),
                             "extraJSFiles": self.getJSFiles(),
                             "extraJS": self._extraJS,
                             "language": language

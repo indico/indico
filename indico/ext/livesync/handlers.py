@@ -81,14 +81,18 @@ class AddAgent(AgentModificationService):
 class AgentOperationBase(AdminService):
 
     def _checkParams(self):
-        pm = ParameterManager(self._params)
+        self._pm = ParameterManager(self._params)
         AdminService._checkParams(self)
-        self._id = pm.extract('id', pType=str)
+        self._id = self._pm.extract('id', pType=str)
         self._sm = SyncManager.getDBInstance()
         self._agent = self._sm.getAllAgents()[self._id]
 
 
 class EditAgent(AgentOperationBase, AgentModificationService):
+
+    def _checkParams(self):
+        AgentOperationBase._checkParams(self)
+        AgentModificationService._checkParams(self)
 
     def _getAnswer(self):
         self._agent.setParameters(self._description, self._name)

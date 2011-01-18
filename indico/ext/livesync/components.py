@@ -55,7 +55,8 @@ class RequestListener(Component):
         Inserts the elements from the temporary index into the permanent one
         """
 
-        track = SyncManager.getDBInstance().getTrack()
+        sm = SyncManager.getDBInstance()
+        track = sm.getTrack()
         cm = ContextManager.get('indico.ext.livesync:actions')
 
         timestamp = int_timestamp(nowutc())
@@ -68,7 +69,8 @@ class RequestListener(Component):
             for action in actions:
                 Logger.get('ext.livesync').debug((obj, action))
                 # TODO: remove redundant items
-                track.add(timestamp, ActionWrapper(timestamp, obj, actions))
+                sm.add(timestamp,
+                       ActionWrapper(timestamp, obj, actions))
 
     def requestRetry(self, req, nretry):
         # reset the context manager

@@ -27,6 +27,9 @@ from persistent import Persistent
 from indico.core.api import IContributor
 
 
+MPT_GRANULARITY = 100
+
+
 class ILiveSyncAgentProvider(IContributor):
     """
     Implemented by classes that provide a LiveSync Agent
@@ -76,3 +79,6 @@ class ActionWrapper(Persistent):
                                                     self._obj,
                                                     ','.join(self._actions),
                                                     self._timestamp)
+
+    def __timestamp__(self):
+        return self._timestamp

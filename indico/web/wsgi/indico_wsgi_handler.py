@@ -27,6 +27,7 @@ under the corresponding GNU GPL license.
 
 import sys
 import os
+from types import ClassType
 
 # indico imports
 from indico.web.rh import RHHtdocs
@@ -88,6 +89,7 @@ def application(environ, start_response):
                 from indico.web.wsgi.indico_wsgi_file_handler import stream_file
 
                 url = req.URLFields['PATH_INFO']
+                possible_static_path = None
 
                 # maybe the url is owned by some plugin?
                 pluginRHMap = RHMapMemory()._map
@@ -95,13 +97,14 @@ def application(environ, start_response):
                 for urlRE, rh in pluginRHMap.iteritems():
                     m = urlRE.match(url)
                     if m:
-                        if type(rh) == type and RHHtdocs in rh.mro():
-                            # calculate the path to the resource
-                            possible_static_path = rh.calculatePath(**m.groupdict())
+                        if type(rh) == ClassType or RHHtdocs not in rh.mro():
+                            plugin_publisher(req, url, rh, m.groupdict())
                             break
                         else:
-                            plugin_publisher(req, url, rh, m.groupdict())
-                else:
+                            # calculate the path to the resource
+                            possible_static_path = rh.calculatePath(**m.groupdict())
+
+                if not possible_static_path:
                     # Finally, it might be a static file
                     possible_static_path = is_static_path(environ['PATH_INFO'])
 

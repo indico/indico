@@ -46,11 +46,13 @@ class TestAgent(PushSyncAgent):
         self._service = service
 
     def _generateRecords(self, data, lastTS):
+
         data = list(data)
         data.reverse()
+
         return data
 
-    def _run(self, data, logger=None):
+    def _run(self, data, logger=None, monitor=None):
 
         # send records one by one
         for ts, w in data:
@@ -163,7 +165,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
         currentTS = 0
         a1 = ActionWrapper(currentTS, self._objs[1], ['add'])
         a2 = ActionWrapper(currentTS, self._objs[2], ['add'])
-        a3 = ActionWrapper(currentTS, self._objs[2], ['del'])
+        a3 = ActionWrapper(currentTS + 1, self._objs[2], ['del'])
 
         self._mgr.add(currentTS, [a1, a2])
 
@@ -189,7 +191,8 @@ class TestPushAgentBehavior(_TestAgentBehavior):
     def testChangeNotification(self):
         currentTS = 0
         a1 = ActionWrapper(currentTS, self._objs[0], ['add'])
-        a2 = ActionWrapper(currentTS, self._objs[0], ['chg'])
+        a2 = ActionWrapper(currentTS + 1, self._objs[0], ['chg'])
+        a3 = ActionWrapper(currentTS + 2, self._objs[0], ['chg'])
 
         self._mgr.add(currentTS, [a1])
 
@@ -218,7 +221,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
                          set([('Python Cookbook', 'borrowed')]))
 
         # change back to available
-        self._mgr.add(currentTS, [a2])
+        self._mgr.add(currentTS, [a3])
 
         currentTS += 1
         self._agt1.run(currentTS, logger=self._logger)

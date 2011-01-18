@@ -53,17 +53,19 @@ class _TestSynchronization(IndicoTestCase):
         super(_TestSynchronization, self).tearDown()
         self._closeEnvironment()
 
-    def _prettyActions(self, asets):
+    def _prettyActions(self, iter):
 
         def friendlyAction(a):
             return (a._obj, ' '.join(sorted(a._actions)))
 
-        return list(set(friendlyAction(a) for a in s) for s in asets)
+        return set(list(friendlyAction(a) for a in iter))
 
     def _nextTS(self):
         time.sleep(1)
         return int_timestamp(nowutc())
 
     def checkActions(self, fromTS, expected):
-        self.assertEqual(self._prettyActions(
-            list(self._sm.getTrack().values(None, fromTS))), expected)
+        res = self._prettyActions(
+            self._sm.getTrack().iterate(fromTS-1, func=(lambda x: x[1])))
+
+        self.assertEqual(res, expected)
