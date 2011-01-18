@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-'''This script will need to be called after doing easy_install cds-indico to
+'''This script will need to be called after doing easy_install indico to
 complete the installation process.
 
 It only contains functions specific to easy_install. For the rest of the

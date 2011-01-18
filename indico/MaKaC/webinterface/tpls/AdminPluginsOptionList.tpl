@@ -71,18 +71,17 @@
                 <% end %>
                 <% elif option.getType() == "links": %>
                     <div id="links<%=name%>" style="margin-bottom: 10px;">
-                        <span style="font-weight: bold; margin-bottom: 10px;">Existing links</span>
                     </div>
                     <script type="text/javascript">
                         var numElements = <%= option.getValue() %>.length;
                         if(numElements > 0){
                             var linksBody = Html.tbody();
-                            var linksTable = Html.table({style: {padding: pixels(10)}}, linksBody);
-                            linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('Link name')),
+                            var linksTable = Html.table({style:{border:"1px dashed #CCC"}}, linksBody);
+                            linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold", paddingRight:pixels(10)}}, $T('Link name')),
                                                                                         Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('URL'))) );
                             each(<%= option.getValue() %>, function(link){
                                     var removeButton = Widget.link(command(function(){
-                                        var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of link..."));
+                                        var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing link..."));
                                         indicoRequest(
                                                 'plugins.removeLink',
                                             {
@@ -101,8 +100,8 @@
                                             }
                                         );
                                     }, IndicoUI.Buttons.removeButton()));
-                                    var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.name),
-                                                                                           Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap"}},link.structure),
+                                    var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(20)}},link.name),
+                                                                                           Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(10)}},link.structure),
                                                                                            Html.td({style:{whiteSpace: "nowrap"}},removeButton))
                                     linksBody.append(newRow);
 
@@ -113,10 +112,10 @@
                         else{
                             $E('links<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, $T('No links created yet. Click in Add new link if you want to do so!')));
                         }
-                        var addButton = Html.input("button", {style:{marginLeft: pixels(100)}}, $T('Add new link'));
+                        var addButton = Html.input("button", {style:{marginTop: pixels(5)}}, $T('Add new link'));
 
                         addButton.observeClick(function() {
-                            var errorLabel=Html.label({style:{float: 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
+                            var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
                             var linkName = new AutocheckTextBox({name: 'name', id:"linkname"}, errorLabel);
                             var linkStructure = Html.input("text", {});
                             var div = Html.div({},IndicoUtil.createFormFromMap([

@@ -136,12 +136,7 @@ class ParameterManager(object):
                 raise ExpectedParameterException(paramName, list, type(value))
         elif pType == bool:
             if not (type(value) == bool or (allowEmpty and value == None)):
-                if type(value) == str and (value == 'true' or value == 'True'):
-                    value = True
-                elif type(value) == str and (value == 'false' or value == 'False'):
-                    value = False
-                else:
-                    raise ExpectedParameterException(paramName, bool, type(value))
+                raise ExpectedParameterException(paramName, bool, type(value))
 
         return value
 
@@ -281,7 +276,7 @@ class ProtectedDisplayService(ProtectedService):
         Overloads ProtectedService._checkProtection, assuring that
         the user is authorized to view the target resource
         """
-        if not self._target.canView( self.getAW() ):
+        if not self._target.canAccess( self.getAW() ):
 
             from MaKaC.conference import Link, LocalFile
 

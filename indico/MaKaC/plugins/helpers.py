@@ -42,20 +42,10 @@ class MailHelper:
         return True
 
 class DBHelpers:
-    @classmethod
-    def getCounter(cls):
-        root = cls.getChatRoot()
-
-        if not root.has_key('counter'):
-            raise ServiceError( message=_('Expected index not found while accessing the database (counter)'))
-
-        return root['counter']
 
     @classmethod
     def newID(cls):
-        #create it in case it doesn't exist
         return CounterIndex().get().newCount()
-        #return cls.getCounter().newCount()
 
     @classmethod
     def getChatroomList(cls, conf):

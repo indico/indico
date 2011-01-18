@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $id$
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,10 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import urllib2, datetime, os, tempfile, stat
-from MaKaC.webinterface import urlHandlers
-from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
-from MaKaC.plugins.InstantMessaging.handlers import ChatroomBase
+import urllib2, os, tempfile, stat
+from MaKaC.plugins.InstantMessaging.XMPP.chatroom import XMPPChatroom
+from MaKaC.plugins.InstantMessaging.handlers import ChatroomServiceBase
 from MaKaC.services.implementation.base import ServiceBase, ParameterManager
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.common.Configuration import Config
@@ -40,7 +38,7 @@ from MaKaC.plugins.InstantMessaging.XMPP.bot import IndicoXMPPBotRoomExists, Ind
 from MaKaC.conference import ConferenceHolder, LocalFile
 
 
-class XMPPChatroomService( ChatroomBase ):
+class XMPPChatroomService( ChatroomServiceBase ):
 
     messages = { 'default': _('There was an error while connecting to the XMPP server'),\
                  'sameId': _('There is already a chat room with the same id'), \
@@ -54,14 +52,14 @@ class XMPPChatroomService( ChatroomBase ):
                  }
 
     def __init__(self, params, remoteHost, session):
-        ChatroomBase.__init__(self, params, remoteHost, session)
+        ChatroomServiceBase.__init__(self, params, remoteHost, session)
         #we want the data from the XMPP plugin in the InstantMessaging Plugin type
         oh = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         self._botJID = oh.getOption('indicoUsername') + '@' + oh.getOption('chatServerHost')
         self._botPass = oh.getOption('indicoPassword')
 
     def _checkParams(self):
-        ChatroomBase._checkParams(self)
+        ChatroomServiceBase._checkParams(self)
         pm = ParameterManager(self._params.get('chatroomParams'))
 
         self._description = pm.extract('description', pType=str, allowEmpty = True)
@@ -151,15 +149,6 @@ class XMPPChatroomService( ChatroomBase ):
             raise ServiceError(message = self.messages['deleting'])
         return self.proccessAnswer(self._bot)
 
-def addLinks2FossilizedCR(fossilizedRoom, room):
-    """ Adds the neccesary links to retrieve logs and also to join the chat room through all the links specified by the user"""
-    # add links to join the room
-    generateCustomLinks(fossilizedRoom, room)
-    # add link to retrieve logs
-    generateLogLink(fossilizedRoom, room, room.getConference() if len(room.getConferences()) is 1 else room.getConference().values()[0])
-
-    return True
-
 class CreateChatroom( XMPPChatroomService ):
 
     def __init__(self, params, remoteHost, session):
@@ -205,7 +194,10 @@ class CreateChatroom( XMPPChatroomService ):
 
         ContextManager.get('mailHelper').sendMails()
         fossilizedRoom = self._room.fossilize(tz=tz)
-        addLinks2FossilizedCR(fossilizedRoom, self._room)
+        # add links to join the room
+        generateCustomLinks(fossilizedRoom, self._room)
+        # add link to retrieve logs
+        generateLogLink(fossilizedRoom, self._room, self._room.getConference() if len(self._room.getConferences()) is 1 else self._room.getConference().values()[0])
 
         return fossilizedRoom
 
@@ -399,7 +391,10 @@ class AddConference2Room( ServiceBase, Observable ):
                 room.setConference(ConferenceHolder().getById(self._conference))
                 self._notify('addConference2Room', {'room': room, 'conf': self._conference})
                 fossilizedRoom = room.fossilizeMultiConference(ConferenceHolder().getById(self._conference))
-                addLinks2FossilizedCR(fossilizedRoom, room)
+                # add links to join the room
+                generateCustomLinks(fossilizedRoom, room)
+                # add link to retrieve logs
+                generateLogLink(fossilizedRoom, room, room.getConference() if len(room.getConferences()) is 1 else room.getConference().values()[0])
                 rooms.append(fossilizedRoom)
         except NoReportError, e:
             Logger.get('InstantMessaging (XMPP-Indico server)').error("Error adding chat rooms. User: %s. Chat room: %s. Traceback: %s" %(self._aw.getUser().getFullName(), roomID, e))

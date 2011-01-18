@@ -191,7 +191,7 @@ class CategoryManager( ObjectHolder ):
     def getDefaultConference( self ):
         dconf = HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
         if dconf == None:
-            return HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
+            return HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultCnference())
         else:
             return dconf
 
@@ -1245,7 +1245,7 @@ class Category(Persistent, CommonObjectBase, Fossilizable):
     def hasAnyProtection( self ):
         if self.__ac.isProtected() or len(self.getDomainList())>0:
             return True
-        if self.getAccessProtectionLevel() == -1:
+        if self.getAccessProtectionLevel() == -1: #PUBLIC
             return False
         if self.getOwner() is not None:
             return self.getOwner().hasAnyProtection()

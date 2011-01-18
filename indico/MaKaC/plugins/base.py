@@ -257,7 +257,7 @@ class RHMap(Persistent):
 
     def addRH(self, rh):
         if self.hasUH(rh):
-            self.__map[rh._uh.getURL().__str__()] = rh
+            self.__map[rh._uh.getRelativeURL().__str__()] = rh
         self._notifyModification()
 
     def cleanRHDict(self):
@@ -993,7 +993,7 @@ class Plugin(PluginBase):
         """
         PluginBase.__init__(self)
         self.__name = pid
-        self.__id = pid
+        self.__id = pid.replace(' ','')
         self.__owner = owner
         self.__present = True
         self.__moduleName = moduleName
@@ -1009,6 +1009,9 @@ class Plugin(PluginBase):
 
     def getId(self):
         return self.__id
+
+    def setId(self, newId):
+        self.__id = newId
 
     def getFullId(self):
         return "%s.%s" % (self.getOwner().getId(), self.__id)

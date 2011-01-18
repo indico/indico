@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 ##
-## $id$
 ##
 ## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
 ##
 ## CDS Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -86,7 +85,7 @@ class EventCollaborationListener(Component):
         try:
             obj.notifyTitleChange(params['oldTitle'], params['newTitle'])
         except Exception, e:
-           Logger.get('PluginNotifier').error("Exception while trying to access to the title parameters when changing an event title" + str(e))
+            Logger.get('PluginNotifier').error("Exception while trying to access to the title parameters when changing an event title" + str(e))
 
 
     @classmethod

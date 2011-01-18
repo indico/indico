@@ -131,6 +131,7 @@ class PluginOptionsAddLink ( PluginOptionsBase ):
                 return False
         links.append({'name': self._linkName, 'structure': self._linkStructure})
         self._targetOption.setValue(self._targetOption.getValue())
+        self._targetOption._notifyModification()
         return True
 
 class PluginOptionsRemoveLink ( PluginOptionsBase ):
@@ -144,6 +145,7 @@ class PluginOptionsRemoveLink ( PluginOptionsBase ):
         for link in links:
             if link['name'] == self._linkName:
                 links.remove(link)
+        self._targetOption._notifyModification()
         return True
 
 

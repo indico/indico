@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $id$
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -19,16 +18,13 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins.notificationComponents import Component, IContributor, INavigationContributor, IListener, IInstantMessagingListener
+from MaKaC.plugins.InstantMessaging.notificationComponents import IInstantMessagingListener
 from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.plugins.util import PluginsWrapper, PluginFieldsWrapper
 from MaKaC.plugins.helpers import DBHelpers, MailHelper, GeneralLinkGenerator
 from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
-from MaKaC.plugins.InstantMessaging.Chatroom import XMPPChatroom
-from BTrees.OOBTree import OOBTree, OOTreeSet
 from MaKaC.i18n import _
 from MaKaC.conference import ConferenceHolder
-from MaKaC.common.Counter import Counter
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
@@ -158,7 +154,7 @@ class ChatroomStorage(Component):
 
     def __init__(self):
         #it's the first thing to do when having these events
-        self._priority=1
+        self.priority=1
 
     @classmethod
     def createChatroom(cls, obj, params):
@@ -255,19 +251,19 @@ class ChatroomMailer(Component):
         # we will execute the method performOperation in a chat room creation, which will send an email to all the requested users
         # saying that a chat room was created. We pass the 2 mandatory arguments and finally the arguments required for performOperation
         # (in this case, only one argument)
-        ExternalOperationsManager.execute(cls, "create_"+str(cls.__class__), cls.performOperation, 'create', room.getConference(), room, room)
+        ExternalOperationsManager.execute(cls, "create_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'create', room.getConference(), room, room)
 
     @classmethod
     def editChatroom(cls, obj, params):
         room = params['newRoom']
         conf = ConferenceHolder().getById(obj._conferenceID)
-        ExternalOperationsManager.execute(cls, "edit_"+str(cls.__class__), cls.performOperation, 'edit', conf, room, room, conf)
+        ExternalOperationsManager.execute(cls, "edit_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'edit', conf, room, room, conf)
 
     @classmethod
     def deleteChatroom(cls, obj, params):
         room = params['room']
         conf = ConferenceHolder().getById(obj._conferenceID)
-        ExternalOperationsManager.execute(cls, "delete_"+str(cls.__class__), cls.performOperation, 'delete', conf, room, room, conf)
+        ExternalOperationsManager.execute(cls, "delete_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'delete', conf, room, room, conf)
 
     @classmethod
     def addConference2Room(cls, obj, params):

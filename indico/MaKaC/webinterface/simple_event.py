@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.plugins.base import Observable
 
 import urllib
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -301,7 +302,7 @@ class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):
     def __init__(self, rh, conf):
         conferences.WPConfModifToolsBase.__init__(self, rh, conf)
 
-class WPSEConfClone(WPSEConfModifToolsBase):
+class WPSEConfClone(WPSEConfModifToolsBase, Observable):
 
     def _setActiveTab( self ):
         self._tabCloneEvent.setActive()
@@ -322,6 +323,8 @@ class WPSEConfClone(WPSEConfModifToolsBase):
     <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" >
         _("Evaluation")</li>
            """) }
+        #let the plugins add their own elements
+        self._notify('addCheckBox2CloneConf', pars)
         return p.getHTML( pars )
 
 

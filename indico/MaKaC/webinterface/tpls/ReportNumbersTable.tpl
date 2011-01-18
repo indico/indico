@@ -8,23 +8,23 @@
                         </td>
                         <td>
                             <select name="reportNumberSystem">
-                                <option value="notype" selected> --  select a system -- </option>
+                                <option value="notype" selected="selected"> --  select a system -- </option>
                                 %(repTypesSelectItems)s
                             </select>
                         </td>
                         <td>
-                            <input type="submit" class="btn" value="add">
+                            <input type="submit" class="btn" value="add"/>
                         </td>
                     </tr>
                 </table>
             </form>
         </td>
     </tr>
-	
+
     <tr>
         <td class="blacktext">
             <form action=%(deleteURL)s method="POST">
-                <ul style="display:block; list-style-type: none; padding-left: 0px;">                    
+                <ul style="display:block; list-style-type: none; padding-left: 0px;">
 					<% for (id, number, name) in items: %>
 					<li style="margin: 0; display: block; height: 20px;">
 						<span style="float:left">
@@ -39,7 +39,7 @@
                 </ul>
 				<div>
 					<input type="hidden" id="removeParams" name="deleteReportNumber" value="" >
-				</div>            	
+				</div>
 			</form>
         </td>
 	</tr>
@@ -47,8 +47,8 @@
 </table>
 
 <script type="text/javascript">
-	
-function removeRptItem(value, form) {	
+
+function removeRptItem(value, form) {
 	$E('removeParams').dom.value=value;
 	form.submit();
 };

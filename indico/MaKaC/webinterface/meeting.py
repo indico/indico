@@ -878,6 +878,8 @@ class WPMConfClone(conferences.WPConfClone):
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" />_("send email to the participants of the created event")</li></ul></li>
                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
                """) }
+        #let the plugins add their own elements
+        self._notify('addCheckBox2CloneConf', pars)
         return p.getHTML( pars )
 
 ##TimeTable view##

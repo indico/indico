@@ -22,6 +22,8 @@ from MaKaC.common import DBMgr
 from MaKaC.common.Counter import Counter
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.timerExec import HelperTaskList
+from MaKaC.plugins.base import PluginType
+from indico.MaKaC.plugins.base import PluginsHolder
 
 
 def runTaskMigration():
@@ -54,8 +56,26 @@ def runConferenceMigration():
 
 
 def runPluginMigration():
+    dbi = DBMgr.getInstance()
+    dbi.startRequest()
+    root = dbi.getDBConnection().root()
+    if root.has_key('plugins'):
+        ptl = []
+        ps = root['plugins']
+        for k,v in ps.iteritems():
+            if isinstance(v, PluginType):
+                ptl.append(v)
+        for pt in ptl:
+            pt.setUsable(True)
+            for p in pt.getPluginList(includeNonPresent=True, includeTestPlugins=True, includeNonActive=True):
+                 p.setId(p.getName().replace(" ", ""))
+                 p.setUsable(True)
+    dbi.commit()
+    dbi.sync()
+    PluginsHolder().reloadAllPlugins()
+    dbi.endRequest()
 
-    # TODO: for each Plugin/PluginType, add __notUsableReason attribute (default None)
+
 
 def main():
     runTaskMigration()

@@ -9,6 +9,8 @@
 import web, os, re, string
 import dateutil.parser
 
+CONF_FILE = '/var/www/html/jappix/code.py.conf'
+
 urls = (
     '/', 'getlogs',
     '/delete', 'deletedir'
@@ -18,6 +20,7 @@ application = app.wsgifunc()
 
 
 class getlogs:
+
     def GET(self):
         # get the range of dates to pick logs
         params = web.input()
@@ -38,7 +41,7 @@ class getlogs:
                 eDate = None
 
         # get the path of the logs dir from the conf file and get the list of log files
-        logsPathFile = open('/var/www/html/jappix/code.py.conf', 'r')
+        logsPathFile = open(CONF_FILE, 'r')
         logsPath = logsPathFile.read()
         logsPathFile.close()
         logsPath = re.sub("\n","",logsPath)
@@ -88,9 +91,10 @@ class getlogs:
                 return True
 
 class deletedir:
+
     def GET(self):
         params = web.input()
-        logsPathFile = open('/var/www/html/jappix/code.py.conf', 'r')
+        logsPathFile = open(CONF_FILE, 'r')
         logsPath = logsPathFile.read()
         logsPathFile.close()
         logsPath = re.sub("\n","",logsPath)

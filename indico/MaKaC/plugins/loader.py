@@ -64,7 +64,7 @@ class PluginLoader(object):
         """
 
         # get all available plugin types
-        ptypes = pkg_resources.get_entry_map('cds-indico', group='indico.ext_types')
+        ptypes = pkg_resources.get_entry_map('indico', group='indico.ext_types')
 
         for ptid, epoint in ptypes.iteritems():
             if not ptid in cls._ptypesLoaded:
@@ -91,7 +91,7 @@ class PluginLoader(object):
             cls._pmodules[ptypeId] = {}
             cls._ptypesLoaded.remove(ptypeId)
 
-        ptypes = pkg_resources.get_entry_map('cds-indico', group='indico.ext_types')
+        ptypes = pkg_resources.get_entry_map('indico', group='indico.ext_types')
 
         cls.loadPluginType(ptypeId, ptypes[ptypeId].module_name)
         cls._ptypesLoaded.add(ptypeId)
@@ -218,7 +218,7 @@ class PluginLoader(object):
                 ptypeId)
             return
         else:
-            pluginEps = pkg_resources.get_entry_map('cds-indico', group='indico.ext')
+            pluginEps = pkg_resources.get_entry_map('indico', group='indico.ext')
 
             # we loop through all the specified plugins
             for itemName, epoint in pluginEps.iteritems():

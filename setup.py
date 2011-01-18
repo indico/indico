@@ -618,7 +618,7 @@ if __name__ == '__main__':
 
     foundPackages.append('indico')
 
-    setup(name = "cds-indico",
+    setup(name = "indico",
           cmdclass = {'sdist': sdist_indico,
                     'bdist': _bdist_indico(dataFiles),
                     'bdist_egg': _bdist_egg_indico(dataFiles),

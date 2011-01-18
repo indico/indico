@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $id$
 ##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -18,11 +17,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from indico.MaKaC.common.logger import Logger
 
 
-import sleekxmpp
+try:
+    import sleekxmpp
+except ImportError:
+    Logger.get("XMPP").error("Missing sleekxmpp python library")
+    raise
 
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.i18n import _
 
 class IndicoXMPPBotBase(object):
@@ -183,7 +186,6 @@ class IndicoXMPPBotEditRoom(IndicoXMPPBotBase):
             form.addField(var = 'muc#roomconfig_roomdesc', value = self._room.getDescription())
         form.addField(var = 'muc#roomconfig_passwordprotectedroom', value = str(self._protected))
         if self._protected and self._room.getPassword() != '':
-            #import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
             form.addField(var = 'muc#roomconfig_roomsecret', value = self._room.getPassword())
 
         form.addField(var = 'muc#roomconfig_persistentroom', value = '1')

@@ -24,7 +24,7 @@ from MaKaC.i18n import _
 globalOptions = [
     ("chatServerHost", {"description": _("Hostname of the chat server"),
                         "type": str,
-                        "defaultValue": "jabber.cern.ch",
+                        "defaultValue": "",
                         "editable": True,
                         "visible": True} ),
 

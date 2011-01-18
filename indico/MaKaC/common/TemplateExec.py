@@ -17,24 +17,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from MaKaC.user import Avatar
-from MaKaC.common.logger import Logger
-
-"""
-Part of Room Booking Module (rb_)
-Responsible: Piotr Wlodarek
-"""
-
-import sys, os, string, StringIO, traceback
+import sys, os, StringIO, traceback
 import MaKaC
 from MaKaC.common.Configuration import Config
-from MaKaC.errors import MaKaCError
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
-from MaKaC.common import Config
 import MaKaC.common.info as info
-
 from MaKaC.common.logger import Logger
-
 
 ERROR_PATH = Config.getInstance().getTempDir()
 

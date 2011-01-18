@@ -311,7 +311,7 @@ def _existingConfiguredEgg():
     env.scan(search_path=path)
 
     # search for all indico dists
-    indico_dists = env['cds-indico']
+    indico_dists = env['indico']
 
     for dist in indico_dists:
         eggPath = dist.location
@@ -588,7 +588,7 @@ Indico has been installed correctly.
 
 For information on how to configure Apache HTTPD, take a look at:
 
-http://cdswaredev.cern.ch/indico/wiki/Admin/Installation#ConfiguringApache
+http://indico-software.org/wiki/Admin/Installation#a3.ConfiguringApache
 
 
 Please do not forget to start the 'taskDaemon' in order to use alarms, creation

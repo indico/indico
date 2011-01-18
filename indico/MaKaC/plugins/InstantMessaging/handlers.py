@@ -19,18 +19,20 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.services.implementation.base import ServiceBase, ParameterManager
+from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.plugins import Observable
+from MaKaC.conference import ConferenceHolder
 
 
-class ChatroomBase ( ServiceBase, Observable ):
+class ChatroomServiceBase ( ProtectedModificationService, Observable ):
 
     def __init__(self, params, remoteHost, session):
-        ServiceBase.__init__(self, params, remoteHost, session)
+        ProtectedModificationService.__init__(self, params, remoteHost, session)
 
     def _checkParams(self):
         pm = ParameterManager(self._params)
         self._conferenceID = pm.extract("conference", pType=str, allowEmpty = False)
+        self._target = ConferenceHolder().getById(self._conferenceID)
 
         pm = ParameterManager(self._params.get('chatroomParams'))
         self._title = pm.extract('title', pType=str, allowEmpty = False)

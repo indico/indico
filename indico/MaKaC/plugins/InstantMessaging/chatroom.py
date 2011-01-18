@@ -30,7 +30,7 @@ from MaKaC.services.interface.rpc.common import ServiceError
 
 
 
-class Chatroom (Persistent, Fossilizable):
+class Chatroom(Persistent, Fossilizable):
 
     fossilizes(fossils.IChatRoomFossil)
 
@@ -143,47 +143,3 @@ class Chatroom (Persistent, Fossilizable):
         if self._modificationDate:
             fossilizedRoom['modificationDate'] = Conversion().datetime(self._modificationDate.astimezone(timezone(tz)), tz)
         return fossilizedRoom
-
-
-
-class XMPPChatroom(Chatroom):
-
-    fossilizes(fossils.IXMPPChatRoomFossil)
-
-    def __init__( self, name, owner, conference, modificationDate=None, description='',createdInLocalServer=True, host='', password='', showRoom=False, showPass=False ):
-        Chatroom.__init__(self, name, owner, conference, modificationDate, createdInLocalServer, showRoom)
-        self._description = description
-        self._host = host
-        self._password = password
-        self._showPass = showPass
-
-    def setValues(self, values):
-        Chatroom.setValues(self, values)
-        self._description = values['description']
-        self._host = values['host']
-        self._password = values['password']
-        self._showPass = values['showPass']
-
-    def setHost(self, host):
-        self._host = host
-
-    def getHost(self):
-        return self._host
-
-    def setDescription(self, description):
-        self._description = description
-
-    def getDescription(self):
-        return self._description
-
-    def setPassword(self, password):
-        self._password = password
-
-    def getPassword(self):
-        return self._password
-
-    def setShowPass(self, showPass):
-        self._showPass = showPass
-
-    def getShowPass(self):
-        return self._showPass

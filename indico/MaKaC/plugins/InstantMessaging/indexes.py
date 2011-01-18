@@ -28,18 +28,11 @@ from MaKaC.i18n import _
 
 class IMIndex(Persistent):
 
-    def __init__(self, index, storingStructure=OOBTree):
-        self._root = self.getChatRoot()
+    def __init__(self, index, storingStructure=OOBTree, pluginId="XMPP"):
+        self._root = PluginFieldsWrapper('InstantMessaging', pluginId).getStorage()
         self._index = index
         self._storingStructure = storingStructure
         self._indexCheck()
-
-    @classmethod
-    def getChatRoot(cls):
-         #pick the plugin
-        pfh = PluginFieldsWrapper('InstantMessaging', 'XMPP')
-        #and the element from which objects will be hanging in the DB
-        return pfh.getStorage()
 
     def _indexCheck(self):
         """ If the index doesn't exist we'll need to create it. In case you don't understand this method

@@ -17,7 +17,7 @@
             <tr>
               <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Status")%>: </span></td>
               <td>
-                <img src="<%= iconURL %>" style="padding-left: 12px; padding-right: 12px;"/> 
+                <img src="<%= iconURL %>" style="padding-left: 12px; padding-right: 12px;"/>
                 <a href="<%=urlHandlers.UHRoomBookingModuleActive.getURL()%>" rel="no-follow"><%= activationText %></a>
               </td>
             </tr>
@@ -93,7 +93,7 @@
         </table>
       </td>
     </tr>
-				
+
     </table>
   </td>
 </tr>

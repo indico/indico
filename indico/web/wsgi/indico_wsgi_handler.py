@@ -78,12 +78,15 @@ def application(environ, start_response):
             if possible_module is not None:
                 mp_legacy_publisher(req, possible_module, possible_handler)
             else:
+                ###### TO REPLACE after Pedro's integration of LiveSync
+                path = req.URLFields['PATH_INFO']
+                if path.startswith("/"):
+                    path = path[1:]
                 # Let's try to load a plugin
                 # Replace URLFields with environ
-                path = req.URLFields['PATH_INFO'].split('/')
                 pluginMap = RHMapMemory()._map
-                if path[1] != '' and pluginMap.has_key(path[1]):
-                    plugin_publisher(req, path[1])
+                if path != '' and pluginMap.has_key(path):
+                    plugin_publisher(req, path, pluginMap[path])
                 else:
                     # Finally, it might be a static file
                     possible_static_path = is_static_path(environ['PATH_INFO'])
@@ -92,6 +95,7 @@ def application(environ, start_response):
                         stream_file(req, possible_static_path)
                     else:
                         raise SERVER_RETURN, HTTP_NOT_FOUND
+                ######  END TO REPLACE
             req.flush()
         #Exception treatment
         except SERVER_RETURN, status:
@@ -159,19 +163,15 @@ def _convert_to_string(form):
             form[key] = str(value)
 
 
-def plugin_publisher(req, path):
+def plugin_publisher(req, path, rh):
     """
     Publishes the plugin described in path
     """
-    pluginMap = RHMapMemory()._map
+
     form = dict(req.form)
 
     _convert_to_string(form)
-
-    importList = pluginMap[path].split('.')
-    funcName = importList.pop()
-    callingFunction = __import__('.'.join(importList[1:]), None, None, importList[0])
-    _check_result(req, getattr(callingFunction, funcName)( req ).process( form ))
+    _check_result(req, rh( req ).process( form ))
 
 def mp_legacy_publisher(req, possible_module, possible_handler):
     """

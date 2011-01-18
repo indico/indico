@@ -1,6 +1,6 @@
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none">
-    <!-- Where is key? --> 
+    <!-- Where is key? -->
     <div id="defaultLocationCH" class="tip">
         <%= _("First location/location by default offered to users")%>
     </div>
