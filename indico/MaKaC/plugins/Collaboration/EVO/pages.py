@@ -174,7 +174,10 @@ class XMLGenerator(object):
         if booking.getBookingParamByName("displayURL"):
             out.openTag("section")
             out.writeTag("title", _('Auto-join URL:'))
-            out.writeTag("line", booking.getUrl())
+            out.openTag("linkLine")
+            out.writeTag("href", booking.getUrl())
+            out.writeTag("caption", booking.getUrl())
+            out.closeTag("linkLine")
             out.closeTag("section")
 
         out.openTag("section")

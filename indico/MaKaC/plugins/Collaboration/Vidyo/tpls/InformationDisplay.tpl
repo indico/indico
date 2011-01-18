@@ -47,7 +47,7 @@
                 <%= _('Auto-join URL:')%>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getURL() %>
+                <a href="<%= Booking.getURL() %>"><%= Booking.getURL() %></a>
             </td>
         </tr>
         <% end %>
