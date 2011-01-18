@@ -222,7 +222,7 @@ class RegistrationForm(Persistent):
             if self._sendReceiptEmail:
                 pass
         except AttributeError, e:
-            self._sendReceiptEmail = True
+            self._sendReceiptEmail = False
         return self._sendReceiptEmail
 
     def setSendReceiptEmail(self, v=True):
@@ -233,7 +233,7 @@ class RegistrationForm(Persistent):
             if self._sendPaidEmail:
                 pass
         except AttributeError, e:
-            self._sendPaidEmail = True
+            self._sendPaidEmail = False
         return self._sendPaidEmail
 
     def setSendPaidEmail(self, v=True):
