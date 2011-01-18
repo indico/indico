@@ -793,7 +793,7 @@ Congratulations, your registration to %s was successful%s See your information b
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
         detailPayment=registrant.getConference().getModPay().getPaymentDetails()
-        subject=_("""New registrant in '%s': %s - payment""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
+        subject=_("""Payment summary for '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
         body= _("""
 Please use this information for your payment (except for e-payment):\n
 - date conference    : %s
@@ -851,10 +851,11 @@ Please use this information for your payment (except for e-payment):\n
         #    maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
         #    GenericMailer.send(GenericNotification(maildata))
         # send email to participants
+        paymentMsg = _("If you haven't paid for your registration yet, you can do it at %s") % urlHandlers.UHConfRegistrationFormCreationDone.getURL(registrant)
         if registrant.getEmail().strip() != "":
-            bodyReg = _("""%s\n\n%s\n\n%s""")%(
+            bodyReg = _("""%s\n\n%s\n\n%s\n\n%s""")%(
                 registrant.getConference().getModPay().getPaymentReceiptMsg(),
-                "\n".join(booking), body)
+                "\n".join(booking), body, paymentMsg)
             to=registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
@@ -865,7 +866,7 @@ Please use this information for your payment (except for e-payment):\n
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
 
-        subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
+        subject= _("""Payment successful for '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
         body= _("""- detail of payment  : \n%s
 - date conference    : %s
 - name conference    : %s
