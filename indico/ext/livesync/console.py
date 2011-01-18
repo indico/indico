@@ -142,6 +142,7 @@ def conferenceHolderIterator(verbose=True):
             print "[%d/%d %f%%] %s %s" % (i, total, (float(i) / total * 100.0),
                                           id, conf.getTitle())
         i += 1
+
         yield conf
         for contrib in eventIterator(conf, 0):
             yield contrib
@@ -156,10 +157,15 @@ def _basicStreamHandler():
     return logger
 
 
-def _wrapper(iterator, operation):
+def _wrapper(iterator, operation, dbi):
+    i = 0
     for elem in iterator:
-        yield elem, operation
 
+        # each 10000 elements, clean zodb objects (avoids memory leak)
+        if i % 10000 == 0:
+            dbi.abort()
+
+        yield elem, operation
 
 class AgentCommand(ConsoleLiveSyncCommand):
     """
@@ -201,17 +207,18 @@ class AgentCommand(ConsoleLiveSyncCommand):
             if 'output' in args:
                 nbatch = 0
                 batch = []
-                for record in _wrapper(iterator, agent._creationState):
+                for record in _wrapper(iterator, agent._creationState, self._dbi):
                     if len(batch) > SIZE_BATCH_PER_FILE:
                         self._writeFile(agent, args.output, nbatch, batch, logger)
                         nbatch += 1
                         batch = []
+
                     batch.append(record)
 
                 if batch:
                     self._writeFile(agent, args.output, nbatch, batch, logger)
             else:
-                agent._run(_wrapper(iterator, agent._creationState),
+                agent._run(_wrapper(iterator, agent._creationState, self._dbi),
                            logger=logger,
                            monitor=monitor)
 

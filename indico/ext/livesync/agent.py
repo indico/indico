@@ -482,6 +482,30 @@ class ThreadedRecordUploader(object):
 
         return result
 
+    def _checkThreadHealth(self):
+        for i in range(0, self._numSlaves):
+            slave = self._slaves[i]
+            if time.time() > (slave._startTime + \
+                              ThreadedRecordUploader.MAX_THREAD_REQUEST_TIME) \
+               and slave._dead == False:
+                self._logger.warning("Slave '%s' seems to be dead. "
+                                     "Adding another one and recovering batch." % \
+                                     slave.getName())
+
+                if slave._currentBatch:
+                    self._queue.put(slave._currentBatch)
+
+                newSlave = self._slaveClass("Uploader%s" % self._numSlaves,
+                                            self._queue,
+                                            self._logger,
+                                            self._agent,
+                                            *self._extraSlaveArgs)
+                self._slaves[self._numSlaves] = newSlave
+                slave._dead = True
+                self._numSlaves += 1
+
+                newSlave.start()
+
     def iterateOver(self, iterator):
         """
         Consumes an iterator
