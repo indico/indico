@@ -1,99 +1,50 @@
-<!-- The date is not necessary yet because now the reviewing stops when
-     the call for abstracts is disable -->
-<!--
-<table width="90%%" border="0" style="padding-bottom: 10px;">
-    <tr>
-        <td id="reviewingModeHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px; padding-left: 20px;">
-            <%= _("Default date for abstract reviewing")%>
-        </td>
-    </tr>
-    <tr>
-        <td nowrap class="titleCellTD" style="padding-left: 30px; padding-top: 15px;"><span class="titleCellFormat">
-            <%= _("Abstract Reviewer Deadline")%>
-        </span></td>
-        <td class="blacktext" style="padding-top: 15px;">
-            <span id="inPlaceEditDefaultAbstractReviewerDueDate">
-                <% date = abstractReview.getAdjustedDefaultAbstractReviewerDueDate() %>
-                <% if date is None: %>
-                    <%= _("Date has not been set yet.")%>
-                <% end %>
-                <% else: %>
-                    <%= formatDateTime(date) %>
-                <% end %>
-            </span>
-        </td>
-    </tr>
-</table>
--->
 
 <table id="reviewingQuestionsTable" width="90%%" border="0" style="padding-bottom: 10px;">
     <tr>
-        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px;"><%= _("Add questions for abstract reviewing")%></td>
+        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px;"><%= _("Step 1 - Reviewing questions")%></td>
+    </tr>
+</table>
+<table style="padding-left: 20px;">
+    <tr>
+        <td class="subGroupTitle" colspan="3"><%= _("Add the questions that the abstract reviewers must answer")%></td>
     </tr>
     <tr>
         <td>
-            <div id="inPlaceEditQuestions"  style="padding-top: 10px; padding-left: 30px"></div>
+            <div id="inPlaceEditQuestions"></div>
         </td>
     </tr>
 </table>
-
-<table id="reviewingScaleTable" width="90%%" border="0" style="padding-bottom: 10px;">
+<table style="padding-left: 20px; padding-top: 20px;">
     <tr>
-        <td id="reviewingScale" colspan="5" class="groupTitle" style="padding-bottom: 10px;"><%= _("Add the number of answers per question and the scale for the rating")%>
-       <% inlineContextHelp(_('Here you can set the number of answers you wish to have for each question and the scale in which you want to see the abstract rating later. ')) %> </td>
-    </tr>
-</table>
-<table>
-    <tr>
-        <td style="padding-right:15px;">
-            <div style="padding-left: 30px; padding-bottom: 10px;">
-                <table>
-                    <tr>
-                        <td class="reviewingsubtitle">
-                            <span><%= _("Select the number of answers per question")%></span>
-                            <span><% inlineContextHelp(_('You can select the number of options the reviewers are going to have to answer each question. The minimun is 2 and the maximum 20.')) %></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div id="inPlaceEditNumberOfAnswers" style="padding-left: 25px;"></div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            <div style="padding-left: 30px; padding-bottom: 10px;">
-                <table>
-                    <tr>
-                        <td class="reviewingsubtitle">
-                            <span><%= _("Select the scale for the rating")%></span>
-                            <span><% inlineContextHelp(_('You can select the range in which you want to have the abstract rating. The maximum difference between the limits can be 100 units and it is possible to have negative numbers.')) %></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div id="inPlaceEditScale" style="padding-left: 25px; max-width: 290px;"></div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
+        <td class="subGroupTitle" colspan="2"><%= _("Answers setup")%>
+        <% inlineContextHelp(_('Here you can set the number of answers you wish to have for each question and the scale in which you want to see the abstract rating later. The number of answers must be a number between 2 and 20. For the scale the maximum difference between the limits can be 100 units and it is possible to have negative numbers.')) %>
         </td>
-        <td valign="top">
+    </tr>
+    <tr>
+        <td valign="top" style="min-width:290px;">
+            <div id="inPlaceEditNumberOfAnswers" ></div>
+        </td>
+        <td rowspan="2" valign="top" style="padding-top:10px;">
             <div class="shadowRectangle">
                 <span class="reviewingsubtitle">Preview</span>
                 <div id="inPlaceShowExample"></div>
             </div>
         </td>
     </tr>
+    <tr>
+        <td valign="top">
+            <div id="inPlaceEditScale"></div>
+        </td>
+    </tr>
 </table>
-
 
 <script type="text/javascript">
 // Component for the review questions
 $E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.abstractReviewing.getQuestions',
         'add':'reviewing.abstractReviewing.addQuestion', 'remove':'reviewing.abstractReviewing.removeQuestion',
         'edit': 'reviewing.abstractReviewing.editQuestion'},
-        {conference: '<%= abstractReview.getConference().getId() %>'},'question', 'Questions'));
+        {conference: '<%= abstractReview.getConference().getId() %>'},'question',
+        'Add the questions that the abstract reviewers must answer'));
 
 
 //get the first question or a default one

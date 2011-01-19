@@ -34,13 +34,13 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
 from MaKaC.reviewing import ConferenceAbstractReview
 
-class RCAbstractReviewer(object):
-    @staticmethod
-    def hasRights(request):
-        """ Returns True if the user is an Abstract Reviewer of the given abstract
-        """
-        #TODO: write this when the ReviewManager for abstracts class is implemented
-        return False
+#class RCAbstractReviewer(object):
+#    @staticmethod
+#    def hasRights(request):
+#        """ Returns True if the user is an Abstract Reviewer of the given abstract
+#        """
+#        #TODO: write this when the ReviewManager for abstracts class is implemented
+#        return False
 
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
@@ -70,37 +70,37 @@ class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
         return self._displayDefaultPage()
 
 
-class RHAbstractModifBaseAbstractManager(RHAbstractModifBase):
-    """ Base class to be used when the request can only be performed
-        by Abstract Managers OR by conference managers
-    """
-
-    def _checkProtection(self):
-        from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
-        if not RCAbstractManager.hasRights(self):
-            RHAbstractModifBase._checkProtection(self)
-        CFAEnabled.checkEnabled(self)
-
-class RHAbstractModifBaseAbstractReviewer(RHAbstractModifBase):
-    """ Base class to be used when the request can only be performed
-        by an Abstract Reviewer (and ONLY by an Abstract Reviewer)
-    """
-
-    def _checkProtection(self):
-        if not RCAbstractReviewer.hasRights(self):
-            raise MaKaCError("Only the reviewer of this abstract can access this page / perform this request")
-        CFAEnabled.checkEnabled(self)
-
-class RHRHAbstractModifBaseAbstractReviewingStaff(RHAbstractModifBase):
-    """ Base class to be used when the request can only be performed
-        by an AM, an AR, OR a Conference Manager
-    """
-
-    def _checkProtection(self):
-        from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
-        if not RCAbstractManager.hasRights(self) and not RCAbstractReviewer.hasRights(self):
-            RHAbstractModifBase._checkProtection(self)
-        CFAEnabled.checkEnabled(self)
+#class RHAbstractModifBaseAbstractManager(RHAbstractModifBase):
+#    """ Base class to be used when the request can only be performed
+#        by Abstract Managers OR by conference managers
+#    """
+#
+#    def _checkProtection(self):
+#        from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
+#        if not RCAbstractManager.hasRights(self):
+#            RHAbstractModifBase._checkProtection(self)
+#        CFAEnabled.checkEnabled(self)
+#
+#class RHAbstractModifBaseAbstractReviewer(RHAbstractModifBase):
+#    """ Base class to be used when the request can only be performed
+#        by an Abstract Reviewer (and ONLY by an Abstract Reviewer)
+#    """
+#
+#    def _checkProtection(self):
+#        if not RCAbstractReviewer.hasRights(self):
+#            raise MaKaCError("Only the reviewer of this abstract can access this page / perform this request")
+#        CFAEnabled.checkEnabled(self)
+#
+#class RHRHAbstractModifBaseAbstractReviewingStaff(RHAbstractModifBase):
+#    """ Base class to be used when the request can only be performed
+#        by an AM, an AR, OR a Conference Manager
+#    """
+#
+#    def _checkProtection(self):
+#        from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
+#        if not RCAbstractManager.hasRights(self) and not RCAbstractReviewer.hasRights(self):
+#            RHAbstractModifBase._checkProtection(self)
+#        CFAEnabled.checkEnabled(self)
 
 
 class RHAbstractDelete(RHAbstractModifBase):
@@ -122,7 +122,8 @@ class RHAbstractDelete(RHAbstractModifBase):
                 return p.display()
 
 
-class RHAbstractManagment(RHRHAbstractModifBaseAbstractReviewingStaff):
+#class RHAbstractManagment(RHRHAbstractModifBaseAbstractReviewingStaff):
+class RHAbstractManagment(RHAbstractModifBase):
 
     #def _checkProtection( self ):
     #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:

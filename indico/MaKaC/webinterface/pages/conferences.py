@@ -2188,13 +2188,13 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._sideMenu.addSection(self._advancedOptionsSection)
 
         #we decide which side menu item appear and which don't
-        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager, RCReviewingStaff
+        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReviewingStaff
         from MaKaC.webinterface.rh.collaboration import RCVideoServicesManager, RCCollaborationAdmin, RCCollaborationPluginAdmin
 
         canModify = self._conf.canModify(self._rh.getAW())
         isReviewingStaff = RCReviewingStaff.hasRights(self._rh)
         isPRM = RCPaperReviewManager.hasRights(self._rh)
-        isAM = RCAbstractManager.hasRights(self._rh)
+        #isAM = RCAbstractManager.hasRights(self._rh)
         isRegistrar = self._conf.canManageRegistration(self._rh.getAW().getUser())
 
         if not canModify:
@@ -2213,7 +2213,8 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         if not (info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)
 
-        if not (self._conf.hasEnabledSection("cfa") and (canModify or isAM)):
+        #if not (self._conf.hasEnabledSection("cfa") and (canModify or isAM)):
+        if not (self._conf.hasEnabledSection("cfa") and (canModify)):
             self._abstractMenuItem.setVisible(False)
 
         if not (canModify or isPRM):

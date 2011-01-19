@@ -1277,20 +1277,12 @@ IndicoUI.Widgets = {
                 var table = Html.table({className:'infoQuestionsTable', cellspacing:'0'});
                 content.append(table);
 
-                // Create the header
-                var trHeaders = Html.tr();
-                table.append(trHeaders);
-                var tdElement = Html.td({className:'dataHeader'},header);
-                var tdEdit = Html.td({className:'dataHeader'},'');
-                var tdRemove = Html.td({className:'dataHeader'},'');
-                trHeaders.append(tdElement);
-                trHeaders.append(tdEdit);
-                trHeaders.append(tdRemove);
-
                 // Create the table with the required data
                 var tr;
                 var spanRemoveList = [];
                 var spanEditList = [];
+                var tdEdit;
+                var tdRemove;
 
                 for (var i=0; i < result.length ; i++) {
                     tr = Html.tr({className: 'infoTR'});

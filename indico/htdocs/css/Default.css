@@ -6692,4 +6692,15 @@ table.infoQuestionsTable td.dataBold {
     font-weight: bold;
     color: #881122;
     padding: 5px 0px 5px 5px;
+    max-width: 270px;
+}
+
+.subGroupTitle {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #523D04;
+    padding: 3px;
+    padding-bottom: 10px;
+    border-bottom: 1px groove #A4A4A4;
+    font-weight: bold;
 }

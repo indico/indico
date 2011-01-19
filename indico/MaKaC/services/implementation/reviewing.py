@@ -25,7 +25,7 @@ from MaKaC.services.implementation.contribution import ContributionBase
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import HTMLModificationBase
 from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager,\
-    RCAbstractManager, RCReferee
+    RCReferee
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.webinterface.rh.contribMod import RCContributionReferee
@@ -71,20 +71,6 @@ class ConferenceReviewingPRMBase(ConferenceReviewingBase):
     """
     def _checkProtection(self):
         if not RCPaperReviewManager.hasRights(self):
-            ConferenceReviewingBase._checkProtection(self)
-
-class ConferenceReviewingAMBase(ConferenceReviewingBase):
-    """ This base class verifies that the user is an AM
-    """
-    def _checkProtection(self):
-        if not RCAbstractManager.hasRights(self):
-            ConferenceReviewingBase._checkProtection(self)
-
-class ConferenceReviewingPRMAMBase(ConferenceReviewingBase):
-    """ This base class verifies that the user is a PRM or an AM
-    """
-    def _checkProtection(self):
-        if not RCPaperReviewManager.hasRights(self) and not RCAbstractManager.hasRights(self):
             ConferenceReviewingBase._checkProtection(self)
 
 
@@ -155,10 +141,6 @@ class ConferenceReviewingDateTimeModificationBase (DateTimeModificationBase, Con
     #Note: don't change the order of the inheritance here!
     pass
 
-class ConferenceAbstractReviewingDateTimeModificationBase (DateTimeModificationBase, ConferenceReviewingAMBase):
-    #Note: don't change the order of the inheritance here!
-    pass
-
 
 class ConferenceReviewingModeModification(ConferenceReviewingSetupTextModificationBase ):
 
@@ -183,14 +165,6 @@ class ConferenceReviewingQuestionsModification(ConferenceReviewingListModificati
 
     def _handleSet(self):
         self._confPaperReview.setReviewingQuestions(self._value)
-
-#class ConferenceAbstractReviewingQuestionsModification(ConferenceReviewingListModificationBase):
-#
-#    def _handleGet(self):
-#        return self._confAbstractReview.getReviewingQuestions()
-#
-#    def _handleSet(self):
-#        self._confAbstractReview.setReviewingQuestions(self._value)
 
 
 class ConferenceReviewingCriteriaModification(ConferenceReviewingListModificationBase):
@@ -237,15 +211,6 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
-class ConferenceAbstractReviewingDefaultDueDateModification(ConferenceAbstractReviewingDateTimeModificationBase):
-
-    def _setParam(self):
-        self._conf.getConfAbstractReview().setDefaultAbstractReviewerDueDate(self._pTime)
-
-    def _handleGet(self):
-        date = self._conf.getConfAbstractReview().getAdjustedDefaultAbstractReviewerDueDate()
-        if date:
-            return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
 
 class ConferenceReviewingAutoEmailsModificationPRM(ConferenceReviewingSetupTextModificationBase ):
 
@@ -391,15 +356,15 @@ class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer(Confer
         return self._confPaperReview.getEnableAuthorSubmittedMatReviewerEmailNotif()
 
 
-class ConferenceReviewingCompetenceModification(ListModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingCompetenceModification(ListModificationBase, ConferenceReviewingPRMBase):
     #Note: don't change the order of the inheritance here!
     """ Class to change competences of users.
-        Both PRMs and AMs can do this so this class inherits from ConferenceReviewingPRMAMBase.
+        Both PRMs and AMs can do this so this class inherits from ConferenceReviewingPRMBase.
         Note: don't change the order of the inheritance!
     """
 
     def _checkParams(self):
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
         userId = self._params.get("user", None)
         if userId:
             ph = user.PrincipalHolder()
@@ -599,15 +564,15 @@ class ConferenceReviewingRemoveAllReviewers(ConferenceReviewingAssignStaffBasePR
 ###  Assign/Remove Team classes ###
 ######################################################
 
-class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceReviewingPRMBase):
     """ Adds paper review managers to reviewers team for the conference
     """
     def _checkParams(self):
         UserListModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         for user in self._avatars:
@@ -616,30 +581,30 @@ class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceRevie
 
         return True
 
-class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewingPRMBase):
     """ Removes paper review manager from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         self._confPaperReview.removePaperReviewManager(self._targetUser)
 
         return True
 
-class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceReviewingPRMBase):
     """ Adds referee to reviewers team for the conference
     """
     def _checkParams(self):
         UserListModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         for user in self._avatars:
@@ -648,15 +613,15 @@ class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceR
 
         return True
 
-class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceReviewingPRMBase):
     """ Removes referee from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         judgedContribs = self._confPaperReview.getJudgedContributions(self._targetUser)[:]
@@ -669,15 +634,15 @@ class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceRevie
         return True
 
 
-class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceReviewingPRMBase):
     """ Adds editor to reviewers team for the conference
     """
     def _checkParams(self):
         UserListModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         for user in self._avatars:
@@ -686,15 +651,15 @@ class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceRe
 
         return True
 
-class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReviewingPRMBase):
     """ Removes editor from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         editedContribs = self._confPaperReview.getEditedContributions(self._targetUser)[:]
@@ -707,15 +672,15 @@ class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReview
         return True
 
 
-class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, ConferenceReviewingPRMBase):
     """ Adds editor to reviewers team for the conference
     """
     def _checkParams(self):
         UserListModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         for user in self._avatars:
@@ -724,15 +689,15 @@ class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, Conference
 
         return True
 
-class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceReviewingPRMAMBase):
+class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceReviewingPRMBase):
     """ Removes editor from reviewers team for the conference
     """
     def _checkParams(self):
         UserModificationBase._checkParams(self)
-        ConferenceReviewingPRMAMBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
 
     def _checkProtection(self):
-        ConferenceReviewingPRMAMBase._checkProtection(self)
+        ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
         if not self._targetUser:
@@ -1018,7 +983,6 @@ methodMap = {
     "conference.deleteTemplate" : ConferenceReviewingDeleteTemplate,
     "conference.changeCompetences": ConferenceReviewingCompetenceModification,
     "conference.changeDefaultDueDate" : ConferenceReviewingDefaultDueDateModification,
-    "conference.changeAbstractReviewerDefaultDueDate" : ConferenceAbstractReviewingDefaultDueDateModification,
     "conference.attributeList" : ConferenceReviewingContributionsAttributeList,
     "conference.contributionsIdPerSelectedAttribute" : ConferenceReviewingContributionsPerSelectedAttributeList,
     "conference.userCompetencesList": ConferenceReviewingUserCompetenceList,

@@ -1652,18 +1652,21 @@ type("ScaleEditWidget", ["InlineEditWidget"],
                edit modes */
 
             __buildStructure: function(minValue, maxValue, warning) {
-                var div = Html.div();
+
+                var div = Html.div({style:{paddingLeft:'2px'}});
+                var spanTitle = Html.span({className:'dataCaptionFormat'},"Scale for each answer: ")
                 var structure = Html.table({},
                                     Html.tbody({},
                                         Html.tr({},Html.td("supportEntry", "From :"),
                                             Html.td({}, minValue)),
                                         Html.tr({},Html.td("supportEntry", "To :"),
                                             Html.td({}, maxValue))));
+                div.append(spanTitle);
                 div.append(structure)
                 if (warning) { // edit mode
                     div.append(warning);
                 }
-	            return div;
+                return div;
             },
 
             _handleEditMode: function(value) {
@@ -1723,7 +1726,11 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
                  return Html.table({className:'editLinkInLine'},
                          Html.tbody({},
                                  Html.tr({},
+<<<<<<< HEAD
                                          Html.td("supportEntry", "Number of possible answers :"),
+=======
+                                		 Html.td("dataCaptionFormat", "Number of answers per question :"),
+>>>>>>> [FTR] Improvements in styles and clean code
                                          Html.td({}, num))));
                                  },
 

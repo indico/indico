@@ -41,9 +41,9 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target)
 
-        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCAbstractManager
+        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
-        self._isAM = RCAbstractManager.hasRights(rh)
+        #self._isAM = RCAbstractManager.hasRights(rh)
         self._canModify = self._conf.canModify(rh.getAW())
 
         self._showListContribToJudge = self._conf.getConfPaperReview().isReferee(rh._getUser())
@@ -59,11 +59,13 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        if self._isAM or self._canModify:
+        #if self._isAM or self._canModify:
+        if self._canModify:
             self._subtabAbstractsReviewing = self._tabCtrl.newTab( "abstractsrev", "Abstracts Reviewing", \
                 urlHandlers.UHConfModifReviewingAbstractSetup.getURL( target = self._conf ) )
 
-        if self._isAM or self._canModify:
+        #if self._isAM or self._canModify:
+        if self._canModify:
             self._tabAbstractReviewingSetup = self._subtabAbstractsReviewing.newSubTab( "revsetup", "Setup",\
                     urlHandlers.UHConfModifReviewingAbstractSetup.getURL(target = self._conf) )
             self._tabAbstractNotifTpl = self._subtabAbstractsReviewing.newSubTab( "notiftpl", "Notification templates",\
