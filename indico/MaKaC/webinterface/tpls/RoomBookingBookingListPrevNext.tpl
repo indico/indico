@@ -40,68 +40,23 @@
     </tr>
     </table>
 
-    <script language="JavaScript">
+    <script type="text/javascript">
 
-    /*   This avoids to create the same method twice.
-         prevNextNo == 1 because the first time we have already
-         incremented prevNextNo (see upper in this template).
-    */
-    <% if prevNextNo == 1 :%>
-        function findDayPeriodFromDTString(sDate, eDate)
-        {
+    $('selectDateIcon<%= prevNextNo %>').observe('click', function() {
+        var dlg = new DateRangeSelector('<%= startD %>', '<%= endD %>', function(startDate, endDate) {
+            var form = $('dateSelect<%= prevNextNo %>');
+            form['sDay'].value = startDate.getDate();
+            form['sMonth'].value = startDate.getMonth() + 1;
+            form['sYear'].value = startDate.getFullYear();
 
-            dateRE = /^(...) (\d+)\/(\d+)\/(\d+)$/;
+            form['eDay'].value = endDate.getDate();
+            form['eMonth'].value = endDate.getMonth() + 1;
+            form['eYear'].value = endDate.getFullYear();
 
-            var m1 = dateRE.exec(sDate);
-            var m2 = dateRE.exec(eDate);
-
-            var sd = new Date(m1[4],m1[3]-1,m1[2]);
-            var ed = new Date(m2[4],m2[3]-1,m2[2]);
-
-            return (ed.getTime() - sd.getTime())/1000.0/3600.0/24.0;
-        }
-
-        function dateSelected(cal)
-        {
-
-            var period = findDayPeriodFromDTString('<%= startD %>','<%= endD %>');
-
-
-            if (! cal.dateClicked)
-            {
-                return;
-            }
-
-            var d = cal.date;
-            d.setHours(0);
-            d.setMinutes(0);
-            d.setSeconds(0);
-
-            var form = $('dateSelect<%= prevNextNo %>')
-
-            form['sDay'].value = d.getDate();
-            form['sMonth'].value = d.getMonth() + 1;
-            form['sYear'].value = d.getFullYear();
-
-            var d2 = new Date(d.getTime() + period*3600*24*1000);
-
-            form['eDay'].value = d2.getDate();
-            form['eMonth'].value = d2.getMonth() + 1;
-            form['eYear'].value = d2.getFullYear();
-
-            form.submit()
-
-        }
-    <% end %>
-
-    var cal = Calendar.setup({
-        button: 'selectDateIcon<%= prevNextNo %>',
-        eventName: "click",
-        ifFormat: "%d/%m/%Y",
-        showsTime: false,
-        firstDay: 1,
-        onSelect : dateSelected
+            form.submit();
         });
+        dlg.open();
+    });
     </script>
 
 <% end %>

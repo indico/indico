@@ -14,7 +14,8 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
                  var dateTime = Util.parseDateTime(value, this.displayFormat);
 
                  if (dateTime) {
-                     return Util.formatDateTime(dateTime, IndicoDateTimeFormats.Server);
+                     return Util.formatDateTime(dateTime, this.dateOnly ?
+                             IndicoDateTimeFormats.ServerHourless : IndicoDateTimeFormats.Server);
                  } else {
                      return undefined;
                  }
@@ -35,7 +36,8 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
              // conversion should be bypassed
              if (!direct) {
                  // convert formats, server <-> client
-                 var dateTime = Util.parseDateTime(value, IndicoDateTimeFormats.Server);
+                 var dateTime = Util.parseDateTime(value, this.dateOnly ?
+                         IndicoDateTimeFormats.ServerHourless : IndicoDateTimeFormats.Server);
                  RealtimeTextBox.prototype.set.call(
                      this,
                      Util.formatDateTime(dateTime, this.displayFormat));
@@ -80,8 +82,9 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
              }
          }
      },
-     function(args, format, mandatory) {
-         this.displayFormat = format || IndicoDateTimeFormats.Default;
+     function(args, format, mandatory, dateOnly) {
+         this.dateOnly = dateOnly || false;
+         this.displayFormat = format || (this.dateOnly ? IndicoDateTimeFormats.DefaultHourless : IndicoDateTimeFormats.Default);
          this.mandatory = mandatory || false;
 
          this.RealtimeTextBox(args);
@@ -117,7 +120,7 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
              displayArea: this.input,
              eventName: "click",
              ifFormat: this.displayFormat,
-             showsTime: true,
+             showsTime: !dateOnly,
              align: "",
              // notify the selector each time a new date/time is set
              // (since onkeydown/onkeyup won't be called)
@@ -127,7 +130,9 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
 
      });
 
-
+type("DateSelector", ["DateTimeSelector"], { }, function(args, format, mandatory) {
+    return this.DateTimeSelector(args, format, mandatory, true);
+});
 
 type("StartEndDateWidget", ["InlineEditWidget"],
      {

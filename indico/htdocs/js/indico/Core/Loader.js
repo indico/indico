@@ -20,3 +20,4 @@ include(ScriptRoot + "indico/Core/Widgets/RichText.js");
 include(ScriptRoot + "indico/Core/Dialogs/Popup.js");
 include(ScriptRoot + "indico/Core/Dialogs/Base.js");
 include(ScriptRoot + "indico/Core/Dialogs/Util.js");
+include(ScriptRoot + "indico/Core/Dialogs/PopupWidgets.js");
