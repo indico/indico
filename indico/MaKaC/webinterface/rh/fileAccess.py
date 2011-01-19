@@ -31,7 +31,7 @@ from email.Utils import formatdate
 
 class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHFileAccess
-    
+
     def _checkParams( self, params ):
         try:
             RHFileBase._checkParams( self, params )
@@ -40,7 +40,7 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
 
     def _checkProtection( self ):
         RHDisplayBaseProtected._checkProtection( self )
-    
+
     def _process( self ):
 
         self._disableCaching()
@@ -52,7 +52,13 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
             cfg = Config.getInstance()
             mimetype = cfg.getFileTypeMimeType( self._file.getFileType() )
             self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%self._file.getFileName()
+            dispos = "inline"
+            try:
+                if self._req.headers_in['User-Agent'].find('Android') != -1:
+                    dispos = "attachment"
+            except KeyError:
+                pass
+            self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
             return self._file.readBin()
         else:
             p = files.WPMinutesDisplay(self, self._file )
@@ -60,14 +66,14 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
 
 class RHFileAccessStoreAccessKey( RHFileBase ):
     _uh = urlHandlers.UHFileEnterAccessKey
-    
+
     def _checkParams( self, params ):
         RHFileBase._checkParams(self, params )
         self._accesskey = params.get( "accessKey", "" ).strip()
-    
+
     def _checkProtection( self ):
         pass
-        
+
     def _process( self ):
         access_keys = self._getSession().getVar("accessKeys")
         if access_keys == None:
@@ -77,10 +83,10 @@ class RHFileAccessStoreAccessKey( RHFileBase ):
         url = urlHandlers.UHFileAccess.getURL( self._target )
         self._redirect( url )
 
-        
+
 class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHVideoWmvAccess
-    
+
     def _checkParams( self, params ):
         try:
             RHLinkBase._checkParams( self, params )
@@ -90,14 +96,14 @@ class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
         return
-    
+
     def _process( self ):
         p = files.WPVideoWmv(self, self._link )
         return p.display()
-    
+
 class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
     _uh  = urlHandlers.UHVideoFlashAccess
-    
+
     def _checkParams( self, params ):
         try:
             RHLinkBase._checkParams( self, params )
@@ -107,7 +113,7 @@ class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
         return
-    
+
     def _process( self ):
         p = files.WPVideoFlash(self, self._link )
         return p.display()
