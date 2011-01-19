@@ -23,7 +23,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType
-from indico.MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.base import PluginsHolder
 
 
 def runTaskMigration():
@@ -79,6 +79,7 @@ def runPluginMigration():
 
 def main():
     runTaskMigration()
+    runPluginMigration()
 
 if __name__ == "__main__":
     main()

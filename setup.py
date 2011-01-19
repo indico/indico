@@ -125,7 +125,6 @@ def _getInstallRequires():
 def _versionInit():
         '''Retrieves the version number from indico/MaKaC/__init__.py and returns it'''
 
-        import datetime
         from indico.MaKaC import __version__
         v = __version__
 
