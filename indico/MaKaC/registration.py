@@ -143,11 +143,14 @@ class RegistrationForm(Persistent):
         sef = self.getSocialEventForm()
         if sef is not None :
             form.socialEventForm = sef.clone(form)
-        for section in self.getGeneralSectionFormsList():
-            newSection = section.clone(form)
-            form.generalSectionForms[section.getId()] = newSection
-            form.addToSortedForms(newSection)
-        del form._sortedForms
+        form._sortedForms = []
+        for item in self.getSortedForms():
+            clonedItem = form.getSectionById(item.getId())
+            if clonedItem is None: # General Section, not cloned yet
+                clonedItem = item.clone(form)
+                form.generalSectionForms[clonedItem.getId()] = clonedItem
+            form.addToSortedForms(clonedItem)
+
         return form
 
     def getCurrency(self):
