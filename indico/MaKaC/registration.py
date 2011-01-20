@@ -127,6 +127,7 @@ class RegistrationForm(Persistent):
         form.setMandatoryAccount(self.isMandatoryAccount())
         form.setAllSessions()
         form.notification=self.getNotification().clone()
+        form.personalData = self.getPersonalData().clone()
         acf = self.getAccommodationForm()
         if acf is not None :
             form.accommodationForm = acf.clone(form)
@@ -2639,6 +2640,14 @@ class PersonalData(Persistent):
         p = PersonalDataFormItem({'id':'personalHomepage', 'name': _("Personal homepage"), 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
+
+    def clone(self):
+        form = PersonalData()
+        for key, item in self._data.iteritems():
+            newItem = form.getDataItem(key)
+            newItem.setEnabled(item.isEnabled())
+            newItem.setMandatory(item.isMandatory())
+        return form
 
     def getValuesFromAvatar(self, av):
         r = {}
