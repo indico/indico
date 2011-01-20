@@ -817,6 +817,8 @@ class RHDisplayBaseProtected( RHProtected ):
 
 class RHModificationBaseProtected( RHProtected ):
 
+    _allowClosed = False
+
     def _checkProtection( self ):
         if not self._target.canModify( self.getAW() ):
             if self._target.getModifKey() != "":
@@ -825,7 +827,7 @@ class RHModificationBaseProtected( RHProtected ):
                 self._checkSessionUser()
             else:
                 raise ModificationError()
-        if hasattr(self._target, "getConference"):
+        if hasattr(self._target, "getConference") and not self._allowClosed:
             if self._target.getConference().isClosed():
                 raise ConferenceClosedError(self._target.getConference())
 

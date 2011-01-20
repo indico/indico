@@ -1905,18 +1905,15 @@ class RHConfGrantModificationToAllConveners( RHConferenceModifBase ):
 
 class RHConfModifTools( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifTools
+    _allowClosed = True
 
     def _process( self ):
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
+        wf = self.getWebFactory()
+        if wf is not None and not self._conf.isClosed():
+            p = wf.getConfModifTools(self, self._conf)
         else:
-            wf=self.getWebFactory()
-            if wf is not None:
-                p = wf.getConfModifTools(self, self._conf)
-            else:
-                p = conferences.WPConfClone( self, self._target )
-            return p.display()
+            p = conferences.WPConfClone(self, self._target)
+        return p.display()
 
 class RHConfModifListings( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifListings
@@ -2694,6 +2691,7 @@ class RHConfModifLogItem (RHConferenceModifBase):
 
 class RHConfClone( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfClone
+    _allowClosed = True
 
     def _process( self ):
         p = conferences.WPConfClone( self, self._conf )
@@ -2858,6 +2856,7 @@ class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observabl
     """
     _uh = urlHandlers.UHConfPerformCloning
     _cloneType = "none"
+    _allowClosed = True
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
