@@ -69,6 +69,31 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 img = notEnabledBulb
                 text = disabledText
 
+            # CERN Plugin: Just admins can see and modify it
+            if gs.getId() == "CERNYellowPay":
+                minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+                al = minfo.getAdminList()
+                if not al.isAdmin( self._user ):
+                    from MaKaC.plugins.base import PluginsHolder
+                    endis="enable"
+                    departmentName = PluginsHolder().getPluginType("EPayment").getPlugin("CERNYellowPay").getOption("FPDepartmentName").getValue()
+                    emailAddress = PluginsHolder().getPluginType("EPayment").getPlugin("CERNYellowPay").getOption("FPEmaillAddress").getValue()
+                    if gs.isEnabled():
+                        endis="disable"
+                        emailAddress = minfo.getSupportEmail()
+                        departmentName = "Indico support"
+                    html.insert(0, """
+                        <tr>
+                        <td>
+                            <img src=%s alt="%s" class="imglink">&nbsp;&nbsp;<b>CERN E-Payment</b> <small>
+                            (please, contact <a href="mailto:%s?subject=Indico Epayment - Conference ID: %s">%s</a> to %s
+                            the CERN e-payment module)</small>
+                        </td>
+                        </tr>
+                        """%(img, text, emailAddress, self._conf.getId(), departmentName, endis))
+                    continue
+            #################################################
+
             selbox = ""
             html.append("""
                         <tr>
