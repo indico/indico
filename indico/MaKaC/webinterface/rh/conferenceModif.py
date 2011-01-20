@@ -2690,21 +2690,6 @@ class RHConfModifLogItem (RHConferenceModifBase):
         p = conferences.WPConfModifLogItem( self, self._target )
         return p.display(**params)
 
-
-class RHConfModifListings( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifListings
-
-    def _process( self ):
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        else:
-            p = conferences.WPConfModifListings( self, self._target )
-            wf=self.getWebFactory()
-            if wf is not None:
-                p = wf.getConfModifListings(self, self._conf)
-            return p.display()
-
 #######################################################################################
 
 class RHConfClone( RHConferenceModifBase ):
