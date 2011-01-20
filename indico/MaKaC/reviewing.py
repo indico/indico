@@ -1088,12 +1088,13 @@ class ConferenceAbstractReview(Persistent):
         self._reviewingQuestions = []
 
         # by default
-        self._numberOfAnswers = 5
+        self._numberOfAnswers = 7
         self._scaleLower = 0
-        self._scaleHigher = 100
-        self._radioButtonsLabels = ["0", "", "50", "", "100"]
-        self._radioButtonsTitles = ["0", "25", "50", "75", "100"]
+        self._scaleHigher = 10
+        self._radioButtonsLabels = ["0", "", "", "5", "", "", "10"]
+        self._radioButtonsTitles = ["0", "1.7", "3.3", "5", "6.7", "8.3", "10"]
         self._questionCounter = Counter(1)
+        self._answerCounter = Counter(1)
         self.notifyModification()
 
     def getConference(self):
@@ -1158,7 +1159,7 @@ class ConferenceAbstractReview(Persistent):
             if self._numberOfAnswers:
                 pass
         except AttributeError :
-            self._numberOfAnswers = 5
+            self._numberOfAnswers = 7
         return self._numberOfAnswers
 
     def setRadioButtonsLabels(self):
@@ -1199,8 +1200,12 @@ class ConferenceAbstractReview(Persistent):
 
     def getRadioButtonsTitles(self):
         """ Get the titles for the radio buttons """
+        try :
+            if self._radioButtonsTitles:
+                pass
+        except AttributeError :
+            self._radioButtonsTitles = ["0", "1.7", "3.3", "5", "6.7", "8.3", "10"]
         return self._radioButtonsTitles
-
 
     def getScaleLower(self):
         try :
@@ -1215,10 +1220,8 @@ class ConferenceAbstractReview(Persistent):
             if self._scaleHigher:
                 pass
         except AttributeError :
-            self._scaleHigher = 100
+            self._scaleHigher = 10
         return self._scaleHigher
-
-
 
     def getRadioButtonsLabels(self):
         """ Get the labels for the radio buttons """
@@ -1226,7 +1229,7 @@ class ConferenceAbstractReview(Persistent):
             if self._radioButtonsLabels:
                 pass
         except AttributeError :
-            self._radioButtonsLabels = ["0", "", "50", "", "100"]
+            self._radioButtonsLabels = ["0", "", "", "5", "", "", "10"]
         return self._radioButtonsLabels
 
     def setScale(self, min, max):
@@ -1239,6 +1242,12 @@ class ConferenceAbstractReview(Persistent):
             Increments the questionId counter
         """
         return self._questionCounter.newCount()
+
+    def getNewAnswerId(self):
+        """ Returns a new an unused answerId
+            Increments the answerId counter
+        """
+        return self._answerCounter.newCount()
 
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed
@@ -1257,7 +1266,7 @@ class Question(Persistent, Fossilizable):
 
     def __init__( self, newId, text):
         """ Constructor.
-            name is a string which represents the content of the question
+            text is a string which represents the content of the question
         """
         self._id = newId
         self._text = text
@@ -1277,10 +1286,43 @@ class Question(Persistent, Fossilizable):
         self._p_changed = 1
 
 
+class Answer(Persistent):
+
+    """
+    This class represents an answer given of a question.
+    """
+
+    def __init__(self, newId, rbValue, numberOfAnswers, questionId):
+        """ Constructor.
+            rbValue: real value of the radio button
+            scaleLower, scaleHigher and numberOfAnswers: params to calculate the value in base to the scale and
+                        the number of answers
+            questionId: Id of the associated question
+        """
+        self._id = newId
+        self._rbValue = rbValue
+        self._questionId = questionId
+        # is necessary to save this value (_numberOfAnswers) here because when the value is recalculated in base to a new scale
+        # we need to keep the rbValue in base to the previous number of answers, otherwise if the user changes the number of radio
+        # buttons as well we could have for example rbValue = 5 and numberOfAnswers = 3 (values 1, 2, 3 but never 5)
+        self._numberOfAnswers = numberOfAnswers
+        self._value = None # value in base to the scale limits
 
 
+    def getId(self):
+        return self._id
 
+    def getValue(self):
+        return self._value
 
+    def getQuestionId(self):
+        return self._questionId
+
+    def calculateRatingValue(self, scaleLower, scaleHigher):
+        """
+        Calculate the value of the answer in base to the scale limits and the number of possible answers (radio buttons)
+        """
+        self._value = "%.2f" % (((scaleHigher-scaleLower)/float(self._numberOfAnswers-1))*self._rbValue + scaleLower)
 
 
 

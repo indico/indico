@@ -40,6 +40,7 @@ from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
 from MaKaC.reviewing import ConferenceAbstractReview
+from MaKaC.reviewing import Answer
 
 
 class RHTrackModifBase( RHTrackBase, RHModificationBaseProtected ):
@@ -416,7 +417,7 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
         self._action=""
         self._comment=params.get("comment","")
         self._contribType=params.get("contribType",self._abstract.getContribType())
-        self._answers = {}
+        self._answers = []
         if params.has_key("OK"):
             self._action = "GO"
             ctId = ""
@@ -424,14 +425,20 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
                 ctId=self._abstract.getContribType().getId()
             ctId=params.get("contribType",ctId)
             self._contribType=self._abstract.getConference().getContribTypeById(ctId)
-            # get answers and make the dictionary
+            # get answers and make the list
+            scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
+            scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
+            numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
             c = 0
             for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
-            self._scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
-            self._scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
-            self._numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
+                rbValue = int(params.get("_GID"+str(c),scaleLower))
+                questionId = i.getId()
+                newId = self._target.getConference().getConfAbstractReview().getNewAnswerId()
+                #self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
+                newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+                newAnswer.calculateRatingValue(scaleLower, scaleHigher)
+                self._answers.append(newAnswer)
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
@@ -441,7 +448,7 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
             self._redirect( url )
         elif self._action == "GO":
             r = self._getUser()
-            self._abstract.proposeToAccept( r, self._track, self._contribType, self._comment, self._answers, self._scaleLower, self._scaleHigher, self._numberOfAnswers )
+            self._abstract.proposeToAccept( r, self._track, self._contribType, self._comment, self._answers )
             self._redirect( url )
         else:
             p=tracks.WPTrackAbstractPropToAcc(self,self._track,self._abstract)
@@ -454,18 +461,24 @@ class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
     def _checkParams( self, params ):
         RHTrackAbstractBase._checkParams( self, params )
         self._action, self._comment = "", ""
-        self._answers = {}
+        self._answers = []
         if params.has_key("OK"):
             self._action = "GO"
             self._comment = params.get("comment", "")
-            # get answers and make the dictionary
+            # get answers and make the list
+            scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
+            scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
+            numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
             c = 0
             for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
-            self._scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
-            self._scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
-            self._numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
+                rbValue = int(params.get("_GID"+str(c),scaleLower))
+                questionId = i.getId()
+                newId = self._target.getConference().getConfAbstractReview().getNewAnswerId()
+                #self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
+                newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+                newAnswer.calculateRatingValue(scaleLower, scaleHigher)
+                self._answers.append(newAnswer)
         elif params.has_key("CANCEL"):
             self._action = "CANCEL"
 
@@ -475,7 +488,7 @@ class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
             self._redirect( url )
         elif self._action == "GO":
             r = self._getUser()
-            self._abstract.proposeToReject( r, self._track, self._comment , self._answers, self._scaleLower, self._scaleHigher, self._numberOfAnswers)
+            self._abstract.proposeToReject( r, self._track, self._comment , self._answers)
             self._redirect( url )
         else:
             p = tracks.WPTrackAbstractPropToRej( self, self._track, self._abstract )

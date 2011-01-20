@@ -40,12 +40,6 @@ class RCPaperReviewManager:
         """
         return request._conf.getConfPaperReview().isPaperReviewManager(request.getAW().getUser())
 
-#class RCAbstractManager:
-#    @staticmethod
-#    def hasRights(request):
-#        """ Returns true if the user is an AM of the conference
-#        """
-#        return request._conf.getConfAbstractReview().isAbstractManager(request.getAW().getUser())
 
 class RCReviewingStaff:
     @staticmethod
@@ -87,7 +81,6 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
         self._isPRM = RCPaperReviewManager.hasRights(self)
-        #self._isAM = RCAbstractManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._isReviewingStaff = RCReviewingStaff.hasRights(self)
         self._isEditor = RCEditor.hasRights(self)
@@ -106,9 +99,9 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
         if self._redirectURL != "":
             url = self._redirectURL
 
-        elif self._conf.canModify(self.getAW()) or self._isPRM:
+        elif self._isPRM:
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
-        elif self._isAM:
+        elif self._conf.canModify(self.getAW()):
             url = urlHandlers.UHConfModifReviewingAbstractSetup.getURL( self._conf)
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
@@ -135,21 +128,6 @@ class RHConfModifReviewingPRMBase (RHConferenceModifBase):
                 RHConferenceModifBase._checkProtection(self);
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-
-
-
-#class RHConfModifReviewingAMBase (RHConferenceModifBase):
-#    """ Base class that allows only abstract managers to do this request.
-#        If user is not a paper review manager, they need to be a conference manager.
-#    """
-#
-#    def _checkProtection(self):
-#        if self._target.hasEnabledSection("paperReviewing"):
-#            if not RCAbstractManager.hasRights(self):
-#                RHConferenceModifBase._checkProtection(self);
-#        else:
-#            raise MaKaCError(_("Paper Reviewing is not active for this conference"))
-
 
 
 class RHConfModifReviewingPRMAMBase (RHConferenceModifBase):
@@ -179,7 +157,7 @@ class RHConfModifReviewingPaperSetup( RHConfModifReviewingPRMBase ):
             p = WPConfModifReviewingPaperSetup( self, self._target)
         return p.display()
 
-#class RHConfModifReviewingAbstractSetup( RHConfModifReviewingAMBase ):
+
 class RHConfModifReviewingAbstractSetup( RHConferenceModifBase ):
     """ Class used when the user clicks on the Abstract Setup
         subtab of the Reviewing tab

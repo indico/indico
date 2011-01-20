@@ -3555,8 +3555,6 @@ class CFAEnabled(object):
 class RHConfModifCFABase(RHConferenceModifBase):
 
     def _checkProtection(self):
-        #from MaKaC.webinterface.rh.reviewingModif import RCAbstractManager
-        #if not RCAbstractManager.hasRights(self):
         RHConferenceModifBase._checkProtection(self)
         CFAEnabled.checkEnabled(self)
 

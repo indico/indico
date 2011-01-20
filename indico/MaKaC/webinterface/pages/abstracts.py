@@ -1533,12 +1533,16 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                     detailsImg = ""
                 else:
                     # Get the list of questions and the answers values
-                    questions = status.getAnswersAverage().keys()
-                    answers = status.getAnswersAverage().values()
+                    questionNames = []
+                    answerValues = []
+                    answers = status.getAnswers()
+                    for ans in answers:
+                        questionNames.append(self._conf.getConfAbstractReview().getQuestionById(ans.getQuestionId()).getText())
+                        answerValues.append(ans.getValue())
                     rating = status.getJudValue()
                     total = status.getTotalJudValue()
                     imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
-                    detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s,%s,%s)" style="cursor: pointer;">"""% (imgIcon, questions, answers, rating, total)
+                    detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s,%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, answerValues, rating, total)
 
                 tracks += "<tr bgcolor=\"%s\">"%color
                 tracks += "<td nowrap class=\"blacktext\" style=\"padding-right:10px;background-color:white\"><b>&nbsp;%s</b></td>"%(trackTitle)
@@ -1574,11 +1578,15 @@ class WAbstractTrackOrderByRating(wcomponents.WTemplated):
 
     def __init__( self, aw, abstract ):
         self._abstract = abstract
-        #self._aw = aw
-        #self._conf = abstract.getOwner().getOwner()
 
     def getVars( self ):
-        questions = self._abstract.getQuestionsAverage()
+        questionIds = self._abstract.getQuestionsAverage().keys()
+        answerValues = self._abstract.getQuestionsAverage().values()
+        i = 0
+        questions = {}
+        for qId in questionIds:
+            questions[self._abstract.getConference().getConfAbstractReview().getQuestionById(qId).getText()] = answerValues[i]
+            i += 1
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["questions"] = questions

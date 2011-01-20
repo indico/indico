@@ -23,7 +23,7 @@ import MaKaC.webinterface.pages.reviewing as reviewing
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 import MaKaC.user as user
 from MaKaC.webinterface.rh.reviewingModif import RHConfModifReviewingPRMAMBase,\
-    RHConfModifReviewingAMBase, RHConfModifReviewingPRMBase
+    RHConfModifReviewingPRMBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.errors import MaKaCError
 
@@ -41,18 +41,6 @@ class RHConfModifReviewingControl( RHConfModifReviewingPRMAMBase ):
             p = reviewing.WPConfModifReviewingControl( self, self._target)
         return p.display()
 
-class RHConfModifReviewingAbstractsControl( RHConfModifReviewingPRMAMBase ):
-    _uh = urlHandlers.UHConfModifReviewingAbstractsControl
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMAMBase._checkParams( self, params )
-
-    def _process( self ):
-        if self._conf.isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-        else:
-            p = reviewing.WPConfModifReviewingAbstractsControl( self, self._target)
-        return p.display()
 
 class RHConfModifReviewingBase(RHConferenceModifBase):
     """ Base class that checks if reviewing module is active
@@ -245,92 +233,4 @@ class RHConfRemoveReviewer( RHConfReviewerBase ):
                     else:
                         self._target.getAccessController().revokeModificationEmail(id)
         self._redirect( urlHandlers.UHConfModifReviewingControl.getURL( self._target ) )
-
-#Abstract Manager classes
-class RHConfSelectAbstractManager( RHConfModifReviewingBase ):
-    """
-    Only conference managers can add abstract managers,
-    so this class inherits from RHConferenceModifBase
-    """
-    _uh = urlHandlers.UHConfSelectAbstractManager
-
-    def _process( self ):
-        p = reviewing.WPConfSelectAbstractManager( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHConfAddAbstractManager( RHConfModifReviewingBase ):
-    """
-    Only conference managers can add abstract managers,
-    so this class inherits from RHConferenceModifBase
-    """
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if id is not None and id != '':
-                    self._target.getConfPaperReview().addAbstractManager( ph.getById( id ) )
-        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
-
-
-class RHConfRemoveAbstractManager( RHConfModifReviewingBase ):
-    """
-    Only conference managers can remove abstract managers,
-    so this class inherits from RHConferenceModifBase
-    """
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if id is not None and id != '':
-                    self._target.getConfPaperReview().removeAbstractManager( ph.getById( id ) )
-                    av = ph.getById(id)
-                    if av:
-                        self._target.revokeModification(av)
-                    else:
-                        self._target.getAccessController().revokeModificationEmail(id)
-        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
-
-#Abstract Reviewer classes
-class RHConfSelectAbstractReviewer( RHConfModifReviewingAMBase ):
-    _uh = urlHandlers.UHConfSelectAbstractReviewer
-
-    def _process( self ):
-        p = reviewing.WPConfSelectAbstractReviewer( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHConfAddAbstractReviewer( RHConfModifReviewingAMBase ):
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if id is not None and id != '':
-                    self._target.getConfPaperReview().addAbstractReviewer( ph.getById( id ) )
-        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
-
-
-class RHConfRemoveAbstractReviewer( RHConfModifReviewingAMBase ):
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if id is not None and id != '':
-                    self._target.getConfPaperReview().removeAbstractReviewer( ph.getById( id ) )
-                    av = ph.getById(id)
-                    if av:
-                        self._target.revokeModification(av)
-                    else:
-                        self._target.getAccessController().revokeModificationEmail(id)
-        self._redirect( urlHandlers.UHConfModifReviewingAbstractsControl.getURL( self._target ) )
 

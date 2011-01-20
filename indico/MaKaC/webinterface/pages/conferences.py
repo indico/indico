@@ -6021,11 +6021,14 @@ class WAbstracts( wcomponents.WTemplated ):
                 detailsImg = ""
             else:
                 # Get the list of questions and the answers values
-                questions = abstract.getQuestionsAverage().keys()
+                questionNames = []
+                questionIds = abstract.getQuestionsAverage().keys()
+                for qId in questionIds:
+                    questionNames.append(self._conf.getConfAbstractReview().getQuestionById(qId).getText())
                 answers = abstract.getQuestionsAverage().values()
                 rating = abstract.getRating()
                 imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
-                detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questions, answers)
+                detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, answers)
 
 
             m = ["""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('abstracts%s')" type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId(), abstract.getId())]

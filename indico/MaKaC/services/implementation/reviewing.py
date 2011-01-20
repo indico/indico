@@ -907,7 +907,6 @@ class AbstractReviewingUpdateExampleQuestion(AbstractReviewingBase):
         numAnswers = range(self._confAbstractReview.getNumberOfAnswers())
         labels = self._confAbstractReview.getRadioButtonsLabels()
         rbValues = self._confAbstractReview.getRadioButtonsTitles()
-
         return {"numberAnswers": numAnswers, "labels": labels, "rbValues": rbValues}
 
 
