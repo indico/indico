@@ -33,10 +33,13 @@
             <input type="hidden" id="eMonth" name="eMonth" />
             <input type="hidden" id="eYear" name="eYear" />
             <input type="hidden" id="reason" name="reason" />
-            <a href="#" id="selectDateIcon<%= prevNextNo %>"><img src="<%= Config.getInstance().getSystemIconURL('ical') %>" alt="Calendar" title="Select a Date" style="border: none; vertical-align: middle;" /></a>&nbsp;<%= verbosePeriod %>
+            <%= verbosePeriod %>
         </form>
     </td>
     <td style="text-align: right;"><a href="<%= nextURL %>" style="font-size: xx-small;"><%= _("next")+" "%> <%= periodName %> &gt;</a></td>
+    </tr>
+    <tr>
+        <td colspan="3" style="text-align: center"><a href="#" style="font-size: x-small;" id="selectDateIcon<%= prevNextNo %>"><%=_("change period") %></a></td>
     </tr>
     </table>
 
@@ -54,7 +57,7 @@
             form['eYear'].value = endDate.getFullYear();
 
             form.submit();
-        });
+        }, '<%=_("Choose Period") %>');
         dlg.open();
     });
     </script>

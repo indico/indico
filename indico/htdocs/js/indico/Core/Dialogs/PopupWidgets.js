@@ -8,7 +8,7 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
 
         var buttonDiv = Html.div({}, Widget.button(command(function() {
             self._submit();
-        }, "Choose")));
+        }, $T("Choose"))));
 
         return buttonDiv;
     },
