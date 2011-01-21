@@ -17,8 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 """Base definitions for the request handlers (rh). A rh is a class which
 complies to a well defined interface and which from a mod_python request knows
@@ -39,6 +37,8 @@ from ZODB.POSException import ConflictError, POSKeyError
 from ZEO.Exceptions import ClientDisconnected
 
 from MaKaC.common import fossilize
+from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
+from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 import MaKaC.webinterface.session as session
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -55,11 +55,6 @@ from MaKaC.common.utils import truncate
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.i18n import _
-
-from MaKaC.common.contextManager import ContextManager
-from MaKaC.i18n import _
-
-from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.user import Group, Avatar

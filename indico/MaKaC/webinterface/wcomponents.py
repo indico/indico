@@ -193,6 +193,7 @@ class WTemplated:
 
         tempHTML = TemplateExec.executeTemplate( text, vars, self.tplId )
 
+
         if helpText == None:
             return tempHTML
         else:

@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.user import Avatar
 from MaKaC.common.logger import Logger
+from MaKaC.services.interface.rpc.common import ServiceAccessError
 
 """
 Part of Room Booking Module (rb_)
@@ -28,7 +29,7 @@ Responsible: Piotr Wlodarek
 import sys, os, string, StringIO, traceback
 import MaKaC
 from MaKaC.common.Configuration import Config
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, AccessError
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.common import Config
 import MaKaC.common.info as info
@@ -404,6 +405,9 @@ class TemplateExec:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
             except: pass
             raise
+        ## In case that included templates raise AccessError due to offlineRequest macro.
+        except (AccessError, ServiceAccessError), e:
+            raise AccessError( e )
         except Exception, e:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.error.py", "w" ).write( pythonCode )
             except: pass
