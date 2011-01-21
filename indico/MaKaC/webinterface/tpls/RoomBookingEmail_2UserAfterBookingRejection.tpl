@@ -16,6 +16,9 @@ Hours: <%= reservation.startDT.strftime("%H:%M") %> -- <%= reservation.endDT.str
 Rejection reason:
 <%= reason %>
 
+Booking details:
+<%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
+
 
 BTW, you can always check your bookings here:
 <%= urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True ) %>
