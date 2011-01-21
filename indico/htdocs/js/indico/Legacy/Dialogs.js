@@ -669,7 +669,6 @@ extend(IndicoUI.Dialogs,
                    var content = Html.div({}, rtWidget.draw());
 
                    var commitChanges = function() {
-                       debugger;
                        killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
                        if(rtWidget.clean()){
                            changedText.set(false);

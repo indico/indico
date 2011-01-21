@@ -179,8 +179,11 @@ class RestrictedHTMLParser( HTMLParser ):
                 raise HarmfulHTMLException(attr[0], self.getpos())
             elif attr[0] in urlProperties:
                 val_unescaped = re.sub("[`\000-\040\177-\240\s]+", '', unescape(attr[1])).lower()
-                #remove replacement characters from unescaped characters
-                val_unescaped = val_unescaped.replace(u"\ufffd", "")
+                try:
+                    #remove replacement characters from unescaped characters
+                    val_unescaped = val_unescaped.replace(u"\ufffd", "")
+                except UnicodeDecodeError, e:
+                    Logger.get('RestrictedHTMLParser-urlProperties').exception(str(e))
                 if (re.match("^[a-z0-9][-+.a-z0-9]*:", val_unescaped) and
                     (val_unescaped.split(':')[0] not in
                      allowedProtocols)):
