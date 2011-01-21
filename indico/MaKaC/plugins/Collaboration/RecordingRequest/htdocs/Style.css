@@ -19,12 +19,12 @@ div.RRFormSection {
     -moz-border-radius-topleft:10px;
     -moz-border-radius-topright:10px;
     border-bottom:1px solid #AAAAAA;
-    border-right:1px solid #AAAAAA; 
+    border-right:1px solid #AAAAAA;
 }
 
 div.RRFormSubsection {
     padding-top: 5px;
-    padding-bottom: 5px;	
+    padding-bottom: 5px;
 }
 
 span.RRQuestion {
@@ -34,7 +34,7 @@ span.RRQuestion {
 ul.RROptionList {
     list-style: none;
     margin: 0;
-    padding: 0;	
+    padding: 0;
 }
 
 ul.RROptionList li.RRInnerQuestion {
@@ -47,12 +47,12 @@ div.RRFormSection label {
 }
 
 div.RRFormSection input, select {
-    margin-left: 20px;	
+    margin-left: 20px;
 }
 
 div.RRContributionListDiv {
     max-height: 400px;
-    overflow: auto;   
+    overflow: auto;
 }
 
 span.RRContributionStartDate {

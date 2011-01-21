@@ -2,7 +2,7 @@
 
 span.WRWarningMessage {
     color: #D01F3C;
-    font-weight: bold;	
+    font-weight: bold;
 }
 
 span.WRNoteTitle {
@@ -24,12 +24,12 @@ div.WRFormSection {
     -moz-border-radius-topleft:10px;
     -moz-border-radius-topright:10px;
     border-bottom:1px solid #AAAAAA;
-    border-right:1px solid #AAAAAA; 
+    border-right:1px solid #AAAAAA;
 }
 
 div.WRFormSubsection {
     padding-top: 5px;
-    padding-bottom: 5px;	
+    padding-bottom: 5px;
 }
 
 span.WRQuestion {
@@ -39,7 +39,7 @@ span.WRQuestion {
 ul.WROptionList {
     list-style: none;
     margin: 0;
-    padding: 0;	
+    padding: 0;
 }
 
 ul.WROptionList li.WRInnerQuestion {
@@ -52,12 +52,12 @@ div.WRFormSection label {
 }
 
 div.WRFormSection input, select {
-    margin-left: 20px;	
+    margin-left: 20px;
 }
 
 div.WRContributionListDiv {
     max-height: 400px;
-    overflow: auto;   
+    overflow: auto;
 }
 
 span.WRContributionStartDate {

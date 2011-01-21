@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import pkg_resources, sys
 from MaKaC.plugins import PluginsHolder, Plugin
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime, \
@@ -98,7 +99,14 @@ class CollaborationTools(object):
         """ Utility function that returns a module object given a plugin name.
             pluginId: a string such as "evo", "DummyPlugin", etc.
         """
-        return cls.getCollaborationPluginType().getPlugin(pluginId).getModule()
+        pmodules = pkg_resources.get_entry_map('cds-indico', group='indico.ext')
+        entry = pmodules.get('Collaboration.%s' % pluginId, None)
+        if entry:
+            __import__(entry.module_name, globals(), locals(),
+                       ['collaboration', 'pages', 'actions'])
+            return sys.modules[entry.module_name]
+        else:
+            return None
 
     @classmethod
     def getTemplateClass(cls, pluginId, templateName):
@@ -119,18 +127,6 @@ class CollaborationTools(object):
         """ Returns the GlobalData object of a plugin
         """
         return cls.getPlugin(pluginName).getGlobalData()
-
-    @classmethod
-    def getExtraCSS(cls, plugin):
-        """ Utility function that returns a string with the extra CSS declared by a plugin.
-            Example: templateClass = CollaborationTools.getExtraCSS("EVO").
-        """
-        templateClass = cls.getTemplateClass(plugin.getId(), "WStyle")
-
-        if templateClass:
-            return templateClass(plugin).getHTML()
-        else:
-            return None
 
     @classmethod
     def getExtraJS(cls, conf, plugin, user):

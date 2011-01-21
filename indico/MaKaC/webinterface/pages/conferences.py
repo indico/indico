@@ -972,8 +972,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                             "baseurl": self._getBaseURL(),
                             "conf": Config.getInstance(),
                             "page": self,
-                            "extraCSSFiles": self._extraCSSFiles,
-                            "extraCSS": self._extraCSS,
+                            "extraCSS": self.getCSSFiles(),
                             "extraJSFiles": self.getJSFiles(),
                             "extraJS": self._extraJS,
                             "language": self._getAW().getSession().getLang()

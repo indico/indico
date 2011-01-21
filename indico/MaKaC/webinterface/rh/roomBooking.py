@@ -671,7 +671,7 @@ class RHRoomBookingSearch4Users( RHRoomBookingBase ):
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
     def _checkParams(self, params):
-        super(RHRoomBookingMapOfRooms, self)._checkParams(self)
+        RHRoomBookingBase._checkParams(self, params)
         self._roomID = params.get('roomID')
 
     def _process(self):
@@ -684,7 +684,7 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
     def __init__(self, *args, **kwargs):
-        super(RHRoomBookingMapOfRoomsWidget, self).__init__(*args, **kwargs)
+        RHRoomBookingBase.__init__(self, *args, **kwargs)
         self._cache = MapOfRoomsCache()
 
     def _setGeneralDefaultsInSession( self ):

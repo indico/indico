@@ -37,7 +37,6 @@ class WPBase:
         self._locTZ = ""
 
         #store page specific CSS and JS
-        self._extraCSSFiles = []
         self._extraCSS = []
         self._extraJS = []
 
@@ -174,11 +173,6 @@ class WPBase:
                             self._display( params ), \
                             self._getHTMLFooter() )
 
-    def addExtraCSSFile(self, filename):
-        self._extraCSSFiles.append(filename)
-
-    def addExtraCSS(self, cssCode):
-        self._extraCSS.append(cssCode)
 
     def addExtraJSFile(self, filename):
         self._extraJSFiles.append(filename)

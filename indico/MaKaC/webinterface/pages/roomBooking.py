@@ -248,7 +248,9 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
         self._defaultLocation = defaultLocation
         self._forVideoConference = forVideoConference
         self._roomID = roomID
-        self.addExtraCSSFile('mapofrooms.css')
+
+    def getCSSFiles(self):
+        return WPNotDecorated.getCSSFiles(self) + ['css/mapofrooms.css']
 
     def getJSFiles(self):
         return WPNotDecorated.getJSFiles(self) + \

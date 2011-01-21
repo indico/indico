@@ -221,19 +221,17 @@ class WPConfModifCollaboration(WPConfModifCSBase):
         """
         WPConfModifCSBase.__init__(self, rh, conf)
         self._tabPlugins = rh._tabPlugins
-        self._buildExtraCSS()
         self._buildExtraJS()
+
+    def getCSSFiles(self):
+        for plugin in self._tabPlugins:
+            return WPConfModifCSBase.getCSSFiles(self) + \
+                   ['Collaboration/%s/Style.css' % plugin.getId()]
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage('Collaboration') + self._includeJSPackage("Management")
 
     ######### private methods ###############
-    def _buildExtraCSS(self):
-        for plugin in self._tabPlugins:
-            extraCSS = CollaborationTools.getExtraCSS(plugin)
-            if extraCSS:
-                self.addExtraCSS(extraCSS)
-
     def _buildExtraJS(self):
         for plugin in self._tabPlugins:
             extraJS = CollaborationTools.getExtraJS(self._conf, plugin, self._getAW().getUser())
