@@ -45,7 +45,7 @@ type("TimetableLayoutManager", [],
                  else {
                      addCheckpoint(key, sTime, 'start', value.sessionId);
 
-                     if (eTime > sTime) {
+                     if (eTime >= sTime) {
                          addCheckpoint(key, eTime, 'end');
                      } else if (eTime == '000000') {
                          addCheckpoint(key, '240000', 'end');
@@ -226,7 +226,6 @@ type("TimetableLayoutManager", [],
 type("IncrementalLayoutManager", ["TimetableLayoutManager"],
      {
          drawDay: function(data, detailLevel, startTime, endTime) {
-
              var self = this;
 
              this.eventData = data;

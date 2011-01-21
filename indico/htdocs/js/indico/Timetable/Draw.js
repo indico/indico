@@ -148,7 +148,11 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     this.timeDiv = Html.div('timetableBlockTimeDiscreet', this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
                     this.div.insert(this.timeDiv);
                 } else {
-                    this.timeDiv = Html.div({className: 'timetableBlockTime'}, this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
+                    if (this.eventData.startDate.time == this.eventData.endDate.time) {
+                        this.timeDiv = Html.div({className: 'timetableBlockTime'}, this.eventData.startDate.time.substring(0,5));
+                    } else {
+                        this.timeDiv = Html.div({className: 'timetableBlockTime'}, this.eventData.startDate.time.substring(0,5) +' - '+ this.eventData.endDate.time.substring(0,5));
+                    }
 
                     this.locationDiv  = Html.div('timetableBlockLocation');
                     var addComma = false;

@@ -852,7 +852,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
                             false);
 
              self.parameterManager.add(self.startTimeField, 'time', false);
-             self.parameterManager.add(self.timeField, 'unsigned_int', false);
+             self.parameterManager.add(self.timeField, 'non_negative_int', false);
 
              var contentDiv = IndicoUtil.createFormFromMap([
                  [$T('Title'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}})), this.info.accessor('title'))],
