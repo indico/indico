@@ -21,7 +21,8 @@
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.RecordingRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
     RequestAcceptedNotification, RequestRejectedNotification,\
-    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin
+    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin,\
+    RequestRescheduledNotification
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.RecordingRequest.common import RecordingRequestException,\
     RecordingRequestError
@@ -173,3 +174,15 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestDeletedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return RecordingRequestError('remove', e)
+
+    def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
+        if MailTools.needToSendEmails('RecordingRequest'):
+            try:
+                notification = RequestRescheduledNotification(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/RecordingRequest/collaboration.py",
+                                     self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('RecReq').exception(
+                    """Could not send RequestRescheduledNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
+                return RecordingRequestError('edit', e)
