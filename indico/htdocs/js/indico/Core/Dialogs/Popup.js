@@ -504,7 +504,7 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
          draw: function() {
              var self = this;
 
-             var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('OK'));
+             var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T(this.buttonTitle));
              okButton.observeClick(function(){
                  self.close();
                  self.handler(true);
@@ -522,9 +522,14 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
          }
     },
 
-    function(title, content, handler) {
+    function(title, content, handler, buttonTitle) {
         var self = this;
 
+        if (buttonTitle) {
+            this.buttonTitle = buttonTitle;
+        } else {
+            this.buttonTitle = 'OK';
+        }
         this.content = content;
         this.handler = handler;
         this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
@@ -577,84 +582,57 @@ type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
     );
 
 /**
- * Works exactly the same as the ConfirmPopup, but includes a parametermanager to perform checks when pressing OK
- */
-type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
-        {
-             draw: function() {
-                 var self = this;
-
-                 var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('OK'));
-                 okButton.observeClick(function(){
-                     checkOK = self.parameterManager.check();
-                     if(checkOK){
-                         self.handler(true);
-                     }
-                 });
-
-                 var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
-                 cancelButton.observeClick(function(){
-                     self.close();
-                     self.handler(false);
-                 });
-
-                 return this.ExclusivePopupWithButtons.prototype.draw.call(this,
-                         this.content,
-                         Html.div({}, okButton, cancelButton));
-             }
-        },
-
-        function(title, content, handler) {
-            var self = this;
-
-            this.content = content;
-            this.handler = handler;
-            this.parameterManager = new IndicoUtil.parameterManager();
-            this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
-                self.handler(false);
-                return true;
-            });
-        }
-    );
-
- * It will have a title, a close button, an SAVE button and a Cancel button.
+ * Utility function to display a three buttons popup.
+ * The difference with ConfirmButton is the existence of a third button.
+ * Apart from the title and close button, the three buttons display, two of them configurables and Cancel
  * @param {Html or String} title The title of the error popup.
  * @param {Element} content Anything you want to put inside.
- * @param {function} handler A function that will be called with a boolean as argument:
- *                   true if the user pressers "Save", or false if the user presses "Cancel"
+ * @param {function} handler A function that will be called with an Integer as argument:
+ *                   1 if the user press button1, 2 for button2, 0 for "Cancel"
  */
-type("SavePopup", ["ExclusivePopupWithButtons"],
+type("SpecialRemovePopup", ["ExclusivePopupWithButtons"],
     {
          draw: function() {
              var self = this;
 
-             var saveButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('Save'));
-             saveButton.observeClick(function(){
+             var button1 = Html.input('button', {style:{marginRight: pixels(3)}}, $T(this.buttonTitle1));
+             button1.observeClick(function(){
                  self.close();
-                 self.handler(true);
+                 self.handler(1);
+             });
+
+             var button2 = Html.input('button', {style:{marginLeft: pixels(3), marginRight: pixels(3)}}, $T(this.buttonTitle2));
+             button2.observeClick(function(){
+                 self.close();
+                 self.handler(2);
              });
 
              var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
              cancelButton.observeClick(function(){
                  self.close();
+                 self.handler(0);
              });
 
              return this.ExclusivePopupWithButtons.prototype.draw.call(this,
                      this.content,
-                     Html.div({}, saveButton, cancelButton));
+                     Html.div({}, button1, button2, cancelButton));
          }
     },
 
-    function(title, content, handler) {
+    function(title, content, handler, buttonTitle1, buttonTitle2) {
         var self = this;
 
+        this.buttonTitle1 = buttonTitle1;
+        this.buttonTitle2 = buttonTitle2;
         this.content = content;
         this.handler = handler;
         this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+            self.handler(0);
             return true;
         });
     }
 );
+
 
 /**
  * Utility function to display a three buttons popup.
@@ -709,6 +687,7 @@ type("SaveConfirmPopup", ["ExclusivePopupWithButtons"],
         });
     }
 );
+
 
 type("WarningPopup", ["AlertPopup"],
     {

@@ -1113,16 +1113,24 @@ class ConferenceAbstractReview(Persistent):
     def getReviewingQuestions(self):
         """ Returns the list of questions
         """
-        return self._reviewingQuestions
+        # Filter the non visible questions
+        visibleQuestions = []
+        for question in self._reviewingQuestions:
+            if question.getVisible():
+                visibleQuestions.append(question)
+        return visibleQuestions
 
-    def removeReviewingQuestion(self, questionId):
+    def removeReviewingQuestion(self, questionId, keepJud):
         """ Removes a question from the list
         """
         question = self.getQuestionById(questionId)
 
         if question:
-            self._reviewingQuestions.remove(question)
-            self.notifyModification()
+            if keepJud:
+                question.setVisible(False)
+            else:
+                self._reviewingQuestions.remove(question)
+                self.notifyModification()
         else:
             raise MaKaCError("Cannot remove a question which doesn't exist")
 
@@ -1270,6 +1278,7 @@ class Question(Persistent, Fossilizable):
         """
         self._id = newId
         self._text = text
+        self._visible = True
 
     def getId(self):
         return self._id
@@ -1277,8 +1286,14 @@ class Question(Persistent, Fossilizable):
     def getText(self):
         return self._text
 
+    def getVisible(self):
+        return self._visible
+
     def setText(self, text):
         self._text = text
+
+    def setVisible(self, value):
+        self._visible = value
 
     def notifyModification(self):
         """ Notifies the DB that a list or dictionary attribute of this object has changed

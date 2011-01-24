@@ -946,10 +946,17 @@ class AbstractReviewingRemoveQuestion(AbstractReviewingBase):
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
         self._value = self._params.get("value") # value is the question id
+        self._keepJud = self._params.get("keepJud") # keep the previous judgements of the question
 
     def _getAnswer(self):
-        self._confAbstractReview.removeReviewingQuestion(self._value)
+        # remove the question
+        self._confAbstractReview.removeReviewingQuestion(self._value, self._keepJud)
+        if not self._keepJud:
+            # Purge all the judgements already exist with answers of this question
+            self._conf.getAbstractMgr().removeAnswersOfQuestion(self._value)
+            self._conf.getAbstractMgr().recalculateAbstractsRating(self._confAbstractReview.getScaleLower(), self._confAbstractReview.getScaleHigher())
         reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
+        # Build the answer
         fossils = []
         for question in reviewingQuestions:
             fossils.append(fossilize(question))

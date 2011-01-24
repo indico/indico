@@ -44,7 +44,7 @@ $E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements
         'add':'reviewing.abstractReviewing.addQuestion', 'remove':'reviewing.abstractReviewing.removeQuestion',
         'edit': 'reviewing.abstractReviewing.editQuestion'},
         {conference: '<%= abstractReview.getConference().getId() %>'},'question',
-        'Add the questions that the abstract reviewers must answer'));
+        'Add the questions that the abstract reviewers must answer', true));
 
 
 //get the first question or a default one

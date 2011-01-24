@@ -1120,6 +1120,10 @@ class AbstractMgr(Persistent):
         for abs in self.getAbstractList():
             abs.recalculateRating(scaleLower, scaleHigher)
 
+    def removeAnswersOfQuestion(self, questionId):
+        ''' Remove a question results for each abstract '''
+        for abs in self.getAbstractList():
+            abs.removeAnswersOfQuestion(questionId)
 
     def notifyModification(self):
         self._p_changed=1
@@ -2373,6 +2377,12 @@ class Abstract(Persistent):
         if judNum != 0:
             self._rating = "%.2f" % (ratingSum/judNum)
 
+    def removeAnswersOfQuestion(self, questionId):
+        ''' Remove the answers of the question with questionId value '''
+        for track in self.getTrackListSorted():
+            for jud in self.getJudgementsHistoricalByTrack(track):
+                jud.removeAnswer(questionId)
+
 
 
 class AbstractJudgement( Persistent ):
@@ -2469,6 +2479,11 @@ class AbstractJudgement( Persistent ):
         self._judValue = self.calculateJudgementAverage()
         self._totalJudValue = self.calculateAnswersTotalValue()
 
+    def removeAnswer(self, questionId):
+        ''' Remove the current answers of the questionId '''
+        for ans in self._answers:
+            if ans.getQuestionId() == questionId:
+                self._answers.remove(ans)
 
 
 class AbstractAcceptance( AbstractJudgement ):
