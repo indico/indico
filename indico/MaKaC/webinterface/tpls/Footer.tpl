@@ -28,7 +28,7 @@ function envoi(){
 
 
             <img src="<%= systemIcon("indico_small") %>" alt="<%= _("Indico - Integrated Digital Conference")%>" style="vertical-align: middle; margin-right: 2px;"/>
-            <span style="vertical-align: middle;"><%= _("Powered by ")%> <a href="http://cdsware.cern.ch/indico/">CDS Indico</a></span>
+            <span style="vertical-align: middle;"><%= _("Powered by ")%> <a href="http://cdsware.cern.ch/indico/">Indico</a></span>
 
             <% if Configuration.Config.getInstance().getWorkerName()!="": %>
                 <span style="display: none;"><%= Configuration.Config.getInstance().getWorkerName() %></span>

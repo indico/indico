@@ -97,9 +97,9 @@ def application(environ, start_response):
                 for urlRE, rh in pluginRHMap.iteritems():
                     m = urlRE.match(url)
                     if m:
+
                         if type(rh) == ClassType or RHHtdocs not in rh.mro():
                             plugin_publisher(req, url, rh, m.groupdict())
-                            break
                         else:
                             # calculate the path to the resource
                             possible_static_path = rh.calculatePath(**m.groupdict())

@@ -21,8 +21,10 @@
 from MaKaC.plugins.InstantMessaging.notificationComponents import IInstantMessagingListener
 from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.plugins.util import PluginsWrapper, PluginFieldsWrapper
-from MaKaC.plugins.helpers import DBHelpers, MailHelper, GeneralLinkGenerator
+from MaKaC.plugins.InstantMessaging.XMPP.helpers import GeneralLinkGenerator
+from MaKaC.plugins.helpers import DBHelpers, MailHelper
 from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
+from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.i18n import _
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.contextManager import ContextManager
@@ -31,7 +33,6 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.mail import GenericNotification
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import zope.interface
 
@@ -48,7 +49,8 @@ class ChatSMContributor(Component, Observable):
 
     @classmethod
     def fillManagementSideMenu(cls, obj, params={}):
-        params['Instant Messaging'] = wcomponents.SideMenuItem(_("Chat Rooms"), urlHandlers.UHConfModifChat.getURL( obj._conf ))
+        params['Instant Messaging'] = wcomponents.SideMenuItem(_("Chat Rooms"),
+                                                               urlHandlers.UHConfModifChat.getURL( obj._conf ))
 
     @classmethod
     def getActiveNavigationItem(cls, obj, params={}):

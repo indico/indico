@@ -20,18 +20,18 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
-from MaKaC.webinterface import wcomponents, urlHandlers
+from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
 from MaKaC.plugins import PluginsHolder
-from MaKaC.plugins.helpers import DBHelpers, DesktopLinkGenerator, WebLinkGenerator
+from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.util import PluginFieldsWrapper
+from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.webinterface.rh.conferenceModif import RHMaterialsShow
-from MaKaC.plugins.helpers import generateCustomLinks, generateLogLink, XMPPLogsActivated
+from MaKaC.plugins.InstantMessaging.XMPP.helpers import generateCustomLinks, generateLogLink, XMPPLogsActivated, DesktopLinkGenerator, WebLinkGenerator
 from MaKaC.i18n import _
-
 
 class WPConfModifChat(WPConferenceModifBase):
 

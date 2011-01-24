@@ -123,11 +123,11 @@
                                                                     [$T('URL'), Html.div({}, linkStructure)]]),
                                                   Html.div({},
                                     (Html.ul({style: {fontWeight: "bold"}},$T('In the URL field, the following patterns will be changed:'),
-                                            Html.li({style: {fontWeight: "lighter"}},$T('*chatroom* by the chat room name')),
-                                            Html.li({style: {fontWeight: "lighter"}},$T('*host* by the specified host')),
-                                            Html.li({style: {fontWeight: "lighter"}},$T('*nickname* by the nick chosen by the user.')))
+                                            Html.li({style: {fontWeight: "lighter"}},$T('[chatroom] by the chat room name')),
+                                            Html.li({style: {fontWeight: "lighter"}},$T('[host] by the specified host')),
+                                            Html.li({style: {fontWeight: "lighter"}},$T('[nickname] by the nick chosen by the user.')))
                                             )),
-                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, $T('Example: http://*host*/resource/?x=*chatroom*@conference.*host*?join')));
+                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, $T('Example: http://[host]/resource/?x=[chatroom]@conference.[host]?join')));
                             var linksPopup = new ConfirmPopupWithPM($T('Select the name of the link and its URL'),
                                     div,
                                                                         function(value){

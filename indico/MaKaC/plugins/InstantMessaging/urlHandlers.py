@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -18,12 +17,15 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.i18n import _
+from MaKaC.webinterface.urlHandlers import URLHandler
 
-globalOptions = [
-    ("customLinks", {"description": _("Create your own links for the chat rooms"),
-                            "type": 'links',
-                            "defaultValue": [{'name': 'your desktop client', 'structure': 'xmpp:[chatroom]@[host]?join'}],
-                            "editable": True,
-                            "visible": True})
-]
+class UHConferenceInstantMessaging( URLHandler ):
+    _relativeURL = "conferenceInstantMessaging"
+
+
+class UHConfModifChat(URLHandler):
+    _relativeURL = "confModifChat"
+
+
+class UHConfModifChatSeeLogs(URLHandler):
+    _relativeURL = "confModifChat/logs"

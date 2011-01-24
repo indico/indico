@@ -31,7 +31,8 @@ from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.plugins import Observable
 from MaKaC.plugins.util import PluginFieldsWrapper
-from MaKaC.plugins.helpers import DBHelpers, MailHelper, DeleteLogLinkGenerator, LogLinkGenerator, generateCustomLinks, generateLogLink, XMPPLogsActivated
+from MaKaC.plugins.helpers import DBHelpers, MailHelper
+from MaKaC.plugins.InstantMessaging.XMPP.helpers import DeleteLogLinkGenerator, LogLinkGenerator, generateCustomLinks, generateLogLink, XMPPLogsActivated
 from MaKaC.i18n import _
 
 from MaKaC.plugins.InstantMessaging.XMPP.bot import IndicoXMPPBotRoomExists, IndicoXMPPBotCreateRoom, IndicoXMPPBotEditRoom, IndicoXMPPBotDeleteRoom, IndicoXMPPBotGetPreferences

@@ -21,14 +21,17 @@
 
 from MaKaC.plugins import PluginsHolder
 from MaKaC.conference import ConferenceHolder
-from MaKaC.plugins.helpers import DBHelpers, LogLinkGenerator
+from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.InstantMessaging.pages import WPConfModifChat, WPConferenceInstantMessaging
-from MaKaC.webinterface import urlHandlers
+from MaKaC.plugins.InstantMessaging.urlHandlers import UHConfModifChat, UHConfModifChatSeeLogs, UHConferenceInstantMessaging
+from MaKaC.plugins.InstantMessaging.XMPP.helpers import LogLinkGenerator
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 import urllib2
 
+from indico.web.legacy import wrapUH
 
 class RHChatModifBase(RHConferenceModifBase):
 
@@ -46,7 +49,7 @@ class RHChatModifBase(RHConferenceModifBase):
 
 class RHChatFormModif(RHChatModifBase):
     """ For the conference modification"""
-    _uh = urlHandlers.UHConfModifChat
+    _url = wrapUH(UHConfModifChat)
 
     def _checkParams(self, params):
         RHChatModifBase._checkParams(self, params)
@@ -64,7 +67,7 @@ class RHChatFormModif(RHChatModifBase):
 
 class RHChatSeeLogs(RHChatModifBase):
     """ For the conference modification"""
-    _uh = urlHandlers.UHConfModifChatSeeLogs
+    _url = wrapUH(UHConfModifChatSeeLogs)
 
     def _checkParams(self, params):
         RHChatModifBase._checkParams(self, params)
@@ -86,13 +89,13 @@ class RHChatSeeLogs(RHChatModifBase):
         req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
         document = urllib2.urlopen(req).read()
         if document is '':
-            return _('No logs were found for these dates')
+            raise MaKaCError('No logs were found for these dates')
         return document
 
 
 class RHInstantMessagingDisplay(RHConferenceBaseDisplay):
     """ For the conference display"""
-    _uh = urlHandlers.UHConferenceInstantMessaging
+    _url = wrapUH(UHConferenceInstantMessaging)
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
