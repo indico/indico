@@ -4900,17 +4900,20 @@ class Observer(object):
         Inheriting classes should overload the following boolean class attributes:
             _shouldBeTitleNotified
             _shouldBeDateChangeNotified
+            _shouldBeLocationChangeNotified
             _shouldBeDeletionNotified
         And set them to True if they want to be notified of the corresponding event.
         In that case, they also have to implement the corresponding methods:
             _notifyTitleChange (for title notification)
             _notifyEventDateChanges and _notifyTimezoneChange (for date / timezone notification)
+            _shouldBeLocationChangeNotified (for location notification)
             _notifyDeletion (for deletion notification).
         The interface for those methods is also specified in this class. If the corresponding
         class attribute is set to False but the method is not implemented, an exception will be thrown.
     """
     _shouldBeTitleNotified = False
     _shouldBeDateChangeNotified = False
+    _shouldBeLocationChangeNotified = False
     _shouldBeDeletionNotified = False
 
     def getObserverName(self):
@@ -4933,6 +4936,10 @@ class Observer(object):
     def notifyTimezoneChange(self, oldTimezone, newTimezone):
         if self._shouldBeDateChangeNotified:
             self._notifyTimezoneChange(oldTimezone, newTimezone)
+
+    def notifyLocationChange(self, newLocation):
+        if self._shouldBeLocationChangeNotified:
+            self._notifyLocationChange(newLocation)
 
     def notifyDeletion(self):
         if self._shouldBeDeletionNotified:
@@ -4961,6 +4968,12 @@ class Observer(object):
             If there are no problems, the DateChangeObserver should return an empty list.
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
+
+    def _notifyLocationChange(self):
+        """ To be implemented by inheriting classes
+            Notifies the observer that the location of the object it is attached to has changed.
+        """
+        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyLocationChange")
 
     def _notifyDeletion(self):
         """ To be implemented by inheriting classes

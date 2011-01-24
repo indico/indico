@@ -213,6 +213,16 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
 
         loc.setAddress( self._value['address'] )
 
+        # notify observers
+        try:
+            self._target._notify('notifyLocationChange', {})
+        except Exception, e:
+            try:
+                Logger.get('Conference').error("Exception while notifying the observer of location change for conference %s: %s" %
+                            (self._target.getId(), str(e)))
+            except Exception, e2:
+                Logger.get('Conference').error("Exception while notifying a location change: %s (origin: %s)" % (str(e2), str(e)))
+
     def _handleGet(self):
 
         loc = self._target.getLocation()

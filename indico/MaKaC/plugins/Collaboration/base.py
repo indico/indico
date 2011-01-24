@@ -54,6 +54,7 @@ class CSBookingManager(Persistent, Observer):
 
     _shouldBeTitleNotified = True
     _shouldBeDateChangeNotified = True
+    _shouldBeLocationChangeNotified = True
     _shouldBeDeletionNotified = True
 
     def __init__(self, conf):
@@ -583,6 +584,14 @@ class CSBookingManager(Persistent, Observer):
             This method will be called by the event (Conference) object
         """
         return []
+
+    def notifyLocationChange(self):
+        for booking in self.getBookingList():
+            if hasattr(booking, "notifyLocationChange"):
+                try:
+                    booking.notifyLocationChange()
+                except Exception, e:
+                    Logger.get('VideoServ').exception("Exception while notifying a plugin of a location change: " + str(e))
 
     @classmethod
     def _booking2NotifyProblem(cls, booking, modifyError):

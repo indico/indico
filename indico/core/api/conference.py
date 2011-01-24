@@ -18,7 +18,40 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.core.api import IContributor
+from indico.core.api import IListener, IContributor
+
+
+class IManagementEventsListener(IListener):
+    """
+    Events that are related to the management of a conference
+    """
+
+    def notifyDateChange(self, obj, params):
+        pass
+
+    def notifyStartDateChange(self, obj, params):
+        pass
+
+    def notifyStartTimeChange(self, obj, sdate):
+        pass
+
+    def notifyEndTimeChange(self, obj, edate):
+        pass
+
+    def notifySetTimezone(self, obj, oldTimezone):
+        pass
+
+    def notifyEndDateChange(self, obj, params):
+        pass
+
+    def notifyLocationChange(self, obj, params):
+        pass
+
+    def notifyTitleChange(self, obj, params):
+        pass
+
+    def notifyDelete(self, obj, params):
+        pass
 
 
 class INavigationContributor(IContributor):

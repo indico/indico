@@ -382,6 +382,36 @@ Click <a href="%s">here</a> to view the request.<br />
         ))
 
 
+class RequestRelocatedNotification(RecordingRequestAdminNotificationBase):
+    """ Template to build an email notification to the recording responsible
+    """
+
+    def __init__(self, booking):
+        RecordingRequestAdminNotificationBase.__init__(self, booking)
+
+        self.setSubject("""[RecReq] Recording request relocated: %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+
+        self.setBody("""Dear Recording Responsible,<br />
+<br />
+A recording request <strong>has been relocated</strong> in <a href="%s">%s</a><br />
+Click <a href="%s">here</a> to view the request.<br />
+<br />
+%s
+<br />
+%s
+<br />
+<br />
+%s
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
+        self._getRequestDetails('modify')
+        ))
+
+
 
 class RequestDeletedNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible

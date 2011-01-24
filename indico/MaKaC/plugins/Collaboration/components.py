@@ -82,13 +82,17 @@ class EventCollaborationListener(Component):
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
 
     @classmethod
+    def locationChanged(cls, obj, params={}):
+        obj = obj.getCSBookingManager()
+        obj.notifyLocationChange()
+
+    @classmethod
     def titleChanged(cls, obj, params={}):
         obj = obj.getCSBookingManager()
         try:
             obj.notifyTitleChange(params['oldTitle'], params['newTitle'])
         except Exception, e:
             Logger.get('PluginNotifier').error("Exception while trying to access to the title parameters when changing an event title" + str(e))
-
 
     @classmethod
     def deleted(cls, obj, params={}):
