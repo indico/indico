@@ -327,7 +327,7 @@ class CSBooking(CSBookingBase):
         """ Changes some of the booking's attributes when the room has been properly created
         """
         self._created = True
-        self._statusMessage = _("Public room created")
+        self._statusMessage = "Public room created"
         self._statusClass = "statusMessageOK"
         self._canBeStarted = True
 
@@ -337,7 +337,7 @@ class CSBooking(CSBookingBase):
             but not in the remote system any more.
         """
         self._created = False
-        self._statusMessage = _("Room no longer exists")
+        self._statusMessage = "Room no longer exists"
         self._statusClass = "statusMessageOther"
         self._canBeStarted = False
         #booking is not present remotely so no need to delete it later

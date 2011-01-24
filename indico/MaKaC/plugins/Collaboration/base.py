@@ -970,7 +970,7 @@ class CSBookingBase(Persistent, Fossilizable):
         """ Returns the status message as a string.
             This attribute will be available in Javascript with the "statusMessage"
         """
-        return self._statusMessage
+        return _(self._statusMessage)
 
     def getStatusClass(self):
         """ Returns the status message CSS class as a string.
