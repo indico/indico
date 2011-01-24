@@ -236,6 +236,64 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
         ))
 
 
+class RequestRescheduledNotification(WebcastRequestAdminNotificationBase):
+    """ Template to build an email notification to the webcast responsible
+    """
+
+    def __init__(self, booking):
+        WebcastRequestAdminNotificationBase.__init__(self, booking)
+
+        self.setSubject("""[WebcastReq] Webcast request rescheduled: %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+
+        self.setBody("""Dear Webcast Responsible,<br />
+<br />
+A webcast request <strong>has been rescheduled</strong> in <a href="%s">%s</a><br />
+Click <a href="%s">here</a> to view the request.<br />
+%s
+<br />
+%s
+<br />
+<br />
+%s
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
+        self._getRequestDetails('modify')
+        ))
+
+
+class RequestRelocatedNotification(WebcastRequestAdminNotificationBase):
+    """ Template to build an email notification to the webcast responsible
+    """
+
+    def __init__(self, booking):
+        WebcastRequestAdminNotificationBase.__init__(self, booking)
+
+        self.setSubject("""[WebcastReq] Webcast request relocated: %s (event id: %s)"""
+                        % (self._conference.getTitle(), str(self._conference.getId())))
+
+        self.setBody("""Dear Webcast Responsible,<br />
+<br />
+A webcast request <strong>has been relocated</strong> in <a href="%s">%s</a><br />
+Click <a href="%s">here</a> to view the request.<br />
+%s
+<br />
+%s
+<br />
+<br />
+%s
+""" % ( MailTools.getServerName(),
+        MailTools.getServerName(),
+        self._modifLink,
+        MailTools.eventDetails(self._conference),
+        MailTools.organizerDetails(self._conference),
+        self._getRequestDetails('modify')
+        ))
+
+
 
 class RequestDeletedNotification(WebcastRequestAdminNotificationBase):
     """ Template to build an email notification to the webcast responsible

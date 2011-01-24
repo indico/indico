@@ -21,7 +21,8 @@
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
     RequestRejectedNotification, RequestAcceptedNotification,\
-    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin
+    RequestAcceptedNotificationAdmin, RequestRejectedNotificationAdmin,\
+    RequestRescheduledNotification, RequestRelocatedNotification
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestException,\
     WebcastRequestError
@@ -157,3 +158,27 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestDeletedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('remove', e)
+
+    def notifyEventDateChanges(self, oldStartDate, newStartDate, oldEndDate, newEndDate):
+        if MailTools.needToSendEmails('WebcastRequest'):
+            try:
+                notification = RequestRescheduledNotification(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
+                                     self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('RecReq').exception(
+                    """Could not send RequestRescheduledNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
+                return WebcastRequestError('edit', e)
+
+    def notifyLocationChange(self):
+        if MailTools.needToSendEmails('WebcastRequest'):
+            try:
+                notification = RequestRelocatedNotification(self)
+                GenericMailer.sendAndLog(notification, self.getConference(),
+                                     "MaKaC/plugins/Collaboration/WebcastRequest/collaboration.py",
+                                     self.getConference().getCreator())
+            except Exception,e:
+                Logger.get('RecReq').exception(
+                    """Could not send RequestRelocatedNotification for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
+                return WebcastRequestError('edit', e)
