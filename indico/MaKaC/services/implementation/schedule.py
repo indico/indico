@@ -405,6 +405,8 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
         self._title = pManager.extract("title", pType=str)
         self._description = pManager.extract("description", pType=str,
                                           allowEmpty=True)
+        self._textColor = pManager.extract("textColor", pType=str)
+        self._bgColor = pManager.extract("bgColor", pType=str)
         self._oldId = None
 
     def _performOperation(self):
@@ -416,6 +418,9 @@ class ScheduleEditBreakBase(ScheduleOperation, LocationSetter):
                        "durHours": "0"},
                        check = 2,
                        tz = self._conf.getTimezone())
+
+        self._brk.setTextColor(self._textColor)
+        self._brk.setBgColor(self._bgColor)
 
         self._setLocationInfo(self._brk)
         self._addToSchedule(self._brk)

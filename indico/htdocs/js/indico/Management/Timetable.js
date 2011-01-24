@@ -854,13 +854,28 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              self.parameterManager.add(self.startTimeField, 'time', false);
              self.parameterManager.add(self.timeField, 'non_negative_int', false);
 
+             // Create the color picker
+             var colorPicker = new ColorPicker([], false, '#90C0F0', '#202020');
+             if(self.isEdit) {
+                 colorPicker.setColors(self.info.get('textColor'), self.info.get('color'));
+             }
+             self.info.set('textColor', colorPicker.getTextColor());
+             self.info.set('bgColor', colorPicker.getBgColor());
+             colorPicker.observe(function(colors) {
+                 self.info.set('textColor', colors.textColor);
+                 self.info.set('bgColor', colors.bgColor);
+             });
+             colorPicker.setFixedPosition();
+             var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
+
              var contentDiv = IndicoUtil.createFormFromMap([
                  [$T('Title'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}})), this.info.accessor('title'))],
                  [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), this.info.accessor('description'))],
                  [$T('Place'), this.roomEditor.draw()],
                  [$T('Date'), conferenceDays],
                  [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}},
-                         this.startTimeField, $T(' Duration '), this.timeField, $T('min'))]
+                         this.startTimeField, $T(' Duration '), this.timeField, $T('min'))],
+                 colorPickerComponent
              ]);
 
              var buttonDiv = Html.div({}, addButton, cancelButton);
