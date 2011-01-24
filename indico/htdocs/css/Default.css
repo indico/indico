@@ -1911,11 +1911,11 @@ ul.CategoryList li:hover{
 
 /* ListWidget, list of users styles */
 
-li.selectedListItem {
+.selectedListItem {
     background-color: #CDEB8B;
 }
 
-li.unselectedListItem {
+.unselectedListItem {
     background-color: #FFFFFF;
 }
 

@@ -20,6 +20,26 @@
 
 from indico.core.api import IListener, IContributor
 
+class ITimetableContributor(IContributor):
+    """
+    Encapsulates extension points concerning event timetable.
+    """
+
+    def includeTimetableJSFiles(self, obj, params = {}):
+        """
+        Includes additional JS files.
+        """
+
+    def includeTimetableCSSFiles(self, obj, params = {}):
+        """
+        Includes additional Css files.
+        """
+
+    def customTimetableLinks(self, obj, params = {}):
+        """
+        Inserts additional links inside the timetable's header.
+        """
+
 
 class INavigationContributor(IContributor):
     """

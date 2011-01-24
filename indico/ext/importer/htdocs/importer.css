@@ -1,0 +1,150 @@
+ul.treeList {
+    list-style: none;
+}
+
+div.treeListContainer {
+    background: #F8F8F8;
+    -moz-border-radius: 5%;
+    border-radius: 5%;
+    margin-top: 15px;
+    overflow: auto;
+}
+
+div.treeListHeader {
+    color: #4E4C46;
+    font-family: "Times New Roman",Verdana,Arial;
+    font-size: 20px;
+    height: 20px;
+    letter-spacing: 1px;
+    padding: 15px;
+    text-align: center;
+}
+
+div.treeListDescription{
+    text-align: center;
+    color: #777777;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: normal;
+    padding: 7px 0;
+    height: 12px;
+}
+
+.treeListDayName {
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    border: 1px solid #CCCCCC;
+    padding: 10px;
+    background-color: #FFFFFF;
+    cursor: pointer;
+    float: left;
+}
+
+.treeListEntry {
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border: 1px solid #CCCCCC;
+    padding: 7px;
+    width: 80%;
+    background-color: #FFFFFF;
+    cursor: pointer;
+}
+
+div.entryListContainer{
+    background: #F8F8F8;
+    -moz-border-radius: 5%;
+    border-radius: 5%;
+    margin-top: 15px;
+    overflow: auto;
+}
+
+div.entryListHeader{
+    color: #4E4C46;
+    font-family: "Times New Roman",Verdana,Arial;
+    font-size: 20px;
+    height: 20px;
+    letter-spacing: 1px;
+    padding: 15px;
+    text-align: center;
+}
+
+div.entryListDesctiption{
+    text-align: center;
+    color: #777777;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: normal;
+    padding: 7px 0;
+    height: 12px;
+}
+
+ul.entryList li{
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+    border: 1px solid #CCCCCC;
+    padding: 7px;
+    width: 90%;
+    margin-bottom: 10px;
+    list-style: none;
+    background-color: #FFFFFF;
+    cursor: pointer;
+}
+
+ul.entryList li div{
+    padding: 5px;
+}
+
+ul.entryList em{
+    font-weight: bold;
+    font-style: normal;
+}
+.entryListSelected {
+    background-color: #CDEB8B !important;
+    box-shadow: 3px 3px 5px #000000;
+    -moz-box-shadow: 3px 3px 5px #000000;
+    -webkit-box-shadow: 3px 3px 5px #000000;
+}
+
+div.importDialogHeader {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 5px;
+    text-align: center;
+}
+
+div.importDialogHeader input[type=text]{
+    width: 35%;
+    min-width: 250px;
+    height: 20px;
+    font-size: 17px;
+}
+
+
+.entryListIndex {
+    -moz-border-radius: 100% 100% 100% 100%;
+    border-radius: 100% 100% 100% 100%;
+    border: 1px solid #CCCCCC;
+    left: -51px;
+    position: relative;
+    text-align: center;
+    width: 23px;
+}
+
+div.expandButtonsDiv{
+    float: left;
+    left: -30px;
+    position: relative;
+    top: 2px;
+    width: 0;
+}
+
+div.presearchContainer{
+    -moz-border-radius: 20px 20px 20px 20px;
+    border-radius: 20px 20px 20px 20px;
+    border: 1px solid #CCCCCC;
+    color: #777777;
+    font-size: 14px;
+    margin-top: 25px;
+    padding: 15px;
+    text-align: center;
+}

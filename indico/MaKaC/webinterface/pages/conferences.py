@@ -2095,7 +2095,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
                self._includeJSPackage('Management') + \
                self._includeJSPackage('MaterialEditor')
 
-
     def _getSiteArea(self):
         return "ModificationArea"
 
@@ -3196,9 +3195,10 @@ class WScheduleSlot(wcomponents.WTemplated):
 
 class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
-    def __init__(self, conference, **params):
+    def __init__(self, conference, customLinks, **params):
         wcomponents.WTemplated.__init__(self, **params)
         self._conf = conference
+        self._customLinks = customLinks
 
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars(self)
@@ -3216,6 +3216,7 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
         vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
                                                                             days = None, mgmtMode = True))
+        vars['customLinks'] = self._customLinks
 
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
@@ -3235,11 +3236,16 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         self._timetableMenuItem.setActive()
 
     def getJSFiles(self):
+        pluginJSFiles = {"paths" : []}
+        self._notify("includeTimetableJSFiles", pluginJSFiles)
         return WPConferenceModifBase.getJSFiles(self) + \
-               self._includeJSPackage('Timetable')
+               self._includeJSPackage('Timetable') + \
+               pluginJSFiles['paths']
 
     def _getSchedule(self):
-        return WConfModifScheduleGraphic( self._conf )
+        self._customLinks = {}
+        self._notify("customTimetableLinks", self._customLinks)
+        return WConfModifScheduleGraphic( self._conf, self._customLinks )
 
     def _getTTPage( self, params ):
         wc = self._getSchedule()
@@ -3248,11 +3254,14 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
     def _getHeadContent( self ):
 
         baseurl = self._getBaseURL()
+        pluginCSSFiles = {"paths" : []}
+        self._notify("includeTimetableCSSFiles", pluginCSSFiles)
+        cssPaths = ".".join(["""<link rel="stylesheet" href="%s/%s">"""%(baseurl,path) for path in pluginCSSFiles['paths']])
         return """
         <!-- Lightbox -->
         <link rel="stylesheet" href="%s/js/lightbox/lightbox.css"> <!--lightbox.css-->
         <script type="text/javascript" src="%s/js/lightbox/lightbox.js"></script>
-        """ % ( baseurl, baseurl)
+        """ % ( baseurl, baseurl) + cssPaths
 
     def _getPageContent(self, params):
         return self._getTTPage(params)

@@ -30,7 +30,7 @@ from MaKaC.fossils.conference import IConferenceParticipationFossil,\
 from MaKaC.common import timezoneUtils
 from MaKaC.common.Conversion import Conversion
 from MaKaC.schedule import BreakTimeSchEntry
-from MaKaC.conference import SessionSlot
+from MaKaC.conference import SessionSlot, Material, Link
 
 import time, datetime, pytz, copy
 
@@ -120,13 +120,14 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
                     contribution.grantSubmission(element)
 
     def _checkParams(self):
-
         self._pManager = ParameterManager(self._params)
 
         self._roomInfo = self._pManager.extract("roomInfo", pType=dict, allowEmpty=True)
         self._keywords = self._pManager.extract("keywords", pType=list,
                                           allowEmpty=True)
         self._boardNumber = self._pManager.extract("boardNumber", pType=str, allowEmpty=True, defaultValue="")
+        self._reportNumbers = self._pManager.extract("reportNumbers", pType=list, allowEmpty=True, defaultValue=[])
+
         self._needsToBeScheduled = self._params.get("schedule", True)
         if self._needsToBeScheduled:
             self._dateTime = self._pManager.extract("startDate", pType=datetime.datetime)
@@ -140,6 +141,7 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
                                                      allowEmpty=True, defaultValue='')
         self._privileges = self._pManager.extract("privileges", pType=dict,                                                  allowEmpty=True)
         self._contribTypeId = self._pManager.extract("type", pType=str, allowEmpty=True)
+        self._materials = self._pManager.extract("materials", pType=dict, allowEmpty=True)
 
     def _performOperation(self):
 
@@ -154,10 +156,26 @@ class ScheduleAddContribution(ScheduleOperation, LocationSetter):
         contribution.setBoardNumber(self._boardNumber)
         contribution.setDuration(self._duration/60, self._duration%60)
 
+        if self._reportNumbers:
+            for reportTuple in self._reportNumbers:
+                for recordNumber in reportTuple[1]:
+                    contribution.getReportNumberHolder().addReportNumber(reportTuple[0], recordNumber)
+
         if self._needsToBeScheduled:
             checkFlag = self._getCheckFlag()
             adjDate = setAdjustedDate(self._dateTime, self._conf)
             contribution.setStartDate(adjDate, check = checkFlag)
+
+        if self._materials:
+            for material in self._materials.keys():
+                newMaterial = Material()
+                newMaterial.setTitle(material)
+                for resource in self._materials[material]:
+                    newLink = Link()
+                    newLink.setURL(resource)
+                    newLink.setName(resource)
+                    newMaterial.addResource(newLink)
+                contribution.addMaterial(newMaterial)
 
         self._schedule(contribution)
 

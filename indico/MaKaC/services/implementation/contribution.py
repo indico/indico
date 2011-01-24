@@ -77,6 +77,8 @@ class ContributionAddSubContribution(ContributionModifBase):
         self._presenters = self._pm.extract("presenters", pType=list, allowEmpty=True)
         self._keywords = self._pm.extract("keywords", pType=list, allowEmpty=True)
         self._description = self._pm.extract("description", pType=str, allowEmpty=True, defaultValue="")
+        self._reportNumbers = self._pm.extract("reportNumbers", pType=list, allowEmpty=True, defaultValue=[])
+        self._materials = self._pm.extract("materials", pType=dict, allowEmpty=True)
 
         # these are required
         self._duration = self._pm.extract("duration", pType=int)
@@ -93,6 +95,24 @@ class ContributionAddSubContribution(ContributionModifBase):
 
             subcontrib.newSpeaker(presenter)
 
+    def __addMaterials(self, subcontrib):
+        if self._materials:
+            for material in self._materials.keys():
+                newMaterial = conference.Material()
+                newMaterial.setTitle(material)
+                for resource in self._materials[material]:
+                    newLink = conference.Link()
+                    newLink.setURL(resource)
+                    newLink.setName(resource)
+                    newMaterial.addResource(newLink)
+                subcontrib.addMaterial(newMaterial)
+
+    def __addReportNumbers(self, subcontrib):
+        if self._reportNumbers:
+            for reportTuple in self._reportNumbers:
+                for recordNumber in reportTuple[1]:
+                    subcontrib.getReportNumberHolder().addReportNumber(reportTuple[0], recordNumber)
+
     def _getAnswer(self):
         # create the sub contribution
         sc = self._target.newSubContribution()
@@ -104,6 +124,8 @@ class ContributionAddSubContribution(ContributionModifBase):
         sc.setDuration( self._duration / 60, \
                          self._duration % 60 )
 
+        self.__addMaterials(sc)
+        self.__addReportNumbers(sc)
         self.__addPresenters(sc)
 
         # log the event
@@ -185,5 +207,5 @@ methodMap = {
     "getBooking": ContributionGetBooking,
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
-    "protection.removeAllowedUser": ContributionProtectionRemoveUser
+    "protection.removeAllowedUser": ContributionProtectionRemoveUser,
 }

@@ -655,6 +655,7 @@ if __name__ == '__main__':
             RoomBooking = MaKaC.plugins.RoomBooking
             EPayment = MaKaC.plugins.EPayment
             livesync = indico.ext.livesync
+            importer = indico.ext.importer
 
 
             [indico.ext]
@@ -674,6 +675,9 @@ if __name__ == '__main__':
             EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
             EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
             EPayment.CERNYellowPay = MaKaC.plugins.EPayment.CERNYellowPay
+
+            importer.invenio = indico.ext.importer.invenio
+            importer.dummy = indico.ext.importer.dummy
 
             InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
 

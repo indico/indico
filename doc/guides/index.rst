@@ -19,6 +19,7 @@ Contents:
    ./AdminGuide/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
+   ./Importer/Importer.rst
 
 
 .. Indices and tables
