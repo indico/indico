@@ -24,6 +24,7 @@ from persistent import Persistent
 from MaKaC.common import DBMgr
 from MaKaC.common import info
 import MaKaC
+from MaKaC.common.contextManager import ContextManager
 
 from MaKaC.plugins import Observable
 
@@ -378,6 +379,7 @@ class AccessWrapper:
 
     def setUser( self, newAvatar ):
         self._currentUser = newAvatar
+        ContextManager.set('currentUser', self._currentUser)
 
     def getUser( self ):
         return self._currentUser
