@@ -29,6 +29,7 @@ from MaKaC.conference import Contribution, Conference
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
     IQueryResultFossil
 from MaKaC.fossils.conference import IConferenceFossil
+from MaKaC.common.contextManager import ContextManager
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -454,11 +455,9 @@ Event details:
 
 
     @classmethod
-    def organizerDetails(cls, conf):
-        creator = conf.getCreator()
-
+    def userDetails(cls, caption, user):
         additionalEmailsText = ""
-        additionalEmails = creator.getSecondaryEmails()
+        additionalEmails = user.getSecondaryEmails()
         if additionalEmails:
             additionalEmailsText="""
     <tr>
@@ -469,10 +468,10 @@ Event details:
             %s
         </td
     </tr>
-""" % ", ".join(creator.getEmails()[1:])
+""" % ", ".join(user.getEmails()[1:])
 
         additionalTelephonesText = ""
-        additionalTelephones = creator.getSecondaryTelephones()
+        additionalTelephones = user.getSecondaryTelephones()
         if additionalTelephones:
             additionalTelephonesText="""
     <tr>
@@ -483,11 +482,11 @@ Event details:
             %s
         </td
     </tr>
-""" % ", ".join(creator.getTelephone()[1:])
+""" % ", ".join(user.getTelephone()[1:])
 
 
         return """
-Creator of the event details:
+%s details:
 <table style="border-spacing: 10px 10px;">
     <tr>
         <td style="vertical-align: top; white-space : nowrap;">
@@ -516,12 +515,24 @@ Creator of the event details:
     </tr>
     %s
 </table>
-""" % (creator.getFullName(),
-       creator.getEmail(),
+""" % (caption,
+       user.getFullName(),
+       user.getEmail(),
        additionalEmailsText,
-       creator.getTelephone(),
+       user.getTelephone(),
        additionalTelephonesText
        )
+
+    @classmethod
+    def organizerDetails(cls, conf):
+        return cls.userDetails('Creator of the event', conf.getCreator())
+
+    @classmethod
+    def currentUserDetails(cls, caption):
+        if not ContextManager.has('currentUser'):
+            return ""
+        user = ContextManager.get('currentUser')
+        return cls.userDetails(caption, user)
 
     @classmethod
     def bookingCreationDate(cls, booking):

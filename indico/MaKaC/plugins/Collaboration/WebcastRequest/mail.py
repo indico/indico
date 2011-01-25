@@ -192,12 +192,15 @@ Click <a href="%s">here</a> to accept or reject the request.<br />
 <br />
 %s
 <br />
+%s
+<br />
 <br />
 %s
 """ % ( MailTools.getServerName(),
         MailTools.getServerName(),
         self._modifLink,
         MailTools.eventDetails(self._conference),
+        MailTools.currentUserDetails('Requester'),
         MailTools.organizerDetails(self._conference),
         self._getRequestDetails('new')
         ))
