@@ -21,6 +21,7 @@
             <input type="checkbox" name="cancelled" size="60" %(checked)s>
           </td>
         </tr>
+       %(billingOptions)s
 		<tr>
           <td>&nbsp;</td>
         </tr>

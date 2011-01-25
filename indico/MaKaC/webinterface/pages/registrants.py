@@ -958,6 +958,23 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                                        <td>%s</td>
                                     </tr>
                                     """%(quantity,gsf.getTitle(),caption,price,price*quantity,currency,disSect) )
+            for bf in self._registrant.getBilledForms():
+                for item in bf.getBilledItems():
+                    caption = item.getCaption()
+                    currency = item.getCurrency()
+                    price = item.getPrice()
+                    quantity = item.getQuantity()
+                    total += price*quantity
+                    if quantity > 0:
+                        html.append("""
+                                <tr>
+                                   <td><b>%i</b></td>
+                                   <td>%s</td>
+                                   <td align="right" style="padding-right:10px" nowrap >%s</td>
+                                   <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
+                                   <td></td>
+                                </tr>
+                                """%(quantity, caption, price, price*quantity, currency))
             html.append( _("""
                         <tr>&nbsp;</tr>
                         <tr>
@@ -1536,10 +1553,14 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
                 selected = ""
                 if currentAccoType == type:
                     selected = "checked=\"checked\""
+                priceCol = ""
+                if type.isBillable():
+                    priceCol = """<td align="right">%s %s per night</td>""" % (type.getPrice(), type.getRegistrationForm().getCurrency())
                 html.append("""<tr>
                                     <td align="left" style="padding-left:10px"><input type="radio" name="accommodationType" value="%s" %s>%s</td>
+                                    %s
                                 </tr>
-                            """%(type.getId(), selected, type.getCaption() ) )
+                            """%(type.getId(), selected, type.getCaption(), priceCol ) )
             else:
                 html.append( _("""<tr>
                                  <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>

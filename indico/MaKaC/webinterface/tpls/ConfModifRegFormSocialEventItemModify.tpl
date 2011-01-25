@@ -24,10 +24,11 @@
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat"><%= _("Cancel item")%></span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
-            <input type="checkbox" name="cancelled" size="60" %(checked)s><%= _("for the following reason")%> 
+            <input type="checkbox" name="cancelled" size="60" %(checked)s><%= _("for the following reason")%>
             <input type="text" name="reason" size="30" value="%(reason)s">
           </td>
         </tr>
+        %(billingOptions)s
 		<tr>
           <td>&nbsp;</td>
         </tr>

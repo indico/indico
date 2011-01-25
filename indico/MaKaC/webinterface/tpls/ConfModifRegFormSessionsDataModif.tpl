@@ -12,7 +12,7 @@
             <td align="left"><textarea name="description" cols="100" rows="10">%(description)s</textarea></td>
         </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Type of sessions' form")%><br><small>( <%= _("how many sessions the<br>registrant can choose")%> )</small></span></td>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Type of sessions' form")%><br><small>( <%= _("how many sessions the<br>registrant can choose<br>please note that billing <br>not possible when using '2 choices'")%> )</small></span></td>
             <td align="left">%(types)s</td>
         </tr>
 		<tr><td>&nbsp;</td></tr>

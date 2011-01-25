@@ -129,7 +129,6 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
                 raise FormValuesError("The field \"%s\" is mandatory and you must fill it in order to register"%(pd.getData()[key].getName()))
         # SESSIONS
         sessionForm = self._regForm.getSessionsForm()
-        sessions = []
         sessions = sessionForm.getSessionsFromParams(params)
         params["sessions"] = sessions
         # ACCMMODATION
@@ -171,6 +170,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         rp = registration.Registrant()
         self._conf.addRegistrant(rp)
         rp.setValues(self._getRequestParams(), user)
+        rp.setSessionBillingEnabled(self._regForm.getSessionsForm().getType() != "2priorities")
         if user is not None:
             user.addRegistrant(rp)
             rp.setAvatar(user)
