@@ -2,7 +2,7 @@
     <tr>
         <td nowrap class="dataHeader" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Question")%></td>
         <td nowrap class="dataHeader" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Average<br>rating")%>
-        <% inlineContextHelp(_('The rating is in a 0-100 scale.')) %> </td>
+        <% inlineContextHelp(_('The rating is in ' + str(scaleLower) + ' - ' + str(scaleHigher) + ' scale.')) %> </td>
     </tr>
     <% for q,v in questions.iteritems():  %>
         <tr class="infoTR">

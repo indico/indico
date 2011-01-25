@@ -1351,7 +1351,7 @@ IndicoUI.Widgets = {
 	                                        }
 		                                }, 'Remove');
 	                        } else {
-		                        var popupContent = Html.span({}, 'Do you want to keep the ratings of the judgements of this question (if they exist)?');
+		                        var popupContent = Html.span({}, 'Do you want to keep the ratings of the judgements for this question (if any)?');
 		                        // For this popup we need two handlers
 		                        var popup = new SpecialRemovePopup('Remove '+kindOfElement, popupContent,
                                     function(option) {

@@ -6,7 +6,7 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Judged by")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Date")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Average<br>rating")%>
-        <% inlineContextHelp(_('The rating is in a 0-100 scale.')) %> </td>
+        <% inlineContextHelp(_('The rating is in ' + str(scaleLower) + ' - ' + str(scaleHigher) + ' scale.')) %> </td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Comments")%></td>
     </tr>
     <tr><td>&nbsp;</td></tr>

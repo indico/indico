@@ -48,7 +48,7 @@ $E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements
 
 
 //get the first question or a default one
-var question = "Do you think it is a very good abstract?";
+var question = "How would you rate this abstract?";
 
 // Component for example question
 var previewQuestion =  new ExampleQuestionWidget('reviewing.abstractReviewing.updateExampleQuestion',

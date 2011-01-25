@@ -1560,6 +1560,8 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
         vars["ratingAverage"] = self._abstract.getRating()
         vars["judgements"] = judgements
         vars["tracks"] = tracks
+        vars["scaleLower"] = self._conf.getConfAbstractReview().getScaleLower()
+        vars["scaleHigher"] = self._conf.getConfAbstractReview().getScaleHigher()
         return vars
 
 
@@ -1578,6 +1580,7 @@ class WAbstractTrackOrderByRating(wcomponents.WTemplated):
 
     def __init__( self, aw, abstract ):
         self._abstract = abstract
+        self._conf = abstract.getOwner().getOwner()
 
     def getVars( self ):
         questionIds = self._abstract.getQuestionsAverage().keys()
@@ -1591,6 +1594,8 @@ class WAbstractTrackOrderByRating(wcomponents.WTemplated):
 
         vars["questions"] = questions
         vars["ratingAverage"] = self._abstract.getRating()
+        vars["scaleLower"] = self._conf.getConfAbstractReview().getScaleLower()
+        vars["scaleHigher"] = self._conf.getConfAbstractReview().getScaleHigher()
         return vars
 
 
