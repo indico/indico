@@ -4479,7 +4479,7 @@ class RHAbstractsToXML(RHConfModifCFABase):
             x.writeTag("Content", abstract.getField("content"))
             for f in self._conf.getAbstractMgr().getAbstractFieldsMgr().getFields():
                 id = f.getId()
-                x.writeTag(id, abstract.getField(id))
+                x.writeTag("field",abstract.getField(id),[("id",id)])
             l = []
             for au in abstract.getAuthorList():
                 if abstract.isPrimaryAuthor(au):
