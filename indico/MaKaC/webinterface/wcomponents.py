@@ -80,8 +80,8 @@ class WTemplated(OldObservable):
     tplId = None
 
     @classmethod
-    def forModule(cls, module):
-        tplobj = cls()
+    def forModule(cls, module, *args):
+        tplobj = cls(*args)
         # HACK :/
         tplobj._dir = os.path.join(module.__path__[0], 'tpls')
         return tplobj

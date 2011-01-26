@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.core.api import IListener, IContributor
+from indico.core.api import IContributor
 
 
 class INavigationContributor(IContributor):
@@ -88,3 +88,15 @@ class INavigationContributor(IContributor):
     def getActiveNavigationItem(self, obj, params):
         pass
 
+
+class IEventDisplayContributor(IContributor):
+
+    """
+    Aggregates extension points that relate to event display pages
+    """
+
+    def injectCSSFiles(self, obj):
+        """
+        Observers should contribute with CSS files they wish to add to the
+        <head></head> block
+        """

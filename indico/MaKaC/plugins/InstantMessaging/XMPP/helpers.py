@@ -40,7 +40,6 @@ class GeneralLinkGenerator(LinkGenerator):
         self._nick = nick
 
     def generate(self):
-
         link = re.sub('\[chatroom\]', self._chatroom.getTitle(), self._structure)
         link = re.sub('\[host\]', self._chatroom.getHost(), link)
 
@@ -49,20 +48,26 @@ class GeneralLinkGenerator(LinkGenerator):
 
         return link
 
-def generateCustomLinks(var, chatroom):
+
+def generateCustomLinks(chatroom):
     linkList = PluginFieldsWrapper('InstantMessaging').getOption('customLinks')
-    # if some link type is specified
-    if linkList.__len__() > 0:
-        var['custom'] = []
-        for link in linkList:
-            addLink(var['custom'], link['name'], GeneralLinkGenerator(chatroom, link['structure']).generate(), chatroom.getId())
+
+    result = []
+    for link in linkList:
+        result.append({'name': link['name'],
+                       'link': GeneralLinkGenerator(chatroom,
+                                                    link['structure']).generate()
+                       })
+    return result
 
 
-def generateLogLink(var, chatroom, conf):
+def generateLogLink(chatroom, conf):
     if XMPPLogsActivated():
-        var['logs'] = UHConfModifChatSeeLogs.getURL(conf)
-        var['logs'].addParam('chatroom', chatroom.getId())
-        var['logs'] = var['logs'].__str__()
+        url = UHConfModifChatSeeLogs.getURL(conf)
+        url.addParam('chatroom', chatroom.getId())
+        return str(url)
+    else:
+        return None
 
 
 def XMPPLogsActivated():

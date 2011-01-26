@@ -49,7 +49,7 @@ class DBHelpers:
     @classmethod
     def getChatroomList(cls, conf):
         conf = str(conf.getId())
-        index = IndexByConf(conf).get()
+        index = IndexByConf().get()
 
         if not index.has_key(conf):
             raise ServiceError( message=_('Conference not found in database: %s' %conf))
@@ -67,7 +67,7 @@ class DBHelpers:
     def getRoomsByUser(cls, user):
         """ Will return the chat rooms created by the requested user """
         userID = str(user['id'])
-        index = IndexByUser(userID).get()
+        index = IndexByUser().get()
 
         if not index.has_key(userID):
             return []

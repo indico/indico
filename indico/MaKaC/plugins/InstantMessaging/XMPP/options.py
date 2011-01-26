@@ -70,9 +70,7 @@ globalOptions = [
     </tr>\
 </table>"}),
 
-    ("activateLogs", {"description": _("Make possible to see chat logs and attach them to the material \
-    \
-    REMEMBER, you will need to put in the Jappix dir the code.py file contained in the ext folder, inside the XMPP plugin."),
+    ("activateLogs", {"description": _("""Make possible to see chat logs and attach them to the material <div style="font-style: italic; margin-top:5px;">You will need to configure a web service in your XMPP server - see <a href="">here</a>.</div>"""),
                             "type": bool,
                             "defaultValue": False,
                             "editable": True,

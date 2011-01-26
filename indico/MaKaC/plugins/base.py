@@ -102,6 +102,7 @@ class ComponentsManager(Persistent):
     def registerComponent(self, component):
         #Register it. We take the list of the interfaces implemented by the component
         implementedInterfaces = list(zope.interface.implementedBy(component))
+
         for interface in implementedInterfaces:
 
             #we take the list of the methods in the interface
@@ -138,8 +139,6 @@ class ComponentsManager(Persistent):
             f = getattr(subscriber,event)
             try:
                 results.append(f(obj, *params))
-            except NoReportError, e:
-                raise NoReportError(str(e))
             except Exception, e:
                 Logger.get('PluginNotifier').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
                 raise

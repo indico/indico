@@ -68,9 +68,8 @@ import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
-from MaKaC.plugins.base import OldObservable
 from MaKaC.common.logger import Logger
-
+from MaKaC.plugins.base import OldObservable
 from indico.modules import ModuleHolder
 
 def stringToDate( str ):
@@ -119,13 +118,19 @@ class WPConferenceBase( base.WPDecorated ):
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
-class WPConferenceDisplayBase( WPConferenceBase ):
+class WPConferenceDisplayBase( WPConferenceBase, OldObservable ):
 
     def getJSFiles(self):
         return WPConferenceBase.getJSFiles(self) + \
                self._includeJSPackage('MaterialEditor')
 
-class WPConferenceDefaultDisplayBase( WPConferenceBase, OldObservable ):
+    def getCSSFiles(self):
+        # flatten returned list
+
+        return WPConferenceBase.getCSSFiles(self) + \
+               sum(self._notify('injectCSSFiles'), [])
+
+class WPConferenceDefaultDisplayBase( WPConferenceBase):
     navigationEntry = None
 
     def _getFooter( self ):
@@ -918,6 +923,11 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         if wm.isManager(self._getAW().getUser()):
             self._webcastadd = True
 
+    def getCSSFiles(self):
+        # flatten returned list
+
+        return WPConferenceBase.getCSSFiles(self) + \
+               sum(self._notify('injectCSSFiles'), [])
 
     def getJSFiles(self):
         modules = WPConferenceBase.getJSFiles(self)

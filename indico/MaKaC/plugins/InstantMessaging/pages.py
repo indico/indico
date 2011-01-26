@@ -25,13 +25,17 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
-from MaKaC.plugins import PluginsHolder
+from MaKaC.plugins import PluginsHolder, InstantMessaging
 from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.webinterface.rh.conferenceModif import RHMaterialsShow
 from MaKaC.plugins.InstantMessaging.XMPP.helpers import generateCustomLinks, generateLogLink, XMPPLogsActivated, DesktopLinkGenerator, WebLinkGenerator
 from MaKaC.i18n import _
+import zope.interface
+from indico.core.api import Component
+from indico.core.api.conference import IEventDisplayContributor
+
 
 class WPConfModifChat(WPConferenceModifBase):
 
@@ -49,6 +53,14 @@ class WPConfModifChat(WPConferenceModifBase):
     #to make possible specifying absoulte paths
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('Plugins')
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+               self._includeJSFile('InstantMessaging/js', 'InstantMessaging')
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + \
+               ['InstantMessaging/im.css']
 
     def _createTabCtrl(self):
         for tabName in self._tabNames:
@@ -69,7 +81,8 @@ class WPConfModifChat(WPConferenceModifBase):
     def _getPageContent(self, params):
         if len(self._tabNames) > 0:
             self._createTabCtrl()
-            wc = WConfModifChat(self._conf, self._activeTabName, self._tabNames, self._aw)
+            wc = WConfModifChat.forModule(InstantMessaging, self._conf,
+                                          self._activeTabName, self._tabNames, self._aw)
             return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(wc.getHTML({}))
         else:
             return _("No available plugins, or no active plugins")
@@ -83,13 +96,22 @@ class WPConferenceInstantMessaging(WPConferenceDefaultDisplayBase):
         self._aw = rh.getAW()
 
     def _getBody(self, params):
-        wc = WConferenceInstantMessaging(self._conf, self._aw)
+        wc = WConferenceInstantMessaging.forModule(InstantMessaging,
+                                                   self._conf, self._aw)
         return wc.getHTML({})
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName("instantMessaging"))
 
+
+class IMEventDisplayComponent(Component):
+
+    zope.interface.implements(IEventDisplayContributor)
+
+    # EventDisplayContributor
+    def injectCSSFiles(self, obj):
+        return ['InstantMessaging/im.css']
 
 
 class WConfModifChat(wcomponents.WTemplated):
@@ -112,12 +134,14 @@ class WConfModifChat(wcomponents.WTemplated):
         except Exception, e:
             vars["Chatrooms"] = None
             chatrooms = {}
-        vars['links'] = {}
+        links = {}
 
         for cr in chatrooms:
-            vars['links'][cr.getId() ] = {}
-            generateCustomLinks(vars["links"][cr.getId()], cr)
-            generateLogLink(vars["links"][cr.getId()], cr, self._conf)
+            crinfo = links[cr.getId() ] = {}
+            crinfo['custom'] = generateCustomLinks(cr)
+            crinfo['logs'] = generateLogLink(cr, self._conf)
+
+        vars['links'] = links
 
         vars['DefaultServer'] = PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost')
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
@@ -127,8 +151,6 @@ class WConfModifChat(wcomponents.WTemplated):
         vars["ShowLogsLink"] = XMPPLogsActivated()
 
         return vars
-
-
 
 class WConferenceInstantMessaging(wcomponents.WTemplated):
 
@@ -149,7 +171,6 @@ class WConferenceInstantMessaging(wcomponents.WTemplated):
         vars["Links"] = {}
         for cr in vars["Chatrooms"]:
             vars["Links"][cr.getId()] = {}
-            generateCustomLinks(vars["Links"][cr.getId()], cr)
+            vars["Links"][cr.getId()]['custom'] = generateCustomLinks(cr)
 
         return vars
-

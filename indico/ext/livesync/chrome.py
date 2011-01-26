@@ -168,10 +168,9 @@ class WPluginAgentManagement(WTemplated):
         return tplVars
 
 
-NUM_CELLS = 10
-
-
 class WPluginAgentStatus(WTemplated):
+
+    NUM_CELLS = 10
 
     def _tsToDate(self, ts):
         return datetime.datetime.utcfromtimestamp(ts * MPT_GRANULARITY)
@@ -206,7 +205,7 @@ class WPluginAgentStatus(WTemplated):
                 ts = int(ts)
                 showTS = ts == first or ts in agentMap
 
-                if showTS or extra < 10:
+                if showTS or extra < self.NUM_CELLS:
                     if breakContinuity:
                         queue.append(('break', numBreakTS, sumElems, []))
                     queue.append((ts, self._tsToDate(ts),

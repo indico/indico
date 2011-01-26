@@ -39,8 +39,8 @@ class Chatroom(Persistent, Fossilizable):
         self._name = name
         self._owner = owner
         self._creationDate = nowutc()
-        self._conference = PersistentMapping()
-        self._conference[conference.getId()] = conference
+        self._conferences = PersistentMapping()
+        self._conferences[conference.getId()] = conference
         self._modificationDate = modificationDate
         self._createdInLocalServer = createdInLocalServer
         self._showRoom = showRoom
@@ -57,7 +57,7 @@ class Chatroom(Persistent, Fossilizable):
         self._name = values['title']
         self._owner = values['user']
         #it has to be a dictionary with conferences, otherwise it'll make everything go wrong
-        self._conference[values['conference'].getId()] = values['conference']
+        self._conferences[values['conference'].getId()] = values['conference']
         self._modificationDate = values['modificationDate']
         self._createdInLocalServer = values['createdInLocalServer']
         self._showRoom = values['showRoom']
@@ -111,22 +111,10 @@ class Chatroom(Persistent, Fossilizable):
         return self.getModificationDate().astimezone(timezone(tz))
 
     def setConference(self, conference):
-        if len(self._conference) is 0:
-            self._conference = PersistentMapping()
-        self._conference[conference.getId()] = conference
-
-    def getConference(self):
-        """ If there's only one conference in the dictionary it returns the conference itself, otherwise returns the dictionary"""
-        if len(self._conference) is 1:
-            return self._conference.values()[0]
-        elif len(self._conference) >1:
-            return self._conference
-        else:
-            raise ServiceError(message='No conferences found in the chat room %s'%self._name)
+        self._conferences[conference.getId()] = conference
 
     def getConferences(self):
-        """ returns always the dictionary"""
-        return self._conference
+        return self._conferences
 
     def getId(self):
         return self._id

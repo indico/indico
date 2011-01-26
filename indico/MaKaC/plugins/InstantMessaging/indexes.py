@@ -43,9 +43,9 @@ class IMIndex(Persistent):
         #self._indexToAccess = self._root[self._index]
         if not self._root.has_key(self._index):
             self._root[self._index] = self
-            self._storingStructure = self._storingStructure()
+            self._data = self._storingStructure()
         self._indexToAccess = self._root[self._index]
-        self._storingStructure = self._indexToAccess.get()
+        self._data = self._indexToAccess.get()
 
     def _indexCheckDelete(self, element):
         #if len( self._root[self._index][element] ) is 0:
@@ -56,7 +56,7 @@ class IMIndex(Persistent):
 
     def get(self):
         #return self._indexToAccess
-        return self._storingStructure
+        return self._data
 
     def index(self, element):
         pass
@@ -75,53 +75,50 @@ class CounterIndex(IMIndex):
 class IndexByConf(IMIndex):
     """ Index by conference. Using the conference id as the key, there will be a OOTreeSet inside with all the existing chat rooms for that conference"""
 
-    def __init__(self, conf):
+    def __init__(self):
         IMIndex.__init__(self, 'indexByConf')
-        self._conf = conf
 
-    def index(self, element):
+    def index(self, conf, element):
         self._indexCheck()
 
         # self.get is equivalent to root['indexByConf']
-        if not self.get().has_key(self._conf):
-            self.get()[self._conf] = OOTreeSet()
+        if not self.get().has_key(conf):
+            self.get()[conf] = OOTreeSet()
 
-        self.get()[self._conf].insert(element)
+        self.get()[conf].insert(element)
 
-    def unindex(self, element):
-        self.get()[self._conf].remove(element)
+    def unindex(self, conf, element):
+        self.get()[conf].remove(element)
 
-        self._indexCheckDelete(self._conf)
+        self._indexCheckDelete(conf)
 
 
 class IndexByUser(IMIndex):
     """ Index by user ID. We use a OOTreeSet to store the chat rooms"""
 
-    def __init__(self, id):
+    def __init__(self):
         IMIndex.__init__(self, 'indexByUser')
-        self._id = id
 
-    def index(self, element):
+    def index(self, userId, element):
         self._indexCheck()
 
         # self.get is equivalent to root['IndexByUser']
-        if not self.get().has_key(self._id):
-            self.get()[self._id] = OOTreeSet()
+        if not self.get().has_key(userId):
+            self.get()[userId] = OOTreeSet()
 
-        self.get()[self._id].insert(element)
+        self.get()[userId].insert(element)
 
-    def unindex(self, element):
-        self.get()[self._id].remove(element)
+    def unindex(self, userId, element):
+        self.get()[userId].remove(element)
 
-        self._indexCheckDelete(self._id)
+        self._indexCheckDelete(userId)
 
 
 class IndexByCRName(IMIndex):
     """ Index by chat room name. We allow chat rooms to have the same name if they are in different servers. For each key we use a OOTreeSet to store them"""
 
-    def __init__(self, name):
+    def __init__(self):
         IMIndex.__init__(self, 'indexByCRName')
-        self._name = name
 
     def index(self, element):
         self._indexCheck()
@@ -145,8 +142,9 @@ class IndexByCRName(IMIndex):
             self.get()[indexToRemove].remove(element)
             self._indexCheckDelete(indexToRemove)
         else:
-            self.get()[self._name].remove(element)
-            self._indexCheckDelete(self._name)
+            title = element.getTitle()
+            self.get()[title].remove(element)
+            self._indexCheckDelete(title)
 
 
 class IndexByID(IMIndex):
@@ -166,4 +164,3 @@ class IndexByID(IMIndex):
 
     def unindex(self, element):
         self.get().pop(element.getId())
-

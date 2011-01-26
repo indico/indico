@@ -24,7 +24,10 @@ from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 
-class WPBase:
+from MaKaC.plugins.base import OldObservable
+
+
+class WPBase(OldObservable):
     """
     """
     _title = "Indico"

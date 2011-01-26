@@ -25,13 +25,24 @@ from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.InstantMessaging.pages import WPConfModifChat, WPConferenceInstantMessaging
 from MaKaC.plugins.InstantMessaging.urlHandlers import UHConfModifChat, UHConfModifChatSeeLogs, UHConferenceInstantMessaging
 from MaKaC.plugins.InstantMessaging.XMPP.helpers import LogLinkGenerator
+from MaKaC.plugins import InstantMessaging
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
-import urllib2
+import urllib2, os
 
 from indico.web.legacy import wrapUH
+from indico.web.rh import RHHtdocs
+
+class RHInstantMessagingHtdocs(RHHtdocs):
+    """
+    Static file handler for InstantMessaging plugin
+    """
+
+    _url = r"^/InstantMessaging/(?P<filepath>.*)$"
+    _local_path = os.path.join(InstantMessaging.__path__[0], 'htdocs')
+
 
 class RHChatModifBase(RHConferenceModifBase):
 

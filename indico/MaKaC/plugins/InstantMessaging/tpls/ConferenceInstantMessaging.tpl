@@ -32,18 +32,18 @@
 
                 <td><div id='desc<%= cr.getId() %>'> <%= cr.getDescription()%></div></td>
 
-                <td> <%= _('Yes') if len(cr.getPassword()) > 0 else _('No')%></td>
+                <td> <%= _('Yes') if cr.getPassword() else _('No')%></td>
 
-                <% if cr.getShowPass() and len(cr.getPassword()) > 0:%>
+                <% if cr.getShowPass() and cr.getPassword():%>
                     <td> <%= cr.getPassword()%> </td>
                 <% end %>
-                <% elif not cr.getShowPass() and len(cr.getPassword()) > 0:%>
+                <% elif not cr.getShowPass() and cr.getPassword():%>
                     <td style="font-style:italic;"> <%= _('Not displayed')%> </td>
                 <% end %>
                 <% else:%>
                     <td style="font-style:italic;"> - </td>
                 <% end %>
-                <% if PluginFieldsWrapper('InstantMessaging').getOption('customLinks').__len__() > 0: %>
+                <% if len(PluginFieldsWrapper('InstantMessaging').getOption('customLinks')) > 0: %>
                     <td style="font-weight: bold;" nowrap><a id="joinLink<%= cr.getId() %>" name = "<%= cr.getId() %>" class="dropDownMenu highlight" href="#"><%= _("Join now!")%></a></td>
                 <% end %>
                 </tr>

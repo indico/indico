@@ -93,7 +93,7 @@ class ChatSMContributor(Component, Observable):
                 out.writeTag("name", chatroom.getTitle())
                 out.writeTag("server", 'conference.' + chatroom.getHost() if chatroom.getCreatedInLocalServer() else chatroom.getHost())
                 out.writeTag("description", chatroom.getDescription())
-                out.writeTag("reqPassword", _('Yes') if len(chatroom.getPassword()) > 0 else _('No'))
+                out.writeTag("reqPassword", _('Yes') if chatroom.getPassword() else _('No'))
                 out.writeTag("showPassword", chatroom.getShowPass())
                 out.writeTag("password", chatroom.getPassword())
                 out.writeTag("createdInLocalServer", chatroom.getCreatedInLocalServer())
@@ -168,15 +168,15 @@ class ChatroomStorage(Component):
         """
         room = params['room']
 
-        conference = room.getConference()
+        conference = params['conference']
 
         # index by conference id
-        confIndex = IndexByConf(conference.getId())
+        confIndex = IndexByConf()
         room.setId(DBHelpers.newID())
-        confIndex.index(room)
+        confIndex.index(conference.getId(), room)
 
         # Index by chat room's name
-        crNameIndex = IndexByCRName(room.getTitle())
+        crNameIndex = IndexByCRName()
         crNameIndex.index(room)
 
         # Index by id
@@ -184,8 +184,8 @@ class ChatroomStorage(Component):
         idIndex.index(room)
 
         # Index by room creator
-        userIndex = IndexByUser(room.getOwner().getId())
-        userIndex.index(room)
+        userIndex = IndexByUser()
+        userIndex.index(room.getOwner().getId(), room)
 
     @classmethod
     def editChatroom(self, obj, params):
@@ -194,36 +194,33 @@ class ChatroomStorage(Component):
         #we have an index by the chat room name. If, while editing, someone changes the chat room name, we'll have to update the index
         if oldTitle != newRoom.getTitle():
             #the title has been changed. Get rid of the old index and substitute it for the new one
-            crNameIndex = IndexByCRName(newRoom.getTitle())
+            crNameIndex = IndexByCRName()
             crNameIndex.unindex(newRoom, oldTitle)
-            crNameIndex.index(newRoom)
+            crNameIndex.index(newRoom.getTitle(), newRoom)
 
     @classmethod
     def deleteChatroom(cls, obj, params):
         """ Deletes the chat room in the database according to all kind of indexing types"""
-        try:
-            chatroom = params['room']
 
-            confId = obj._conferenceID
-            #if we have the same room used in two or more different conferences, we just delete it from the
-            #conferences list in the chat room and from the IndexByConf index
-            chatroom.getConferences().pop(confId)
-            confIndex = IndexByConf(confId)
-            confIndex.unindex(chatroom)
+        chatroom = params['room']
 
-            if len(chatroom.getConferences()) is 0:
-                #there are no more references to the chat room, we completely delete it
-                crNameIndex = IndexByCRName(chatroom.getTitle())
-                crNameIndex.unindex(chatroom)
+        confId = obj._conferenceID
+        #if we have the same room used in two or more different conferences, we just delete it from the
+        #conferences list in the chat room and from the IndexByConf index
+        chatroom.getConferences().pop(confId)
+        confIndex = IndexByConf()
+        confIndex.unindex(confId, chatroom)
 
-                idIndex = IndexByID()
-                idIndex.unindex(chatroom)
+        if len(chatroom.getConferences()) is 0:
+            #there are no more references to the chat room, we completely delete it
+            crNameIndex = IndexByCRName()
+            crNameIndex.unindex(chatroom)
 
-                userIndex = IndexByUser(chatroom.getOwner().getId())
-                userIndex.unindex(chatroom)
+            idIndex = IndexByID()
+            idIndex.unindex(chatroom)
 
-        except Exception, e:
-            raise ServiceError(message=str(e))
+            userIndex = IndexByUser()
+            userIndex.unindex(chatroom.getOwner().getId(), chatroom)
 
     @classmethod
     def addConference2Room(cls, obj, params):
@@ -233,12 +230,8 @@ class ChatroomStorage(Component):
         room = params['room']
         confId = params['conf']
 
-        try:
-            confIndex = IndexByConf(confId)
-            confIndex.index(room)
-
-        except Exception, e:
-            raise NoReportError( _('The chat room %s could not be re-used' %room.getTitle()))
+        confIndex = IndexByConf()
+        confIndex.index(confId, room)
 
 
 class ChatroomMailer(Component):
@@ -253,7 +246,7 @@ class ChatroomMailer(Component):
         # we will execute the method performOperation in a chat room creation, which will send an email to all the requested users
         # saying that a chat room was created. We pass the 2 mandatory arguments and finally the arguments required for performOperation
         # (in this case, only one argument)
-        ExternalOperationsManager.execute(cls, "create_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'create', room.getConference(), room, room)
+        ExternalOperationsManager.execute(cls, "create_"+str(cls.__class__)+str(room.getId()), cls.performOperation, 'create', room.getConferences().values()[0], room, room)
 
     @classmethod
     def editChatroom(cls, obj, params):
