@@ -101,7 +101,6 @@ class NiceAuthenticator(Authenthicator):
         return "https://login.cern.ch/adfs/ls/?wa=wsignout1.0"
 
 
-
 class NiceIdentity(PIdentity):
 
     def authenticate( self, id ):

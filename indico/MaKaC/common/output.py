@@ -47,7 +47,7 @@ from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.plugins.base import Observable
-
+from MaKaC.user import Avatar, CERNGroup
 
 def fake(string1=""):
     return ""
@@ -196,6 +196,53 @@ class outputGenerator(Observable):
                 # use the full name instead
                 roomName = roomFromDB.getFullName()
         return roomName
+
+    def _getNiceAccounts(self, user):
+        accounts = []
+        for identity in user.getIdentityList():
+            if identity.getAuthenticatorTag() == 'Nice':
+                accounts.append(identity.getLogin())
+
+        return accounts
+
+    def _generateAccessList(self, out, obj):
+        """Generate a comprehensive access list showing all users and e-groups who may access
+        this object, taking into account the permissions and access lists of its owners.
+        obj could be a Conference, Session, Contribution, Material, Resource or SubContribution object."""
+
+        allowed_users = obj.getRecursiveAllowedToAccessList()
+
+        # Populate two lists holding email/group strings instead of Avatar/Group objects
+        allowed_logins = []
+        allowed_groups = []
+
+        for user_obj in allowed_users:
+            if isinstance(user_obj, Avatar):
+                for account in self._getNiceAccounts(user_obj):
+                    allowed_logins.append(account)
+            elif isinstance(user_obj, CERNGroup):
+                allowed_groups.append(user_obj.getId())
+            else:
+                allowed_logins.append(user_obj.getId())
+
+        if len(allowed_groups) + len(allowed_users) > 0:
+            # Create XML list of groups
+            if len(allowed_groups) > 0:
+                out.openTag("datafield", [["tag","506"],["ind1","1"],["ind2"," "]])
+                for group_id in allowed_groups:
+                    out.writeTag("subfield", group_id, [["code","d"]])
+                out.writeTag("subfield", "group", [["code","f"]])
+                out.closeTag("datafield")
+
+            # Create XML list of emails
+            if len(allowed_logins) > 0:
+                out.openTag("datafield", [["tag","506"],["ind1","1"],["ind2"," "]])
+                for email_id in allowed_logins:
+                    out.writeTag("subfield", email_id, [["code","d"]])
+                out.writeTag("subfield", "username", [["code","f"]])
+                out.closeTag("datafield")
+        else:
+            out.writeTag("datafield", '', [["tag","506"],["ind1","0"],["ind2"," "]])
 
     def _confToXML(self,
                    conf,
@@ -1342,6 +1389,8 @@ class outputGenerator(Observable):
         out.writeTag("subfield", "Event details", [["code","y"]])
         out.closeTag("datafield")
 
+        self._generateAccessList(out, conf)
+
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, overrideCache=False):
     ##     if not out:
     ##         out = self._XMLGen
@@ -1628,6 +1677,8 @@ class outputGenerator(Observable):
         out.writeTag("subfield", "Contribution details", [["code","y"]])
         out.closeTag("datafield")
 
+        self._generateAccessList(out, cont)
+
     ####
     #fb
 
@@ -1800,6 +1851,9 @@ class outputGenerator(Observable):
         out.writeTag("subfield",url,[["code","u"]])
         out.writeTag("subfield", "Contribution details", [["code","y"]])
         out.closeTag("datafield")
+
+        self._generateAccessList(out, subCont)
+
 
     def materialToXMLMarc21(self,mat, out=None):
         if not out:
