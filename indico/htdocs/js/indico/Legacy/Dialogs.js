@@ -592,6 +592,7 @@ extend(IndicoUI.Dialogs,
                var wasChanged = false;
                var compileMinutes = exists(compile)?compile:false;
                var killProgress = null;
+               var saveAndClose = false;
 
                var rtWidget = new ParsedRichTextEditor(700, 400, 'IndicoFull');
 
@@ -648,6 +649,9 @@ extend(IndicoUI.Dialogs,
                            changedText.set(false);
                            wasChanged = true;
                            saveButton.dom.disabled = true;
+                           if (saveAndClose) {
+                               closeMinutes();
+                           }
                        }
                    }
                });
@@ -664,18 +668,21 @@ extend(IndicoUI.Dialogs,
                    var self = this;
                    var content = Html.div({}, rtWidget.draw());
 
-                   var commitChanges = function(suicideHook) {
+                   var commitChanges = function() {
+                       debugger;
                        killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
                        if(rtWidget.clean()){
                            changedText.set(false);
+                           wasChanged = true;
                            saveButton.dom.disabled = true;
-                           req.set(rtWidget.get())
+                           req.set(rtWidget.get());
                        }
-                       killProgress()
+                       killProgress();
                    };
 
-                   var commitChangesAndClose = function(suicideHook) {
-                       commitChanges(suicideHook);
+                   var commitChangesAndClose = function() {
+                       saveAndClose = true;
+                       commitChanges();
                    };
 
                    self.closeMinutesPopup = function(){
@@ -698,7 +705,7 @@ extend(IndicoUI.Dialogs,
                        }
                    };
 
-                   saveButton = Widget.button(command(curry(commitChanges, function(){self.close();}, null), $T("Save")));
+                   saveButton = Widget.button(command(commitChanges, $T("Save")));
                    saveButton.dom.disabled = !compileMinutes;
 
                    return this.ExclusivePopupWithButtons.prototype.draw.call(
