@@ -116,6 +116,8 @@ class FilterField:
         """
         self._conf=conf
         self._values = values
+        if not isinstance(self._values, list):
+            self._values = [self._values]
         self._showNoValue = showNoValue
 
     def getId( cls ):
