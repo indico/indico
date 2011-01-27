@@ -2337,7 +2337,8 @@ class GeneralField(Persistent):
             caption= _("General Field")
         self.setCaption(caption)
         self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input","text"))(self))
-        self._input.setValues(data)
+        if data.has_key("inputObj"):
+            self._input.setValues(data["inputObj"].getValues())
         self.setMandatory(data.has_key("mandatory") and data["mandatory"])
         self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price",""))
@@ -2347,6 +2348,7 @@ class GeneralField(Persistent):
         values = {}
         values["caption"] = self.getCaption()
         values["input"] = self.getInput().getId()
+        values["inputObj"] = self.getInput()
         values["mandatory"] = self.isMandatory()
         values["billable"]=self.isBillable()
         values["price"]=self.getPrice()
