@@ -2338,8 +2338,8 @@ class GeneralField(Persistent):
         self.setCaption(caption)
         self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input","text"))(self))
         self._input.setValues(data)
-        self.setMandatory(data.has_key("mandatory"))
-        self.setBillable(data.has_key("billable"))
+        self.setMandatory(data.has_key("mandatory") and data["mandatory"])
+        self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price",""))
         self.setDescription(data.get("description",""))
 
@@ -2793,9 +2793,9 @@ class AccommodationType(Persistent):
 
     def setValues(self, data):
         self.setCaption(data.get("caption", "--no caption--"))
-        self.setCancelled(data.has_key("cancelled"))
+        self.setCancelled(data.has_key("cancelled") and data["cancelled"])
         self.setPlacesLimit(data.get("placesLimit", "0"))
-        self.setBillable(data.has_key("billable"))
+        self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price"))
         self._regForm.notifyModification()
 
@@ -3211,7 +3211,7 @@ class RegistrationSession(Persistent):
         self._currency = regForm.getCurrency()
 
     def setValues(self, data):
-        self.setBillable(data.has_key("billable"))
+        self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price"))
 
     def getValues(self):
@@ -3525,12 +3525,12 @@ class SocialEventItem(Persistent):
 
     def setValues(self, data):
         self.setCaption(data.get("caption", "--no caption--"))
-        self.setCancelled(data.has_key("cancelled"))
+        self.setCancelled(data.has_key("cancelled") and data["cancelled"])
         self.setCancelledReason(data.get("reason", ""))
         self.setMaxPlacePerRegistrant(int(data.get("maxPlace", "10")))
         self.setPlacesLimit(data.get("placesLimit", "0"))
-        self.setBillable(data.has_key("billable"))
-        self.setPricePerPlace(data.has_key("pricePerPlace"))
+        self.setBillable(data.has_key("billable") and data["billable"])
+        self.setPricePerPlace(data.has_key("pricePerPlace") and data["pricePerPlace"])
         self.setPrice(data.get("price"))
 
     def getValues(self):
