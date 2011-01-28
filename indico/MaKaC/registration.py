@@ -3420,52 +3420,6 @@ class SessionsForm(BaseForm):
     def getSessionById(self, id):
         return self._sessions.get(id, None)
 
-class RegistrantSession(Persistent):
-
-    def __init__(self, ses):
-        self._regSession = ses
-        self._price = self._regSession.getPrice()
-        self._billable = self._regSession.isBillable()
-        self._currency = self._regSession.getCurrency()
-
-    def getCurrency(self):
-        try:
-            return self._currency
-        except:
-            self._currency = self._regSession.getCurrency()
-        return self._currency
-
-    def getPrice(self):
-        try:
-            return self._price
-        except:
-            return 0
-
-    def isBillable(self):
-        try:
-            return self._billable
-        except:
-            return False
-
-    def getBilledItem(self):
-        return BilledItem(self.getCaption(), self.getPrice(), 1, self.getCurrency())
-
-    def getRegSession(self):
-        return self._regSession
-
-    def getSession(self):
-        return self._regSession.getSession()
-
-    def getId(self):
-        return self._regSession.getId()
-
-    def getCaption(self):
-        return self._regSession.getCaption()
-    getTitle = getCaption
-
-    def isCancelled(self):
-        return self._regSession.isCancelled()
-
 def sortByStartDate( x, y ):
     return cmp(x.getSession().getStartDate(),y.getSession().getStartDate())
 
@@ -4651,6 +4605,52 @@ class SocialEvent(Persistent):
 
     def delete(self):
         self._socialEventItem.decreaseNoPlaces(self._noPlaces)
+
+class RegistrantSession(Persistent):
+
+    def __init__(self, ses):
+        self._regSession = ses
+        self._price = self._regSession.getPrice()
+        self._billable = self._regSession.isBillable()
+        self._currency = self._regSession.getCurrency()
+
+    def getCurrency(self):
+        try:
+            return self._currency
+        except:
+            self._currency = self._regSession.getCurrency()
+        return self._currency
+
+    def getPrice(self):
+        try:
+            return self._price
+        except:
+            return 0
+
+    def isBillable(self):
+        try:
+            return self._billable
+        except:
+            return False
+
+    def getBilledItem(self):
+        return BilledItem(self.getCaption(), self.getPrice(), 1, self.getCurrency())
+
+    def getRegSession(self):
+        return self._regSession
+
+    def getSession(self):
+        return self._regSession.getSession()
+
+    def getId(self):
+        return self._regSession.getId()
+
+    def getCaption(self):
+        return self._regSession.getCaption()
+    getTitle = getCaption
+
+    def isCancelled(self):
+        return self._regSession.isCancelled()
 
 class MiscellaneousInfoGroup(Persistent):
 
