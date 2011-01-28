@@ -3987,7 +3987,7 @@ class Registrant(Persistent):
 
         self._sessions = []
         self._socialEvents = []
-        self._accommodation = Accommodation()
+        self._accommodation = Accommodation(self)
         self._reasonParticipation = ""
 
         self._miscellaneous={}
@@ -4299,7 +4299,7 @@ class Registrant(Persistent):
 
     def _fixSessions(self):# Convert old sessions
         if self._sessions and isinstance(self._sessions[0], RegistrationSession):
-            self._sessions = [RegistrantSession(ses) for ses in self._sessions]
+            self._sessions = [RegistrantSession(ses, self) for ses in self._sessions]
 
     def getSessionList(self):
         self._fixSessions()
@@ -4317,6 +4317,8 @@ class Registrant(Persistent):
 
     def setSessions(self, sesList):
         self._sessions = sesList
+        for ses in self._sessions:
+            ses.setRegistrant(self)
         self.notifyModification()
 
     def setAccommodation(self, a):
@@ -4350,6 +4352,7 @@ class Registrant(Persistent):
         self.notifyModification()
 
     def addSocialEvent(self, se):
+        se.setRegistrant(self)
         self.getSocialEvents().append(se)
         self.notifyModification()
 
@@ -4484,13 +4487,23 @@ class BilledItem(object):
 
 class Accommodation(Persistent):
 
-    def __init__(self):
+    def __init__(self, reg=None):
+        self._registrant = reg
         self._arrivalDate = None
         self._departureDate = None
         self._accommodationType = None
         self._price = 0
         self._billable = False
         self._currency = ""
+
+    def getRegistrant(self):
+        try:
+            return self._registrant
+        except:
+            return None
+
+    def setRegistrant(self, reg):
+        self._registrant = reg
 
     def getArrivalDate(self):
         return self._arrivalDate
@@ -4545,7 +4558,8 @@ class Accommodation(Persistent):
 
 class SocialEvent(Persistent):
 
-    def __init__(self, se, noPlaces):
+    def __init__(self, se, noPlaces, reg=None):
+        self._registrant = None
         self.addSEItem(se, noPlaces)
 
     def addSEItem(self, se, noPlaces):
@@ -4556,6 +4570,15 @@ class SocialEvent(Persistent):
         self._pricePerPlace = self._socialEventItem.isPricePerPlace()
         self._billable = self._socialEventItem.isBillable()
         self._currency = self._socialEventItem.getCurrency()
+
+    def getRegistrant(self):
+        try:
+            return self._registrant
+        except:
+            return None
+
+    def setRegistrant(self, reg):
+        self._registrant = reg
 
     def getNoPlaces(self):
         return self._noPlaces
@@ -4608,11 +4631,18 @@ class SocialEvent(Persistent):
 
 class RegistrantSession(Persistent):
 
-    def __init__(self, ses):
+    def __init__(self, ses, reg=None):
         self._regSession = ses
+        self._registrant = reg
         self._price = self._regSession.getPrice()
         self._billable = self._regSession.isBillable()
         self._currency = self._regSession.getCurrency()
+
+    def getRegistrant(self):
+        return self._registrant
+
+    def setRegistrant(self, reg):
+        self._registrant = reg
 
     def getCurrency(self):
         try:
