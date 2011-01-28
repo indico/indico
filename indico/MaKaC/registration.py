@@ -2940,26 +2940,6 @@ class AccommodationType(Persistent):
         self.setRegistrationForm(rf)
         TrashCanManager().remove(self)
 
-    def _getSpecialOptionsHTML(self):
-        checked=""
-        if self.isBillable():
-            checked="checked=\"checked\""
-
-        html= _(""" <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat">Is Billable</span></td>
-                  <td bgcolor="white" class="blacktext" width="100%%">
-                    <input type="checkbox" name="billable" size="60" %s> _("(uncheck if it is not billable)")
-                  </td>
-                </tr>
-                <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat"> _("Price")</span></td>
-                  <td bgcolor="white" class="blacktext" width="100%%">
-                    <input type="text" name="price" size="60" value=%s>
-                  </td>
-                </tr>
-                           """)%(checked, self.getPrice())
-        return "".join(html)
-
     def getLocator( self ):
         """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the AccommodationType instance """
@@ -3314,26 +3294,6 @@ class RegistrationSession(Persistent):
         lconf = self.getRegistrationForm().getLocator()
         lconf["sessionId"] = self.getId()
         return lconf
-
-    def _getSpecialOptionsHTML(self):
-        checked=""
-        if self.isBillable():
-            checked="checked=\"checked\""
-
-        html= _(""" <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat">Is Billable</span></td>
-                  <td bgcolor="white" class="blacktext" width="100%%">
-                    <input type="checkbox" name="billable" size="60" %s> _("(uncheck if it is not billable)")
-                  </td>
-                </tr>
-                <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat"> _("Price")</span></td>
-                  <td bgcolor="white" class="blacktext" width="100%%">
-                    <input type="text" name="price" size="60" value=%s>
-                  </td>
-                </tr>
-                           """)%(checked, self.getPrice())
-        return "".join(html)
 
     @staticmethod
     def _cmpTitle(s1, s2):
@@ -3719,34 +3679,6 @@ class SocialEventItem(Persistent):
         lconf = self.getRegistrationForm().getLocator()
         lconf["socialEventId"] = self.getId()
         return lconf
-
-    def _getSpecialOptionsHTML(self):
-        billable = ""
-        pricePerPlace = ""
-        if self.isBillable():
-            billable = ' checked="checked"'
-        if self.isPricePerPlace():
-            pricePerPlace = ' checked="checked"'
-        html= _(""" <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat">Is Billable</span></td>
-                  <td bgcolor="white" class="blacktext" width="100%%">
-                    <input type="checkbox" name="billable" size="60" %s> _("(uncheck if it is not billable)")
-                  </td>
-                </tr>
-                <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat"> _("Price")</span></td>
-                  <td bgcolor="white" class="blacktext" width="100%%">
-                    <input type="text" name="price" size="60" value=%s>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat">Price is per place</span></td>
-                  <td bgcolor="white" class="blacktext" width="100%%">
-                    <input type="checkbox" name="pricePerPlace" size="60"%s> _("(uncheck if the price is the same no matter how many places are chosen)")
-                  </td>
-                </tr>
-                           """)%(billable, self.getPrice(), pricePerPlace)
-        return "".join(html)
 
     @staticmethod
     def _cmpCaption(se1, se2):

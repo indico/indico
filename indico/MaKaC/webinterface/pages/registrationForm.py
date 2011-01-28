@@ -545,7 +545,10 @@ class WConfModifRegFormSessionItemModify( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
         vars["caption"] = quoteattr(self._sessionItem.getCaption())
-        vars["billingOptions"] = self._sessionItem._getSpecialOptionsHTML()
+        vars["billable"] = ""
+        if self._sessionItem.isBillable():
+            vars["billable"] = """ checked="checked" """
+        vars["price"] = self._sessionItem.getPrice()
         return vars
 
 class WPConfModifRegFormAccommodationBase(WPConfModifRegFormSectionsBase):
@@ -713,7 +716,10 @@ class WConfModifRegFormAccommodationTypeModify( wcomponents.WTemplated ):
         vars["checked"] = ""
         if self._accoType.isCancelled():
             vars["checked"] = """ checked="checked" """
-        vars["billingOptions"] = self._accoType._getSpecialOptionsHTML()
+        vars["billable"] = ""
+        if self._accoType.isBillable():
+            vars["billable"] = """ checked="checked" """
+        vars["price"] = self._accoType.getPrice()
         return vars
 
 class WPConfRemoveAccommodationType(WPConfModifRegFormAccommodationBase):
@@ -1115,7 +1121,13 @@ class WConfModifRegFormSocialEventItemModify( wcomponents.WTemplated ):
             vars["reason"] = self._socialEventItem.getCancelledReason()
         vars["maxPlace"] = self._socialEventItem.getMaxPlacePerRegistrant()
         vars["placesLimit"] = self._socialEventItem.getPlacesLimit()
-        vars["billingOptions"] = self._socialEventItem._getSpecialOptionsHTML()
+        vars["billable"] = ""
+        if self._socialEventItem.isBillable():
+            vars["billable"] = """ checked="checked" """
+        vars["pricePerPlace"] = ""
+        if self._socialEventItem.isPricePerPlace():
+            vars["pricePerPlace"] = """ checked="checked" """
+        vars["price"] = self._socialEventItem.getPrice()
         return vars
 
 class WPConfRemoveSocialEvent(WPConfModifRegFormSocialEventBase):
