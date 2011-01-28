@@ -1496,18 +1496,25 @@ class WPRegistrantSessionModify( WPRegistrantModifMain ):
 
 class WConfModifRegistrantSessionsAllModify(WConfModifRegistrantSessionsBase):
 
-    def _getSessionsHTML(self):
+    def _getSessionsHTML(self, alreadyPaid):
         html=[]
+        registeredSessions = [ses.getRegSession() for ses in self._registrant.getSessionList()]
         for session in self._registrant.getRegistrationForm().getSessionsForm().getSessionList():
             selected=""
-            if session in self._registrant.getSessionList():
+            if session in registeredSessions:
                 selected=" checked"
-            html.append("""<input type="checkbox" name="sessions" value="%s"%s>%s"""%(session.getId(), selected, session.getTitle()) )
+            disabled = ""
+            if alreadyPaid and session.isBillable():
+                disabled = " disabled"
+            price = ""
+            if session.isBillable() and self._sessionForm.getType() != "2priorities":
+                price = " [%s %s]" % (session.getPrice(), self._conf.getRegistrationForm().getCurrency())
+            html.append("""<input type="checkbox" name="sessions" value="%s"%s%s>%s%s"""%(session.getId(), selected, disabled, session.getTitle(), price) )
         return "<br>".join(html)
 
     def getVars(self):
         vars = WConfModifRegistrantSessionsBase.getVars( self )
-        vars ["sessions"] = self._getSessionsHTML()
+        vars ["sessions"] = self._getSessionsHTML(self._registrant.getPayed())
         return vars
 
 class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
@@ -1517,7 +1524,7 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
         self._conf = self._registrant.getConference()
         self._accommodation = self._conf.getRegistrationForm().getAccommodationForm()
 
-    def _getDatesHTML(self, name, currentDate, startDate=None, endDate=None):
+    def _getDatesHTML(self, name, currentDate, startDate=None, endDate=None, alreadyPaid=False):
         if name=="arrivalDate":
             dates = self._accommodation.getArrivalDates()
         elif name=="departureDate":
@@ -1532,10 +1539,13 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
         selected = ""
         if currentDate is None:
             selected = "selected"
+        disabled = ""
+        if alreadyPaid:
+            disabled = " disabled"
         html = ["""
-                <select name="%s">
+                <select name="%s"%s>
                 <option value="nodate" %s>-- select a date --</option>
-                """%(name, selected)]
+                """%(name, disabled, selected)]
         for date in dates:
             selected = ""
             if currentDate is not None and currentDate.strftime("%d-%B-%Y") == date.strftime("%d-%B-%Y"):
@@ -1546,21 +1556,24 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
         html.append("</select>")
         return "".join(html)
 
-    def _getAccommodationTypesHTML(self, currentAccoType):
+    def _getAccommodationTypesHTML(self, currentAccoType, alreadyPaid):
         html=[]
         for type in self._accommodation.getAccommodationTypesList():
             if not type.isCancelled():
                 selected = ""
+                disabled = ""
                 if currentAccoType == type:
                     selected = "checked=\"checked\""
+                if alreadyPaid and (type.isBillable() or (currentAccoType and currentAccoType.isBillable())):
+                    disabled = ' disabled="disabled"'
                 priceCol = ""
                 if type.isBillable():
                     priceCol = """<td align="right">%s %s per night</td>""" % (type.getPrice(), type.getRegistrationForm().getCurrency())
                 html.append("""<tr>
-                                    <td align="left" style="padding-left:10px"><input type="radio" name="accommodationType" value="%s" %s>%s</td>
+                                    <td align="left" style="padding-left:10px"><input type="radio" name="accommodationType" value="%s" %s%s>%s</td>
                                     %s
                                 </tr>
-                            """%(type.getId(), selected, type.getCaption(), priceCol ) )
+                            """%(type.getId(), selected, disabled, type.getCaption(), priceCol ) )
             else:
                 html.append( _("""<tr>
                                  <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>
@@ -1580,14 +1593,16 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
         currentArrivalDate = None
         currentDepartureDate = None
         currentAccoType = None
+        alreadyPaid = self._registrant.getPayed()
         if acco is not None:
             currentArrivalDate = acco.getArrivalDate()
             currentDepartureDate = acco.getDepartureDate()
             currentAccoType = acco.getAccommodationType()
+            alreadyPaidAcco = alreadyPaid and acco.isBillable()
         vars["title"] = self._accommodation.getTitle()
-        vars["arrivalDate"] = self._getDatesHTML("arrivalDate", currentArrivalDate)
-        vars["departureDate"] = self._getDatesHTML("departureDate", currentDepartureDate)
-        vars["accommodationTypes"] = self._getAccommodationTypesHTML(currentAccoType)
+        vars["arrivalDate"] = self._getDatesHTML("arrivalDate", currentArrivalDate, alreadyPaid=alreadyPaidAcco)
+        vars["departureDate"] = self._getDatesHTML("departureDate", currentDepartureDate, alreadyPaid=alreadyPaidAcco)
+        vars["accommodationTypes"] = self._getAccommodationTypesHTML(currentAccoType, alreadyPaid)
         return vars
 
 class WPRegistrantAccommodationModify( WPRegistrantModifMain ):
@@ -1604,7 +1619,7 @@ class WConfModifRegistrantSocialEventsModify(wcomponents.WTemplated):
         self._conf = self._registrant.getConference()
         self._socialEvents = self._conf.getRegistrationForm().getSocialEventForm()
 
-    def _getSocialEventsHTML(self, socialEvents=[]):
+    def _getSocialEventsHTML(self, socialEvents=[], alreadyPaid=False):
         html=[]
         for se in self._socialEvents.getSocialEventList():
             if not se.isCancelled():
@@ -1621,16 +1636,27 @@ class WConfModifRegistrantSocialEventsModify(wcomponents.WTemplated):
                         selected = " selected"
                     optList.append("""<option value="%s"%s>%s"""%(i, selected, i))
 
+                priceCol = ""
+                disabled = ""
+                if se.isBillable():
+                    perPlace = ""
+                    if se.isPricePerPlace():
+                        perPlace = '&nbsp;<acronym title="" onmouseover="IndicoUI.Widgets.Generic.tooltip(this, event, \'per place\')">pp</acronym>'
+                    priceCol = """<td align="left" nowrap>%s&nbsp;%s%s</td>""" % (se.getPrice(), self._conf.getRegistrationForm().getCurrency(), perPlace)
+                    if alreadyPaid:
+                        disabled = ' disabled="disabled"'
+
                 html.append("""<tr>
-                                    <td align="left" nowrap style="padding-left:10px"><input type="checkbox" name="socialEvents" value="%s" %s>%s&nbsp;&nbsp;
+                                    <td align="left" nowrap style="padding-left:10px"><input type="checkbox" name="socialEvents" value="%s" %s%s>%s&nbsp;&nbsp;
                                     </td>
-                                    <td width="100%%" align="left">
-                                    <select name="places-%s">
+                                    <td align="left" nowrap>
+                                    <select name="places-%s"%s>
                                        %s
                                     </select>
                                     </td>
+                                    %s
                                 </tr>
-                            """%(se.getId(), checked, se.getCaption(), se.getId(), "".join(optList) ) )
+                            """%(se.getId(), checked, disabled, se.getCaption(), se.getId(), disabled, "".join(optList), priceCol ) )
             else:
                 cancelledReason = "(cancelled)"
                 if se.getCancelledReason().strip():
@@ -1655,7 +1681,7 @@ class WConfModifRegistrantSocialEventsModify(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         regSocialEvents = self._registrant.getSocialEvents()
         vars["title"] = self._socialEvents.getTitle()
-        vars["socialEvents"] = self._getSocialEventsHTML(regSocialEvents)
+        vars["socialEvents"] = self._getSocialEventsHTML(regSocialEvents, self._registrant.getPayed())
         return vars
 
 class WPRegistrantSocialEventsModify( WPRegistrantModifMain ):

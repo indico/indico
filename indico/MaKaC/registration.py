@@ -4067,7 +4067,14 @@ class Registrant(Persistent):
             sessions=data.get("sessions",[])
             if not isinstance(sessions, list):
                 sessions = [ sessions ]
-            self.setSessions(sessions)
+            if not self.getPayed():
+                self.setSessions(sessions)
+            else:
+                # First keep all sessions which are billable (they are not submitted anymore)
+                newSessions = [session for session in self.getSessionList() if session.isBillable()]
+                # Then take all chosen sessions which are not billable
+                newSessions += [session for session in sessions if not session.isBillable()]
+                self.setSessions(newSessions)
 
         if self.getRegistrationForm().getAccommodationForm().isEnabled():
             ad = data.get("arrivalDate",None)
@@ -4085,20 +4092,33 @@ class Registrant(Persistent):
                     raise FormValuesError( _("Arrival date has to be earlier than departure date"))
             if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[] and data.get("accommodationType",None) is None:
                 raise FormValuesError( _("It is mandatory to choose an accommodation in order to register"))
-            self._accommodation.setArrivalDate(ad)
-            self._accommodation.setDepartureDate(dd)
+            # Allow changing of the dates only if the current accomodation is not billable or the user hasn't paid yet
+            currentAccoType = self._accommodation.getAccommodationType()
+            if not self.getPayed() or currentAccoType is None or not currentAccoType.isBillable():
+                self._accommodation.setArrivalDate(ad)
+                self._accommodation.setDepartureDate(dd)
             accoType = data.get("accommodationType",None)
             if accoType != None and accoType.isCancelled():
                 accoType = None
             if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[]:
-                self._accommodation.setAccommodationType(accoType)
+                # Only change the accommodation type if:
+                # - the registrant hasn't paid yet OR
+                # - neither the current nor the new accommodation is billable
+                if not self.getPayed() or \
+                    ((currentAccoType is None or not currentAccoType.isBillable()) and \
+                     (accoType is None or not accoType.isBillable())):
+                    self._accommodation.setAccommodationType(accoType)
 
         if self.getRegistrationForm().getSocialEventForm().isEnabled():
             for seItem in self.getSocialEvents()[:]:
-                self.removeSocialEventById(seItem.getId())
+                # Remove all items which can be added back (i.e. if paid only non-billable ones)
+                if not (self.getPayed() and seItem.isBillable()):
+                    self.removeSocialEventById(seItem.getId())
             for seItem in data.get("socialEvents", []):
-                newSE = SocialEvent(seItem, int(data.get("places-%s"%seItem.getId(), "1")))
-                self.addSocialEvent(newSE)
+                # Only add item if the registrant hasn't paid yet or the item is not billable
+                if not self.getPayed() or not seItem.isBillable():
+                    newSE = SocialEvent(seItem, int(data.get("places-%s"%seItem.getId(), "1")))
+                    self.addSocialEvent(newSE)
         #if not self.getPayed():
         #    self._miscellaneous = {}
         total = 0
@@ -4599,6 +4619,12 @@ class SocialEvent(Persistent):
     def isBillable(self):
         try:
             return self._billable
+        except:
+            return False
+
+    def isPricePerPlace(self):
+        try:
+            return self._pricePerPlace
         except:
             return False
 
