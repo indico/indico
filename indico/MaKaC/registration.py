@@ -125,7 +125,6 @@ class RegistrationForm(Persistent):
         form.setUsersLimit(self.getUsersLimit())
         form.setActivated(self.isActivated())
         form.setMandatoryAccount(self.isMandatoryAccount())
-        form.setAllSessions()
         form.notification=self.getNotification().clone()
         form.personalData = self.getPersonalData().clone()
         acf = self.getAccommodationForm()
@@ -137,6 +136,7 @@ class RegistrationForm(Persistent):
         rpf = self.getReasonParticipationForm()
         if rpf is not None :
             form.reasonParticipationForm = rpf.clone()
+        form.setAllSessions()
         ses = self.getSessionsForm()
         if ses is not None :
             form.sessionsForm = ses.clone(form.sessionsForm.getSessionList())
@@ -768,6 +768,7 @@ Please use this information for your payment (except for e-payment):\n
         total=0
         booking.append( _("""
 \tQuantity\t\tItem\t\tunit.price\t\tCost"""))
+        #All billable general fields
         for gsf in registrant.getMiscellaneousGroupList():
             miscGroup=registrant.getMiscellaneousGroupById(gsf.getId())
             if miscGroup is not None:
@@ -789,7 +790,8 @@ Please use this information for your payment (except for e-payment):\n
                     if value != "":
                         value=":%s"%value
                     if(quantity>0):
-                         booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%(quantity,miscGroup.getTitle(),caption,value,price,price*quantity,currency) )
+                        booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%(quantity,miscGroup.getTitle(),caption,value,price,price*quantity,currency) )
+        #All billable standard fields (accommodation, sessions, social events)
         for bf in registrant.getBilledForms():
             for item in bf.getBilledItems():
                 caption = item.getCaption()
@@ -4063,8 +4065,9 @@ class Registrant(Persistent):
         if self.getRegistrationForm().getReasonParticipationForm().isEnabled():
             self.setReasonParticipation(data.get("reason",""))
 
+
         if self.getRegistrationForm().getSessionsForm().isEnabled():
-            sessions=data.get("sessions",[])
+            sessions = data.get("sessions", [])
             if not isinstance(sessions, list):
                 sessions = [ sessions ]
             if not self.getPayed():
@@ -4075,6 +4078,8 @@ class Registrant(Persistent):
                 # Then take all chosen sessions which are not billable
                 newSessions += [session for session in sessions if not session.isBillable()]
                 self.setSessions(newSessions)
+        else:
+            self.setSessions([])
 
         if self.getRegistrationForm().getAccommodationForm().isEnabled():
             ad = data.get("arrivalDate",None)
@@ -4090,8 +4095,6 @@ class Registrant(Persistent):
                 dd = datetime(dd[2], dd[1], dd[0])
                 if ad > dd:
                     raise FormValuesError( _("Arrival date has to be earlier than departure date"))
-            if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[] and data.get("accommodationType",None) is None:
-                raise FormValuesError( _("It is mandatory to choose an accommodation in order to register"))
             # Allow changing of the dates only if the current accomodation is not billable or the user hasn't paid yet
             currentAccoType = self._accommodation.getAccommodationType()
             if not self.getPayed() or currentAccoType is None or not currentAccoType.isBillable():
@@ -4107,7 +4110,11 @@ class Registrant(Persistent):
                 if not self.getPayed() or \
                     ((currentAccoType is None or not currentAccoType.isBillable()) and \
                      (accoType is None or not accoType.isBillable())):
+                    if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[] and data.get("accommodationType",None) is None:
+                        raise FormValuesError( _("It is mandatory to choose an accommodation in order to register"))
                     self._accommodation.setAccommodationType(accoType)
+        else: # AccommodationForm disabled
+            self._accommodation.setAccommodationType(None)
 
         if self.getRegistrationForm().getSocialEventForm().isEnabled():
             for seItem in self.getSocialEvents()[:]:
@@ -4119,6 +4126,9 @@ class Registrant(Persistent):
                 if not self.getPayed() or not seItem.isBillable():
                     newSE = SocialEvent(seItem, int(data.get("places-%s"%seItem.getId(), "1")))
                     self.addSocialEvent(newSE)
+        else:
+            for seItem in self.getSocialEvents()[:]:
+                self.removeSocialEventById(seItem.getId())
         #if not self.getPayed():
         #    self._miscellaneous = {}
         total = 0
@@ -4438,6 +4448,9 @@ class Registrant(Persistent):
         return self._sessionBillingEnabled
 
     def getBilledForms(self):
+        """
+
+        """
         forms = []
         if self._accommodation:
             forms.append(BilledItemsWrapper([self._accommodation]))
@@ -4571,10 +4584,14 @@ class Accommodation(Persistent):
                 self.getAccommodationType().decreaseNoPlaces()
             if at is not None:
                 at.increaseNoPlaces()
+                self._price = at.getPrice()
+                self._billable = at.isBillable()
+                self._currency = at.getCurrency()
+            else:
+                self._price = 0
+                self._billable = False
+                self._currency = ""
             self._accommodationType = at
-            self._price = at.getPrice()
-            self._billable = at.isBillable()
-            self._currency = at.getCurrency()
 
 class SocialEvent(Persistent):
 
