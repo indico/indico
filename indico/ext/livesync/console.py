@@ -32,18 +32,12 @@ from MaKaC.conference import CategoryManager, ConferenceHolder
 
 # indico imports
 from indico.modules.scheduler import Client
+from indico.util import console
 
 # plugin imports
 from indico.ext.livesync import SyncManager
 from indico.ext.livesync.tasks import LiveSyncUpdateTask
 from indico.ext.livesync.agent import ThreadedRecordUploader
-
-def _yesno(message):
-    inp = raw_input("%s [y/N] " % message)
-    if inp == 'y' or inp == 'Y':
-        return True
-    else:
-        return False
 
 SIZE_BATCH_PER_FILE = 1000
 
@@ -95,10 +89,10 @@ class DestroyCommand(ConsoleLiveSyncCommand):
     """
 
     def _run(self, args):
-        if not _yesno("Are you sure you want to empty the MPT?"):
+        if not console.yesno("Are you sure you want to empty the MPT?"):
             return 1
 
-        if not _yesno("Really... is this what you want?"):
+        if not console.yesno("Really... is this what you want?"):
             return 1
 
         self._sm.reset()
@@ -190,8 +184,8 @@ class AgentCommand(ConsoleLiveSyncCommand):
     def _export(self, args):
         logger = _basicStreamHandler()
 
-        if _yesno("This will export all the data to the remote service "
-                  "using the agent (takes LONG). Are you sure?"):
+        if console.yesno("This will export all the data to the remote service "
+                         "using the agent (takes LONG). Are you sure?"):
             try:
                 agent = self._sm.getAllAgents()[args.agent]
             except KeyError:

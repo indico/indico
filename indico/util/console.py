@@ -19,32 +19,31 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-DB Update and related matters
-
-This should be easy to adapt to InTRePId 2, in the case of its acceptance.
+Multiple CLI utils
 """
 
-# plugin imports
-from indico.ext.livesync.util import getPluginType
-from indico.ext.livesync.agent import SyncManager
 
-from indico.core.api.db import DBUpdateException
-
-
-def updateDBStructures(root):
+def yesno(message):
     """
-    Updates the DB for use with livesync
+    A simple yes/no question (returns True/False)
     """
-
-    # get our storage
-    ptype = getPluginType()
-    storage = ptype.getStorage()
-
-    # check if it is empty
-    if len(storage) == 0:
-        # nice, let's fill it
-        storage['agent_manager'] = SyncManager()
+    inp = raw_input("%s [y/N] " % message)
+    if inp == 'y' or inp == 'Y':
         return True
-
     else:
-        raise Exception("")
+        return False
+
+
+# Coloring
+
+# pylint: disable-msg=W0611
+
+try:
+    from termcolor import colored
+except ImportError:
+    def colored(text, *__, **___):
+        """
+        just a dummy function that returns the same string
+        (in case termcolor is not available)
+        """
+        return text

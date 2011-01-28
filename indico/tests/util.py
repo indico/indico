@@ -166,15 +166,3 @@ def relpathto(origin, dest):
     return relpath
 
 ### END ###
-
-# pylint: disable-msg=W0611
-
-try:
-    from termcolor import colored
-except ImportError:
-    def colored(text, *__, **___):
-        """
-        just a dummy function that returns the same string
-        (in case termcolor is not available)
-        """
-        return text

@@ -208,7 +208,7 @@ class CategoryManager( ObjectHolder ):
     def getDefaultConference( self ):
         dconf = HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
         if dconf == None:
-            return HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultCnference())
+            return HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
         else:
             return dconf
 

@@ -820,10 +820,12 @@ class PluginType (PluginBase):
         for obj in module.__dict__.itervalues():
 
             # check if it's a module and it is inside the parent module
+            # ignore test modules
             if type(obj) == types.ModuleType and \
-                   obj.__name__.startswith(module.__name__):
-                accum += [obj]
-                accum += self._getAllSubmodules(obj)
+                   obj.__name__.startswith(module.__name__) and \
+                   obj.__name__.split('.')[-1] != 'test':
+                    accum += [obj]
+                    accum += self._getAllSubmodules(obj)
 
         return accum
 

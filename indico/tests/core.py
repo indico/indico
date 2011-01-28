@@ -35,7 +35,7 @@ from MaKaC.common.db import DBMgr
 # Indico
 from MaKaC.common.Configuration import Config
 
-from indico.tests.util import colored
+from indico.util.console import colored
 from indico.tests.config import TestConfig
 from indico.tests.runners import *
 from indico.tests.base import TestOptionException

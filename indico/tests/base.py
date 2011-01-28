@@ -30,7 +30,8 @@ import os, sys
 import StringIO
 
 # Indico
-from indico.tests.util import TeeStringIO, colored
+from indico.util.console import colored
+from indico.tests.util import TeeStringIO
 from indico.tests.config import TestConfig
 
 

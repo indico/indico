@@ -130,7 +130,7 @@ class PluginLoader(object):
         if pid in modulesDict:
             return modulesDict[pid]
         else:
-            raise PluginError("Tried to get a plugin of the type %s with name %s "
+            raise PluginError("Tried to get a plugin of the type %s with id %s "
                               "but there is no such plugin" % (ptypeId,
                                                                pid))
 
@@ -322,8 +322,10 @@ class PluginLoader(object):
 
                 # we store the submodule in the foundSubModules dictionary
                 foundSubModules[itemName] = subModule
-                # we make a recursive call
-                cls._loadSubModules(subModule)
+
+                if subModule.__name__.split('.')[-1] != 'test':
+                    # we make a recursive call
+                    cls._loadSubModules(subModule)
 
             # if the item is a .py file and not __init__, it's a submodule that is
             # not a package

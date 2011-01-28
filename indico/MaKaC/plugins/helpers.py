@@ -52,7 +52,8 @@ class DBHelpers:
         index = IndexByConf().get()
 
         if not index.has_key(conf):
-            raise ServiceError( message=_('Conference not found in database: %s' %conf))
+            return []
+            # raise ServiceError( message=_('Conference not found in database: %s' %conf))
         return index[conf]
 
     @classmethod
