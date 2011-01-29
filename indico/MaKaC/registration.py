@@ -2341,6 +2341,8 @@ class GeneralField(Persistent):
         self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input","text"))(self))
         if data.has_key("inputObj"):
             self._input.setValues(data["inputObj"].getValues())
+        else:
+            self._input.setValues(data)
         self.setMandatory(data.has_key("mandatory") and data["mandatory"])
         self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price",""))
