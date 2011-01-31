@@ -97,7 +97,7 @@ class PosterFilterField (filters.FilterField):
     def satisfies( self, contribution ):
         if self._showNoValue:
             return True
-        elif self._values: #contribution has to be a poster
+        elif len(self._values) > 0 and self._values[0]: #values[0] is True or False. Contribution has to be a poster
             return contribution.getSession() and contribution.getSession().getScheduleType() == "poster"
         else: #contribution must not be a poster
             return not contribution.getSession() or contribution.getSession().getScheduleType() != "poster"
@@ -123,7 +123,10 @@ class AuthorFilterField( filters.FilterField ):
     def satisfies(self,contribution):
         """
         """
-        query=str(self._values).strip().lower()
+        queryText = ""
+        if len(self._values) > 0:
+            queryText = str(self._values[0]) #The first value is the query text
+        query=queryText.strip().lower()
         if query=="":
             return True
         for auth in contribution.getPrimaryAuthorList():
@@ -174,7 +177,8 @@ class RefereeFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         rm = contribution.getReviewManager()
         if rm.hasReferee():
-            if self._values == "any" or rm.isReferee(self._values):
+            user = self._values[0]
+            if user == "any" or rm.isReferee(user):
                 return True
             else:
                 return False
@@ -197,7 +201,8 @@ class EditorFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         rm = contribution.getReviewManager()
         if rm.hasEditor():
-            if self._values == "any" or rm.isEditor(self._values):
+            user = self._values[0]
+            if user == "any" or rm.isEditor(user):
                 return True
             else:
                 return False
@@ -220,7 +225,8 @@ class ReviewerFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         rm = contribution.getReviewManager()
         if rm.hasReviewers():
-            if self._values == "any" or rm.isReviewer(self._values):
+            user = self._values[0]
+            if user == "any" or rm.isReviewer(user):
                 return True
             else:
                 return False

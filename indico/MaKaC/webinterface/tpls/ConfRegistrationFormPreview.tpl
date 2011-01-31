@@ -1,4 +1,11 @@
 <form action="" method="POST">
+
+<script type="text/javascript">
+  var validators = [];
+  var parameterManager = new IndicoUtil.parameterManager();
+  var addParam = parameterManager.add;
+</script>
+
 <table width="70%%" align="center">
 	<tr><td>&nbsp;</td></tr>
     <tr>

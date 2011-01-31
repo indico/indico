@@ -218,7 +218,7 @@
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Auto-join URL:')),
-            Html.td({}, booking.url? booking.url : $T("not assigned yet"))));
+            Html.td({}, booking.url ? Html.a({href:booking.url}, booking.url) : $T("not assigned yet"))));
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Created on:')),

@@ -191,6 +191,30 @@ class RHRegistrationFormModifSessionsRemove( RHRegistrationFormModifBase ):
             ses.removeSession(name)
         self._redirect(urlHandlers.UHConfModifRegFormSessions.getURL(self._conf))
 
+class RHRegistrationFormSessionItemModify( RHRegistrationFormModifBase ):
+
+    def _checkParams(self, params):
+        RHRegistrationFormModifBase._checkParams(self, params)
+        sessionId = params.get("sessionId", "")
+        self._sessionItem = self._conf.getRegistrationForm().getSessionsForm().getSessionById(sessionId)
+
+    def _process( self ):
+        p = registrationForm.WPConfModifRegFormSessionItemModify(self, self._conf, self._sessionItem)
+        return p.display()
+
+class RHRegistrationFormSessionItemPerformModify( RHRegistrationFormModifBase ):
+
+    def _checkParams( self, params ):
+        RHRegistrationFormModifBase._checkParams( self, params )
+        sessionId = params.get("sessionId", "")
+        self._sessionItem = self._conf.getRegistrationForm().getSessionsForm().getSessionById(sessionId)
+        self._cancel = params.has_key("cancel")
+
+    def _process( self ):
+        if not self._cancel:
+            self._sessionItem.setValues(self._getRequestParams())
+        self._redirect(urlHandlers.UHConfModifRegFormSessions.getURL(self._conf))
+
 class RHRegistrationFormModifAccommodation( RHRegistrationFormModifBase ):
 
     def _process( self ):

@@ -113,7 +113,7 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
         # if it's associated with a session, coordinators
         # should be allowed
         elif self._material.getSession() != None and \
-            self._material.getSession().canCoordinate(self._aw, "modifContribs"):
+            self._material.getSession().canCoordinate(self._aw):
             # Session coordinators have access
             return
 

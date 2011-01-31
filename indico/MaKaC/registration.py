@@ -125,8 +125,8 @@ class RegistrationForm(Persistent):
         form.setUsersLimit(self.getUsersLimit())
         form.setActivated(self.isActivated())
         form.setMandatoryAccount(self.isMandatoryAccount())
-        form.setAllSessions()
         form.notification=self.getNotification().clone()
+        form.personalData = self.getPersonalData().clone()
         acf = self.getAccommodationForm()
         if acf is not None :
             form.accommodationForm = acf.clone(form)
@@ -136,17 +136,21 @@ class RegistrationForm(Persistent):
         rpf = self.getReasonParticipationForm()
         if rpf is not None :
             form.reasonParticipationForm = rpf.clone()
+        form.setAllSessions()
         ses = self.getSessionsForm()
         if ses is not None :
-            form.sessionsForm = ses.clone(conference.getSessionList())
+            form.sessionsForm = ses.clone(form.sessionsForm.getSessionList())
         sef = self.getSocialEventForm()
         if sef is not None :
             form.socialEventForm = sef.clone(form)
-        for section in self.getGeneralSectionFormsList():
-            newSection = section.clone(form)
-            form.generalSectionForms[section.getId()] = newSection
-            form.addToSortedForms(newSection)
-        del form._sortedForms
+        form._sortedForms = []
+        for item in self.getSortedForms():
+            clonedItem = form.getSectionById(item.getId())
+            if clonedItem is None: # General Section, not cloned yet
+                clonedItem = item.clone(form)
+                form.generalSectionForms[clonedItem.getId()] = clonedItem
+            form.addToSortedForms(clonedItem)
+
         return form
 
     def getCurrency(self):
@@ -764,6 +768,7 @@ Please use this information for your payment (except for e-payment):\n
         total=0
         booking.append( _("""
 \tQuantity\t\tItem\t\tunit.price\t\tCost"""))
+        #All billable general fields
         for gsf in registrant.getMiscellaneousGroupList():
             miscGroup=registrant.getMiscellaneousGroupById(gsf.getId())
             if miscGroup is not None:
@@ -785,7 +790,18 @@ Please use this information for your payment (except for e-payment):\n
                     if value != "":
                         value=":%s"%value
                     if(quantity>0):
-                         booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%(quantity,miscGroup.getTitle(),caption,value,price,price*quantity,currency) )
+                        booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%(quantity,miscGroup.getTitle(),caption,value,price,price*quantity,currency) )
+        #All billable standard fields (accommodation, sessions, social events)
+        for bf in registrant.getBilledForms():
+            for item in bf.getBilledItems():
+                caption = item.getCaption()
+                currency = item.getCurrency()
+                price = item.getPrice()
+                quantity = item.getQuantity()
+                total += price*quantity
+                if quantity > 0:
+                    booking.append("""%i\t\t%s\t\t%s\t\t%s %s"""%(quantity, caption, price, price*quantity, currency))
+
         booking.append("""\nTOTAL\t\t\t\t\t\t\t%s %s"""%(total,regForm.getCurrency()))
         # send email to organisers
         #if self.getToList() != [] or self.getCCList() != []:
@@ -847,6 +863,16 @@ Please use this information for your payment (except for e-payment):\n
                     if(quantity>0):
                          booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s"""%\
                                         (quantity,gsf.getTitle(),caption,v,price,price*quantity,currency) )
+        for bf in registrant.getBilledForms():
+            for item in bf.getBilledItems():
+                caption = item.getCaption()
+                currency = item.getCurrency()
+                price = item.getPrice()
+                quantity = item.getQuantity()
+                total += price*quantity
+                if quantity > 0:
+                    booking.append("""%i\t\t%s\t\t%s\t\t%s %s"""%(quantity, caption, price, price*quantity, currency))
+
         booking.append("""\nTOTAL\t\t\t\t\t\t\t%s %s"""%(total,regForm.getCurrency()))
         # send email to organisers
         if self.getToList() != [] or self.getCCList() != []:
@@ -2313,9 +2339,12 @@ class GeneralField(Persistent):
             caption= _("General Field")
         self.setCaption(caption)
         self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input","text"))(self))
-        self._input.setValues(data)
-        self.setMandatory(data.has_key("mandatory"))
-        self.setBillable(data.has_key("billable"))
+        if data.has_key("inputObj"):
+            self._input.setValues(data["inputObj"].getValues())
+        else:
+            self._input.setValues(data)
+        self.setMandatory(data.has_key("mandatory") and data["mandatory"])
+        self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price",""))
         self.setDescription(data.get("description",""))
 
@@ -2323,6 +2352,7 @@ class GeneralField(Persistent):
         values = {}
         values["caption"] = self.getCaption()
         values["input"] = self.getInput().getId()
+        values["inputObj"] = self.getInput()
         values["mandatory"] = self.isMandatory()
         values["billable"]=self.isBillable()
         values["price"]=self.getPrice()
@@ -2640,6 +2670,14 @@ class PersonalData(Persistent):
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
 
+    def clone(self):
+        form = PersonalData()
+        for key, item in self._data.iteritems():
+            newItem = form.getDataItem(key)
+            newItem.setEnabled(item.isEnabled())
+            newItem.setMandatory(item.isMandatory())
+        return form
+
     def getValuesFromAvatar(self, av):
         r = {}
         r["title"] = ""
@@ -2756,11 +2794,15 @@ class AccommodationType(Persistent):
         self._cancelled = False
         self._placesLimit = 0
         self._currentNoPlaces = 0
+        self._billable = False
+        self._price = 0
 
     def setValues(self, data):
         self.setCaption(data.get("caption", "--no caption--"))
-        self.setCancelled(data.has_key("cancelled"))
+        self.setCancelled(data.has_key("cancelled") and data["cancelled"])
         self.setPlacesLimit(data.get("placesLimit", "0"))
+        self.setBillable(data.has_key("billable") and data["billable"])
+        self.setPrice(data.get("price"))
         self._regForm.notifyModification()
 
     def getValues(self):
@@ -2769,6 +2811,9 @@ class AccommodationType(Persistent):
         if self.isCancelled():
             values["cancelled"] = self.isCancelled()
         values["placesLimit"] = self.getPlacesLimit()
+        if self.isBillable():
+            values["billable"] = True
+        values["price"] = self.getPrice()
 
         return values
 
@@ -2858,6 +2903,35 @@ class AccommodationType(Persistent):
 
     def setCancelled(self, v):
         self._cancelled = v
+
+    def isBillable(self):
+        try:
+            return self._billable
+        except:
+            self._billable = False
+        return self._billable
+
+    def setBillable(self, v):
+        self._billable = v
+
+    def getPrice(self):
+        try:
+            return self._price
+        except:
+            self.setPrice(0)
+        return self._price
+
+    def setPrice(self, price):
+        if price:
+            match = PRICE_PATTERN.match(price)
+            if match:
+                price = match.group(1)
+            else:
+                raise MaKaCError(_('The price is in incorrect format!'))
+        self._price = price
+
+    def getCurrency(self):
+        return self._regForm.getCurrency()
 
     def remove(self):
         self.setCancelled(True)
@@ -3111,41 +3185,6 @@ class ReasonParticipationForm(BaseForm):
     def setDescription(self, description):
         self._description = description
 
-class SessionItem(Persistent):
-
-    def __init__(self, rf, data=None):
-        self._session = None
-        self._regForm = rf
-        self._cancelled = False
-
-    def getRegistrationForm(self):
-        return self._regForm
-
-    def setRegistrationForm(self, rf):
-        self._regForm = rf
-
-    def isCancelled(self):
-        try:
-            if self._cancelled:
-                pass
-        except AttributeError, e:
-            self._cancelled = False
-        return self._cancelled
-
-    def setCancelled(self, v):
-        self._cancelled = v
-
-    def remove(self):
-        self.setCancelled(True)
-
-    def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in
-            a Locator object for the SocialEventItem instance """
-        if self.getRegistrationForm().getConference() == None:
-            return Locator()
-        lconf = self.getRegistrationForm().getLocator()
-        lconf["sessionItemId"] = self.getId()
-        return lconf
 
 class RegistrationSession(Persistent):
 
@@ -3153,12 +3192,28 @@ class RegistrationSession(Persistent):
         self._session = ses
         self._session.setRegistrationSession(self)
         self._regForm = regForm
+        self._price = 0
+        self._billable = False
+        self._currency = regForm.getCurrency()
+
+    def setValues(self, data):
+        self.setBillable(data.has_key("billable") and data["billable"])
+        self.setPrice(data.get("price"))
+
+    def getValues(self):
+        data = {}
+        if self.isBillable():
+            data["billable"] = True
+        data["price"] = self.getPrice()
+        return data
 
     def getSession(self):
         return self._session
 
     def setSession(self, ses):
         self._session = ses
+        self._billable = ses.isBillable()
+        self._price = ses.getPrice()
 
     def getRegistrationForm(self):
         return self._regForm
@@ -3202,6 +3257,53 @@ class RegistrationSession(Persistent):
     def getCode(self):
         return self._session.getCode()
 
+    def getPrice(self):
+        try:
+            return self._price
+        except:
+            self.setPrice(0)
+        return self._price
+
+    def setPrice(self, price):
+        if price:
+            match = PRICE_PATTERN.match(price)
+            if match:
+                price = match.group(1)
+            else:
+                raise MaKaCError(_('The price is in incorrect format!'))
+        self._price = price
+
+    def isBillable(self):
+        try:
+            return self._billable
+        except:
+            self._billable = False
+        return self._billable
+
+    def setBillable(self, v):
+        self._billable = v
+
+    def getCurrency(self):
+        try:
+            return self._currency
+        except:
+            # it may happen that _regForm doesn't exist (session was removed from it)
+            if self._regForm:
+                self._currency = self._regForm.getCurrency()
+            else:
+                self._currency = None
+        return self._currency
+
+    def getLocator( self ):
+        """Gives back (Locator) a globaly unique identification encapsulated in
+            a Locator object for the RegistrationSession instance """
+        if self.getRegistrationForm().getConference() == None:
+            return Locator()
+        lconf = self.getRegistrationForm().getLocator()
+        lconf["sessionId"] = self.getId()
+        return lconf
+
+    @staticmethod
     def _cmpTitle(s1, s2):
         if s1 is None and s2 is not None:
             return -1
@@ -3210,7 +3312,6 @@ class RegistrationSession(Persistent):
         elif s1 is None and s2 is None:
             return 0
         return cmp(s1.getTitle(), s2.getTitle())
-    _cmpTitle=staticmethod(_cmpTitle)
 
 class SessionsForm(BaseForm):
 
@@ -3242,9 +3343,11 @@ class SessionsForm(BaseForm):
         sesf.setType(self.getType())
         sesf.setDescription(self.getDescription())
         sesf.setEnabled(self.isEnabled())
-        #TODO: Cloning of registrant session
-        #for s in newSessions :
-        #    sesf.addSession(s)
+        for s in newSessions:
+            ses = self.getSessionById(s.getId())
+            if ses:
+                s.setValues(ses.getValues())
+            sesf.addSession(s)
 
         return sesf
 
@@ -3294,7 +3397,7 @@ class SessionsForm(BaseForm):
                     sess=[sess]
                 for ses in sess:
                     sessions.append(self.getSessionById(ses))
-        return sessions
+        return [RegistrantSession(ses) for ses in sessions]
 
     def getSessionList(self, doSort=False):
         lv = self._sessions.values()
@@ -3325,7 +3428,6 @@ class SessionsForm(BaseForm):
     def getSessionById(self, id):
         return self._sessions.get(id, None)
 
-
 def sortByStartDate( x, y ):
     return cmp(x.getSession().getStartDate(),y.getSession().getStartDate())
 
@@ -3341,13 +3443,19 @@ class SocialEventItem(Persistent):
         self._maxPlacePerRegistrant = 9
         self._placesLimit = 0
         self._currentNoPlaces = 0
+        self._billable = False
+        self._price = 0
+        self._pricePerPlace = False
 
     def setValues(self, data):
         self.setCaption(data.get("caption", "--no caption--"))
-        self.setCancelled(data.has_key("cancelled"))
+        self.setCancelled(data.has_key("cancelled") and data["cancelled"])
         self.setCancelledReason(data.get("reason", ""))
         self.setMaxPlacePerRegistrant(int(data.get("maxPlace", "10")))
         self.setPlacesLimit(data.get("placesLimit", "0"))
+        self.setBillable(data.has_key("billable") and data["billable"])
+        self.setPricePerPlace(data.has_key("pricePerPlace") and data["pricePerPlace"])
+        self.setPrice(data.get("price"))
 
     def getValues(self):
         data={}
@@ -3357,6 +3465,11 @@ class SocialEventItem(Persistent):
         data["reason"]=self.getCancelledReason()
         data["maxPlace"]=self.getMaxPlacePerRegistrant()
         data["placesLimit"]=self.getPlacesLimit()
+        if self.isBillable():
+            data["billable"] = True
+        if self.isPricePerPlace():
+            data["pricePerPlace"] = True
+        data["price"] = self.getPrice()
         return data
 
     def clone(self, regForm):
@@ -3469,6 +3582,45 @@ class SocialEventItem(Persistent):
     def setMaxPlacePerRegistrant(self, numPlace):
         self._maxPlacePerRegistrant = numPlace
 
+    def isBillable(self):
+        try:
+            return self._billable
+        except:
+            self._billable = False
+        return self._billable
+
+    def setBillable(self, v):
+        self._billable = v
+
+    def isPricePerPlace(self):
+        try:
+            return self._pricePerPlace
+        except:
+            self._pricePerPlace = False
+        return self._pricePerPlace
+
+    def setPricePerPlace(self, v):
+        self._pricePerPlace = v
+
+    def getPrice(self):
+        try:
+            return self._price
+        except:
+            self.setPrice(0)
+        return self._price
+
+    def setPrice(self, price):
+        if price:
+            match = PRICE_PATTERN.match(price)
+            if match:
+                price = match.group(1)
+            else:
+                raise MaKaCError(_('The price is in incorrect format!'))
+        self._price = price
+
+    def getCurrency(self):
+        return self._regForm.getCurrency()
+
     def remove(self):
         self.setCancelled(True)
         self.delete()
@@ -3490,6 +3642,7 @@ class SocialEventItem(Persistent):
         lconf["socialEventId"] = self.getId()
         return lconf
 
+    @staticmethod
     def _cmpCaption(se1, se2):
         return cmp(se1.getCaption().lower(), se2.getCaption().lower())
 
@@ -3842,7 +3995,7 @@ class Registrant(Persistent):
 
         self._sessions = []
         self._socialEvents = []
-        self._accommodation = Accommodation()
+        self._accommodation = Accommodation(self)
         self._reasonParticipation = ""
 
         self._miscellaneous={}
@@ -3888,6 +4041,9 @@ class Registrant(Persistent):
                             price = 0
                         quantity = miscItem.getQuantity()
                         total += price*quantity
+        for bf in self.getBilledForms():
+            for item in bf.getBilledItems():
+                total += item.getPrice() * item.getQuantity()
         self.setTotal(total)
 
     def doPay(self):
@@ -3915,11 +4071,21 @@ class Registrant(Persistent):
         if self.getRegistrationForm().getReasonParticipationForm().isEnabled():
             self.setReasonParticipation(data.get("reason",""))
 
+
         if self.getRegistrationForm().getSessionsForm().isEnabled():
-            sessions=data.get("sessions",[])
+            sessions = data.get("sessions", [])
             if not isinstance(sessions, list):
                 sessions = [ sessions ]
-            self.setSessions(sessions)
+            if not self.getPayed():
+                self.setSessions(sessions)
+            else:
+                # First keep all sessions which are billable (they are not submitted anymore)
+                newSessions = [session for session in self.getSessionList() if session.isBillable()]
+                # Then take all chosen sessions which are not billable
+                newSessions += [session for session in sessions if not session.isBillable()]
+                self.setSessions(newSessions)
+        else:
+            self.setSessions([])
 
         if self.getRegistrationForm().getAccommodationForm().isEnabled():
             ad = data.get("arrivalDate",None)
@@ -3935,22 +4101,40 @@ class Registrant(Persistent):
                 dd = datetime(dd[2], dd[1], dd[0])
                 if ad > dd:
                     raise FormValuesError( _("Arrival date has to be earlier than departure date"))
-            if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[] and data.get("accommodationType",None) is None:
-                raise FormValuesError( _("It is mandatory to choose an accommodation in order to register"))
-            self._accommodation.setArrivalDate(ad)
-            self._accommodation.setDepartureDate(dd)
+            # Allow changing of the dates only if the current accomodation is not billable or the user hasn't paid yet
+            currentAccoType = self._accommodation.getAccommodationType()
+            if not self.getPayed() or currentAccoType is None or not currentAccoType.isBillable():
+                self._accommodation.setArrivalDate(ad)
+                self._accommodation.setDepartureDate(dd)
             accoType = data.get("accommodationType",None)
             if accoType != None and accoType.isCancelled():
                 accoType = None
             if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[]:
-                self._accommodation.setAccommodationType(accoType)
+                # Only change the accommodation type if:
+                # - the registrant hasn't paid yet OR
+                # - neither the current nor the new accommodation is billable
+                if not self.getPayed() or \
+                    ((currentAccoType is None or not currentAccoType.isBillable()) and \
+                     (accoType is None or not accoType.isBillable())):
+                    if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() !=[] and data.get("accommodationType",None) is None:
+                        raise FormValuesError( _("It is mandatory to choose an accommodation in order to register"))
+                    self._accommodation.setAccommodationType(accoType)
+        else: # AccommodationForm disabled
+            self._accommodation.setAccommodationType(None)
 
         if self.getRegistrationForm().getSocialEventForm().isEnabled():
             for seItem in self.getSocialEvents()[:]:
-                self.removeSocialEventById(seItem.getId())
+                # Remove all items which can be added back (i.e. if paid only non-billable ones)
+                if not (self.getPayed() and seItem.isBillable()):
+                    self.removeSocialEventById(seItem.getId())
             for seItem in data.get("socialEvents", []):
-                newSE = SocialEvent(seItem, int(data.get("places-%s"%seItem.getId(), "1")))
-                self.addSocialEvent(newSE)
+                # Only add item if the registrant hasn't paid yet or the item is not billable
+                if not self.getPayed() or not seItem.isBillable():
+                    newSE = SocialEvent(seItem, int(data.get("places-%s"%seItem.getId(), "1")))
+                    self.addSocialEvent(newSE)
+        else:
+            for seItem in self.getSocialEvents()[:]:
+                self.removeSocialEventById(seItem.getId())
         #if not self.getPayed():
         #    self._miscellaneous = {}
         total = 0
@@ -3971,6 +4155,9 @@ class Registrant(Persistent):
                         price = 0
                     quantity = miscItem.getQuantity()
                     total += price*quantity
+        for bf in self.getBilledForms():
+            for item in bf.getBilledItems():
+                total += item.getPrice() * item.getQuantity()
         if not self.getPayed():
             self.setTotal(total)
         self._complete = True
@@ -4146,19 +4333,28 @@ class Registrant(Persistent):
     def setPersonalHomepage(self, v):
         self._personalHomepage = v
 
+    def _fixSessions(self):# Convert old sessions
+        if self._sessions and isinstance(self._sessions[0], RegistrationSession):
+            self._sessions = [RegistrantSession(ses, self) for ses in self._sessions]
+
     def getSessionList(self):
+        self._fixSessions()
         return self._sessions
 
     def addSession(self, ses):
+        self._fixSessions()
         self._sessions.append(ses)
         self.notifyModification()
 
     def removeSession(self, ses):
+        self._fixSessions()
         self._sessions.remove(ses)
         self.notifyModification()
 
     def setSessions(self, sesList):
         self._sessions = sesList
+        for ses in self._sessions:
+            ses.setRegistrant(self)
         self.notifyModification()
 
     def setAccommodation(self, a):
@@ -4192,6 +4388,7 @@ class Registrant(Persistent):
         self.notifyModification()
 
     def addSocialEvent(self, se):
+        se.setRegistrant(self)
         self.getSocialEvents().append(se)
         self.notifyModification()
 
@@ -4246,6 +4443,29 @@ class Registrant(Persistent):
             self.getMiscellaneousGroups()[g.getId()]=g
             self.notifyModification()
 
+    def setSessionBillingEnabled(self, v):
+        self._sessionBillingEnabled = v
+
+    def isSessionBillingEnabled(self):
+        try:
+            return self._sessionBillingEnabled
+        except:
+            self.setSessionBillingEnabled(False)
+        return self._sessionBillingEnabled
+
+    def getBilledForms(self):
+        """
+
+        """
+        forms = []
+        if self._accommodation:
+            forms.append(BilledItemsWrapper([self._accommodation]))
+        if self._socialEvents:
+            forms.append(BilledItemsWrapper(self._socialEvents))
+        if self._sessions and self.isSessionBillingEnabled():
+            forms.append(BilledItemsWrapper(self._sessions))
+        return forms
+
     def getStatuses(self):
         try:
             if self._statuses:
@@ -4276,12 +4496,53 @@ class Registrant(Persistent):
             self.addStatus(v)
         return v
 
+class BilledItemsWrapper(object):
+
+    def __init__(self, items):
+        self._items = items
+
+    def getBilledItems(self):
+        return [item.getBilledItem() for item in self._items if item.isBillable()]
+
+class BilledItem(object):
+
+    def __init__(self, caption, price, quantity, currency):
+        self._caption = caption
+        self._price = price
+        self._quantity = quantity
+        self._currency = currency
+
+    def getCaption(self):
+        return self._caption
+
+    def getPrice(self):
+        return float(self._price)
+
+    def getQuantity(self):
+        return self._quantity
+
+    def getCurrency(self):
+        return self._currency
+
 class Accommodation(Persistent):
 
-    def __init__(self):
+    def __init__(self, reg=None):
+        self._registrant = reg
         self._arrivalDate = None
         self._departureDate = None
         self._accommodationType = None
+        self._price = 0
+        self._billable = False
+        self._currency = ""
+
+    def getRegistrant(self):
+        try:
+            return self._registrant
+        except:
+            return None
+
+    def setRegistrant(self, reg):
+        self._registrant = reg
 
     def getArrivalDate(self):
         return self._arrivalDate
@@ -4295,6 +4556,31 @@ class Accommodation(Persistent):
     def setDepartureDate(self, dd):
         self._departureDate = dd
 
+    def getNights(self):
+        return (self._departureDate - self._arrivalDate).days
+
+    def getPrice(self):
+        try:
+            return self._price
+        except:
+            return 0
+
+    def isBillable(self):
+        try:
+            return self._billable
+        except:
+            return False
+
+    def getCurrency(self):
+        try:
+            return self._currency
+        except:
+            self._currency = self._regForm.getCurrency()
+        return self._currency
+
+    def getBilledItem(self):
+        return BilledItem(self._accommodationType.getCaption(), self.getPrice(), self.getNights(), self.getCurrency())
+
     def getAccommodationType(self):
         return self._accommodationType
 
@@ -4304,20 +4590,72 @@ class Accommodation(Persistent):
                 self.getAccommodationType().decreaseNoPlaces()
             if at is not None:
                 at.increaseNoPlaces()
+                self._price = at.getPrice()
+                self._billable = at.isBillable()
+                self._currency = at.getCurrency()
+            else:
+                self._price = 0
+                self._billable = False
+                self._currency = ""
             self._accommodationType = at
 
 class SocialEvent(Persistent):
 
-    def __init__(self, se, noPlaces):
+    def __init__(self, se, noPlaces, reg=None):
+        self._registrant = None
         self.addSEItem(se, noPlaces)
 
     def addSEItem(self, se, noPlaces):
         self._socialEventItem = se
         self._noPlaces = noPlaces
         self._socialEventItem.increaseNoPlaces(noPlaces)
+        self._price = self._socialEventItem.getPrice()
+        self._pricePerPlace = self._socialEventItem.isPricePerPlace()
+        self._billable = self._socialEventItem.isBillable()
+        self._currency = self._socialEventItem.getCurrency()
+
+    def getRegistrant(self):
+        try:
+            return self._registrant
+        except:
+            return None
+
+    def setRegistrant(self, reg):
+        self._registrant = reg
 
     def getNoPlaces(self):
         return self._noPlaces
+
+    def getCurrency(self):
+        try:
+            return self._currency
+        except:
+            self._currency = self._socialEventItem.getCurrency()
+        return self._currency
+
+    def getPrice(self):
+        try:
+            return self._price
+        except:
+            return 0
+
+    def isBillable(self):
+        try:
+            return self._billable
+        except:
+            return False
+
+    def isPricePerPlace(self):
+        try:
+            return self._pricePerPlace
+        except:
+            return False
+
+    def getBilledItem(self):
+        quantity = 1
+        if self._pricePerPlace:
+            quantity = self.getNoPlaces()
+        return BilledItem(self.getCaption(), self.getPrice(), quantity, self.getCurrency())
 
     def getSocialEventItem(self):
         return self._socialEventItem
@@ -4339,6 +4677,62 @@ class SocialEvent(Persistent):
 
     def delete(self):
         self._socialEventItem.decreaseNoPlaces(self._noPlaces)
+
+class RegistrantSession(Persistent):
+
+    def __init__(self, ses, reg=None):
+        self._regSession = ses
+        self._registrant = reg
+        self._price = self._regSession.getPrice()
+        self._billable = self._regSession.isBillable()
+        self._currency = self._regSession.getCurrency()
+
+    def getRegistrant(self):
+        return self._registrant
+
+    def setRegistrant(self, reg):
+        self._registrant = reg
+
+    def getCurrency(self):
+        try:
+            return self._currency
+        except:
+            self._currency = self._regSession.getCurrency()
+        return self._currency
+
+    def getPrice(self):
+        try:
+            return self._price
+        except:
+            return 0
+
+    def isBillable(self):
+        try:
+            return self._billable
+        except:
+            return False
+
+    def getBilledItem(self):
+        return BilledItem(self.getCaption(), self.getPrice(), 1, self.getCurrency())
+
+    def getRegSession(self):
+        return self._regSession
+
+    def getSession(self):
+        return self._regSession.getSession()
+
+    def getId(self):
+        return self._regSession.getId()
+
+    def getCaption(self):
+        return self._regSession.getCaption()
+    getTitle = getCaption
+
+    def getCode(self):
+        return self._regSession.getCode()
+
+    def isCancelled(self):
+        return self._regSession.isCancelled()
 
 class MiscellaneousInfoGroup(Persistent):
 

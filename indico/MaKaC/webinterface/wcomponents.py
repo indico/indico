@@ -209,6 +209,7 @@ class WTemplated(OldObservable):
 
         tempHTML = TemplateExec.executeTemplate( text, vars, self.tplId )
 
+
         if helpText == None:
             return tempHTML
         else:

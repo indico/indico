@@ -975,6 +975,9 @@ class Category(CommonObjectBase):
     def getAccessKey(self):
         return ""
 
+    def getModifKey(self):
+        return ""
+
     def indexConf( self, conf ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.indexConf(conf)

@@ -569,7 +569,14 @@ class RHRegistrantSessionPerformModify( RHRegistrantModifBase ):
 
     def _process( self ):
         if not self._cancel:
-            self._registrant.setSessions(self._sessions)
+            if not self._registrant.getPayed():
+                sessions = self._sessions
+            else:
+                # First keep all sessions which are billable (they are not submitted anymore)
+                sessions = [session for session in self._registrant.getSessionList() if session.isBillable()]
+                # Then take all chosen sessions which are not billable
+                sessions += [session for session in self._sessions if not session.isBillable()]
+            self._registrant.setSessions(sessions)
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantAccommodationModify( RHRegistrantModifBase ):
@@ -605,10 +612,19 @@ class RHRegistrantAccommodationPerformModify( RHRegistrantModifBase ):
 
     def _process( self ):
         if not self._cancel:
-            self._registrant.getAccommodation().setArrivalDate(self._arrivalDate)
-            self._registrant.getAccommodation().setDepartureDate(self._departureDate)
+            # Allow changing of the dates only if the current accomodation is not billable or the user hasn't paid yet
+            currentAccoType = self._registrant.getAccommodation().getAccommodationType()
+            if not self._registrant.getPayed() or currentAccoType is None or not currentAccoType.isBillable():
+                self._registrant.getAccommodation().setArrivalDate(self._arrivalDate)
+                self._registrant.getAccommodation().setDepartureDate(self._departureDate)
             if self._regForm.getAccommodationForm().getAccommodationTypesList() !=[]:
-                self._registrant.getAccommodation().setAccommodationType(self._accoType)
+                # Only change the accommodation type if:
+                # - the registrant hasn't paid yet OR
+                # - neither the current nor the new accommodation is billable
+                if not self._registrant.getPayed() or \
+                    ((currentAccoType is None or not currentAccoType.isBillable()) and \
+                     (self._accoType is None or not self._accoType.isBillable())):
+                    self._registrant.getAccommodation().setAccommodationType(self._accoType)
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantSocialEventsModify( RHRegistrantModifBase ):
@@ -641,12 +657,16 @@ class RHRegistrantSocialEventsPerformModify( RHRegistrantModifBase ):
     def _process( self ):
         if not self._cancel:
             for seItem in self._registrant.getSocialEvents()[:]:
-                self._registrant.removeSocialEventById(seItem.getId())
+                # Remove all items which can be added back (i.e. if paid only non-billable ones)
+                if not (self._registrant.getPayed() and seItem.isBillable()):
+                    self._registrant.removeSocialEventById(seItem.getId())
 
             l = []
             for seItem in self._socialEvents:
-                newSE = SocialEvent(seItem, int(self._places[seItem.getId()]))
-                self._registrant.addSocialEvent(newSE)
+                # Only add item if the registrant hasn't paid yet or the item is not billable
+                if not self._registrant.getPayed() or not seItem.isBillable():
+                    newSE = SocialEvent(seItem, int(self._places[seItem.getId()]))
+                    self._registrant.addSocialEvent(newSE)
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantReasonParticipationModify( RHRegistrantModifBase ):

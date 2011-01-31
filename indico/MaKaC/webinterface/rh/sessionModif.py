@@ -853,11 +853,11 @@ class RHConvenerEdit(RHSessionModifBase):
             return p.display(convener=c)
 
 
-class RHSessionAddMaterial( RHSessionModifBase ):
+class RHSessionAddMaterial( RHSessionModCoordinationBase ):
     _uh = urlHandlers.UHSessionAddMaterial
 
     def _checkParams( self, params ):
-        RHSessionModifBase._checkParams( self, params )
+        RHSessionModCoordinationBase._checkParams( self, params )
         typeMat = params.get( "typeMaterial", "notype" )
         if typeMat=="notype" or typeMat.strip()=="":
             raise FormValuesError("Please choose a material type")
@@ -876,11 +876,11 @@ class RHSessionAddMaterial( RHSessionModifBase ):
         return p.display()
 
 
-class RHSessionPerformAddMaterial( RHSessionModifBase ):
+class RHSessionPerformAddMaterial( RHSessionModCoordinationBase ):
     _uh = urlHandlers.UHSessionPerformAddMaterial
 
     def _checkParams( self, params ):
-        RHSessionModifBase._checkParams( self, params )
+        RHSessionModCoordinationBase._checkParams( self, params )
         typeMat = params.get( "typeMaterial", "" )
         self._mf = materialFactories.SessionMFRegistry().getById( typeMat )
 
@@ -899,11 +899,11 @@ class RHSessionPerformAddMaterial( RHSessionModifBase ):
         self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
 
 
-class RHSessionRemoveMaterials( RHSessionModifBase ):
+class RHSessionRemoveMaterials( RHSessionModCoordinationBase ):
     _uh = urlHandlers.UHSessionRemoveMaterials
 
     def _checkParams( self, params ):
-        RHSessionModifBase._checkParams( self, params )
+        RHSessionModCoordinationBase._checkParams( self, params )
         typeMat = params.get( "typeMaterial", "" )
         self._materialIds = self._normaliseListParam( params.get("materialId", []) )
         self._returnURL = params.get("returnURL","")
@@ -925,11 +925,11 @@ class RHSessionRemoveMaterials( RHSessionModifBase ):
         self._redirect( url )
 
 
-class RHMaterials(RHSessionModUnrestrictedContribMngCoordBase):
+class RHMaterials(RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifMaterials
 
     def _checkParams(self, params):
-        RHSessionModUnrestrictedContribMngCoordBase._checkParams(self, params)
+        RHSessionModCoordinationBase._checkParams(self, params)
 
         #if not hasattr(self, "_rhSubmitMaterial"):
         #    self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
@@ -946,11 +946,11 @@ class RHMaterials(RHSessionModUnrestrictedContribMngCoordBase):
         p = sessions.WPSessionModifMaterials( self, self._target )
         return p.display(**self._getRequestParams())
 
-class RHMaterialsAdd(RHSessionModUnrestrictedContribMngCoordBase):
+class RHMaterialsAdd(RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifMaterials
 
     def _checkParams(self, params):
-        RHSessionModUnrestrictedContribMngCoordBase._checkParams(self, params)
+        RHSessionModCoordinationBase._checkParams(self, params)
         if not hasattr(self, "_rhSubmitMaterial"):
             self._rhSubmitMaterial=RHSubmitMaterialBase(self._target, self)
         self._rhSubmitMaterial._checkParams(params)

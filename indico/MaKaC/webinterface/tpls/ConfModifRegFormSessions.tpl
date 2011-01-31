@@ -39,4 +39,9 @@
             </table>
         </td>
     </tr>
+    <tr>
+        <td colspan="2">
+            <%= _("You can change the price and billable flag of a session in the session properties.") %>
+        </td>
+    </tr>
 </table>

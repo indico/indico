@@ -428,19 +428,23 @@ class WConfModifRegFormSessions( wcomponents.WTemplated ):
         else:
             html = []
             for ses in sessions.getSessionList(True):
+                billable = ""
+                if ses.isBillable():
+                    billable = " <i>[billable: %s]</i>" % ses.getPrice()
                 cancelled = ""
                 if ses.isCancelled():
-                    cancelled = "<font color=\"red\">(cancelled)</font>"
+                    cancelled = " <font color=\"red\">(cancelled)</font>"
+                url = urlHandlers.UHConfModifRegFormSessionItemModify.getURL(ses)
                 html.append("""
-                        <input type="checkbox" name="sessionIds" value="%s">%s %s
-                        """%(ses.getId(), ses.getTitle(), cancelled) )
+                        <input type="checkbox" name="sessionIds" value="%s"><a href=%s>%s</a>%s%s
+                        """%(ses.getId(), quoteattr(str(url)), ses.getTitle(), billable, cancelled) )
             html = "<br>".join(html)
         return html
 
     def _getSessionFormTypeHTML(self, sessions):
         if sessions.getType()=="all":
             return  _("multiple")
-        return  _("2 choices")
+        return  _("""2 choices <span style="color:red;">(session billing not possible)</span>""")
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
@@ -519,6 +523,32 @@ class WConfModifRegFormSessionsAdd( wcomponents.WTemplated ):
         sessions = regForm.getSessionsForm()
         vars["title"] = sessions.getTitle()
         vars["sessions"] = self._getSessionsHTML(sessions)
+        return vars
+
+class WPConfModifRegFormSessionItemModify( WPConfModifRegFormSessionsBase ):
+
+    def __init__(self, rh, conf, sessionItem):
+        WPConfModifRegFormSessionsBase.__init__(self, rh, conf)
+        self._sessionItem = sessionItem
+
+    def _getTabContent( self, params ):
+        wc = WConfModifRegFormSessionItemModify(self._sessionItem)
+        p = {'postURL': quoteattr(str(urlHandlers.UHConfModifRegFormSessionItemPerformModify.getURL( self._sessionItem )))
+            }
+        return wc.getHTML(p)
+
+class WConfModifRegFormSessionItemModify( wcomponents.WTemplated ):
+
+    def __init__(self, sessionItem):
+        self._sessionItem = sessionItem
+
+    def getVars( self ):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["caption"] = quoteattr(self._sessionItem.getCaption())
+        vars["billable"] = ""
+        if self._sessionItem.isBillable():
+            vars["billable"] = """ checked="checked" """
+        vars["price"] = self._sessionItem.getPrice()
         return vars
 
 class WPConfModifRegFormAccommodationBase(WPConfModifRegFormSectionsBase):
@@ -604,10 +634,13 @@ class WConfModifRegFormAccommodation( wcomponents.WTemplated ):
             limit =  _(""" <i>[ _("unlimited places") ]</i>""")
             if atype.getPlacesLimit() > 0:
                 limit = " <i>[%s/%s place(s)]</i>"%(atype.getCurrentNoPlaces(), atype.getPlacesLimit())
+            billable = ""
+            if atype.isBillable():
+                billable = " <i>[billable: %s]</i>" % atype.getPrice()
             html.append("""<tr>
-                                <td align="left" style="padding-left:10px"><input type="checkbox" name="accommodationType" value="%s"><a href=%s>%s</a>%s%s</td>
+                                <td align="left" style="padding-left:10px"><input type="checkbox" name="accommodationType" value="%s"><a href=%s>%s</a>%s%s%s</td>
                             </tr>
-                        """%(atype.getId(), url, self.htmlText(atype.getCaption()), limit, cancelled ) )
+                        """%(atype.getId(), url, self.htmlText(atype.getCaption()), limit, billable, cancelled ) )
         return "".join(html)
 
     def getVars( self ):
@@ -683,6 +716,10 @@ class WConfModifRegFormAccommodationTypeModify( wcomponents.WTemplated ):
         vars["checked"] = ""
         if self._accoType.isCancelled():
             vars["checked"] = """ checked="checked" """
+        vars["billable"] = ""
+        if self._accoType.isBillable():
+            vars["billable"] = """ checked="checked" """
+        vars["price"] = self._accoType.getPrice()
         return vars
 
 class WPConfRemoveAccommodationType(WPConfModifRegFormAccommodationBase):
@@ -998,11 +1035,17 @@ class WConfModifRegFormSocialEvent( wcomponents.WTemplated ):
             limit = " <i>[unlimited places]</i>"
             if se.getPlacesLimit() > 0:
                 limit = " <i>[%s/%s place(s)]</i>"%(se.getCurrentNoPlaces(), se.getPlacesLimit())
+            billable = ""
+            if se.isBillable():
+                perPlace = ""
+                if se.isPricePerPlace():
+                    perPlace = ' <acronym title="per place">pp</acronym>'
+                billable = " <i>[billable: %s%s]</i>" % (se.getPrice(), perPlace)
             url = urlHandlers.UHConfModifRegFormSocialEventItemModify.getURL(se)
             html.append("""<tr>
-                                <td align="left" style="padding-left:10px"><input type="checkbox" name="socialEvents" value="%s"><a href=%s>%s</a>%s%s</td>
+                                <td align="left" style="padding-left:10px"><input type="checkbox" name="socialEvents" value="%s"><a href=%s>%s</a>%s%s%s</td>
                             </tr>
-                        """%(se.getId(), quoteattr(str(url)), self.htmlText(se.getCaption()), limit, cancelled ) )
+                        """%(se.getId(), quoteattr(str(url)), self.htmlText(se.getCaption()), limit, billable, cancelled ) )
         return "".join(html)
 
     def getVars( self ):
@@ -1078,6 +1121,13 @@ class WConfModifRegFormSocialEventItemModify( wcomponents.WTemplated ):
             vars["reason"] = self._socialEventItem.getCancelledReason()
         vars["maxPlace"] = self._socialEventItem.getMaxPlacePerRegistrant()
         vars["placesLimit"] = self._socialEventItem.getPlacesLimit()
+        vars["billable"] = ""
+        if self._socialEventItem.isBillable():
+            vars["billable"] = """ checked="checked" """
+        vars["pricePerPlace"] = ""
+        if self._socialEventItem.isPricePerPlace():
+            vars["pricePerPlace"] = """ checked="checked" """
+        vars["price"] = self._socialEventItem.getPrice()
         return vars
 
 class WPConfRemoveSocialEvent(WPConfModifRegFormSocialEventBase):
@@ -1686,9 +1736,9 @@ class WConfRegFormSessionsBase(wcomponents.WTemplated):
         self._conf = conf
         self._currentUser = currentUser
         self._sessionForm = self._conf.getRegistrationForm().getSessionsForm()
-        self._selectedSessions = []
+        self._regSessions = []
         if self._currentUser is not None and self._currentUser.isRegisteredInConf(self._conf):
-            self._selectedSessions = self._currentUser.getRegistrantById(self._conf.getId()).getSessionList()
+            self._regSessions = [ses.getRegSession() for ses in self._currentUser.getRegistrantById(self._conf.getId()).getSessionList()]
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -1705,11 +1755,14 @@ class WConfRegFormSessionsDisplay(WConfRegFormSessionsBase):
             html = []
             for ses in sessions.getSessionList(True):
                 selected = ""
-                if ses in self._selectedSessions:
+                if ses in self._regSessions:
                     selected = "selected"
+                price = ""
+                if ses.isBillable() and sessions.getType() != "2priorities":
+                    price = " [%s %s]" % (ses.getPrice(), self._conf.getRegistrationForm().getCurrency())
                 html.append("""
-                        <input type="checkbox" name="sessionIds" value="%s" %s>%s
-                        """%(ses.getId(), selected, ses.getTitle()) )
+                        <input type="checkbox" name="sessionIds" value="%s" %s>%s%s
+                        """%(ses.getId(), selected, ses.getTitle(), price) )
             html = "<br>".join(html)
         return html
 
@@ -1749,12 +1802,12 @@ class WConfRegFormSessions2PrioritiesDisplay(WConfRegFormSessionsBase):
     def getVars(self):
         vars = WConfRegFormSessionsBase.getVars( self )
         ses1 = None
-        if len(self._selectedSessions)>0:
-            ses1 = self._selectedSessions[0]
+        if len(self._regSessions)>0:
+            ses1 = self._regSessions[0]
         vars ["sessions1"] = self._getSessionsHTML(self._sessionForm, "session1", ses1, True)
         ses2 = None
-        if len(self._selectedSessions)>1:
-            ses2 = self._selectedSessions[1]
+        if len(self._regSessions)>1:
+            ses2 = self._regSessions[1]
         vars["sessions2"] = self._getSessionsHTML(self._sessionForm, "session2", ses2)
         return vars
 
@@ -1767,20 +1820,30 @@ def cmpSessionByStartDateThenTitle(x, y):
 
 class WConfRegFormSessionsAllDisplay(WConfRegFormSessionsBase):
 
-    def _getSessionsHTML(self):
+    def _getSessionsHTML(self, alreadyPaid):
         html=[]
         sessionList = self._sessionForm.getSessionList()
         sessionList.sort(cmpSessionByStartDateThenTitle)
         for session in sessionList :
             selected=""
-            if session in self._selectedSessions:
+            if session in self._regSessions:
                 selected=" checked"
-            html.append("""<input type="checkbox" name="sessions" value="%s"%s>%s"""%(session.getId(), selected, session.getTitle()) )
+            disabled = ""
+            if alreadyPaid and session.isBillable():
+                disabled = " disabled"
+            price = ""
+            if session.isBillable():
+                price = " [%s %s]" % (session.getPrice(), self._conf.getRegistrationForm().getCurrency())
+            html.append("""<input type="checkbox" name="sessions" value="%s"%s%s>%s%s"""%(session.getId(), selected, disabled, session.getTitle(), price) )
         return "<br>".join(html)
 
     def getVars(self):
         vars = WConfRegFormSessionsBase.getVars( self )
-        vars ["sessions"] = self._getSessionsHTML()
+        alreadyPaid = False
+        if self._currentUser is not None and self._currentUser.isRegisteredInConf(self._conf):
+            registrant = self._currentUser.getRegistrantById(self._conf.getId())
+            alreadyPaid = registrant.getPayed()
+        vars ["sessions"] = self._getSessionsHTML(alreadyPaid)
         return vars
 
 class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
@@ -1790,7 +1853,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         self._accommodation = self._conf.getRegistrationForm().getAccommodationForm()
         self._currentUser = currentUser
 
-    def _getDatesHTML(self, name, currentDate, startDate=None, endDate=None):
+    def _getDatesHTML(self, name, currentDate, startDate=None, endDate=None, alreadyPaid=False):
         if name=="arrivalDate":
             dates = self._accommodation.getArrivalDates()
         elif name=="departureDate":
@@ -1805,10 +1868,13 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         selected = ""
         if currentDate is None:
             selected = "selected"
+        disabled = ""
+        if alreadyPaid:
+            disabled = " disabled"
         html = [ _("""
-                <select id="%s" name="%s">
+                <select id="%s" name="%s"%s>
                 <option value="nodate" %s>--_("select a date")--</option>
-                """)%(name, name, selected)]
+                """)%(name, name, disabled, selected)]
         for date in dates:
             selected = ""
             if currentDate is not None and currentDate.strftime("%d-%B-%Y") == date.strftime("%d-%B-%Y"):
@@ -1827,7 +1893,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         html.append("</select>%s"%addParam)
         return "".join(html)
 
-    def _getAccommodationTypesHTML(self, currentAccoType):
+    def _getAccommodationTypesHTML(self, currentAccoType, alreadyPaid):
         html=[]
         for atype in self._accommodation.getAccommodationTypesList():
             if not atype.isCancelled():
@@ -1835,13 +1901,21 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                     selected = ""
                     if currentAccoType == atype:
                         selected = "checked=\"checked\""
+                    disabled = ""
+                    if alreadyPaid and (atype.isBillable() or (currentAccoType and currentAccoType.isBillable())):
+                        disabled = ' disabled="disabled"'
                     placesLeft = ""
                     if atype.getNoPlacesLeft() > 0:
                         placesLeft = " <font color='green'><i>[%s place(s) left]</i></font>"%atype.getNoPlacesLeft()
+                    priceCol = ""
+                    if atype.isBillable():
+                        priceCol = """<td align="right">%s %s per night</td>""" % (atype.getPrice(), self._conf.getRegistrationForm().getCurrency())
+
                     html.append("""<tr>
-                                        <td align="left" style="padding-left:10px"><input type="radio" id="accommodationType" name="accommodationType" value="%s" %s>%s%s</td>
+                                        <td align="left" style="padding-left:10px"><input type="radio" id="accommodationType" name="accommodationType" value="%s" %s%s>%s%s</td>
+                                        %s
                                     </tr>
-                                """%(atype.getId(), selected, atype.getCaption(), placesLeft ) )
+                                """%(atype.getId(), selected, disabled, atype.getCaption(), placesLeft, priceCol ) )
                 else:
                     html.append("""<tr>
                                      <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">\
@@ -1868,21 +1942,25 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         currentArrivalDate = None
         currentDepartureDate = None
         currentAccoType = None
+        alreadyPaid = False
+        alreadyPaidAcco = False
         if self._currentUser is not None and self._currentUser.isRegisteredInConf(self._conf):
             registrant = self._currentUser.getRegistrantById(self._conf.getId())
             acco = registrant.getAccommodation()
             currentArrivalDate = None
             currentDepartureDate = None
             currentAccoType = None
+            alreadyPaid = registrant.getPayed()
             if acco is not None:
                 currentArrivalDate = acco.getArrivalDate()
                 currentDepartureDate = acco.getDepartureDate()
                 currentAccoType = acco.getAccommodationType()
+                alreadyPaidAcco = alreadyPaid and acco.isBillable()
         vars["title"] = self._accommodation.getTitle()
         vars["description"] = self._accommodation.getDescription()
-        vars["arrivalDate"] = self._getDatesHTML("arrivalDate", currentArrivalDate)
-        vars["departureDate"] = self._getDatesHTML("departureDate", currentDepartureDate)
-        vars["accommodationTypes"] = self._getAccommodationTypesHTML(currentAccoType)
+        vars["arrivalDate"] = self._getDatesHTML("arrivalDate", currentArrivalDate, alreadyPaid=alreadyPaidAcco)
+        vars["departureDate"] = self._getDatesHTML("departureDate", currentDepartureDate, alreadyPaid=alreadyPaidAcco)
+        vars["accommodationTypes"] = self._getAccommodationTypesHTML(currentAccoType, alreadyPaid)
         return vars
 
 class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
@@ -1892,7 +1970,7 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
         self._socialEvent = self._conf.getRegistrationForm().getSocialEventForm()
         self._currentUser = currentUser
 
-    def _getSocialEventsHTML(self, socialEvents=[]):
+    def _getSocialEventsHTML(self, socialEvents=[], alreadyPaid=False):
         html=[]
         for se in self._socialEvent.getSocialEventList(True):
             if not se.isCancelled():
@@ -1902,14 +1980,17 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
                         se = ser
                         checked = "checked=\"checked\""
                         break
+                disabled = ""
+                if se.isBillable() and alreadyPaid:
+                    disabled = ' disabled="disabled"'
                 optList = []
                 for i in range(1, se.getMaxPlacePerRegistrant()+1):
                     selected = ""
                     if isinstance(se, registration.SocialEvent) and i == se.getNoPlaces():
                         selected = " selected"
-                    optList.append("""<option value="%s"%s>%s"""%(i, selected, i))
+                    optList.append("""<option value="%s"%s%s>%s"""%(i, selected, disabled, i))
                 if len(optList)>0:
-                    optList.insert(0, """<select name="places-%s">"""%se.getId())
+                    optList.insert(0, """<select name="places-%s"%s>"""%(se.getId(), disabled))
                     optList.append("</select>")
                 seItem=se
                 if isinstance(se, registration.SocialEvent):
@@ -1917,17 +1998,24 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
                 placesLeft = ""
                 if seItem.getPlacesLimit() > 0:
                     placesLeft = " <font color='green'><i>[%s place(s) left]</i></font>"%seItem.getNoPlacesLeft()
+                priceCol = ""
+                if seItem.isBillable():
+                    perPlace = ""
+                    if seItem.isPricePerPlace():
+                        perPlace = '&nbsp;<acronym title="" onmouseover="IndicoUI.Widgets.Generic.tooltip(this, event, \'per place\')">pp</acronym>'
+                    priceCol = """<td align="right" nowrap>%s&nbsp;%s%s</td>""" % (seItem.getPrice(), self._conf.getRegistrationForm().getCurrency(), perPlace)
+
                 inputType="checkbox"
                 if self._socialEvent.getSelectionTypeId() == "unique":
                     inputType="radio"
                 html.append("""<tr>
-                                    <td align="left" nowrap style="padding-left:10px"><input type="%s" name="socialEvents" value="%s" %s>%s&nbsp;&nbsp;
-                                    </td>
-                                    <td width="100%%" align="left">
+                                    <td align="left" style="padding-left:10px"><input type="%s" name="socialEvents" value="%s" %s%s>%s&nbsp;&nbsp;</td>
+                                    <td align="left" nowrap>
                                        %s%s
                                     </td>
+                                    %s
                                 </tr>
-                            """%(inputType, se.getId(), checked, se.getCaption(), "".join(optList), placesLeft ) )
+                            """%(inputType, se.getId(), checked, disabled, se.getCaption(), "".join(optList), placesLeft, priceCol ) )
             else:
                 cancelledReason = ""
                 if se.getCancelledReason().strip():
@@ -1951,13 +2039,15 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         socialEvents = []
+        alreadyPaid = False
         if self._currentUser is not None and self._currentUser.isRegisteredInConf(self._conf):
             registrant = self._currentUser.getRegistrantById(self._conf.getId())
             socialEvents = registrant.getSocialEvents()
+            alreadyPaid = registrant.getPayed()
         vars["title"] = self._socialEvent.getTitle()
         vars["description"] = self._socialEvent.getDescription()
         vars["intro"] =  self._socialEvent.getIntroSentence()
-        vars["socialEvents"] = self._getSocialEventsHTML(socialEvents)
+        vars["socialEvents"] = self._getSocialEventsHTML(socialEvents, alreadyPaid)
         return vars
 
 class WConfRegFormFurtherInformationDisplay(wcomponents.WTemplated):
@@ -2267,6 +2357,26 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         return "".join(html)
 
 
+    def _getFormItemsHTMLBilllable(self, bf, total):
+        html=[""]
+        for item in bf.getBilledItems():
+            caption = item.getCaption()
+            currency = item.getCurrency()
+            price = item.getPrice()
+            quantity = item.getQuantity()
+            total["value"] += price*quantity
+            if quantity > 0:
+                html.append("""
+                        <tr>
+                           <td><b>%i</b></td>
+                           <td>%s</td>
+                           <td align="right" style="padding-right:10px" nowrap >%s</td>
+                           <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
+                        </tr>
+                        """%(quantity, caption, price, price*quantity, currency))
+        return "".join(html)
+
+
     def _getMiscellaneousInfoHTML(self, gsf):
         html=[]
         if gsf.isEnabled():
@@ -2299,7 +2409,9 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                             </tr>
                         """))
             for gsf in self._registrant.getMiscellaneousGroupList():
-                    html.append("""<tr>%s</tr>"""%(self._getMiscInfoItemsHTMLBilllable(gsf,total)))
+                html.append("""<tr>%s</tr>"""%(self._getMiscInfoItemsHTMLBilllable(gsf,total)))
+            for bf in self._registrant.getBilledForms():
+                html.append("""<tr>%s</tr>"""%(self._getFormItemsHTMLBilllable(bf,total)))
 
             url=urlHandlers.UHConfRegistrationFormconfirmBooking.getURL(self._registrant)
             url.addParam("registrantId", self._registrant.getId())

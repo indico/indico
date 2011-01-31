@@ -62,7 +62,13 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
             cfg = Config.getInstance()
             mimetype = cfg.getFileTypeMimeType( self._file.getFileType() )
             self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%self._file.getFileName()
+            dispos = "inline"
+            try:
+                if self._req.headers_in['User-Agent'].find('Android') != -1:
+                    dispos = "attachment"
+            except KeyError:
+                pass
+            self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
             return self._file.readBin()
         else:
             p = files.WPMinutesDisplay(self, self._file )

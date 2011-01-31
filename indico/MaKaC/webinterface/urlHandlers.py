@@ -3795,6 +3795,12 @@ class UHConfModifRegFormSessionsPerformAdd( URLHandler ):
 class UHConfModifRegFormSessionsRemove( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/removeSession"
 
+class UHConfModifRegFormSessionItemModify( URLHandler ):
+    _relativeURL = "confModifRegistrationForm.py/modifySessionItem"
+
+class UHConfModifRegFormSessionItemPerformModify( URLHandler ):
+    _relativeURL = "confModifRegistrationForm.py/performModifySessionItem"
+
 class UHConfModifRegFormAccommodation( URLHandler ):
     _relativeURL = "confModifRegistrationForm.py/modifAccommodation"
 

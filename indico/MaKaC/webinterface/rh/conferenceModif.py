@@ -4509,7 +4509,7 @@ class RHAbstractsToXML(RHConfModifCFABase):
             x.writeTag("Content", abstract.getField("content"))
             for f in self._conf.getAbstractMgr().getAbstractFieldsMgr().getFields():
                 id = f.getId()
-                x.writeTag(id, abstract.getField(id))
+                x.writeTag("field",abstract.getField(id),[("id",id)])
             l = []
             for au in abstract.getAuthorList():
                 if abstract.isPrimaryAuthor(au):
@@ -5123,7 +5123,7 @@ class RHConfRemoveCSS( RHConferenceModifBase ):
         sm.useLocalCSS()
         self._redirect( "%s#css"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
 
-class RHConfModifPreviewCSS(RHConferenceModifBase):
+class RHConfModifPreviewCSS(RoomBookingDBMixin, RHConferenceModifBase):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )

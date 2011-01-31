@@ -22,6 +22,8 @@ from MaKaC.user import Avatar
 import sys, os, StringIO, traceback
 import MaKaC
 from MaKaC.common.Configuration import Config
+from MaKaC.services.interface.rpc.common import ServiceAccessError
+from MaKaC.errors import MaKaCError, AccessError
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 import MaKaC.common.info as info
 from MaKaC.common.logger import Logger
@@ -184,7 +186,7 @@ def deepstr(obj):
     #stringfy objects inside a dictionary
     if isinstance(obj,dict):
         for k,v in obj.items():
-            del obj[k] #we delete the old key
+            del obj[k] #wAvatare delete the old key
             obj[deepstr(k)] = deepstr(v)
 
     return str(obj)
@@ -395,6 +397,9 @@ class TemplateExec:
             except: pass
             Logger.get('tplexec').exception('Template error')
             raise
+        ## In case that included templates raise AccessError due to offlineRequest macro.
+        except (AccessError, ServiceAccessError), e:
+            raise AccessError( e )
         except Exception, e:
             try: open( ERROR_PATH + "/" + tplFilename + ".tpl.error.py", "w" ).write( pythonCode )
             except: pass

@@ -210,7 +210,7 @@ class RHAbstractToXML(RHAbstractModifBase):
         for f in afm.getFields():
             id = f.getId()
             if f.isActive() and self._target.getField(id).strip() != "":
-                x.writeTag(id.replace(" ","_"),self._target.getField(id))
+                x.writeTag("field",self._target.getField(id),[("id",id)])
         x.writeTag("Conference", self._target.getConference().getTitle())
         l = []
         for au in self._target.getAuthorList():

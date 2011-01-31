@@ -51,6 +51,12 @@ def performAddSession(req, **params):
 def removeSession(req, **params):
     return registrationFormModif.RHRegistrationFormModifSessionsRemove( req ).process( params )
 
+def modifySessionItem(req, **params):
+    return registrationFormModif.RHRegistrationFormSessionItemModify( req ).process( params )
+
+def performModifySessionItem(req, **params):
+    return registrationFormModif.RHRegistrationFormSessionItemPerformModify( req ).process( params )
+
 def modifAccommodation(req, **params):
     return registrationFormModif.RHRegistrationFormModifAccommodation( req ).process( params )
 
