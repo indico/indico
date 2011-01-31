@@ -3287,7 +3287,11 @@ class RegistrationSession(Persistent):
         try:
             return self._currency
         except:
-            self._currency = self._regForm.getCurrency()
+            # it may happen that _regForm doesn't exist (session was removed from it)
+            if self._regForm:
+                self._currency = self._regForm.getCurrency()
+            else:
+                self._currency = None
         return self._currency
 
     def getLocator( self ):
