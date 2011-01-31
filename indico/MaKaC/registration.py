@@ -4724,6 +4724,9 @@ class RegistrantSession(Persistent):
         return self._regSession.getCaption()
     getTitle = getCaption
 
+    def getCode(self):
+        return self._regSession.getCode()
+
     def isCancelled(self):
         return self._regSession.isCancelled()
 
