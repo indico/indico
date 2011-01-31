@@ -1,17 +1,17 @@
 <center>
-<form action="%(postURL)s" method="POST">
-    %(locator)s
-    <table width="80%%">
+<form action="<%= postURL %>" method="POST">
+    <%= locator %>
+    <table width="80%">
         <tr>
-            <td colspan="2" align="center"><font size="+2"><u>%(Wtitle)s</u></font></td>
+            <td colspan="2" align="center"><font size="+2"><u><%= Wtitle %></u></font></td>
         </tr>
             <td colspan="2" align="center">
-                <table width="90%%"><tr><td>
+                <table width="90%"><tr><td>
                     <font color="gray">
                         <br><br>
                     </font>
                 </td></tr></table>
-                %(msg)s
+                <%= msg %>
             </td>
         </tr>
         <tr>
@@ -24,41 +24,41 @@
             <td align="right"><font color="gray"><%= _("Title")%><font></td>
             <td align="left">
                 <select name="title">
-                    %(titles)s
+                    <%= titles %>
                 </select>
             </td>
         </tr>
         <tr>
             <td align="right"><font color="gray"><font color="red">* </font><%= _("Family name")%></font></td>
-            <td align="left"><input type="text" name="surName" value="%(surName)s" size="100"></td>
+            <td align="left"><input type="text" name="surName" value="<%= surName %>" size="100"></td>
         </tr>
         <tr>
             <td align="right"><font color="gray"><font color="red">* </font><%= _("First name")%></font></td>
-            <td align="left"><input type="text" name="name" value="%(name)s" size="100"></td>
+            <td align="left"><input type="text" name="name" value="<%= name %>" size="100"></td>
         </tr>
         <tr>
             <td align="right"><font color="gray"><font color="red">* </font><%= _("Organisation")%></font></td>
-            <td align="left"><input type="text" name="organisation" value="%(organisation)s" size="100"></td>
+            <td align="left"><input type="text" name="organisation" value="<%= organisation %>" size="100"></td>
         </tr>
         <tr>
             <td align="right"><font color="gray"><font color="red">* </font><%= _("Primary email")%></font></td>
-            <td align="left"><input type="text" name="email" value="%(email)s" size="100"></td>
+            <td align="left"><input type="text" name="email" value="<%= email %>" size="100"></td>
         </tr>
         <tr>
             <td align="right"><font color="gray"><%= _("Secondary emails")%></font></td>
-            <td align="left">%(secEmails)s</td>
+            <td align="left"><%= secEmails %></td>
         </tr>
         <tr>
             <td align="right"><font color="gray"><%= _("Address")%></font></td>
-            <td align="left"><textarea name="address" rows="5" cols="75">%(address)s</textarea></td>
+            <td align="left"><textarea name="address" rows="5" cols="75"><%= address %></textarea></td>
         </tr>
         <tr>
             <td align="right" nowrap><font color="gray"><%= _("Telephone number")%></font></td>
-            <td align="left"><input type="text" name="telephone" value="%(telephone)s" size="25"></td>
+            <td align="left"><input type="text" name="telephone" value="<%= telephone %>" size="25"></td>
         </tr>
         <tr>
             <td align="right"><font color="gray"><%= _("Fax number")%></font></td>
-            <td align="left"><input type="text" name="fax" value="%(fax)s" size="25"></td>
+            <td align="left"><input type="text" name="fax" value="<%= fax %>" size="25"></td>
         </tr>
         <tr>
             <td colspan="2">

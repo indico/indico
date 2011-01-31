@@ -1,14 +1,14 @@
 <br>
-<table width="90%%" align="center" border="0"
+<table width="90%" align="center" border="0"
                                     style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle" colspan="4"><%= _("Sub Contribution")%></td>
     </tr>
     <tr>
-        <td bgcolor="white" width="100%%" colspan="4">
-            <form action="%(deleteItemsURL)s" method="POST">
+        <td bgcolor="white" width="100%" colspan="4">
+            <form action="<%= deleteItemsURL %>" method="POST">
               <table bgcolor="white" border="0" cellspacing="0">
-                %(subContList)s
+                <%= subContList %>
 
 
         </td>
@@ -22,7 +22,7 @@
                             <input type="submit" class="btn" value="<%= _("remove selected")%>">
                     </td>
                     </form>
-                    <form action="%(addSubContURL)s" method="POST">
+                    <form action="<%= addSubContURL %>" method="POST">
                     <td>
                         <input type="submit" class="btn" value="<%= _("add sub contribution")%>">
                     </td>

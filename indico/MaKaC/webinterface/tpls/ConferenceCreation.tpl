@@ -1,6 +1,6 @@
 <div class="container" style="max-width: 1000px; overflow: visible;">
-<form id="conferenceCreationForm" action="%(postURL)s" method="POST">
-    <input type="hidden" name="event_type" value="%(event_type)s">
+<form id="conferenceCreationForm" action="<%= postURL %>" method="POST">
+    <input type="hidden" name="event_type" value="<%= event_type %>">
 
     <em><%= _("Please follow the steps to create a conference")%></em>
 
@@ -24,22 +24,22 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>
             <td nowrap class="contentCellTD">
                 <span id="sDatePlace"></span>
-                <input type="hidden" id="sDay" name="sDay" value="%(sDay)s">
-                <input type="hidden" id="sMonth"  name="sMonth" value="%(sMonth)s">
-                <input type="hidden" id="sYear" name="sYear" value="%(sYear)s">
-                <input type="hidden" id="sHour" name="sHour" value="%(sHour)s">
-                <input type="hidden" id="sMinute" name="sMinute" value="%(sMinute)s">
+                <input type="hidden" id="sDay" name="sDay" value="<%= sDay %>">
+                <input type="hidden" id="sMonth"  name="sMonth" value="<%= sMonth %>">
+                <input type="hidden" id="sYear" name="sYear" value="<%= sYear %>">
+                <input type="hidden" id="sHour" name="sHour" value="<%= sHour %>">
+                <input type="hidden" id="sMinute" name="sMinute" value="<%= sMinute %>">
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("End date")%></span></td>
             <td nowrap class="contentCellTD">
                 <span id="eDatePlace"></span>
-                <input type="hidden" id="eDay" name="eDay" value="%(eDay)s">
-                <input type="hidden" id="eMonth"  name="eMonth" value="%(eMonth)s">
-                <input type="hidden" id="eYear" name="eYear" value="%(eYear)s">
-                <input type="hidden" id="eHour" name="eHour" value="%(eHour)s">
-                <input type="hidden" id="eMinute" name="eMinute" value="%(eMinute)s">
+                <input type="hidden" id="eDay" name="eDay" value="<%= eDay %>">
+                <input type="hidden" id="eMonth"  name="eMonth" value="<%= eMonth %>">
+                <input type="hidden" id="eYear" name="eYear" value="<%= eYear %>">
+                <input type="hidden" id="eHour" name="eHour" value="<%= eHour %>">
+                <input type="hidden" id="eMinute" name="eMinute" value="<%= eMinute %>">
 		        <span><a href="#" onclick="new ShowConcurrentEvents(createDatesDict()).execute()"><%= _("Show existing events during these dates")%></a></span>
             </td>
         </tr>
@@ -71,13 +71,13 @@
                 <tr>
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Additional info")%></span></td>
                     <td nowrap class="contentCellTD">
-                        <textarea name="contactInfo" cols="80" rows="6" wrap="soft">%(contactInfo)s</textarea>
+                        <textarea name="contactInfo" cols="80" rows="6" wrap="soft"><%= contactInfo %></textarea>
                     </td>
                 </tr>
                 <tr>
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Support email")%></span></td>
                     <td class="contentCellTD">
-                <input type="text" name="supportEmail" value="%(supportEmail)s" size="33">
+                <input type="text" name="supportEmail" value="<%= supportEmail %>" size="33">
                 </td>
                 </tr>
                 <tr>
@@ -94,7 +94,7 @@
                 <tr>
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Keywords")%><br><small>( <%= _("one per line")%>)</small></span></td>
                     <td nowrap class="contentCellTD">
-                        <textarea name="keywords" cols="60" rows="3">%(keywords)s</textarea>
+                        <textarea name="keywords" cols="60" rows="3"><%= keywords %></textarea>
                     </td>
                 </tr>
             </table>
@@ -106,7 +106,7 @@
 
     <table class="groupTable" style="background-color: #ECECEC; border-top: 1px dashed #777777;">
         <tr>
-            <td width="15%%" nowrap>&nbsp;</td>
+            <td width="15%" nowrap>&nbsp;</td>
             <td nowrap  style="padding: 10px 0;">
                 <input style="font-weight: bold;" type="submit" name="ok" value="<%= _("Create conference")%>">
             </td>

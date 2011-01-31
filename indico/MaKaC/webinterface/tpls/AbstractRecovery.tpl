@@ -1,6 +1,6 @@
 
-<form action="%(postURL)s" method="POST">
-    <table width="100%%" align="center">
+<form action="<%= postURL %>" method="POST">
+    <table width="100%" align="center">
         <tr>
             <td><br></td>
         </tr>
@@ -12,7 +12,7 @@
 						<td align="center"> <%= _("You are going to recover to the conference the abstract titled")%>: </td>
 					</tr>
 					<tr>
-						<td align="center"> "<b>%(title)s<b>".</td>
+						<td align="center"> "<b><%= title %><b>".</td>
 					</tr>
 					<tr><td>&nbsp;</td></tr>
 				</table>

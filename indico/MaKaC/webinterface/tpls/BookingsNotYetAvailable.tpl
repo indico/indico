@@ -1,5 +1,5 @@
 
-<form action=%(gobackURL)s method="post">
+<form action=<%= gobackURL %> method="post">
 	<table align="center">
            <tr>
 	<td align="center">

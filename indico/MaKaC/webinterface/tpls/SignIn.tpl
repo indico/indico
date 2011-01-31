@@ -1,10 +1,10 @@
 
-<div class="container" style="width: 100%%; margin: 50px auto; max-width: 800px">
+<div class="container" style="width: 100%; margin: 50px auto; max-width: 800px">
 
 <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt;    "><%= _("Log in to Indico")%></div>
 
-<form name="signInForm" action=%(postURL)s method="POST">
-<input type="hidden" name="returnURL" value=%(returnURL)s>
+<form name="signInForm" action=<%= postURL %> method="POST">
+<input type="hidden" name="returnURL" value=<%= returnURL %>>
 
 <table class="groupTable">
     <tr>
@@ -12,12 +12,12 @@
         <script type="text/javascript">
         //Free JavaScripts on http://www.ScriptBreaker.com
         var cookiesEnabled = false;
-        
-         
+
+
         // Check whether cookies enabled
         document.cookie = "Enabled=true";
         var cookieValid = document.cookie;
-           
+
         // if retrieving the VALUE we just set actually works
         // then we know cookies enabled
         if (cookieValid.indexOf("Enabled=true") != -1)
@@ -28,14 +28,14 @@
         {
            cookiesEnabled = false;
         }
-         
+
         if(cookiesEnabled == false) document.write('<td colspan="2"><br><center><font size=+1 color=red>Please enable cookies in your browser!</font></center><br></td></tr><tr>');
         </SCRIPT>
         <td class="titleCellTD">
             <span class="titleCellFormat"><%= _("User Name")%></span>
         </td>
-        <td class="contentCellTD" id="usernameInput">                                    
-            <input type="text" name="login" size="40" value=%(login)s>
+        <td class="contentCellTD" id="usernameInput">
+            <input type="text" name="login" size="40" value=<%= login %>>
         </td>
     </tr>
     <tr>
@@ -46,25 +46,25 @@
             <input type="password" name="password" size="40">
         </td>
     </tr>
-    
+
     <% if NiceMsg: %>
     <tr>
         <td class="titleCellTD">&nbsp;</td>
         <td class="contentCellTD">
-            <em>%(NiceMsg)s</em>
+            <em><%= NiceMsg %></em>
         </td>
     </tr>
     <% end %>
-    
+
     <% if msg: %>
         <tr>
             <td class="titleCellTD">&nbsp;</td>
             <td class="contentCellTD">
-                <span style="color: darkred">%(msg)s</span>
+                <span style="color: darkred"><%= msg %></span>
             </td>
         </tr>
     <% end %>
-    
+
     <tr>
         <td class="titleCellTD">&nbsp;</td>
         <td class="contentCellTD">
@@ -82,19 +82,19 @@
 
 <div style="margin: 20px 30px 0 30px;">
 
-    <table width="100%%" cellspacing="5" cellpadding="0"><tbody>
+    <table width="100%" cellspacing="5" cellpadding="0"><tbody>
         <tr>
-            <td align="left"><img src="%(itemIcon)s" alt="o" style="padding-right: 10px;"></td>
-            <td align="left" width="100%%">
+            <td align="left"><img src="<%= itemIcon %>" alt="o" style="padding-right: 10px;"></td>
+            <td align="left" width="100%">
                 <div style="padding: 5px 0; color: #444">
-                    %(createAccount)s
+                    <%= createAccount %>
                 </div>
             </td>
         </tr>
-        
+
         <tr>
-            <td align="left"><img src="%(itemIcon)s" alt="o" style="padding-right: 10px;"></td>
-            <td align="left" width="100%%">
+            <td align="left"><img src="<%= itemIcon %>" alt="o" style="padding-right: 10px;"></td>
+            <td align="left" width="100%">
                 <div style="color: #444">
                     <%= ("Forgot your password?") %> <span class="fakeLink" onclick="$E('forgotPasswordInfo').dom.style.display = ''; this.style.display = 'none';"><%= ("Click here") %></span>
                 </div>
@@ -102,10 +102,10 @@
         </tr>
         <tr style="display: none;" id="forgotPasswordInfo">
             <td>&nbsp;</td>
-            <td width="100%%">
+            <td width="100%">
                 <div style="padding: 5px 0;">
                     <div style="padding-bottom: 10px;"><%= _("Please enter your e-mail address in the field below and your password will be sent to you") %></div>
-                    <form action=%(forgotPasswordURL)s method="POST">
+                    <form action=<%= forgotPasswordURL %> method="POST">
                         <input type="text" name="email"> <input type="submit" class="btn" value="<%= _("Send me my password") %>">
                     </form>
                 </div>
@@ -121,7 +121,7 @@
             </td>
         </tr>
     </tbody></table>
-    
+
 
 </div>
 

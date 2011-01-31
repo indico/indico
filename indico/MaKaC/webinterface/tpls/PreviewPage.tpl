@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <div class="cssTplSelection">
     <form action="<%= saveCSS %>" method="POST" ENCTYPE="multipart/form-data">
 		<label for="demo"><%= _("Select to switch templates")%></label>
@@ -17,6 +16,6 @@
         <br/>
 		<a href="<%= URL2Back %>"><%= _("Back to management area")%></a>
 	</form>
-</div>	
-	
+</div>
+
 <%= bodyConf %>

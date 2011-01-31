@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <table width="100%%" cellpadding="0" cellspacing="0" border="0" style="padding-right:5px">
 	<tr>
 		<td>
@@ -25,7 +23,7 @@
 								<td>&nbsp;</td>
 								<td width="25%%">&nbsp;</td>
 								<td rowspan="2"><% includeTpl('LoginWidget') %></td>
-								
+
 							</tr>
 							<tr>
 								<td colspan="3">&nbsp;</td>

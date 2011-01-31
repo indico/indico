@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <table class="groupTable">
 <% includeTpl('EventModifMainData', evtType='conference', confObj=self._conf) %>
     <tr>

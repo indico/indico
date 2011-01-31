@@ -1,26 +1,26 @@
-<form id="eventModificationForm" action="%(postURL)s" method="POST">
-    %(locator)s
-    <input type="hidden" name="event_type" value="%(event_type)s">
+<form id="eventModificationForm" action="<%= postURL %>" method="POST">
+    <%= locator %>
+    <input type="hidden" name="event_type" value="<%= event_type %>">
     <table class="groupTable">
         <tr>
             <td colspan="2"><div class="groupTitle"><%= _("Modify event data")%></div></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td bgcolor="white" width="100%%">
-                    <input type="text" name="title" size="80" value=%(title)s>
+            <td bgcolor="white" width="100%">
+                    <input type="text" name="title" size="80" value=<%= title %>>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
-            <td bgcolor="white" width="100%%">
-                <textarea name="description" cols="70" rows="12" wrap="soft">%(description)s</textarea>
+            <td bgcolor="white" width="100%">
+                <textarea name="description" cols="70" rows="12" wrap="soft"><%= description %></textarea>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Keywords<br><small>( <%= _("one per line")%>)</small></span></td>
-            <td bgcolor="white" width="100%%">
-                <textarea name="keywords" cols="70" rows="3">%(keywords)s</textarea>
+            <td bgcolor="white" width="100%">
+                <textarea name="keywords" cols="70" rows="3"><%= keywords %></textarea>
             </td>
         </tr>
 
@@ -28,7 +28,7 @@
 
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
                 <span id="sDatePlace"></span>
                 <input type="hidden" value="<%= sDay %>" name="sDay" id="sDay"/>
                 <input type="hidden" value="<%= sMonth %>" name="sMonth" id="sMonth"/>
@@ -40,7 +40,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("End date")%></span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
                 <span id="eDatePlace"></span>
                 <input type="hidden" value="<%= eDay %>" name="eDay" id="eDay"/>
                 <input type="hidden" value="<%= eMonth %>" name="eMonth" id="eMonth"/>
@@ -52,28 +52,28 @@
         <!-- Fermi timezone awareness -->
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Timezone</span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
               <select name="Timezone">
-              %(timezoneOptions)s
+              <%= timezoneOptions %>
               </select>
             </td>
         </tr>
         <!-- Fermi timezone awareness(end) -->
-%(additionalInfo)s
+<%= additionalInfo %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Support caption")%></span></td>
-            <td bgcolor="white" width="100%%"><input type="text" name="supportCaption" value=%(supportCaption)s size="50"></td>
+            <td bgcolor="white" width="100%"><input type="text" name="supportCaption" value=<%= supportCaption %> size="50"></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Support email")%></span></td>
-            <td bgcolor="white" width="100%%"><input type="text" name="supportEmail" value=%(supportEmail)s size="50"></td>
+            <td bgcolor="white" width="100%"><input type="text" name="supportEmail" value=<%= supportEmail %> size="50"></td>
         </tr>
         <!-- TO REMOVE CHAIRPERSON TEXT -->
         <% if conference.getType() != "simple_event" and chairText != '""': %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Chairperson text")%></span></td>
-            <td bgcolor="white" width="100%%">
-                <input type="text" name="chairText" id="chairText" value=%(chairText)s size="50" disabled="disabled">
+            <td bgcolor="white" width="100%">
+                <input type="text" name="chairText" id="chairText" value=<%= chairText %> size="50" disabled="disabled">
                 <span id="removeChairpersonText"></span>
                 <% inlineContextHelp( _("Chairperson text is deprecated, use chairpersons list instead.<br>Click on the red cross to remove the text.") ) %>
             </td>
@@ -82,48 +82,48 @@
         <% if conference.getType() == "simple_event": %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Organisers</span></td>
-            <td bgcolor="white" width="100%%">
-                <input type="text" name="orgText" value=%(orgText)s size="50">
+            <td bgcolor="white" width="100%">
+                <input type="text" name="orgText" value=<%= orgText %> size="50">
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Internal Comments</span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
                 <textarea name="comments" cols=50 rows=5><%= conference.getComments() %></textarea>
             </td>
         </tr>
         <% end %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Timetable default style")%></span></td>
-            <td bgcolor="white" width="100%%"><select name="defaultStyle">%(styleOptions)s</select></td>
+            <td bgcolor="white" width="100%"><select name="defaultStyle"><%= styleOptions %></select></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Visibility")%></span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
               <select name="visibility">
-              %(visibility)s
+              <%= visibility %>
               </select>
 	    </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Event type")%></span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
               <select name="eventType">
-              %(types)s
+              <%= types %>
               </select>
 	    </td>
         </tr>
         <% if Config.getInstance().getShortEventURL() != "" : %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Short URL tag</span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
                 <span class="blacktext"><em> <%=Config.getInstance().getShortEventURL() %></em></span>
                 <span id="shortTag"></span>
             </td>
         </tr>
         <% end %>
         <tr align="left">
-            <td class="buttonBar" align="center" width="100%%" colspan="2">
+            <td class="buttonBar" align="center" width="100%" colspan="2">
             <span id="submitPlace"></span>
             </td>
         </tr>
@@ -159,7 +159,7 @@
             endDate.set('<%= eDay %>/<%= eMonth %>/<%= eYear %><%= " " %><%if len (eHour) == 1:%>0<%= eHour %><%end%><%else:%><%= eHour %><%end%>:<% if len (eMinute) == 1:%>0<%= eMinute %><%end%><%else:%><%= eMinute %><%end%>');
         <% end %>
 
-        var shortTags = Html.input('text', {name: "shortURLTag", size: "30"}, %(shortURLTag)s);
+        var shortTags = Html.input('text', {name: "shortURLTag", size: "30"}, <%= shortURLTag %>);
         $E('shortTag').set(shortTags);
 
         var submitButton = Html.input('button', {className: 'btn'}, $T("ok"));

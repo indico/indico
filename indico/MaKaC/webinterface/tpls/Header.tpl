@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle = True) %>
-
 <% includeTpl('Announcement') %>
 
 <div class="pageHeader pageHeaderMainPage clearfix">
@@ -109,5 +107,4 @@ helpMenu.observeClick(function(e) {
     return false;
 });
 </script>
-
 

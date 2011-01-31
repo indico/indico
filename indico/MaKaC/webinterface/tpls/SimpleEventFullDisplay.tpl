@@ -1,7 +1,7 @@
 <table border="0" bgcolor="gray" cellspacing="1" cellpadding="1" align="center">
     <tr>
         <td>
-            <table border="0" cellpadding="2" cellspacing="0" width="100%%" 
+            <table border="0" cellpadding="2" cellspacing="0" width="100%"
                     bgcolor="#000060">
                 <tr>
                     <td width="35">
@@ -11,7 +11,7 @@
                         <font size="+1" color="#bbbbbb"> <%= _("EVENT")%></font>
                     </td>
                     <td align="right">
-                        <font size="-1" color="white">%(dateInterval)s</font>
+                        <font size="-1" color="white"><%= dateInterval %></font>
                     </td>
                 </tr>
             </table>
@@ -19,22 +19,22 @@
     </tr>
     <tr>
         <td>
-            <table border="0" bgcolor="#f0c060" cellpadding="2" cellspacing="0" 
-                    width="100%%"> 
+            <table border="0" bgcolor="#f0c060" cellpadding="2" cellspacing="0"
+                    width="100%">
                 <tr>
                     <td align="right" valign="top" nowrap>
                         <b><strong> <%= _("Name")%>:</strong></b>
                     </td>
-                    <td width="100%%">
-                        <font face="arial" color="#333333">%(modifyItem)s <u>%(title)s</u></font>
+                    <td width="100%">
+                        <font face="arial" color="#333333"><%= modifyItem %> <u><%= title %></u></font>
 	                </td>
                 </tr>
-                %(description)s
-                %(location)s
-                %(room)s
-                %(contact)s
-                %(moreInfo)s
-                %(material)s
+                <%= description %>
+                <%= location %>
+                <%= room %>
+                <%= contact %>
+                <%= moreInfo %>
+                <%= material %>
             </table>
         </td>
     </tr>

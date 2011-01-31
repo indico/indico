@@ -1,10 +1,10 @@
-<form action='%(NewTemplateURL)s' method='post'>
+<form action='<%= NewTemplateURL %>' method='post'>
   <table class="groupTable" cellpadding="0">
     <tbody>
       <tr>
         <td colspan="2" class="subgroupTitle"> <%= _("Badge Printing")%></td>
       </tr>
-            
+
       <tr>
         <td  colspan="2">
           &nbsp;
@@ -21,11 +21,11 @@
       	</td>
       	<td>
         	<select name="baseTemplate">
-          	%(baseTemplates)s
+          	<%= baseTemplates %>
         	</select>
       	</td>
 
-    </tr>            
+    </tr>
      <tr>
      	<td></td>
         <td>
@@ -34,7 +34,7 @@
      </tr>
 
 </form>
-<form action='%(CreatePDFURL)s' method='post' target='_blank'>
+<form action='<%= CreatePDFURL %>' method='post' target='_blank'>
 
       <tr>
         <td colspan="2" class="groupTitle">
@@ -44,31 +44,30 @@
 
       <tr>
         <td colspan="2">
-          <table class="gestiontable" width="50%%">
+          <table class="gestiontable" width="50%">
             <tbody>
-%(templateList)s
+<%= templateList %>
           </table>
         </td>
       </tr>
 
       <tr>
         <td>
-          <input class="btn" value="<%= _("Try Selected Template")%>" type="submit" %(TryTemplateDisabled)s>
+          <input class="btn" value="<%= _("Try Selected Template")%>" type="submit" <%= TryTemplateDisabled %>>
         </td>
       </tr>
 
     </tbody>
   </table>
-  
-  <table width="100%%" class="gestiontable" >
+
+  <table width="100%" class="gestiontable" >
     <tbody>
       <tr>
         <td class="groupTitle">
           <span><%= _("PDF Options")%></span>
         </td>
       </tr>
-      %(PDFOptions)s
+      <%= PDFOptions %>
     </tbody>
   </table>
 </form>
-

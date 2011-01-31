@@ -1,7 +1,7 @@
 
 <div class="container">
     <div class="categoryHeader">
-        <ul>      
+        <ul>
             <li><a href="<%= categDisplayURL %>"><%= _("Go back to category page") %></a></li>
         </ul>
         <h1 class="categoryTitle">
@@ -11,19 +11,19 @@
     </div>
 
 <br>
-<table width="100%%" cellpadding="0" cellspacing="0" border="0">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
 	<tr><td>&nbsp;</td></tr>
 	<tr>
 		<td colspan="2">
-			%(contents)s
+			<%= contents %>
 			<br>
 			<br>
-			<table cellpadding="0" cellspacing="0" width="100%%">
+			<table cellpadding="0" cellspacing="0" width="100%">
  				<tr>
-    					<td colspan="2" align="right"> <%= _("Updated")%> %(updated)s
+    					<td colspan="2" align="right"> <%= _("Updated")%> <%= updated %>
     					</td>
   				</tr>
-			</table>			
+			</table>
 		</td>
 	</tr>
 </table>

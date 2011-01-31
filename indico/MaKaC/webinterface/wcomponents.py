@@ -239,7 +239,8 @@ class WTemplated(OldObservable):
     textToHTML = staticmethod( textToHTML )
 
     def _escapeChars(self, text):
-        return text.replace('%','%%')
+        # Does nothing right now - it used to replace % with %% for the old-style templates
+        return text
 
 class WHTMLHeader(WTemplated):
 
@@ -7220,5 +7221,5 @@ class WDateField(WTemplated):
         vars['isDisabled'] = self._isDisabled
         vars['withTime'] = self._withTime
         vars['isMandatory'] = self._isMandatory
-        vars['format'] = re.sub('%', '%%', self._format)
+        vars['format'] = self._format
         return vars

@@ -1,11 +1,11 @@
-<form action="%(postURL)s" method="POST">
-    <table width="50%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form action="<%= postURL %>" method="POST">
+    <table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle"> <%= _("Select the main resource")%></td>
         </tr>
         <tr>
             <td>
-                <br>%(resources)s
+                <br><%= resources %>
             <td>
         </tr>
 		<tr><td>&nbsp;</td></tr>

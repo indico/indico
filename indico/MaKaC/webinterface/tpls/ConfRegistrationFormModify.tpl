@@ -31,8 +31,8 @@
   }
 </script>
 
-<form action=%(postURL)s method="POST" onSubmit="return formSubmit(this);">
-<table width="70%%" align="center">
+<form action=<%= postURL %> method="POST" onSubmit="return formSubmit(this);">
+<table width="70%" align="center">
 	<tr><td>&nbsp;</td></tr>
     <tr>
         <td nowrap class="title"><center><%= _("Modification of your registration")%></center></td>
@@ -42,10 +42,10 @@
     </tr>
     <tr>
         <td>
-            %(personalData)s
+            <%= personalData %>
         </td>
     </tr>
-    %(otherSections)s
+    <%= otherSections %>
     <tr>
         <td><br></td>
     </tr>

@@ -1,7 +1,7 @@
-<script type="text/javascript" src="%(baseURL)s/js/htmleditor/fckeditor.js"></script>
-<form action="%(postURL)s" method="POST">
+<script type="text/javascript" src="<%= baseURL %>/js/htmleditor/fckeditor.js"></script>
+<form action="<%= postURL %>" method="POST">
     <br>
-    <table width="50%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle">
                  <%= _("Write your minutes")%>
@@ -9,8 +9,8 @@
             </td>
         </tr>
         <tr>
-            <td bgcolor="white" width="100%%" colspan="3" bgcolor="#EAEAEA">
-                <textarea cols="100" rows="20" name="text">%(text)s</textarea>
+            <td bgcolor="white" width="100%" colspan="3" bgcolor="#EAEAEA">
+                <textarea cols="100" rows="20" name="text"><%= text %></textarea>
             </td>
         </tr>
         <tr><td>&nbsp;</td></tr>
@@ -19,7 +19,7 @@
                 <input type="submit" class="btn"  name="OK" value="<%= _("save")%>">
                 <input type="submit" class="btn"  name="cancel" value="<%= _("cancel")%>">
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                %(compileButton)s
+                <%= compileButton %>
                 <input type="button" class="btn"  name="clear" value="<%= _("clear")%>" onClick="this.form.text.value='';">
             </td>
         </tr>
@@ -33,15 +33,15 @@ var oFCKeditor = "";
 function setHTML() {
   if (oFCKeditor == "") {
     oFCKeditor = new FCKeditor( 'text' ) ;
-    oFCKeditor.Config["CustomConfigurationsPath"] = "%(baseURL)s/js/htmleditor/indicoconfig.js"  ;
-    oFCKeditor.Config["ImageUploadURL"] = "%(imageUploadURL)s" ;
-    oFCKeditor.Config["ImageBrowserURL"] = "%(imageBrowserURL)s";
+    oFCKeditor.Config["CustomConfigurationsPath"] = "<%= baseURL %>/js/htmleditor/indicoconfig.js"  ;
+    oFCKeditor.Config["ImageUploadURL"] = "<%= imageUploadURL %>" ;
+    oFCKeditor.Config["ImageBrowserURL"] = "<%= imageBrowserURL %>";
     oFCKeditor.Config["ImageBrowserWindowWidth"] = 700 ;
     oFCKeditor.Config["ImageBrowserWindowHeight"] = 200 ;
     oFCKeditor.Config["ImageDlgHideAdvanced"] = true ;
     oFCKeditor.Config["ImageDlgHideLink"] = true ;
     oFCKeditor.Config["LinkBrowser"] = false ;
-    oFCKeditor.BasePath       = "%(baseURL)s/js/htmleditor/" ;
+    oFCKeditor.BasePath       = "<%= baseURL %>/js/htmleditor/" ;
     oFCKeditor.Width          = 650 ;
     oFCKeditor.Height         = 500 ;
     oFCKeditor.ToolbarSet     = "Indico" ;

@@ -10,33 +10,33 @@
     </tr>
 	<tr>
         <td colspan="2">
-		    <div class="groupTitle"><%=  _("Details for")%> %(title)s %(fullName)s</div>
+		    <div class="groupTitle"><%=  _("Details for")%> <%= title %> <%= fullName %></div>
         </td>
     </tr>
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionormat"><%= _("Affiliation")%></span></td>
-        <td class="blacktext">%(organisation)s</td>
+        <td class="blacktext"><%= organisation %></td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Email")%></span></td>
-        <td class="blacktext">%(email)s</td>
+        <td class="blacktext"><%= email %></td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Address")%></span></td>
-        <td class="blacktext"><pre>&nbsp;&nbsp;%(address)s</pre></td>
+        <td class="blacktext"><pre>&nbsp;&nbsp;<%= address %></pre></td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Telephone")%></span></td>
-        <td class="blacktext">%(telephon)s</td>
+        <td class="blacktext"><%= telephon %></td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Fax")%></span></td>
-        <td class="blacktext">%(fax)s</td>
+        <td class="blacktext"><%= fax %></td>
     </tr>
     <tr>
         <td>&nbsp;</td>
         <td class="blacktext">
-            <form action="%(modifyUserURL)s" method="POST" style="margin:0;">
+            <form action="<%= modifyUserURL %>" method="POST" style="margin:0;">
                 <input type="submit" class="btn" value="<%= _("modify")%>">
             </form>
         </td>
@@ -48,14 +48,14 @@
             <span class="dataCaptionFormat"><%= _("Account status")%></span>
         </td>
         <td bgcolor="white" nowrap valign="top" class="blacktext">
-            %(status)s
-            %(activeButton)s
+            <%= status %>
+            <%= activeButton %>
         </td>
     </tr>
     <tr>
         <td>&nbsp;</td>
         <td class="blacktext">
-            %(identities)s
+            <%= identities %>
         </td>
     </tr>
     <tr>
@@ -68,13 +68,13 @@
             <span class="dataCaptionFormat"><%= _("Category Manager")%></span>
         </td>
         <td class="blacktext">
-            %(categoryManager)s
+            <%= categoryManager %>
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Event Manager")%></span>
         <td class="blacktext">
-            %(eventManager)s
+            <%= eventManager %>
         </td>
     </tr>
 </table>

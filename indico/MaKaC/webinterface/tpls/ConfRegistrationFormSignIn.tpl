@@ -15,7 +15,7 @@
     </tr>
     <tr>
         <td>
-            %(signIn)s
+            <%= signIn %>
         </td>
     </tr>
 </table>

@@ -1,12 +1,12 @@
 <tr>
   <td>
-    <b>%(materialName)s%(materialActions)s:</b>
+    <b><%= materialName %><%= materialActions %>:</b>
   </td>
 </tr>
 <tr>
   <td class="titleCellTD">
     <ul>
-      %(fileList)s
+      <%= fileList %>
     </ul>
   </td>
 </tr>

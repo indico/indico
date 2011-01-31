@@ -1,1 +1,1 @@
-<input type="%(type)s" name="selectedPrincipals" value="%(id)s" %(selected)s> <span class="blacktext">%(fullName)s</span><br>
+<input type="<%= type %>" name="selectedPrincipals" value="<%= id %>" <%= selected %>> <span class="blacktext"><%= fullName %></span><br>

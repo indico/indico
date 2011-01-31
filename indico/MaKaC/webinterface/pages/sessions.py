@@ -416,7 +416,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
                 });
             </script>
         """ %(_("Building timetable..."),
-              str(ttdata).replace('%','%%'),
+              str(ttdata),
               eventInfo)
 
     def _getContribsHTML(self):

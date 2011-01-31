@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <div><span>
 <a id="scroll_down" name="top"></a>
 <br />

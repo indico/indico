@@ -8,13 +8,13 @@
 		<td>
 			<table>
 				<tr>
-					<form action=%(unduplicateURL)s method="POST">
+					<form action=<%= unduplicateURL %> method="POST">
                     <td align="left">
 						<input type="submit" class="btn" name="OK" value="<%= _("confirm")%>">
 					</td>
 					</form>
 					<td>
-					<form action=%(cancelURL)s method="POST">
+					<form action=<%= cancelURL %> method="POST">
                     <td align="center">
 						<input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
 					</td>

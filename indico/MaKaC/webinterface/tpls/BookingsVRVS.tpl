@@ -1,98 +1,98 @@
 
-<form action=%(postURL)s method="POST">  
-    <table width="65%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
+<form action=<%= postURL %> method="POST">
+    <table width="65%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
         <tr>
             <td colspan="3" class="groupTitle"> <%= _("Creating a Booking on VRVS")%></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("Title")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <input type="text" name="title" size="50" value="%(title)s">
+            <td bgcolor="white" width="100%">&nbsp;
+                <input type="text" name="title" size="50" value="<%= title %>">
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("Description")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <textarea name="description" cols="43" rows="6">%(description)s</textarea>
+            <td bgcolor="white" width="100%">&nbsp;
+                <textarea name="description" cols="43" rows="6"><%= description %></textarea>
             </td>
         </tr>
 
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Physical location")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-            <input type="text" name="locationRoom" value="%(locationRoom)s"></td>
+            <td bgcolor="white" width="100%">&nbsp;
+            <input type="text" name="locationRoom" value="<%= locationRoom %>"></td>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("Start date")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
                 <select name="sDay" onChange="this.form.eDay.value=this.value;">
-                    %(sday)s
+                    <%= sday %>
                 </select>
                 <select name="sMonth" onChange="this.form.eMonth.value=this.value;">
-                    %(smonth)s
+                    <%= smonth %>
                 </select>
                 <select name="sYear" onChange="this.form.eYear.value=this.value;">
-                    %(syear)s
+                    <%= syear %>
                 </select>
-                <input type="image" src=%(calendarIconURL)s alt="open calendar" border="0" onClick="javascript:window.open('%(calendarSelectURL)s?daystring=sDay&monthstring=sMonth&yearstring=sYear&month='+this.form.sMonth.value+'&year='+this.form.sYear.value+'&date='+this.form.sDay.value+'-'+this.form.sMonth.value+'-'+this.form.sYear.value,'calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
+                <input type="image" src=<%= calendarIconURL %> alt="open calendar" border="0" onClick="javascript:window.open('<%= calendarSelectURL %>?daystring=sDay&monthstring=sMonth&yearstring=sYear&month='+this.form.sMonth.value+'&year='+this.form.sYear.value+'&date='+this.form.sDay.value+'-'+this.form.sMonth.value+'-'+this.form.sYear.value,'calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
                 &nbsp;at&nbsp;
                 <select name="sHour">
-                  %(shouroptions)s
+                  <%= shouroptions %>
                 </select>
-                <select name="sMinute"> 
-                  %(sminuteoptions)s
+                <select name="sMinute">
+                  <%= sminuteoptions %>
                 </select>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("End date")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
                 <select name="eDay" onchange="">
-                    %(eday)s
+                    <%= eday %>
                 </select>
                 <select name="eMonth" onchange="">
-                    %(emonth)s
+                    <%= emonth %>
                 </select>
                 <select name="eYear" onchange="">
-                    %(eyear)s
+                    <%= eyear %>
                 </select>
-                <input type="image" src=%(calendarIconURL)s alt="open calendar" border="0" onClick="javascript:window.open('%(calendarSelectURL)s?daystring=eDay&monthstring=eMonth&yearstring=eYear&month='+this.form.eMonth.value+'&year='+this.form.eYear.value+'&date='+this.form.eDay.value+'-'+this.form.eMonth.value+'-'+this.form.eYear.value,'calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
+                <input type="image" src=<%= calendarIconURL %> alt="open calendar" border="0" onClick="javascript:window.open('<%= calendarSelectURL %>?daystring=eDay&monthstring=eMonth&yearstring=eYear&month='+this.form.eMonth.value+'&year='+this.form.eYear.value+'&date='+this.form.eDay.value+'-'+this.form.eMonth.value+'-'+this.form.eYear.value,'calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
                 &nbsp;at&nbsp;
                 <select name="eHour">
-                    %(ehouroptions)s
+                    <%= ehouroptions %>
                 </select>
                 <select name="eMinute">
-                    %(eminuteoptions)s
+                    <%= eminuteoptions %>
                 </select>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("Email address or mailing list")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-            <input type="text" name="supportEmail" size="25" value="%(supportEmail)s"></td>
+            <td bgcolor="white" width="100%">&nbsp;
+            <input type="text" name="supportEmail" size="25" value="<%= supportEmail %>"></td>
         </tr>
         <tr>
      <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Protection password")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <input type="text" name="accessPasswd" size="25" value="%(accessPasswd)s">
+            <td bgcolor="white" width="100%">&nbsp;
+                <input type="text" name="accessPasswd" size="25" value="<%= accessPasswd %>">
             </td>
         </tr>
     <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Comments or remarks")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <textarea name="comments" cols="43" rows="4">%(comments)s</textarea>
+            <td bgcolor="white" width="100%">&nbsp;
+                <textarea name="comments" cols="43" rows="4"><%= comments %></textarea>
             </td>
         </tr>
     <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("My VRVS user details")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
                 <table>
                     <tr>
                         <td align="right"><small> <%= _("VRVS login")%></small></td>
-                        <td align="left"><input type="text" name="vrvsLogin" value="%(vrvsLogin)s"></td>
+                        <td align="left"><input type="text" name="vrvsLogin" value="<%= vrvsLogin %>"></td>
             <td align="right"><small>VRVS password</small></td>
-            <td align="left"><input type="password" name="vrvsPasswd" value="%(vrvsPasswd)s"></td>
+            <td align="left"><input type="password" name="vrvsPasswd" value="<%= vrvsPasswd %>"></td>
             <td align="right"><small>Community Name</small></td>
-            <td align="left"><select name="vrvsCommunity" value="%(vrvsCommunity)s">
+            <td align="left"><select name="vrvsCommunity" value="<%= vrvsCommunity %>">
                                         <option value="" selected>---- <%= _("not selected")%>----</option>
                                         <option value="Universe">Universe</option>
                                         <option value="HENP">HENP</option>
@@ -117,7 +117,7 @@
          </table>
             </td>
         </tr>
-        
+
         <tr><td>&nbsp;</td></tr>
         <tr align="center">
             <td colspan="2" valign="bottom" align="center">

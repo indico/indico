@@ -1,14 +1,14 @@
 <li class="UIGroup">
 <span class="nameLink">
 <% if selectable: %>
-<input type="%(type)s" name="selectedPrincipals" value="%(id)s" %(selected)s> 
-<% end %> 
-%(fullName)s</span>
+<input type="<%= type %>" name="selectedPrincipals" value="<%= id %>" <%= selected %>>
+<% end %>
+<%= fullName %></span>
 
 <% if not selectable: %>
 <input 	type="image" class="UIRowButton"
 			onclick="javascript:removeItem('<%= id %>', this.form);return false;"
 			title="<%= _("Remove this person from the list")%>"
-			src="<%= systemIcon("remove") %>" />	
+			src="<%= systemIcon("remove") %>" />
 <% end %>
 </li>

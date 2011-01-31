@@ -8,13 +8,13 @@
 		<td>
 			<table>
 				<tr>
-					<form action=%(unmergeURL)s method="POST">
+					<form action=<%= unmergeURL %> method="POST">
 					<td align="left">
 						<input type="submit" class="btn" name="OK" value="<%= _("confirm")%>">
 					</td>
 					</form>
 					<td>
-					<form action=%(cancelURL)s method="POST">
+					<form action=<%= cancelURL %> method="POST">
 						<input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
 					</td>
 					</form>

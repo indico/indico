@@ -1,11 +1,11 @@
 
 <!--ConfModifEvaluationEdit start-->
-<table style="border-spacing:0px; width:90%%">  
+<table style="border-spacing:0px; width:90%">
   <tr>
     <td style="width: 125px;">
-    
+
       <br/><br/>
-    
+
       <!--left menu start-->
       <table class="evalEditLeftMenu">
         <tr>
@@ -13,39 +13,39 @@
         <tr>
         <tr><td>
           <!--button Textbox-->
-          %(form_tbox)s
+          <%= form_tbox %>
         </td></tr>
         <tr><td>
           <!--button Textarea-->
-          %(form_area)s
+          <%= form_area %>
         </td></tr>
         <tr><td>
           <!--button Password-->
-          %(form_pswd)s
+          <%= form_pswd %>
         </td></tr>
         <tr><td>
           <!--button Select-->
-          %(form_slct)s
+          <%= form_slct %>
         </td></tr>
         <tr><td>
           <!--button Radio-->
-          %(form_radi)s
+          <%= form_radi %>
         </td></tr>
         <tr><td>
           <!--button Checkbox-->
-          %(form_chck)s
+          <%= form_chck %>
         </td></tr>
       </table>
       <br/>
       <!--left menu end-->
-      
+
     </td>
     <td style="margin-right:0px;padding-right:0px;border-spacing:0px;">
-    
+
       <!--MAIN starts-->
-      %(main)s
+      <%= main %>
       <!--MAIN ends-->
-      
+
     </td>
   </tr>
 </table>

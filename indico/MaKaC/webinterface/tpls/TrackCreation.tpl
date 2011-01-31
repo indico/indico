@@ -1,15 +1,15 @@
 <div class="groupTitle"> <%= _("Creating new track (basic data)")%></div>
 
-<form method="POST" action="%(postURL)s">
-    %(locator)s
-    <table width="100%%" border="0">
+<form method="POST" action="<%= postURL %>">
+    <%= locator %>
+    <table width="100%" border="0">
         <tr>
 			<td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td bgcolor="white" width="100%%"><input type="text" name="title" size="60" value="%(title)s"></td>
+            <td bgcolor="white" width="100%"><input type="text" name="title" size="60" value="<%= title %>"></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
-            <td bgcolor="white" width="100%%"><textarea name="description" cols="43" rows="6">%(description)s</textarea></td>
+            <td bgcolor="white" width="100%"><textarea name="description" cols="43" rows="6"><%= description %></textarea></td>
         </tr>
         <tr><td>&nbsp;</td></tr>
         <tr align="left">

@@ -1,6 +1,5 @@
 <script type="text/javascript">
 <!--
-    window.location = "%(urlDisplay)s"
+    window.location = "<%= urlDisplay %>"
 //-->
 </script>
-

@@ -1,2 +1,1 @@
-%(alarmFrame)s
-
+<%= alarmFrame %>

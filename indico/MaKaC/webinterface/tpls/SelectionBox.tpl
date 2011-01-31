@@ -1,13 +1,13 @@
-<table align="center" cellspacing="0" cellpadding="0"> 
+<table align="center" cellspacing="0" cellpadding="0">
     <tr>
         <td>
             <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                <tr><td colspan="2"><font color="black">%(description)s</font></td></tr>
+                <tr><td colspan="2"><font color="black"><%= description %></font></td></tr>
                 <tr><td>&nbsp;</td></tr>
                 <tr>
                     <td>&nbsp;</td>
                     <td nowrap>
-                        %(options)s
+                        <%= options %>
                     </td>
                     <td>&nbsp;</td>
                 </tr>

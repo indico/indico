@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <script type="text/javascript">
 
     // Function for checking and submitting the form when the user presses Enter.

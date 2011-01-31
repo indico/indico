@@ -1,70 +1,70 @@
 <br>
-<table width="100%%" cellpadding="0" cellspacing="0" border="0">
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr>
     <td valign="bottom">
-    	<span class="categorytitle">%(name)s</span>
-    	<span class="categoryManagers">%(managers)s</span>
+    	<span class="categorytitle"><%= name %></span>
+    	<span class="categoryManagers"><%= managers %></span>
     </td>
   </tr>
   <tr>
-    <td class="subtitle" width="100%%">
-      %(description)s
+    <td class="subtitle" width="100%">
+      <%= description %>
     </td>
     <td class="subtitle">
-    	<a href="%(conferenceList)s"> <%= _("Conference&nbsp;List&nbsp;")%></a>
+    	<a href="<%= conferenceList %>"> <%= _("Conference&nbsp;List&nbsp;")%></a>
     </td>
   </tr>
 
   <tr><td>&nbsp;</td></tr>
   <tr>
     <td class="menutitle" colspan="2">
-      %(taskDetailsTitle)s
+      <%= taskDetailsTitle %>
     </td>
   </tr>
   <tr><td colspan="2">&nbsp;</td></tr>
   <tr>
     <td colspan="2" align="right">
-      <a href="%(taskList)s"> <%= _("Task&nbsp;List&nbsp;")%></a>
+      <a href="<%= taskList %>"> <%= _("Task&nbsp;List&nbsp;")%></a>
     </td>
   </tr>
   <tr>
     <td colspan="2" align="center">
-		<form method="post" action="%(taskDetailsAction)s">    	
-		<input type="hidden" name="editRights" value="%(editRights)s">
-    	<table width="70%%">
+		<form method="post" action="<%= taskDetailsAction %>">
+		<input type="hidden" name="editRights" value="<%= editRights %>">
+    	<table width="70%">
 		    <tr>
     			<td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Task Id")%></span></td>
     			<td>
-    				&nbsp;%(taskId)s
-    				<input type="hidden" name="taskId" value="%(taskId)s">
+    				&nbsp;<%= taskId %>
+    				<input type="hidden" name="taskId" value="<%= taskId %>">
     			</td>
     		</tr>
     		<tr>
     			<td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Created by")%></span></td>
     			<td>
-    				&nbsp;%(createdBy)s
-    				<input type="hidden" name="createdBy" value="%(creatorId)s">
+    				&nbsp;<%= createdBy %>
+    				<input type="hidden" name="createdBy" value="<%= creatorId %>">
     			</td>
     		</tr>
     		<tr>
     			<td nowrap class="titleCellTD"><span class="titleCellFormat">
 		    		 <%= _("Title")%>
     			</span></td>
-    			<td>&nbsp;%(taskTitle)s</td>
+    			<td>&nbsp;<%= taskTitle %></td>
     		</tr>
     		<tr>
     			<td nowrap class="titleCellTD"><span class="titleCellFormat">
 		    		 <%= _("Status")%>
     			</span></td>
     			<td>
- 		   			<table width="100%%">
+ 		   			<table width="100%">
     					<tr>
-    						<td >%(taskStatus)s</td>
+    						<td ><%= taskStatus %></td>
     						<td align="right">
-    							<select name="changedStatus" %(statusDisabled)s>%(taskStatusOptions)s</select>    							
+    							<select name="changedStatus" <%= statusDisabled %>><%= taskStatusOptions %></select>
 	    					</td>
-	    					<td width="29%%">
-		    					&nbsp;<input type="submit" class="btn" name="performedAction" value="<%= _("Change status")%>" %(statusDisabled)s>
+	    					<td width="29%">
+		    					&nbsp;<input type="submit" class="btn" name="performedAction" value="<%= _("Change status")%>" <%= statusDisabled %>>
 	    					</td>
     					</tr>
     				</table>
@@ -74,24 +74,24 @@
     			<td nowrap class="titleCellTD"><span class="titleCellFormat">
 		    		 <%= _("Description")%>
     			</span></td>
-    			<td>%(taskDescription)s</td>
+    			<td><%= taskDescription %></td>
     		</tr>
-    		%(responsible)s
+    		<%= responsible %>
     		<tr>
     			<td nowrap class="titleCellTD"><span class="titleCellFormat">
 		    		 <%= _("Comments")%>
     			</span></td>
     			<td>
-    			<table width="100%%">
+    			<table width="100%">
     				<tr>
 	        			<td>
-	        				%(showCommentsButton)s
-	        				%(showComments)s
+	        				<%= showCommentsButton %>
+	        				<%= showComments %>
 	        			</td>
-	        			<td width="29%%">&nbsp;%(newCommentButton)s</td>
+	        			<td width="29%">&nbsp;<%= newCommentButton %></td>
         			</tr>
         			<tr>
-        				<td colspan="2">%(commentsList)s</td>
+        				<td colspan="2"><%= commentsList %></td>
         			</tr>
         		</table>
     			</td>
@@ -101,23 +101,22 @@
 		    		 <%= _("Status history")%>
     			</span></td>
     			<td>
-    			<table width="100%%">
+    			<table width="100%">
 	    			<tr>
     					<td>
-    						%(showStatusButton)s
-    						%(showStatus)s
+    						<%= showStatusButton %>
+    						<%= showStatus %>
     					</td>
     				</tr>
     				<tr>
-    					<td>%(statusList)s</td>
+    					<td><%= statusList %></td>
     				</tr>
     			</table>
     			</td>
     		</tr>
-    		<tr><td>&nbsp;</td></tr>	        
+    		<tr><td>&nbsp;</td></tr>
     	</table>
     	</form>
     </td>
   </tr>
 </table>
-

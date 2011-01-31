@@ -4,12 +4,12 @@
   <td><div class="groupTitle"><%= _("Common actions")%></div></td>
 </tr>
 <tr>
-  <td bgcolor="white" width="100%%" style="padding-top:10px">
-        <form action="%(deleteCategoryURL)s" method="POST">
-        %(deleteButton)s
-        <input type="hidden" name="selectedCateg" value="%(id)s">
+  <td bgcolor="white" width="100%" style="padding-top:10px">
+        <form action="<%= deleteCategoryURL %>" method="POST">
+        <%= deleteButton %>
+        <input type="hidden" name="selectedCateg" value="<%= id %>">
         </form>
-        %(clearCache)s
+        <%= clearCache %>
   </td>
 </tr>
 </table>

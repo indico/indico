@@ -1,8 +1,8 @@
-<table width="100%%" class="ACtab"><tr><td>
+<table width="100%" class="ACtab"><tr><td>
 <br>
-%(modifyControlFrame)s
+<%= modifyControlFrame %>
 <br>
-%(accessControlFrame)s
+<%= accessControlFrame %>
 <br>
 <table class="groupTable">
     <tr>
@@ -10,12 +10,12 @@
     </tr>
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat"><%= _("Submitters")%><br><font size="-2">(<%= _("users allowed to submit material for this contribution")%>)</font></span></td>
-        <form action=%(remSubmittersURL)s method="POST">
-        <td bgcolor="white" width="80%%" valign="top" class="blacktext">%(submitters)s</td>
+        <form action=<%= remSubmittersURL %> method="POST">
+        <td bgcolor="white" width="80%" valign="top" class="blacktext"><%= submitters %></td>
         <td align="right">
             <input type="submit" class="btn" value="<%= _("remove")%>">
         </form>
-        <form action=%(addSubmittersURL)s method="POST">
+        <form action=<%= addSubmittersURL %> method="POST">
             <input type="submit" class="btn" value="<%= _("add")%>">
         </form>
         </td>

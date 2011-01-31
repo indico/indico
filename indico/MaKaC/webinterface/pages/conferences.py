@@ -5720,7 +5720,7 @@ class WFilterCriteriaAbstracts(wcomponents.WFilterCriteria):
         page = WFilterCriterionOptionsAbstracts(id, data)
 
         # TODO: remove when we have a better template system
-        return page.getHTML().replace('%','%%')
+        return page.getHTML()
 
 class WFilterCriterionOptionsAbstracts(wcomponents.WTemplated):
 

@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <td class="ttManagementBlock" style="vertical-align: top; background-color: <%= bgcolor %>" rowspan="<%= rowspan %>" width="<%= width %>%%" <%= colspan %> >
 <div style="height: 20px; width: 100%;">
   <div style="width: 60px; float: right;" class="nonLinked">
@@ -18,7 +16,7 @@
 	    <% if self._breakEntry.isTextColorToLinks(): %>
             color:<%= self._breakEntry.getTextColor() %>;
 	    <% end %>">
-	<%from MaKaC.common.TemplateExec import truncateTitle %>    
+	<%from MaKaC.common.TemplateExec import truncateTitle %>
     <%= self.htmlText(truncateTitle(self._breakEntry.getTitle(), 40)) %>
   </p>
   <small class="ttMBlockExtraInfo">
@@ -27,6 +25,6 @@
     <% end %>
     <%= self.htmlText(self._breakEntry.getAdjustedStartDate().strftime("%H:%M")) %>-<%= self.htmlText(self._breakEntry.getAdjustedEndDate().strftime("%H:%M")) %>
   </small>
-  
+
 </div>
 </td>

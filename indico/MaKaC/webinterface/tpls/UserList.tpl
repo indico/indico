@@ -10,32 +10,32 @@
   <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Tools")%></span></td>
   <td bgcolor="white" class="blacktext">
     <table>
-    <form action="%(createUserURL)s" method="POST">
+    <form action="<%= createUserURL %>" method="POST">
     <tr>
       <td>
         <input type="submit" value="<%= _("New User")%>" class="btn">
       </td>
-    </tr>    
+    </tr>
     </form>
-    <form action="%(mergeUsersURL)s" method="POST">
+    <form action="<%= mergeUsersURL %>" method="POST">
     <tr>
       <td>
         <input type="submit" value="<%= _("Merge Users")%>" class="btn">
       </td>
-    </tr>   
+    </tr>
     </form>
-    <form action="%(logMeAsURL)s" method="POST">
+    <form action="<%= logMeAsURL %>" method="POST">
     <tr>
       <td>
         <input type="submit" value="<%= _("Log me as ...")%>" class="btn">
       </td>
-    </tr>   
+    </tr>
     </form>
-    </table> 
+    </table>
   </td>
 </tr>
 <tr>
-  <form action="%(browseUsersURL)s" method="POST" name="browseForm">
+  <form action="<%= browseUsersURL %>" method="POST" name="browseForm">
   <input type="hidden" value="" name="letter">
   <td class="dataCaptionTD"><span class="dataCaptionFormat">
      <%= _("Browse Users")%>
@@ -43,10 +43,10 @@
   <td bgcolor="white" class="blacktext">
     <span class="groupLink">
     <select name="browseIndex" onChange="this.form.submit();" class="btn">
-    %(browseOptions)s
+    <%= browseOptions %>
     </select>
     </span>
-    %(browseUsers)s
+    <%= browseUsers %>
   </td>
   </form>
 </tr>
@@ -54,7 +54,7 @@
 <tr>
   <td colspan="2"><div class="groupTitle"><%= _("Search users")%></div></td>
 </tr>
-<form action="%(searchUsersURL)s" method="POST" style="margin:0;">
+<form action="<%= searchUsersURL %>" method="POST" style="margin:0;">
 <tr>
     <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Surname")%></span></td>
     <td><input type="text" name="sSurName"></td>
@@ -79,8 +79,8 @@
 <tr>
     <td>&nbsp;</td>
     <td>
-        <table width="100%%"><tbody>
-            %(users)s
+        <table width="100%"><tbody>
+            <%= users %>
         </tbody></table>
         <br /><br />
     </td>

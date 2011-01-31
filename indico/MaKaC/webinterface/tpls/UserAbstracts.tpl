@@ -1,12 +1,12 @@
 
-<table width="100%%" align="center">
+<table width="100%" align="center">
     <tr>
         <td><br>
         </td>
     </tr>
     <tr>
         <td>
-            <table style="border-left:1px solid #777777;border-top:1px solid #777777;" width="95%%" align="center" cellspacing="0">
+            <table style="border-left:1px solid #777777;border-top:1px solid #777777;" width="95%" align="center" cellspacing="0">
 				<tr>
 					<td class="groupTitle" colspan="4" style="background:#E5E5E5; color:gray; border-top:2px solid #FFFFFF; border-left:2px solid #FFFFFF">&nbsp;&nbsp;&nbsp; <%= _("Abstracts")%></td>
 				</tr>
@@ -19,8 +19,8 @@
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> <%= _("Status")%></td>
                     <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> <%= _("Modification date")%></td>
                 </tr>
-                <form action=%(abstractsPDFURL)s method="post" target="_blank">
-                %(abstracts)s
+                <form action=<%= abstractsPDFURL %> method="post" target="_blank">
+                <%= abstracts %>
 				<tr><td colspan="4">&nbsp;</td></tr>
 				<tr>
                     <td align="center" colspan="4">
@@ -33,4 +33,3 @@
     </tr>
 </table>
 <br>
-

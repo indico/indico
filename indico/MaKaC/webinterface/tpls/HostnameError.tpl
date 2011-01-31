@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <div class="container">
 
 <table align="center" width="100%%">

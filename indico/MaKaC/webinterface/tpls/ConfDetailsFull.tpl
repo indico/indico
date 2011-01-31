@@ -1,23 +1,22 @@
-%(description)s
+<%= description %>
 <table class="conferenceDetails">
     <tr>
         <td colspan="2"><br></td>
     </tr>
     <tr>
         <td align="right" valign="top" class="displayField"><b> <%= _("Dates")%>:</b></td>
-        <td>%(dateInterval)s</td>
+        <td><%= dateInterval %></td>
     </tr>
     <tr>
         <td align="right" valign="top" class="displayField"><b> <%= _("Timezone")%>:</b></td>
-        <td>%(timezone)s</td>
+        <td><%= timezone %></td>
     </tr>
     <tr>
         <td align="right" valign="top" class="displayField"><b> <%= _("Location")%>:</b></td>
-        <td>%(location)s</td>
+        <td><%= location %></td>
     </tr>
-    %(chairs)s
-    %(material)s
-    %(moreInfo)s
+    <%= chairs %>
+    <%= material %>
+    <%= moreInfo %>
 </table>
-%(actions)s
-
+<%= actions %>

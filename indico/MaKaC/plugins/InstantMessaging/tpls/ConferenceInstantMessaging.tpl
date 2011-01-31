@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% from MaKaC.plugins.util import PluginFieldsWrapper %>
 
 <table width="100%" align="center" border="0" cellpadding="5px">

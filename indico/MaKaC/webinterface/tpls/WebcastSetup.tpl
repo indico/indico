@@ -1,15 +1,15 @@
-<table align="center" width="95%%">
+<table align="center" width="95%">
 <tr>
   <td>
     <br />
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Channels</td>
     </tr>
     <tr>
       <td>
-  %(channels)s
-  <form action="%(postURL)s" method="POST">
+  <%= channels %>
+  <form action="<%= postURL %>" method="POST">
   <table bgcolor="#bbbbbb">
   <tr bgcolor="#999999"><td colspan=2><font color=white>New Channel</font>
   </td></tr><tr><td>
@@ -28,35 +28,35 @@
       </td>
     </tr>
     </table>
-    
+
     <br /><br />
-    
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+
+    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Webcast Service URL</td>
     </tr>
     <tr>
-      <td bgcolor="white" width="100%%" valign="top" class="blacktext" style="padding-top: 10px;">
-        <form action="%(saveWebcastServiceURL)s" method="POST">
-          <input name="webcastServiceURL" value="%(webcastServiceURL)s"/>
+      <td bgcolor="white" width="100%" valign="top" class="blacktext" style="padding-top: 10px;">
+        <form action="<%= saveWebcastServiceURL %>" method="POST">
+          <input name="webcastServiceURL" value="<%= webcastServiceURL %>"/>
           <input type="submit" name="submit" value="Save">
           <span>Used for forthcoming webcast display in event public pages.</span>
         </form>
       </td>
     </tr>
     </table>
-    
+
     <br /><br />
-    
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+
+    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Webcast Synchronization</td>
     </tr>
     <tr>
-      <td bgcolor="white" width="100%%" valign="top" class="blacktext" style="padding-top: 10px;">
-        <form action="%(saveWebcastSynchronizationURL)s" method="POST">
+      <td bgcolor="white" width="100%" valign="top" class="blacktext" style="padding-top: 10px;">
+        <form action="<%= saveWebcastSynchronizationURL %>" method="POST">
           <span>Synchronization URL: </span>
-          <input name="webcastSynchronizationURL" size="50" value="%(webcastSynchronizationURL)s"/>
+          <input name="webcastSynchronizationURL" size="50" value="<%= webcastSynchronizationURL %>"/>
           <input type="submit" name="submit" value="Save">
         </form>
         <div style="padding-top: 10px;padding-bottom: 10px;">
@@ -71,23 +71,23 @@
           </ul>
           Leave empty for no automatic synchronization.
         </div>
-        <form action="%(webcastManualSynchronize)s" method="POST">
+        <form action="<%= webcastManualSynchronize %>" method="POST">
             <input type="submit" name="submit" value="Synchronize manually">
             <span>Remember to save the URL first if you have modified it.</span>
         </form>
       </td>
     </tr>
     </table>
-    
+
     <br /><br />
-    
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+
+    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle">Webcast Administrators list</td>
     </tr>
     <tr>
-      <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-	%(adminList)s
+      <td bgcolor="white" width="100%" valign="top" class="blacktext">
+	<%= adminList %>
       </td>
     </tr>
     </table>

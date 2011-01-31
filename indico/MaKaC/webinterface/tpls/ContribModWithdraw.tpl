@@ -1,6 +1,6 @@
 <br>
-<form action=%(postURL)s method="POST">
-    <table width="60%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form action=<%= postURL %> method="POST">
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle" colspan="2"><%= _("Withdrawing a contribution")%></td>
         </tr>
@@ -9,7 +9,7 @@
                 <span class="titleCellFormat"><%= _("Reason for withdrawal & comments")%>&nbsp;</span>
             </td>
             <td>
-                <textarea cols="60" rows="5" name="comment">%(comment)s</textarea>
+                <textarea cols="60" rows="5" name="comment"><%= comment %></textarea>
             </td>
         </tr>
         <tr>

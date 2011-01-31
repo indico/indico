@@ -11,7 +11,7 @@ for (i = 0; i < document.participantsForm.participants.length; i++)
 	document.participantsForm.participants[i].checked=true
 	}
 }
-}   
+}
 
 function unselectAll()
 {
@@ -24,20 +24,20 @@ for (i = 0; i < document.participantsForm.participants.length; i++)
 	document.participantsForm.participants[i].checked=false
 	}
 }
-}   
+}
 //-->
 </script>
-<table width="100%%">
+<table width="100%">
 	<tr>
 		<td>
 			<a name="results"></a>
-			<table align="center" width="100%%" border="0" style="border-left: 1px solid #777777;" cellpadding="0" cellspacing="0">
+			<table align="center" width="100%" border="0" style="border-left: 1px solid #777777;" cellpadding="0" cellspacing="0">
 				<tr>
 					<td colspan="9" style="background:#E5E5E5; color:gray">
 
-                        <table cellpadding="0" cellspacing="0" width="100%%">
+                        <table cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                                <td colspan=2 class="groupTitle" width="100%%">&nbsp;&nbsp;&nbsp;%(title)s (%(participantNumber)s)</td>
+                                <td colspan=2 class="groupTitle" width="100%">&nbsp;&nbsp;&nbsp;<%= title %> (<%= participantNumber %>)</td>
                             </tr>
                         </table>
                     </td>
@@ -45,10 +45,10 @@ for (i = 0; i < document.participantsForm.participants.length; i++)
 				<tr>
 					<td colspan="9">&nbsp;</td>
 				</tr>
-				<form action=%(participantSelectionAction)s method="post" name="participantsForm">				
+				<form action=<%= participantSelectionAction %> method="post" name="participantsForm">
 				<tr>
-					%(columns)s
-					%(participants)s
+					<%= columns %>
+					<%= participants %>
 				</tr>
 				<tr><td colspan="9">&nbsp;</td></tr>
 				</form>

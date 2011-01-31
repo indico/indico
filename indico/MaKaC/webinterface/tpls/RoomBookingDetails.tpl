@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
     <script type="text/javascript">
         function submit_cancel()
         {

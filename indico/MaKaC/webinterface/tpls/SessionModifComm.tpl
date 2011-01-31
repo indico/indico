@@ -1,2 +1,1 @@
-%(comment)s
-
+<%= comment %>

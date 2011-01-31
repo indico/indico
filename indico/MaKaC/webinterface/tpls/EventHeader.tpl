@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <%!
 owner = conf.getOwnerList()[0]
 
@@ -149,5 +147,4 @@ except NameError:
 
 <%= errorMsg %>
 <%= infoMsg %>
-
 

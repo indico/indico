@@ -1,7 +1,7 @@
-<table width="100%%" align="center">
+<table width="100%" align="center">
     <tr>
         <td>
-            <table width="90%%" align="center">
+            <table width="90%" align="center">
                 <tr>
                     <td>
                     </td>
@@ -10,10 +10,10 @@
         </td>
     </tr>
     <tr>
-        <td>%(error)s</td>
+        <td><%= error %></td>
     </tr>
     <tr>
-        <td>%(dataModificationForm)s</td>
+        <td><%= dataModificationForm %></td>
     </tr>
 </table>
 <br>

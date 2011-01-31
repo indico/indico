@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <% format = "%a %d %b %Y at %H\x3a%M" %>
 
 <!-- Final reviewing of the referee -->

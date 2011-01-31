@@ -9,21 +9,21 @@
            <%= _("List of default templates")%>
         </td>
       </tr>
-      
+
       <tr>
         <td>
-          <input name="New Template Button" class="btn" value="<%= _("New")%>" type="button" onClick="location.href='%(NewDefaultTemplateURL)s'">
+          <input name="New Template Button" class="btn" value="<%= _("New")%>" type="button" onClick="location.href='<%= NewDefaultTemplateURL %>'">
         </td>
       </tr>
 
       <tr>
         <td>
-          <table class="gestiontable" width="50%%">
+          <table class="gestiontable" width="50%">
             <tbody>
-%(templateList)s
+<%= templateList %>
           </table>
         </td>
       </tr>
-      
+
     </tbody>
   </table>

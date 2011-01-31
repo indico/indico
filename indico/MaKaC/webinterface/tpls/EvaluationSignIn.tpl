@@ -9,7 +9,7 @@
   <tr>
     <td>
       <font color="black"><b><%= _("Before doing this survey you must have an account with Indico and be logged in.")%>
-      <br/>Please <a href="%(signInURL)s">log in</a> <%= _("if you have an account, or create a new one.")%></b></font>
+      <br/>Please <a href="<%= signInURL %>">log in</a> <%= _("if you have an account, or create a new one.")%></b></font>
       <br/><br/><br/>
     </td>
   </tr>

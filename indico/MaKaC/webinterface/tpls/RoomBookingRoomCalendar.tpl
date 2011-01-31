@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <!--
 Room Calendar is composed of day rows ( RoomBookingRoomCalendar*DayRow* )
 Day row is composed of of bars, showing particular reservations ( RoomBookingRoomCalendar*Bar* )

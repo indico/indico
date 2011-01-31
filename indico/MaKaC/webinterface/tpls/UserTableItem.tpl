@@ -23,10 +23,10 @@
     <span class="nameLink">
 
         <% if selectable: %>
-    	<input type="<%= inputType %>" name="selectedPrincipals" value="%(id)s" %(selected)s>
+    	<input type="<%= inputType %>" name="selectedPrincipals" value="<%= id %>" <%= selected %>>
         <% end %>
 
-        %(fullName)s <em>(%(email)s)</em>
+        <%= fullName %> <em>(<%= email %>)</em>
     </span>
 
 </li>

@@ -1,6 +1,6 @@
 
-<form id="categCreationForm" action="%(postURL)s" method="POST">
-    %(locator)s
+<form id="categCreationForm" action="<%= postURL %>" method="POST">
+    <%= locator %>
     <table class="groupTable">
         <tr>
             <td colspan="2"><div class="groupTitle"><%= _("Creation of a new sub-category")%></div></td>
@@ -17,15 +17,15 @@
         </tr>
         <tr>
             <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Default lectures style")%></span></td>
-            <td class="blacktext"><select name="defaultSimpleEventStyle">%(simple_eventStyleOptions)s</select></td>
+            <td class="blacktext"><select name="defaultSimpleEventStyle"><%= simple_eventStyleOptions %></select></td>
         </tr>
         <tr>
             <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Default meetings style")%></span></td>
-            <td class="blacktext"><select name="defaultMeetingStyle">%(meetingStyleOptions)s</select></td>
+            <td class="blacktext"><select name="defaultMeetingStyle"><%= meetingStyleOptions %></select></td>
         </tr>
         <tr>
             <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Default Timezone")%></span></td>
-            <td class="blacktext"><select name="defaultTimezone">%(timezoneOptions)s</select></td>
+            <td class="blacktext"><select name="defaultTimezone"><%= timezoneOptions %></select></td>
         </tr>
         <tr>
             <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Protection")%></span></td>

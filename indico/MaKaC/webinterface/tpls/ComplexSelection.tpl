@@ -1,36 +1,36 @@
 <table class="groupTable">
     <tr>
-        <td colspan="2"><div class="groupTitle">%(WPtitle)s</div></td>
+        <td colspan="2"><div class="groupTitle"><%= WPtitle %></div></td>
     </tr>
-    <form action="%(postURL)s" method="POST">
+    <form action="<%= postURL %>" method="POST">
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Family name")%></span></td>
         <td class="contentCellTD">
-            <input type="text" name="surname" size="60" value="%(surName)s">
+            <input type="text" name="surname" size="60" value="<%= surName %>">
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("First name")%></span></td>
         <td class="contentCellTD">
-            <input type="text" name="firstname" size="60" value="%(firstName)s">
+            <input type="text" name="firstname" size="60" value="<%= firstName %>">
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email")%></span></td>
         <td class="contentCellTD">
-            <input type="text" name="email" size="60" value="%(email)s">
+            <input type="text" name="email" size="60" value="<%= email %>">
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Organisation")%></span></td>
         <td class="contentCellTD">
             <input type="text" name="organisation" size="60"
-                    value="%(organisation)s">
+                    value="<%= organisation %>">
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Search options")%></span></td>
-        <td class="contentCellTD">%(searchOptions)s</td>
+        <td class="contentCellTD"><%= searchOptions %></td>
     </tr>
     <tr>
         <td>&nbsp;</td>
@@ -40,19 +40,19 @@
     </tr>
     </form>
 
-  %(msg)s
+  <%= msg %>
     <% if searchResultsTable: %>
-        <form action="%(addURL)s" method="POST">
-        %(params)s
+        <form action="<%= addURL %>" method="POST">
+        <%= params %>
             <tr>
                 <td colspan="2">
-                    %(searchResultsTable)s
+                    <%= searchResultsTable %>
                 </td>
 
             </tr>
             <tr>
                 <td colspan="2">
-                    %(selectionBox)s
+                    <%= selectionBox %>
                 </td>
             </tr>
             <tr>
@@ -64,4 +64,3 @@
         </form>
     <% end %>
 </table>
-

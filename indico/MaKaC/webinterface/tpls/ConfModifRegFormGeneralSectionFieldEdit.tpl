@@ -34,37 +34,37 @@
   }
 </script>
 
-<form id="WConfModifRegFormGeneralSectionFieldEdit" name="WConfModifRegFormGeneralSectionFieldEdit" action=%(postURL)s method="POST" onsubmit="return controle()">
-  <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form id="WConfModifRegFormGeneralSectionFieldEdit" name="WConfModifRegFormGeneralSectionFieldEdit" action=<%= postURL %> method="POST" onsubmit="return controle()">
+  <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle" colspan="2"> <%= _("Modify general field")%></td>
     </tr>
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Caption")%></span></td>
-      <td bgcolor="white" class="blacktext" width="100%%">
+      <td bgcolor="white" class="blacktext" width="100%">
       <input type="text" name="caption" size="60" maxlength="60" value=<%= caption %> />
       </td>
     </tr>
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Type of field")%></span></td>
-      <td bgcolor="white" class="blacktext" width="100%%">
-      %(inputtypes)s
+      <td bgcolor="white" class="blacktext" width="100%">
+      <%= inputtypes %>
       </td>
     </tr>
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
-      <td bgcolor="white" class="blacktext" width="100%%">
-        <textarea name="description" rows="4" cols="30">%(description)s</textarea>
+      <td bgcolor="white" class="blacktext" width="100%">
+        <textarea name="description" rows="4" cols="30"><%= description %></textarea>
       </td>
     </tr>
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Mandatory field")%></span></td>
-      <td bgcolor="white" class="blacktext" width="100%%">
-      <input type="checkbox" name="mandatory" size="60" %(mandatory)s> ( <%= _("uncheck if it is not a mandatory field")%>)
+      <td bgcolor="white" class="blacktext" width="100%">
+      <input type="checkbox" name="mandatory" size="60" <%= mandatory %>> ( <%= _("uncheck if it is not a mandatory field")%>)
       </td>
     </tr>
 
-    %(specialOptions)s
+    <%= specialOptions %>
   <tr>
       <td>&nbsp;</td>
     </tr>

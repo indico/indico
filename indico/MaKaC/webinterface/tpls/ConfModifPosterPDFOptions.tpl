@@ -1,4 +1,4 @@
-<table width="60%%" class="gestiontable" >
+<table width="60%" class="gestiontable" >
   <tbody>
     <tr>
       <td NOWRAP>
@@ -12,7 +12,7 @@
       <td NOWRAP>
         <%= _("Minimal vertical margin (cm)")%>
       </td>
-      <td width="100%%">
+      <td width="100%">
         <input name="marginV" size="5" value="0">
       </td>
     </tr>
@@ -22,7 +22,7 @@
       </td>
       <td>
         <select name="pagesize">
-          %(pagesizes)s
+          <%= pagesizes %>
         </select>
       </td>
     </tr>

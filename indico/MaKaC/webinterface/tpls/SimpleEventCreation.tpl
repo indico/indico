@@ -50,7 +50,7 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Timezone")%></span></td>
             <td class="contentCellTD">
-                <select name="Timezone">%(timezoneOptions)s</select>
+                <select name="Timezone"><%= timezoneOptions %></select>
             </td>
         </tr>
         <% includeTpl('EventLocationInfo', modifying=False, showParent=False, conf=False) %>
@@ -102,7 +102,7 @@
 
     <table class="groupTable" style="background-color: #ECECEC; border-top: 1px dashed #777777;">
         <tr>
-            <td width="15%%" nowrap>&nbsp;</td>
+            <td width="15%" nowrap>&nbsp;</td>
             <td nowrap  style="padding: 10px 0;">
                 <input style="font-weight: bold;" type="submit" name="ok" value="<%= _("Create lecture")%>">
             </td>

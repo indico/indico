@@ -1,6 +1,6 @@
 <center>
 
-    <table width="80%%">
+    <table width="80%">
         <tr>
             <td colspan="2" align="center"><font size="+2"><u><%= _("Creating new Indico user account")%></u></font><br><br></td>
         </tr>
@@ -9,7 +9,7 @@
                     <table><tr><td width="10"></td><td>
                         <br>
                         <b><%= _("Congratulations!!!")%></b> <%= _("You have successfully created your Indico account.")%><br><br>
-                        %(however)s
+                        <%= however %>
                          <%= _("Once your account is activated you can <a href=%(signInURL)s>log in</a> and start using the system.")%><br>
                         <br>
                         <br>

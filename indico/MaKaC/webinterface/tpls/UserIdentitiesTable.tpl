@@ -1,7 +1,7 @@
 
-<form action="%(removeIdentityURL)s" method="POST" style="margin: 0;">
+<form action="<%= removeIdentityURL %>" method="POST" style="margin: 0;">
 <table>
-    %(items)s
+    <%= items %>
     <tr>
         <td>
         <table>
@@ -12,7 +12,7 @@
                 </td>
 
                 <td>
-                <form style="margin: 0; padding: 0;" action="%(addIdentityURL)s" method="POST">
+                <form style="margin: 0; padding: 0;" action="<%= addIdentityURL %>" method="POST">
                     <input type="submit" class="btn" value="<%= _("create a new account")%>" name="action">
                 </form>
 

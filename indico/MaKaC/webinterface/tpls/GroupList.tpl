@@ -1,5 +1,5 @@
 <table class="groupTable">
-<form action="%(createGroupURL)s" method="POST">
+<form action="<%= createGroupURL %>" method="POST">
 
 <tr>
   <td colspan="2"><div class="groupTitle"><%= _("Group tools") %></div></td>
@@ -13,18 +13,18 @@
     <td class="blacktext">
         <input type="submit" value="<%= _("New Group")%>" class="btn" />
     </td>
-</tr>  
+</tr>
 </form>
-<form action="%(browseGroupsURL)s" method="POST" name="browseForm">
+<form action="<%= browseGroupsURL %>" method="POST" name="browseForm">
 <input type="hidden" value="" name="letter">
 <tr>
   <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Browse Groups")%></span></td>
-  <td>%(browseGroups)s</td>
+  <td><%= browseGroups %></td>
 </tr>
 </form>
 
 
-<form action="%(searchGroupsURL)s" method="POST">
+<form action="<%= searchGroupsURL %>" method="POST">
 
 <tr>
     <td colspan="2"><div class="groupTitle"><%= _("Search groups")%></div></td>
@@ -40,8 +40,8 @@
 <tr>
     <td>&nbsp;</td>
     <td>
-        <table width="100%%"><tbody>
-            %(groups)s
+        <table width="100%"><tbody>
+            <%= groups %>
         </tbody></table>
         <br /><br />
     </td>

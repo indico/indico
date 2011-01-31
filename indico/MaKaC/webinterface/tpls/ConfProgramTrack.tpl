@@ -1,15 +1,15 @@
 <table>
     <tr>
-        <td class="trackDisplayTitle" width="100%%">%(mgtIcon)s%(title)s</td>
+        <td class="trackDisplayTitle" width="100%"><%= mgtIcon %><%= title %></td>
     </tr>
     <tr>
-        <td style="padding-left: 25px;">%(description)s</td>
+        <td style="padding-left: 25px;"><%= description %></td>
     </tr>
     <tr>
-        <td>%(coordinators)s</td>
+        <td><%= coordinators %></td>
     </tr>
     <tr>
-        <td>%(subtracks)s</td>
+        <td><%= subtracks %></td>
     </tr>
     <tr>
         <td><br></td>

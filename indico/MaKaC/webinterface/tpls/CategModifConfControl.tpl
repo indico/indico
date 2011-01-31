@@ -1,1 +1,1 @@
-%(confCreationControlFrame)s
+<%= confCreationControlFrame %>

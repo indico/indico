@@ -1,4 +1,4 @@
-<form action=%(getPDFURL)s method="post" target="_blank" style="margin: 0;">
+<form action=<%= getPDFURL %> method="post" target="_blank" style="margin: 0;">
 
     <div class="groupTitle"><%= _("Book of Abstracts")%></div>
 

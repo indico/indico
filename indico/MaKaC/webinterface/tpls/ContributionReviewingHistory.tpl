@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.conference import LocalFile %>
 <% from MaKaC.conference import Link %>
@@ -28,7 +27,7 @@
 	        </table>
            <% end %>
          <% end %>
-           
+
         <% includeTpl ('ContributionReviewingDisplay',
                         Editing = review.getEditorJudgement(), AdviceList = review.getReviewerJudgements(), Review = review,
                         ConferenceChoice = ConferenceChoice) %>

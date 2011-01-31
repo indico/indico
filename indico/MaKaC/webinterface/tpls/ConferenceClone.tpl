@@ -96,12 +96,12 @@
 </script>
 
 
-<div class="groupTitle"><%= _("Clone the event:")%> %(confTitle)s</div>
+<div class="groupTitle"><%= _("Clone the event:")%> <%= confTitle %></div>
 
 
 <h2><%= _("Step 1: What to clone?")%></h2>
 
-<form id="cloningForm" action="%(cloning)s" method="post">
+<form id="cloningForm" action="<%= cloning %>" method="post">
 
     <div class="cloneElements">
         <input type="hidden" id="ct" name="cloneType" value="none" />
@@ -117,7 +117,7 @@
             <li><input type="checkbox" name="cloneAlerts" id="cloneAlerts" checked value="1" />
                 <%= _("Alerts")%></li>
 
-            %(cloneOptions)s
+            <%= cloneOptions %>
         </ul>
     </div>
 
@@ -244,4 +244,3 @@
         </div>
 
 </form>
-

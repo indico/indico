@@ -1,6 +1,3 @@
-<% declareTemplate(newTemplateStyle=True)%>
-
-
 <div class="groupTitleNoBorder"><%= _("Timetable")%> <em>(<%=_("from")+" "%> <%= start_date %> <%=" "+_("to")+" "%> <%= end_date %> <a href=<%= editURL %>>[<%=_("edit")%>]</a> <%=_("Timezone")%>: <%= timezone %>)</em></div>
 <div id="timetableDiv" style="position: relative;">
 

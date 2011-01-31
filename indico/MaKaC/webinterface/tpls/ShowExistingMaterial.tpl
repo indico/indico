@@ -1,4 +1,4 @@
-%(existingMaterialsTitle)s
+<%= existingMaterialsTitle %>
 
 <div id="materialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>

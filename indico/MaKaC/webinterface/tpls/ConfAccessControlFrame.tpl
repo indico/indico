@@ -1,5 +1,5 @@
 
-<table width="100%%" align="center" border="0">
+<table width="100%" align="center" border="0">
     <tr>
         <td colspan="5" class="groupTitle"> <%= _("Access control")%></td>
     </tr>
@@ -11,13 +11,13 @@
     locator=locator, isFullyPublic=isFullyPublic) %>
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat"><%= _("Access key")%></span></td>
-        <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-            <form action="%(setAccessKeyURL)s" id="setAccessKey" method="POST">
-                %(locator)s
-                <input name="accessKey" id="accessKey" type="password" autocomplete="off" size=25 value="%(accessKey)s">
-                <input type="submit" class="btn" value="<%= _("change")%>"> <span id="accessKeyChanged" class="successText"></span>
-                <div class="warningText"><%=_("Note: It is more secure to use make the event private instead of using an access key!")%></div>
-            </form>
+        <td bgcolor="white" width="100%" valign="top" class="blacktext">
+    		<form action="<%= setAccessKeyURL %>" id="setAccessKey" method="POST">
+                	<%= locator %>
+    		<input name="accessKey" id="accessKey" type="password" autocomplete="off" size=25 value="<%= accessKey %>">
+    		<input type="submit" class="btn" value="<%= _("change")%>"> <span id="accessKeyChanged" class="successText"></span>
+            <div class="warningText"><%=_("Note: It is more secure to use make the event private instead of using an access key!")%></div>
+    		</form>
 
             <script type="text/javascript">
                 $E('setAccessKey').dom.onsubmit = function(e) {

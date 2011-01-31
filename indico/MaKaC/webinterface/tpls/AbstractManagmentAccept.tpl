@@ -1,5 +1,5 @@
 
-<table width="50%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
 	<tr>
 		<td class="groupTitle"><%= _("Accepting abstract")%></td>
     </tr>
@@ -7,7 +7,7 @@
         <td bgcolor="white">
             <table>
                 <tr>
-					<form action=%(acceptURL)s method="POST">
+					<form action=<%= acceptURL %> method="POST">
 					<td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%></span></td>
 					<td><textarea name="comments" rows="6" cols="50"></textarea></td>
 				</tr>
@@ -15,7 +15,7 @@
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Destination track")%></span></td>
                     <td>
                         <select name="track">
-                            %(tracks)s
+                            <%= tracks %>
                         </select>
                     </td>
                 </tr>
@@ -23,7 +23,7 @@
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Destination session")%></span></td>
                     <td>
                         <select name="session">
-                            %(sessions)s
+                            <%= sessions %>
                         </select>
                     </td>
                 </tr>
@@ -31,7 +31,7 @@
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Type of contribution")%></span></td>
                     <td>
                         <select name="type">
-                            %(types)s
+                            <%= types %>
                         </select>
                     </td>
                 </tr>
@@ -53,7 +53,7 @@
 						<input type="submit" class="btn" name="accept" value="<%= _("accept")%>">
                     </td>
 					</form>
-					<form action=%(cancelURL)s method="POST">
+					<form action=<%= cancelURL %> method="POST">
                     <td valign="bottom" align="left">
 						<input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
                     </td>

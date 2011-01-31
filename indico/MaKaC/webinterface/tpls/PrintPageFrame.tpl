@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <%= content %>
 
 <style type="text/css">

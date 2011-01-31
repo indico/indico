@@ -1,5 +1,5 @@
-<table width="100%%" class="ACtab"><tr><td>
+<table width="100%" class="ACtab"><tr><td>
 <br>
-%(accessControlFrame)s
+<%= accessControlFrame %>
 <br>
 </tr></td></table>

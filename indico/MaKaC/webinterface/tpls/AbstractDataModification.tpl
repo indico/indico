@@ -1,9 +1,9 @@
 
-<form action=%(postURL)s method="POST" width="100%%">
-    <table width="100%%" align="center">
+<form action=<%= postURL %> method="POST" width="100%">
+    <table width="100%" align="center">
         <tr>
             <td>
-                <table width="100%%" class="groupTable" align="center">
+                <table width="100%" class="groupTable" align="center">
 					<tr>
                         <td class="groupTitle"><%= _("Abstract")%></td>
                     </tr>
@@ -12,18 +12,18 @@
                     </tr>
                     <tr>
                         <td>
-                            <table align="center" width="100%%">
+                            <table align="center" width="100%">
                                 <tr>
                                     <td align="right" valign="top" white-space="nowrap">
                                         <span class="dataCaptionFormat"><%= _("Title")%></span>
                                         <span class="mandatoryField">*</span>
                                     </td>
-                                    <td width="100%%">
-                                        <input type="text" name="title" value=%(title)s style="width:100%%">
+                                    <td width="100%">
+                                        <input type="text" name="title" value=<%= title %> style="width:100%">
                                     </td>
                                 </tr>
-                                %(additionalFields)s
-                                %(types)s
+                                <%= additionalFields %>
+                                <%= types %>
                             </table>
                         </td>
                     </tr>
@@ -35,7 +35,7 @@
         </tr>
         <tr>
            <td>
-                <table align="center" width="100%%" class="groupTable">
+                <table align="center" width="100%" class="groupTable">
                     <tr>
                         <td class="groupTitle"><%= _("Primary Authors")%></td>
                     </tr>
@@ -45,7 +45,7 @@
                     <tr>
                         <td>
                             <table cellspacing="1" align="center">
-                                %(primary_authors)s
+                                <%= primary_authors %>
                             </table>
                         </td>
                     </tr>
@@ -66,7 +66,7 @@
         </tr>
         <tr>
             <td>
-                <table align="center" width="95%%" class="groupTable">
+                <table align="center" width="95%" class="groupTable">
                     <tr>
                         <td class="groupTitle"><%= _("Co-Authors")%></td>
                     </tr>
@@ -76,7 +76,7 @@
                     <tr>
                         <td>
                             <table cellspacing="1" align="center">
-                                %(secondary_authors)s
+                                <%= secondary_authors %>
                             </table>
                         </td>
                     </tr>
@@ -97,17 +97,17 @@
         </tr>
         <tr>
             <td>
-                <table align="center" width="95%%" class="groupTable">
+                <table align="center" width="95%" class="groupTable">
                     <tr>
-                        <td class="groupTitle"><%= _("Track classification")%>&nbsp;%(tracksMandatory)s</td>
+                        <td class="groupTitle"><%= _("Track classification")%>&nbsp;<%= tracksMandatory %></td>
                     </tr>
                     <tr>
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
                         <td>
-                            <table class="groupTable" align="center" width="80%%">
-                                %(tracks)s
+                            <table class="groupTable" align="center" width="80%">
+                                <%= tracks %>
                             </table>
                         </td>
                     </tr>
@@ -119,7 +119,7 @@
         </tr>
         <tr>
             <td>
-                <table align="center" width="95%%" class="groupTable">
+                <table align="center" width="95%" class="groupTable">
                     <tr>
                         <td class="groupTitle"><%= _("Comments")%></td>
                     </tr>
@@ -127,9 +127,9 @@
                         <td>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td width="100%%">
-                            <table align="center" width="100%%">
-                                <textarea name="comments" rows="8" style="width:100%%;">%(comments)s</textarea>
+                        <td width="100%">
+                            <table align="center" width="100%">
+                                <textarea name="comments" rows="8" style="width:100%;"><%= comments %></textarea>
                             </table>
                         </td>
                     </tr>
@@ -147,4 +147,3 @@
         </tr>
     </table>
 </form>
-

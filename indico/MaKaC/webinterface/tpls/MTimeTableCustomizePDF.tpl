@@ -1,14 +1,14 @@
 <br><br>
-<form id="pdfForm" action=%(getPDFURL)s method="post">
-    <input type="hidden" name="showDays" value="%(showDays)s">
-    <input type="hidden" name="showSessions" value="%(showSessions)s">
-    <table width="40%%" align="center" border="0" style="background-color: white; border-left: 1px solid #777777; border-top: 1px solid #777777;">
+<form id="pdfForm" action=<%= getPDFURL %> method="post">
+    <input type="hidden" name="showDays" value="<%= showDays %>">
+    <input type="hidden" name="showSessions" value="<%= showSessions %>">
+    <table width="40%" align="center" border="0" style="background-color: white; border-left: 1px solid #777777; border-top: 1px solid #777777;">
         <tr>
             <td class="groupTitle" style="background:#E5E5E5; color:gray"> <%= _("PDF timetable customisation")%></td>
         </tr>
         <tr>
           <td>
-            <table width="100%%" style="padding:20px;">
+            <table width="100%" style="padding:20px;">
               <tr>
                 <td>
                   <input type="radio" name="typeTT" value="normalTT" checked><b> <%= _("Normal timetable")%>:</b>
@@ -16,7 +16,7 @@
               </tr>
               <tr>
                 <td>
-                  <table width="100%%" style="padding-left:20px">
+                  <table width="100%" style="padding-left:20px">
                     <tr>
                         <td>
                             <input type="checkbox" name="showCoverPage" value="showCoverPage"> <%= _("Print cover page")%>
@@ -82,7 +82,7 @@
               </tr>
               <tr>
                 <td>
-                  <table width="100%%" style="padding-left:20px">
+                  <table width="100%" style="padding-left:20px">
                     <tr>
                         <td>
                             <input type="checkbox" name="showContribsAtConfLevel" value="showContribsAtConfLevel" checked="checked"> <%= _("Print contributions which are not within any session")%>

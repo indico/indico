@@ -2,10 +2,10 @@
 <span style="font-style: italic;"><%= _("Category") %></span>: <%= category.getTitle()%>
 </span></div>
 
-%(sideMenu)s
+<%= sideMenu %>
 
 <!-- Body -->
 <div class="bodyWithSideMenu">
-    %(body)s
+    <%= body %>
 </div>
 <!-- End of body -->

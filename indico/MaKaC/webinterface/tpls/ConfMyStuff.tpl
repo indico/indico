@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <div class="groupTitle"><%= _("My Conference Features")%></div>
 <div>
 <table width='100%'>
@@ -9,7 +8,7 @@
               </b>
            </td>
     </tr>
-    <tr>      
+    <tr>
            <td style="padding-left: 30px; padding-top: 10px">
               <font color="gray"> <%= _("To navigate, please use the sublink(s) located under 'My Conference'.") %>
               </font>

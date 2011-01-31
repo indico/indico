@@ -1,11 +1,11 @@
 <tr>
-    <td style="color:black"><input type="%(type)s" name="tracks" value=%(id)s %(checked)s>%(title)s</td>
+    <td style="color:black"><input type="<%= type %>" name="tracks" value=<%= id %> <%= checked %>><%= title %></td>
 </tr>
 <tr>
     <td>
-        <table width="80%%" align="center">
+        <table width="80%" align="center">
             <tr>
-                <td>%(description)s</td>
+                <td><%= description %></td>
             </tr>
         </table>
     </td>
@@ -15,4 +15,3 @@
         <br>
     </td>
 </tr>
-

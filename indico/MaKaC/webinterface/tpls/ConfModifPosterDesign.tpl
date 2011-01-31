@@ -174,7 +174,7 @@
 
       // We set the inner html of the div depending on the type of item inserted
       switch($F('elementList')) {
-        %(switchCases)s
+        <%= switchCases %>
       }
 
       if (!lastSelectedDiv) {
@@ -635,13 +635,13 @@
 
 <iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0" onload="sent()"></iframe>
 
-<div style="width:100%%">
+<div style="width:100%">
   <br/>
 
   <table class="groupTable" cellpadding="0">
     <tbody>
       <tr>
-        <td class="groupTitle" colspan="6">%(titleMessage)s</td>
+        <td class="groupTitle" colspan="6"><%= titleMessage %></td>
       </tr>
       <tr>
         <td class="titleCellTD">
@@ -655,14 +655,14 @@
         <td class="titleCellTD">
           <span class="titleCellFormat">Background</span>
         </td>
-        <form action="%(saveBackgroundURL)s" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
+        <form action="<%= saveBackgroundURL %>" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
         <td height="20px" NOWRAP align="left" colspan="3">
           <input name="file" size="58" type="file">
           <input class="btn" value="Send File" type="submit">
           <input class="btn" type="button" value="Remove background" onclick="removeBackground()">
         </td>
-        <td width="100%%" align="left" colspan="4">
-          <img id="loadingIcon" src=%(loadingIconURL)s width="20px" height="20px" style="display:none;">
+        <td width="100%" align="left" colspan="4">
+          <img id="loadingIcon" src=<%= loadingIconURL %> width="20px" height="20px" style="display:none;">
         </td>
       </tr>
       <tr>
@@ -721,7 +721,7 @@
           <br/><br/>
 
           <select name="Template Elements List" id="elementList">
-            %(selectOptions)s
+            <%= selectOptions %>
           </select>
 
           <br/>
@@ -784,7 +784,7 @@
 
         <td align="left" valign="top">
           <div id="templateDiv" style="width:525px;height:742px;position:relative;left:0px;top:0px">
-            <table border="1" width="100%%" height="100%%" cellspacing="0" cellpadding="0">
+            <table border="1" width="100%" height="100%" cellspacing="0" cellpadding="0">
               <tbody>
                 <tr><td></td></tr>
               </tbody>
@@ -834,7 +834,7 @@
           <span class="titleCellFormat">Color&nbsp;</span>
         </td>
 
-        <td width="100%%">
+        <td width="100%">
           <select id='color selector' name="Template Element Color" onchange="changeColor()">
             <option>black</option>
             <option>red</option>
@@ -870,7 +870,7 @@
           <span class="titleCellFormat">Size&nbsp;</span>
         </td>
 
-        <td width="100%%">
+        <td width="100%">
           <select id='size selector' name="Template Element Size" onchange="changeSize()">
             <option>160pt</option>
             <option>150pt</option>
@@ -911,7 +911,7 @@
         <td class="titleCellTD">
           <span class="titleCellFormat">Width (cm)&nbsp;</span>
         </td>
-        <td width="100%%">
+        <td width="100%">
           <input id="width field" size="5" name="Element Size">
           <input class="btn" value="Change" type="button" onclick="changeWidth()">
         </td>
@@ -935,16 +935,16 @@
   <table class="groupTable">
     <tbody>
       <tr>
-        <td colspan="4" align="center" width="100%%">
+        <td colspan="4" align="center" width="100%">
           <input class="btn" name="Save Template Button" value="Save" type="button" onclick="save()">
-          <input class="btn" name="Cancel Button" value="Cancel" type="button" onclick="location.href='%(cancelURL)s'">
+          <input class="btn" name="Cancel Button" value="Cancel" type="button" onclick="location.href='<%= cancelURL %>'">
         </td>
       </tr>
     </tbody>
   </table>
 
-  <form name="hiddenform" action="%(saveTemplateURL)s" method="POST">
-      <input name="templateId" value="%(templateId)s" type="hidden">
+  <form name="hiddenform" action="<%= saveTemplateURL %>" method="POST">
+      <input name="templateId" value="<%= templateId %>" type="hidden">
       <input id="templateData" name="templateData" type="hidden">
   </form>
 
@@ -957,8 +957,8 @@
   <script type="text/javascript">
 
     // We load the template if we are editing a template
-    if (%(editingTemplate)s) {
-       var template = eval(%(templateData)s.unescapeHTML());
+    if (<%= editingTemplate %>) {
+       var template = eval(<%= templateData %>.unescapeHTML());
        $('template name').value = template[0];
        $('templateDiv').style.width = template[1].width;
        $('templateDiv').style.height = template[1].height;
@@ -983,10 +983,10 @@
     // This function displays the items, if any have been loaded, on the screen
     displayItems()
 
-    if (%(editingTemplate)s && %(hasBackground)s) {
-       backgroundId = %(backgroundId)s
-       backgroundPos = '%(backgroundPos)s'
-       displayBackground("%(backgroundURL)s")
+    if (<%= editingTemplate %> && <%= hasBackground %>) {
+       backgroundId = <%= backgroundId %>
+       backgroundPos = '<%= backgroundPos %>'
+       displayBackground("<%= backgroundURL %>")
     }
 
   </script>

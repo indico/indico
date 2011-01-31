@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% if not isFrontPage and navigation: %>
     <%= navigation %>
 <% end %>

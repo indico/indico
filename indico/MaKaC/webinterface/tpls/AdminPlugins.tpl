@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <% pluginList = PluginType.getPluginList(doSort = True, includeNonPresent = False, includeNonActive = True) %>
 
 <table style="width: 100%%">

@@ -1,14 +1,14 @@
-<table width="100%%">
+<table width="100%">
     <tr>
         <td>&nbsp;</td>
     </tr>
     <tr>
         <td>
-            <form action=%(displayURL)s method="POST">
-			<table width="100%%" align="center" border="0" 
+            <form action=<%= displayURL %> method="POST">
+			<table width="100%" align="center" border="0"
                     style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
 				<tr>
-					<td class="groupTitle" 
+					<td class="groupTitle"
                             style="background:#E5E5E5; color:gray">
                         &nbsp;&nbsp;&nbsp;<%= _("Display options")%>
                     </td>
@@ -16,8 +16,8 @@
 				<tr>
 					<td>
                         <span class="titleCellFormat"><%= _("View mode")%> </span>
-                            <select name="view">%(viewModes)s</select>
-                          
+                            <select name="view"><%= viewModes %></select>
+
                     </td>
                 </tr>
 				<tr>
@@ -32,7 +32,7 @@
     </tr>
 	<tr>
 		<td>
-			<table width="100%%" align="center" border="0" 
+			<table width="100%" align="center" border="0"
                     style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
                 <tr>
 					<td colspan="9" class="groupTitle" style="background:#E5E5E5; color:gray">
@@ -41,13 +41,13 @@
 				</tr>
                 <tr>
                     <td align="center" colspan="2">
-                        %(letterIndex)s
+                        <%= letterIndex %>
                     </td>
                 </tr>
                 <tr>
                     <td align="center" colspan="2">&nbsp;</td>
                 </tr>
-           %(items)s
+           <%= items %>
             </table>
         </td>
 	</tr>

@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% from MaKaC.reviewing import ConferenceReview %>
 <% from MaKaC.reviewing import Template %>
 <% from MaKaC.common.utils import formatDateTime %>

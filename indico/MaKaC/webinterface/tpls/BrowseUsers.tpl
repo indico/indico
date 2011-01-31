@@ -1,14 +1,14 @@
-<table width="100%%">
+<table width="100%">
 <tr>
   <td>
   <div class="nav_alphabet">
-  %(browseIndex)s
+  <%= browseIndex %>
   </div>
   </td>
 </tr>
 <tr>
   <td>
-  %(browseResult)s
+  <%= browseResult %>
   </td>
 </tr>
 </table>

@@ -1,15 +1,15 @@
-<form method="POST" action=%(postURL)s>
-    <table width="60%%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
+<form method="POST" action=<%= postURL %>>
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
 		<tr>
-			<td colspan="2" class="groupTitle"> <%= _("Reschedule entries within the")%> %(entryType)s</td>
+			<td colspan="2" class="groupTitle"> <%= _("Reschedule entries within the")%> <%= entryType %></td>
         </tr>
         <tr>
             <td></td>
         </tr>
-        %(title)s
+        <%= title %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Time between entries")%><br>(hh:mm)</span></td>
-            <td bgcolor="white" width="100%%" valign="top">&nbsp;
+            <td bgcolor="white" width="100%" valign="top">&nbsp;
                 <input type="text" size="2" name="hour" value="00">:<input type="text" size="2" name="minute" value="00">
             </td>
         </tr>
@@ -20,7 +20,7 @@
                 <input type="radio" name="action" value="duration"> <%= _("compute entries duration")%>
             </td>
         </tr>
-        
+
         <tr><td>&nbsp;</td></tr>
         <tr align="center">
             <td colspan="2" class="buttonBar" valign="bottom" align="center">

@@ -70,9 +70,9 @@
                     <div class="leftCorner"></div>
                     <div class="rightCorner"></div>
                     <div id="errorBoxContent">
-                        <h1>%(errorTitle)s</h1>
+                        <h1><%= errorTitle %></h1>
                         <div id="errorBoxText">
-                            %(errorText)s<br />
+                            <%= errorText %><br />
                             <%= _("Click the following link to go to the main page:") %>
                         </div>
                         <div id="errorBoxLink">

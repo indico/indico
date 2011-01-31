@@ -4,14 +4,14 @@
     <input  type="image" style="padding: 3px;" class="UIRowButton"
             onclick="javascript:removeItem('<%= email %>', this.form);return false;"
             title="<%= _("Remove this person from the list")%>"
-            src="<%= systemIcon("remove") %>" />    
+            src="<%= systemIcon("remove") %>" />
 <% end %>
 
 
 <span class="nameLink">
 <% if selectable: %>
-	<input type="%(type)s" name="selectedPrincipals" value="%(email)s" %(selected)s>
+	<input type="<%= type %>" name="selectedPrincipals" value="<%= email %>" <%= selected %>>
 <% end %>
-Non-registered user <em>(%(email)s)</em></span>
+Non-registered user <em>(<%= email %>)</em></span>
 
 </li>

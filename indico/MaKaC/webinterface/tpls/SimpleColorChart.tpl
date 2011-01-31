@@ -6,8 +6,8 @@
 <SCRIPT LANGUAGE="JavaScript">
 <!-- Begin
 function showColor(val) {
-	window.opener.document.forms["%(formId)s"].%(colorString)s.value = val;
-	window.opener.document.forms["%(formId)s"].%(colorPreviewString)s.style.background = val;
+	window.opener.document.forms["<%= formId %>"].<%= colorString %>.value = val;
+	window.opener.document.forms["<%= formId %>"].<%= colorPreviewString %>.style.background = val;
 	window.close();
 }
 //  End -->
@@ -240,7 +240,7 @@ function showColor(val) {
 				<area shape="rect" coords="273,56,279,65" href="javascript:showColor('#FF00CC')">
 				<area shape="rect" coords="281,56,287,65" href="javascript:showColor('#FF00FF')">
 			</map>
-			<a><img usemap="#colmap" src="%(imgColortable)s" border="0px" width="289px" height="67px" alt="colormap"></a><br>
+			<a><img usemap="#colmap" src="<%= imgColortable %>" border="0px" width="289px" height="67px" alt="colormap"></a><br>
 			<!-- END COLOR SET -->
 		</td>
 	</tr>

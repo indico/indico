@@ -5,25 +5,24 @@
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Current status")%></span></td>
         <td class="blacktext">
-            <form action="%(setStatusURL)s" method="POST">
-                %(locator)s
-                <b>%(status)s</b>
-                <small>%(changeStatus)s</small>
+            <form action="<%= setStatusURL %>" method="POST">
+                <%= locator %>
+                <b><%= status %></b>
+                <small><%= changeStatus %></small>
             </form>
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Users allowed to create conferences")%></span></td>
-        <td class="blacktext"><div style="width:50%%;">%(principalTable)s</div></td>
+        <td class="blacktext"><div style="width:50%;"><%= principalTable %></div></td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Notify event creation by email to")%>:</span></td>
-        <form action="%(setNotifyCreationURL)s" method="POST">
+        <form action="<%= setNotifyCreationURL %>" method="POST">
         <td class="blacktext">
-        <table><tr><td><small><input name="notifyCreationList" size="30" value=%(notifyCreationList)s> ( <%= _("email addresses separated by semi-colons")%>)</small></td>
+        <table><tr><td><small><input name="notifyCreationList" size="30" value=<%= notifyCreationList %>> ( <%= _("email addresses separated by semi-colons")%>)</small></td>
         <td align="right"><input type="submit" value="<%= _("save")%>"></td></tr></table>
         </td>
         </form>
     </tr>
 </table>
-

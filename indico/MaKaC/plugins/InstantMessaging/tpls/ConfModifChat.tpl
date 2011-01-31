@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <table>
     <tr>
         <td colspan="2" style="padding-top: 20px"></td>

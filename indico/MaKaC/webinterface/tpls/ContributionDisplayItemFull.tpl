@@ -1,21 +1,20 @@
 <tr>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        %(id)s
+        <%= id %>
     </td>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        %(startDate)s
+        <%= startDate %>
     </td>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        %(duration)s
+        <%= duration %>
     </td>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        %(type)s
+        <%= type %>
     </td>
-    <td width="100%%" valign="top" style="border-bottom: 1px solid grey">
-        <a href=%(displayURL)s>%(title)s</a>
+    <td width="100%" valign="top" style="border-bottom: 1px solid grey">
+        <a href=<%= displayURL %>><%= title %></a>
     </td>
     <td valign="top" nowrap style="border-bottom: 1px solid grey">
-       %(speakers)s
+       <%= speakers %>
     </td>
 </tr>
-

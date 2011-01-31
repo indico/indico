@@ -1,1 +1,1 @@
-<small>%(startTime)s-%(endTime)s <i>%(title)s</i> <%= _("by")%> %(speakerList)s <small><a href="%(modifyURL)s">[<%= _("Modify")%>]</a></small>
+<small><%= startTime %>-<%= endTime %> <i><%= title %></i> <%= _("by")%> <%= speakerList %> <small><a href="<%= modifyURL %>">[<%= _("Modify")%>]</a></small>

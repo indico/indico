@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <table align="center" width="95%%">
 <tr>
   <td class="formTitle"><a href="<%=backURL%>">&lt;&lt; back</a></td>

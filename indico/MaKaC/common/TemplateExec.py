@@ -52,11 +52,6 @@ class TemplateExecException( Exception ):
 
         return s
 
-def declareTemplate(newTemplateStyle=False):
-
-    objDict = globals()['_objDict']
-    objDict['newTemplateStyle'] = newTemplateStyle
-
 def includeTpl( tplFileName, *args, **kwargs ):
     """
     Use:
@@ -74,9 +69,7 @@ def includeTpl( tplFileName, *args, **kwargs ):
     from MaKaC.webinterface import wcomponents
     result = wcomponents.WTemplated(tplFileName).getHTML(objDict)
 
-    globals()['_objDict']["newTemplateStyle"] = True
-
-    print( result.replace('%', '%%') )
+    print result
 
 def contextHelp( helpId ):
     """
@@ -409,34 +402,6 @@ class TemplateExec:
         #    raise pythonCode
 
 
-        try:
-            if (not objDict.has_key( "isIncluded" ) and \
-                not (objDict.has_key("newTemplateStyle") and objDict['newTemplateStyle'])):
-                # Perform old-style string substitution
-                newTpl = newTpl % dictCopy
-            else:
-                # Substitute %% => %
-                newTpl = newTpl.replace( '%%', '%' )
-
-        except Exception, e:
-            try: open( ERROR_PATH + "/" + tplFilename + ".tpl.error.py", "w" ).write( pythonCode )
-            except: pass
-            TemplateExec.__saveDebugInfo(e, tplFilename)
-
-            if e.__class__ == ValueError:
-                try:
-                    message = str(e)
-                    if message.startswith("unsupported format character"):
-                        #we add some context information to the error message so that it's easier to see where the unsupported character is
-                        problematicIndex = int(message[message.rfind('index')+6:])
-                        newMessage = message + ". Context: [[ " + str(newTpl[problematicIndex-20:problematicIndex+20]) + " ]]"
-                        e.message = newMessage
-                        e.args = (newMessage)
-                except Exception:
-                    pass
-            raise e
-
-
         #recurrenceLevel -= 1
 
         #if recurrenceLevel == 0 and globals().has_key( '_dictCopy' ):
@@ -542,8 +507,6 @@ class TemplateExec:
             objDict['systemIcon'] = systemIcon
         if not 'formatDateTime' in objDict:
             objDict['formatDateTime'] = formatDateTime
-        if not 'declareTemplate' in objDict:
-            objDict['declareTemplate'] = declareTemplate
         if not 'linkify' in objDict:
             objDict['linkify'] = linkify
         if not 'truncateTitle' in objDict:

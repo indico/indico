@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% singleBookingPluginCount = len(SingleBookingPlugins) %>
 <% multipleBookingPluginCount = len(MultipleBookingPlugins) %>
 <% allPluginCount = singleBookingPluginCount + multipleBookingPluginCount %>
@@ -83,7 +81,7 @@ var clientLoadTime = new Date();
  * It will call in turn 'startBooking' in Collaboration.js
  */
 var start = function(booking) {
-    startBooking(booking, '<%= Conference.getId() %>'); 
+    startBooking(booking, '<%= Conference.getId() %>');
 }
 
 /**

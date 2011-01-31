@@ -1,5 +1,5 @@
 <tr>
     <td>
-        <input type="checkbox" name="selectedUsers" value="%(id)s"> <img src="%(name)s" alt="users">
+        <input type="checkbox" name="selectedUsers" value="<%= id %>"> <img src="<%= name %>" alt="users">
     </td>
 </tr>

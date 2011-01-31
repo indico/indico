@@ -91,7 +91,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
         </h1>
     </div>
 
-    <table width="100%%"><tbody>
+    <table width="100%"><tbody>
     <tr><td width="330" valign="top">
 
     <div class="sideBar clearfix" style="margin-top: 30px; float: none; width: 320px;">
@@ -100,10 +100,10 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
         <div class="content clearfix">
 
             <h1><%= _("Options") %></h1>
-                <form action="%(changeMonthsURL)s" method="GET" id="calendarOptionsForm">
+                <form action="<%= changeMonthsURL %>" method="GET" id="calendarOptionsForm">
                 <table style="margin: 10px 0 10px 20px; padding: 0; border: none;">
                 <tbody>
-                    %(locatorNoMonth)s
+                    <%= locatorNoMonth %>
                     <tr>
                         <td><%= _("Number of months")%>:<td>
                         <td>
@@ -185,20 +185,20 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
 
                 var calendarOptionsForm = $E("calendarOptionsForm");
 
-                calendarOptionsForm.dom.months.selectedIndex=%(selectedmonths)s-1;
-                calendarOptionsForm.dom.columns.selectedIndex=%(selectedcolumns)s-1;
-                calendarOptionsForm.dom.month.selectedIndex=%(selectedmonth)s-1;
-                calendarOptionsForm.dom.year.selectedIndex=2012-%(selectedyear)s;
+                calendarOptionsForm.dom.months.selectedIndex=<%= selectedmonths %>-1;
+                calendarOptionsForm.dom.columns.selectedIndex=<%= selectedcolumns %>-1;
+                calendarOptionsForm.dom.month.selectedIndex=<%= selectedmonth %>-1;
+                calendarOptionsForm.dom.year.selectedIndex=2012-<%= selectedyear %>;
 
                 </script>
 
 
             <h1><%= _("Color legend") %></h1>
             <div class="calendarColorLegend clearfix">
-                %(legend)s
+                <%= legend %>
                 <div>
-                    <form action="%(selCategsURL)s" method="POST" style="margin-top: 10px;">
-                        %(locator)s
+                    <form action="<%= selCategsURL %>" method="POST" style="margin-top: 10px;">
+                        <%= locator %>
                         <input type="submit" class="btn" value="<%= _("change")%>">
                     </form>
                 </div>
@@ -209,8 +209,8 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
     </td>
     <td valign="top">
     <div style="margin-top: 20px; margin-left: 30px;">
-        <table cellspacing="10" align="center" width="100%%">
-            %(calendar)s
+        <table cellspacing="10" align="center" width="100%">
+            <%= calendar %>
         </table>
     </div>
     </td>

@@ -1,22 +1,22 @@
 <br>
-<table width="100%%" align="center">
+<table width="100%" align="center">
     <tr>
         <td><br></td>
     </tr>
     <tr>
         <td>
-			<table align="center" width="95%%" border="0" style="border: 1px solid #777777;">
+			<table align="center" width="95%" border="0" style="border: 1px solid #777777;">
 				<tr>
 					<td>
-						<table align="center" width="95%%" border="0">
+						<table align="center" width="95%" border="0">
 							<tr>
 								<td align="left">
                                     <font size="+1" color="black">
-                                        <img src=%(icon)s alt="file"> %(title)s
+                                        <img src=<%= icon %> alt="file"> <%= title %>
                                     </font>
-                                    <table align="left" width="80%%">
+                                    <table align="left" width="80%">
                                         <tr>
-                                            <td>%(description)s
+                                            <td><%= description %>
                                             </td>
                                         </tr>
                                     </table>
@@ -24,7 +24,7 @@
 							</tr>
 							<tr>
 								<td style="padding-left:20px">
-									%(resources)s
+									<%= resources %>
 								</td>
 							</tr>
 						</table>

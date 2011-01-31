@@ -1,1 +1,1 @@
-<a href="%(sessionDisplayURL)s"><img class="imglink" src="%(imgGestionGrey)s" alt="Viewing interface"></a> <%= _("Session")%>: <a href="%(sessionModificationURL)s">%(sessionTitle)s</a>
+<a href="<%= sessionDisplayURL %>"><img class="imglink" src="<%= imgGestionGrey %>" alt="Viewing interface"></a> <%= _("Session")%>: <a href="<%= sessionModificationURL %>"><%= sessionTitle %></a>

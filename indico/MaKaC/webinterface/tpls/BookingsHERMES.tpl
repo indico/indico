@@ -1,41 +1,41 @@
 
-<form action=%(postURL)s method="POST">  
-    <table width="65%%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
+<form action=<%= postURL %> method="POST">
+    <table width="65%" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
         <tr>
             <td colspan="3" class="groupTitle"> <%= _("Creating a Meeting on HeRMeS system")%></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("Meeting Name")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <input type="text" name="title" size="40" value="%(title)s">
+            <td bgcolor="white" width="100%">&nbsp;
+                <input type="text" name="title" size="40" value="<%= title %>">
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">  <%= _("Description")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <textarea name="description" cols="43" rows="6">%(description)s</textarea>
+            <td bgcolor="white" width="100%">&nbsp;
+                <textarea name="description" cols="43" rows="6"><%= description %></textarea>
             </td>
         </tr>
 
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("PIN Code")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-            <input type="password" size="8" name="PinCode" value="%(PinCode)s"></td></tr>
-        <tr>    
+            <td bgcolor="white" width="100%">&nbsp;
+            <input type="password" size="8" name="PinCode" value="<%= PinCode %>"></td></tr>
+        <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("PIN Code (confirmation)")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-            <input type="password" size="8" name="ConfirmPinCode" value="%(ConfirmPinCode)s"></td></tr>
+            <td bgcolor="white" width="100%">&nbsp;
+            <input type="password" size="8" name="ConfirmPinCode" value="<%= ConfirmPinCode %>"></td></tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">Start date</span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <input type="text" size="2" name="sDay" value="%(sDay)s">-
-                <input type="text" size="2" name="sMonth" value="%(sMonth)s">-
-                <input type="text" size="4" name="sYear" value="%(sYear)s">
-                <a href="" onClick="javascript:window.open('%(calendarSelectURL)s?daystring=sDay&monthstring=sMonth&yearstring=sYear','calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
-                <img src=%(calendarIconURL)s alt="open calendar" border="0">
+            <td bgcolor="white" width="100%">&nbsp;
+                <input type="text" size="2" name="sDay" value="<%= sDay %>">-
+                <input type="text" size="2" name="sMonth" value="<%= sMonth %>">-
+                <input type="text" size="4" name="sYear" value="<%= sYear %>">
+                <a href="" onClick="javascript:window.open('<%= calendarSelectURL %>?daystring=sDay&monthstring=sMonth&yearstring=sYear','calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
+                <img src=<%= calendarIconURL %> alt="open calendar" border="0">
                 </a>
                 &nbsp;at&nbsp;
-                <select name="sHour" value="%(sHour)s">:
+                <select name="sHour" value="<%= sHour %>">:
                             <option value="08" selected>08</option>
                             <option value="09">09</option>
                             <option value="10">10</option>
@@ -52,22 +52,22 @@
                             <option value="21">21</option>
                             <option value="22">22</option>
                             <option value="23">23</option></select>
-                <select name="sMinute" value="%(sMinute)s"> 
+                <select name="sMinute" value="<%= sMinute %>">
                             <option value="00" selected>00</option>
                             <option value="30" >30</option>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("End date")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <input type="text" size="2" name="eDay" value="%(eDay)s">-
-                <input type="text" size="2" name="eMonth" value="%(eMonth)s">-
-                <input type="text" size="4" name="eYear" value="%(eYear)s">
-                <a href="" onClick="javascript:window.open('%(calendarSelectURL)s?daystring=eDay&monthstring=eMonth&yearstring=eYear','calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
-                <img src=%(calendarIconURL)s alt="open calendar" border="0">
+            <td bgcolor="white" width="100%">&nbsp;
+                <input type="text" size="2" name="eDay" value="<%= eDay %>">-
+                <input type="text" size="2" name="eMonth" value="<%= eMonth %>">-
+                <input type="text" size="4" name="eYear" value="<%= eYear %>">
+                <a href="" onClick="javascript:window.open('<%= calendarSelectURL %>?daystring=eDay&monthstring=eMonth&yearstring=eYear','calendar','scrollbars=no,menubar=no,width=200,height=170');return false;">
+                <img src=<%= calendarIconURL %> alt="open calendar" border="0">
                 </a>
                 &nbsp;at&nbsp;
-                <select name="eHour" value="%(eHour)s">:
+                <select name="eHour" value="<%= eHour %>">:
                             <option value="08">08</option>
                             <option value="09">09</option>
                             <option value="10">10</option>
@@ -84,27 +84,27 @@
                             <option value="21">21</option>
                             <option value="22">22</option>
                             <option value="23">23</option></select>
-                <select name="eMinute" value="%(eMinute)s">
+                <select name="eMinute" value="<%= eMinute %>">
                             <option value="28">28</option>
                             <option value="58" selected>58</option>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><font color="red">*</font>  <%= _("Email address or mailing list")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
             <input type="text" name="UserEmail" size="25" value=""></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("List of Participants")%></span></td>
-            <td bgcolor="white" width="100%%" align="left">&nbsp;
+            <td bgcolor="white" width="100%" align="left">&nbsp;
                 <input type="submit" class="btn" name="addParticipant" value="<%= _("add participant")%>">
                 <input type="submit" class="btn" name="RemoveParticipant" value="<%= _("remove participant")%>">
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Comments or remarks")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <textarea name="comments" cols="43" rows="3">%(comments)s</textarea>
+            <td bgcolor="white" width="100%">&nbsp;
+                <textarea name="comments" cols="43" rows="3"><%= comments %></textarea>
             </td>
         </tr>
         <tr><td>&nbsp;</td></tr>

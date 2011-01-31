@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <form action="<%= removePrincipalsURL %>" method="post">
 <%= locator %>
 <ul class="UIPeopleList">

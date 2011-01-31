@@ -1,2 +1,2 @@
 <br>
-%(timetable)s
+<%= timetable %>

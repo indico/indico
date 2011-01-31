@@ -1,19 +1,19 @@
 <table>
 <tr>
-    <td class="groupTitle">%(itemNumber)s</td>
+    <td class="groupTitle"><%= itemNumber %></td>
     <td>
         <table>
         <tr>
             <td>Type:
-                <select name="%(materialTypeSelectFieldName)s">
-                    %(matTypeItems)s
+                <select name="<%= materialTypeSelectFieldName %>">
+                    <%= matTypeItems %>
                 </select>
-                or <input name="%(materialTypeInputFieldName)s" size="25" value="%(materialTypeInputFieldValue)s">
+                or <input name="<%= materialTypeInputFieldName %>" size="25" value="<%= materialTypeInputFieldValue %>">
             </td>
         </tr>
         <tr>
             <td> <%= _("URL to File")%>:
-                <input name="%(urlFieldName)s" value="%(linkValue)s">
+                <input name="<%= urlFieldName %>" value="<%= linkValue %>">
             </td>
         </tr>
         </table>

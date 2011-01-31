@@ -13,17 +13,17 @@ function setEmailsState()
 
 
 <center>
-<table width="60%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
   <tr>
-    <td colspan="5" class="groupTitle">%(formTitle)s</td>
+    <td colspan="5" class="groupTitle"><%= formTitle %></td>
   </tr>
   <tr>
     <td>
 <br>
-<TABLE border="0" align="center" width="100%%">
-<form action="%(saveAlarm)s" methode="POST" name="alarmForm">
-<input type="hidden" name="confId" value="%(confId)s">
-<input type="hidden" name="alarmId" value="%(alarmId)s">
+<TABLE border="0" align="center" width="100%">
+<form action="<%= saveAlarm %>" methode="POST" name="alarmForm">
+<input type="hidden" name="confId" value="<%= confId %>">
+<input type="hidden" name="alarmId" value="<%= alarmId %>">
     <tr>
       <td align="right">
       </td>
@@ -36,42 +36,42 @@ function setEmailsState()
 </tr>
 <tr>
 	<td>
-        <input name="dateType" type="radio" value="1" %(selec1)s>  <%= _("At this date")%>:
+        <input name="dateType" type="radio" value="1" <%= selec1 %>>  <%= _("At this date")%>:
 	</td>
 	<td nowrap>
         <SMALL>
         <SELECT name=day >
-            %(dayOptions)s
+            <%= dayOptions %>
         </SELECT>
         <SELECT name=month >
-            %(monthOptions)s
+            <%= monthOptions %>
         </SELECT>
         <SELECT name=year >
-            %(yearOptions)s
+            <%= yearOptions %>
         </SELECT>&nbsp;&nbsp;&nbsp;
         <SELECT name=hour >
-            %(hour)s
+            <%= hour %>
         </SELECT>
-        (%(timezone)s)
+        (<%= timezone %>)
     </td>
 </tr>
 <tr>
    <td>
-        <input name="dateType" type="radio" value="2" %(selec2)s> <%= _("Day before the beginning of the event")%>:
+        <input name="dateType" type="radio" value="2" <%= selec2 %>> <%= _("Day before the beginning of the event")%>:
     </td>
     <td>
         <SELECT name=dayBefore >
-          %(dayBefore)s
+          <%= dayBefore %>
         </SELECT>
   </td>
 </tr>
 <tr>
   <td>
-        <input name="dateType" type="radio" value="3" %(selec3)s> <%= _("Hours before the beginning of the event")%>:
+        <input name="dateType" type="radio" value="3" <%= selec3 %>> <%= _("Hours before the beginning of the event")%>:
     </td>
     <td>
         <SELECT name=hourBefore >
-          %(hourBefore)s
+          <%= hourBefore %>
         </SELECT>
   </td>
 </tr>
@@ -81,15 +81,15 @@ function setEmailsState()
 <tr><td colspan="2" align="center">
 
 <br>
-<table width="100%%">
+<table width="100%">
     <tr>
         <td colspan="2"><b>&nbsp; <%= _("From address")%>:</b></td>
     </tr>
     <tr>
 	    <td>&nbsp;</td>
-	    <td>	
+	    <td>
     	    <select name="fromAddr" style="width:425px">
-    	    	%(fromOptions)s
+    	    	<%= fromOptions %>
 	        </select>
     	</td>
     </tr>
@@ -97,14 +97,14 @@ function setEmailsState()
 	<tr>
 		<td colspan="2"><b>&nbsp; <%= _("Send alarm to")%>:</b></td>
 	</tr>
-		%(toAllParticipants)s
+		<%= toAllParticipants %>
 	<tr>
-		<td>&nbsp;<input type="checkbox" name="defineReceprtiens" onClick="setEmailsState()" %(definedRecipients)s></td>
-		<td> <%= _("Define recipients (comma-separated list of email addresses)")%> :</td>		
+		<td>&nbsp;<input type="checkbox" name="defineReceprtiens" onClick="setEmailsState()" <%= definedRecipients %>></td>
+		<td> <%= _("Define recipients (comma-separated list of email addresses)")%> :</td>
 	</tr>
 	<tr>
 		<td>&nbsp;</td>
-		<td><input type="text" name="Emails" id="email" size="90%%" %(recipientsDisabled)s value="%(toEmails)s"></td>
+		<td><input type="text" name="Emails" id="email" size="90%" <%= recipientsDisabled %> value="<%= toEmails %>"></td>
 	</tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr>
@@ -112,12 +112,12 @@ function setEmailsState()
 	<tr>
 	</tr>
 		<td>&nbsp;</td>
-		<td align="right"><textarea name="note" rows="5" style="width:100%%;" >%(note)s</textarea></td>
+		<td align="right"><textarea name="note" rows="5" style="width:100%;" ><%= note %></textarea></td>
 	</tr>
 	<tr>
 		<td colspan="2" align="left">
         <br>
-        &nbsp;<input name="includeConf" type="checkbox" value="1" %(includeConf)s> <%= _("Include a text version of the agenda in the email")%> 
+        &nbsp;<input name="includeConf" type="checkbox" value="1" <%= includeConf %>> <%= _("Include a text version of the agenda in the email")%>
 		</td>
 	</tr>
     </SMALL>
@@ -125,7 +125,7 @@ function setEmailsState()
       </TD></tr>
     <tr><td align="center" colspan="2">
         <br>
-        <input type="submit" class="btn" value="<%= _("save the alarm")%>"> %(testSendAlarm)s
+        <input type="submit" class="btn" value="<%= _("save the alarm")%>"> <%= testSendAlarm %>
       </td>
     </tr>
 </form>
@@ -134,7 +134,7 @@ function setEmailsState()
 </td></tr>
 
 </table>
-<form action="%(cancelURL)s" method="POST">
+<form action="<%= cancelURL %>" method="POST">
 	<input type="submit" class="btn" value="<%= _("cancel")%>">
 </form>
 </center>

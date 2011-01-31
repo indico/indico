@@ -1,35 +1,35 @@
 <br>
-<table width="100%%" align="center">
+<table width="100%" align="center">
 <tr>
   <td><br></td>
 </tr>
 <tr>
   <td>
-    <table align="center" width="95%%" border="0" style="border: 1px solid #777777;">
+    <table align="center" width="95%" border="0" style="border: 1px solid #777777;">
     <tr><td>&nbsp;</td></tr>
 				<tr>
 					<td>
-						<table align="center" width="95%%" border="0">
+						<table align="center" width="95%" border="0">
 							<tr>
-								<td colspan="2" align="center"><b><font size="+1" color="black">%(title)s</font></b></td>
+								<td colspan="2" align="center"><b><font size="+1" color="black"><%= title %></font></b></td>
 							</tr>
 							<tr>
-								<td width="100%%" colspan="3">&nbsp;<td>
+								<td width="100%" colspan="3">&nbsp;<td>
 							</tr>
 							<tr>
 								<td align="left" colspan="3">
-									<table width="95%%" align="center" valign="top" border="0">
+									<table width="95%" align="center" valign="top" border="0">
                                         <tr>
-                                            <td align="right" valign="top" 
+                                            <td align="right" valign="top"
                                                 class="displayField"><b><%= _("Id:")%></b></td>
-                                            <td>%(id)s</td>
+                                            <td><%= id %></td>
                                         </tr>
-										%(material)s
+										<%= material %>
 										<tr><td>&nbsp;</td></tr>
-										%(inSession)s
-										%(inTrack)s
+										<%= inSession %>
+										<%= inTrack %>
 										<tr><td>&nbsp;</td></tr>
-										%(subConts)s
+										<%= subConts %>
 									</table>
 								</td>
 							</tr>

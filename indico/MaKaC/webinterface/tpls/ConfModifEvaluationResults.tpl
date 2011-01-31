@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% colors=["blue","green","yellow","pink"]; color=0 %>
 <!-- EvaluationResults start -->
 <form action="<%=actionUrl%>" method="POST">

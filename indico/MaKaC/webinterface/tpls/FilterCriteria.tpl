@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <div class="CRLDiv" style="display: none;" id="filterMenu">
 <table width="100%%" cellpadding="0" cellspacing="0" valign="top"  style="padding-bottom: 10px;">
 

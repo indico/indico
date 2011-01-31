@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <form action="<%= postURL %>" method="post">
     <table width="90%" align="center" border="0">
         <tr>
@@ -35,7 +33,7 @@
 			<% pList.sort(self._cmpByContribName) %>
 			<% for cp in pList: %>
                         <% contrib=cp.getContribution() %>
-			<a href="<%= str(urlHandlers.UHContributionModification.getURL(contrib)) %>"><%= self.htmlText(contrib.getTitle()) %></a> 
+			<a href="<%= str(urlHandlers.UHContributionModification.getURL(contrib)) %>"><%= self.htmlText(contrib.getTitle()) %></a>
 			 <% if pType == _("Submitters"): %>
 			  <small>
 			   <% if contrib.isPrimaryAuthor(cp): %>
@@ -50,7 +48,7 @@
 			   <% else: %>
 			    unkwon
 			   <% end %>
-			  </small>			
+			  </small>
 			 <% end %>
 			<% end %>
 		      </td>

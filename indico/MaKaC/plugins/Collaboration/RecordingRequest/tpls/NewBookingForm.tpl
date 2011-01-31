@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% if not HasRoom: %>
 <div style="margin-bottom: 1em;">
     <span class="RRNoteTitle"><%=_("Warning:")%></span>

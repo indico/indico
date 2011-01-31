@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <form action="<%= postURL %>" method="POST">
 <%= locator %>
 <table align="center" width="95%">

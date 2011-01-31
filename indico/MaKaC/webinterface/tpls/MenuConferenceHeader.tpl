@@ -1,9 +1,7 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <div style="float:right;">
   <ul class="horizontalMenu">
-    
-    <% includeTpl('LoginWidget') %>				
+
+    <% includeTpl('LoginWidget') %>
   </ul>
 </div>
 
@@ -11,7 +9,7 @@
 <table>
 	<tr>
         <form style="margin:0pt;" action="">
-        <table width="100%%" cellpadding="0" cellspacing="0" border="0">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr class="bluerowheader">
             <td colspan="4"></td>
           </tr>
@@ -21,7 +19,7 @@
                 <img class="imglink" src="<%= imgLogo %>" alt="indico">
               </a>
             </td>
-            <td width="100%%">
+            <td width="100%">
               <small>
               <input type="hidden" name="confId" value="<%= confId %>">
               &nbsp;<a href="<%= categurl %>"><%= _("event home page")%></a>&nbsp;
@@ -38,7 +36,7 @@
               </small>
             </td>
             </form>
-            <td>%(TZSelector)s</td>
+            <td><%= TZSelector %></td>
            </tr>
         </table>
     </tr>
@@ -47,4 +45,3 @@
 		<%= infoMsg %>
 	</tr>
 </table>
-

@@ -1,5 +1,5 @@
-<form id="ContributionDataModificationForm" method="POST" action="%(postURL)s">
-    <table width="60%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form id="ContributionDataModificationForm" method="POST" action="<%= postURL %>">
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Edit contribution data")%></td>
         </tr>
@@ -7,14 +7,14 @@
             <td class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Title")%></span>
             </td>
-            <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                <input type="text" name="title" size="80" value=%(title)s />
+            <td bgcolor="white" width="100%" valign="top" class="blacktext">
+                <input type="text" name="title" size="80" value=<%= title %> />
             </td>
         </tr>
         <%
         if self._rh._target.getConference().getAbstractMgr().isActive() and self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
         %>
-        %(additionalFields)s
+        <%= additionalFields %>
         <%end%>
         <%
             else:
@@ -23,8 +23,8 @@
             <td class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Description")%></span>
             </td>
-            <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                <textarea name="description" cols="80" rows="6" wrap="soft">%(description)s</textarea>
+            <td bgcolor="white" width="100%" valign="top" class="blacktext">
+                <textarea name="description" cols="80" rows="6" wrap="soft"><%= description %></textarea>
             </td>
 
         </tr>
@@ -47,14 +47,14 @@
     <% includeTpl('EventLocationInfo', event=self._rh._target, modifying=True, parentRoomInfo=roomInfo(self._rh._target, level='inherited'), showParent=True, conf = self._conf, eventId = self.getContribId()) %>
 
 
-	%(Board)s
-	%(Type)s
+	<%= Board %>
+	<%= Type %>
         <tr>
           <td class="titleCellTD">
             <span class="titleCellFormat"><%= _("Keywords")%><br><small>( <%= _("one per line")%>)</small></span>
           </td>
-          <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-            <textarea name="keywords" cols="60" rows="6">%(keywords)s</textarea>
+          <td bgcolor="white" width="100%" valign="top" class="blacktext">
+            <textarea name="keywords" cols="60" rows="6"><%= keywords %></textarea>
           </td>
         </tr>
         <tr align="center">

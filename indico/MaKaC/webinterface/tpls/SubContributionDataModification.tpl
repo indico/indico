@@ -1,34 +1,34 @@
 
-<form method="POST" action="%(postURL)s">
-    %(locator)s
-    <table width="70%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form method="POST" action="<%= postURL %>">
+    <%= locator %>
+    <table width="70%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Modifying sub contribution data")%></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td bgcolor="white" width="100%%"><input type="text" name="title" size="80" value="%(title)s"></td>
+            <td bgcolor="white" width="100%"><input type="text" name="title" size="80" value="<%= title %>"></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
-            <td bgcolor="white" width="100%%"><textarea name="description" cols="80" rows="10" wrap="soft">%(description)s</textarea></td>
+            <td bgcolor="white" width="100%"><textarea name="description" cols="80" rows="10" wrap="soft"><%= description %></textarea></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Keywords")%><br><small>( <%= _("one per line")%>)</small></span></td>
-            <td bgcolor="white" width="100%%"><textarea name="keywords" cols="85" rows="3">%(keywords)s</textarea></td>
+            <td bgcolor="white" width="100%"><textarea name="keywords" cols="85" rows="3"><%= keywords %></textarea></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Duration")%></span></td>
-            <td bgcolor="white" width="100%%">
-                <input type="text" size="2" name="durationHours" value="%(durationHours)s">:
-                <input type="text" size="2" name="durationMinutes" value="%(durationMinutes)s">
+            <td bgcolor="white" width="100%">
+                <input type="text" size="2" name="durationHours" value="<%= durationHours %>">:
+                <input type="text" size="2" name="durationMinutes" value="<%= durationMinutes %>">
             </td>
         </tr>
         <!--<tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Presenters")%></span></td>
-            <td bgcolor="white" width="100%%"><input type="text" name="speakers" size="50" value="%(speakers)s"></td>
+            <td bgcolor="white" width="100%"><input type="text" name="speakers" size="50" value="<%= speakers %>"></td>
         </tr>-->
-        <input type="hidden" name="speakers" value="%(speakers)s">
+        <input type="hidden" name="speakers" value="<%= speakers %>">
 		<tr><td>&nbsp;</td></tr>
         <tr>
             <td colspan="2" align="left">

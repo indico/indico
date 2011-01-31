@@ -1,23 +1,23 @@
 <br>
-<form action=%(postURL)s method="POST" enctype="multipart/form-data">
-<table width="40%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form action=<%= postURL %> method="POST" enctype="multipart/form-data">
+<table width="40%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
         <td colspan="5" class="groupTitle"><%= _("Submitting material for a contribution")%></td>
     </tr>
-    %(errors)s
+    <%= errors %>
     <tr>
         <td nowrap class="titleCellTD">
             <span class="titleCellFormat"><%= _("Contribution")%></span>
         </td>
-        <td bgcolor="white" width="80%%">%(contribId)s-%(contribTitle)s</td>
+        <td bgcolor="white" width="80%"><%= contribId %>-<%= contribTitle %></td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD">
             <span class="titleCellFormat"><%= _("Material type")%></span>
         </td>
-        <td bgcolor="white" width="80%%">
+        <td bgcolor="white" width="80%">
             <select name="materialType">
-                %(matTypeItems)s
+                <%= matTypeItems %>
             </select>
         </td>
     </tr>
@@ -25,7 +25,7 @@
         <td nowrap class="titleCellTD">
             <span class="titleCellFormat"><%= _("File to submit")%></span>
         </td>
-        <td bgcolor="white" width="80%%">
+        <td bgcolor="white" width="80%">
             <input type="file" name="file">
         </td>
     </tr>
@@ -33,8 +33,8 @@
         <td nowrap class="titleCellTD">
             <span class="titleCellFormat"><%= _("Description & comments")%></span>
         </td>
-        <td bgcolor="white" width="80%%">
-            <textarea name="description" cols="43" rows="6">%(description)s</textarea>
+        <td bgcolor="white" width="80%">
+            <textarea name="description" cols="43" rows="6"><%= description %></textarea>
         </td>
     </tr>
     <tr>

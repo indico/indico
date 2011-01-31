@@ -1,18 +1,18 @@
 
-<table width="50%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
 	<tr>
 		<td class="groupTitle" colspan="2"> <%= _("Marking an abstract as a duplicate")%></td>
     </tr>
     <tr>
         <td bgcolor="white">
             <br>
-            <table width="100%%">
-                %(error)s
+            <table width="100%">
+                <%= error %>
                 <tr>
-					<form action=%(duplicateURL)s method="POST">
+					<form action=<%= duplicateURL %> method="POST">
 					<td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Comments")%></span></td>
 					<td>&nbsp;
-						<textarea name="comments" rows="6" cols="50">%(comments)s</textarea>
+						<textarea name="comments" rows="6" cols="50"><%= comments %></textarea>
 					</td>
                 </tr>
                 <tr>
@@ -21,7 +21,7 @@
                 <tr>
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Original abstract id")%></span></td>
                     <td>&nbsp;
-                        <input type="text" name="id" value=%(id)s>
+                        <input type="text" name="id" value=<%= id %>>
                     </td>
                 </tr>
             </table>
@@ -36,7 +36,7 @@
 						<input type="submit" class="btn" name="OK" value="<%= _("confirm")%>">
 					</td>
 					</form>
-					<form action=%(cancelURL)s method="POST">
+					<form action=<%= cancelURL %> method="POST">
                     <td align="left">
 						<input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
 					</td>

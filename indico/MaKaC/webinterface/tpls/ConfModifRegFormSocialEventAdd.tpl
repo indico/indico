@@ -1,11 +1,11 @@
-<form action=%(postURL)s method="POST">
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form action=<%= postURL %> method="POST">
+    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle" colspan="2"><%= _("Add a new social event")%></td>
         </tr>
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat"><%= _("Caption")%></span></td>
-          <td bgcolor="white" class="blacktext" width="100%%">
+          <td bgcolor="white" class="blacktext" width="100%">
             <input type="text" name="caption" size="60">
           </td>
         </tr>

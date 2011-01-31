@@ -10,22 +10,22 @@
           <% inlineContextHelp( _('Templates that will be available for all conferences.') ) %>
         </td>
       </tr>
-      
+
       <tr>
         <td>
-          <input name="New Template Button" class="btn" value="<%= _("New")%>" type="button" onClick="location.href='%(NewDefaultTemplateURL)s'">
+          <input name="New Template Button" class="btn" value="<%= _("New")%>" type="button" onClick="location.href='<%= NewDefaultTemplateURL %>'">
         </td>
       </tr>
 
       <tr>
         <td>
-          <table class="gestiontable" width="50%%">
+          <table class="gestiontable" width="50%">
             <tbody>
               <%= templateList %>
           </table>
         </td>
       </tr>
-      
+
       <tr>
         <td class="groupTitle">
           <%= _("Default PDF Options")%>
@@ -37,7 +37,7 @@
        <td>
          <input name="savePDFOptions" class="btn" value="<%= _("Save")%>" type="submit">
        </td>
-     </tr> 
+     </tr>
       <%= PDFOptions %>
 </form>
     </tbody>

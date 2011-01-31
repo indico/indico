@@ -1,11 +1,11 @@
 
-<form action="%(postURL)s" method="POST">
-    <table width="100%%" align="center">
+<form action="<%= postURL %>" method="POST">
+    <table width="100%" align="center">
         <tr>
             <td><br></td>
         </tr>
         <tr>
-            <td style="padding:25px"> <%= _("You are going to withdraw from this conference the abstract titled")%> "<b>%(title)s<b>".</td>
+            <td style="padding:25px"> <%= _("You are going to withdraw from this conference the abstract titled")%> "<b><%= title %><b>".</td>
         </tr>
         <tr>
             <td><br></td>
@@ -29,4 +29,3 @@
         </tr>
     </table>
 </form>
-

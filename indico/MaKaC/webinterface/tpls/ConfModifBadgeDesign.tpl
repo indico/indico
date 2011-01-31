@@ -530,7 +530,7 @@
 
 <iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0" onload="sent()"></iframe>
 
-<div style="width:100%%">
+<div style="width:100%">
   <br/>
 
   <table class="groupTable" cellpadding="0">
@@ -557,7 +557,7 @@
           <input class="btn" type="button" value="<%= _("Remove background")%>" onclick="removeBackground()">
         </td>
 	    </form>
-	    <td width="100%%" align="left" colspan="4">
+	    <td width="100%" align="left" colspan="4">
           <img id="loadingIcon" src=<%=loadingIconURL%> width="20px" height="20px" style="display:none;">
 	    </td>
       </tr>
@@ -667,7 +667,7 @@
 
         <td align="left" valign="top">
           <div id="templateDiv" style="width:425px;height:270px;position:relative;left:0px;top:0px"> <!-- put here the initial dimensions of templateDiv -->
-            <table border="1" style="border-style: none;" width="100%%" height="100%%" cellspacing="0" cellpadding="0">
+            <table border="1" style="border-style: none;" width="100%" height="100%" cellspacing="0" cellpadding="0">
               <tbody>
                 <tr><td></td></tr>
               </tbody>
@@ -720,7 +720,7 @@
           <span class="titleCellFormat"> <%= _("Color")%>&nbsp;</span>
         </td>
 
-        <td width="100%%">
+        <td width="100%">
           <select id='color selector' name="Template Element Color" onchange="changeColor()">
             <option value="black"> <%= _("black")%></option>
             <option value="red"> <%= _("red")%></option>
@@ -756,7 +756,7 @@
           <span class="titleCellFormat"> <%= _("Size")%>&nbsp;</span>
         </td>
 
-        <td width="100%%">
+        <td width="100%">
           <select id='size selector' name="Template Element Size" onchange="changeSize()">
             <option value="xx-small"> <%= _("xx-small")%></option>
             <option value="x-small"> <%= _("x-small")%></option>
@@ -785,7 +785,7 @@
         <td class="titleCellTD">
           <span class="titleCellFormat"> <%= _("Width (cm)")%>&nbsp;</span>
         </td>
-        <td width="100%%">
+        <td width="100%">
           <input id="width field" size="5" name="Element Size">
           <input class="btn" value="<%= _("Change")%>" type="button" onclick="changeWidth()">
         </td>
@@ -809,7 +809,7 @@
   <table class="groupTable">
     <tbody>
       <tr>
-        <td colspan="4" align="center" width="100%%">
+        <td colspan="4" align="center" width="100%">
           <input class="btn" name="Save Template Button" value="<%= _("Save")%>" type="button" onclick="save()">
           <input class="btn" name="Cancel Button" value="<%= _("Cancel")%>" type="button" onclick="location.href='<%=cancelURL%>'">
         </td>
@@ -831,8 +831,8 @@
   <script type="text/javascript">
 
     // We load the template if we are editing a template
-    if (%(editingTemplate)s) {
-       var template = %(templateData)s
+    if (<%= editingTemplate %>) {
+       var template = <%= templateData %>
        $E('template name').dom.value = template[0];
        $E('templateDiv').dom.style.width = template[1].width;
        $E('templateDiv').dom.style.height = template[1].height;

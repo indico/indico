@@ -6,10 +6,10 @@
   var addParam = parameterManager.add;
 </script>
 
-<table width="70%%" align="center">
+<table width="70%" align="center">
 	<tr><td>&nbsp;</td></tr>
     <tr>
-        <td nowrap class="title"><center>%(title)s</center></td>
+        <td nowrap class="title"><center><%= title %></center></td>
     </tr>
     <tr>
         <td colspan="2" align="left">
@@ -21,10 +21,10 @@
     </tr>
     <tr>
         <td>
-            %(personalData)s
+            <%= personalData %>
         </td>
     </tr>
-    %(otherSections)s
+    <%= otherSections %>
     <tr>
         <td><br></td>
     </tr>

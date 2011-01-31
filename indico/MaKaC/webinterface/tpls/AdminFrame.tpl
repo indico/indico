@@ -1,9 +1,9 @@
 <div class="banner"><span class="bannerTitle bannerTitle_0"><%= _("Server Administration") %></span></div>
 
-%(sideMenu)s
+<%= sideMenu %>
 
 <!-- Body -->
 <div class="bodyWithSideMenu">
-    %(body)s
+    <%= body %>
 </div>
 <!-- End of body -->

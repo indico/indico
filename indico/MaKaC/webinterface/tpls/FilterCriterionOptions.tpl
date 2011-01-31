@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
     <tr>
     <td class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px" colspan="2">
         <%= form.getTitle() %>

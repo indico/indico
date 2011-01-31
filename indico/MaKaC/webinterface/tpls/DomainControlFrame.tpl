@@ -5,14 +5,14 @@
 <tr>
   <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Allowed domains")%><br><font size="-2">(<%= _("if no domain is selected<br>no control is applied")%>)</font></span></td>
   <td class="blacktext">
-    <form action="%(removeURL)s" method="POST">
-    %(locator)s
-    <table width="100%%">
+    <form action="<%= removeURL %>" method="POST">
+    <%= locator %>
+    <table width="100%">
     <tr>
-      <td width="80%%">
-        %(domains)s
+      <td width="80%">
+        <%= domains %>
       </td>
-      <td width="20%%" align="right" valign="bottom">
+      <td width="20%" align="right" valign="bottom">
         <table>
         <tr>
           <td>
@@ -21,11 +21,11 @@
           <td>
             <select name="addDomain">
             <option><%= _("Select")%>:
-            %(domainsToAdd)s
+            <%= domainsToAdd %>
             </select>
           </td>
           <td>
-            <input type="submit" class="btn" value="<- <%= _("add")%><" onClick="if (this.form.addDomain.value=='<%= _("Select")%>:') { return false; } else { this.form.action='%(addURL)s'; }">
+            <input type="submit" class="btn" value="<- <%= _("add")%><" onClick="if (this.form.addDomain.value=='<%= _("Select")%>:') { return false; } else { this.form.action='<%= addURL %>'; }">
           </td>
         </tr>
         </table>

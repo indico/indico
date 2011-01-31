@@ -1,4 +1,4 @@
-<table width="98%%" cellpadding="0" cellspacing="1" bgcolor="#000060" 
+<table width="98%" cellpadding="0" cellspacing="1" bgcolor="#000060"
         align="center">
     <tr bgcolor="#F0C060">
         <td>
@@ -7,24 +7,24 @@
                     <td valign="top">
                             <table cellpadding="1" cellspacing="1">
                                 <tr>
-                                    <td align="right" nowrap><font size="-1" >%(startDate)s</font>
+                                    <td align="right" nowrap><font size="-1" ><%= startDate %></font>
                                     </td>
-                                    <td nowrap><font size="-1">%(startTime)s</font>
+                                    <td nowrap><font size="-1"><%= startTime %></font>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="right" nowrap><font size="-1">%(endDate)s</font></td>
-                                    <td nowrap><font size="-1">%(endTime)s</font></td>
+                                    <td align="right" nowrap><font size="-1"><%= endDate %></font></td>
+                                    <td nowrap><font size="-1"><%= endTime %></font></td>
                                 </tr>
                             </table>
                     </td>
-                    <td width="100%%" valign="top">
-                        <b><a href="%(detailsURL)s">%(detailsIcon)s</a> <font size="+1"><a href="%(displayURL)s">%(title)s</a></font></b> <small>%(place)s</small>
+                    <td width="100%" valign="top">
+                        <b><a href="<%= detailsURL %>"><%= detailsIcon %></a> <font size="+1"><a href="<%= displayURL %>"><%= title %></a></font></b> <small><%= place %></small>
                     </td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td>%(program)s</td>
+                    <td><%= program %></td>
                 </tr>
             </table>
         </td>

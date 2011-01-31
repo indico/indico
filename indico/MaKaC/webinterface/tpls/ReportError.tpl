@@ -1,5 +1,5 @@
-<form action=%(postURL)s method="post">
-    <input type="hidden" name="reportMsg" value=%(reportMsg)s>
+<form action=<%= postURL %> method="post">
+    <input type="hidden" name="reportMsg" value=<%= reportMsg %>>
     <table align="center">
         <tr>
             <td align="center"><font size="+2" color="#5294CC"><b> <%= _("Error Report Form")%></b></font></td>
@@ -19,7 +19,7 @@
                     </tr>
                     <tr>
                         <td align="right" valign="top"><font color="#3366AA"> <%= _("your email address")%></font></td>
-                        <td><input type="text" size="60" name="userEmail" value=%(dstEmail)s></td>
+                        <td><input type="text" size="60" name="userEmail" value=<%= dstEmail %>></td>
                     </tr>
                 </table>
             </td>

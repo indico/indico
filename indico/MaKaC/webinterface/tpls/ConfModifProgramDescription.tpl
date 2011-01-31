@@ -1,9 +1,9 @@
 <div class="groupTitle"><%= _("Program description")%></div>
-<table width="100%%" align="left" border="0" >
+<table width="100%" align="left" border="0" >
     <tr>
         <td>
-            <form action="%(submitURL)s" method="POST">
-                <textarea name="description" rows="10" cols="80" >%(description)s</textarea>
+            <form action="<%= submitURL %>" method="POST">
+                <textarea name="description" rows="10" cols="80" ><%= description %></textarea>
         </td>
     </tr>
     <tr>

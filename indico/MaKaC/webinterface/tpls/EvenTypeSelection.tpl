@@ -1,4 +1,4 @@
-<table width="90%%" bgcolor="#808080" align="center">
+<table width="90%" bgcolor="#808080" align="center">
     <tr>
         <td bgcolor="#000060" align="center">
             <b><font size="+2" color="white"> <%= _("Creation of a new event")%></font></b>
@@ -12,12 +12,12 @@
     <tr>
         <td bgcolor="white">
              <%= _("Select the type of event you want to create")%>:<br><br>
-            <form action="%(postURL)s" method="POST">
-                <table width="90%%" align="center">
-                    %(eventTypes)s
+            <form action="<%= postURL %>" method="POST">
+                <table width="90%" align="center">
+                    <%= eventTypes %>
                     <tr>
                         <td valign="top"><input type="submit" class="btn" name="event_type" value="<%= _("default")%>"></td>
-                        <td align="left" width="100%%"><font size="-1"> <%= _("No type is specified, the event will be shown using the default interface")%></font></td>
+                        <td align="left" width="100%"><font size="-1"> <%= _("No type is specified, the event will be shown using the default interface")%></font></td>
                         </td>
                     </tr>
                 </table>

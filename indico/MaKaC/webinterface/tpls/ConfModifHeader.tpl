@@ -3,7 +3,7 @@
 
 <h2 class="bannerTitle">
     <a href="<%= confDisplayURL %>" style="margin-right: 10px;">
-        <img class="titleMiddleImg" src="%(imgGestionGrey)s" alt="<%= _("Preview")%>" title="<%= _("Preview in Browser")%>">
+        <img class="titleMiddleImg" src="<%= imgGestionGrey %>" alt="<%= _("Preview")%>" title="<%= _("Preview in Browser")%>">
     </a>
     <%= confTitle %>
 </h2>

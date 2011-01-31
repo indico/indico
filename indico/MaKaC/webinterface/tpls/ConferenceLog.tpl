@@ -1,4 +1,4 @@
-<table width="100%%" class="logsTab"><tr><td>
+<table width="100%" class="logsTab"><tr><td>
 <script type="text/javascript">
 <!--
 function selectAll()
@@ -27,31 +27,31 @@ function deselectAll()
 //-->
 </script>
 <br>
-<table width="100%%" align="center" border="0">
+<table width="100%" align="center" border="0">
 	<tr>
 		<td colspan="2" class="groupTitle"> <%= _("Event Log")%></td>
 	</tr>
 	<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
 	<tr>
 		<td colspan="2">
-		%(errorMsg)s
-		%(infoMsg)s
+		<%= errorMsg %>
+		<%= infoMsg %>
 		</td>
 	</tr>
-	<form action=%(logFilterAction)s method="post" name="logFilterForm">
+	<form action=<%= logFilterAction %> method="post" name="logFilterForm">
 	<tr>
-		<td width="18%%">
+		<td width="18%">
 			&nbsp;<b> <%= _("Show standard views")%>:</b>
 		</td>
 		<td>
 			&nbsp;<input type="submit" class="btn" name="filter" value="<%= _("General Log")%>" />
 			&nbsp;<input type="submit" class="btn" name="filter" value="<%= _("Email Log")%>" />
 			&nbsp;<input type="submit" class="btn" name="filter" value="<%= _("Action Log")%>" />
-		</td>	
+		</td>
 	</tr>
 	<tr><td>&nbsp;</td></tr>
 	<tr>
-		<td width="18%%">
+		<td width="18%">
 			&nbsp;<b> <%= _("Apply custom filter")%>:</b>
 		</td>
 		<td>
@@ -67,21 +67,21 @@ function deselectAll()
 		<table border="0">
 			<tr>
 				<td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-					
-					<a href="%(orderByDate)s"><%= _("Date")%></a>
+
+					<a href="<%= orderByDate %>"><%= _("Date")%></a>
 				</td>
 				<td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-					&nbsp;<a href="%(orderBySubject)s"> <%= _("Subject")%></a>
+					&nbsp;<a href="<%= orderBySubject %>"> <%= _("Subject")%></a>
 				</td>
 				<td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-					&nbsp;<a href="%(orderByResponsible)s"> <%= _("Responsible")%></a>
+					&nbsp;<a href="<%= orderByResponsible %>"> <%= _("Responsible")%></a>
 				</td>
 				<td class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-					&nbsp;<a href="%(orderByModule)s"> <%= _("Module")%></a>
+					&nbsp;<a href="<%= orderByModule %>"> <%= _("Module")%></a>
 				</td>
 			</tr>
-			<form action=%(logListAction)s method="post" name="logListForm">
-			%(log)s
+			<form action=<%= logListAction %> method="post" name="logListForm">
+			<%= log %>
 			</form>
 		</table>
 		</td>

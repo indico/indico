@@ -1,47 +1,47 @@
-<table width="100%%" align="center">
+<table width="100%" align="center">
     <tr>
-        
+
     </tr>
     <tr>
         <td align="center">
-            <form action=%(submitURL)s method="POST">
-            %(submitBtn)s
+            <form action=<%= submitURL %> method="POST">
+            <%= submitBtn %>
             </form>
         </td>
     </tr>
     <tr>
         <td>
-	    <table align="center" width="95%%" border="0" style="border: 1px solid #777777;">
+	    <table align="center" width="95%" border="0" style="border: 1px solid #777777;">
             <tr>
                 <td>&nbsp;</td>
             </tr>
             <tr>
               <td>
-                <table>  
+                <table>
 		          <tr>
-                    <td align="center"><font size="+1" color="black"><b>%(title)s <img src=%(icon)s alt="file"></b></font></td>
+                    <td align="center"><font size="+1" color="black"><b><%= title %> <img src=<%= icon %> alt="file"></b></font></td>
 		          </tr>
 		          <tr>
-		            <td width="100%%">&nbsp;<td>
+		            <td width="100%">&nbsp;<td>
 		          </tr>
 		          <tr>
 		            <td>
                        <table align="center">
                           <tr>
-                             <td><pre>%(description)s</pre></td>
+                             <td><pre><%= description %></pre></td>
                           </tr>
                         </table>
                     </td>
 		          </tr>
                   <tr>
 		            <td>
-		                <table align="center" width="80%%">
+		                <table align="center" width="80%">
 		                  <tr>
-		                    %(resources)s
+		                    <%= resources %>
 					      </tr>
                         </table>
                     </td>
-              
+
                 </table>
               </td>
             </tr>
@@ -50,10 +50,9 @@
     <tr>
       <td align="center">
         <br>
-        <form action=%(submitURL)s method="POST">
-        %(submitBtn)s
+        <form action=<%= submitURL %> method="POST">
+        <%= submitBtn %>
         </form>
       </td>
     </tr>
 </table>
-

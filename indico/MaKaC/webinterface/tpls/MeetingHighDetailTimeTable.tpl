@@ -1,5 +1,5 @@
 <br>
-<font size="+2">%(title)s</font>
+<font size="+2"><%= title %></font>
 <br>
 <br>
-%(timetable)s
+<%= timetable %>

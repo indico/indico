@@ -1,5 +1,5 @@
-<form action=%(postURL)s method="POST">
-<table width="90%%" cellspacing="0" align="center" border="0">
+<form action=<%= postURL %> method="POST">
+<table width="90%" cellspacing="0" align="center" border="0">
 	<tr>
 		<td colspan="3">
             <span class="groupTitle" style="border:0px;"><%= _("Step 1: Assign a name to the template")%></span>
@@ -8,17 +8,17 @@
             <br /><br />
         </td>
     </tr>
-	%(errors)s
+	<%= errors %>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-        <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-			<input id="notificationTplTitle" type="text" name="title" value=%(title)s style="width: 61%%;" onfocus="selected('notificationTplTitle')">
+        <td colspan="2" bgcolor="white" width="100%">&nbsp;
+			<input id="notificationTplTitle" type="text" name="title" value=<%= title %> style="width: 61%;" onfocus="selected('notificationTplTitle')">
 		</td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
-        <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-			<textarea id="notificationTplDescription" name="description" rows="5" style="width: 61%%;" onfocus="selected('notificationTplDescription')">%(description)s</textarea>
+        <td colspan="2" bgcolor="white" width="100%">&nbsp;
+			<textarea id="notificationTplDescription" name="description" rows="5" style="width: 61%;" onfocus="selected('notificationTplDescription')"><%= description %></textarea>
 		</td>
     </tr>
 	<tr>
@@ -31,39 +31,39 @@
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("From address")%></span></td>
-        <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-            <input id="notificationTplAddress" type="text" name="fromAddr" style="width: 61%%;" value=%(fromAddr)s onfocus="selected('notificationTplAddress')">
+        <td colspan="2" bgcolor="white" width="100%">&nbsp;
+            <input id="notificationTplAddress" type="text" name="fromAddr" style="width: 61%;" value=<%= fromAddr %> onfocus="selected('notificationTplAddress')">
         </td>
     </tr>
 	<tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("To addresses")%></span></td>
-        <td colspan="2" bgcolor="white" width="100%%">&nbsp;%(toAddrs)s
+        <td colspan="2" bgcolor="white" width="100%">&nbsp;<%= toAddrs %>
         </td>
     </tr>
 	<tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("CC addresses")%></span></td>
-        <td colspan="2" bgcolor="white" width="100%%">&nbsp;
-            <input id="notificationTplCCAddress" type="text" name="CCAddrs" style="width: 61%%;" value=%(CCAddrs)s onfocus="selected('notificationTplCCAddress')">
+        <td colspan="2" bgcolor="white" width="100%">&nbsp;
+            <input id="notificationTplCCAddress" type="text" name="CCAddrs" style="width: 61%;" value=<%= CCAddrs %> onfocus="selected('notificationTplCCAddress')">
         </td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Subject")%></span></td>
-        <td bgcolor="white" width="100%%">&nbsp;
-			<input id="notificationTplSubject" type="text" name="subject" style="width: 97%%;" value=%(subject)s onfocus="selected('notificationTplSubject')">
+        <td bgcolor="white" width="100%">&nbsp;
+			<input id="notificationTplSubject" type="text" name="subject" style="width: 97%;" value=<%= subject %> onfocus="selected('notificationTplSubject')">
 		</td>
         <td align="center" valign="top" rowspan="2" style="padding-left: 5px; padding-top:3px;">
-            <table width="75%%" class="legend" cellspacing="0" cellpadding="2">
+            <table width="75%" class="legend" cellspacing="0" cellpadding="2">
                 <tr>
                     <td class="titleTd"><b> <%= _("Available tags")%>:</b></td>
                 </tr>
-                %(vars)s
+                <%= vars %>
             </table>
         </td>
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Body")%></span></td>
         <td bgcolor="white">&nbsp;
-		  <textarea id="notificationTplBody" name="body" rows="26" style="width: 97%%;" onfocus="selected('notificationTplBody')">%(body)s</textarea>
+		  <textarea id="notificationTplBody" name="body" rows="26" style="width: 97%;" onfocus="selected('notificationTplBody')"><%= body %></textarea>
         </td>
     </tr>
 	<tr><td colspan="3"><br></td></tr>
@@ -75,5 +75,4 @@
     </tr>
 </table>
 </form>
-
 

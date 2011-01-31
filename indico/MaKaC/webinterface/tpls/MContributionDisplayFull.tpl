@@ -1,30 +1,30 @@
-<br><table width="100%%" align="center">
+<br><table width="100%" align="center">
     <tr>
         <td align="center">
-            <form action=%(submitURL)s method="POST">
-            %(submitBtn)s
+            <form action=<%= submitURL %> method="POST">
+            <%= submitBtn %>
             </form>
         </td>
     </tr>
     <tr>
         <td>
-	    <table align="center" width="95%%" border="0" style="border: 1px solid #777777;">
+	    <table align="center" width="95%" border="0" style="border: 1px solid #777777;">
             <tr>
                 <td>&nbsp;</td>
             </tr>
             <tr>
                 <td>
-		            <table align="center" width="95%%" border="0">
-                        %(withdrawnNotice)s
+		            <table align="center" width="95%" border="0">
+                        <%= withdrawnNotice %>
 		            <tr>
-                        <td align="center">%(modifIcon)s%(submitIcon)s<font size="+1" color="black"><b>%(title)s</b></font></td>
+                        <td align="center"><%= modifIcon %><%= submitIcon %><font size="+1" color="black"><b><%= title %></b></font></td>
 		            </tr>
 
 		            <tr>
 		                <td>
                             <table align="center">
                                 <tr>
-                                    <td>%(description)s</td>
+                                    <td><%= description %></td>
                                 </tr>
                             </table>
                         </td>
@@ -32,47 +32,47 @@
 
 		            <tr>
 		                <td>
-		                    <table align="center" width="90%%">
+		                    <table align="center" width="90%">
 		                        <tr>
 		                            <td align="right" valign="top" class="displayField"><b> <%= _("Id")%>:</b></td>
-                                    <td>%(id)s</td>
+                                    <td><%= id %></td>
             </tr>
-		    %(location)s
+		    <%= location %>
 		    <tr>
 		        <td align="right" valign="top" class="displayField"><b> <%= _("Starting date")%>:</b></td>
-			<td width="100%%">
+			<td width="100%">
 			    <table cellspacing="0" cellpadding="0" align="left">
 			    <tr>
-			        <td align="right">%(startDate)s</td>
-				<td>&nbsp;&nbsp;%(startTime)s</td>
+			        <td align="right"><%= startDate %></td>
+				<td>&nbsp;&nbsp;<%= startTime %></td>
 			    </tr>
 			    </table>
 			</td>
 		    </tr>
 		    <tr>
 		        <td align="right" valign="top" class="displayField"><b> <%= _("Duration")%>:</b></td>
-			<td width="100%%">%(duration)s</td>
+			<td width="100%"><%= duration %></td>
 		    </tr>
-					%(contribType)s
-					%(primaryAuthors)s
-					%(coAuthors)s
-                    %(speakers)s
+					<%= contribType %>
+					<%= primaryAuthors %>
+					<%= coAuthors %>
+                    <%= speakers %>
                     <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
                     <td class="displayField" nowrap="" align="right" valign="top">
                         <b><%= _("Material:")%></b>
                     </td>
-                    <td width="100%%" valign="top">
+                    <td width="100%" valign="top">
                         <%=MaterialList%>
                     </td>
                     <% end %>
                     <% else: %>
-                        %(material)s
+                        <%= material %>
                     <% end %>
 					<tr><td>&nbsp;</td></tr>
-                    %(inSession)s
-                    %(inTrack)s
+                    <%= inSession %>
+                    <%= inTrack %>
 					<tr><td>&nbsp;</td></tr>
-                    %(subConts)s
+                    <%= subConts %>
                  </table>
                  </td>
               </tr>
@@ -84,8 +84,8 @@
 </tr>
 <tr>
     <td align="center">
-        <form action=%(submitURL)s method="POST">
-        %(submitBtn)s
+        <form action=<%= submitURL %> method="POST">
+        <%= submitBtn %>
         </form>
     </td>
 </tr>

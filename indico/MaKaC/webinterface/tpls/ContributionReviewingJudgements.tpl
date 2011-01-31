@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <% from MaKaC.reviewing import ConferenceReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.common.utils import formatDateTime %>

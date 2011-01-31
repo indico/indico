@@ -185,7 +185,8 @@ class WPBase(OldObservable):
 
     # auxiliar functions
     def _escapeChars(self, text):
-        return text.replace('%','%%')
+        # Not doing anything right now - it used to convert % to %% for old-style templates
+        return text
 
 
 class WPDecorated( WPBase ):

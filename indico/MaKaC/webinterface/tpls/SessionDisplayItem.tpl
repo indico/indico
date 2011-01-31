@@ -1,3 +1,3 @@
-<td valign="top">%(startDate)s %(startTime)s - %(endDate)s %(endTime)s</td>
-<td>%(title)s<br>%(contributions)s</td>
-<td valign="top"><small><a href="%(modifyURL)s">[ <%= _("Modify")%>]</a></small></a>
+<td valign="top"><%= startDate %> <%= startTime %> - <%= endDate %> <%= endTime %></td>
+<td><%= title %><br><%= contributions %></td>
+<td valign="top"><small><a href="<%= modifyURL %>">[ <%= _("Modify")%>]</a></small></a>

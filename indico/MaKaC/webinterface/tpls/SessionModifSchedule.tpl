@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True)%>
-
 <div id="timetableDiv" style="position: relative;">
 
 <div class="timetablePreLoading" style="width: 700px; height: 300px;">

@@ -1,4 +1,4 @@
-<form method="get" action="%(searchAction)s" id="searchBoxForm" style="margin: 0px;">
+<form method="get" action="<%= searchAction %>" id="searchBoxForm" style="margin: 0px;">
 <input type="hidden" id="searchCategId" name="categId" value="<%=categId%>"/>
 <div id="UISearchBox">
     <div id="searchControls">

@@ -1,13 +1,13 @@
-<table align="center" width="95%%" cellspacing="0">
+<table align="center" width="95%" cellspacing="0">
     <tr>
-        <td><font color="black">%(description)s</font></td>
+        <td><font color="black"><%= description %></font></td>
     </tr>
     <tr>
         <td>&nbsp;</td>
     </tr>
     <tr>
         <td>
-            %(program)s
+            <%= program %>
         </td>
     </tr>
 </table>

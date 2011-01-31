@@ -1,5 +1,5 @@
-<form method="POST" action=%(postURL)s>
-    <table width="60%%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
+<form method="POST" action=<%= postURL %>>
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
 		<tr>
 			<td colspan="2" class="groupTitle"> <%= _("Modify contribution schedule data")%></td>
         </tr>
@@ -8,14 +8,14 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;%(title)s</td>
+            <td bgcolor="white" width="100%">&nbsp;<%= title %></td>
         </tr>
 <!--
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Place")%></span>
             </td>
-            <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+            <td bgcolor="white" width="100%" valign="top" class="blacktext">
                 <table>
                     <tr>
                         <td valign="top">
@@ -44,7 +44,7 @@
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Room")%></span>
             </td>
-            <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+            <td bgcolor="white" width="100%" valign="top" class="blacktext">
                 <table>
                     <tr>
                         <td valign="top">
@@ -67,31 +67,31 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Board #")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
 			<input type="text" name="boardNumber" size="10" value=(boardNumber)s></td>
         </tr>
 -->
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>
-            <td bgcolor="white" width="100%%" valign="top">&nbsp;
-                <input type="text" size="2" name="sDay" value=%(sDay)s>-<input type="text" size="2" name="sMonth" value=%(sMonth)s>-<input type="text" size="4" name="sYear" value=%(sYear)s>&nbsp;&nbsp;&nbsp;<input type="text" size="2" name="sHour" value=%(sHour)s>:<input type="text" size="2" name="sMinute" value=%(sMinute)s>
+            <td bgcolor="white" width="100%" valign="top">&nbsp;
+                <input type="text" size="2" name="sDay" value=<%= sDay %>>-<input type="text" size="2" name="sMonth" value=<%= sMonth %>>-<input type="text" size="4" name="sYear" value=<%= sYear %>>&nbsp;&nbsp;&nbsp;<input type="text" size="2" name="sHour" value=<%= sHour %>>:<input type="text" size="2" name="sMinute" value=<%= sMinute %>>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Duration")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <input type="text" size="2" name="durHours" value=%(durHours)s>:<input type="text" size="2" name="durMins" value=%(durMins)s>
+            <td bgcolor="white" width="100%">&nbsp;
+                <input type="text" size="2" name="durHours" value=<%= durHours %>>:<input type="text" size="2" name="durMins" value=<%= durMins %>>
             </td>
         </tr>
-        
+
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Action")%>:</span></td>
             <td style="padding-left:10px">
-		%(autoUpdate)s
-                <input type="checkbox" name="moveEntries" value="1"> <%= _("reschedule entries after this contribution")%> 
+		<%= autoUpdate %>
+                <input type="checkbox" name="moveEntries" value="1"> <%= _("reschedule entries after this contribution")%>
             </td>
         </tr>
-        
+
         <tr align="center">
             <td colspan="2" class="buttonBar" valign="bottom" align="center">
                 <input type="submit" class="btn" value="<%= _("ok")%>" name="OK">

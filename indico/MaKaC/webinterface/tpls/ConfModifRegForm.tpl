@@ -3,11 +3,11 @@
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Current status")%></span></td>
     <td class="blacktext" colspan="2">
-      <form action="%(setStatusURL)s" method="POST">
+      <form action="<%= setStatusURL %>" method="POST">
 	<div>
-	  <input name="changeTo" type="hidden" value="%(changeTo)s" />
-	  <b>%(status)s</b>
-	  <small><input type="submit" class="btn" value="%(changeStatus)s" /></small>
+	  <input name="changeTo" type="hidden" value="<%= changeTo %>" />
+	  <b><%= status %></b>
+	  <small><input type="submit" class="btn" value="<%= changeStatus %>" /></small>
 	</div>
       </form>
     </td>
@@ -15,12 +15,12 @@
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Registration start date")%></span></td>
     <td class="blacktext">
-      %(startDate)s
+      <%= startDate %>
     </td>
     <td rowspan="8" style="align: right; vertical-align: bottom;">
-      <form action="%(dataModificationURL)s" method="POST">
+      <form action="<%= dataModificationURL %>" method="POST">
 	<div>
-	  <input type="submit" class="btn" value="<%= _("modify")%>" %(disabled)s />
+	  <input type="submit" class="btn" value="<%= _("modify")%>" <%= disabled %> />
 	</div>
       </form>
     </td>
@@ -28,7 +28,7 @@
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Registration end date")%></span></td>
     <td class="blacktext">
-      %(endDate)s
+      <%= endDate %>
       <% if extraTimeAmount: %>
       (<%= _("Allow")%>&nbsp;<%= extraTimeAmount %>&nbsp;<%= extraTimeUnit %>&nbsp;<%= _("after")%>)
       <% end %>
@@ -37,49 +37,49 @@
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Modification end date")%></span></td>
     <td class="blacktext">
-      %(modificationEndDate)s
+      <%= modificationEndDate %>
     </td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Title")%></span></td>
     <td class="blacktext">
-      %(title)s
+      <%= title %>
     </td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Contact info")%></span></td>
     <td class="blacktext">
-      %(contactInfo)s
+      <%= contactInfo %>
     </td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Announcement")%></span></td>
     <td class="blacktext">
-      <pre>%(announcement)s</pre>
+      <pre><%= announcement %></pre>
     </td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Max No. of registrants")%></span></td>
     <td class="blacktext">
-      %(usersLimit)s
+      <%= usersLimit %>
     </td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification (on new registrations)")%></span></td>
     <td class="blacktext">
-      %(notification)s
+      <%= notification %>
     </td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Must have account")%></span></td>
     <td class="blacktext">
-      %(mandatoryAccount)s
+      <%= mandatoryAccount %>
     </td>
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Currency")%></span></td>
     <td class="blacktext">
-      %(Currency)s
+      <%= Currency %>
     </td>
   </tr>
   <tr>
@@ -91,12 +91,12 @@
       <span class="dataCaptionFormat"><%= _("Personal Data")%></span>
       <br/>
       <br/>
-      <img src=%(enablePic)s alt="<%= _("Click to disable")%>"> <small><%= _("Enabled field") %></small>
+      <img src=<%= enablePic %> alt="<%= _("Click to disable")%>"> <small><%= _("Enabled field") %></small>
       <br/>
-      <img src=%(disablePic)s alt="<%= _("Click to enable")%>"> <small><%= _("Disabled field") %></small>
+      <img src=<%= disablePic %> alt="<%= _("Click to enable")%>"> <small><%= _("Disabled field") %></small>
     </td>
     <td class="blacktext" style="padding-left:20px">
-      %(personalfields)s
+      <%= personalfields %>
     </td>
     <td>
     </td>
@@ -110,13 +110,13 @@
       <span class="dataCaptionFormat"><%= _("Sections of the form")%></span>
       <br/>
       <br/>
-      <img src=%(enablePic)s alt="<%= _("Click to disable")%>"> <small> <%= _("Enabled section")%></small>
+      <img src=<%= enablePic %> alt="<%= _("Click to disable")%>"> <small> <%= _("Enabled section")%></small>
       <br/>
-      <img src=%(disablePic)s alt="<%= _("Click to enable")%>"> <small> <%= _("Disabled section")%></small>
+      <img src=<%= disablePic %> alt="<%= _("Click to enable")%>"> <small> <%= _("Disabled section")%></small>
     </td>
-    <form action=%(actionSectionURL)s method="POST">
+    <form action=<%= actionSectionURL %> method="POST">
       <td class="blacktext" style="padding-left:20px">
-	%(sections)s
+	<%= sections %>
       </td>
       <td>
 	<input type="submit" class="btn" name="removeSection" value="<%= _("remove sect.")%>" />
@@ -132,7 +132,7 @@
       <span class="dataCaptionFormat"> <%= _("Custom statuses")%></span>
     </td>
     <td colspan="2">
-      <form action=%(actionStatusesURL)s method="POST">
+      <form action=<%= actionStatusesURL %> method="POST">
 	<table>
 	  <tr>
 	    <td colspan="2">
@@ -141,7 +141,7 @@
 	    </td>
 	  </tr>
 	  <tr>
-	    <td>%(statuses)s</td>
+	    <td><%= statuses %></td>
 	    <td>
 	      <input type="submit" class="btn" name="removeStatuses" value="<%= _("remove status")%>" />
 	    </td>
@@ -155,4 +155,3 @@
   </tr>
 </table>
 <br/>
-

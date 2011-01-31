@@ -457,11 +457,10 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
         vars = wcomponents.WTemplated.getVars( self )
 
-        # '%' escaping for template engine (just until we have a decent one)
-        vars["filterUrl"] = str(self._filterUrl).replace('%', '%%')
+        vars["filterUrl"] = str(self._filterUrl)
 
         sortingField = self._sortingCrit.getField()
-        vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)).replace('%','%%'))
+        vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
         cl = self._conf.getRegistrantsList(False)
         f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
         vars["eve"]=""
@@ -562,8 +561,7 @@ class WFilterCriteriaRegistrants(wcomponents.WFilterCriteria):
         else:
             page = WFilterCriterionOptions(formName, form, self._filterCrit)
 
-        # TODO: remove when we have a better template system
-        return page.getHTML().replace('%','%%')
+        return page.getHTML()
 
 class WFilterCriterionOptions(wcomponents.WTemplated):
     """

@@ -1,12 +1,12 @@
 
-<form method="POST" action="%(postURL)s">
-    <table width="90%%" align="center"  style="border-bottom: 1px solid #BBBBBB;">
+<form method="POST" action="<%= postURL %>">
+    <table width="90%" align="center"  style="border-bottom: 1px solid #BBBBBB;">
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Modify call for abstract data")%></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>
-             <td bgcolor="white" width="100%%">
+             <td bgcolor="white" width="100%">
                 <span id="sDatePlace"></span>
                 <input type="hidden" value="<%= sDay %>" name="sDay" id="sDay"/>
                 <input type="hidden" value="<%= sMonth %>" name="sMonth" id="sMonth"/>
@@ -15,7 +15,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("End date")%></span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
                 <span id="eDatePlace"></span>
                 <input type="hidden" value="<%= eDay %>" name="eDay" id="eDay"/>
                 <input type="hidden" value="<%= eMonth %>" name="eMonth" id="eMonth"/>
@@ -24,7 +24,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Modification deadline")%></span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
                 <span id="mDatePlace"></span>
                 <input type="hidden" value="<%= mDay %>" name="mDay" id="mDay"/>
                 <input type="hidden" value="<%= mMonth %>" name="mMonth" id="mMonth"/>
@@ -33,25 +33,25 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Announcement")%></span></td>
-            <td bgcolor="white" width="100%%"><textarea name="announcement" rows="10" cols="60">%(announcement)s</textarea></td>
+            <td bgcolor="white" width="100%"><textarea name="announcement" rows="10" cols="60"><%= announcement %></textarea></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Email Notification on Submission")%></span></td>
-            <td bgcolor="white" width="100%%">
+            <td bgcolor="white" width="100%">
               <table align="left">
                 <tr>
                   <td align="right">
                     <b> <%= _("To List")%>:&nbsp;</b>
                   </td>
                   <td align="left">
-                    <input type="text" size="50" name="toList" value="%(toList)s">
+                    <input type="text" size="50" name="toList" value="<%= toList %>">
                   </td>
                 <tr>
                   <td>
                     <b> <%= _("Cc List")%>:&nbsp;</b>
                   </td>
                   <td align="left">
-                    <input type="text" size="50" name="ccList" value="%(ccList)s">
+                    <input type="text" size="50" name="ccList" value="<%= ccList %>">
                   </td>
                 </tr>
                 <tr><td colspan="2"><small>( <%= _("You can write several email addresses separated by commas")%>)</small></td></tr>
@@ -101,4 +101,3 @@
      });
 
 </script>
-

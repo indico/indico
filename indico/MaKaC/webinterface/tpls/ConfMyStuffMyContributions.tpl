@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
     <%= items %>
 
     <% if hasPaperReviewing: %>

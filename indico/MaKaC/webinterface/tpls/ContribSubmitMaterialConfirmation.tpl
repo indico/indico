@@ -1,11 +1,11 @@
 <br>
-<form action=%(postURL)s method="POST">
-<input type="hidden" name="materialType" value=%(matType)s>
-<input type="hidden" name="description" value=%(description)s>
-<input type="hidden" name="fileName" value=%(fileName)s>
-<input type="hidden" name="filePath" value=%(filePath)s>
+<form action=<%= postURL %> method="POST">
+<input type="hidden" name="materialType" value=<%= matType %>>
+<input type="hidden" name="description" value=<%= description %>>
+<input type="hidden" name="fileName" value=<%= fileName %>>
+<input type="hidden" name="filePath" value=<%= filePath %>>
 
-<table width="90%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="90%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
         <td colspan="5" class="groupTitle"><%= _("Submitting material for a contribution")%></td>
     </tr>
@@ -13,10 +13,10 @@
         <td nowrap class="titleCellTD">
             <span class="titleCellFormat"><%= _("Contribution")%></span>
         </td>
-        <td bgcolor="white" width="80%%">%(contribId)s-%(contribTitle)s</td>
+        <td bgcolor="white" width="80%"><%= contribId %>-<%= contribTitle %></td>
     </tr>
     <tr>
-        <td colspan="2" align="center" width="100%%">
+        <td colspan="2" align="center" width="100%">
             <table align="center">
                 <tr>
                     <td style="color:red" align="center"><%= _("WARNING!!")%></td>
@@ -28,11 +28,11 @@
                                 border-bottom:1px solid red">
                         <%= _("You have selected to submit as %(matTypeCaption)s material the file")%>:
                         <ul>
-                            <li><i>%(selFileName)s</i> (%(selFileSize)s)</li>
+                            <li><i><%= selFileName %></i> (<%= selFileSize %>)</li>
                         </ul>
                         <%= _("but there is ALREADY SOME EXISTING MATERIAL of this type")%>:
                         <ul>
-                            <li><i>%(oldFileName)s</i> (%(oldFileSize)s)</li>
+                            <li><i><%= oldFileName %></i> (<%= oldFileSize %>)</li>
                         </ul>
                         <%= _("if you continue the EXISTING FILES WILL BE REPLACED")%>.
                         <br>

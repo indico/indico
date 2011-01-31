@@ -1,16 +1,16 @@
-<form action=%(postURL)s method="POST">
+<form action=<%= postURL %> method="POST">
 <tr><td>
-    <table align="center" width="100%%" border="0">
+    <table align="center" width="100%" border="0">
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td><input type="text" name="title" size="90" value=%(title)s></td>
+            <td><input type="text" name="title" size="90" value=<%= title %>></td>
         </tr>
-        %(additionalFields)s
+        <%= additionalFields %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Primary authors")%></span></td>
             <td>
-                <table cellspacing="0" cellpadding="0" width="50%%" align="left" valign="middle" border="0">
-                    %(primaryAuthors)s
+                <table cellspacing="0" cellpadding="0" width="50%" align="left" valign="middle" border="0">
+                    <%= primaryAuthors %>
 					<tr>
 						<td colspan="3">
 							<input type="submit" class="btn" name="remPrimAuthors" value="<%= _("remove selected primary authors")%>">
@@ -23,8 +23,8 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Co-authors")%></span></td>
             <td>
-                <table cellspacing="0" cellpadding="0" width="50%%" align="left" valign="middle" border="0">
-                    %(coAuthors)s
+                <table cellspacing="0" cellpadding="0" width="50%" align="left" valign="middle" border="0">
+                    <%= coAuthors %>
 					<tr>
 						<td colspan="3">
 							<input type="submit" class="btn" name="remCoAuthors" value="<%= _("remove selected co-authors")%>">
@@ -36,7 +36,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Contribution type")%></span></td>
-            <td><select name="contribType">%(contribTypeItems)s</select></td>
+            <td><select name="contribType"><%= contribTypeItems %></select></td>
         </tr>
         <tr><td colspan="2">&nbsp;</td></tr>
         <tr align="center">
@@ -48,4 +48,3 @@
     </table>
 </td></tr>
 </form>
-

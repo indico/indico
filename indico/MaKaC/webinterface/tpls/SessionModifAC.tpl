@@ -1,8 +1,8 @@
-<table width="100%%" class="ACtab"><tr><td>
+<table width="100%" class="ACtab"><tr><td>
 <br>
-%(modifyControlFrame)s
+<%= modifyControlFrame %>
 <br>
-%(accessControlFrame)s
+<%= accessControlFrame %>
 <br>
 <table class="groupTable">
 <tr>
@@ -10,7 +10,7 @@
 </tr>
 <tr>
   <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Coordinators")%></span></td>
-  <td bgcolor="white" width="100%%" valign="top" class="blacktext">%(coordinators)s</td>
+  <td bgcolor="white" width="100%" valign="top" class="blacktext"><%= coordinators %></td>
 </tr>
 </table>
 </tr></td></table>

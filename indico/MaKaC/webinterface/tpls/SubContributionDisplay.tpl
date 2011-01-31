@@ -4,7 +4,7 @@
 				<tr>
                     <td>
                         <table border="0" bgcolor="#000060" width="90%">
-%(subContList)s
+<%= subContList %>
                         </table>
                     </td>
                 </tr>

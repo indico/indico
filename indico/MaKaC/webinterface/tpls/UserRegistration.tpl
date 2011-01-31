@@ -1,19 +1,19 @@
 <%! from MaKaC.i18n import _,langList %>
 <center>
-<form action=%(postURL)s method="POST">   
-%(locator)s
-<table width="80%%">
+<form action=<%= postURL %> method="POST">
+<%= locator %>
+<table width="80%">
 <tr>
-  <td colspan="2" align="center"><font size="+2"><u>%(Wtitle)s</u></font></td>
+  <td colspan="2" align="center"><font size="+2"><u><%= Wtitle %></u></font></td>
 </tr>
 <tr>
   <td colspan="2" align="center">
-    <table width="90%%">
+    <table width="90%">
     <tr>
       <td>
         <font color="gray">
          <%= _("To create a new user please fill in the following form.")%><br>
-        %(after)s<br><br>
+        <%= after %><br><br>
         </font>
         <font color="red">
           <center><b> <%= _("Beware! This is not a conference registration form but an Indico account creation.")%></b></center><br><br>
@@ -21,7 +21,7 @@
       </td>
     </tr>
     </table>
-    %(msg)s
+    <%= msg %>
   </td>
 </tr>
 <tr>
@@ -36,29 +36,29 @@
   </td>
   <td align="left">
     <select name="title">
-    %(titleOptions)s
+    <%= titleOptions %>
     </select>
   </td>
 </tr>
 <tr>
   <td align="right"><font color="gray"><font color="red">* </font> <%= _("Family name")%></font></td>
-  <td align="left"><input type="text" name="surName" value=%(surName)s size="100"></td>
+  <td align="left"><input type="text" name="surName" value=<%= surName %> size="100"></td>
 </tr>
 <tr>
   <td align="right"><font color="gray"><font color="red">* </font> <%= _("First name")%></font></td>
-  <td align="left"><input type="text" name="name" value=%(name)s size="100"></td>
+  <td align="left"><input type="text" name="name" value=<%= name %> size="100"></td>
 </tr>
 <tr>
   <td align="right"><font color="gray"><font color="red">* </font> <%= _("Affiliation")%></font></td>
-  <td align="left"><input type="text" name="organisation" value=%(organisation)s size="100"></td>
+  <td align="left"><input type="text" name="organisation" value=<%= organisation %> size="100"></td>
 </tr>
 <tr>
   <td align="right"><font color="gray"><font color="red">* </font> <%= _("Email")%></font></td>
-  <td align="left"><input type="text" name="email" value=%(email)s size="100"></td>
+  <td align="left"><input type="text" name="email" value=<%= email %> size="100"></td>
 </tr>
 <tr>
   <td align="right"><font color="gray"><font color="red">* </font> <%= _("Language")%></font></td>
-  <td bgcolor="white" width="100%%" align="left">
+  <td bgcolor="white" width="100%" align="left">
   <select size=1 name="lang">
     <% for l in langList(): %>
 		<option value="<%=l[0]%>" <%if l[0]==defaultLang: %>selected="selected"<%end%>><%=l[1]%></option><br>
@@ -68,31 +68,31 @@
 </tr>
 <tr>
   <td align="right" valign="top"><font color="gray"> <%= _("Address")%></font></td>
-  <td align="left"><textarea name="address" rows="5" cols="75">%(address)s</textarea></td>
+  <td align="left"><textarea name="address" rows="5" cols="75"><%= address %></textarea></td>
 </tr>
 <tr>
   <td align="right" nowrap><font color="gray"> <%= _("Telephone number")%></font></td>
-  <td align="left"><input type="text" name="telephone" value=%(telephone)s size="25"></td>
+  <td align="left"><input type="text" name="telephone" value=<%= telephone %> size="25"></td>
 </tr>
 <tr>
   <td align="right"><font color="gray"> <%= _("Fax number")%></font></td>
-  <td align="left"><input type="text" name="fax" value=%(fax)s size="25"></td>
+  <td align="left"><input type="text" name="fax" value=<%= fax %> size="25"></td>
 </tr>
 <!-- Fermi timezone awareness -->
 <tr>
  <td align="right">
      <font color="gray"><%= _("My Timezone")%></font>
  </td>
-    <td bgcolor="white" width="100%%" align="left">
-       <select name="timezone">%(timezoneOptions)s</select>
+    <td bgcolor="white" width="100%" align="left">
+       <select name="timezone"><%= timezoneOptions %></select>
     </td>
 </tr>
 <tr>
  <td align="right">
      <font color="gray"><%= _("Display Timezone")%></font>
  </td>
-    <td bgcolor="white" width="100%%" align="left">
-       <select name="displayTZMode">option value=%(displayTZModeOptions)s</select>
+    <td bgcolor="white" width="100%" align="left">
+       <select name="displayTZMode">option value=<%= displayTZModeOptions %></select>
     </td>
 </tr>
 <!-- Fermi timezone awareness(end) -->
@@ -108,7 +108,7 @@
 </tr>
 <tr>
   <td align="right"><font color="gray"><font color="red">* </font> <%= _("Login")%></font></td>
-  <td align="left"><input type="text" name="login" value=%(login)s size="25"></td>
+  <td align="left"><input type="text" name="login" value=<%= login %> size="25"></td>
 </tr>
 <tr>
   <td align="right"><font color="gray"><font color="red">* </font> <%= _("Password")%></font></td>

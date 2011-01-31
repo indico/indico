@@ -1,3 +1,1 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <%= schedule %>

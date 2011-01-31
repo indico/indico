@@ -1,20 +1,20 @@
-<form method="POST" action=%(postURL)s>
-    <table width="60%%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
-    	<input type="hidden" name="orginURL" value="%(orginURL)s">
+<form method="POST" action=<%= postURL %>>
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
+    	<input type="hidden" name="orginURL" value="<%= orginURL %>">
 		<tr>
-			<td colspan="2" class="groupTitle">%(formTitle)s</td>
+			<td colspan="2" class="groupTitle"><%= formTitle %></td>
         </tr>
         <tr>
-            <td colspan="2">%(errors)s</td>
+            <td colspan="2"><%= errors %></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Session title")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;%(sessionTitle)s</td>
+            <td bgcolor="white" width="100%">&nbsp;<%= sessionTitle %></td>
         </tr>
-		%(slotTitle)s
+		<%= slotTitle %>
 		<!--<tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
 				<input type="text" size="60" name="title" value="(title)s">
 			</td>
         </tr>
@@ -22,7 +22,7 @@
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Place")%></span>
             </td>
-            <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+            <td bgcolor="white" width="100%" valign="top" class="blacktext">
                 <table>
                     <tr>
                         <td valign="top">
@@ -51,7 +51,7 @@
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Room")%></span>
             </td>
-            <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+            <td bgcolor="white" width="100%" valign="top" class="blacktext">
                 <table>
                     <tr>
                         <td valign="top">
@@ -75,20 +75,20 @@
 -->
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Start date")%></span></td>
-            <td bgcolor="white" width="100%%" valign="top">&nbsp;
-                <input type="text" size="2" name="sDay" value=%(sDay)s>-<input type="text" size="2" name="sMonth" value=%(sMonth)s>-<input type="text" size="4" name="sYear" value=%(sYear)s>&nbsp;&nbsp;&nbsp;<input type="text" size="2" name="sHour" value=%(sHour)s>:<input type="text" size="2" name="sMinute" value=%(sMinute)s>
+            <td bgcolor="white" width="100%" valign="top">&nbsp;
+                <input type="text" size="2" name="sDay" value=<%= sDay %>>-<input type="text" size="2" name="sMonth" value=<%= sMonth %>>-<input type="text" size="4" name="sYear" value=<%= sYear %>>&nbsp;&nbsp;&nbsp;<input type="text" size="2" name="sHour" value=<%= sHour %>>:<input type="text" size="2" name="sMinute" value=<%= sMinute %>>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Duration")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
-                <input type="text" size="2" name="durHours" value=%(durHours)s>:<input type="text" size="2" name="durMins" value=%(durMins)s>
+            <td bgcolor="white" width="100%">&nbsp;
+                <input type="text" size="2" name="durHours" value=<%= durHours %>>:<input type="text" size="2" name="durMins" value=<%= durMins %>>
             </td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Action")%>:</span></td>
             <td style="padding-left:10px">
-                %(updateParentDates)s
+                <%= updateParentDates %>
                 <input type="checkbox" name="moveEntries" value="1"> <%= _(reschedule entries after this session slot%>
             </td>
         </tr>
@@ -96,7 +96,7 @@
 		<tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Conveners")%></span></td>
             <td>
-                <table cellspacing="0" cellpadding="0" width="50%%" align="left" valign="middle" border="0">
+                <table cellspacing="0" cellpadding="0" width="50%" align="left" valign="middle" border="0">
                     (conveners)s
 					<tr>
 						<td colspan="3" nowrap>&nbsp;

@@ -1,12 +1,12 @@
 <table class="groupTable">
-<form action="%(createDomainURL)s" method="POST">
+<form action="<%= createDomainURL %>" method="POST">
 
 <tr>
   <td colspan="2"><div class="groupTitle"><%= _("Domain tools") %></div></td>
 </tr>
 <tr>
   <td></td>
-  <td class="blacktext"><em><%= _("The database currently hosts")%> %(nbDomains)s <%= _("domains.")%></em></td>
+  <td class="blacktext"><em><%= _("The database currently hosts")%> <%= nbDomains %> <%= _("domains.")%></em></td>
 </tr>
 <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Tools")%></span></td>
@@ -17,16 +17,16 @@
 </form>
 
 
-<form action="%(browseDomainsURL)s" method="POST" name="browseForm">
+<form action="<%= browseDomainsURL %>" method="POST" name="browseForm">
 <input type="hidden" value="" name="letter">
 <tr>
   <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Browse Domains")%></span></td>
-  <td>%(browseDomains)s</td>
+  <td><%= browseDomains %></td>
 </tr>
 </form>
 
 
-<form action="%(searchDomainsURL)s" method="POST">
+<form action="<%= searchDomainsURL %>" method="POST">
 <tr>
     <td colspan="2"><div class="groupTitle"><%= _("Search Domains") %></div></td>
     <td>
@@ -43,8 +43,8 @@
 <tr>
     <td>&nbsp;</td>
     <td>
-        <table width="100%%"><tbody>
-            %(domains)s
+        <table width="100%"><tbody>
+            <%= domains %>
         </tbody></table>
         <br /><br />
     </td>

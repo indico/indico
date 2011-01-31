@@ -1,6 +1,6 @@
 
-<form action=%(postURL)s method="POST">    
-    <table width="50%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form action=<%= postURL %> method="POST">
+    <table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle"> <%= _("New internal comment")%></td>
         </tr>

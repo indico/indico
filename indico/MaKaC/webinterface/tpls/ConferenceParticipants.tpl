@@ -152,16 +152,16 @@ function deselectAll()
 			<% end %>
 		</table>
 
-		%(errorMsg)s
-		%(infoMsg)s
+		<%= errorMsg %>
+		<%= infoMsg %>
 
 		<table style="margin-top: 20px;">
 				<tr>
 					<td>Add participant: </td>
 
                     <td>
-                        <form action="%(addAction)s" method="post">
-                            <div>%(addButton)s</div>
+                        <form action="<%= addAction %>" method="post">
+                            <div><%= addButton %></div>
                         </form>
                     </td>
 
@@ -174,8 +174,8 @@ function deselectAll()
 					<% if inviteAction: %>
 					<td>
 
-						<form action="%(inviteAction)s" method="post">
-							<div>%(inviteButton)s</div>
+						<form action="<%= inviteAction %>" method="post">
+							<div><%= inviteButton %></div>
 						</form>
 					</td>
 					<% end %>
@@ -186,21 +186,21 @@ function deselectAll()
 
 
 		<div style="position: relative; overflow: auto; margin-top: 10px;">
-		<form action="%(statisticAction)s" method="post" id="statisticsForm"></form>
-			<form action="%(participantsAction)s" method="post" name="participantsForm">
+		<form action="<%= statisticAction %>" method="post" id="statisticsForm"></form>
+			<form action="<%= participantsAction %>" method="post" name="participantsForm">
 
 				<div style="float: left; padding-right: 30px; min-width: 400px; min-height: 270px;">
 							<table>
 								<tr>
 									<th class="titleCellFormat">
-										<img src="%(selectAll)s" alt="<%= _("Select all")%>" title="<%= _("Select all")%>" onclick="javascript:selectAll()">
-										<img src="%(deselectAll)s" alt="<%= _("Deselect all")%>" title="<%= _("Deselect all")%>" onclick="javascript:deselectAll()">
+										<img src="<%= selectAll %>" alt="<%= _("Select all")%>" title="<%= _("Select all")%>" onclick="javascript:selectAll()">
+										<img src="<%= deselectAll %>" alt="<%= _("Deselect all")%>" title="<%= _("Deselect all")%>" onclick="javascript:deselectAll()">
 										<%= _("Name")%>
 									</th>
 									<th class="titleCellFormat">&nbsp;<%= _("Status")%></th>
 									<th class="titleCellFormat">&nbsp;<%= _("Presence")%></th>
 								</tr>
-									%(participants)s
+									<%= participants %>
 
 
 							</table>
@@ -211,35 +211,34 @@ function deselectAll()
                             <div><input type="button" class="btn" style="margin-bottom: 20px" value="<%= _("View attendance") %>" onclick="javascript:$E('statisticsForm').dom.submit();" /></div>
 
 							<% if presenceButton: %>
-								<div>%(presenceButton)s</div>
+								<div><%= presenceButton %></div>
 							<% end %>
 
 							<% if absenceButton: %>
-								<div>%(absenceButton)s</div>
+								<div><%= absenceButton %></div>
 							<% end %>
 
 							<% if askButton: %>
-								<div>%(askButton)s</div>
+								<div><%= askButton %></div>
 							<% end %>
 
 							<% if excuseButton: %>
-								<div>%(excuseButton)s</div>
+								<div><%= excuseButton %></div>
 							<% end %>
 
 							<% if sendButton: %>
-								<div style="margin-bottom: 20px">%(sendButton)s</div>
+								<div style="margin-bottom: 20px"><%= sendButton %></div>
 							<% end %>
 
 							<% if sendAddedInfoButton: %>
-								<div>%(sendAddedInfoButton)s</div>
+								<div><%= sendAddedInfoButton %></div>
 							<% end %>
-                            <div>%(excelButton)s</div>
-							<div>%(removeButton)s</div>
+                            <div><%= excelButton %></div>
+							<div><%= removeButton %></div>
 
 				</div>
 
 
 			</form>
 		</div>
-
 

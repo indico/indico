@@ -158,17 +158,17 @@ document.filterOptionForm.showSubmissionDate.checked=false
 //-->
 </script>
 <a href="" name="results"></a>
-<table width="100%%" valign="top" align="left" cellspacing="0">
+<table width="100%" valign="top" align="left" cellspacing="0">
     <tr>
         <td class="titleCellFormat" nowrap colspan="10">
-            <form action=%(accessAbstract)s method="post">
+            <form action=<%= accessAbstract %> method="post">
             <%= _("Quick search: Abstract ID")%> <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="<%= _("seek it")%>"><br>
             </form>
         </td>
     </tr>
     <tr>
        <td nowrap colspan="10">
-            <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> %(filteredNumberAbstracts)s </strong>
+            <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> <%= filteredNumberAbstracts %> </strong>
             <% if filteredNumberAbstracts == "1": %>
                 <%= _("abstract")%>
             <% end %>
@@ -176,10 +176,10 @@ document.filterOptionForm.showSubmissionDate.checked=false
                 <%= _("abstracts")%>
             <% end %>
             <% if filterUsed: %>
-                (<%= _("Total")%>: <strong>%(totalNumberAbstracts)s</strong>)
+                (<%= _("Total")%>: <strong><%= totalNumberAbstracts %></strong>)
             <% end %>
             </div>
-            <form action=%(filterPostURL)s method="post" name="optionForm">
+            <form action=<%= filterPostURL %> method="post" name="optionForm">
             <div class="CRLIndexList" >
                 <% if filterUsed: %>
                     <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
@@ -198,18 +198,18 @@ document.filterOptionForm.showSubmissionDate.checked=false
         </td>
     </tr>
     <tr>
-        <td colspan="10" align="left" width="100%%">
-          <form action=%(filterPostURL)s method="post" name="filterOptionForm">
+        <td colspan="10" align="left" width="100%">
+          <form action=<%= filterPostURL %> method="post" name="filterOptionForm">
             <input type="hidden" name="operationType" value="filter" />
-            %(filterMenu)s
-            %(sortingOptions)s
+            <%= filterMenu %>
+            <%= sortingOptions %>
           </form>
         </td>
     </tr>
     <tr>
         <td colspan="10" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
             <table>
-                <form action=%(abstractSelectionAction)s method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
+                <form action=<%= abstractSelectionAction %> method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
                 <tr>
                     <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="<%= _("Add new")%>"></td>
                     <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("Accept") %>">
@@ -225,11 +225,11 @@ document.filterOptionForm.showSubmissionDate.checked=false
         </td>
     </tr>
     <tr>
-        %(abstractTitleBar)s
+        <%= abstractTitleBar %>
     </tr>
     <tr><td>
         <tbody id="abstractsItems">
-        %(abstracts)s
+        <%= abstracts %>
         </tbody>
     </td></tr>
     <tr>

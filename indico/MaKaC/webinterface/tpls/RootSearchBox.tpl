@@ -1,3 +1,3 @@
 <div>
-%(innerBox)s
+<%= innerBox %>
 </div>

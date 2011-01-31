@@ -7,10 +7,10 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 <div class="container">
 <div class="categoryHeader">
 <ul>
-        <% if not isRootCategory: %>            
+        <% if not isRootCategory: %>
             <li><a href="<%= urlHandlers.UHCategoryDisplay.getURL(categ.owner) %>"><%= _("Go to parent category") %></a>|</li>
         <% end %>
-            <% if categ.getConferenceList() != []: %>            
+            <% if categ.getConferenceList() != []: %>
                 <li><a href="<%= urlHandlers.UHCategoryToiCal.getURL(categ) %>"><%= _("iCal export")%></a>|</li>
             <% end %>
         <li><a id="moreLink" class="dropDownMenu" href="#"><%= _("View") %></a></li>
@@ -28,7 +28,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 <% elif isRootCategory: %>
     <%= _("All events") %>
 <% end %>
-<% else: %>    
+<% else: %>
     <%= name %>
 <% end %>
 </h1>
@@ -40,26 +40,26 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 <% end %>
 <% if description: %>
 <div class="categoryInfo">
-    %(description)s
+    <%= description %>
 </div>
 <% end %>
 
 
 <% if managers: %>
-	<div class="categoryManagers"><strong><%= _("Managers") %>:</strong> %(managers)s</div>
+	<div class="categoryManagers"><strong><%= _("Managers") %>:</strong> <%= managers %></div>
 <% end %>
 
 <!--
 <% if taskList: %>
 <h2 class="subtitle">
-	%(taskList)s
+	<%= taskList %>
 </h2>
 <% end %>
 -->
 </div>
 
 <div>
-%(contents)s
+<%= contents %>
 </div>
 
 </div>
@@ -67,10 +67,10 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 <%
 urlConference = urlHandlers.UHConferenceCreation.getURL(categ)
 urlConference.addParam("event_type","default")
-    
+
 urlLecture = urlHandlers.UHConferenceCreation.getURL(categ)
 urlLecture.addParam("event_type","simple_event")
-    
+
 urlMeeting = urlHandlers.UHConferenceCreation.getURL(categ)
 urlMeeting.addParam("event_type","meeting")
 %>

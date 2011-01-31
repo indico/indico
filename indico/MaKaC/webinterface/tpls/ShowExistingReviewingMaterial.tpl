@@ -1,6 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
-%(existingMaterialsTitle)s
+<%= existingMaterialsTitle %>
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>
 <% if self._target.getReviewManager().getLastReview().isAuthorSubmitted(): %>
@@ -70,4 +70,3 @@ $E('reviewingMaterialListPlace').set(mlist.draw());
     $E('SendBtnForm').dom.style.display = 'none';
 <% end %>
 </script>
-

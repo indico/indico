@@ -42,13 +42,13 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
 </div>
 
-<table cellpadding="0" cellspacing="0" style="width:100%%">
+<table cellpadding="0" cellspacing="0" style="width:100%">
     <tbody>
         <tr>
-            <td style="vertical-align: top; width:200px">%(sideMenu)s</td>
+            <td style="vertical-align: top; width:200px"><%= sideMenu %></td>
             <td style="vertical-align: top">
                 <div class="body" style="padding:20px;">
-                    %(body)s
+                    <%= body %>
                 </div>
             </td>
         </tr>

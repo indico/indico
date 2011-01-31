@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% if not WebcastCapable: %>
 <div style="margin-bottom: 1em;">
     <% if WebcastCapableRooms: %>
@@ -237,4 +235,3 @@
     }
 </script>
 <% end %>
-

@@ -1,5 +1,5 @@
-<form action=%(postURL)s method="POST">
-    <table width="60%%" align="center" border="0" style="border-left: 1px solid #777777">
+<form action=<%= postURL %> method="POST">
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Propose to be rejected")%></td>
         </tr>
@@ -8,13 +8,13 @@
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Proposed track")%></span>
             </td>
-            <td><select name="track">%(tracks)s</select></td>
+            <td><select name="track"><%= tracks %></select></td>
         </tr>
         <% end %>
         <% else: %>
         <tr>
             <td colspan="2">
-                <span class="titleCellFormat"> <b><%= _("This abstract has not been included in any track, if you want to include it now click")%> <a href=%(changeTrackURL)s><%= _("here")%></a></b> </span>
+                <span class="titleCellFormat"> <b><%= _("This abstract has not been included in any track, if you want to include it now click")%> <a href=<%= changeTrackURL %>><%= _("here")%></a></b> </span>
             </td>
         </tr>
         <% end %>
@@ -23,7 +23,7 @@
                 <span class="titleCellFormat"> <%= _("Comment")%></span>
             </td>
             <td>
-                <textarea cols="60" rows="5" name="comment">%(comment)s</textarea>
+                <textarea cols="60" rows="5" name="comment"><%= comment %></textarea>
             </td>
         </tr>
         <tr>
@@ -37,5 +37,4 @@
         </tr>
     </table>
 </form>
-
 

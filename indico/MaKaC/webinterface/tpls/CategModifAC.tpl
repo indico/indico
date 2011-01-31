@@ -1,8 +1,8 @@
-<table width="100%%" class="ACtab"><tr><td>
+<table width="100%" class="ACtab"><tr><td>
 <br>
-%(modifyControlFrame)s
+<%= modifyControlFrame %>
 <br>
-%(accessControlFrame)s
+<%= accessControlFrame %>
 <br>
-%(confCreationControlFrame)s
+<%= confCreationControlFrame %>
 </tr></td></table>

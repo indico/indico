@@ -1,14 +1,14 @@
 
 <center>
-    <form action="%(createPDFURL)s" method="post">
-	%(contribIdsList)s
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <form action="<%= createPDFURL %>" method="post">
+	<%= contribIdsList %>
+    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle"> <%= _("Contribution to PDF")%></td>
         </tr>
         <tr>
             <td>
-                <table width="100%%">
+                <table width="100%">
                     <tr>
                         <td>
                             <%= _("PDF type :")%><br>

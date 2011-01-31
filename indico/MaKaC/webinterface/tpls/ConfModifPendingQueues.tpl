@@ -1,4 +1,3 @@
 
-%(pendingQueue)s
-
+<%= pendingQueue %>
 

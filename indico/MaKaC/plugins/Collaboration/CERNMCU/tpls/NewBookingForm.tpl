@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <table>
     <tr>
         <td class="bookingFormFieldName">

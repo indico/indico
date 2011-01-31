@@ -1,7 +1,7 @@
 <table>
 	<tr>
         <td>
-            <form action=%(addURL)s method="POST">
+            <form action=<%= addURL %> method="POST">
                 <table>
                     <tr>
                         <td>
@@ -9,7 +9,7 @@
                         <td>
                             <select name="reportNumberSystem">
                                 <option value="notype" selected="selected"> --  select a system -- </option>
-                                %(repTypesSelectItems)s
+                                <%= repTypesSelectItems %>
                             </select>
                         </td>
                         <td>
@@ -23,7 +23,7 @@
 
     <tr>
         <td class="blacktext">
-            <form action=%(deleteURL)s method="POST">
+            <form action=<%= deleteURL %> method="POST">
                 <ul style="display:block; list-style-type: none; padding-left: 0px;">
 					<% for (id, number, name) in items: %>
 					<li style="margin: 0; display: block; height: 20px;">

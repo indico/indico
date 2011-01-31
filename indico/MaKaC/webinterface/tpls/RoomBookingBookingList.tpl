@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 <% def orderBy(text, keyword): %>
 <% nParams = rh._reqParams.copy() %>
 <% nParams['order'] = keyword %>

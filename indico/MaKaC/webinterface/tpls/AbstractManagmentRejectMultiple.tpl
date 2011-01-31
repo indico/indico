@@ -17,9 +17,9 @@ function showAbstracts()
 <div class="groupTitle"><%= _("Rejecting %s abstracts")%abstractsQuantity %></div>
 <em><%= _("Click")%><a href="javascript:showAbstracts()"><%=" "+_("here")+" "%></a><%=_("to see the list of the abstracts you are rejecting")%></em>
 <br/><br/>
-<table width="100%%" align="center" border="0">
+<table width="100%" align="center" border="0">
     <tr>
-        <form action=%(rejectURL)s method="POST">
+        <form action=<%= rejectURL %> method="POST">
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Comments")%></span></td>
         <td colspan="2"><textarea name="comments" rows="6" cols="50"></textarea></td>
     </tr>
@@ -41,7 +41,7 @@ function showAbstracts()
                         <input type="submit" class="btn" name="reject" value="<%= _("reject")%>">
                     </td>
                     </form>
-                    <form action=%(cancelURL)s method="POST">
+                    <form action=<%= cancelURL %> method="POST">
                     <td align="left">
                         <input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
                     </td>
@@ -51,4 +51,3 @@ function showAbstracts()
         </td>
     </tr>
 </table>
-

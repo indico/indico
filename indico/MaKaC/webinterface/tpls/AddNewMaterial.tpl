@@ -1,22 +1,22 @@
 
-<table width="100%%" class="filesTab"><tr><td>
-<form action=%(postURL)s method="POST" enctype="multipart/form-data" name="submitfile">
+<table width="100%" class="filesTab"><tr><td>
+<form action=<%= postURL %> method="POST" enctype="multipart/form-data" name="submitfile">
 <input type="hidden" name="numFieldChange" id="numFieldChange" value=""/>
 <table style="border-left: 1px solid #777777">
     <tr>
         <td colspan="5" class="groupTitle"><%= _("Add new material")%></td>
     </tr>
-    %(errors)s
+    <%= errors %>
     <tr>
         <td class="titleCellTD">
             <span class="titleCellFormat"><%= _("Number of files:")%>
             </span>
             <select name="nbFiles" onchange="$E('numFieldChange').set('true');this.form.submit();">
-                %(selectNumberOfFiles)s
+                <%= selectNumberOfFiles %>
             </select>
         </td>
         <td>
-            %(fileSubmitForms)s
+            <%= fileSubmitForms %>
         </td>
     </tr>
     <tr>
@@ -24,21 +24,21 @@
             <span class="titleCellFormat"><%= _("Number of urls:")%>
             </span>
             <select name="nbLinks" onchange="$E('numFieldChange').set('true');this.form.submit();">
-                %(selectNumberOfLinks)s
+                <%= selectNumberOfLinks %>
             </select>
         </td>
         <td>
-            %(linkSubmitForms)s
+            <%= linkSubmitForms %>
         </td>
     </tr>
-    %(conversion)s
+    <%= conversion %>
     <tr>
         <td colspan="2">&nbsp;</td>
     </tr>
     <tr>
         <td>
             <input type="submit" class="btn" name="OK" value="submit">
-            %(CancelButton)s
+            <%= CancelButton %>
         </td>
     </tr>
 </table>

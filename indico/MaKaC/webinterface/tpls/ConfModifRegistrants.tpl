@@ -107,10 +107,10 @@
 
 
 <a href="" name="results"></a>
-<table width="100%%" cellspacing="0" align="center" border="0">
+<table width="100%" cellspacing="0" align="center" border="0">
         <tr>
            <td nowrap colspan="10">
-                <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> %(filteredNumberRegistrants)s </strong>
+                <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> <%= filteredNumberRegistrants %> </strong>
                 <% if filteredNumberRegistrants == "1": %>
                     <%= _("registrant")%>
                 <% end %>
@@ -118,10 +118,10 @@
                     <%= _("registrants")%>
                 <% end %>
                 <% if filterUsed: %>
-                    (<%= _("Total")%>: <strong>%(totalNumberRegistrants)s</strong>)
+                    (<%= _("Total")%>: <strong><%= totalNumberRegistrants %></strong>)
                 <% end %>
             </div>
-            <form action=%(filterPostURL)s method="post" name="optionForm">
+            <form action=<%= filterPostURL %> method="post" name="optionForm">
             <div class="CRLIndexList" >
                 <% if filterUsed: %>
                     <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
@@ -148,22 +148,22 @@
             </td>
         </tr>
         <tr>
-            <td colspan="1000" align="left" width="100%%">
-              <form action=%(filterPostURL)s method="post" name="displayOptionForm">
+            <td colspan="1000" align="left" width="100%">
+              <form action=<%= filterPostURL %> method="post" name="displayOptionForm">
                 <input type="hidden" name="operationType" value="display" />
-                %(displayMenu)s
-                %(sortingOptions)s
+                <%= displayMenu %>
+                <%= sortingOptions %>
               </form>
-              <form action=%(filterPostURL)s method="post" name="filterOptionForm">
+              <form action=<%= filterPostURL %> method="post" name="filterOptionForm">
                 <input type="hidden" name="operationType" value="filter" />
-                %(filterMenu)s
-                %(sortingOptions)s
+                <%= filterMenu %>
+                <%= sortingOptions %>
               </form>
             </td>
 	   </tr>
 
         <tr>
-            <td colspan="1000" align="left" width="100%%">
+            <td colspan="1000" align="left" width="100%">
                 <input type="text" id="staticURL" size="74" style="display: none;" readonly="readonly" value="<%= filterUrl %>" />
                 <a id="staticURLLink" style="display: none; margin-left: 5px;" href="<%= filterUrl %>"><%= _("Go to URL")%></a>
             </td>
@@ -171,13 +171,13 @@
 
         <tr>
           <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
-            <form action=%(actionPostURL)s method="post" name="registrantsForm" onSubmit="return atLeastOneSelected()">
+            <form action=<%= actionPostURL %> method="post" name="registrantsForm" onSubmit="return atLeastOneSelected()">
 	      <table>
                 <tr>
                   <td colspan="10">
                     <div>
-                      <input type="hidden" name="reglist" value="%(reglist)s">
-                      %(displayOptions)s
+                      <input type="hidden" name="reglist" value="<%= reglist %>">
+                      <%= displayOptions %>
                     </div>
                   </td>
                 </tr>
@@ -202,19 +202,19 @@
                   Export to:
                 </td>
                 <td valign="bottom" align="left">
-                  %(printIconURL)s
+                  <%= printIconURL %>
                 </td>
                 <td valign="bottom" align="left">
-                  %(excelIconURL)s
+                  <%= excelIconURL %>
                 </td>
                 </tr>
               </table>
           </td>
         </tr>
         <tr>
-    %(columns)s
+    <%= columns %>
     <tbody id="registrantsItems">
-    %(registrants)s
+    <%= registrants %>
     </tbody>
     </tr>
         <tr>
@@ -241,10 +241,10 @@
                             Export to:
                         </td>
                         <td valign="bottom" align="left">
-                            %(printIconURL)s
+                            <%= printIconURL %>
                         </td>
                         <td valign="bottom" align="left">
-                            %(excelIconURL)s
+                            <%= excelIconURL %>
                         </td>
 
                 </tbody>

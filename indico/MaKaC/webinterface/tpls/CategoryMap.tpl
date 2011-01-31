@@ -1,25 +1,25 @@
 <div class="container categoryMap">
     <div class="categoryHeader">
-        <ul>      
+        <ul>
             <li><a href="<%= categDisplayURL %>"><%= _("Go back to category page") %></a></li>
         </ul>
         <h1 class="categoryTitle">
-            %(categName)s&nbsp;
+            <%= categName %>&nbsp;
             <span style="font-style: italic; font-size: 0.8em;">(<%= _("category map") %>)</span>
         </h1>
     </div>
-    
-<table width="100%%">
+
+<table width="100%">
     <tr>
         <td>
-            <table width="100%%" cellspacing="0" cellpadding="0" align="left">
+            <table width="100%" cellspacing="0" cellpadding="0" align="left">
                 <tr>
                     <td bgcolor="gray">
-                            <table width="100%%" bgcolor="white" 
+                            <table width="100%" bgcolor="white"
                                     cellpadding="0" cellspacing="1">
                                 <tr>
                                     <td>
-					                   %(map)s
+					                   <%= map %>
                                     </td>
                                 </tr>
                             </table>

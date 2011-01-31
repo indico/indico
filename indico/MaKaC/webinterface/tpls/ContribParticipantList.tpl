@@ -1,25 +1,25 @@
-<table align="center" width="75%%">
+<table align="center" width="75%">
     <tr>
        <td class="formTitle"><%= _("List of participants")%></td>
     </tr>
 	<tr>
 		<td>
 			<br>
-	            <table width="100%%" align="center" border="0" style="border-left: 1px solid #777777">
+	            <table width="100%" align="center" border="0" style="border-left: 1px solid #777777">
 		            <tr>
-						<td colspan="2" class="groupTitle" width="100%%"><%= _("Primary authors")%></td>
+						<td colspan="2" class="groupTitle" width="100%"><%= _("Primary authors")%></td>
 					</tr>
 					<tr>
-						<td width="100%%">
-							<table width="100%%">
-							%(primaryAuthors)s
+						<td width="100%">
+							<table width="100%">
+							<%= primaryAuthors %>
 							</table>
 						</td>
 						<td align="right" valign="top">
-							<form action="mailto:%(primaryAuthorEmails)s" method="POST" enctype="text/plain">
+							<form action="mailto:<%= primaryAuthorEmails %>" method="POST" enctype="text/plain">
 								<input type="submit" class="btn" value="<%= _("send")%>">
 							</form>
-							%(showPrimaryAuthors)s
+							<%= showPrimaryAuthors %>
 						</td>
 					</tr>
 				</table>
@@ -28,21 +28,21 @@
 	<tr>
 		<td>
 			<br>
-	            <table width="100%%" align="center" border="0" style="border-left: 1px solid #777777">
+	            <table width="100%" align="center" border="0" style="border-left: 1px solid #777777">
 		            <tr>
-						<td colspan="2" class="groupTitle" width="100%%"><%= _("Co-Authors")%></td>
+						<td colspan="2" class="groupTitle" width="100%"><%= _("Co-Authors")%></td>
 					</tr>
 					<tr>
-						<td width="100%%">
-							<table width="100%%">
-							%(coAuthors)s
+						<td width="100%">
+							<table width="100%">
+							<%= coAuthors %>
 							</table>
 						</td>
 						<td align="right" valign="top">
-							<form action="mailto:%(coAuthorEmails)s" method="POST" enctype="text/plain">
+							<form action="mailto:<%= coAuthorEmails %>" method="POST" enctype="text/plain">
 								<input type="submit" class="btn" value="<%= _("send")%>">
 							</form>
-							%(showCoAuthors)s
+							<%= showCoAuthors %>
 						</td>
 					</tr>
 				</table>
@@ -51,21 +51,21 @@
 	<tr>
 		<td>
 			<br>
-				<table width="100%%" align="center" border="0" style="border-left: 1px solid #777777">
+				<table width="100%" align="center" border="0" style="border-left: 1px solid #777777">
 					<tr>
-						<td colspan="2" class="groupTitle" width="100%%"><%= _("Presenters")%></td>
+						<td colspan="2" class="groupTitle" width="100%"><%= _("Presenters")%></td>
 					</tr>
 					<tr>
-						<td width="100%%">
-							<table width="100%%">
-							%(speakers)s
+						<td width="100%">
+							<table width="100%">
+							<%= speakers %>
 							</table>
 						</td>
 						<td align="right" valign="top">
-							<form action="mailto:%(speakerEmails)s" method="POST" enctype="text/plain">
+							<form action="mailto:<%= speakerEmails %>" method="POST" enctype="text/plain">
 								<input type="submit" class="btn" value="<%= _("send")%>">
 							</form>
-							%(showSpeakers)s
+							<%= showSpeakers %>
 						</td>
 					</tr>
 				</table>

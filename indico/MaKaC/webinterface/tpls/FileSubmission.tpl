@@ -1,4 +1,4 @@
-<table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
 		<td class="groupTitle" colspan="2"> <%= _("Submitting a new file")%></td>
     </tr>
@@ -14,7 +14,7 @@
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Local file to be uploaded")%></span></td>
         <td align="left"><input type="file" name="file"></td>
     </tr>
-    %(conversion)s
+    <%= conversion %>
     <tr><td>&nbsp;</td></tr>
     <tr>
         <td colspan="2" align="left"><input type="submit" class="btn" value="<%= _("ok")%>"></td>
