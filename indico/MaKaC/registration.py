@@ -4333,21 +4333,14 @@ class Registrant(Persistent):
     def setPersonalHomepage(self, v):
         self._personalHomepage = v
 
-    def _fixSessions(self):# Convert old sessions
-        if self._sessions and isinstance(self._sessions[0], RegistrationSession):
-            self._sessions = [RegistrantSession(ses, self) for ses in self._sessions]
-
     def getSessionList(self):
-        self._fixSessions()
         return self._sessions
 
     def addSession(self, ses):
-        self._fixSessions()
         self._sessions.append(ses)
         self.notifyModification()
 
     def removeSession(self, ses):
-        self._fixSessions()
         self._sessions.remove(ses)
         self.notifyModification()
 

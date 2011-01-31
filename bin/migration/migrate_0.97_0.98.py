@@ -28,9 +28,11 @@ from BTrees.OOBTree import OOTreeSet
 from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex
 from MaKaC.common import DBMgr
 from MaKaC.common.Counter import Counter
-from MaKaC.conference import ConferenceHolder, CategoryManager
+from MaKaC.conference import ConferenceHolder, CategoryManager, Conference
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
+from MaKaC.registration import RegistrantSession, RegistrationSession
+
 
 from indico.ext import livesync
 from indico.util import console
@@ -93,6 +95,12 @@ def runConferenceMigration(dbi):
         if i % 1000 == 999:
             dbi.commit()
         i += 1
+
+        # Convert RegistrationSessions to RegistrantSessions
+        if isinstance(obj, Conference):
+            for reg in obj.getRegistrants().values():
+                if reg._sessions and isinstance(reg._sessions[0], RegistrationSession):
+                    reg._sessions = [RegistrantSession(ses, reg) for ses in self._sessions]
 
     dbi.commit()
 
@@ -157,6 +165,7 @@ def runCategoryConfDictToTreeSet(dbi):
 
 
 def runMigration():
+
     tasks = [runPluginMigration,
              runTaskMigration,
              runConferenceMigration,
