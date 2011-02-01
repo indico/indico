@@ -617,8 +617,8 @@ Calendar.cellClick = function(el, ev) {
 		// unless "today" was clicked, we assume no date was clicked so
 		// the selected handler will know not to close the calenar when
 		// in single-click mode.
-		// cal.dateClicked = (el.navtype == 0);
-		cal.dateClicked = false;
+		cal.dateClicked = (el.navtype == 0);
+		//cal.dateClicked = false;
 		var year = date.getFullYear();
 		var mon = date.getMonth();
 		function setMonth(m) {
