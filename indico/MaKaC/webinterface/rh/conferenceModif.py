@@ -52,7 +52,8 @@ from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceDisplay
 from MaKaC.common import Config, info
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.errors import MaKaCError, FormValuesError,ModificationError
+from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
+    ConferenceClosedError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.webinterface import locators
@@ -275,7 +276,7 @@ class RHConferenceCloseModifKey( RHConferenceBase ):
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         self._redirect( url )
 
-class RHConferenceClose( RHConferenceBase ):
+class RHConferenceClose( RHConferenceModifBase ):
     _uh = urlHandlers.UHConferenceClose
 
     def _checkParams( self, params ):
@@ -296,7 +297,26 @@ class RHConferenceClose( RHConferenceBase ):
             return conferences.WPConfClosing( self, self._conf ).display()
 
 
-class RHConferenceOpen( RHConferenceBase ):
+class RHConferenceOpen( RHConferenceModifBase ):
+    _allowClosed = True
+
+    def _checkProtection( self ):
+        RHConferenceModifBase._checkProtection(self)
+
+        user = self._getUser()
+        if user is self._conf.getCreator():
+            return
+        # If we are not the creator, check if we have category admin privileges
+        hasAccess = False
+        for owner in self._conf.getOwnerList():
+            if owner.canUserModify(user): # category or system admin
+                hasAccess = True
+                break
+        if not hasAccess:
+            if self._conf.isClosed():
+                raise ConferenceClosedError(self._target.getConference())
+            else:
+                raise ModificationError()
 
     _allowClosed = True
 
