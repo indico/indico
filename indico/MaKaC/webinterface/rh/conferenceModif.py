@@ -272,7 +272,7 @@ class RHConferenceCloseModifKey( RHConferenceBase ):
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         self._redirect( url )
 
-class RHConferenceClose( RHConferenceBase ):
+class RHConferenceClose( RHConferenceModifBase ):
     _uh = urlHandlers.UHConferenceClose
 
     def _checkParams( self, params ):
@@ -293,7 +293,7 @@ class RHConferenceClose( RHConferenceBase ):
             return conferences.WPConfClosing( self, self._conf ).display()
 
 
-class RHConferenceOpen( RHConferenceBase ):
+class RHConferenceOpen( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceBase._checkParams(self, params )
