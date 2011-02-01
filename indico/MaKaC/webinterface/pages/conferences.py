@@ -3948,7 +3948,7 @@ class WPConfClosing(WPConfModifToolsBase):
     def _getTabContent( self, params ):
         msg = _("""
         <font size="+2"> _("Are you sure that you want to LOCK the event") <i>"%s"</i>?</font><br>
-        (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the administrator of the system can unlock an event"))
+        (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the creator of the event or an administrator of the system/category can unlock an event"))
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
         return wc.getHTML( msg, \

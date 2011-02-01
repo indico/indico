@@ -15,8 +15,13 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
           <a style="vertical-align: middle;" href="<%= urlHandlers.UHConferenceClose.getURL(conf) %>">
               <%= _("Lock") %><div class="leftCorner"></div>
           </a>
-          <div class="separator"></div>
     <% end %>
+    <% else: %>
+          <a style="vertical-align: middle;" href="<%= urlHandlers.UHConferenceOpen.getURL(conf) %>">
+              <%= _("Unlock") %><div class="leftCorner"></div>
+          </a>
+    <% end %>
+          <div class="separator"></div>
 
           <a class="eventModifSpecial" style="vertical-align: middle;" href="<%= urlHandlers.UHConferenceDisplay.getURL( conf ) %>">
               <%= _("Switch to event page") %><div class="leftCorner"></div>
