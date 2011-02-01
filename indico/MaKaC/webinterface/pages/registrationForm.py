@@ -2277,6 +2277,12 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                     """)%(self.htmlText( self._registrant.getReasonParticipation() ))
         return ""
 
+    def _formatValue(self, fieldInput, value):
+        try:
+            return str(fieldInput.getValueDisplay(value))
+        except:
+            return str(value).strip()
+
     def _getMiscInfoItemsHTML(self, gsf):
         regForm = self._conf.getRegistrationForm()
         miscGroup=self._registrant.getMiscellaneousGroupById(gsf.getId())
@@ -2286,8 +2292,10 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             miscItem=None
             price=""
             currancy=""
+            fieldInput = None
             if miscGroup is not None:
                 miscItem=miscGroup.getResponseItemById(f.getId())
+                fieldInput = miscItem.getGeneralField().getInput()
             v= _("""--_("no value selected")--""")
             if f.isBillable():
                 price=f.getPrice()
@@ -2304,7 +2312,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                        <td align="left">%s</td>
                        <td align="right">%s&nbsp;&nbsp;%s</td>
                     </tr>
-                    """%(f.getCaption(),v,price,currancy) )
+                    """%(f.getCaption(), self._formatValue(fieldInput, v), price, currancy) )
         if miscGroup is not None:
             for miscItem in miscGroup.getResponseItemList():
                     f=gsf.getFieldById(miscItem.getId())
@@ -2314,7 +2322,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                                        <td align="right" nowrap><b>%s:</b></td>
                                        <td align="left">%s <font color="red">( _("cancelled") )</font></td>
                                     </tr>
-                                    """)%(miscItem.getCaption(), miscItem.getValue()) )
+                                    """)%(miscItem.getCaption(), self._formatValue(fieldInput, miscItem.getValue())) )
         if len(html)==1:
             html.append( _("""
                         <tr><td><font color="black"><i>--_("No fields")--</i></font></td></tr>
@@ -2336,6 +2344,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                 currency=miscItem.getCurrency()
                 if miscItem is not None:
                     v=miscItem.getValue()
+                    fieldInput = miscItem.getGeneralField().getInput()
                     if miscItem.isBillable():
                         _billlable=miscItem.isBillable()
                         #caption=miscItem.getValue()
@@ -2353,7 +2362,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                                <td align="right" style="padding-right:10px" nowrap >%s</td>
                                <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
                             </tr>
-                            """%(quantity,gsf.getTitle(),caption,value,price,price*quantity,currency) )
+                            """%(quantity,gsf.getTitle(),caption,self._formatValue(fieldInput, value),price,price*quantity,currency) )
         return "".join(html)
 
 
