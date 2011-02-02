@@ -51,8 +51,8 @@
     <tr id="hoursTR" >
         <td align="right" ><small> <%= _("Hours")%>&nbsp;</small></td>
         <td align="left" class="blacktext">
-            <input name="sTime" id="sTime" maxlength="4" size="4" type="text" value="<%= startT %>" onchange="" /> &nbsp;&mdash;&nbsp;
-            <input name="eTime" id="eTime" maxlength="4" size="4" type="text" value="<%= endT %>" onchange="" />
+            <input name="sTime" id="sTime" maxlength="5" size="4" type="text" value="<%= startT %>" onchange="" /> &nbsp;&mdash;&nbsp;
+            <input name="eTime" id="eTime" maxlength="5" size="4" type="text" value="<%= endT %>" onchange="" />
             <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
         </td>
     </tr>
