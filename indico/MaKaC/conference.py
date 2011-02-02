@@ -4450,7 +4450,7 @@ class Conference(Persistent, Fossilizable, CommonObjectBase):
             conf.setModifKey(self.getModifKey())
         # Access Control cloning
         if options.get("access",False) :
-            conf.setProtection(self.isItselfProtected())
+            conf.setProtection(self.getAccessController()._getAccessProtection())
             for mgr in self.getManagerList() :
                 conf.grantModification(mgr)
             for user in self.getAllowedToAccessList() :
@@ -5933,7 +5933,7 @@ class Session(Persistent, Fossilizable, CommonObjectBase):
 
         # Access Control cloning
         if options.get("access", False) :
-            ses.setProtection(self.isItselfProtected())
+            ses.setProtection(self.getAccessController()._getAccessProtection())
             for mgr in self.getManagerList() :
                 ses.grantModification(mgr)
             for user in self.getAllowedToAccessList() :
@@ -8274,7 +8274,7 @@ class Contribution(Persistent, Fossilizable, CommonObjectBase):
                 cont.setTrack(None)
 
         if options.get("access", False) :
-            cont.setProtection(self.isItselfProtected())
+            cont.setProtection(self.getAccessController()._getAccessProtection())
             for u in self.getAllowedToAccessList() :
                 cont.grantAccess(u)
             for mgr in self.getManagerList() :
@@ -10987,29 +10987,12 @@ class Material(Persistent, Fossilizable, CommonObjectBase):
         mat.setOwner(owner)
         mat.setType(self.getType())
 
-        mat.setProtection(self.isItselfProtected())
+        mat.setProtection(self.getAccessController()._getAccessProtection())
         mat.setAccessKey(self.getAccessKey())
-        lrep = self._getRepository()
-        flist = lrep.getFiles()
         rlist = self.getResourceList()
-        for r in rlist :
-            if  isinstance(r,Link):
-                newlink = Link()
-                newlink.setOwner(mat)
-                newlink.setName(r.getName())
-                newlink.setDescription(r.getDescription())
-                newlink.setURL(r.getURL())
-                mat.addResource(newlink)
-            elif isinstance(r,LocalFile):
-                newfile = LocalFile()
-                newfile.setOwner(mat)
-                newfile.setName(r.getName())
-                newfile.setDescription(r.getDescription())
-                newfile.setFilePath(r.getFilePath())
-                newfile.setFileName(r.getFileName())
-                mat.addResource(newfile)
-            else :
-                raise Exception( _("Unexpected object type in Resource List : ")+str(type(r)))
+        for r in rlist:
+            newres = r.clone(mat)
+            mat.addResource(newres)
 
         mat.setMainResource(self.getMainResource())
 
@@ -11494,7 +11477,7 @@ class Minutes(Material):
         mat.setOwner(owner)
         mat.setType(self.getType())
 
-        mat.setProtection(self.isItselfProtected())
+        mat.setProtection(self.__ac._getAccessProtection())
         mat.setAccessKey(self.getAccessKey())
         lrep = self._getRepository()
         flist = lrep.getFiles()
@@ -11614,14 +11597,14 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
         self.__ac = AccessController()
 
     def clone( self, conf ):
-        res = Resource()
+        res = self.__class__()
         res.setName(self.getName())
         res.setDescription(self.getDescription())
         res.setOwner(conf)
         res.notifyModification()
         res.setId(self.getId())
 
-        res.setProtection(self.isItselfProtected())
+        res.setProtection(self.__ac._getAccessProtection())
         #res.__ac = self.getAccessController()
 
         return res
@@ -11939,6 +11922,11 @@ class Link(Resource):
         Resource.__init__( self, resData )
         self.url = ""
 
+    def clone( self, conf ):
+        link = Resource.clone(self, conf)
+        link.setURL(self.getURL())
+        return link
+
     @Updates ('MaKaC.conference.Link', 'url')
     def setURL( self, newURL ):
         self.url = newURL.strip()
@@ -11981,6 +11969,11 @@ class LocalFile(Resource):
         self.__repository = None
         self.__archivedId = ""
 
+    def clone( self, conf ):
+        localfile = Resource.clone(self, conf)
+        localfile.setFilePath(self.getFilePath())
+        localfile.setFileName(self.getFileName())
+        return localfile
 
     def setFileName( self, newFileName, checkArchive=True ):
         """While the file is not archived sets the file name of the current
