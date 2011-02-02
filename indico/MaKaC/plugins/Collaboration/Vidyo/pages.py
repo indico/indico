@@ -24,7 +24,8 @@ from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.i18n import _
 from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.webinterface.pages.collaboration import WAdvancedTabBase
-from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
+from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools,\
+    getVidyoOptionValue
 from datetime import timedelta
 from MaKaC.common import info
 
@@ -90,6 +91,7 @@ class WInformationDisplay(WCSPageTemplateBase):
         variables = WCSPageTemplateBase.getVars(self)
 
         variables["Booking"] = self._booking
+        variables["PhoneNumbers"] = getVidyoOptionValue("phoneNumbers")
 
         return variables
 
@@ -148,6 +150,12 @@ class XMLGenerator(object):
             out.writeTag("href", booking.getURL())
             out.writeTag("caption", booking.getURL())
             out.closeTag("linkLine")
+            out.closeTag("section")
+
+        if booking.getBookingParamByName("displayPhoneNumbers") and getVidyoOptionValue("phoneNumbers"):
+            out.openTag("section")
+            out.writeTag("title", _('VidyoVoice phone numbers:'))
+            out.writeTag("line", ', '.join(getVidyoOptionValue("phoneNumbers")))
             out.closeTag("section")
 
         out.openTag("section")

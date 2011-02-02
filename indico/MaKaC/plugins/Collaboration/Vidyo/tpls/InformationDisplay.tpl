@@ -51,6 +51,18 @@
             </td>
         </tr>
         <% end %>
+        <% if Booking.getBookingParamByName("displayPhoneNumbers") and PhoneNumbers: %>
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
+                <%= _('VidyoVoice phone numbers:')%>
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <ul style="margin: 0;">
+                    <%= '<li>' + '</li><li>'.join(PhoneNumbers) + '</li>' %>
+                </ul>
+            </td>
+        </tr>
+        <% end %>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 <span><%= _('Description')%>:</span>
