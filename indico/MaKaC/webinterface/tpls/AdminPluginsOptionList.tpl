@@ -180,6 +180,9 @@
                     <% if option.getType() == list: %>
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>
                     <% end %>
+                    <% elif option.getType() == 'list_multiline': %>
+                        <% value=  "\n".join([str(v) for v in option.getValue()]) %>
+                    <% end %>
                     <% else: %>
                         <% value = str(option.getValue()) %>
                     <% end %>
@@ -190,6 +193,9 @@
                             <% checked = 'checked' %>
                         <% end %>
                     <input name="<%= name %>" type="checkbox" size="50" <%=checked%>>
+                    <% end %>
+                    <% elif option.getType() == 'list_multiline': %>
+                    <textarea name="<%= name %>" cols="38"><%= value %></textarea>
                     <% end %>
                     <% else: %>
                     <input name="<%= name %>" type="text" size="50" value="<%= value %>">
@@ -204,13 +210,16 @@
                     <% end %>
                 <% end %>
             </td>
-            <% if option.getType() == int or option.getType() == list or option.getType() == dict: %>
+            <% if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict: %>
             <td style="width: 40%%">
                 <% if option.getType() == int: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please input an integer")%></span>
                 <% end %>
                 <% elif option.getType() == list: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please separate values by commas: ','")%></span>
+                <% end %>
+                <% elif option.getType() == "list_multiline": %>
+                <span style="color: orange; font-size: smaller;"><%= _("Please input one value per line.")%></span>
                 <% end %>
                 <% elif option.getType() == dict: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please input keys and values in Python syntax. No unicode objects allowed. Example: {\"john\":\"tall\", \"pete\":\"short\"}")%></span>

@@ -475,6 +475,11 @@ class RHAdminPluginsSaveOptionsBase(RHAdminPluginsBase):
                 option.setValue([value.strip() for value in v.split(',')])
             else:
                 option.setValue([])
+        elif option.getType() == "list_multiline":
+            if v.strip():
+                option.setValue([value.strip() for value in v.split('\n')])
+            else:
+                option.setValue([])
         elif option.getType() == dict:
             d = {}
             items = v.split(',')
