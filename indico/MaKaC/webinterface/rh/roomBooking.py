@@ -1266,9 +1266,44 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             # approved pre-booking or booking
             if not self._confirmAdditionFirst:
 
+                # Form is OK and (no conflicts or skip conflicts)
+                if self._formMode == FormMode.NEW:
+                    candResv.insert()
+                    self._emailsToBeSent += candResv.notifyAboutNewReservation()
+                    if candResv.isConfirmed:
+                        session.setVar( "title", 'You have successfully made a booking.' )
+                        session.setVar( "description", 'NOTE: Your booking is complete. However, be <b>aware</b> that in special cases the person responsible for a room may reject your booking. In that case you would be instantly notified by e-mail.' )
+                    else:
+                        session.setVar( "title", 'You have successfully made a <span style="color: Red;">PRE</span>-booking.' )
+                        session.setVar( "description", 'NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.' )
+                elif self._formMode == FormMode.MODIF:
+                    self._orig_candResv.unindexDayReservations()
+                    if self._forceAddition:
+                        self._loadResvCandidateFromSession( self._orig_candResv, self._params )
+                    else:
+                        self._loadResvCandidateFromParams( self._orig_candResv, self._params )
+                    self._orig_candResv.update()
+                    self._orig_candResv.indexDayReservations()
+                    self._emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
+
+                    # Add entry to the log
+                    info = []
+                    self._orig_candResv.getResvHistory().getResvModifInfo(info, self._resvAttrsBefore , self._resvAttrsAfter)
+
+                    # If no modification was observed ("Save" was pressed but no field
+                    # was changed) no entry is added to the log
+                    if len(info) > 1 :
+                        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+                        self._orig_candResv.getResvHistory().addHistoryEntry(histEntry)
+
+                    session.setVar( "title", 'Booking updated.' )
+                    session.setVar( "description", 'Please review details below.' )
+
+                session.setVar( "actionSucceeded", True )
+
                 # Booking - reject all colliding PRE-Bookings
                 if candResv.isConfirmed and self._collisions:
-                    rejectionReason = "Conflict with booking"
+                    rejectionReason = "Conflict with booking: %s" % urlHandlers.UHRoomBookingBookingDetails.getURL(candResv)
                     for coll in self._collisions:
                         collResv = coll.withReservation
                         if collResv.repeatability is None: # not repeatable -> reject whole booking. easy :)
@@ -1297,45 +1332,6 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                             info.append("Reason: '%s'" % rejectionReason)
                             histEntry = ResvHistoryEntry(self._getUser(), info, emails)
                             collResv.getResvHistory().addHistoryEntry(histEntry)
-
-
-                # Form is OK and (no conflicts or skip conflicts)
-                if self._formMode == FormMode.NEW:
-                    candResv.insert()
-                    self._emailsToBeSent += candResv.notifyAboutNewReservation()
-                    if candResv.isConfirmed:
-                        session.setVar( "title", 'You have successfully made a booking.' )
-                        session.setVar( "description", 'NOTE: Your booking is complete. However, be <b>aware</b> that in special cases the person responsible for a room may reject your booking. In that case you would be instantly notified by e-mail.' )
-                    else:
-                        session.setVar( "title", 'You have successfully made a <span style="color: Red;">PRE</span>-booking.' )
-                        session.setVar( "description", 'NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.' )
-                elif self._formMode == FormMode.MODIF:
-                    self._orig_candResv.unindexDayReservations()
-                    if self._forceAddition:
-                        self._loadResvCandidateFromSession( self._orig_candResv, self._params )
-                    else:
-                        self._loadResvCandidateFromParams( self._orig_candResv, self._params )
-                    self._orig_candResv.update()
-                    self._orig_candResv.indexDayReservations()
-                    emails = self._orig_candResv.notifyAboutUpdate()
-                    self._emailsToBeSent += emails
-
-                    # Add entry to the log
-                    info = []
-                    self._orig_candResv.getResvHistory().getResvModifInfo(info, self._resvAttrsBefore , self._resvAttrsAfter)
-
-                    # If no modification was observed ("Save" was pressed but no field
-                    # was changed) no entry is added to the log
-                    if len(info) > 1 :
-                        histEntry = ResvHistoryEntry(self._getUser(), info, emails)
-                        self._orig_candResv.getResvHistory().addHistoryEntry(histEntry)
-
-                    session.setVar( "title", 'Booking updated.' )
-                    session.setVar( "description", 'Please review details below.' )
-
-
-                session.setVar( "actionSucceeded", True )
-
 
         else:
             session.setVar( "candDataInSession", True )
