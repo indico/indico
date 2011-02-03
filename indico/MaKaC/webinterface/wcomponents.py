@@ -6674,12 +6674,19 @@ class WRoomBookingConfirmBooking( WRoomBookingBookingForm ):
         vars["FormMode"] = FormMode
         vars["collisions"] = self._rh._collisions
 
+        # If we are here, we are either in booking mode and trying to overwrite PRE-Bookings...
         bookingMessage = "Book"
+        bookingMessageOther = "PRE-Book"
+        vars["rejectOthers"] = True
         room = self._candResv.room
         user = self._rh._getUser()
         if room.canPrebook( user ) and not room.canBook( user ):
+            # ...or we are in PRE-booking mode and conflicting with another PRE-Booking
             bookingMessage = "PRE-Book"
+            bookingMessageOther = "PRE-Book"
+            vars["rejectOthers"] = False
         vars["bookingMessage"] = bookingMessage
+        vars["bookingMessageOther"] = bookingMessageOther
 
         if self._standalone:
              vars["conf"] = None

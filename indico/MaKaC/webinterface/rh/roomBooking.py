@@ -1250,30 +1250,59 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
 
         if not errors and self._answer != 'No':
 
-            # If we're dealing with an unapproved pre-booking
-            if not candResv.isConfirmed and not self._forceAddition:
+            isConfirmed = candResv.isConfirmed
+            candResv.isConfirmed = None
+            # find pre-booking collisions
+            self._collisions = candResv.getCollisions(sansID=candResv.id)
+            candResv.isConfirmed = isConfirmed
 
-                candResv.isConfirmed = None;
-                # find pre-booking collisions
-                self._collisions = candResv.getCollisions(sansID = candResv.id)
-
-                candResv.isConfirmed = False
-
-                # are there any collisions?
-                if len( self._collisions ) > 0:
-                    # save the reservation to the session
-                    self._saveResvCandidateToSession( candResv )
-                    # ask for confirmation about the pre-booking
-                    self._confirmAdditionFirst = True
+            if not self._forceAddition and self._collisions:
+                # save the reservation to the session
+                self._saveResvCandidateToSession( candResv )
+                # ask for confirmation about the pre-booking
+                self._confirmAdditionFirst = True
 
 
             # approved pre-booking or booking
             if not self._confirmAdditionFirst:
 
+                # Booking - reject all colliding PRE-Bookings
+                if candResv.isConfirmed and self._collisions:
+                    rejectionReason = "Conflict with booking"
+                    for coll in self._collisions:
+                        collResv = coll.withReservation
+                        if collResv.repeatability is None: # not repeatable -> reject whole booking. easy :)
+                            collResv.rejectionReason = rejectionReason
+                            collResv.reject()    # Just sets isRejected = True
+                            collResv.update()
+                            emails = collResv.notifyAboutRejection()
+                            self._emailsToBeSent += emails
+
+                            # Add entry to the booking history
+                            info = []
+                            info.append("Booking rejected")
+                            info.append("Reason: '%s'" % collResv.rejectionReason)
+                            histEntry = ResvHistoryEntry(self._getUser(), info, emails)
+                            collResv.getResvHistory().addHistoryEntry(histEntry)
+                        else: # repeatable -> only reject the specific days
+                            rejectDate = coll.startDT.date()
+                            collResv.excludeDay(rejectDate, unindex=True)
+                            collResv.update()
+                            emails = collResv.notifyAboutRejection(date=rejectDate, reason=rejectionReason)
+                            self._emailsToBeSent += emails
+
+                            # Add entry to the booking history
+                            info = []
+                            info.append("Booking occurence of the %s rejected" % rejectDate.strftime("%d %b %Y"))
+                            info.append("Reason: '%s'" % rejectionReason)
+                            histEntry = ResvHistoryEntry(self._getUser(), info, emails)
+                            collResv.getResvHistory().addHistoryEntry(histEntry)
+
+
                 # Form is OK and (no conflicts or skip conflicts)
                 if self._formMode == FormMode.NEW:
                     candResv.insert()
-                    self._emailsToBeSent+=candResv.notifyAboutNewReservation()
+                    self._emailsToBeSent += candResv.notifyAboutNewReservation()
                     if candResv.isConfirmed:
                         session.setVar( "title", 'You have successfully made a booking.' )
                         session.setVar( "description", 'NOTE: Your booking is complete. However, be <b>aware</b> that in special cases the person responsible for a room may reject your booking. In that case you would be instantly notified by e-mail.' )
@@ -1288,7 +1317,8 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                         self._loadResvCandidateFromParams( self._orig_candResv, self._params )
                     self._orig_candResv.update()
                     self._orig_candResv.indexDayReservations()
-                    self._emailsToBeSent += self._orig_candResv.notifyAboutUpdate()
+                    emails = self._orig_candResv.notifyAboutUpdate()
+                    self._emailsToBeSent += emails
 
                     # Add entry to the log
                     info = []
@@ -1297,11 +1327,13 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                     # If no modification was observed ("Save" was pressed but no field
                     # was changed) no entry is added to the log
                     if len(info) > 1 :
-                        histEntry = ResvHistoryEntry(self._getUser(), info, self._emailsToBeSent)
+                        histEntry = ResvHistoryEntry(self._getUser(), info, emails)
                         self._orig_candResv.getResvHistory().addHistoryEntry(histEntry)
 
                     session.setVar( "title", 'Booking updated.' )
                     session.setVar( "description", 'Please review details below.' )
+
+
                 session.setVar( "actionSucceeded", True )
 
 
