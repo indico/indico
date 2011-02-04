@@ -1,7 +1,7 @@
 
-<table id="reviewingQuestionsTable" width="90%%" border="0" style="padding-bottom: 10px;">
+<table id="reviewingQuestionsTable" width="90%%" border="0" style="padding-bottom: 5px;">
     <tr>
-        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px;"><%= _("Step 1 - Reviewing questions")%></td>
+        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle"><%= _("Step 1 - Reviewing questions")%></td>
     </tr>
 </table>
 <table style="padding-left: 20px;">
@@ -17,7 +17,7 @@
 <table style="padding-left: 20px; padding-top: 20px;">
     <tr>
         <td class="subGroupTitle" colspan="2"><%= _("Answers setup")%>
-        <% inlineContextHelp(_('Here you can set the number of answers you wish to have for each question and the scale in which you want to see the abstract rating later. The number of answers must be a number between 2 and 20. For the scale the maximum difference between the limits can be 100 units and it is possible to have negative numbers.')) %>
+        <% inlineContextHelp(_('Here you can set the number of answers you wish to have for each question and the scale in which you want to see the abstract rating later. The number of answers must be a number between 2 and 20. For the scale, the maximum difference between the limits can be 100 units and it is possible to have negative numbers.')) %>
         </td>
     </tr>
     <tr>
@@ -43,8 +43,7 @@
 $E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.abstractReviewing.getQuestions',
         'add':'reviewing.abstractReviewing.addQuestion', 'remove':'reviewing.abstractReviewing.removeQuestion',
         'edit': 'reviewing.abstractReviewing.editQuestion'},
-        {conference: '<%= abstractReview.getConference().getId() %>'},'question',
-        'Add the questions that the abstract reviewers must answer', true));
+        {conference: '<%= abstractReview.getConference().getId() %>'},'question', 'abstractReviewingQuestions', true));
 
 
 //get the first question or a default one

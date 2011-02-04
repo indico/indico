@@ -46,8 +46,11 @@
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong><%= _("Judgement")%>:</strong></span></td>
         <td>
-            <div id="inPlaceEditJudgement"><%= Editing.getJudgement() %></div>
-            <div id="commentsMessage">
+            <div id="statusDiv">
+                <div id="initialStatus" style="display:inline"><%= Editing.getJudgement() %></div>
+                <div id="inPlaceEditJudgement" style="display:inline"></div>
+            </div>
+            <div id="commentsMessage" style="padding-top:5px;">
                 <%= _("The comments and your judgement, will be sent by e-mail to the author(s)")%>
             </div>
         </td>
@@ -69,11 +72,10 @@
 <script type="text/javascript">
 
 var observer = function(value) {
-                if(value!="None"){
-                        submitButton.dom.disabled = false;
-                        $E('submitHelpPopUp').set("");
-                        $E('submitHelpPopUp').dom.display = 'none';
-                        }
+    if($E('initialStatus')) {
+        $E('statusDiv').remove($E('initialStatus'));
+        submitButton.dom.disabled = false;
+    }
 }
 
 var showWidgets = function(firstLoad) {
@@ -83,7 +85,8 @@ var showWidgets = function(firstLoad) {
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'editorJudgement'
-                        }, <%= ConferencePaperReview.predefinedStates %>);
+                        }, <%= ConfReview.getDefaultStatusesDictionary() %>,
+                        "<%= Editing.getJudgement() %>", observer);
 
     var initialValue = '<%= Editing.getComments() %>';
     if (initialValue == '') {
@@ -96,20 +99,20 @@ var showWidgets = function(firstLoad) {
              current: 'editorJudgement'},initialValue).draw());
 
 
-    <% if len (ConfReview.getLayoutCriteria()) == 0 : %>
+    <% if len (ConfReview.getLayoutQuestions()) == 0 : %>
         $E('criteriaListDisplay').set("No form criteria proposed for this conference.");
     <% end %>
     <% else: %>
         $E("criteriaListDisplay").set('');
 
-        <% for c in ConfReview.getLayoutCriteria(): %>
+        <% for c in ConfReview.getLayoutQuestions(): %>
 
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
-            newDiv.append(Html.span(null,"<%=c%>"));
+            newDiv.append(Html.span(null,"<%=c.getText()%>"));
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                var initialValue = "<%= Editing.getAnswer(c) %>";
+                var initialValue = "<%= Editing.getAnswer(c.getId()).getRbValue() %>";
             } else {
                 var initialValue = false;
             }
@@ -124,7 +127,7 @@ var showWidgets = function(firstLoad) {
                                                     {
                                                         conference: '<%= Contribution.getConference().getId() %>',
                                                         contribution: '<%= Contribution.getId() %>',
-                                                        criterion: '<%= c %>',
+                                                        criterion: '<%= c.getId() %>',
                                                         current: 'editorJudgement'
                                                     }));
 
@@ -200,10 +203,16 @@ var submitted = false;
 
 var updatePage = function (firstLoad){
     if (submitted) {
+        if($E('initialStatus')) {
+            $E('statusDiv').remove($E('initialStatus'));
+        }
         submitButton.set('Mark as NOT submitted');
         $E('submittedmessage').set('Judgement submitted');
         showValues();
     } else {
+    	if ("<%= Editing.getJudgement() %>" == "None") {
+    	    submitButton.dom.disabled = true;
+    	}
         submitButton.set('Mark as submitted');
         $E('submittedmessage').set('Judgement not submitted yet');
         showWidgets(firstLoad);
@@ -221,10 +230,11 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
             if (!error) {
                 submitted = !submitted;
                /* updatePage(false)*/
-               location.href = "<%= urlHandlers.UHContributionModifReviewing.getURL(Contribution) %>"
-               location.reload(true)
+               location.href = "<%= urlHandlers.UHContributionModifReviewing.getURL(Contribution) %>";
+               location.reload(true);
             } else {
-                alert (error)
+                alert (error.message);
+            	//IndicoUtil.errorReport(error);
             }
         },
         ''

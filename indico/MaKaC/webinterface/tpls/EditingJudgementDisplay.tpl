@@ -25,8 +25,8 @@
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Criteria Evaluation:")%></span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <% for q,a in Editing.getAnswers(): %>
-                            <%= q %> : <%= ConferencePaperReview.reviewingQuestionsAnswers[int(a)] %>
+                        <% for a in Editing.getAnswers(): %>
+                            <%= a %>
                             <br/>
                         <% end %>
                     </td>

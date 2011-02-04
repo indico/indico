@@ -32,6 +32,8 @@ from MaKaC.i18n import _
 from MaKaC.fossils.reviewing import IReviewManagerFossil,\
     IReviewFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.reviewing import Answer
+from MaKaC.common.Counter import Counter
 ###############################################
 # Contribution reviewing classes
 ###############################################
@@ -293,12 +295,13 @@ class Judgement(Persistent):
     def __init__(self, review, author = None, judgement = None, comments = "", submitted = False, submissionDate = None):
         self._review = review #the parent Review object for this Judgement
         self._author = author #the user (Referee, Editor or Reviewer) author of the judgement
-        self._judgement = judgement #the judgement, a string
+        self._judgement = judgement #the judgement, a string which represents the id of the judgement, 1:Accept, 2:To be Corrected, 3:Reject, ...others
         self._comments = comments #the comments, a string
-        #a dictionary with the questions / criteria proposed and the author evaluation
-        self._answers = {}
+        #a list with the Answers objects
+        self._answers = []
         self._submitted = submitted #boolean that indicates if the judgement has been submitted or not
         self._submissionDate = submissionDate #the date where the judgement was passed
+        self._answerCounter = Counter(1)
 
     def getReview(self):
         return self._review
@@ -316,7 +319,10 @@ class Judgement(Persistent):
         return self._author
 
     def getJudgement(self):
-        return self._judgement
+        if self._judgement == None:
+            return None
+        else:
+            return self.getReviewManager().getConfPaperReview().getStatusById(self._judgement).getName()
 
     def getComments(self):
         return self._comments
@@ -326,6 +332,12 @@ class Judgement(Persistent):
             Returns a list of tuples (question, answer)
         """
         pass
+
+    def getNewAnswerId(self):
+        """ Returns a new an unused answerId
+            Increments the answerId counter
+        """
+        return self._answerCounter.newCount()
 
     def getAllAnswers(self):
         return self._answers
@@ -352,14 +364,24 @@ class Judgement(Persistent):
     def setComments(self, comments):
         self._comments = comments
 
-    def getAnswer(self, question):
-        if not self._answers.has_key(question):
-            self._answers[question] = ConferencePaperReview.initialSelectedAnswer
-        return self._answers[question]
-
-    def setAnswer(self, question, answer):
-        self._answers[question] = answer
+    def getAnswer(self, questionId):
+        """ Returns the Answer object if it already exists otherwise we create it
+        """
+        for answer in self._answers:
+            if (questionId == answer.getQuestionId()):
+                return answer
+        # Create the new object with the initial value for the rbValue
+        newId = self.getNewAnswerId()
+        rbValue = ConferencePaperReview.initialSelectedAnswer
+        numberOfAnswers = len(ConferencePaperReview.reviewingQuestionsAnswers)
+        newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+        self._answers.append(newAnswer)
         self.notifyModification()
+        return newAnswer
+
+    def setAnswer(self, questionId, rbValue, numberOfAnswers):
+        answer = self.getAnswer(questionId)
+        answer.setRbValue(rbValue)
 
     def setSubmitted(self, submitted):
         if self._judgement is None:
@@ -417,14 +439,22 @@ class RefereeJudgement(Judgement):
 
         self.getReview().copyMaterials(matReviewing)
 
-        if self._judgement == "To be corrected" or self._judgement in self.getReviewManager().getConference().getConfPaperReview().getStates():
+        if self._judgement == "2" or int(self._judgement) > 3:
             self.getReviewManager().newReview()
             # remove reviewing materials from the contribution
             self.getReviewManager().getContribution().removeMaterial(matReviewing)
 
 
     def getAnswers(self):
-        return zip(self.getConfPaperReview().getReviewingQuestions(), (self.getAnswer(k) for k in self.getConfPaperReview().getReviewingQuestions()))
+        questionAnswerList = []
+        for answer in self._answers:
+            try:
+                questionText = self.getConfPaperReview().getReviewingQuestionById(answer.getQuestionId()).getText()
+                questionJudgement = ConferencePaperReview.reviewingQuestionsAnswers[answer.getRbValue()]
+                questionAnswerList.append(questionText+": "+questionJudgement)
+            except AttributeError:
+                continue
+        return questionAnswerList
 
 class EditorJudgement(Judgement):
 
@@ -438,7 +468,7 @@ class EditorJudgement(Judgement):
             A new Review object is then created as 'last review'.
         """
         Judgement.setSubmitted(self, submitted)
-        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == 3 and self._judgement == "To be corrected":
+        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == 3 and self._judgement == "2":
             matReviewing = self.getReviewManager().getContribution().getReviewing()
             self.getReview().copyMaterials(matReviewing)
             self.getReviewManager().newReview()
@@ -446,11 +476,29 @@ class EditorJudgement(Judgement):
             self.getReviewManager().getContribution().removeMaterial(matReviewing)
 
     def getAnswers(self):
-        return zip(self.getConfPaperReview().getLayoutCriteria(), (self.getAnswer(k) for k in self.getConfPaperReview().getLayoutCriteria()))
+        questionAnswerList = []
+        for answer in self._answers:
+            try:
+                questionText = self.getConfPaperReview().getLayoutQuestionById(answer.getQuestionId()).getText()
+                questionJudgement = ConferencePaperReview.reviewingQuestionsAnswers[answer.getRbValue()]
+                questionAnswerList.append(questionText+": "+questionJudgement)
+            except AttributeError:
+                continue
+        return questionAnswerList
+
 
 class ReviewerJudgement(Judgement):
     def getAnswers(self):
-        return zip(self.getConfPaperReview().getReviewingQuestions(), (self.getAnswer(k) for k in self.getConfPaperReview().getReviewingQuestions()))
+        questionAnswerList = []
+        for answer in self._answers:
+            try:
+                questionText = self.getConfPaperReview().getReviewingQuestionById(answer.getQuestionId()).getText()
+                questionJudgement = ConferencePaperReview.reviewingQuestionsAnswers[answer.getRbValue()]
+                questionAnswerList.append(questionText+": "+questionJudgement)
+            except AttributeError:
+                continue
+        return questionAnswerList
+
 
 class Review(Persistent, Fossilizable):
     """This class represents the judgement of a contribution made by the referee. It contains judgement and comments

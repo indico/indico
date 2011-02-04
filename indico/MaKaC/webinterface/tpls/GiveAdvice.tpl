@@ -46,8 +46,11 @@
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Judgement")%></span></td>
         <td>
-            <div id="inPlaceEditJudgement"><%= Advice.getJudgement() %></div>
-            <div id="commentsMessage">
+            <div id="statusDiv">
+                <div id="initialStatus" style="display:inline"><%= Advice.getJudgement() %></div>
+                <div id="inPlaceEditJudgement" style="display:inline"></div>
+            </div>
+            <div id="commentsMessage" style="padding-top:5px;">
                 <%= _("The comments and your judgement, will be sent by e-mail to the author(s)")%>
             </div>
         </td>
@@ -63,6 +66,13 @@
 
 <script type="text/javascript">
 
+var observer = function(value) {
+    if($E('initialStatus')) {
+        $E('statusDiv').remove($E('initialStatus'));
+        submitButton.dom.disabled = false;
+    }
+}
+
 var showWidgets = function(firstLoad) {
 
     new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditJudgement'),
@@ -70,7 +80,8 @@ var showWidgets = function(firstLoad) {
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'reviewerJudgement'
-                        }, <%= ConfReview.getAllStates() %>);
+                        }, <%= ConfReview.getStatusesDictionary() %>,
+                        "<%= Advice.getJudgement() %>", observer);
 
     var initialValue = '<%= Advice.getComments() %>';
     if (initialValue == '') {
@@ -91,11 +102,11 @@ var showWidgets = function(firstLoad) {
         <% for q in ConfReview.getReviewingQuestions(): %>
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
 
-            newDiv.append(Html.span(null,"<%=q%>"));
+            newDiv.append(Html.span(null,"<%=q.getText()%>"));
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                var initialValue = "<%= Advice.getAnswer(q) %>";
+                var initialValue = "<%= Advice.getAnswer(q.getId()).getRbValue() %>";
             } else {
                 var initialValue = false;
             }
@@ -109,7 +120,7 @@ var showWidgets = function(firstLoad) {
                                                     'reviewing.contribution.changeCriteria',
                                                     {conference: '<%= Contribution.getConference().getId() %>',
                                                     contribution: '<%= Contribution.getId() %>',
-                                                    criterion: '<%= q %>',
+                                                    criterion: '<%= q.getId() %>',
                                                     current: 'reviewerJudgement'
                                                     }));
 
@@ -183,10 +194,16 @@ var showValues = function() {
 
 var updatePage = function (firstLoad){
     if (submitted) {
+    	if($E('initialStatus')) {
+            $E('statusDiv').remove($E('initialStatus'));
+        }
         submitButton.set($T('Undo sending'));
         $E('submittedmessage').set($T('Judgement has been sent'));
         showValues();
     } else {
+        if ("<%= Advice.getJudgement() %>" == "None") {
+            submitButton.dom.disabled = true;
+        }
         submitButton.set('Mark as submitted');
         $E('submittedmessage').set('Judgement not submitted yet');
         showWidgets(firstLoad);
@@ -203,9 +220,10 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
         function(result, error){
             if (!error) {
                 submitted = !submitted;
-                updatePage(false)
+                updatePage(false);
             } else {
-                alert (error)
+            	alert (error.message);
+                //IndicoUtil.errorReport(error);
             }
         },
         ''

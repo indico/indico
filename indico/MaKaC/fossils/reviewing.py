@@ -64,8 +64,16 @@ class IReviewingQuestionFossil(IFossil):
     def getText(self):
         pass
 
+class IReviewingStatusFossil(IFossil):
+    """
+    Fossil for the reviewing status
+    """
+    def getId(self):
+        pass
 
-
+    def getName(self):
+        pass
+    getName.name = 'text'
 
 
 

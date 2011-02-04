@@ -1726,7 +1726,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
                  return Html.table({className:'editLinkInLine'},
                          Html.tbody({},
                                  Html.tr({},
-                                		 Html.td("dataCaptionFormat", "Number of answers per question :"),
+                                         Html.td("dataCaptionFormat", "Number of answers per question :"),
                                          Html.td({}, num))));
                                  },
 

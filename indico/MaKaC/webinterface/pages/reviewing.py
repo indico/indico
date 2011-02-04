@@ -166,9 +166,9 @@ class WConfModifReviewingPaperSetup(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["states"] = self._conf.getConfPaperReview().getStates()
+        vars["states"] = self._conf.getConfPaperReview().getStatuses()
         vars["reviewingQuestions"] = self._conf.getConfPaperReview().getReviewingQuestions()
-        vars["criteria"] = self._conf.getConfPaperReview().getLayoutCriteria()
+        vars["criteria"] = self._conf.getConfPaperReview().getLayoutQuestions()
         return vars
 
     def getHTML(self, params):
@@ -225,10 +225,10 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
 
 
             """displays states with checkboxes to select those to remove"""
-            if len(self.__target.getConfPaperReview().getStates()) == 0:
+            if len(self.__target.getConfPaperReview().getStatuses()) == 0:
                 ht = "No personal states defined"
             else:
-                for s in self.__target.getConfPaperReview().getStates():
+                for s in self.__target.getConfPaperReview().getStatuses():
                     ht.append("""
                     <tr>
                         <td style="border-bottom: 1px solid #5294CC;">
@@ -287,10 +287,10 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
 
 
             """displays criteria with checkboxes to select those to remove"""
-            if len(self.__target.getConfPaperReview().getLayoutCriteria()) == 0:
+            if len(self.__target.getConfPaperReview().getLayoutQuestions()) == 0:
                 cs = "No criteria defined"
             else:
-                for i in self.__target.getConfPaperReview().getLayoutCriteria():
+                for i in self.__target.getConfPaperReview().getLayoutQuestions():
                     cs.append("""
                     <tr>
                         <td style="border-bottom: 1px solid #5294CC;">

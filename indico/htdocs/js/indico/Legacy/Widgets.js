@@ -1208,12 +1208,12 @@ IndicoUI.Widgets = {
         /* Widget to add, remove, edit and show question in the abstract reviewing
         @param methods: get, add, remove, edit
         @param kindOfElement: Title of the element that you want to manage. Example 'question'
-        @param header: Header text for the table of elements
         @param specialRemove: Shows if is necessary a special way to remove items
+        @param divsIdRoot: The main part of the ids of the Footer and ListOfElements ids. (ex. myIdFooter, myIdElements)
         @return result (return of request): list of items with the fields 'text': content of the item, 'id': element id.
         @return the content of the component. Table with list of elements and input and button to add new elements to the list
       */
-        manageListOfElements: function(methods, attributes, kindOfElement, header, specialRemove) {
+        manageListOfElements: function(methods, attributes, kindOfElement, divsIdRoot, specialRemove) {
 
             var widgetContent = Html.div();
 
@@ -1230,11 +1230,11 @@ IndicoUI.Widgets = {
             var drawFooter = function() {
 
                 // Remove previous elements
-                if ($E('addElementsDiv')) {
-                    widgetContent.remove($E('addElementsDiv'));
+                if ($E(divsIdRoot+'Footer')) {
+                    widgetContent.remove($E(divsIdRoot+'Footer'));
                 }
 
-                var content = Html.div({id: 'addElementsDiv', style:{paddingTop:'10px'}});
+                var content = Html.div({id: divsIdRoot+'Footer', style:{paddingTop:'10px'}});
 
                 var edit = Html.edit({size: '30'});
                 var addButton = Html.input('button','popUpButton',$T('Add '+kindOfElement));
@@ -1269,12 +1269,12 @@ IndicoUI.Widgets = {
 	            self = this;
 
 	            // Remove previous elements
-	            if ($E('elementsDiv')) {
-	                widgetContent.remove($E('elementsDiv'));
+	            if ($E(divsIdRoot+'Elements')) {
+	                widgetContent.remove($E(divsIdRoot+'Elements'));
 	            }
 
 	            if (result.length) {
-	                var content = Html.div({id:'elementsDiv'});
+	                var content = Html.div({id:divsIdRoot+'Elements'});
 	                var table = Html.table({className:'infoQuestionsTable', cellspacing:'0'});
 	                content.append(table);
 
@@ -1334,7 +1334,7 @@ IndicoUI.Widgets = {
 	                        var attr = attributes;
 	                        attr['value'] = spanId;
 	                        if (!specialRemove) {
-		                        var popupContent = Html.span({}, 'Are you sure you want to remove the element?');
+		                        var popupContent = Html.span({}, 'Are you sure you want to remove the '+kindOfElement +'?');
 		                        var popup = new ConfirmPopup('Remove '+kindOfElement, popupContent,
 		                                function(action) {
                                             if (action) {

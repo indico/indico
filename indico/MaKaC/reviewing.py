@@ -30,7 +30,7 @@ import tempfile
 from MaKaC.common import Config
 import conference
 from MaKaC.common.Counter import Counter
-from MaKaC.fossils.reviewing import IReviewingQuestionFossil
+from MaKaC.fossils.reviewing import IReviewingQuestionFossil, IReviewingStatusFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from persistent.list import PersistentList
 
@@ -90,20 +90,23 @@ class ConferencePaperReview(Persistent):
         self._enableAuthorSubmittedMatEditorEmailNotif = False
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
 
-        from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
-        #from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-        self._nonReviewableMaterials = []#this is not used any more, since we have new material type used only for reviewing
-
-
-        self._states = [] # list of content reviewing and final judgement non-default states
+        self._statuses = [] # list of content reviewing and final judgement
         self._reviewingQuestions = [] #list of content reviewing and final judgement questions
-        self._formCriteriaList = [] #list of layout editing criteria
+        self._layoutQuestions = [] #list of layout editing criteria
         self._templates = {} #dictionary with layout templates. key: id, value: Template object
         self._templateCounter = Counter(1) #counter to make new id's for the templates
         self._userCompetences = {} #dictionary with the competences of each user. key: user, value: list of competences
         self._userCompetencesByTag = {} #dictionary with the users for each competence. key: competence, value: list of users
         self._reviewingMaterials = {}
         self.notifyModification()
+
+        # id generators
+        self._statusCounter = Counter(1)
+        self._questionCounter = Counter(1)
+        self._answerCounter = Counter(1)
+        self.addStatus("Accept", False)
+        self.addStatus("To be corrected", False)
+        self.addStatus("Reject", False)
 
 
     def getConference(self):
@@ -399,37 +402,6 @@ class ConferencePaperReview(Persistent):
         """
         return self._choice == 3 or self._choice == 4
 
-    #Content reviewing and final judgement new states methods
-    def addState(self, state):
-        """ Adds a state to the list of non-default states
-        """
-        self._states.append(state)
-        self.notifyModification()
-
-    def getStates(self):
-        """ Returns list of non-default states
-        """
-        return self._states
-
-    def setStates(self, states):
-        self._states = states
-
-    def getAllStates(self):
-        """ Returns list of default and non-default states
-        """
-        return ConferencePaperReview.predefinedStates + self._states
-
-    def removeState(self, state):
-        """ Remoevs a state
-        """
-        if state in self._states:
-            self._states.remove(state)
-            self.notifyModification()
-        else:
-            raise MaKaCError("Cannot remove a state which doesn't exist")
-
-
-
     def inModificationPeriod(self):
         date = nowutc()
         if date <= self._endCorrectionDate:
@@ -458,57 +430,207 @@ class ConferencePaperReview(Persistent):
         else:
             return False
 
+    # Configurable options (for the future)
+    def getNumberOfAnswers(self):
+        """ Returns the number of possible answers (radio buttons) per question
+        """
+        return len(ConferencePaperReview.reviewingQuestionsLabels)
+
+
+    # status methods
+    def addStatus(self, name, editable):
+        """ Adds this status at the end of the list of statuses list
+        """
+        newId = self.getNewStatusId()
+        status = Status(newId,name,editable)
+        #status.setEditable(True) # en las 3 primeras veces esto no funciona
+        self._statuses.append(status)
+        self.notifyModification()
+
+    def getStatusById(self, statusId):
+        """ Return the status with the especified id """
+        for status in self._statuses:
+            if (statusId == status.getId()):
+                return status
+
+    def getStatuses(self):
+        """ Returns the list of statuses
+        """
+        # Filter the non editable statuses
+        editableStatuses = []
+        for status in self._statuses:
+            if status.getEditable():
+                editableStatuses.append(status)
+        return editableStatuses
+
+    def getDefaultStatusesDictionary(self):
+        """ Returns a dictionary with the default statuses {id:name, ...}
+        """
+        dic = {}
+        for status in self._statuses:
+            # 1: Accept, 2: To be corrected, 3: Reject
+            if ((status.getId() == "1") or (status.getId() == "2") or (status.getId() == "3")):
+                dic[status.getId()] = status.getName()
+        return dic
+
+
+    def getStatusesDictionary(self):
+        """ Returns a dictionary with the names of the statuses and the ids
+        """
+        dic = {}
+        for status in self._statuses:
+            dic[status.getId()] = status.getName()
+        return dic
+
+    def removeStatus(self, statusId):
+        """ Removes a status from the list
+        """
+        status = self.getStatusById(statusId)
+
+        if status:
+            #self._statuses.remove(status)
+            #self.notifyModification()
+            status.setEditable(False)
+        else:
+            raise MaKaCError("Cannot remove a status which doesn't exist")
+
+    def editStatus(self, statusId, newName):
+        """ Edit the name of a status
+        """
+        status = self.getStatusById(statusId)
+
+        if status:
+            status.setName(newName)
+            self.notifyModification()
+        else:
+            raise MaKaCError("Cannot edit a question which doesn't exist")
+
+
+    def getNewStatusId(self):
+        """ Returns a new an unused questionId
+            Increments the questionId counter
+        """
+        return self._statusCounter.newCount()
+
+
     # content reviewing and final judgement questions methods
-    def addReviewingQuestion(self, reviewingQuestion):
+    def addReviewingQuestion(self, text):
         """ Adds this question at the end of the list of questions
         """
-        self._reviewingQuestions.append(reviewingQuestion)
+        newId = self.getNewQuestionId()
+        question = Question(newId,text)
+        self._reviewingQuestions.append(question)
         self.notifyModification()
+
+    def getReviewingQuestionById(self, questionId):
+        """ Return the question with the especified id """
+        for question in self._reviewingQuestions:
+            if (questionId == question.getId()):
+                return question
 
     def getReviewingQuestions(self):
         """ Returns the list of questions
         """
-        return self._reviewingQuestions
+        # Filter the non visible questions
+        visibleQuestions = []
+        for question in self._reviewingQuestions:
+            if question.getVisible():
+                visibleQuestions.append(question)
+        return visibleQuestions
 
-    def setReviewingQuestions(self, questions):
-        """ Set the whole list of questions
-        """
-        self._reviewingQuestions = questions
+    #def setReviewingQuestions(self, questions):
+    #    """ Set the whole list of questions
+    #    """
+    #    self._reviewingQuestions = questions
 
-    def removeReviewingQuestion(self, reviewingQuestion):
+    def removeReviewingQuestion(self, questionId):
         """ Removes a question from the list
         """
-        if reviewingQuestion in self._reviewingQuestions:
-            self._reviewingQuestions.remove(reviewingQuestion)
-            self.notifyModification()
+        question = self.getReviewingQuestionById(questionId)
+
+        if question:
+            #self._reviewingQuestions.remove(question)
+            #self.notifyModification()
+            question.setVisible(False)
         else:
             raise MaKaCError("Cannot remove a question which doesn't exist")
 
-    # layout editing criteria methods
-    def addLayoutCriteria(self, formCriteria):
-        """ Add a new layout editing criterion
+    def editReviewingQuestion(self, questionId, text):
+        """ Edit the text of a question
         """
-        self._formCriteriaList.append(formCriteria)
-        self.notifyModification()
+        question = self.getReviewingQuestionById(questionId)
 
-    def getLayoutCriteria(self):
-        """ Get the list of all the layout criteria
-        """
-        return self._formCriteriaList
-
-    def setLayoutCriteria(self, criteria):
-        """ Set the whole list of all the layout criteria
-        """
-        self._formCriteriaList = criteria
-
-    def removeLayoutCriteria(self, criteria):
-        """ Remove one the layout criteria
-        """
-        if criteria in self._formCriteriaList:
-            self._formCriteriaList.remove(criteria)
+        if question:
+            question.setText(text)
             self.notifyModification()
         else:
-            raise MaKaCError("Cannot remove a criteria which doesn't exist")
+            raise MaKaCError("Cannot edit a question which doesn't exist")
+
+
+    # layout editing criteria methods
+    def addLayoutQuestion(self, text):
+        """ Add a new layout editing criterion
+        """
+        newId = self.getNewQuestionId()
+        question = Question(newId,text)
+        self._layoutQuestions.append(question)
+        self.notifyModification()
+
+    def getLayoutQuestionById(self, questionId):
+        """ Return the question with the especified id """
+        for question in self._layoutQuestions:
+            if (questionId == question.getId()):
+                return question
+
+    def getLayoutQuestions(self):
+        """ Get the list of all the layout criteria
+        """
+        # Filter the non visible questions
+        visibleQuestions = []
+        for question in self._layoutQuestions:
+            if question.getVisible():
+                visibleQuestions.append(question)
+        return visibleQuestions
+
+    #def setLayoutCriteria(self, criteria):
+    #    """ Set the whole list of all the layout criteria
+    #    """
+    #    self._formCriteriaList = criteria
+
+    def removeLayoutQuestion(self, questionId):
+        """ Remove one the layout question
+        """
+        question = self.getLayoutQuestionById(questionId)
+
+        if question:
+            #self._layoutQuestions.remove(question)
+            #self.notifyModification()
+            question.setVisible(False)
+        else:
+            raise MaKaCError("Cannot remove a question which doesn't exist")
+
+    def editLayoutQuestion(self, questionId, text):
+        """ Edit the text of a question
+        """
+        question = self.getLayoutQuestionById(questionId)
+
+        if question:
+            question.setText(text)
+            self.notifyModification()
+        else:
+            raise MaKaCError("Cannot edit a question which doesn't exist")
+
+    def getNewQuestionId(self):
+        """ Returns a new an unused questionId
+            Increments the questionId counter
+        """
+        return self._questionCounter.newCount()
+
+    #def getNewAnswerId(self):
+    #    """ Returns a new an unused answerId
+    #        Increments the answerId counter
+    #    """
+    #   return self._answerCounter.newCount()
 
 
     #referee methods
@@ -1267,7 +1389,7 @@ class ConferenceAbstractReview(Persistent):
 class Question(Persistent, Fossilizable):
 
     """
-    This class represents a question for the abstracts reviewing.
+    This class represents a question for the abstract/paper reviewing.
     """
 
     fossilizes(IReviewingQuestionFossil)
@@ -1294,11 +1416,6 @@ class Question(Persistent, Fossilizable):
 
     def setVisible(self, value):
         self._visible = value
-
-    def notifyModification(self):
-        """ Notifies the DB that a list or dictionary attribute of this object has changed
-        """
-        self._p_changed = 1
 
 
 class Answer(Persistent):
@@ -1333,6 +1450,12 @@ class Answer(Persistent):
     def getQuestionId(self):
         return self._questionId
 
+    def getRbValue(self):
+        return self._rbValue
+
+    def setRbValue(self, rbValue):
+        self._rbValue = rbValue
+
     def calculateRatingValue(self, scaleLower, scaleHigher):
         """
         Calculate the value of the answer in base to the scale limits and the number of possible answers (radio buttons)
@@ -1341,6 +1464,37 @@ class Answer(Persistent):
 
 
 
+class Status(Persistent, Fossilizable):
 
+    """
+    This class represents a status for the paper reviewing.
+    """
+
+    fossilizes(IReviewingStatusFossil)
+
+    def __init__( self, newId, name, editable):
+        """ Constructor.
+            name: is a string which represents the name of the status
+            editable: is a boolean which represent if the status is going to be shown in the list for editing and removing options
+                    (default statuses)
+        """
+        self._id = newId
+        self._name = name
+        self._editable = editable
+
+    def getId(self):
+        return self._id
+
+    def getName(self):
+        return self._name
+
+    def setName(self, name):
+        self._name = name
+
+    def getEditable(self):
+        return self._editable
+
+    def setEditable(self, value):
+        self._editable = value
 
 

@@ -922,7 +922,7 @@ a.confSubSection:hover {
    font-size: 24px;
    color: #4E4C46;
    letter-spacing: 1px;
-   padding: 3px;
+   padding: 3px 3px 5px 3px;
    border-bottom: 1px solid #777777;
    margin: 10px 0;
 }
@@ -6704,3 +6704,13 @@ table.infoQuestionsTable td.dataBold {
     border-bottom: 1px groove #A4A4A4;
     font-weight: bold;
 }
+
+.deadLineCell {
+    text-align:left;
+    padding: 7px;
+    width: 170px;
+}
+
+
+
+

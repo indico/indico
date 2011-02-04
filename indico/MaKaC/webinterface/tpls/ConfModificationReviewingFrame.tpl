@@ -29,13 +29,13 @@
     <tr>
 </table>
 
-<table width="83%" align="right" border="0">
+<table width="83%" align="center" border="0">
 <% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
 <% pass %>
 <% end %>
 <% else: %>
     <tr>
-        <td width="80%" nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Referees") %><br><span style="font-size: 8pt"><%= _("responsiblities: Assign, contributions to Reviewers, Give final judgement") %></span></span></td>
+        <td width="80%" class="titleCellTD"><span class="titleCellFormat"><%= _("Referees") %><br><span style="font-size: 8pt"><%= _("responsiblities: Assign, contributions to Reviewers, Give final judgement") %></span></span></td>
         <td width="80%" style="padding-top: 15px; padding-bottom: 15px;"><div id="RefereeList"></div></td>
     </tr>
 <script type="text/javascript">

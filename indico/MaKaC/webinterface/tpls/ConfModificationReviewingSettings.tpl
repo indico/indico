@@ -4,22 +4,16 @@
 <% from MaKaC.common.utils import formatDateTime %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% import MaKaC.common.Configuration as Configuration %>
-<table width="90%%" border="0" style="margin-bottom:1em">
+<table width="90%%" border="0">
     <tr>
-        <td nowrap id="reviewingModeHelp" class="groupTitle"><%= _("Step 1: Choose type of paper reviewing for the conference")%>
+        <td nowrap id="reviewingModeHelp" class="groupTitle"><%= _("Step 1 - Choose type of paper reviewing")%>
         </td>
     </tr>
-        <em><%= _("Please, follow these steps to set up the Paper Reviewing Module")%></em>
 </table>
 
 <table width="90%%" border="0" style="margin-bottom:1em">
     <tr>
-        <td>
-
-        </td>
-    </tr>
-    <tr>
-        <td nowrap class="titleCellTD"  style="padding-top: 5px;">
+        <td nowrap class="titleCellTD"  style="padding-top: 5px; padding-left: 20px;">
             <span class="titleCellFormat"><%= _("Type of reviewing:")%></span>
         </td>
         <td nowrap style="vertical-align:top; padding-top: 5px;">
@@ -33,10 +27,10 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id='steptitle' width="90%%" border="0" style="margin-bottom:1em; display:<%=display%>">
+<table id='steptitle' width="90%%" border="0" style="padding-bottom:5px; display:<%=display%>">
     <tr>
         <td class="groupTitle">
-            <%= _("Step 2: Set up the options for ")%><span id="title">
+            <%= _("Step 2 - Set up the options for ")%><span id="title">
             <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[2]: %><%= _("content reviewing team")%><% end %>
             <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[3]: %><%= _("layout reviewing team")%><% end %>
             <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[4]: %><%= _("content and layout reviewing team")%><% end %>
@@ -50,33 +44,21 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id='statusTable' width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
+<table id='statusTable' style="padding-left: 20px; padding-bottom: 20px; display:<%=display%>">
     <tr>
-        <td id="reviewingStatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Add a paper status for paper reviewing")%></td>
+        <td id="reviewingStatesHelp" class="subGroupTitle" colspan="3"><%= _("Add your own statuses for the paper reviewing")%></td>
     </tr>
     <tr>
-
-    </tr>
-    <!--
-    <tr>
-    <form action=<%=addStateURL%> method="post">
-        <%= stateAdd %>
-    </form>
-    </tr>
-    <tr>
-        <form action=<%=removeStateURL%> method="post">
-            <td bgcolor="white" width="50%%" valign="top" class="blacktext">
-                <%= stateTable %>
-            </td>
-        </form>
-    </tr>
-    -->
-    <tr>
-        <td style="width: 400px;">
-            <div class="titleCellFormat" style="padding-top: 5px;">
-                <%= _("The default statuses are: ")%><em><%= _("Accept, To be corrected")%></em><%=_(" and ")%><em><%=_("Reject")%></em>.<%= _(" You can define your own statuses")%>
+        <td class="questionContent">
+            <div  style="padding-top:5px; padding-left:5px;">
+                <%= _("The default statuses are: ")%><em><b><%= _("Accept, To be corrected")%></b></em><%=_(" and ")%><em><b><%=_("Reject")%></b></em>.
             </div>
-            <div id="inPlaceEditStates"  style="padding-top: 10px;"><%= ', '.join(ConfReview.getAllStates())%></div>
+            <div id="inPlaceEditStates"  style="padding-top: 5px;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div id="inPlaceEditStates"></div>
         </td>
     </tr>
 </table>
@@ -87,27 +69,13 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id="reviewingQuestionsTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
+<table id="reviewingQuestionsTable" style="padding-left: 20px; padding-bottom: 20px; display:<%=display%>">
     <tr>
-        <td id="reviewingQuestionsHelp" colspan="5" class="reviewingsubtitle"><%= _("Add questions for content reviewing")%></td>
+        <td id="reviewingQuestionsHelp" class="subGroupTitle" colspan="3"><%= _("Add the questions that the referees and the content reviewers must answer")%></td>
     </tr>
-    <!--
-    <tr>
-        <form action=<%=addQuestionURL%> method="post">
-            <%= questionAdd %>
-        </form>
-    </tr>
-    <tr>
-        <form action=<%=removeQuestionURL%> method="post">
-          <td bgcolor="white" width="50%%" valign="top" class="blacktext">
-              <%= questionTable%>
-          </td>
-        </form>
-    </tr>
-    -->
     <tr>
         <td>
-            <div id="inPlaceEditQuestions"  style="padding-top: 5px;"><%= ', '.join(ConfReview.getReviewingQuestions())%></div>
+            <div id="inPlaceEditContentQuestions"></div>
         </td>
     </tr>
 </table>
@@ -119,27 +87,13 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id="editingCriteriaTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
+<table id="editingCriteriaTable" style="padding-left: 20px; padding-bottom: 20px; display:<%=display%>">
     <tr>
-        <td id="editingCriteriaHelp" colspan="5" class="reviewingsubtitle"  style="padding-top: 5px;"><%= _("Set criteria for layout reviewing")%></td>
+        <td id="editingCriteriaHelp" class="subGroupTitle" colspan="3"><%= _("Add the questions that the layout reviewers must answer")%></td>
     </tr>
-    <!--
-    <tr>
-        <form action=<%=addCriteriaURL%> method="post">
-            <%= criteriaAdd %>
-            </form>
-    </tr>
-    <tr>
-        <form action=<%=removeCriteriaURL%> method="post">
-        <td bgcolor="white" width="50%%" valign="top" class="blacktext">
-             <%= criteriaTable %>
-        </td>
-        </form>
-    </tr>
-    -->
     <tr>
         <td>
-            <div id="inPlaceEditCriteria"  style="padding-top: 10px;"><%= ', '.join(ConfReview.getLayoutCriteria())%></div>
+            <div id="inPlaceEditLayoutQuestions"></div>
         </td>
     </tr>
 </table>
@@ -151,9 +105,9 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id="defaultDueDatesTable" width="90%%" align="center" border="0" style="margin-bottom:1em; display:<%=display%>">
+<table id="defaultDueDatesTable" style="padding-left: 20px; padding-bottom: 20px; min-width: 320px; display:<%=display%>">
     <tr>
-        <td id="defaultDatesHelp" colspan="5" class="reviewingsubtitle"><%= _("Default deadlines for the new contributions")%></td>
+        <td id="defaultDatesHelp" colspan="2" class="subGroupTitle" style="min-width:500px;"><%= _("Default deadlines for the judgements")%></td>
     </tr>
     <% if ConfReview.hasPaperReviewing(): %>
         <% display = 'table-row' %>
@@ -162,10 +116,10 @@
         <% display = 'none' %>
     <% end %>
     <tr id="refereeDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
-        <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat" align="left">
+        <td nowrap class="deadLineCell"><span  align="left">
             <%= _("Referee Deadline")%>
         </span></td>
-        <td nowrap class="blacktext">
+        <td style="color: #000000;">
             <span id="inPlaceEditDefaultRefereeDueDate">
                 <% date = ConfReview.getAdjustedDefaultRefereeDueDate() %>
                 <% if date is None: %>
@@ -184,10 +138,10 @@
         <% display = 'none' %>
     <% end %>
     <tr id="editorDefaultDateRow" style="white-space:nowrap; display: <%=display%>">
-        <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat">
+        <td nowrap class="deadLineCell"><span>
             <%= _("Layout Reviewer Deadline")%>
         </span></td>
-        <td nowrap class="blacktext">
+        <td  style="color: #000000;">
             <span id="inPlaceEditDefaultEditorDueDate">
                 <% date = ConfReview.getAdjustedDefaultEditorDueDate() %>
                 <% if date is None: %>
@@ -212,10 +166,10 @@
         <% display = 'none' %>
     <% end %>
     <tr id="reviewerDefaultDateRow" style="white-space:nowrap;display: <%=display%>">
-        <td nowrap class="titleCellTD" style="text-align:left"><span class="titleCellFormat">
+        <td nowrap class="deadLineCell"><span>
             <%= _("Content Reviewer Deadline")%>
         </span></td>
-        <td nowrap class="blacktext">
+        <td style="color: #000000;">
             <span id="inPlaceEditDefaultReviewerDueDate">
                 <% date = ConfReview.getAdjustedDefaultReviewerDueDate() %>
                 <% if date is None: %>
@@ -229,7 +183,7 @@
     </tr>
 </table>
 
-<table id="automaticNotification" width="90%%" align="center" border="0">
+<table id="automaticNotification" style="padding-left: 20px; padding-bottom: 20px;">
     <% if ConfReview.hasReviewing(): %>
             <% display = 'table' %>
         <% end %>
@@ -237,17 +191,17 @@
             <% display = 'none' %>
         <% end %>
 	    <tr id="autoEmails" style="display:<%=display%>">
-	        <td id="automaticNotificationHelp" colspan="5" class="reviewingsubtitle"><%= _("Automatic e-mails can be sent")%>:
+	        <td id="automaticNotificationHelp"  class="subGroupTitle" style="width:500px;"><%= _("Automatic e-mails can be sent")%>:
 	           <% inlineContextHelp(_('Here you can enable/disable automatic e-mails sending.<br/>Notifications can be send to the Reviewing Team in the next several situations<br/><ul><li>when are added/removed Reviewers for the conference</li><li>when are assinged/removed contributions to Reviewers</li><li>when authors of the contributions have been submitted materials</li></ul>Notifications can be send to the authors when their contributions had been judged by the Reviewers.'))%>
 	        </td>
 	    </tr>
 	    <tr id="autoEmailsPRMLabel" style="display:<%=display%>">
-           <td style="padding-top: 10px;">
+           <td style="padding-top: 7px; padding-left: 7px;">
                <%= _("To the Paper Review Managers when")%>:
            </td>
         </tr>
        <tr id="PRMNotif" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="PRMNotifButton">
                 </span>
@@ -261,12 +215,12 @@
             <% display = 'none' %>
         <% end %>
         <tr id="autoEmailsRefereeLabel" style="display:<%=display%>">
-           <td style="padding-top: 10px;">
+           <td style="padding-top: 7px; padding-left: 7px;">
                <%= _("To the Referees when")%>:
            </td>
         </tr>
 	   <tr id="refereeNotif" style="white-space:nowrap; display: <%=display%>">
-	    <td style="padding-left: 50px;">
+	    <td style="padding-left: 20px;">
             <div>
                 <span id="refereeNotifButton">
                 </span>
@@ -274,7 +228,7 @@
         </td>
        </tr>
        <tr id="refereeNotifForContribution" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="refereeNotifForContributionButton">
                 </span>
@@ -282,7 +236,7 @@
         </td>
        </tr>
        <tr id="authorSubmittedMatRefereeNotif" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="authorSubmittedMatRefereeNotifButton">
                 </span>
@@ -290,12 +244,12 @@
         </td>
        </tr>
         <tr id="autoEmailsContentLabel" style="display:<%=display%>">
-           <td style="padding-top: 10px;">
+           <td style="padding-top: 7px; padding-left: 7px;">
                <%= _("To the Content Reviewers when")%>:
            </td>
         </tr>
        <tr id="reviewerNotif" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="reviewerNotifButton">
                 </span>
@@ -303,7 +257,7 @@
         </td>
        </tr>
        <tr id="reviewerNotifForContribution" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="reviewerNotifForContributionButton">
                 </span>
@@ -311,7 +265,7 @@
         </td>
        </tr>
        <tr id="authorSubmittedMatReviewerNotif" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="authorSubmittedMatReviewerNotifButton">
                 </span>
@@ -325,12 +279,12 @@
             <% display = 'none' %>
         <% end %>
         <tr id="autoEmailsEditorLabel" style="display:<%=display%>">
-           <td style="padding-top: 10px;">
+           <td style="padding-top: 7px; padding-left: 7px;">
                <%= _("To the Layout Reviewers when")%>:
            </td>
         </tr>
        <tr id="editorNotif" style="white-space:nowrap; display: <%=display%>">
-          <td style="padding-left: 50px;">
+          <td style="padding-left: 20px;">
             <div>
                 <span id="editorNotifButton">
                 </span>
@@ -338,7 +292,7 @@
          </td>
        </tr>
        <tr id="editorNotifForContribution" style="white-space:nowrap; display: <%=display%>">
-          <td style="padding-left: 50px;">
+          <td style="padding-left: 20px;">
             <div>
                 <span id="editorNotifForContributionButton">
                 </span>
@@ -346,7 +300,7 @@
          </td>
        </tr>
        <tr id="authorSubmittedMatEditorNotif" style="white-space:nowrap; display: <%=display%>">
-          <td style="padding-left: 50px;">
+          <td style="padding-left: 20px;">
             <div>
                 <span id="authorSubmittedMatEditorNotifButton">
                 </span>
@@ -360,7 +314,7 @@
             <% display = 'none' %>
         <% end %>
         <tr id="autoEmailsAuthor" style="display:<%=display%>">
-           <td style="padding-top: 10px;">
+           <td style="padding-top: 7px; padding-left: 7px;">
                <%= _("To the Author of the paper when a judgement is submitted by")%>:
            </td>
         </tr>
@@ -371,7 +325,7 @@
             <% display = 'none' %>
         <% end %>
        <tr id="refereeJudgementNotif" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="refereeJudgementNotifButton">
                 </span>
@@ -379,7 +333,7 @@
         </td>
        </tr>
        <tr id="reviewerJudgementNotif" style="white-space:nowrap; display: <%=display%>">
-        <td style="padding-left: 50px;">
+        <td style="padding-left: 20px;">
             <div>
                 <span id="reviewerJudgementNotifButton">
                 </span>
@@ -393,7 +347,7 @@
             <% display = 'none' %>
         <% end %>
        <tr id="editorJudgementNotif" style="white-space:nowrap; display: <%=display%>">
-          <td style="padding-left: 50px;">
+          <td style="padding-left: 20px;">
             <div>
                 <span id="editorJudgementNotifButton">
                 </span>
@@ -409,56 +363,9 @@
     <% display = 'none' %>
 <% end %>
 <form action="<%= setTemplateURL %>" method="post" ENCTYPE="multipart/form-data">
-<table id="templateTable" width="90%%" align="center" border="0" style="padding-top: 10px; display:<%=display%>">
+<table id="templateTable" style="padding-left: 20px; padding-bottom: 20px; display:<%=display%>">
     <tr>
-        <td id="uploadTemplateHelp" colspan="5" class="reviewingsubtitle"><%= _("Upload a template")%></td>
-    </tr>
-   <!--  <tr>
-        <td>
-            <table>
-            	<tr>
-            		<td align="right">
-            			<%= _("Name")%>
-            		</td>
-					<td>
-						<input type=text size="70" name="name">
-					</td>
-            	</tr>
-                <tr>
-                    <td align="right">
-                        <%= _("Description")%>
-                    </td>
-                    <td>
-                        <textarea rows="2" cols="53" name="description">
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">
-                        <%= _("Format")%>
-                    </td>
-                    <td id='formatchooser'>
-                    </td>
-
-                </tr>
-				<tr>
-                    <td align="right">
-                        <%= _("Template")%>
-                    </td>
-                    <td>
-                        <input name="file" type="file" value="<%= _("Browse...")%>">
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <input type="submit" class="btn" value="<%= _("Upload")%>">
-        </td>
-    </tr> -->
-    <tr><a name="UploadTemplate" />
-        <td style="padding-left: 15px;" ><input id='uploadTpl' type="button" value="<%= _('Upload Template')%>"></a>
-        </td>
+        <td id="uploadTemplateHelp" class="subGroupTitle" style="width:500px;"><%= _("Upload a template")%></td>
     </tr>
     <tr><td>
         <% if ConfReview.hasTemplates(): %>
@@ -484,31 +391,6 @@
         </thead>
         <tbody id="templateListTable">
         </tbody>
-        <!-- <% keys = ConfReview.getTemplates().keys() %>
-       <% keys.sort() %>
-        <% for k in keys: %>
-            <% t = ConfReview.getTemplates()[k] %>
-        <tr id="TemplateRow_<%= k %>">
-            <td id="TemplateName_<%= k %>" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <a style="color:#5FA5D4" href="<%= urlHandlers.UHDownloadContributionTemplate.getURL(t) %>">
-                    <%= t.getName() %>
-                </a>
-                <% if CanDelete: %>
-                &nbsp;&nbsp;&nbsp;
-                <a href="<%= urlHandlers.UHDeleteContributionTemplate.getURL(t) %>">
-                <a href="#" onclick="deleteTemplate('<%=t.getId()%>', '<%= t.getName() %>',  '<%= k %>')">
-                    <img class="imglink" style="vertical-align: bottom; width: 15px; height: 15px;" src="<%= Configuration.Config.getInstance().getSystemIconURL("remove") %>" alt="delete template">
-                </a>
-                <% end %>
-            </td>
-            <td id="TemplateFormat_<%= k %>" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= t.getFormat() %>
-            </td>
-            <td id="TemplateDescription_<%= k %>" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= t.getDescription() %>
-            </td>
-        </tr>
-        <% end %> -->
         </table>
         <% if ConfReview.hasTemplates(): %>
          <% display = 'none' %>
@@ -516,12 +398,16 @@
        <% else: %>
          <% display = 'table' %>
        <% end %>
-        <table id="NoTemplateTable" width="90%%" align="center" border="0" style="display:<%=display%>">
-        <tr><td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+        <table id="NoTemplateTable" style="display:<%=display%>">
+        <tr><td style="padding-left: 7px;">
             <%= _("No templates have been uploaded yet.")%>
         </td></tr>
         </table>
     </tr></td>
+    <tr><a name="UploadTemplate" />
+        <td style="padding-left: 7px;" ><input id='uploadTpl' type="button" value="<%= _('Upload Template')%>"></a>
+        </td>
+    </tr>
     <tr><td style="padding-bottom:15px;"></td></tr>
         <tr><td colspan="5" style="padding-top: 20px;">
             <em><%= _("To assign team for Paper Review Module, please click on 'Team' and follow the steps")%></em>
@@ -600,7 +486,6 @@ var observer = function(value) {
         showReviewingQuestions();
         showDefaultReviewerDate();
         showDefaultRefereeDate();
-        //showFormatChooser();
     }
     if (value == "Layout reviewing") {
         $E('steptitle').dom.style.display = '';
@@ -636,7 +521,6 @@ var observer = function(value) {
 
         showEditingCriteria();
         showDefaultEditorDate();
-        //showFormatChooser();
     }
     if (value == "Content and layout reviewing") {
         $E('steptitle').dom.style.display = '';
@@ -676,7 +560,6 @@ var observer = function(value) {
         showDefaultRefereeDate();
         showEditingCriteria();
         showDefaultEditorDate();
-        //showFormatChooser();
     }
 }
 
@@ -687,36 +570,28 @@ new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
                     "<%= ConfReview.getReviewingMode() %>",
                     observer);
 
-
 var showReviewingStates = function() {
-    new IndicoUI.Widgets.Generic.keywordField(
-        $E('inPlaceEditStates'),
-        'multipleLinesListItem',
-        'reviewing.conference.changeStates',
-        {conference: '<%= ConfReview.getConference().getId() %>'},
-        $T('Remove this status from the list')
-    );
+    $E('inPlaceEditStates').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.paperReviewing.getStatuses',
+        'add':'reviewing.paperReviewing.addStatus', 'remove':'reviewing.paperReviewing.removeStatus',
+        'edit': 'reviewing.paperReviewing.editStatus'},
+        {conference: '<%= ConfReview.getConference().getId() %>'},'status', 'statusComponent', false));
 }
 
 var showReviewingQuestions = function() {
-    new IndicoUI.Widgets.Generic.keywordField(
-        $E('inPlaceEditQuestions'),
-        'multipleLinesListItem',
-        'reviewing.conference.changeQuestions',
-        {conference: '<%= ConfReview.getConference().getId() %>'},
-        $T('Remove this question from the list')
-    );
+	$E('inPlaceEditContentQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.paperReviewing.getContentQuestions',
+        'add':'reviewing.paperReviewing.addContentQuestion', 'remove':'reviewing.paperReviewing.removeContentQuestion',
+        'edit': 'reviewing.paperReviewing.editContentQuestion'},
+        {conference: '<%= ConfReview.getConference().getId() %>'},'question', 'contentReviewerQuestion', false));
 }
 
 var showEditingCriteria = function() {
-    new IndicoUI.Widgets.Generic.keywordField(
-        $E('inPlaceEditCriteria'),
-        'multipleLinesListItem',
-        'reviewing.conference.changeCriteria',
-        {conference: '<%= ConfReview.getConference().getId() %>'},
-        $T('Remove this criteria from the list')
-    );
+    $E('inPlaceEditLayoutQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.paperReviewing.getLayoutQuestions',
+        'add':'reviewing.paperReviewing.addLayoutQuestion', 'remove':'reviewing.paperReviewing.removeLayoutQuestion',
+        'edit': 'reviewing.paperReviewing.editLayoutQuestion'},
+        {conference: '<%= ConfReview.getConference().getId() %>'},'question', 'layoutReviewerQuestion', false));
 }
+
+
 
 var showDefaultRefereeDate = function() {
     new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultRefereeDueDate'),
@@ -742,26 +617,6 @@ var showDefaultReviewerDate = function() {
                        null, true);
 }
 
-/*var deleteTemplate = function(tempId, tempName, rowId) {
-                    var row = $E('TemplateRow_'+rowId);
-                    var params = {conference: '<%= ConfReview.getConference().getId() %>',templateId: tempId}
-                    if (confirm("Are you sure you want to delete '"+ tempName+"'?")) {
-                        var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
-                        jsonRpc(Indico.Urls.JsonRpcService,
-                            'reviewing.conference.deleteTemplate',
-                            params,
-                            function(response,error) {
-                                    if (exists(error)) {
-                                        killProgress();
-                                        IndicoUtil.errorReport(error);
-                                    } else {
-                                        $E('templateListTable').remove(row);
-                                        killProgress();
-                                    }
-                                }
-                    );
-                    }
-                };*/
 
 var TemplateList = function(){
             <% keys = ConfReview.getTemplates().keys() %>
@@ -892,53 +747,6 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
                                             true
 ));
 
-
-/* IndicoUI.executeOnLoad(function(){
-    var pm = new IndicoUtil.parameterManager();
-    return $E('formatchooser').set(showFormatChooser(pm));
-});
-
-
-function showFormatChooser(pm){
-    var select = Html.select({name: 'format'}, Html.option({value: "Unknown"}, "--Select a format--")<% for f in Template.formats: %>,Html.option({value: "<%= f %>"}, "<%= f %>")<%end%>);
-    var text = Html.edit({name: 'formatOther'});
-    var chooser = new Chooser(new Lookup({
-            select: function() {
-                pm.remove(text);
-                pm.add(select);
-               var sel = '<select name="format" id="defaultformat">'+
-                         '<option value="Unknown"><%= _("--Select a format--")%></option>'+
-<% for f in Template.formats: %>
-                         '<option value="<%= f %>"><%= f %></option>'+
-<% end %>
-                         '</select>';
-                return Html.div({},select,
-                         " ",
-                         $T("or"),
-                         " ",
-                         Widget.link(command(function() {
-                             chooser.set('write');
-                         }, $T("other"))));
-            },
-
-            write: function() {
-                bind.detach(select);
-                pm.remove(select);
-                pm.add(text);
-                return Html.div({}, text,
-                                " ",
-                               $T("or"),
-                               " ",
-                                Widget.link(command(function() {
-                                    chooser.set('select');
-                                }, $T("select from list"))));
-            }
-        }));
-        chooser.set('select');
-
-        return Widget.block(chooser);
-}
- */
 
 <% if ConfReview.hasReviewing(): %>
     TemplateList();

@@ -133,9 +133,6 @@ class ConferenceReviewingSetupTextModificationBase(TextModificationBase, Confere
     #Note: don't change the order of the inheritance here!
     pass
 
-class ConferenceReviewingListModificationBase (ListModificationBase, ConferenceReviewingPRMBase):
-    #Note: don't change the order of the inheritance here!
-    pass
 
 class ConferenceReviewingDateTimeModificationBase (DateTimeModificationBase, ConferenceReviewingPRMBase):
     #Note: don't change the order of the inheritance here!
@@ -150,30 +147,6 @@ class ConferenceReviewingModeModification(ConferenceReviewingSetupTextModificati
     def _handleGet(self):
         return self._confPaperReview.getReviewingMode()
 
-class ConferenceReviewingStatesModification(ConferenceReviewingListModificationBase):
-
-    def _handleGet(self):
-        return self._confPaperReview.getStates()
-
-    def _handleSet(self):
-        self._confPaperReview.setStates(self._value)
-
-class ConferenceReviewingQuestionsModification(ConferenceReviewingListModificationBase):
-
-    def _handleGet(self):
-        return self._confPaperReview.getReviewingQuestions()
-
-    def _handleSet(self):
-        self._confPaperReview.setReviewingQuestions(self._value)
-
-
-class ConferenceReviewingCriteriaModification(ConferenceReviewingListModificationBase):
-
-    def _handleGet(self):
-        return self._confPaperReview.getLayoutCriteria()
-
-    def _handleSet(self):
-        self._confPaperReview.setLayoutCriteria(self._value)
 
 class ConferenceReviewingDeleteTemplate(ConferenceReviewingBase):
 
@@ -818,15 +791,15 @@ class ContributionReviewingCriteriaModification(ContributionReviewingTextModific
 
     def _checkParams(self):
         ContributionReviewingTextModificationBase._checkParams(self)
-        self._criterion = self._params.get("criterion")
+        self._criterion = self._params.get("criterion") # question id
 
     def _handleSet(self):
         if self.getJudgementObject().isSubmitted():
             raise ServiceError("ERR-REV8c",_("You cannot modify a judgement marked as submitted"))
-        self.getJudgementObject().setAnswer(self._criterion, int(self._value))
+        self.getJudgementObject().setAnswer(self._criterion, int(self._value), self._conf.getConfPaperReview().getNumberOfAnswers())
 
     def _handleGet(self):
-        return self.getJudgementObject().getAnswer(self._criterion)
+        return self.getJudgementObject().getAnswer(self._criterion).getRbValue()
 
 
 class ContributionReviewingSetSubmitted(ContributionReviewingBase):
@@ -847,8 +820,7 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
 class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
 
     def _getAnswer( self ):
-        return [str(q) + " : " + ConferencePaperReview.reviewingQuestionsAnswers[int(a)]
-                for q,a in self.getJudgementObject().getAnswers()]
+        return self.getJudgementObject().getAnswers()
 
 #####################################
 ###  Abstract reviewing classes
@@ -981,11 +953,212 @@ class AbstractReviewingEditQuestion(AbstractReviewingBase):
         return fossils
 
 
+#######################################
+###  Paper reviewing questions classes
+#######################################
+
+# Content questions
+class PaperReviewingGetContentQuestions(ConferenceReviewingPRMBase):
+
+    ''' Get the current list of content questions '''
+
+    def _getAnswer(self):
+        reviewingQuestions = self._confPaperReview.getReviewingQuestions()
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+class PaperReviewingAddContentQuestion(ConferenceReviewingPRMBase):
+
+    ''' Add a new question '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._value = self._params.get("value") # value is the question text
+
+    def _getAnswer(self):
+        self._confPaperReview.addReviewingQuestion(self._value)
+        reviewingQuestions = self._confPaperReview.getReviewingQuestions()
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+class PaperReviewingRemoveContentQuestion(ConferenceReviewingPRMBase):
+
+    ''' Remove a question '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._value = self._params.get("value") # value is the question id
+
+    def _getAnswer(self):
+        # remove the question
+        self._confPaperReview.removeReviewingQuestion(self._value)
+        reviewingQuestions = self._confPaperReview.getReviewingQuestions()
+        # Build the answer
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+class PaperReviewingEditContentQuestion(ConferenceReviewingPRMBase):
+
+    ''' Edit a question '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._id = self._params.get("id") # value is the question id
+        self._text = self._params.get("text")
+
+    def _getAnswer(self):
+        # remove the question
+        self._confPaperReview.editReviewingQuestion(self._id, self._text)
+        reviewingQuestions = self._confPaperReview.getReviewingQuestions()
+        # Build the answer
+        fossils = []
+        for question in reviewingQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+
+# Layout questions
+class PaperReviewingGetLayoutQuestions(ConferenceReviewingPRMBase):
+
+    ''' Get the current list of Layout questions '''
+
+    def _getAnswer(self):
+        layoutQuestions = self._confPaperReview.getLayoutQuestions()
+        fossils = []
+        for question in layoutQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+class PaperReviewingAddLayoutQuestion(ConferenceReviewingPRMBase):
+
+    ''' Add a new question '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._value = self._params.get("value") # value is the question text
+
+    def _getAnswer(self):
+        self._confPaperReview.addLayoutQuestion(self._value)
+        layoutQuestions = self._confPaperReview.getLayoutQuestions()
+        fossils = []
+        for question in layoutQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+class PaperReviewingRemoveLayoutQuestion(ConferenceReviewingPRMBase):
+
+    ''' Remove a question '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._value = self._params.get("value") # value is the question id
+
+    def _getAnswer(self):
+        # remove the question
+        self._confPaperReview.removeLayoutQuestion(self._value)
+        layoutQuestions = self._confPaperReview.getLayoutQuestions()
+        # Build the answer
+        fossils = []
+        for question in layoutQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+class PaperReviewingEditLayoutQuestion(ConferenceReviewingPRMBase):
+
+    ''' Edit a question '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._id = self._params.get("id") # value is the question id
+        self._text = self._params.get("text")
+
+    def _getAnswer(self):
+        # remove the question
+        self._confPaperReview.editLayoutQuestion(self._id, self._text)
+        layoutQuestions = self._confPaperReview.getLayoutQuestions()
+        # Build the answer
+        fossils = []
+        for question in layoutQuestions:
+            fossils.append(fossilize(question))
+        return fossils
+
+
+# Status services
+class PaperReviewingGetStatuses(ConferenceReviewingPRMBase):
+
+    ''' Get the current list of Layout questions '''
+
+    def _getAnswer(self):
+        statuses = self._confPaperReview.getStatuses()
+        fossils = []
+        for status in statuses:
+            fossils.append(fossilize(status))
+        return fossils
+
+class PaperReviewingAddStatus(ConferenceReviewingPRMBase):
+
+    ''' Add a new status '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._value = self._params.get("value") # value is the status name
+
+    def _getAnswer(self):
+        self._confPaperReview.addStatus(self._value, True)
+        statuses = self._confPaperReview.getStatuses()
+        fossils = []
+        for status in statuses:
+            fossils.append(fossilize(status))
+        return fossils
+
+class PaperReviewingRemoveStatus(ConferenceReviewingPRMBase):
+
+    ''' Remove a status '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._value = self._params.get("value") # value is the status id
+
+    def _getAnswer(self):
+        # remove the status
+        self._confPaperReview.removeStatus(self._value)
+        statuses = self._confPaperReview.getStatuses()
+        # Build the answer
+        fossils = []
+        for status in statuses:
+            fossils.append(fossilize(status))
+        return fossils
+
+class PaperReviewingEditStatus(ConferenceReviewingPRMBase):
+
+    ''' Edit a status '''
+
+    def _checkParams(self):
+        ConferenceReviewingPRMBase._checkParams(self)
+        self._id = self._params.get("id") # value is the status id
+        self._name = self._params.get("text")
+
+    def _getAnswer(self):
+        # remove the status
+        self._confPaperReview.editStatus(self._id, self._name)
+        statuses = self._confPaperReview.getStatuses()
+        # Build the answer
+        fossils = []
+        for status in statuses:
+            fossils.append(fossilize(status))
+        return fossils
+
+
+
+
 methodMap = {
     "conference.changeReviewingMode": ConferenceReviewingModeModification,
-    "conference.changeStates": ConferenceReviewingStatesModification,
-    "conference.changeQuestions": ConferenceReviewingQuestionsModification,
-    "conference.changeCriteria": ConferenceReviewingCriteriaModification,
     "conference.deleteTemplate" : ConferenceReviewingDeleteTemplate,
     "conference.changeCompetences": ConferenceReviewingCompetenceModification,
     "conference.changeDefaultDueDate" : ConferenceReviewingDefaultDueDateModification,
@@ -1038,6 +1211,20 @@ methodMap = {
     "abstractReviewing.getQuestions": AbstractReviewingGetQuestions,
     "abstractReviewing.addQuestion": AbstractReviewingAddQuestion,
     "abstractReviewing.removeQuestion": AbstractReviewingRemoveQuestion,
-    "abstractReviewing.editQuestion": AbstractReviewingEditQuestion
+    "abstractReviewing.editQuestion": AbstractReviewingEditQuestion,
 
+    "paperReviewing.getContentQuestions": PaperReviewingGetContentQuestions,
+    "paperReviewing.addContentQuestion": PaperReviewingAddContentQuestion,
+    "paperReviewing.removeContentQuestion": PaperReviewingRemoveContentQuestion,
+    "paperReviewing.editContentQuestion": PaperReviewingEditContentQuestion,
+
+    "paperReviewing.getLayoutQuestions": PaperReviewingGetLayoutQuestions,
+    "paperReviewing.addLayoutQuestion": PaperReviewingAddLayoutQuestion,
+    "paperReviewing.removeLayoutQuestion": PaperReviewingRemoveLayoutQuestion,
+    "paperReviewing.editLayoutQuestion": PaperReviewingEditLayoutQuestion,
+
+    "paperReviewing.getStatuses": PaperReviewingGetStatuses,
+    "paperReviewing.addStatus": PaperReviewingAddStatus,
+    "paperReviewing.removeStatus": PaperReviewingRemoveStatus,
+    "paperReviewing.editStatus": PaperReviewingEditStatus
     }

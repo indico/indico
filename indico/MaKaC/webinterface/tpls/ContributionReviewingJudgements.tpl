@@ -115,7 +115,10 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong><%= _("Judgement")%>:</strong></span></td>
             <td>
-                <div id="inPlaceEditJudgement"><strong><%= Review.getRefereeJudgement().getJudgement() %></strong></div>
+                <div id="statusDiv">
+                    <div id="initialStatus" style="display:inline"><%= Review.getRefereeJudgement().getJudgement() %></div>
+                    <div id="inPlaceEditJudgement" style="display:inline"></div>
+                </div>
             </td>
         </tr>
         <% if IsReferee: %>
@@ -139,12 +142,10 @@
 <script type="text/javascript">
 
 var observer = function(value) {
-                if(value!="None"){
-                        submitButton.dom.disabled = false;
-                        $E('submitHelpPopUp').set("");
-                        $E('submitHelpPopUp').dom.display = 'none';
-                        }
-
+    if($E('initialStatus')) {
+        $E('statusDiv').remove($E('initialStatus'));
+        submitButton.dom.disabled = false;
+    }
 }
 
 var showWidgets = function(firstLoad) {
@@ -154,7 +155,7 @@ var showWidgets = function(firstLoad) {
                         {conference: '<%= Contribution.getConference().getId() %>',
                         contribution: '<%= Contribution.getId() %>',
                         current: 'refereeJudgement'
-                        }, <%= ConfReview.getAllStates() %>, "<%=FinalJudge%>", observer);
+                        }, <%= ConfReview.getStatusesDictionary() %>, "<%=FinalJudge%>", observer);
 
     var initialValue = '<%= Review.getRefereeJudgement().getComments() %>';
     if (initialValue == '') {
@@ -175,11 +176,11 @@ var showWidgets = function(firstLoad) {
         <% for q in ConfReview.getReviewingQuestions(): %>
             var newDiv = Html.div({style:{paddingLeft:'5px', marginLeft:'10px'}});
 
-            newDiv.append(Html.span(null,"<%=q%>"));
+            newDiv.append(Html.span(null,"<%=q.getText()%>"));
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                var initialValue = "<%= Review.getRefereeJudgement().getAnswer(q) %>";
+                var initialValue = "<%= Review.getRefereeJudgement().getAnswer(q.getId()).getRbValue() %>";
             } else {
                 var initialValue = false;
             }
@@ -193,7 +194,7 @@ var showWidgets = function(firstLoad) {
                                                     'reviewing.contribution.changeCriteria',
                                                     {conference: '<%= Contribution.getConference().getId() %>',
                                                     contribution: '<%= Contribution.getId() %>',
-                                                    criterion: '<%= q %>',
+                                                    criterion: '<%= q.getId() %>',
                                                     current: 'refereeJudgement'
                                                     }));
 
@@ -272,6 +273,9 @@ var updatePage = function (){
         submitButton.set($T('Undo sending'));
         $E('submittedmessage').set($T('Judgement has been sent'));
         <% end %>
+        if($E('initialStatus')) {
+            $E('statusDiv').remove($E('initialStatus'));
+        }
         showValues();
     } else {
         <% if IsReferee: %>
@@ -314,7 +318,8 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
                 location.href = "<%= urlHandlers.UHContributionModifReviewing.getURL(Contribution) %>#FinalReviewing"
                 location.reload(true)
             } else {
-                IndicoUtil.errorReport(error);
+                alert (error.message);
+                //IndicoUtil.errorReport(error);
             }
         },
         $T('Send')
