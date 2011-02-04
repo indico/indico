@@ -71,5 +71,5 @@ class IAvatarAllDetailsFossil(IAvatarFossil):
 
 class IPersonalInfoFossil(IFossil):
 
-    def getTabAdvancedMode(self):
-        """ Tab Advanced Mode """
+    def getShowPastEvents(self):
+        """ Show Past Events """

@@ -161,20 +161,24 @@ class GetPastEventsList(CategoryDisplayBase):
                         pastEvents.setdefault(year,{})[month] = allEvents[year][month]
         return WConferenceListEvents(pastEvents, self._aw).getHTML()
 
-class GetPastEventsFromCateg(CategoryDisplayBase):
+class SetShowPastEventsForCateg(CategoryDisplayBase):
 
     def _checkParams(self):
         CategoryDisplayBase._checkParams(self)
-        self._getPastEvents = bool(self._params.get("getPastEvents",False))
+        self._showPastEvents = bool(self._params.get("showPastEvents",False))
 
     def _getAnswer( self ):
         session = self._aw.getSession()
         if not session.getVar("fetchPastEventsFrom"):
             session.setVar("fetchPastEventsFrom",set())
-        if self._getPastEvents:
-            session.getVar("fetchPastEventsFrom").add(self._categ.getId())
+        if self._showPastEvents:
+            fpef = session.getVar("fetchPastEventsFrom")
+            fpef.add(self._categ.getId())
+            session.setVar("fetchPastEventsFrom", fpef)
         else:
-            session.getVar("fetchPastEventsFrom").remove(self._categ.getId())
+            fpef = session.getVar("fetchPastEventsFrom")
+            fpef.remove(self._categ.getId())
+            session.setVar("fetchPastEventsFrom", fpef)
 
 class CategoryProtectionUserList(CategoryModifBase):
     def _getAnswer(self):
@@ -221,7 +225,7 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
-    "getPastEventsFromCateg": GetPastEventsFromCateg,
+    "setShowPastEventsForCateg": SetShowPastEventsForCateg,
     "canCreateEvent": CanCreateEvent,
     "protection.getAllowedUsersList": CategoryProtectionUserList,
     "protection.addAllowedUsers": CategoryProtectionAddUsers,

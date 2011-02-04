@@ -3731,7 +3731,6 @@ class WTabControl( WTemplated ):
         # TODO: Transport this to the template
 
         hasHiddenOptions = False
-        optionsAreShown = self._aw.getUser() is not None and self._aw.getUser().getPersonalInfo().getTabAdvancedMode()
 
         if tabCtrl==None:
             tabCtrl = self._tabCtrl
@@ -3758,7 +3757,7 @@ class WTabControl( WTemplated ):
         for tab in tabCtrl.getTabList():
             if tab.isActive():
                 break
-            elif tab.isEnabled() and (not tab.isHidden() or optionsAreShown):
+            elif tab.isEnabled() and (not tab.isHidden()):
                 beforeActive = tab
         ########
         for i in range(0, len(tabCtrl.getTabList())):

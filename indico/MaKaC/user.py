@@ -487,7 +487,6 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.common import utils
         self.key = utils.newKey() #key to activate the account
         self.registrants = {}
-        self._showPastEvents = False #determines if past events in category overview will be shown
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._lang = minfo.getLang()
@@ -1325,14 +1324,6 @@ class Avatar(Persistent, Fossilizable):
     def setLang(self, lang):
         self._lang =lang
 
-    def getShowPastEvents(self):
-        if not hasattr(self, "_showPastEvents"):
-            self._showPastEvents = False
-        return self._showPastEvents
-
-    def setShowPastEvents(self, value):
-        self._showPastEvents = value
-
 
 class AvatarHolder( ObjectHolder ):
     """Specialised ObjectHolder dealing with user (avatar) objects. Objects of
@@ -1845,22 +1836,16 @@ class PersonalInfo(Persistent, Fossilizable):
 
     def __init__(self):
         self._basket = PersonalBasket()
-        self._tabAdvancedMode = False # Basic set of tabs
+        self._showPastEvents = False #determines if past events in category overview will be shown
         self._p_changed = 1
 
-    def getTabAdvancedMode( self ):
-        # TabAdvancedMode refers to whether the user is in "Advanced Options"
-        # mode or not
-        try:
-            self._tabAdvancedMode
-        except AttributeError:
-            self.setTabAdvancedMode(False) # (default)
-        return self._tabAdvancedMode
+    def getShowPastEvents(self):
+        if not hasattr(self, "_showPastEvents"):
+            self._showPastEvents = False
+        return self._showPastEvents
 
-    def setTabAdvancedMode( self, mode ):
-        self._tabAdvancedMode = mode
-        self._p_changed = 1
-
+    def setShowPastEvents(self, value):
+        self._showPastEvents = value
 
     def getBasket(self):
         return self._basket

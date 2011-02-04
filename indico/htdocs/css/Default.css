@@ -6547,3 +6547,14 @@ table.legend td.legendTd {
     color:#3054BF;
     cursor: pointer;
 }
+
+/* End notif templates */
+
+.userPrefOption {
+    float: left;
+}
+
+.userPrefOptionStatus {
+    float: left;
+    padding: 4px;
+}

@@ -276,7 +276,7 @@ class _UserUtils:
         a.setTelephone( userData["telephone"] )
         a.setFax( userData["fax"] )
         if userData.has_key("showPastEvents"):
-            a.setShowPastEvents( userData.has_key("showPastEvents"))
+            a.getPersonalInfo().setShowPastEvents( userData.has_key("showPastEvents"))
 
         #################################
         # Fermi timezone awareness      #

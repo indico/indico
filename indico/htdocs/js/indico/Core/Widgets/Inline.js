@@ -224,7 +224,6 @@ type("RemoteSwitchButton", ["InlineWidget"],
       * initState - initial state (true=enabled, false=disabled)
       * imgEnabled - image for 'enabled' state
       * imgDisabled - image for 'disabled' state
-      * imgDisabled - image for 'disabled' state
       * enableMethod - remote method to be called in order to pass to "enabled state"
       * disableMethod - remote method to be called in order to pass to "disabled state"
       * args - extra args to be passed to either method

@@ -1,5 +1,3 @@
-<%! from MaKaC.i18n import langList %>
-
 <center>
 <form action="%(postURL)s" method="POST">
     %(locator)s

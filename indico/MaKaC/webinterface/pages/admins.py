@@ -1446,7 +1446,7 @@ class WUserPreferences(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["showPastEvents"] = self._avatar.getShowPastEvents()
+        vars["showPastEvents"] = self._avatar.getPersonalInfo().getShowPastEvents()
         return vars
 
 class WUserDetails(wcomponents.WTemplated):
@@ -1582,7 +1582,6 @@ class WUserModify(wcomponents.WTemplated):
         vars["name"] = vars.get("name", u.getName())
         vars["surName"] =  vars.get("surName", u.getSurName())
         vars["title"] = vars.get("title", u.getTitle())
-        vars["lang"] = u.getLang()
         vars["organisation"] = vars.get("organisation", u.getOrganisations()[0])
         vars["address"] = vars.get("address", u.getAddresses()[0])
         vars["email"] = vars.get("email", u.getEmails()[0])

@@ -64,11 +64,11 @@ def sortAndReturn(list):
     var callDone = false;
     var pastSwitch = false;
 
-    function getPastEventsFromCateg(value){
-        indicoRequest('category.getPastEventsFromCateg',
+    function setShowPastEventsForCateg(value){
+        indicoRequest('category.setShowPastEventsForCateg',
                 {
                     categId: '<%= categ.getId() %>',
-                    getPastEvents: value
+                    showPastEvents: value
                 },
                 function(result, error){}
             )
@@ -78,16 +78,15 @@ def sortAndReturn(list):
         if (!callDone) {
             $E("loadingPast").dom.style.display = "inline";
             fetchPastEvents()
-            getPastEventsFromCateg(true)
         }else {
             if (pastSwitch) {
                 $E("pastEvents").dom.style.display = "none";
                 $E("pastEventsText").dom.innerHTML = "There are <%= numOfEventsInThePast %> more events in the <em>past</em>. <span class='fakeLink' onclick='tooglePastEvents()'>Show them.</a>";
-                getPastEventsFromCateg(false)
+                setShowPastEventsForCateg(false);
             }else {
                 $E("pastEvents").dom.style.display = "inline";
                 $E("pastEventsText").dom.innerHTML = '<span class="fakeLink" onclick="tooglePastEvents()">Hide</span> the events in the past (<%= numOfEventsInThePast %>).';
-                getPastEventsFromCateg(true)
+                setShowPastEventsForCateg(true);
             }
             pastSwitch = !pastSwitch;
         }

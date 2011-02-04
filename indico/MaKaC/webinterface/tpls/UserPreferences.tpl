@@ -1,54 +1,50 @@
 <h2 class="formTitle"><%= _("User Preferences")%></h2>
-<h3>Site-wide</h3>
 <table style="margin-left: 100px;">
-	<tr>
-	    <td class="titleCellTD"><span class="titleCellFormat"><%= _("Modification Tabs")%></span></td>
-	    <td class="blacktext spaceLeft" id="tabExpandSelect"></td>
-	</tr>
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat"><%= _("Language")%></span></td>
-        <td class="blacktext spaceLeft" id="selectLanguage"></td>
+        <td class="blacktext spaceLeft"><div id="selectLanguage" class="userPrefOption"></div><div id="langStatus" class="userPrefOptionStatus"></div></td>
     </tr>
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat"><%= _("My Timezone")%></span></td>
-        <td class="blacktext spaceLeft" id="myTimezone"></td>
+        <td class="blacktext spaceLeft"><div id="myTimezone" class="userPrefOption"></div><div id="myTimezoneStatus" class="userPrefOptionStatus"></div></td>
     </tr>
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat"><%= _("Display Timezone")%></span></td>
-        <td class="blacktext spaceLeft" id="displayTimezone"></td>
+        <td class="blacktext spaceLeft"><div id="displayTimezone" class="userPrefOption"></div><div id="displayTimezoneStatus" class="userPrefOptionStatus"></div></td>
     </tr>
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat"><%= _("Show past events by default")%></span></td>
-        <td class="blacktext spaceLeft" id="tabShowPastEvents" style="vertical-align:middle"></td>
+        <td class="blacktext spaceLeft" nowrap><div id="tabShowPastEvents"></div></td>
     </tr>
 </table>
 
 
 <script type="text/javascript">
 
-	var source = jsonRpcObject(Indico.Urls.JsonRpcService, "user.personalinfo.set", {value: null});
-
-	source.state.observe(function(state) {
-           // wait for the source to be loaded
-	   if (state == SourceState.Loaded) {
-        	IndicoUI.Widgets.Generic.sourceSelectionField($E('tabExpandSelect'),
-	   					  $C(source.accessor('tabAdvancedMode'), {
-		                                     toTarget: function(value) {
-			                                  return str(value);
-			                             },
-			                             toSource: function(value) {
-			                                  return value == "true";
-			                             }
-			                          }),
-				                 {'false': 'Basic',
-					          'true': 'Advanced'});
-	   }
-	});
+    var checkState = function(statusId) {
+        var status = $E(statusId);
+        status.dom.style.color = "orange";
+        status.set("Saving...");
+        var _checkState = function(state){
+            if (state == SourceState.Error) {
+                IndicoUtil.errorReport($T("Error saving"));
+                status.set("");
+            } else if (state == SourceState.Loaded) {
+                status.dom.style.color = "green";
+                status.set("Saved!");
+                setTimeout(function(){
+                    status.set("");
+                }, 1000);
+            }
+    };
+    return _checkState;
+    };
 
     var langCallback = function(){
         $E("selectLanguage").set(languageSelector.draw());
         languageSelector.observe(function(){
-            indicoSource('user.setLanguage', {"lang":languageSelector.get()});
+            var req = indicoSource('user.setLanguage', {"lang":languageSelector.get()});
+            req.state.observe(checkState("langStatus"));
         });
     };
     var languageSelector = new SelectRemoteWidget("user.getLanguages",{},langCallback)
@@ -56,7 +52,8 @@
     var tzCallback = function(){
         $E("myTimezone").set(myTimezoneSelector.draw());
         myTimezoneSelector.observe(function(){
-            indicoSource('user.setTimezone', {"tz":myTimezoneSelector.get()});
+            var req = indicoSource('user.setTimezone', {"tz":myTimezoneSelector.get()});
+            req.state.observe(checkState("myTimezoneStatus"));
         });
     };
     var myTimezoneSelector = new SelectRemoteWidget("user.getTimezones",{},tzCallback);
@@ -64,7 +61,8 @@
     var displayTzCallback = function(){
         $E("displayTimezone").set(displayTimezoneSelector.draw());
         displayTimezoneSelector.observe(function(){
-            indicoSource('user.setDisplayTimezone', {"tzMode":displayTimezoneSelector.get()});
+            var req = indicoSource('user.setDisplayTimezone', {"tzMode":displayTimezoneSelector.get()});
+            req.state.observe(checkState("displayTimezoneStatus"));
         });
     };
     var displayTimezoneSelector = new SelectRemoteWidget("user.getDisplayTimezones",{},displayTzCallback);

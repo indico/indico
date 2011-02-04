@@ -23,12 +23,10 @@ from MaKaC.services.implementation.base import ServiceBase
 import MaKaC.user as user
 from MaKaC.services.interface.rpc.common import ServiceError
 
-from MaKaC.common.PickleJar import DictPickler
 from MaKaC.common import info
 
 import time
-from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil,\
-                            IPersonalInfoFossil
+from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 
 from MaKaC.rb_location import CrossLocationQueries
@@ -177,19 +175,6 @@ class UserListBasket(ServiceBase):
         else:
             return None
 
-
-class UserGetPersonalInfo(LoggedOnlyService):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-
-        self._target = self.getAW().getUser()
-
-
-    def _getAnswer( self):
-        return self._target.getPersonalInfo().fossilize(IPersonalInfoFossil)
-
-
 class UserGetEmail(LoggedOnlyService):
 
     def _checkParams(self):
@@ -202,25 +187,6 @@ class UserGetEmail(LoggedOnlyService):
             return self._target.getEmail()
         else:
             raise ServiceError("ERR-U4","User is not logged in")
-
-
-class UserSetPersonalInfo(LoggedOnlyService):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-
-        self._target = self.getAW().getUser()
-        self._info = self._params.get("value", None)
-
-    def _getAnswer( self):
-        if self._info == None:
-            return UserGetPersonalInfo(self._params, self._aw.getIP(), self._aw.getSession()).process()
-
-        pInfo = self._target.getPersonalInfo()
-
-        DictPickler.update(pInfo, self._info)
-        return pInfo.fossilize(IPersonalInfoFossil)
-
 
 class UserGetTimezone(ServiceBase):
 
@@ -273,7 +239,7 @@ class UserShowPastEvents(LoggedOnlyService):
         self._target = self.getAW().getUser()
 
     def _getAnswer( self):
-        self._target.setShowPastEvents(True)
+        self._target.getPersonalInfo().setShowPastEvents(True)
         return True
 
 
@@ -284,7 +250,7 @@ class UserHidePastEvents(LoggedOnlyService):
         self._target = self.getAW().getUser()
 
     def _getAnswer( self):
-        self._target.setShowPastEvents(False)
+        self._target.getPersonalInfo().setShowPastEvents(False)
         return True
 
 
@@ -366,8 +332,6 @@ methodMap = {
     "favorites.removeUser": UserRemoveFromBasket,
     "favorites.listUsers": UserListBasket,
     "data.email.get": UserGetEmail,
-    "personalinfo.get": UserGetPersonalInfo,
-    "personalinfo.set": UserSetPersonalInfo,
     "timezone.get": UserGetTimezone,
     "session.timezone.get": UserGetSessionTimezone,
     "session.language.get": UserGetSessionLanguage,
