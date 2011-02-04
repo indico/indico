@@ -280,7 +280,7 @@ class RHAbstractManagmentAccept(RHAbstractModifBase):
         self._session=self._conf.getSessionById(params.get("session", ""))
         self._comments = params.get("comments", "")
         self._typeId = params.get("type", "")
-        self._notify=params.has_key("notify")
+        self._doNotify=params.has_key("notify")
 
     def _process( self ):
         if self._accept:
@@ -288,12 +288,12 @@ class RHAbstractManagmentAccept(RHAbstractModifBase):
             st=review.AbstractStatusAccepted(self._target,None,self._track,cType)
             wrapper=_AbstractWrapper(st)
             tpl=self._target.getOwner().getNotifTplForAbstract(wrapper)
-            if self._notify and not self._warningShown and tpl is None:
+            if self._doNotify and not self._warningShown and tpl is None:
                 p=abstracts.WPModAcceptConfirmation(self,self._target)
                 return p.display(track=self._trackId,comments=self._comments,type=self._typeId,session=self._sessionId)
             else:
                 self._target.accept(self._getUser(),self._track,cType,self._comments,self._session)
-                if self._notify:
+                if self._doNotify:
                     n=EmailNotificator()
                     self._target.notify(n,self._getUser())
                 self._redirect(urlHandlers.UHAbstractManagment.getURL(self._abstract))
@@ -308,7 +308,7 @@ class RHAbstractManagmentReject(RHAbstractModifBase):
         RHAbstractModifBase._checkParams( self, params )
         self._reject = params.get("reject", None)
         self._comments = params.get("comments", "")
-        self._notify=params.has_key("notify")
+        self._doNotify=params.has_key("notify")
         self._warningShown=params.has_key("confirm")
 
     def _process( self ):
@@ -316,12 +316,12 @@ class RHAbstractManagmentReject(RHAbstractModifBase):
             st=review.AbstractStatusRejected(self._target,None,None)
             wrapper=_AbstractWrapper(st)
             tpl=self._target.getOwner().getNotifTplForAbstract(wrapper)
-            if self._notify and not self._warningShown and tpl is None:
+            if self._doNotify and not self._warningShown and tpl is None:
                 p=abstracts.WPModRejectConfirmation(self,self._target)
                 return p.display(comments=self._comments)
             else:
                 self._target.reject(self._getUser(), self._comments)
-                if self._notify:
+                if self._doNotify:
                     n=EmailNotificator()
                     self._target.notify(n,self._getUser())
             self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
@@ -388,13 +388,13 @@ class RHMergeInto(RHAbstractModifBase):
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams( self, params )
         self._action,self._comments,self._targetAbs="","",None
-        self._targetAbsId,self._includeAuthors,self._notify="",False,True
+        self._targetAbsId,self._includeAuthors,self._doNotify="",False,True
         if params.has_key("OK"):
             self._action="MERGE"
             self._comments=params.get("comments","")
             self._targetAbsId=params.get("id","")
             self._includeAuthors=params.has_key("includeAuthors")
-            self._notify=params.has_key("notify")
+            self._doNotify=params.has_key("notify")
             self._targetAbs=self._target.getOwner().getAbstractById(self._targetAbsId)
 
     def _getErrorsInData(self):
@@ -409,14 +409,14 @@ class RHMergeInto(RHAbstractModifBase):
             errorList=self._getErrorsInData()
             if len(errorList)==0:
                 self._target.mergeInto(self._getUser(),self._targetAbs,comments=self._comments,mergeAuthors=self._includeAuthors)
-                if self._notify:
+                if self._doNotify:
                     self._target.notify(EmailNotificator(),self._getUser())
                 self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
                 return
             else:
                 errMsg="<br>".join(errorList)
         p=abstracts.WPModMergeInto(self,self._target)
-        return p.display(comments=self._comments,targetId=self._targetAbsId,errorMsg=errMsg,includeAuthors=self._includeAuthors,notify=self._notify)
+        return p.display(comments=self._comments,targetId=self._targetAbsId,errorMsg=errMsg,includeAuthors=self._includeAuthors,notify=self._doNotify)
 
 
 class RHUnMerge(RHAbstractModifBase):

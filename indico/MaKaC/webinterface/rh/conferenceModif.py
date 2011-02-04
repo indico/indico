@@ -4237,7 +4237,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
         self._abstractIds=normaliseListParam(params.get("abstracts",[]))
         self._targetAbsId=params.get("targetAbstract","")
         self._inclAuthors=params.has_key("includeAuthors")
-        self._notify=params.has_key("notify")
+        self._doNotify=params.has_key("notify")
         self._comments=params.get("comments","")
         self._action=""
         if params.has_key("CANCEL"):
@@ -4246,7 +4246,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
             self._action="MERGE"
             self._abstractIds=params.get("selAbstracts","").split(",")
         else:
-            self._notify=True
+            self._doNotify=True
 
     def _process(self):
         errorList=[]
@@ -4294,7 +4294,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
                 for abs in self._abstracts:
                     abs.mergeInto(self._getUser(),self._targetAbs,\
                         mergeAuthors=self._inclAuthors,comments=self._comments)
-                    if self._notify:
+                    if self._doNotify:
                         abs.notify(EmailNotificator(),self._getUser())
                 return self._redirect(urlHandlers.UHAbstractManagment.getURL(self._targetAbs))
         p=conferences.WPModMergeAbstracts(self,self._target)
@@ -4303,7 +4303,7 @@ class RHAbstractsMerge(RHConfModifCFABase):
                             inclAuth=self._inclAuthors,\
                             comments=self._comments,\
                             errorMsgList=errorList,\
-                            notify=self._notify)
+                            notify=self._doNotify)
 
 #Base class for multi abstract management
 class RHAbstractManagmentMultiple( RHConferenceModifBase ):
@@ -4321,7 +4321,7 @@ class RHAbstractManagmentMultiple( RHConferenceModifBase ):
             self._abstracts.append(abMgr.getAbstractById(abstractIds))
         self._warningShown=params.has_key("confirm")
         self._comments = params.get("comments", "")
-        self._notify=params.has_key("notify")
+        self._doNotify=params.has_key("notify")
 
     #checks if notification email template is defined for all selected abstracts
     #returns List of abstracts which doesn't have required template
@@ -4373,14 +4373,14 @@ class RHAbstractManagmentAcceptMultiple( RHAbstractManagmentMultiple ):
             if improperAbstracts == []:
                 if self._accept:
                     improperTemplates = self._checkNotificationTemplate(review.AbstractStatusAccepted)
-                    if self._notify and not self._warningShown and  improperTemplates != []:
+                    if self._doNotify and not self._warningShown and  improperTemplates != []:
                         raise FormValuesError("""The abstracts with the following IDs can not be automatically
                                                  notified: %s. Therefore, none of your request has been processed;
                                                  go back, uncheck the relevant abstracts and try again."""%(", ".join(map(lambda x:x.getId(),improperTemplates))))
                     cType=self._conf.getContribTypeById(self._typeId)
                     for abstract in self._abstracts:
                         abstract.accept(self._getUser(),self._track,cType,self._comments,self._session)
-                        if self._notify:
+                        if self._doNotify:
                             n=EmailNotificator()
                             abstract.notify(n,self._getUser())
                     self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
@@ -4401,7 +4401,7 @@ class RHAbstractManagmentRejectMultiple( RHAbstractManagmentMultiple ):
         RHAbstractManagmentMultiple._checkParams(self, params)
         self._reject = params.get("reject", None)
         self._comments = params.get("comments", "")
-        self._notify=params.has_key("notify")
+        self._doNotify=params.has_key("notify")
         self._warningShown=params.has_key("confirm")
 
     def _process( self ):
@@ -4410,13 +4410,13 @@ class RHAbstractManagmentRejectMultiple( RHAbstractManagmentMultiple ):
             if improperAbstracts == []:
                 if self._reject:
                     improperTemplates = self._checkNotificationTemplate(review.AbstractStatusRejected)
-                    if self._notify and not self._warningShown and  improperTemplates != []:
+                    if self._doNotify and not self._warningShown and  improperTemplates != []:
                         raise FormValuesError("""The abstracts with the following IDs can not be automatically
                                                  notified: %s. Therefore, none of your request has been processed;
                                                  go back, uncheck the relevant abstracts and try again."""%(", ".join(map(lambda x:x.getId(),improperTemplates))))
                     for abstract in self._abstracts:
                         abstract.reject(self._getUser(), self._comments)
-                        if self._notify:
+                        if self._doNotify:
                             n=EmailNotificator()
                             abstract.notify(n,self._getUser())
                     self._redirect(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
