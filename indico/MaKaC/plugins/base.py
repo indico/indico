@@ -167,6 +167,7 @@ class PluginBase(Persistent):
 
         return {"description": description,
                 "type": optionType,
+                "subType": attributes.get("subType", None),
                 "defaultValue": attributes.get("defaultValue", None),
                 "editable": attributes.get("editable", True),
                 "visible": attributes.get("visible", True),
@@ -238,7 +239,7 @@ class PluginBase(Persistent):
         """
         self.__options[name] = PluginOption(name, attributes["description"], attributes["type"],
                                             attributes["defaultValue"], attributes["editable"], attributes["visible"],
-                                            attributes["mustReload"], True, order)
+                                            attributes["mustReload"], True, order, attributes["subType"])
         self._notifyModification()
 
     def updateOption(self, name, attributes, order):
@@ -251,6 +252,7 @@ class PluginBase(Persistent):
         option.setPresent(True)
         option.setDescription(attributes["description"])
         option.setType(attributes["type"])
+        option.setSubType(attributes["subType"])
         option.setEditable(attributes["editable"])
         option.setVisible(attributes["visible"])
         option.setMustReload(attributes["mustReload"])
@@ -696,10 +698,11 @@ class PluginOption(Persistent):
         'list_multiline': list
     }
 
-    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0):
+    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None):
         self.__name = name
         self.__description = description
         self.__type = valueType
+        self.__subType = subType
         self.__present = present
         self.__editable = editable
         self.__visible = visible
@@ -719,6 +722,9 @@ class PluginOption(Persistent):
 
     def getType(self):
         return self.__type
+
+    def getSubType(self):
+        return self.__subType
 
     def getValue(self):
         return self.__value
@@ -759,6 +765,9 @@ class PluginOption(Persistent):
 
     def setType(self, valueType):
         self.__type = valueType
+
+    def setSubType(self, subType):
+        self.__subType = subType
 
     def setValue(self, value):
         if isinstance(self.__type, type):

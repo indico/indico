@@ -24,7 +24,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
 
 class PluginOptionsBase (AdminService):
-    
+
     def _checkParams(self):
         optionName = self._params.get('optionName', None)
         if optionName:
@@ -48,15 +48,15 @@ class PluginOptionsBase (AdminService):
             else:
                 raise ServiceError('ERR-PLUG1', 'optionName argument does not have the proper pluginType.plugin.option format')
         else:
-            raise ServiceError('ERR-PLUG0', 'optionName argument not present') 
-            
+            raise ServiceError('ERR-PLUG0', 'optionName argument not present')
+
 
 class PluginOptionsAddUsers ( PluginOptionsBase, UserListModificationBase):
-    
+
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)
         UserListModificationBase._checkParams(self)
-        
+
     def _getAnswer(self):
         if self._targetOption.getType() == 'users' or self._targetOption.getType() == 'usersGroups':
             optionValue = self._targetOption.getValue()
@@ -67,7 +67,7 @@ class PluginOptionsAddUsers ( PluginOptionsBase, UserListModificationBase):
             self._targetOption._notifyModification()
         else:
             raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'users'" % (self._pluginType, self._plugin, self._targetOption))
-        
+
         return True
 
 class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
@@ -75,21 +75,21 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)
         UserModificationBase._checkParams(self)
-        
+
     def _getAnswer(self):
         if self._targetOption.getType() == 'users' or self._targetOption.getType() == 'usersGroups':
             self._targetOption.getValue().remove(self._targetUser)
             self._targetOption._notifyModification()
         else:
             raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'users'" % (self._pluginType, self._plugin, self._targetOption))
-        
+
         return True
 
 class PluginOptionsAddRooms ( PluginOptionsBase ):
-    
+
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)
-        
+
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
             optionValue = self._targetOption.getValue()
@@ -99,14 +99,14 @@ class PluginOptionsAddRooms ( PluginOptionsBase ):
             self._targetOption._notifyModification()
         else:
             raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'rooms'" % (self._pluginType, self._plugin, self._targetOption))
-        
+
         return True
 
 class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)
-        
+
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
             roomToRemove=self._params.get("room")
