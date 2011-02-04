@@ -114,12 +114,46 @@ class PluginOptionsRemoveRooms ( PluginOptionsBase ):
             self._targetOption._notifyModification()
         else:
             raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'rooms'" % (self._pluginType, self._plugin, self._targetOption))
-        
+
         return True
+
+class PluginOptionsAddLink ( PluginOptionsBase ):
+
+    def _checkParams(self):
+        PluginOptionsBase._checkParams(self)
+        self._linkName = self._params.get('name', None)
+        self._linkStructure = self._params.get('structure', None)
+
+    def _getAnswer(self):
+        links = self._targetOption.getValue()
+        for link in links:
+            if link['name'] == self._linkName:
+                return False
+        links.append({'name': self._linkName, 'structure': self._linkStructure})
+        self._targetOption.setValue(self._targetOption.getValue())
+        self._targetOption._notifyModification()
+        return True
+
+class PluginOptionsRemoveLink ( PluginOptionsBase ):
+
+    def _checkParams(self):
+        PluginOptionsBase._checkParams(self)
+        self._linkName = self._params.get('name', None)
+
+    def _getAnswer(self):
+        links = self._targetOption.getValue()
+        for link in links:
+            if link['name'] == self._linkName:
+                links.remove(link)
+        self._targetOption._notifyModification()
+        return True
+
 
 methodMap = {
     "addUsers": PluginOptionsAddUsers,
     "removeUser": PluginOptionsRemoveUser,
     "addRooms": PluginOptionsAddRooms,
-    "removeRooms": PluginOptionsRemoveRooms
+    "removeRooms": PluginOptionsRemoveRooms,
+    "addLink": PluginOptionsAddLink,
+    "removeLink": PluginOptionsRemoveLink
 }

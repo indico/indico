@@ -1439,3 +1439,88 @@ type("SessionRenameWidget", ["InlineWidget"],
             this.__parameterManager = parameterManager;
             this.info = info;
     });
+
+type('AutocheckTextBox', ['RealtimeTextBox'],
+        /*
+         * A usual text box that, when the startWatching method is called,
+         * will inform the user in case that what he writes is the same string
+         * the text box had when startWatching was called.
+         */
+        {
+            /*
+             * Called each time a new character is typed
+             * strips white spaces, and calls for a request if needed
+             */
+            _textTyped: function(key) {
+
+                var self = this;
+                var text = trim(this.get());
+                if(text.length > 1) {
+                    if(text != self.originalText){
+                        if (exists(self.functionToHide)){
+                            self.functionToHide(self.component);
+                        }
+                        else{
+                            self.component.dom.style.display = "none";
+                        }
+                    }
+                    else{
+                        if (exists(self.functionToShow)){
+                            self.functionToShow(self.component);
+                        }
+                        else{
+                            self.component.dom.style.display = '';
+                        }
+                    }
+
+                }
+            },
+
+            setOriginalText: function(text){
+                this.originalText = text;
+            },
+
+            startWatching: function(isRepeated, originalText){
+                var self = this;
+
+                //we set the text with which we will compare before doing the observe
+                self.setOriginalText(originalText == null?self.get():originalText);
+                if (isRepeated){
+                    if (exists(self.functionToShow)){
+                        self.functionToShow(self.component);
+                    }
+                    else{
+                        self.component.dom.style.display = '';
+                    }
+                }
+                else{
+                    if (exists(self.functionToHide)){
+                        self.functionToHide(self.component);
+                    }
+                    else{
+                        self.component.dom.style.display = "none";
+                    }
+                }
+
+                self.observe(function(key, event) {
+                    self._textTyped(key);
+                    return true;
+                });
+            }
+        },
+
+            function(args, component, functionToShow, functionToHide){
+                /* component: The component (usually a simple label) that you want to
+                   inform the user that the original text field is repeated
+                   functionToShow: In case that your component requires some other operations to accomplish what you
+                   want rather than just setting the display to none, you'll need to specify what do you want to do.
+                   functionToHide: the same thing when hiding the component.
+                */
+                args.autocomplete = 'off';
+                this.RealtimeTextBox(args);
+                this.setOriginalText(this.get());
+                this.component = component;
+                this.functionToShow = functionToShow;
+                this.functionToHide = functionToHide;
+             }
+    );

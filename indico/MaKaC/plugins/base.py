@@ -695,7 +695,8 @@ class PluginOption(Persistent):
         'users': list,
         'usersGroups': list,
         'rooms': list,
-        'list_multiline': list
+        'list_multiline': list,
+        'links': list
     }
 
     def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None):

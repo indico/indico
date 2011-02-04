@@ -65,5 +65,12 @@ globalOptions = [
                       "type": "rooms",
                       "defaultValue": [],
                       "editable": True,
+                      "visible": True} ),
+
+    ("webcastAudiences", {"description": "Available webcast audiences",
+                      "type": "links",
+                      "subType": "webcastAudiences",
+                      "defaultValue": [],
+                      "editable": True,
                       "visible": True} )
 ]

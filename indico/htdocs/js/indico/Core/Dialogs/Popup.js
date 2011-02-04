@@ -501,6 +501,48 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
 );
 
 /**
+ * Works exactly the same as the ConfirmPopup, but includes a parametermanager to perform checks when pressing OK
+ */
+type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
+        {
+             draw: function() {
+                 var self = this;
+
+                 var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('OK'));
+                 okButton.observeClick(function(){
+                     checkOK = self.parameterManager.check();
+                     if(checkOK){
+                         self.handler(true);
+                     }
+                 });
+
+                 var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
+                 cancelButton.observeClick(function(){
+                     self.close();
+                     self.handler(false);
+                 });
+
+                 return this.ExclusivePopupWithButtons.prototype.draw.call(this,
+                         this.content,
+                         Html.div({}, okButton, cancelButton));
+             }
+        },
+
+        function(title, content, handler) {
+            var self = this;
+
+            this.content = content;
+            this.handler = handler;
+            this.parameterManager = new IndicoUtil.parameterManager();
+            this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+                self.handler(false);
+                return true;
+            });
+        }
+    );
+
+
+/**
  * Utility function to display a three buttons popup.
  * The difference with ConfirmButton is the existence of a third button.
  * Apart from the title and close button, the three buttons display Save, Don't Save and Cancel
