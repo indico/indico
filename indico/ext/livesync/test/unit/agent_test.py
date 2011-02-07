@@ -54,12 +54,16 @@ class TestAgent(PushSyncAgent):
 
     def _run(self, data, logger=None, monitor=None):
 
+        ts = None
+
         # send records one by one
-        for ts, w in data:
-            self._service.inform(
-                NotificationStub(w.getObject().id,
-                                 w.getObject().name,
-                                 w.getActions()))
+        for ts, actions in data:
+            for w in actions:
+                notf = NotificationStub(w.getObject().id,
+                                        w.getObject().name,
+                                        w.getActions())
+                self._service.inform(notf)
+
         return ts
 
 
@@ -101,7 +105,7 @@ class _TestAgentBehavior(unittest.TestCase):
         self._srvc1 = RemoteServiceStub()
         self._srvc2 = RemoteServiceStub()
 
-        self._mgr = SyncManager()
+        self._mgr = SyncManager(granularity=1)
 
         # let's create some books
         self._objs = [
@@ -132,7 +136,6 @@ class TestPushAgentBehavior(_TestAgentBehavior):
         self._agt1.setActive(True)
         self._agt2.setActive(True)
 
-
     def testSimpleRecordCreation(self):
         currentTS = 0
         a1 = ActionWrapper(currentTS, self._objs[1], ['add'])
@@ -141,6 +144,7 @@ class TestPushAgentBehavior(_TestAgentBehavior):
         self._mgr.add(currentTS, [a1, a2])
 
         currentTS += 1
+
         # check current available/borrowed books
         self._agt1.run(currentTS, logger=self._logger)
         self._agt1.acknowledge()

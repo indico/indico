@@ -85,3 +85,10 @@ tr.downarrows td {
     border: 0px;
     color: #555;
 }
+
+ul.infobox {
+    padding: 5px;
+    width: 250px;
+    border: 1px solid #747E80;
+    list-style-type: none;
+}

@@ -123,37 +123,35 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
     """
 
     def getRecursiveAllowedToAccessList(self):
-        """Returns a set of Avatar resp. CERNGroup objects for those people resp. e-groups allowed to access
-        this category as well as all parent objects.
+        """Returns a set of Avatar resp. CERNGroup objects for those people resp.
+        e-groups allowed to access this object as well as all parent objects.
         """
 
-        # Initialize set of avatars/groups: this will hold those people/groups explicitly
+        # Initialize set of avatars/groups: this will hold those
+        # people/groups explicitly
         # allowed to access this object
         av_set = set()
 
         # Get the AccessProtectionLevel for this
         apl = self.getAccessProtectionLevel()
 
-        # If this category is "absolutely public", then return an empty set
+        # If this object is "absolutely public", then return an empty set
         if apl == -1:
             pass
 
-        # If this category is protected "all by itself", then get the list of
+        # If this object is protected "all by itself", then get the list of
         # people/groups allowed to access it, and ignore all owners' permissions.
         elif apl == 1:
-            al = self.getAllowedToAccessList()
+            al = self.getAllowedToAccessList() + self.getManagerList()
             if al is not None:
                 for av in al:
                     av_set.add(av)
 
         # If access settings are inherited from its owners, look at those.
         elif apl == 0:
-            # If event is protected, then get list of people/groups allowed to access,
-            # and add that to the set of avatars.
-            # NOTE: I'm not sure this ever happens, i.e. an event having protection
-            # level 0 and also having its own access list, but it doesn't hurt anything
-            # to leave this in for now.
-            al = self.getAllowedToAccessList()
+            # If event is protected, then get list of people/groups allowed
+            # to access, and add that to the set of avatars.
+            al = self.getAllowedToAccessList() + self.getManagerList()
             if al is not None:
                 for av in al:
                     av_set.add(av)
@@ -512,6 +510,7 @@ class Category(CommonObjectBase):
         except:
             self.materials={}
             return self.materials.values()
+
     def getAllMaterialList( self ):
         l = self.getMaterialList()
         if self.getPaper():
@@ -6418,7 +6417,6 @@ class Session(CommonObjectBase):
         self.__ac.revokeAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
-        self.resetAccessCache()
 
     def canView( self, aw ):
         """tells whether the specified user has access to the current object

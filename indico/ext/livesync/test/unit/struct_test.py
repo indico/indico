@@ -130,9 +130,9 @@ class TestMultiPointerTrack(unittest.TestCase):
         self.assertEqual(self._mpt.getPointerTimestamp('p2'), 3 )
 
 
-    def testMovePointerErrors(self):
+    def testMovePointerError(self):
         """
-        exceptions thrown by movePointer()
+        exception thrown by movePointer()
         """
 
         # pointer doesn't exist
@@ -141,9 +141,6 @@ class TestMultiPointerTrack(unittest.TestCase):
         self._addSome()
 
         self._mpt.addPointer(self._a, 1 )
-
-        # lower bound
-        self.assertRaises(ValueError, self._mpt.movePointer, self._a, 0)
 
         # higher bound
         self.assertRaises(ValueError, self._mpt.movePointer, self._a, 4 )

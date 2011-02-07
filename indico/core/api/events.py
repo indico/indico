@@ -20,10 +20,32 @@
 
 from indico.core.api import IListener
 
+
 class IAccessControlListener(IListener):
 
     def protectionChanged(self, obj, oldProtection, newProtection):
         pass
+
+    def accessGranted(self, obj, who):
+        """
+        Access was granted to a particular user/group/email
+        """
+
+    def accessRevoked(self, obj, who):
+        """
+        Access was revoked for a particular user/group/email
+        """
+
+    def modificationGranted(self, obj, who):
+        """
+        Modification was revoked for a particular user/group/email
+        """
+
+
+    def modificationRevoked(self, obj, who):
+        """
+        Modification was revoked for a particular user/group/email
+        """
 
     def accessDomainAdded(self, obj, domain):
         pass
@@ -72,5 +94,4 @@ class IMetadataChangeListener(IListener):
 
     def infoChanged(self, obj):
         pass
-
 

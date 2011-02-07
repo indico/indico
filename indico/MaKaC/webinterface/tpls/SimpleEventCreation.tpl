@@ -143,7 +143,7 @@
         $E("createCategId").set(categ.id);
         $E("categTitle").set(categ.title);
         $E("buttonCategChooser").set("<%= _("Change...")%>")
-        IndicoUI.Effect.highLightBackground("categTitle");
+        IndicoUI.Effect.highLightBackground($E("categTitle"));
 
         updateProtectionChooser(categ.title, protection);
     };

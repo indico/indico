@@ -21,24 +21,40 @@
 from BTrees.OOBTree import OOSet
 
 from indico.ext.livesync.invenio.agent import InvenioRecordProcessor
+from indico.ext.livesync.invenio.agent import STATUS_DELETED, STATUS_CREATED, \
+     STATUS_CHANGED
 from indico.ext.livesync import ActionWrapper
 
 from indico.tests.python.unit.util import IndicoTestCase
 
+class DummyWrapper(object):
+    def __init__(self, name):
+        self._name = name
+
+    def canAccess(self, whatever):
+        return True
+
+    def __str__(self):
+        return "Dummy %s" % self._name
+
+
 class TestInvenioRecordProcessor(IndicoTestCase):
 
     def testEventWorkflow(self):
+        evt1 = DummyWrapper('evt1')
+        evt2 = DummyWrapper('evt2')
+
         self.assertEqual(
-            list(InvenioRecordProcessor.computeRecords(OOSet([
-                ActionWrapper(1, 'evt1', set(['data_changed created'])),
-                ActionWrapper(1, 'evt2', set(['data_changed created'])),
-                ActionWrapper(2, 'evt1', set(['deleted'])),
-                ActionWrapper(2, 'evt2', set(['data_changed']))
-                ]))),
-            [('evt2', 'create')])
+            set(list(InvenioRecordProcessor.computeRecords([
+                (1, ActionWrapper(1, evt1,
+                                  ['data_changed', 'created'])),
+                (2, ActionWrapper(1, evt2,
+                                  ['data_changed', 'created'])),
+                (3, ActionWrapper(2, evt1,
+                                  ['deleted'])),
+                (4, ActionWrapper(2, evt2,
+                                 ['data_changed']))], None))),
+            set([(evt1, STATUS_CREATED | STATUS_CHANGED | STATUS_DELETED),
+             (evt2, STATUS_CREATED | STATUS_CHANGED)]))
 
 
-class TestMetadataGeneration(IndicoTestCase):
-
-    def testConferenceMetadataGeneration():
-        pass

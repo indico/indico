@@ -82,7 +82,7 @@ class MaterialDisplayBase(ProtectedDisplayService, MaterialBase):
         MaterialBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
 
-class MaterialModifBase(MaterialBase, ProtectedModificationService):
+class MaterialModifBase(ProtectedModificationService, MaterialBase):
 
     def _checkParams(self):
         MaterialBase._checkParams(self)

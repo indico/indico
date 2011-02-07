@@ -34,6 +34,37 @@ def yesno(message):
         return False
 
 
+def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
+    """
+    Goes over all conferences, printing a status message (ideal for scripts)
+    """
+
+    def _eventIterator(conference, tabs):
+        for contrib in conference.getContributionList():
+            yield contrib
+
+            if deepness == 'subcontrib':
+                for scontrib in contrib.getSubContributionList():
+                    yield scontrib
+
+    idx = ch._getIdx()
+
+    total = len(idx.keys())
+
+    i = 1
+    for id, conf in idx.iteritems():
+        if verbose:
+            text = "[%d/%d %f%%] %s %s" % \
+                   (i, total, (float(i) / total * 100.0), id, conf.getTitle())
+            print text[:80].ljust(80), '\r',
+        i += 1
+
+        yield conf
+        if deepness == 'contrib':
+            for contrib in _eventIterator(conf, 0):
+                yield contrib
+
+
 # Coloring
 
 # pylint: disable-msg=W0611

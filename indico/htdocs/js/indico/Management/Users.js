@@ -1425,7 +1425,7 @@ type("UserListWidget", ["ListWidget"],
 type("UserListField", ["IWidget"], {
 
     _highlightNewUser: function(userId) {
-        IndicoUI.Effect.highLightBackground(this.userList.getId() + '_' + userId);
+        IndicoUI.Effect.highLightBackground($E(this.userList.getId() + '_' + userId));
     },
 
     getUsers: function() {

@@ -99,13 +99,6 @@ class DestroyCommand(ConsoleLiveSyncCommand):
         self._dbi.commit()
 
 
-def eventIterator(conference, tabs):
-    for contrib in conference.getContributionList():
-        yield contrib
-        for scontrib in contrib.getSubContributionList():
-            yield scontrib
-
-
 def categoryIterator(category, tabs, verbose=True):
 
     clist = category.getSubCategoryList()
@@ -121,25 +114,6 @@ def categoryIterator(category, tabs, verbose=True):
     for conf in category.getConferenceList():
         yield conf
         for contrib in eventIterator(conf, tabs):
-            yield contrib
-
-
-def conferenceHolderIterator(verbose=True):
-    ch = ConferenceHolder()
-    idx = ch._getIdx()
-
-    total = len(idx.keys())
-
-    i = 1
-    for id, conf in idx.iteritems():
-        if verbose:
-            text = "[%d/%d %f%%] %s %s" % (i, total, (float(i) / total * 100.0),
-                                            id, conf.getTitle())
-            print text[:80].ljust(80),'\r',
-        i += 1
-
-        yield conf
-        for contrib in eventIterator(conf, 0):
             yield contrib
 
 
@@ -199,7 +173,8 @@ class AgentCommand(ConsoleLiveSyncCommand):
                 monitor = None
 
             if args.fast:
-                iterator = conferenceHolderIterator(verbose=args.verbose)
+                iterator = console.conferenceHolderIterator(ConferenceHolder(),
+                                                            verbose=args.verbose)
             else:
                 iterator = categoryIterator(root, 0, verbose=args.verbose)
 

@@ -46,26 +46,50 @@ def runTaskMigration(dbi):
     dbi.commit()
 
 
+def _fixAC(obj):
+    ac = obj.getAccessController()
+    ac.setOwner(obj)
+
+
+def _fixAccessController(obj):
+    _fixAC(obj)
+
+    for mat in obj.getAllMaterialList():
+        for res in mat.getResourceList():
+            _fixAC(res)
+        _fixAC(mat)
+
+
 def runConferenceMigration(dbi):
     """
-    Adding missing attributes to conference objects
+    Adding missing attributes to conference objects and children
     """
 
     ch = ConferenceHolder()
+    i = 0
 
-    for conf in ch.getList():
-        if hasattr(conf, '__alarmCounter'):
+    for (obj, level) in console.conferenceHolderIterator(ch, deepness='contrib'):
+
+        # only for conferences
+        if level == 'conf':
+            if hasattr(conf, '__alarmCounter'):
             raise Exception("Conference Object %s (%s) seems to have been already "
                             "converted" % (conf, conf.id))
 
-        existingKeys = conf.alarmList.keys()
-        existingKeys.sort()
-        nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
-        conf._Conference__alarmCounter = Counter(nstart)
+            existingKeys = conf.alarmList.keys()
+            existingKeys.sort()
+            nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
+            conf._Conference__alarmCounter = Counter(nstart)
 
-        # TODO: For each conference, take the existing tasks and convert them to
-        # the new object classes.
-        # It is important to save the state of the alarm (sent or not)
+            # TODO: For each conference, take the existing tasks and convert them to
+            # the new object classes.
+            # It is important to save the state of the alarm (sent or not)
+
+        _fixAccessController(obj)
+
+        if i % 1000 == 999:
+            dbi.commit()
+        i += 1
 
     dbi.commit()
 

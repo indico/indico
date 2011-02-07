@@ -32,6 +32,7 @@ from indico.ext.livesync import SyncManager
 from MaKaC.services.implementation.base import AdminService, ParameterManager, \
      ServiceError
 from MaKaC.plugins.base import Observable
+from MaKaC.accessControl import AdminList
 
 
 # JSON Services
@@ -74,8 +75,10 @@ class AddAgent(AgentModificationService):
             raise ServiceError('', 'Agent type %s is unknown' % self._type)
 
         typeClass = avtypes[self._type]
+        access = AdminList().getInstance().getList()[0]
+
         sm.registerNewAgent(typeClass(self._id, self._name, self._description,
-                                      60, **self._specificParams))
+                                      60, access, **self._specificParams))
 
 
 class AgentOperationBase(AdminService):

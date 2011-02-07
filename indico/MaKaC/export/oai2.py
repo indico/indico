@@ -69,6 +69,13 @@ class DataInt:
         #self.supportemail            = self._info.getSupportEmail()
         self.repositoryIdentifier    = self._config.getRepositoryIdentifier()
 
+    def setPermissionsOf(self, avatar):
+        """
+        Defines that this interface will have access to contents that
+        can be consulted by a specific users
+        """
+        self.OAIuser.setUser(avatar)
+
     def targetIsVisible(self, target):
         return not target.hasAnyProtection()
 
@@ -104,7 +111,7 @@ class DataInt:
         else:
             return None, None
 
-    def objToId(self, obj, separator=[':',':']):
+    def objToId(self, obj, separator=['.','.']):
 
         if type(separator) == str:
             separator = [separator]*2
@@ -115,6 +122,10 @@ class DataInt:
             oid = "%s%s%s"%(obj.getConference().getId(),separator[0],obj.getId())
         elif isinstance(obj, conference.SubContribution):
             oid = "%s%s%s%s%s"%(obj.getConference().getId(), separator[0], obj.getContribution().getId(), separator[1], obj.getId())
+        elif isinstance(obj, conference.Material):
+            oid = "%sm%s" % (self.objToId(obj.getOwner(), separator), obj.getId())
+        elif isinstance(obj, conference.Resource):
+            oid = "%s.%s" % (self.objToId(obj.getOwner(), separator), obj.getId())
         else:
             oid = obj.getId()
         return oid

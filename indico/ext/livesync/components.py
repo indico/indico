@@ -42,6 +42,7 @@ from indico.ext.livesync.agent import SyncManager
 # legacy indico imports
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.logger import Logger
+from MaKaC import conference
 
 
 class RequestListener(Component):
@@ -165,8 +166,35 @@ class ObjectChangeListener(Component):
     def protectionChanged(self, obj, oldProtection, newProtection):
         self._protectionChanged(obj, oldProtection, newProtection)
 
+    def _aclChanged(self, obj, child=False):
+        """
+        Emit right events, depending on whether a new record should be produced
+        for the object or for a parent of it
+        """
+        if type(obj) in [conference.Conference, conference.Contribution,
+                         conference.SubContribution, conference.Category]:
+            # if it was a child, emit data_changed instead
+            if child:
+                self._objectInfoChanged(obj, 'data')
+            else:
+                self._objectInfoChanged(obj, 'acl')
+        else:
+            self._aclChanged(obj.getOwner(), child=True)
+
+    def accessGranted(self, obj, who):
+        self._aclChanged(obj)
+
+    def accessRevoked(self, obj, who):
+        self._aclChanged(obj)
+
+    def modificationGranted(self, obj, who):
+        self._aclChanged(obj)
+
+    def modificationRevoked(self, obj, who):
+        self._aclChanged(obj)
+
     def accessDomainAdded(self, obj, domain):
-        self._objectInfoChanged(category, 'acl')
+        self._objectInfoChanged(obj, 'acl')
 
     def accessDomainRemoved(self, obj, domain):
-        self._objectInfoChanged(category, 'acl')
+        self._objectInfoChanged(obj, 'acl')

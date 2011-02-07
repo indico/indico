@@ -23,7 +23,14 @@
         <% end %>
         <tr>
         <td class="timestamp"><%= ts %><div class="small"><%= dt %></div></td>
-        <td class="content<% if not harvested: %> notharvested<% end %><% if len(agents) > 0: %> hasagents<% end %>"><%= nelems %>&nbsp;<%= _("changeset(s)") %></td>
+        <td class="content<% if not harvested: %> notharvested<% end %><% if len(agents) > 0: %> hasagents<% end %>">
+            <% if nelems == 0: %>
+               (nothing)
+            <% end %>
+            <% else: %>
+               <%= nelems %>&nbsp;<%= _("changeset(s)") %>
+            <% end %>
+        </td>
         <td class="agents">
           <% if len(agents) > 0: %>
           ⇦
@@ -48,7 +55,15 @@
 <li>
   <div style="background-color: #EEE;" class="colorSquare"></div>
   <div style="float:left"><%= _("not yet harvested") %></div></li>
-<div style="clear: both"></div>
 </ul>
 </div>
+
+<div style="clear: both"></div>
+
+<ul class="infobox">
+  <li><label>Current slot:</label> <%= currentTS / granularity %> (<%= currentTS %>)</li>
+  <li><label>Time to next slot:</label> <%= (currentTS / granularity + 1) * granularity - currentTS %>s</li>
+</ul>
+
+
 <% end %>

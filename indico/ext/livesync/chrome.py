@@ -32,13 +32,13 @@ import zope.interface
 from indico.ext.livesync import SyncManager
 from indico.ext.livesync.struct import EmptyTrackException
 from indico.ext.livesync.handlers import AgentTypeInspector
-from indico.ext.livesync.base import MPT_GRANULARITY
 import indico.ext.livesync
 
 # indico api imports
 from indico.core.api import Component
 from indico.core.api.plugins import IPluginSettingsContributor
 from indico.web.rh import RHHtdocs
+from indico.util.date_time import nowutc, int_timestamp
 
 # legacy indico imports
 from MaKaC.webinterface.wcomponents import WTemplated
@@ -149,7 +149,6 @@ class WPLiveSyncAdmin(WPAdminPlugins):
 
 class WPluginAgentManagement(WTemplated):
 
-
     def getVars(self):
         tplVars = WTemplated.getVars(self)
 
@@ -172,14 +171,15 @@ class WPluginAgentStatus(WTemplated):
 
     NUM_CELLS = 10
 
-    def _tsToDate(self, ts):
-        return datetime.datetime.utcfromtimestamp(ts * MPT_GRANULARITY)
+    def _tsToDate(self, ts, granularity):
+        return datetime.datetime.utcfromtimestamp(ts * granularity)
 
     def _calculateTrackData(self, smanager):
         """
         Builds a semi-graphical representation of the current agent status
         """
         track = smanager.getTrack()
+        granularity = smanager.getGranularity()
 
         try:
             first, last = int(track.oldestTS()), int(track.mostRecentTS())
@@ -200,16 +200,27 @@ class WPluginAgentStatus(WTemplated):
             showTS = breakContinuity = False
             extra = sumElems = numBreakTS = 0
 
-            for ts, elems in track._container.iteritems():
+            agentsLeft = list(agentMap)
 
+            for ts, elems in track._container.iteritems():
                 ts = int(ts)
                 showTS = ts == first or ts in agentMap
 
                 if showTS or extra < self.NUM_CELLS:
                     if breakContinuity:
                         queue.append(('break', numBreakTS, sumElems, []))
-                    queue.append((ts, self._tsToDate(ts),
+
+                    queue.append((ts, self._tsToDate(ts, granularity),
                                   len(elems), agentMap.get(ts, [])))
+
+                    for agentTS in agentsLeft:
+                        if agentTS < ts:
+                            queue.append((agentTS, self._tsToDate(agentTS,
+                                                                  granularity),
+                                          0, agentMap[agentTS]))
+
+                            agentsLeft.remove(agentTS)
+
                     breakContinuity = False
                     sumElems = numBreakTS = 0
                     if not showTS:
@@ -235,4 +246,7 @@ class WPluginAgentStatus(WTemplated):
         tplVars['trackData'], tplVars['lastAgentTS'] = \
                               self._calculateTrackData(smanager)
         tplVars['agents'] = smanager.getAllAgents()
+        tplVars['currentTS'] = int_timestamp(nowutc())
+        tplVars['granularity'] = smanager.getGranularity()
+
         return tplVars

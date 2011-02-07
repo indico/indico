@@ -28,6 +28,7 @@ from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
 
 # legacy indico
 from MaKaC import conference
+from MaKaC.accessControl import AccessWrapper
 
 # legacy OAI/XML libs - this should be replaced soon
 from MaKaC.export.oai2 import DataInt
@@ -85,7 +86,7 @@ class InvenioRecordProcessor(object):
             cls._setStatus(chgSet, obj, STATUS_CHANGED)
 
     @classmethod
-    def computeRecords(cls, data):
+    def computeRecords(cls, data, access):
         """
         Receives a sequence of ActionWrappers and returns a sequence
         of records to be updated (created, changed or deleted)
@@ -96,14 +97,15 @@ class InvenioRecordProcessor(object):
         for __, aw in data:
             obj = aw.getObject()
 
-            if obj in records or isinstance(obj, conference.Category):
-                # seen before? category? jump over this one
+            if  isinstance(obj, conference.Category) or \
+                   not obj.canAccess(AccessWrapper(access)):
+                # category? no access? jump over this one
                 continue
-            else:
+
+            if obj not in records:
                 records[obj] = 0
 
             for action in aw.getActions():
-
                 if action == 'deleted':
                     # if the record has been deleted, mark it as such
                     # nothing else will matter
@@ -133,9 +135,10 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
     _creationState = STATUS_CREATED
     _extraOptions = {'url': 'Server URL'}
 
-    def __init__(self, aid, name, description, updateTime, url=None):
+    def __init__(self, aid, name, description, updateTime,
+                 access = None, url=None):
         super(InvenioBatchUploaderAgent, self).__init__(
-            aid, name, description, updateTime)
+            aid, name, description, updateTime, access)
         self._url = url
 
     def _getMetadata(self, records):
@@ -144,6 +147,8 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
         """
         xg = XMLGen()
         di = DataInt(xg)
+        # set the permissions
+        di.setPermissionsOf(self._access)
 
         xg.initXml()
 
@@ -158,7 +163,7 @@ class InvenioBatchUploaderAgent(PushSyncAgent):
         return xg.getXml()
 
     def _generateRecords(self, data, lastTS):
-        return InvenioRecordProcessor.computeRecords(data)
+        return InvenioRecordProcessor.computeRecords(data, self._access)
 
     def _run(self, records, logger=None, monitor=None):
 

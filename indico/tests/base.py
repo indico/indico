@@ -28,6 +28,7 @@ import os, sys
 
 # Python stdlib
 import StringIO
+import pkg_resources
 
 # Indico
 from indico.util.console import colored
@@ -228,6 +229,23 @@ class BaseTestRunner(IOMixin):
         sys.stdout = sys.__stdout__
 
         return self.out.getvalue()
+
+    @staticmethod
+    def findPlugins():
+        """
+        Goes throught the plugin directories, and adds
+        existing unit test dirs
+        """
+
+        dirs = []
+
+        for epoint in pkg_resources.iter_entry_points('indico.ext_types'):
+            dirs.append(os.path.dirname(epoint.load().__file__))
+
+        for epoint in pkg_resources.iter_entry_points('indico.ext'):
+            dirs.append(os.path.dirname(epoint.load().__file__))
+
+        return dirs
 
     @staticmethod
     def _redirectPipeToStdout(pipe):

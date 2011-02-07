@@ -855,7 +855,7 @@ type("EditMaterialDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
     }
 },
 
-     function(args, types, material, list, title) {
+     function(args, material, types, list, title) {
          this.material = material;
          this.materialId = this.material.get('id');
          this.types = types;
@@ -1144,7 +1144,7 @@ type("ResourceListWidget", ["ListWidget"], {
         };
 
         var storedDataInfo = function(info) {
-            var list = Html.ul();
+            var list = Html.ul("materialDescription");
 
             var labelAndValue = function(label, value) {
                 list.append(Html.li({},Html.span({},Html.strong({},label+": "),value)));
@@ -1157,17 +1157,7 @@ type("ResourceListWidget", ["ListWidget"], {
             var filetype = info.get('fileType');
 
             return Html.div(
-                "resourceContainer",
-                Html.div({style: {'float':'left'}},
-                                    Html.img({
-                                        alt: filetype,
-                                        style: {
-                                            width: '20px',
-                                            height: '20px'
-                                        },
-                                        src: imageSrc(Indico.FileTypeIcons[filetype.toLowerCase()])
-                                    }),
-                         Html.div({style:{'float': 'left'}},list)));
+                "resourceContainer", list);
         };
 
         var removeButton;
@@ -1235,7 +1225,7 @@ type("ResourceListWidget", ["ListWidget"], {
     this.resources = resources;
     this.materialName = materialTitle;
     this.materialTypes = materialTypes;
-    this.ListWidget();
+    this.ListWidget("materialListResource");
     this.showMainResources = showMainResources || false;
 
     var self = this;
@@ -1311,6 +1301,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                 function(){
                     IndicoUI.Dialogs.Material.editMaterial(
                         self.args,
+                        self.types,
                         material,
                         self);
                 },
@@ -1345,20 +1336,26 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                            :'');
 
             var item = [
-                IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
-                protectionIcon,
-                $B(Html.span({verticalAlign: 'middle'}),material.accessor('title')),
-                menu,
-                $B(Html.div("descriptionLine"), material.accessor('description')),
+                Html.div('topMaterialBar',
+                         IndicoUI.Buttons.arrowExpandIcon(matWidgetDiv, true),
+                         protectionIcon,
+                         $B(Html.span({verticalAlign: 'middle'}),material.accessor('title')),
+                         menu,
+                         $B(Html.div("descriptionLine"), material.accessor('description'))),
+
                 matWidgetDiv
             ];
         } else {
             item = [matWidgetDiv];
         }
-        /*if(self.highlight){
-            self._highlightItem(self.highlight);
-        }*/
-        return item;
+
+        var domElement = Html.div("materialEntry",item);
+
+        if (self.highlight && self.highlight == pair.key){
+            domElement.dom.className += " highlighted";
+        }
+
+        return domElement;
 
     },
 
@@ -1412,10 +1409,6 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
 
     _postDraw: function(pair){
         var self = this;
-
-        if (self.highlight && self.highlight == pair.key){
-            self._highlightItem(self.highlight);
-        }
     },
 
     drawContent: function() {

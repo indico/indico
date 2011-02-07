@@ -37,8 +37,10 @@ import commands, os, socket, subprocess, tempfile, threading, multiprocessing
 import time, urllib2
 
 # Test modules
-import nose, figleaf, figleaf.annotate_html
+import figleaf
+import figleaf.annotate_html
 from selenium import selenium
+import nose
 
 from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner, Option
@@ -154,7 +156,28 @@ class XMLOutputOption(Option):
             args += ['-v']
 
 
-class UnitTestRunner(BaseTestRunner):
+class NoseTestRunner(BaseTestRunner):
+
+    def _buildArgs(self):
+        args = ['nose', '--nologcapture', '--logging-clear-handlers', \
+                '--with-id', '-s']
+
+        # will set args
+        self._callOptions('use_xml_output', 'unit', args)
+
+        specific = self.options.valueOf('specify')
+
+        if specific:
+            args.append(specific)
+        else:
+            args.append(os.path.join(self.setupDir, 'python', 'unit'))
+
+            # add plugins
+            args += BaseTestRunner.findPlugins()
+        return args
+
+
+class UnitTestRunner(NoseTestRunner):
     """
     Python Unit Tests
 
@@ -168,57 +191,11 @@ class UnitTestRunner(BaseTestRunner):
                       'xml': XMLOutputOption }
 
     def _run(self):
-        #coverage = CoverageTestRunner.getInstance()
-
-        #if coverage:
-        #    coverage.start()
-
-        #retrieving tests from tests folder
-        args = ['nose', '--nologcapture',  '--logging-clear-handlers', \
-                '--with-id', '-s']
-
-        # will set args
-        self._callOptions('use_xml_output', 'unit', args)
-
-        specific = self.options.valueOf('specify')
-
-        if specific:
-            args.append(specific)
-        else:
-            args.append(os.path.join(self.setupDir, 'python', 'unit'))
-            # retrieving tests from plugins folder
-            for folder in BaseTestRunner.walkThroughFolders(
-                os.path.join(self.setupDir, '..', 'MaKaC', 'plugins'),
-                "/tests/python/unit"):
-                args.append(folder)
+        args = self._buildArgs()
+        return nose.run(argv = args)
 
 
-        result = nose.run(argv = args)
-
-        #if coverage:
-        #    coverage.stop()
-
-        return result
-
-    def walkThroughPluginsFolders(self):
-        """
-        Goes throught the plugin directories, and adds
-        existing unit test dirs
-        """
-        rootPluginsPath = os.path.join(self.setupDir,
-                                       '..',
-                                       'MaKaC',
-                                       'plugins')
-        foldersArray = []
-
-        for root, __, ___ in os.walk(rootPluginsPath):
-            if root.endswith("/tests/python/unit") > 0:
-                foldersArray.append(root)
-
-        return foldersArray
-
-
-class FunctionalTestRunner(BaseTestRunner):
+class FunctionalTestRunner(NoseTestRunner):
     """
     Functional Tests
 
@@ -247,25 +224,7 @@ class FunctionalTestRunner(BaseTestRunner):
                 return ('[ERR] Could not start functional tests because selenium'
                         ' server cannot be started.\n')
 
-
-            args = ['nose', '--nologcapture', '--logging-clear-handlers']
-
-            # will set args
-            self._callOptions('use_xml_output', 'functional', args)
-
-            specific = self.options.valueOf('specify')
-
-            # if a particular test was specified
-            if specific:
-                args.append(specific)
-            else:
-                args.append(os.path.join(self.setupDir, 'python', 'functional'))
-                # retrieving tests from plugins folder
-                for folder in BaseTestRunner.walkThroughFolders(
-                    os.path.join(self.setupDir, '..', 'MaKaC', 'plugins'),
-                    "/tests/python/functional"):
-                    args.append(folder)
-
+            args = self._buildArgs()
 
             # Execute the tests
             result = True
@@ -276,11 +235,12 @@ class FunctionalTestRunner(BaseTestRunner):
 
             for i in range(0, repeat):
                 if threads > 1:
-                    testResult = self._runParallel(args,threads)
+                    testResult = self._runParallel(args, threads)
                 else:
-                    testResult = nose.run(argv = args)
+                    testResult = nose.run(argv=args)
                 result = result and testResult
-                self._info("Test #%d: %s\n" % (i+1, testResult and 'OK' or 'Error'))
+                self._info("Test #%d: %s\n" % \
+                           (i + 1, testResult and 'OK' or 'Error'))
 
         except Exception, e:
             raise e

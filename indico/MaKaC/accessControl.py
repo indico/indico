@@ -25,7 +25,10 @@ from MaKaC.common import DBMgr
 from MaKaC.common import info
 import MaKaC
 
-class AccessController( Persistent ):
+from MaKaC.plugins import Observable
+
+
+class AccessController( Persistent, Observable ):
     """This class keeps access control information both for accessing and
         modifying which can be related to any conference object. The fact that
         we have a separated class which handles this allows us to reuse the code
@@ -116,6 +119,7 @@ class AccessController( Persistent ):
         if principal not in self.allowed and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)):
             self.allowed.append( principal )
             self._p_changed = 1
+        self._notify('accessGranted', principal)
 
     def getAccessEmail(self):
         try:
@@ -127,11 +131,12 @@ class AccessController( Persistent ):
     def grantAccessEmail(self, email):
         if not email in self.getAccessEmail():
             self.getAccessEmail().append(email)
+        self._notify('accessGranted', email)
 
     def revokeAccessEmail(self, email):
         if email in self.getAccessEmail.keys():
             self.getAccessEmail().remove(email)
-
+        self._notify('accessRevoked', email)
 
     def revokeAccess( self, principal ):
         """revokes read access for the related resource to the specified
@@ -145,6 +150,7 @@ class AccessController( Persistent ):
         if principal in self.allowed:
             self.allowed.remove( principal )
             self._p_changed = 1
+        self._notify('accessRevoked', principal)
 
     def setAccessKey( self, key="" ):
         self.accessKey = key
@@ -174,7 +180,6 @@ class AccessController( Persistent ):
             return True
         else:
             return False
-
 
     def canIPAccess( self, ip ):
         """
@@ -230,11 +235,13 @@ class AccessController( Persistent ):
         if not email in self.getModificationEmail():
             self.getModificationEmail().append(email)
             self._p_changed = 1
+        self._notify('modificationGranted', email)
 
     def revokeModificationEmail(self, email):
         if email in self.getModificationEmail():
             self.getModificationEmail().remove(email)
             self._p_changed = 1
+        self._notify('modificationRevoked', email)
 
     def grantModification( self, principal ):
         """grants modification access for the related resource to the specified
@@ -243,6 +250,7 @@ class AccessController( Persistent ):
         if principal not in self.managers and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)):
             self.managers.append( principal )
             self._p_changed = 1
+        self._notify('modificationGranted', principal)
 
     def revokeModification( self, principal ):
         """revokes modification access for the related resource to the
@@ -250,6 +258,7 @@ class AccessController( Persistent ):
         if principal in self.managers:
             self.managers.remove( principal )
             self._p_changed = 1
+        self._notify('modificationRevoked', principal)
 
     def canModify( self, user ):
         """tells whether the specified user has modification privileges"""
@@ -369,8 +378,8 @@ class AccessWrapper:
             control operations over the objects in the system.
     """
 
-    def __init__( self ):
-        self._currentUser = None
+    def __init__( self, user=None ):
+        self._currentUser = user
         self._ip = ""
         self._session = None
 

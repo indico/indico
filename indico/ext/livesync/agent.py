@@ -93,7 +93,7 @@ class SyncAgent(Fossilizable, Persistent):
 
     # TODO: Subclass into PushSyncAgent(task)/PullSyncAgent?
 
-    def __init__(self, aid, name, description, updateTime):
+    def __init__(self, aid, name, description, updateTime, access = None):
         self._id = aid
         self._name = name
         self._description = description
@@ -101,6 +101,7 @@ class SyncAgent(Fossilizable, Persistent):
         self._manager = None
         self._active = False
         self._recording = False
+        self._access = access
 
     def setManager(self, manager):
         self._manager = manager
@@ -118,7 +119,8 @@ class SyncAgent(Fossilizable, Persistent):
         track = self._manager.getTrack()
 
         try:
-            track.movePointer(self._id, track.mostRecentTS(ts))
+            track.movePointer(self._id, ts / \
+                              self._manager.getGranularity() - 1)
         except EmptyTrackException:
             # if the track is empty, don't bother doing this
             pass
@@ -135,7 +137,8 @@ class SyncAgent(Fossilizable, Persistent):
 
     def getLastDT(self):
         ts = self.getLastTS()
-        return datetime.datetime.utcfromtimestamp(ts * MPT_GRANULARITY) if ts else None
+        return datetime.datetime.utcfromtimestamp(ts * \
+                    self._manager.getGranularity()) if ts else None
 
     def getName(self):
         return self._name
@@ -189,9 +192,10 @@ class PushSyncAgent(SyncAgent):
     # Should specify which worker will be used
     _workerClass = None
 
-    def __init__(self, aid, name, description, updateTime):
+    def __init__(self, aid, name, description, updateTime, access = None):
         super(PushSyncAgent, self).__init__(aid, name, description, updateTime)
         self._lastTry = None
+        self._access = access
 
     def _run(self, data, logger=None, monitor=None):
         """
@@ -219,7 +223,7 @@ class PushSyncAgent(SyncAgent):
         if currentTS == None:
             till = None
         else:
-            till = currentTS - 1
+            till = currentTS / self._manager.getGranularity() - 1
 
         if not self._manager:
             raise AgentExecutionException("SyncAgent '%s' has no manager!" % \
@@ -242,7 +246,7 @@ class PushSyncAgent(SyncAgent):
                 logger.exception("Problem running agent %s" % self.getId())
             return None
 
-        if result:
+        if result != None:
             self._lastTry = till
             return self._lastTry
         else:
@@ -261,13 +265,17 @@ class SyncManager(Persistent):
     "Agent Manager"
     """
 
+    def __init__(self, granularity=MPT_GRANULARITY):
+        self._granularity = granularity
+        self.reset()
+
+    def getGranularity(self):
+        return self._granularity
+
     @classmethod
     def getDBInstance(cls):
         storage = getPluginType().getStorage()
         return storage['agent_manager']
-
-    def __init__(self):
-        self.reset()
 
     def reset(self, agentsOnly=False, trackOnly=False):
         """
@@ -314,13 +322,13 @@ class SyncManager(Persistent):
         Advances the agent "pointer" to the specified timestamp
         """
         self._track.movePointer(agentId,
-                                self._track.mostRecentTS(newLastTS))
+                                newLastTS)
 
     def add(self, timestamp, action):
         """
         Adds a specific action to the specified timestamp
         """
-        self._track.add(timestamp / MPT_GRANULARITY, action)
+        self._track.add(timestamp / self._granularity, action)
 
     def getTrack(self):
         """

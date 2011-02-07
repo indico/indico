@@ -20,7 +20,7 @@
 
 import time
 
-from indico.ext.livesync import SyncManager
+from indico.ext.livesync import SyncManager, db
 from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
 from indico.util.date_time import nowutc, int_timestamp
 
@@ -33,8 +33,8 @@ class LiveSync_Feature(IndicoTestFeature):
 
         with obj._context('database'):
             obj._ph.getPluginType('livesync').toggleActive()
-            obj._do._notify('updateDBStructures', 'indico.ext.livesync',
-                            None, None, None)
+            db.updateDBStructures(obj._dbi._getConnObject().root._root,
+                                  granularity=1)
 
             obj._sm = SyncManager.getDBInstance()
 

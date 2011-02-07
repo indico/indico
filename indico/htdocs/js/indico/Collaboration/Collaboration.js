@@ -201,10 +201,10 @@ var showInfo = {};
  * in order to let the user see which booking was just created or modified.
  */
 var hightlightBookingM = function(booking) {
-    IndicoUI.Effect.highLightBackground("bookingRow" + booking.id, highlightColor, 3000);
+    IndicoUI.Effect.highLightBackground($E("bookingRow" + booking.id), highlightColor, 3000);
     var existingInfoRow = $E("infoRow" + booking.id);
     if (existingInfoRow != null) {
-        IndicoUI.Effect.highLightBackground("infoRow" + booking.id, highlightColor, 3000);
+        IndicoUI.Effect.highLightBackground($E("infoRow" + booking.id), highlightColor, 3000);
     }
 };
 

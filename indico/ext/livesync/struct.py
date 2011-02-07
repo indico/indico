@@ -64,6 +64,7 @@ class timestamp(int):
     def fromObject(cls, obj):
         return obj.__timestamp__()
 
+
 class EmptyTrackException(Exception):
     pass
 
@@ -183,7 +184,7 @@ class MultiPointerTrack(Persistent):
             # negative numbers mean "last but one", "last but two", etc...
             if till == timestamp(-1):
                 # most common case
-                till = self._container.maxKey() - 1
+                till = self._container.maxKey() - timestamp(1)
 
         if fromPos != None:
             fromPos = timestamp(fromPos)
@@ -193,7 +194,7 @@ class MultiPointerTrack(Persistent):
         # consume a single position
         for ts, entry in it:
             if fromPos and ts == fromPos:
-                # stop immediately if we're past fromPosGran
+                # stop immediately if we're past fromPos
                 raise StopIteration
 
             for elem in entry:
@@ -260,11 +261,7 @@ class MultiPointerTrack(Persistent):
         # logic should be inverted here, minKey is actually a maxKey,
         # numerically - since our logics have inverted comparison, it
         # ends up like this
-        if ts < (self._container.minKey()) \
-               or (ts > self._container.maxKey()):
-            raise ValueError("timestamp %s outside bounds" % ts)
-        else:
-            self._pointers[pid] = pos
+        self._pointers[pid] = pos
 
     def __len__(self):
         """

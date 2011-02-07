@@ -49,14 +49,13 @@ from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.plugins.base import Observable
 from MaKaC.user import Avatar, CERNGroup
 
-def fake(string1=""):
-    return ""
 
 # TODO This really needs to be fixed... no i18n and strange implementation using month names as keys
 def stringToDate( str ):
     months = { "January":1, "February":2, "March":3, "April":4, "May":5, "June":6, "July":7, "August":8, "September":9, "October":10, "November":11, "December":12 }
     [ day, month, year ] = str.split("-")
     return datetime(int(year),months[month],int(day))
+
 
 class XSLTransformer:
 
@@ -205,7 +204,7 @@ class outputGenerator(Observable):
 
         return accounts
 
-    def _generateAccessList(self, out, obj):
+    def _generateAccessList(self, out, obj, specifyId=True):
         """Generate a comprehensive access list showing all users and e-groups who may access
         this object, taking into account the permissions and access lists of its owners.
         obj could be a Conference, Session, Contribution, Material, Resource or SubContribution object."""
@@ -225,14 +224,13 @@ class outputGenerator(Observable):
             else:
                 allowed_logins.append(user_obj.getId())
 
-        if len(allowed_groups) + len(allowed_users) > 0:
+        if len(allowed_groups) + len(allowed_logins) > 0:
             # Create XML list of groups
             if len(allowed_groups) > 0:
                 out.openTag("datafield", [["tag","506"],["ind1","1"],["ind2"," "]])
                 for group_id in allowed_groups:
                     out.writeTag("subfield", group_id, [["code","d"]])
                 out.writeTag("subfield", "group", [["code","f"]])
-                out.closeTag("datafield")
 
             # Create XML list of emails
             if len(allowed_logins) > 0:
@@ -240,9 +238,15 @@ class outputGenerator(Observable):
                 for email_id in allowed_logins:
                     out.writeTag("subfield", email_id, [["code","d"]])
                 out.writeTag("subfield", "username", [["code","f"]])
-                out.closeTag("datafield")
         else:
-            out.writeTag("datafield", '', [["tag","506"],["ind1","0"],["ind2"," "]])
+            out.openTag("datafield", [["tag","506"],["ind1","0"],["ind2"," "]])
+
+        # define which part of the record the list concerns
+        if specifyId:
+            out.writeTag("subfield", "INDICO.%s" % \
+                         self.dataInt.objToId(obj), [["code","3"]])
+
+        out.closeTag("datafield")
 
     def _confToXML(self,
                    conf,
@@ -1389,7 +1393,7 @@ class outputGenerator(Observable):
         out.writeTag("subfield", "Event details", [["code","y"]])
         out.closeTag("datafield")
 
-        self._generateAccessList(out, conf)
+        self._generateAccessList(out, conf, specifyId=False)
 
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, overrideCache=False):
     ##     if not out:
@@ -1677,8 +1681,7 @@ class outputGenerator(Observable):
         out.writeTag("subfield", "Contribution details", [["code","y"]])
         out.closeTag("datafield")
 
-        self._generateAccessList(out, cont)
-
+        self._generateAccessList(out, cont, specifyId=False)
     ####
     #fb
 
@@ -1852,7 +1855,7 @@ class outputGenerator(Observable):
         out.writeTag("subfield", "Contribution details", [["code","y"]])
         out.closeTag("datafield")
 
-        self._generateAccessList(out, subCont)
+        self._generateAccessList(out, subCont, specifyId=None)
 
 
     def materialToXMLMarc21(self,mat, out=None):
@@ -1870,13 +1873,11 @@ class outputGenerator(Observable):
     def resourcesToXMLMarc21(self, rList, out=None):
         if not out:
             out = self._XMLGen
-        #out.openTag("resources")
+
         for res in rList:
-            if self.dataInt.isPrivateDataInt() or res.canView(self.__aw):
+            if self.dataInt.isPrivateDataInt() or res.canAccess(self.__aw):
                 self.resourceToXMLMarc21(res, out=out)
-        #out.closeTag("resources")
-
-
+                self._generateAccessList(out, res)
 
     def resourceToXMLMarc21(self,res, out=None):
         if not out:
@@ -1896,7 +1897,10 @@ class outputGenerator(Observable):
         #out.writeTag("description",res.getDescription())
         #out.writeTag("url",res.getURL())
         out.writeTag("subfield",res.getURL(),[["code","u"]])
+        out.writeTag("subfield", "INDICO.%s" % \
+                     self.dataInt.objToId(res), [["code", "3"]])
         out.writeTag("subfield", "resource", [["code","x"]])
+        out.writeTag("subfield", "external", [["code","z"]])
         out.writeTag("subfield", res.getOwner().getTitle(), [["code","y"]])
         out.closeTag("datafield")
 
@@ -1918,7 +1922,10 @@ class outputGenerator(Observable):
         #out.writeTag("subfield",res.getFileName(),[["code","q"]])
         url = str(urlHandlers.UHFileAccess.getURL( res ))
         out.writeTag("subfield",url,[["code","u"]])
+        out.writeTag("subfield", "INDICO.%s" % \
+                     self.dataInt.objToId(res), [["code", "3"]])
         out.writeTag("subfield", res.getFileName(), [["code","y"]])
+        out.writeTag("subfield", "stored", [["code","z"]])
         out.writeTag("subfield", "resource", [["code","x"]])
         out.closeTag("datafield")
         #out.writeTag("duration","1")#TODO:DURATION ISN'T ESTABLISHED

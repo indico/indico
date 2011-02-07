@@ -125,7 +125,7 @@ class TestUpload(IndicoTestCase):
         fakeInvenio = FakeInvenio('', FAKE_SERVICE_PORT)
 
         agent = InvenioBatchUploaderAgent('test1', 'test1', 'test',
-                                          0, 'http://localhost:%s' % \
+                                          0, url='http://localhost:%s' % \
                                           FAKE_SERVICE_PORT)
 
         globalRecordSet = dict()

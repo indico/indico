@@ -30,6 +30,7 @@ from MaKaC.common.contextManager import ContextManager
 
 loadedFeatures = []
 
+
 class FeatureLoadingObject(object):
 
     def __init__(self):
@@ -138,7 +139,6 @@ class ContextManager_Feature(IndicoTestFeature):
 
         # create the context
         ContextManager.create()
-
 
     def destroy(self, obj):
         super(ContextManager_Feature, self).destroy(obj)

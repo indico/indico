@@ -3809,6 +3809,17 @@ ul.materialList li
     padding-bottom: 5px;
 }
 
+div.materialEntry {
+    padding: 5px;
+    -webkit-border-radius: 10px;
+
+}
+div.topMaterialBar {
+    background: #E0E0E0;
+    border: 1px solid #A0A0A0;
+    padding: 2px;
+}
+
 ul.materialList li span
 {
     padding-left: 5px;
@@ -3816,39 +3827,50 @@ ul.materialList li span
 }
 
 
-ul.materialList li ul
+ul.materialListResource
 {
-    margin-left: 15px;
-    padding: 5px;
+    padding: 0px 0px 0px 5px;
 }
 
-ul.materialList li ul li
+ul.materialListResource li
 {
     background: #F2F2F2;
     list-style-type: none;
     padding-left: 5px;
     padding-right: 5px;
     padding-top: 5px;
-    border-top: 1px solid #DDDDDD;
+    margin-top: 2px;
+    border: 1px solid #DDDDDD;
 }
 
-ul.materialList li ul li span
+ul.materialListResource li span
 {
     padding-left: 0px;
     font-size: 13px;
 }
 
-ul.materialList li ul li ul li
-{
-    background: #FFFFFF;
-    padding-left: 10px;
-
+ul.materialDescription {
+    background: none;
+    padding: 5px;
+    border: none;
+    margin-top: 5px;
 }
+
+ul.materialDescription li{
+    border: none;
+    background: none;
+    margin: 0px;
+    padding: 0px;
+}
+
 
 div.resourceContainer
 {
-    background: white;
     overflow: auto;
+}
+
+div.highlighted {
+    border: 1 px solid red;
 }
 
 div.descriptionBox

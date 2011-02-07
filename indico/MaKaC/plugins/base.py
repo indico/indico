@@ -31,7 +31,6 @@ from MaKaC.errors import PluginError
 from MaKaC.common import DBMgr
 from MaKaC.common.logger import Logger
 import zope.interface, types
-from MaKaC.services.interface.rpc.common import NoReportError
 from persistent import Persistent
 import pkg_resources, types, inspect, re
 
@@ -134,14 +133,20 @@ class ComponentsManager(Persistent):
 
     def notifyComponent(self, event, obj, *params):
         results = []
-        for subscriber in self.getAllSubscribers(event):
+        subscribers = self.getAllSubscribers(event)
+
+        for subscriber in subscribers:
 
             f = getattr(subscriber,event)
             try:
                 results.append(f(obj, *params))
             except Exception, e:
-                Logger.get('PluginNotifier').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
+                Logger.get('ext.notification').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
                 raise
+
+        if subscribers == []:
+            Logger.get('ext.notification').warning('Event %s not present in %s' %
+                                                   (event, obj))
 
         return results
 

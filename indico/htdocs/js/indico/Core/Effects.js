@@ -116,30 +116,23 @@ IndicoUI.Effect = {
      * @param {number} time A number in milliseconds after which the element will come back to its default color.
      * @param {bool} elementIsDom elementId can be either an Id or the dom element itself.
      */
-    highLightBackground: function(elementId, color, time, elementIsDom) {
-        if (!exists(color)) {
-            color = "#FFFF88" //light yellow
-        }
-        if (!exists(time)) {
-            time = 3000; //3 seconds
-        }
+    highLightBackground: function(element, color, time) {
+        color = color || "#FFFF88";
+        time = time || 3000;
 
-        $E(elementId).dom.style.backgroundColor = color;
-
-        if (elementIsDom){
-            elementId = elementId.id;
-        }
+        element.dom.style.backgroundColor = color;
 
         if (time) {
-            setTimeout("IndicoUI.Effect.removeHighlightBackground('" + elementId +"')", time);
+            setTimeout(function() {
+                IndicoUI.Effect.removeHighlightBackground(elementId);
+            }, time);
         }
     },
 
     /**
      * Utility function used by highLightBackground to remove the highlight safely (the element may have disappeared during the timeout)
      */
-    removeHighlightBackground: function(elementId) {
-        element = $E(elementId);
+    removeHighlightBackground: function(element) {
         if (exists(element)) {
             element.dom.style.backgroundColor = '';
         }
