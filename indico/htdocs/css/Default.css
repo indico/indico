@@ -4013,11 +4013,11 @@ ul.keywordList li.multipleLinesListItem_last {
 }
 
 .invalidLabel {
-    color: #881122;
+    color: #ff1122;
 }
 
 select.invalidSelect {
-    color: #881122;
+    color: #ff1122;
 }
 
 .tooltipError {
