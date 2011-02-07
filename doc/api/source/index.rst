@@ -15,6 +15,7 @@ Contents:
    ./fossilize.rst
    ./test.rst
    ./scheduler.rst
+   ./extension.rst
 
 Indices and tables
 ==================
