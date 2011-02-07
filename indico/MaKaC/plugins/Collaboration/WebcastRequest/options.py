@@ -67,7 +67,14 @@ globalOptions = [
                       "editable": True,
                       "visible": True} ),
 
-    ("webcastAudiences", {"description": "Available webcast audiences",
+    # Audience-related options
+    ("webcastPublicURL", {"description" : "Webcast service URL (for default 'Public' audience)",
+               "type": str,
+               "defaultValue": "",
+               "editable": True,
+               "visible": True}),
+
+    ("webcastAudiences", {"description": "Private webcast audiences/service URLs",
                       "type": "links",
                       "subType": "webcastAudiences",
                       "defaultValue": [],

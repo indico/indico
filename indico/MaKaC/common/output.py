@@ -486,6 +486,7 @@ class outputGenerator:
 
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         url = wm.isOnAir(conf)
+        wc = wm.getForthcomingWebcast(conf)
         if url:
             out.openTag("material")
             out.writeTag("ID","live webcast")
@@ -494,13 +495,13 @@ class outputGenerator:
             out.writeTag("type","")
             out.writeTag("displayURL",url)
             out.closeTag("material")
-        elif wm.getForthcomingWebcast(conf):
+        elif wc:
             out.openTag("material")
             out.writeTag("ID","forthcoming webcast")
             out.writeTag("title","forthcoming webcast")
             out.writeTag("description","")
             out.writeTag("type","")
-            out.writeTag("displayURL", wm.getWebcastServiceURL())
+            out.writeTag("displayURL", wm.getWebcastServiceURL(wc))
             out.closeTag("material")
 
         #plugins XML

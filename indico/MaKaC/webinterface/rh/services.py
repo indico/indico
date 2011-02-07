@@ -40,15 +40,15 @@ class RHServicesBase(admins.RHAdminBase):
 
 class RHRecording( RHServicesBase ):
     _uh = urlHandlers.UHRecording
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._params = params
-    
+
     def _process( self ):
         p = adminPages.WPRecording(self)
         return p.display()
-    
+
 class RHWebcastBase( RHServicesBase ):
 
     def _checkProtection( self ):
@@ -57,14 +57,14 @@ class RHWebcastBase( RHServicesBase ):
         self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         if not self._wm.isManager( self._getUser() ) and not self._al.isAdmin( self._getUser() ):
             raise WebcastAdminError("management area")
-    
+
 class RHWebcast( RHWebcastBase ):
     _uh = urlHandlers.UHWebcast
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._params = params
-    
+
     def _process( self ):
         p = adminPages.WPWebcast(self)
         return p.display()
@@ -74,14 +74,14 @@ class RHWebcastICal( RHWebcastBase ):
     the link is public so all webcasted events are supposed
     to be public """
     _uh = urlHandlers.UHWebcast
-    
+
     def _checkProtection( self ):
         self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._params = params
-    
+
     def _process( self ):
         filename = "Webcast - Event.ics"
         data = ""
@@ -92,36 +92,36 @@ class RHWebcastICal( RHWebcastBase ):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
-    
+
 class RHWebcastArchive( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastArchive
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._params = params
-    
+
     def _process( self ):
         p = adminPages.WPWebcastArchive(self)
         return p.display()
-   
+
 class RHWebcastSetup( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastSetup
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._params = params
-    
+
     def _process( self ):
         p = adminPages.WPWebcastSetup(self)
         return p.display()
-     
+
 class RHWebcastSelectManager( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastSelectManager
 
     def _process( self ):
         p = adminPages.WPWebcastSelectManager(self)
         return p.display(**self._getRequestParams())
-        
+
 class RHWebcastAddManager( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddManager
 
@@ -146,15 +146,15 @@ class RHWebcastRemoveManager( RHWebcastBase ):
                 if ph.getById( id ) != None:
                     self._wm.removeManager( ph.getById( id ) )
         self._redirect( urlHandlers.UHWebcastSetup.getURL() )
-    
+
 class RHWebcastAddWebcast( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddWebcast
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._eventid = params.get("eventid","")
         self._params = params
-    
+
     def _process( self ):
         event = ConferenceHolder().getById(self._eventid)
         if event:
@@ -163,12 +163,12 @@ class RHWebcastAddWebcast( RHWebcastBase ):
 
 class RHWebcastRemoveWebcast( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastRemoveWebcast
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._webcastid = params.get("webcastid","")
         self._params = params
-    
+
     def _process( self ):
         if self._webcastid != "":
             if self._wm.deleteForthcomingWebcastById(self._webcastid):
@@ -182,33 +182,33 @@ class RHWebcastRemoveWebcast( RHWebcastBase ):
 
 class RHWebcastArchiveWebcast( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastArchiveWebcast
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._webcastid = params.get("webcastid","")
         self._params = params
-    
+
     def _process( self ):
         if self._webcastid != "":
             self._wm.archiveForthcomingWebcastById(self._webcastid)
         self._redirect(urlHandlers.UHWebcast.getURL())
-       
+
 class RHWebcastUnArchiveWebcast( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastUnArchiveWebcast
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._webcastid = params.get("webcastid","")
         self._params = params
-    
+
     def _process( self ):
         if self._webcastid != "":
             self._wm.unArchiveWebcastById(self._webcastid)
         self._redirect(urlHandlers.UHWebcastArchive.getURL())
-        
+
 class RHWebcastAddChannel( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddChannel
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._action = ""
@@ -219,7 +219,7 @@ class RHWebcastAddChannel( RHWebcastBase ):
             self._chwidth = params.get("chwidth",480)
             self._chheight = params.get("chheight",360)
         self._params = params
-    
+
     def _process( self ):
         if self._action == "addchannel":
             if self._wm.getChannel(self._chname):
@@ -230,7 +230,7 @@ class RHWebcastAddChannel( RHWebcastBase ):
 
 class RHWebcastModifyChannel( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastModifyChannel
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._action = ""
@@ -242,7 +242,7 @@ class RHWebcastModifyChannel( RHWebcastBase ):
             self._chwidth = params.get("chwidth",480)
             self._chheight = params.get("chheight",360)
         self._params = params
-    
+
     def _process( self ):
         if self._action == "modifychannel":
             if self._wm.getChannel(self._choldname):
@@ -251,12 +251,12 @@ class RHWebcastModifyChannel( RHWebcastBase ):
 
 class RHWebcastRemoveChannel( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastRemoveChannel
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._chname = params.get("chname","")
         self._params = params
-    
+
     def _process( self ):
         if self._chname != "":
             self._wm.removeChannel(self._chname)
@@ -264,72 +264,59 @@ class RHWebcastRemoveChannel( RHWebcastBase ):
 
 class RHWebcastSwitchChannel( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastSwitchChannel
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._chname = params.get("chname","")
         self._params = params
-    
+
     def _process( self ):
         if self._chname != "":
             self._wm.switchChannel(self._chname)
         self._redirect(urlHandlers.UHWebcast.getURL())
-        
+
 class RHWebcastMoveChannelUp( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastMoveChannelUp
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._chnb = params.get("chnb","")
         self._params = params
-    
+
     def _process( self ):
         if self._chnb != "":
             self._wm.moveChannelUp(int(self._chnb))
         self._redirect(urlHandlers.UHWebcastSetup.getURL())
-        
+
 class RHWebcastMoveChannelDown( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastMoveChannelDown
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._chnb = params.get("chnb","")
         self._params = params
-    
+
     def _process( self ):
         if self._chnb != "":
             self._wm.moveChannelDown(int(self._chnb))
         self._redirect(urlHandlers.UHWebcastSetup.getURL())
-        
-class RHWebcastSaveWebcastServiceURL( RHWebcastBase ):
-    _uh = urlHandlers.UHWebcastSetup
-    
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
-        self._webcastServiceURL = params.get('webcastServiceURL', '')
-        self._params = params
-    
-    def _process( self ):
-        self._wm.setWebcastServiceURL(self._webcastServiceURL)
-        self._redirect(urlHandlers.UHWebcastSetup.getURL())
-        
-        
+
 class RHWebcastSaveWebcastSynchronizationURL( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastSetup
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._webcastSynchronizationURL = params.get('webcastSynchronizationURL', '')
         self._params = params
-    
+
     def _process( self ):
         self._wm.setWebcastSynchronizationURL(self._webcastSynchronizationURL)
         self._redirect(urlHandlers.UHWebcastSetup.getURL())
-        
-        
+
+
 class RHWebcastManuelSynchronizationURL( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastSetup
-        
+
     def _process( self ):
         answer = self._wm.remoteSynchronize(raiseExceptionOnSyncFail = True)
         if answer:
@@ -337,10 +324,10 @@ class RHWebcastManuelSynchronizationURL( RHWebcastBase ):
         else:
             self._redirect(urlHandlers.UHWebcastSetup.getURL())
 
-        
+
 class RHWebcastAddStream( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddStream
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._action = ""
@@ -350,7 +337,7 @@ class RHWebcastAddStream( RHWebcastBase ):
             self._format = params.get("stformat","")
             self._url = params.get("sturl","")
         self._params = params
-    
+
     def _process( self ):
         if self._action == "addstream":
             ch = self._wm.getChannel(self._chname)
@@ -360,13 +347,13 @@ class RHWebcastAddStream( RHWebcastBase ):
 
 class RHWebcastRemoveStream( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastRemoveStream
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._chname = params.get("chname","")
         self._format = params.get("stformat","")
         self._params = params
-    
+
     def _process( self ):
         ch = self._wm.getChannel(self._chname)
         if ch:
@@ -375,14 +362,14 @@ class RHWebcastRemoveStream( RHWebcastBase ):
 
 class RHWebcastAddOnAir( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddOnAir
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._action = ""
         self._chname = params.get("chname","")
         self._eventid = params.get("eventid","")
         self._params = params
-    
+
     def _process( self ):
         wc = self._wm.getForthcomingWebcastById(self._eventid)
         if wc:
@@ -391,12 +378,12 @@ class RHWebcastAddOnAir( RHWebcastBase ):
 
 class RHWebcastRemoveFromAir( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastRemoveFromAir
-    
+
     def _checkParams( self, params ):
         admins.RHAdminBase._checkParams( self, params )
         self._chname = params.get("chname","")
         self._params = params
-    
+
     def _process( self ):
         if self._chname != "":
             self._wm.removeFromAir(self._chname)
@@ -404,17 +391,17 @@ class RHWebcastRemoveFromAir( RHWebcastBase ):
 
 class RHOAIPrivateConfig( RHServicesBase ):
     """ OAI Private Gateway Configuration Interface """
-    
+
     _uh = urlHandlers.UHOAIPrivateConfig
-       
-    def _process( self ):        
+
+    def _process( self ):
         p = adminPages.WPOAIPrivateConfig(self)
         return p.display()
 
 class RHOAIPrivateConfigAddIP( RHServicesBase ):
     """ OAI Private Gateway Configuration Interface
         (Add an IP Address) """
-    
+
     _uh = urlHandlers.UHOAIPrivateConfigAddIP
 
     def _checkParams( self, params ):
@@ -433,13 +420,13 @@ class RHOAIPrivateConfigAddIP( RHServicesBase ):
                 ipList = minfo.getOAIPrivateHarvesterList()
                 ipList.append(ipAddress)
                 minfo.setOAIPrivateHarvesterList(ipList)
-        
+
         self._redirect(urlHandlers.UHOAIPrivateConfig.getURL())
 
 class RHOAIPrivateConfigRemoveIP( RHServicesBase ):
     """ OAI Private Gateway Configuration Interface
         (Add an IP Address) """
-    
+
     _uh = urlHandlers.UHOAIPrivateConfigRemoveIP
 
     def _checkParams( self, params ):
@@ -455,5 +442,5 @@ class RHOAIPrivateConfigRemoveIP( RHServicesBase ):
             ipList = minfo.getOAIPrivateHarvesterList()
             ipList.remove(ipAddress)
             minfo.setOAIPrivateHarvesterList(ipList)
-        
+
         self._redirect(urlHandlers.UHOAIPrivateConfig.getURL())

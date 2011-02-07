@@ -83,6 +83,12 @@ Request details:<br />
     </tr>
     <tr>
         <td colspan="2">
+            <strong>Audience:</strong><br />
+            %s
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
             <strong>Additional comments:</strong><br />
             %s
         </td>
@@ -102,6 +108,7 @@ Request details:<br />
        self._getTalksShortMessage(),
        self._getTalkSelectionComments(),
        bp["permission"],
+       self._bp["audience"] or _("Public"),
        self._getComments(),
        self._getTalks())
 

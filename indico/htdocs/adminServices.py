@@ -71,9 +71,6 @@ def webcastMoveChannelUp(req, **params):
 def webcastMoveChannelDown(req, **params):
     return services.RHWebcastMoveChannelDown(req).process(params)
 
-def webcastSaveWebcastServiceURL(req, **params):
-    return services.RHWebcastSaveWebcastServiceURL(req).process(params)
-
 def webcastSaveWebcastSynchronizationURL(req, **params):
     return services.RHWebcastSaveWebcastSynchronizationURL(req).process(params)
 
