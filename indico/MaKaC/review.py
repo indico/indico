@@ -36,6 +36,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
+from cgi import escape
 
 
 class AbstractSorter:
@@ -1260,7 +1261,7 @@ class Abstract(Persistent):
         abs = Abstract(conference.getAbstractMgr(), abstractId, self.getSubmitter().getAvatar())
         abs.setTitle(self.getTitle())
         for key in self.getFields().keys():
-            abs.setField(key,self.getField(key))
+            abs.setField(key,self.getField(key, False))
         abs.setComments(self.getComments())
 
         abs._setSubmissionDate(self.getSubmissionDate())
@@ -1466,7 +1467,7 @@ class Abstract(Persistent):
         except:
             pass
 
-    def getField( self, field ):
+    def getField( self, field, escapeHtml=True ):
         try:
             if self._content != "":
                 self._fields["content"] = self._content
@@ -1480,6 +1481,8 @@ class Abstract(Persistent):
         except:
             pass
         if self.getFields().has_key(field):
+            if escapeHtml:
+                return escape(self.getFields()[field])
             return self.getFields()[field]
         else:
             return ""

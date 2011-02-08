@@ -144,6 +144,7 @@ class RH(RequestHandlerBase):
     """
     _currentRH = None
     _tohttps = False
+    _doNotSanitizeFields = []
 
     def __init__( self, req ):
         """Constructor. Initialises the rh setting up basic attributes so it is
@@ -468,7 +469,7 @@ class RH(RequestHandlerBase):
                         self._checkProtection()
                         security.Sanitization.sanitizationCheck(self._target,
                                                self._reqParams,
-                                               self._aw)
+                                               self._aw, self._doNotSanitizeFields)
                         if self._doProcess:
                             if profile:
                                 import profile, pstats
