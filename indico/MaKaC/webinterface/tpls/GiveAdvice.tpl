@@ -220,7 +220,9 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
         function(result, error){
             if (!error) {
                 submitted = !submitted;
-                updatePage(false);
+                //updatePage(false);
+                location.href = "<%= urlHandlers.UHContributionModifReviewing.getURL(Contribution) %>";
+                location.reload(true);
             } else {
             	alert (error.message);
                 //IndicoUtil.errorReport(error);

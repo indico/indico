@@ -443,7 +443,6 @@ class ConferencePaperReview(Persistent):
         """
         newId = self.getNewStatusId()
         status = Status(newId,name,editable)
-        #status.setEditable(True) # en las 3 primeras veces esto no funciona
         self._statuses.append(status)
         self.notifyModification()
 
@@ -488,9 +487,8 @@ class ConferencePaperReview(Persistent):
         status = self.getStatusById(statusId)
 
         if status:
-            #self._statuses.remove(status)
-            #self.notifyModification()
-            status.setEditable(False)
+            self._statuses.remove(status)
+            self.notifyModification()
         else:
             raise MaKaCError("Cannot remove a status which doesn't exist")
 
@@ -531,17 +529,7 @@ class ConferencePaperReview(Persistent):
     def getReviewingQuestions(self):
         """ Returns the list of questions
         """
-        # Filter the non visible questions
-        visibleQuestions = []
-        for question in self._reviewingQuestions:
-            if question.getVisible():
-                visibleQuestions.append(question)
-        return visibleQuestions
-
-    #def setReviewingQuestions(self, questions):
-    #    """ Set the whole list of questions
-    #    """
-    #    self._reviewingQuestions = questions
+        return self._reviewingQuestions
 
     def removeReviewingQuestion(self, questionId):
         """ Removes a question from the list
@@ -549,9 +537,8 @@ class ConferencePaperReview(Persistent):
         question = self.getReviewingQuestionById(questionId)
 
         if question:
-            #self._reviewingQuestions.remove(question)
-            #self.notifyModification()
-            question.setVisible(False)
+            self._reviewingQuestions.remove(question)
+            self.notifyModification()
         else:
             raise MaKaCError("Cannot remove a question which doesn't exist")
 
@@ -585,17 +572,7 @@ class ConferencePaperReview(Persistent):
     def getLayoutQuestions(self):
         """ Get the list of all the layout criteria
         """
-        # Filter the non visible questions
-        visibleQuestions = []
-        for question in self._layoutQuestions:
-            if question.getVisible():
-                visibleQuestions.append(question)
-        return visibleQuestions
-
-    #def setLayoutCriteria(self, criteria):
-    #    """ Set the whole list of all the layout criteria
-    #    """
-    #    self._formCriteriaList = criteria
+        return self._layoutQuestions
 
     def removeLayoutQuestion(self, questionId):
         """ Remove one the layout question
@@ -603,9 +580,8 @@ class ConferencePaperReview(Persistent):
         question = self.getLayoutQuestionById(questionId)
 
         if question:
-            #self._layoutQuestions.remove(question)
-            #self.notifyModification()
-            question.setVisible(False)
+            self._layoutQuestions.remove(question)
+            self.notifyModification()
         else:
             raise MaKaCError("Cannot remove a question which doesn't exist")
 
@@ -625,13 +601,6 @@ class ConferencePaperReview(Persistent):
             Increments the questionId counter
         """
         return self._questionCounter.newCount()
-
-    #def getNewAnswerId(self):
-    #    """ Returns a new an unused answerId
-    #        Increments the answerId counter
-    #    """
-    #   return self._answerCounter.newCount()
-
 
     #referee methods
     def addReferee(self, newReferee):
@@ -1236,11 +1205,12 @@ class ConferenceAbstractReview(Persistent):
         """ Returns the list of questions
         """
         # Filter the non visible questions
-        visibleQuestions = []
-        for question in self._reviewingQuestions:
-            if question.getVisible():
-                visibleQuestions.append(question)
-        return visibleQuestions
+        #visibleQuestions = []
+        #for question in self._reviewingQuestions:
+            #if question.getVisible():
+            #    visibleQuestions.append(question)
+        #return visibleQuestions
+        return self._reviewingQuestions
 
     def removeReviewingQuestion(self, questionId, keepJud):
         """ Removes a question from the list
@@ -1248,11 +1218,11 @@ class ConferenceAbstractReview(Persistent):
         question = self.getQuestionById(questionId)
 
         if question:
-            if keepJud:
-                question.setVisible(False)
-            else:
-                self._reviewingQuestions.remove(question)
-                self.notifyModification()
+            #if keepJud:
+            #    question.setVisible(False)
+            #else:
+            self._reviewingQuestions.remove(question)
+            self.notifyModification()
         else:
             raise MaKaCError("Cannot remove a question which doesn't exist")
 
@@ -1408,14 +1378,14 @@ class Question(Persistent, Fossilizable):
     def getText(self):
         return self._text
 
-    def getVisible(self):
-        return self._visible
+#    def getVisible(self):
+#        return self._visible
 
     def setText(self, text):
         self._text = text
 
-    def setVisible(self, value):
-        self._visible = value
+#    def setVisible(self, value):
+#        self._visible = value
 
 
 class Answer(Persistent):
@@ -1424,16 +1394,16 @@ class Answer(Persistent):
     This class represents an answer given of a question.
     """
 
-    def __init__(self, newId, rbValue, numberOfAnswers, questionId):
+    def __init__(self, newId, rbValue, numberOfAnswers, question):
         """ Constructor.
             rbValue: real value of the radio button
             scaleLower, scaleHigher and numberOfAnswers: params to calculate the value in base to the scale and
                         the number of answers
-            questionId: Id of the associated question
+            question: Question objett associated
         """
         self._id = newId
         self._rbValue = rbValue
-        self._questionId = questionId
+        self._question = question
         # is necessary to save this value (_numberOfAnswers) here because when the value is recalculated in base to a new scale
         # we need to keep the rbValue in base to the previous number of answers, otherwise if the user changes the number of radio
         # buttons as well we could have for example rbValue = 5 and numberOfAnswers = 3 (values 1, 2, 3 but never 5)
@@ -1447,8 +1417,8 @@ class Answer(Persistent):
     def getValue(self):
         return self._value
 
-    def getQuestionId(self):
-        return self._questionId
+    def getQuestion(self):
+        return self._question
 
     def getRbValue(self):
         return self._rbValue

@@ -276,7 +276,7 @@ class RHFinalJudge(RHContribModifBase):
             #lastReview.getRefereeJudgement().setQuestions(self._questions)
             lastReview.getRefereeJudgement().setComments(self._comments)
             lastReview.getRefereeJudgement().setJudgement(self._judgement)
-            lastReview.setFinalJudgement(self._judgement)
+            #lastReview.setFinalJudgement(self._judgement)
             lastReview.getRefereeJudgement().sendNotificationEmail()
             self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
@@ -334,11 +334,11 @@ class RHJudgeEditing(RHEditorBase):
             lastReview.getEditorJudgement().setJudgement(self._editingJudgement)
             lastReview.getEditorJudgement().setComments(self._comments)
             lastReview.getEditorJudgement().sendNotificationEmail()
+            #if self._target.getParent().getConfPaperReview().getChoice() == 3:
+            #    self._target.getReviewManager().getLastReview().setFinalJudgement(self._editingJudgement)
 
-            if self._target.getParent().getConfPaperReview().getChoice() == 3:
-                self._target.getReviewManager().getLastReview().setFinalJudgement(self._editingJudgement)
-
-            if self._editingJudgement == "Accept" or self._editingJudgement == "Reject":
+            #if self._editingJudgement == "Accept" or self._editingJudgement == "Reject":
+            if self._editingJudgement == "1" or self._editingJudgement == "3":
                 self._redirect( urlHandlers.UHContributionEditingJudgement.getURL( self._target ))
             else:
                 self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ))

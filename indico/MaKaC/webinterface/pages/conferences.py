@@ -6021,10 +6021,7 @@ class WAbstracts( wcomponents.WTemplated ):
                 detailsImg = ""
             else:
                 # Get the list of questions and the answers values
-                questionNames = []
-                questionIds = abstract.getQuestionsAverage().keys()
-                for qId in questionIds:
-                    questionNames.append(self._conf.getConfAbstractReview().getQuestionById(qId).getText())
+                questionNames = abstract.getQuestionsAverage().keys()
                 answers = abstract.getQuestionsAverage().values()
                 rating = abstract.getRating()
                 imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")

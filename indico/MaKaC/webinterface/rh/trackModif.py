@@ -430,13 +430,11 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
             scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
             numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
             c = 0
-            for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
+            for question in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
                 rbValue = int(params.get("_GID"+str(c),scaleLower))
-                questionId = i.getId()
                 newId = self._target.getConference().getConfAbstractReview().getNewAnswerId()
-                #self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
-                newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+                newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
                 newAnswer.calculateRatingValue(scaleLower, scaleHigher)
                 self._answers.append(newAnswer)
         elif params.has_key("CANCEL"):
@@ -470,13 +468,11 @@ class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
             scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
             numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
             c = 0
-            for i in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
+            for question in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
                 rbValue = int(params.get("_GID"+str(c),scaleLower))
-                questionId = i.getId()
                 newId = self._target.getConference().getConfAbstractReview().getNewAnswerId()
-                #self._answers[i.getId()] = int(params.get("_GID"+str(c),0))
-                newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+                newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
                 newAnswer.calculateRatingValue(scaleLower, scaleHigher)
                 self._answers.append(newAnswer)
         elif params.has_key("CANCEL"):

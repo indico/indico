@@ -295,7 +295,7 @@ class Judgement(Persistent):
     def __init__(self, review, author = None, judgement = None, comments = "", submitted = False, submissionDate = None):
         self._review = review #the parent Review object for this Judgement
         self._author = author #the user (Referee, Editor or Reviewer) author of the judgement
-        self._judgement = judgement #the judgement, a string which represents the id of the judgement, 1:Accept, 2:To be Corrected, 3:Reject, ...others
+        self._judgement = judgement #the judgement is a status object, 1:Accept, 2:To be Corrected, 3:Reject, ...others
         self._comments = comments #the comments, a string
         #a list with the Answers objects
         self._answers = []
@@ -322,14 +322,13 @@ class Judgement(Persistent):
         if self._judgement == None:
             return None
         else:
-            return self.getReviewManager().getConfPaperReview().getStatusById(self._judgement).getName()
+            return self._judgement.getName()
 
     def getComments(self):
         return self._comments
 
     def getAnswers(self):
         """ To be implemented by sub-classes
-            Returns a list of tuples (question, answer)
         """
         pass
 
@@ -358,8 +357,8 @@ class Judgement(Persistent):
     def setAuthor(self, user):
         self._author = user
 
-    def setJudgement(self, judgement):
-        self._judgement = judgement
+    def setJudgement(self, judgementId):
+        self._judgement = self.getReviewManager().getConfPaperReview().getStatusById(judgementId)
 
     def setComments(self, comments):
         self._comments = comments
@@ -368,13 +367,14 @@ class Judgement(Persistent):
         """ Returns the Answer object if it already exists otherwise we create it
         """
         for answer in self._answers:
-            if (questionId == answer.getQuestionId()):
+            if (questionId == answer.getQuestion().getId()):
                 return answer
         # Create the new object with the initial value for the rbValue
         newId = self.getNewAnswerId()
         rbValue = ConferencePaperReview.initialSelectedAnswer
         numberOfAnswers = len(ConferencePaperReview.reviewingQuestionsAnswers)
-        newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+        question = self.getReviewManager().getConfPaperReview().getReviewingQuestionById(questionId)
+        newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
         self._answers.append(newAnswer)
         self.notifyModification()
         return newAnswer
@@ -388,6 +388,14 @@ class Judgement(Persistent):
             raise MaKaCError("Cannot submit an opinion without choosing the judgemenent before")
         self._submitted = submitted
         self._submissionDate = nowutc()
+
+    def purgeAnswers(self):
+        """ Remove the answers of the questions that were sent but we don't need anymory because
+            the questions has been removed """
+        # Check if the question has been removed
+        for answer in self._answers:
+            if (self.getConfPaperReview().getReviewingQuestionById(answer.getQuestion().getId()) == None):
+                self._answers.remove(answer)
 
     def sendNotificationEmail(self, widthdrawn = False):
         """ Sends an email to the contribution's authors when the referee, editor or reviewer
@@ -434,12 +442,14 @@ class RefereeJudgement(Judgement):
             A new Review object is then created as 'last review'.
         """
         Judgement.setSubmitted(self, submitted)
-
+        if (not self._submitted):
+            # Check if it is necessary to purge some answers
+            self.purgeAnswers()
         matReviewing = self.getReviewManager().getContribution().getReviewing()
 
         self.getReview().copyMaterials(matReviewing)
 
-        if self._judgement == "2" or int(self._judgement) > 3:
+        if self._judgement.getId() == "2" or int(self._judgement.getId()) > 3:
             self.getReviewManager().newReview()
             # remove reviewing materials from the contribution
             self.getReviewManager().getContribution().removeMaterial(matReviewing)
@@ -449,7 +459,7 @@ class RefereeJudgement(Judgement):
         questionAnswerList = []
         for answer in self._answers:
             try:
-                questionText = self.getConfPaperReview().getReviewingQuestionById(answer.getQuestionId()).getText()
+                questionText = answer.getQuestion().getText()
                 questionJudgement = ConferencePaperReview.reviewingQuestionsAnswers[answer.getRbValue()]
                 questionAnswerList.append(questionText+": "+questionJudgement)
             except AttributeError:
@@ -468,18 +478,46 @@ class EditorJudgement(Judgement):
             A new Review object is then created as 'last review'.
         """
         Judgement.setSubmitted(self, submitted)
-        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == 3 and self._judgement == "2":
+        if (not self._submitted):
+            # Check if it is necessary to purge some answers
+            self.purgeAnswers()
+        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == 3 and self._judgement.getId() == "2":
             matReviewing = self.getReviewManager().getContribution().getReviewing()
             self.getReview().copyMaterials(matReviewing)
             self.getReviewManager().newReview()
             # remove reviewing materials from the contribution
             self.getReviewManager().getContribution().removeMaterial(matReviewing)
 
+    def purgeAnswers(self):
+        """ Remove the answers of the questions that were sent but we don't need anymory because
+            the questions has been removed """
+        # Check if the question has been removed
+        for answer in self._answers:
+            if (self.getConfPaperReview().getLayoutQuestionById(answer.getQuestion().getId()) == None):
+                self._answers.remove(answer)
+
+
+    def getAnswer(self, questionId):
+        """ Returns the Answer object if it already exists otherwise we create it
+        """
+        for answer in self._answers:
+            if (questionId == answer.getQuestion().getId()):
+                return answer
+        # Create the new object with the initial value for the rbValue
+        newId = self.getNewAnswerId()
+        rbValue = ConferencePaperReview.initialSelectedAnswer
+        numberOfAnswers = len(ConferencePaperReview.reviewingQuestionsAnswers)
+        question = self.getReviewManager().getConfPaperReview().getLayoutQuestionById(questionId)
+        newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
+        self._answers.append(newAnswer)
+        self.notifyModification()
+        return newAnswer
+
     def getAnswers(self):
         questionAnswerList = []
         for answer in self._answers:
             try:
-                questionText = self.getConfPaperReview().getLayoutQuestionById(answer.getQuestionId()).getText()
+                questionText = answer.getQuestion().getText()
                 questionJudgement = ConferencePaperReview.reviewingQuestionsAnswers[answer.getRbValue()]
                 questionAnswerList.append(questionText+": "+questionJudgement)
             except AttributeError:
@@ -488,11 +526,18 @@ class EditorJudgement(Judgement):
 
 
 class ReviewerJudgement(Judgement):
+
+    def setSubmitted(self, submitted):
+        Judgement.setSubmitted(self, submitted)
+        if (not self._submitted):
+            # Check if it is necessary to purge some answers
+            self.purgeAnswers()
+
     def getAnswers(self):
         questionAnswerList = []
         for answer in self._answers:
             try:
-                questionText = self.getConfPaperReview().getReviewingQuestionById(answer.getQuestionId()).getText()
+                questionText = answer.getQuestion().getText()
                 questionJudgement = ConferencePaperReview.reviewingQuestionsAnswers[answer.getRbValue()]
                 questionAnswerList.append(questionText+": "+questionJudgement)
             except AttributeError:

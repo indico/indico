@@ -2347,12 +2347,12 @@ class Abstract(Persistent):
             for jud in self.getJudgementsHistoricalByTrack(track):
                 for answer in jud.getAnswers():
                     # check if the question is in d and sum the answers value or insert in d the new question
-                    if dTotals.has_key(answer.getQuestionId()):
-                        dTotals[answer.getQuestionId()] += float(answer.getValue())
-                        dTimes[answer.getQuestionId()] += 1
+                    if dTotals.has_key(answer.getQuestion().getText()):
+                        dTotals[answer.getQuestion().getText()] += float(answer.getValue())
+                        dTimes[answer.getQuestion().getText()] += 1
                     else: # first time
-                        dTotals[answer.getQuestionId()] = float(answer.getValue())
-                        dTimes[answer.getQuestionId()] = 1
+                        dTotals[answer.getQuestion().getText()] = float(answer.getValue())
+                        dTimes[answer.getQuestion().getText()] = 1
         # get the questions average
         questionsAverage = {}
         for q, v in dTotals.iteritems():
@@ -2482,7 +2482,7 @@ class AbstractJudgement( Persistent ):
     def removeAnswer(self, questionId):
         ''' Remove the current answers of the questionId '''
         for ans in self._answers:
-            if ans.getQuestionId() == questionId:
+            if ans.getQuestion().getId() == questionId:
                 self._answers.remove(ans)
 
 

@@ -805,7 +805,6 @@ class ContributionReviewingCriteriaModification(ContributionReviewingTextModific
 class ContributionReviewingSetSubmitted(ContributionReviewingBase):
 
     def _getAnswer( self ):
-
         if self._params.has_key('value'):
             judgementObject = self.getJudgementObject()
             try:

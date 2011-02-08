@@ -427,12 +427,11 @@ class RHPropToAcc(RHAbstractModifBase):
             scaleHigher = conf.getConfAbstractReview().getScaleHigher()
             numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()
             c = 0
-            for i in conf.getConfAbstractReview().getReviewingQuestions():
+            for question in conf.getConfAbstractReview().getReviewingQuestions():
                 c += 1
                 rbValue = int(params.get("_GID"+str(c),scaleLower))
-                questionId = i.getId()
                 newId = conf.getConfAbstractReview().getNewAnswerId()
-                newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+                newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
                 newAnswer.calculateRatingValue(scaleLower, scaleHigher)
                 self._answers.append(newAnswer)
 
@@ -481,12 +480,11 @@ class RHPropToRej(RHAbstractModifBase):
             scaleHigher = conf.getConfAbstractReview().getScaleHigher()
             numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()
             c = 0
-            for i in conf.getConfAbstractReview().getReviewingQuestions():
+            for question in conf.getConfAbstractReview().getReviewingQuestions():
                 c += 1
                 rbValue = int(params.get("_GID"+str(c),scaleLower))
-                questionId = i.getId()
                 newId = conf.getConfAbstractReview().getNewAnswerId()
-                newAnswer = Answer(newId, rbValue, numberOfAnswers, questionId)
+                newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
                 newAnswer.calculateRatingValue(scaleLower, scaleHigher)
                 self._answers.append(newAnswer)
         elif params.has_key("CANCEL"):

@@ -1537,7 +1537,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                     answerValues = []
                     answers = status.getAnswers()
                     for ans in answers:
-                        questionNames.append(self._conf.getConfAbstractReview().getQuestionById(ans.getQuestionId()).getText())
+                        questionNames.append(ans.getQuestion().getText())
                         answerValues.append(ans.getValue())
                     rating = status.getJudValue()
                     total = status.getTotalJudValue()
@@ -1587,8 +1587,8 @@ class WAbstractTrackOrderByRating(wcomponents.WTemplated):
         answerValues = self._abstract.getQuestionsAverage().values()
         i = 0
         questions = {}
-        for qId in questionIds:
-            questions[self._abstract.getConference().getConfAbstractReview().getQuestionById(qId).getText()] = answerValues[i]
+        for qText in questionIds:
+            questions[qText] = answerValues[i]
             i += 1
         vars = wcomponents.WTemplated.getVars( self )
 
