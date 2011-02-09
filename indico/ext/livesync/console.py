@@ -74,7 +74,7 @@ class ListCommand(ConsoleLiveSyncCommand):
         if args.pid:
             it = self._track.pointerIterItems(args.pid, args.toTS)
         else:
-            it = self._track._iter(args.fromTS, args.toTS)
+            it = self._track.iterate(args.fromTS, args.toTS)
 
         for ts, elem in it:
             print ts, elem
@@ -84,8 +84,9 @@ class ListCommand(ConsoleLiveSyncCommand):
 
 class DestroyCommand(ConsoleLiveSyncCommand):
     """
-    Completely resets the MPT. Please do not do this unless you know what you
-    are doing...
+    Completely resets the MPT.
+
+    .. WARNING:: Please do not do this unless you know what you are doing...
     """
 
     def _run(self, args):

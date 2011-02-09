@@ -18,6 +18,14 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Livesync is an Indico plugin that allows information to be exported to other
+systems in a regular basis, and to keep track of what has been exported.
+It relies on "agents", basically interfaces that convert Indico metadata into
+some format that can be read by the target system, and negociate the protocol
+for data delivery.
+"""
+
 __metadata__ = {
     'name': "Live Sync",
     'description': "Synchronizes information between Indico and external repositories"

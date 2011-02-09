@@ -208,7 +208,7 @@ class PeriodicTask(BaseTask):
 
     def __init__(self, frequency, **kwargs):
         """
-        - frequency - a valid dateutil frequency specifier (DAILY, HOURLY, etc...)
+        :param frequency: a valid dateutil frequency specifier (DAILY, HOURLY, etc...)
         """
         super(PeriodicTask, self).__init__()
 

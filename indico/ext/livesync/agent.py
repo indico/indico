@@ -186,13 +186,20 @@ class AgentProviderComponent(Component):
 
 class PushSyncAgent(SyncAgent):
     """
-    Base class for PushSyncAgents
+    PushSyncAgents are agents that actively send data to remote services,
+    instead of waiting to be queried.
     """
 
     # Should specify which worker will be used
     _workerClass = None
 
-    def __init__(self, aid, name, description, updateTime, access = None):
+    def __init__(self, aid, name, description, updateTime, access=None):
+        """
+        :param aid: agent ID
+        :param name: agent name
+        :param description: a description of the agent
+        :param access: an Indico user/group that has equivalent access
+        """
         super(PushSyncAgent, self).__init__(aid, name, description, updateTime)
         self._lastTry = None
         self._access = access
@@ -205,12 +212,15 @@ class PushSyncAgent(SyncAgent):
 
     def _generateRecords(self, data, lastTS):
         """
+        :param data: iterable containing data to be converted
+        :param lastTS:
+
         Takes the raw data (i.e. "event created", etc) and transforms
         it into a sequence of 'record/action' pairs.
 
-        Basically ,this function reduces actions to remove server "commands"
+        Basically, this function reduces actions to remove server "commands"
 
-        i.e. "modified 1234, deleted 1234" becomes just "delete 1234"
+        i.e. ``modified 1234, deleted 1234`` becomes just ``delete 1234``
 
         Overloaded by agents
         """
@@ -255,6 +265,7 @@ class PushSyncAgent(SyncAgent):
     def acknowledge(self):
         """
         Called to signal that the information has been correctly processed
+        (usually called by periodic task)
         """
         self._manager.advance(self.getId(), self._lastTry)
 
@@ -266,20 +277,32 @@ class SyncManager(Persistent):
     """
 
     def __init__(self, granularity=MPT_GRANULARITY):
+        """
+        :param granularity: integer, number of seconds per MPT entry
+        """
         self._granularity = granularity
         self.reset()
 
     def getGranularity(self):
+        """
+        Returns the granularity that is set for the MPT
+        """
         return self._granularity
 
     @classmethod
     def getDBInstance(cls):
+        """
+        Returns the instance of SyncManager currently in the DB
+        """
         storage = getPluginType().getStorage()
         return storage['agent_manager']
 
     def reset(self, agentsOnly=False, trackOnly=False):
         """
         Resets database structures
+
+        .. WARNING::
+           This erases any agents and contents in the MPT
         """
         if not trackOnly:
             self._agents = mapping.PersistentMapping()
@@ -344,6 +367,9 @@ class SyncManager(Persistent):
 
 
 class RecordUploader(object):
+    """
+    Encapsulates record uploading behavior.
+    """
 
     DEFAULT_BATCH_SIZE, DEFAULT_NUM_SLAVES = 1000, 2
 
@@ -354,13 +380,15 @@ class RecordUploader(object):
 
     def _uploadBatch(self, batch):
         """
-        To be overloaded by uploaders
+        :param batch: list of records
+
+        To be overloaded by uploaders. Does the actual upload.
         """
         raise Exception("Unimplemented method!")
 
     def iterateOver(self, iterator):
         """
-        Consumes an iterator
+        Consumes an iterator, uploading the records that are returned
         """
 
         currentBatch = []
@@ -580,4 +608,3 @@ class UploaderSlave(Thread):
         Should be overloaded.
         """
         raise Exception("Unimplemented method")
-

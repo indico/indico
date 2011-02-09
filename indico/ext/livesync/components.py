@@ -46,15 +46,16 @@ from MaKaC import conference
 
 
 class RequestListener(Component):
+    """
+    This component manages the ``ContextManager`` area that stores
+    livesync actions
+    """
 
     implements(IServerRequestListener)
 
     # IServerRequestListener
 
     def requestFinished(self, req):
-        """
-        Inserts the elements from the temporary index into the permanent one
-        """
 
         sm = SyncManager.getDBInstance()
         track = sm.getTrack()
@@ -66,6 +67,8 @@ class RequestListener(Component):
         if cm.__class__ == ContextManager.DummyContext:
             return
 
+        # Insert the elements from the temporary index
+        # into the permanent one (MPT)
         for obj, actions in cm.iteritems():
             for action in actions:
                 Logger.get('ext.livesync').debug((obj, action))
@@ -83,6 +86,11 @@ class RequestListener(Component):
 
 
 class ObjectChangeListener(Component):
+    """
+    This component listens for events and directs them to the MPT.
+    Implements ``IAccessControlListener``, ``IObjectLifeCycleListener``
+    and ``IMetadataChangeListener``
+    """
 
     implements(IAccessControlListener,
                IObjectLifeCycleListener,

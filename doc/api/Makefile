@@ -40,6 +40,11 @@ html: 	generate_dynamic
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+coverage: 	generate_dynamic
+	$(SPHINXBUILD) -b coverage $(ALLSPHINXOPTS) $(BUILDDIR)/coverage
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
+
 dirhtml: generate_dynamic
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo

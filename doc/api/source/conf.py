@@ -22,7 +22,12 @@ sys.path = [os.path.abspath('../../../'),os.path.abspath('../../../indico')] + s
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'repoze.sphinx.autointerface']
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.doctest',
+              'sphinx.ext.todo',
+              'sphinx.ext.coverage',
+              'sphinx.ext.pngmath',
+              'repoze.sphinx.autointerface']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -86,6 +91,9 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# include __init__() as well
+autoclass_content = "both"
+autodoc_default_flags = ['members', 'show-inheritance']
 
 # -- Options for HTML output ---------------------------------------------------
 
@@ -158,7 +166,7 @@ html_static_path = ['_static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'cds-indicodoc'
+htmlhelp_basename = 'indicodoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------

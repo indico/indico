@@ -16,6 +16,7 @@ Contents:
    ./test.rst
    ./scheduler.rst
    ./extension.rst
+   ./livesync.rst
 
 Indices and tables
 ==================
