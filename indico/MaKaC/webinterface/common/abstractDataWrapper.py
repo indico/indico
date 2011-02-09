@@ -20,7 +20,7 @@
 
 
 class Author:
-    
+
     def __init__(self,id,**data):
         self._id=id
         self.setValues(**data)
@@ -75,11 +75,11 @@ class Author:
 
 
 class Abstract:
-    
+
     def __init__(self, afm, **data):
         self._afm = afm
         self.setValues(**data)
-    
+
     def setValues(self, **data):
         self._title=data.get("title", "")
         self._otherFields = {}
@@ -112,12 +112,15 @@ class Abstract:
             id=len(self._coAuthors)
             self._coAuthors.append(Author(id,**val))
 
+    def getFieldNames( self ):
+        return self._otherFields.keys()
+
     def getOtherFieldValue( self, id ):
         return self._otherFields.get(id, "")
 
     def setOtherFieldValue( self, id, value ):
         self._otherFields[id] = value
-    
+
     def mapAbstract(self, abstract):
         self._title=abstract.getTitle()
         self._otherFields = {}
@@ -193,7 +196,7 @@ class Abstract:
         for auth in l:
             auth.setId(i)
             i += 1
-    
+
     def upPrimaryAuthors(self,id):
         i = 0
         pauth = None
@@ -249,7 +252,7 @@ class Abstract:
             self._coAuthors.remove(cauth)
             self._coAuthors.insert(i, cauth)
             self._resetIds(self._coAuthors)
-            
+
     def removePrimaryAuthors(self,idList):
         toRem=[]
         for auth in self._primAuthors:
@@ -257,7 +260,7 @@ class Abstract:
                 toRem.append(auth)
         for auth in toRem:
             self._primAuthors.remove(auth)
-    
+
     def removeCoAuthors(self,idList):
         toRem=[]
         for auth in self._coAuthors:

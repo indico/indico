@@ -81,7 +81,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         for f in afm.getActiveFields():
             id = f.getId()
             caption = f.getName()
-            html+=self._getHTMLRow(caption, self._contrib.getField(id))
+            html+=self._getHTMLRow(caption, self.htmlText(self._contrib.getField(id)))
         return html
 
     def _getSubContributionItem(self, sc, modifURL):

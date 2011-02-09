@@ -33,7 +33,7 @@ class Sanitization(object):
     @staticmethod
     def _sanitize(params, level, doNotSanitize=[]):
         for i in params:
-            if isinstance(doNotSanitize, list) and i in doNotSanitize:
+            if i in doNotSanitize:
                 continue
             if isinstance(params, dict):
                 param = params[i]
@@ -87,7 +87,7 @@ class Sanitization(object):
                 Sanitization._encodeUnicode(param)
 
     @staticmethod
-    def sanitizationCheck(target, params, accessWrapper, doNotSanitize=False):
+    def sanitizationCheck(target, params, accessWrapper, doNotSanitize=[]):
         # first make sure all params are utf-8
         Sanitization._encodeUnicode(params)
 
@@ -108,7 +108,7 @@ class Sanitization(object):
             #Escape all HTML tags
             Sanitization._escapeHTML(params)
 
-        elif level in [1,2] and doNotSanitize != True:
+        elif level in [1,2]:
             #level 1 or default: raise error if script or style detected
             #level 2: raise error if script but style accepted
             Sanitization._sanitize(params, level, doNotSanitize)

@@ -407,6 +407,7 @@ class RHAbstractSubmission( RHAbstractSubmissionBase ):
         params["type"] = self._conf.getContribTypeById(id)
         self._abstractData = AbstractData( self._target.getAbstractMgr(), params )
         self._doNotSanitizeFields = self._abstractData.getFieldNames()
+        self._doNotSanitizeFields.append('title')
         if "add_primary_author" in params:
             #self._action = "NEW_AUTHOR"
             self._abstractData.authors.addPrimaryAuthor( focus=True )
@@ -635,6 +636,7 @@ class RHAbstractModify( RHAbstractModificationBase ):
         params["type"]=self._conf.getContribTypeById(params.get("type", ""))
         self._abstractData = AbstractData( self._conf.getAbstractMgr(), params )
         self._doNotSanitizeFields = self._abstractData.getFieldNames()
+        self._doNotSanitizeFields.append('title')
         if "add_primary_author" in params:
             self._abstractData.authors.addPrimaryAuthor( focus=True )
         elif "add_secondary_author" in params:
