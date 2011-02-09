@@ -318,8 +318,6 @@ class RHConferenceOpen( RHConferenceModifBase ):
             else:
                 raise ModificationError()
 
-    _allowClosed = True
-
     def _checkParams( self, params ):
         RHConferenceBase._checkParams(self, params )
 
