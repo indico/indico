@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferenceAbstractReview %>
+<% from MaKaC.abstractReviewing import ConferenceAbstractReview %>
 <form action=<%= postURL %> method="POST">
     <table width="60%" align="left" border="0" cellspacing="6" cellpadding="2" style="padding-top:15px; padding-left:15px;">
         <tr>

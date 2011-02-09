@@ -870,7 +870,7 @@ class SystemLinkData(Observable):
                 "parent": "mystuff"}, \
             "manageabstractreviewing": { \
                 "caption": _("Manage Abstract Reviewing"), \
-                "URL": str(str(urlHandlers.UHConfModifReviewingAbstractSetup.getURL(conf))), \
+                "URL": str(str(urlHandlers.UHAbstractReviewingSetup.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "mystuff"}, \
             "managepaperreviewing": { \

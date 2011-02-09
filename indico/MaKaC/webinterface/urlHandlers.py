@@ -2961,6 +2961,7 @@ class UHTrackAbstractModIntCommentEdit(UHTrackAbstractModCommentBase):
 class UHTrackAbstractModIntCommentRem(UHTrackAbstractModCommentBase):
     _relativeURL = "trackAbstractModif.py/commentRem"
 
+
 class UHAbstractReviewingNotifTpl(URLHandler):
     _relativeURL = "confModifCFA.py/notifTpl"
 
@@ -3275,6 +3276,12 @@ class UHConfModAbstractBook( URLHandler ):
 
 class UHConfModAbstractBookEdit( URLHandler ):
     _relativeURL = "confModBOA.py/edit"
+
+class UHAbstractReviewingSetup(URLHandler):
+    _relativeURL = "confModifCFA.py/reviewingSetup"
+
+class UHAbstractReviewingTeam (URLHandler):
+    _relativeURL = "confModifCFA.py/reviewingTeam"
 
 class UHConfModScheduleDataEdit( URLHandler ):
     _relativeURL = "confModifSchedule.py/edit"
@@ -4363,9 +4370,6 @@ class UHDownloadContributionTemplate( URLHandler ):
 
 class UHDeleteContributionTemplate( URLHandler ):
     _relativeURL = "confModifReviewing.py/deleteTemplate"
-
-class UHConfModifReviewingAbstractSetup ( URLHandler ):
-    _relativeURL = "confModifReviewing.py/abstractSetup"
 
 class UHConfModifReviewingControl ( URLHandler ):
     _relativeURL = "confModifReviewingControl.py"

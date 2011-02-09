@@ -32,7 +32,7 @@ from MaKaC.common import Config
 import MaKaC.webinterface.common.abstractDataWrapper as abstractDataWrapper
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
-from MaKaC.reviewing import ConferenceAbstractReview
+from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.reviewing import Answer
 
 

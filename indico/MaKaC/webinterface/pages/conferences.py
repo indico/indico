@@ -2126,7 +2126,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             urlHandlers.UHConfModifContribList.getURL( self._conf ))
         self._generalSection.addItem( self._contribListMenuItem)
 
-        self._reviewingMenuItem = wcomponents.SideMenuItem(_("Reviewing"),
+        self._reviewingMenuItem = wcomponents.SideMenuItem(_("Paper Reviewing"),
             urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
         self._generalSection.addItem( self._reviewingMenuItem)
 
@@ -2293,12 +2293,22 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
         self._tabCFAPreview = self._tabCtrl.newTab("cfapreview", _("Preview"), urlHandlers.UHConfModifCFAPreview.getURL(self._conf))
         self._tabAbstractList = self._tabCtrl.newTab( "abstractList", _("List of Abstracts"), urlHandlers.UHConfAbstractList.getURL( self._conf ) )
         self._tabBOA = self._tabCtrl.newTab("boa", _("Book of Abstracts Setup"), urlHandlers.UHConfModAbstractBook.getURL(self._conf))
+        self._tabCFAR = self._tabCtrl.newTab("reviewing", _("Reviewing"), urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
+
+        # Create subtabs for the reviewing
+        self._subTabARSetup = self._tabCFAR.newSubTab( "revsetup", "Setup",\
+                    urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
+        self._subTabARTeam = self._tabCFAR.newSubTab( "revteam", "Team",\
+                    urlHandlers.UHAbstractReviewingTeam.getURL(self._conf))
+        self._subTabARNotifTpl = self._tabCFAR.newSubTab( "notiftpl", "Notification templates",\
+                    urlHandlers.UHAbstractReviewingNotifTpl.getURL(self._conf))
 
         if not self._conf.hasEnabledSection("cfa"):
             self._tabBOA.disable()
             self._tabCFA.disable()
             self._tabAbstractList.disable()
             self._tabCFAPreview.disable()
+            self._tabCFAR.disable()
 
         self._setActiveTab()
 

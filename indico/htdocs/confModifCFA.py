@@ -53,6 +53,12 @@ def selectSubmitter( req, **params ):
 def removeSubmitter( req, **params ):
     return conferenceModif.RHConfModifCFARemoveSubmitter( req ).process( params )
 
+def reviewingSetup(req, **params):
+    return conferenceModif.RHAbstractReviewingSetup(req).process(params)
+
+def reviewingTeam(req, **params):
+    return conferenceModif.RHAbstractReviewingTeam(req).process(params)
+
 def notifTpl( req, **params ):
     return conferenceModif.RHNotifTpl( req ).process( params )
 

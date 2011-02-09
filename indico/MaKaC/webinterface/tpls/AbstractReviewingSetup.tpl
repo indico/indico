@@ -40,9 +40,9 @@
 
 <script type="text/javascript">
 // Component for the review questions
-$E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.abstractReviewing.getQuestions',
-        'add':'reviewing.abstractReviewing.addQuestion', 'remove':'reviewing.abstractReviewing.removeQuestion',
-        'edit': 'reviewing.abstractReviewing.editQuestion'},
+$E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'abstractReviewing.getQuestions',
+        'add':'abstractReviewing.addQuestion', 'remove':'abstractReviewing.removeQuestion',
+        'edit': 'abstractReviewing.editQuestion'},
         {conference: '<%= abstractReview.getConference().getId() %>'},'question', 'abstractReviewingQuestions', true));
 
 
@@ -50,15 +50,15 @@ $E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements
 var question = "How would you rate this abstract?";
 
 // Component for example question
-var previewQuestion =  new ExampleQuestionWidget('reviewing.abstractReviewing.updateExampleQuestion',
+var previewQuestion =  new ExampleQuestionWidget('abstractReviewing.updateExampleQuestion',
         {conference: '<%= abstractReview.getConference().getId() %>'});
 previewQuestion.draw();
 
 // Components to change the number of answers and the scale
-$E('inPlaceEditNumberOfAnswers').set(new NumberAnswersEditWidget('reviewing.abstractReviewing.changeNumberofAnswers',
+$E('inPlaceEditNumberOfAnswers').set(new NumberAnswersEditWidget('abstractReviewing.changeNumberofAnswers',
        {conference: '<%= abstractReview.getConference().getId() %>'},'<%= abstractReview.getNumberOfAnswers() %>').draw());
 
-$E('inPlaceEditScale').set(new ScaleEditWidget('reviewing.abstractReviewing.changeScale',
+$E('inPlaceEditScale').set(new ScaleEditWidget('abstractReviewing.changeScale',
        {conference: '<%= abstractReview.getConference().getId() %>'},
        {'min':'<%= abstractReview.getScaleLower() %>', 'max':'<%= abstractReview.getScaleHigher() %>'}).draw());
 

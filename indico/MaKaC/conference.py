@@ -48,7 +48,7 @@ from datetime import datetime, timedelta, time
 
 from MaKaC.contributionReviewing import ReviewManager
 from reviewing import ConferencePaperReview as ConferencePaperReview
-from reviewing import ConferenceAbstractReview as ConferenceAbstractReview
+from abstractReviewing import ConferenceAbstractReview as ConferenceAbstractReview
 
 from pytz import timezone
 from pytz import all_timezones

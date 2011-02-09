@@ -39,7 +39,7 @@ from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
-from MaKaC.reviewing import ConferenceAbstractReview
+from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.reviewing import Answer
 
 

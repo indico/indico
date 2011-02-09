@@ -57,6 +57,7 @@ endpointMap = {
     "upcomingEvents": importModule('MaKaC.services.implementation.upcoming'),
     "timezone": importModule('MaKaC.services.implementation.timezone'),
     "scheduler": importModule('MaKaC.services.implementation.scheduler'),
+    "abstractReviewing": importModule('MaKaC.services.implementation.abstractReviewing'),
 
     # Hermes integration
     #"hermes": importPlugin('Collaboration', 'Hermes', 'ServiceEndpoint'),

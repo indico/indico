@@ -22,8 +22,7 @@ import simplejson
 
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-from MaKaC.webinterface.pages.reviewing import WPConfModifReviewingPaperSetup,\
-    WPConfModifAbstractReviewing
+from MaKaC.webinterface.pages.reviewing import WPConfModifReviewingPaperSetup
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase,\
     RHConferenceModifKey
@@ -101,8 +100,6 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
 
         elif self._isPRM:
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
-        elif self._conf.canModify(self.getAW()):
-            url = urlHandlers.UHConfModifReviewingAbstractSetup.getURL( self._conf)
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
         elif self._isReviewer:
@@ -157,19 +154,6 @@ class RHConfModifReviewingPaperSetup( RHConfModifReviewingPRMBase ):
             p = WPConfModifReviewingPaperSetup( self, self._target)
         return p.display()
 
-
-class RHConfModifReviewingAbstractSetup( RHConferenceModifBase ):
-    """ Class used when the user clicks on the Abstract Setup
-        subtab of the Reviewing tab
-    """
-    _uh = urlHandlers.UHConfModifReviewingAbstractSetup
-
-    def _process( self ):
-        if self._conf.isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-        else:
-            p = WPConfModifAbstractReviewing(self, self._target)
-        return p.display()
 
 
 #################################### Start of old classes that are not used anymore ###############################
