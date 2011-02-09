@@ -298,6 +298,8 @@ class RHConferenceClose( RHConferenceBase ):
 
 class RHConferenceOpen( RHConferenceBase ):
 
+    _allowClosed = True
+
     def _checkParams( self, params ):
         RHConferenceBase._checkParams(self, params )
 
