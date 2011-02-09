@@ -204,16 +204,45 @@ class outputGenerator(Observable):
 
         return accounts
 
+    def _generateACLDatafield(self, eType, memberList, objId, out):
+        """
+        Generates a specific MARCXML 506 field containing the ACL
+        """
+        if eType:
+            out.openTag("datafield", [["tag", "506"],
+                                      ["ind1", "1"], ["ind2", " "]])
+            for memberId in memberList:
+                out.writeTag("subfield", memberId, [["code", "d"]])
+            out.writeTag("subfield", eType, [["code", "f"]])
+
+        else:
+            out.openTag("datafield", [["tag", "506"], ["ind1", "0"],
+                                      ["ind2", " "]])
+
+        # define which part of the record the list concerns
+        if objId != None:
+            out.writeTag("subfield", "INDICO.%s" % \
+                         objId, [["code", "3"]])
+
+        out.closeTag("datafield")
+
     def _generateAccessList(self, out, obj, specifyId=True):
-        """Generate a comprehensive access list showing all users and e-groups who may access
-        this object, taking into account the permissions and access lists of its owners.
-        obj could be a Conference, Session, Contribution, Material, Resource or SubContribution object."""
+        """
+        Generate a comprehensive access list showing all users and e-groups who
+        may access this object, taking into account the permissions and access
+        lists of its owners.
+        obj could be a Conference, Session, Contribution, Material, Resource
+        or SubContribution object.
+        """
 
         allowed_users = obj.getRecursiveAllowedToAccessList()
 
-        # Populate two lists holding email/group strings instead of Avatar/Group objects
+        # Populate two lists holding email/group strings instead of
+        # Avatar/Group objects
         allowed_logins = []
         allowed_groups = []
+
+        objId = self.dataInt.objToId(obj) if specifyId else None
 
         for user_obj in allowed_users:
             if isinstance(user_obj, Avatar):
@@ -227,26 +256,14 @@ class outputGenerator(Observable):
         if len(allowed_groups) + len(allowed_logins) > 0:
             # Create XML list of groups
             if len(allowed_groups) > 0:
-                out.openTag("datafield", [["tag","506"],["ind1","1"],["ind2"," "]])
-                for group_id in allowed_groups:
-                    out.writeTag("subfield", group_id, [["code","d"]])
-                out.writeTag("subfield", "group", [["code","f"]])
+                self._generateACLDatafield('group', allowed_groups, objId, out)
 
             # Create XML list of emails
             if len(allowed_logins) > 0:
-                out.openTag("datafield", [["tag","506"],["ind1","1"],["ind2"," "]])
-                for email_id in allowed_logins:
-                    out.writeTag("subfield", email_id, [["code","d"]])
-                out.writeTag("subfield", "username", [["code","f"]])
+                self._generateACLDatafield('username', allowed_logins, objId, out)
         else:
-            out.openTag("datafield", [["tag","506"],["ind1","0"],["ind2"," "]])
-
-        # define which part of the record the list concerns
-        if specifyId:
-            out.writeTag("subfield", "INDICO.%s" % \
-                         self.dataInt.objToId(obj), [["code","3"]])
-
-        out.closeTag("datafield")
+            # public record
+            self._generateACLDatafield(None, None, objId, out)
 
     def _confToXML(self,
                    conf,
