@@ -38,7 +38,6 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
 
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
-        #self._isAM = RCAbstractManager.hasRights(rh)
         self._canModify = self._conf.canModify(rh.getAW())
 
         self._showListContribToJudge = self._conf.getConfPaperReview().isReferee(rh._getUser())
@@ -50,44 +49,30 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
         self._showAssignContributions = self._canModify or self._isPRM or self._conf.getConfPaperReview().isReferee(rh._getUser())
 
 
-
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
         if self._isPRM or self._canModify:
-            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
+            self._subTabPaperReviewingSetup = self._tabCtrl.newTab( "revsetup", "Setup",\
                 urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-        elif self._showAssignContributions:
-            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
-                urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
-        elif self._showListContribToJudgeAsEditor:
-            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
-                urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) )
-        else:
-            self._subtabPaperReviewing = self._tabCtrl.newTab( "paperrev", "Paper Reviewing", \
-                urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
-
-        if self._isPRM or self._canModify:
-            self._subTabPaperReviewingSetup = self._subtabPaperReviewing.newSubTab( "revsetup", "Setup",\
-                urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-            self._tabPaperReviewingControl = self._subtabPaperReviewing.newSubTab( "revcontrol", "Team",\
+            self._tabPaperReviewingControl = self._tabCtrl.newTab( "revcontrol", "Team",\
                     urlHandlers.UHConfModifReviewingControl.getURL( self._conf ) )
-            self._tabUserCompetencesReviewing = self._subtabPaperReviewing.newSubTab( "revcompetences", "Competences",\
+            self._tabUserCompetencesReviewing = self._tabCtrl.newTab( "revcompetences", "Competences",\
                     urlHandlers.UHConfModifUserCompetences.getURL( self._conf ) )
 
 
         if self._showAssignContributions:
-            self._tabAssignContributions = self._subtabPaperReviewing.newSubTab( "assignContributions", "Assign Contributions",\
+            self._tabAssignContributions = self._tabCtrl.newTab( "assignContributions", "Assign Contributions",\
                     urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
 
         if self._showListContribToJudge and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
-            self._tabListContribToJudge = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Referee",\
+            self._tabListContribToJudge = self._tabCtrl.newTab( "contributionsToJudge", "Judge as Referee",\
                     urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) )
         if self._showListContribToJudgeAsReviewer and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
-            self._tabListContribToJudgeAsReviewer = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Content Reviewer",\
+            self._tabListContribToJudgeAsReviewer = self._tabCtrl.newTab( "contributionsToJudge", "Judge as Content Reviewer",\
                     urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
         if self._showListContribToJudgeAsEditor and (self._conf.getConfPaperReview().getChoice()==3 or self._conf.getConfPaperReview().getChoice()==4):
-            self._tabListContribToJudgeAsEditor = self._subtabPaperReviewing.newSubTab( "contributionsToJudge", "Judge as Layout Reviewer",\
+            self._tabListContribToJudgeAsEditor = self._tabCtrl.newTab( "contributionsToJudge", "Judge as Layout Reviewer",\
                     urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) )
 
         self._setActiveTab()
@@ -115,7 +100,6 @@ class WPConfModifReviewingPaperSetup(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, target)
 
     def _setActiveTab( self ):
-        self._subtabPaperReviewing.setActive()
         self._subTabPaperReviewingSetup.setActive()
 
     def _getTabContent( self, params ):
@@ -315,7 +299,6 @@ class WPConfModifReviewingControl(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, target)
 
     def _setActiveTab( self ):
-        self._subtabPaperReviewing.setActive()
         self._tabPaperReviewingControl.setActive()
 
     def _getTabContent( self, params ):
@@ -674,7 +657,6 @@ class WPConfReviewingAssignContributions(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, conference)
 
     def _setActiveTab( self ):
-        self._subtabPaperReviewing.setActive()
         self._tabAssignContributions.setActive()
 
     def _getTabContent( self, params ):
@@ -710,7 +692,6 @@ class WPConfModifUserCompetences(WPConfModifReviewingBase):
         WPConfModifReviewingBase.__init__(self, rh, conference)
 
     def _setActiveTab( self ):
-        self._subtabPaperReviewing.setActive()
         self._tabUserCompetencesReviewing.setActive()
 
     def _getTabContent( self, params ):
