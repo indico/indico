@@ -14,7 +14,7 @@
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionormat"><%= _("Affiliation")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Affiliation")%></span></td>
         <td class="blacktext">%(organisation)s</td>
     </tr>
     <tr>
