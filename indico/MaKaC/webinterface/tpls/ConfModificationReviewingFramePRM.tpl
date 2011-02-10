@@ -1,26 +1,32 @@
 <% from MaKaC.reviewing import ConferencePaperReview %>
 <% from MaKaC.common.fossilize import fossilize %>
 
-
-<br>
-<table width="85%" align="center" border="0">
+<table width="90%" align="left" border="0" style="padding-top:10px;">
     <tr>
-        <td id="revControlPRMHelp"  colspan="3" class="groupTitle" style="padding-top: 15px;"><%= _("Step 1: Assign Managers of Paper Reviewing Module")%></td>
+        <td id="revControlPRMHelp"  colspan="3" class="groupTitle"><%= _("Step 1 - Assign managers of paper reviewing")%></td>
     </tr>
     <tr>
         <td colspan="3">
             <% if ConfReview.getEnablePRMEmailNotif(): %>
-                <div style="padding-top: 10px; padding-bottom: 15px;">
-                    <em><%=_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")%></em><br>
-                    <em><%= _("You  can  modify this from the Paper Reviewing Setup.")%></em>
+                <div style="padding:5px; color:gray;">
+                    <span class="collShowBookingsText"><%=_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")%></span><br>
+                    <span class="collShowBookingsText"><%= _("You  can  modify this from the Paper Reviewing Setup.")%></span>
                 </div>
             <% end %>
         </td>
     </tr>
+</table>
+<table style="padding-left:20px;">
     <tr>
-         <td style="padding-top: 15px;"><span class="titleCellFormat"><br><%= _("Managers of Paper Reviewing Module") %><br><span style="font-size:8pt;"><%= _("responsibilities: setup, assign contributions to Referees, define team competences") %></span></span></td>
-        <td width="80%" style="padding-top: 15px;"><div id="PRMList"></div></td>
+        <td class="subGroupTitle"><%= _("Managers") %></td>
     </tr>
+    <tr>
+        <td class="questionContent" style="padding-top:5px; padding-left:3px;">
+            <span><%= _("Responsibilities: Setup, assign contributions to Referees, define team competences") %></span></span>
+        </td>
+    </tr>
+    <tr>
+        <td width="80%" style="padding-top: 5px; padding-left:3px;"><div id="PRMList"></div></td>
     </tr>
 </table>
 <br>
@@ -62,7 +68,7 @@
                             );
                         };
 
-                        var uf = new UserListField('userListDiv', 'userList',
+                        var uf = new UserListField('managersPRUserListDiv', 'userList',
                                 <%= jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) %>,
                                 true,null,
                                 true, false, null, null,

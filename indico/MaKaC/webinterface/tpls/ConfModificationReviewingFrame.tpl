@@ -2,16 +2,16 @@
 <% from MaKaC.common.fossilize import fossilize %>
 
 
-<table width="85%" align="center" border="0">
+<table width="90%" align="left" border="0">
     <tr>
-        <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="padding-top: 15px; padding-bottom: 15px;">
-            <%= _("Step 2: Assign Reviewers")%>
+        <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="padding-top: 10px;">
+            <%= _("Step 2 - Assign Reviewers")%>
         </td>
     </tr>
     <% if not ConfReview.hasReviewing(): %>
     <tr>
-        <td>
-            <p style="padding-left: 25px;"><font color="gray"><%= _("Type of reviewing has not been chosen yet.")%></font></p>
+        <td style="padding-left: 25px; padding-top:10px; color:gray;">
+            <span><%= _("Type of reviewing has not been chosen yet.")%></span>
         </td>
     </tr>
     <% end %>
@@ -19,9 +19,9 @@
     <tr>
         <td>
             <% if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif(): %>
-                <div style="padding-top: 10px; padding-bottom: 15px;">
-                    <em><%=_("An automatically generated e-mail will be sent to newly assigned Reviewers.")%></em><br>
-                    <em><%= _("You  can  modify this from the Paper Reviewing Setup.")%></em>
+                <div style="padding:5px; color:gray;">
+                    <span class="collShowBookingsText"><%=_("An automatically generated e-mail will be sent to newly assigned Reviewers.")%></span><br>
+                    <span class="collShowBookingsText"><%= _("You  can  modify this from the Paper Reviewing Setup.")%></span>
                 </div>
             <% end %>
         </td>
@@ -29,14 +29,21 @@
     <tr>
 </table>
 
-<table width="83%" align="center" border="0">
+<table align="left" border="0" style="padding-left:20px;">
 <% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
 <% pass %>
 <% end %>
 <% else: %>
     <tr>
-        <td width="80%" class="titleCellTD"><span class="titleCellFormat"><%= _("Referees") %><br><span style="font-size: 8pt"><%= _("responsiblities: Assign, contributions to Reviewers, Give final judgement") %></span></span></td>
-        <td width="80%" style="padding-top: 15px; padding-bottom: 15px;"><div id="RefereeList"></div></td>
+        <td class="subGroupTitle"><%= _("Referees") %></td>
+    </tr>
+    <tr>
+        <td class="questionContent" style="padding-top:5px; padding-left:3px;">
+            <span><%= _("Responsibilities: Assign contributions to reviewers and give final judgement") %></span>
+        </td>
+    </tr>
+    <tr>
+        <td width="80%" style="padding-top: 5px; padding-left:3px;"><div id="RefereeList"></div></td>
     </tr>
 <script type="text/javascript">
 
@@ -90,7 +97,7 @@
                             }
                         };
 
-                        var uf = new UserListField('userListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
                                 <%= jsonEncode(fossilize(ConfReview.getRefereesList())) %>,
                                 true,null,
                                 true, false, null, null,
@@ -99,8 +106,15 @@
                         $E('RefereeList').set(uf.draw());
 </script>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Content Reviewers") %><br><span style="font-size: 8pt"><%= _("responsibility: judge content verification of contributions") %></span></span></td>
-        <td width="80%" style="padding-top: 15px; padding-bottom: 15px;"><div id="ReviewerList"></div></td>
+        <td class="subGroupTitle" style="padding-top:15px;"><%= _("Content Reviewers") %></td>
+    </tr>
+    <tr>
+        <td class="questionContent" style="padding-top:5px; padding-left:3px;">
+            <span><%= _("Responsibility: Judge content verification of contributions") %></span>
+        </td>
+    </tr>
+    <tr>
+        <td width="80%" style="padding-top: 5px; padding-left:3px;"><div id="ReviewerList"></div></td>
     </tr>
 <script type="text/javascript">
                         var newReviewerHandler = function(userList, setResult) {
@@ -152,7 +166,7 @@
                             }
                         };
 
-                        var uf = new UserListField('userListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
                                 <%= jsonEncode(fossilize(ConfReview.getReviewersList())) %>,
                                 true,null,
                                 true, false, null, null,
@@ -167,8 +181,15 @@
 <% end %>
 <% else: %>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Layout Reviewers") %><br><span style="font-size: 8pt"><%= _("responsibility: judge form verification of contributions") %></span></span></td>
-        <td width="80%" style="padding-top: 15px;"><div id="EditorList"></div></td>
+        <td class="subGroupTitle" style="padding-top:15px;"><%= _("Layout Reviewers") %></td>
+    </tr>
+    <tr>
+        <td class="questionContent" style="padding-top:5px; padding-left:3px;">
+            <span><%= _("Responsibility: Judge form verification of contributions") %></span>
+        </td>
+    </tr>
+    <tr>
+        <td width="80%" style="padding-top: 5px; padding-left:3px;"><div id="EditorList"></div></td>
     </tr>
 <script type="text/javascript">
                         var newEditorHandler = function(userList, setResult) {
@@ -218,7 +239,7 @@
 		                            );
                             }
                         };
-                        var uf = new UserListField('userListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
                                                    <%= jsonEncode(fossilize(ConfReview.getEditorsList())) %>,
                                                    true,null,
                                                    true, false, null, null,

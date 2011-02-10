@@ -60,7 +60,7 @@ class WPAbstractReviewingTeam(WPConferenceModifAbstractBase):
         self._subTabARTeam.setActive()
 
     def _getTabContent( self, params ):
-        wc = WAbstractReviewingSetup(self._conf)
+        wc = WAbstractReviewingTeam(self._conf)
         params = {}
         return wc.getHTML( params )
 
