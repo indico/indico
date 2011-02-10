@@ -1,3 +1,5 @@
+var addedWebkitJqueryFixDiv = false;
+
 type("IWidget", [],
      {
          draw: function(content) {
@@ -840,6 +842,16 @@ type("PopupWidget", [], {
         this.canvas.setContent(content);
 
         IndicoUI.assignLayerLevel(this.canvas);
+
+        /* This fixes an issue caused by chrome/jquery (embedded e.g. by Adblock) which
+         * prevents dialogs from showing. Inserting an empty div fixes it (probably whatever
+         * incorrect was still active now affects that diff instead of the dialog)
+         * Related bug report: http://code.google.com/p/chromium/issues/detail?id=72568
+         */
+        if(!addedWebkitJqueryFixDiv && navigator.userAgent.indexOf('WebKit') != -1) {
+            $E(document.body).append(Html.div());
+        }
+        addedWebkitJqueryFixDiv = true; // also set to true if we do not have a webkit browser so we don't check again
 
         return this.canvas;
     },
