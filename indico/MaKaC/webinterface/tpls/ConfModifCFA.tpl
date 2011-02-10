@@ -19,7 +19,7 @@
         <td rowspan="5" valign="bottom" align="right">
 			<input type="submit" class="btn" value="<%= _("modify")%>" <%= disabled %>>
         </td>
-		</form>
+    </form>
     </tr>
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Submission end date")%></span></td>
@@ -53,7 +53,16 @@
           </table>
         </td>
     </tr>
-	<tr>
+    <tr>
+        <td colspan="3" class="horizontalLine">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Late submission authorised users")%></span></td>
+        <td bgcolor="white" width="100%" class="blacktext" colspan="2">
+            <%= submitters %>
+        </td>
+    </tr>
+    <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
     <tr>
@@ -79,15 +88,6 @@
             <table align="left" width="100%">
                     <%= abstractFields %>
             </table>
-        </td>
-    </tr>
-	<tr>
-        <td colspan="3" class="horizontalLine">&nbsp;</td>
-    </tr>
-    <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Late submission authorised users")%></span></td>
-        <td bgcolor="white" width="100%" class="blacktext" colspan="2">
-            <%= submitters %>
         </td>
     </tr>
 	<tr>

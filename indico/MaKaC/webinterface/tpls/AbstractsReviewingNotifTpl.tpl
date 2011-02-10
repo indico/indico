@@ -1,22 +1,33 @@
 <table class="groupTable">
     <tr>
-        <td id="reviewingModeHelp" colspan="5" class="groupTitle" style="padding-bottom: 10px; padding-left: 20px;">
+        <td id="reviewingModeHelp" colspan="5" class="groupTitle">
             <%= _("Email notification templates")%>
         </td>
     </tr>
     <tr>
+        <td style="padding-top:5px; padding-left:5px;">
+            <span class="collShowBookingsText"><%= _("Add the templates for the emails which will be sent to the primary authors or submitters.")%></em>
+        </td>
+    </tr>
+    <tr>
         <form action=<%= remNotifTplURL %> method="POST">
-        <td bgcolor="white" width="100%" class="blacktext">
-            <table width="98%" border="0" align="right" style="padding-top: 10px; padding-bottom: 10px;">
+        <td bgcolor="white" width="100%%" class="blacktext">
+            <table width="98%%" border="0" align="right" style="padding-top: 10px; padding-bottom: 10px;">
                 <%= notifTpls %>
             </table>
         </td>
-        <td valign="center" align="right">
-            <input type="submit" class="btn" value="<%= _("remove")%>">
+        <table>
+        <tr>
+            <td valign="center" align="left">
+                <input type="submit" class="btn" value="<%= _("remove")%>">
+            </td>
         </form>
-        <form action=<%= addNotifTplURL %> method="POST">
-            <input type="submit" class="btn" value="<%= _("add")%>">
-        </td>
-        </form>
+            <td valign="center" align="left">
+            <form action=<%= addNotifTplURL %> method="POST">
+                <input type="submit" class="btn" value="<%= _("add")%>">
+            </form>
+            </td>
+        </tr>
+        </table>
     </tr>
 </table>
