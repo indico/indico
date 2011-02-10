@@ -444,7 +444,8 @@ extend(IndicoUI.Dialogs,
                                startEndTimeField.endTimeField.dispatchEvent('change');
                            });
 
-                           var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5));
+                           var timezoneMsg = ' (' + $T('Timezone') + ': ' + params.conference.timezone + ')';
+                           var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5), timezoneMsg);
                            var startEndTimeComponent;
                            var timeTranslation = {
                                    toTarget: function (value) {
