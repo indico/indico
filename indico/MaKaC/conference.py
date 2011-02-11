@@ -11477,7 +11477,7 @@ class Minutes(Material):
         mat.setOwner(owner)
         mat.setType(self.getType())
 
-        mat.setProtection(self.__ac._getAccessProtection())
+        mat.setProtection(self.getAccessController()._getAccessProtection())
         mat.setAccessKey(self.getAccessKey())
         lrep = self._getRepository()
         flist = lrep.getFiles()
@@ -11604,7 +11604,7 @@ class Resource(Persistent, Fossilizable, CommonObjectBase):
         res.notifyModification()
         res.setId(self.getId())
 
-        res.setProtection(self.__ac._getAccessProtection())
+        res.setProtection(self.getAccessController()._getAccessProtection())
         #res.__ac = self.getAccessController()
 
         return res
