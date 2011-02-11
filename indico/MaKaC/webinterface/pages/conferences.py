@@ -2296,7 +2296,7 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
         self._tabCFAR = self._tabCtrl.newTab("reviewing", _("Reviewing"), urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
 
         # Create subtabs for the reviewing
-        self._subTabARSetup = self._tabCFAR.newSubTab( "revsetup", "Setup",\
+        self._subTabARSetup = self._tabCFAR.newSubTab( "revsetup", "Review settings",\
                     urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
         self._subTabARTeam = self._tabCFAR.newSubTab( "revteam", "Team",\
                     urlHandlers.UHAbstractReviewingTeam.getURL(self._conf))

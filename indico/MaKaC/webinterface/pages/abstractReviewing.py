@@ -52,7 +52,7 @@ class WAbstractReviewingSetup(wcomponents.WTemplated):
 
 
 class WPAbstractReviewingTeam(WPConferenceModifAbstractBase):
-    """ Tab for setup of general aspects of the abstract reviewing process
+    """ Tab to select the team of abstract reviewing process
     """
 
     def _setActiveTab( self ):
@@ -71,7 +71,16 @@ class WAbstractReviewingTeam(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["abstractReview"] = self._conf.getConfAbstractReview()
+        # Get the track ids and titles
+        vars["tracks"] = self._conf.getTrackList()
+        trackIdsList = []
+        coordinatorsByTrack = {}
+        for track in self._conf.getTrackList():
+            trackIdsList.append(track.getId())
+            coordinatorsByTrack[track.getId()] = track.getCoordinatorList()
+        vars["conf"] = self._conf.getId()
+        vars["trackIds"] = trackIdsList
+        vars["coordinatorsByTrack"] = coordinatorsByTrack
         return vars
 
 ### Classes for the NOTIFICATION TEMPLATES ###

@@ -16,7 +16,7 @@
         </td>
     </tr>
 </table>
-<table style="padding-left:20px;">
+<table style="padding-left:20px; width:570px;">
     <tr>
         <td class="subGroupTitle"><%= _("Managers") %></td>
     </tr>

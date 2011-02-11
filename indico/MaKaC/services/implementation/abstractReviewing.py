@@ -20,11 +20,12 @@
 
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common.fossilize import fossilize
+import MaKaC.user as user
 
 
-#####################################
-###  Abstract reviewing classes
-#####################################
+##########################################
+###  Abstract reviewing questions classes
+##########################################
 class AbstractReviewingBase(ConferenceModifBase):
 
     ''' Base Clase for Abstract Reviewing'''
@@ -153,14 +154,51 @@ class AbstractReviewingEditQuestion(AbstractReviewingBase):
         return fossils
 
 
+##########################################
+###  Abstract reviewing team classes
+##########################################
+
+class AbstractReviewingAddReviewer(AbstractReviewingBase):
+
+    ''' Add a reviewer for the indicated track '''
+
+    def _checkParams(self):
+        AbstractReviewingBase._checkParams(self)
+        self._trackId = self._params.get("track")
+        self._reviewerId = self._params.get("user")
+
+    def _getAnswer(self):
+        ah = user.AvatarHolder()
+        av = ah.getById(self._reviewerId)
+        self._conf.getTrackById(self._trackId).addCoordinator(av)
+        return True
+
+
+class AbstractReviewingRemoveReviewer(AbstractReviewingBase):
+
+    ''' Add a reviewer for the indicated track '''
+
+    def _checkParams(self):
+        AbstractReviewingBase._checkParams(self)
+        self._trackId = self._params.get("track")
+        self._reviewerId = self._params.get("user")
+
+    def _getAnswer(self):
+        ah = user.AvatarHolder()
+        av = ah.getById(self._reviewerId)
+        self._conf.getTrackById(self._trackId).removeCoordinator(av)
+        return True
 
 methodMap = {
-    "changeNumberofAnswers": AbstractReviewingChangeNumAnswers,
-    "changeScale": AbstractReviewingChangeScale,
-    "updateExampleQuestion": AbstractReviewingUpdateExampleQuestion,
-    "getQuestions": AbstractReviewingGetQuestions,
-    "addQuestion": AbstractReviewingAddQuestion,
-    "removeQuestion": AbstractReviewingRemoveQuestion,
-    "editQuestion": AbstractReviewingEditQuestion,
+    "questions.changeNumberofAnswers": AbstractReviewingChangeNumAnswers,
+    "questions.changeScale": AbstractReviewingChangeScale,
+    "questions.updateExampleQuestion": AbstractReviewingUpdateExampleQuestion,
+    "questions.getQuestions": AbstractReviewingGetQuestions,
+    "questions.addQuestion": AbstractReviewingAddQuestion,
+    "questions.removeQuestion": AbstractReviewingRemoveQuestion,
+    "questions.editQuestion": AbstractReviewingEditQuestion,
+
+    "team.addReviewer": AbstractReviewingAddReviewer,
+    "team.removeReviewer": AbstractReviewingRemoveReviewer
     }
 
