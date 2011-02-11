@@ -159,7 +159,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
 //-->
 </script>
 <a href="" name="results"></a>
-<table width="100%" valign="top" align="left" cellspacing="0">
+<table width="100%" valign="top" align="left" cellspacing="0" style="padding-top: 30px;">
     <tr>
         <td class="titleCellFormat" nowrap colspan="10">
             <form action=<%= accessAbstract %> method="post">
@@ -225,12 +225,22 @@ document.filterOptionForm.showSubmissionDate.checked=false
             </table>
         </td>
     </tr>
+    <% if (totalNumberAbstracts == "0"): %>
     <tr>
-        <%= abstractTitleBar %>
+        <td style="padding:5px 0px 5px 10px;"><span class="collShowBookingsText"><%=_("There are no abstracts submitted yet")%></span></td>
     </tr>
+    <% end %>
+    <% elif (filteredNumberAbstracts == "0"): %>
+        <td style="padding:5px 0px 5px 10px;"><span class="collShowBookingsText"><%=_("There are no abstracts with the filters criteria selected")%></span></td>
+    <% end %>
+    <% else: %>
+        <tr>
+            <%= abstractTitleBar %>
+        </tr>
+    <% end %>
     <tr><td>
         <tbody id="abstractsItems">
-        <%= abstracts %>
+            <%= abstracts %>
         </tbody>
     </td></tr>
     <tr>
