@@ -99,7 +99,7 @@ class CollaborationTools(object):
         """ Utility function that returns a module object given a plugin name.
             pluginId: a string such as "evo", "DummyPlugin", etc.
         """
-        pmodules = pkg_resources.get_entry_map('cds-indico', group='indico.ext')
+        pmodules = pkg_resources.get_entry_map('indico', group='indico.ext')
         entry = pmodules.get('Collaboration.%s' % pluginId, None)
         if entry:
             __import__(entry.module_name, globals(), locals(),
