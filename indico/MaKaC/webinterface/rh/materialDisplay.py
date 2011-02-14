@@ -24,7 +24,7 @@ import MaKaC.webinterface.pages.material as material
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.conference as conference
 from MaKaC.common.general import *
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected 
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHMaterialBase
 from MaKaC.common import Config
 from MaKaC.export import fileConverter
@@ -49,21 +49,9 @@ class RHMaterialDisplayModifBase( RHMaterialDisplayBase ):
         else:
             raise MaKaCError( _("you are not authorised to manage material for this contribution"))
 
+class RHMaterialDisplayCommon:
 
-class RHMaterialBrowse( RHMaterialDisplayBase ):
-    _uh = urlHandlers.UHMaterialBrowse
-
-    def _checkParams(self, params):
-        confId = int(params["confId"])
-        contribId = int(params["contribId"])
-        materialId = params["materialId"]
-        conf = conference.ConferenceHolder().getById( confId )
-        contr = conf.getContributionById(contribId)
-
-        self._material = self._target = contr.getMaterialById(materialId)
-
-    def _process( self ):
-
+    def _process(self):
         # material pages should not be cached, since protection can change
         self._disableCaching()
 
@@ -82,53 +70,35 @@ class RHMaterialBrowse( RHMaterialDisplayBase ):
             elif isinstance(res, conference.LocalFile):
                 self._redirect( urlHandlers.UHFileAccess.getURL( res ), noCache=True )
         else:
-            self._redirect( urlHandlers.UHContribModifMaterials.getURL( self._material ))
+            self._processManyMaterials()
 
-
-class RHMaterialDisplay( RHMaterialDisplayBase ):
+class RHMaterialDisplay( RHMaterialDisplayBase, RHMaterialDisplayCommon ):
     _uh = urlHandlers.UHMaterialDisplay
-    
-    def _process( self ):
 
-        # material pages should not be cached, since protection can change
-        self._disableCaching()
+    def _process(self):
+        RHMaterialDisplayCommon._process(self)
 
-        if len(self._material.getResourceList()) == 1:
-            res = self._material.getResourceList()[0]
-            if isinstance(res, conference.Link):
-                url = res.getURL()
-                if url.find(".wmv") != -1:
-                    urlwmv = urlHandlers.UHVideoWmvAccess().getURL(res)
-                    self._redirect( urlwmv )
-                elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
-                    urlflash = urlHandlers.UHVideoFlashAccess().getURL(res)
-                    self._redirect( urlflash, noCache=True)
-                else:
-                    self._redirect( res.getURL(), noCache=True )
-            elif isinstance(res, conference.LocalFile):
-                self._redirect( urlHandlers.UHFileAccess.getURL( res ), noCache=True )
+    def _processManyMaterials( self ):
+        if self._material.getConference()!=None:
+            p = material.WPMaterialConfDisplayBase(self, self._material  )
         else:
-            #raise "%s"%self._material.getOwner()
-            if self._material.getConference()!=None:
-                p = material.WPMaterialConfDisplayBase(self, self._material  )
-            else:
-                p= material.WPMaterialCatDisplayBase(self, self._material)
-            wf=self.getWebFactory()
-            if wf is not None:
-                p = wf.getMaterialDisplay( self, self._material)
-            return p.display()
-        
-    
+            p= material.WPMaterialCatDisplayBase(self, self._material)
+        wf=self.getWebFactory()
+        if wf is not None:
+            p = wf.getMaterialDisplay( self, self._material)
+        return p.display()
+
+
 class RHMaterialDisplayStoreAccessKey( RHMaterialDisplayBase ):
     _uh = urlHandlers.UHMaterialEnterAccessKey
-    
+
     def _checkParams( self, params ):
         RHMaterialDisplayBase._checkParams(self, params )
         self._accesskey = params.get( "accessKey", "" ).strip()
-    
+
     def _checkProtection( self ):
         pass
-        
+
     def _process( self ):
         access_keys = self._getSession().getVar("accessKeys")
         if access_keys == None:
@@ -158,13 +128,13 @@ class RHMaterialDisplayRemoveResource( RHMaterialDisplayModifBase ):
                 wf = self.getWebFactory()
                 if wf != None:
                     wp = wf.getMaterialDisplayRemoveResourceConfirm(self, self._conf, self._res)
-                else:    
+                else:
                     wp = material.WPMaterialDisplayRemoveResourceConfirm(self, self._conf, self._res)
                 return wp.display()
         if self._material.getNbResources()<=1 and isinstance(self._material.getOwner(), conference.Contribution):
             self._redirect( urlHandlers.UHContributionDisplay.getURL( self._material ) )
         else:
-            self._redirect( urlHandlers.UHMaterialDisplay.getURL( self._material ) ) 
+            self._redirect( urlHandlers.UHMaterialDisplay.getURL( self._material ) )
 
 class RHMaterialDisplaySubmitResource(RHMaterialDisplayModifBase):
 
@@ -212,7 +182,7 @@ class RHMaterialDisplaySubmitResource(RHMaterialDisplayModifBase):
         errorList=[]
         if self._action=="CANCEL":
             self._redirect(url)
-            return 
+            return
         elif self._action=="SUBMIT_FILES":
             errorList=self._getErrorList()
             if len(errorList)==0:
@@ -223,7 +193,7 @@ class RHMaterialDisplaySubmitResource(RHMaterialDisplayModifBase):
                 f.setFilePath(self._filePath)
                 self._material.addResource(f)
                 self._redirect(url)
-                return 
+                return
         p=material.WPMaterialDisplaySubmitResource(self,self._target)
         pars=self._getRequestParams()
         pars["errorList"]=errorList

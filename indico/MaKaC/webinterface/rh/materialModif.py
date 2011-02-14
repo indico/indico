@@ -30,7 +30,7 @@ from MaKaC.errors import FormValuesError
 from MaKaC.export import fileConverter
 
 class RHMaterialModifBase( RHMaterialBase, RHModificationBaseProtected ):
-    
+
     def _checkParams( self, params ):
         RHMaterialBase._checkParams( self, params )
 
@@ -39,7 +39,7 @@ class RHMaterialModifBase( RHMaterialBase, RHModificationBaseProtected ):
             if self._material.getSession().canCoordinate(self.getAW(), "modifContribs"):
                 return
         RHModificationBaseProtected._checkProtection( self )
-    
+
     def _displayCustomPage( self, wf ):
         return None
 
@@ -56,7 +56,7 @@ class RHMaterialModifBase( RHMaterialBase, RHModificationBaseProtected ):
 
 class RHMaterialModification( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialModification
-    
+
     def _process( self ):
         p = material.WPMaterialModification( self, self._material )
         return p.display()
@@ -110,7 +110,7 @@ class RHMaterialAddFile( RHMaterialModifBase ):
 
 class RHMaterialPerformAddFile( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialPerformFileCreation
-    
+
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
         tempPath = cfg.getUploadedFilesTempDir()
@@ -143,20 +143,20 @@ class RHMaterialPerformAddFile( RHMaterialModifBase ):
         f.setFilePath( self._filePath )
         title=f.getFileName()
         if params.get("title", "").strip() != "":
-           title=params.get("title") 
+           title=params.get("title")
         f.setName( title)
         self._material.addResource( f )
 
         #apply conversion
         if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(f.getFileName())[1].strip().lower()):
             fileConverter.CDSConvFileConverter.convert(f.getFilePath(), "pdf", self._material)
-        
+
         self._redirect( urlHandlers.UHMaterialModification.getURL( self._material ) )
 
 
 class RHMaterialRemoveResources( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialRemoveResources
-    
+
     def _checkParams( self, params ):
         RHMaterialModifBase._checkParams( self, params )
         self._res = []
@@ -172,7 +172,7 @@ class RHMaterialRemoveResources( RHMaterialModifBase ):
 
 class RHMaterialModifAC( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialModifAC
-    
+
     def _process( self ):
         p = material.WPMaterialModifAC( self, self._material )
         return p.display()
@@ -180,7 +180,7 @@ class RHMaterialModifAC( RHMaterialModifBase ):
 
 class RHMaterialSetPrivacy( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialSetPrivacy
-    
+
     def _checkParams( self, params ):
         RHMaterialModifBase._checkParams( self, params )
         privacy = params.get("visibility","PUBLIC")
@@ -191,29 +191,29 @@ class RHMaterialSetPrivacy( RHMaterialModifBase ):
             self._protect = 0
         elif privacy == "ABSOLUTELY PUBLIC":
             self._protect = -1
-    
+
     def _process( self ):
         self._material.setProtection( self._protect )
         self._redirect( urlHandlers.UHMaterialModifAC.getURL( self._material ) )
 
 class RHMaterialSetVisibility( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialSetVisibility
-    
+
     def _checkParams( self, params ):
         RHMaterialModifBase._checkParams( self, params )
         self._hidden = params.get( "visibility", "VISIBLE") == "HIDDEN"
-    
+
     def _process( self ):
         self._material.setHidden( self._hidden )
         self._redirect( urlHandlers.UHMaterialModifAC.getURL( self._material ) )
 
 class RHMaterialSetAccessKey( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialSetAccessKey
-    
+
     def _checkParams( self, params ):
         RHMaterialModifBase._checkParams( self, params )
         self._accessKey = params.get( "accessKey", "")
-    
+
     def _process( self ):
         self._material.setAccessKey( self._accessKey )
         self._redirect( urlHandlers.UHMaterialModifAC.getURL( self._material ) )
@@ -221,7 +221,7 @@ class RHMaterialSetAccessKey( RHMaterialModifBase ):
 
 class RHMaterialSelectAllowed( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialSelectAllowed
-    
+
     def _process( self ):
         p = material.WPMaterialSelectAllowed( self, self._material )
         return p.display( **self._getRequestParams() )
@@ -229,7 +229,7 @@ class RHMaterialSelectAllowed( RHMaterialModifBase ):
 
 class RHMaterialAddAllowed( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialAddAllowed
-    
+
     def _checkParams( self, params ):
         RHMaterialModifBase._checkParams( self, params )
         selAllowedId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
@@ -238,7 +238,7 @@ class RHMaterialAddAllowed( RHMaterialModifBase ):
         self._allowed = []
         for id in selAllowedId:
             self._allowed.append( ph.getById( id ) )
-    
+
     def _process( self ):
         for av in self._allowed:
             self._target.grantAccess( av )
@@ -256,7 +256,7 @@ class RHMaterialRemoveAllowed( RHMaterialModifBase ):
         self._allowed = []
         for id in selAllowedId:
             self._allowed.append( ph.getById( id ) )
-    
+
     def _process( self ):
         for av in self._allowed:
             self._target.revokeAccess( av )
@@ -265,7 +265,7 @@ class RHMaterialRemoveAllowed( RHMaterialModifBase ):
 
 class RHMaterialAddDomains( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialAddDomains
-    
+
     def _process( self ):
         params = self._getRequestParams()
         if ("addDomain" in params) and (len(params["addDomain"])!=0):
@@ -277,7 +277,7 @@ class RHMaterialAddDomains( RHMaterialModifBase ):
 
 class RHMaterialRemoveDomains( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialRemoveDomains
-    
+
     def _process( self ):
         params = self._getRequestParams()
         if ("selectedDomain" in params) and (len(params["selectedDomain"])!=0):
@@ -288,7 +288,7 @@ class RHMaterialRemoveDomains( RHMaterialModifBase ):
 
 class RHMaterialMainResourceSelect( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialMainResourceSelect
-    
+
     def _process( self ):
         p = material.WPMaterialMainResourceSelect( self, self._material )
         return p.display( **self._getRequestParams() )
@@ -296,12 +296,12 @@ class RHMaterialMainResourceSelect( RHMaterialModifBase ):
 
 class RHMaterialMainResourcePerformSelect( RHMaterialModifBase ):
     _uh = urlHandlers.UHMaterialMainResourcePerformSelect
-     
+
     def _checkParams( self, params ):
         RHMaterialModifBase._checkParams( self, params )
         self._mainResourceID = params.get("mainResource","")
         self._cancel = params.has_key("cancel")
-            
+
     def _process( self ):
         if not self._cancel:
             if self._mainResourceID.strip().lower() == "none":
@@ -310,4 +310,4 @@ class RHMaterialMainResourcePerformSelect( RHMaterialModifBase ):
                 r = self._material.getResourceById(str(self._mainResourceID))
                 self._material.setMainResource(r)
         self._redirect( urlHandlers.UHMaterialModification.getURL( self._material ) )
-        
+

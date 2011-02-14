@@ -30,7 +30,7 @@ class TypeFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf._contribTypes) == self._values:
+        if len(self._conf.getContribTypeList()) == len(self._values):
             return True
         elif contribution.getType() is None:
             return self._showNoValue
@@ -53,7 +53,7 @@ class TrackFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.program) == len(self._values):
+        if len(self._conf.getTrackList()) == len(self._values):
             return True
         elif contribution.getTrack():
             if contribution.getTrack().getId() in self._values:
@@ -78,7 +78,7 @@ class SessionFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.sessions) == len(self._values):
+        if len(self._conf.getSessionList()) == len(self._values):
             return True
         elif contribution.getSession():
             if contribution.getSession().getId() in self._values:
@@ -118,7 +118,7 @@ class StatusFilterField(filters.FilterField):
     def satisfies(self,contribution):
         """
         """
-        if len(ContribStatusList._statusIds) == len(self._values):
+        if len(ContribStatusList().getList()) == len(self._values):
             return True
         stKlass=contribution.getCurrentStatus().__class__
         return ContribStatusList().getId(stKlass) in self._values

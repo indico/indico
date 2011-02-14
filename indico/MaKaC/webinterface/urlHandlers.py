@@ -2806,9 +2806,6 @@ class UHSubContribModifMaterials( URLHandler ):
 class UHMaterialDisplay( URLHandler ):
     _relativeURL = "materialDisplay.py"
 
-class UHMaterialBrowse( URLHandler ):
-    _relativeURL = "materialDisplay.py/browseMaterial"
-
 class UHConferenceProgram( URLHandler ):
     _relativeURL = "conferenceProgram.py"
 
@@ -2884,6 +2881,8 @@ class UHConfModifContribListOpenMenu( URLHandler ):
 class UHConfModifContribListCloseMenu( URLHandler ):
     _relativeURL = "confModifContribList.py/closeMenu"
 
+class UHContribModifMaterialBrowse( URLHandler ):
+    _relativeURL = "contributionModification.py/browseMaterial"
 
 class UHContribModAddSpeakers( URLHandler ):
     _relativeURL = "contributionModification.py/addSpk"

@@ -38,6 +38,7 @@ from MaKaC.conference import SubContribParticipation
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
+from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
 
 class RHContribModifBase(RHModificationBaseProtected):
     """ Base RH for contribution modification.
@@ -1246,47 +1247,21 @@ class RHSetSession(RHContribModifBase):
         url=urlHandlers.UHContributionModification.getURL(self._target)
         self._redirect(url)
 
+class RHContribModifMaterialBrowse( RHContribModifBase, RHMaterialDisplayCommon ):
+    _uh = urlHandlers.UHContribModifMaterialBrowse
 
-#class RHContributionSelectSpeakers( RHContribModifBase ):
-#    _uh = urlHandlers.UHContributionSelectSpeakers
-#
-#    def _process( self ):
-#        p = contributions.WPcontribSelectChairs( self, self._target )
-#        return p.display( **self._getRequestParams() )
-#
-#
-#class RHContributionAddSpeakers( RHContribModifBase ):
-#    _uh = urlHandlers.UHContributionAddSpeakers
-#
-#    def _checkParams( self, params ):
-#        RHContribModifBase._checkParams( self, params )
-#        selSpeakerId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
-#        ah = user.AvatarHolder()
-#        self._speakers = []
-#        for id in selSpeakerId:
-#            self._speakers.append( ah.getById( id ) )
-#
-#    def _process( self ):
-#        for av in self._speakers:
-#            self._target.addSpeaker( av )
-#        self._redirect( urlHandlers.UHContributionModification.getURL( self._target ) )
-#
-#
-#class RHContributionRemoveSpeakers( RHContribModifBase ):
-#    _uh = urlHandlers.UHContributionRemoveSpeakers
-#
-#    def _checkParams( self, params ):
-#        RHContribModifBase._checkParams( self, params )
-#        selSpeakerId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
-#        ah = user.AvatarHolder()
-#        self._speakers = []
-#        for id in selSpeakerId:
-#            self._speakers.append( ah.getById( id ) )
-#
-#    def _process( self ):
-#        for av in self._speakers:
-#            self._target.removeSpeaker( av )
-#        self._redirect( urlHandlers.UHContributionModification.getURL( self._target ) )
+    def _checkParams(self, params):
+        RHContribModifBase._checkParams(self, params)
+        self._contrib = self._target
+        materialId = params["materialId"]
+
+        self._material = self._target = self._contrib.getMaterialById(materialId)
+
+    def _process(self):
+        RHMaterialDisplayCommon._process(self)
+
+    def _processManyMaterials( self ):
+        self._redirect( urlHandlers.UHContribModifMaterials.getURL( self._material ))
 
 
 class RHContributionAddMaterial(RHContribModifBaseSpecialSesCoordRights):

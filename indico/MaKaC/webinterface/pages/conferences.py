@@ -6915,42 +6915,30 @@ class WConfModifContribList(wcomponents.WTemplated):
         return url
 
 
-    def _createMaterialURL(self, contrib):
-        """ Creates link to material management menu of given contribution.
-            This method is faster than fetching material object from the
-            database and getting link from it """
-
-        url = urlHandlers.UHContribModifMaterials._getURL()
-        url.addParam('returnURL','')
-        url.addParam('contribId',contrib.getId())
-        url.addParam('confId',contrib.getConference().getId())
-        return url
-
-
     def _getMaterialsHTML(self, contrib):
         materials=[]
         if contrib.getPaper() is not None:
-            url= urlHandlers.UHMaterialBrowse.getURL()
-            url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'paper'})
+            url= urlHandlers.UHContribModifMaterialBrowse.getURL(contrib.getPaper())
+            #url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'paper'})
             materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(PaperFactory().getTitle().lower())))
         if contrib.getSlides() is not None:
-            url= urlHandlers.UHMaterialBrowse.getURL()
-            url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'slides'})
+            url= urlHandlers.UHContribModifMaterialBrowse.getURL(contrib.getSlides())
+            #url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'slides'})
             materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(SlidesFactory().getTitle().lower())))
         if contrib.getPoster() is not None:
-            url= urlHandlers.UHMaterialBrowse.getURL()
-            url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'poster'})
+            url= urlHandlers.UHContribModifMaterialBrowse.getURL(contrib.getPoster())
+            #url.addParams({'contribId' : contrib.getId(), 'confId' : contrib.getConference().getId(), 'materialId' : 'poster'})
             materials.append("""<a href=%s>%s</a>"""%(quoteattr(str(url)),self.htmlText(PosterFactory().getTitle().lower())))
         if contrib.getVideo() is not None:
             materials.append("""<a href=%s>%s</a>"""%(
-                quoteattr(str(self._createMaterialURL(contrib))),
+                quoteattr(str(urlHandlers.UHContribModifMaterials.getURL(contrib))),
                 self.htmlText(materialFactories.VideoFactory.getTitle())))
         if contrib.getMinutes() is not None:
             materials.append("""<a href=%s>%s</a>"""%(
-                quoteattr(str(self._createMaterialURL(contrib))),
+                quoteattr(str(urlHandlers.UHContribModifMaterials.getURL(contrib))),
                 self.htmlText(materialFactories.MinutesFactory.getTitle())))
         for material in contrib.getMaterialList():
-            url=self._createMaterialURL(contrib)
+            url=urlHandlers.UHContribModifMaterials.getURL(contrib)
             materials.append("""<a href=%s>%s</a>"""%(
                 quoteattr(str(url)),self.htmlText(material.getTitle())))
         return "<br>".join(materials)

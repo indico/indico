@@ -23,6 +23,9 @@ from MaKaC.webinterface.rh import contribMod
 def index(req, **params):
     return contribMod.RHContributionModification( req ).process( params )
 
+def browseMaterial(req, **params):
+    return contribMod.RHContribModifMaterialBrowse( req ).process( params )
+
 def newPrimAuthor(req, **params):
     return contribMod.RHNewPrimaryAuthor( req ).process( params )
 
@@ -83,7 +86,7 @@ def data( req, **params ):
 
 def xml( req, **params ):
     return contribMod.RHContributionToXML( req ).process( params )
-    
+
 
 def pdf( req, **params ):
     return contribMod.RHContributionToPDF( req ).process( params )
@@ -91,7 +94,7 @@ def pdf( req, **params ):
 
 def modifData( req, **params ):
     return contribMod.RHContributionModifData( req ).process( params )
-    
+
 
 def addSpk( req, **params ):
     return contribMod.RHAddSpeakers( req ).process( params )
