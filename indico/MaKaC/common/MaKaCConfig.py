@@ -33,8 +33,10 @@ if indico_conf == '': # we may be in development mode or in installation mode
 execfile(indico_conf)
 
 FileTypes = {"DOC":  ["Ms Word","application/msword","word_big.png"],
+             "DOCX":  ["Ms Word","application/vnd.openxmlformats-officedocument.wordprocessingml.document","word_big.png"],
              "WAV":  ["Audio","audio/x-pn-wav",""],
              "XLS":  ["MS Excel","application/vnd.ms-excel","xls.png"],
+             "XLSX":  ["MS Excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","xls.png"],
              "PS":   ["PostScript","application/postscript","ps.png"],
              "SXC":  ["Open Office Calc","application/vnd.sun.xml.calc","calc_big.png"],
              "TAR":  ["Tar File","application/tar","zip.png"],
@@ -44,6 +46,7 @@ FileTypes = {"DOC":  ["Ms Word","application/msword","word_big.png"],
              "ODT":  ["Open Document Text","application/vnd.sun.xml.writer","writer_big.png"],
              "HTML": ["HTML","text/html",""],
              "PPT":  ["Ms Powerpoint","application/vnd.ms-powerpoint","powerpoint_big.png"],
+             "PPTX":  ["Ms Powerpoint","application/vnd.openxmlformats-officedocument.presentationml.presentation","powerpoint_big.png"],
              "RM":   ["Real Video","application/vnd.rn-realmedia",""],
              "TXT":  ["Plain Text","text/plain","txt.png"],
              "XML":  ["XML","text/xml",""],
