@@ -62,5 +62,9 @@ FileTypes = {"DOC":  ["Ms Word","application/msword","word_big.png"],
              "RTF":  ["RTF","application/rtf",""],
              "OGG":  ["Ogg/Theora Video","application/ogg",""],
              "RSS":  ["RSS","application/xhtml+xml",""],
-             "MHT":  ["MHT", " message/rfc822", ""]}
-
+             "MHT":  ["MHT", " message/rfc822", ""],
+             "JPG":  ["JPEG Image","image/jpeg",""],
+             "PNG":  ["PNG Image","image/png",""],
+             "GIF":  ["GIF Image","image/gif",""],
+             "TIFF":  ["TIFF Image","image/gif",""]
+             }
