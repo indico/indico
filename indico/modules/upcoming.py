@@ -216,13 +216,15 @@ class UpcomingEventsModule(Module):
         objDict = {}
 
         for obj in self._objects:
-            if isinstance(obj.getObject(), conference.Conference):
-                self.processEvent(date, obj.getObject(), obj, objDict)
-            elif isinstance(obj.getObject(), conference.Category):
-                events = categDateIdx.getObjectsIn(obj.getObject().getId(),
-                                                           date,
-                                                           date+obj.getAdvertisingDelta())
-                for conf in events:
+            wrappedObj = obj.getObject()
+            if isinstance(wrappedObj, conference.Conference):
+                self.processEvent(date, wrappedObj, obj, objDict)
+            elif isinstance(wrappedObj, conference.Category):
+                events = categDateIdx.getObjectsIn(
+                    wrappedObj.getId(),
+                    date, date + obj.getAdvertisingDelta())
+                for confId in events:
+                    conf = conference.ConferenceHolder().getById(confId)
                     self.processEvent(date, conf, obj, objDict)
 
         resultList = []
