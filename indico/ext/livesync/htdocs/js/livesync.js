@@ -122,7 +122,7 @@ type("AgentModificationDialog", ["ExclusivePopupWithButtons"],
              if (this.fullyEditable) {
                  selectType.observe(function(agentType) {
                      pmExtra.clear();
-                     this.info.set('specific', $O())
+                     self.info.set('specific', $O())
                      self._resetForm(agentType);
                  });
              }

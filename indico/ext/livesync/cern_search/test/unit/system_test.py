@@ -35,7 +35,7 @@ from threading import Thread
 from lxml import etree
 
 # plugin imports
-from indico.ext.livesync.invenio.agent import InvenioBatchUploaderAgent
+from indico.ext.livesync.cern_search import CERNSearchUploadAgent
 from indico.ext.livesync.bistate.test.unit import _TestUpload
 
 
@@ -49,7 +49,6 @@ class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.wfile.write('sorry, only POST is allowed')
 
     def do_POST(self):
-        global globalRecordSet
 
         contType, params = cgi.parse_header(
             self.headers.getheader('content-type'))
@@ -57,12 +56,12 @@ class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             varsDict = cgi.parse_multipart(self.rfile, params)
         elif contType == 'application/x-www-form-urlencoded':
             length = int(self.headers.getheader('content-length'))
-            varsDict = cgi.parse_qs(
-                self.rfile.read(length), keep_blank_values=1)
+            varsDict = cgi.parse_qs(self.rfile.read(length),
+                                    keep_blank_values=1)
         else:
             varsDict = {}
 
-        xmlDoc = etree.parse(StringIO(varsDict['file'][0]))
+        xmlDoc = etree.parse(StringIO(varsDict['xml'][0]))
 
         ns = {'marc': 'http://www.loc.gov/MARC21/slim'}
 
@@ -81,13 +80,15 @@ class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             self.server.recordSet[rid] = {'title': title}
 
-        self.wfile.write('[INFO] blablablabla uploaded_file.xml')
+        self.wfile.write('')
+
+        # TODO: Handle deleted!
 
 
-class FakeInvenio(Thread):
+class FakeCERNSearch(Thread):
 
     def __init__(self, host, port, recordSet):
-        super(FakeInvenio, self).__init__()
+        super(FakeCERNSearch, self).__init__()
         self._server = BaseHTTPServer.HTTPServer((host, port), FakeHTTPHandler)
         self._server.recordSet = recordSet
 
@@ -103,5 +104,5 @@ class FakeInvenio(Thread):
 
 
 class TestUpload(_TestUpload):
-    _server = FakeInvenio
-    _agent = InvenioBatchUploaderAgent
+    _server = FakeCERNSearch
+    _agent = CERNSearchUploadAgent

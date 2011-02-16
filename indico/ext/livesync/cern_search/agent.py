@@ -22,26 +22,37 @@
 Agent definitions for CERN Search
 """
 
-# standard lib imports
-import time
+# standard library imports
+import time, base64
+from urllib2 import urlopen, Request
+from urllib import urlencode
 
 # plugin imports
 from indico.ext.livesync.agent import AgentProviderComponent, RecordUploader
 from indico.ext.livesync.bistate.agent import BistateBatchUploaderAgent
-from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
 
 
-class InvenioBatchUploaderAgent(BistateBatchUploaderAgent):
+class CERNSearchUploadAgent(BistateBatchUploaderAgent):
+
+    _extraOptions = {'url': 'Server URL',
+                     'username': 'Username',
+                     'password': 'Password'}
+
+    def __init__(self, aid, name, description, updateTime,
+                 access=None, url=None, username=None, password=None):
+        super(CERNSearchUploadAgent, self).__init__(
+            aid, name, description, updateTime, access)
+        self._url = url
+        self._username = username
+        self._password = password
 
     def _run(self, records, logger=None, monitor=None):
 
         self._v_logger = logger
 
-        server = InvenioConnector(self._url)
-
         # the uploader will manage everything for us...
 
-        uploader = InvenioRecordUploader(logger, self, server)
+        uploader = CERNSearchRecordUploader(logger, self, self._url)
 
         if self._v_logger:
             self._v_logger.info('Starting metadata/upload cycle')
@@ -50,19 +61,27 @@ class InvenioBatchUploaderAgent(BistateBatchUploaderAgent):
         return uploader.iterateOver(records)
 
 
-class InvenioRecordUploader(RecordUploader):
+class CERNSearchRecordUploader(RecordUploader):
     """
     A worker that uploads data using HTTP
     """
 
-    def __init__(self, logger, agent, server):
-        super(InvenioRecordUploader, self).__init__(logger, agent)
-        self._server = server
+    def __init__(self, logger, agent, url, username, password):
+        super(CERNSearchRecordUploader, self).__init__(logger, agent)
+        self._url = url
+        self._username = username
+        self._password = password
+
+    def _postRequest(self, batch):
+
+        pass
 
     def _uploadBatch(self, batch):
         """
         Uploads a batch to the server
         """
+
+        url = "%s?op=ImportXML" % self._url
 
         self._logger.debug('getting a batch')
 
@@ -73,25 +92,37 @@ class InvenioRecordUploader(RecordUploader):
         data = self._agent._getMetadata(batch)
         self._logger.info('Metadata ready ')
 
+        postData = {
+            'xml': data
+            }
+
         tgen = time.time() - tstart
 
-        result = self._server.upload_marcxml(data, "-ir").read()
+        req = Request(url)
+        # remove line break
+        cred = base64.encodestring(
+            '%s:%s' % (self._username, self._password)).strip()
+
+        req.add_header("Authorization", "Basic %s" % cred)
+
+        result = urlopen(req, data=urlencode(postData))
+        result_data = result.read()
 
         tupload = time.time() - (tstart + tgen)
 
-        self._logger.debug('rec %s result: %s' % (batch, result))
+        self._logger.debug('rec %s result: %s' % (batch, result_data))
 
-        if result.startswith('[INFO]'):
-            fpath = result.strip().split(' ')[-1]
-            self._logger.info('Batch of %d records stored in server (%s) '
+        if result.code == '200':
+            self._logger.info('Batch of %d records stored in server'
                               '[%f s %f s]' % \
-                              (len(batch), fpath, tgen, tupload))
+                              (len(batch), tgen, tupload))
         else:
-            self._logger.error('Records: %s output: %s' % (batch, result))
+            self._logger.error('Records: %s output: %s '
+                               '(HTTP code %s)' % (batch, result.code, result_data))
             raise Exception('upload failed')
 
         return True
 
 
-class InvenioAgentProviderComponent(AgentProviderComponent):
-    _agentType = InvenioBatchUploaderAgent
+class CERNSearchAgentProviderComponent(AgentProviderComponent):
+    _agentType = CERNSearchUploadAgent

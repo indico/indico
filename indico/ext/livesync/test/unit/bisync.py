@@ -18,14 +18,12 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from BTrees.OOBTree import OOSet
-
-from indico.ext.livesync.invenio.agent import InvenioRecordProcessor
-from indico.ext.livesync.invenio.agent import STATUS_DELETED, STATUS_CREATED, \
-     STATUS_CHANGED
+from indico.ext.livesync.bistate.agent import BistateRecordProcessor, \
+     STATUS_DELETED, STATUS_CREATED, STATUS_CHANGED
 from indico.ext.livesync import ActionWrapper
 
 from indico.tests.python.unit.util import IndicoTestCase
+
 
 class DummyWrapper(object):
     def __init__(self, name):
@@ -45,7 +43,7 @@ class TestInvenioRecordProcessor(IndicoTestCase):
         evt2 = DummyWrapper('evt2')
 
         self.assertEqual(
-            set(list(InvenioRecordProcessor.computeRecords([
+            set(list(BistateRecordProcessor.computeRecords([
                 (1, ActionWrapper(1, evt1,
                                   ['data_changed', 'created'])),
                 (2, ActionWrapper(1, evt2,
@@ -56,5 +54,3 @@ class TestInvenioRecordProcessor(IndicoTestCase):
                                  ['data_changed']))], None))),
             set([(evt1, STATUS_CREATED | STATUS_CHANGED | STATUS_DELETED),
              (evt2, STATUS_CREATED | STATUS_CHANGED)]))
-
-

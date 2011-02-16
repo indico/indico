@@ -182,62 +182,61 @@ class WPluginAgentStatus(WTemplated):
         granularity = smanager.getGranularity()
 
         try:
-            first, last = int(track.oldestTS()), int(track.mostRecentTS())
-
-            agentMap = {}
-            lastAgentTS = 0
-
-            # create a map of agents, indexed by timestamp
-            for aid in smanager.getAllAgents():
-                ts = track.getPointerTimestamp(aid)
-                if ts:
-                    ts = int(ts)
-                    agentMap.setdefault(ts, []).append(aid)
-                    lastAgentTS = max(ts, lastAgentTS)
-
-            queue = []
-
-            showTS = breakContinuity = False
-            extra = sumElems = numBreakTS = 0
-
-            agentsLeft = list(agentMap)
-
-            for ts, elems in track._container.iteritems():
-                ts = int(ts)
-                showTS = ts == first or ts in agentMap
-
-                if showTS or extra < self.NUM_CELLS:
-                    if breakContinuity:
-                        queue.append(('break', numBreakTS, sumElems, []))
-
-                    for agentTS in agentsLeft:
-                        if ts < agentTS:
-
-                            queue.append((agentTS, self._tsToDate(agentTS,
-                                                                  granularity),
-                                          0, agentMap[agentTS]))
-
-                            agentsLeft.remove(agentTS)
-
-                    queue.append((ts, self._tsToDate(ts, granularity),
-                                  len(elems), agentMap.get(ts, [])))
-
-                    breakContinuity = False
-                    sumElems = numBreakTS = 0
-                    if not showTS:
-                        extra += 1
-                else:
-                    sumElems += len(elems)
-                    numBreakTS += 1
-                    breakContinuity = True
-
-            queue.reverse()
-
-            # return ordered rows
-            return queue, lastAgentTS
-
+            first = int(track.oldestTS())
         except EmptyTrackException:
             return None, None
+
+        agentMap = {}
+        lastAgentTS = 0
+
+        # create a map of agents, indexed by timestamp
+        for aid in smanager.getAllAgents():
+            ts = track.getPointerTimestamp(aid)
+            if ts:
+                ts = int(ts)
+                agentMap.setdefault(ts, []).append(aid)
+                lastAgentTS = max(ts, lastAgentTS)
+
+        queue = []
+        showTS = breakContinuity = False
+        extra = sumElems = numBreakTS = 0
+
+        agentsLeft = sorted(agentMap)
+        agentsLeft.reverse()
+
+        for ts, elems in track._container.iteritems():
+            ts = int(ts)
+            showTS = ts == first or ts in agentMap
+
+            if showTS or extra < self.NUM_CELLS:
+                if breakContinuity:
+                    queue.append(('break', numBreakTS, sumElems, []))
+
+                for agentTS in agentsLeft[:]:
+                    if ts < agentTS:
+
+                        queue.append((agentTS,
+                                      self._tsToDate(agentTS, granularity),
+                                      0, agentMap[agentTS]))
+
+                        agentsLeft.remove(agentTS)
+
+                queue.append((ts, self._tsToDate(ts, granularity),
+                              len(elems), agentMap.get(ts, [])))
+
+                breakContinuity = False
+                sumElems = numBreakTS = 0
+                if not showTS:
+                    extra += 1
+            else:
+                sumElems += len(elems)
+                numBreakTS += 1
+                breakContinuity = True
+
+        queue.reverse()
+
+        # return ordered rows
+        return queue, lastAgentTS
 
     def getVars(self):
         tplVars = WTemplated.getVars(self)

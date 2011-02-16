@@ -677,6 +677,8 @@ if __name__ == '__main__':
             InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
 
             livesync.invenio = indico.ext.livesync.invenio
+            livesync.cern_search = indico.ext.livesync.cern_search
+
             """,
           zip_safe = False,
           packages = foundPackages,

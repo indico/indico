@@ -69,8 +69,10 @@ class TestMultiPointerTrack(unittest.TestCase):
         adding several elements and checking the result
         """
         self._addSome()
-        self.assertEqual(list(self._mpt[2:1]), [[self._b, self._a], [self._a, self._c, self._a]])
-        self.assertEqual(list(self._mpt[:]), [[self._c], [self._b, self._a], [self._a, self._c, self._a]])
+        self.assertEqual(list(self._mpt[2:1]), [[self._b, self._a],
+                                                [self._a, self._c, self._a]])
+        self.assertEqual(list(self._mpt[:]),
+                         [[self._c], [self._b, self._a], [self._a, self._c, self._a]])
 
     def testDel(self):
         """
@@ -129,7 +131,6 @@ class TestMultiPointerTrack(unittest.TestCase):
         self._mpt.addPointer('p2', 3 )
         self.assertEqual(self._mpt.getPointerTimestamp('p2'), 3 )
 
-
     def testMovePointerError(self):
         """
         exception thrown by movePointer()
@@ -137,13 +138,6 @@ class TestMultiPointerTrack(unittest.TestCase):
 
         # pointer doesn't exist
         self.assertRaises(KeyError, self._mpt.movePointer, self._a, 1 )
-
-        self._addSome()
-
-        self._mpt.addPointer(self._a, 1 )
-
-        # higher bound
-        self.assertRaises(ValueError, self._mpt.movePointer, self._a, 4 )
 
 
 class TestSetMultiPointerTrack(unittest.TestCase):
@@ -157,7 +151,6 @@ class TestSetMultiPointerTrack(unittest.TestCase):
         self._e = DummyType(2  + 1)
         self._f = DummyType(3  + 4)
 
-
     def _addSome(self):
         self._mpt.add(1, self._a)
         self._mpt.add(2, self._b)
@@ -165,7 +158,6 @@ class TestSetMultiPointerTrack(unittest.TestCase):
         self._mpt.add(1, self._d)
         self._mpt.add(2, self._e)
         self._mpt.add(3, self._f)
-
 
     def testOrdering(self):
         self._addSome()
@@ -222,7 +214,6 @@ class TestSetMultiPointerTrackDB(unittest.TestCase):
         self._a = DummyType(1)
         self._b = DummyType(2)
         self._c = DummyType(3)
-
 
     def testConcurrentAdditionsConflict(self):
         """
