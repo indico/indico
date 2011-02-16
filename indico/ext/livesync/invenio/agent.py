@@ -27,7 +27,7 @@ import time
 
 # plugin imports
 from indico.ext.livesync.agent import AgentProviderComponent, RecordUploader
-from indico.ext.livesync.bistate.agent import BistateBatchUploaderAgent
+from indico.ext.livesync.bistate import BistateBatchUploaderAgent
 from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
 
 

@@ -29,7 +29,7 @@ from urllib import urlencode
 
 # plugin imports
 from indico.ext.livesync.agent import AgentProviderComponent, RecordUploader
-from indico.ext.livesync.bistate.agent import BistateBatchUploaderAgent
+from indico.ext.livesync.bistate import BistateBatchUploaderAgent
 
 
 class CERNSearchUploadAgent(BistateBatchUploaderAgent):
