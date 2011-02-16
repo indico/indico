@@ -49,6 +49,7 @@ base module for asynchronous server requests
 def parseDateTime(dt, format):
     return datetime(*(time.strptime(dt, format)[0:6]))
 
+
 class ExpectedParameterException(ServiceError):
     """
     Represents an exception that occurs when a type of parameter was expected
@@ -58,12 +59,14 @@ class ExpectedParameterException(ServiceError):
     def __init__(self, paramName, expected, got):
         ServiceError.__init__(self, "ERR-P2","'%s': Expected '%s', got instead '%s'" % (paramName, expected, got))
 
+
 class EmptyParameterException(ServiceError):
     """
     Thrown when a parameter that should have a value is empty
     """
     def __init__(self, paramName=""):
         ServiceError.__init__(self, "ERR-P3","Expected parameter '%s' is empty"%paramName)
+
 
 class ParameterManager(object):
 
@@ -142,6 +145,7 @@ class ParameterManager(object):
 
     def setTimezone(self, tz):
         self._timezone = tz
+
 
 class ServiceBase(RequestHandlerBase):
     """
@@ -344,7 +348,7 @@ class AdminService(LoggedOnlyService):
         if not self._getUser().isAdmin():
             raise ServiceAccessError(_("Only administrators can perform this operation"))
 
-class TextModificationBase( object ):
+class TextModificationBase:
     """
     Base class for text field modification
     """
@@ -375,7 +379,7 @@ class TextModificationBase( object ):
             else:
                 return self._value
 
-class HTMLModificationBase( object ):
+class HTMLModificationBase:
     """
     Base class for HTML field modification
     """

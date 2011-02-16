@@ -48,7 +48,7 @@ class ContributionDisplayBase(ProtectedDisplayService, ContributionBase):
         ContributionBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
 
-class ContributionModifBase(ProtectedModificationService, ContributionBase):
+class ContributionModifBase(ContributionBase, ProtectedModificationService):
 
     def _checkParams(self):
         ContributionBase._checkParams(self)

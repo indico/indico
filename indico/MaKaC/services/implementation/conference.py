@@ -39,7 +39,8 @@ from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
         ResultWithWarning, TimingNoReportError, ServiceAccessError
 from MaKaC.fossils.contribution import IContributionFossil
 
-class ConferenceBase(object):
+
+class ConferenceBase:
     """
     Base class for conference modification
     """

@@ -7,7 +7,6 @@ from MaKaC.common.utils import isStringHTML,sortContributionByDate
 import MaKaC.webinterface.locators as locators
 
 
-
 class MinutesEdit(TextModificationBase, ProtectedModificationService):
 
     def _checkParams(self):
