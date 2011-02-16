@@ -1,4 +1,4 @@
-<a id="timezoneSelectorLink" href="#">
+<a id="timezoneSelectorLink" class="dropDownMenu" href="#">
     <%= ActiveTimezoneDisplay %>
 </a>
 
