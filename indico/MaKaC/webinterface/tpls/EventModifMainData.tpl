@@ -251,7 +251,7 @@ $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', <
 
 <%= macros.genericField(macros.FIELD_SELECT, 'inPlaceEditType', 'event.main.changeType', {'conference': "%s"%conferenceId}, preCache=True, rh=self._rh, options=typeList, orderOptionsBy = "value") %>
 
-$E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}).draw());
+$E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, {'startDate': confFossile.startDate, 'endDate': confFossile.endDate}, confFossile.type != 'simple_event').draw());
 
 $E('inPlaceEditDescription').set(new ParsedRichTextInlineEditWidget('event.main.changeDescription', <%= jsonEncode({'conference': "%s"%conferenceId}) %>, confFossile.description).draw());
 

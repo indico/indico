@@ -35,7 +35,9 @@
                 <input type="hidden" value="<%= sYear %>" name="sYear" id="sYear"/>
                 <input type="hidden" value="<%= sHour %>" name="sHour" id="sHour" />
                 <input type="hidden" value="<%= sMinute %>" name="sMinute" id="sMinute" />
+                <% if conference.getType() != "simple_event": %>
                 &nbsp;<input type="checkbox" name="move" value="1" checked>  <%= _("move timetable content")%>
+                <% end %>
             </td>
         </tr>
         <tr>

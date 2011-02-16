@@ -204,10 +204,13 @@ type("StartEndDateWidget", ["InlineEditWidget"],
              // call buildStructure with modification widgets
              return Html.div({},
                              this.__buildStructure(this.startDate.draw(), this.endDate.draw()),
-                             Html.div("widgetCheckboxOption",
+                             (this.showShiftOption ?
+                                  Html.div("widgetCheckboxOption",
                                       this.shiftTimes,
                                       Html.span({},
-                                      $T("Move session/contribution times in the timetable accordingly"))));
+                                      $T("Move session/contribution times in the timetable accordingly")))
+                                  : ''
+                              ));
          },
 
          _handleDisplayMode: function(value) {
@@ -235,7 +238,8 @@ type("StartEndDateWidget", ["InlineEditWidget"],
              return true;
          }
      },
-     function(method, attributes, initValue) {
+     function(method, attributes, initValue, showShiftOption) {
+         this.showShiftOption = showShiftOption;
          this.InlineEditWidget(method, attributes, initValue);
      });
 
