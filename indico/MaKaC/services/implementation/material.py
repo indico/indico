@@ -40,7 +40,7 @@ class UserListChange(object):
             object.grantAccess(avatar)
 
 
-class MaterialBase(object):
+class MaterialBase:
 
     def _checkParams( self ):
         try:
@@ -125,7 +125,7 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
         except Exception, e:
             raise e
 
-class ResourceBase(object):
+class ResourceBase:
     """
     Base class for material resource access
     """

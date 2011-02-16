@@ -122,7 +122,30 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
       * Resource
     """
 
-    def getRecursiveAllowedToAccessList(self):
+    def getRecursiveManagerList(self):
+        av_set = set()
+
+        # Get the AccessProtectionLevel for this
+        apl = self.getAccessProtectionLevel()
+
+        if apl == -1:
+            pass
+        elif apl == 1:
+            for av in self.getManagerList():
+                av_setadd(av)
+            for av in self.getOwner().getRecursiveManagerList():
+                av_set.add(av)
+        else:
+            for av in self.getManagerList():
+                av_set.add(av)
+
+            if self.getOwner():
+                for av in self.getOwner().getRecursiveManagerList():
+                    av_set.add(av)
+
+        return list(av_set)
+
+    def getRecursiveAllowedToAccessList(self, onlyManagers=False):
         """Returns a set of Avatar resp. CERNGroup objects for those people resp.
         e-groups allowed to access this object as well as all parent objects.
         """
@@ -140,9 +163,10 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
             pass
 
         # If this object is protected "all by itself", then get the list of
-        # people/groups allowed to access it, and ignore all owners' permissions.
+        # people/groups allowed to access it, plus managers of owner(s)
         elif apl == 1:
-            al = self.getAllowedToAccessList() + self.getManagerList()
+            al = self.getAllowedToAccessList() + self.getManagerList() + \
+                 self.getOwner().getRecursiveManagerList()
             if al is not None:
                 for av in al:
                     av_set.add(av)
@@ -159,7 +183,7 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
             # Add list of avatars/groups allowed to access parents objects.
             owner = self.getOwner()
             if owner is not None:
-                owner_al = owner.getRecursiveAllowedToAccessList()
+                owner_al = owner.getRecursiveAllowedToAccessList(onlyManagers=True)
                 if owner_al is not None:
                     for av in owner_al:
                         av_set.add(av)
@@ -228,7 +252,7 @@ class Category(CommonObjectBase):
         self.owner = None
         self._defaultStyle = { "simple_event":"","meeting":"" }
         self._order = 0
-        self.__ac = AccessController()
+        self.__ac = AccessController(self)
         self.__confCreationRestricted = 1
         self.__confCreators = []
         self._visibility = 999
@@ -2092,7 +2116,7 @@ class Conference(CommonObjectBase):
         self.program = []
         self.__programGenerator = Counter() # Provides track unique
                                             #   identifiers for this conference
-        self.__ac = AccessController()
+        self.__ac = AccessController(self)
         self.materials = {}
         self.__materialGenerator = Counter() # Provides material unique
                                              #   identifiers for this conference
@@ -5428,7 +5452,7 @@ class Session(CommonObjectBase):
         self.convenerText=""
         self.contributions={}
         self._contributionDuration=timedelta(minutes=20)
-        self.__ac=AccessController()
+        self.__ac=AccessController(self)
         self.materials={}
         self.__materialGenerator=Counter()
         self.minutes=None
@@ -7934,7 +7958,7 @@ class Contribution(CommonObjectBase):
         self.room = None
         self._boardNumber=""
         self._resetSchEntry()
-        self.__ac = AccessController()
+        self.__ac = AccessController(self)
         self.materials = {}
         self.__materialGenerator = Counter()
         self._subConts = []
@@ -10835,7 +10859,7 @@ class Material(CommonObjectBase):
         self.description = ""
         self.type = ""
         self.owner = None
-        self.__ac = AccessController()
+        self.__ac = AccessController(self)
         self._mainResource = None
 
     def isFullyPublic( self ):
@@ -11545,7 +11569,7 @@ class Resource(CommonObjectBase):
         self.name = ""
         self.description = ""
         self._owner = None
-        self.__ac = AccessController()
+        self.__ac = AccessController(self)
 
     def clone( self, conf ):
         res = Resource()

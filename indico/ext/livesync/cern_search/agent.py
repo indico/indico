@@ -24,8 +24,11 @@ Agent definitions for CERN Search
 
 # standard library imports
 import time, base64
-from urllib2 import urlopen, Request
+from urllib2 import urlopen, Request, HTTPError
 from urllib import urlencode
+
+# dependency imports
+from lxml import etree
 
 # plugin imports
 from indico.ext.livesync.agent import AgentProviderComponent, RecordUploader
@@ -52,7 +55,8 @@ class CERNSearchUploadAgent(BistateBatchUploaderAgent):
 
         # the uploader will manage everything for us...
 
-        uploader = CERNSearchRecordUploader(logger, self, self._url)
+        uploader = CERNSearchRecordUploader(logger, self, self._url,
+                                            self._username, self._password)
 
         if self._v_logger:
             self._v_logger.info('Starting metadata/upload cycle')
@@ -81,7 +85,7 @@ class CERNSearchRecordUploader(RecordUploader):
         Uploads a batch to the server
         """
 
-        url = "%s?op=ImportXML" % self._url
+        url = "%s/ImportXML" % self._url
 
         self._logger.debug('getting a batch')
 
@@ -105,20 +109,30 @@ class CERNSearchRecordUploader(RecordUploader):
 
         req.add_header("Authorization", "Basic %s" % cred)
 
-        result = urlopen(req, data=urlencode(postData))
+        try:
+            result = urlopen(req, data=urlencode(postData))
+        except HTTPError, e:
+            self._logger.exception("Status %s: \n %s" % (e.code, e.read()))
+            raise Exception('upload failed')
+
         result_data = result.read()
 
         tupload = time.time() - (tstart + tgen)
 
-        self._logger.debug('rec %s result: %s' % (batch, result_data))
+        self._logger.info('rec %s result: %s' % (batch, result_data))
 
-        if result.code == '200':
+        xmlDoc = etree.fromstring(result_data)
+
+        # right now there is nothing else to pay attention to
+        booleanResult = etree.tostring(xmlDoc, method="text")
+
+        if result.code == 200 and booleanResult == 'true':
             self._logger.info('Batch of %d records stored in server'
-                              '[%f s %f s]' % \
+                              ' [%f s %f s]' % \
                               (len(batch), tgen, tupload))
         else:
             self._logger.error('Records: %s output: %s '
-                               '(HTTP code %s)' % (batch, result.code, result_data))
+                               '(HTTP code %s)' % (batch, result_data, result.code))
             raise Exception('upload failed')
 
         return True

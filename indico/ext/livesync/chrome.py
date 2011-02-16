@@ -212,17 +212,18 @@ class WPluginAgentStatus(WTemplated):
                 if breakContinuity:
                     queue.append(('break', numBreakTS, sumElems, []))
 
-                for agentTS in agentsLeft[:]:
-                    if ts < agentTS:
+                if ts in agentMap:
+                    for agentTS in agentsLeft[:]:
+                        if ts < agentTS:
 
-                        queue.append((agentTS,
-                                      self._tsToDate(agentTS, granularity),
-                                      0, agentMap[agentTS]))
+                            queue.append((agentTS,
+                                          self._tsToDate(agentTS, granularity),
+                                          0, agentMap[agentTS]))
 
-                        agentsLeft.remove(agentTS)
-
-                queue.append((ts, self._tsToDate(ts, granularity),
-                              len(elems), agentMap.get(ts, [])))
+                            agentsLeft.remove(agentTS)
+                else:
+                    queue.append((ts, self._tsToDate(ts, granularity),
+                                  len(elems), agentMap.get(ts, [])))
 
                 breakContinuity = False
                 sumElems = numBreakTS = 0

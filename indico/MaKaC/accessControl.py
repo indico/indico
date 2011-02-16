@@ -49,7 +49,7 @@ class AccessController( Persistent, Observable ):
             allowed to access the related resource
     """
 
-    def __init__( self ):
+    def __init__( self, owner ):
         self._accessProtection = 0
         self._fatherProtection = 0
         self._hideFromUnauthorizedUsers = 0
@@ -59,7 +59,7 @@ class AccessController( Persistent, Observable ):
         self.allowedEmail = []
         self.requiredDomains = []
         self.accessKey = ""
-        self.owner = None
+        self.owner = owner
 
     def getOwner(self):
         return self.owner
