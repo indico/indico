@@ -37,6 +37,8 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
     ILocalFileExtendedFossil, IConferenceParticipationMinimalFossil,\
     ICategoryFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.common.url import ShortURLMapper
+
 
 import re, os
 import tempfile
@@ -2682,6 +2684,10 @@ class Conference(CommonObjectBase):
         for manager in self.getManagerList():
             if isinstance(manager, MaKaC.user.Avatar):
                 manager.unlinkTo(self, "manager")
+
+        # Remote short URL mappings
+        sum = ShortURLMapper()
+        sum.remove(self)
 
         TrashCanManager().add(self)
 
