@@ -538,8 +538,6 @@ class SimulatedModPythonRequest(object):
             else:
                 if self.URLFields['SERVER_PORT'] != '80':
                     url += ':' + self.URLFields['SERVER_PORT']
-
-        url += self.URLFields['SERVER_NAME']
         url += supplied_uri
 
         return url
