@@ -204,6 +204,13 @@ class outputGenerator(Observable):
 
         return accounts
 
+    def _generateLinkField(self, obj, text, out):
+        out.openTag("datafield", [["tag", "856"], ["ind1", "4"], ["ind2", " "]])
+        url = str(urlHandlers.UHConferenceDisplay.getURL(obj))
+        out.writeTag("subfield", url, [["code", "u"]])
+        out.writeTag("subfield", text, [["code", "y"]])
+        out.closeTag("datafield")
+
     def _generateACLDatafield(self, eType, memberList, objId, out):
         """
         Generates a specific MARCXML 506 field containing the ACL
@@ -226,7 +233,7 @@ class outputGenerator(Observable):
 
         out.closeTag("datafield")
 
-    def _generateAccessList(self, out, obj, specifyId=True):
+    def _generateAccessList(self, obj, out, specifyId=True):
         """
         Generate a comprehensive access list showing all users and e-groups who
         may access this object, taking into account the permissions and access
@@ -1404,13 +1411,9 @@ class outputGenerator(Observable):
         out.writeTag("subfield","INDICO." + self.dataInt.objToId(conf),[["code","a"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        url = str(urlHandlers.UHConferenceDisplay.getURL(conf))
-        out.writeTag("subfield",url,[["code","u"]])
-        out.writeTag("subfield", "Event details", [["code","y"]])
-        out.closeTag("datafield")
+        self._generateLinkField(conf, "Event details", out)
 
-        self._generateAccessList(out, conf, specifyId=False)
+        self._generateAccessList(conf, out, specifyId=False)
 
     ## def sessionToXMLMarc21(self,session,includeMaterial=1, out=None, overrideCache=False):
     ##     if not out:
@@ -1692,13 +1695,10 @@ class outputGenerator(Observable):
         out.writeTag("subfield", self._getRecordCollection(cont), [["code","a"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        url = str(urlHandlers.UHContributionDisplay.getURL(cont))
-        out.writeTag("subfield",url,[["code","u"]])
-        out.writeTag("subfield", "Contribution details", [["code","y"]])
-        out.closeTag("datafield")
+        self._generateLinkField(cont, "Contribution details", out)
+        self._generateLinkField(cont.getConference(), "Event details", out)
 
-        self._generateAccessList(out, cont, specifyId=False)
+        self._generateAccessList(cont, out, specifyId=False)
     ####
     #fb
 
@@ -1866,13 +1866,10 @@ class outputGenerator(Observable):
         out.writeTag("subfield", self._getRecordCollection(subCont), [["code","a"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
-        url = str(urlHandlers.UHSubContributionDisplay.getURL(subCont))
-        out.writeTag("subfield",url,[["code","u"]])
-        out.writeTag("subfield", "Contribution details", [["code","y"]])
-        out.closeTag("datafield")
+        self._generateLinkField(subCont, "Contribution details", out)
+        self._generateLinkField(subCont.getConference(), "Event details", out)
 
-        self._generateAccessList(out, subCont, specifyId=None)
+        self._generateAccessList(subCont, out, specifyId=None)
 
 
     def materialToXMLMarc21(self,mat, out=None):
@@ -1894,7 +1891,7 @@ class outputGenerator(Observable):
         for res in rList:
             if self.dataInt.isPrivateDataInt() or res.canAccess(self.__aw):
                 self.resourceToXMLMarc21(res, out=out)
-                self._generateAccessList(out, res)
+                self._generateAccessList(res, out)
 
     def resourceToXMLMarc21(self,res, out=None):
         if not out:
