@@ -1464,7 +1464,7 @@ class Abstract(Persistent):
         except:
             pass
 
-    def getField( self, field ):
+    def getField( self, field):
         try:
             if self._content != "":
                 self._fields["content"] = self._content

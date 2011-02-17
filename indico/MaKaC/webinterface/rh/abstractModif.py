@@ -614,6 +614,8 @@ class RHEditData(RHAbstractModifBase):
         for k in toNorm:
             params[k]=self._normaliseListParam(params.get(k,[]))
         self._abstractData=abstractDataWrapper.Abstract(self._conf.getAbstractMgr().getAbstractFieldsMgr(), **params)
+        self._doNotSanitizeFields = self._abstractData.getFieldNames()
+        self._doNotSanitizeFields.append('title')
         self._action=""
         if params.has_key("OK"):
             self._action="UPDATE"

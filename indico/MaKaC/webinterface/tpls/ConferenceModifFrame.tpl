@@ -22,7 +22,6 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
           </a>
     <% end %>
           <div class="separator"></div>
-
           <a class="eventModifSpecial" style="vertical-align: middle;" href="<%= urlHandlers.UHConferenceDisplay.getURL( conf ) %>">
               <%= _("Switch to event page") %><div class="leftCorner"></div>
           </a>

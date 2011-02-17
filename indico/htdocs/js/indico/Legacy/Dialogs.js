@@ -444,7 +444,11 @@ extend(IndicoUI.Dialogs,
                                startEndTimeField.endTimeField.dispatchEvent('change');
                            });
 
-                           var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5));
+                           var timezoneMsg = '';
+                           if(params.conference && params.conference.timezone) {
+                               timezoneMsg = ' (' + $T('Timezone') + ': ' + params.conference.timezone + ')';
+                           }
+                           var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5), timezoneMsg);
                            var startEndTimeComponent;
                            var timeTranslation = {
                                    toTarget: function (value) {
@@ -731,9 +735,10 @@ extend(IndicoUI.Dialogs,
                                        slot.confId = slot.conference.id;
                                        slot.title = slot.session.title;
                                        slot.scheduleEntry = slot.sessionSlotId;
-                                       days = [];
-                                       stDay = new Date(slot.conference.startDate.date)
-                                       eDay = new Date(slot.conference.endDate.date)
+                                       var days = [];
+                                       var stDay = Util.parseJSDateTime(slot.conference.startDate.date, '%Y-%m-%d');
+                                       var eDay = Util.parseJSDateTime(slot.conference.endDate.date, '%Y-%m-%d');
+
                                        while(stDay <= eDay){
                                            days.push(IndicoUtil.formatDate2(stDay));
                                            stDay.setDate(stDay.getDate() + 1);

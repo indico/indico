@@ -27,6 +27,7 @@ from xml.dom.minidom import parseString
 from MaKaC.common.Configuration import Config
 from MaKaC.i18n import _
 from MaKaC.errors import MaKaCError
+from MaKaC.common.logger import Logger
 
 class ExtUserHolder:
     def __init__(self):
@@ -82,7 +83,11 @@ class NiceUser:
             data = response.read()
             #print data
             conn.close()
-            doc = parseString(data)
+            try:
+                doc = parseString(data)
+            except Exception:
+                Logger.get('auth.nice').exception("Returned text:\n%s\n" % data)
+                raise
             for elem in doc.getElementsByTagName("userInfo"):
                 email = elem.getElementsByTagName("email")[0].childNodes[0].nodeValue.encode("utf-8").lower()
                 try:

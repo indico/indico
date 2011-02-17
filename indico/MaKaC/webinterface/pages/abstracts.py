@@ -317,7 +317,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
                                                 </table>
                                             </td>
                                         </tr>
-                """%(caption, self._abstract.getField(id) )
+                """%(caption, self.htmlText(self._abstract.getField(id)) )
         return html
 
     def getVars( self ):
@@ -877,7 +877,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
                         <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
                     </tr>
-                """%(self.htmlText(caption), self._abstract.getField(id) )
+                """%(self.htmlText(caption), self.htmlText(self._abstract.getField(id)) )
         return html
 
     def getVars( self ):

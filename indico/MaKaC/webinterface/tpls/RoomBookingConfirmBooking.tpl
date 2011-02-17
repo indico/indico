@@ -21,7 +21,7 @@
                                 <input type="hidden" name="resvID" id="resvID" value="<%=candResv.id%>" />
                             <% end %>
                             </span><br />
-                            
+
                             <br />
                             <table width="100%%" align="left" border="0">
                             <tr>
@@ -34,29 +34,35 @@
 							</tr>
 						   	<tr>
 						   		<td class="titleUpCellTD"></td>
-							 	<td><span style="color: red;">This <%=bookingMessage%>ing collides with the following <%=bookingMessage%>ings:</span>
-								<ul>
-									<% for col in collisions: %>
-									<li><%= col.withReservation.bookedForName %>, <%= verbose_dt(col.withReservation.startDT) %> - <%= verbose_dt(col.withReservation.endDT) %> 
-										(<a href="<%= urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) %>">more info</a>)</li>
-									<% end %>
-								</ul>
-								<p>It is probable that yours will be rejected in their favour.</p>								 
-								<strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
+                                <td><span style="color: red;">This <%=bookingMessage%>ing collides with the following <%=bookingMessageOther%>ings:</span>
+                                <ul>
+                                    <% for col in collisions: %>
+                                    <li><%= col.withReservation.bookedForName %>, <%= verbose_dt(col.withReservation.startDT) %> - <%= verbose_dt(col.withReservation.endDT) %>
+                                        (<a href="<%= urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) %>">more info</a>)</li>
+                                    <% end %>
+                                </ul>
+                                <% if rejectOthers: %>
+                                    <p>Those PRE-Bookings will be automatically rejected. For recurring bookings, only the conflicting days will be rejected.</p>
+                                    <strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
+                                <% end %>
+                                <% else: %>
+                                    <p>It is probable that yours will be rejected in their favour.</p>
+                                    <strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
+                                <% end %>
 								</td>
 						   	</tr>
-						   
+
                             <!-- ACTIONS -->
                             <tr>
                                 <td class="titleUpCellTD"></td>
                                 <td>
                                 	<input type="hidden" name="roomID" id="roomID" value="<%=candResv.room.id%>" />
                             		<input type="hidden" name="roomLocation" id="roomLocation" value="<%=candResv.room.locationName%>" />
-									
+
 									<input type="hidden" name="conf" value="<%= conf %>" />
-									
+
 									<input type="hidden" name="forceAddition" value="True" />
-									
+
                                     <input name="answer" type="submit" class="btn" value="Yes" />
                                     <input name="answer" type="submit" class="btn" value="No"  />
                                 </td>
@@ -65,7 +71,7 @@
                         </td>
                     </tr>
                 </table>
-                
+
             </td>
         </tr>
     </table>

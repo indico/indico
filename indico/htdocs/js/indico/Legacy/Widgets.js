@@ -1032,7 +1032,7 @@ IndicoUI.Widgets = {
             $B(elem, [editable(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue), context), Widget.text(" "), IndicoUI.Aux.defaultEditMenu(context)]);
         },
 
-        dateStartEndTimeField: function(defaultStartTime, defaultEndTime) {
+        dateStartEndTimeField: function(defaultStartTime, defaultEndTime, additional) {
 
             var obj = new WatchObject();
             obj.set('startTime', defaultStartTime);
@@ -1052,7 +1052,8 @@ IndicoUI.Widgets = {
 
             var element = Widget.block([
                 $B(startTimeField, obj.accessor('startTime')), dash,
-                $B(endTimeField, obj.accessor('endTime'))
+                $B(endTimeField, obj.accessor('endTime')),
+                additional || ''
             ]);
 
             return {'element': element,

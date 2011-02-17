@@ -159,6 +159,13 @@ class NoReportError(MaKaCError):
         self._msg = msg
         self._area = area
 
+class NotFoundError(MaKaCError):
+    """
+    """
+    def __init__( self, msg="", area=""):
+        self._msg = msg
+        self._area = area
+
 
 class PluginError(MaKaCError):
     pass

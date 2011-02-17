@@ -224,6 +224,9 @@ class AbstractData:
         self.authors = _AbstractAuthorList( params )
         self.comments = params.get("comments","")
 
+    def getFieldNames( self ):
+        return ['f_%s' % id for id in self._otherFields.keys()]
+
     def getFieldValue( self, id ):
         return self._otherFields.get(id, "")
 
@@ -403,6 +406,8 @@ class RHAbstractSubmission( RHAbstractSubmissionBase ):
         id = params.get("type", "")
         params["type"] = self._conf.getContribTypeById(id)
         self._abstractData = AbstractData( self._target.getAbstractMgr(), params )
+        self._doNotSanitizeFields = self._abstractData.getFieldNames()
+        self._doNotSanitizeFields.append('title')
         if "add_primary_author" in params:
             #self._action = "NEW_AUTHOR"
             self._abstractData.authors.addPrimaryAuthor( focus=True )
@@ -627,8 +632,11 @@ class RHAbstractModify( RHAbstractModificationBase ):
         if "cancel" in params:
             self._action = "CANCEL"
             return
+
         params["type"]=self._conf.getContribTypeById(params.get("type", ""))
         self._abstractData = AbstractData( self._conf.getAbstractMgr(), params )
+        self._doNotSanitizeFields = self._abstractData.getFieldNames()
+        self._doNotSanitizeFields.append('title')
         if "add_primary_author" in params:
             self._abstractData.authors.addPrimaryAuthor( focus=True )
         elif "add_secondary_author" in params:
