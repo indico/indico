@@ -69,7 +69,7 @@ def runConferenceMigration(dbi):
     ch = ConferenceHolder()
     i = 0
 
-    for (obj, level) in console.conferenceHolderIterator(ch, deepness='contrib'):
+    for (level, obj) in console.conferenceHolderIterator(ch, deepness='contrib'):
 
         ## TODO: Fix and uncomment
         ##

@@ -41,11 +41,11 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
 
     def _eventIterator(conference, tabs):
         for contrib in conference.getContributionList():
-            yield contrib
+            yield ('contrib', contrib)
 
             if deepness == 'subcontrib':
                 for scontrib in contrib.getSubContributionList():
-                    yield scontrib
+                    yield ('subcontrib', scontrib)
 
     idx = ch._getIdx()
 
@@ -59,8 +59,8 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
             print text[:80].ljust(80), '\r',
         i += 1
 
-        yield conf
-        if deepness == 'contrib':
+        yield ('event', conf)
+        if deepness in ['contrib', 'subcontrib']:
             for contrib in _eventIterator(conf, 0):
                 yield contrib
 

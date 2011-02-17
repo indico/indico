@@ -132,7 +132,7 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
             pass
         elif apl == 1:
             for av in self.getManagerList():
-                av_setadd(av)
+                av_set.add(av)
             for av in self.getOwner().getRecursiveManagerList():
                 av_set.add(av)
         else:
@@ -10517,6 +10517,9 @@ class SubContribution(CommonObjectBase):
             access or domain protection.
         """
         return self.getOwner().hasAnyProtection()
+
+    def getManagerList( self ):
+        return self.parent.getManagerList()
 
     def hasProtectedOwner( self ):
         if self.getOwner() != None:

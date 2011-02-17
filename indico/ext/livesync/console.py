@@ -101,6 +101,16 @@ class DestroyCommand(ConsoleLiveSyncCommand):
 
 
 def categoryIterator(category, tabs, verbose=True):
+    """
+    Iterates over the whole tree, drawing it in the way
+    """
+
+    def _eventIterator(conference, tabs):
+        for contrib in conference.getContributionList():
+            yield ('contrib', contrib)
+
+            for scontrib in contrib.getSubContributionList():
+                yield ('subcontrib', scontrib)
 
     clist = category.getSubCategoryList()
     i = 1
@@ -113,8 +123,8 @@ def categoryIterator(category, tabs, verbose=True):
         i += 1
 
     for conf in category.getConferenceList():
-        yield conf
-        for contrib in eventIterator(conf, tabs):
+        yield ('event', conf)
+        for contrib in _eventIterator(conf, tabs):
             yield contrib
 
 
@@ -134,12 +144,22 @@ def _basicStreamHandler():
 def _wrapper(iterator, operation, dbi):
     i = 0
     for elem in iterator:
-
         # each 10000 elements, clean zodb objects (avoids memory leak)
         if i % 10000 == 0:
             dbi.abort()
 
         yield elem, operation
+
+
+def _only_second(tupleIterator):
+    for tup in tupleIterator:
+        yield tup[1]
+
+
+def _only_first(tupleIterator):
+    for tup in tupleIterator:
+        yield tup[0]
+
 
 class AgentCommand(ConsoleLiveSyncCommand):
     """
@@ -182,18 +202,22 @@ class AgentCommand(ConsoleLiveSyncCommand):
             if args.output:
                 nbatch = 0
                 batch = []
-                for record in _wrapper(iterator, agent._creationState, self._dbi):
+                for record, operation in _wrapper(_only_second(iterator),
+                                                  agent._creationState,
+                                                  self._dbi):
                     if len(batch) > SIZE_BATCH_PER_FILE:
-                        self._writeFile(agent, args.output, nbatch, batch, logger)
+                        self._writeFile(agent, args.output,
+                                        nbatch, batch, logger)
                         nbatch += 1
                         batch = []
 
-                    batch.append(record)
+                    batch.append((record, operation))
 
                 if batch:
                     self._writeFile(agent, args.output, nbatch, batch, logger)
             else:
-                agent._run(_wrapper(iterator, agent._creationState, self._dbi),
+                agent._run(_wrapper(_only_second(iterator),
+                                    agent._creationState, self._dbi),
                            logger=logger,
                            monitor=monitor)
 
