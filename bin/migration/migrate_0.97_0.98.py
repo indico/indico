@@ -71,20 +71,22 @@ def runConferenceMigration(dbi):
 
     for (obj, level) in console.conferenceHolderIterator(ch, deepness='contrib'):
 
-        # only for conferences
-        if level == 'conf':
-            if hasattr(conf, '__alarmCounter'):
-            raise Exception("Conference Object %s (%s) seems to have been already "
-                            "converted" % (conf, conf.id))
+        ## TODO: Fix and uncomment
+        ##
+        ## # only for conferences
+        ## if level == 'conf':
+        ##     if hasattr(obj, '__alarmCounter'):
+        ##         raise Exception("Conference Object %s (%s) seems to have been "
+        ##                         "already converted" % (obj, obj.id))
 
-            existingKeys = conf.alarmList.keys()
-            existingKeys.sort()
-            nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
-            conf._Conference__alarmCounter = Counter(nstart)
+        ##     existingKeys = obj.alarmList.keys()
+        ##     existingKeys.sort()
+        ##     nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
+        ##     obj._Conference__alarmCounter = Counter(nstart)
 
-            # TODO: For each conference, take the existing tasks and convert them to
-            # the new object classes.
-            # It is important to save the state of the alarm (sent or not)
+        ##     # TODO: For each conference, take the existing tasks and
+        ##     # convert them to the new object classes.
+        ##     # It is important to save the state of the alarm (sent or not)
 
         _fixAccessController(obj)
 
@@ -129,18 +131,23 @@ def runCategoryDateIndexMigration(dbi):
     """
     Replacing category date indexes.
     """
-    if not IndexesHolder()._getIdx().has_key("backupCategoryDate"):
-        IndexesHolder()._getIdx()["backupCategoryDate"] = IndexesHolder().getIndex("categoryDate")
+    if "backupCategoryDate" not in IndexesHolder()._getIdx():
+        categoryDate = IndexesHolder().getIndex("categoryDate")
+        IndexesHolder()._getIdx()["backupCategoryDate"] = categoryDate
         newIdx = CategoryDayIndex()
         newIdx.buildIndex()
         IndexesHolder()._getIdx()["categoryDate"] = newIdx
     else:
-        print """runCategoryDateIndexMigration: new categoryDate index has NOT been generated because the index backup already exists.
-                If you still want to regenerate it, please, do it manually using bin/migration/CategoryDate.py"""
+        print """runCategoryDateIndexMigration: new categoryDate index has """ \
+        """NOT been generated because the index backup already exists.
+
+If you still want to regenerate it, please, do it manually using """ \
+        """bin/migration/CategoryDate.py"""
 
 
 def runMigration():
-    tasks = [runPluginMigration, runTaskMigration, runConferenceMigration, migrateCategoryDateIndex]
+    tasks = [runPluginMigration, runTaskMigration,
+             runConferenceMigration, runCategoryDateIndexMigration]
 
     print "\nExecuting migration...\n"
 
