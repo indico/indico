@@ -6853,14 +6853,15 @@ class WPConfModifParticipantList( WPConferenceBase ):
 
 class WConfModifContribList(wcomponents.WTemplated):
 
-    def __init__(self,conf,filterCrit, sortingCrit, order, websession):
+    def __init__(self,conf,filterCrit, sortingCrit, order, websession, filterUsed=False, filterUrl=None):
         self._conf=conf
         self._filterCrit=filterCrit
         self._sortingCrit=sortingCrit
         self._order = order
         self._totaldur =timedelta(0)
-        self._menuStatus = websession.getVar("ContribListMenuStatusConf%s"%conf.getId())
         self.websession = websession
+        self._filterUsed = filterUsed
+        self._filterUrl = filterUrl
 
 
     def _getURL( self ):
@@ -6966,20 +6967,22 @@ class WConfModifContribList(wcomponents.WTemplated):
         status=contrib.getCurrentStatus()
         statusCaption=ContribStatusList().getCode(status.__class__)
         html = """
-            <tr>
-                <td valign="top" nowrap><input type="checkbox" name="contributions" value=%s></td>
-                <td valign="top" nowrap class="abstractLeftDataCell">%s</td>
-                <td valign="top" nowrap class="abstractDataCell">%s</td>
-                <td valign="top" nowrap class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell">%s</td>
-                <td valign="top" class="abstractDataCell" nowrap>%s</td>
+            <tr id="contributions%s" style="background-color: transparent;" onmouseout="javascript:onMouseOut('contributions%s')" onmouseover="javascript:onMouseOver('contributions%s')">
+                <td valign="top" align="right" nowrap><input onchange="javascript:isSelected('contributions%s')" type="checkbox" name="contributions" value=%s></td>
+                <td valign="top" nowrap class="CRLabstractDataCell">%s</td>
+                <td valign="top" nowrap class="CRLabstractDataCell">%s</td>
+                <td valign="top" nowrap class="CRLabstractDataCell">%s</td>
+                <td valign="top" class="CRLabstractDataCell">%s</td>
+                <td valign="top" class="CRLabstractDataCell">%s</td>
+                <td valign="top" class="CRLabstractDataCell">%s</td>
+                <td valign="top" class="CRLabstractDataCell">%s</td>
+                <td valign="top" class="CRLabstractDataCell">%s</td>
+                <td valign="top" class="CRLabstractDataCell">%s</td>
+                <td valign="top" class="CRLabstractDataCell" nowrap>%s</td>
             </tr>
-                """%(contrib.getId(), self.htmlText(contrib.getId()),
+                """%(contrib.getId(), contrib.getId(), contrib.getId(),
+                    contrib.getId(), contrib.getId(),
+                    self.htmlText(contrib.getId()),
                     sdate or "&nbsp;",strdur or "&nbsp;",cType or "&nbsp;",
                     title or "&nbsp;",
                     speaker or "&nbsp;",session or "&nbsp;",
@@ -6997,7 +7000,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             if t.getId() in self._filterCrit.getField("type").getValues():
                 checked=" checked"
             res.append("""<input type="checkbox" name="types" value=%s%s> %s"""%(quoteattr(str(t.getId())),checked,self.htmlText(t.getName())))
-        return "<br>".join(res)
+        return res
 
     def _getSessionItemsHTML(self):
         checked=""
@@ -7012,7 +7015,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             if s.getId() in l:
                 checked=" checked"
             res.append("""<input type="checkbox" name="sessions" value=%s%s> (%s) %s"""%(quoteattr(str(s.getId())),checked,self.htmlText(s.getCode()),self.htmlText(s.getTitle())))
-        return "<br>".join(res)
+        return res
 
     def _getTrackItemsHTML(self):
         checked=""
@@ -7024,7 +7027,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             if t.getId() in self._filterCrit.getField("track").getValues():
                 checked=" checked"
             res.append("""<input type="checkbox" name="tracks" value=%s%s> (%s) %s"""%(quoteattr(str(t.getId())),checked,self.htmlText(t.getCode()),self.htmlText(t.getTitle())))
-        return "<br>".join(res)
+        return res
 
     def _getStatusItemsHTML(self):
         res=[]
@@ -7036,7 +7039,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             code=ContribStatusList().getCode(st)
             caption=ContribStatusList().getCaption(st)
             res.append("""<input type="checkbox" name="status" value=%s%s> (%s) %s"""%(quoteattr(str(id)),checked,self.htmlText(code),self.htmlText(caption)))
-        return "<br>".join(res)
+        return res
 
     def _getMaterialItemsHTML(self):
         res=[]
@@ -7047,91 +7050,41 @@ class WConfModifContribList(wcomponents.WTemplated):
             if id in self._filterCrit.getField("material").getValues():
                 checked=" checked"
             res.append("""<input type="checkbox" name="material" value=%s%s> %s"""%(quoteattr(str(id)),checked,self.htmlText(caption)))
-        return "<br>".join(res)
+        return res
 
-    def _getOpenMenuURL(self):
-        url = urlHandlers.UHConfModifContribListOpenMenu.getURL(self._conf)
-        url.addParam("currentURL", self._getURL())
-        return url
+    def _getFilterMenu(self):
 
-    def _getCloseMenuURL(self):
-        url = urlHandlers.UHConfModifContribListCloseMenu.getURL(self._conf)
-        url.addParam("currentURL", self._getURL())
-        return url
+        options = [
+            ('Types', {"title": _("Types"),
+                       "options": self._getTypeItemsHTML()}),
+            ('Sessions', {"title": _("Sessions"),
+                        "options": self._getSessionItemsHTML()}),
+            ('Tracks', {"title": _("Tracks"),
+                        "options": self._getTrackItemsHTML()}),
+            ('Status', {"title": _("Status"),
+                       "options": self._getStatusItemsHTML()}),
+            ('Materials', {"title": _("Materials"),
+                        "options": self._getMaterialItemsHTML()})
+        ]
 
-    def _getMenu(self):
-        if self._menuStatus == "open":
-            menu = _("""<form action=%(filterPostURL)s method="post">
-    <table width="100%%" align="center" border="0" style="border-left: 1px solid #777777">
-        <tr>
-            <td class="groupTitle"><a href="%(closeMenuURL)s"><img src=%(openMenuImg)s alt="_("hide menu")" border="0"></a> _("Filtering criteria")</td>
-        </tr>
-        <tr>
-            <td>
-                <table width="100%%">
-                    <tr>
-                        <td>
-                            <table align="center" cellspacing="10" width="100%%">
-                                <tr>
-                                    <td class="titleCellFormat"> _("Author search") <input type="text" name="authSearch" value=%(authSearch)s></td>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <table align="center" cellspacing="10" width="100%%">
-                                <tr>
-                                    <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px"> _("types")</td>
-                                    <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;"> _("sessions")</td>
-                                    <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;"> _("tracks")</td>
-                                    <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;"> _("status")</td>
-                                    <td align="center" class="titleCellFormat" style="border-bottom: 1px solid #5294CC;"> _("material")</td>
-                                </tr>
-                                <tr>
-                                    <td valign="top" style="border-right:1px solid #777777;">%(types)s</td>
-                                    <td valign="top" style="border-right:1px solid #777777;">%(sessions)s</td>
-                                    <td valign="top" style="border-right:1px solid #777777;">%(tracks)s</td>
-                                    <td valign="top" style="border-right:1px solid #777777;">%(status)s</td>
-                                    <td valign="top" style="border-right:1px solid #777777;">%(materials)s</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center" style="border-top:1px solid #777777;padding:10px"><input type="submit" class="btn" name="OK" value="_("apply filter")"></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</form>""")
-        else :
-            menu = _("""<form action=%(filterPostURL)s method="post">
-    <table width="100%%" align="center" border="0" style="border-left: 1px solid #777777">
-        <tr>
-            <td class="groupTitle"><a href="%(openMenuURL)s"><img src=%(closeMenuImg)s alt="Show menu" border="0"></a> _("Filtering criteria")</td>
-        </tr>
-    </table>
-</form>
-""")
+        extraInfo = _("""<table align="center" cellspacing="10" width="100%%">
+                            <tr>
+                                <td colspan="5" class="titleCellFormat"> _("Author search") <input type="text" name="authSearch" value=%s></td>
+                            </tr>
+                        </table>
+                    """)%(quoteattr(str(self._authSearch)))
 
-        return menu
+        p = WFilterCriteriaContribs(options, None, extraInfo)
+
+        return p.getHTML()
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars["filterUrl"] = str(self._filterUrl).replace('%', '%%')
         vars["quickSearchURL"]=quoteattr(str(urlHandlers.UHConfModContribQuickAccess.getURL(self._conf)))
         vars["filterPostURL"]=quoteattr(str(urlHandlers.UHConfModifContribList.getURL(self._conf)))
-        authSearch=vars.get("authSearch","").strip()
-        if self._menuStatus == 'open':
-            vars["authSearch"]=quoteattr(str(authSearch))
-            vars["types"]=self._getTypeItemsHTML()
-            vars["sessions"]=self._getSessionItemsHTML()
-            vars["tracks"]=self._getTrackItemsHTML()
-            vars["status"]=self._getStatusItemsHTML()
-            vars["materials"]=self._getMaterialItemsHTML()
-        cl=self._conf.getContribsMatchingAuth(authSearch)
+        self._authSearch=vars.get("authSearch","").strip()
+        cl=self._conf.getContribsMatchingAuth(self._authSearch)
 
         sortingField = self._sortingCrit.getField()
         self._currentSorting=""
@@ -7248,19 +7201,12 @@ class WConfModifContribList(wcomponents.WTemplated):
         vars["newContribURL"] = newContribURL
         #vars["newContribURL"] = urlHandlers.UHConfAddContribution.getURL( self._conf )
         vars["numContribs"]=str(numContribs)
-        vars["contribSelectionAction"]=quoteattr(str(urlHandlers.UHContribConfSelectionAction.getURL(self._conf)))
+
+        vars["totalNumContribs"] = str(len(self._conf.getContributionList()))
+        vars["filterUsed"] = self._filterUsed
+
         vars["contributionsPDFURL"]=quoteattr(str(urlHandlers.UHContribsConfManagerDisplayMenuPDF.getURL(self._conf)))
-        vars["participantListURL"]=quoteattr(str(urlHandlers.UHContribsConfManagerDisplayParticipantList.getURL(self._conf)))
-        vars["moveURL"]=quoteattr(str(urlHandlers.UHConfModMoveContribsToSession.getURL(self._conf)))
-        vars["materialPkgURL"]=quoteattr(str(urlHandlers.UHConfModMaterialPackage.getURL(self._conf)))
-        vars["proceedingsURL"]=quoteattr(str(urlHandlers.UHConfModProceedings.getURL(self._conf)))
-
-        vars["closeMenuURL"] = self._getCloseMenuURL()
-        vars["closeMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("openMenu"))
-        vars["openMenuURL"] = self._getOpenMenuURL()
-        vars["openMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("closeMenu"))
-
-        vars["menu"] = self._getMenu()%vars
+        vars["contribSelectionAction"]=quoteattr(str(urlHandlers.UHContribConfSelectionAction.getURL(self._conf)))
 
         totaldur = self._totaldur
         days = totaldur.days
@@ -7270,11 +7216,53 @@ class WConfModifContribList(wcomponents.WTemplated):
         vars["totaldur" ]="""%sh%sm"""%(dayhours,mins)
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         vars["bookings"] = Conversion.reservationsList(self._conf.getRoomBookingList())
+        vars["filterMenu"] = self._getFilterMenu()
+        vars["sortingOptions"]="""<input type="hidden" name="sortBy" value="%s">
+                                  <input type="hidden" name="order" value="%s">"""%(self._sortingCrit.getField().getId(), self._order)
+        vars["pdfIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
+        return vars
+
+class WFilterCriteriaContribs(wcomponents.WFilterCriteria):
+    """
+    Draws the options for a filter criteria object
+    This means rendering the actual table that contains
+    all the HTML for the several criteria
+    """
+
+    def __init__(self, options, filterCrit, extraInfo=""):
+        wcomponents.WFilterCriteria.__init__(self, options, filterCrit, extraInfo)
+
+    def _drawFieldOptions(self, id, data):
+
+        page = WFilterCriterionOptionsContribs(id, data)
+
+        # TODO: remove when we have a better template system
+        return page.getHTML().replace('%','%%')
+
+class WFilterCriterionOptionsContribs(wcomponents.WTemplated):
+
+    def __init__(self, id, data):
+        self._id = id
+        self._data = data
+
+    def getVars(self):
+
+        vars = wcomponents.WTemplated.getVars( self )
+
+        vars["id"] = self._id
+        vars["title"] = self._data["title"]
+        vars["options"] = self._data["options"]
+        vars["selectFunc"] = self._data.get("selectFunc", True)
+
         return vars
 
 class WPModifContribList( WPConferenceModifBase ):
 
     _userData = ['favorite-user-list', 'favorite-user-ids']
+
+    def __init__(self, rh, conference, filterUsed=False):
+        WPConferenceModifBase.__init__(self, rh, conference)
+        self._filterUsed = filterUsed
 
     def _setActiveSideMenuItem(self):
         self._contribListMenuItem.setActive(True)
@@ -7284,7 +7272,29 @@ class WPModifContribList( WPConferenceModifBase ):
         sortingCrit=params.get("sortingCrit",None)
         order = params.get("order","down")
         websession = self._rh._getSession()
-        wc = WConfModifContribList(self._conf,filterCrit, sortingCrit ,order, websession)
+
+        filterParams = {}
+        fields = getattr(filterCrit, '_fields')
+        for field in fields.values():
+            id = field.getId()
+            showNoValue = field.getShowNoValue()
+            values = field.getValues()
+            if showNoValue:
+                filterParams['%sShowNoValue' % id] = '--none--'
+            filterParams[id] = values
+
+        requestParams = self._rh.getRequestParams()
+
+        operationType = requestParams.get('operationType')
+        if operationType != 'resetFilters':
+            operationType = 'filter'
+        urlParams = dict(isBookmark='y', operationType=operationType)
+
+        urlParams.update(self._rh.getRequestParams())
+        urlParams.update(filterParams)
+        filterUrl = self._rh._uh.getURL(None, **urlParams)
+
+        wc = WConfModifContribList(self._conf,filterCrit, sortingCrit, order, websession, self._filterUsed, filterUrl)
         p={"authSearch":params.get("authSearch","")}
 
         return wc.getHTML(p)

@@ -5355,29 +5355,6 @@ class RHContributionListBase(RHConferenceModifBase):
             RHConferenceModifBase._checkProtection(self)
 
 
-class RHContributionListOpenMenu( RHContributionListBase ):
-
-    def _checkParams( self, params ):
-        RHContributionListBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("ContribListMenuStatusConf%s"%self._conf.getId(), "open")
-        self._redirect(self._currentURL)
-
-
-class RHContributionListCloseMenu(RHContributionListBase):
-
-    def _checkParams( self, params ):
-        RHContributionListBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("ContribListMenuStatusConf%s"%self._conf.getId(), "close")
-        self._redirect(self._currentURL)
-
 class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
     _uh = urlHandlers.UHConfModifContribList
 
@@ -5386,87 +5363,147 @@ class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
         if not RCPaperReviewManager.hasRights(self):
             RHContributionListBase._checkProtection(self)
 
+    def _resetFilters( self, sessionData ):
+        """
+        Brings the filter data to a consistent state (websession),
+        marking everything as "checked"
+        """
+
+        sessionData.clear()
+        sessionData["type"] = map(lambda ctype: ctype.getId(), self._conf.getContribTypeList())
+        sessionData["track"] = map(lambda track: track.getId(), self._conf.getTrackList())
+        sessionData["session"] = map(lambda ses: ses.getId(), self._conf.getSessionList())
+        sessionData["status"] = map(lambda status: ContribStatusList.getId(status), ContribStatusList.getList())
+        lmaterial = []
+        paperId = materialFactories.PaperFactory().getId()
+        slidesId = materialFactories.SlidesFactory().getId()
+        for matId in ["--other--","--none--",paperId,slidesId]: # wtf? doesn't that simply re-create the list?
+            lmaterial.append(matId)
+        sessionData["material"] = lmaterial
+        sessionData["typeShowNoValue"] = True
+        sessionData["trackShowNoValue"] = True
+        sessionData["sessionShowNoValue"] = True
+
+        return sessionData
+
+    def _updateFilters( self, sessionData, params ):
+        """
+        Updates the filter parameters in the websession with those
+        coming from the HTTP request
+        """
+
+        sessionData["type"] = []
+        sessionData["track"] = []
+        sessionData["status"] = []
+        sessionData["material"] = []
+        sessionData.update(params)
+        sessionData['session'] = utils.normalizeToList(params.get('sessions', []))
+
+        # update these elements in the session so that the parameters that are
+        # passed are always taken into account (sessionData.update is not
+        # enough, since the elements that are ommitted in params would just be
+        # ignored
+
+        sessionData['typeShowNoValue'] = params.has_key('typeShowNoValue')
+        sessionData['trackShowNoValue'] = params.has_key('trackShowNoValue')
+        sessionData['sessionShowNoValue'] = params.has_key('sessionShowNoValue')
+
+        return sessionData
+
+    def _buildFilteringCriteria(self, sessionData):
+        """
+        Creates the Filtering Criteria object, without changing the existing
+        session data (sessionData is cloned, not directly changed)
+        """
+        sessionCopy = sessionData.copy()
+
+        # Build the filtering criteria
+        filterCrit = ContribFilterCrit(self._conf, sessionCopy)
+
+        filterCrit.getField("type").setShowNoValue(sessionCopy.get('typeShowNoValue'))
+        filterCrit.getField("track").setShowNoValue(sessionCopy.get('trackShowNoValue'))
+        filterCrit.getField("session").setShowNoValue(sessionCopy.get('sessionShowNoValue'))
+
+        return filterCrit
+
+    def _checkAction(self, params, filtersActive, sessionData, operation, isBookmark):
+        """
+        Decides what to do with the request parameters, depending
+        on the type of operation that is requested
+        """
+
+        # user chose to reset the filters
+        if operation ==  'resetFilters':
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
+
+        # user set the filters
+        elif operation ==  'setFilters':
+            self._filterUsed = True
+            sessionData = self._updateFilters(sessionData, params)
+
+        # user has changed the display options
+        elif operation == 'setDisplay':
+            self._filterUsed = filtersActive
+
+        # session is empty (first time)
+        elif not filtersActive:
+            self._filterUsed = False
+            sessionData = self._resetFilters(sessionData)
+        else:
+            self._filterUsed = True
+
+        # if this is accessed through a direct link, the session is empty, so set default values
+        if isBookmark:
+            sessionData = self._resetFilters(sessionData)
+            if operation != 'resetFilters':
+                sessionData = self._updateFilters(sessionData, params)
+
+        # preserve the order and sortBy parameters, whatever happens
+        sessionData['order'] = params.get('order', 'down')
+        sessionData['sortBy'] = params.get('sortBy', 'number')
+
+        return sessionData
+
     def _checkParams( self, params ):
         RHContributionListBase._checkParams( self, params )
+        operationType = params.get('operationType')
         websession = self._getSession()
-        dict = websession.getVar("ContributionFilterConf%s"%self._conf.getId())
-        noMemory = False
-        if not dict:
-            noMemory = True
-            dict = {}
-        else:
-            dict = dict.copy()
-        dict.update(params)
-        if params.has_key("OK"):
-            if not params.has_key("typeShowNoValue") and dict.has_key("typeShowNoValue"):
-                del dict["typeShowNoValue"]
-            if not params.has_key("types") and dict.has_key("types"):
-                del dict["types"]
-            if not params.has_key("sessionShowNoValue") and dict.has_key("sessionShowNoValue"):
-                del dict["sessionShowNoValue"]
-            if not params.has_key("sessions") and dict.has_key("sessions"):
-                del dict["sessions"]
-            if not params.has_key("trackShowNoValue") and dict.has_key("trackShowNoValue"):
-                del dict["trackShowNoValue"]
-            if not params.has_key("tracks") and dict.has_key("tracks"):
-                del dict["tracks"]
-            if not params.has_key("status") and dict.has_key("status"):
-                del dict["status"]
-            if not params.has_key("material") and dict.has_key("material"):
-                del dict["material"]
-        #sorting
-        self._sortingCrit=ContribSortingCrit([dict.get("sortBy","number").strip()])
-        self._order = dict.get("order","down")
-        #filter
-        self._authSearch=dict.get("authSearch","")
-        #filterUsed=dict.has_key("OK")
-        filterUsed = False
-        if not noMemory:
-            filterUsed = True
-        filter = {}
-        ltypes = []
-        if not filterUsed:
-            for type in self._conf.getContribTypeList():
-                ltypes.append(type.getId())
-        else:
-            for id in dict.get("types",[]):
-                ltypes.append(id)
-        filter["type"]=utils.normalizeToList(ltypes)
-        ltracks = []
-        if not filterUsed:
-            for track in self._conf.getTrackList():
-                ltracks.append( track.getId() )
-        filter["track"]=utils.normalizeToList(dict.get("tracks",ltracks))
-        lsessions = []
-        if not filterUsed:
-            for session in self._conf.getSessionList():
-                lsessions.append(session.getId())
-        filter["session"]=utils.normalizeToList(dict.get("sessions",lsessions))
-        lstatus=[]
-        if not filterUsed:
-            for status in ContribStatusList.getList():
-                lstatus.append(ContribStatusList.getId(status))
-        filter["status"]=utils.normalizeToList(dict.get("status",lstatus))
-        lmaterial=[]
-        if not filterUsed:
-            paperId=materialFactories.PaperFactory().getId()
-            slidesId=materialFactories.SlidesFactory().getId()
-            for matId in ["--other--","--none--",paperId,slidesId]:
-                lmaterial.append(matId)
-        filter["material"]=utils.normalizeToList(dict.get("material",lmaterial))
-        self._filterCrit=ContribFilterCrit(self._conf,filter)
-        typeShowNoValue,trackShowNoValue,sessionShowNoValue=True,True,True
-        if filterUsed:
-            typeShowNoValue =  dict.has_key("typeShowNoValue")
-            trackShowNoValue =  dict.has_key("trackShowNoValue")
-            sessionShowNoValue =  dict.has_key("sessionShowNoValue")
-        self._filterCrit.getField("type").setShowNoValue( typeShowNoValue )
-        self._filterCrit.getField("track").setShowNoValue( trackShowNoValue )
-        self._filterCrit.getField("session").setShowNoValue( sessionShowNoValue )
+        sessionData = websession.getVar("ContributionFilterConf%s"%self._conf.getId())
 
+        # check if there is information already
+        # set in the session variables
+        if sessionData:
+            # work on a copy
+            sessionData = sessionData.copy()
+            filtersActive =  sessionData.get('filtersActive', False)
+        else:
+            # set a default, empty dict
+            sessionData = {}
+            filtersActive = False
+
+        if params.has_key("resetFilters"):
+            operation =  'resetFilters'
+        elif operationType ==  'filter':
+            operation =  'setFilters'
+        elif operationType ==  'display':
+            operation =  'setDisplay'
+        else:
+            operation = None
+
+        isBookmark = params.has_key("isBookmark")
+        sessionData = self._checkAction(params, filtersActive, sessionData, operation, isBookmark)
+        # Maintain the state about filter usage
+        sessionData['filtersActive'] = self._filterUsed;
+        # Save the web session
+        websession.setVar("ContributionFilterConf%s"%self._conf.getId(), sessionData)
+        self._filterCrit = self._buildFilteringCriteria(sessionData)
+        self._sortingCrit = ContribSortingCrit([sessionData.get("sortBy", "number").strip()])
+        self._order = sessionData.get("order", "down")
+        self._authSearch = sessionData.get("authSearch", "")
 
     def _process( self ):
-        p = conferences.WPModifContribList(self, self._target)
+        p = conferences.WPModifContribList(self, self._target, self._filterUsed)
         return p.display(authSearch=self._authSearch,\
                         filterCrit=self._filterCrit, sortingCrit=self._sortingCrit, order=self._order)
 
@@ -6473,6 +6510,8 @@ class RHContribsActions:
             return RHMoveContribsToSession(self._req).process(params)
         elif params.has_key("PKG"):
             return RHMaterialPackage(self._req).process(params)
+        elif params.has_key("PROC"):
+            return RHProceedings(self._req).process(params)
         return "no action to do"
 
 

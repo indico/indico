@@ -24,12 +24,6 @@ from MaKaC.webinterface.rh import conferenceModif
 def index( req, **params ):
     return conferenceModif.RHContributionList( req ).process( params )
 
-def openMenu( req, **params ):
-    return conferenceModif.RHContributionListOpenMenu( req ).process( params )
-
-def closeMenu( req, **params ):
-    return conferenceModif.RHContributionListCloseMenu( req ).process( params )
-
 def addContribution( req, **params ):
     return conferenceModif.RHConfAddContribution(req).process(params)
 
