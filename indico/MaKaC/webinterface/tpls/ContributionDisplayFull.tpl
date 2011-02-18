@@ -38,6 +38,25 @@
 	<tr>
 	  <td>
             <table align="center" width="95%">
+                <tr>
+                <td colspan="2">
+                <% if hideInfo: %>
+                    <% display = '' %>
+                <% end %>
+                <% else: %>
+                    <% display = 'none' %>
+                <% end %>
+                <div align="center" style="display:<%=display%>">
+                    <span id="hideContributionFull" class="collaborationDisplayMoreInfo" onclick="showGeneralInfo();"><%= _("Show general info")%></span>
+                </div>
+                <% if hideInfo: %>
+                    <% display = 'none' %>
+                <% end %>
+                <% else: %>
+                    <% display = '' %>
+                <% end %>
+                <div id="showContributionFull" style="display:<%=display%>">
+                <table align="center" width="95%">
                 <%
                 if self._rh._target.getConference().getAbstractMgr().isActive() and self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
                 %>
@@ -86,8 +105,12 @@
                     <%= subConts %>
                     <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() : %>
                         <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
+                        </table>
+                        </div>
+                        </td>
+                        </tr>
                         <tr><td align="right" valign="top" class="displayField" nowrap>
-                                <b><%=_("Reviewing materials")%>:</b>
+                                <b><%=_("Reviewing material")%>:</b>
                                 <% inlineContextHelp(_('Here you should add the materials for reviewing. They will be judged by the reviewing team.')) %>
                             </td>
                             <td>
@@ -136,6 +159,16 @@
                                             </form>
                                         </td>
                                 </tr>
+                          <% end %>
+                          <% else: %>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div id="reviewingWarning">
+                                        <span class="collaborationWarning">You must send the reviewing material to start the reviewing process</span>
+                                    </div>
+                                </td>
+                            </tr>
                           <% end %>
                       <% if len(Contribution.getReviewManager().getVersioning()) > 1: %>
                       <tr>
@@ -188,4 +221,17 @@ var buildShowHideHistory = function() {
 buildShowHideHistory();
 $E('HistoryTable').dom.style.display = 'none';
 <% end %>
+
+function showGeneralInfo() {
+    if ($E('hideContributionFull').dom.innerHTML == 'Hide general info') {
+        $E('showContributionFull').dom.style.display = 'none';
+        $E('hideContributionFull').dom.innerHTML = 'Show general info';
+    } else {
+        if ($E('hideContributionFull').dom.innerHTML == 'Show general info') {
+            $E('showContributionFull').dom.style.display = '';
+            $E('hideContributionFull').dom.innerHTML = $T('Hide general info');
+        }
+    }
+}
+
 </script>

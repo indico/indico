@@ -628,20 +628,30 @@ class Review(Persistent, Fossilizable):
                 elif forAuthor:
                     status.append(_("Pending referee decision"))
                 else:
-                        if self.getConfPaperReview().getChoice() == 4:
-                            editor = self._reviewManager.getEditor()
-                            if self._reviewManager.isEditor(editor) and self._editorJudgement.isSubmitted():
-                                status.append(_("Layout judged by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
-                            else:
-                                status.append(_("Pending layout reviewer decision"))
+                    if self.getConfPaperReview().getChoice() == 4:
+                        editor = self._reviewManager.getEditor()
+                        if self._reviewManager.isEditor(editor) and self._editorJudgement.isSubmitted():
+                            status.append(_("Layout judged by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
+                        else:
+                            status.append(_("Pending layout reviewer decision"))
 
-                            if self.anyReviewerHasGivenAdvice():
-                                for reviewer in self._reviewManager.getReviewersList():
+                        if self.anyReviewerHasGivenAdvice():
+                            for reviewer in self._reviewManager.getReviewersList():
+                                if (self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement() != None):
                                     status.append(_("Content judged by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
-                                if not self.allReviewersHaveGivenAdvice():
-                                    status.append(_("Some content reviewers have not decided yet"))
-                            else:
-                                status.append(_("No content reviewers have decided yet"))
+                            if not self.allReviewersHaveGivenAdvice():
+                                status.append(_("Some content reviewers have not decided yet"))
+                        else:
+                            status.append(_("No content reviewers have decided yet"))
+                    if self.getConfPaperReview().getChoice() == 2:
+                        if self.anyReviewerHasGivenAdvice():
+                            for reviewer in self._reviewManager.getReviewersList():
+                                if (self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement() != None):
+                                    status.append(_("Content judged by ") + str(reviewer.getFullName())+ _(" as: ") + str(self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement()))
+                            if not self.allReviewersHaveGivenAdvice():
+                                status.append(_("Some content reviewers have not decided yet"))
+                        else:
+                            status.append(_("No content reviewers have decided yet"))
         else:
             status.append(_("Materials not submitted yet"))
         return status
@@ -882,6 +892,9 @@ class Review(Persistent, Fossilizable):
         else:
             return getAdjustedDate(self._reviewerDueDate, self.getConference())
 
+    def setModificationDate(self):
+        """Update the modification date (of type 'datetime') to now."""
+        self.modificationDate = nowutc()
 
 ######################################
 # Email notification classes

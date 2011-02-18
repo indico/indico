@@ -251,7 +251,7 @@
 
     <tr><td style="padding-top: 15px;"></td></tr>
     <tr><td colspan="5" style="padding-top: 15px;">
-     <em><%= _("You can define paper reviewers competences by clicking on 'Competences'")%></em>
+     <em><%= _("You can define paper reviewers competences by clicking on ") %><a href="<%=urlHandlers.UHConfModifUserCompetences.getURL(ConfReview.getConference())%>"><%= _("Competences")%></a></em>
         </td>
     </tr>
 </table>

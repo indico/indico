@@ -42,10 +42,11 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 
 class WPContributionBase( WPMainBase, WPConferenceBase ):
 
-    def __init__( self, rh, contribution ):
+    def __init__( self, rh, contribution, hideFull = 0 ):
         self._contrib = self._target = contribution
         WPConferenceBase.__init__( self, rh, self._contrib.getConference() )
         self._navigationTarget = contribution
+        self._hideFull = hideFull
 
 
 class WPContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPContributionBase ):
@@ -55,15 +56,16 @@ class WPContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPContri
             self._includeJSPackage('Management') + \
                self._includeJSPackage('MaterialEditor')
 
-    def __init__( self, rh, contribution ):
-        WPContributionBase.__init__( self, rh, contribution )
+    def __init__( self, rh, contribution, hideFull = 0 ):
+        WPContributionBase.__init__( self, rh, contribution, hideFull )
 
 
 class WContributionDisplayBase(wcomponents.WTemplated):
 
-    def __init__(self, aw, contrib):
+    def __init__(self, aw, contrib, hideFull = 0):
         self._aw = aw
         self._contrib = contrib
+        self._hideFull = hideFull
 
     def _getHTMLRow( self, title, body):
         if body.strip() == "":
@@ -296,6 +298,11 @@ class WContributionDisplayBase(wcomponents.WTemplated):
             vars["sessionType"] = self._contrib.getSession().getScheduleType()
         else:
             vars["sessionType"] = 'none'
+
+        if self._hideFull == 1:
+            vars["hideInfo"] = True
+        else:
+            vars["hideInfo"] = False
         return vars
 
 
@@ -309,13 +316,14 @@ class WContributionDisplayMin(WContributionDisplayBase):
 
 class WContributionDisplay:
 
-    def __init__(self, aw, contrib):
+    def __init__(self, aw, contrib, hideFull = 0):
         self._aw = aw
         self._contrib = contrib
+        self._hideFull = hideFull
 
     def getHTML(self,params={}):
         if self._contrib.canAccess( self._aw ):
-            c = WContributionDisplayFull( self._aw, self._contrib)
+            c = WContributionDisplayFull( self._aw, self._contrib, self._hideFull)
             return c.getHTML( params )
         if self._contrib.canView( self._aw ):
             c = WContributionDisplayMin( self._aw, self._contrib)
@@ -346,9 +354,8 @@ class WPContributionDisplay( WPContributionDefaultDisplayBase ):
         self._toolBar.addItem(ical)
 
     def _getBody( self, params ):
-        wc=WContributionDisplay( self._getAW(), self._contrib )
+        wc=WContributionDisplay( self._getAW(), self._contrib, self._hideFull )
         return wc.getHTML()
-
 
 
 class WPContributionModifBase( WPConferenceModifBase  ):
@@ -457,7 +464,16 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         if self._target.isScheduled():
             banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
         else:
-            banner = wcomponents.WContribListBannerModif(self._target).getHTML()
+            if self._canModify or self._isPRM:
+                banner = wcomponents.WContribListBannerModif(self._target).getHTML()
+            else:
+                if self._conf.getConfPaperReview().isRefereeContribution(self._rh._getUser(), self._contrib):
+                    banner = wcomponents.WListOfPapersToReview(self._target, "referee").getHTML()
+                if self._conf.getConfPaperReview().isReviewerContribution(self._rh._getUser(), self._contrib):
+                    banner = wcomponents.WListOfPapersToReview(self._target, "reviewer").getHTML()
+                if self._conf.getConfPaperReview().isEditorContribution(self._rh._getUser(), self._contrib):
+                    banner = wcomponents.WListOfPapersToReview(self._target, "editor").getHTML()
+
         body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner + body
 

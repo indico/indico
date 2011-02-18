@@ -387,48 +387,6 @@ class WConfModificationReviewingFrame(wcomponents.WTemplated):
         vars["ConfReview"] = self.__target.getConfPaperReview()
         return vars
 
-class WConfModifAbstractsReviewingControl(wcomponents.WTemplated):
-    """ Template for the previous class. Uses the next class as templates
-    """
-
-    def __init__( self, conference):
-        self._conf = conference
-
-    def getHTML( self, params ):
-
-        rcAbstract=""
-        rcAbstract = WConfModificationAbstractReviewingFrame().getHTML( self._conf,\
-                                                params["addAbstractManagerURL"], \
-                                                params["removeAbstractManagerURL"], \
-                                                params["addAbstractReviewerURL"], \
-                                                params["removeAbstractReviewerURL"])
-
-        return """<table width="100%%" class="Revtab"><tr><td>%s</td></tr></table>"""%(rcAbstract)
-
-
-class WConfModificationAbstractReviewingFrame(wcomponents.WTemplated):
-    """ Template used by WConfModifReviewingControl,
-        for the list of abstract managers and abstract reviewers
-    """
-
-    def getHTML( self, target, addAbstractManagerURL, removeAbstractManagerURL, addAbstractReviewerURL, removeAbstractReviewerURL):
-        self.__target = target
-        params = { "addAbstractManagerURL": addAbstractManagerURL,\
-                   "removeAbstractManagerURL": removeAbstractManagerURL,\
-                   "addAbstractReviewerURL": addAbstractReviewerURL,\
-                   "removeAbstractReviewerURL": removeAbstractReviewerURL
-                   }
-        return  wcomponents.WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["abstractManagerTable"] = wcomponents.WPrincipalTable().getHTML( self.__target.getConfPaperReview().getAbstractManagersList(),
-                                                                              self.__target, vars["addAbstractManagerURL"],
-                                                                              vars["removeAbstractManagerURL"], selectable=False)
-        vars["abstractReviewerTable"] = wcomponents.WPrincipalTable().getHTML( self.__target.getConfPaperReview().getAbstractReviewersList(),
-                                                                               self.__target, vars["addAbstractReviewerURL"],
-                                                                               vars["removeAbstractReviewerURL"], selectable=False)
-        return vars
 
 class WPConfSelectPaperReviewManager( WPConfModifReviewingBase ):
     """ Page to select a PRM
@@ -446,25 +404,6 @@ class WPConfSelectPaperReviewManager( WPConfModifReviewingBase ):
             searchLocal = True
         wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectPaperReviewManager.getURL(), forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHConfAddPaperReviewManager.getURL()
-        return wc.getHTML( params )
-
-class WPConfSelectAbstractManager( WPConfModifReviewingBase ):
-    """ Page to select a PRM
-    """
-
-    def _createTabCtrl(self):
-        WPConfModifReviewingBase._createTabCtrl(self)
-        self._subtabAbstractsReviewing.setActive()
-        self._tabAbstractsReviewingControl.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectAbstractManager.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfAddAbstractManager.getURL()
         return wc.getHTML( params )
 
 class WPConfSelectEditor( WPConfModifReviewingBase ):
@@ -519,25 +458,6 @@ class WPConfSelectReferee( WPConfModifReviewingBase ):
             searchLocal = True
         wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectReferee.getURL(), forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHConfAddReferee.getURL()
-        return wc.getHTML( params )
-
-class WPConfSelectAbstractReviewer( WPConfModifReviewingBase ):
-    """ Page to select a PRM
-    """
-
-    def _createTabCtrl(self):
-        WPConfModifReviewingBase._createTabCtrl(self)
-        self._subtabAbstractsReviewing.setActive()
-        self._tabAbstractsReviewingControl.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectAbstractReviewer.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfAddAbstractReviewer.getURL()
         return wc.getHTML( params )
 
 #classes for contributions to judge list tab

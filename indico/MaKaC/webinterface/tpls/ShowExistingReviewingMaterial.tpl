@@ -69,4 +69,5 @@ $E('reviewingMaterialListPlace').set(mlist.draw());
 <% else: %>
     $E('SendBtnForm').dom.style.display = 'none';
 <% end %>
+
 </script>

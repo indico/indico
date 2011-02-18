@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="wohl.xsd" version="0.1">
 
     <page name="ConfModificationReviewingSettings">
-    
+
         <tooltip name="typeOfReviewing" target="//*[@id='reviewingModeHelp']">
             <translation language="en">
                 <text>
@@ -44,7 +44,7 @@
                 </text>
             </translation>
         </tooltip>
-        
+
         <tooltip name="reviewableMaterials" target="//*[@id='reviewableMaterialsHelp']">
             <translation language="en">
                 <text>
@@ -56,7 +56,7 @@
                 </text>
             </translation>
         </tooltip>
-        
+
         <tooltip name="reviewingStates" target="//*[@id='reviewingStatesHelp']">
             <translation language="en">
                 <text>
@@ -72,7 +72,7 @@
                 </text>
             </translation>
         </tooltip>
-        
+
         <tooltip name="reviewingQuestions" target="//*[@id='reviewingQuestionsHelp']">
             <translation language="en">
                 <text>
@@ -83,7 +83,7 @@
                 </text>
             </translation>
         </tooltip>
-        
+
         <tooltip name="editingCriteria" target="//*[@id='editingCriteriaHelp']">
             <translation language="en">
                 <text>
@@ -98,22 +98,22 @@
         <tooltip name="defaultDates" target="//*[@id='defaultDatesHelp']">
             <translation language="en">
                 <text>
-                        <p>For each contribution, you can set a deadline for the judgement / opinion of
-                        Referees, Layout Reviewers, and Content Reviewers independently</p>.
-                        <p>Here you can set a default date that will be used for new contributions</p>.
+                        <p>For each contribution, you can set a deadline for the judgement/opinion of
+                        Referees, Layout Reviewers, and Content Reviewers independently. The deadline will
+                        be used for new contributions.</p>
                 </text>
             </translation>
         </tooltip>
-        
+
         <tooltip name="uploadTemplate" target="//*[@id='uploadTemplateHelp']">
             <translation language="en">
                 <text>
                         <p>Here you can upload a layout template, in the form of a document file,
-                        that contribution authors will be able to download in order to have a good
-                        idea of the kind of layout that is required</p>
+                        that contribution authors will be able to download from the event page,
+                        in order to have a good idea of the kind of layout that is required.</p>
                 </text>
             </translation>
         </tooltip>
     </page>
-    
+
 </wohl>

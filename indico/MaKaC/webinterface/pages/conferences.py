@@ -257,10 +257,11 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 self._trackMgtOpt.setVisible(False)
 
 
-        self._abstractReviewingMgtOpt=self._sectionMenu.getLinkByName("manageabstractreviewing")
-        self._abstractReviewingMgtOpt.setVisible(False)
-
         #paper reviewing related
+        self._paperReviewingOpt = self._sectionMenu.getLinkByName("paperreviewing")
+        self._paperReviewingOpt.setURL(urlHandlers.UHPaperReviewingDisplay.getURL(self._conf))
+        self._paperReviewingOpt.setCaption( _("Paper Reviewing"))
+
         self._paperReviewingMgtOpt=self._sectionMenu.getLinkByName("managepaperreviewing")
         self._paperReviewingMgtOpt.setVisible(False)
 
@@ -270,29 +271,45 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         self._judgeListOpt=self._sectionMenu.getLinkByName("judgelist")
         self._judgeListOpt.setVisible(False)
         self._judgereviewerListOpt=self._sectionMenu.getLinkByName("judgelistreviewer")
+
         self._judgereviewerListOpt.setVisible(False)
         self._judgeeditorListOpt=self._sectionMenu.getLinkByName("judgelisteditor")
         self._judgeeditorListOpt.setVisible(False)
+
+        self._uploadPaperOpt = self._sectionMenu.getLinkByName("uploadpaper")
+        self._uploadPaperOpt.setURL(urlHandlers.UHUploadPaper.getURL(self._conf))
+        self._uploadPaperOpt.setCaption( _("Upload paper"))
+
+        self._downloadTemplateOpt = self._sectionMenu.getLinkByName("downloadtemplate")
+        self._downloadTemplateOpt.setURL(urlHandlers.UHDownloadPRTemplate.getURL(self._conf))
+        self._downloadTemplateOpt.setCaption( _("Download Template"))
+
+        if self._conf.getConfPaperReview().hasReviewing():
+            self._paperReviewingOpt.setVisible(True)
+            # These options are shown if there is any contribution of this user
+            self._uploadPaperOpt.setVisible(len(lc)>0)
+            self._downloadTemplateOpt.setVisible(len(lc)>0)
+        else:
+            self._paperReviewingOpt.setVisible(False)
+            self._uploadPaperOpt.setVisible(False)
+            self._downloadTemplateOpt.setVisible(False)
 
 
         if awUser != None:
 
             conferenceRoles = awUser.getLinkedTo()["conference"]
 
-            if "abstractManager" in conferenceRoles:
-                if self._conf in awUser.getLinkedTo()["conference"]["abstractManager"]:
-                    self._abstractReviewingMgtOpt.setVisible(True)
-
             if "paperReviewManager" in conferenceRoles:
                 if self._conf in awUser.getLinkedTo()["conference"]["paperReviewManager"]:
                     self._paperReviewingMgtOpt.setVisible(True)
                     self._assignContribOpt.setVisible(True)
+                    self._uploadPaperOpt.setVisible(len(lc)>0)
+                    self._downloadTemplateOpt.setVisible(True)
 
             if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
                 showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"]
                 showreviewerarea = self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
                 showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"]
-
 
                 if showrefereearea and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
                     self._assignContribOpt.setVisible(True)
@@ -303,6 +320,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
                 if showeditorarea and (self._conf.getConfPaperReview().getChoice()==3 or self._conf.getConfPaperReview().getChoice()==4):
                     self._judgeeditorListOpt.setVisible(True)
+
 
 
         #collaboration related
@@ -2118,6 +2136,10 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             urlHandlers.UHConfModifProgram.getURL( self._conf ))
         self._generalSection.addItem( self._programMenuItem)
 
+        self._regFormMenuItem = wcomponents.SideMenuItem(_("Registration"),
+            urlHandlers.UHConfModifRegForm.getURL( self._conf ))
+        self._generalSection.addItem( self._regFormMenuItem)
+
         self._abstractMenuItem = wcomponents.SideMenuItem(_("Call for Abstracts"),
             urlHandlers.UHConfModifCFA.getURL( self._conf ))
         self._generalSection.addItem( self._abstractMenuItem)
@@ -2129,10 +2151,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._reviewingMenuItem = wcomponents.SideMenuItem(_("Paper Reviewing"),
             urlHandlers.UHConfModifReviewingAccess.getURL( target = self._conf ) )
         self._generalSection.addItem( self._reviewingMenuItem)
-
-        self._regFormMenuItem = wcomponents.SideMenuItem(_("Registration"),
-            urlHandlers.UHConfModifRegForm.getURL( self._conf ))
-        self._generalSection.addItem( self._regFormMenuItem)
 
         self._pluginsDictMenuItem = {}
         self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
@@ -2296,7 +2314,7 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
         self._tabCFAR = self._tabCtrl.newTab("reviewing", _("Reviewing"), urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
 
         # Create subtabs for the reviewing
-        self._subTabARSetup = self._tabCFAR.newSubTab( "revsetup", "Review settings",\
+        self._subTabARSetup = self._tabCFAR.newSubTab( "revsetup", "Settings",\
                     urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
         self._subTabARTeam = self._tabCFAR.newSubTab( "revteam", "Team",\
                     urlHandlers.UHAbstractReviewingTeam.getURL(self._conf))
@@ -8989,10 +9007,6 @@ class WConfMyStuffMyContributions(wcomponents.WTemplated):
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         vars["items"]=self._getContribsHTML()
-
-        import reviewing
-        vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
-        vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
         return vars
 
 class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
@@ -9004,7 +9018,7 @@ class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
-        self._sectionMenu.setCurrentItem(self._myStuffOpt)
+        self._sectionMenu.setCurrentItem(self._myContribsOpt)
 
 
 class WConfMyStuffMyTracks(wcomponents.WTemplated):

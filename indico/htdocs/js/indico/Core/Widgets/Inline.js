@@ -86,16 +86,10 @@ type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
      {
          draw: function() {
              var self = this;
-             var t;
-             t = setTimeout("$E(\""+"message" + "\").set(\'\u00A0\')",2000);
              var canvas = Html.span({}, 'loading...');
              canvas.set(self.drawContent());
              var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
-             message.dom.id = "message";
-
-             if (t) {
-                 clearTimeout(t);
-             }
+             message.dom.id = this.messageId;
 
              var table = Html.table();
              var tbody = Html.tbody();
@@ -104,7 +98,6 @@ type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
 
              table.dom.style.display = 'inline';
              table.set(tbody);
-
 
              cell2.append(canvas);
              row1.append(cell2);
@@ -118,17 +111,21 @@ type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
              tbody.append(row1);
 
              this.source.state.observe(function(state) {
+                 var to = 0;
                  if (state == SourceState.Error) {
                      self.ready.set(true);
                      self._error(self.source.error.get());
                  } else if (state == SourceState.Committing) {
                      self.ready.set(true);
-                     message.set('Saving');
-                     message.dom.style.color='orange';
-                  }
-                    else  {message.set(' ');}
+                     message.set('Saved');
+                     message.dom.style.color='green';
+                     to = setTimeout("$E(\""+self.messageId + "\").set(\'\u00A0\')", 2000);
+                 } else if (state == SourceState.Loaded) {
+                     clearTimeout(to);
+                 } else {
+                     message.set(' ');
+                 }
              });
-
 
              return table;
          }
@@ -154,10 +151,11 @@ type("SwitchOptionButton", ["InlineRemoteWidgetForOptionButton"],
 
          }
      },
-     function(method, attributes, caption) {
+     function(method, attributes, caption, messageId) {
          this.InlineRemoteWidgetForOptionButton(method, attributes);
          this.caption = caption;
          this.checkbox = Html.checkbox({});
+         this.messageId = messageId;
 
          $B(this.checkbox, this.source);
      });

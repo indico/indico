@@ -8,7 +8,7 @@
             <table width="90%%" align="center" border="0" style="padding-bottom: 10px;">
                 <tr>
 		            <td colspan="1" class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-		             <em><%= _("Review ")%> <%= review.getVersion() %><span class="titleCellFormat" style="font-size: 12px;"><%= _(" of:")%></span></em>
+		             <em><%= _("Review ")%> <%= review.getVersion() %><span class="titleCellFormat" style="font-size: 12px;"><%= _(":")%></span></em>
 		            </td>
 		            <td>
 		                    <span style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">

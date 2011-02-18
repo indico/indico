@@ -1,12 +1,13 @@
 
 <table id="reviewingQuestionsTable" width="90%%" border="0" style="padding-bottom: 5px;">
     <tr>
-        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle"><%= _("Step 1 - Reviewing questions")%></td>
+        <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle"><%= _("Reviewing questions")%></td>
     </tr>
 </table>
 <table style="padding-left: 20px;">
     <tr>
-        <td class="subGroupTitle" colspan="3"><%= _("Add the questions that the abstract reviewers must answer")%></td>
+        <td class="subGroupTitle" colspan="3"><%= _("Add the questions that the abstract reviewers must answer")%>
+        <% inlineContextHelp(_('The questions you add here will be show to the reviewers when they propose to accept/reject an abstract.')) %></td>
     </tr>
     <tr>
         <td>

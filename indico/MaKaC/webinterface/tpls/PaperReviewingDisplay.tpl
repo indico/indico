@@ -1,0 +1,19 @@
+<% declareTemplate(newTemplateStyle=True) %>
+<div class="groupTitle"><%= _("Paper Reviewing")%></div>
+<div>
+<table width='100%'>
+    <tr>
+           <td nowrap class="displayField" style="padding-top: 25px; padding-left: 10px;">
+              <b>
+                 <%= _("This section gives you the opportunity to access all your features for the paper reviewing of this conference.")%>
+              </b>
+           </td>
+    </tr>
+    <tr>
+           <td style="padding-left: 30px; padding-top: 10px">
+              <font color="gray"> <%= _("To navigate, please use the sublink(s) located under 'Paper Reviewing'.") %>
+              </font>
+           </td>
+    </tr>
+</table>
+</div>

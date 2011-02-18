@@ -197,14 +197,14 @@ var updatePage = function (firstLoad){
     	if($E('initialStatus')) {
             $E('statusDiv').remove($E('initialStatus'));
         }
-        submitButton.set($T('Undo sending'));
-        $E('submittedmessage').set($T('Judgement has been sent'));
+        submitButton.set($T('Modify judgement'));
+        $E('submittedmessage').set($T('Judgement has been submitted'));
         showValues();
     } else {
         if ("<%= Advice.getJudgement() %>" == "None") {
             submitButton.dom.disabled = true;
         }
-        submitButton.set('Mark as submitted');
+        submitButton.set('Submit');
         $E('submittedmessage').set('Judgement not submitted yet');
         showWidgets(firstLoad);
     }

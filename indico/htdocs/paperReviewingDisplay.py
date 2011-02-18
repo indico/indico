@@ -18,32 +18,16 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.webinterface.rh import contribDisplay
+import MaKaC.webinterface.rh.paperReviewingDisplay as paperReviewingDisplay
 
 
 def index(req, **params):
-    return contribDisplay.RHContributionDisplay( req ).process( params )
+    return paperReviewingDisplay.RHPaperReviewingDisplay( req ).process( params )
 
 
-def xml( req, **params ):
-    return contribDisplay.RHContributionToXML( req ).process( params )
+def downloadTemplate(req, **params):
+    return paperReviewingDisplay.RHDownloadPRTemplate( req ).process( params )
 
 
-def pdf( req, **params ):
-    return contribDisplay.RHContributionToPDF( req ).process( params )
-
-
-def ical( req, **params ):
-    return contribDisplay.RHContributionToiCal( req ).process( params )
-
-def marcxml( req, **params ):
-    return contribDisplay.RHContributionToMarcXML( req ).process( params )
-
-def submit(req, **params):
-    return contribDisplay.RHSubmitMaterial(req).process(params)
-
-def removeMaterial(req, **params):
-    return contribDisplay.RHContributionDisplayRemoveMaterial(req).process(params)
-
-def writeMinutes(req, **params):
-    return contribDisplay.RHWriteMinutes(req).process(params)
+def uploadPaper(req, **params):
+    return paperReviewingDisplay.RHUploadPaper( req ).process( params )

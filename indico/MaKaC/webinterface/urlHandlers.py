@@ -4395,15 +4395,6 @@ class UHConfAddPaperReviewManager( URLHandler ):
 class UHConfRemovePaperReviewManager( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removePaperReviewManager"
 
-class UHConfSelectAbstractManager( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py/selectAbstractManager"
-
-class UHConfAddAbstractManager( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py/addAbstractManager"
-
-class UHConfRemoveAbstractManager( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py/removeAbstractManager"
-
 class UHConfSelectEditor( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/selectEditor"
 
@@ -4421,15 +4412,6 @@ class UHConfAddReviewer( URLHandler ):
 
 class UHConfRemoveReviewer( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/removeReviewer"
-
-class UHConfSelectAbstractReviewer( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py/selectAbstractReviewer"
-
-class UHConfAddAbstractReviewer( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py/addAbstractReviewer"
-
-class UHConfRemoveAbstractReviewer( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py/removeAbstractReviewer"
 
 class UHConfSelectReferee( URLHandler ):
     _relativeURL = "confModifReviewingControl.py/selectReferee"
@@ -4516,6 +4498,15 @@ class UHEditorDueDate (URLHandler):
 
 class UHReviewerDueDate (URLHandler):
     _relativeURL = "contributionReviewing.py/reviewerDueDate"
+
+class UHDownloadPRTemplate(URLHandler):
+    _relativeURL = "paperReviewingDisplay.py/downloadTemplate"
+
+class UHUploadPaper(URLHandler):
+    _relativeURL = "paperReviewingDisplay.py/uploadPaper"
+
+class UHPaperReviewingDisplay(URLHandler):
+    _relativeURL = "paperReviewingDisplay.py"
 
 #### End of reviewing
 

@@ -868,36 +868,46 @@ class SystemLinkData(Observable):
                 "URL": str(str(urlHandlers.UHConfMyStuffMyContributions.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "mystuff"}, \
-            "manageabstractreviewing": { \
-                "caption": _("Manage Abstract Reviewing"), \
-                "URL": str(str(urlHandlers.UHAbstractReviewingSetup.getURL(conf))), \
+            "paperreviewing": { \
+                "caption": _("Paper Reviewing"), \
+                "URL": str(urlHandlers.UHPaperReviewingDisplay.getURL(conf)), \
                 "staticURL": "", \
-                "parent": "mystuff"}, \
+                "parent": ""}, \
             "managepaperreviewing": { \
                 "caption": _("Manage Paper Reviewing"), \
                 "URL": str(str(urlHandlers.UHConfModifReviewingPaperSetup.getURL(conf))), \
                 "staticURL": "", \
-                "parent": "mystuff"}, \
+                "parent": "paperreviewing"}, \
             "assigncontributions": { \
                 "caption": _("Assign contributions"), \
                 "URL": str(str(urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(conf))), \
                 "staticURL": "", \
-                "parent": "mystuff"}, \
+                "parent": "paperreviewing"}, \
             "judgelist": { \
                 "caption": _("Referee Area"), \
                 "URL": str(str(urlHandlers.UHConfModifListContribToJudge.getURL(conf))), \
                 "staticURL": "", \
-                "parent": "mystuff"}, \
+                "parent": "paperreviewing"}, \
             "judgelistreviewer": { \
                 "caption": _("Content Reviewer Area"), \
                 "URL": str(str(urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL(conf))), \
                 "staticURL": "", \
-                "parent": "mystuff"}, \
+                "parent": "paperreviewing"}, \
             "judgelisteditor": { \
                 "caption": _("Layout Reviewer Area"), \
                 "URL": str(str(urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL(conf))), \
                 "staticURL": "", \
-                "parent": "mystuff"}, \
+                "parent": "paperreviewing"}, \
+            "uploadpaper": { \
+                "caption": _("Upload paper"), \
+                "URL": str(str(urlHandlers.UHUploadPaper.getURL(conf))), \
+                "staticURL": "", \
+                "parent": "paperreviewing"}, \
+            "downloadtemplate": { \
+                "caption": _("Download template"), \
+                "URL": str(str(urlHandlers.UHDownloadPRTemplate.getURL(conf))), \
+                "staticURL": "", \
+                "parent": "paperreviewing"}, \
             "abstractsBook": { \
                 "caption": _("Book of abstracts"), \
                 "URL": str(urlHandlers.UHConfAbstractBook.getURL(conf)), \
@@ -962,12 +972,13 @@ class SystemLinkData(Observable):
                                         "mytracks",
                                         "mysessions",
                                         "mycontribs",
-                                        "manageabstractreviewing",
                                         "managepaperreviewing",
                                         "assigncontributions",
                                         "judgelist",
                                         "judgelistreviewer",
                                         "judgelisteditor",
+                                        "uploadpaper",
+                                        "downloadtemplate",
                                         "abstractsBook",
                                         "registrationForm",
                                         "ViewMyRegistration",

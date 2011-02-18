@@ -49,11 +49,15 @@ class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
 class RHContributionDisplay( RoomBookingDBMixin, RHContributionDisplayBase ):
     _uh = urlHandlers.UHContributionDisplay
 
+    def _checkParams( self, params ):
+        RHContributionDisplayBase._checkParams( self, params )
+        self._hideFull = int(params.get("s",0)) # 1 hide details except paper reviewing
+
     def _process( self ):
-        p = contributions.WPContributionDisplay( self, self._contrib )
+        p = contributions.WPContributionDisplay( self, self._contrib, self._hideFull )
         wf=self.getWebFactory()
         if wf is not None:
-                p = wf.getContributionDisplay( self, self._contrib)
+                p = wf.getContributionDisplay( self, self._contrib, self._hideFull)
         return p.display()
 
 

@@ -206,14 +206,14 @@ var updatePage = function (firstLoad){
         if($E('initialStatus')) {
             $E('statusDiv').remove($E('initialStatus'));
         }
-        submitButton.set('Mark as NOT submitted');
-        $E('submittedmessage').set('Judgement submitted');
+        submitButton.set('Modify judgement');
+        $E('submittedmessage').set('Judgement has been submitted');
         showValues();
     } else {
     	if ("<%= Editing.getJudgement() %>" == "None") {
     	    submitButton.dom.disabled = true;
     	}
-        submitButton.set('Mark as submitted');
+        submitButton.set('Submit');
         $E('submittedmessage').set('Judgement not submitted yet');
         showWidgets(firstLoad);
     }

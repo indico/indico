@@ -848,6 +848,23 @@ class WTimetableBannerModif(WBannerModif):
                 break
         return path
 
+class WListOfPapersToReview(WBannerModif):
+
+    def __init__(self, target, user ):
+        ## PATH
+        # Iterate till conference is reached
+        conf = target.getConference()
+        if user == "referee":
+            path = [{"url": urlHandlers.UHConfModifListContribToJudge.getURL(conf), "title":_("Contributions list")}]
+        if user == "reviewer":
+            path = [{"url": urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL(conf), "title":_("Contributions list")}]
+        if user == "editor":
+            path = [{"url": urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL(conf), "title":_("Contributions list")}]
+        # TITLE AND TYPE
+        itemType = type(target).__name__
+        title = target.getTitle()
+        WBannerModif.__init__(self, path, itemType, title)
+
 class WContribListBannerModif(WTimetableBannerModif):
 
     def __init__(self, target ):
@@ -855,7 +872,9 @@ class WContribListBannerModif(WTimetableBannerModif):
         # Iterate till conference is reached
         conf = target.getConference()
         path = self._getOwnerBasePath(target)
+
         path.append({"url": urlHandlers.UHConfModifContribList.getURL( conf ), "title": _("Contributions list")})
+
         # TITLE AND TYPE
         itemType = type(target).__name__
         title = target.getTitle()

@@ -340,8 +340,8 @@ IndicoUI.Widgets = {
             return button;
         },
 
-        switchOptionButton: function(method, attributes, caption) {
-            var button = new SwitchOptionButton(method, attributes, caption);
+        switchOptionButton: function(method, attributes, caption, messageId) {
+            var button = new SwitchOptionButton(method, attributes, caption, messageId);
             return button.draw();
         },
 

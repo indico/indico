@@ -12,23 +12,35 @@
 <p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions to assign.")%></font></p>
 <% end %>
 <%else:%>
-<div style="padding-top:10px; padding-bottom: 10px;padding-left: 10px"><em><%= _("Please, select one or more contributions to assign Reviewers")%></em></div>
-
-<div id="showHideFilteringHelp" style="padding-top: 10px;padding-left: 40px"><div id="showHideFiltering" style="display:inline"></div></div>
+<table>
+    <tr>
+        <td align="bottom">
+            <div id="showHideFilteringHelp" style="padding-top:30px; margin-left:20px;"><div id="showHideFiltering" style="display:inline"></div></div>
+        </td>
+        <td align="bottom" style="padding-left:10px; padding-top:27px;">
+           <div><%= _("Displaying  ")%><span id="contributionsToShow" style="font-size:15px; font-weight: bold;"></span></div>
+        </td>
+        <td align="bottom" style="padding-top:27px;">
+            <div id="totalContributions" style="display:none;"><span><%=_("  ( Total:  ")%></span><span style="font-size:15px; font-weight: bold;"><%= len(Conference.getContributionListSortedById()) %></span>
+            <span><%=_(" )")%></span>
+            </div>
+        </td>
+    </tr>
+</table>
 <br/>
-<table id="filteringTable" class="Revtab" width="90%%" align="center">
+<table id="filteringTable" class="shadowRectangle" width="95%%" align="left" style="margin-left:20px; margin-bottom: 20px;">
     <thead>
-        <tr style="text-align:center;">
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
-                <%= _("types")%>
+        <tr style="text-align:left;">
+            <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
+                <%= _("types ")%><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selTypes')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTypes')" style="border:none;">
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
-                <%= _("sessions")%>
+            <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
+                <%= _("sessions")%><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selSessions')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selSessions')" style="border:none;">
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
-                <%= _("tracks")%>
+            <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
+                <%= _("tracks")%><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selTracks')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTracks')" style="border:none;">
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom:1px solid #BBBBBB;">
+            <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
                 <%= _("assign status")%>
             </td>
         </tr>
@@ -37,9 +49,6 @@
         <tr style="vertical-align:top">
             <td>
                 <table cellpadding="0px" cellspacing="0px" border="0px">
-                    <tr>
-                        <td><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selTypes')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTypes')" style="border:none;"></td>
-                    </tr>
                     <tr>
                         <td><input type="checkbox" id="typeShowNoValue" name="selTypes" value="not specified" checked/></td>
                         <td> --<%= _("not specified")%>--</td>
@@ -55,9 +64,6 @@
             <td>
                 <table cellpadding="0px" cellspacing="0px" border="0px">
                     <tr>
-                        <td><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selSessions')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selSessions')" style="border:none;"></td>
-                    </tr>
-                    <tr>
                         <td><input type="checkbox" id="sessionShowNoValue" name="selSessions" value="not specified" checked/></td>
                         <td> --<%= _("not specified")%>--</td>
                     </tr>
@@ -72,9 +78,6 @@
             <td>
                 <table cellpadding="0px" cellspacing="0px" border="0px">
                     <tr>
-                        <td><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selTracks')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTracks')" style="border:none;"></td>
-                    </tr>
-                    <tr>
                         <td><input type="checkbox" id="trackShowNoValue" name="selTracks" value="not specified" checked/></td>
                         <td> --<%= _("not specified")%>--</td>
                     </tr>
@@ -87,25 +90,25 @@
                 </table>
             </td>
             <td>
-                <ul style="list-style-type:none">
+                <table style="list-style-type:none">
                     <% if not IsOnlyReferee: %>
-                        <li><input type="checkbox" id="showWithReferee" checked/> <%= _("With Referee assigned")%></li>
+                        <tr><td><input type="checkbox" id="showWithReferee" checked/> <%= _("With Referee assigned")%></td></tr>
                     <% end %>
-                    <li><input type="checkbox" id="showWithEditor" checked/> <%= _("With Layout Reviewer assigned")%></li>
-                    <li><input type="checkbox" id="showWithReviewer" checked/> <%= _("With at least 1 Content Reviewer assigned")%></li>
+                    <tr><td><input type="checkbox" id="showWithEditor" checked/> <%= _("With Layout Reviewer assigned")%></td></tr>
+                    <tr><td><input type="checkbox" id="showWithReviewer" checked/> <%= _("With at least 1 Content Reviewer assigned")%></td></tr>
 
-                </ul>
+                </table>
             </td>
         </tr>
         <tr>
-            <td id="applyFilterHelp" colspan="4" style="border-top: 1px solid rgb(119, 119, 119); padding: 10px;text-align:center">
+            <td id="applyFilterHelp" colspan="4" style="text-align:center; padding-top:5px;">
                 <input id="applyFilter" type="button" class="popUpButton" value="Apply filter"/>
             </td>
         </tr>
     </tbody>
 </table>
 
-<table style="padding-left: 40px">
+<table class="shadowRectangleSoft" width="95%%">
     <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Referee")%>:</td>
@@ -164,8 +167,7 @@
             </td>
         </tr>
 </table>
-
-   <table class="Revtab" width="95%%" cellspacing="0" align="center" border="0" style="padding-left:20px; margin-bottom:1em">
+<table class="Revtab" width="95%%" cellspacing="0" align="center" border="0" style="padding-left:20px; margin-bottom:1em">
 <!--
     <tr>
         <td nowrap class="groupTitle" colspan=4>Contributions to judge as Referee</td>
@@ -174,19 +176,19 @@
     <thead>
         <tr>
             <td></td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Id")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Title")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Type")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Track")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Session")%>
             </td>
             <!--
@@ -194,10 +196,10 @@
                 State
             </td>
             -->
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Reviewing team")%>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Deadline")%>
             </td>
         </tr>
@@ -290,7 +292,7 @@
     </tbody>
 </table>
 
-<table style="padding-left: 40px">
+<table class="shadowRectangleSoft" width="95%%" style="margin-top:10px;">
     <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
     <tr>
         <td><%= _("Referee")%>:</td>
@@ -383,10 +385,16 @@ var selectAll = function (name) {
     var checkBoxes = document.getElementsByName(name);
     if ( checkBoxes ) { // true if there is at least 1 checkbox
         if ( !checkBoxes.length) { // true if there is only 1 checkbox
-            checkBoxes.checked=true
+            checkBoxes.checked=true;
+            if (checkBoxes.name == "selectedContributions") {
+                isSelected(checkBoxes.id.split('b')[1]);
+            }
         } else { // there is more than 1 checkbox
             for (i = 0; i < checkBoxes.length; i++) {
-                checkBoxes[i].checked=true
+                checkBoxes[i].checked=true;
+                if (checkBoxes[i].name == "selectedContributions") {
+                    isSelected(checkBoxes[i].id.split('b')[1]);
+                }
             }
         }
     }
@@ -399,10 +407,16 @@ var deselectAll = function(name) {
     var checkBoxes = document.getElementsByName(name)
     if ( checkBoxes ) { // true if there is at least 1 checkbox
         if ( !checkBoxes.length) { // true if there is only 1 checkbox
-            checkBoxes.checked=false
+            checkBoxes.checked=false;
+            if (checkBoxes.name == "selectedContributions") {
+                isSelected(checkBoxes.id.split('b')[1]);
+            }
         } else { // there is more than 1 checkbox
             for (i = 0; i < checkBoxes.length; i++) {
-                checkBoxes[i].checked=false
+                checkBoxes[i].checked=false;
+                if (checkBoxes[i].name == "selectedContributions") {
+                    isSelected(checkBoxes[i].id.split('b')[1]);
+                }
             }
         }
     }
@@ -416,11 +430,11 @@ var buildShowHideFiltering = function() {
         showFiltering: command(function(){
             $E('filteringTable').dom.style.display = '';
             option.set('hideFiltering');
-        }, $T('Show Filtering Criteria')),
+        }, $T('Show Filters')),
         hideFiltering: command(function(){
             $E('filteringTable').dom.style.display = 'none';
             option.set('showFiltering');
-        }, $T('Hide Filtering Criteria'))
+        }, $T('Hide Filters'))
     });
     option.set('showFiltering');
 
@@ -432,23 +446,44 @@ var buildShowHideFiltering = function() {
  * @param {Object} contribution
  */
 var backgroundColorOver = function() {
-    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='#FFF6DF');
+    var cbId = "cb" + this.id.split('_')[1];
+    var checkbox = $E(cbId);
+    if (!checkbox.dom.checked) {
+        IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='#FFF6DF');
+    }
 }
 
 var backgroundColorOut = function() {
-    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='transparent');
+    var cbId = "cb" + this.id.split('_')[1];
+    var checkbox = $E(cbId);
+    if (!checkbox.dom.checked) {
+        IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='transparent');
+    }
 }
 
-var backgroundColorOnClick = function() {
-    IndicoUI.Widgets.Generic.tooltip(this.style.backgroundColor='#CDEB8B');
+
+function isSelected(numId) {
+    var rowId = "row_" + numId;
+    var elem = $E(rowId);
+    var checkboxId = "cb" + numId;
+    var checkbox = $E(checkboxId);
+    if (checkbox.dom.checked == true) {
+        elem.dom.style.backgroundColor = '#CDEB8B';
+    } else {
+        elem.dom.style.backgroundColor = 'transparent';
+    }
 }
+
 
 
 var contributionTemplate = function(contribution) {
 
     var row = Html.tr();
+    var rowId = "row_" + contribution.id;
+    row.dom.id = rowId;
     row.dom.onmouseover = backgroundColorOver;
     row.dom.onmouseout = backgroundColorOut;
+
     // Cell1: checkbox to select this contribution
     var cell1 = Html.td({style:{"textAlign":"center", "width":"0px"}});
     var id = ("cb" + contribution.id);
@@ -468,19 +503,20 @@ var contributionTemplate = function(contribution) {
     cell1.set(checkbox);
     //checkbox.dom.value = contribution.id; // has to be added after constructor because of IE
     */
-    var checkbox = Html.input('checkbox', {id: id, name:name});
+    var checkbox = Html.input('checkbox', {id: id, name:name, onchange:"isSelected("+contribution.id+");"});
     checkbox.dom.value = contribution.id;
-     cell1.set(checkbox);
+
+    cell1.set(checkbox);
 
     row.append(cell1);
 
     // Cell2: contribution id
-    var cell2 = Html.td({style:{"textAlign":"center", "width":"0px"}});
+    var cell2 = Html.td({className:'contributionDataCell',style:{"textAlign":"center", "width":"0px"}});
     cell2.set(contribution.id)
     row.append(cell2);
 
     // Cell3: contribution title
-    var cell3 = Html.td();
+    var cell3 = Html.td({className:'contributionDataCell'});
     // Sadly this hack is necessary to get the link since getURL() needs a Contribution object (from Indico, not the local one from Javascript)
     // and contributions are loaded asynchronously...
     linkString = "<%= urlHandlers.UHContributionModifReviewing.getURL() %>" + "?contribId=" + contribution.id + "&confId=<%= Conference.getId()%>"
@@ -490,17 +526,17 @@ var contributionTemplate = function(contribution) {
     row.append(cell3);
 
     // Cell4: contribution type
-    var cell4 = Html.td({style:{"marginLeft":"5px"}});
+    var cell4 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
     cell4.set(contribution.type ? contribution.type : "")
     row.append(cell4);
 
     // Cell5: contribution track
-    var cell5 = Html.td({style:{"marginLeft":"5px"}});
+    var cell5 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
     cell5.set(contribution.track ? contribution.track : "")
     row.append(cell5);
 
     // Cell6: contribution session
-    var cell6 = Html.td({style:{"marginLeft":"5px"}});
+    var cell6 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
     cell6.set(contribution.session ? contribution.session : "")
     row.append(cell6);
 
@@ -539,7 +575,7 @@ var contributionTemplate = function(contribution) {
     */
 
     // Cell8: reviewing team assigned to the contribution
-    var cell8 = Html.td();
+    var cell8 = Html.td({className:'contributionDataCell'});
 
     var ul = Html.ul();
     ul.dom.style.listStyleType = 'none';
@@ -591,11 +627,15 @@ var contributionTemplate = function(contribution) {
     row.append(cell8);
 
     // Cell9: due date of the contribution
-    var cell9 = Html.td();
-    if (contribution.reviewManager.lastReview.refereeDueDate == null)
+    var cell9 = Html.td({className:'contributionDataCell'});
+    if (contribution.reviewManager.lastReview.refereeDueDate == null) {
         cell9.set("");
-    else
-        cell9.set(contribution.reviewManager.lastReview.refereeDueDate.date);
+    }
+    else {
+        var date = contribution.reviewManager.lastReview.refereeDueDate.date;
+        var newDate = date.split('-')[2] + '-' + date.split('-')[1] + '-' + date.split('-')[0];
+        cell9.set(newDate);
+    }
     row.append(cell9);
 
     return row;
@@ -679,6 +719,7 @@ var deselectWithoutReferee = function(contributions) {
         contribution = getContribution(contributionId);
         if (contribution.reviewManager.referee == null) {
             $E('cb' + contributionId).dom.checked = false;
+            isSelected(contributionId);
         }
     }
 }
@@ -695,6 +736,7 @@ var deselectWithoutReviewer = function(contributions) {
         contribution = getContribution(contributionId);
         if (contribution.reviewManager.reviewersList.length == 0) {
             $E('cb' + contributionId).dom.checked = false;
+            isSelected(contributionId);
         }
     }
 }
@@ -965,6 +1007,7 @@ var userSelected = function(user, contrPerAttribute){
                             updateContribution(contributionId);
                             colorify(contributionId,'referee');
                             $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                            isSelected(contributionId);
                         }
                         killProgress();
                     } else {
@@ -989,6 +1032,7 @@ var userSelected = function(user, contrPerAttribute){
                             updateContribution(contributionId)
                             colorify(contributionId,'editor');
                             $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                            isSelected(contributionId);
                         }
                         killProgress();
                     } else {
@@ -1024,6 +1068,7 @@ var userSelected = function(user, contrPerAttribute){
                             updateContribution(contributionId);
                             colorify(contributionId,'reviewer', user.id);
                             $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                            isSelected(contributionId);
                         }
                         killProgress();
                     } else {
@@ -1053,12 +1098,13 @@ var userSelected = function(user, contrPerAttribute){
                                     updateContribution(contributionId);
                                     colorify(contributionId,'reviewerstitle');
                                     $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                                    isSelected(contributionId);
                                     deleted = true;
                                 } else {
                                     notinlist = true;
                                     notinlist2.push(contributionId)
                                     $E('cb' + contributionId).dom.checked = false;
-
+                                    isSelected(contributionId);
                                 }
                             }
                         }
@@ -1107,6 +1153,13 @@ var fetchContributions = function() {
                     c = result[i]
                     contributions.append(c);
                     contributionsIndexes[c.id] = i;
+                }
+                $E('contributionsToShow').dom.innerHTML = result.length;
+                var totalContributions = <%= len(Conference.getContributionListSortedById()) %>;
+                if (totalContributions == result.length) {
+                    $E('totalContributions').dom.style.display = 'none';
+                } else {
+                    $E('totalContributions').dom.style.display = '';
                 }
             } else {
                 IndicoUtil.errorReport(error);
@@ -1439,7 +1492,7 @@ var removeUser = function(role) {
                         updateContribution(contributionId);
                         colorify(contributionId, 'referee')
                         $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
-
+                        isSelected(contributionId);
                     }
                     if(!removeRefereeAlerts(checkedContributions)){
                       fetchUsers('new_assign', 'referee')
@@ -1466,6 +1519,7 @@ var removeUser = function(role) {
                         updateContribution(contributionId);
                         colorify(contributionId, 'editor')
                         $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                        isSelected(contributionId);
                     }
                 } else {
                     IndicoUtil.errorReport(error);
@@ -1489,6 +1543,7 @@ var removeUser = function(role) {
                         updateContribution(contributionId);
                         colorify(contributionId, 'reviewer')
                         $E('cb' + contributionId).dom.checked = true; //updateContribution will build a row with an unchecked checkbox
+                        isSelected(contributionId);
                     }
                 } else {
                     IndicoUtil.errorReport(error);

@@ -26,15 +26,15 @@ arrowImage = systemIcon( "breadcrumbArrow" )
         <td align="right" valign="top"><span style="padding-right: 5px"><%= _("Go back to:")%></td>
         <td>
         <div style="color: #444;">
-            
+
             <% for i in range(0, len(path)): %>
-                
+
                 <% object = path[i] %>
 
                 <% if i > 0: %>
                     <img src="<%= arrowImage %>" />
                 <% end %>
-                
+
                 <a href="<%= object["url"] %>"><%= object["title"] %></a>
                 <%if object.has_key("type"):%>
                 <em>
@@ -53,5 +53,5 @@ arrowImage = systemIcon( "breadcrumbArrow" )
 </table>
 
 </div>
-    
+
 

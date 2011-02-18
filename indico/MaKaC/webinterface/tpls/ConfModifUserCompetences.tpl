@@ -7,14 +7,18 @@
 <table align="center"><tr><td><%= _("The Reviewing Team has not been assigned yet.")%></td></tr></table>
 <% end %>
 <%else:%>
-<div style="padding-top:10px; padding-bottom: 10px;padding-left: 10px">
-<em><%= _("Here you can define competences for every team member, if needed.")%></em>
-</div>
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 20px;">
+<table class="Revtab" width="90%%" cellspacing="0" align="left" border="0" style="padding-left:2px; padding-top: 10px;">
     <tr>
         <td nowrap class="groupTitle" colspan=5>
             <%= _("Paper Reviewing Team competences")%>
             <span id="competencesHelp"></span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4">
+            <div style="padding:5px; color:gray;">
+                <span class="collShowBookingsText"><%= _("To define competences for each user could help you to choose better the user when you assign contributions.")%></span>
+            </div>
         </td>
     </tr>
     <tr>
@@ -42,7 +46,7 @@
     <% end %>
     <% end %>
     <tr><td colspan=5 style="padding-top: 15px;">
-            <em><%= _("To assign contributions for paper reviewing, please click on 'Assign Contributions'")%></em>
+       <em><%= _("To assign contributions for paper reviewing, please click on ") %><a href="<%=urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(ConfReview.getConference())%>"><%= _("Assign Contributions")%></a></em>
    </td></tr>
 </table>
 

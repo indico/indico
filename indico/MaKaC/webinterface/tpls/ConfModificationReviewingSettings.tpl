@@ -4,19 +4,19 @@
 <% from MaKaC.common.utils import formatDateTime %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% import MaKaC.common.Configuration as Configuration %>
-<table width="90%%" border="0">
+<table width="90%%" border="0" style="padding-bottom:5px;">
     <tr>
-        <td nowrap id="reviewingModeHelp" class="groupTitle"><%= _("Step 1 - Choose type of paper reviewing")%>
+        <td nowrap class="groupTitle"><%= _("Step 1 - Choose type of paper reviewing")%>
         </td>
     </tr>
 </table>
 
-<table width="90%%" border="0" style="margin-bottom:1em">
+<table style="padding-left: 20px; padding-bottom: 20px;">
     <tr>
-        <td nowrap class="titleCellTD"  style="padding-top: 5px; padding-left: 20px;">
-            <span class="titleCellFormat"><%= _("Type of reviewing:")%></span>
-        </td>
-        <td nowrap style="vertical-align:top; padding-top: 5px;">
+        <td id="reviewingModeHelp" class="subGroupTitle" style="width:480px;"><%= _("Type of reviewing")%></td>
+    </tr>
+    <tr>
+        <td nowrap style="vertical-align:top; padding-top: 5px; padding-left:5px;">
             <span id="inPlaceEditReviewingMode" style="display:inline"><%= ConferencePaperReview.reviewingModes[choice] %></span>
         </td>
     </tr>
@@ -31,9 +31,9 @@
     <tr>
         <td class="groupTitle">
             <%= _("Step 2 - Set up the options for ")%><span id="title">
-            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[2]: %><%= _("content reviewing team")%><% end %>
-            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[3]: %><%= _("layout reviewing team")%><% end %>
-            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[4]: %><%= _("content and layout reviewing team")%><% end %>
+            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[2]: %><%= _("content reviewing")%><% end %>
+            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[3]: %><%= _("layout reviewing")%><% end %>
+            <%if ConferencePaperReview.reviewingModes[choice]==ConferencePaperReview.reviewingModes[4]: %><%= _("content and layout reviewing")%><% end %>
             </span>
         </td>
     </tr>
@@ -374,7 +374,7 @@
        <% else: %>
          <% display = 'none' %>
        <% end %>
-    <table id="templateListTableAll" width="90%%" align="center" border="0" style="display:<%=display%>">
+    <table id="templateListTableAll" width="90%%" align="left" border="0" style="padding-left:3px; display:<%=display%>">
     <!-- here to put table for the uploaded templates info :) -->
      <thead>
         <tr>
@@ -410,7 +410,7 @@
     </tr>
     <tr><td style="padding-bottom:15px;"></td></tr>
         <tr><td colspan="5" style="padding-top: 20px;">
-            <em><%= _("To assign team for Paper Review Module, please click on 'Team' and follow the steps")%></em>
+            <em><%= _("To assign team for Paper Review Module, please click on ") %><a href="<%=urlHandlers.UHConfModifReviewingControl.getURL(ConfReview.getConference())%>"><%= _("Team")%></a><%= _(" and follow the steps")%></em>
         </td></tr>
 </table>
 </form>
@@ -671,80 +671,80 @@ $E('PRMNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'PRM'},
                                             'are added to/removed from the conference',
-                                            true
+                                            'message1'
 ));
 
 $E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
                                             'are added to/removed from the conference',
-                                            true
+                                            'message2'
 ));
 $E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
                                             'are added to/removed from the conference',
-                                            true
+                                            'message3'
 ));
 $E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
                                             'are added to/removed from the conference',
-                                            true
+                                            'message4'
 ));
 $E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
                                             'have assigned to /unassigned from contributions',
-                                            true
+                                            'message5'
 ));
 $E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
                                             'have assigned to/unassigned from contributions',
-                                            true
+                                            'message6'
 ));
 $E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
                                             'have assigned to/unassigned from contributions',
-                                            true
+                                            'message7'
 ));
 $E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
                                             'Referee',
-                                            true
+                                            'message8'
 ));
 $E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
                                             'Content Reviewer',
-                                            true
+                                            'message9'
 ));
 $E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
                                             'Layout Reviewer',
-                                            true
+                                            'message10'
 ));
 $E('authorSubmittedMatRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
                                             'the author submits a paper',
-                                            true
+                                            'message11'
 ));
 $E('authorSubmittedMatReviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
                                             'the author submits a paper',
-                                            true
+                                            'message12'
 ));
 $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
                                             'the author submits a paper',
-                                            true
+                                            'message13'
 ));
 
 

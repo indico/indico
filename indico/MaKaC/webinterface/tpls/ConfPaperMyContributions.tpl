@@ -44,7 +44,9 @@
                             <a href="<%=urlHandlers.UHContributionModification.getURL(c)%>">Edit</a><span class="horizontalSeparator">|</span><a href="<%=urlHandlers.UHContributionDisplay.getURL(c)%>">View</a>
                     <% end %>
                     <% else: %>
-                            <a href="<%=urlHandlers.UHContributionDisplay.getURL(c)%>">View</a>
+                        <% url = urlHandlers.UHContributionDisplay.getURL(c) %>
+                        <% url.addParam("s",1) %>
+                            <a href="<%=url%>">Upload Paper</a>
                     <% end %>
                     </td>
                 </tr>
