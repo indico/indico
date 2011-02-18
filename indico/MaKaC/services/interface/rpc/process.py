@@ -66,7 +66,7 @@ class ServiceRunner(Observable):
         _startRequestSpecific2RH()
 
         # notify components that the request has started
-        self._notify('requestStarted')
+        self._notify('requestStarted', req)
 
         try:
             try:
@@ -74,7 +74,7 @@ class ServiceRunner(Observable):
                 while retry > 0:
                     if 10 - retry > 0:
                         # notify components that the request is being retried
-                        self._notify('requestRetry')
+                        self._notify('requestRetry', req, 10 - retry)
 
                     try:
                         DBMgr.getInstance().sync()
@@ -82,7 +82,7 @@ class ServiceRunner(Observable):
                         result = processRequest(method, params, req)
 
                         # notify components that the request has ended
-                        self._notify('requestFinished')
+                        self._notify('requestFinished', req)
 
                         _endRequestSpecific2RH( True )
 

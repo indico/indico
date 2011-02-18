@@ -908,9 +908,10 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             var buttonsDiv = Html.div({style:{textAlign:'center', display:'none', padding:'5px'}}, saveButton, cancelButton);
 
             saveButton.observeClick(function(){
-                self.saveTimeFunction();
-                self.saveRoomLocationFunction();
-                self.close();
+                self.saveRoomLocationFunction()
+                if (self.saveTimeFunction()) {
+                    self.close();
+                }
             });
 
             cancelButton.observeClick(function(){
@@ -958,15 +959,19 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                  function(value) {
                                      var sTime = translate(parseTime(self.startEndTimeField.startTimeField.get()), zeropad).join('');
                                      var eTime = translate(parseTime(value), zeropad).join('');
-                                     if (eTime <= sTime) {
+                                     if (eTime == sTime &&
+                                         self.eventData.entryType == "Break") {
+                                         // this is so that we allow
+                                         // zero-sized breaks
+                                         // do nothing
+                                     } else if (eTime <= sTime) {
                                          return "End time should be after start time!";
                                      }
                                  });
 
             this.saveTimeFunction = function() {
-
                 if (!parameterManager.check()) {
-                    return;
+                    return false;
                 }
 
                 var startDate = clone(self.eventData.startDate);
@@ -979,6 +984,8 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                                              Util.formatDateTime(endDate, IndicoDateTimeFormats.Server),
                                                              self.eventData,
                                                              rescheduleCheckbox.get());
+
+                return true;
             };
 
             this.editTimeFunction = function() {
@@ -1145,6 +1152,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
             this.saveRoomLocationFunction = function() {
                 self.managementActions.editRoomLocation(self.roomEditor.info.accessor('room').get(),self.roomEditor.info.accessor('location').get(), self.eventData);
+                return true;
             };
 
             this.stopEditingRoomLocationFunction = function() {

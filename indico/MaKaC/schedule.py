@@ -246,7 +246,14 @@ class TimeSchedule(Schedule, Persistent):
     ####################################
 
     def cmpEntries(self,e1,e2):
-        return cmp(e1.getStartDate(),e2.getStartDate())
+        datePrecedence = cmp(e1.getStartDate(), e2.getStartDate())
+
+        # if we're tied, let's use duration as a criterion
+        # this keeps zero-duration breaks from making it get stuck
+        if datePrecedence == 0:
+            return cmp(e1.getDuration(), e2.getDuration())
+        else:
+            return datePrecedence
 
     def reSchedule(self):
         try:
@@ -709,7 +716,7 @@ class SlotSchedule(TimeSchedule):
 
     def _setEntryDuration(self,entry):
         entryDur=entry.getDuration()
-        if entryDur is None or entryDur == timedelta(0):
+        if entryDur is None:
             ownerDur=self.getOwner().getContribDuration()
             if ownerDur is not None and ownerDur!=timedelta(0):
                 entry.setDuration(dur=ownerDur)
@@ -1308,6 +1315,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         self.notifyModification()
 
     def setStartDate(self, newDate,check=2, moveEntries=0):
+
 #        try:
 #            tz = str(newDate.tzinfo)
 #        except:
@@ -1339,7 +1347,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                                                           owner, owner.getAdjustedEndDate()))
         IndTimeSchEntry.setStartDate(self, newDate,check)
         # Check that after modifying the start date, the end date is still within the limits of the slot
-        if self.getSchedule() and self.getDuration() and self.getEndDate() > owner.getEndDate():
+        if self.getSchedule() and self.getEndDate() > owner.getEndDate():
             if check==1:
                 raise ParentTimingError("The break cannot end after (%s) its parent ends (%s)"%\
                         (self.getAdjustedEndDate().strftime('%Y-%m-%d %H:%M'),\

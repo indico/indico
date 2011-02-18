@@ -458,14 +458,14 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').info('[pid=%s] Request %s started (%s)' % (os.getpid(),id(self._req), self._req.unparsed_uri))
 
         # notify components that the request has started
-        self._notify('requestStarted')
+        self._notify('requestStarted', self._req)
 
         try:
             while retry>0:
 
                 if retry < 10:
                     # notify components that the request is being retried
-                    self._notify('requestRetry', self._req, 10-retry)
+                    self._notify('requestRetry', self._req, 10 - retry)
 
                 try:
                     Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), self.getHostIP()))
@@ -509,7 +509,7 @@ class RH(RequestHandlerBase):
                                 res = self._process()
 
                         # notify components that the request has finished
-                        self._notify('requestFinished')
+                        self._notify('requestFinished', self._req)
 
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
 

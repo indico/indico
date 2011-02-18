@@ -552,7 +552,6 @@ class ModifyStartEndDate(ScheduleOperation):
 
     def _performOperation(self):
 
-
         checkFlag = self._getCheckFlag()
 
         # if we want to reschedule other entries, let's store the old parameters
