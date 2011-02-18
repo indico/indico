@@ -119,7 +119,7 @@ class CERNSearchRecordUploader(RecordUploader):
 
         tupload = time.time() - (tstart + tgen)
 
-        self._logger.info('rec %s result: %s' % (batch, result_data))
+        self._logger.debug('rec %s result: %s' % (batch, result_data))
 
         xmlDoc = etree.fromstring(result_data)
 

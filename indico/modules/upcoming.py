@@ -223,8 +223,7 @@ class UpcomingEventsModule(Module):
                 events = categDateIdx.getObjectsIn(
                     wrappedObj.getId(),
                     date, date + obj.getAdvertisingDelta())
-                for confId in events:
-                    conf = conference.ConferenceHolder().getById(confId)
+                for conf in events:
                     self.processEvent(date, conf, obj, objDict)
 
         resultList = []

@@ -144,6 +144,7 @@ def runCategoryDateIndexMigration(dbi):
 If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
+
 def runCategoryConfDictToTreeSet(dbi):
     """
     Replacing the conference dictionary in the Category objects by a OOTreeSet.
@@ -154,9 +155,12 @@ def runCategoryConfDictToTreeSet(dbi):
         if len(categ.conferences) != len(categ.conferencesBackup):
             print categ.getId()
 
+
 def runMigration():
-    tasks = [runPluginMigration, runTaskMigration,
-             runConferenceMigration, migrateCategoryDateIndex,
+    tasks = [runPluginMigration,
+             runTaskMigration,
+             runConferenceMigration,
+             runCategoryDateIndexMigration,
              runCategoryConfDictToTreeSet]
 
     print "\nExecuting migration...\n"
@@ -173,6 +177,7 @@ def runMigration():
 
     print console.colored("Database Migration successful!\n",
                           'green', attrs=['bold'])
+
 
 def main():
     """

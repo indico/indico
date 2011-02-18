@@ -465,7 +465,7 @@ class RH(RequestHandlerBase):
 
                 if retry < 10:
                     # notify components that the request is being retried
-                    self._notify('requestRetry', 10-retry)
+                    self._notify('requestRetry', self._req, 10-retry)
 
                 try:
                     Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), self.getHostIP()))
