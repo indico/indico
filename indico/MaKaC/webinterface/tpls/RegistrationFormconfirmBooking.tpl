@@ -1,9 +1,6 @@
 <center>
   <table width="80%%">
     <tr>
-      <td colspan="2" align="center" nowrap class="title"> <%= _("Registered new participant")%></td>
-    </tr>
-    <tr>
       <td colspan="2" align="center" width=100%%>
         <br><br>
         <table bgcolor="white" width=100%%>
@@ -35,7 +32,7 @@
                         </td>
                       </tr>
                     </table>
-                                    
+
                 </td></tr>
               </table>
             </td>
