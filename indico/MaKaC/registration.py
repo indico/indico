@@ -2682,40 +2682,40 @@ class PersonalData(Persistent):
     def _initStandardPersonalData(self):
         self._data = PersistentMapping()
         self._sortedKeys = PersistentList()
-        p = PersonalDataFormItem({'id':'title', 'name': _("Title"), 'input':'list', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'title', 'name': "Title", 'input':'list', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'firstName', 'name': _("First Name"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'firstName', 'name': "First Name", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'surname', 'name': _("Surname"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'surname', 'name': "Surname", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'position', 'name': _("Position"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'position', 'name': "Position", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'institution', 'name': _("Institution"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'institution', 'name': "Institution", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'address', 'name': _("Address"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'address', 'name': "Address", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'city', 'name': _("City"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'city', 'name': "City", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'country', 'name': _("Country/Region"), 'input':'list', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'country', 'name': "Country/Region", 'input':'list', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'phone', 'name': _("Phone"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'phone', 'name': "Phone", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'fax', 'name': _("Fax"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'fax', 'name': "Fax", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'email', 'name': _("Email"), 'input':'hidden', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'email', 'name': "Email", 'input':'hidden', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'personalHomepage', 'name': _("Personal homepage"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'personalHomepage', 'name': "Personal homepage", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
 

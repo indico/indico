@@ -1720,7 +1720,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
                     <td nowrap class="displayField">%s<b>%s</b></td>
                     <td width="100%%" align="left">%s</td>
                 </tr>
-                """%(mandatory, item.getName(), inputHTML)
+                """%(mandatory, _(item.getName()), inputHTML)
         return html
 
     def getVars(self):
