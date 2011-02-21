@@ -1706,7 +1706,7 @@ type("ScaleEditWidget", ["InlineEditWidget"],
             _handleSuccess: function() {
                 // previewQuestion is a global var used in ConfModifAbstractRev
                 previewQuestion.draw();
-            },
+            }
         },
         function(method, attributes, initValue) {
             this.InlineEditWidget(method, attributes, initValue);
@@ -1766,7 +1766,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
             _handleSuccess: function() {
                 // previewQuestion is a global var used in ConfModifAbstractRev
                 previewQuestion.draw();
-            },
+            }
         },
 
         function(method, attributes, initValue) {
@@ -1779,7 +1779,7 @@ type("ExampleQuestionWidget", ["InlineWidget"],
         {
             draw: function() {
                 this.numReq += 1;
-                self = this;
+                var self = this;
                 // Request to get the new values of number of answers and labels
                 indicoRequest(this.method, this.attributes,
                         function(result, error) {
@@ -1801,11 +1801,11 @@ type("ExampleQuestionWidget", ["InlineWidget"],
                                         IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>"+value+"</span>");
                                     };
                                 }
-			                } else {
+                            } else {
                                 IndicoUtil.errorReport(error);
                             }
                         });
-                 },
+                 }
         },
 
         function(method, attributes) {

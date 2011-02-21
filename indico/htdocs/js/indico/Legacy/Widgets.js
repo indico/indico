@@ -1240,20 +1240,20 @@ IndicoUI.Widgets = {
                 var addButton = Html.input('button','popUpButton',$T('Add '+kindOfElement));
 
                 addButton.observeClick(function(){
-	                  var element = edit.get();
-	                  if (element != '') {
+                      var element = edit.get();
+                      if (element != '') {
                           var attr = attributes;
                           attr['value'] = element;
                           indicoRequest(methods.add,
-	                              attr,
-	                              function(result, error){
-	                                  if (!error) {
+                                  attr,
+                                  function(result, error){
+                                      if (!error) {
                                           widgetContent.append(drawListOfElements(result));
                                           widgetContent.append(drawFooter());
-	                                  }
-	                              });
-	                      edit.set('');
-	                  }
+                                      }
+                                  });
+                          edit.set('');
+                     }
                 });
 
                 content.append(edit);
@@ -1262,151 +1262,156 @@ IndicoUI.Widgets = {
                 return content;
             };
 
-	        // Draw the list of current questions added
-	        var drawListOfElements = function(result) {
-	            // Initialize the i counter
-	            this.i = 0;
-	            self = this;
+            // Draw the list of current questions added
+            var drawListOfElements = function(result) {
+                // Initialize the i counter
+                this.i = 0;
+                var self = this;
 
-	            // Remove previous elements
-	            if ($E(divsIdRoot+'Elements')) {
-	                widgetContent.remove($E(divsIdRoot+'Elements'));
-	            }
+                // Remove previous elements
+                if ($E(divsIdRoot+'Elements')) {
+                    widgetContent.remove($E(divsIdRoot+'Elements'));
+                }
 
-	            if (result.length) {
-	                var content = Html.div({id:divsIdRoot+'Elements'});
-	                var table = Html.table({className:'infoQuestionsTable', cellspacing:'0'});
-	                content.append(table);
+                if (result.length) {
+                    var content = Html.div({id:divsIdRoot+'Elements'});
+                    var table = Html.table({className:'infoQuestionsTable', cellpadding:0, cellPadding:0, cellspacing:0, cellSpacing:0});
+                    var tbody = Html.tbody({});
+                    table.append(tbody);
+                    content.append(table);
 
-	                // Create the table with the required data
-	                var tr;
-	                var spanRemoveList = [];
-	                var spanEditList = [];
-	                var tdEdit;
-	                var tdRemove;
+                    // Create the table with the required data
+                    var tr;
+                    var spanRemoveList = [];
+                    var spanEditList = [];
+                    var tdEdit;
+                    var tdRemove;
 
-	                for (var i=0; i < result.length ; i++) {
-	                    tr = Html.tr({className: 'infoTR'});
-	                    tdElement = Html.td({className: 'questionContent'}, result[i].text);
-	                    tdElement.dom.id = "TEID_"+result[i].id;
+                    for (var i=0; i < result.length; i++) {
+                        tr = Html.tr({className: 'infoTR'});
+                        tdElement = Html.td({className: 'questionContent'}, result[i].text);
+                        tdElement.dom.id = "TEID_"+result[i].id;
 
-	                    // 'Edit' elements and functionality
-	                    tdEdit = Html.td({className: 'content'});
-	                    var spanEdit = Html.span({className: 'link'},'Edit');
-	                    spanEdit.dom.id = "QEID_"+result[i].id; // Set the span id with the question id included
-	                    spanEdit.dom.name = result[i].text;
-	                    spanEditList.push(spanEdit);
-	                    tdEdit.append(spanEdit);
+                        // 'Edit' elements and functionality
+                        tdEdit = Html.td({className: 'content'});
+                        var spanEdit = Html.span({className: 'link'},'Edit');
+                        spanEdit.dom.id = "QEID_"+result[i].id; // Set the span id with the question id included
+                        spanEdit.dom.name = result[i].text;
+                        spanEditList.push(spanEdit);
+                        tdEdit.append(spanEdit);
 
-	                    spanEditList[i].observeClick(function(event) {
-	                        var spanId = event.target.id.split('_')[1];
-	                        var previousText = $E('TEID_'+spanId).dom.textContent;
-	                        var popupContent = Html.textarea({id:'modifyArea', cols:'40', rows:'7'}, previousText);
-	                        var popup = new ConfirmPopup('Edit '+kindOfElement, popupContent,
-	                                function(action) {
+                        spanEditList[i].observeClick(function(event) {
+                            if (event.target) { // Firefox
+                                var spanId = event.target.id.split('_')[1];
+                            } else { // IE
+                                var spanId = event.srcElement.id.split('_')[1];
+                            }
+                            var previousText = $E('TEID_'+spanId).dom.innerHTML;
+                            var popupContent = Html.textarea({id:'modifyArea', cols:'40', rows:'7'}, previousText);
+                            var popup = new ConfirmPopup('Edit '+kindOfElement, popupContent,
+                                    function(action) {
                                         if (action) {
-		                                    var attr = attributes;
-		                                    attr['id'] = spanId;
-		                                    attr['text'] = popupContent.dom.value;
-		                                    indicoRequest(methods.edit,
-		                                        attr,
-		                                        function(result, error){
-		                                            if (!error) {
-		                                                widgetContent.append(drawListOfElements(result));
-		                                                widgetContent.append(drawFooter());
-		                                            }
-		                                        });
-	                                    }
-	                                }, 'Save');
-	                        popup.open();
-	                    });
+                                            var attr = attributes;
+                                            attr['id'] = spanId;
+                                            attr['text'] = popupContent.dom.value;
+                                            indicoRequest(methods.edit,
+                                                attr,
+                                                function(result, error){
+                                                   if (!error) {
+                                                       widgetContent.append(drawListOfElements(result));
+                                                       widgetContent.append(drawFooter());
+                                                    }
+                                                 });
+                                            }
+                                    }, 'Save');
+                            popup.open();
+                        });
 
-	                    // 'Remove' elements and functionality
-	                    tdRemove = Html.td({className: 'content'});
-	                    var spanRemove = Html.span({className: 'link'},'Remove');
-	                    spanRemove.dom.id = "QRID_"+result[i].id; // Set the span id with the question id included
-	                    spanRemoveList.push(spanRemove);
-	                    tdRemove.append(spanRemove);
+                        // 'Remove' elements and functionality
+                        tdRemove = Html.td({className: 'content'});
+                        var spanRemove = Html.span({className: 'link'},'Remove');
+                        spanRemove.dom.id = "QRID_"+result[i].id; // Set the span id with the question id included
+                        spanRemoveList.push(spanRemove);
+                        tdRemove.append(spanRemove);
 
-	                    spanRemoveList[i].observeClick(function(event){
-	                        var spanId = event.target.id.split('_')[1];
-
-	                        var attr = attributes;
-	                        attr['value'] = spanId;
-	                        if (!specialRemove) {
-		                        var popupContent = Html.span({}, 'Are you sure you want to remove the '+kindOfElement +'?');
-		                        var popup = new ConfirmPopup('Remove '+kindOfElement, popupContent,
-		                                function(action) {
-                                            if (action) {
-			                                    var attr = attributes;
-			                                    attr['id'] = spanId;
-			                                    indicoRequest(methods.remove,
-			                                        attr,
-			                                        function(result, error){
-			                                            if (!error) {
-			                                                widgetContent.append(drawListOfElements(result));
-			                                                widgetContent.append(drawFooter());
-			                                                }
-			                                        });
-	                                        }
-		                                }, 'Remove');
-	                        } else {
-		                        var popupContent = Html.span({}, 'Do you want to keep the ratings of the judgements for this question (if any)?');
-		                        // For this popup we need two handlers
-		                        var popup = new SpecialRemovePopup('Remove '+kindOfElement, popupContent,
+                        spanRemoveList[i].observeClick(function(event){
+                            if (event.target) { // Firefox
+                                var spanId = event.target.id.split('_')[1];
+                            } else { // IE
+                                var spanId = event.srcElement.id.split('_')[1];
+                            }
+                            var attr = attributes;
+                            attr['value'] = spanId;
+                            if (!specialRemove) {
+                                var popupContent = Html.span({}, 'Are you sure you want to remove the '+kindOfElement +'?');
+                                var popup = new ConfirmPopup('Remove '+kindOfElement, popupContent,
+                                         function(action) {
+                                             if (action) {
+                                                 var attr = attributes;
+                                                 attr['id'] = spanId;
+                                                 indicoRequest(methods.remove,
+                                                         attr,
+                                                         function(result, error){
+                                                             if (!error) {
+                                                                widgetContent.append(drawListOfElements(result));
+                                                                widgetContent.append(drawFooter());
+                                                             }
+                                                  });
+                                            }
+                                        }, 'Remove');
+                            } else {
+                                var popupContent = Html.span({}, 'Do you want to keep the ratings of the judgements for this question (if any)?');
+                                // For this popup we need two handlers
+                                var popup = new SpecialRemovePopup('Remove '+kindOfElement, popupContent,
                                     function(option) {
-			                                if (option == 0) {
+                                            if (option == 0) {
                                                 // close popup option
                                                 null;
                                             }
                                             if (option == 1) {
                                                 // Keep ratings handler
-			                                    var attr = attributes;
-			                                    attr['id'] = spanId;
-			                                    attr['keepJud'] = true;
-			                                    indicoRequest(methods.remove,
-			                                        attr,
-			                                        function(result, error){
-			                                            if (!error) {
-			                                                widgetContent.append(drawListOfElements(result));
-			                                                widgetContent.append(drawFooter());
-			                                                }
-			                                        });
-	                                        }
+                                                var attr = attributes;
+                                                attr['id'] = spanId;
+                                                attr['keepJud'] = true;
+                                                indicoRequest(methods.remove,
+                                                    attr,
+                                                    function(result, error){
+                                                        if (!error) {
+                                                            widgetContent.append(drawListOfElements(result));
+                                                            widgetContent.append(drawFooter());
+                                                            }
+                                                     });
+                                            }
                                             if (option == 2) {
                                                 // Remove ratings handler
                                                 var attr = attributes;
                                                 attr['id'] = spanId;
-			                                    attr['keepJud'] = false;
-			                                    indicoRequest(methods.remove,
-			                                        attr,
-			                                        function(result, error){
-			                                            if (!error) {
-			                                                widgetContent.append(drawListOfElements(result));
-			                                                widgetContent.append(drawFooter());
-			                                                }
-			                                        });
-	                                        }
-		                                }, 'Keep ratings', 'Remove ratings');
-	                        }
-	                        popup.open();
-	                    });
+                                                attr['keepJud'] = false;
+                                                indicoRequest(methods.remove,
+                                                    attr,
+                                                    function(result, error){
+                                                        if (!error) {
+                                                            widgetContent.append(drawListOfElements(result));
+                                                            widgetContent.append(drawFooter());
+                                                            }
+                                                    });
+                                            }
+                                        }, 'Keep ratings', 'Remove ratings');
+                            }
+                            popup.open();
+                        });
 
-
-	                    table.append(tr);
-	                    tr.append(tdElement);
-	                    tr.append(tdEdit);
-	                    tr.append(tdRemove);
-	                }
-	            }
-	            return content;
-
-	          };
-
+                        tbody.append(tr);
+                        tr.append(tdElement);
+                        tr.append(tdEdit);
+                        tr.append(tdRemove);
+                    }
+                }
+                return content;
+              };
           return widgetContent;
-      }
-
-    },// end of Generic namespace
+       }
+    }// end of Generic namespace
 
 
 

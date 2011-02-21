@@ -503,7 +503,18 @@ var contributionTemplate = function(contribution) {
     cell1.set(checkbox);
     //checkbox.dom.value = contribution.id; // has to be added after constructor because of IE
     */
-    var checkbox = Html.input('checkbox', {id: id, name:name, onchange:"isSelected("+contribution.id+");"});
+    var checkbox = Html.input('checkbox', {id: id, name:name});//, onclick:"isSelected("+contribution.id+");"
+    checkbox.dom.onclick = function () { // the function is here again in order to avoid problems with IE
+        var rowId = "row_" + contribution.id;
+        var elem = $E(rowId);
+        var checkboxId = "cb" + contribution.id;
+        var checkbox = $E(checkboxId);
+        if (checkbox.dom.checked == true) {
+            elem.dom.style.backgroundColor = '#CDEB8B';
+        } else {
+            elem.dom.style.backgroundColor = 'transparent';
+        }
+    };
     checkbox.dom.value = contribution.id;
 
     cell1.set(checkbox);
