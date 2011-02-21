@@ -699,6 +699,8 @@ class _TmpSectionField:
             self._input.dateFormat = params.get("dateFormat")
         if params.has_key('length'):
             self._input.setLength(params.get('length'))
+        if params.has_key('minValue'):
+            self._input.setMinValue(params.get('minValue'))
         if params.has_key('numberOfRows'):
             self._input.setNumberOfRows(params.get('numberOfRows'))
         if params.has_key('numberOfColumns'):

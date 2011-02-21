@@ -1454,6 +1454,7 @@ class NumberInput(FieldInputType):
     def __init__(self, field):
         FieldInputType.__init__(self, field)
         self._length = ''
+        self._minValue = 0
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
@@ -1484,10 +1485,16 @@ class NumberInput(FieldInputType):
             length = 'size="%s"' % self.getLength()
         else:
             length = 'size="6"'
-        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s />&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, disable, length, caption, param)
+        onkeyup = ""
+        if billable:
+            onkeyup = """
+                onkeyup="$E('subtotal-%s').dom.innerHTML = ((isNaN(parseInt(this.value, 10)) || parseInt(this.value, 10) < 0) ? 0 : parseInt(this.value, 10)) * %s;"
+            """ % (htmlName, price)
+        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s %s />&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, onkeyup, disable, length, caption, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
+            subTotal = (float(price)*int(v) or 0)
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s (Total: <span id="subtotal-%s">%s</span>&nbsp;%s)</td> """%(tmp,price,currency,htmlName,subTotal,currency)
         else:
             tmp= """%s </td> """%tmp
         if description:
@@ -1510,6 +1517,8 @@ class NumberInput(FieldInputType):
             quantity = 0
         else:
             quantity = int(v)
+        if quantity < self.getMinValue():
+            raise FormValuesError( _("The field \"%s\" needs to be filled with a number greater than or equal to %d.")%(self.getParent().getCaption(), self.getMinValue()))
         item.setQuantity(quantity)
         item.setValue(quantity)
         item.setBillable(self._parent.isBillable())
@@ -1519,27 +1528,55 @@ class NumberInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
+        price = self._parent.getPrice()
+        billable = self._parent.isBillable()
+        checked=""
+        if billable:
+            checked="checked=\"checked\""
+
         return _("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Min. value")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <input type="text" name="minValue" value="%s" />
+          </td>
+        </tr>
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Size in chars")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
               <input type="text" name="length" value="%s" />
           </td>
-        </tr>""" % self.getLength())
+        </tr>
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">Is Billable</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+            <input type="checkbox" name="billable" size="60" %s> _("(uncheck if it is not billable)")
+          </td>
+        </tr>
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat"> _("Price (multiplied with entered number)")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+            <input type="text" name="price" size="60" value=%s>
+          </td>
+        </tr>""" % (self.getMinValue(), self.getLength(), checked, price))
 
     def clone(self, gf):
         ni = FieldInputType.clone(self, gf)
         ni.setLength(self.getLength())
+        ni.setMinValue(self.getMinValue())
         return ni
 
     def getValues(self):
         d = {}
         d["length"] = self.getLength()
+        d["minValue"] = self.getMinValue()
         return d
 
     def setValues(self, data):
         if data.has_key("length"):
             self.setLength(data.get("length"))
+        if data.has_key("minValue"):
+            self.setMinValue(int(data.get("minValue") or 0))
 
     def getLength(self):
         try:
@@ -1550,6 +1587,16 @@ class NumberInput(FieldInputType):
 
     def setLength(self, value):
         self._length = value
+
+    def getMinValue(self):
+        try:
+            if self._minValue: pass
+        except AttributeError:
+            self._minValue = 0
+        return self._minValue
+
+    def setMinValue(self, value):
+        self._minValue = value
 
 class LabelInput(FieldInputType):
     _id="label"
