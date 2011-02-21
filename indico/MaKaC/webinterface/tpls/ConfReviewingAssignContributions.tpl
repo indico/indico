@@ -12,10 +12,16 @@
 <p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions to assign.")%></font></p>
 <% end %>
 <%else:%>
-<table>
+<table style="margin-left:20px;">
     <tr>
+        <td id="resetFilters" align="bottom" style="display: none;">
+            <div style="padding-top:30px; ">
+                <span id="btnReset" class="btnRemove" name="resetFilters"><%= _("Reset filters")%></span>
+                <span style="padding: 0px 6px 0px 6px">|</span>
+            </div>
+        </td>
         <td align="bottom">
-            <div id="showHideFilteringHelp" style="padding-top:30px; margin-left:20px;"><div id="showHideFiltering" style="display:inline"></div></div>
+            <div id="showHideFilteringHelp" style="padding-top:30px;"><div id="showHideFiltering" style="display:inline"></div></div>
         </td>
         <td align="bottom" style="padding-left:10px; padding-top:27px;">
            <div><%= _("Displaying  ")%><span id="contributionsToShow" style="font-size:15px; font-weight: bold;"></span></div>
@@ -1141,6 +1147,13 @@ var userSelected = function(user, contrPerAttribute){
  */
 var fetchContributions = function() {
 
+    if (appliedFilter) {
+        $E('resetFilters').dom.style.display = '';
+    } else {
+        $E('resetFilters').dom.style.display = 'none';
+    }
+    //alert(appliedFilter);
+
     contributions.clear();
     contributionsIndexes = []
     indicoRequest('event.contributions.list',
@@ -1573,7 +1586,16 @@ $E('filteringTable').dom.style.display = 'none';
 
 bind.element($E("tablebody"), contributions, contributionTemplate);
 
-$E('applyFilter').observeClick(fetchContributions);
+$E('btnReset').observeClick(function(){window.location = "<%= urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(Conference) %>";});
+
+var appliedFilter = false;
+
+$E('applyFilter').observeClick(function(){
+	$E('filteringTable').dom.style.display = 'none';
+	buildShowHideFiltering();
+    appliedFilter = true;
+    fetchContributions();
+});
 
 <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
 $E('assignRefereeButton_top').observeClick(function(){ fetchUsers('assign', 'referee'); });
