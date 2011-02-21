@@ -34,6 +34,7 @@ import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.export import fileConverter
 from MaKaC.conference import Conference,Session,Contribution,SubContribution
 from MaKaC.i18n import _
+from MaKaC.user import AvatarHolder, GroupHolder
 
 from MaKaC.common.logger import Logger
 
@@ -209,7 +210,7 @@ class RHSubmitMaterialBase:
     def __init__(self, target, rh = None):
         self._target=target
         self._callerRH = rh
-        #self._repositoryId = None
+        self._repositoryIds = None
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
@@ -288,18 +289,18 @@ class RHSubmitMaterialBase:
 
         if self._uploadType == "file":
             if not self._files:
-                res.append("""A file must be submitted.""")
+                res.append(_("""A file must be submitted."""))
             for fileEntry in self._files:
                 if hasattr(fileEntry, "filePath") and not fileEntry["filePath"].strip():
-                    res.append("""A valid file to be submitted must be specified.""")
+                    res.append(_("""A valid file to be submitted must be specified."""))
                 if hasattr(fileEntry, "size") and fileEntry["size"] < 10:
-                    res.append("""The file %s seems to be empty""" % fileEntry["fileName"])
+                    res.append(_("""The file %s seems to be empty""") % fileEntry["fileName"])
         elif self._uploadType == "link":
             if not self._links[0]["url"].strip():
-                res.append("""A valid URL must be specified.""")
+                res.append(_("""A valid URL must be specified."""))
 
         if self._materialId=="":
-            res.append("""A material ID must be selected.""")
+            res.append(_("""A material ID must be selected."""))
         return res
 
     def _getMaterial(self, forceCreate = True):
@@ -350,7 +351,6 @@ class RHSubmitMaterialBase:
         resources = []
         if self._uploadType in ['file','link']:
             if self._uploadType == "file":
-
                 for fileEntry in self._files:
                     resource = LocalFile()
                     resource.setFileName(fileEntry["fileName"])
@@ -388,26 +388,23 @@ class RHSubmitMaterialBase:
             info = "Unknown upload type"
             return mat, status, info
 
-        from MaKaC.user import AvatarHolder, GroupHolder
-
-        toPdf = self._topdf
-        self._topdf = False
-
         # forcedFileId - in case there is a conflict, use the file that is
         # already stored
-        for resource in resources:
-            #mat.addResource(resource, forcedFileId=self._repositoryId)
-            mat.addResource(resource, forcedFileId=None)
+        repoIDs = []
+        for i, resource in enumerate(resources):
+            if self._repositoryIds is None:
+                mat.addResource(resource, forcedFileId=None)
+            else:
+                mat.addResource(resource, forcedFileId=self._repositoryIds[i])
 
             #apply conversion
-            if toPdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
-                Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
-
+            if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
+                #Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
                 fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
 
             # store the repo id, for files
-            #if isinstance(resource, LocalFile):
-            #    self._repositoryId = resource.getRepositoryId()
+            if isinstance(resource, LocalFile) and self._repositoryIds is None:
+                repoIDs.append(resource.getRepositoryId())
 
             if protectedAtResourceLevel:
                 protectedObject = resource
@@ -424,6 +421,10 @@ class RHSubmitMaterialBase:
                 else:
                     avatar = AvatarHolder().getById(userElement['id'])
                 protectedObject.grantAccess(avatar)
+
+        self._topdf = False
+        if self._repositoryIds is None:
+            self._repositoryIds = repoIDs
 
         return mat, status, fossilize(info, {"MaKaC.conference.Link": ILinkFossil,
                                              "MaKaC.conference.LocalFile": ILocalFileExtendedFossil})
