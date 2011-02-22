@@ -96,10 +96,10 @@ class RequestHandlerBase(object):
             return ""
         return self._uh.getURL( self._target )
 
-    def _setLang(self, params):
+    def _setLang(self, params=None):
 
         # allow to choose the lang from params
-        if 'lang' in params:
+        if params and 'lang' in params:
             newLang = params.get('lang', '')
             for lang in langList():
                 if newLang.lower() == lang[0].lower():
