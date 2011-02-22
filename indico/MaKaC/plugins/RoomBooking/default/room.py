@@ -31,6 +31,8 @@ from MaKaC.webinterface import urlHandlers
 # fossils
 from MaKaC.fossils.roomBooking import IRoomMapFossil, IRoomCalendarFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
+import datetime
+from MaKaC.common.contextManager import ContextManager
 
 # Branch name in ZODB root
 _ROOMS = 'Rooms'
@@ -80,6 +82,14 @@ class Room( Persistent, RoomBase, Fossilizable ):
             if nbd.doesDayOverlap(day):
                 return True
         return False
+
+    def getBlockedDay(self, day):
+        blockings = Factory.newRoomBlocking().getByDate(day)
+        for bl in blockings:
+            rbl = bl.getBlockedRoom(self)
+            if rbl and rbl.active is not False:
+                return rbl
+        return None
 
     def setAvailableVC(self, avc):
         self.avaibleVC = avc
@@ -164,6 +174,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         ownedBy = kwargs.get( 'ownedBy' )
         customAtts = kwargs.get( 'customAtts' )
 #        responsibleID = kwargs.get( 'responsibleID' )
+        pendingBlockings = kwargs.get( 'pendingBlockings' )
 
         ret_lst = []
         counter = 0
@@ -193,6 +204,11 @@ class Room( Persistent, RoomBase, Fossilizable ):
                 resvEx.room = room
                 aval = room.isAvailable( resvEx )
                 if aval != available:
+                    continue
+                blockState = resvEx.getBlockingConflictState(ContextManager.get('currentUser'))
+                if blockState == 'active':
+                    continue
+                elif blockState == 'pending' and pendingBlockings:
                     continue
             if ownedBy != None:
                 if not room.isOwnedBy( ownedBy ):

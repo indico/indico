@@ -432,13 +432,14 @@ type("RoomListWidget", ["ListWidget"],
             return Html.div({style:{display: 'inline'}},
                             Html.span({},
                                     Html.div({style: {cssFloat: "right", paddingRight: "10px"}},removeButton),
-                                    $B(Html.span(), room.key)
+                                    $B(Html.span(), self.useValue ? roomData : room.key)
                                     ));
         }
     },
 
-    function(style, removeProcess) {
+    function(style, removeProcess, useValue) {
         this.removeProcess = removeProcess;
+        this.useValue = useValue || false;
         if (!exists(style)) {
             style = "UIPeopleList";
         }

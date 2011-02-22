@@ -274,6 +274,6 @@
     </table>
 
     <script type="text/javascript">
-    var roomBookingCalendar = new RoomBookingCalendar(${ barsFossil });
+    var roomBookingCalendar = new RoomBookingCalendar(${ jsonEncode(barsFossil) }, ${ jsonEncode(dayAttrs) });
     $E("roomBookingCal").set(roomBookingCalendar.draw());
     </script>

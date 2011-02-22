@@ -32,6 +32,7 @@ from BTrees.OOBTree import OOBTree
 from ZEO import ClientStorage
 from ZODB.DB import DB
 import transaction
+from MaKaC.common.indexes import CalendarDayIndex
 
 
 @contextmanager

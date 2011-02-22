@@ -373,6 +373,12 @@ def formatDateTime(date):
     # Convert the date to the Indico "de facto" standard
     return date.strftime("%a %d/%m/%Y %H:%M")
 
+def datespan(startDate, endDate, delta=timedelta(days=1)):
+    currentDate = startDate
+    while currentDate <= endDate:
+        yield currentDate
+        currentDate += delta
+
 
 if __name__ == "__main__":
     Test.doesPeriodsOverlap()

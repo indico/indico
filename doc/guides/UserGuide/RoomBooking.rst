@@ -216,6 +216,47 @@ a particular entry can be viewed by clicking the 'More Info' link.
 
 --------------
 
+Blocking a Room
+~~~~~~~~~~~~~~~
+
+As a room manager you may create room blockings which prevent regular users
+from booking certain rooms. This feature can be used for special events
+during which only a few people should be allowed to create bookings for
+some rooms.
+
+To create such a blocking, go to 'Block rooms' in the Room Booking side
+menu and follow these steps:
+
+* Choose the period during which the rooms should be blocked by clicking the
+  start and end date on the calendars.
+* Enter a reason for the blocking - it will be displayed to users
+  trying to book one of the blocked rooms.
+* Add some rooms to the 'Rooms' list. Those will be affected by the
+  blocking.
+* Unless you want only you to be able to book the blocked rooms, add
+  some users or groups to the 'Allowed users/groups' list.
+* Submit the blocking after confirming that the chosen period is correct.
+  You cannot change it anymore once you created the blocking.
+
+When trying to book a blocked room, users in the 'Allowed users/groups'
+list will see that there's a blocking and its reason but will be able
+to create bookings anyway. You as the creator of the blocking will always
+be able to override your blocking, so you don't have to add yourself to
+the list. The same applies to the owners of blocked rooms. They will see
+the blocking and a warning that the room has been blocked, but they are
+able to override the blocking.
+
+You can not only block rooms you own but also any other rooms. Blockings
+for those rooms have to be approved by the respective owners - until they
+have been approved users trying to create a booking will see your pending
+blocking request but the are still able to create bookings.
+
+As soon as the blocking for a room has been approved (blockings for your own
+rooms are approved immediately when creating the blocking), all bookings
+colliding with the blocking are automatically rejected.
+
+--------------
+
 Core Features and Constraints
 -----------------------------
 
@@ -272,6 +313,7 @@ User
 * Manage own bookings (track, modify, cancel)
 * Search for rooms
 * Search for bookings (including archival)
+* View existing room blockings
 
 --------------
 
@@ -280,6 +322,8 @@ Room Manager
 
 * Accept and reject PRE-bookings (for his room)
 * Reject bookings (for his room)
+* Block rooms from being booked (with confirmation from the room owner)
+* Accept blocking requests (for his room)
 
 --------------
 
@@ -334,6 +378,10 @@ Each room has exactly one person responsible. A person may be
 responsible for any number of rooms.
 
 *Room manager*: room responsible
+
+*Room blocking*: a restriction created by a room manager which prevents
+users from booking the rooms listed in the blocking unless they have
+explicit permission to override the permission or own the rooms.
 
 --------------
 

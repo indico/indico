@@ -60,6 +60,6 @@ var files = [
 	"Ui/Widgets/WidgetGrid.js"
 ];
 
-for (var i in files) {
+for (var i = 0; i < files.length; i++) {
 	include(ScriptRoot + "presentation/" + files[i]);
 }

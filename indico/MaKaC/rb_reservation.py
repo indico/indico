@@ -24,7 +24,8 @@ Responsible: Piotr Wlodarek
 """
 
 from datetime import datetime, timedelta, date
-from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime, formatDate
+from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime, formatDate,\
+    datespan
 from MaKaC.rb_location import ReservationGUID, Location, CrossLocationQueries
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.user import AvatarHolder, Avatar
@@ -659,6 +660,40 @@ class ReservationBase( Fossilizable ):
         return Factory.newReservation().getReservations( **kwargs )
 
     # Time-play: repeatings, overlapings, etc.
+
+    def getBlockingConflictState(self, user=None):
+        """
+        Return the blocking conflict type (None, 'active', 'pending') of the reservation's room.
+        If a user is given, override permission is honored.
+        """
+        from MaKaC.rb_factory import Factory
+        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
+        res = None
+        for rbl in roomBlockings:
+            if rbl.block.canOverride(user, self.room):
+                continue
+            if rbl.block.startDate <= self.endDT.date() and self.startDT.date() <= rbl.block.endDate:
+                if rbl.active == True:
+                    return 'active'
+                elif rbl.active is None:
+                    res = 'pending'
+        return res
+
+    def getBlockedDates(self, user=None):
+        """
+        Get the dates on which a room is blocked.
+        If a user is given, override permission is honored.
+        """
+        from MaKaC.rb_factory import Factory
+        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
+        dates = []
+        for rbl in roomBlockings:
+            if not rbl.active or rbl.block.canOverride(user, self.room):
+                continue
+            if rbl.block.startDate <= self.endDT.date() and self.startDT.date() <= rbl.block.endDate:
+                for day in datespan(rbl.block.startDate, rbl.block.endDate):
+                    dates.append(day)
+        return dates
 
     def getCollisions( self, sansID = None, rooms = None, boolResult = False ):
         """

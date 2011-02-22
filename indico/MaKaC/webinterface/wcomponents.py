@@ -23,8 +23,9 @@ from MaKaC.plugins import PluginsHolder, OldObservable
 import os,types,string
 from xml.sax.saxutils import escape, quoteattr
 from copy import copy
-from datetime import timedelta,datetime, date
+from datetime import timedelta,datetime,date,time
 import exceptions
+from operator import attrgetter
 from MaKaC.common.db import DBMgr
 import MaKaC.conference as conference
 import MaKaC.user as user
@@ -6395,6 +6396,8 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         for key in bars:
             fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
         vars["barsFossil"] = fossilizedBars
+        vars["dayAttrs"] = fossilize({})
+        vars["bars"] = bars
         vars["showEmptyRooms"] = showEmptyRooms
         vars["manyRooms"] = not self._rh._rooms or len(self._rh._rooms) > 1
         vars["calendarParams"] = {}
@@ -6521,7 +6524,7 @@ def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmpty
         dayBars = dayBarsDic[day.date()]
         roomBarsDic = {}
         for bar in dayBars:
-            bar.canReject = bar.forReservation.canReject(user)
+            bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
             if bar.forReservation.repeatability != None:
                 bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( bar.forReservation, formatDate(bar.startDT.date()) ))
             else:
@@ -6547,6 +6550,25 @@ def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmpty
 
     return newDayBarsDic
 
+def getDayAttrsForRoom(dayDT, room):
+    attrs = {'tooltip': '', 'className': ''}
+    roomBlocked = room.getBlockedDay(dayDT)
+    if roomBlocked:
+        block = roomBlocked.block
+    if roomBlocked and block.canOverride(ContextManager.get('currentUser'), explicitOnly=True):
+        attrs['className'] = "blocked_permitted"
+        attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You are permitted to override the blocking.</b>') % (block.createdByUser.getFullName(), block.message)
+    elif roomBlocked and roomBlocked.active is True:
+        if block.canOverride(ContextManager.get('currentUser'), room):
+            attrs['className'] = "blocked_override"
+            attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You own this room or are an administrator and are thus permitted to override the blocking. Please use this privilege with care!</b>') % (block.createdByUser.getFullName(), block.message)
+        else:
+            attrs['className'] = "blocked"
+            attrs['tooltip'] = _('Blocked by %s:\n%s') % (block.createdByUser.getFullName(), block.message)
+    elif roomBlocked and roomBlocked.active is None:
+        attrs['className'] = "preblocked"
+        attrs['tooltip'] = _('Blocking requested by %s:\n%s\n\n<b>If this blocking is approved, any colliding bookings will be rejected!</b>') % (block.createdByUser.getFullName(), block.message)
+    return attrs
 
 class WRoomBookingRoomStats( WTemplated ):
 
@@ -6651,10 +6673,13 @@ class WRoomBookingRoomDetails( WTemplated ):
         for key in bars:
             fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
         vars["barsFossil"] = fossilizedBars
+        vars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"), getDayAttrsForRoom(day, self._rh._room)) for day in bars.iterkeys()))
+        vars["bars"] = bars
         vars["iterdays"] = iterdays
         vars["day_name"] = day_name
         vars["Bar"] = Bar
         vars["withConflicts"] = False
+        vars["currentUser"] = self._rh._aw.getUser()
 
         return vars
 
@@ -6909,6 +6934,8 @@ class WRoomBookingRoomCalendar( WTemplated ):
                 for bar in bars[dt]:
                     bar.forReservation.setOwner( self._rh._conf )
 
+        vars["blockConflicts"] = candResv.getBlockingConflictState(self._rh._aw.getUser())
+
         vars["calendarStartDT"] = calendarStartDT
         vars["calendarEndDT"] = calendarEndDT
         bars = introduceRooms( [room], bars, calendarStartDT, calendarEndDT, user = self._rh._aw.getUser() )
@@ -6916,12 +6943,14 @@ class WRoomBookingRoomCalendar( WTemplated ):
         for key in bars:
             fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
         vars["barsFossil"] = fossilizedBars
+        vars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"), getDayAttrsForRoom(day, room)) for day in bars.iterkeys()))
+        vars["bars"] = bars
         vars["iterdays"] = iterdays
         vars["day_name"] = day_name
         vars["Bar"] = Bar
         vars["room"] = room
         vars["buttonText"] = self._buttonText
-
+        vars["currentUser"] = self._rh._aw.getUser()
         vars["withConflicts"] = True
 
         return vars
@@ -6988,6 +7017,50 @@ class WRoomBookingAdminLocation( WTemplated ):
             # Next 9 KPIs
             vars["stats"] = rh._booking_stats
 
+        return vars
+
+class WRoomBookingBlockingsForMyRooms(WTemplated):
+
+    def __init__(self, roomBlocks):
+        self._roomBlocks = roomBlocks
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        vars['roomBlocks'] = self._roomBlocks
+        return vars
+
+class WRoomBookingBlockingDetails(WTemplated):
+
+    def __init__(self, block):
+        self._block = block
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        vars['block'] = self._block
+        return vars
+
+class WRoomBookingBlockingList(WTemplated):
+
+    def __init__(self, blocks):
+        self._blocks = blocks
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+
+        self._blocks.sort(key=attrgetter('startDate'), reverse=True)
+        vars['blocks'] = self._blocks
+        return vars
+
+class WRoomBookingBlockingForm(WTemplated):
+
+    def __init__(self, block, hasErrors):
+        self._block = block
+        self._hasErrors = hasErrors
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        vars['block'] = self._block
+        vars['hasErrors'] = self._hasErrors
         return vars
 
 class WBaseSearchBox(WTemplated):

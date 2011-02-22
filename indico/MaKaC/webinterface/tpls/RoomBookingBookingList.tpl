@@ -32,10 +32,10 @@
     <br />
 
     <script type="text/javascript">
-    var roomBookingCalendar = new RoomBookingCalendar(${ barsFossil }, ${ str(overload).lower() },
+    var roomBookingCalendar = new RoomBookingCalendar(${ jsonEncode(barsFossil) }, ${ jsonEncode(dayAttrs) }, ${ str(overload).lower() },
             {"prevURL" : "${ prevURL }", "nextURL" : "${ nextURL }", "formUrl" : "${ calendarFormUrl }",
             "startD" : "${ startD }", "endD" : "${ endD }", "periodName" : "${ periodName }",
-            "params" : ${ calendarParams }}, ${ str(manyRooms).lower() }
-            ${',"' + urlHandlers.UHRoomBookingRejectAllConflicting.getURL() + '"' if showRejectAllButton else ""} );
+            "params" : ${ jsonEncode(calendarParams) }}, ${ str(manyRooms).lower() }
+            ${',"' + urlHandlers.UHRoomBookingRejectAllConflicting.getURL() + '"' if showRejectAllButton else ''});
     $E("roomBookingCal").set(roomBookingCalendar.draw());
     </script>

@@ -1,0 +1,9 @@
+/* make "today" less prominent */
+.ui-datepicker-today .ui-state-highlight {
+    background: none !important;
+}
+
+/* ensure daterange selectors are large enough to prevent wrapping */
+.ui-daterange {
+    width: 37em;
+}

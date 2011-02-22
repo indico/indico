@@ -86,6 +86,9 @@ class IRoomMapFossil(IRoomFossil):
 class IReservationFossil(IFossil):
     """ Fossil inteface for reservation """
 
+    def id(self):
+        """ Id of the reservation """
+
     def bookedForName(self):
         """ Name of the reservation owner """
 

@@ -46,6 +46,11 @@ class FactoryCERN( object ):
         return reservationCERN.ReservationCERN()
 
     @staticmethod
+    def newRoomBlocking():
+        import roomblockingCERN
+        return roomblockingCERN.RoomBlockingCERN
+
+    @staticmethod
     def newCrbsUser():
         import crbsUserCERN
         return crbsUserCERN.CrbsUserCERN()

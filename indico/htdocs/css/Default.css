@@ -740,13 +740,50 @@ a.menuaddlink:hover {
    text-align: left;
 }
 
-.resvTable {
+.resvTable, .blockingTable {
     border-collapse: collapse;
 }
 
-.resvHover:hover {
+.resvHover:hover, .blockingHover:hover {
     background-color: #f0f0f0;
 }
+
+/* tables used for room blocking. */
+.blockingTable td {
+    padding: 0px 5px;
+}
+/* some space between table header and body */
+.blockingTable thead tr td {
+    padding-bottom: 5px;
+}
+/* "my blocking" row blocks (per room) have a border */
+.blockingTable tbody.blockingForMyRoom {
+    border: 1px solid transparent;
+}
+
+.blockingTable tbody.blockingForMyRoom:hover {
+    border: 1px solid #aaa;
+}
+/* separate simply table rows with some more padding */
+.blockingTable tr.blockingPadding td {
+    padding: 2px 5px 3px 5px;
+}
+/* blocking room list is hidden by default */
+.blockingTable tr.blockingRoomList {
+    display:none;
+}
+/* since TBODY cannot have a padding/margin, we use an empty row for it */
+.blockingTable .blockingSpacer td {
+    height: 10px;
+}
+/* blockings with an open room list have a border */
+.blockingTable tbody.hasRoomList {
+    border: 1px solid transparent;
+}
+.blockingTable tbody.hasRoomList:hover {
+    border: 1px solid #aaa;
+}
+
 
 /*All used styles*/
 /* TODO: should probably be removed...
@@ -1292,6 +1329,7 @@ span.horizontalSeparator {
     color:#222222;
     background-color:#f0f0f0;
     font-size: 11px;
+    padding: 2px;
 }
 
 .tip ul, .tip strong, .tip em {
@@ -1410,6 +1448,26 @@ option.moderatedRoom, span.moderatedRoom, a.moderatedRoom {
 
 option.privateRoom, span.privateRoom, a.privateRoom, a.weekend {
     color: Red;
+}
+
+a.blocked {
+    background-color: #f00;
+    color: #fff;
+}
+
+a.preblocked {
+    background-color: #fb0;
+    color: #000;
+}
+
+a.blocked_permitted {
+    background-color: #af5;
+    color: #000;
+}
+
+a.blocked_override {
+    background-color: #b5f;
+    color: #000;
 }
 
 span.unavailable {
@@ -3057,6 +3115,10 @@ h1.active
 }
 
 li.active a{
+    font-weight: bold;
+}
+
+a.active {
     font-weight: bold;
 }
 

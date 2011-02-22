@@ -24,13 +24,16 @@ methodMap = {
     "roomBooking.rooms.availabilitySearch": roomBooking.RoomBookingAvailabilitySearchRooms,
     "roomBooking.rooms.fullNameList": roomBooking.RoomBookingFullNameListRooms,
     "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
+    "roomBooking.locationsAndRooms.listWithGuids" :roomBooking.RoomBookingListLocationsAndRoomsWithGuids,
     "roomBooking.getDateWarning" :roomBooking.GetDateWarning,
 
     "roomBooking.mapaspects.create": roomBooking.RoomBookingMapCreateAspect,
     "roomBooking.mapaspects.update": roomBooking.RoomBookingMapUpdateAspect,
     "roomBooking.mapaspects.remove": roomBooking.RoomBookingMapRemoveAspect,
     "roomBooking.mapaspects.list": roomBooking.RoomBookingMapListAspects,
-    "roomBooking.locationsAndRooms.getLink" :roomBooking.RoomBookingLocationsAndRoomsGetLink,
+    "roomBooking.locationsAndRooms.getLink": roomBooking.RoomBookingLocationsAndRoomsGetLink,
+    "roombooking.blocking.approve": roomBooking.RoomBookingBlockingApprove,
+    "roombooking.blocking.reject": roomBooking.RoomBookingBlockingReject,
 
     "resources.timezones.getAll": resources.GetTimezones,
     "resources.languages.getAll": resources.GetLanguages,

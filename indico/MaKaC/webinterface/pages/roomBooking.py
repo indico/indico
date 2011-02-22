@@ -72,7 +72,8 @@ class WPRoomBookingBase( WPMainBase ):
     def getJSFiles(self):
         return [ 'js/prototype/prototype.js',
                  'js/scriptaculous/scriptaculous.js' ] + \
-                WPMainBase.getJSFiles(self)
+                WPMainBase.getJSFiles(self) + \
+                self._includeJSPackage('Management')
 
     def _getHeadContent( self ):
         """
@@ -144,6 +145,23 @@ class WPRoomBookingBase( WPMainBase ):
                                         urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, onlyPrebookings = True, autoCriteria = True ),
                                         enabled=self._showResponsible)
 
+        self._blockingsOpt = wcomponents.SideMenuSection(_("Room Blocking"))
+        self._usersBlockings = wcomponents.SideMenuItem(_("Blockings for my rooms"),
+                                        urlHandlers.UHRoomBookingBlockingsMyRooms.getURL( filterState='pending' ),
+                                        enabled=self._showResponsible)
+        if self._showResponsible:
+            self._myBlockingListOpt = wcomponents.SideMenuItem(_("My blockings"),
+                                            urlHandlers.UHRoomBookingBlockingList.getURL( onlyMine = True, onlyRecent = True ),
+                                            enabled=True)
+        else:
+            self._myBlockingListOpt = wcomponents.SideMenuItem(_("Blockings"),
+                                            urlHandlers.UHRoomBookingBlockingList.getURL( onlyRecent = True ),
+                                            enabled=True)
+        self._blockRooms = wcomponents.SideMenuItem(_("Block rooms"),
+                                        urlHandlers.UHRoomBookingBlockingForm.getURL(),
+                                        enabled=self._showResponsible)
+
+
 
         self._leftMenu.addSection( self._roomsOpt )
         self._roomsOpt.addItem( self._roomSearchOpt )
@@ -158,6 +176,10 @@ class WPRoomBookingBase( WPMainBase ):
         self._bookingsOpt.addItem( self._myPreBookingListOpt )
         self._bookingsOpt.addItem( self._usersBookings )
         self._bookingsOpt.addItem( self._usersPrebookings )
+        self._leftMenu.addSection( self._blockingsOpt )
+        self._blockingsOpt.addItem( self._blockRooms )
+        self._blockingsOpt.addItem( self._myBlockingListOpt )
+        self._blockingsOpt.addItem( self._usersBlockings )
         return self._leftMenu
 
     def _isRoomBooking(self):
@@ -421,3 +443,54 @@ class WPRoomBookingConfirmBooking( WPRoomBookingBase ):
     def _getBody( self, params ):
         wc = wcomponents.WRoomBookingConfirmBooking( self._rh, standalone = True )
         return wc.getHTML( params )
+
+class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
+
+    def __init__(self, rh, roomBlocks):
+        WPRoomBookingBase.__init__(self, rh)
+        self._roomBlocks = roomBlocks
+
+    def _setCurrentMenuItem( self ):
+        self._usersBlockings.setActive(True)
+
+    def _getBody(self, params):
+        wc = wcomponents.WRoomBookingBlockingsForMyRooms(self._roomBlocks)
+        return wc.getHTML(params)
+
+
+class WPRoomBookingBlockingDetails(WPRoomBookingBase):
+
+    def __init__(self, rh, block):
+        WPRoomBookingBase.__init__(self, rh)
+        self._block = block
+
+    def _getBody(self, params):
+        wc = wcomponents.WRoomBookingBlockingDetails(self._block)
+        return wc.getHTML(params)
+
+class WPRoomBookingBlockingList(WPRoomBookingBase):
+
+    def __init__(self, rh, blocks):
+        WPRoomBookingBase.__init__(self, rh)
+        self._blocks = blocks
+
+    def _setCurrentMenuItem( self ):
+        self._myBlockingListOpt.setActive(True)
+
+    def _getBody(self, params):
+        wc = wcomponents.WRoomBookingBlockingList(self._blocks)
+        return wc.getHTML(params)
+
+class WPRoomBookingBlockingForm(WPRoomBookingBase):
+
+    def __init__(self, rh, block, hasErrors):
+        WPRoomBookingBase.__init__(self, rh)
+        self._block = block
+        self._hasErrors = hasErrors
+
+    def _setCurrentMenuItem( self ):
+        self._blockRooms.setActive(True)
+
+    def _getBody(self, params):
+        wc = wcomponents.WRoomBookingBlockingForm(self._block, self._hasErrors)
+        return wc.getHTML(params)

@@ -28,10 +28,10 @@ from rb_location import Location
 class Factory( object ):
     """
     Creates objects specific to the location, according to the Factory design pattern.
-    
+
     Use new*() methods to instantiate objects.
     """
-    
+
     @staticmethod
     def newRoom( locationName="" ):
         """Instantiates new room object, specific for the location"""
@@ -41,12 +41,17 @@ class Factory( object ):
         room = location.factory.newRoom()
         room.locationName = location.friendlyName
         return room
-    
+
     @staticmethod
     def newReservation():
         """Instantiates new reservation object, specific for the location"""
         return Location.getDefaultLocation().factory.newReservation()
-    
+
+    @staticmethod
+    def newRoomBlocking():
+        """Instantiates new blocking object, specific for the location"""
+        return Location.getDefaultLocation().factory.newRoomBlocking()
+
     @staticmethod
     def newCrbsUser():
         """Instantiates new user object, specific for the location"""

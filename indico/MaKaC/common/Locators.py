@@ -20,18 +20,24 @@
 
 from UserDict import UserDict
 from types import ListType
+import simplejson
 
 
 class Locator(UserDict):
     """Helper class specialising UserDict (dictionary) which contains a locator
-        for an object. This is needed due to the id schema chosen and to the 
+        for an object. This is needed due to the id schema chosen and to the
         web needs: it is a relative id schema (a suboject is given an id which
-        is unique only inside its superobject) and we need to uniquely identify 
-        some objects on the web pages so it is needed to handle the "locator" 
+        is unique only inside its superobject) and we need to uniquely identify
+        some objects on the web pages so it is needed to handle the "locator"
         which can be made up of various ids. This class will contain the locator
-        and provide methods for using it on the web pages so it's use is 
+        and provide methods for using it on the web pages so it's use is
         transparent for client.
     """
+    def getJSONForm( self ):
+        """Returns the current locator data as a JSON string.
+        """
+        return simplejson.dumps(self.data)
+
     def getURLForm( self ):
         """Returns the current locator ready for being included in a URL.
         """
@@ -46,7 +52,7 @@ class Locator(UserDict):
         return "&".join( l )
 
     def getWebForm( self ):
-        """Returns the current locator for being used in web pages forms 
+        """Returns the current locator for being used in web pages forms
             (hidden parameters)
         """
         l = []
@@ -58,7 +64,7 @@ class Locator(UserDict):
             else:
                 l.append("""<input type="hidden" name="%s" value="%s">"""%(item, val))
         return "\n".join( l )
-        
-            
+
+
 
 

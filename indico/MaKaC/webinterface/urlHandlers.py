@@ -472,6 +472,43 @@ class UHRoomBookingGetRoomSelectList( URLHandler ):
 class UHRoomBookingGetRoomSelectList4SubEvents( URLHandler ):
     _relativeURL = "roomBooking.py/getRoomSelectList4SubEvents"
 
+class UHRoomBookingBlockingsMyRooms( URLHandler ):
+    _relativeURL = "roomBooking.py/blockingsForMyRooms"
+    @classmethod
+    def getURL(cls, filterState=None):
+        """
+        filterState - only show requests which have the given state
+        """
+        url = cls._getURL()
+        if filterState:
+            url.addParam( 'filterState', filterState )
+        return url
+
+class UHRoomBookingBlockingsBlockingDetails( URLHandler ):
+    _relativeURL = "roomBooking.py/blockingDetails"
+
+class UHRoomBookingBlockingList( URLHandler ):
+    _relativeURL = "roomBooking.py/blockingList"
+    @classmethod
+    def getURL(cls, onlyMine=False, onlyRecent=False, onlyThisYear=True):
+        """
+        onlyMine - only show own blockings
+        onlyRecent - only show bookings ending in the future
+        """
+        url = cls._getURL()
+        if onlyMine:
+            url.addParam( 'onlyMine', 'on' )
+        if onlyRecent:
+            url.addParam( 'onlyRecent', 'on' )
+        if onlyThisYear:
+            url.addParam( 'onlyThisYear', 'on' )
+        return url
+
+class UHRoomBookingBlockingForm( URLHandler ):
+    _relativeURL = "roomBooking.py/blockingForm"
+
+class UHRoomBookingDeleteBlocking( URLHandler ):
+    _relativeURL = "roomBooking.py/deleteBlocking"
 
 # For the event ==============================================================
 

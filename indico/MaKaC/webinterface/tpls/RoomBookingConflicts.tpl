@@ -8,20 +8,21 @@
 <!-- Render each conflict... -->
 <% c = 0; ks = bars.keys(); ks.sort()  %>
 % for dt in ks:
-    % for bar in bars[dt]:
-        % if bar.type == Bar.CONFLICT:
-            <tr>
-                <td>${ formatDate(bar.startDT.date()) }
-                <td>${ bar.startDT.time() } -- ${ bar.endDT.time() }</td>
-                <td>${ bar.forReservation.bookedForName }</td>
-            </tr>
+    % for roomBars in bars[dt]:
+        % for bar in roomBars.bars:
+            % if bar.type == Bar.CONFLICT:
+                <tr>
+                    <td>${ formatDate(bar.startDT.date()) }
+                    <td>${ bar.startDT.time() } -- ${ bar.endDT.time() }</td>
+                    <td>${ bar.forReservation.bookedForName }</td>
+                </tr>
 
-            <% c += 1 %>
-            % if c > 4:
-                <% break %>
+                <% c += 1 %>
+                % if c > 4:
+                    <% break %>
+                % endif
             % endif
-
-        % endif
+        % endfor
     % endfor
 % endfor
 

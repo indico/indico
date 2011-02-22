@@ -105,9 +105,18 @@ def saveCustomAttributes( req, **params ):
 def deleteCustomAttribute( req, **params ):
     return roomBooking.RHRoomBookingDeleteCustomAttribute(req).process(params)
 
-#    import wingdbstub
-#    if wingdbstub.debugger != None:
-#        wingdbstub.debugger.StartDebug()
+# Blocking
+
+def blockingsForMyRooms( req, **params ):
+    return roomBooking.RHRoomBookingBlockingsForMyRooms(req).process(params)
+def blockingDetails( req, **params ):
+    return roomBooking.RHRoomBookingBlockingDetails(req).process(params)
+def blockingList( req, **params ):
+    return roomBooking.RHRoomBookingBlockingList(req).process(params)
+def blockingForm( req, **params ):
+    return roomBooking.RHRoomBookingBlockingForm(req).process(params)
+def deleteBlocking( req, **params ):
+    return roomBooking.RHRoomBookingDelete(req).process(params)
 
 def sendRoomPhoto( req, **params ):
     return roomBooking.RHRoomBookingSendRoomPhoto(req).process(params)

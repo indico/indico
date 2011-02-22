@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 
 
 """
@@ -29,7 +30,7 @@ from datetime import datetime
 from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.rb_reservation import ReservationBase
-from MaKaC.rb_location import Location, MapAspect
+from MaKaC.rb_location import Location, MapAspect, RoomGUID
 from MaKaC.rb_location import CrossLocationQueries
 import MaKaC.common.info as info
 from MaKaC.common.utils import HolidaysHolder, isWeekend
@@ -123,6 +124,18 @@ class RoomBookingListLocationsAndRooms( ServiceBase ):
             return sorted(result)
         else:
             return []
+
+class RoomBookingListLocationsAndRoomsWithGuids( ServiceBase ):
+
+    def _getAnswer( self ):
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        result = {}
+        if minfo.getRoomBookingModuleActive():
+            locationNames = map(lambda l: l.friendlyName, Location.allLocations)
+            for loc in locationNames:
+                for room in CrossLocationQueries.getRooms( location = loc ):
+                    result[str(room.guid)] = "%s: %s" % (loc, room.getFullName())
+        return result
 
 class GetBookingBase(object):
 
@@ -319,3 +332,34 @@ class RoomBookingLocationsAndRoomsGetLink( ServiceBase ):
 
     def _getAnswer( self ):
         return linking.RoomLinker().getURLByName( self._room, self._location )
+
+
+class RoomBookingBlockingProcessBase(ServiceBase):
+
+    def _checkParams(self):
+        self._blocking = RoomBlockingBase.getById(int(self._params["blockingId"]));
+        self._room = RoomGUID.parse(self._params["room"]).getRoom();
+        self._roomBlocking = self._blocking.getBlockedRoom(self._room)
+
+    def _checkProtection(self):
+        user = self._aw.getUser()
+        if not user or (not user.isAdmin() and not self._room.isOwnedBy(user)):
+            raise ServiceError(_('You are not permitted to modify this blocking'))
+
+class RoomBookingBlockingApprove(RoomBookingBlockingProcessBase):
+
+    def _getAnswer(self):
+        self._roomBlocking.approve()
+        return { "active": self._roomBlocking.getActiveString() }
+
+class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
+
+    def _checkParams( self ):
+        RoomBookingBlockingProcessBase._checkParams(self)
+        self._reason = self._params.get('reason')
+        if not self._reason:
+            raise ServiceError(_('You have to specify a rejection reason'))
+
+    def _getAnswer(self):
+        self._roomBlocking.reject(self._getUser(), self._reason)
+        return { "active": self._roomBlocking.getActiveString() }

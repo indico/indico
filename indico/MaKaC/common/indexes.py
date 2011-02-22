@@ -581,6 +581,7 @@ class CalendarDayIndex(Persistent):
         return list(self._idxDay.items())
 
     def indexConf(self, conf):
+        # Note: conf can be any object which has getEndDate() and getStartDate() methods
         self._idxDay._p_changed = True
         days = (conf.getEndDate().date() - conf.getStartDate().date()).days
         startDate = datetime(conf.getStartDate().year, conf.getStartDate().month, conf.getStartDate().day)
@@ -596,6 +597,7 @@ class CalendarDayIndex(Persistent):
 
 
     def unindexConf( self, conf):
+        # Note: conf can be any object which has getEndDate() and getStartDate() methods
         self._idxDay._p_changed = True
         days = (conf.getEndDate().date() - conf.getStartDate().date()).days
         startDate = datetime(conf.getStartDate().year, conf.getStartDate().month, conf.getStartDate().day)

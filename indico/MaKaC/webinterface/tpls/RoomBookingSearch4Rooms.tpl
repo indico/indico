@@ -4,7 +4,7 @@
     // Displays div with dates and hours
     function display_availability( bool)
     {
-        trs = $( 'sdatesTR', 'edatesTR', 'hoursTR', 'repTypeTR', 'includePrebookingsTR' )
+        trs = $( 'sdatesTR', 'edatesTR', 'hoursTR', 'repTypeTR', 'includePrebookingsTR', 'includePendingBlockingsTR' )
         for ( i = 0; i < trs.length; i++ )
         {
             if ( bool ) trs[i].style.display = ''      // Show
@@ -285,6 +285,14 @@
                                                             <input id="includePrebookings" name="includePrebookings" type="checkbox" checked="checked"/>
                                                              ${ _("Check conflicts against pre-bookings")}
                                                             ${inlineContextHelp(_("[v] Check if you want to avoid conflicts with PRE-bookings. By default conflicts are checked only against confirmed bookings.") )}
+                                                        </td>
+                                                    </tr>
+                                                    <tr id='includePendingBlockingsTR'>
+                                                        <td class="subFieldWidth" align="right" ><small> ${ _("Blockings")}</small></td>
+                                                        <td align="left" class="blacktext">
+                                                            <input id="includePendingBlockings" name="includePendingBlockings" type="checkbox" checked="checked"/>
+                                                             ${ _("Check conflicts against pending blockings")}
+                                                            ${inlineContextHelp(_("[v] Check if you want to avoid conflicts with pending blockings. By default conflicts are checked only against confirmed blockings.") )}
                                                         </td>
                                                     </tr>
                                                 </table>

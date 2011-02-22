@@ -51,6 +51,15 @@ class WPBase(OldObservable):
         else:
             return ['js/%s/pack/%s.pack.js' % (module, packageName)]
 
+    def _includeJQuery(self):
+        info = HelperMaKaCInfo().getMaKaCInfoInstance()
+        files = ['jquery', 'jquery-compat', 'jquery-ui', 'jquery.daterange']
+        if info.isDebugActive():
+            # We can't use Loader.js as jQuery is included before any indico js
+            return ['js/jquery/%s.js' % f for f in files] + ['js/indico/jquery/defaults.js']
+        else:
+            return ['js/jquery/jquery.pack.js'] + ['js/indico/jquery/defaults.js']
+
     def _includeJSFile(self, path, filename):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
@@ -81,6 +90,7 @@ class WPBase(OldObservable):
 
     def getJSFiles(self):
         return self._includePresentationFiles() + \
+               self._includeJQuery() + \
                self._includeJSPackage('Core') + \
                self._includeJSPackage('Legacy') + \
                self._includeJSPackage('Common')

@@ -84,6 +84,7 @@ class Group(Persistent, Fossilizable):
 
     def getName( self ):
         return self.name
+    getFullName = getName
 
     def setDescription( self, newDesc ):
         self.description = newDesc.strip()

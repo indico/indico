@@ -8,6 +8,8 @@
         <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/${ stylesheet }">
         <link rel="stylesheet" type="text/css" href="${ baseurl }/css/calendar-blue.css" >
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui.css">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/jquery-ui-custom.css">
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 

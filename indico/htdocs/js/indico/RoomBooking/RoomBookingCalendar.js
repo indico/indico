@@ -91,6 +91,7 @@ type ("RoomBookingCalendarBar", [],
             this.reason = barInfo["forReservation"]["reason"];
             this.owner = barInfo["forReservation"]["bookedForName"];
             this.bookingUrl = barInfo["forReservation"]["bookingUrl"];
+            this.inDB = barInfo.forReservation.id !== null;
             this.type = barClasses[parseInt(barInfo["type"])];
         }
         )
@@ -169,11 +170,24 @@ type ("RoomBookingCalendarData", [],
                 for( var day = 0; day < this.days.size(); ++day )
                     bars = bars.concat(this.days[day].getBars());
                 return bars;
+            },
+            getDayClass: function(day) {
+                if(!this.dayAttrs[day.date]) {
+                    return;
+                }
+                return this.dayAttrs[day.date].className || '';
+            },
+            getDayTooltip: function(day) {
+                if(!this.dayAttrs[day.date]) {
+                    return;
+                }
+                return this.dayAttrs[day.date].tooltip || '';
             }
         },
-        function(reservationBars){
+        function(reservationBars, dayAttrs){
             this.days = [];
-            for (date in reservationBars){
+            this.dayAttrs = dayAttrs;
+            for (var date in reservationBars){
                 this.days.push(new RoomBookingCalendarDay(reservationBars[date], date));
             }
             this.days.sort(function(day1, day2){
@@ -198,10 +212,12 @@ type ("RoomBookingCalendarDrawer", [],
                                "<br />" + bar.reason;
                 var barDiv =  Html.div({
                     className: bar.type,
-                    style: {cursor: 'pointer', width: pixels(parseInt(width)), left: pixels(parseInt(left))}});
-                barDiv.observeClick(function(){
-                    window.location = bar.bookingUrl;
-                });
+                    style: {cursor: (bar.inDB ? 'pointer' : ''), width: pixels(parseInt(width)), left: pixels(parseInt(left))}});
+                if(bar.inDB) {
+                    barDiv.observeClick(function(){
+                        window.location = bar.bookingUrl;
+                    });
+                }
                 barDiv.observeEvent('mouseover', function(event){
                     domTT_activate(barDiv.dom, event, 'content', resvInfo, 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );
                 });
@@ -358,11 +374,25 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 if (this.room.nonBookableDates) {
                     return Html.span({title: $T("This room cannot be booked for this date due to maintenance reasons"), className: "unavailable"}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
                 } else {
-                    return Html.div({style:{clear:'both', width:pixels(120), paddingTop:pixels(5)}},
-                        Html.a({href:this.room.getBookingFormUrl(day.date),  className : 'dateLink ' + dateClass,
-                            style:{display:'block', cssFloat:'left', width:pixels(125)}}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d")),
+                    if(this.data.getDayClass(day)) {
+                        dateClass = this.data.getDayClass(day);
+                    }
+                    var tt = this.data.getDayTooltip(day);
+                    if(tt) {
+                        tt = tt.replace(/\n/g, '<br>');
+                    }
+                    var link = Html.a({href:this.room.getBookingFormUrl(day.date),  className : 'dateLink ' + dateClass},
+                                      Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
+                    var div = Html.div({style:{clear:'both', paddingTop:pixels(5)}},
+                        Html.div({style:{display:'block', cssFloat:'left', width:pixels(125)}}, link),
                         Html.div({style:{cssFloat:'left'}},
                         Html.div('dayCalendarDiv',bars, this.drawSmallHours())));
+                    if(tt) {
+                        link.observeEvent('mouseover', function(e){
+                            domTT_activate(link.dom, e, 'content', tt, 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip');
+                        });
+                    }
+                    return div;
                 }
             },
 
@@ -484,8 +514,13 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                         });
                     }
 
-                    return Html.div({ onmouseover : "this.style.backgroundColor='#f0f0f0';", onmouseout : "this.style.backgroundColor='#ffffff';", style:{clear:'both', overflow:'auto', cursor:'pointer'}},
-                                Html.div({onclick:"window.location='" + bar.bookingUrl +"'"},
+                    var attrs = {}, cursorStyle = '';
+                    if(bar.inDB) {
+                        attrs.onclick = "window.location='" + bar.bookingUrl + "';";
+                        cursorStyle = 'pointer';
+                    }
+                    return Html.div({ onmouseover : "this.style.backgroundColor='#f0f0f0';", onmouseout : "this.style.backgroundColor='#ffffff';", style:{clear:'both', overflow:'auto', cursor:cursorStyle}},
+                                Html.div(attrs,
                                     Html.p({style:{cssFloat:'left', width: pixels(175), height:pixels(40)}},bar.room.getFullNameHtml(true)),
                                     Html.p({style:{cssFloat:'left', width: pixels(350), height:'auto'}},bar.reason, Html.br(), bar.owner ),
                                     Html.p({style:{cssFloat:'left', width: pixels(90), height:pixels(40)}},bar.startDT.print("%d/%m/%Y")),
@@ -650,7 +685,7 @@ type("RoomBookingPrevNext", [],
                         var redirectUrl =  self.formUrl + "?search=on&sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() +
                         "&eDay=" + endDate.getDate() +"&eMonth=" + (endDate.getMonth() + 1) + "&eYear=" + endDate.getFullYear();
 
-                        for (param in self.params)
+                        for (var param in self.params)
                             redirectUrl += "&" + param + "=" + self.params[param];
 
                         window.location = redirectUrl;
@@ -701,8 +736,8 @@ type ("RoomBookingCalendar", [],
                             this.roomBookingCalendarSummary.draw()];
             }
         },
-        function(reservationBars, overload, prevNextBarArgs, manyRooms, rejectAllLink){
-            this.data = new RoomBookingCalendarData(reservationBars);
+        function(reservationBars, dayAttrs, overload, prevNextBarArgs, manyRooms, rejectAllLink){
+            this.data = new RoomBookingCalendarData(reservationBars, dayAttrs);
             this.prevNextBarArgs = prevNextBarArgs;
             if(manyRooms)
                 this.roomBookingCalendarContent = new RoomBookingManyRoomsCalendarDrawer(this.data, overload);
