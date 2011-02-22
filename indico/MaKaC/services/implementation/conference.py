@@ -192,36 +192,33 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
     Conference location name modification
     """
     def _handleSet(self):
+        changed = False
         room = self._target.getRoom()
+        loc = self._target.getLocation()
 
-        if  room == None:
+        newLocation = self._value.get('location')
+        newRoom = self._value.get('room')
+
+        if room == None:
             room = conference.CustomRoom()
             self._target.setRoom(room)
 
-        # if a room name is not passed, it is assumed
-        # as empty
-        if 'room' in self._value:
-            room.setName( self._value['room'] )
+        if room.getName() != newRoom:
+            room.setName(newRoom)
+            changed = True
 
-        loc = self._target.getLocation()
-        if not loc:
+        if loc == None:
             loc = conference.CustomLocation()
             self._target.setLocation(loc)
 
-        if 'location' in self._value:
-            loc.setName( self._value['location'] )
+        if loc.getName() != newLocation:
+            loc.setName(newLocation)
+            changed = True
 
-        loc.setAddress( self._value['address'] )
+        loc.setAddress(self._value['address'])
 
-        # notify observers
-        try:
-            self._target._notify('notifyLocationChange', {})
-        except Exception, e:
-            try:
-                Logger.get('Conference').error("Exception while notifying the observer of location change for conference %s: %s" %
-                            (self._target.getId(), str(e)))
-            except Exception, e2:
-                Logger.get('Conference').error("Exception while notifying a location change: %s (origin: %s)" % (str(e2), str(e)))
+        if changed:
+            self._target._notify('placeChanged')
 
     def _handleGet(self):
 

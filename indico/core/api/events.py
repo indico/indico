@@ -71,6 +71,10 @@ class ITimeActionListener(IListener):
     def endTimeChanged(self, obj, oldEdate, edate):
         pass
 
+    def eventDatesChanged(self, obj, oldStartDate, oldEndDate,
+                          newStartDate, newEndDate):
+        pass
+
     def timezoneChanged(self, obj, oldTimezone, timezone):
         pass
 

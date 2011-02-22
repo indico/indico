@@ -23,7 +23,9 @@ from MaKaC.common.utils import *
 from MaKaC.conference import Conference
 
 from indico.core.api import Component, IListener
-from indico.core.api.events import IObjectLifeCycleListener, ITimeActionListener
+from indico.core.api.events import IObjectLifeCycleListener, ITimeActionListener, \
+     IMetadataChangeListener
+from indico.core.api.location import ILocationActionListener
 
 from MaKaC.common.logger import Logger
 import zope.interface
@@ -32,7 +34,9 @@ import zope.interface
 class EventCollaborationListener(Component):
 
     zope.interface.implements(IObjectLifeCycleListener,
-                              ITimeActionListener)
+                              ITimeActionListener,
+                              ILocationActionListener,
+                              IMetadataChangeListener)
 
     """In this case, obj is a conference object. Since all we
        need is already programmed in CSBookingManager, we get the
@@ -82,15 +86,20 @@ class EventCollaborationListener(Component):
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
 
     @classmethod
-    def locationChanged(cls, obj, params={}):
-        obj = obj.getCSBookingManager()
-        obj.notifyLocationChange()
-
-    @classmethod
-    def titleChanged(cls, obj, params={}):
+    def eventDatesChanged(cls, obj, oldStartDate, oldEndDate,
+                          newStartDate, newEndDate):
         obj = obj.getCSBookingManager()
         try:
-            obj.notifyTitleChange(params['oldTitle'], params['newTitle'])
+            obj.notifyEventDateChanges(oldStartDate, newStartDate,
+                                       oldEndDate, newEndDate)
+        except Exception, e:
+            Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
+
+    @classmethod
+    def titleChanged(cls, obj, oldTitle, newTitle):
+        obj = obj.getCSBookingManager()
+        try:
+            obj.notifyTitleChange(oldTitle, newTitle)
         except Exception, e:
             Logger.get('PluginNotifier').error("Exception while trying to access to the title parameters when changing an event title" + str(e))
 
@@ -99,3 +108,9 @@ class EventCollaborationListener(Component):
         if obj.__class__ == Conference:
             obj = obj.getCSBookingManager()
             obj.notifyDeletion()
+
+    # ILocationActionListener
+    @classmethod
+    def placeChanged(cls, obj):
+        obj = obj.getCSBookingManager()
+        obj.notifyLocationChange()

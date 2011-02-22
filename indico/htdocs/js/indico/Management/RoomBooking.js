@@ -144,7 +144,8 @@ type("RoomBookingWidget", ["IWidget"],
                  });
          }
          else {
-             this.roomChooser = Html.input('text', {className: "roomTextField"});
+             this.roomChooser = Html.input('text', {className: "roomTextField",
+                                                    name: "roomName"});
          }
 
          this.addressArea = new RealtimeTextArea({});

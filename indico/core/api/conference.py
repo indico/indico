@@ -21,39 +21,6 @@
 from indico.core.api import IListener, IContributor
 
 
-class IManagementEventsListener(IListener):
-    """
-    Events that are related to the management of a conference
-    """
-
-    def notifyDateChange(self, obj, params):
-        pass
-
-    def notifyStartDateChange(self, obj, params):
-        pass
-
-    def notifyStartTimeChange(self, obj, sdate):
-        pass
-
-    def notifyEndTimeChange(self, obj, edate):
-        pass
-
-    def notifySetTimezone(self, obj, oldTimezone):
-        pass
-
-    def notifyEndDateChange(self, obj, params):
-        pass
-
-    def notifyLocationChange(self, obj, params):
-        pass
-
-    def notifyTitleChange(self, obj, params):
-        pass
-
-    def notifyDelete(self, obj, params):
-        pass
-
-
 class INavigationContributor(IContributor):
     """
     Events that fill the sidemenu of a conference with the activated plugins.

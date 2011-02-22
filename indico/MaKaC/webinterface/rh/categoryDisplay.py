@@ -409,7 +409,7 @@ class UtilPersons:
 
 class UtilsConference:
 
-    def setValues(c, confData):
+    def setValues(c, confData, notify=False):
         from MaKaC.webinterface.common.tools import escape_tags_short_url
         c.setTitle( confData["title"] )
         c.setDescription( confData["description"] )
@@ -460,25 +460,39 @@ class UtilsConference:
         #################################
         # Fermi timezone awareness(end) #
         #################################
-        if confData.get("locationName","").strip() == "":
+        changed = False
+        newLocation = confData.get("locationName","")
+        newRoom = confData.get( "locationBookedRoom" )  or  \
+                   confData.get( "roomName" )  or  ""
+
+        if newLocation.strip() == "":
             c.setLocation( None )
         else:
             l = c.getLocation()
             if not l:
                 l = conference.CustomLocation()
                 c.setLocation( l )
-            l.setName( confData["locationName"] )
+
+            if l.getName() != newLocation:
+                l.setName(newLocation)
+                changed = True
+
             l.setAddress( confData.get("locationAddress","") )
 
-        roomName = confData.get( "locationBookedRoom" )  or  confData.get( "roomName" )  or  ""
-        if roomName.strip() == "":
+        if newRoom.strip() == "":
             c.setRoom( None )
         else:
             r = c.getRoom()
             if not r:
                 r = conference.CustomRoom()
                 c.setRoom( r )
-            r.setName( roomName )
+
+            if r.getName() != newRoom:
+                r.setName(newRoom)
+                changed = True
+
+        if changed:
+            c._notify('placeChanged')
 
         emailstr = setValidEmailSeparators(confData.get("supportEmail", ""))
 

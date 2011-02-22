@@ -104,11 +104,78 @@ class CoreObject(Persistent):
     """
 
     def setModificationDate(self, date = None):
-        """Method called to notify the current conference has been modified.
+        """
+        Method called to notify the current object has been modified.
         """
         if not date:
             date = nowutc()
         self._modificationDS = date
+
+
+class Locatable:
+    """
+    Inherited by objects that imply a physical location:
+    * Conferences
+    * Sessions
+    * SessionSlots
+    * Contributions
+    * SubContributions
+    """
+
+    def getLocationParent(self):
+        """
+        Returns the object the location info should be inherited from
+        (Overridden)
+        """
+        raise Exception("Unimplemented method")
+
+    def getLocation(self):
+        if self.getOwnLocation():
+            return self.getOwnLocation()
+        return self.getInheritedLocation()
+
+    def getOwnLocation(self):
+        if len(self.places) > 0:
+            return self.places[0]
+        return None
+
+    def getInheritedLocation(self):
+        return self.getLocationParent().getLocation()
+
+    def getOwnRoom(self):
+        if len(self.rooms) > 0:
+            return self.rooms[0]
+        return None
+
+    def getRoom(self):
+        if self.getOwnRoom():
+            return self.getOwnRoom()
+        return self.getInheritedRoom()
+
+    def getInheritedRoom(self):
+        return self.getLocationParent().getRoom()
+
+    def setLocation(self, newLocation):
+        oldLocation = self.getOwnLocation()
+        if newLocation == None:
+            if len(self.places) > 0:
+                del self.places[0]
+        elif len(self.places) > 0:
+            self.places[0] = newLocation
+        else:
+            self.places.append( newLocation )
+        self.notifyModification()
+
+    def setRoom(self, newRoom):
+        oldRoom = self.getOwnRoom()
+        if newRoom == None:
+            if len(self.rooms) > 0:
+                del self.rooms[0]
+        elif len(self.rooms) > 0:
+            self.rooms[0] = newRoom
+        else:
+            self.rooms.append( newRoom )
+        self.notifyModification()
 
 
 class CommonObjectBase(CoreObject, Observable, Fossilizable):
@@ -1940,7 +2007,7 @@ class ReportNumberHolder(Persistent):
         if self.getOwner() != None:
             self.getOwner().notifyModification()
 
-class Conference(CommonObjectBase):
+class Conference(CommonObjectBase, Locatable):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
         access to other objects representing certain parts of the conferences
@@ -2065,6 +2132,8 @@ class Conference(CommonObjectBase):
         return "<Conference %s@%s>" % (self.getId(), hex(id(self)))
 
     def __cmp__(self, toCmp):
+        if toCmp != Conference:
+            return cmp(hash(self), hash(toCmp))
         res = cmp(self.getStartDate(), toCmp.getStartDate())
         if res != 0:
             return res
@@ -3238,41 +3307,11 @@ class Conference(CommonObjectBase):
         """
         return None
 
-    def getOwnLocation( self ):
-        return self.getLocation()
-
     def getLocation( self ):
-        if len(self.places)>0:
-            return self.places[0]
-        return None
-
-    def setLocation( self, newLocation ):
-        if newLocation == None:
-            if len(self.places)>0:
-                del self.places[0]
-        elif len(self.places)>0:
-            self.places[0] = newLocation
-        else:
-            self.places.append( newLocation )
-        self.notifyModification()
-
-    def getOwnRoom( self ):
-        return self.getRoom()
+        return self.getOwnLocation()
 
     def getRoom( self ):
-        if len(self.rooms)>0:
-            return self.rooms[0]
-        return None
-
-    def setRoom( self, newRoom ):
-        if newRoom == None:
-            if len(self.rooms)>0:
-                del self.rooms[0]
-        elif len(self.rooms)>0:
-            self.rooms[0] = newRoom
-        else:
-            self.rooms.append( newRoom )
-        self.notifyModification()
+        return self.getOwnRoom()
 
     def getLocationList(self):
         """Method returning a list of "location" objects which contain the
@@ -4895,6 +4934,7 @@ class ConfSectionsMgr:
             return self._sections[id]
         return None
 
+
 class Observer(object):
     """ Base class for Observer objects.
         Inheriting classes should overload the following boolean class attributes:
@@ -4991,43 +5031,6 @@ class TitleChangeObserver(Observer):
             Notifies the observer that the Conference object's title has changed
         """
         raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTitleChange")
-
-class DateChangeObserver(Observer):
-    """ Base class for objects who want to be notified of a change in the start date / end date
-        of an object (for example a Conference object).
-        Inheriting classes have to implement the notifyStartDateChange and notifyEndDateChange methods,
-        and probably the __init__ method too.
-    """
-
-    def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the start and / or end dates of the object it is attached to has changed.
-            If the observer finds any problems during whatever he needs to do as a consequence of
-            the event dates changing, he should write strings describing the problems
-            in the 'dateChangeNotificationProblems' context variable (which is a list of strings).
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyStartDateChange")
-
-    def notifyTimezoneChange(self, oldTimezone, newTimezone):
-        """ To be implemented by inheriting classes.
-            Notifies the observer that the end date of the object it is attached to has changed.
-            This method has to return a list of strings describing problems encountered during
-            whatever the DateChangeObserver object does as a consequence of the notification.
-            If there are no problems, the DateChangeObserver should return an empty list.
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyTimezoneChange")
-
-
-class DeleteObserver(Observer):
-    """ Base class for objects who want to be notified of a Conference object being deleted.
-        Inheriting classes have to implement the notifyDeletion method, and probably the __init__ method too.
-    """
-    def notifyDeletion(self):
-        """ To be implemented by inheriting classes
-            Notifies the observer that the Conference object it is attached to has been deleted
-        """
-        raise MaKaCError("Class " + str(self.__class__.__name__) + " did not implement method notifyDeletion")
-
 
 
 class SessionChair(ConferenceParticipation):
@@ -5198,7 +5201,7 @@ class SCIndex(Persistent):
         self._idx._p_changed=1
 
 
-class Session(CommonObjectBase):
+class Session(CommonObjectBase, Locatable):
     """This class implements a conference session, being the different parts
         in which the conference can be divided and the contributions can be
         organised in. The class contains necessary attributes to store session
@@ -5989,52 +5992,6 @@ class Session(CommonObjectBase):
         """
         return self.getConference()
 
-    def getLocation( self ):
-        if self.getOwnLocation():
-            return self.getOwnLocation()
-        return self.getInheritedLocation()
-
-    def getInheritedLocation(self):
-        return self.getLocationParent().getLocation()
-
-    def getOwnLocation( self ):
-        if len(self.places)>0:
-            return self.places[0]
-        return None
-
-    def setLocation( self, newLocation ):
-        if newLocation == None:
-            if len(self.places)>0:
-                del self.places[0]
-        elif len(self.places)>0:
-            self.places[0] = newLocation
-        else:
-            self.places.append( newLocation )
-        self.notifyModification()
-
-    def getRoom( self ):
-        if self.getOwnRoom():
-            return self.getOwnRoom()
-        return self.getInheritedRoom()
-
-    def getInheritedRoom(self):
-        return self.getLocationParent().getRoom()
-
-    def getOwnRoom( self ):
-        if len(self.rooms)>0:
-            return self.rooms[0]
-        return None
-
-    def setRoom( self, newRoom ):
-        if newRoom == None:
-            if len(self.rooms)>0:
-                del self.rooms[0]
-        elif len(self.rooms)>0:
-            self.rooms[0] = newRoom
-        else:
-            self.rooms.append( newRoom )
-        self.notifyModification()
-
     def getLocationList(self):
         """Method returning a list of "location" objects which contain the
             information about the different places the conference is gonna
@@ -6591,7 +6548,7 @@ class Session(CommonObjectBase):
         return cmp( s1, s2 )
     _cmpTitle=staticmethod(_cmpTitle)
 
-class SessionSlot(Persistent, Fossilizable):
+class SessionSlot(Persistent, Fossilizable, Locatable):
 
     fossilizes(ISessionSlotFossil)
 
@@ -7094,52 +7051,6 @@ class SessionSlot(Persistent, Fossilizable):
         """
         return self.session
 
-    def getLocation( self ):
-        if self.getOwnLocation():
-            return self.getOwnLocation()
-        return self.getInheritedLocation()
-
-    def getInheritedLocation(self):
-        return self.getLocationParent().getLocation()
-
-    def getOwnLocation( self ):
-        if len(self.places)>0:
-            return self.places[0]
-        return None
-
-    def setLocation( self, newLocation ):
-        if newLocation == None:
-            if len(self.places)>0:
-                del self.places[0]
-        elif len(self.places)>0:
-            self.places[0] = newLocation
-        else:
-            self.places.append( newLocation )
-        self.notifyModification()
-
-    def getRoom( self ):
-        if self.getOwnRoom():
-            return self.getOwnRoom()
-        return self.getInheritedRoom()
-
-    def getInheritedRoom(self):
-        return self.getLocationParent().getRoom()
-
-    def getOwnRoom( self ):
-        if len(self.rooms)>0:
-            return self.rooms[0]
-        return None
-
-    def setRoom( self, newRoom ):
-        if newRoom == None:
-            if len(self.rooms)>0:
-                del self.rooms[0]
-        elif len(self.rooms)>0:
-            self.rooms[0] = newRoom
-        else:
-            self.rooms.append( newRoom )
-        self.notifyModification()
-
     def delete(self):
         self.getSchedule().clear()
         if self.getSession() is not None:
@@ -7631,7 +7542,7 @@ class _PrimAuthIdx(_AuthIdx):
             for auth in contrib.getPrimaryAuthorList():
                 self.index(auth)
 
-class Contribution(CommonObjectBase):
+class Contribution(CommonObjectBase, Locatable):
     """This class implements a conference contribution, being the concrete
         contributes of the conference participants. The class contains
         necessary attributes to store contribution basic meta data and provides
@@ -8206,34 +8117,22 @@ class Contribution(CommonObjectBase):
             return self.getSchEntry().getSchedule().getOwner()
         return self.getOwner()
 
-    def getLocation( self ):
-        if self.getOwnLocation():
-            return self.getOwnLocation()
-        return self.getInheritedLocation()
-
-    def getInheritedLocation(self):
-        return self.getLocationParent().getLocation()
-
     def getOwnLocation( self ):
         return self.place
 
     def setLocation( self, newLocation ):
+        oldLocation = self.place
         self.place = newLocation
+        self._notify('locationChanged', oldLocation, newLocation)
         self.notifyModification()
-
-    def getRoom( self ):
-        if self.getOwnRoom():
-            return self.getOwnRoom()
-        return self.getInheritedRoom()
-
-    def getInheritedRoom(self):
-        return self.getLocationParent().getRoom()
 
     def getOwnRoom( self ):
         return self.room
 
     def setRoom( self, newRoom ):
+        oldRoom = self.room
         self.room = newRoom
+        self._notify('roomChanged', oldRoom, newRoom)
         self.notifyModification()
 
     def setBoardNumber(self,newBoardNum):
@@ -9835,7 +9734,7 @@ class SubContribParticipation(Persistent, Fossilizable):
             res = "%s%s."%(res, self.getFirstName()[0].upper())
         return res
 
-class SubContribution(CommonObjectBase):
+class SubContribution(CommonObjectBase, Locatable):
     """
     """
 
