@@ -22,7 +22,7 @@
                 <table>
                     <tr>
                         <td valign="top">
-                            <input type="radio" name="locationAction" value="inherit" <%= defaultInheritPlace %>><%= _("Same as for the %(parentType)s:")%> <i><small><%= confPlace %></small></i>
+                            <input type="radio" name="locationAction" value="inherit" <%= defaultInheritPlace %>><%= _("Same as for the %s:") % parentType %> <i><small><%= confPlace %></small></i>
                         </td>
                     </tr>
                     <tr>

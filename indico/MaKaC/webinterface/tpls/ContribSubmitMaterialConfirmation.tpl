@@ -26,7 +26,7 @@
                                 border-left:1px solid red;
                                 border-right:1px solid red;
                                 border-bottom:1px solid red">
-                        <%= _("You have selected to submit as %(matTypeCaption)s material the file")%>:
+                        <%= _("You have selected to submit as %s material the file")%matTypeCaption %>:
                         <ul>
                             <li><i><%= selFileName %></i> (<%= selFileSize %>)</li>
                         </ul>

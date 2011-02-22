@@ -10,10 +10,10 @@
                         <br>
                         <b><%= _("Congratulations!!!")%></b> <%= _("You have successfully created your Indico account.")%><br><br>
                         <%= however %>
-                         <%= _("Once your account is activated you can <a href=%(signInURL)s>log in</a> and start using the system.")%><br>
+                         <%= _("Once your account is activated you can <a href=%s>log in</a> and start using the system.")%signInURL %><br>
                         <br>
                         <br>
-                         <%= _("""If you don't receive this email or you have any trouble with the login, do not hesitate to <a href="mailto:%(supportAddr)s">contact us""")%></a>.
+                         <%= _("""If you don't receive this email or you have any trouble with the login, do not hesitate to <a href="mailto:%s">contact us""")%supportAddr %></a>.
                     </td><td width="10"></td></tr></table>
                 </td></tr></table>
             </td>

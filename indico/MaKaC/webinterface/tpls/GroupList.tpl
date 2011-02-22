@@ -6,7 +6,7 @@
 </tr>
 <tr>
   <td></td>
-  <td class="blacktext"><em><%= _("The database currently hosts %(nbGroups)s groups.")%></em></td>
+  <td class="blacktext"><em><%= _("The database currently hosts %s groups.")%nbGroups %></em></td>
 </tr>
 <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Tools")%></span></td>

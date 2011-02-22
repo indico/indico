@@ -9,10 +9,10 @@
         <td align="left" bgcolor="white">
             <%= _("""Offline website request received.
             Shortly, you will receive an email notifying you that the offline website is completed.
-            Please, do not apply for the creation serveral times. Thank you for your patience, 
+            Please, do not apply for the creation serveral times. Thank you for your patience,
             please wait for the result.
-            If you have any doubts you can contact <a href="mailto:%(supportAddr)s" enctype="text/plain">Indico support</a>.""")%>
+            If you have any doubts you can contact <a href="mailto:%s" enctype="text/plain">Indico support</a>.""")%supportAddr %>
         </td>
     </tr>
-   
+
 </table>

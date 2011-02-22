@@ -4,7 +4,7 @@
 </tr>
 <tr>
   <td>&nbsp;</td>
-  <td class="blacktext"><em><%= _("The database currently hosts %(nbUsers)s users.")%></em></td>
+  <td class="blacktext"><em><%= _("The database currently hosts %s users.") % nbUsers%></em></td>
 </tr>
 <tr>
   <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Tools")%></span></td>

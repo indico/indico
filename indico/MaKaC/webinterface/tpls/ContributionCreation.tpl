@@ -7,7 +7,7 @@
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%<</span></td>
             <td bgcolor="white" width="100%%">&nbsp;
-			<input type="text" name="title" size="80" value="%(title)s"></td>
+			<input type="text" name="title" size="80" value="<%= title %>"></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
@@ -26,7 +26,7 @@
                 <table>
                     <tr>
                         <td valign="top">
-                            <input type="radio" name="locationAction" value="inherit" %(defaultInheritPlace)s> <%= _("Same as for the")%> <%= parentType %>: <i><small><%= confPlace %></small></i>
+                            <input type="radio" name="locationAction" value="inherit" <%= defaultInheritPlace %>> <%= _("Same as for the")%> <%= parentType %>: <i><small><%= confPlace %></small></i>
                         </td>
                     </tr>
                     <tr>
