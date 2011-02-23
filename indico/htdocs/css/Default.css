@@ -6430,6 +6430,18 @@ div.invalid {
     color: gray;
 }
 
+.regFormSubtotal{
+    background: #ECECEC;
+    margin-left: 10px;
+    padding: 2px;
+}
+
+.regFormPrice{
+}
+
+.regFormNumberCaption {
+}
+
 /*
     Used to display scroll bar in CKEditor properly.
 */

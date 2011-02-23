@@ -1490,11 +1490,11 @@ class NumberInput(FieldInputType):
             onkeyup = """
                 onkeyup="$E('subtotal-%s').dom.innerHTML = ((isNaN(parseInt(this.value, 10)) || parseInt(this.value, 10) < 0) ? 0 : parseInt(this.value, 10)) * %s;"
             """ % (htmlName, price)
-        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s %s />&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, onkeyup, disable, length, caption, param)
+        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s %s />&nbsp;&nbsp;<span class="regFormNumberCaption">%s</span> %s""" % (htmlName, htmlName, v, onkeyup, disable, length, caption, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             subTotal = (float(price)*int(v) or 0)
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s (Total: <span id="subtotal-%s">%s</span>&nbsp;%s)</td> """%(tmp,price,currency,htmlName,subTotal,currency)
+            tmp= """%s&nbsp;&nbsp;<span class="regFormPrice">%s&nbsp;%s</span><span class="regFormSubtotal">Total: <span id="subtotal-%s">%s</span>&nbsp;%s</span></td> """%(tmp,price,currency,htmlName,subTotal,currency)
         else:
             tmp= """%s </td> """%tmp
         if description:
