@@ -6420,6 +6420,16 @@ div.invalid {
     width: 7px;
 }
 
+.regSection {
+    border-left: 1px solid #777777;
+    border-top: 1px solid #777777;"
+}
+
+.regSectionBackground{
+    background: #E5E5E5;
+    color: gray;
+}
+
 /*
     Used to display scroll bar in CKEditor properly.
 */
