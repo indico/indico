@@ -286,6 +286,8 @@ def _findApacheUserGroup(uid, gid):
                     print "\nERROR: Invalid user/group pair (%s/%s)" % (accessuser, accessgroup)
 
         return accessuser, accessgroup
+    else: #for windows
+        return "apache", "apache"
 
 
 def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=None, accessgroup=None):
