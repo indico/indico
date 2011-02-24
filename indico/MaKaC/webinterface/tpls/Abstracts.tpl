@@ -227,11 +227,11 @@ document.filterOptionForm.showSubmissionDate.checked=false
     </tr>
     <% if (totalNumberAbstracts == "0"): %>
     <tr>
-        <td style="padding:5px 0px 5px 10px;"><span class="collShowBookingsText"><%=_("There are no abstracts submitted yet")%></span></td>
+        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText"><%=_("There are no abstracts submitted yet")%></span></td>
     </tr>
     <% end %>
     <% elif (filteredNumberAbstracts == "0"): %>
-        <td style="padding:5px 0px 5px 10px;"><span class="collShowBookingsText"><%=_("There are no abstracts with the filters criteria selected")%></span></td>
+        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText"><%=_("There are no abstracts with the filters criteria selected")%></span></td>
     <% end %>
     <% else: %>
         <tr>

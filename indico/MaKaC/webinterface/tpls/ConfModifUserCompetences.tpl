@@ -10,7 +10,7 @@
 <table class="Revtab" width="90%%" cellspacing="0" align="left" border="0" style="padding-left:2px; padding-top: 10px;">
     <tr>
         <td nowrap class="groupTitle" colspan=5>
-            <%= _("Paper Reviewing Team competences")%>
+            <%= _("Team competences")%>
             <span id="competencesHelp"></span>
         </td>
     </tr>
@@ -46,7 +46,7 @@
     <% end %>
     <% end %>
     <tr><td colspan=5 style="padding-top: 15px;">
-       <em><%= _("To assign contributions for paper reviewing, please click on ") %><a href="<%=urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(ConfReview.getConference())%>"><%= _("Assign Contributions")%></a></em>
+       <em><%= _("Once this step is done you may want to assign papers to review. Please click on the next tab ") %><a href="<%=urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(ConfReview.getConference())%>"><%= _("Assign Papers")%></a><%= _(" to continue the process.")%></em>
    </td></tr>
 </table>
 

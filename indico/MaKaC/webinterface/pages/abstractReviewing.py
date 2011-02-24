@@ -78,7 +78,7 @@ class WAbstractReviewingTeam(wcomponents.WTemplated):
         for track in self._conf.getTrackList():
             trackIdsList.append(track.getId())
             coordinatorsByTrack[track.getId()] = track.getCoordinatorList()
-        vars["conf"] = self._conf.getId()
+        vars["conf"] = self._conf
         vars["trackIds"] = trackIdsList
         vars["coordinatorsByTrack"] = coordinatorsByTrack
         return vars

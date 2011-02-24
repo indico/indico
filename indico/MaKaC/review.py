@@ -1333,7 +1333,7 @@ class Abstract(Persistent):
 
         for trl in self._trackReallocations.values() :
             for newtrack in conference.getTrackList():
-                if newTrack.getTitle() == trl.getTrack().getTitle() :
+                if newtrack.getTitle() == trl.getTrack().getTitle() :
                     newtrl = trl.clone(newtrack)
                     abs._addTrackReallocation(newtrl)
                     abs._addTrackJudgementToHistorical(newtrl)
@@ -2022,6 +2022,8 @@ class Abstract(Persistent):
         jud = AbstractAcceptance( track, responsible, contribType, answers )
         jud.setComment( comment )
         self._addTrackAcceptance( jud )
+        # Update the rating of the abstract
+        self.updateRating()
         #We trigger the state transition
         self.getCurrentStatus().proposeToAccept()
 
@@ -2041,6 +2043,8 @@ class Abstract(Persistent):
         jud = AbstractRejection( track, responsible, answers )
         jud.setComment( comment )
         self._addTrackRejection( jud )
+        # Update the rating of the abstract
+        self.updateRating()
         #We trigger the state transition
         self.getCurrentStatus().proposeToReject()
 
@@ -2324,7 +2328,11 @@ class Abstract(Persistent):
 
     # Rating methods
     def getRating(self):
-        '''Get the average rating of the abstract which is calculated with the average of each judgement '''
+        ''' Get the average rating of the abstract '''
+        return self._rating
+
+    def updateRating(self):
+        '''Update the average rating of the abstract which is calculated with the average of each judgement '''
         self._rating = None
         # calculate the total valoration
         judNum = 0
@@ -2337,7 +2345,6 @@ class Abstract(Persistent):
         # Calculate the average
         if judNum != 0:
             self._rating = "%.2f" % (ratingSum/judNum)
-        return self._rating
 
     def getQuestionsAverage(self):
         '''Get the list of questions answered in the reviews for an abstract '''
@@ -2484,6 +2491,10 @@ class AbstractJudgement( Persistent ):
         for ans in self._answers:
             if ans.getQuestion().getId() == questionId:
                 self._answers.remove(ans)
+                self._notifyModification()
+
+    def _notifyModification(self):
+        self._p_changed = 1
 
 
 class AbstractAcceptance( AbstractJudgement ):

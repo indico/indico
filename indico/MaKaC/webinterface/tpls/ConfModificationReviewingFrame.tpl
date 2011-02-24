@@ -3,6 +3,7 @@
 
 
 <table width="90%" align="left" border="0">
+    <tbody>
     <tr>
         <td id="revControlRefereeEditorReviewerHelp"  colspan="3" class="groupTitle"  style="padding-top: 10px;">
             <%= _("Step 2 - Assign Reviewers")%>
@@ -27,9 +28,11 @@
         </td>
     </tr>
     <tr>
+    </tbody>
 </table>
-
-<table align="left" border="0" style="padding-left:20px;">
+<tr><td>
+<table align="left" border="0" width="60%" style="padding-left:20px;">
+<tbody>
 <% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
 <% pass %>
 <% end %>
@@ -251,9 +254,11 @@
 
     <tr><td style="padding-top: 15px;"></td></tr>
     <tr><td colspan="5" style="padding-top: 15px;">
-     <em><%= _("You can define paper reviewers competences by clicking on ") %><a href="<%=urlHandlers.UHConfModifUserCompetences.getURL(ConfReview.getConference())%>"><%= _("Competences")%></a></em>
+     <em><%= _("Once this step is done you may want to assign competences for the members of the team. Please click on the next tab ") %><a href="<%=urlHandlers.UHConfModifUserCompetences.getURL(ConfReview.getConference())%>"><%= _("Competences")%></a><%= _(" to continue the process.")%></em>
         </td>
     </tr>
+    </tbody>
 </table>
+</td></tr>
 <% end %>
 <br>

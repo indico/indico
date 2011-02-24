@@ -9,7 +9,7 @@
 <% end %>
 <% else: %>
 <% if len(Conference.getContributionListSortedById()) == 0: %>
-<p style="padding-left: 25px;"><font color="gray"><%= _("There are no contributions to assign.")%></font></p>
+<p style="padding-left: 25px;"><font color="gray"><%= _("There are no papers to assign.")%></font></p>
 <% end %>
 <%else:%>
 <table style="margin-left:20px;">
@@ -24,7 +24,9 @@
             <div id="showHideFilteringHelp" style="padding-top:30px;"><div id="showHideFiltering" style="display:inline"></div></div>
         </td>
         <td align="bottom" style="padding-left:10px; padding-top:27px;">
-           <div><%= _("Displaying  ")%><span id="contributionsToShow" style="font-size:15px; font-weight: bold;"></span></div>
+           <div><%= _("Displaying  ")%><span id="contributionsToShow" style="font-size:15px; font-weight: bold;"></span>
+                <span id="contributionText"></span>
+           </div>
         </td>
         <td align="bottom" style="padding-top:27px;">
             <div id="totalContributions" style="display:none;"><span><%=_("  ( Total:  ")%></span><span style="font-size:15px; font-weight: bold;"><%= len(Conference.getContributionListSortedById()) %></span>
@@ -211,6 +213,14 @@
         </tr>
         <tr>
             <td colspan="8" style="border-bottom: 1px solid grey"></td>
+        </tr>
+        <tr>
+            <td id="noFilteredContribution" colspan="8" style="padding:15px 0px 15px 15px; display:none;">
+                <span><%= _("There are no papers with the selected filters criteria.")%></span>
+                <% if IsOnlyReferee: %>
+                    <span><%= _("It is also possible you do not have any assigned paper for the review yet.")%></span>
+                <% end %>
+            </td>
         </tr>
     </thead>
 
@@ -1152,7 +1162,6 @@ var fetchContributions = function() {
     } else {
         $E('resetFilters').dom.style.display = 'none';
     }
-    //alert(appliedFilter);
 
     contributions.clear();
     contributionsIndexes = []
@@ -1179,11 +1188,16 @@ var fetchContributions = function() {
                     contributionsIndexes[c.id] = i;
                 }
                 $E('contributionsToShow').dom.innerHTML = result.length;
-                var totalContributions = <%= len(Conference.getContributionListSortedById()) %>;
-                if (totalContributions == result.length) {
-                    $E('totalContributions').dom.style.display = 'none';
+                if (result.length == 0) {
+                    $E('noFilteredContribution').dom.style.display = '';
+                }
+                else {
+                    $E('noFilteredContribution').dom.style.display = 'none';
+                }
+                if (result.length == 1) {
+                    $E('contributionText').dom.innerHTML = $T('paper');
                 } else {
-                    $E('totalContributions').dom.style.display = '';
+                    $E('contributionText').dom.innerHTML = $T('papers');
                 }
             } else {
                 IndicoUtil.errorReport(error);
@@ -1586,7 +1600,10 @@ $E('filteringTable').dom.style.display = 'none';
 
 bind.element($E("tablebody"), contributions, contributionTemplate);
 
-$E('btnReset').observeClick(function(){window.location = "<%= urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(Conference) %>";});
+$E('btnReset').observeClick(function(){
+    window.location = "<%= urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(Conference) %>";
+    $E('totalContributions').dom.style.display = 'none';
+});
 
 var appliedFilter = false;
 
@@ -1595,6 +1612,9 @@ $E('applyFilter').observeClick(function(){
 	buildShowHideFiltering();
     appliedFilter = true;
     fetchContributions();
+    <% if not IsOnlyReferee: %>
+        $E('totalContributions').dom.style.display = '';
+    <% end %>
 });
 
 <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>

@@ -410,7 +410,7 @@
     </tr>
     <tr><td style="padding-bottom:15px;"></td></tr>
         <tr><td colspan="5" style="padding-top: 20px;">
-            <em><%= _("To assign team for Paper Review Module, please click on ") %><a href="<%=urlHandlers.UHConfModifReviewingControl.getURL(ConfReview.getConference())%>"><%= _("Team")%></a><%= _(" and follow the steps")%></em>
+            <em><%= _("Once this step is done you may want to assign the team for paper reviewing. Please click on the next tab ") %><a href="<%=urlHandlers.UHConfModifReviewingControl.getURL(ConfReview.getConference())%>"><%= _("Team")%></a><%= _(" and follow the steps")%></em>
         </td></tr>
 </table>
 </form>

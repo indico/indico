@@ -2,6 +2,7 @@
 <% from MaKaC.common.fossilize import fossilize %>
 
 <table width="90%" align="left" border="0" style="padding-top:10px;">
+    <tbody>
     <tr>
         <td id="revControlPRMHelp"  colspan="3" class="groupTitle"><%= _("Step 1 - Assign managers of paper reviewing")%></td>
     </tr>
@@ -15,8 +16,11 @@
             <% end %>
         </td>
     </tr>
+    </tbody>
 </table>
-<table style="padding-left:20px; width:570px;">
+<tr><td>
+<table width="60%" style="padding-left:20px;">
+    <tbody>
     <tr>
         <td class="subGroupTitle"><%= _("Managers") %></td>
     </tr>
@@ -28,7 +32,9 @@
     <tr>
         <td width="80%" style="padding-top: 5px; padding-left:3px;"><div id="PRMList"></div></td>
     </tr>
+    </tbody>
 </table>
+</td></tr>
 <br>
 
 <script type="text/javascript">

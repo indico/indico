@@ -62,7 +62,7 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
 
 
         if self._showAssignContributions:
-            self._tabAssignContributions = self._tabCtrl.newTab( "assignContributions", "Assign Contributions",\
+            self._tabAssignContributions = self._tabCtrl.newTab( "assignContributions", "Assign papers",\
                     urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
 
         if self._showListContribToJudge and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
@@ -343,7 +343,7 @@ class WConfModifReviewingControl(wcomponents.WTemplated):
                                                 params["addReviewerURL"], \
                                                 params["removeReviewerURL"])
 
-            return """<table width="100%%" class="Revtab"><tr><td>%s%s</td></tr></table>"""%(rcPRM, rc)
+            return """<table width="100%%" class="Revtab"><tr><td>%s</td></tr><tr><td>%s</td></tr></table>"""%(rcPRM, rc)
 
 
 class WConfModificationReviewingFramePRM(wcomponents.WTemplated):

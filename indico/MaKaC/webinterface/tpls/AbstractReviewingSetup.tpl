@@ -7,7 +7,7 @@
 <table style="padding-left: 20px;">
     <tr>
         <td class="subGroupTitle" colspan="3"><%= _("Add the questions that the abstract reviewers must answer")%>
-        <% inlineContextHelp(_('The questions you add here will be show to the reviewers when they propose to accept/reject an abstract.')) %></td>
+        <% inlineContextHelp(_('The questions you add here will be shown to the reviewers when they propose to accept/reject an abstract.')) %></td>
     </tr>
     <tr>
         <td>

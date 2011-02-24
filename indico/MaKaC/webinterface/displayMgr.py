@@ -879,7 +879,7 @@ class SystemLinkData(Observable):
                 "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "assigncontributions": { \
-                "caption": _("Assign contributions"), \
+                "caption": _("Assign papers"), \
                 "URL": str(str(urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(conf))), \
                 "staticURL": "", \
                 "parent": "paperreviewing"}, \

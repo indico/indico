@@ -218,7 +218,7 @@ class GetReviewingMaterial(GetMaterialClassesBase):
         matList = {}
 
         rev = self._target.getReviewing()
-        if (rev != None):
+        if (rev != None and len(rev._Material__resources) != 0):
             matList[rev.getId()] = rev.fossilize(IMaterialFossil)
 
         return matList

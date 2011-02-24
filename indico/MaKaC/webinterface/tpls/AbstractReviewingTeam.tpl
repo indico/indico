@@ -1,5 +1,6 @@
 <% declareTemplate(newTemplateStyle=True) %>
 <% from MaKaC.common.fossilize import fossilize %>
+<% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <table width="90%" align="left" border="0" style="padding-top:10px;">
     <tr>
         <td id="revControlPRMHelp"  colspan="3" class="groupTitle"><%= _("Assign reviewers by track")%></td>
@@ -11,7 +12,7 @@
                     <span class="collShowBookingsText"><%=_("Note that the reviewers will be track coordinators of that track.")%></span>
                 <% end %>
                 <% else: %>
-                    <span class="collShowBookingsText"><%=_("There are no tracks created yet")%></span>
+                    <span class="collShowBookingsText"><%=_("There are no tracks created yet. Please go to the menu ")%><a href="<%= urlHandlers.UHConfModifProgram.getURL(conf) %>"><%= _("Programme")%></a><%=_(" to create tracks.")%></span>
                 <% end %>
             </div>
         </td>
@@ -49,7 +50,7 @@ var listOfAddHandlers = {};
         indicoRequest(
                 'abstractReviewing.team.addReviewer',
                 {
-                    conference: '<%= conf %>',
+                    conference: '<%= conf.getId() %>',
                     track: '<%= i %>',
                     user: user[0]['id']
                 },
@@ -68,7 +69,7 @@ var listOfAddHandlers = {};
     	indicoRequest(
                 'abstractReviewing.team.removeReviewer',
                 {
-                    conference: '<%= conf %>',
+                    conference: '<%= conf.getId() %>',
                     track: '<%= i %>',
                     user: user.get('id')
                 },

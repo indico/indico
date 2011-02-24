@@ -1,4 +1,4 @@
-<table width="90%" align="left" border="0">
+<table width="90%" align="left" border="0" style="padding-top:15px;">
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Additional text")%></span></td>
         <td bgcolor="white" class="blacktext"><%= text %></td>

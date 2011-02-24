@@ -150,23 +150,12 @@
                                         <% display = 'table' %>
                                     <% end %>
                                 <% end %>
-                                <tr>
-                                <td>&nbsp;</td>
-                                        <td colspan="2" align="left">
-                                            <form action="<%=urlHandlers.UHContributionRemoveSubmittedMarkForReviewing.getURL(Contribution)%>" method="POST" style="display:<%=display%>">
-                                                <input type="submit" class="btn" value="UNDO sending" >
-                                                <% inlineContextHelp(_('Press this button only if you made some mistake when submitting the materials.The reviewing team will be notified and the reviewing process will be stopped until you mark the materials as submitted again')) %>
-                                            </form>
-                                        </td>
-                                </tr>
                           <% end %>
                           <% else: %>
                             <tr>
                                 <td></td>
                                 <td>
-                                    <div id="reviewingWarning">
-                                        <span class="collaborationWarning">You must send the reviewing material to start the reviewing process</span>
-                                    </div>
+
                                 </td>
                             </tr>
                           <% end %>

@@ -1,5 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
+<div id="showStep1" class="groupTitleSmallPaper"><span><%= _("Step 1 - Upload paper") %></span></div>
 <%= existingMaterialsTitle %>
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>
@@ -9,10 +10,14 @@
 <% else: %>
     <% display = 'form' %>
 <% end %>
+<div id="showStep2" class="groupTitleSmallPaper"><span><%= _("Step 2 - Submit the paper") %></span></div>
 <form id="SendBtnForm" action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(self._target)%>" method="POST" style="disabled:true; display:<%=display%>">
-    <input id="SendBtn" type="submit" class="btn" value="Send" disabled="disabled" style="display:<%=display%>">
+    <div id="reviewingWarning" style="padding-bottom:3px; padding-left:3px;">
+        <span class="collaborationWarning">Note that you cannot modify the reviewing materials after submitting them.</span>
+    </div>
+    <input id="SendBtn" type="submit" class="btn" value="Submit" disabled="disabled" style="display:<%=display%>">
     <span id="SendHelp" style="display:<%=display%>">
-        <% inlineContextHelp(_('First you should add the materials and then by clicking on this button you will send them for reviewing. They will be locked until the end of the process')) %>
+        <% inlineContextHelp(_('First you should add the materials and then by clicking on this button you will submit them for reviewing. They will be locked until the end of the process')) %>
     </span>
 </form>
 <script type="text/javascript">
@@ -32,7 +37,12 @@ var args = {
     var visibility = '';
      <% if  self._target.getConference().getConfPaperReview().getChoice() == 3: %>
         <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
-            visibility = 'visible';
+            <% if showSendButton: %>
+                visibility = 'visible';
+            <% end %>
+            <% else: %>
+                visibility = 'hidden';
+            <% end %>
         <% end %>
         <% else: %>
             visibility = 'hidden';
@@ -40,7 +50,12 @@ var args = {
     <% end %>
     <% if self._target.getConference().getConfPaperReview().getChoice() == 2: %>
         <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
-            visibility = 'visible';
+            <% if showSendButton: %>
+                visibility = 'visible';
+            <% end %>
+            <% else: %>
+                visibility = 'hidden';
+            <% end %>
         <% end %>
         <% else: %>
             visibility = 'hidden';
@@ -48,7 +63,12 @@ var args = {
     <% end %>
     <% if  self._target.getConference().getConfPaperReview().getChoice() == 4: %>
         <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>
-            visibility = 'visible';
+            <% if showSendButton: %>
+                visibility = 'visible';
+            <% end %>
+            <% else: %>
+                visibility = 'hidden';
+            <% end %>
         <% end %>
         <% else: %>
             visibility = 'hidden';
@@ -69,5 +89,13 @@ $E('reviewingMaterialListPlace').set(mlist.draw());
 <% else: %>
     $E('SendBtnForm').dom.style.display = 'none';
 <% end %>
+
+if (visibility == 'visible') {
+    $E('showStep1').dom.style.display = '';
+    $E('showStep2').dom.style.display = '';
+} else {
+    $E('showStep1').dom.style.display = 'none';
+    $E('showStep2').dom.style.display = 'none';
+}
 
 </script>

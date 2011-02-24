@@ -6,7 +6,7 @@
     </tr>
     <tr>
         <td style="padding-top:5px; padding-left:5px;">
-            <span class="collShowBookingsText"><%= _("Add the templates for the emails which will be sent to the primary authors or submitters.")%></em>
+            <span class="collShowBookingsText"><%= _("Add the templates for the emails which will be sent to the primary authors or submitters when their abstracts change the status to Accepted, Rejected or Merged.")%></em>
         </td>
     </tr>
     <tr>
