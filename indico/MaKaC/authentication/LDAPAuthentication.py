@@ -51,8 +51,11 @@ See indico.conf for information about customization options.
 """
 
 # python-ldap
-import ldap
-import ldap.filter
+try:
+    import ldap
+    import ldap.filter
+except:
+    pass
 
 # legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
