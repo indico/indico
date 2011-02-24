@@ -70,7 +70,8 @@
                     </script>
                 <% end %>
                 <% elif option.getType() == "links": %>
-                    <div id="links<%=name%>" style="margin-bottom: 10px;">
+                    <div id="links<%=name%>">
+                      <div id="linksContainer<%=name%>" style="margin-bottom: 10px;"></div>
                     </div>
                     <script type="text/javascript">
                         var addLinkText = $T('Add new link');
@@ -95,45 +96,52 @@
                             linkNameHeader = $T('Name');
                         <% end %>
 
-                        var numElements = <%= option.getValue() %>.length;
-                        if(numElements > 0){
-                            var linksBody = Html.tbody();
-                            var linksTable = Html.table({style:{border:"1px dashed #CCC"}}, linksBody);
-                            linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold", paddingRight:pixels(10)}}, linkNameHeader),
-                                                                                        Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('URL'))) );
-                            each(<%= option.getValue() %>, function(link){
-                                    var removeButton = Widget.link(command(function(){
-                                        var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing link..."));
-                                        indicoRequest(
-                                                'plugins.removeLink',
-                                            {
-                                                optionName: "<%= name %>",
-                                                name: link.name
-                                            },
-                                            function(result,error) {
-                                                if (!error){
-                                                    killProgress();
-                                                    window.location.reload();
+                        var renderLinkTable = function(table) {
+                            if(table.length > 0){
+                                var linksBody = Html.tbody();
+                                var linksTable = Html.table({style:{border:"1px dashed #CCC"}}, linksBody);
+                                linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold", paddingRight:pixels(10)}}, linkNameHeader),
+                                                                                            Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('URL'))) );
+                                each(table, function(link){
+                                        var removeButton = Widget.link(command(function(){
+                                            var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing link..."));
+                                            indicoRequest(
+                                                    'plugins.removeLink',
+                                                {
+                                                    optionName: "<%= name %>",
+                                                    name: link.name
+                                                },
+                                                function(result,error) {
+                                                    if (!error){
+                                                        killProgress();
+                                                        self.close();
+                                                        renderLinkTable(result.table);
+                                                    }
+                                                    else{
+                                                        killProgress();
+                                                        IndicoUtil.errorReport(error);
+                                                    }
                                                 }
-                                                else{
-                                                    killProgress();
-                                                    IndicoUtil.errorReport(error);
-                                                }
-                                            }
-                                        );
-                                    }, IndicoUI.Buttons.removeButton()));
-                                    var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(20)}},link.name),
-                                                                                           Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(10)}},link.structure),
-                                                                                           Html.td({style:{whiteSpace: "nowrap"}},removeButton))
-                                    linksBody.append(newRow);
+                                            );
+                                        }, IndicoUI.Buttons.removeButton()));
+                                        var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(20)}},link.name),
+                                                                                               Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(10)}},link.structure),
+                                                                                               Html.td({style:{whiteSpace: "nowrap"}},removeButton));
+                                        linksBody.append(newRow);
 
 
-                                });
-                                $E('links<%=name%>').append(linksTable);
-                        }
-                        else{
-                            $E('links<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, noLinksMsg));
-                        }
+                                    });
+                                    $E('linksContainer<%=name%>').clear();
+                                    $E('linksContainer<%=name%>').append(linksTable);
+                            }
+                            else{
+                                $E('linksContainer<%=name%>').clear();
+                                $E('linksContainer<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, noLinksMsg));
+                            }
+                        };
+
+                        var optVal = <%= option.getValue() %>;
+                        renderLinkTable(optVal);
                         var addButton = Html.input("button", {style:{marginTop: pixels(5)}}, addLinkText);
 
                         addButton.observeClick(function() {
@@ -159,17 +167,17 @@
                                                                                         structure: linkStructure.dom.value
                                                                                     },
                                                                                     function(result,error) {
-                                                                                        if (!error && result) {
+                                                                                        if (!error && result.success) {
                                                                                             killProgress();
-                                                                                            self.close();
-                                                                                            window.location.reload();
-                                                                                        } else if(!error && !result){
+                                                                                            linksPopup.close();
+                                                                                            renderLinkTable(result.table);
+                                                                                        } else if(!error && !result.success){
                                                                                             killProgress();
                                                                                             linkName.startWatching(true);
                                                                                         }
                                                                                         else{
                                                                                             killProgress();
-                                                                                            self.close();
+                                                                                            linksPopup.close();
                                                                                             IndicoUtil.errorReport(error);
                                                                                         }
                                                                                     }
