@@ -1564,7 +1564,8 @@ class RHRoomBookingSaveRoom( RHRoomBookingAdminBase ):
     """
 
     def _uploadPhotos( self, candRoom, params ):
-        if params.get( "largePhotoPath" ) and params.get( "smallPhotoPath" ):
+        if (params.get( "largePhotoPath" ) and params.get( "smallPhotoPath" )
+            and params["largePhotoPath"].filename and params["smallPhotoPath"].filename):
             candRoom.savePhoto( params["largePhotoPath"] )
             candRoom.saveSmallPhoto( params["smallPhotoPath"] )
 
