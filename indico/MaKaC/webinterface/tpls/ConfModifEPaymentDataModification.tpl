@@ -30,15 +30,15 @@ if al.isAdmin( self._rh._getUser() ):
         <tr>
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat"><%= _("Payment Summary Email Message")%></span></td>
             <td align="left">
-                <%=_("Currently this email is")%> <strong>%(receiptMsgPaymentEnabled)s</strong> (<%=_("You can change this in the")%> <a href="%(dataModificationURL)s"><%=_("registration form setup")%></a>)<br>
-                <textarea name="receiptMsgPayment" rows="6" cols="60">%(receiptMsgPayment)s</textarea>
+                <%=_("Currently this email is")%> <strong><%= receiptMsgPaymentEnabled %></strong> (<%=_("You can change this in the")%> <a href="<%= dataModificationURL %>"><%=_("registration form setup")%></a>)<br>
+                <textarea name="receiptMsgPayment" rows="6" cols="60"><%= receiptMsgPayment %></textarea>
             </td>
         </tr>
         <tr>
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat"><%= _("Success Email Message")%></span></td>
             <td align="left">
-                <%=_("Currently this email is")%> <strong>%(successMsgPaymentEnabled)s</strong> (<%=_("You can change this in the")%> <a href="%(dataModificationURL)s"><%=_("registration form setup")%></a>)<br>
-                <textarea name="successMsgPayment" rows="6" cols="60">%(successMsgPayment)s</textarea>
+                <%=_("Currently this email is")%> <strong><%= successMsgPaymentEnabled %></strong> (<%=_("You can change this in the")%> <a href="<%= dataModificationURL %>"><%=_("registration form setup")%></a>)<br>
+                <textarea name="successMsgPayment" rows="6" cols="60"><%= successMsgPayment %></textarea>
             </td>
         </tr>
 		<tr><td>&nbsp;</td></tr>

@@ -86,14 +86,14 @@
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Email notification sender address")%></span></td>
-      <td bgcolor="white" width="100%%"><input type="text" size="50" name="notificationSender" value="<%= notificationSender %>"></td>
+      <td bgcolor="white" width="100%"><input type="text" size="50" name="notificationSender" value="<%= notificationSender %>"></td>
     </tr>
     <tr>
       <td nowrap class="titleCellTD">
         <span class="titleCellFormat"> <%= _("Email organisators")%></span><br>
         <span class="smallLabel"><%= _("(on new registrations)")%></span>
       </td>
-      <td bgcolor="white" width="100%%">
+      <td bgcolor="white" width="100%">
         <table align="left">
         <tr>
           <td align="right">
@@ -116,16 +116,16 @@
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Email registrant...")%></span></td>
-      <td bgcolor="white" width="100%%">
-        <input type="checkbox" size="50" name="sendRegEmail" id="sendRegEmail" %(sendRegEmail)s>
+      <td bgcolor="white" width="100%">
+        <input type="checkbox" size="50" name="sendRegEmail" id="sendRegEmail" <%= sendRegEmail %>>
         <label for="sendRegEmail"><strong><%= _("...after registration")%></strong></label>
         <br>
 
-        <input type="checkbox" size="50" name="sendReceiptEmail" id="sendReceiptEmail" %(sendReceiptEmail)s>
+        <input type="checkbox" size="50" name="sendReceiptEmail" id="sendReceiptEmail" <%= sendReceiptEmail %>>
         <label for="sendReceiptEmail"><strong><%= _("...with a payment summary")%></strong></label>
         <br>
 
-        <input type="checkbox" size="50" name="sendPaidEmail" id="sendPaidEmail" %(sendPaidEmail)s>
+        <input type="checkbox" size="50" name="sendPaidEmail" id="sendPaidEmail" <%= sendPaidEmail %>>
         <label for="sendPaidEmail"><strong><%= _("...after successful payment")%></strong></label>
       </td>
     </tr>

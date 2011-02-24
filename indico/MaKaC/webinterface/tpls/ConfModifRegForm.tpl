@@ -67,7 +67,7 @@
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification sender address")%></span></td>
     <td class="blacktext">
-      %(notificationSender)s
+      <%= notificationSender %>
     </td>
   </tr>
   <tr>
@@ -78,20 +78,20 @@
   </tr>
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email registrant")%></span></td>
-    <td bgcolor="white" width="100%%">
+    <td bgcolor="white" width="100%">
       <% if activated: %>
       <table>
         <tr>
           <td align="right"><strong><%= _("After registration")%></strong>:</td>
-          <td>%(sendRegEmail)s</td>
+          <td><%= sendRegEmail %></td>
         </tr>
         <tr>
           <td align="right"><strong><%= _("With a payment summary")%></strong>:</td>
-          <td>%(sendReceiptEmail)s</td>
+          <td><%= sendReceiptEmail %></td>
         </tr>
         <tr>
           <td align="right"><strong><%= _("After successful payment")%></strong>:</td>
-          <td>%(sendPaidEmail)s</td>
+          <td><%= sendPaidEmail %></td>
         </tr>
       </table>
       <% end %>
