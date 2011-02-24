@@ -597,7 +597,7 @@
 
           <tr id="webCastRow" style="display: none">
             <xsl:for-each select="./material">
-            <xsl:if test="./title = 'live webcast' or ./title = 'forthcoming webcast'">
+            <xsl:if test="(./title = 'live webcast' or ./title = 'forthcoming webcast') and ./displayURL != ''">
             <td class="leftCol">
               <xsl:if test="./title='live webcast'">
               Live Webcast
@@ -610,7 +610,7 @@
             </xsl:for-each>
             <td>
               <xsl:for-each select="./material">
-                <xsl:if test="./title = 'live webcast' or ./title = 'forthcoming webcast'">
+                <xsl:if test="(./title = 'live webcast' or ./title = 'forthcoming webcast') and ./displayURL != ''">
                   <!-- Show the table row containing info about the webcast -->
                   <xsl:text disable-output-escaping="yes">
                     <![CDATA[
@@ -622,7 +622,7 @@
                 </xsl:if>
 
 
-                <xsl:if test="./title='live webcast'">
+                <xsl:if test="./title='live webcast' and ./displayURL != ''">
                   <a href="{./displayURL}">
                     <strong>View the live webcast</strong>
                   </a>
@@ -631,7 +631,7 @@
                   </xsl:if>
                 </xsl:if>
 
-                <xsl:if test="./title='forthcoming webcast'">
+                <xsl:if test="./title='forthcoming webcast' and ./displayURL != ''">
                   Please note that this event will be available <em>live</em> via the
                   <a href="{./displayURL}">
                     <strong>Webcast Service</strong>.

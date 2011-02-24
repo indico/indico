@@ -167,6 +167,17 @@
             </div>
         </div>
         <div class="WRFormSubsection">
+            <span class="WRQuestion"><%=_("Please select the audience of the webcast:")%></span>
+            <div>
+                <select name="audience">
+                    <option value=""><%=_("Public")%></option>
+                    <% for audience in Audiences: %>
+                        <option><%= audience['name'] %></option>
+                    <% end %>
+                </select>
+            </div>
+        </div>
+        <div class="WRFormSubsection">
             <span class="WRQuestion"><%=_("Please write here additional comments about talk selection:")%></span>
             <div><input size="60" type="text" name="talkSelectionComments"></div>
         </div>

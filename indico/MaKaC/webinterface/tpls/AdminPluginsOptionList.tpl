@@ -71,64 +71,90 @@
                 <% end %>
                 <% elif option.getType() == "links": %>
                     <div id="links<%=name%>" style="margin-bottom: 10px;">
+                      <div id="linksContainer<%=name%>" style="margin-bottom: 10px;"></div>
                     </div>
                     <script type="text/javascript">
-                        var numElements = <%= option.getValue() %>.length;
-                        if(numElements > 0){
-                            var linksBody = Html.tbody();
-                            var linksTable = Html.table({style:{border:"1px dashed #CCC"}}, linksBody);
-                            linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold", paddingRight:pixels(10)}}, $T('Link name')),
-                                                                                        Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('URL'))) );
-                            each(<%= option.getValue() %>, function(link){
-                                    var removeButton = Widget.link(command(function(){
-                                        var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing link..."));
-                                        indicoRequest(
-                                                'plugins.removeLink',
-                                            {
-                                                optionName: "<%= name %>",
-                                                name: link.name
-                                            },
-                                            function(result,error) {
-                                                if (!error){
-                                                    killProgress();
-                                                    window.location.reload();
+                        var addLinkText = $T('Add new link');
+                        var noLinksMsg = $T('No links created yet. Click in Add new link if you want to do so!');
+                        var popupTitle = $T('Enter the name of the link and its URL');
+                        var linkNameLabel = $T('Link name');
+                        var linkNameHeader = $T('Link name');
+                        var info = '';
+                        var example = '';
+                        <% if option.getSubType() == 'instantMessaging': %>
+                            info = Html.ul({style: {fontWeight: "bold"}},$T('In the URL field, the following patterns will be changed:'),
+                                    Html.li({style: {fontWeight: "lighter"}},$T('[chatroom] by the chat room name')),
+                                    Html.li({style: {fontWeight: "lighter"}},$T('[host] by the specified host')),
+                                    Html.li({style: {fontWeight: "lighter"}},$T('[nickname] by the nick chosen by the user.')));
+                            example = $T('Example: http://[host]/resource/?x=[chatroom]@conference.[host]?join');
+                        <% end %>
+                        <% elif option.getSubType() == 'webcastAudiences': %>
+                            addLinkText = $T('Add new audience');
+                            noLinksMsg = $T('No audiences created yet. Click "Add new audience" to create one');
+                            popupTitle = $T('Enter the name of the audience and its URL');
+                            linkNameLabel = $T('Audience name');
+                            linkNameHeader = $T('Name');
+                        <% end %>
+
+                        var renderLinkTable = function(table) {
+                            if(table.length > 0){
+                                var linksBody = Html.tbody();
+                                var linksTable = Html.table({style:{border:"1px dashed #CCC"}}, linksBody);
+                                linksBody.append( Html.tr({style: {marginTop: pixels(10)}}, Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold", paddingRight:pixels(10)}}, linkNameHeader),
+                                                                                            Html.td({style:{whiteSpace: "nowrap", fontWeight:"bold"}}, $T('URL'))) );
+                                each(table, function(link){
+                                        var removeButton = Widget.link(command(function(){
+                                            var killProgress = IndicoUI.Dialogs.Util.progress($T("Removing link..."));
+                                            indicoRequest(
+                                                    'plugins.removeLink',
+                                                {
+                                                    optionName: "<%= name %>",
+                                                    name: link.name
+                                                },
+                                                function(result,error) {
+                                                    if (!error){
+                                                        killProgress();
+                                                        self.close();
+                                                        renderLinkTable(result.table);
+                                                    }
+                                                    else{
+                                                        killProgress();
+                                                        IndicoUtil.errorReport(error);
+                                                    }
                                                 }
-                                                else{
-                                                    killProgress();
-                                                    IndicoUtil.errorReport(error);
-                                                }
-                                            }
-                                        );
-                                    }, IndicoUI.Buttons.removeButton()));
-                                    var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(20)}},link.name),
-                                                                                           Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(10)}},link.structure),
-                                                                                           Html.td({style:{whiteSpace: "nowrap"}},removeButton))
-                                    linksBody.append(newRow);
+                                            );
+                                        }, IndicoUI.Buttons.removeButton()));
+                                        var newRow = Html.tr({style: {marginTop: pixels(10)}}, Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(20)}},link.name),
+                                                                                               Html.td({style: {marginRight: pixels(10), whiteSpace: "nowrap", paddingRight:pixels(10)}},link.structure),
+                                                                                               Html.td({style:{whiteSpace: "nowrap"}},removeButton));
+                                        linksBody.append(newRow);
 
 
-                                });
-                                $E('links<%=name%>').append(linksTable);
-                        }
-                        else{
-                            $E('links<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, $T('No links created yet. Click in Add new link if you want to do so!')));
-                        }
-                        var addButton = Html.input("button", {style:{marginTop: pixels(5)}}, $T('Add new link'));
+                                    });
+                                    $E('linksContainer<%=name%>').clear();
+                                    $E('linksContainer<%=name%>').append(linksTable);
+                            }
+                            else{
+                                $E('linksContainer<%=name%>').clear();
+                                $E('linksContainer<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, noLinksMsg));
+                            }
+                        };
+
+                        var optVal = <%= option.getValue() %>;
+                        renderLinkTable(optVal);
+                        var addButton = Html.input("button", {style:{marginTop: pixels(5)}}, addLinkText);
 
                         addButton.observeClick(function() {
                             var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
                             var linkName = new AutocheckTextBox({name: 'name', id:"linkname"}, errorLabel);
                             var linkStructure = Html.input("text", {});
                             var div = Html.div({},IndicoUtil.createFormFromMap([
-                                                                    [$T('Link name'), Html.div({}, linkName.draw(), errorLabel)],
+                                                                    [linkNameLabel, Html.div({}, linkName.draw(), errorLabel)],
                                                                     [$T('URL'), Html.div({}, linkStructure)]]),
                                                   Html.div({},
-                                    (Html.ul({style: {fontWeight: "bold"}},$T('In the URL field, the following patterns will be changed:'),
-                                            Html.li({style: {fontWeight: "lighter"}},$T('[chatroom] by the chat room name')),
-                                            Html.li({style: {fontWeight: "lighter"}},$T('[host] by the specified host')),
-                                            Html.li({style: {fontWeight: "lighter"}},$T('[nickname] by the nick chosen by the user.')))
-                                            )),
-                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, $T('Example: http://[host]/resource/?x=[chatroom]@conference.[host]?join')));
-                            var linksPopup = new ConfirmPopupWithPM($T('Select the name of the link and its URL'),
+                                    (info)),
+                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
+                            var linksPopup = new ConfirmPopupWithPM(popupTitle,
                                     div,
                                                                         function(value){
                                                                             if(value){
@@ -141,17 +167,17 @@
                                                                                         structure: linkStructure.dom.value
                                                                                     },
                                                                                     function(result,error) {
-                                                                                        if (!error && result) {
+                                                                                        if (!error && result.success) {
                                                                                             killProgress();
-                                                                                            self.close();
-                                                                                            window.location.reload();
-                                                                                        } else if(!error && !result){
+                                                                                            linksPopup.close();
+                                                                                            renderLinkTable(result.table);
+                                                                                        } else if(!error && !result.success){
                                                                                             killProgress();
                                                                                             linkName.startWatching(true);
                                                                                         }
                                                                                         else{
                                                                                             killProgress();
-                                                                                            self.close();
+                                                                                            linksPopup.close();
                                                                                             IndicoUtil.errorReport(error);
                                                                                         }
                                                                                     }
@@ -315,6 +341,9 @@
                     <% if option.getType() == list: %>
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>
                     <% end %>
+                    <% elif option.getType() == 'list_multiline': %>
+                        <% value=  "\n".join([str(v) for v in option.getValue()]) %>
+                    <% end %>
                     <% else: %>
                         <% value = str(option.getValue()) %>
                     <% end %>
@@ -325,6 +354,9 @@
                             <% checked = 'checked' %>
                         <% end %>
                     <input name="<%= name %>" type="checkbox" size="50" <%=checked%>>
+                    <% end %>
+                    <% elif option.getType() == 'list_multiline': %>
+                    <textarea name="<%= name %>" cols="38"><%= value %></textarea>
                     <% end %>
                     <% else: %>
                     <input name="<%= name %>" type="text" size="50" value="<%= value %>">
@@ -339,13 +371,16 @@
                     <% end %>
                 <% end %>
             </td>
-            <% if option.getType() == int or option.getType() == list or option.getType() == dict: %>
+            <% if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict: %>
             <td style="width: 40%%">
                 <% if option.getType() == int: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please input an integer")%></span>
                 <% end %>
                 <% elif option.getType() == list: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please separate values by commas: ','")%></span>
+                <% end %>
+                <% elif option.getType() == "list_multiline": %>
+                <span style="color: orange; font-size: smaller;"><%= _("Please input one value per line.")%></span>
                 <% end %>
                 <% elif option.getType() == dict: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please input keys and values in Python syntax. No unicode objects allowed. Example: {\"john\":\"tall\", \"pete\":\"short\"}")%></span>

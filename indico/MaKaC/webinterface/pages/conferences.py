@@ -355,7 +355,8 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         if onAirURL:
             webcastURL = onAirURL
         else:
-            webcastURL = wm.getWebcastServiceURL()
+            wc = wm.getForthcomingWebcast(self._conf)
+            webcastURL = wm.getWebcastServiceURL(wc)
         forthcomingWebcast = not onAirURL and wm.getForthcomingWebcast(self._conf)
 
         frameParams = {\

@@ -54,7 +54,7 @@ from xml.sax.saxutils import escape
 from MaKaC.common.utils import truncate
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.i18n import _
+from MaKaC.i18n import _, langList
 
 from MaKaC.plugins import PluginsHolder
 from MaKaC.user import Group, Avatar
@@ -97,7 +97,16 @@ class RequestHandlerBase(OldObservable):
             return ""
         return self._uh.getURL( self._target )
 
-    def _setLang(self):
+    def _setLang(self, params=None):
+
+        # allow to choose the lang from params
+        if params and 'lang' in params:
+            newLang = params.get('lang', '')
+            for lang in langList():
+                if newLang.lower() == lang[0].lower():
+                    self._websession.setLang(lang[0])
+                    break
+
         lang=self._websession.getLang()
         Logger.get('i18n').debug("lang:%s"%lang)
         if lang is None:
@@ -481,7 +490,7 @@ class RH(RequestHandlerBase):
                         self._aw.setSession(self._getSession())
                         #raise(str(dir(self._websession)))
                         self._setSessionUser()
-                        self._setLang()
+                        self._setLang(params)
 
                         if self._getUser():
                             Logger.get('requestHandler').debug('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))

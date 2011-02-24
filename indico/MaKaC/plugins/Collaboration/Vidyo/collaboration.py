@@ -59,7 +59,8 @@ class CSBooking(CSBookingBase):
         "roomName": (str, ''),
         "roomDescription": (str, ''),
         "displayPin": (bool, False),
-        "displayURL": (bool, True)}
+        "displayURL": (bool, True),
+        "displayPhoneNumbers": (bool, True)}
 
     _complexParameters = ["pin", "hasPin", "owner"]
 

@@ -568,7 +568,11 @@ class ModifyStartEndDate(ScheduleOperation):
             while(i < len(self._schEntry.getSchedule().getEntries()) and
                   self._schEntry.getStartDate() >= self._schEntry.getSchedule().getEntries()[i].getStartDate()):
                 i += 1
-            entriesList = self._schEntry.getSchedule().getEntries()[i:]
+            j = i
+            while(j < len(self._schEntry.getSchedule().getEntries()) and
+                  self._schEntry.getStartDate().date() == self._schEntry.getSchedule().getEntries()[j].getStartDate().date()):
+                j += 1
+            entriesList = self._schEntry.getSchedule().getEntries()[i:j]
 
         duration = self._endDate - self._startDate
         owner = self._schEntry.getOwner()

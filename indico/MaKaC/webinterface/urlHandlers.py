@@ -3411,9 +3411,6 @@ class UHWebcastMoveChannelUp( URLHandler ):
 class UHWebcastMoveChannelDown( URLHandler ):
     _relativeURL = "adminServices.py/webcastMoveChannelDown"
 
-class UHWebcastSaveWebcastServiceURL( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSaveWebcastServiceURL"
-
 class UHWebcastSaveWebcastSynchronizationURL( URLHandler ):
     _relativeURL = "adminServices.py/webcastSaveWebcastSynchronizationURL"
 

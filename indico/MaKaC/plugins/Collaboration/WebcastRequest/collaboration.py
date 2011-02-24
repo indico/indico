@@ -48,7 +48,8 @@ class CSBooking(CSBookingBase):
         "talkSelectionComments": (str, ''),
         "talkSelection": (list, []),
         "permission": (str, ''),
-        "otherComments": (str, '')}
+        "otherComments": (str, ''),
+        "audience": (str, '')}
 
     def __init__(self, type, conf):
         CSBookingBase.__init__(self, type, conf)
@@ -99,7 +100,7 @@ class CSBooking(CSBookingBase):
         self._statusMessage = "Request accepted"
         self._statusClass = "statusMessageOK"
         import MaKaC.webcast as webcast
-        webcast.HelperWebcastManager.getWebcastManagerInstance().addForthcomingWebcast(self._conf)
+        webcast.HelperWebcastManager.getWebcastManagerInstance().addForthcomingWebcast(self._conf, self._bookingParams.get("audience", ""))
 
         try:
             notification = RequestAcceptedNotification(self)

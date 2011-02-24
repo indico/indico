@@ -223,7 +223,7 @@ class RHRegistrationFormconfirmBooking( RHRegistrationFormDisplayBase ):
     def _processIfActive( self ):
         if self._registrant is not None:
             # avoid multiple sending in case of db conflict
-            if not hasattr(self, "_emailSent"):
+            if not hasattr(self, "_emailSent") and self._regForm.isSendReceiptEmail():
                 self._regForm.getNotification().sendEmailNewRegistrantDetailsPay(self._regForm,self._registrant)
                 self._emailSent = True
             url=urlHandlers.UHConfRegistrationFormconfirmBookingDone.getURL(self._conf)

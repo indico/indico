@@ -55,7 +55,7 @@
         <td><br></td>
     </tr>
     <tr>
-        <td align="center" style="border-top: 2px solid #777777;padding-top:10px"><input type="submit" class="btn" value="register" onClick="return confirm('<%= _("Are you sure you want to submit this form?") %>');"></td>
+        <td align="center" class="regFormBottomLine"><input type="submit" class="btn" value="register" onClick="return confirm('<%= _("Are you sure you want to submit this form?") %>');"></td>
     </tr>
 </table>
 <br>

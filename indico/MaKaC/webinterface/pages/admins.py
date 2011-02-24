@@ -607,6 +607,8 @@ class WWebcast( wcomponents.WTemplated ):
         for ch in wm.getChannels():
             channeloptions += "<option>%s" % ch.getName()
         for wc in webcasts:
+            if wc.getAudience(): # skip webcasts with an audience
+                continue
             onair = wc in wm.whatsOnAir()
             if not onair:
                 list_webcasts += """<form action="%s">""" % urladdonair
@@ -656,6 +658,8 @@ class WWebcastArchive( wcomponents.WTemplated ):
         webcasts = wm.getArchivedWebcasts()
         webcasts.sort(webcast.sortWebcastByDate)
         for wc in webcasts:
+            if wc.getAudience(): # skip webcasts with an audience
+                continue
             title = wc.getTitle()
             if wc.getEvent():
                 eventurl = urlHandlers.UHConferenceDisplay.getURL(wc.getEvent())
@@ -764,9 +768,6 @@ class WWebcastSetup( wcomponents.WTemplated ):
         list_channels += "</table>"
         vars["channels"] = list_channels
         vars["postURL"] = urlHandlers.UHWebcastAddChannel.getURL()
-
-        vars["saveWebcastServiceURL"] = urlHandlers.UHWebcastSaveWebcastServiceURL.getURL()
-        vars["webcastServiceURL"] = wm.getWebcastServiceURL()
 
         vars["saveWebcastSynchronizationURL"] = urlHandlers.UHWebcastSaveWebcastSynchronizationURL.getURL()
         vars["webcastSynchronizationURL"] = wm.getWebcastSynchronizationURL()

@@ -213,6 +213,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
         vars["enablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "enabledSection" )))
         vars["disablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "disabledSection" )))
         if regForm.isActivated():
+            vars["activated"] = True
             vars["changeTo"] = "False"
             vars["status"] =  _("ENABLED")
             vars["changeStatus"] =  _("DISABLE")
@@ -252,8 +253,19 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["mandatoryAccount"] =  _("Yes")
             if not regForm.isMandatoryAccount():
                 vars["mandatoryAccount"] =  _("No")
+            vars["notificationSender"] = regForm.getNotificationSender()
+            vars["sendRegEmail"] = _("Yes")
+            if not regForm.isSendRegEmail():
+                vars["sendRegEmail"] = _("No")
+            vars["sendReceiptEmail"] = _("Yes")
+            if not regForm.isSendReceiptEmail():
+                vars["sendReceiptEmail"] = _("No")
+            vars["sendPaidEmail"] = _("Yes")
+            if not regForm.isSendPaidEmail():
+                vars["sendPaidEmail"] = _("No")
             vars["Currency"]=regForm.getCurrency()
         else:
+            vars["activated"] = False
             vars["changeTo"] = "True"
             vars["status"] =_("DISABLED")
             vars["changeStatus"] = _("ENABLE")
@@ -269,6 +281,10 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["title"] = ""
             vars["notification"] = ""
             vars["mandatoryAccount"] = ""
+            vars["notificationSender"] = ""
+            vars["sendRegEmail"] = ""
+            vars["sendReceiptEmail"] = ""
+            vars["sendPaidEmail"] = ""
             vars["Currency"]=""
         vars["sections"] = self._getSectionsHTML()
         vars["personalfields"] = self._getPersonalFieldsHTML()
@@ -326,7 +342,17 @@ class WConfModifRegFormDataModification( wcomponents.WTemplated ):
         vars["ccList"] = ", ".join(regForm.getNotification().getCCList())
         vars["mandatoryAccount"]=""
         if regForm.isMandatoryAccount():
-            vars["mandatoryAccount"]= _("CHECKED")
+            vars["mandatoryAccount"]= "CHECKED"
+        vars["notificationSender"] = regForm.getNotificationSender()
+        vars["sendRegEmail"] = ""
+        vars["sendReceiptEmail"] = ""
+        vars["sendPaidEmail"] = ""
+        if regForm.isSendRegEmail():
+            vars["sendRegEmail"] = "CHECKED"
+        if regForm.isSendReceiptEmail():
+            vars["sendReceiptEmail"] = "CHECKED"
+        if regForm.isSendPaidEmail():
+            vars["sendPaidEmail"] = "CHECKED"
         vars["Currency"]="""<select name="%s">%s</select>"""%("Currency", CurrencyRegistry.getSelectItemsHTML(regForm.getCurrency()))
         vars["extraTimeAmount"] = regForm.getEndExtraTimeAmount()
         vars["extraTimeUnit"] = regForm.getEndExtraTimeUnit()
@@ -1694,7 +1720,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
                     <td nowrap class="displayField">%s<b>%s</b></td>
                     <td width="100%%" align="left">%s</td>
                 </tr>
-                """%(mandatory, item.getName(), inputHTML)
+                """%(mandatory, _(item.getName()), inputHTML)
         return html
 
     def getVars(self):

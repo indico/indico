@@ -14,6 +14,10 @@ div.wrapper .emptyFooter {
     height: 50px; /* The height of the footer */
 }
 
+.smallLabel {
+    font-size: 10px;
+}
+
 .pageheader{
     color: gray
 }
@@ -6476,6 +6480,33 @@ div.invalid {
 
 .beforeRegistrationInput {
     width: 7px;
+}
+
+.regSection {
+    border-left: 1px solid #777777;
+    border-top: 1px solid #777777;"
+}
+
+.regSectionBackground{
+    background: #E5E5E5;
+    color: gray;
+}
+
+.regFormSubtotal{
+    background: #ECECEC;
+    margin-left: 10px;
+    padding: 2px;
+}
+
+.regFormPrice{
+}
+
+.regFormNumberCaption {
+}
+
+.regFormBottomLine {
+    border-top: 2px solid #777777;
+    padding-top:10px;
 }
 
 /*

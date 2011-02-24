@@ -125,6 +125,11 @@ class RegistrationForm(Persistent):
         form.setUsersLimit(self.getUsersLimit())
         form.setActivated(self.isActivated())
         form.setMandatoryAccount(self.isMandatoryAccount())
+        form.setNotificationSender(self.getNotificationSender())
+        form.setSendRegEmail(self.isSendRegEmail())
+        form.setSendReceiptEmail(self.isSendReceiptEmail())
+        form.setSendPaidEmail(self.isSendPaidEmail())
+        form.setAllSessions()
         form.notification=self.getNotification().clone()
         form.personalData = self.getPersonalData().clone()
         acf = self.getAccommodationForm()
@@ -201,6 +206,53 @@ class RegistrationForm(Persistent):
 
     def setMandatoryAccount(self, v=True):
         self._mandatoryAccount = v
+
+    def setNotificationSender(self, sender):
+        self._notificationSender = sender
+
+    def getNotificationSender(self):
+        sender = None
+        try:
+            if self._notificationSender:
+                sender = self._notificationSender
+        except AttributeError, e:
+            pass
+        if not sender:
+            self._notificationSender = self._conf.getSupportEmail(returnNoReply=True).split(',', 1)[0]
+        return self._notificationSender
+
+    def isSendRegEmail(self):
+        try:
+            if self._sendRegEmail:
+                pass
+        except AttributeError, e:
+            self._sendRegEmail = True
+        return self._sendRegEmail
+
+    def setSendRegEmail(self, v=True):
+        self._sendRegEmail = v
+
+    def isSendReceiptEmail(self):
+        try:
+            if self._sendReceiptEmail:
+                pass
+        except AttributeError, e:
+            self._sendReceiptEmail = False
+        return self._sendReceiptEmail
+
+    def setSendReceiptEmail(self, v=True):
+        self._sendReceiptEmail = v
+
+    def isSendPaidEmail(self):
+        try:
+            if self._sendPaidEmail:
+                pass
+        except AttributeError, e:
+            self._sendPaidEmail = False
+        return self._sendPaidEmail
+
+    def setSendPaidEmail(self, v=True):
+        self._sendPaidEmail = v
 
     def setTitle( self, newName ):
         self.title = newName.strip()
@@ -690,7 +742,7 @@ class Notification(Persistent):
         """
             Creates an email to be sent to the user after registration
         """
-        fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         url = urlHandlers.UHConferenceDisplay.getURL(regForm.getConference())
 
 #        if rp.getConference().getModPay().isActivated():
@@ -722,7 +774,7 @@ There is a new registrant in '%s'. See information below:
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send mail to participant
-        if rp.getEmail().strip() != "":
+        if regForm.isSendRegEmail() and rp.getEmail().strip() != "":
             bodyReg = _("""
 Congratulations, your registration to %s was successful%s See your information below:
 
@@ -751,12 +803,12 @@ Congratulations, your registration to %s was successful%s See your information b
     def sendEmailNewRegistrantDetailsPay(self, regForm,registrant):
         if not registrant.getConference().getModPay().isEnableSendEmailPaymentDetails():
             return
-        fromAddr=registrant.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         date=registrant.getConference().getStartDate()
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
         detailPayment=registrant.getConference().getModPay().getPaymentDetails()
-        subject=_("""New registrant in '%s': %s - payment""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
+        subject=_("""Payment summary for '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
         body= _("""
 Please use this information for your payment (except for e-payment):\n
 - date conference    : %s
@@ -814,31 +866,28 @@ Please use this information for your payment (except for e-payment):\n
         #    maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
         #    GenericMailer.send(GenericNotification(maildata))
         # send email to participants
+        paymentMsg = _("If you haven't paid for your registration yet, you can do it at %s") % urlHandlers.UHConfRegistrationFormCreationDone.getURL(registrant)
         if registrant.getEmail().strip() != "":
-            bodyReg = _("""
-             Please, see the summary of your order:\n\n%s\n\n%s""")%\
-                                                                                 ("\n".join(booking),body)
+            bodyReg = _("""%s\n\n%s\n\n%s\n\n%s""")%(
+                registrant.getConference().getModPay().getPaymentReceiptMsg(),
+                "\n".join(booking), body, paymentMsg)
             to=registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
 
     def sendEmailNewRegistrantConfirmPay(self, regForm,registrant):
-        fromAddr=registrant.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         date=registrant.getConference().getStartDate()
         getTitle=strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant=registrant.getIdPay()
 
-        subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
-        body= _("""
-        thank you for the payment :\n
-
-- detail of payment  : \n%s
+        subject= _("""Payment successful for '%s': %s""")%(strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
+        body= _("""- detail of payment  : \n%s
 - date conference    : %s
 - name conference    : %s
 - registration id    : %s""")%(registrant.getTransactionInfo().getTransactionTxt(),date,getTitle,idRegistrant)
         booking=[]
         total=0
-        booking.append( _(""" Thank you for this payment """))
         booking.append("""Quantity\t\tItem\t\tunit.price\t\tCost""")
         for gsf in registrant.getMiscellaneousGroupList():
             miscGroup=registrant.getMiscellaneousGroupById(gsf.getId())
@@ -885,16 +934,16 @@ Please use this information for your payment (except for e-payment):\n
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send email to participant
-        if registrant.getEmail().strip() != "":
-            bodyReg =  _("""
-             Congratulations, your registration and your payment were successful. See your informations below:\n\n%s\n\n%s""")%\
-                                                                                 ("\n".join(booking),body)
+        if regForm.isSendPaidEmail() and registrant.getEmail().strip() != "":
+            bodyReg =  _("""%s\n\n%s\n\n%s""")%(registrant.getConference().getModPay().getPaymentSuccessMsg(),
+                                                                "\n".join(booking),
+                                                                body)
             to=registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
 
     def sendEmailModificationRegistrant(self, regForm, rp):
-        fromAddr=regForm.getConference().getSupportEmail(returnNoReply=True)
+        fromAddr = regForm.getNotificationSender()
         subject= _("""Registration modified for '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
         body= _("""
 _("Registrant Id"): %s
@@ -1405,6 +1454,7 @@ class NumberInput(FieldInputType):
     def __init__(self, field):
         FieldInputType.__init__(self, field)
         self._length = ''
+        self._minValue = 0
 
     def _getModifHTML(self,item, registrant):
         caption = self._parent.getCaption()
@@ -1435,10 +1485,16 @@ class NumberInput(FieldInputType):
             length = 'size="%s"' % self.getLength()
         else:
             length = 'size="6"'
-        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s />&nbsp;&nbsp;%s %s""" % (htmlName, htmlName, v, disable, length, caption, param)
+        onkeyup = ""
+        if billable:
+            onkeyup = """
+                onkeyup="$E('subtotal-%s').dom.innerHTML = ((isNaN(parseInt(this.value, 10)) || parseInt(this.value, 10) < 0) ? 0 : parseInt(this.value, 10)) * %s;"
+            """ % (htmlName, price)
+        tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s %s />&nbsp;&nbsp;<span class="regFormNumberCaption">%s</span> %s""" % (htmlName, htmlName, v, onkeyup, disable, length, caption, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
+            subTotal = (float(price)*int(v) or 0)
+            tmp= """%s&nbsp;&nbsp;<span class="regFormPrice">%s&nbsp;%s</span><span class="regFormSubtotal">Total: <span id="subtotal-%s">%s</span>&nbsp;%s</span></td> """%(tmp,price,currency,htmlName,subTotal,currency)
         else:
             tmp= """%s </td> """%tmp
         if description:
@@ -1461,6 +1517,8 @@ class NumberInput(FieldInputType):
             quantity = 0
         else:
             quantity = int(v)
+        if quantity < self.getMinValue():
+            raise FormValuesError( _("The field \"%s\" needs to be filled with a number greater than or equal to %d.")%(self.getParent().getCaption(), self.getMinValue()))
         item.setQuantity(quantity)
         item.setValue(quantity)
         item.setBillable(self._parent.isBillable())
@@ -1470,27 +1528,55 @@ class NumberInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
+        price = self._parent.getPrice()
+        billable = self._parent.isBillable()
+        checked=""
+        if billable:
+            checked="checked=\"checked\""
+
         return _("""
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">_("Min. value")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+              <input type="text" name="minValue" value="%s" />
+          </td>
+        </tr>
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Size in chars")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
               <input type="text" name="length" value="%s" />
           </td>
-        </tr>""" % self.getLength())
+        </tr>
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat">Is Billable</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+            <input type="checkbox" name="billable" size="60" %s> _("(uncheck if it is not billable)")
+          </td>
+        </tr>
+        <tr>
+          <td class="titleCellTD"><span class="titleCellFormat"> _("Price (multiplied with entered number)")</span></td>
+          <td bgcolor="white" class="blacktext" width="100%%">
+            <input type="text" name="price" size="60" value=%s>
+          </td>
+        </tr>""" % (self.getMinValue(), self.getLength(), checked, price))
 
     def clone(self, gf):
         ni = FieldInputType.clone(self, gf)
         ni.setLength(self.getLength())
+        ni.setMinValue(self.getMinValue())
         return ni
 
     def getValues(self):
         d = {}
         d["length"] = self.getLength()
+        d["minValue"] = self.getMinValue()
         return d
 
     def setValues(self, data):
         if data.has_key("length"):
             self.setLength(data.get("length"))
+        if data.has_key("minValue"):
+            self.setMinValue(int(data.get("minValue") or 0))
 
     def getLength(self):
         try:
@@ -1501,6 +1587,16 @@ class NumberInput(FieldInputType):
 
     def setLength(self, value):
         self._length = value
+
+    def getMinValue(self):
+        try:
+            if self._minValue: pass
+        except AttributeError:
+            self._minValue = 0
+        return self._minValue
+
+    def setMinValue(self, value):
+        self._minValue = value
 
 class LabelInput(FieldInputType):
     _id="label"
@@ -2633,40 +2729,40 @@ class PersonalData(Persistent):
     def _initStandardPersonalData(self):
         self._data = PersistentMapping()
         self._sortedKeys = PersistentList()
-        p = PersonalDataFormItem({'id':'title', 'name': _("Title"), 'input':'list', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'title', 'name': "Title", 'input':'list', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'firstName', 'name': _("First Name"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'firstName', 'name': "First Name", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'surname', 'name': _("Surname"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'surname', 'name': "Surname", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'position', 'name': _("Position"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'position', 'name': "Position", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'institution', 'name': _("Institution"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'institution', 'name': "Institution", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'address', 'name': _("Address"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'address', 'name': "Address", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'city', 'name': _("City"), 'input':'text', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'city', 'name': "City", 'input':'text', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'country', 'name': _("Country/Region"), 'input':'list', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'country', 'name': "Country/Region", 'input':'list', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'phone', 'name': _("Phone"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'phone', 'name': "Phone", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'fax', 'name': _("Fax"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'fax', 'name': "Fax", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'email', 'name': _("Email"), 'input':'hidden', 'mandatory':True})
+        p = PersonalDataFormItem({'id':'email', 'name': "Email", 'input':'hidden', 'mandatory':True})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
-        p = PersonalDataFormItem({'id':'personalHomepage', 'name': _("Personal homepage"), 'input':'text', 'mandatory':False})
+        p = PersonalDataFormItem({'id':'personalHomepage', 'name': "Personal homepage", 'input':'text', 'mandatory':False})
         self._data[p.getId()] = p
         self._sortedKeys.append(p.getId())
 

@@ -65,9 +65,36 @@
     </td>
   </tr>
   <tr>
+    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification sender address")%></span></td>
+    <td class="blacktext">
+      %(notificationSender)s
+    </td>
+  </tr>
+  <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification (on new registrations)")%></span></td>
     <td class="blacktext">
       <%= notification %>
+    </td>
+  </tr>
+  <tr>
+    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email registrant")%></span></td>
+    <td bgcolor="white" width="100%%">
+      <% if activated: %>
+      <table>
+        <tr>
+          <td align="right"><strong><%= _("After registration")%></strong>:</td>
+          <td>%(sendRegEmail)s</td>
+        </tr>
+        <tr>
+          <td align="right"><strong><%= _("With a payment summary")%></strong>:</td>
+          <td>%(sendReceiptEmail)s</td>
+        </tr>
+        <tr>
+          <td align="right"><strong><%= _("After successful payment")%></strong>:</td>
+          <td>%(sendPaidEmail)s</td>
+        </tr>
+      </table>
+      <% end %>
     </td>
   </tr>
   <tr>

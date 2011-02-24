@@ -126,6 +126,10 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
             regForm.getNotification().setToList( utils.getEmailList(params.get("toList", "")) )
             regForm.getNotification().setCCList( utils.getEmailList(params.get("ccList", "")) )
             regForm.setMandatoryAccount(params.has_key("mandatoryAccount"))
+            regForm.setNotificationSender(params["notificationSender"])
+            regForm.setSendRegEmail(params.has_key("sendRegEmail"))
+            regForm.setSendReceiptEmail(params.has_key("sendReceiptEmail"))
+            regForm.setSendPaidEmail(params.has_key("sendPaidEmail"))
             regForm.setCurrency(params.get("Currency",""))
         self._redirect(urlHandlers.UHConfModifRegForm.getURL(self._conf))
 
@@ -695,6 +699,8 @@ class _TmpSectionField:
             self._input.dateFormat = params.get("dateFormat")
         if params.has_key('length'):
             self._input.setLength(params.get('length'))
+        if params.has_key('minValue'):
+            self._input.setMinValue(params.get('minValue'))
         if params.has_key('numberOfRows'):
             self._input.setNumberOfRows(params.get('numberOfRows'))
         if params.has_key('numberOfColumns'):

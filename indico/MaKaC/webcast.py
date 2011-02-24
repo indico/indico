@@ -25,6 +25,7 @@ from MaKaC.common.httpTimeout import urlOpenWithTimeout
 from MaKaC.errors import MaKaCError
 from urllib2 import HTTPError, URLError
 from BaseHTTPServer import BaseHTTPRequestHandler
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 class WebcastManager(Persistent):
     """Holds and manages general information about webcasts in the system
@@ -36,7 +37,6 @@ class WebcastManager(Persistent):
         self._archived_webcasts = []
         self._forthcoming_webcasts = []
         self._managers = []
-        self._webcastServiceURL = '' #used for forthcoming webcast display
         self._webcastSynchronizationURL = '' #used for automatic synchronization
 
     def getManagers( self ):
@@ -101,13 +101,16 @@ class WebcastManager(Persistent):
 #                self._requested_webcasts.remove(webcast)
 #                self._p_changed=1
 
-    def addForthcomingWebcast( self, event):
-        if not self.getForthcomingWebcast(event):
+    def addForthcomingWebcast( self, event, audience=""):
+        wc = self.getForthcomingWebcast(event)
+        if not wc:
             if event:
-                wc = Webcast(event)
+                wc = Webcast(event, audience)
                 self._forthcoming_webcasts.append(wc)
                 self._p_changed=1
                 self.remoteSynchronize()
+        else:
+            wc.setAudience(audience)
 
     def getForthcomingWebcast(self, event):
         for wc in self._forthcoming_webcasts:
@@ -276,18 +279,18 @@ class WebcastManager(Persistent):
         self.remoteSynchronize()
         return True
 
-    def getWebcastServiceURL(self):
+    def getWebcastServiceURL(self, wc):
         """ Returns the Webcast Service URL ( a string ).
             It will be used to display a link when an event is a forthcoming webcast.
         """
-        if not hasattr(self, "_webcastServiceURL"):
-            self._webcastServiceURL = ''
-        return self._webcastServiceURL
+        if not wc or not wc.getAudience():
+            return CollaborationTools.getOptionValue('WebcastRequest', "webcastPublicURL")
 
-    def setWebcastServiceURL(self, url):
-        """ Sets the Webcast Service URL ( a string ).
-        """
-        self._webcastServiceURL = url
+        for row in CollaborationTools.getOptionValue('WebcastRequest', "webcastAudiences"):
+            if row['name'] == wc.getAudience():
+                return row['structure']
+
+        return ''
 
     def getWebcastSynchronizationURL(self):
         """ Returns the Webcast Synchronization URL ( a string ).
@@ -488,10 +491,11 @@ class Webcast(Persistent):
     """This class represents the live webcasts which may take place on some of the events
     """
 
-    def __init__( self, event ):
+    def __init__( self, event, audience="" ):
         self._event = event
         self._id = event.getId()
         self._startDate = event.getStartDate()
+        self._audience = audience
 
     def getId( self ):
         return self._id
@@ -510,6 +514,16 @@ class Webcast(Persistent):
         if r:
             return r.getName()
         else:
+            return ""
+
+    def setAudience(self, audience):
+        self._audience = audience
+
+    def getAudience(self):
+        try:
+            return self._audience
+        except:
+            self._audience = ""
             return ""
 
 def sortWebcastByDate(x, y):

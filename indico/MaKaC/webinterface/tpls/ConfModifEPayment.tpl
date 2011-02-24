@@ -47,6 +47,22 @@ if al.isAdmin( self._rh._getUser() ):
         </td>
         <td></td>
     </tr>
+    <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Payment Summary Email Message")%></span></td>
+        <td bgcolor="white" width="100%%" class="blacktext">
+           <textarea rows="6" cols="60" disabled="disabled">%(receiptMsgPayment)s</textarea>
+           <br/>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Success Email Message")%></span></td>
+        <td bgcolor="white" width="100%%" class="blacktext">
+           <textarea rows="6" cols="60" disabled="disabled">%(successMsgPayment)s</textarea>
+           <br/>
+        </td>
+        <td></td>
+    </tr>
 	<tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>

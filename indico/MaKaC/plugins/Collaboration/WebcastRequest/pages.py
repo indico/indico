@@ -80,6 +80,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         else:
             vars["Contributions"] = []
 
+        vars["Audiences"] = CollaborationTools.getOptionValue('WebcastRequest', "webcastAudiences")
 
         vars["ConsentForm"] = self._WebcastRequestOptions["ConsentForm"].getValue()
 
