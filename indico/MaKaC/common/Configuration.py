@@ -439,11 +439,19 @@ class Config:
             'UseXSendFile'              : 'no',
             'AuthenticatedEnforceSecure': 'yes',
 
+            # Authentication
+            'LDAPConfig': {'host': 'myldapserver.example.com',
+                           'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
+                           'groupDNQuery': ('cn={0}',
+                                            'OU=Groups,DC=example,DC=com'),
+                           'membershipQuery': 'memberof={0}',
+                           'accessCredentials': ('CN=user,OU=Users,'
+                                                 'DC=example,DC=com',
+                                                 'secret_password')},
             # Room Booking Related
             'LightboxCssStylesheetName' : "lightbox/lightbox.css",
             'LightboxJavascriptName'    : "lightbox/lightbox.js"
             }
-
 
         if sys.platform == 'win32':
             default_values.update({

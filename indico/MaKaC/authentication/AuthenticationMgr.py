@@ -37,6 +37,9 @@ class AuthenticatorMgr:
             if auth == "Nice":
                 from MaKaC.authentication.NiceAuthentication import NiceAuthenticator
                 self.AuthenticatorList.append( NiceAuthenticator() )
+            if auth == "LDAP":
+                from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator
+                self.AuthenticatorList.append(LDAPAuthenticator())
         self.create = True
 
 

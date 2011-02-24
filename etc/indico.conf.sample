@@ -193,12 +193,28 @@ UseXSendFile = "no"
 # you can write them like this (systems will be queried about users from left
 # to right):
 #
-#     AuthenticatorList = ['Local', 'MyAuthSystem']
+#     AuthenticatorList = ['Local', 'LDAP', 'MyAuthSystem']
 #
 # The default configuration will use only Indico's authentication system.
 
 AuthenticatorList    = ['Local']
 
+# Uncomment/customize the following lines if you want to use LDAP authentication
+#
+# LDAPConfig = {'host': 'myldapserver.example.com',
+#
+#               # filter parameters for users, base DN to use
+#               'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
+#
+#               # filter parameters for groups, base DN to use
+#               'groupDNQuery': ('cn={0}', 'OU=Groups,DC=example,DC=com'),
+#
+#               # query used to infer membership of a group
+#               'membershipQuery': 'memberof={0}',
+#
+#               # access credentials of a user with read access
+#               'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
+# }
 
 #------------------------------------------------------------------------------
 # STYLING

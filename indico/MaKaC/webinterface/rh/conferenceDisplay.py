@@ -389,6 +389,7 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
         RHConferenceBase._checkParams( self, params )
 
     def _checkProtection( self ):
+
         from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
         if not RCCollaborationAdmin.hasRights(self, None) and \
             not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"):

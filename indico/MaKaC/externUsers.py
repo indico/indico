@@ -28,10 +28,13 @@ from MaKaC.common.Configuration import Config
 from MaKaC.i18n import _
 from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
+from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator, LDAPUser
+
 
 class ExtUserHolder:
     def __init__(self):
-        self.extUserList = {"Nice":NiceUser}
+        self.extUserList = {"Nice": NiceUser,
+                            LDAPAuthenticator.getId(): LDAPUser}
 
     def getById(self, id):
         if id in self.extUserList.keys():

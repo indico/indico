@@ -494,6 +494,7 @@ class RH(RequestHandlerBase):
                         #    profile = True
                         self._reqParams = copy.copy( params )
                         self._checkParams( self._reqParams )
+
                         self._checkProtection()
                         security.Sanitization.sanitizationCheck(self._target,
                                                self._reqParams,

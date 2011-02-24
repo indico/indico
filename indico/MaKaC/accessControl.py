@@ -122,7 +122,13 @@ class AccessController( Persistent, Observable ):
     def grantAccess( self, principal ):
         """grants read access for the related resource to the specified
             principal"""
-        if principal not in self.allowed and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.CERNGroup) or isinstance(principal, MaKaC.user.Group)):
+
+        # TODO: make this extensible
+        if principal not in self.allowed and \
+               (isinstance(principal, MaKaC.user.Avatar) or \
+                isinstance(principal, MaKaC.user.CERNGroup) or \
+                isinstance(principal, MaKaC.user.Group) or \
+                isinstance(principal, MaKaC.user.LDAPGroup)):
             self.allowed.append( principal )
             self._p_changed = 1
         self._notify('accessGranted', principal)

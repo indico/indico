@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -38,6 +39,7 @@ from MaKaC.externUsers import ExtUserHolder
 from MaKaC.common.db import DBMgr
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator, ldapFindGroups, ldapUserInGroup
 
 from datetime import datetime, timedelta
 
@@ -324,6 +326,50 @@ class _GroupFilterCriteria(filters.FilterCriteria):
         filters.FilterCriteria.__init__(self,None,criteria)
 
 
+class LDAPGroup(Group):
+    groupType = "LDAP"
+
+    def __str__(self):
+        return "<LDAPGroup id: %s name: %s desc: %s>" % (self.getId(),
+                                                         self.getName(),
+                                                         self.getDescription())
+
+    def addMember(self, newMember):
+        pass
+
+    def removeMember(self, member):
+        pass
+
+    def getMemberList(self):
+        uidList = ldapFindGroupMemberUids(self.getName())
+        avatarLists = []
+        for uid in uidList:
+            # First, try locally (fast)
+            lst = AvatarHolder().match({'login': uid }, exact=1,
+                                       forceWithoutExtAuth=True)
+            if not lst:
+                # If not found, try external
+                lst = AvatarHolder().match({'login': uid}, exact=1)
+            avatarLists.append(lst)
+        return [avList[0] for avList in avatarLists if avList]
+
+    def containsUser(self, avatar):
+
+        # used when checking acces to private events restricted for certain groups
+        if not avatar:
+            return False
+        login = None
+        for aid in avatar.getIdentityList():
+            if aid.getAuthenticatorTag() == 'LDAP':
+                login = aid.getLogin()
+        if not login:
+            return False
+        return ldapUserInGroup(login, self.getName())
+
+    def containsMember(self, avatar):
+        return 0
+
+
 class GroupHolder(ObjectHolder):
     """
     """
@@ -383,6 +429,8 @@ class GroupHolder(ObjectHolder):
             crit["name"] = crit["groupname"]
         if "Nice" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
             self.updateCERNGroupMatch(crit["name"][0],exact)
+        if "LDAP" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
+            self.updateLDAPGroupMatch(crit["name"][0],exact)
         match = self.getIndex().matchGroup(crit["name"][0], exact=exact)
 
         if match != None:
@@ -391,6 +439,21 @@ class GroupHolder(ObjectHolder):
                 if gr not in result:
                     result.append(gr)
         return result
+
+    def updateLDAPGroupMatch(self, name, exact=False):
+        logger.Logger.get('GroupHolder').debug(
+            "updateLDAPGroupMatch(name=" + name + ")")
+
+        for grDict in ldapFindGroups(name, exact):
+            grName = grDict['cn']
+            if not self.hasKey(grName):
+                gr = LDAPGroup()
+                gr.setId(grName)
+                gr.setName(grName)
+                gr.setDescription('LDAP group: ' + grDict['description'])
+                self.add(gr)
+                logger.Logger.get('GroupHolder').debug(
+                    "updateLDAPGroupMatch() added" + str(gr))
 
     def updateCERNGroupMatch(self, name, exact=False):
         if not exact:
@@ -1394,12 +1457,17 @@ class AvatarHolder( ObjectHolder ):
         if not forceWithoutExtAuth:
             euh = ExtUserHolder()
             from MaKaC.authentication import NiceAuthentication
+            from MaKaC.authentication import LDAPAuthentication
             for authId in Config.getInstance().getAuthenticatorList():
                 if not authId == "Local":
                     dict = euh.getById(authId).match(criteria, exact=exact)
-                    auth = NiceAuthentication.NiceAuthenticator()
-
-
+                    if authId == "Nice":
+                        auth = NiceAuthentication.NiceAuthenticator()
+                    elif authId == "LDAP":
+                        auth = LDAPAuthentication.LDAPAuthenticator()
+                    else:
+                       raise MaKaCError(
+                           _("Authentication type " + authId + " is not known."))
                     for email in dict.keys():
                         # TODO and TOSTUDY: result.keys should be replace it with
                         # l=[]; for av in result.values(): l.append(av.getAllEmails())

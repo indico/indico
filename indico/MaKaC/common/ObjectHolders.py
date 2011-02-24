@@ -51,15 +51,16 @@ class ObjectHolder:
             generate unique identifiers for the objects stored on the current
             index.
     """
-    __allowedIdxs = ["conferences", "avatars", "groups", "counters", 
-                    "identities", "principals", "categories", 
-                    "localidentities", "niceidentities", "groupsregistration", 
-                    "fieldsregistration", "registrationform", "domains", "indexes",
-                    "trashcan", "roomsmapping", "deletedobject", "shorturl", "modules", "plugins"]
+    __allowedIdxs = ["conferences", "avatars", "groups", "counters",
+                     "identities", "principals", "categories",
+                     "localidentities", "niceidentities", "groupsregistration",
+                     "ldapidentities", "fieldsregistration", "registrationform",
+                     "domains", "indexes", "trashcan", "roomsmapping",
+                     "deletedobject", "shorturl", "modules", "plugins"]
     idxName = None
     counterName = None
 
-    def __init__(self): 
+    def __init__(self):
         """Class constructor. Gets an opened DB storage and initializes the 
            DB connection so it's available for later requests.
         """
