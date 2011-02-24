@@ -1,4 +1,4 @@
-<table width="100%%" align="left" class="regSection" cellspacing="0">
+<table id="regFormSectPersonalData" width="100%%" align="left" class="regSection" cellspacing="0">
     <tr>
         <td nowrap class="groupTitle regSectionBackground"><b><%= _("Personal data")%></b></td>
     </tr>

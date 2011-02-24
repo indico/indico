@@ -6442,6 +6442,11 @@ div.invalid {
 .regFormNumberCaption {
 }
 
+.regFormBottomLine {
+    border-top: 2px solid #777777;
+    padding-top:10px;
+}
+
 /*
     Used to display scroll bar in CKEditor properly.
 */
