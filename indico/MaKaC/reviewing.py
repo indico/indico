@@ -164,11 +164,6 @@ class ConferencePaperReview(Persistent):
 
     #auto e-mails methods for assign/remove reviewing team to the conference notification
     def getEnablePRMEmailNotif(self):
-        try :
-            if self._enablePRMEmailNotif  :
-                pass
-        except AttributeError :
-            self._enablePRMEmailNotif = True
         return self._enablePRMEmailNotif
 
     def enablePRMEmailNotif(self):
@@ -178,11 +173,6 @@ class ConferencePaperReview(Persistent):
         self._enablePRMEmailNotif = False
 
     def getEnableRefereeEmailNotif(self):
-        try :
-            if self._enableRefereeEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableRefereeEmailNotif = True
         return self._enableRefereeEmailNotif
 
     def enableRefereeEmailNotif(self):
@@ -193,11 +183,6 @@ class ConferencePaperReview(Persistent):
 
 
     def getEnableEditorEmailNotif(self):
-        try :
-            if self._enableEditorEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableEditorEmailNotif = True
         return self._enableEditorEmailNotif
 
     def enableEditorEmailNotif(self):
@@ -208,11 +193,6 @@ class ConferencePaperReview(Persistent):
 
 
     def getEnableReviewerEmailNotif(self):
-        try :
-            if self._enableReviewerEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableReviewerEmailNotif = True
         return self._enableReviewerEmailNotif
 
     def enableReviewerEmailNotif(self):
@@ -224,11 +204,6 @@ class ConferencePaperReview(Persistent):
 
     #auto e-mails methods for assign/remove reviewers to/from contributions notification
     def getEnableRefereeEmailNotifForContribution(self):
-        try :
-            if self._enableRefereeEmailNotifForContribution  :
-                pass
-        except AttributeError :
-            self._enableRefereeEmailNotifForContribution = True
         return self._enableRefereeEmailNotifForContribution
 
     def enableRefereeEmailNotifForContribution(self):
@@ -238,11 +213,6 @@ class ConferencePaperReview(Persistent):
         self._enableRefereeEmailNotifForContribution = False
 
     def getEnableEditorEmailNotifForContribution(self):
-        try :
-            if self._enableEditorEmailNotifForContribution  :
-                pass
-        except AttributeError :
-            self._enableEditorEmailNotifForContribution = True
         return self._enableEditorEmailNotifForContribution
 
     def enableEditorEmailNotifForContribution(self):
@@ -252,11 +222,6 @@ class ConferencePaperReview(Persistent):
         self._enableEditorEmailNotifForContribution = False
 
     def getEnableReviewerEmailNotifForContribution(self):
-        try :
-            if self._enableReviewerEmailNotifForContribution  :
-                pass
-        except AttributeError :
-            self._enableReviewerEmailNotifForContribution = True
         return self._enableReviewerEmailNotifForContribution
 
     def enableReviewerEmailNotifForContribution(self):
@@ -267,11 +232,6 @@ class ConferencePaperReview(Persistent):
 
     #auto e-mails methods for reviewers judgements notification
     def getEnableRefereeJudgementEmailNotif(self):
-        try :
-            if self._enableRefereeJudgementEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableRefereeJudgementEmailNotif = True
         return self._enableRefereeJudgementEmailNotif
 
     def enableRefereeJudgementEmailNotif(self):
@@ -281,11 +241,6 @@ class ConferencePaperReview(Persistent):
         self._enableRefereeJudgementEmailNotif = False
 
     def getEnableEditorJudgementEmailNotif(self):
-        try :
-            if self._enableEditorJudgementEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableEditorJudgementEmailNotif = True
         return self._enableEditorJudgementEmailNotif
 
     def enableEditorJudgementEmailNotif(self):
@@ -295,11 +250,6 @@ class ConferencePaperReview(Persistent):
         self._enableEditorJudgementEmailNotif = False
 
     def getEnableReviewerJudgementEmailNotif(self):
-        try :
-            if self._enableReviewerJudgementEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableReviewerJudgementEmailNotif = True
         return self._enableReviewerJudgementEmailNotif
 
     def enableReviewerJudgementEmailNotif(self):
@@ -310,11 +260,6 @@ class ConferencePaperReview(Persistent):
 
     #auto e-mails methods for authors' submittion materials notification
     def getEnableAuthorSubmittedMatRefereeEmailNotif(self):
-        try :
-            if self._enableAuthorSubmittedMatRefereeEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableAuthorSubmittedMatRefereeEmailNotif = True
         return self._enableAuthorSubmittedMatRefereeEmailNotif
 
     def enableAuthorSubmittedMatRefereeEmailNotif(self):
@@ -324,11 +269,6 @@ class ConferencePaperReview(Persistent):
         self._enableAuthorSubmittedMatRefereeEmailNotif = False
 
     def getEnableAuthorSubmittedMatEditorEmailNotif(self):
-        try :
-            if self._enableAuthorSubmittedMatEditorEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableAuthorSubmittedMatEditorEmailNotif = True
         return self._enableAuthorSubmittedMatEditorEmailNotif
 
     def enableAuthorSubmittedMatEditorEmailNotif(self):
@@ -338,11 +278,6 @@ class ConferencePaperReview(Persistent):
         self._enableAuthorSubmittedMatEditorEmailNotif = False
 
     def getEnableAuthorSubmittedMatReviewerEmailNotif(self):
-        try :
-            if self._enableAuthorSubmittedMatReviewerEmailNotif  :
-                pass
-        except AttributeError :
-            self._enableAuthorSubmittedMatReviewerEmailNotif = True
         return self._enableAuthorSubmittedMatReviewerEmailNotif
 
     def enableAuthorSubmittedMatReviewerEmailNotif(self):

@@ -130,7 +130,7 @@ class ReviewManager(Persistent, Fossilizable):
             self.getConfPaperReview().addRefereeContribution(referee, self._contribution)
             self.getLastReview().setRefereeDueDate(self.getConfPaperReview().getDefaultRefereeDueDate())
             #e-mail notification will be send when referee is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
-            if self.getConfPaperReview()._enableRefereeEmailNotifForContribution == True:
+            if self.getConfPaperReview().getEnableRefereeEmailNotifForContribution():
                 notification = ContributionReviewingNotification(referee, 'Referee', self._contribution)
                 GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", referee)
 
@@ -147,7 +147,7 @@ class ReviewManager(Persistent, Fossilizable):
         if self.hasReviewers():
             self.removeAllReviewers()
         #e-mail notification will be send when referee is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
-        if self.getConfPaperReview()._enableRefereeEmailNotifForContribution == True:
+        if self.getConfPaperReview().getEnableRefereeEmailNotifForContribution():
             notification = ContributionReviewingRemoveNotification(self._referee, 'Referee', self._contribution)
             GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", self._referee)
         self._referee = None
@@ -182,7 +182,7 @@ class ReviewManager(Persistent, Fossilizable):
             self.getConfPaperReview().addEditorContribution(editor, self._contribution)
             self.getLastReview().setEditorDueDate(self.getConfPaperReview().getDefaultEditorDueDate())
             #e-mail notification will be send when editor is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
-            if self.getConfPaperReview()._enableEditorEmailNotifForContribution == True:
+            if self.getConfPaperReview().getEnableEditorEmailNotifForContribution():
                 notification = ContributionReviewingNotification(editor, 'Layout Reviewer', self._contribution)
                 GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", editor)
         else:
@@ -196,7 +196,7 @@ class ReviewManager(Persistent, Fossilizable):
         self._editor.unlinkTo(self._contribution, "editor")
         self.getConfPaperReview().removeEditorContribution(self._editor, self._contribution)
         #e-mail notification will be send when editor is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
-        if self.getConfPaperReview()._enableEditorEmailNotifForContribution == True:
+        if self.getConfPaperReview().getEnableEditorEmailNotifForContribution():
             notification = ContributionReviewingRemoveNotification(self._editor, 'Layout Reviewer', self._contribution)
             GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", self._editor)
         self._editor = None
@@ -229,7 +229,7 @@ class ReviewManager(Persistent, Fossilizable):
             if self.getLastReview().getAdviceFrom(reviewer) is None:
                 self.getLastReview().addReviewerJudgement(reviewer)
                 #e-mail notification will be send when reviewer is assigned to contribution only if the manager enable the option in 'Automatic e-mails' section
-            if self.getConfPaperReview()._enableReviewerEmailNotifForContribution == True:
+            if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
                 notification = ContributionReviewingNotification(reviewer, 'Content Reviewer', self._contribution)
                 GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", reviewer)
         else:
@@ -246,7 +246,7 @@ class ReviewManager(Persistent, Fossilizable):
             self._reviewersList.remove(reviewer)
             self.notifyModification()
             #e-mail notification will be send when reviewer is removed from contribution only if the manager enable the option in 'Automatic e-mails' section
-            if self.getConfPaperReview()._enableReviewerEmailNotifForContribution == True:
+            if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
                 notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
                 GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", reviewer)
 
@@ -259,7 +259,7 @@ class ReviewManager(Persistent, Fossilizable):
             self.getConfPaperReview().removeReviewerContribution(reviewer, self._contribution)
             self.notifyModification()
             #e-mail notification will be send when reviewers are removed from contribution only if the manager enable the option in 'Automatic e-mails' section
-            if self.getConfPaperReview()._enableReviewerEmailNotifForContribution == True:
+            if self.getConfPaperReview().getEnableReviewerEmailNotifForContribution():
                 notification = ContributionReviewingRemoveNotification(reviewer, 'Content Reviewer', self._contribution)
                 GenericMailer.sendAndLog(notification, self._contribution.getConference(), "Reviewing", reviewer)
         del(self._reviewersList[:])
@@ -369,11 +369,18 @@ class Judgement(Persistent):
         for answer in self._answers:
             if (questionId == answer.getQuestion().getId()):
                 return answer
-        # Create the new object with the initial value for the rbValue
+        return None
+
+    def _getQuestionById(self, questionId):
+        return self.getReviewManager().getConfPaperReview().getReviewingQuestionById(questionId)
+
+    def createAnswer(self, questionId):
+        """ Create the new object with the initial value for the rbValue
+        """
         newId = self.getNewAnswerId()
         rbValue = ConferencePaperReview.initialSelectedAnswer
         numberOfAnswers = len(ConferencePaperReview.reviewingQuestionsAnswers)
-        question = self.getReviewManager().getConfPaperReview().getReviewingQuestionById(questionId)
+        question = self._getQuestionById(questionId)
         newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
         self._answers.append(newAnswer)
         self.notifyModification()
@@ -381,6 +388,8 @@ class Judgement(Persistent):
 
     def setAnswer(self, questionId, rbValue, numberOfAnswers):
         answer = self.getAnswer(questionId)
+        if answer is None:
+            answer = self.createAnswer(questionId)
         answer.setRbValue(rbValue)
 
     def setSubmitted(self, submitted):
@@ -391,7 +400,7 @@ class Judgement(Persistent):
 
     def purgeAnswers(self):
         """ Remove the answers of the questions that were sent but we don't need anymory because
-            the questions has been removed """
+            the questions have been removed """
         # Check if the question has been removed
         for answer in self._answers:
             if (self.getConfPaperReview().getReviewingQuestionById(answer.getQuestion().getId()) == None):
@@ -404,23 +413,23 @@ class Judgement(Persistent):
         authorList = self.getReviewManager().getContribution().getAuthorList()
         for author in authorList:
             if widthdrawn:
-                if isinstance(self, RefereeJudgement) and self.getConfPaperReview()._enableRefereeJudgementEmailNotif == True:
+                if isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif():
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, EditorJudgement) and self.getConfPaperReview()._enableEditorJudgementEmailNotif == True:
+                if isinstance(self, EditorJudgement) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif():
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, ReviewerJudgement) and self.getConfPaperReview()._enableReviewerJudgementEmailNotif == True:
+                if isinstance(self, ReviewerJudgement) and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif():
                     notification = ContributionReviewingJudgementWithdrawalNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
             else:
-                if isinstance(self, RefereeJudgement) and self.getConfPaperReview()._enableRefereeJudgementEmailNotif == True:
+                if isinstance(self, RefereeJudgement) and self.getConfPaperReview().getEnableRefereeJudgementEmailNotif():
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, EditorJudgement) and self.getConfPaperReview()._enableEditorJudgementEmailNotif == True:
+                if isinstance(self, EditorJudgement) and self.getConfPaperReview().getEnableEditorJudgementEmailNotif():
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
-                if isinstance(self, ReviewerJudgement) and self.getConfPaperReview()._enableReviewerJudgementEmailNotif == True:
+                if isinstance(self, ReviewerJudgement) and self.getConfPaperReview().getEnableReviewerJudgementEmailNotif():
                     notification = ContributionReviewingJudgementNotification(author, self, self.getReviewManager().getContribution())
                     GenericMailer.sendAndLog(notification, self._review.getConference(), "Reviewing", author)
 
@@ -449,7 +458,8 @@ class RefereeJudgement(Judgement):
 
         self.getReview().copyMaterials(matReviewing)
 
-        if self._judgement.getId() == "2" or int(self._judgement.getId()) > 3:
+        # 2 --> to be corrected, > 3 has the same behaviour as 'to be corrected'
+        if int(self._judgement.getId()) == 2 or int(self._judgement.getId()) > 3:
             self.getReviewManager().newReview()
             # remove reviewing materials from the contribution
             self.getReviewManager().getContribution().removeMaterial(matReviewing)
@@ -490,28 +500,14 @@ class EditorJudgement(Judgement):
 
     def purgeAnswers(self):
         """ Remove the answers of the questions that were sent but we don't need anymory because
-            the questions has been removed """
+            the questions have been removed """
         # Check if the question has been removed
         for answer in self._answers:
             if (self.getConfPaperReview().getLayoutQuestionById(answer.getQuestion().getId()) == None):
                 self._answers.remove(answer)
 
-
-    def getAnswer(self, questionId):
-        """ Returns the Answer object if it already exists otherwise we create it
-        """
-        for answer in self._answers:
-            if (questionId == answer.getQuestion().getId()):
-                return answer
-        # Create the new object with the initial value for the rbValue
-        newId = self.getNewAnswerId()
-        rbValue = ConferencePaperReview.initialSelectedAnswer
-        numberOfAnswers = len(ConferencePaperReview.reviewingQuestionsAnswers)
-        question = self.getReviewManager().getConfPaperReview().getLayoutQuestionById(questionId)
-        newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
-        self._answers.append(newAnswer)
-        self.notifyModification()
-        return newAnswer
+    def _getQuestionById(self):
+        return self.getReviewManager().getConfPaperReview().getLayoutQuestionById(questionId)
 
     def getAnswers(self):
         questionAnswerList = []
@@ -675,30 +671,30 @@ class Review(Persistent, Fossilizable):
 
         if submitted:
 
-            if self._reviewManager.hasReferee() and self.getConfPaperReview()._enableAuthorSubmittedMatRefereeEmailNotif == True:
+            if self._reviewManager.hasReferee() and self.getConfPaperReview().getEnableAuthorSubmittedMatRefereeEmailNotif():
                 notification = MaterialsSubmittedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getReferee())
 
-            if self._reviewManager.hasEditor() and self.getConfPaperReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
+            if self._reviewManager.hasEditor() and self.getConfPaperReview().getEnableAuthorSubmittedMatEditorEmailNotif():
                 notification = MaterialsSubmittedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getEditor())
 
             for reviewer in self._reviewManager.getReviewersList():
-                if self.getConfPaperReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
+                if self.getConfPaperReview().getEnableAuthorSubmittedMatReviewerEmailNotif():
                     notification = MaterialsSubmittedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
                     GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
 
         else:
-            if self._reviewManager.hasReferee() and self.getConfPaperReview()._enableAuthorSubmittedMatRefereeEmailNotif == True:
+            if self._reviewManager.hasReferee() and self.getConfPaperReview().getEnableAuthorSubmittedMatRefereeEmailNotif():
                 notification = MaterialsChangedNotification(self._reviewManager.getReferee(), 'Referee', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getReferee())
 
-            if self._reviewManager.hasEditor() and self.getConfPaperReview()._enableAuthorSubmittedMatEditorEmailNotif == True:
+            if self._reviewManager.hasEditor() and self.getConfPaperReview().getEnableAuthorSubmittedMatEditorEmailNotif():
                 notification = MaterialsChangedNotification(self._reviewManager.getEditor(), 'Layout Reviewer', self._reviewManager.getContribution())
                 GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", self._reviewManager.getEditor())
 
             for reviewer in self._reviewManager.getReviewersList():
-                if self.getConfPaperReview()._enableAuthorSubmittedMatReviewerEmailNotif == True:
+                if self.getConfPaperReview().getEnableAuthorSubmittedMatReviewerEmailNotif():
                     notification = MaterialsChangedNotification(reviewer, 'Content Reviewer', self._reviewManager.getContribution())
                     GenericMailer.sendAndLog(notification, self._reviewManager.getContribution().getConference(), "Reviewing", reviewer)
 

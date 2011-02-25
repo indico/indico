@@ -35,7 +35,7 @@ from MaKaC.common.timezoneUtils import nowutc
 
 class Evaluation(Persistent):
     """Evaluation class : an evaluation belongs to a conference."""
-    
+
     ###########
     #Constants#
     ###########
@@ -49,7 +49,7 @@ class Evaluation(Persistent):
     _EVALUATION_START  = "evaluationStartNotify" #never change this value!
     _NEW_SUBMISSION    = "newSubmissionNotify"   #never change this value!
     _ALL_NOTIFICATIONS = [_EVALUATION_START, _NEW_SUBMISSION]
-    
+
     def __init__(self, conf, id=None):
         if id==None :
             self._id = str( conf._getEvaluationCounter().newCount() )
@@ -74,7 +74,7 @@ class Evaluation(Persistent):
 
     def getTimezone(self):
         return self._conf.getTimezone()
-    
+
     def reinit(self):
         """ reinit the evaluation.
             Note: all current information are lost, except '_id' and '_conf' attributes.
@@ -82,7 +82,7 @@ class Evaluation(Persistent):
         """
         self.removeAllQuestions()
         self.__init__(self.getConference(), self.getId())
-    
+
     def removeReferences(self):
         """remove all pointers to other objects."""
         self._conf = None
@@ -90,7 +90,7 @@ class Evaluation(Persistent):
         self.removeAllNotifications()
         self.removeAllQuestions()
         self.removeAllSubmissions()
-        
+
     def clone(self, conference):
         """returns a new Evaluation which is a copy of the current one (self)."""
         evaluation = Evaluation(conference)
@@ -111,7 +111,7 @@ class Evaluation(Persistent):
         for q in self.getQuestions():
             evaluation.insertQuestion(q.clone())
         return evaluation
-    
+
     def exportXml(self, xmlGen):
         """Write xml tags about this object in the given xml generator of type XMLGen."""
         #evaluations/evaluation/ - start
@@ -165,14 +165,14 @@ class Evaluation(Persistent):
         if not hasattr(self, "anonymous"):
             self.anonymous = True
         return self.anonymous
-    
+
     def setConference(self, conf):
         self._conf = conf
     def getConference(self):
         if not hasattr(self, "_conf"):
             self._conf = None
         return self._conf
-    
+
     def setId(self, id):
         self._id = str(id)
     def getId(self):
@@ -195,7 +195,7 @@ class Evaluation(Persistent):
         if not hasattr(self, "mandatoryAccount"):
             self.mandatoryAccount = False
         return self.mandatoryAccount
-    
+
     def setTitle( self, title ):
         self.title = utils.removeQuotes(title)
     def getTitle( self ):
@@ -206,21 +206,21 @@ class Evaluation(Persistent):
             else:
                 self.title = _("Evaluation")
         return self.title
-        
+
     def setAnnouncement( self, announcement ):
         self.announcement = utils.removeQuotes(announcement)
     def getAnnouncement( self ):
         if not hasattr(self, "announcement"):
             self.announcement = ""
         return self.announcement
-    
+
     def setSubmissionsLimit( self, submissionsLimit ):
         self.submissionsLimit = utils._positiveInt(submissionsLimit)
     def getSubmissionsLimit( self ):
         if not hasattr(self, "submissionsLimit"):
             self.submissionsLimit = 0
         return self.submissionsLimit
-        
+
     def setStartDate( self, sd ):
         self.startDate = datetime(sd.year,sd.month,sd.day,0,0,0)
     def getStartDate( self ):
@@ -234,17 +234,17 @@ class Evaluation(Persistent):
         if not hasattr(self, "endDate") or self.endDate==datetime(1,1,1,23,59,59):
             self.setEndDate(self._conf.getEndDate() + timedelta(days=8))
         return timezone(self.getTimezone()).localize(self.endDate)
-    
+
     def inEvaluationPeriod(self, date=nowutc()):
         return date>=self.getStartDate() and date<=self.getEndDate()
-    
+
     def setContactInfo( self, contactInfo ):
         self.contactInfo = utils.removeQuotes(contactInfo)
     def getContactInfo( self ):
         if not hasattr(self, "contactInfo"):
             self.contactInfo = ""
         return self.contactInfo
-        
+
     def insertQuestion(self, question, position=-1):
         """ Insert a question in this evaluation at the given position (if given, otherwise at the end).
             It also sets questions's evaluation to be this evaluation.
@@ -258,13 +258,13 @@ class Evaluation(Persistent):
                 self.getQuestions().append(question)
         question.setEvaluation(self)
         self.notifyModification()
-        
+
     def getQuestions(self):
         """get the questions of this evaluation."""
         if not hasattr(self, "_questions"):
             self._questions = []
         return self._questions
-        
+
     def getQuestionAt(self, position):
         """ get a question from this evalution given by its position.
             Note: first position = 1.
@@ -275,7 +275,7 @@ class Evaluation(Persistent):
         #getting...
         questions = self.getQuestions()
         return questions[position]
-        
+
     def removeQuestion(self, position):
         """ remove and return the questions given by its position from this evaluation.
             Note: first position = 1.
@@ -288,7 +288,7 @@ class Evaluation(Persistent):
         q.removeReferences()
         self.notifyModification()
         return q
-        
+
     def removeAllQuestions(self):
         """ remove all the questions of this evaluation.
             Advice: the session variable 'selectedSubmissions_<ConfId>_<EvalId>' should be deleted.
@@ -302,7 +302,7 @@ class Evaluation(Persistent):
         #reinit
         self._questions = []
         self.notifyModification()
-    
+
     def getNbOfQuestions(self):
         """get the number of questions contained in this evaluation."""
         return len(self.getQuestions())
@@ -312,7 +312,7 @@ class Evaluation(Persistent):
         if not hasattr(self, "_submissionCounter"):
             self._submissionCounter = Counter()
         return self._submissionCounter
-        
+
     def insertSubmission(self, submission):
         """ Insert a submission for this evaluation.
             Params:
@@ -321,7 +321,7 @@ class Evaluation(Persistent):
         if submission not in self.getSubmissions():
             self.getSubmissions().append(submission)
         self.notifyModification()
-        
+
     def setSubmissions(self, submissions):
         """set the submissions of this evaluation."""
         self._submissions = submissions
@@ -330,17 +330,17 @@ class Evaluation(Persistent):
         if not hasattr(self, "_submissions"):
             self._submissions = []
         return self._submissions
-        
+
     def getUserSubmission(self, user):
         """ return the submission of the given user, or None if nothing found.
-            Params: 
+            Params:
                 user -- an object generally of type Avatar.
         """
         for submission in self.getSubmissions():
             if submission.getSubmitter()==user :
                 return submission
         return None
-        
+
     def removeSubmission(self, submission):
         """remove the given submission from the submissions list."""
         submissions = self.getSubmissions()
@@ -348,7 +348,7 @@ class Evaluation(Persistent):
             submissions.remove(submission)
             self.notifyModification()
         submission.removeReferences()
-        
+
     def removeAllSubmissions(self):
         """ remove all the submissions of this evaluation.
             Advice: the session variable 'selectedSubmissions_<ConfId>_<EvalId>' should be deleted.
@@ -359,15 +359,15 @@ class Evaluation(Persistent):
             submission.removeReferences()
         self._submissions = []
         self.notifyModification()
-    
+
     def getNbOfSubmissions(self):
         """get the number of submissions contained in this evaluation."""
         return len(self.getSubmissions())
-    
+
     def isFull(self):
         """If the number of submissions has reached the number of submissions limit, return True. False otherwise."""
         return self.getNbOfSubmissions() >= self.getSubmissionsLimit() and self.getSubmissionsLimit()!=0
-    
+
     def setNotification( self, notificationKey, notification=None ):
         """ Set a Notification with given notification key and optional Notification instance.
             Do nothing if the notification key is unknown (cf _ALL_NOTIFICATIONS).
@@ -379,7 +379,7 @@ class Evaluation(Persistent):
             self.getNotifications()[notificationKey] = notification or Notification()
             self.notifyModification()
             self.setAlarm(notificationKey)
-            
+
     def removeNotification(self, notificationKey):
         """remove corresponding Notification with given notification key."""
         notifications = self.getNotifications()
@@ -387,22 +387,22 @@ class Evaluation(Persistent):
             notifications.pop(notificationKey, None)
             self.notifyModification()
             self.removeAlarm(self.getAlarm(notificationKey))
-            
+
     def removeAllNotifications(self):
         """remove all notifications."""
         self.notifications = {}
         self.notifyModification()
-            
+
     def getNotifications(self):
         """get the dictionnary with pairs like this ([int]notificationKey: [Notification]notification)."""
         if not hasattr(self, "notifications"):
             self.notifications = {}
         return self.notifications
-    
+
     def getNotification(self, notificationKey):
         """For given notification key gets the corresponding Notification or None if not found."""
         return self.getNotifications().get(notificationKey, None)
-    
+
     def setAlarm(self, notificationKey):
         """Set the id of an Alarm with given notification key (cf _ALL_NOTIFICATIONS)."""
         if self.getStartDate() < nowutc():
@@ -427,7 +427,7 @@ class Evaluation(Persistent):
                 alarm.setSubject( self.getTitle() )
                 url = urlHandlers.UHConfEvaluationDisplay.getURL(self.getConference())
                 alarm.setText( _("Hello,\n\nPlease answer this survey :\n%s\n\nBest Regards")%url)
-            
+
     def removeAlarm(self, alarm):
         """Remove given Alarm."""
         if alarm != None :
@@ -436,7 +436,7 @@ class Evaluation(Persistent):
             else :
                 self.getAlarms().pop(alarm.getNotificationKey(), None)
                 self.notifyModification()
-            
+
     def removeAllAlarms(self):
         """remove all alarms."""
         alarms = self.getAlarms()
@@ -444,13 +444,13 @@ class Evaluation(Persistent):
             self.getConference().removeAlarm(alarm)
         self.alarms = {}
         self.notifyModification()
-            
+
     def getAlarms(self):
         """get the dictionnary with pairs like this ([int]notificationKey: [Alarm]alarm)."""
         if not hasattr(self, "alarms"):
             self.alarms = {}
         return self.alarms
-    
+
     def getAlarm(self, notificationKey):
         """For given notification key gets the corresponding Alarm or None if not found."""
         alarm = self.getAlarms().get(notificationKey, None)
@@ -459,39 +459,39 @@ class Evaluation(Persistent):
             self.removeAlarm(alarm)
             return None
         return alarm
-    
-    
+
+
 class EvaluationAlarm(Alarm):
     """Suited alarm for an evaluation."""
-    
+
     def __init__(self, evaluation, notificationKey):
         self._evaluation = evaluation
         self.notificationKey = notificationKey #cf Evaluation._ALL_NOTIFICATIONS
         Alarm.__init__(self, evaluation.getConference())
-    
+
     def setEvaluation(self, evaluation):
         self._evaluation = evaluation
-    
+
     def getEvaluation(self):
         if not hasattr(self, "_evaluation"):
             self._evaluation = None
         return self._evaluation
-    
+
     def setNotificationKey(self, notificationKey): #cf Evaluation._ALL_NOTIFICATIONS
         self.notificationKey = notificationKey
-    
+
     def getNotificationKey(self): #cf Evaluation._ALL_NOTIFICATIONS
         if not hasattr(self, "notificationKey"):
             self.notificationKey = None
         return self.notificationKey
-    
+
     def delete(self):
         evaluation = self.getEvaluation()
         if evaluation != None :
             evaluation.removeAlarm(self)
         self.setEvaluation(None)
         Alarm.delete(self)
-        
+
     def prerun(self):
         """returns True if aborted, False otherwise."""
         #date checking...
@@ -507,11 +507,11 @@ class EvaluationAlarm(Alarm):
             self.conf.removeAlarm(self)
             return True #email aborted
         return False #email ok
-        
-    
+
+
 class Question(Persistent):
     """Question class : a question belongs to an evaluation."""
-    
+
     ###########
     #Constants#
     ###########
@@ -534,7 +534,7 @@ class Question(Persistent):
     #question type names: topclasses
     _QUESTION          = "Question"
     _QUESTION_SUBTYPES = _BOX_SUBTYPES + _CHOICE_SUBTYPES
-    
+
     def __init__(self):
         self._evaluation = None
         self._answers = []
@@ -544,7 +544,7 @@ class Question(Persistent):
         self.description = ""
         self.help = ""
 #        self.level = 1
-    
+
     def removeReferences(self):
         """remove all pointers to other objects."""
         self._evaluation = None
@@ -560,7 +560,7 @@ class Question(Persistent):
         q.setHelp(self.getHelp())
 #        q.setLevel(self.getLevel())
         return q
-    
+
     def _exportCommonAttributesXml(self, xmlGen):
         """Write xml tags about common question attributes in the given xml generator of type XMLGen."""
         xmlGen.writeTag("questionValue", self.getQuestionValue())
@@ -568,7 +568,7 @@ class Question(Persistent):
         xmlGen.writeTag("required", self.isRequired())
         xmlGen.writeTag("description", self.getDescription())
         xmlGen.writeTag("help", self.getHelp())
-    
+
     def removeAnswer(self, answer):
         """remove the given answer from its answers."""
         answers = self.getAnswers()
@@ -576,7 +576,7 @@ class Question(Persistent):
             answers.remove(answer)
             self.notifyModification()
         answer.removeReferences()
-        
+
     def removeAllAnswers(self):
         """remove all the answers of this question."""
         #remove all answers and links to them
@@ -593,7 +593,7 @@ class Question(Persistent):
     def notifyModification(self):
         """indicates to the database that current object attributes have changed."""
         self._p_changed=1
-    
+
     def setEvaluation(self, evaluation):
         """Sets the evaluation to which this question belongs."""
         self._evaluation = evaluation
@@ -602,19 +602,19 @@ class Question(Persistent):
         if not hasattr(self, "_evaluation"):
             self._evaluation = None
         return self._evaluation
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._QUESTION
-    
+
     def getClass(self):
         """gets the class of this object."""
         return self.__class__
-    
+
     def getClassName(self):
         """gets the class name of this object."""
         return self.getClass().__name__
-    
+
     def setQuestionValue(self, questionValue):
         """sets the question itself (i.e. the text), not a Question object."""
         self.questionValue = utils.removeQuotes(questionValue)
@@ -623,7 +623,7 @@ class Question(Persistent):
         if not hasattr(self, "questionValue"):
             self.questionValue = ""
         return self.questionValue
-    
+
     def setKeyword(self, keyword):
         """Set the keyword. A keyword is the question summarised in one word."""
         self.keyword = utils.removeQuotes(keyword)
@@ -632,7 +632,7 @@ class Question(Persistent):
         if not hasattr(self, "keyword"):
             self.keyword = ""
         return self.keyword
-    
+
     def setRequired(self, required):
         """Set if an answer for the question is required."""
         self.required = utils._bool(required)
@@ -641,14 +641,14 @@ class Question(Persistent):
         if not hasattr(self, "required"):
             self.required = False
         return self.required
-    
+
     def setDescription(self, description):
         self.description = utils.removeQuotes(description)
     def getDescription(self):
         if not hasattr(self, "description"):
             self.description = ""
         return self.description
-    
+
     def setHelp(self, help):
         """sets help message."""
         self.help = utils.removeQuotes(help)
@@ -657,7 +657,7 @@ class Question(Persistent):
         if not hasattr(self, "help"):
             self.help = ""
         return self.help
-    
+
     def setPosition(self, position):
         """ sets position of a question within a form.
             Note: first position = 1.
@@ -672,7 +672,7 @@ class Question(Persistent):
             Note: first position = 1.
         """
         return self.getEvaluation().getQuestions().index(self)+1
-    
+
 #    def setLevel(self, level):
 #        """ sets level of a question, used for multipart questions. (e.g. 1.1,1.1a, 1.1b,...)
 #            The lower the level, the higher its importance.
@@ -685,14 +685,14 @@ class Question(Persistent):
 #        if not hasattr(self, "level"):
 #            self.level = 1
 #        return self.level
-        
+
     def insertAnswer(self, answer):
         """Insert an answer for this question. It also sets answer's question to be this question."""
         if answer not in self.getAnswers():
             self.getAnswers().append(answer)
         answer.setQuestion(self)
         self.notifyModification()
-        
+
     def getAnswers(self, selectedSubmissions=[]):
         """ get the answers for this question.
             This function is a shortcut for getting answers easily from this question.
@@ -712,7 +712,7 @@ class Question(Persistent):
             if answer.getSubmission() in selectedSubmissions:
                 tempAnswers.append(answer)
         return tempAnswers
-    
+
     def getNbOfAnswers(self, selectedSubmissions=[]):
         """ get the number of answers for this question.
             Params:
@@ -720,7 +720,7 @@ class Question(Persistent):
                                        If the list is empty, we treat all the answers.
         """
         return len(self.getAnswers(selectedSubmissions))
-    
+
     def getNbOfFilledAnswers(self, selectedSubmissions=[]):
         """ returns the number of not empty answers.
             Params:
@@ -732,7 +732,7 @@ class Question(Persistent):
             if answer.hasAnswerValue():
                 nb += 1
         return nb
-    
+
     def areAllAnswersFilled(self, selectedSubmissions=[]):
         """ returns True if all the answers are filled, False otherwise.
             Params:
@@ -740,23 +740,23 @@ class Question(Persistent):
                                        If the list is empty, we treat all the answers.
         """
         return self.getNbOfFilledAnswers(selectedSubmissions) == self.getNbOfAnswers(selectedSubmissions)
-    
+
     def printAreAllAnswersFilled(self, selectedSubmissions=[]):
         return "%s %s"%(self.getNbOfFilledAnswers(selectedSubmissions), self.getNbOfAnswers(selectedSubmissions))
-        
+
     def getUserAnswer(self, user):
         """ return the answer (of type Answer) of the given user, or None if nothing found.
-            Params: 
+            Params:
                 user -- an object generally of type Avatar.
         """
         for answer in self.getAnswers():
             if answer.getSubmission().getSubmitter()==user :
                 return answer
         return None
-        
+
     def getUserAnswerValue(self, user):
         """ return the answer value (of type str) of the given user, or None if nothing found.
-            Params: 
+            Params:
                 user -- an object generally of type Avatar.
         """
         answer = self.getUserAnswer(user)
@@ -764,11 +764,11 @@ class Question(Persistent):
             return None
         else:
             return answer.getAnswerValue()
-        
+
 
 class Box(Question):
     """A Box is a question to which you answer with the help of a box (e.g. Textbox, TextArea, PasswordBox)."""
-    
+
     def __init__(self):
         Question.__init__(self)
         self.defaultAnswer = ""
@@ -779,14 +779,14 @@ class Box(Question):
         q = Question.clone(self)
         q.setDefaultAnswer(self.getDefaultAnswer())
         return q
-    
+
     def exportXml(self, xmlGen):
         """Write xml tags about this object in the given xml generator of type XMLGen."""
         xmlGen.openTag(self.getClassName())
         self._exportCommonAttributesXml(xmlGen)
         xmlGen.writeTag("defaultAnswer", self.getDefaultAnswer())
         xmlGen.closeTag(self.getClassName())
-    
+
     def setDefaultAnswer(self, defaultAnswer):
         """sets the default answer of the question."""
         self.defaultAnswer = utils.removeQuotes(defaultAnswer)
@@ -795,15 +795,15 @@ class Box(Question):
         if not hasattr(self, "defaultAnswer"):
             self.defaultAnswer = ""
         return self.defaultAnswer
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._BOX
-    
-    
+
+
 class Choice(Question):
     """A Choice is a question to which you answer with the help of a multiple choices (e.g. Radio buttons, Checkboxes, ...)."""
-    
+
     def __init__(self):
         Question.__init__(self)
         self.choiceItems = {};
@@ -816,7 +816,7 @@ class Choice(Question):
         for itemText,isSelected in self.getChoiceItems().items():
             q.insertChoiceItem(itemText, isSelected)
         return q
-    
+
     def exportXml(self, xmlGen):
         """Write xml tags about this object in the given xml generator of type XMLGen."""
         xmlGen.openTag(self.getClassName())
@@ -829,11 +829,11 @@ class Choice(Question):
             xmlGen.closeTag("choiceItem")
         xmlGen.closeTag("choiceItems")
         xmlGen.closeTag(self.getClassName())
-    
+
     def insertChoiceItem(self, itemText, isSelected):
         """ Insert a new choice item in the dictionnary.
             A choiceItem is a pair like this : (itemText,isSelected).
-            
+
             Params:
                 itemText -- [str] text of the choiceItem.
                 isSelected -- [bool] if the choiceItem is selected.
@@ -847,13 +847,13 @@ class Choice(Question):
             self.getChoiceItemsOrderedKeys().append(itemText)
         #notify
         self.notifyModification()
-            
+
     def getChoiceItems(self):
         """Gets the dictionary of choice items. Its elements are pairs like this (itemText:isSelected)."""
         if not hasattr(self, "choiceItems"):
             self.choiceItems = {};
         return self.choiceItems
-            
+
     def getChoiceItemsOrderedKeys(self):
         """ Gets the list of ordered keys (itemText of type str) for choice items.
             The keys are ordered in the same order as the user inserted them.
@@ -861,7 +861,7 @@ class Choice(Question):
         if not hasattr(self, "choiceItemsOrderedKeys"):
             self.choiceItemsOrderedKeys = []
         return self.choiceItemsOrderedKeys
-            
+
     def getChoiceItemsKeyAt(self, position):
         """ Gets the key (itemText) at the given position.
             Note: first position = 1.
@@ -871,24 +871,24 @@ class Choice(Question):
         keys = self.getChoiceItemsOrderedKeys()
         if position<0 or position>=len(keys) : return ""
         return keys[position]
-            
+
     def getChoiceItemsCorrespondingValue(self, itemText):
         """ Given the key (itemText) returns the corresponding value (isSelected). """
         return self.getChoiceItems().get(itemText, False)
-            
+
     def getNbOfChoiceItems(self):
         """Gets the number of choice items."""
         choiceItemsNb = len(self.getChoiceItems())
         choiceItemsOrderedKeysNb = len(self.getChoiceItemsOrderedKeys())
         #both should always be the same, but... we never know!
         return min([choiceItemsNb , choiceItemsOrderedKeysNb])
-        
+
     def removeAllChoiceItems(self):
         """remove all the choice items for this question."""
         self.choiceItems = {}
         self.choiceItemsOrderedKeys = []
         self.notifyModification()
-    
+
     def getDefaultAnswers(self):
         """gets the default answers (list of strings) of the question."""
         keys = self.getChoiceItems().keys()
@@ -900,25 +900,25 @@ class Choice(Question):
                 defaultAnswers.append(keys[index])
             index+=1
         return defaultAnswers
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._CHOICE
-    
-    
+
+
 class Textbox(Box):
-    
+
     def __init__(self):
         Box.__init__(self)
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._TEXTBOX
-    
+
     def getAnswerClass(self):
         """gets the class of the corresponding answer(s) for this question."""
         return TextAnswer
-    
+
     def displayHtml(self, **attributes):
         """ Display the question in HTML.
             Params:
@@ -929,7 +929,7 @@ class Textbox(Box):
         attributes["class"] = "textType"
         attributes["value"] = self.getDefaultAnswer()
         return WUtils.createInput(**attributes)
-    
+
     def displayHtmlWithUserAnswer(self, user, **attributes):
         """ Display the question in HTML with the answer of given user.
             Params:
@@ -942,20 +942,20 @@ class Textbox(Box):
         attributes["value"] = self.getUserAnswerValue(user)
         return WUtils.createInput(**attributes)
 
-    
+
 class Textarea(Box):
-    
+
     def __init__(self):
         Box.__init__(self)
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._TEXTAREA
-    
+
     def getAnswerClass(self):
         """gets the class of the corresponding answer(s) for this question."""
         return TextAnswer
-    
+
     def displayHtml(self, **attributes):
         """ Display the question in HTML.
             Params:
@@ -963,7 +963,7 @@ class Textarea(Box):
         """
         from MaKaC.webinterface.wcomponents import WUtils
         return WUtils.createTextarea(self.getDefaultAnswer(), **attributes)
-    
+
     def displayHtmlWithUserAnswer(self, user, **attributes):
         """ Display the question in HTML with the answer of given user.
             Params:
@@ -972,21 +972,21 @@ class Textarea(Box):
         """
         from MaKaC.webinterface.wcomponents import WUtils
         return WUtils.createTextarea(self.getUserAnswerValue(user), **attributes)
-    
-    
+
+
 class Password(Box):
-    
+
     def __init__(self):
         Box.__init__(self)
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._PASSWORD
-    
+
     def getAnswerClass(self):
         """gets the class of the corresponding answer(s) for this question."""
         return TextAnswer
-    
+
     def displayHtml(self, **attributes):
         """ Display the question in HTML.
             Params:
@@ -997,7 +997,7 @@ class Password(Box):
         attributes["class"] = "passwordType"
         attributes["value"] = self.getDefaultAnswer()
         return WUtils.createInput(**attributes)
-    
+
     def displayHtmlWithUserAnswer(self, user, **attributes):
         """ Display the question in HTML with the answer of given user.
             Params:
@@ -1009,13 +1009,13 @@ class Password(Box):
         attributes["class"] = "passwordType"
         attributes["value"] = self.getUserAnswerValue(user)
         return WUtils.createInput(**attributes)
-    
-    
+
+
 class Select(Choice):
-    
+
     def __init__(self):
         Choice.__init__(self)
-        
+
     def getDefaultAnswer(self):
         """gets the default answer (string) of the question."""
         defaultAnswers = self.getDefaultAnswers()
@@ -1023,15 +1023,15 @@ class Select(Choice):
             return defaultAnswers.pop()
         else:
             return ""
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._SELECT
-    
+
     def getAnswerClass(self):
         """gets the class of the corresponding answer(s) for this question."""
         return TextAnswer
-    
+
     def displayHtml(self, **attributes):
         """ Display the question in HTML.
             Params:
@@ -1041,7 +1041,7 @@ class Select(Choice):
         options  = self.getChoiceItemsOrderedKeys()
         selected = self.getDefaultAnswer()
         return WUtils.createSelect(True, options, selected, **attributes)
-    
+
     def displayHtmlWithUserAnswer(self, user, **attributes):
         """ Display the question in HTML with the answer of given user.
             Params:
@@ -1052,7 +1052,7 @@ class Select(Choice):
         options  = self.getChoiceItemsOrderedKeys()
         selected = self.getUserAnswerValue(user)
         return WUtils.createSelect(True, options, selected, **attributes)
-    
+
     def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
@@ -1068,7 +1068,7 @@ class Select(Choice):
             return nb
         except:
             return 0
-    
+
     def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
@@ -1081,13 +1081,13 @@ class Select(Choice):
             return utils._positiveInt(round(percent))
         except:
             return 0
-    
-    
+
+
 class Radio(Choice):
-    
+
     def __init__(self):
         Choice.__init__(self)
-        
+
     def getDefaultAnswer(self):
         """gets the default answer (text) of the question."""
         defaultAnswers = self.getDefaultAnswers()
@@ -1095,15 +1095,15 @@ class Radio(Choice):
             return defaultAnswers.pop()
         else:
             return ""
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._RADIO
-    
+
     def getAnswerClass(self):
         """gets the class of the corresponding answer(s) for this question."""
         return TextAnswer
-    
+
     def displayHtml(self, **attributes):
         """ Display the question in HTML.
             Params:
@@ -1121,7 +1121,7 @@ class Radio(Choice):
                 attributes.pop("checked", None)
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
-    
+
     def displayHtmlWithUserAnswer(self, user, **attributes):
         """ Display the question in HTML with the answer of given user.
             Params:
@@ -1139,7 +1139,7 @@ class Radio(Choice):
                 attributes.pop("checked", None)
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
-    
+
     def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
@@ -1155,7 +1155,7 @@ class Radio(Choice):
             return nb
         except:
             return 0
-    
+
     def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
@@ -1168,21 +1168,21 @@ class Radio(Choice):
             return utils._positiveInt(round(percent))
         except:
             return 0
-    
-    
+
+
 class Checkbox(Choice):
-    
+
     def __init__(self):
         Choice.__init__(self)
-    
+
     def getTypeName(self):
         """gets type name of this question."""
         return self._CHECKBOX
-    
+
     def getAnswerClass(self):
         """gets the class of the corresponding answer(s) for this question."""
         return MultipleChoicesAnswer
-    
+
     def displayHtml(self, **attributes):
         """ Display the question in HTML.
             Params:
@@ -1200,7 +1200,7 @@ class Checkbox(Choice):
                 attributes.pop("checked", None)
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
-    
+
     def displayHtmlWithUserAnswer(self, user, **attributes):
         """ Display the question in HTML with the answer of given user.
             Params:
@@ -1222,7 +1222,7 @@ class Checkbox(Choice):
                 attributes.pop("checked", None)
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
-    
+
     def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
@@ -1236,7 +1236,7 @@ class Checkbox(Choice):
                 if str(selectedChoiceItem)==str(answerValue):
                     nb += 1
         return nb
-        
+
     def getNbOfAllSelectedChoiceItems(self, selectedSubmissions=[]):
         """ [Statistics] Returns the number of all selected choice items for all answers for this question.
             Params:
@@ -1250,7 +1250,7 @@ class Checkbox(Choice):
             return nb
         except:
             return 0
-    
+
     def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
@@ -1268,16 +1268,16 @@ class Checkbox(Choice):
 
 class Answer(Persistent):
     """Answer for a corresponding question..."""
-    
+
     def __init__(self):
         self._question = None
         self._submission = None
-    
+
     def removeReferences(self):
         """remove all pointers to other objects."""
         self._question = None
         self._submission = None
-    
+
     def setQuestion(self, q):
         """Set the corresponding Question of this Answer."""
         self._question = q
@@ -1286,7 +1286,7 @@ class Answer(Persistent):
         if not hasattr(self, "_question"):
             self._question = None
         return self._question
-    
+
     def setSubmission(self, s):
         """Set the submission to which this answer belongs."""
         self._submission = s
@@ -1302,22 +1302,22 @@ class Answer(Persistent):
 
 class TextAnswer(Answer):
     """Answer which is just a text. (e.g. for Textbox, Textarea, Passwordbox, RadioButtons, Select)"""
-    
+
     def __init__(self):
         Answer.__init__(self)
         self._answerValue = ""
-    
+
     def setAnswerValue(self, a):
         """Set the answer value (str) of this object Answer."""
         if a==[] or a==None: a=""
         self._answerValue = utils.removeQuotes(a)
-    
+
     def getAnswerValue(self):
         """Get the answer value (str) of this object Answer."""
         if not hasattr(self, "_answerValue"):
             self._answerValue = ""
         return self._answerValue
-    
+
     def hasAnswerValue(self):
         """Returns False if the answer value is empty, True otherwise."""
         return self.getAnswerValue()!=""
@@ -1325,14 +1325,14 @@ class TextAnswer(Answer):
 
 class MultipleChoicesAnswer(Answer):
     """Answer (list of selected items) for a question with multiple choices (i.e. Checkbox)."""
-    
+
     def __init__(self):
         Answer.__init__(self)
         self._selectedChoiceItems = [] #list of str
-            
+
     def setSelectedChoiceItems(self, selectedAnswers):
         """ Sets the list of selected choice items.
-            
+
             Params:
                 selectedAnswers -- [str or list-of-str] selected answers for the question.
         """
@@ -1344,7 +1344,7 @@ class MultipleChoicesAnswer(Answer):
             self._selectedChoiceItems = [utils.removeQuotes(ci) for ci in selectedAnswers]
         self.notifyModification()
     setAnswerValue = setSelectedChoiceItems
-        
+
     def getSelectedChoiceItems(self):
         """ Gets the list of selected choice items (str).
         """
@@ -1352,16 +1352,16 @@ class MultipleChoicesAnswer(Answer):
             self._selectedChoiceItems = []
         return self._selectedChoiceItems
     getAnswerValue = getSelectedChoiceItems
-    
+
     def hasSelectedChoiceItems(self):
         """Returns False if the answer value is empty, True otherwise."""
         return self.getNbOfSelectedChoiceItems()>0
     hasAnswerValue = hasSelectedChoiceItems
-        
+
     def getNbOfSelectedChoiceItems(self):
         """ Gets the number of selected choice items. """
         return len(self.getSelectedChoiceItems())
-        
+
     def removeAllSelectedChoiceItems(self):
         """remove all the selected choice items for this question."""
         self._selectedChoiceItems = []
@@ -1374,7 +1374,7 @@ class MultipleChoicesAnswer(Answer):
 
 class Submission(Persistent):
     """When you submit an evaluation, you create a Submission instance."""
-    
+
     def __init__(self, evaluation, submitter):
         """ Initiation + insert this submission in evaluation's submissions.
             Params:
@@ -1389,13 +1389,13 @@ class Submission(Persistent):
         self.submissionDate = nowutc()
         self.modificationDate = None
         self.anonymous = evaluation.isAnonymous()
-    
+
     def removeReferences(self):
         """remove all pointers to other objects."""
         self._evaluation = None
         self.removeSubmitter()
         self.removeAllAnswers()
-    
+
     def setId(self, id):
         self._id = str(id)
     def getId(self):
@@ -1406,7 +1406,7 @@ class Submission(Persistent):
     def notifyModification(self):
         """indicates to the database that current object attributes have changed."""
         self._p_changed=1
-    
+
     def setEvaluation(self, evaluation):
         """Sets the evaluation to which this submission is bound."""
         self._evaluation = evaluation
@@ -1424,7 +1424,7 @@ class Submission(Persistent):
         if not hasattr(self, "anonymous"):
             self.anonymous = True
         return self.anonymous
-    
+
     def setSubmitter(self, submitter):
         """Set the submitter. He is of type None when anonymous, Avatar otherwise."""
         if isinstance(submitter, Avatar) :
@@ -1441,7 +1441,7 @@ class Submission(Persistent):
         if isinstance(submitter, Avatar) :
             submitter.unlinkTo(self, "submitter")
         self._submitter = None
-        
+
     def getSubmitterName(self):
         """returns name of submitter"""
         submitter = self.getSubmitter()
@@ -1449,7 +1449,7 @@ class Submission(Persistent):
             return submitter.getFullName()
         else :
             return "Anonymous (%s)"%self.getId()
-                    
+
     def notifyByEmail(self, message=""):
         """Notifies concerned people (given by To and Cc) by email about the given message [str]."""
         try:
@@ -1470,23 +1470,23 @@ class Submission(Persistent):
                         sm.addCcAddr(cc)
                     sm.setSubject(subject)
                     sm.setText(message)
-                    sm.run() 
+                    sm.run()
         except Exception, e:
             if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
                 raise Exception(e)
-            
+
     def notifySubmissionSubmitted(self):
         """notification when a new submission arrive."""
         evaluation = self.getEvaluation()
         self.notifyByEmail( _("""New submission from *%s* for \nevaluation *%s*.
                             """)%(self.getSubmitterName(), evaluation.getTitle()) )
-            
+
     def notifySubmissionModified(self):
         """notification when a submission is modified."""
         evaluation = self.getEvaluation()
         self.notifyByEmail( _("""*%s* modified his submission for \nevaluation *%s*.
                             """)%(self.getSubmitterName(), evaluation.getTitle()) )
-        
+
     def addNewAnswer(self, question, answerValue):
         """ Add a new answer for this submission.
             Params:
@@ -1499,17 +1499,17 @@ class Submission(Persistent):
         answer.setAnswerValue(answerValue) #answer's question must be set!!! (done through question.insertAnswer)
         self.getAnswers().append(answer)
         self.notifyModification()
-        
+
     def getAnswers(self):
         """get the answers of this submission."""
         if not hasattr(self, "_answers"):
             self._answers = []
         return self._answers
-    
+
     def getNbOfAnswers(self):
         """get the number of answers for this question."""
         return len(self.getAnswers())
-    
+
     def removeAnswer(self, answer):
         """remove the given answer from its answers."""
         answers = self.getAnswers()
@@ -1517,7 +1517,7 @@ class Submission(Persistent):
             answers.remove(answer)
             self.notifyModification()
         answer.removeReferences()
-        
+
     def removeAllAnswers(self):
         """remove all the answers of this submission."""
         #remove all answers and links to them
@@ -1526,7 +1526,7 @@ class Submission(Persistent):
         #reinit
         self._answers = []
         self.notifyModification()
-        
+
     def getDictQuestionsAnswers(self):
         """ Returns a dictionnary like this {Question : Answer},
             with a Question as key and its corresponding Answer as value.
@@ -1538,7 +1538,7 @@ class Submission(Persistent):
         for answer in self.getAnswers() :
             dictQuestionsAnswers[answer.getQuestion()] = answer
         return dictQuestionsAnswers
-        
+
     def getSubmissionDate(self, format=datetime):
         """ Get the submission date.
             Params:
@@ -1550,7 +1550,7 @@ class Submission(Persistent):
             return self.submissionDate.strftime("%x %H:%M")
         else:
             return self.submissionDate
-        
+
     def setModificationDate(self):
         """Update the modification date (of type 'datetime') to now."""
         self.modificationDate = nowutc()
@@ -1559,7 +1559,7 @@ class Submission(Persistent):
                 get the modification date (of type 'str'), or "" if there is no modification.
             Else:
                 get the modification date (of type 'datetime'), or None if there is no modification.
-            
+
             Params:
                 format -- output format (datetime or str)
         """

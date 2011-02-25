@@ -799,7 +799,11 @@ class ContributionReviewingCriteriaModification(ContributionReviewingTextModific
         self.getJudgementObject().setAnswer(self._criterion, int(self._value), self._conf.getConfPaperReview().getNumberOfAnswers())
 
     def _handleGet(self):
-        return self.getJudgementObject().getAnswer(self._criterion).getRbValue()
+        judgementObj = self.getJudgementObject()
+        answer = judgementObj.getAnswer(self._criterion)
+        if answer is None:
+            answer = judgementObj.createAnswer(self._criterion)
+        return answer.getRbValue()
 
 
 class ContributionReviewingSetSubmitted(ContributionReviewingBase):

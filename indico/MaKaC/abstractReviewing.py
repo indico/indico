@@ -54,7 +54,7 @@ class ConferenceAbstractReview(Persistent):
     def addReviewingQuestion(self, text):
         """ Adds this question at the end of the list of questions
         """
-        newId = self.getNewQuestionId()
+        newId = self._getNewQuestionId()
         question = Question(newId,text)
         self._reviewingQuestions.append(question)
         self.notifyModification()
@@ -104,11 +104,6 @@ class ConferenceAbstractReview(Persistent):
 
     def getNumberOfAnswers(self):
         """ Returns the number of possible answers """
-        try :
-            if self._numberOfAnswers:
-                pass
-        except AttributeError :
-            self._numberOfAnswers = 7
         return self._numberOfAnswers
 
     def setRadioButtonsLabels(self):
@@ -132,6 +127,7 @@ class ConferenceAbstractReview(Persistent):
             else:
                 self._radioButtonsLabels.append("")
             i += 1
+        self.notifyModification()
 
     def setRadioButtonsTitles(self):
         """ Set the titles for the radio buttons """
@@ -146,39 +142,20 @@ class ConferenceAbstractReview(Persistent):
                 title = "%.1f" % (((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*i + self.getScaleLower())
                 self._radioButtonsTitles.append(title)
             i += 1
+        self.notifyModification()
 
     def getRadioButtonsTitles(self):
         """ Get the titles for the radio buttons """
-        try :
-            if self._radioButtonsTitles:
-                pass
-        except AttributeError :
-            self._radioButtonsTitles = ["0", "1.7", "3.3", "5", "6.7", "8.3", "10"]
         return self._radioButtonsTitles
 
     def getScaleLower(self):
-        try :
-            if self._scaleLower:
-                pass
-        except AttributeError :
-            self._scaleLower = 0
         return self._scaleLower
 
     def getScaleHigher(self):
-        try :
-            if self._scaleHigher:
-                pass
-        except AttributeError :
-            self._scaleHigher = 10
         return self._scaleHigher
 
     def getRadioButtonsLabels(self):
         """ Get the labels for the radio buttons """
-        try :
-            if self._radioButtonsLabels:
-                pass
-        except AttributeError :
-            self._radioButtonsLabels = ["0", "", "", "5", "", "", "10"]
         return self._radioButtonsLabels
 
     def setScale(self, min, max):
@@ -186,7 +163,7 @@ class ConferenceAbstractReview(Persistent):
         self._scaleLower = min
         self._scaleHigher = max
 
-    def getNewQuestionId(self):
+    def _getNewQuestionId(self):
         """ Returns a new an unused questionId
             Increments the questionId counter
         """
