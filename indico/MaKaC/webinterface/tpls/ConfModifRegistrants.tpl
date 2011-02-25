@@ -2,44 +2,10 @@
 <!--
     var newUser = false;
 
-    function selectStatuses()
-    {
-        for (i = 0; i < document.filterOptionForm.statuses.length; i++)
-        {
-            document.filterOptionForm.statuses[i].checked=true;
-        }
-    }
+    <% includeTpl("ListJSHelpers") %>
 
-    function selectOneStatus(elementName)
-    {
-        var inputNodes = IndicoUtil.findFormFields($E(elementName))
-        for (i = 0; i < inputNodes.length; i++)
-        {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                node.checked = true;
-            }
-        }
-    }
-
-    function unselectOneStatus(elementName)
-    {
-        var inputNodes = IndicoUtil.findFormFields($E(elementName))
-        for (i = 0; i < inputNodes.length; i++)
-        {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                node.checked = false;
-            }
-        }
-    }
-
-    function unselectStatuses()
-    {
-        for (i = 0; i < document.filterOptionForm.statuses.length; i++)
-        {
-            document.filterOptionForm.statuses[i].checked=false
-        }
+    window.onload = function(){
+        isSelected("registrantsItems")
     }
 
     function selectDisplay()
@@ -86,22 +52,6 @@
         isSelected("registrantsItems")
     }
 
-    var staticURLState = false;
-    var staticURLSwitch = function() {
-        if (staticURLState) {
-            IndicoUI.Effect.disappear($E('staticURL'));
-            IndicoUI.Effect.disappear($E('staticURLLink'));
-        } else {
-            IndicoUI.Effect.appear($E('staticURL'));
-            IndicoUI.Effect.appear($E('staticURLLink'));
-            $E('staticURL').dom.select();
-        }
-        staticURLState = !staticURLState;
-    }
-
-    window.onload = function(){
-        isSelected("registrantsItems")
-    }
 //-->
 </script>
 
@@ -171,7 +121,7 @@
 
         <tr>
           <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
-            <form action=<%= actionPostURL %> method="post" name="registrantsForm" onSubmit="return atLeastOneSelected()">
+            <form action=<%= actionPostURL %> method="post" name="registrantsForm" onsubmit="return atLeastOneSelected($E("registrantsItems"), $T("No registrant selected! Please select at least one."));">
 	      <table>
                 <tr>
                   <td colspan="10">
@@ -255,62 +205,6 @@
 </form>
 
 <script type="text/javascript">
-    function onMouseOver(element) {
-        if ($E(element).dom.style.backgroundColor ==='transparent') {
-           $E(element).dom.style.backgroundColor='rgb(255, 246, 223)';
-        }
-    }
-
-    function onMouseOut(element) {
-        var inputNodes = IndicoUtil.findFormFields($E(element))
-        for (i = 0; i < inputNodes.length; i++) {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                if(node.checked !== true) {
-                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
-                } else {
-                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-                }
-            }
-        }
-    }
-
-
-    function atLeastOneSelected() {
-        if(!newUser) {
-            var inputNodes = IndicoUtil.findFormFields($E("registrantsItems"))
-            for (i = 0; i < inputNodes.length; i++)
-            {
-                var node = inputNodes[i];
-                if (node.type == "checkbox") {
-                    if(node.checked == true) {
-                        return true;
-                    }
-                }
-            }
-
-            var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
-            dialog.open();
-
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    function isSelected(element) {
-        var inputNodes = IndicoUtil.findFormFields($E(element))
-        for (i = 0; i < inputNodes.length; i++) {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                if(node.checked == true) {
-                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-                } else {
-                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
-                }
-            }
-        }
-    }
 
     function showFilters() {
         if ($E("displayMenu").dom.style.display == "") {

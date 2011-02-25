@@ -23,44 +23,11 @@ else:
 
 <script type="text/javascript">
 <!--
-    function selectStatuses()
-    {
-        for (i = 0; i < document.filterOptionForm.statuses.length; i++)
-        {
-            document.filterOptionForm.statuses[i].checked=true;
-        }
-    }
 
-    function selectOneStatus(elementName)
-    {
-        var inputNodes = IndicoUtil.findFormFields($E(elementName))
-        for (i = 0; i < inputNodes.length; i++)
-        {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                node.checked = true;
-            }
-        }
-    }
+    <% includeTpl("ListJSHelpers") %>
 
-    function unselectOneStatus(elementName)
-    {
-        var inputNodes = IndicoUtil.findFormFields($E(elementName))
-        for (i = 0; i < inputNodes.length; i++)
-        {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                node.checked = false;
-            }
-        }
-    }
-
-    function unselectStatuses()
-    {
-        for (i = 0; i < document.filterOptionForm.statuses.length; i++)
-        {
-            document.filterOptionForm.statuses[i].checked=false;
-        }
+    window.onload = function(){
+        isSelected("contribsItems");
     }
 
     function selectAll()
@@ -91,22 +58,6 @@ else:
         isSelected("contribsItems");
     }
 
-    var staticURLState = false;
-    var staticURLSwitch = function() {
-        if (staticURLState) {
-            IndicoUI.Effect.disappear($E('staticURL'));
-            IndicoUI.Effect.disappear($E('staticURLLink'));
-        } else {
-            IndicoUI.Effect.appear($E('staticURL'));
-            IndicoUI.Effect.appear($E('staticURLLink'));
-            $E('staticURL').dom.select();
-        }
-        staticURLState = !staticURLState;
-    }
-
-    window.onload = function(){
-        isSelected("contribsItems");
-    }
 //-->
 </script>
 
@@ -162,14 +113,19 @@ else:
         </td>
     </tr>
     <tr>
-
         <td colspan="40" style="border-bottom: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
-            <form action=<%= contribSelectionAction %> method="post" name="contribsForm">
             <table>
                 <tbody>
+                        <td>
+                          <form action="<%= newContribURL %>" method="POST" style="padding:0px;margin:0px; display:inline">
+                            <input type="hidden" name="contributionCreatedFrom" value="contributionList"/>
+                            <input type="button" onclick="addContribution()" class="btn" name="" value="<%= _("Add new")%>">
+                          </form>
+                        </td>
+                        <form action=<%= contribSelectionAction %> method="post" name="contribsForm" onsubmit="return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));">
 
                         <td valign="bottom" align="left" class="eventModifButtonBar">
-                            <input type="submit" class="btn" name="move" value="<%= _("Move")%>">
+                           <input type="submit" class="btn" name="move" value="<%= _("Move")%>">
                         </td>
                         <td valign="bottom" align="left">
                             <input type="submit" class="btn" name="AUTH" value="<%= _("Author list")%>">
@@ -249,63 +205,6 @@ else:
 </table>
 </form>
 <script type="text/javascript">
-    function onMouseOver(element) {
-        if ($E(element).dom.style.backgroundColor ==='transparent') {
-           $E(element).dom.style.backgroundColor='rgb(255, 246, 223)';
-        }
-    }
-
-    function onMouseOut(element) {
-        var inputNodes = IndicoUtil.findFormFields($E(element))
-        for (i = 0; i < inputNodes.length; i++) {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                if(node.checked !== true) {
-                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
-                } else {
-                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-                }
-            }
-        }
-    }
-
-
-    function atLeastOneSelected() {
-        if(!newUser) {
-            var inputNodes = IndicoUtil.findFormFields($E("contribsItems"))
-            for (i = 0; i < inputNodes.length; i++)
-            {
-                var node = inputNodes[i];
-                if (node.type == "checkbox") {
-                    if(node.checked == true) {
-                        return true;
-                    }
-                }
-            }
-
-            var dialog = new WarningPopup($T("Warning"), $T("No contribution selected! Please select at least one."));
-            dialog.open();
-
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    function isSelected(element) {
-        var inputNodes = IndicoUtil.findFormFields($E(element))
-        for (i = 0; i < inputNodes.length; i++) {
-            var node = inputNodes[i];
-            if (node.type == "checkbox") {
-                if(node.checked == true) {
-                    $E(node.name+node.value).dom.style.backgroundColor = "#CDEB8B";
-                } else {
-                    $E(node.name+node.value).dom.style.backgroundColor='transparent';
-                }
-            }
-        }
-    }
-
     function showFilters() {
         if ($E("filterMenu").dom.style.display == "") {
 <% if filterUsed: %>
@@ -322,9 +221,7 @@ else:
             $E("filterMenu").dom.style.display = "";
         }
     }
-</script>
 
-<script type="text/javascript">
 var parentEventRoomData = $O(<%= jsonEncode(roomInfo(self._rh._target)) %>);
 
 var addContribution = function() {
