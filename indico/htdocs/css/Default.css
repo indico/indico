@@ -148,6 +148,28 @@ a:link, .fakeLink {
    color: #0b63a5;
    text-decoration: none;
 }
+
+a.fakeLink span.infoBubble{
+    display: None;
+    margin-top: -7px;
+    visibility: hidden;
+}
+
+a.fakeLink:hover span.infoBubble{
+    display: inline;
+    position: absolute;
+    left: 102%;
+    background: white;
+    color: #777;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12px;
+    padding: 3px;
+    border: 1px solid #0b63a5;
+    border-left: 4px solid #0b63a5;
+    /*height: 150px; /* to decide the max */
+}
+
 a:visited {
    color: #0b63a5;
    text-decoration: none;

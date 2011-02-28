@@ -3,7 +3,7 @@
 <div class="pageHeader pageHeaderMainPage clearfix">
         <%include file="SessionBar.tpl" args="dark=False"/>
 
-        % if searchBox != '': 
+        % if searchBox != '':
             ${ searchBox }
         % endif
 
@@ -14,7 +14,7 @@
             <img class="headerLogo" src="${ imgLogo }" />
         </a>
 
-        % if isFrontPage: 
+        % if isFrontPage:
             <div class="headerAboutIndico">
                 ${ _("The Indico tool allows you to manage complex conferences, workshops and meetings.") }
             </div>
@@ -25,17 +25,17 @@
             <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHWelcome.getURL() }">${ _("Home") }</a></li>
             <li id="createEventMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Create event") }</span></li>
 
-            % if roomBooking: 
+            % if roomBooking:
                 <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHRoomBookingWelcome.getURL() }">${ _("Room booking") }</a></li>
             % endif
 
-            % if len(adminItemList) == 1: 
+            % if len(adminItemList) == 1:
                 <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ adminItemList[0]['url'] }">${ adminItemList[0]['text'] }</a></li>
-            % elif len(adminItemList) > 1: 
+            % elif len(adminItemList) > 1:
                 <li id="administrationMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Administration") }</span></li>
             % endif
 
-            % if currentUser: 
+            % if currentUser:
                 <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHUserDetails.getURL(currentUser) }">${ _("My profile") }</a></li>
             % endif
 
@@ -64,24 +64,32 @@ urlMeeting.addParam("event_type","meeting")
 var createEventMenu = $E('createEventMenu');
 createEventMenu.observeClick(function(e) {
     var menuItems = {};
-
     menuItems['${ _("Create lecture") }'] = "${ urlLecture }";
     menuItems['${ _("Create meeting") }'] = "${ urlMeeting }";
     menuItems['${ _("Create conference") }'] = "${ urlConference }";
 
+    var infoItems = {}; //List used to print additional help on the menu (MUST use the same keys as menuItems)
+    infoItems['${ _("Create lecture") }'] = "${ _("A <strong>lecture</strong> is a simple event to annouce a talk.<br/><strong>Features</strong>: poster creation, participants management,...") }";
+    infoItems['${ _("Create meeting") }'] = "${ _("A <strong>meeting</strong> is an event that defines an agenda with many talks.<br/><strong>Features</strong>: timetable, minutes, poster creation, participants management,...") }";
+    infoItems['${ _("Create conference") }'] = "${ _("A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.<br/><strong>Features</strong>: call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...") }";
+
     var menu = new PopupMenu(menuItems, [createEventMenu], "globalMenuPopupList");
     var pos = createEventMenu.getAbsolutePosition();
     menu.open(pos.x, pos.y + 30);
+
+    //Write down the content of the infoBubble
+    menu.drawInfoBubbles(infoItems);
+
     return false;
 });
 
-% if len(adminItemList) > 1: 
+% if len(adminItemList) > 1:
 
     var administrationMenu = $E('administrationMenu');
     administrationMenu.observeClick(function(e) {
         var menuItems = {};
 
-        % for item in adminItemList: 
+        % for item in adminItemList:
         menuItems["${ item['text']}"] = "${ item['url'] }"
         % endfor
         var menu = new PopupMenu(menuItems, [administrationMenu], "globalMenuPopupList");

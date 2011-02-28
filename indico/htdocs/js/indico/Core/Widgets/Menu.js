@@ -17,9 +17,8 @@ type("ChainedPopupWidget", ["PopupWidget"],
 
          open: function(x, y) {
              var self = this;
-
              if (this.active) {
-                 // don't let the popup open twice
+                 // don't let the popup open twice [** Update: It's not working ! **]
                  return;
              } else {
                  this.active = true;
@@ -71,7 +70,6 @@ type("ChainedPopupWidget", ["PopupWidget"],
              IndicoUtil.onclickHandlerRemove(this.handler);
              this.PopupWidget.prototype.close.call(this);
          }
-
      },
      function(chainElements, alignRight) {
          this.PopupWidget();
@@ -86,6 +84,15 @@ type("PopupMenu", ["ChainedPopupWidget"],
             var self = this;
             var value = pair.get();
             var link = Html.a('fakeLink', pair.key);
+            var id = Html.generateId();
+
+            /* Build <span> tags.
+             * The content will be added only if drawBubbles is called.
+             * Done like that because span.set() doesn't interpret html tags,
+             * by using drawBubbles, the html tags can be interpreted. */
+            var span = Html.span('infoBubble');
+            span.setAttribute("id", pair.key);
+            link.append(span);
 
             if(typeof value == "string" ) {
                 link.setAttribute('href', value);
@@ -106,7 +113,6 @@ type("PopupMenu", ["ChainedPopupWidget"],
 
                                       link.dom.className = 'selected';
                                       self.selected = link;
-
                                       var pos = listItem.getAbsolutePosition();
 
                                       each(self.items, function(item, key) {
@@ -137,11 +143,18 @@ type("PopupMenu", ["ChainedPopupWidget"],
             else {
                 listItem = Html.li({}, link);
             }
+
             return listItem;
         },
         close: function() {
             if(this.closeHandler()) {
                 this.ChainedPopupWidget.prototype.close.call(this);
+            }
+        },
+        drawInfoBubbles: function(infoItems){
+            for(var item in infoItems){
+                $E(item).dom.innerHTML = infoItems[item];
+                $E(item).dom.style.visibility = "visible";
             }
         },
         draw: function(x, y) {
