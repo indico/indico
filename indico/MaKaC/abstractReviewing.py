@@ -29,9 +29,9 @@ class ConferenceAbstractReview(Persistent):
     This class manages the parameters of the abstract reviewing.
     """
 
-    def __init__( self, conference):
-        """ Constructor.
-            conference must be a Conference object (not an id).
+    def __init__(self, conference):
+        """
+        conference must be a Conference object (not an id).
         """
         self._conference = conference
         self._reviewingQuestions = []
@@ -55,7 +55,7 @@ class ConferenceAbstractReview(Persistent):
         """ Adds this question at the end of the list of questions
         """
         newId = self._getNewQuestionId()
-        question = Question(newId,text)
+        question = Question(newId, text)
         self._reviewingQuestions.append(question)
         self.notifyModification()
 
@@ -110,12 +110,14 @@ class ConferenceAbstractReview(Persistent):
         """ Set the labels for the radio buttons """
         self._radioButtonsLabels = []
         i = 0
-        while i<self.getNumberOfAnswers():
-            if i == 0: # first label
+        while i < self.getNumberOfAnswers():
+            # first label
+            if i == 0:
                 self._radioButtonsLabels.append(str(self.getScaleLower()))
-            elif i == self._numberOfAnswers - 1: # last label
+            # last label
+            elif i == self._numberOfAnswers - 1:
                 self._radioButtonsLabels.append(str(self.getScaleHigher()))
-            # middle label: exist middle radio button, i has the correct value, exist middle value in the scale
+            # if there is a middle value (odd number of values) and we are there
             elif (self.getNumberOfAnswers() % 2 == 1) and  (i ==  (self.getNumberOfAnswers() - 1) / 2):
                 # check if we need float division
                 if ((self.getScaleLower() + self.getScaleHigher()) % 2 == 0):
@@ -133,13 +135,13 @@ class ConferenceAbstractReview(Persistent):
         """ Set the titles for the radio buttons """
         self._radioButtonsTitles = []
         i = 0
-        while i<self.getNumberOfAnswers():
+        while i < self.getNumberOfAnswers():
             # check if we need float division
-            if ((i*self.getScaleHigher()) % (self.getNumberOfAnswers()-1) == 0):
-                title = "%.0f" % (((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*i + self.getScaleLower())
+            if ((i * self.getScaleHigher()) % (self.getNumberOfAnswers() - 1) == 0):
+                title = "%.0f" % (((self.getScaleHigher() - self.getScaleLower()) / float(self.getNumberOfAnswers()-1)) * i + self.getScaleLower())
                 self._radioButtonsTitles.append(title)
             else:
-                title = "%.1f" % (((self.getScaleHigher()-self.getScaleLower())/float(self.getNumberOfAnswers()-1))*i + self.getScaleLower())
+                title = "%.1f" % (((self.getScaleHigher() - self.getScaleLower()) / float(self.getNumberOfAnswers()-1)) * i + self.getScaleLower())
                 self._radioButtonsTitles.append(title)
             i += 1
         self.notifyModification()
