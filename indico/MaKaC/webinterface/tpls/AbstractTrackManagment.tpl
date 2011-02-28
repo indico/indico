@@ -17,7 +17,7 @@
 <% end %>
 <% if ratingAverage: %>
     <br>
-    <span>The abstract's average rating is: <b>%(ratingAverage)s</b></span>
+    <span>The abstract's average rating is: <b><%= ratingAverage %></b></span>
 <% end %>
 
 <script>

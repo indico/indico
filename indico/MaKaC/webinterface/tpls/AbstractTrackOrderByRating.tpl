@@ -1,4 +1,4 @@
-<table class="infoQuestionsTable" width="100%%" align="center" cellpadding="0" cellspacing="0" border="0">
+<table class="infoQuestionsTable" width="100%" align="center" cellpadding="0" cellspacing="0" border="0">
     <tr>
         <td nowrap class="dataHeader" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Question")%></td>
         <td nowrap class="dataHeader" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #BBBBBB;"> <%= _("Average<br>rating")%>
@@ -16,5 +16,5 @@
     <span style="padding-left: 10px;">There are no judgements with answered questions yet.</span>
 <% end %>
 <% if ratingAverage: %>
-    <span>The abstract's average rating is: <b>%(ratingAverage)s</b></span>
+    <span>The abstract's average rating is: <b><%= ratingAverage %></b></span>
 <% end %>
