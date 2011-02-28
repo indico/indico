@@ -94,6 +94,11 @@ type("PopupMenu", ["ChainedPopupWidget"],
             span.setAttribute("id", pair.key);
             link.append(span);
 
+            if(this.infoItems != null){
+                var span = Html.span(null, this.infoItems[pair.key]);
+                link.append(span);
+            }
+
             if(typeof value == "string" ) {
                 link.setAttribute('href', value);
                 if (self.closeOnClick) {
