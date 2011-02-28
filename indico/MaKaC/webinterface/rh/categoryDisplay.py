@@ -60,7 +60,8 @@ class RHCategDisplayBase( base.RHDisplayBaseProtected ):
             base.RHDisplayBaseProtected._checkProtection( self )
 
     def _checkParams( self, params, mustExist = 1 ):
-        params["categId"] = str(params["categId"])
+        if "categId" in params:
+            params["categId"] = str(params["categId"])
         l = locators.CategoryWebLocator( params, mustExist )
         self._target = l.getObject()
 
