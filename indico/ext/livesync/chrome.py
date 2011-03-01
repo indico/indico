@@ -178,66 +178,80 @@ class WPluginAgentStatus(WTemplated):
         """
         Builds a semi-graphical representation of the current agent status
         """
+
+        # TODO: Reduce, split this!
+
         track = smanager.getTrack()
-        granularity = smanager.getGranularity()
 
         try:
             first = int(track.oldestTS())
+            last = int(track.mostRecentTS())
         except EmptyTrackException:
             return None, None
 
-        agentMap = {}
+        self._agentMap = {}
         lastAgentTS = 0
+        granularity = smanager.getGranularity()
 
         # create a map of agents, indexed by timestamp
         for aid in smanager.getAllAgents():
             ts = track.getPointerTimestamp(aid)
             if ts:
                 ts = int(ts)
-                agentMap.setdefault(ts, []).append(aid)
+                self._agentMap.setdefault(ts, []).append(aid)
                 lastAgentTS = max(ts, lastAgentTS)
 
         queue = []
-        showTS = breakContinuity = False
-        extra = sumElems = numBreakTS = 0
+        self._breakContinuity = False
+        extra = self._sumElems = self._numBreakTS = 0
 
-        agentsLeft = sorted(agentMap)
-        agentsLeft.reverse()
+        self._agentsLeft = sorted(self._agentMap)
+        self._agentsLeft.reverse()
 
         for ts, elems in track._container.iteritems():
-            ts = int(ts)
-            showTS = ts == first or ts in agentMap
-
-            if showTS or extra < self.NUM_CELLS:
-                if breakContinuity:
-                    queue.append(('break', numBreakTS, sumElems, []))
-
-                if ts in agentMap:
-                    for agentTS in agentsLeft[:]:
-                        if ts < agentTS:
-
-                            queue.append((agentTS,
-                                          self._tsToDate(agentTS, granularity),
-                                          0, agentMap[agentTS]))
-
-                            agentsLeft.remove(agentTS)
-                else:
-                    queue.append((ts, self._tsToDate(ts, granularity),
-                                  len(elems), agentMap.get(ts, [])))
-
-                breakContinuity = False
-                sumElems = numBreakTS = 0
-                if not showTS:
-                    extra += 1
+            if int(ts) in [first, last] or ts in self._agentMap or \
+                   extra < self.NUM_CELLS:
+                self._drawCell(queue, int(ts), elems,
+                               granularity)
+                extra += 1
             else:
-                sumElems += len(elems)
-                numBreakTS += 1
-                breakContinuity = True
+                self._sumElems += len(elems)
+                self._numBreakTS += 1
+                self._breakContinuity = True
+
+        for ts in self._agentsLeft:
+            self._drawCell(queue, int(ts), [],
+                           granularity)
 
         queue.reverse()
 
         # return ordered rows
         return queue, lastAgentTS
+
+    def _drawCell(self, queue, ts, elems, granularity):
+
+        if ts not in self._agentMap:
+            for agentTS in self._agentsLeft[:]:
+                if ts < agentTS:
+                    queue.append((agentTS,
+                                  self._tsToDate(agentTS, granularity),
+                                  0, self._agentMap[agentTS]))
+                    self._agentsLeft.remove(agentTS)
+        else:
+            if ts in self._agentsLeft:
+                self._agentsLeft.remove(ts)
+
+        if self._breakContinuity:
+            queue.append(('break', self._numBreakTS, self._sumElems, []))
+
+        queue.append((ts, self._tsToDate(ts, granularity),
+                          len(elems), self._agentMap.get(ts)))
+
+
+        self._breakContinuity = False
+        self._sumElems = self._numBreakTS = 0
+
+        return 0
 
     def getVars(self):
         tplVars = WTemplated.getVars(self)

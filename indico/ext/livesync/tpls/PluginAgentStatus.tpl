@@ -23,7 +23,7 @@
         <% end %>
         <tr>
         <td class="timestamp"><%= ts %><div class="small"><%= dt %></div></td>
-        <td class="content<% if not harvested: %> notharvested<% end %><% if len(agents) > 0: %> hasagents<% end %>">
+        <td class="content<% if not harvested: %> notharvested<% end %><% if agents: %> hasagents<% end %>">
             <% if nelems == 0: %>
                (nothing)
             <% end %>
@@ -32,10 +32,10 @@
             <% end %>
         </td>
         <td class="agents">
-          <% if len(agents) > 0: %>
+          <% if agents: %>
           ⇦
-          <% end %>
           <%= ', '.join(agents) %>
+          <% end %>
         </td>
       <% end %>
    </tr>
