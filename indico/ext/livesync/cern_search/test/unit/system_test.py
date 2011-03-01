@@ -36,7 +36,7 @@ from lxml import etree
 
 # plugin imports
 from indico.ext.livesync.cern_search import CERNSearchUploadAgent
-from indico.ext.livesync.bistate.test.unit import _TestUpload
+from indico.ext.livesync.test.unit.base import _TestUpload
 
 
 class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):

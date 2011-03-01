@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.ext.livesync.bistate.agent import BistateRecordProcessor, \
+from indico.ext.livesync.bistate import BistateRecordProcessor, \
      STATUS_DELETED, STATUS_CREATED, STATUS_CHANGED
 from indico.ext.livesync import ActionWrapper
 

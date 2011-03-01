@@ -36,7 +36,7 @@ from lxml import etree
 
 # plugin imports
 from indico.ext.livesync.invenio.agent import InvenioBatchUploaderAgent
-from indico.ext.livesync.bistate.test.unit import _TestUpload
+from indico.ext.livesync.test.unit.base import _TestUpload
 
 
 class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):

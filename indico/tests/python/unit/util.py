@@ -155,10 +155,10 @@ class RequestEnvironment_Feature(IndicoTestFeature):
     _requires = []
 
     def _action_endRequest(self):
-        self._do._notify('requestFinished')
+        self._do._notify('requestFinished', None)
 
     def _action_startRequest(self):
-        self._do._notify('requestStarted')
+        self._do._notify('requestStarted', None)
 
     def _context_request(self):
         self._startRequest()

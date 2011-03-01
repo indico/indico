@@ -18,12 +18,14 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import time
+import time, contextlib, dateutil
 
 from indico.ext.livesync import SyncManager, db
 from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
 from indico.util.date_time import nowutc, int_timestamp
+from indico.ext.livesync.tasks import LiveSyncUpdateTask
 
+FAKE_SERVICE_PORT = 12380
 
 class LiveSync_Feature(IndicoTestFeature):
     _requires = ['plugins.Plugins', 'util.ContextManager']
@@ -69,3 +71,81 @@ class _TestSynchronization(IndicoTestCase):
             self._sm.getTrack().iterate(fromTS-1, func=(lambda x: x[1])))
 
         self.assertEqual(res, expected)
+
+
+class _TestUpload(IndicoTestCase):
+
+    _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
+
+    def tearDown(self):
+        super(_TestUpload, self).tearDown()
+        self._closeEnvironment()
+
+    @contextlib.contextmanager
+    def _generateTestResult(self):
+
+        global FAKE_SERVICE_PORT
+
+        self._recordSet = dict()
+
+        fakeInvenio = self._server('', FAKE_SERVICE_PORT, self._recordSet)
+
+        agent = self._agent('test1', 'test1', 'test',
+                            0, url = 'http://localhost:%s' % \
+                            FAKE_SERVICE_PORT)
+
+        with self._context('database', 'request'):
+            self._sm.registerNewAgent(agent)
+            agent.preActivate(0)
+            agent.setActive(True)
+            # execute code
+            yield
+
+        time.sleep(1)
+
+        fakeInvenio.start()
+
+        # params won't be used
+        task = LiveSyncUpdateTask(dateutil.rrule.MINUTELY)
+
+        try:
+            task.run()
+        finally:
+            fakeInvenio.shutdown()
+            fakeInvenio.join()
+
+            # can't reuse the same port, as the OS won't have it free
+            FAKE_SERVICE_PORT += 1
+
+    def testSmallUpload(self):
+        """
+        Tests uploading multiple records (small)
+        """
+        with self._generateTestResult():
+            conf1 = self._home.newConference(self._dummy)
+            conf1.setTitle('Test Conference 1')
+            conf2 = self._home.newConference(self._dummy)
+            conf2.setTitle('Test Conference 2')
+
+        self.assertEqual(
+            self._recordSet,
+            {
+                'INDICO.0': {'title': 'Test Conference 1'},
+                'INDICO.1': {'title': 'Test Conference 2'}
+                })
+
+    def testLargeUpload(self):
+        """
+        Tests uploading multiple records (large)
+        """
+        with self._generateTestResult():
+            for nconf in range(0, 100):
+                conf = self._home.newConference(self._dummy)
+                conf.setTitle('Test Conference %s' % nconf)
+
+        self.assertEqual(
+            self._recordSet,
+            dict(('INDICO.%s' % nconf,
+                  {'title': 'Test Conference %s' % nconf}) \
+                 for nconf in range(0, 100)))
+
