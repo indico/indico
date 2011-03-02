@@ -5204,7 +5204,7 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
             "cancelURL": urlHandlers.UHConfDisplayAlarm.getURL( self._conf ), \
             "saveAlarm": urlHandlers.UHConfSaveAlarm.getURL(), \
             "confId": self._conf.getId(), \
-            "alarmId": self._alarm.getId(), \
+            "alarmId": self._alarm.getConfRelativeId(), \
             "confTitle": self._conf.getTitle() }
         vars["selec1"] = vars["selec2"] = vars["selec3"] = ""
         year = month = day = hour = dayBefore = hourBefore = -1
@@ -5296,7 +5296,7 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
             testSendAlarm += _(""" <input type="submit" class="btn" value="_("send me this alarm as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
 
         vars["testSendAlarm"] = testSendAlarm
-        if self._alarm.getConfSumary():
+        if self._alarm.getConfSummary():
             vars["includeConf"] = "checked"
 
         return p.getHTML( vars )

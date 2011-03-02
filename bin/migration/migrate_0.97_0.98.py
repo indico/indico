@@ -24,6 +24,7 @@ Migration script: v0.97 -> v0.98
 import sys
 import traceback
 from BTrees.OOBTree import OOTreeSet
+from dateutil import rrule
 
 from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex
 from MaKaC.common import DBMgr
@@ -36,15 +37,36 @@ from MaKaC.registration import RegistrantSession, RegistrationSession
 
 from indico.ext import livesync
 from indico.util import console
+from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
+     CategoryStatisticsUpdaterTask
+
+from indico.modules.scheduler import Client
 
 
 def runTaskMigration(dbi):
     """
     Migrating database tasks from the old format to the new one
     """
+
+    c = Client()
+
     for t in HelperTaskList().getTaskListInstance().getTasks():
-        print t
-        # TODO: finish this
+        for obj in t.getObjList():
+            print console.colored("   * %s" % obj.__class__.__name__, 'blue')
+            if obj.__class__.__name__ == 'FoundationSync':
+                c.enqueue(
+                    FoundationSyncTask(rrule.DAILY, byhour=0, byminute=0))
+            elif obj.__class__.__name__ == 'StatisticsUpdater':
+                c.enqueue(CategoryStatisticsUpdaterTask(
+                    CategoryManager().getById('0'),
+                    rrule.DAILY,
+                    byhour=0, byminute=0))
+            elif obj.__class__.__name__ == 'sendMail':
+                # they have to be somewhere in the conference
+                alarm = t.conf.alarmList[t.id]
+                c.enqueue(alarm)
+            else:
+                raise Exception("Unknown task type!")
 
     dbi.commit()
 
@@ -63,6 +85,27 @@ def _fixAccessController(obj):
         _fixAC(mat)
 
 
+def _convertAlarms(obj):
+    alarms = {}
+    obj._legacyAlarmList = obj.getAlarmList()
+
+    for alarm in obj.getAlarmList():
+        sdate = alarm.getStartDate()
+        newTask = AlarmTask(obj, alarm.id, sdate)
+        newTask.setSubject(alarm.getSubject())
+        newTask.setText(alarm.getText())
+        newTask.setNote(alarm.getNote())
+        newTask.setConfSummary(alarm.getConfSumary())
+        newTask.setToAllParticipants(alarm.getToAllParticipants())
+        alarms[alarm.id] = newTask
+
+        newTask.setFromAddr(alarm.getFromAddr())
+        for addr in alarm.getToAddrList():
+            newTask.addToAddr(addr)
+
+    obj.alarmList = alarms
+
+
 def runConferenceMigration(dbi):
     """
     Adding missing attributes to conference objects and children
@@ -72,24 +115,21 @@ def runConferenceMigration(dbi):
     i = 0
 
     for (level, obj) in console.conferenceHolderIterator(ch, deepness='contrib'):
+        # only for conferences
+        if level == 'event':
+            if hasattr(obj, '_Conference__alarmCounter'):
+                raise Exception("Conference Object %s (%s) seems to have been "
+                                "already converted" % (obj, obj.id))
 
-        ## TODO: Fix and uncomment
-        ##
-        ## # only for conferences
-        ## if level == 'conf':
-        ##     if hasattr(obj, '__alarmCounter'):
-        ##         raise Exception("Conference Object %s (%s) seems to have been "
-        ##                         "already converted" % (obj, obj.id))
+            existingKeys = obj.alarmList.keys()
+            existingKeys.sort()
+            nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
+            obj._Conference__alarmCounter = Counter(nstart)
 
-        ##     existingKeys = obj.alarmList.keys()
-        ##     existingKeys.sort()
-        ##     nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
-        ##     obj._Conference__alarmCounter = Counter(nstart)
-
-        ##     # TODO: For each conference, take the existing tasks and
-        ##     # convert them to the new object classes.
-        ##     # It is important to save the state of the alarm (sent or not)
-
+            # TODO: For each conference, take the existing tasks and
+            # convert them to the new object classes.
+            # It is important to save the state of the alarm (sent or not)
+            _convertAlarms(obj)
         _fixAccessController(obj)
 
         if i % 1000 == 999:
@@ -99,8 +139,10 @@ def runConferenceMigration(dbi):
         # Convert RegistrationSessions to RegistrantSessions
         if isinstance(obj, Conference):
             for reg in obj.getRegistrants().values():
-                if reg._sessions and isinstance(reg._sessions[0], RegistrationSession):
-                    reg._sessions = [RegistrantSession(ses, reg) for ses in self._sessions]
+                if reg._sessions and \
+                       isinstance(reg._sessions[0], RegistrationSession):
+                    reg._sessions = [RegistrantSession(ses, reg) \
+                                     for ses in reg._sessions]
 
     dbi.commit()
 
@@ -167,8 +209,8 @@ def runCategoryConfDictToTreeSet(dbi):
 def runMigration():
 
     tasks = [runPluginMigration,
-             runTaskMigration,
              runConferenceMigration,
+             runTaskMigration,
              runCategoryDateIndexMigration,
              runCategoryConfDictToTreeSet]
 

@@ -158,7 +158,7 @@ class DBMgr:
             transaction.commit()
 
     def commitZODBOld(self, sub=False):
-            transaction.commit(sub)
+        transaction.commit(sub)
 
     def abort(self):
         transaction.abort()
@@ -211,5 +211,3 @@ class DBMgr:
         raise Exception("ZODB 3 required! %s found" % zodbPkg.version)
     elif int(zodbVersion[1]) < 7:
         commit = commitZODBOld
-
-

@@ -280,8 +280,9 @@ class PeriodicTask(BaseTask):
 class PeriodicUniqueTask(PeriodicTask):
     """
     Singleton periodic tasks: no two or more PeriodicUniqueTask of this
-    class will be queued or running at the same time
+    class will be queued or running at the same time (TODO)
     """
+    # TODO: implement this
 
 
 class TaskOccurrence(TimedEvent):
@@ -316,11 +317,13 @@ class TaskOccurrence(TimedEvent):
     def getTask(self):
         return self._task
 
+
 class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
     '''Updates statistics associated with categories
     '''
-    def __init__(self, cat, **kwargs):
-        super(CategoryStatisticsUpdaterTask, self).__init__(**kwargs)
+    def __init__(self, cat, frequency, **kwargs):
+        super(CategoryStatisticsUpdaterTask, self).__init__(frequency,
+                                                            **kwargs)
         self._cat = cat
 
     def run(self):
@@ -328,7 +331,7 @@ class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
         CategoryStatistics.updateStatistics(self._cat)
 
 
-# TODO CERN Specific
+# TODO: Isolate CERN Specific
 class FoundationSyncTask(PeriodicUniqueTask):
     """
     Synchronizes room data (along with associated room managers
@@ -338,9 +341,8 @@ class FoundationSyncTask(PeriodicUniqueTask):
 
     (This is object for a task class)
     """
-    def __init__(self, **kwargs):
-        super(FoundationSyncTask, self).__init__(**kwargs)
-        obj.__init__(self)
+    def __init__(self, frequency, **kwargs):
+        super(FoundationSyncTask, self).__init__(frequency, **kwargs)
 
     def run(self):
         from MaKaC.common.FoundationSync.foundationSync import FoundationSync
@@ -360,12 +362,12 @@ class SendMailTask(OneShotTask):
         self.text = ""
         self.smtpServer = Config.getInstance().getSmtpServer()
 
-    def run(self, check = False):
+    def run(self, check=False):
         import smtplib
         from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
         # prepare the mail
-        self._prepare(check = check);
+        self._prepare(check=check);
 
         addrs = [smtplib.quoteaddr(x) for x in self.toAddr]
         ccaddrs = [smtplib.quoteaddr(x) for x in self.ccAddr]
@@ -392,22 +394,22 @@ class SendMailTask(OneShotTask):
     def addToAddr(self, addr):
         if not addr in self.toAddr:
             self.toAddr.append(addr)
-            self._p_changed=1
+            self._p_changed = 1
 
     def addCcAddr(self, addr):
         if not addr in self.ccAddr:
             self.ccAddr.append(addr)
-            self._p_changed=1
+            self._p_changed = 1
 
     def removeToAddr(self, addr):
         if addr in self.toAddr:
             self.toAddr.remove(addr)
-            self._p_changed=1
+            self._p_changed = 1
 
     def setToAddrList(self, addrList):
         """Params: addrList -- addresses of type : list of str."""
         self.toAddr = addrList
-        self._p_changed=1
+        self._p_changed = 1
 
     def getToAddrList(self):
         return self.toAddr
@@ -415,7 +417,7 @@ class SendMailTask(OneShotTask):
     def setCcAddrList(self, addrList):
         """Params: addrList -- addresses of type : list of str."""
         self.ccAddr = addrList
-        self._p_changed=1
+        self._p_changed = 1
 
     def getCcAddrList(self):
         return self.ccAddr
@@ -423,12 +425,12 @@ class SendMailTask(OneShotTask):
     def addToUser(self, user):
         if not user in self.toUser:
             self.toUser.append(user)
-            self._p_changed=1
+            self._p_changed = 1
 
     def removeToUser(self, user):
         if user in self.toUser:
             self.toUser.remove(user)
-            self._p_changed=1
+            self._p_changed = 1
 
     def getToUserList(self):
         return self.toUser
@@ -444,7 +446,6 @@ class SendMailTask(OneShotTask):
 
     def getText(self):
         return self.text
-
 
 
 class AlarmTask(SendMailTask):
@@ -552,12 +553,12 @@ class AlarmTask(SendMailTask):
     def getNote(self):
         return self.note
 
-    def setConfSumary(self, val):
+    def setConfSummary(self, val):
         self.confSumary = val
         self._setMailText()
         self._p_changed=1
 
-    def getConfSumary(self):
+    def getConfSummary(self):
         return self.confSumary
 
     def _prepare(self, check = True):

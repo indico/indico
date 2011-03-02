@@ -3247,9 +3247,9 @@ Best Regards%s
             ))
 
         if self._includeConf and self._includeConf == "1":
-            al.setConfSumary(True)
+            al.setConfSummary(True)
         else:
-            al.setConfSumary(False)
+            al.setConfSummary(False)
 
         self._al = al
 
@@ -5380,7 +5380,7 @@ class RHContributionListBase(RHConferenceModifBase):
             RHConferenceModifBase._checkProtection(self)
 
 
-class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
+class RHContributionList202( RoomBookingDBMixin, RHContributionListBase ):
     _uh = urlHandlers.UHConfModifContribList
 
     def _checkProtection(self):
