@@ -5852,11 +5852,6 @@ class WAbstracts( wcomponents.WTemplated ):
             l.append( """<input type="checkbox" name="status" value=%s%s>%s (%s) %s"""%(quoteattr(statusId),checked,imgHTML,self.htmlText(statusCode),self.htmlText(statusCaption)))
         return l
 
-    def _getRatingFilterItemList(self):
-        l = []
-        return l
-
-
     def _getOthersFilterItemList( self ):
         checkedShowMultiple, checkedShowComments = "", ""
         track_field=self._filterCrit.getField("track")
@@ -6052,9 +6047,9 @@ class WAbstracts( wcomponents.WTemplated ):
                 # Get the list of questions and the answers values
                 questionNames = abstract.getQuestionsAverage().keys()
                 answers = abstract.getQuestionsAverage().values()
-                rating = abstract.getRating()
+                rating = "%.2f" % abstract.getRating()
                 imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
-                detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, answers)
+                detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, ["%.2f" % i for i in answers])
 
 
             m = ["""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('abstracts%s')" type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId(), abstract.getId())]

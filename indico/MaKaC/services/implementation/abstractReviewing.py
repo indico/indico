@@ -43,8 +43,7 @@ class AbstractReviewingChangeNumAnswers(AbstractReviewingBase):
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
         pm = ParameterManager(self._params)
-        # we need to do like this because the value sent is an str (inherit of InlineEditWidget)
-        self._value = int(pm.extract("value", pType=str, allowEmpty=False))
+        self._value = pm.extract("value", pType=int, allowEmpty=False)
 
     def _getAnswer(self):
         self._confAbstractReview.setNumberOfAnswers(self._value)

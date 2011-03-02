@@ -159,7 +159,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
 //-->
 </script>
 <a href="" name="results"></a>
-<table width="100%" valign="top" align="left" cellspacing="0" style="padding-top: 30px;">
+<table width="100%" valign="top" align="left" cellspacing="0">
     <tr>
         <td class="titleCellFormat" nowrap colspan="10">
             <form action=<%= accessAbstract %> method="post">

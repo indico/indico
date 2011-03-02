@@ -6,8 +6,8 @@
         <% for error in errors: %>
             <tr align="left">
                 <td></td>
-                <td bgcolor="white" nowrap colspan="3" style="color:red; padding-bottom:10px; padding-top:10px; padding-left:10px;">
-                    <b><font color="red"><%= error %></font></b>
+                <td bgcolor="white" nowrap colspan="3" style="font-weight: bold; color: #881122; padding-bottom:10px; padding-top:10px; padding-left:10px;">
+                    <%= error %>
                 </td>
             </tr>
         <% end %>

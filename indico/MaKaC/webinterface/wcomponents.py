@@ -3627,6 +3627,9 @@ class Tab:
         tab=self._subtabControl.newTab( id, caption, url )
         return tab
 
+    def hasChildren(self):
+        return self._subtabControl is not None
+
 
 #class WTrackModifSubTrack( WTemplated ):
 #
@@ -3721,8 +3724,6 @@ class WTabControl( WTemplated ):
     def _getTabsHTML(self, tabCtrl=None,maxtabs=1):
         # TODO: Transport this to the template
 
-        hasHiddenOptions = False
-
         if tabCtrl==None:
             tabCtrl = self._tabCtrl
 
@@ -3732,25 +3733,13 @@ class WTabControl( WTemplated ):
         tabClassPrefix = ""
         isSubTab = False
 
-        addGradientDiv = True
-
         if tabCtrl.getLevel() % 2 == 0:
             tabClassPrefix = "tab"
-            # If no sub tabs then add gradient
-            if tabCtrl.getChild():
-                addGradientDiv = False
         else:
             tabClassPrefix = "subTab"
             isSubTab = True
 
-        ## Looking for the previous "not hidden and enabled" tab, before the active one.
-        beforeActive = None
-        for tab in tabCtrl.getTabList():
-            if tab.isActive():
-                break
-            elif tab.isEnabled() and (not tab.isHidden()):
-                beforeActive = tab
-        ########
+        activeTopLevelTab = None
         for i in range(0, len(tabCtrl.getTabList())):
             tab = tabCtrl.getTabList()[i]
 
@@ -3767,23 +3756,16 @@ class WTabControl( WTemplated ):
                                                 tab.getCaption().replace(" ","&nbsp;") )
 
             if tab.isActive():
-                self._activeTab = tab
+                self._activeTab = activeTopLevelTab = tab
                 cls=self.__class__._selTabCls
 
                 if tab.getSubTabControl():
                     self._getTabsHTML(tab.getSubTabControl(), maxtabs)
 
-            if (tab.isHidden()):
-                hasHiddenOptions = True
-
-                hiddenClass = ' hiddenTab'
-            else:
-                hiddenClass = ''
-
-            html.append("""<li class="%s%s %s" onclick="window.location = '%s'" onmouseout="this.style.backgroundPosition = '0 -30px';" onmouseover="this.style.backgroundPosition = '0 0';">%s</li>"""%(tabClassPrefix, cls, hiddenClass, tab.getURL(), caption))
+            html.append("""<li class="%s%s" onclick="window.location = '%s'" onmouseout="this.style.backgroundPosition = '0 -30px';" onmouseover="this.style.backgroundPosition = '0 0';">%s</li>"""%(tabClassPrefix, cls, tab.getURL(), caption))
         if html!=[]:
             gradientDiv = ""
-            if addGradientDiv:
+            if not activeTopLevelTab.hasChildren():
                 gradientDiv = """<div class="tabGradient"><div class="tabBorderGradient" style="float: left;"></div><div class="tabBorderGradient" style="float: right;"></div></div>"""
 
             cssClass = ""

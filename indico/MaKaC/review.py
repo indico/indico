@@ -1118,7 +1118,7 @@ class AbstractMgr(Persistent):
     def recalculateAbstractsRating(self, scaleLower, scaleHigher):
         ''' recalculate the values of the rating for all the abstracts in the conference '''
         for abs in self.getAbstractList():
-            abs.recalculateRating(scaleLower, scaleHigher)
+            abs.updateRating((scaleLower, scaleHigher))
 
     def removeAnswersOfQuestion(self, questionId):
         ''' Remove a question results for each abstract '''
@@ -2327,23 +2327,35 @@ class Abstract(Persistent):
 
     # Rating methods
     def getRating(self):
-        ''' Get the average rating of the abstract '''
+        """ Get the average rating of the abstract """
+        try:
+            if self._rating:
+                pass
+        except AttributeError:
+            self._rating = None
         return self._rating
 
-    def updateRating(self):
-        '''Update the average rating of the abstract which is calculated with the average of each judgement '''
+    def updateRating(self, scale = None):
+        """
+            Update the average rating of the abstract which is calculated with the average of each judgement.
+            If the scale (tuple with lower,higher) is passed, the judgement are re-adjusted to the new scale.
+        """
         self._rating = None
         # calculate the total valoration
         judNum = 0
         ratingSum = 0
         for track in self.getTrackListSorted():
             for jud in self.getJudgementHistoryByTrack(track):
+                if scale:
+                    # calculate the new values for each judgement
+                    scaleLower, scaleHigher = scale
+                    jud.recalculateJudgementValues(scaleLower, scaleHigher)
                 if jud.getJudValue() != None: # it means there is a numeric value for the judgement
                     ratingSum += jud.getJudValue()
                     judNum += 1
         # Calculate the average
         if judNum != 0:
-            self._rating = "%.2f" % (ratingSum/judNum)
+            self._rating = float(ratingSum) / judNum
 
     def getQuestionsAverage(self):
         '''Get the list of questions answered in the reviews for an abstract '''
@@ -2354,34 +2366,17 @@ class Abstract(Persistent):
                 for answer in jud.getAnswers():
                     # check if the question is in d and sum the answers value or insert in d the new question
                     if dTotals.has_key(answer.getQuestion().getText()):
-                        dTotals[answer.getQuestion().getText()] += float(answer.getValue())
+                        dTotals[answer.getQuestion().getText()] += answer.getValue()
                         dTimes[answer.getQuestion().getText()] += 1
                     else: # first time
-                        dTotals[answer.getQuestion().getText()] = float(answer.getValue())
+                        dTotals[answer.getQuestion().getText()] = answer.getValue()
                         dTimes[answer.getQuestion().getText()] = 1
         # get the questions average
         questionsAverage = {}
         for q, v in dTotals.iteritems():
             # insert the element and calculate the average for the value
-            questionsAverage[q] = "%.2f" % (float(v)/dTimes[q])
+            questionsAverage[q] = float(v)/dTimes[q]
         return questionsAverage
-
-    def recalculateRating(self, scaleLower, scaleHigher):
-        ''' Recalculate the values of each judgement with the new scales value '''
-        self._rating = None
-        # calculate the total valoration
-        judNum = 0
-        ratingSum = 0
-        for track in self.getTrackListSorted():
-            for jud in self.getJudgementHistoryByTrack(track):
-                # calculate the new values for each judgement
-                jud.recalculateJudgementValues(scaleLower, scaleHigher)
-                if jud.getJudValue() != None: # it means there is a numeric value for the judgement
-                    ratingSum += jud.getJudValue()
-                    judNum += 1
-        # Calculate the average
-        if judNum != 0:
-            self._rating = "%.2f" % (ratingSum/judNum)
 
     def removeAnswersOfQuestion(self, questionId):
         ''' Remove the answers of the question with questionId value '''
@@ -2434,40 +2429,47 @@ class AbstractJudgement( Persistent ):
         return self._comment
 
     def getAnswers(self):
+        try:
+            if self._answers:
+                pass
+        except AttributeError:
+            self._answers = []
         return self._answers
 
     def calculateJudgementAverage(self):
         '''Calculate the average value of the given answers'''
         result = 0
-        if (len(self._answers) != 0):
+        if (len(self.getAnswers()) != 0):
             # convert the values into float types
-            floatList = []
-            for ans in self._answers:
-                floatList.append(float(ans.getValue()))
-            result = "%.2f" % (sum(floatList) / float(len(floatList))) # calculate the average
+            floatList = [ans.getValue() for ans in self._answers]
+            result = sum(floatList) / float(len(floatList)) # calculate the average
         else:
             # there are no questions
             result = None
         return result
 
     def getJudValue(self):
-        if self._judValue:
-            # To be sure that it takes always a float value
-            self._judValue = float(self._judValue)
+        try:
+            if self._judValue:
+                pass
+        except AttributeError:
+            self._judValue = self.calculateJudgementAverage() # judgement average value
         return self._judValue
 
     def getTotalJudValue(self):
-        if self._totalJudValue:
-            # To be sure that it takes always a float value
-            self._totalJudValue = float(self._totalJudValue)
+        try:
+            if self._totalJudValue:
+                pass
+        except AttributeError:
+            self._totalJudValue = self.calculateAnswersTotalValue()
         return self._totalJudValue
 
     def calculateAnswersTotalValue(self):
         ''' Calculate the sum of all the ratings '''
         result = 0
         for ans in self._answers:
-            result += float(ans.getValue())
-        return "%.2f" % result
+            result += ans.getValue()
+        return result
 
     def recalculateJudgementValues(self, scaleLower, scaleHigher):
         ''' Update the values of the judgement. This function is called when the scale is changed.'''

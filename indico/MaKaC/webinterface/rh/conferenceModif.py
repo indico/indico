@@ -3565,19 +3565,13 @@ class RHConfModifCFA(RHConfModifCFABase):
 class RHAbstractReviewingSetup(RHConfModifCFABase):
 
     def _process(self):
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed(self, self._target)
-        else:
-            p = WPAbstractReviewingSetup(self, self._target)
+        p = WPAbstractReviewingSetup(self, self._target)
         return p.display()
 
 class RHAbstractReviewingTeam(RHConfModifCFABase):
 
     def _process(self):
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed(self, self._target)
-        else:
-            p = WPAbstractReviewingTeam(self, self._target)
+        p = WPAbstractReviewingTeam(self, self._target)
         return p.display()
 
 
@@ -4029,7 +4023,7 @@ class _AbstractRatingSF( filters.SortingField ):
             a = -1.0
         if b == None:
             b = -1.0
-        return cmp( float(a), float(b) )
+        return cmp( a, b )
 
 
 class AbstractSortingCriteria( filters.SortingCriteria ):

@@ -348,6 +348,9 @@ class WConfModCFANotifTplPreview(wcomponents.WTemplated):
             vars["cc"]=notif.getCCList()
             vars["subject"]=notif.getSubject()
             vars["body"] = notif.getBody()
+        else:
+            vars["From"]= vars["to"] = vars["cc"] = vars["subject"]= _("No preview available")
+            vars["body"] = _("An abstract must be submitted to display the preview")
         vars["cfaURL"]=quoteattr(str(urlHandlers.UHConfModifCFA.getURL(conf)))
         return vars
 

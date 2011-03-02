@@ -1174,7 +1174,7 @@ class Answer(Persistent):
         """
         Calculate the value of the answer in base to the scale limits and the number of possible answers (radio buttons)
         """
-        self._value = "%.2f" % (((scaleHigher-scaleLower)/float(self._numberOfAnswers-1))*self._rbValue + scaleLower)
+        self._value = (((scaleHigher-scaleLower)/float(self._numberOfAnswers-1))*self._rbValue) + scaleLower
 
 
 

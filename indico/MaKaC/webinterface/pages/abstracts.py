@@ -1538,9 +1538,9 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                     answers = status.getAnswers()
                     for ans in answers:
                         questionNames.append(ans.getQuestion().getText())
-                        answerValues.append(ans.getValue())
-                    rating = status.getJudValue()
-                    total = status.getTotalJudValue()
+                        answerValues.append("%.2f" % ans.getValue())
+                    rating = "%.2f" % status.getJudValue()
+                    total = "%.2f" % status.getTotalJudValue()
                     imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
                     detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s,%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, answerValues, rating, total)
 
@@ -1557,7 +1557,10 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                 tracks+="""
                         <tr><td>&nbsp;</td></tr>
                         """
-        vars["ratingAverage"] = self._abstract.getRating()
+        if self._abstract.getRating():
+            vars["ratingAverage"] = "%.2f" % self._abstract.getRating()
+        else:
+            vars["ratingAverage"] = None
         vars["judgements"] = judgements
         vars["tracks"] = tracks
         vars["scaleLower"] = self._conf.getConfAbstractReview().getScaleLower()
@@ -1588,12 +1591,15 @@ class WAbstractTrackOrderByRating(wcomponents.WTemplated):
         i = 0
         questions = {}
         for qText in questionIds:
-            questions[qText] = answerValues[i]
+            questions[qText] = "%.2f" % answerValues[i]
             i += 1
         vars = wcomponents.WTemplated.getVars( self )
 
         vars["questions"] = questions
-        vars["ratingAverage"] = self._abstract.getRating()
+        if self._abstract.getRating():
+            vars["ratingAverage"] = "%.2f" % self._abstract.getRating()
+        else:
+            vars["ratingAverage"] = None
         vars["scaleLower"] = self._conf.getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._conf.getConfAbstractReview().getScaleHigher()
         return vars
