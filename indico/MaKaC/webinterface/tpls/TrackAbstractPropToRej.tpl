@@ -1,3 +1,5 @@
+<% from MaKaC.common.fossilize import fossilize %>
+
 <form action="<%= postURL %>" method="POST">
     <table align="left" width="50%" border="0" cellspacing="6" cellpadding="2" style="padding-left:15px;">
 		<tr>
@@ -41,31 +43,30 @@
 
 var showQuestions = function() {
 
-    <% if len (abstractReview.getReviewingQuestions()) == 0 : %>
-        $E('questionListDisplay').set("No reviewing questions proposed for the abstract review.");
-    <% end %>
-    <% else: %>
-        $E("questionListDisplay").set('');
-        <% for q in abstractReview.getReviewingQuestions(): %>
-            var newDiv = Html.div({style:{marginLeft:'10px'}});
+    var numQuestions = <%= len(abstractReview.getReviewingQuestions()) %>;
+    var newDiv;
+    var reviewingQuestions = <%= fossilize(abstractReview.getReviewingQuestions()) %>;
+    var range = <%= str(range(abstractReview.getNumberOfAnswers())) %>;
+    var labels = <%= str(abstractReview.getRBLabels()) %>;
 
-            newDiv.append(Html.span(null,"<%=q.getText()%>"));
+    if (numQuestions == 0) {
+        $E('questionListDisplay').set("No reviewing questions proposed for the abstract review.");
+    } else {
+        $E("questionListDisplay").set('');
+        for (var i=0; i<numQuestions; i++) {
+            newDiv = Html.div({style:{marginLeft:'10px'}});
+            newDiv.append(Html.span(null, reviewingQuestions[i].text));
             newDiv.append(Html.br());
 
-            newDiv.append(new IndicoUI.Widgets.Generic.radioButtonSimpleField(
-                                                    null,
-                                                    <%= str(range(abstractReview.getNumberOfAnswers())) %>,
-                                                    <%= str(abstractReview.getRadioButtonsLabels()) %>));
+            newDiv.append(new RadioButtonSimpleField(null, range, labels).draw());
 
             $E("questionListDisplay").append(newDiv);
             $E("questionListDisplay").append(Html.br());
+        }
+    }
 
-        <% end %>
-    <% end %>
-
-    var numQuestions = <%= len(abstractReview.getReviewingQuestions()) %>;
     var numAnswers = <%= abstractReview.getNumberOfAnswers() %>;
-    var rbValues = <%= str(abstractReview.getRadioButtonsTitles()) %>;
+    var rbValues = <%= str(abstractReview.getRBTitles()) %>;
     var groupName = "_GID" // The common name for all the radio buttons
 
     for (var i=1; i<numQuestions+1; i++) {

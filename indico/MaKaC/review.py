@@ -1262,8 +1262,7 @@ class Abstract(Persistent):
         self._notifLog=NotificationLog(self)
         self._submitter=None
         self._setSubmitter( submitter )
-        #self._abstractReview = AbstractReview(self)
-        self._rating = 0
+        self._rating = None # It needs to be none to avoid the case of having the same value as the lowest value in the judgement
 
     def clone(self, conference, abstractId):
 
@@ -1868,7 +1867,7 @@ class Abstract(Persistent):
             self._notifyModification()
         return self._trackJudgementsHistorical
 
-    def getJudgementsHistoricalByTrack(self, track):
+    def getJudgementHistoryByTrack(self, track):
         id = "notrack"
         if track is not None:
             id = track.getId()
@@ -1998,7 +1997,7 @@ class Abstract(Persistent):
     def _removePreviousJud(self, responsible, track):
         ''' Check if there is a previous judgement and remove it '''
         toDelete = [] # list of judgements to delete
-        for jud in self.getJudgementsHistoricalByTrack(track):
+        for jud in self.getJudgementHistoryByTrack(track):
             if jud.getResponsible() == responsible:
                 toDelete.append(jud)
 
@@ -2338,7 +2337,7 @@ class Abstract(Persistent):
         judNum = 0
         ratingSum = 0
         for track in self.getTrackListSorted():
-            for jud in self.getJudgementsHistoricalByTrack(track):
+            for jud in self.getJudgementHistoryByTrack(track):
                 if jud.getJudValue() != None: # it means there is a numeric value for the judgement
                     ratingSum += jud.getJudValue()
                     judNum += 1
@@ -2351,7 +2350,7 @@ class Abstract(Persistent):
         dTotals = {} # {idQ1: total_value, idQ2: total_value ...}
         dTimes = {} # {idQ1: times_answered, idQ2: times_answered}
         for track in self.getTrackListSorted():
-            for jud in self.getJudgementsHistoricalByTrack(track):
+            for jud in self.getJudgementHistoryByTrack(track):
                 for answer in jud.getAnswers():
                     # check if the question is in d and sum the answers value or insert in d the new question
                     if dTotals.has_key(answer.getQuestion().getText()):
@@ -2374,7 +2373,7 @@ class Abstract(Persistent):
         judNum = 0
         ratingSum = 0
         for track in self.getTrackListSorted():
-            for jud in self.getJudgementsHistoricalByTrack(track):
+            for jud in self.getJudgementHistoryByTrack(track):
                 # calculate the new values for each judgement
                 jud.recalculateJudgementValues(scaleLower, scaleHigher)
                 if jud.getJudValue() != None: # it means there is a numeric value for the judgement
@@ -2387,7 +2386,7 @@ class Abstract(Persistent):
     def removeAnswersOfQuestion(self, questionId):
         ''' Remove the answers of the question with questionId value '''
         for track in self.getTrackListSorted():
-            for jud in self.getJudgementsHistoricalByTrack(track):
+            for jud in self.getJudgementHistoryByTrack(track):
                 jud.removeAnswer(questionId)
 
 
@@ -2435,11 +2434,6 @@ class AbstractJudgement( Persistent ):
         return self._comment
 
     def getAnswers(self):
-        try:
-            if self._answers:
-                pass
-        except AttributeError:
-            self._answers = []
         return self._answers
 
     def calculateJudgementAverage(self):
@@ -2457,19 +2451,15 @@ class AbstractJudgement( Persistent ):
         return result
 
     def getJudValue(self):
-        try:
-            if self._judValue:
-                self._judValue = float(self._judValue)
-        except AttributeError:
-                self._judValue = None
+        if self._judValue:
+            # To be sure that it takes always a float value
+            self._judValue = float(self._judValue)
         return self._judValue
 
     def getTotalJudValue(self):
-        try:
-            if self._totalJudValue:
-                self._totalJudValue = float(self._totalJudValue)
-        except AttributeError:
-                self._totalJudValue = None
+        if self._totalJudValue:
+            # To be sure that it takes always a float value
+            self._totalJudValue = float(self._totalJudValue)
         return self._totalJudValue
 
     def calculateAnswersTotalValue(self):

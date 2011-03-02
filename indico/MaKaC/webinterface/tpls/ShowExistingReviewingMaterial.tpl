@@ -1,5 +1,7 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
+<% from MaKaC.reviewing import ConferencePaperReview as CPR %>
+
 <div id="showStep1" class="groupTitleSmallPaper"><span><%= _("Step 1 - Upload paper") %></span></div>
 <%= existingMaterialsTitle %>
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
@@ -35,7 +37,7 @@ var args = {
 
     var uploadAction = Indico.Urls.UploadAction.contribution;
     var visibility = '';
-     <% if  self._target.getConference().getConfPaperReview().getChoice() == 3: %>
+     <% if  self._target.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING: %>
         <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
             <% if showSendButton: %>
                 visibility = 'visible';
@@ -48,7 +50,7 @@ var args = {
             visibility = 'hidden';
         <% end %>
     <% end %>
-    <% if self._target.getConference().getConfPaperReview().getChoice() == 2: %>
+    <% if self._target.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING: %>
         <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
             <% if showSendButton: %>
                 visibility = 'visible';
@@ -61,7 +63,7 @@ var args = {
             visibility = 'hidden';
         <% end %>
     <% end %>
-    <% if  self._target.getConference().getConfPaperReview().getChoice() == 4: %>
+    <% if  self._target.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING: %>
         <% if not self._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): %>
             <% if showSendButton: %>
                 visibility = 'visible';

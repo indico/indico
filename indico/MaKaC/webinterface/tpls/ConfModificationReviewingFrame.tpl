@@ -33,7 +33,7 @@
 <tr><td>
 <table align="left" border="0" width="60%" style="padding-left:20px;">
 <tbody>
-<% if ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1:%>
+<% if ConfReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or ConfReview.getChoice() == ConferencePaperReview.NO_REVIEWING: %>
 <% pass %>
 <% end %>
 <% else: %>
@@ -179,7 +179,7 @@
 </script>
     </tr>
 <% end %>
-<%if ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1:%>
+<% if ConfReview.getChoice() == ConferencePaperReview.CONTENT_REVIEWING or ConfReview.getChoice() == ConferencePaperReview.NO_REVIEWING: %>
 <% pass %>
 <% end %>
 <% else: %>

@@ -40,8 +40,8 @@ class ConferenceAbstractReview(Persistent):
         self._numberOfAnswers = 7
         self._scaleLower = 0
         self._scaleHigher = 10
-        self._radioButtonsLabels = ["0", "", "", "5", "", "", "10"]
-        self._radioButtonsTitles = ["0", "1.7", "3.3", "5", "6.7", "8.3", "10"]
+        self._rbLabels = ["0", "", "", "5", "", "", "10"]
+        self._rbTitles = ["0", "1.7", "3.3", "5", "6.7", "8.3", "10"]
         self._questionCounter = Counter(1)
         self._answerCounter = Counter(1)
         self.notifyModification()
@@ -106,59 +106,54 @@ class ConferenceAbstractReview(Persistent):
         """ Returns the number of possible answers """
         return self._numberOfAnswers
 
-    def setRadioButtonsLabels(self):
-        """ Set the labels for the radio buttons """
-        self._radioButtonsLabels = []
+    def recalculateRBLabelsAndTitles(self):
+        """ Recalculate the labels for the radio buttons """
+        self._rbLabels = []
+        self._rbTitles = []
         i = 0
         while i < self.getNumberOfAnswers():
+            # labels
             # first label
             if i == 0:
-                self._radioButtonsLabels.append(str(self.getScaleLower()))
+                self._rbLabels.append(str(self.getScaleLower()))
             # last label
             elif i == self._numberOfAnswers - 1:
-                self._radioButtonsLabels.append(str(self.getScaleHigher()))
+                self._rbLabels.append(str(self.getScaleHigher()))
             # if there is a middle value (odd number of values) and we are there
             elif (self.getNumberOfAnswers() % 2 == 1) and  (i ==  (self.getNumberOfAnswers() - 1) / 2):
                 # check if we need float division
                 if ((self.getScaleLower() + self.getScaleHigher()) % 2 == 0):
                     label = str((self.getScaleLower() + self.getScaleHigher()) / 2)
-                    self._radioButtonsLabels.append(label)
+                    self._rbLabels.append(label)
                 else:
                     label = str((self.getScaleLower() + self.getScaleHigher()) / float(2))
-                    self._radioButtonsLabels.append(label)
+                    self._rbLabels.append(label)
             else:
-                self._radioButtonsLabels.append("")
-            i += 1
-        self.notifyModification()
-
-    def setRadioButtonsTitles(self):
-        """ Set the titles for the radio buttons """
-        self._radioButtonsTitles = []
-        i = 0
-        while i < self.getNumberOfAnswers():
+                self._rbLabels.append("")
+            # titles
             # check if we need float division
             if ((i * self.getScaleHigher()) % (self.getNumberOfAnswers() - 1) == 0):
                 title = "%.0f" % (((self.getScaleHigher() - self.getScaleLower()) / float(self.getNumberOfAnswers()-1)) * i + self.getScaleLower())
-                self._radioButtonsTitles.append(title)
+                self._rbTitles.append(title)
             else:
                 title = "%.1f" % (((self.getScaleHigher() - self.getScaleLower()) / float(self.getNumberOfAnswers()-1)) * i + self.getScaleLower())
-                self._radioButtonsTitles.append(title)
+                self._rbTitles.append(title)
             i += 1
         self.notifyModification()
 
-    def getRadioButtonsTitles(self):
+    def getRBTitles(self):
         """ Get the titles for the radio buttons """
-        return self._radioButtonsTitles
+        return self._rbTitles
+
+    def getRBLabels(self):
+        """ Get the labels for the radio buttons """
+        return self._rbLabels
 
     def getScaleLower(self):
         return self._scaleLower
 
     def getScaleHigher(self):
         return self._scaleHigher
-
-    def getRadioButtonsLabels(self):
-        """ Get the labels for the radio buttons """
-        return self._radioButtonsLabels
 
     def setScale(self, min, max):
         """ Set the scale for the rating and labels """

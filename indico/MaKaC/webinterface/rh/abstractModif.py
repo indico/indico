@@ -400,7 +400,7 @@ class RHUnMerge(RHAbstractModifBase):
         return p.display(comments=self._comments)
 
 
-class RHPropToAcc(RHAbstractModifBase):
+class RHPropBase(RHAbstractModifBase):
 
     def _checkProtection(self):
         try:
@@ -411,18 +411,17 @@ class RHPropToAcc(RHAbstractModifBase):
             raise e
 
     def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action=""
+        RHAbstractModifBase._checkParams(self, params)
+        self._action = ""
         self._answers = []
         if params.has_key("OK"):
-            self._action="GO"
+            self._action = "GO"
             conf=self._target.getConference()
-            self._track=conf.getTrackById(params.get("track",""))
+            self._track = conf.getTrackById(params.get("track",""))
             if self._track is None:
                 raise FormValuesError( _("You have to choose a track in order to do the proposal. If there are not tracks to select, please change the track assignment of the abstract from its management page"))
-            self._contribType=self._conf.getContribTypeById(params.get("contribType",""))
-            self._comment=params.get("comment","")
-            # get answers and make the list
+            self._contribType = self._conf.getContribTypeById(params.get("contribType",""))
+            self._comment = params.get("comment","")
             scaleLower = conf.getConfAbstractReview().getScaleLower()
             scaleHigher = conf.getConfAbstractReview().getScaleHigher()
             numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()
@@ -434,10 +433,11 @@ class RHPropToAcc(RHAbstractModifBase):
                 newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
                 newAnswer.calculateRatingValue(scaleLower, scaleHigher)
                 self._answers.append(newAnswer)
-
-
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
+
+
+class RHPropToAcc(RHPropBase):
 
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
@@ -453,42 +453,7 @@ class RHPropToAcc(RHAbstractModifBase):
 
 
 
-class RHPropToRej(RHAbstractModifBase):
-
-    def _checkProtection(self):
-        try:
-            RHAbstractModifBase._checkProtection(self)
-        except ModificationError,e:
-            if self._target.isAllowedToCoordinate(self._getUser()):
-                return
-            raise e
-
-    def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action=""
-        self._answers = []
-        if params.has_key("OK"):
-            self._action="GO"
-            conf=self._target.getConference()
-            self._track=conf.getTrackById(params.get("track",""))
-            if self._track is None:
-                raise FormValuesError( _("You have to choose a track in order to do the proposal. If there are not tracks to select, please change the track assignment of the abstract from its management page"))
-            self._contribType=self._conf.getContribTypeById(params.get("contribType",""))
-            self._comment=params.get("comment","")
-            # get answers and make the list
-            scaleLower = conf.getConfAbstractReview().getScaleLower()
-            scaleHigher = conf.getConfAbstractReview().getScaleHigher()
-            numberOfAnswers = conf.getConfAbstractReview().getNumberOfAnswers()
-            c = 0
-            for question in conf.getConfAbstractReview().getReviewingQuestions():
-                c += 1
-                rbValue = int(params.get("_GID"+str(c),scaleLower))
-                newId = conf.getConfAbstractReview().getNewAnswerId()
-                newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
-                newAnswer.calculateRatingValue(scaleLower, scaleHigher)
-                self._answers.append(newAnswer)
-        elif params.has_key("CANCEL"):
-            self._action="CANCEL"
+class RHPropToRej(RHPropBase):
 
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)

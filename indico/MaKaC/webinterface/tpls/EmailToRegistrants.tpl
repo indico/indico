@@ -7,7 +7,7 @@
         </tr>
         <tr>
             <td><%= _("From")%>: </td>
-            <td colspan="2"><input type="text" id="from" name="from" size="50" value="<%= from %>"></text></td>
+            <td colspan="2"><input type="text" id="from" name="from" size="50" value="<%= From %>"></text></td>
         </tr>
         <tr>
             <td>

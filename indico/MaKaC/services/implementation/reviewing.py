@@ -415,7 +415,6 @@ class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationB
                 else:
                     raise ServiceError("ERR-REV5",_("No attribute specified"))
 
-
         return contributionsPerSelectedAttribute
 
 
@@ -438,7 +437,7 @@ class ConferenceReviewingAssignReferee(ConferenceReviewingAssignStaffBasePRM):
     """ Assigns a referee to a list of contributions
     """
     def _getAnswer(self):
-        if self._confPaperReview.getChoice() == 1 or self._confPaperReview.getChoice() == 3:
+        if self._confPaperReview.getChoice() == ConferencePaperReview.NO_REVIEWING or self._confPaperReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
             raise ServiceError("ERR-REV6aa",_("can't assign referee"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6a",_("user id not set"))
@@ -466,14 +465,14 @@ class ConferenceReviewingAssignEditor(ConferenceReviewingAssignStaffBasePRMRefer
     """ Assigns an editor to a list of contributions
     """
     def _getAnswer(self):
-        if self._confPaperReview.getChoice() == 1 or self._confPaperReview.getChoice() == 2:
+        if self._confPaperReview.getChoice() == ConferencePaperReview.NO_REVIEWING or self._confPaperReview.getChoice() == ConferencePaperReview.CONTENT_REVIEWING:
             raise ServiceError("ERR-REV6bb",_("can't assign layout reviewer"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6b",_("user id not set"))
 
         for contribution in self._contributions:
             rm = contribution.getReviewManager()
-            if rm.hasReferee() or self._confPaperReview.getChoice() == 3:
+            if rm.hasReferee() or self._confPaperReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
                 if not rm.isEditor(self._targetUser):
                     if rm.hasEditor():
                         rm.removeEditor()
@@ -497,7 +496,7 @@ class ConferenceReviewingAddReviewer(ConferenceReviewingAssignStaffBasePRMRefere
     """ Adds a reviewer to a list of contributions
     """
     def _getAnswer(self):
-        if self._confPaperReview.getChoice() == 1 or self._confPaperReview.getChoice() == 3:
+        if self._confPaperReview.getChoice() == ConferencePaperReview.NO_REVIEWING or self._confPaperReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
             raise ServiceError("ERR-REV6cc",_("can't assign content reviewer"))
         if not self._targetUser:
             raise ServiceError("ERR-REV6c",_("user id not set"))
@@ -683,6 +682,8 @@ class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceRevi
         self._confPaperReview.removeReviewer(self._targetUser)
 
         return True
+
+
 #####################################
 ###  Contribution reviewing classes
 #####################################
@@ -827,7 +828,7 @@ class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
 
 
 #######################################
-###  Paper reviewing questions classes
+###  Paper reviewing question classes
 #######################################
 
 # Content questions
@@ -837,10 +838,8 @@ class PaperReviewingGetContentQuestions(ConferenceReviewingPRMBase):
 
     def _getAnswer(self):
         reviewingQuestions = self._confPaperReview.getReviewingQuestions()
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
+
 
 class PaperReviewingAddContentQuestion(ConferenceReviewingPRMBase):
 
@@ -853,10 +852,8 @@ class PaperReviewingAddContentQuestion(ConferenceReviewingPRMBase):
     def _getAnswer(self):
         self._confPaperReview.addReviewingQuestion(self._value)
         reviewingQuestions = self._confPaperReview.getReviewingQuestions()
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
+
 
 class PaperReviewingRemoveContentQuestion(ConferenceReviewingPRMBase):
 
@@ -871,10 +868,8 @@ class PaperReviewingRemoveContentQuestion(ConferenceReviewingPRMBase):
         self._confPaperReview.removeReviewingQuestion(self._value)
         reviewingQuestions = self._confPaperReview.getReviewingQuestions()
         # Build the answer
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
+
 
 class PaperReviewingEditContentQuestion(ConferenceReviewingPRMBase):
 
@@ -890,10 +885,7 @@ class PaperReviewingEditContentQuestion(ConferenceReviewingPRMBase):
         self._confPaperReview.editReviewingQuestion(self._id, self._text)
         reviewingQuestions = self._confPaperReview.getReviewingQuestions()
         # Build the answer
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
 
 
 # Layout questions
@@ -903,10 +895,8 @@ class PaperReviewingGetLayoutQuestions(ConferenceReviewingPRMBase):
 
     def _getAnswer(self):
         layoutQuestions = self._confPaperReview.getLayoutQuestions()
-        fossils = []
-        for question in layoutQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(layoutQuestions)
+
 
 class PaperReviewingAddLayoutQuestion(ConferenceReviewingPRMBase):
 
@@ -919,10 +909,8 @@ class PaperReviewingAddLayoutQuestion(ConferenceReviewingPRMBase):
     def _getAnswer(self):
         self._confPaperReview.addLayoutQuestion(self._value)
         layoutQuestions = self._confPaperReview.getLayoutQuestions()
-        fossils = []
-        for question in layoutQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(layoutQuestions)
+
 
 class PaperReviewingRemoveLayoutQuestion(ConferenceReviewingPRMBase):
 
@@ -937,10 +925,8 @@ class PaperReviewingRemoveLayoutQuestion(ConferenceReviewingPRMBase):
         self._confPaperReview.removeLayoutQuestion(self._value)
         layoutQuestions = self._confPaperReview.getLayoutQuestions()
         # Build the answer
-        fossils = []
-        for question in layoutQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(layoutQuestions)
+
 
 class PaperReviewingEditLayoutQuestion(ConferenceReviewingPRMBase):
 
@@ -956,10 +942,7 @@ class PaperReviewingEditLayoutQuestion(ConferenceReviewingPRMBase):
         self._confPaperReview.editLayoutQuestion(self._id, self._text)
         layoutQuestions = self._confPaperReview.getLayoutQuestions()
         # Build the answer
-        fossils = []
-        for question in layoutQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(layoutQuestions)
 
 
 # Status services
@@ -969,10 +952,7 @@ class PaperReviewingGetStatuses(ConferenceReviewingPRMBase):
 
     def _getAnswer(self):
         statuses = self._confPaperReview.getStatuses()
-        fossils = []
-        for status in statuses:
-            fossils.append(fossilize(status))
-        return fossils
+        return fossilize(statuses)
 
 class PaperReviewingAddStatus(ConferenceReviewingPRMBase):
 
@@ -985,10 +965,8 @@ class PaperReviewingAddStatus(ConferenceReviewingPRMBase):
     def _getAnswer(self):
         self._confPaperReview.addStatus(self._value, True)
         statuses = self._confPaperReview.getStatuses()
-        fossils = []
-        for status in statuses:
-            fossils.append(fossilize(status))
-        return fossils
+        return fossilize(statuses)
+
 
 class PaperReviewingRemoveStatus(ConferenceReviewingPRMBase):
 
@@ -1003,10 +981,8 @@ class PaperReviewingRemoveStatus(ConferenceReviewingPRMBase):
         self._confPaperReview.removeStatus(self._value)
         statuses = self._confPaperReview.getStatuses()
         # Build the answer
-        fossils = []
-        for status in statuses:
-            fossils.append(fossilize(status))
-        return fossils
+        return fossilize(statuses)
+
 
 class PaperReviewingEditStatus(ConferenceReviewingPRMBase):
 
@@ -1022,10 +998,7 @@ class PaperReviewingEditStatus(ConferenceReviewingPRMBase):
         self._confPaperReview.editStatus(self._id, self._name)
         statuses = self._confPaperReview.getStatuses()
         # Build the answer
-        fossils = []
-        for status in statuses:
-            fossils.append(fossilize(status))
-        return fossils
+        return fossilize(statuses)
 
 
 

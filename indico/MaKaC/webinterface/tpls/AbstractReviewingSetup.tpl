@@ -41,10 +41,10 @@
 
 <script type="text/javascript">
 // Component for the review questions
-$E('inPlaceEditQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'abstractReviewing.questions.getQuestions',
+$E('inPlaceEditQuestions').set(new ManageListOfElements({'get':'abstractReviewing.questions.getQuestions',
         'add':'abstractReviewing.questions.addQuestion', 'remove':'abstractReviewing.questions.removeQuestion',
         'edit': 'abstractReviewing.questions.editQuestion'},
-        {conference: '<%= abstractReview.getConference().getId() %>'},'question', 'abstractReviewingQuestions', true));
+        {conference: '<%= abstractReview.getConference().getId() %>'},'question', 'abstractReviewingQuestions', true).draw());
 
 
 //get the first question or a default one

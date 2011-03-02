@@ -410,21 +410,16 @@ class RHTrackAbstractDirectAccess( RHTrackAbstractBase ):
             return
 
 
-class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
+class RHTrackAbstractPropBase(RHTrackAbstractBase):
+    """ Base class for propose to accept/reject classes """
 
     def _checkParams(self,params):
         RHTrackAbstractBase._checkParams(self,params)
-        self._action=""
-        self._comment=params.get("comment","")
-        self._contribType=params.get("contribType",self._abstract.getContribType())
+        self._action = ""
+        self._comment = params.get("comment","")
         self._answers = []
         if params.has_key("OK"):
             self._action = "GO"
-            ctId = ""
-            if self._abstract.getContribType():
-                ctId=self._abstract.getContribType().getId()
-            ctId=params.get("contribType",ctId)
-            self._contribType=self._abstract.getConference().getContribTypeById(ctId)
             # get answers and make the list
             scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
             scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
@@ -440,6 +435,19 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
         elif params.has_key("CANCEL"):
             self._action="CANCEL"
 
+
+class RHTrackAbstractPropToAccept( RHTrackAbstractPropBase ):
+
+    def _checkParams(self,params):
+        RHTrackAbstractPropBase._checkParams(self,params)
+        self._contribType = params.get("contribType",self._abstract.getContribType())
+        if params.has_key("OK"):
+            ctId = ""
+            if self._abstract.getContribType():
+                ctId = self._abstract.getContribType().getId()
+            ctId = params.get("contribType",ctId)
+            self._contribType = self._abstract.getConference().getContribTypeById(ctId)
+
     def _process( self ):
         url = urlHandlers.UHTrackAbstractModif.getURL( self._track, self._abstract )
         if self._action == "CANCEL":
@@ -454,29 +462,7 @@ class RHTrackAbstractPropToAccept( RHTrackAbstractBase ):
                                 comment=self._comment)
 
 
-class RHTrackAbstractPropToReject( RHTrackAbstractBase ):
-
-    def _checkParams( self, params ):
-        RHTrackAbstractBase._checkParams( self, params )
-        self._action, self._comment = "", ""
-        self._answers = []
-        if params.has_key("OK"):
-            self._action = "GO"
-            self._comment = params.get("comment", "")
-            # get answers and make the list
-            scaleLower = self._target.getConference().getConfAbstractReview().getScaleLower()
-            scaleHigher = self._target.getConference().getConfAbstractReview().getScaleHigher()
-            numberOfAnswers = self._target.getConference().getConfAbstractReview().getNumberOfAnswers()
-            c = 0
-            for question in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
-                c += 1
-                rbValue = int(params.get("_GID"+str(c),scaleLower))
-                newId = self._target.getConference().getConfAbstractReview().getNewAnswerId()
-                newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
-                newAnswer.calculateRatingValue(scaleLower, scaleHigher)
-                self._answers.append(newAnswer)
-        elif params.has_key("CANCEL"):
-            self._action = "CANCEL"
+class RHTrackAbstractPropToReject( RHTrackAbstractPropBase ):
 
     def _process( self ):
         url = urlHandlers.UHTrackAbstractModif.getURL( self._track, self._abstract )

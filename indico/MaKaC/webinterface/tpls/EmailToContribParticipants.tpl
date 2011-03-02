@@ -8,7 +8,7 @@
         </tr>
         <tr>
             <td>From: </td>
-  	        <td colspan="2"><input type="text" name="from" size="50" value="<%= from %>"/></td>
+            <td colspan="2"><input type="text" name="from" size="50" value="<%= From %>"/></td>
         </tr>
         <tr>
             <td>

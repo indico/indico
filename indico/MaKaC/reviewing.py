@@ -48,6 +48,11 @@ class ConferencePaperReview(Persistent):
     reviewingQuestionsAnswers = ["Strongly Disagree", "Disagree", "Weakly Disagree", "Borderline", "Weakly Agree", "Agree", "Strongly Agree"]
     reviewingQuestionsLabels = ["-3", "", "", "0", "", "", "+3"]
     initialSelectedAnswer = 3
+    # Reviewing constant values
+    NO_REVIEWING = 1
+    CONTENT_REVIEWING = 2
+    LAYOUT_REVIEWING = 3
+    CONTENT_AND_LAYOUT_REVIEWING = 4
 
     def __init__( self, conference):
         """ Constructor.
@@ -66,7 +71,7 @@ class ConferencePaperReview(Persistent):
         self._editorContribution = {} #key: user, value: list of contributions where user is editor
         self._reviewerContribution = {} #key: user, value: list of contributions where user is reviewer
 
-        self.setChoice(1) #initial reviewing mode: no reviewing
+        self.setChoice(self.NO_REVIEWING) #initial reviewing mode: no reviewing
 
         #default dates
         self._startSubmissionDate = None
@@ -329,13 +334,13 @@ class ConferencePaperReview(Persistent):
         """ Convenience method that returns if the Conference has a reviewing mode that allows paper reviewing.
             (modes 2 and 4)
         """
-        return self._choice == 2 or self._choice == 4
+        return self._choice == self.CONTENT_REVIEWING or self._choice == self.CONTENT_AND_LAYOUT_REVIEWING
 
     def hasPaperEditing(self):
         """ Convenience method that returns if the Conference has a reviewing mode that allows paper editing.
             (modes 3 and 4)
         """
-        return self._choice == 3 or self._choice == 4
+        return self._choice == self.LAYOUT_REVIEWING or self._choice == self.CONTENT_AND_LAYOUT_REVIEWING
 
     def inModificationPeriod(self):
         date = nowutc()
@@ -994,13 +999,13 @@ class ConferencePaperReview(Persistent):
             in this conference, as a list of strings.
         """
         roles=[]
-        if self.isPaperReviewManager(user) and not self._choice == 1:
+        if self.isPaperReviewManager(user) and not self._choice == self.NO_REVIEWING:
             roles.append('Manager of Paper Reviewing Module')
-        if self.isReferee(user) and (self._choice == 2 or self._choice == 4):
+        if self.isReferee(user) and (self._choice == self.CONTENT_REVIEWING or self._choice == self.CONTENT_AND_LAYOUT_REVIEWING):
             roles.append('Referee')
-        if self.isEditor(user) and (self._choice == 3 or self._choice == 4):
+        if self.isEditor(user) and (self._choice == self.LAYOUT_REVIEWING or self._choice == self.CONTENT_AND_LAYOUT_REVIEWING):
             roles.append('Layout Reviewer')
-        if self.isReviewer(user) and (self._choice == 2 or self._choice == 4):
+        if self.isReviewer(user) and (self._choice == self.CONTENT_REVIEWING or self._choice == self.CONTENT_AND_LAYOUT_REVIEWING):
             roles.append('Content Reviewer')
         return roles
 
@@ -1123,14 +1128,8 @@ class Question(Persistent, Fossilizable):
     def getText(self):
         return self._text
 
-#    def getVisible(self):
-#        return self._visible
-
     def setText(self, text):
         self._text = text
-
-#    def setVisible(self, value):
-#        self._visible = value
 
 
 class Answer(Persistent):

@@ -14,7 +14,7 @@
     </tr>
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("From")%></span></td>
-        <td bgcolor="white" width="100%"><b><%= from %></b></td>
+        <td bgcolor="white" width="100%"><b><%= From %></b></td>
     </tr>
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("To addresses")%></span></td>

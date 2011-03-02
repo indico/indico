@@ -223,7 +223,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         from MaKaC.webinterface.rh.collaboration import RCCollaborationPluginAdmin
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
-        #self._isAM = RCAbstractManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._isVideoServicesManagerOrAdmin = (RCVideoServicesManager.hasRights(self, 'any') or
                                                RCCollaborationAdmin.hasRights(self) or
@@ -231,7 +230,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
 
 
     def _checkProtection(self):
-        #if not (self._isRegistrar or self._isPRM or self._isAM or self._isReferee or self._isVideoServicesManagerOrAdmin):
         if not (self._isRegistrar or self._isPRM or self._isReferee or self._isVideoServicesManagerOrAdmin):
             RHConferenceModifKey._checkProtection(self)
 
@@ -247,8 +245,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             url = urlHandlers.UHConfModifRegForm.getURL( self._conf )
         elif self._isPRM:
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
-        #elif self._isAM:
-        #    url = urlHandlers.UHConfModifReviewingAbstractSetup.getURL( self._conf )
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
         elif self._isVideoServicesManagerOrAdmin:

@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common.fossilize import fossilize
 import MaKaC.user as user
@@ -41,13 +42,14 @@ class AbstractReviewingChangeNumAnswers(AbstractReviewingBase):
 
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
-        self._value = int(self._params.get("value"))
+        pm = ParameterManager(self._params)
+        # we need to do like this because the value sent is an str (inherit of InlineEditWidget)
+        self._value = int(pm.extract("value", pType=str, allowEmpty=False))
 
     def _getAnswer(self):
         self._confAbstractReview.setNumberOfAnswers(self._value)
-        # update the labels
-        self._confAbstractReview.setRadioButtonsLabels()
-        self._confAbstractReview.setRadioButtonsTitles()
+        # update the labels and titles
+        self._confAbstractReview.recalculateRBLabelsAndTitles()
         return self._value
 
 
@@ -57,7 +59,9 @@ class AbstractReviewingChangeScale(AbstractReviewingBase):
 
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
-        self._value = self._params.get("value")
+        pm = ParameterManager(self._params)
+        # we need to do like this because the value sent is an str (inherit of InlineEditWidget)
+        self._value = pm.extract("value", pType=dict, allowEmpty=False)
         self._min = int(self._value["min"])
         self._max = int(self._value["max"])
 
@@ -66,8 +70,7 @@ class AbstractReviewingChangeScale(AbstractReviewingBase):
         # recalculate the current values for the judgements
         self._conf.getAbstractMgr().recalculateAbstractsRating(self._min, self._max)
         # update the labels and titles again
-        self._confAbstractReview.setRadioButtonsLabels()
-        self._confAbstractReview.setRadioButtonsTitles()
+        self._confAbstractReview.recalculateRBLabelsAndTitles()
         return self._value
 
 
@@ -78,8 +81,8 @@ class AbstractReviewingUpdateExampleQuestion(AbstractReviewingBase):
     def _getAnswer(self):
         # get the necessary values
         numAnswers = range(self._confAbstractReview.getNumberOfAnswers())
-        labels = self._confAbstractReview.getRadioButtonsLabels()
-        rbValues = self._confAbstractReview.getRadioButtonsTitles()
+        labels = self._confAbstractReview.getRBLabels()
+        rbValues = self._confAbstractReview.getRBTitles()
         return {"numberAnswers": numAnswers, "labels": labels, "rbValues": rbValues}
 
 
@@ -89,10 +92,7 @@ class AbstractReviewingGetQuestions(AbstractReviewingBase):
 
     def _getAnswer(self):
         reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
 
 
 class AbstractReviewingAddQuestion(AbstractReviewingBase):
@@ -101,15 +101,13 @@ class AbstractReviewingAddQuestion(AbstractReviewingBase):
 
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
-        self._value = self._params.get("value") # value is the question text
+        pm = ParameterManager(self._params)
+        self._value = pm.extract("value", pType=str, allowEmpty=False) # value is the question text
 
     def _getAnswer(self):
         self._confAbstractReview.addReviewingQuestion(self._value)
         reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
 
 
 class AbstractReviewingRemoveQuestion(AbstractReviewingBase):
@@ -118,8 +116,9 @@ class AbstractReviewingRemoveQuestion(AbstractReviewingBase):
 
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
-        self._value = self._params.get("value") # value is the question id
-        self._keepJud = self._params.get("keepJud") # keep the previous judgements of the question
+        pm = ParameterManager(self._params)
+        self._value = pm.extract("value", pType=str, allowEmpty=False) # value is the question id
+        self._keepJud = pm.extract("keepJud", pType=bool, allowEmpty=False) # keep the previous judgements of the question
 
     def _getAnswer(self):
         # remove the question
@@ -130,10 +129,7 @@ class AbstractReviewingRemoveQuestion(AbstractReviewingBase):
             self._conf.getAbstractMgr().recalculateAbstractsRating(self._confAbstractReview.getScaleLower(), self._confAbstractReview.getScaleHigher())
         reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
         # Build the answer
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
 
 
 class AbstractReviewingEditQuestion(AbstractReviewingBase):
@@ -142,16 +138,14 @@ class AbstractReviewingEditQuestion(AbstractReviewingBase):
 
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
-        self._id = self._params.get("id") # value is the question id
-        self._text = self._params.get("text")
+        pm = ParameterManager(self._params)
+        self._id = pm.extract("id", pType=str, allowEmpty=False) # value is the question id
+        self._text = pm.extract("text", pType=str, allowEmpty=True)
 
     def _getAnswer(self):
         self._confAbstractReview.editReviewingQuestion(self._id, self._text)
         reviewingQuestions = self._confAbstractReview.getReviewingQuestions()
-        fossils = []
-        for question in reviewingQuestions:
-            fossils.append(fossilize(question))
-        return fossils
+        return fossilize(reviewingQuestions)
 
 
 ##########################################
@@ -164,8 +158,9 @@ class AbstractReviewingAddReviewer(AbstractReviewingBase):
 
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
-        self._trackId = self._params.get("track")
-        self._reviewerId = self._params.get("user")
+        pm = ParameterManager(self._params)
+        self._trackId = pm.extract("track", pType=str, allowEmpty=False)
+        self._reviewerId = pm.extract("user", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
         ah = user.AvatarHolder()
@@ -180,8 +175,9 @@ class AbstractReviewingRemoveReviewer(AbstractReviewingBase):
 
     def _checkParams(self):
         AbstractReviewingBase._checkParams(self)
-        self._trackId = self._params.get("track")
-        self._reviewerId = self._params.get("user")
+        pm = ParameterManager(self._params)
+        self._trackId = pm.extract("track", pType=str, allowEmpty=False)
+        self._reviewerId = pm.extract("user", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
         ah = user.AvatarHolder()

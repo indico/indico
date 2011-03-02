@@ -176,7 +176,7 @@ class ReviewManager(Persistent, Fossilizable):
         """
         if self.hasEditor():
             raise MaKaCError("This contribution is already has an editor")
-        elif self.hasReferee() or self.getConfPaperReview().getChoice() == 3:
+        elif self.hasReferee() or self.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
             self._editor = editor
             editor.linkTo(self._contribution, "editor")
             self.getConfPaperReview().addEditorContribution(editor, self._contribution)
@@ -491,7 +491,7 @@ class EditorJudgement(Judgement):
         if (not self._submitted):
             # Check if it is necessary to purge some answers
             self.purgeAnswers()
-        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == 3 and self._judgement.getId() == "2":
+        if self.getReviewManager().getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING and self._judgement.getId() == "2":
             matReviewing = self.getReviewManager().getContribution().getReviewing()
             self.getReview().copyMaterials(matReviewing)
             self.getReviewManager().newReview()
@@ -613,18 +613,18 @@ class Review(Persistent, Fossilizable):
         """
         status = []
         if self.isAuthorSubmitted():
-            if self.getConfPaperReview().getChoice() == 3:
+            if self.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
                 if self._editorJudgement.isSubmitted():
                     status.append(_("Judged: ") + str(self._editorJudgement.getJudgement()))
                 else:
                     status.append(_("Pending layout reviewer decision"))
-            elif self.getConfPaperReview().getChoice() == 4 or self.getConfPaperReview().getChoice() == 2:
+            elif self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING or self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING:
                 if self._refereeJudgement.isSubmitted():
                     status.append(_("Judged: ") + str(self._refereeJudgement.getJudgement()))
                 elif forAuthor:
                     status.append(_("Pending referee decision"))
                 else:
-                    if self.getConfPaperReview().getChoice() == 4:
+                    if self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING:
                         editor = self._reviewManager.getEditor()
                         if self._reviewManager.isEditor(editor) and self._editorJudgement.isSubmitted():
                             status.append(_("Layout judged by ") + str(self._reviewManager.getEditor().getFullName())+ _(" as: ") + str(self._editorJudgement.getJudgement()))
@@ -639,7 +639,7 @@ class Review(Persistent, Fossilizable):
                                 status.append(_("Some content reviewers have not decided yet"))
                         else:
                             status.append(_("No content reviewers have decided yet"))
-                    if self.getConfPaperReview().getChoice() == 2:
+                    if self.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING:
                         if self.anyReviewerHasGivenAdvice():
                             for reviewer in self._reviewManager.getReviewersList():
                                 if (self._reviewManager.getLastReview().getReviewerJudgement(reviewer).getJudgement() != None):
@@ -951,7 +951,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
-            if contribution.getConference().getConfPaperReview().getChoice() == 3:
+            if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
                 self.setSubject("""[Indico] Your contribution "%s" (id: %s) has been completely reviewed by the layout reviewer"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Indico user,
@@ -1026,7 +1026,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
-            if contribution.getConference().getConfPaperReview().getChoice() == 3:
+            if contribution.getConference().getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
                 self.setSubject("""[Indico] The judgement for your contribution "%s" (id: %s) has been widthdrawn by the layout reviewer"""
                             % (contribution.getTitle(), str(contribution.getId())))
                 self.setBody("""Dear Indico user,

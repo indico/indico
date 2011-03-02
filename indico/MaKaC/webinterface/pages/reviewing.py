@@ -23,6 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.i18n import _
 import MaKaC.webinterface.pages.conferences as conferences
+from MaKaC.reviewing import ConferencePaperReview as CPR
 #============================================================
 #==================== Reviewing =============================
 #============================================================
@@ -53,26 +54,26 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
         self._tabCtrl = wcomponents.TabControl()
 
         if self._isPRM or self._canModify:
-            self._subTabPaperReviewingSetup = self._tabCtrl.newTab( "revsetup", "Setup",\
+            self._subTabPaperReviewingSetup = self._tabCtrl.newTab( "revsetup", _("Setup"),\
                 urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-            self._tabPaperReviewingControl = self._tabCtrl.newTab( "revcontrol", "Team",\
+            self._tabPaperReviewingControl = self._tabCtrl.newTab( "revcontrol", _("Team"),\
                     urlHandlers.UHConfModifReviewingControl.getURL( self._conf ) )
-            self._tabUserCompetencesReviewing = self._tabCtrl.newTab( "revcompetences", "Competences",\
+            self._tabUserCompetencesReviewing = self._tabCtrl.newTab( "revcompetences", _("Competences"),\
                     urlHandlers.UHConfModifUserCompetences.getURL( self._conf ) )
 
 
         if self._showAssignContributions:
-            self._tabAssignContributions = self._tabCtrl.newTab( "assignContributions", "Assign papers",\
+            self._tabAssignContributions = self._tabCtrl.newTab( "assignContributions", _("Assign papers"),\
                     urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf ) )
 
-        if self._showListContribToJudge and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
-            self._tabListContribToJudge = self._tabCtrl.newTab( "contributionsToJudge", "Judge as Referee",\
+        if self._showListContribToJudge and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
+            self._tabListContribToJudge = self._tabCtrl.newTab( "contributionsToJudge", _("Judge as Referee"),\
                     urlHandlers.UHConfModifListContribToJudge.getURL( self._conf ) )
-        if self._showListContribToJudgeAsReviewer and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
-            self._tabListContribToJudgeAsReviewer = self._tabCtrl.newTab( "contributionsToJudge", "Judge as Content Reviewer",\
+        if self._showListContribToJudgeAsReviewer and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
+            self._tabListContribToJudgeAsReviewer = self._tabCtrl.newTab( "contributionsToJudge", _("Judge as Content Reviewer"),\
                     urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL( self._conf ) )
-        if self._showListContribToJudgeAsEditor and (self._conf.getConfPaperReview().getChoice()==3 or self._conf.getConfPaperReview().getChoice()==4):
-            self._tabListContribToJudgeAsEditor = self._tabCtrl.newTab( "contributionsToJudge", "Judge as Layout Reviewer",\
+        if self._showListContribToJudgeAsEditor and (self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
+            self._tabListContribToJudgeAsEditor = self._tabCtrl.newTab( "contributionsToJudge", _("Judge as Layout Reviewer"),\
                     urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL( self._conf ) )
 
         self._setActiveTab()
@@ -172,7 +173,7 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
         #add new states
         stateAdd = []
         ht = []
-        if self.__target.getConfPaperReview().getChoice() == 2 or self.__target.getConfPaperReview().getChoice() == 4 :
+        if self.__target.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self.__target.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
             stateAdd.append("""
         <td>
             Name of the new status <INPUT type=textarea name="state">
@@ -206,7 +207,7 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
         #add questions
         questionAdd = []
         qs = []
-        if self.__target.getConfPaperReview().getChoice() == 2 or self.__target.getConfPaperReview().getChoice() == 4:
+        if self.__target.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self.__target.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
             questionAdd.append("""<td>New question <INPUT type=text size="70" name="question">
             </td>
             <td>
@@ -236,7 +237,7 @@ class WConfModificationReviewingSettings(wcomponents.WTemplated):
         criteriaAdd=[]
         cs = []
 
-        if self.__target.getConfPaperReview().getChoice() == 3 or self.__target.getConfPaperReview().getChoice() == 4:
+        if self.__target.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self.__target.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
             criteriaAdd.append("""<td>New criteria <INPUT type=textarea name="criteria">
         </td>
         <td>
@@ -328,8 +329,8 @@ class WConfModifReviewingControl(wcomponents.WTemplated):
         rc=""
         rcPRM=""
 
-        if self._conf.getConfPaperReview().getChoice() != 1 and self._conf.getConfPaperReview().getChoice() == 0:
-            return """<table align="center"><tr><td>Type of reviewing has not been chosen yet</td></tr></table>"""
+        if self._conf.getConfPaperReview().getChoice() == CPR.NO_REVIEWING:
+            return """<table align="left"><tr><td>Type of reviewing has not been chosen yet</td></tr></table>"""
         else:
             rcPRM = WConfModificationReviewingFramePRM().getHTML(self._conf, \
                                                 params["addPaperReviewManagerURL"], \

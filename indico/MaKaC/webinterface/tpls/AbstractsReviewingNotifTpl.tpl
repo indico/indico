@@ -1,3 +1,5 @@
+<% import MaKaC.webinterface.urlHandlers as urlHandlers %>
+<% from MaKaC.common import Config %>
 <table class="groupTable">
     <tr>
         <td id="reviewingModeHelp" colspan="5" class="groupTitle">
@@ -11,9 +13,20 @@
     </tr>
     <tr>
         <form action=<%= remNotifTplURL %> method="POST">
-        <td bgcolor="white" width="100%%" class="blacktext">
-            <table width="98%%" border="0" align="right" style="padding-top: 10px; padding-bottom: 10px;">
-                <%= notifTpls %>
+        <td bgcolor="white" width="100%" class="blacktext">
+            <table width="98%" border="0" align="right" style="padding-top: 10px; padding-bottom: 10px;">
+                <% for tpl in conf.getAbstractMgr().getNotificationTplList(): %>
+                <tr>
+                    <td bgcolor="white" nowrap>
+                        <a href='<%= str(urlHandlers.UHConfModCFANotifTplUp.getURL(tpl)) %>'><img src='<%= str(Config.getInstance().getSystemIconURL("upArrow")) %>' border="0" alt=""></a>
+                        <a href='<%= str(urlHandlers.UHConfModCFANotifTplDown.getURL(tpl)) %>'><img src='<%= str(Config.getInstance().getSystemIconURL("downArrow")) %>' border="0" alt=""></a>
+                        <input type="checkbox" name="selTpls" value='<%= str(tpl.getId()) %>'>
+                    </td>
+                    <td bgcolor="white" align="left" nowrap><a href='<%= str(urlHandlers.UHAbstractModNotifTplDisplay.getURL(tpl)) %>'><%= tpl.getName() %></a></td>
+                    <td>&nbsp;<td>
+                    <td bgcolor="white" align="left" width="90%"><font size="-1"><%= tpl.getDescription() %></font></td>
+                </tr>
+                <% end %>
             </table>
         </td>
         <table>

@@ -72,6 +72,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import OldObservable
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
+from MaKaC.reviewing import ConferencePaperReview as CPR
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -311,14 +312,14 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 showreviewerarea = self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
                 showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"]
 
-                if showrefereearea and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
+                if showrefereearea and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
                     self._assignContribOpt.setVisible(True)
                     self._judgeListOpt.setVisible(True)
 
-                if showreviewerarea and (self._conf.getConfPaperReview().getChoice()==2 or self._conf.getConfPaperReview().getChoice()==4):
+                if showreviewerarea and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
                     self._judgereviewerListOpt.setVisible(True)
 
-                if showeditorarea and (self._conf.getConfPaperReview().getChoice()==3 or self._conf.getConfPaperReview().getChoice()==4):
+                if showeditorarea and (self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
                     self._judgeeditorListOpt.setVisible(True)
 
 
@@ -890,11 +891,11 @@ class WEmail(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         if vars.get("from", None) is None :
-            vars["from"] = self._fromEmail
+            vars["From"] = self._fromEmail
         if vars.get("fromDisabled", None) is None or not vars.get("fromDisabled", None):
-            vars["fromField"] = """<input type="text" name="from" size="50" value="%s"></text>"""%vars["from"]
+            vars["fromField"] = """<input type="text" name="from" size="50" value="%s"></text>"""%vars["From"]
         else :
-            vars["fromField"] = """<input type="hidden" name="from" value="%s"></input>%s"""%(vars["from"],vars["from"])
+            vars["fromField"] = """<input type="hidden" name="from" value="%s"></input>%s"""%(vars["From"],vars["From"])
 
         if vars.get("to", None) is None :
             vars["to"] = self._toEmail
@@ -2314,11 +2315,11 @@ class WPConferenceModifAbstractBase( WPConferenceModifBase ):
         self._tabCFAR = self._tabCtrl.newTab("reviewing", _("Reviewing"), urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
 
         # Create subtabs for the reviewing
-        self._subTabARSetup = self._tabCFAR.newSubTab( "revsetup", "Settings",\
+        self._subTabARSetup = self._tabCFAR.newSubTab( "revsetup", _("Settings"),\
                     urlHandlers.UHAbstractReviewingSetup.getURL(self._conf))
-        self._subTabARTeam = self._tabCFAR.newSubTab( "revteam", "Team",\
+        self._subTabARTeam = self._tabCFAR.newSubTab( "revteam", _("Team"),\
                     urlHandlers.UHAbstractReviewingTeam.getURL(self._conf))
-        self._subTabARNotifTpl = self._tabCFAR.newSubTab( "notiftpl", "Notification templates",\
+        self._subTabARNotifTpl = self._tabCFAR.newSubTab( "notiftpl", _("Notification templates"),\
                     urlHandlers.UHAbstractReviewingNotifTpl.getURL(self._conf))
 
         if not self._conf.hasEnabledSection("cfa"):
@@ -4949,7 +4950,7 @@ class WEmailToContribParticipants(wcomponents.WTemplated):
         for email in self._contribParticipantList:
             if len(email) > 0 :
                 toEmails.append(email)
-        vars["from"] = self._fromemail
+        vars["From"] = self._fromemail
         vars["toEmails"]= ", ".join(toEmails)
         vars["emails"]= ",".join(toEmails)
         vars["postURL"]=urlHandlers.UHContribParticipantsSendEmail.getURL(self._conf)
@@ -4983,7 +4984,7 @@ class WEmailToConveners(wcomponents.WTemplated):
         for email in self._convenerList:
             if len(email) > 0 :
                 toEmails.append(email)
-        vars["from"] = self._fromemail
+        vars["From"] = self._fromemail
         vars["toEmails"]= ", ".join(toEmails)
         vars["emails"]= ",".join(toEmails)
         vars["postURL"]=urlHandlers.UHConvenersSendEmail.getURL(self._conf)
@@ -5975,7 +5976,7 @@ class WAbstracts( wcomponents.WTemplated ):
                 vars["typeImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["typeImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                vars["typeImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["typeSortingURL"] = quoteattr( str( url ) )
 
@@ -5988,7 +5989,7 @@ class WAbstracts( wcomponents.WTemplated ):
                 vars["statusImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["statusImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                vars["statusImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["statusSortingURL"] = quoteattr( str( url ) )
 
@@ -6002,7 +6003,7 @@ class WAbstracts( wcomponents.WTemplated ):
                 vars["ratingImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["ratingImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                vars["ratingImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
         vars["ratingSortingURL"] = quoteattr( str( url ) )
 
@@ -6026,7 +6027,7 @@ class WAbstracts( wcomponents.WTemplated ):
         if sortingField and sortingField.getId() == "date":
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="date">"""
             if self._order == "down":
-                vars["dateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                vars["dateImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
                 vars["dateImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))

@@ -1475,7 +1475,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
 
         for track in self._abstract.getTrackListSorted():
             firstJudg=True
-            for status in self._abstract.getJudgementsHistoricalByTrack(track):
+            for status in self._abstract.getJudgementHistoryByTrack(track):
                 judgements = True
                 if status.__class__ == review.AbstractAcceptance:
                     contribType = ""
@@ -1553,7 +1553,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                 tracks += """<td class=\"blacktext\">&nbsp;%s</td>"""%comments
                 tracks += "</tr>"
 
-            if self._abstract.getJudgementsHistoricalByTrack(track) != []:
+            if self._abstract.getJudgementHistoryByTrack(track) != []:
                 tracks+="""
                         <tr><td>&nbsp;</td></tr>
                         """

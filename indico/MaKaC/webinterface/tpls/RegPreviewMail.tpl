@@ -2,7 +2,7 @@
 <table width="80%" align="center" style="border-top:1px solid #777777; border-left:1px solid #777777">
     <tr>
         <td style="color: #5294CC;border-bottom:1px solid #5294CC"> <%= _("From")%>&nbsp;&nbsp;&nbsp;</td>
-        <td style="color: black"><b><%= from %></b></span></td>
+        <td style="color: black"><b><%= From %></b></span></td>
     </tr>
     <tr>
         <td style="color: #5294CC;border-bottom:1px solid #5294CC"> <%= _("To")%>&nbsp;&nbsp;&nbsp;</td>

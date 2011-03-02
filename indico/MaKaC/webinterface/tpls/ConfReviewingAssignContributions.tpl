@@ -1,6 +1,7 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.common.timezoneUtils import nowutc %>
 <% from MaKaC.conference import ContribStatusNone %>
+<% from MaKaC.reviewing import ConferencePaperReview as CPR %>
 
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>
@@ -117,7 +118,7 @@
 </table>
 
 <table class="shadowRectangleSoft" width="95%%">
-    <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+    <% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     <tr>
         <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
@@ -130,7 +131,7 @@
         </td>
     </tr>
     <% end %>
-    <%if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1):%>
+    <%if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):%>
     <tr>
         <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
@@ -143,7 +144,7 @@
         </td>
     </tr>
     <% end %>
-    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     <tr>
         <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
@@ -158,7 +159,7 @@
     </tr>
     <% end %>
 </table>
-<!--  and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1) -->
+<!--  and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING) -->
 
 <table style="padding-left:40px;">
         <tr>
@@ -274,7 +275,7 @@
             -->
             <td>
                 <ul>
-                    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+                    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
                     <li>
                         <em><%= _("Referee")%>:</em>
                     </li>
@@ -309,7 +310,7 @@
 </table>
 
 <table class="shadowRectangleSoft" width="95%%" style="margin-top:10px;">
-    <% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+    <% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     <tr>
         <td><%= _("Referee")%>:</td>
         <td id="assignRefereeHelp">
@@ -322,7 +323,7 @@
         </td>
     </tr>
     <% end %>
-    <%if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1):%>
+    <%if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):%>
     <tr>
         <td><%= _("Layout Reviewer")%>:</td>
         <td id="assignEditorHelp">
@@ -335,7 +336,7 @@
         </td>
     </tr>
     <% end %>
-    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     <tr>
         <td><%= _("Content Reviewers")%>:</td>
         <td id="assignReviewerHelp">
@@ -609,7 +610,7 @@ var contributionTemplate = function(contribution) {
     ul.dom.style.padding = 0;
     ul.dom.style.marginLeft = '5px';
 
-    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     var li1 = Html.li();
     var span1 = Html.span({}, $T('Referee: '))
     var span2 = contribution.reviewManager.referee ?
@@ -619,7 +620,7 @@ var contributionTemplate = function(contribution) {
     ul.append(li1);
     <% end %>
 
-    <% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
+    <% if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     var li2 = Html.li();
     var span1 = Html.span({}, $T('Layout reviewer: '))
     var span2 = contribution.reviewManager.editor ?
@@ -629,7 +630,7 @@ var contributionTemplate = function(contribution) {
     ul.append(li2);
     <% end %>
 
-    <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     var li3 = Html.li();
     var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Content reviewers: '));
     li3.append(span);
@@ -1220,7 +1221,7 @@ var fetchUsers = function(order, role) {
     }
 
     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-        <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+        <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
             if (!checkAllHaveReferee(checkedContributions, order, role, false)) {
                 return;
             }
@@ -1415,7 +1416,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                                           contrPerAttribute.push(result[i]);
                                                     }
                                                     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-													        <% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+													        <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
 													            if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
 													                return;
 													            }
@@ -1617,7 +1618,7 @@ $E('applyFilter').observeClick(function(){
     <% end %>
 });
 
-<% if not IsOnlyReferee and not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+<% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
 $E('assignRefereeButton_top').observeClick(function(){ fetchUsers('assign', 'referee'); });
 assignPerTrackMenus('referee', 'top');
 assignPerTrackMenus('referee', 'bottom');
@@ -1626,7 +1627,7 @@ $E('removeRefereeButton_top').observeClick(function(){ removeUser('referee') });
 $E('removeRefereeButton_bottom').observeClick(function(){ removeUser('referee') });
 <% end %>
 
-<% if not (ConfReview.getChoice() == 2 or ConfReview.getChoice() == 1): %>
+<% if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
 $E('assignEditorButton_top').observeClick(function(){ fetchUsers('assign', 'editor'); });
 assignPerTrackMenus('editor', 'top');
 assignPerTrackMenus('editor', 'bottom');
@@ -1635,7 +1636,7 @@ $E('removeEditorButton_top').observeClick(function(){ removeUser('editor') });
 $E('removeEditorButton_bottom').observeClick(function(){ removeUser('editor') });
 <% end %>
 
-<% if not (ConfReview.getChoice() == 3 or ConfReview.getChoice() == 1): %>
+<% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
 $E('addReviewerButton_top').observeClick(function(){ fetchUsers('add', 'reviewer'); });
 assignPerTrackMenus('reviewer', 'top');
 assignPerTrackMenus('reviewer', 'bottom');

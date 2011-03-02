@@ -10533,7 +10533,7 @@ class Material(CommonObjectBase):
         """
         if isinstance(self.owner, Contribution):
             conference = self.owner.getConference()
-            if conference.getConfPaperReview().getChoice() == 0: #conference has no reviewing process
+            if conference.getConfPaperReview().getChoice() == ConferencePaperReview.NO_REVIEWING: #conference has no reviewing process
                 return 0
             else: #conference has reviewing
                 #if self.id in reviewableMaterials: #material is reviewable

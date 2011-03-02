@@ -26,6 +26,7 @@ from MaKaC.webinterface.rh.reviewingModif import RHConfModifReviewingPRMAMBase,\
     RHConfModifReviewingPRMBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.errors import MaKaCError
+from MaKaC.reviewing import ConferencePaperReview as CPR
 
 #class to display the page
 class RHConfModifReviewingControl( RHConfModifReviewingPRMAMBase ):
@@ -107,7 +108,7 @@ class RHConfRefereeBase( RHConfModifReviewingPRMBase ):
 
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
-        if self._conf.getConfPaperReview().getChoice() == 1 or self._conf.getConfPaperReview().getChoice() == 3:
+        if self._conf.getConfPaperReview().getChoice() == CPR.NO_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
             raise MaKaCError("Reviewing mode does not allow creation or deletion of referees")
 
 class RHConfSelectReferee( RHConfRefereeBase ):
@@ -151,7 +152,7 @@ class RHConfEditorBase( RHConfModifReviewingPRMBase ):
 
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
-        if self._conf.getConfPaperReview().getChoice() == 1 or self._conf.getConfPaperReview().getChoice() == 2:
+        if self._conf.getConfPaperReview().getChoice() == CPR.NO_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING:
             raise MaKaCError("Reviewing mode does not allow creation or deletion of editors")
 
 class RHConfSelectEditor( RHConfEditorBase ):
@@ -195,7 +196,7 @@ class RHConfReviewerBase( RHConfModifReviewingPRMBase ):
 
     def _checkParams( self, params ):
         RHConfModifReviewingPRMBase._checkParams( self, params )
-        if self._conf.getConfPaperReview().getChoice() == 1 or self._conf.getConfPaperReview().getChoice() == 3:
+        if self._conf.getConfPaperReview().getChoice() == CPR.NO_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
             raise MaKaCError("Reviewing mode does not allow creation or deletion of reviewers")
 
 class RHConfSelectReviewer( RHConfReviewerBase ):

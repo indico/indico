@@ -1,5 +1,5 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
-
+<% from MaKaC.reviewing import ConferencePaperReview as CPR %>
 
 <table width="100%" align="center">
 
@@ -126,7 +126,7 @@
                                         <%= "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) %>
                                     </td>
                                 </tr>
-                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == 3: %>
+                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING: %>
                                     <% if not Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
                                         <% display = 'table' %>
                                     <% end %>
@@ -134,7 +134,7 @@
                                         <% display = 'none' %>
                                     <% end %>
                                 <% end %>
-                                <% if Contribution.getConference().getConfPaperReview().getChoice() == 2: %>
+                                <% if Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING: %>
                                     <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
                                         <% display = 'table' %>
                                     <% end %>
@@ -142,7 +142,7 @@
                                         <% display = 'none' %>
                                     <% end %>
                                 <% end %>
-                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == 4: %>
+                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING: %>
                                     <% if Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): %>
                                         <% display = 'none' %>
                                     <% end %>

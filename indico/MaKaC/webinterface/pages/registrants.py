@@ -629,14 +629,14 @@ class WRegPreviewMail(wcomponents.WTemplated):
         registrant=None
         if len(regsIds)>0:
             registrant=self._conf.getRegistrantById(regsIds[0])
-        vars["from"]=  _("""<center>  _("No preview avaible") </center>""")
+        vars["From"]=  _("""<center>  _("No preview avaible") </center>""")
         vars["subject"]=  _("""<center>  _("No preview avaible") </center>""")
         vars["body"]=  _("""<center> _("No preview avaible") </center>""")
         vars["to"]=  _("""<center> _("No preview avaible") </center>""")
         vars["cc"]=  _("""<center> _("No preview avaible") </center>""")
         if registrant != None:
             notif=EmailNotificator().apply(registrant,{"subject":subject, "body":body, "from":fromAddr, "to":[registrant.getEmail()], "cc": [cc]})
-            vars["from"]=notif.getFromAddr()
+            vars["From"]=notif.getFromAddr()
             vars["to"]=notif.getToList()
             vars["subject"]=notif.getSubject()
             vars["body"] = notif.getBody()
@@ -698,7 +698,7 @@ class WEmailToRegistrants(wcomponents.WTemplated):
             if  reg!=None:
                 toEmails.append(reg.getEmail())
                 toIds.append("""<input type="hidden" name="regsIds" value="%s">"""%reg.getId())
-        vars["from"] = self._fromemail
+        vars["From"] = self._fromemail
         vars["cc"] = self._cc
         vars["toEmails"]= ", ".join(toEmails)
         if vars["toEmails"] == "":

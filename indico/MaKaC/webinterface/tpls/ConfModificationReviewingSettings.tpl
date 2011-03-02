@@ -571,24 +571,24 @@ new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditReviewingMode'),
                     observer);
 
 var showReviewingStates = function() {
-    $E('inPlaceEditStates').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.paperReviewing.getStatuses',
+    $E('inPlaceEditStates').set(new ManageListOfElements({'get':'reviewing.paperReviewing.getStatuses',
         'add':'reviewing.paperReviewing.addStatus', 'remove':'reviewing.paperReviewing.removeStatus',
         'edit': 'reviewing.paperReviewing.editStatus'},
-        {conference: '<%= ConfReview.getConference().getId() %>'},'status', 'statusComponent', false));
+        {conference: '<%= ConfReview.getConference().getId() %>'},'status', 'statusComponent', false).draw());
 }
 
 var showReviewingQuestions = function() {
-	$E('inPlaceEditContentQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.paperReviewing.getContentQuestions',
+	$E('inPlaceEditContentQuestions').set(new ManageListOfElements({'get':'reviewing.paperReviewing.getContentQuestions',
         'add':'reviewing.paperReviewing.addContentQuestion', 'remove':'reviewing.paperReviewing.removeContentQuestion',
         'edit': 'reviewing.paperReviewing.editContentQuestion'},
-        {conference: '<%= ConfReview.getConference().getId() %>'},'question', 'contentReviewerQuestion', false));
+        {conference: '<%= ConfReview.getConference().getId() %>'},'question', 'contentReviewerQuestion', false).draw());
 }
 
 var showEditingCriteria = function() {
-    $E('inPlaceEditLayoutQuestions').set(new IndicoUI.Widgets.Generic.manageListOfElements({'get':'reviewing.paperReviewing.getLayoutQuestions',
+    $E('inPlaceEditLayoutQuestions').set(new ManageListOfElements({'get':'reviewing.paperReviewing.getLayoutQuestions',
         'add':'reviewing.paperReviewing.addLayoutQuestion', 'remove':'reviewing.paperReviewing.removeLayoutQuestion',
         'edit': 'reviewing.paperReviewing.editLayoutQuestion'},
-        {conference: '<%= ConfReview.getConference().getId() %>'},'question', 'layoutReviewerQuestion', false));
+        {conference: '<%= ConfReview.getConference().getId() %>'},'question', 'layoutReviewerQuestion', false).draw());
 }
 
 

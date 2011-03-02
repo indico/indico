@@ -4,7 +4,7 @@
 <p style="padding-left: 25px;"><font color="gray"><%= _("Type of reviewing has not been chosen yet")%></font></p>
 <% end %>
 <% elif ConfReview.getAllUserCompetences() == []: %>
-<table align="center"><tr><td><%= _("The Reviewing Team has not been assigned yet.")%></td></tr></table>
+<table align="left" style="color:gray; font-style:italic; padding-left:10px;"><tr><td><%= _("The Reviewing Team has not been assigned yet.")%></td></tr></table>
 <% end %>
 <%else:%>
 <table class="Revtab" width="90%%" cellspacing="0" align="left" border="0" style="padding-left:2px; padding-top: 10px;">
