@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferencePaperReview %>
+<% from MaKaC.paperReviewing import ConferencePaperReview %>
             <table cellspacing="0" cellpadding="2" width="100%%" >
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">

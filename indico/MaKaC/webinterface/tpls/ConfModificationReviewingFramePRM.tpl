@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferencePaperReview %>
+<% from MaKaC.paperReviewing import ConferencePaperReview %>
 <% from MaKaC.common.fossilize import fossilize %>
 
 <table width="90%" align="left" border="0" style="padding-top:10px;">

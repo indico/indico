@@ -1,5 +1,5 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
-<% from MaKaC.reviewing import ConferencePaperReview as CPR %>
+<% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
 
 <table width="100%" align="center">
 

@@ -23,7 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.i18n import _
 import MaKaC.webinterface.pages.conferences as conferences
-from MaKaC.reviewing import ConferencePaperReview as CPR
+from MaKaC.paperReviewing import ConferencePaperReview as CPR
 #============================================================
 #==================== Reviewing =============================
 #============================================================

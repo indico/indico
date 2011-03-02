@@ -47,8 +47,8 @@ import stat
 from datetime import datetime, timedelta, time
 
 from MaKaC.contributionReviewing import ReviewManager
-from reviewing import ConferencePaperReview as ConferencePaperReview
-from abstractReviewing import ConferenceAbstractReview as ConferenceAbstractReview
+from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
+from MaKaC.abstractReviewing import ConferenceAbstractReview as ConferenceAbstractReview
 
 from pytz import timezone
 from pytz import all_timezones

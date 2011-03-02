@@ -25,14 +25,14 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc
 from persistent import Persistent
 from MaKaC.errors import MaKaCError
-from MaKaC.reviewing import ConferencePaperReview
+from MaKaC.paperReviewing import ConferencePaperReview
 import datetime
 from MaKaC.common import Config
 from MaKaC.i18n import _
 from MaKaC.fossils.reviewing import IReviewManagerFossil,\
     IReviewFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
-from MaKaC.reviewing import Answer
+from MaKaC.paperReviewing import Answer
 from MaKaC.common.Counter import Counter
 ###############################################
 # Contribution reviewing classes

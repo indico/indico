@@ -17,10 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.reviewing import ConferencePaperReview
-from MaKaC.reviewing import ConferenceReviewingNotification
-from MaKaC.services.implementation.base import ProtectedModificationService,\
-    TwoListModificationBase, ParameterManager
+from MaKaC.paperReviewing import ConferencePaperReview
+from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.contribution import ContributionBase
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import HTMLModificationBase

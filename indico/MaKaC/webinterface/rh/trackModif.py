@@ -40,7 +40,7 @@ from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
 from MaKaC.abstractReviewing import ConferenceAbstractReview
-from MaKaC.reviewing import Answer
+from MaKaC.paperReviewing import Answer
 
 
 class RHTrackModifBase( RHTrackBase, RHModificationBaseProtected ):

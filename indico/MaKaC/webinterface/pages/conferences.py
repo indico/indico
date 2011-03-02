@@ -72,7 +72,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import OldObservable
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
-from MaKaC.reviewing import ConferencePaperReview as CPR
+from MaKaC.paperReviewing import ConferencePaperReview as CPR
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -9054,7 +9054,7 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
         vars=wcomponents.WTemplated.getVars(self)
         vars["items"]=self._getTracksHTML()
 
-        import reviewing
+        from MaKaC.webinterface.pages import reviewing
         vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
         vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
         return vars

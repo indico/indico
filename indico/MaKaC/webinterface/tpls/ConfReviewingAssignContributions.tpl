@@ -1,7 +1,7 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.common.timezoneUtils import nowutc %>
 <% from MaKaC.conference import ContribStatusNone %>
-<% from MaKaC.reviewing import ConferencePaperReview as CPR %>
+<% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
 
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>

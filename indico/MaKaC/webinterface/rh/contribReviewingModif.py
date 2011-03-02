@@ -32,7 +32,7 @@ from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
 from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.i18n import _
-from MaKaC.reviewing import ConferencePaperReview as CPR
+from MaKaC.paperReviewing import ConferencePaperReview as CPR
 
 #Assign Editor classes
 class RHAssignEditorOrReviewerBase(RHContribModifBase):

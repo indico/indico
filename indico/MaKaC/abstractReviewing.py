@@ -20,7 +20,7 @@
 
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
-from MaKaC.reviewing import Question
+from MaKaC.paperReviewing import Question
 from MaKaC.errors import MaKaCError
 
 

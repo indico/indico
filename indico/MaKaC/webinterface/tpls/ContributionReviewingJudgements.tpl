@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferencePaperReview %>
+<% from MaKaC.paperReviewing import ConferencePaperReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.common.utils import formatDateTime %>
 

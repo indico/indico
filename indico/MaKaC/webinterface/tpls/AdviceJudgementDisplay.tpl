@@ -1,4 +1,4 @@
-<% from MaKaC.reviewing import ConferencePaperReview %>
+<% from MaKaC.paperReviewing import ConferencePaperReview %>
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Content judgement:")%></span>

@@ -26,7 +26,7 @@ from MaKaC.webinterface.rh.reviewingModif import RHConfModifReviewingPRMAMBase,\
     RHConfModifReviewingPRMBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.errors import MaKaCError
-from MaKaC.reviewing import ConferencePaperReview as CPR
+from MaKaC.paperReviewing import ConferencePaperReview as CPR
 
 #class to display the page
 class RHConfModifReviewingControl( RHConfModifReviewingPRMAMBase ):

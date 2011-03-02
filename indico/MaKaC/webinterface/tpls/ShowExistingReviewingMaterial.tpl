@@ -1,6 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase %>
-<% from MaKaC.reviewing import ConferencePaperReview as CPR %>
+<% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
 
 <div id="showStep1" class="groupTitleSmallPaper"><span><%= _("Step 1 - Upload paper") %></span></div>
 <%= existingMaterialsTitle %>

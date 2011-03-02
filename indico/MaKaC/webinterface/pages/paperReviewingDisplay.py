@@ -73,7 +73,7 @@ class WDownloadPRTemplate(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        import reviewing
+        from MaKaC.webinterface.pages import reviewing
         vars["hasPaperReviewing"] = self._conf.getConfPaperReview().hasReviewing()
         vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
         return vars
