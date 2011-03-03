@@ -70,7 +70,7 @@ class XSLTransformer:
         # compute the transformation
         result = self.__style(doc)
 
-        return etree.tostring(result)
+        return str(result)
 
 class outputGenerator(Observable):
     """
