@@ -62,23 +62,26 @@ urlMeeting.addParam("event_type","meeting")
 
 <script type="text/javascript">
 var createEventMenu = $E('createEventMenu');
+var eventPopupMenu;
 createEventMenu.observeClick(function(e) {
     var menuItems = {};
     menuItems['${ _("Create lecture") }'] = "${ urlLecture }";
     menuItems['${ _("Create meeting") }'] = "${ urlMeeting }";
     menuItems['${ _("Create conference") }'] = "${ urlConference }";
 
+    //Create a new PopupMenu only if it has never been created before -> fix #679
+    if(!eventPopupMenu){
+        eventPopupMenu = new PopupMenu(menuItems, [createEventMenu], "globalMenuPopupList");
+    }
+
+    var pos = createEventMenu.getAbsolutePosition();
+    eventPopupMenu.open(pos.x, pos.y + 30);
+
     var infoItems = {}; //List used to print additional help on the menu (MUST use the same keys as menuItems)
     infoItems['${ _("Create lecture") }'] = "${ _("A <strong>lecture</strong> is a simple event to annouce a talk.<br/><strong>Features</strong>: poster creation, participants management,...") }";
     infoItems['${ _("Create meeting") }'] = "${ _("A <strong>meeting</strong> is an event that defines an agenda with many talks.<br/><strong>Features</strong>: timetable, minutes, poster creation, participants management,...") }";
     infoItems['${ _("Create conference") }'] = "${ _("A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.<br/><strong>Features</strong>: call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...") }";
-
-    var menu = new PopupMenu(menuItems, [createEventMenu], "globalMenuPopupList");
-    var pos = createEventMenu.getAbsolutePosition();
-    menu.open(pos.x, pos.y + 30);
-
-    //Write down the content of the infoBubble
-    menu.drawInfoBubbles(infoItems);
+    eventPopupMenu.drawInfoBubbles(infoItems);
 
     return false;
 });
@@ -86,21 +89,26 @@ createEventMenu.observeClick(function(e) {
 % if len(adminItemList) > 1:
 
     var administrationMenu = $E('administrationMenu');
+    var administrationPopupMenu;
     administrationMenu.observeClick(function(e) {
         var menuItems = {};
 
         % for item in adminItemList:
         menuItems["${ item['text']}"] = "${ item['url'] }"
         % endfor
-        var menu = new PopupMenu(menuItems, [administrationMenu], "globalMenuPopupList");
+        //Create a new PopupMenu only if it has never been created before -> fix #679
+        if(!administrationPopupMenu){
+            administrationPopupMenu = new PopupMenu(menuItems, [administrationMenu], "globalMenuPopupList");
+        }
         var pos = administrationMenu.getAbsolutePosition();
-        menu.open(pos.x, pos.y + 30);
+        administrationPopupMenu.open(pos.x, pos.y + 30);
         return false;
     });
 
 % endif
 
 var helpMenu = $E('helpMenu');
+var helpPopupMenu;
 helpMenu.observeClick(function(e) {
     var menuItems = {};
 
@@ -108,9 +116,12 @@ helpMenu.observeClick(function(e) {
     menuItems['${ _("About Indico") }'] = "${ urlHandlers.UHAbout.getURL() }";
     menuItems['${ _("Contact") }'] = "${ urlHandlers.UHContact.getURL() }";
 
-    var menu = new PopupMenu(menuItems, [helpMenu], "globalMenuPopupList");
+    //Create a new PopupMenu only if it has never been created before-> fix #679
+    if(!helpPopupMenu){
+        helpPopupMenu = new PopupMenu(menuItems, [helpMenu], "globalMenuPopupList");
+    }
     var pos = helpMenu.getAbsolutePosition();
-    menu.open(pos.x, pos.y + 30);
+    helpPopupMenu.open(pos.x, pos.y + 30);
     return false;
 });
 </script>
