@@ -337,21 +337,72 @@ type("RadioButtonPreviewQuestion", [],
 type("ManageListOfElements", [],
         {
             draw: function() {
+                // Draw the component
+                this.widgetContent = Html.div();
+                this._buildStructure(this.methods.get, this.attributes);
+                return this.widgetContent;
+            },
+
+            _buildStructure: function(method, attributes) {
 
                 var self = this;
-                this.widgetContent = Html.div();
 
-                indicoRequest(this.methods.get,
-                        this.attributes,
+                indicoRequest(method,
+                        attributes,
                         function(result, error){
                             if (!error) {
                                 self.widgetContent.append(self._drawListOfElements(result));
                                 self.widgetContent.append(self._drawFooter());
                             }
                         });
-
-                return this.widgetContent
             },
+
+            _createConfirmPopup: function(method, spanId, previousText, popupContent, title, buttonText) {
+
+                var self = this;
+
+                var popup = new ConfirmPopup(title, popupContent,
+                        function(action) {
+                            if (action) {
+                                var attr = self.attributes;
+                                attr['id'] = spanId;
+                                if (previousText) {
+                                    attr['text'] = popupContent.dom.value;
+                                }
+                                self._buildStructure(method, attr);
+                            }
+                        }, buttonText);
+                return popup;
+            },
+
+            _createSpecialRemovePopup: function(method, spanId, popupContent, title, button1, button2) {
+
+                var self = this;
+
+                var popup = new SpecialRemovePopup(title, popupContent,
+                        function(option) {
+                            if (option == 0) {
+                                // close popup option
+                                null;
+                            } else {
+                                var attr = self.attributes;
+                                attr['id'] = spanId;
+
+                                if (option == 1) {
+                                    // Keep ratings handler
+                                    attr['keepJud'] = true;
+                                }
+                                if (option == 2) {
+                                    // Remove ratings handler
+                                    attr['keepJud'] = false;
+                                }
+                                self._buildStructure(method, attr);
+                            }
+                        }, button1, button2);
+
+                return popup;
+            },
+
 
             _drawListOfElements: function(result) {
                 // Initialize the i counter
@@ -398,22 +449,7 @@ type("ManageListOfElements", [],
                             }
                             var previousText = $E('TEID_'+spanId).dom.innerHTML;
                             var popupContent = Html.textarea({id:'modifyArea', cols:'40', rows:'7'}, previousText);
-                            var popup = new ConfirmPopup('Edit '+this.kindOfElement, popupContent,
-                                    function(action) {
-                                        if (action) {
-                                            var attr = self.attributes;
-                                            attr['id'] = spanId;
-                                            attr['text'] = popupContent.dom.value;
-                                            indicoRequest(self.methods.edit,
-                                                attr,
-                                                function(result, error){
-                                                   if (!error) {
-                                                       self.widgetContent.append(self._drawListOfElements(result));
-                                                       self.widgetContent.append(self._drawFooter());
-                                                    }
-                                                 });
-                                            }
-                                    }, 'Save');
+                            var popup = self._createConfirmPopup(self.methods.edit, spanId, previousText, popupContent, 'Edit '+self.kindOfElement, 'Save');
                             popup.open();
                         });
 
@@ -432,61 +468,15 @@ type("ManageListOfElements", [],
                             }
                             var attr = self.attributes;
                             attr['value'] = spanId;
+
                             if (!self.specialRemove) {
                                 var popupContent = Html.span({}, 'Are you sure you want to remove the '+ self.kindOfElement +'?');
-                                var popup = new ConfirmPopup('Remove '+ self.kindOfElement, popupContent,
-                                         function(action) {
-                                             if (action) {
-                                                 var attr = self.attributes;
-                                                 attr['id'] = spanId;
-                                                 indicoRequest(self.methods.remove,
-                                                         attr,
-                                                         function(result, error){
-                                                             if (!error) {
-                                                                self.widgetContent.append(self._drawListOfElements(result));
-                                                                self.widgetContent.append(self._drawFooter());
-                                                             }
-                                                  });
-                                            }
-                                        }, 'Remove');
+                                var popup = self._createConfirmPopup(self.methods.remove, spanId, null, popupContent, 'Remove '+self.kindOfElement, 'Remove');
+
                             } else {
                                 var popupContent = Html.span({}, 'Do you want to keep the ratings of the judgements for this question (if any)?');
                                 // For this popup we need two handlers
-                                var popup = new SpecialRemovePopup('Remove '+ self.kindOfElement, popupContent,
-                                    function(option) {
-                                            if (option == 0) {
-                                                // close popup option
-                                                null;
-                                            }
-                                            if (option == 1) {
-                                                // Keep ratings handler
-                                                var attr = self.attributes;
-                                                attr['id'] = spanId;
-                                                attr['keepJud'] = true;
-                                                indicoRequest(self.methods.remove,
-                                                    attr,
-                                                    function(result, error){
-                                                        if (!error) {
-                                                            self.widgetContent.append(self._drawListOfElements(result));
-                                                            self.widgetContent.append(self._drawFooter());
-                                                            }
-                                                     });
-                                            }
-                                            if (option == 2) {
-                                                // Remove ratings handler
-                                                var attr = self.attributes;
-                                                attr['id'] = spanId;
-                                                attr['keepJud'] = false;
-                                                indicoRequest(self.methods.remove,
-                                                    attr,
-                                                    function(result, error){
-                                                        if (!error) {
-                                                            self.widgetContent.append(self._drawListOfElements(result));
-                                                            self.widgetContent.append(self._drawFooter());
-                                                            }
-                                                    });
-                                            }
-                                        }, 'Keep ratings', 'Remove ratings');
+                                var popup = self._createSpecialRemovePopup(self.methods.remove, spanId, popupContent, 'Remove '+ self.kindOfElement ,'Keep ratings', 'Remove ratings');
                             }
                             popup.open();
                         });
@@ -518,14 +508,7 @@ type("ManageListOfElements", [],
                       if (element != '') {
                           var attr = self.attributes;
                           attr['value'] = element;
-                          indicoRequest(self.methods.add,
-                                  attr,
-                                  function(result, error){
-                                      if (!error) {
-                                          self.widgetContent.append(self._drawListOfElements(result));
-                                          self.widgetContent.append(self._drawFooter());
-                                      }
-                                  });
+                          self._buildStructure(self.methods.add, attr);
                           edit.set('');
                      }
                 });

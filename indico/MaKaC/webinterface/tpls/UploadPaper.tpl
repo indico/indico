@@ -1,3 +1,2 @@
-<% declareTemplate(newTemplateStyle=True) %>
 
     <%= items %>

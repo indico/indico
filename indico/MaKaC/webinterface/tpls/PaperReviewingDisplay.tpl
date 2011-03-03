@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <div class="groupTitle"><%= _("Paper Reviewing")%></div>
 <div>
 <table width='100%'>

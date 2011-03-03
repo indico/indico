@@ -1,4 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
 <% from MaKaC.common.fossilize import fossilize %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <table width="90%" align="left" border="0" style="padding-top:10px;">
