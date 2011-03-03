@@ -87,6 +87,9 @@ def _fixAccessController(obj):
 
 
 def _convertAlarms(obj):
+    """
+    Take the alarms in an event and convert them to the new format
+    """
     alarms = {}
     obj._legacyAlarmList = obj.getAlarmList()
 
@@ -95,8 +98,11 @@ def _convertAlarms(obj):
         newTask = AlarmTask(obj, alarm.id, sdate)
         newTask.setSubject(alarm.getSubject())
         newTask.setText(alarm.getText())
-        newTask.setNote(alarm.getNote())
-        newTask.setConfSummary(alarm.getConfSumary())
+
+        # define directly, otherwise _setText will be triggered!
+        newTask.note = alarm.getNote()
+        newTask.confSummary = alarm.getConfSumary()
+
         newTask.setToAllParticipants(alarm.getToAllParticipants())
         alarms[alarm.id] = newTask
 
@@ -153,7 +159,6 @@ def runConferenceMigration(dbi, withRBDB):
         DALManager.commit()
 
 
-
 def runPluginMigration(dbi, withRBDB):
     """
     Adding new plugins and adapting existing ones to new name policies
@@ -176,7 +181,6 @@ def runPluginMigration(dbi, withRBDB):
     dbi.commit()
     if withRBDB:
         DALManager.commit()
-
 
     # load new plugins, so that we can update them after
     PluginsHolder().reloadAllPlugins()
