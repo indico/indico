@@ -22,7 +22,7 @@
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 from MaKaC.trashCan import TrashCanManager
-from MaKaC.plugins import PluginLoader
+from MaKaC.plugins import PluginLoader, pluginId
 
 class EPayment(Persistent):
 
@@ -44,41 +44,28 @@ class EPayment(Persistent):
         self.payMods = {}
         epaymentModules = PluginLoader.getPluginsByType("EPayment")
         for mod in epaymentModules:
-            try:
-                self.payMods[mod.pluginName] = mod.epayment.getPayMod()
-            except:
-                pass
+            self.payMods[mod.__name__] = mod.epayment.getPayMod()
         self._p_changed = 1
-        #self.payMods["PayLater"] = PayLaterMod()
         if initSorted:
             self.initSortedModPay()
-
-##        #Simple-SubForms
-##        self.yellowPay = YellowPayMod()
-##        self.payLater = PayLaterMod()
-##        self.payPal = PayPalMod()
-##        self.worldPay = WorldPayMod()
-##        #All SortedForms
 
     def updatePlugins(self, initSorted=True):
         epaymentModules = PluginLoader.getPluginsByType("EPayment")
         changed = False
         for mod in epaymentModules:
-            try:
-                if not mod.pluginName in self.payMods.keys():
-                    print "add mod %s"%mod
-                    self.payMods[mod.pluginName] = mod.epayment.getPayMod()
-                    print "%s"%self.payMods
+            name = pluginId(mod)
+            if name not in self.payMods:
+                self.payMods[name] = mod.epayment.getPayMod()
+                changed = True
+            else:
+                # this seems to be some kind of replacement mechanism
+                # no idea of its use though...
+                if not isinstance(self.payMods[name],
+                                  mod.epayment.getPayModClass()):
+                    newMod = mod.epayment.getPayMod()
+                    self.payMods[pluginId(mod)] = newMod
                     changed = True
-                else:
-                    if not isinstance(self.payMods[mod.pluginName], mod.epayment.getPayModClass()):
-                        #oldMod = self.payMods[mod.pluginName]
-                        print "replace by mod %s"%mod
-                        newMod = mod.epayment.getPayMod()
-                        self.payMods[mod.pluginName] = newMod
-                        changed = True
-            except:
-                pass
+
         if changed:
             self._p_changed = 1
         if initSorted:
@@ -254,11 +241,6 @@ class EPayment(Persistent):
 ##        return self.worldPay
 
     def getSortedModPay(self):
-##        try:
-##            if self._sortedModPay:
-##                pass
-##        except AttributeError,e:
-##            self.initSortedModPay()
         self.updatePlugins()
         return self._sortedModPay
 

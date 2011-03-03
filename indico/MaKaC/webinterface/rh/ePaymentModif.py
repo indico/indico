@@ -29,6 +29,11 @@ from MaKaC.errors import FormValuesError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages import registrationForm
+from MaKaC.plugins.base import pluginId
+
+from MaKaC.plugins.EPayment.payPal import MODULE_ID
+
+
 
 class RHEPaymentModifBase( conferenceModif.RHConferenceModifBase ):
 
@@ -166,7 +171,7 @@ class RHEPaymentmodifPayPalPerformDataModif( RHEPaymentModifBase ):
 
     def _process( self ):
         if not self._cancel:
-            ses = self._conf.getModPay().getPayModByTag("PayPal")
+            ses = self._conf.getModPay().getPayModByTag(MODULE_ID)
             ses.setValues(self._params)
         self._redirect(urlHandlers.UHConfModifEPaymentPayPal.getURL(self._conf))
 
@@ -220,9 +225,10 @@ class RHModifModule:
         epaymentModules = PluginLoader.getPluginsByType("EPayment")
         module = None
         for mod in epaymentModules:
-            if mod.pluginName == params.get("EPaymentName","No module name"):
+            if pluginId(mod) == params.get("EPaymentName","No module name"):
                 module = mod
                 break
+
         if module:
             try:
                 rhmod = module.webinterface.rh

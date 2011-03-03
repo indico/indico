@@ -28,10 +28,7 @@ import MaKaC
 
 from MaKaC.plugins.EPayment.worldPay.webinterface.wcomponents import WTemplated
 from MaKaC.plugins.EPayment.worldPay.webinterface import urlHandlers as localUrlHandlers
-
-
-
-
+from MaKaC.plugins.EPayment.worldPay import MODULE_ID
 
 #### configuration interface for WorldPay
 class WPConfModifEPaymentWorldPayBase( registrationForm.WPConfModifRegFormBase ):
@@ -53,7 +50,7 @@ class WPConfModifEPaymentWorldPayBase( registrationForm.WPConfModifRegFormBase )
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag("WorldPay"), self._conf).getHTML()
+        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag(MODULE_ID), self._conf).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner+html
 
@@ -74,7 +71,7 @@ class WConfModifEPaymentWorldPay( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modWorldPay = self._conf.getModPay().getPayModByTag("WorldPay")
+        modWorldPay = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modWorldPay.getTitle()
         vars["url"] = modWorldPay.getUrl()
         vars["instId"] =  modWorldPay.getInstId()
@@ -93,13 +90,13 @@ class WPConfModifEPaymentWorldPayDataModif( WPConfModifEPaymentWorldPayBase):
         return wc.getHTML(p)
 
 class WConfModifEPaymentWorldPayDataModif( WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modWorldPay = self._conf.getModPay().getPayModByTag("WorldPay")
+        modWorldPay = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modWorldPay.getTitle()
         vars["url"] = modWorldPay.getUrl()
         vars["instId"] =  modWorldPay.getInstId()
@@ -143,16 +140,16 @@ class WConfModifEPaymentWorldPayDataModif( WTemplated ):
 
 
 class WEPaymentWorldPayModifFrame( WTemplated ):
-    
+
     def __init__(self, conf, aw):
         self._conf = conf
         self._aw = aw
-        self._worldPay = self._conf.getModPay().getPayModByTag("WorldPay")
-    
+        self._worldPay = self._conf.getModPay().getPayModByTag(MODULE_ID)
+
     def getHTML( self, body, **params ):
         params["body"] = body
         return WTemplated.getHTML( self, params )
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
@@ -165,15 +162,15 @@ class WEPaymentWorldPayModifFrame( WTemplated ):
     def getOwnerComponent( self ):
         wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
         return wc
-        
+
     def getIntermediateVTabPixels( self ):
         wc = self.getOwnerComponent()
         return 7 + wc.getIntermediateVTabPixels()
-        
+
     def getTitleTabPixels( self ):
         wc = self.getOwnerComponent()
         return wc.getTitleTabPixels() - 7
-    
+
     def getCloseHeaderTags( self ):
         wc = self.getOwnerComponent()
         return "</table></td></tr>" + wc.getCloseHeaderTags()
@@ -185,10 +182,10 @@ class WPConfirmEPaymentWorldPay( conferences.WPConferenceDefaultDisplayBase ):
     def __init__( self, rh, conf, reg ):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant = reg
-        
+
     def _getBody( self, params ):
         wc = WConfirmEPaymentWorldPay( self._conf, self._registrant)
-        
+
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defindeSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
@@ -198,7 +195,7 @@ class WconfirmEPaymentWorldPay( WTemplated ):
     def __init__( self,configuration, registrant):
         self._registrant = registrant
         self._conf = configuration
-        
+
     def getVars( self ):
         vars = WTemplated.getVars(self)
         vars["message"] = "Thank you to the payment!\n you have used WorldPay"
@@ -209,34 +206,34 @@ class WPEPaymentWorldPayAccepted(conferences.WPConferenceDefaultDisplayBase):
     def __init__(self, rh, conf, reg ):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant = reg
-    
+
     def display(self, params):
         modPay = self._conf.getModPay()
-        return modPay.getPayModByTag("WorldPay").getTextCallBackSuccess()%params
+        return modPay.getPayModByTag(MODULE_ID).getTextCallBackSuccess()%params
 
 class WPEPaymentWorldPayCancelled(conferences.WPConferenceDefaultDisplayBase):
     def __init__(self, rh, conf, reg ):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant = reg
-    
+
     def display(self, params):
         modPay = self._conf.getModPay()
-        return modPay.getPayModByTag("WorldPay").getTextCallBackCancelled()%params
+        return modPay.getPayModByTag(MODULE_ID).getTextCallBackCancelled()%params
 
 class WPCancelEPaymentWorldPay( conferences.WPConferenceDefaultDisplayBase ):
 
     def __init__(self, rh, conf, reg):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant=reg
-        
+
     def _getBody( self, params ):
         wc = WCancelEPaymentWorldPay( self._conf,self._registrant )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)    
-        
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
+
 class WCancelEPaymentWorldPay( WTemplated ):
     def __init__( self, conference,reg ):
         self._conf = conference
@@ -246,4 +243,4 @@ class WCancelEPaymentWorldPay( WTemplated ):
         vars = WTemplated.getVars(self)
         vars["message"] = "You have Cancelled!\nplease check your mail\n you have used WorldPay"
         vars["messagedetailPayment"]="%s:%s"%(self._registrant.getFirstName(),self._registrant.getSurName())
-        return vars 
+        return vars

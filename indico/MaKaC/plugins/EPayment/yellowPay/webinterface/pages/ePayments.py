@@ -28,6 +28,9 @@ import MaKaC
 
 from MaKaC.plugins.EPayment.yellowPay.webinterface.wcomponents import WTemplated
 from MaKaC.plugins.EPayment.yellowPay.webinterface import urlHandlers as localUrlHandlers
+from MaKaC.plugins.EPayment.yellowPay import MODULE_ID
+
+
 
 class WPConfModifEPaymentYellowPayBase(registrationForm.WPConfModifRegFormBase):
 
@@ -48,7 +51,7 @@ class WPConfModifEPaymentYellowPayBase(registrationForm.WPConfModifRegFormBase):
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag("YellowPay"), self._conf).getHTML()
+        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag(MODULE_ID), self._conf).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner+html
 
@@ -71,7 +74,7 @@ class WConfModifEPaymentYellowPay( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modYellowPay = self._conf.getModPay().getPayModByTag("YellowPay")
+        modYellowPay = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modYellowPay.getTitle()
         vars["url"] = modYellowPay.getUrl()
         vars["shopid"] =  modYellowPay.getShopID()
@@ -94,7 +97,7 @@ class WConfModifEPaymentYellowPayDataModif( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modYellowPay = self._conf.getModPay().getPayModByTag("YellowPay")
+        modYellowPay = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modYellowPay.getTitle()
         vars["url"] = modYellowPay.getUrl()
         vars["shopid"] =  modYellowPay.getShopID()

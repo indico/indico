@@ -229,9 +229,12 @@ class MaterialLocalRepository(Persistent):
 
     def readFile( self, id ):
         filePath = self.__getFilePath( id )
-        f = open(filePath, "rb")
-        data = f.read()
-        f.close()
+        try:
+            f = open(filePath, "rb")
+            data = f.read()
+            f.close()
+        except IOError:
+            data = "<nothing>"
         return data
 
     def replaceContent( self, id, newContent ):

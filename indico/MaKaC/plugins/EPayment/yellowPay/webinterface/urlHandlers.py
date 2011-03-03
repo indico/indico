@@ -20,6 +20,8 @@
 
 from MaKaC.webinterface.urlHandlers import URLHandler as MainURLHandler
 
+from MaKaC.plugins.EPayment.yellowPay import MODULE_ID
+
 
 class EPURLHandler(MainURLHandler):
     
@@ -39,7 +41,7 @@ class EPURLHandler(MainURLHandler):
         url = cls._getURL()
         if target is not None:
             url.setParams( target.getLocator() )
-        url.addParam( "EPaymentName", "YellowPay" )
+        url.addParam( "EPaymentName", MODULE_ID )
         url.addParam( "requestTag", cls._requestTag )
         return url
     getURL = classmethod( getURL )

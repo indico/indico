@@ -23,6 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 
 
 from MaKaC.plugins.EPayment.yellowPay.webinterface import urlHandlers as localUrlHandlers
+from MaKaC.plugins.EPayment.yellowPay import MODULE_ID
 import md5
 
 class YellowPayMod(BaseEPayMod):
@@ -37,15 +38,9 @@ class YellowPayMod(BaseEPayMod):
         self._hashSeed = ""
         if data is not None:
             setValue(data)
-        self._id="YellowPay"
 
     def getId(self):
-        try:
-            if self._id:
-                pass
-        except AttributeError, e:
-            self._id="YellowPay"
-        return self._id
+        return MODULE_ID
 
     def clone(self, newSessions):
         sesf = YellowPayMod()

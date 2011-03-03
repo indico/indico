@@ -27,6 +27,8 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.plugins.EPayment.payPal.webinterface.pages import ePayments
 from MaKaC.plugins.EPayment.payPal.webinterface import urlHandlers as localUrlHandlers
 from MaKaC.plugins.EPayment.payPal import epayment as ePayment
+from MaKaC.plugins.EPayment.payPal import MODULE_ID
+
 
 class RHEPaymentmodifPayPal( RHEPaymentModifBase ):
     _requestTag = "modifPayPal"
@@ -52,7 +54,7 @@ class RHEPaymentmodifPayPalPerformDataModif( RHEPaymentModifBase ):
     
     def _process( self ):
         if not self._cancel:
-            ses = self._conf.getModPay().getPayModByTag("PayPal")
+            ses = self._conf.getModPay().getPayModByTag(MODULE_ID)
             ses.setValues(self._params)
         self._redirect(localUrlHandlers.UHConfModifEPaymentPayPal.getURL(self._conf)) 
         

@@ -23,6 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 
 
 from MaKaC.plugins.EPayment.worldPay.webinterface import urlHandlers as localUrlHandlers
+from MaKaC.plugins.EPayment.worldPay import MODULE_ID
 
 
 
@@ -32,7 +33,6 @@ class WorldPayMod( BaseEPayMod ):
     def __init__(self, date=None):
         BaseEPayMod.__init__(self)
         self._title = "worldpay"
-        self._id = "WorldPay"
         self._url = "https://select.worldpay.com/wcc/purchase"
         self._instId = ""#"70950"
         self._description = ""#"EuroPython Registration"
@@ -41,12 +41,7 @@ class WorldPayMod( BaseEPayMod ):
         self._textCallBackCancelled = ""
 
     def getId(self):
-        try:
-            if self._id:
-                pass
-        except AttributeError, e:
-            self._id="WorldPay"
-        return self._id
+        return MODULE_ID
 
     def getInstId(self):
         try:

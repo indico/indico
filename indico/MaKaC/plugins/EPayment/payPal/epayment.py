@@ -24,6 +24,7 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 
 
 from MaKaC.plugins.EPayment.payPal.webinterface import urlHandlers as localUrlHandlers
+from MaKaC.plugins.EPayment.payPal import MODULE_ID
 
 class PayPalMod(BaseEPayMod):
 
@@ -36,15 +37,9 @@ class PayPalMod(BaseEPayMod):
 
         if data is not None:
             setValue(data)
-        self._id="PayPal"
 
     def getId(self):
-        try:
-            if self._id:
-                pass
-        except AttributeError, e:
-            self._id="PayPal"
-        return self._id
+        return MODULE_ID
 
     def clone(self, newSessions):
         sesf = PayPalMod()

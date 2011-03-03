@@ -23,7 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 
 
 from MaKaC.plugins.EPayment.skipjack.webinterface import urlHandlers as localUrlHandlers
-
+from MaKaC.plugins.EPayment.skipjack import MODULE_ID
 
 
 
@@ -32,7 +32,6 @@ class SkipjackMod( BaseEPayMod ):
     def __init__(self, date=None):
         BaseEPayMod.__init__(self)
         self._title = "skipjack"
-        self._id = "skipjack"
         self._url = "https://vpos.skipjack.com/ezPay/order.asp"
         self._description = ""#"Skipjack Registration"
         self._testMode = ""#"100"
@@ -47,13 +46,7 @@ class SkipjackMod( BaseEPayMod ):
            return self._url
 
     def getId(self):
-        try:
-            if self._id:
-                pass
-        except AttributeError, e:
-            self._id="Skipjack"
-        return self._id
-
+        return MODULE_ID
 
     def getTextCallBackSuccess(self):
         try:

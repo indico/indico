@@ -23,6 +23,6 @@ __metadata__ = {
     'name': "skipjack"
     }
 
+MODULE_ID = 'skipjack'
 
 modules = {}
-

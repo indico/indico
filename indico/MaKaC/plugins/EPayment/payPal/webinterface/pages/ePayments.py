@@ -27,6 +27,8 @@ from MaKaC.webinterface import urlHandlers
 import MaKaC
 from MaKaC.i18n import _
 
+
+from MaKaC.plugins.EPayment.payPal import MODULE_ID
 from MaKaC.plugins.EPayment.payPal.webinterface.wcomponents import WTemplated
 from MaKaC.plugins.EPayment.payPal.webinterface import urlHandlers as localUrlHandlers
 
@@ -51,7 +53,7 @@ class WPConfModifEPaymentPayPalBase(registrationForm.WPConfModifRegFormBase):
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag("PayPal"), self._conf).getHTML()
+        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag(MODULE_ID), self._conf).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner+html
 
@@ -74,7 +76,7 @@ class WConfModifEPaymentPayPal( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modPayPal = self._conf.getModPay().getPayModByTag("PayPal")
+        modPayPal = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modPayPal.getTitle()
         vars["url"] = modPayPal.getUrl()
         vars["business"] =  modPayPal.getBusiness()
@@ -95,7 +97,7 @@ class WConfModifEPaymentPayPalDataModif( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modPayPal = self._conf.getModPay().getPayModByTag("PayPal")
+        modPayPal = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modPayPal.getTitle()
         vars["url"] = modPayPal.getUrl()
         vars["business"] =  modPayPal.getBusiness()

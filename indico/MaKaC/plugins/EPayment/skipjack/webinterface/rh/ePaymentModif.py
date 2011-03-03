@@ -25,7 +25,8 @@ from datetime import datetime
 
 from MaKaC.plugins.EPayment.skipjack.webinterface.pages import ePayments
 from MaKaC.plugins.EPayment.skipjack.webinterface import urlHandlers as localUrlHandlers
-from MaKaC.plugins.EPayment.skipjack import epayment as ePayment
+from MaKaC.plugins.EPayment.skipjack import MODULE_ID, epayment as ePayment
+
 from MaKaC.errors import AccessError
 
 
@@ -60,7 +61,7 @@ class RHEPaymentmodifSkipjackPerformDataModif( RHEPaymentModifBase ):
 
     def _process( self ):
         if not self._cancel:
-            ses = self._conf.getModPay().getPayModByTag("skipjack")
+            ses = self._conf.getModPay().getPayModByTag(MODULE_ID)
             ses.setValues(self._params)
         self._redirect(localUrlHandlers.UHConfModifEPaymentSkipjack.getURL(self._conf))
 

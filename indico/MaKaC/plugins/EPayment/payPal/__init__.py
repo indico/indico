@@ -23,5 +23,6 @@ __metadata__ = {
     'name': "PayPal"
     }
 
+MODULE_ID = 'payPal'
 
 modules = {}

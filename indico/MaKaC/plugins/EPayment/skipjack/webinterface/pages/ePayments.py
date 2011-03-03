@@ -25,9 +25,7 @@ from xml.sax.saxutils import quoteattr
 
 from MaKaC.plugins.EPayment.skipjack.webinterface.wcomponents import WTemplated
 from MaKaC.plugins.EPayment.skipjack.webinterface import urlHandlers as localUrlHandlers
-
-
-
+from MaKaC.plugins.EPayment.skipjack import MODULE_ID
 
 
 #### configuration interface for Skipjack
@@ -50,7 +48,7 @@ class WPConfModifEPaymentSkipjackBase( registrationForm.WPConfModifRegFormBase )
 
     def _getPageContent( self, params ):
         self._createTabCtrl()
-        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag("skipjack"), self._conf).getHTML()
+        banner = wcomponents.WEpaymentBannerModif(self._conf.getModPay().getPayModByTag(MODULE_ID), self._conf).getHTML()
         html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
         return banner+html
 
@@ -72,7 +70,7 @@ class WConfModifEPaymentSkipjack( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modSkipjack = self._conf.getModPay().getPayModByTag("skipjack")
+        modSkipjack = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modSkipjack.getTitle()
         vars["url"] = modSkipjack.getUrl()
         vars["description"] = modSkipjack.getDescription()
@@ -97,7 +95,7 @@ class WConfModifEPaymentSkipjackDataModif( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        modSkipjack = self._conf.getModPay().getPayModByTag("skipjack")
+        modSkipjack = self._conf.getModPay().getPayModByTag(MODULE_ID)
         vars["title"] = modSkipjack.getTitle()
         vars["url"] = modSkipjack.getUrl()
         vars["description"] = modSkipjack.getDescription()

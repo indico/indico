@@ -42,6 +42,13 @@ from indico.core.api import Component, IListener, IContributor
 from indico.web import rh as newrh
 
 
+def pluginId(mod):
+    """
+    Takes a module and spits out its plugin id
+    """
+    return mod.__name__.split('.')[-1]
+
+
 class Observable(object):
     def _notify(self, event, *params):
         return PluginsHolder().getComponentsManager().notifyComponent(event, self, *params)

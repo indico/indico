@@ -23,4 +23,6 @@ __metadata__ = {
     'name': "YellowPay"
     }
 
+MODULE_ID = 'yellowPay'
+
 modules = {}

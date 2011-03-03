@@ -27,6 +27,8 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.plugins.EPayment.yellowPay.webinterface.pages import ePayments
 from MaKaC.plugins.EPayment.yellowPay.webinterface import urlHandlers as localUrlHandlers
 from MaKaC.plugins.EPayment.yellowPay import epayment as ePayment
+from MaKaC.plugins.EPayment.yellowPay import MODULE_ID
+
 
 
 class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):
@@ -52,7 +54,7 @@ class RHEPaymentmodifYellowPayPerformDataModif( RHEPaymentModifBase ):
     
     def _process( self ):
         if not self._cancel:
-            ses = self._conf.getModPay().getPayModByTag("YellowPay")
+            ses = self._conf.getModPay().getPayModByTag(MODULE_ID)
             ses.setValues(self._getRequestParams())
         self._redirect(localUrlHandlers.UHConfModifEPaymentYellowPay.getURL(self._conf)) 
 
@@ -132,7 +134,7 @@ class RHEPaymentValideParamYellowPay( RHConferenceBaseDisplay ):
             if self._registrant is not None:
                 self._registrant.setPayed(True)
                 d={}
-                d["ModPay"]=self._params.get("YellowPay")
+                d["ModPay"]=self._params.get(MODULE_ID)
                 d["payment_date"]=nowutc()
                 d["TransactionID"]=self._params.get("txtTransactionID")
                 d["OrderTotal"]=self._params.get("txtOrderTotal")

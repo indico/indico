@@ -39,7 +39,7 @@ class EPURLHandler(MainURLHandler):
         url = cls._getURL()
         if target is not None:
             url.setParams( target.getLocator() )
-        url.addParam( "EPaymentName", skipjack.pluginName )
+        url.addParam( "EPaymentName", skipjack.MODULE_ID )
         url.addParam( "requestTag", cls._requestTag )
         return url
     getURL = classmethod( getURL )

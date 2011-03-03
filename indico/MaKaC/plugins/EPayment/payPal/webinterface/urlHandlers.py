@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.webinterface.urlHandlers import URLHandler as MainURLHandler
-
+from MaKaC.plugins.EPayment import payPal
 
 class EPURLHandler(MainURLHandler):
     
@@ -39,7 +39,7 @@ class EPURLHandler(MainURLHandler):
         url = cls._getURL()
         if target is not None:
             url.setParams( target.getLocator() )
-        url.addParam( "EPaymentName", "PayPal" )
+        url.addParam( "EPaymentName",  payPal.MODULE_ID)
         url.addParam( "requestTag", cls._requestTag )
         return url
     getURL = classmethod( getURL )

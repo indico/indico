@@ -23,5 +23,6 @@ __metadata__ = {
     'name': "WorldPay"
     }
 
-modules = {}
+MODULE_ID = 'worldPay'
 
+modules = {}
