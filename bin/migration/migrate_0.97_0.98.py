@@ -21,8 +21,7 @@
 Migration script: v0.97 -> v0.98
 """
 
-import sys
-import traceback
+import sys, traceback, argparse
 from BTrees.OOBTree import OOTreeSet
 from dateutil import rrule
 
@@ -33,7 +32,7 @@ from MaKaC.conference import ConferenceHolder, CategoryManager, Conference
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
-
+from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 
 from indico.ext import livesync
 from indico.util import console
@@ -43,7 +42,7 @@ from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
 from indico.modules.scheduler import Client
 
 
-def runTaskMigration(dbi):
+def runTaskMigration(dbi, withRBDB):
     """
     Migrating database tasks from the old format to the new one
     """
@@ -68,6 +67,8 @@ def runTaskMigration(dbi):
             else:
                 raise Exception("Unknown task type!")
 
+    if withRBDB:
+        DALManager.commit()
     dbi.commit()
 
 
@@ -106,7 +107,7 @@ def _convertAlarms(obj):
     obj.alarmList = alarms
 
 
-def runConferenceMigration(dbi):
+def runConferenceMigration(dbi, withRBDB):
     """
     Adding missing attributes to conference objects and children
     """
@@ -134,6 +135,9 @@ def runConferenceMigration(dbi):
 
         if i % 1000 == 999:
             dbi.commit()
+            if withRBDB:
+                DALManager.commit()
+
         i += 1
 
         # Convert RegistrationSessions to RegistrantSessions
@@ -145,9 +149,12 @@ def runConferenceMigration(dbi):
                                      for ses in reg._sessions]
 
     dbi.commit()
+    if withRBDB:
+        DALManager.commit()
 
 
-def runPluginMigration(dbi):
+
+def runPluginMigration(dbi, withRBDB):
     """
     Adding new plugins and adapting existing ones to new name policies
     """
@@ -167,14 +174,21 @@ def runPluginMigration(dbi):
                 p.setId(p.getName().replace(" ", ""))
                 p.setUsable(True)
     dbi.commit()
+    if withRBDB:
+        DALManager.commit()
+
 
     # load new plugins, so that we can update them after
     PluginsHolder().reloadAllPlugins()
     dbi.commit()
+    if withRBDB:
+        DALManager.commit()
 
     # update db for specific plugins
     livesync.db.updateDBStructures(root)
     dbi.commit()
+    if withRBDB:
+        DALManager.commit()
 
 
 def runCategoryDateIndexMigration(dbi):
@@ -206,7 +220,7 @@ def runCategoryConfDictToTreeSet(dbi):
             print categ.getId()
 
 
-def runMigration():
+def runMigration(withRBDB=False):
 
     tasks = [runPluginMigration,
              runConferenceMigration,
@@ -222,8 +236,15 @@ def runMigration():
         print console.colored("->", 'green', attrs=['bold']), \
               task.__doc__.replace('\n', '').strip()
         dbi.startRequest()
-        task(dbi)
+        if withRBDB:
+            DALManager.connect()
+
+        task(dbi, withRBDB)
+
+        if withRBDB:
+            DALManager.commit()
         dbi.endRequest()
+
         print console.colored("   DONE\n", 'green', attrs=['bold'])
 
     print console.colored("Database Migration successful!\n",
@@ -239,10 +260,16 @@ def main():
 this operation be executed while the web server is down, in order to avoid
 concurrency problems and DB conflicts.\n\n""", 'yellow')
 
+    parser = argparse.ArgumentParser(description='Execute migration')
+    parser.add_argument('--with-rb', dest='useRBDB', action='store_true',
+                        help='Use the Room Booking DB')
+
+    args = parser.parse_args()
+
     if console.yesno("Are you sure you want to execute the "
                      "migration now?"):
         try:
-            return runMigration()
+            return runMigration(withRBDB=args.useRBDB)
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])
