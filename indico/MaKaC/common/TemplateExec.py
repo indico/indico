@@ -603,7 +603,7 @@ class TemplateExec:
         ixSt = tpl.find( "<%", afterIx )
         if ixSt == -1: return ( len( tpl ), None, None, None )
 
-        ixEnd = tpl.find( "%>", afterIx + 1 )
+        ixEnd = tpl.find( "%>", ixSt + 1 )
         if ixEnd == -1: return ( len( tpl ), None, None, None )
 
         isExpression, statement = (None, None)
