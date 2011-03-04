@@ -346,7 +346,7 @@ class FoundationSyncTask(PeriodicUniqueTask):
 
     def run(self):
         from MaKaC.common.FoundationSync.foundationSync import FoundationSync
-        FoundationSync().doAll()
+        FoundationSync(self._v_logger).doAll()
 
 
 class SendMailTask(OneShotTask):

@@ -22,6 +22,8 @@ import time, logging
 
 from indico.modules.scheduler import SchedulerModule, base
 from MaKaC.common import DBMgr
+from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
+from MaKaC.common.info import HelperMaKaCInfo
 
 import multiprocessing
 import threading
@@ -63,11 +65,21 @@ class _Worker(object):
         # times and if it continues failing we abort it
         i = 0
 
+        # RoomBooking forces us to connect to its own DB if needed
+        # Maybe we should add some extension point here that lets plugins
+        # define their own actions on DB connect/disconnect/commit/abort
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+        rbEnabled = info.getRoomBookingModuleActive()
+
         self._dbi.startRequest()
+        if rbEnabled:
+            DALManager.connect()
 
         # potentially conflict-prone (!)
         self._task.prepare()
         self._dbi.commit()
+        if rbEnabled:
+            DALManager.commit()
 
         while i < self._config.task_max_tries:
 
@@ -95,6 +107,8 @@ class _Worker(object):
 
                 # abort transaction and synchronize
                 self._dbi.sync()
+                if rbEnabled:
+                    DALManager.abort()
             else:
                 break
 
@@ -110,6 +124,9 @@ class _Worker(object):
             self._logger.error("Task %s failed too many (%d) times. "
                                "Aborting its execution.." % (self._task.id, i))
 
+        if rbEnabled:
+            DALManager.commit()
+            DALManager.disconnect()
         self._dbi.endRequest()
         self._logger.info("exiting")
 

@@ -195,7 +195,7 @@ def runPluginMigration(dbi, withRBDB):
         DALManager.commit()
 
 
-def runCategoryDateIndexMigration(dbi):
+def runCategoryDateIndexMigration(dbi, withRBDB):
     """
     Replacing category date indexes.
     """
@@ -213,7 +213,7 @@ If you still want to regenerate it, please, do it manually using """ \
         """bin/migration/CategoryDate.py"""
 
 
-def runCategoryConfDictToTreeSet(dbi):
+def runCategoryConfDictToTreeSet(dbi, withRBDB):
     """
     Replacing the conference dictionary in the Category objects by a OOTreeSet.
     """
@@ -229,8 +229,8 @@ def runMigration(withRBDB=False):
     tasks = [runPluginMigration,
              runConferenceMigration,
              runTaskMigration,
-             runCategoryDateIndexMigration,
-             runCategoryConfDictToTreeSet]
+             runCategoryConfDictToTreeSet,
+             runCategoryDateIndexMigration]
 
     print "\nExecuting migration...\n"
 
