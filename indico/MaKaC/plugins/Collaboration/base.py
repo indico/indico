@@ -1520,16 +1520,16 @@ class WCSTemplateBase(wcomponents.WTemplated):
         This class also overloads the _setTPLFile method so that Indico knows where each plugin's *.tpl files are.
     """
 
-    def __init__(self, plugin):
+    def __init__(self, pluginId):
         """ Constructor for the WCSTemplateBase class.
             conf: a Conference object
             plugin: the corresponding plugin
         """
-        self._plugin = plugin
-        self._pluginId = plugin.getId()
+        self._plugin = CollaborationTools.getPlugin(pluginId)
+        self._pluginId = self._plugin.getId()
         self._ph = PluginsHolder()
 
-        setattr(self, "_" + self._pluginId + "Options", plugin.getOptions())
+        setattr(self, "_" + self._pluginId + "Options", self._plugin.getOptions())
 
     def _setTPLFile(self, extension='tpl'):
         tplDir = os.path.join(self._plugin.getModule().__path__[0], "tpls")
@@ -1545,8 +1545,8 @@ class WCSPageTemplateBase(WCSTemplateBase):
     """ Base class for Collaboration templates for the create / modify booking form.
     """
 
-    def __init__(self, conf, plugin, user):
-        WCSTemplateBase.__init__(self, plugin)
+    def __init__(self, conf, pluginId, user):
+        WCSTemplateBase.__init__(self, pluginId)
         self._conf = conf
         self._user = user
 

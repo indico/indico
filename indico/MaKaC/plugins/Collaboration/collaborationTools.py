@@ -54,16 +54,16 @@ class CollaborationTools(object):
         return PluginsHolder().getPluginType("Collaboration")
 
     @classmethod
-    def getPlugin(cls, pluginName):
+    def getPlugin(cls, pluginId):
         #This commented code tried to gain some performance by caching the collaboration
         # PluginType object, but sometimes there would be problems by
         # different requests sharing memory and trying to access the database
         # after a connection was closed. This happened under Apache in Windows Vista with ZODB 3.8
 
 #        if not pluginName in cls._plugins:
-#            cls._plugins[pluginName] = cls.getCollaborationPluginType().getPlugin(pluginName)
-#        return cls._plugins[pluginName]
-        return cls.getCollaborationPluginType().getPlugin(pluginName)
+#            cls._plugins[pluginName] = cls.getCollaborationPluginType().getPlugin(pluginId)
+#        return cls._plugins[pluginId]
+        return cls.getCollaborationPluginType().getPlugin(pluginId)
 
     @classmethod
     def anyPluginsAreActive(cls):
