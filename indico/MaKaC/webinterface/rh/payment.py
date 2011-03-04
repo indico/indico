@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from copy import copy
+from MaKaC.plugins import pluginId
 
 class RHPaymentModule:
 
@@ -35,7 +36,7 @@ class RHPaymentModule:
 ##            mod.webinterface.rh.preprocessParams(params2)
 ##            if mod.pluginName == params2.get("EPaymentName","No module name"):
             if mod.webinterface.rh.preprocessParams(params2) and \
-               mod.pluginName == params2.get("EPaymentName","No module name"):
+               pluginId(mod) == params2.get("EPaymentName","No module name"):
                 module = mod
                 break
         if module:
