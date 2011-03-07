@@ -534,7 +534,7 @@ class ConferenceReviewingRemoveAllReviewers(ConferenceReviewingAssignStaffBasePR
 ###  Assign/Remove Team classes ###
 ######################################################
 
-class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingAssignTeamPRM(ConferenceReviewingPRMBase, UserListModificationBase):
     """ Adds paper review managers to reviewers team for the conference
     """
     def _checkParams(self):
@@ -551,7 +551,7 @@ class ConferenceReviewingAssignTeamPRM(UserListModificationBase, ConferenceRevie
 
         return True
 
-class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingRemoveTeamPRM(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes paper review manager from reviewers team for the conference
     """
     def _checkParams(self):
@@ -566,7 +566,7 @@ class ConferenceReviewingRemoveTeamPRM(UserModificationBase, ConferenceReviewing
 
         return True
 
-class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingAssignTeamReferee(ConferenceReviewingPRMBase, UserListModificationBase):
     """ Adds referee to reviewers team for the conference
     """
     def _checkParams(self):
@@ -583,7 +583,7 @@ class ConferenceReviewingAssignTeamReferee(UserListModificationBase, ConferenceR
 
         return True
 
-class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingRemoveTeamReferee(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes referee from reviewers team for the conference
     """
     def _checkParams(self):
@@ -604,7 +604,7 @@ class ConferenceReviewingRemoveTeamReferee(UserModificationBase, ConferenceRevie
         return True
 
 
-class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingAssignTeamEditor(ConferenceReviewingPRMBase, UserListModificationBase):
     """ Adds editor to reviewers team for the conference
     """
     def _checkParams(self):
@@ -621,7 +621,7 @@ class ConferenceReviewingAssignTeamEditor(UserListModificationBase, ConferenceRe
 
         return True
 
-class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingRemoveTeamEditor(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes editor from reviewers team for the conference
     """
     def _checkParams(self):
@@ -642,7 +642,7 @@ class ConferenceReviewingRemoveTeamEditor(UserModificationBase, ConferenceReview
         return True
 
 
-class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingAssignTeamReviewer(ConferenceReviewingPRMBase, UserListModificationBase):
     """ Adds editor to reviewers team for the conference
     """
     def _checkParams(self):
@@ -659,7 +659,7 @@ class ConferenceReviewingAssignTeamReviewer(UserListModificationBase, Conference
 
         return True
 
-class ConferenceReviewingRemoveTeamReviewer(UserModificationBase, ConferenceReviewingPRMBase):
+class ConferenceReviewingRemoveTeamReviewer(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes editor from reviewers team for the conference
     """
     def _checkParams(self):

@@ -5380,7 +5380,7 @@ class RHContributionListBase(RHConferenceModifBase):
             RHConferenceModifBase._checkProtection(self)
 
 
-class RHContributionList202( RoomBookingDBMixin, RHContributionListBase ):
+class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
     _uh = urlHandlers.UHConfModifContribList
 
     def _checkProtection(self):

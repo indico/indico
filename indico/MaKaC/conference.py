@@ -9320,6 +9320,9 @@ class Contribution(CommonObjectBase, Locatable):
             res=self.getSession().getTextColor()
         return res
 
+    def getCSBookingManager(self):
+        self.getConference().getCSBookingManager()
+
 class AcceptedContribution( Contribution ):
     """This class represents a contribution which has been created from an
         abstract
