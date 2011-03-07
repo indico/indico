@@ -26,7 +26,7 @@
         }
         function submit_reject_occurrence( action )
         {
-            reason = prompt(  <%= _("'Are you sure you want to REJECT booking for selected date? If so, please give a reason:'")%>, '' );
+            reason = prompt(  <%= _("'Are you sure you want to REJECT the booking for the selected date? If so, please give a reason:'")%>, '' );
             if ( reason == null )
                 return;
             var frm = document.forms['submits']
@@ -35,7 +35,7 @@
         }
         function submit_cancel_occurrence( action )
         {
-	    if (confirm('Are you sure you want to remove the selected date from the booking?')) {
+	    if (confirm('Are you sure you want to cancel the selected date from the booking?')) {
 	      var frm = document.forms['submits']
               frm.action = action;
               frm.submit();

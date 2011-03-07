@@ -108,7 +108,7 @@
 	    <div id="tooltipPool" style="display: none">
             <!-- Choose Button -->
             <div id="chooseButtonHelp" class="tip">
-                <span>Black</span> -  <%= _("rooms that <b>does not</b> require confirmation")%><br />
+                <span>Black</span> -  <%= _("rooms that <b>do not</b> require confirmation")%><br />
                 <span class="moderatedRoom">Orange</span> -  <%= _("rooms that <b>require confirmation")%></b><br />
                 <span class="privateRoom">Red</span> -  <%= _("rooms not publically bookable")%><br />
             </div>
@@ -140,12 +140,12 @@
             <p class="tip-no-borders">
                 <!--<span style="width: 30px; background-color: Red">&nbsp;</span><span style="width: 80px; background-color: Lime">&nbsp;</span><span style="width: 80px; background-color: Green">&nbsp;</span>!<br />
                 -->
-                 <%= _("""Find only rooms having capacity within 20%% range.
+                 <%= _("""Find only rooms having capacity within 20% range.
                 In example for capacity = 20, rooms having capacity 16 - 24
                 will be included in searching results.""")%><br />
             </p>
             <p class="tip-no-borders">
-                 <%= _("""If there are no rooms of capacity within 20%% range,
+                 <%= _("""If there are no rooms of capacity within 20% range,
                 system will search for greater capacity.""")%>
             </p>
             <p class="tip-no-borders">

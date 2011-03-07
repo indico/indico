@@ -132,7 +132,7 @@
 						    <tr>
 						        <td>
                                     <form id="searchForm" method="post" action="<%= roomBookingBookingListURL %>">
-                                    <table width="90%" align="center" border="0" style="border-left: 1px solid #777777;">
+                                    <table width="90%" align="center" border="0">
                                         <tr>
                                             <td colspan="2" class="groupTitle"> <%= _("Simple Search")%></td>
                                         </tr>
@@ -226,7 +226,7 @@
                                         </tr>
                                     </table>
                                     <br>
-                                    <table width="90%" align="center" border="0" style="border-left: 1px solid #777777">
+                                    <table width="90%" align="center" border="0">
                                         <tr>
                                             <td colspan="2" class="groupTitle"> <%= _("Advanced search")%></td>
                                         </tr>

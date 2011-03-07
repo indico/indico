@@ -1075,7 +1075,7 @@ class MoveEntryBase(ScheduleOperation):
                 session = self._conf.getSessionById(sessionId)
 
                 if session.getScheduleType() == "poster" and isinstance(self._schEntry, BreakTimeSchEntry):
-                    raise NoReportError("ERR-S5", _("It is not possible to move a break inside a poster session"))
+                    raise NoReportError(_("It is not possible to move a break inside a poster session"))
 
                 if session is not None:
                     slot = session.getSlotById(sessionSlotId)
