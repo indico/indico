@@ -9,9 +9,14 @@
         return true;
     }
 
-    function confirm_reject_reservation(date)
+    function confirm_reject_reservation(element, date)
     {
-        return confirm( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
+        var reason = prompt( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
+        if ( reason == null )
+            return false;
+
+        element.href = element.href + '&reason=' + encodeURI( reason );
+        return true;
     }
 </script>
 <% for collision in unrolledReservations: %>
@@ -79,7 +84,7 @@
                     <a href="<%= rejectOccurrence %>" onclick="return confirm_reject_occurrence(this, '<%= occurrence.startDT %>');" ><%= _("reject")%></a><br />
                 <% end %>
                 <% else: %>
-                    <a href="<%= rejectReservation %>" onclick="return confirm_reject_reservation('<%= occurrence.startDT %>');" ><%= _("reject")%></a><br />
+                    <a href="<%= rejectReservation %>" onclick="return confirm_reject_reservation(this, '<%= occurrence.startDT %>');" ><%= _("reject")%></a><br />
                 <% end %>
             <% end %>
         </td>
