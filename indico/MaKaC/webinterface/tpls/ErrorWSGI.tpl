@@ -4,7 +4,7 @@
     <head>
         <title>Indico</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link href="<%= Config.getInstance().getSystemIconURL("addressBarIcon") %>" type="image/x-icon" rel="shortcut icon" />
+        <link href="${ Config.getInstance().getSystemIconURL("addressBarIcon") }" type="image/x-icon" rel="shortcut icon" />
 
         <style type="text/css">
             body {
@@ -34,13 +34,13 @@
                 padding-bottom: 10px;
             }
             .leftCorner {
-                background: url("<%= Config.getInstance().getBaseURL() %>/images/grey_corners.png") no-repeat scroll 0 0 transparent;
+                background: url("${ Config.getInstance().getBaseURL() }/images/grey_corners.png") no-repeat scroll 0 0 transparent;
                 float: left;
                 height: 15px;
                 width: 15px;
             }
             .rightCorner {
-                background: url("<%= Config.getInstance().getBaseURL() %>/images/grey_corners.png") no-repeat scroll -15px 0 transparent;
+                background: url("${ Config.getInstance().getBaseURL() }/images/grey_corners.png") no-repeat scroll -15px 0 transparent;
                 float: right;
                 height: 15px;
                 width: 15px;
@@ -50,7 +50,7 @@
                 padding-top: 20px;
             }
             #errorBoxContent {
-                background: url("<%= Config.getInstance().getBaseURL() %>/images/grey_gradient.png") repeat-x scroll left bottom #ECECEC;
+                background: url("${ Config.getInstance().getBaseURL() }/images/grey_gradient.png") repeat-x scroll left bottom #ECECEC;
                 padding: 20px 20px 50px;
             }
             #errorBoxLink {
@@ -61,8 +61,8 @@
     <body>
         <div class="wrapper">
             <div class="pageHeader" align="center">
-                <a href="<%= Config.getInstance().getBaseURL() %>/index.py">
-                    <img alt="logo" class="headerLogo" src="<%= Config.getInstance().getSystemIconURL("logoIndico") %>" />
+                <a href="${ Config.getInstance().getBaseURL() }/index.py">
+                    <img alt="logo" class="headerLogo" src="${ Config.getInstance().getSystemIconURL("logoIndico") }" />
                 </a>
             </div>
             <div align="center">
@@ -70,13 +70,13 @@
                     <div class="leftCorner"></div>
                     <div class="rightCorner"></div>
                     <div id="errorBoxContent">
-                        <h1><%= errorTitle %></h1>
+                        <h1>${ errorTitle }</h1>
                         <div id="errorBoxText">
-                            <%= errorText %><br />
-                            <%= _("Click the following link to go to the main page:") %>
+                            ${ errorText }<br />
+                            ${ _("Click the following link to go to the main page:") }
                         </div>
                         <div id="errorBoxLink">
-                            <a href="<%= Config.getInstance().getBaseURL() %>/index.py"><%= _("Indico main page") %></a>
+                            <a href="${ Config.getInstance().getBaseURL() }/index.py">${ _("Indico main page") }</a>
                         </div>
                     </div>
                 </div>

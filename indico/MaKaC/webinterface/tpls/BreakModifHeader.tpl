@@ -1,3 +1,3 @@
-<h3><%= _("Break") %>: <%= breakTitle %></h3>
+<h3>${ _("Break") }: ${ breakTitle }</h3>
 
-<%= body %>
+${ body }

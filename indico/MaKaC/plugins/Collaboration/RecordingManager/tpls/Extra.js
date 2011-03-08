@@ -428,7 +428,7 @@ function RMCreateCDSRecord() {
                     {
                         plugin: 'RecordingManager',
                         service: 'RMCreateCDSRecord',
-                        conference: '<%= ConferenceId %>',
+                        conference: '${ ConferenceId }',
                         IndicoID: RMselectedTalkId,
                         LODBID: RMselectedLODBID,
                         // LOID is only defined for web_lecture, not plain_video
@@ -478,7 +478,7 @@ function RMCreateIndicoLink() {
             {
                 plugin: 'RecordingManager',
                 service: 'RMCreateIndicoLink',
-                conference: '<%= ConferenceId %>',
+                conference: '${ ConferenceId }',
                 IndicoID: RMselectedTalkId,
                 CDSID: RMTalkList[RMselectedTalkId]["CDSID"]
             },

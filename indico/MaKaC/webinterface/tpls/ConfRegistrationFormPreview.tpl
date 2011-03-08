@@ -7,13 +7,13 @@
 </script>
 
 <table width="70%" align="center">
-	<tr><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td></tr>
     <tr>
-        <td nowrap class="title"><center><%= title %></center></td>
+        <td nowrap class="title"><center>${ title }</center></td>
     </tr>
     <tr>
         <td colspan="2" align="left">
-            <br><b><%= _("""Please, note that fields marked with <font color="red">*</font> are mandatory""")%></b><br>
+            <br><b>${ _("""Please, note that fields marked with <font color="red">*</font> are mandatory""")}</b><br>
         </td>
     </tr>
     <tr>
@@ -21,15 +21,15 @@
     </tr>
     <tr>
         <td>
-            <%= personalData %>
+            ${ personalData }
         </td>
     </tr>
-    <%= otherSections %>
+    ${ otherSections }
     <tr>
         <td><br></td>
     </tr>
     <tr>
-        <td align="center" style="border-top: 2px solid #777777;padding-top:10px"><input type="button" class="btn" value="<%= _("register")%>"></td>
+        <td align="center" style="border-top: 2px solid #777777;padding-top:10px"><input type="button" class="btn" value="${ _("register")}"></td>
     </tr>
 </table>
 <br>

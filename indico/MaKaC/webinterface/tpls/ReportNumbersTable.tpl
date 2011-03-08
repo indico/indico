@@ -1,7 +1,7 @@
 <table>
-	<tr>
+    <tr>
         <td>
-            <form action=<%= addURL %> method="POST">
+            <form action=${ addURL } method="POST">
                 <table>
                     <tr>
                         <td>
@@ -9,7 +9,7 @@
                         <td>
                             <select name="reportNumberSystem">
                                 <option value="notype" selected="selected"> --  select a system -- </option>
-                                <%= repTypesSelectItems %>
+                                ${ repTypesSelectItems }
                             </select>
                         </td>
                         <td>
@@ -23,34 +23,34 @@
 
     <tr>
         <td class="blacktext">
-            <form action=<%= deleteURL %> method="POST">
+            <form action=${ deleteURL } method="POST">
                 <ul style="display:block; list-style-type: none; padding-left: 0px;">
-					<% for (id, number, name) in items: %>
-					<li style="margin: 0; display: block; height: 20px;">
-						<span style="float:left">
-							<strong><%= name %> :</strong>  <%= number %>
-						</span>
-						<input 	type="image" class="UIRowButton"
-							onclick="javascript:removeRptItem('<%= id %>', this.form);return false;"
-							title="<%= _("Remove this report number from the list")%>"
-							src="<%= systemIcon("remove") %>" />
-					</li>
-					<% end %>
+                    % for (id, number, name) in items: 
+                    <li style="margin: 0; display: block; height: 20px;">
+                        <span style="float:left">
+                            <strong>${ name } :</strong>  ${ number }
+                        </span>
+                        <input     type="image" class="UIRowButton"
+                            onclick="javascript:removeRptItem('${ id }', this.form);return false;"
+                            title="${ _("Remove this report number from the list")}"
+                            src="${ systemIcon("remove") }" />
+                    </li>
+                    % endfor
                 </ul>
-				<div>
-					<input type="hidden" id="removeParams" name="deleteReportNumber" value="" >
-				</div>
-			</form>
+                <div>
+                    <input type="hidden" id="removeParams" name="deleteReportNumber" value="" >
+                </div>
+            </form>
         </td>
-	</tr>
+    </tr>
 
 </table>
 
 <script type="text/javascript">
 
 function removeRptItem(value, form) {
-	$E('removeParams').dom.value=value;
-	form.submit();
+    $E('removeParams').dom.value=value;
+    form.submit();
 };
 
 </script>

@@ -1,19 +1,19 @@
-Dear <%= firstName %>,
+Dear ${ firstName },
 
 
 TINY ACTION IS REQUIRED TO PROLONG YOUR BOOKING
 
 If you are still interested in the following booking:
 
-<%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
-Room: <%= reservation.room.getFullName() %>
-For:  <%= reservation.bookedForName %>
-Reason: <%= reservation.reason %>
-Dates: <%= formatDate(reservation.startDT.date()) %> -- <%= formatDate(reservation.endDT.date()) %>
-Hours: <%= reservation.startDT.strftime("%H:%M") %> -- <%= reservation.endDT.strftime("%H:%M") %>
+${ urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) }
+Room: ${ reservation.room.getFullName() }
+For:  ${ reservation.bookedForName }
+Reason: ${ reservation.reason }
+Dates: ${ formatDate(reservation.startDT.date()) } -- ${ formatDate(reservation.endDT.date()) }
+Hours: ${ reservation.startDT.strftime("%H:%M") } -- ${ reservation.endDT.strftime("%H:%M") }
 
 please just click this link:
-<%= prolongationLink %>
+${ prolongationLink }
 
 WARNING: If you will not click the link, your booking may be DELETED.
 
@@ -30,5 +30,5 @@ Thank you for your understanding.
 
 
 BTW, you can always check your bookings here:
-<%= urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True ) %>
-<% includeTpl( 'RoomBookingEmail_Footer' ) %>
+${ urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True ) }
+<%include file="RoomBookingEmail_Footer.tpl"/>

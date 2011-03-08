@@ -41,13 +41,13 @@
                 // }
 
                 // check start date is not before the minimum start date (event start date)
-                if (startDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("Start date cannot be more than <%= ExtraMinutesBefore %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                if (startDate < IndicoUtil.parseDateTime("${ MinStartDate }")) {
+                    errors.push($T("Start date cannot be more than ${ ExtraMinutesBefore } minutes before the Indico event start date. Please choose it after ${ MinStartDate }"));
                 }
 
                 // check start date is not after the maximum start date (event end date)
-                if (startDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("Start date cannot be more than <%= ExtraMinutesAfter %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                if (startDate > IndicoUtil.parseDateTime("${ MaxEndDate }")) {
+                    errors.push($T("Start date cannot be more than ${ ExtraMinutesAfter } minutes after the Indico event end date. Please choose it before ${ MaxEndDate }"));
                 }
 
                 // check start date is not after end date, if end date exists
@@ -70,13 +70,13 @@
                 }
 
                 // check start date is not after the maximum start date (event end date)
-                if (endDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("End date cannot be more than <%= ExtraMinutesAfter %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                if (endDate > IndicoUtil.parseDateTime("${ MaxEndDate }")) {
+                    errors.push($T("End date cannot be more than ${ ExtraMinutesAfter } minutes after the Indico event end date. Please choose it before ${ MaxEndDate }"));
                 }
 
                 // check start date is not before the minimum start date (event start date)
-                if (endDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("End date cannot be more than <%= ExtraMinutesBefore %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                if (endDate < IndicoUtil.parseDateTime("${ MinStartDate }")) {
+                    errors.push($T("End date cannot be more than ${ ExtraMinutesBefore } minutes before the Indico event start date. Please choose it after ${ MinStartDate }"));
                 }
 
 
@@ -228,13 +228,13 @@
             infoTbody.append(Html.tr({},
                 Html.td("collaborationInfoLeftCol", $T('How to join:')),
                 Html.td({},
-                        $T('1) If you are registered in the CERN Gatekeeper, please dial ') + '<%= CERNGatekeeperPrefix %>' + booking.bookingParams.id,
+                        $T('1) If you are registered in the CERN Gatekeeper, please dial ') + '${ CERNGatekeeperPrefix }' + booking.bookingParams.id,
                         Html.br(),
-                        $T('2) If you have GDS enabled in your endpoint, please call ') + '<%= GDSPrefix %>' + booking.bookingParams.id,
+                        $T('2) If you have GDS enabled in your endpoint, please call ') + '${ GDSPrefix }' + booking.bookingParams.id,
                         Html.br(),
-                        $T('3) Otherwise dial ') + '<%= MCU_IP %>' + $T(' and using FEC (Far-End Controls) with your remote, enter "') + booking.bookingParams.id + $T('" followed by the "#".'),
+                        $T('3) Otherwise dial ') + '${ MCU_IP }' + $T(' and using FEC (Far-End Controls) with your remote, enter "') + booking.bookingParams.id + $T('" followed by the "#".'),
                         Html.br(),
-                        $T('4) To join by phone dial ') + '<%= Phone_number %>' + $T(', enter "') + booking.bookingParams.id + $T('" followed by the "#".'))));
+                        $T('4) To join by phone dial ') + '${ Phone_number }' + $T(', enter "') + booking.bookingParams.id + $T('" followed by the "#".'))));
         }
 
         infoTbody.append(Html.tr({},
@@ -255,13 +255,13 @@
     onCreate : function(bookingPopup) {
         $E('autoYesRB').dom.checked = true;
         disableCustomId();
-        <% if IncludeInitialRoom: %>
+        % if IncludeInitialRoom: 
             pf = new ParticipantListField([{type: 'room',
-                                           name: "<%= InitialRoomName %>",
-                                           institution: "<%= InitialRoomInstitution %>",
-                                           ip: "<%= InitialRoomIP %>",
+                                           name: "${ InitialRoomName }",
+                                           institution: "${ InitialRoomInstitution }",
+                                           ip: "${ InitialRoomIP }",
                                            participantType: 'by_address'}])
-            var ipRetrievalResult = <%= IPRetrievalResult %>
+            var ipRetrievalResult = ${ IPRetrievalResult }
 
             switch (ipRetrievalResult) {
             case 1:
@@ -290,10 +290,9 @@
                 break;
             }
 
-        <% end %>
-        <% else: %>
+        % else: 
             pf = new ParticipantListField();
-        <% end %>
+        % endif
 
         $E('participantsCell').set(pf.draw());
 

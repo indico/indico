@@ -1,5 +1,5 @@
 
-<div class="groupTitle"><%= title %></div>
+<div class="groupTitle">${ title }</div>
 
   <table class="noticeMain" align="center">
     <tr>
@@ -8,10 +8,10 @@
         <br><br>
         <table class="noticeInside" align="center">
           <tr>
-            <td><%= msg %><br>
+            <td>${ msg }<br>
               <ul>
-                <li><b> <%= _("Registration start date")%>:</b> <%= startDate %></li>
-                <li><b> <%= _("Registration end date")%>:</b> <%= endDate %></li>
+                <li><b> ${ _("Registration start date")}:</b> ${ startDate }</li>
+                <li><b> ${ _("Registration end date")}:</b> ${ endDate }</li>
               </ul>
             </td>
           </tr>

@@ -2,73 +2,72 @@
     <tbody>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Room Name:')%>
+                ${ _('Room Name:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getBookingParamByName("roomName") %>
+                ${ Booking.getBookingParamByName("roomName") }
             </td>
         </tr>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Extension:')%>
+                ${ _('Extension:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getExtension() %>
+                ${ Booking.getExtension() }
             </td>
         </tr>
-        <% if Booking.getHasPin(): %>
+        % if Booking.getHasPin(): 
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('PIN:')%>
+                ${ _('PIN:')}
             </td>
-            <% if Booking.getBookingParamByName("displayPin"): %>
+            % if Booking.getBookingParamByName("displayPin"): 
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getPin() %>
+                ${ Booking.getPin() }
             </td>
-            <% end %>
-            <% else: %>
+            % else: 
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= _("This Vidyo room is protected by a PIN.") %>
+                ${ _("This Vidyo room is protected by a PIN.") }
             </td>
-            <% end %>
+            % endif
         </tr>
-        <% end %>
+        % endif
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Owner:')%>
+                ${ _('Owner:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getOwnerObject().getFullName() %>
-            </td>
-        </tr>
-        <% if Booking.getBookingParamByName("displayURL"): %>
-        <tr>
-            <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Auto-join URL:')%>
-            </td>
-            <td class="collaborationConfDisplayInfoRightCol">
-                <a href="<%= Booking.getURL() %>"><%= Booking.getURL() %></a>
+                ${ Booking.getOwnerObject().getFullName() }
             </td>
         </tr>
-        <% end %>
-        <% if Booking.getBookingParamByName("displayPhoneNumbers") and PhoneNumbers: %>
+        % if Booking.getBookingParamByName("displayURL"): 
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('VidyoVoice phone numbers:')%>
+                ${ _('Auto-join URL:')}
+            </td>
+            <td class="collaborationConfDisplayInfoRightCol">
+                <a href="${ Booking.getURL() }">${ Booking.getURL() }</a>
+            </td>
+        </tr>
+        % endif
+        % if Booking.getBookingParamByName("displayPhoneNumbers") and PhoneNumbers: 
+        <tr>
+            <td class="collaborationConfDisplayInfoLeftCol">
+                ${ _('VidyoVoice phone numbers:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <ul style="margin: 0;">
-                    <%= '<li>' + '</li><li>'.join(PhoneNumbers) + '</li>' %>
+                    ${ '<li>' + '</li><li>'.join(PhoneNumbers) + '</li>' }
                 </ul>
             </td>
         </tr>
-        <% end %>
+        % endif
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <span><%= _('Description')%>:</span>
+                <span>${ _('Description')}:</span>
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking.getBookingParamByName("roomDescription") %>
+                ${ Booking.getBookingParamByName("roomDescription") }
             </td>
         </tr>
     </tbody>

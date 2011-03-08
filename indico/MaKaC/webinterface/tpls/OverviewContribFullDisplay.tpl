@@ -15,11 +15,11 @@
     <td colspan="2">
         <table class="subItem" bgcolor="#deebf8" cellspacing="0" cellpadding="0"><tbody>
             <tr>
-                <td class="time"><%= startTime %></td>
+                <td class="time">${ startTime }</td>
                 <td class="title">
-                    <%= title %>
-                    <span style="color: darkgreen"><%= speakers %></span>
-                    <span style="color: darkblue"><%= location %></span>
+                    ${ title }
+                    <span style="color: darkgreen">${ speakers }</span>
+                    <span style="color: darkblue">${ location }</span>
                 </td>
             </tr>
         </tbody></table>

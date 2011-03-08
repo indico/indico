@@ -1,82 +1,82 @@
 <table width="90%" border="0" style="border-right:1px solid #777777">
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Abstract ID")%></td>
-        <td bgcolor="white"><%= abstractId %></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Abstract ID")}</td>
+        <td bgcolor="white">${ abstractId }</td>
         <td align="right">
             <table border="0" cellspacing="1" cellpadding="0">
                 <tr>
                     <td align="right">
-                        <a href=<%= abstractPDF %> target="_blank"><img src=<%= printIconURL %> alt="<%= _("print the current abstract")%>" border="0"> </a>
+                        <a href=${ abstractPDF } target="_blank"><img src=${ printIconURL } alt="${ _("print the current abstract")}" border="0"> </a>
                     </td>
                 </tr>
             </table>
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Title")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Title")}</span></td>
                     <td bgcolor="white" width="90%">
                         <table width="100%"><tr>
-                            <td><b><%= title %></b></td>
+                            <td><b>${ title }</b></td>
                         </tr></table>
                     </td>
                 </tr>
-                <%= additionalFields %>
+                ${ additionalFields }
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Primary authors")%></span></td>
-                    <td bgcolor="white" valign="top"><%= primary_authors %></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Primary authors")}</span></td>
+                    <td bgcolor="white" valign="top">${ primary_authors }</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Co-authors")%></span></td>
-                    <td bgcolor="white" valign="top"><%= co_authors %></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Co-authors")}</span></td>
+                    <td bgcolor="white" valign="top">${ co_authors }</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Presenters")%></span></td>
-                    <td bgcolor="white" valign="top"><i><%= speakers %></i></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Presenters")}</span></td>
+                    <td bgcolor="white" valign="top"><i>${ speakers }</i></td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Contribution type")%></span></td>
-                    <td bgcolor="white" valign="top"><%= type %></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Contribution type")}</span></td>
+                    <td bgcolor="white" valign="top">${ type }</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Track classification")%></span></td>
-                    <td bgcolor="white" valign="top"><%= tracks %></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Track classification")}</span></td>
+                    <td bgcolor="white" valign="top">${ tracks }</td>
                 </tr>
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Status")%></span></td>
-                    <td colspan="2" valign="top" bgcolor="<%= statusColor %>">
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Status")}</span></td>
+                    <td colspan="2" valign="top" bgcolor="${ statusColor }">
                         <table width="100%">
                             <tr>
-                                <td width="100%"><%= statusDetails %></td>
+                                <td width="100%">${ statusDetails }</td>
                                 <td align="right" valign="bottom">
                                     <table align="right">
                                         <tr>
-                                            <form action=<%= proposeToAccURL %> method="POST">
+                                            <form action=${ proposeToAccURL } method="POST">
                                             <td align="right">
-                                                    <%= proposeToAcceptButton %>
+                                                    ${ proposeToAcceptButton }
                                             </td>
                                             </form>
                                         </tr>
                                         <tr>
-                                            <form action=<%= proposeToRejURL %> method="POST">
+                                            <form action=${ proposeToRejURL } method="POST">
                                             <td align="right">
-                                                    <%= proposeToRejectButton %>
+                                                    ${ proposeToRejectButton }
                                             </td>
                                             </form>
                                         </tr>
                                         <tr>
-                                            <form action=<%= proposeForOtherTracksURL %> method="POST">
+                                            <form action=${ proposeForOtherTracksURL } method="POST">
                                             <td align="right">
-                                                    <%= proposeForOtherTracksButton %>
+                                                    ${ proposeForOtherTracksButton }
                                             </td>
                                             </form>
                                         </tr>
                                         <tr>
-                                            <form action=<%= duplicatedURL %> method="POST">
+                                            <form action=${ duplicatedURL } method="POST">
                                             <td align="right">
-                                                    <%= duplicatedButton %>
+                                                    ${ duplicatedButton }
                                             </td>
                                             </form>
                                         </tr>
@@ -84,47 +84,46 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="2"><%= statusComment %></td>
+                                <td colspan="2">${ statusComment }</td>
                             </tr>
                         </table>
                     </td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Your rating for this abstract")%></span></td>
-                    <td bgcolor="white" valign="top"><%= rating %>
-                        <% if rating != "": %>
-                            <%= _(" (in ") %><%= scaleLower %><%= _(" to ") %><%= scaleHigher %><%= _(" scale) ") %>
-                        <% end %>
-                        <% else: %>
-                        <%= _("No rating yet") %>
-                        <% end %>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Your rating for this abstract") }</span></td>
+                    <td bgcolor="white" valign="top">${ rating }
+                        % if rating != "":
+                            ${ _(" (in ") + str(scaleLower) + _(" to ") + str(scaleHigher) + _(" scale) ") }
+                        % else:
+                        ${ _("No rating yet") }
+                        % endif
                     </td>
                 </tr>
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Submitted by")%></span></td>
-                    <td bgcolor="white" valign="top"><%= submitter %></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Submitted by")}</span></td>
+                    <td bgcolor="white" valign="top">${ submitter }</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Submitted on")%></span></td>
-                    <td bgcolor="white" valign="top"><%= submissionDate %></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Submitted on")}</span></td>
+                    <td bgcolor="white" valign="top">${ submissionDate }</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Last modified on")%></span></td>
-                    <td bgcolor="white" valign="top"><%= modificationDate %></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Last modified on")}</span></td>
+                    <td bgcolor="white" valign="top">${ modificationDate }</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Comments")%></span></td>
-                    <td bgcolor="white" valign="top"><pre><%= comments %></pre></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Comments")}</span></td>
+                    <td bgcolor="white" valign="top"><pre>${ comments }</pre></td>
                 </tr>
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Contribution")%></span></td>
-                    <td bgcolor="white" valign="top" colspan="3"><pre><%= contribution %></pre></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Contribution")}</span></td>
+                    <td bgcolor="white" valign="top" colspan="3"><pre>${ contribution }</pre></td>
                 </tr>
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>

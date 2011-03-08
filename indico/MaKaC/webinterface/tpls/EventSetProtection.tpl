@@ -1,20 +1,21 @@
+<%page args="eventType=None"/>
 
-    <div class="groupTitle"><%= _("Step 3: Set the access protection of the ") %><%= eventType %></div>
+    <div class="groupTitle">${ _("Step 3: Set the access protection of the ") }${ eventType }</div>
     <div class="accessProtection">
-        <span id="protectionRadioInfo" class="protectionRadioInfo"><em><%= _("Please choose a Category first in order to be able to set the protection.") %></em></span>
+        <span id="protectionRadioInfo" class="protectionRadioInfo"><em>${ _("Please choose a Category first in order to be able to set the protection.") }</em></span>
         <span id="inheritRadioButtonWrapper" class="eventProtectionRadioEntry">
-            <input type="radio" id="inheritRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='inherit' onclick="hideUserList();"/><label for="inheritRadioButton"><span id="inheritRadioEntryKey"><%= _("Same as for Category '") %><span id="radioCategTitle"><%= categ["title"] %></span>'</span> : <span id="radioCategProtection" style="font-weight: bold;"><%= protection %></span> <%= _("for the moment, but it may change") %></label>
+            <input type="radio" id="inheritRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='inherit' onclick="hideUserList();"/><label for="inheritRadioButton"><span id="inheritRadioEntryKey">${ _("Same as for Category '") }<span id="radioCategTitle">${ categ["title"] }</span>'</span> : <span id="radioCategProtection" style="font-weight: bold;">${ protection }</span> ${ _("for the moment, but it may change") }</label>
         </span>
         <span id="privateRadioButtonWrapper" class='eventProtectionRadioEntry'>
-            <input type="radio" id="privateRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='private' onclick="showUserList();"/><label for="privateRadioButton"><span style="color: #B02B2C"><%= _("Private") %></span><%= _(" : Can only be viewed by you and users/groups chosen by you from the list of users") %></label>
+            <input type="radio" id="privateRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='private' onclick="showUserList();"/><label for="privateRadioButton"><span style="color: #B02B2C">${ _("Private") }</span>${ _(" : Can only be viewed by you and users/groups chosen by you from the list of users") }</label>
         </span>
         <span id="userListInfo" class="userListInfo" style="display: none;">
-            <em><%= _("Please fill in the list below with the users/groups that will be granted access to this event. You can always do so later, once the event is created, through the event protection settings.") %></em>
+            <em>${ _("Please fill in the list below with the users/groups that will be granted access to this event. You can always do so later, once the event is created, through the event protection settings.") }</em>
         </span>
         <div id="userListWrapper" class="userListWrapper">
         </div>
         <span id="publicRadioButtonWrapper" class='eventProtectionRadioEntry'>
-            <input type="radio" id="publicRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='public' onclick="hideUserList();"/><label for="publicRadioButton"><span style="color: #128F33"><%= _("Public") %></span><%= _(" : Can be viewed by everyone") %></label>
+            <input type="radio" id="publicRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='public' onclick="hideUserList();"/><label for="publicRadioButton"><span style="color: #128F33">${ _("Public") }</span>${ _(" : Can be viewed by everyone") }</label>
         </span>
     </div>
     <input type="hidden" value="" id="allowedUsers" name="allowedUsers"/>

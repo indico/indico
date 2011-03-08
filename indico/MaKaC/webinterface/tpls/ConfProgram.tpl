@@ -1,13 +1,13 @@
 <table align="center" width="95%" cellspacing="0">
     <tr>
-        <td><font color="black"><%= description %></font></td>
+        <td><font color="black">${ description }</font></td>
     </tr>
     <tr>
         <td>&nbsp;</td>
     </tr>
     <tr>
         <td>
-            <%= program %>
+            ${ program }
         </td>
     </tr>
 </table>

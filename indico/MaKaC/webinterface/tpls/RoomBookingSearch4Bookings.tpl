@@ -3,8 +3,8 @@
 <script type="text/javascript">
 
     // Displays div with dates and hours
-	function period_clean_redouts( f1 )
-	{
+    function period_clean_redouts( f1 )
+    {
         f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = ''
         f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = ''
         f1.sTime.className = f1.eTime.className = ''
@@ -96,96 +96,95 @@
             }
         });
 
-       <% if today.day != '': %>
-            startDate.set('<%= today.day %>/<%= today.month %>/<%= today.year %>');
-        <% end %>
+       % if today.day != '':
+            startDate.set('${ today.day }/${ today.month }/${ today.year }');
+        % endif
 
-        <% if weekLater.day != '': %>
-            endDate.set('<%= weekLater.day %>/<%= weekLater.month %>/<%= weekLater.year %>');
-        <% end %>
+        % if weekLater.day != '':
+            endDate.set('${ weekLater.day }/${ weekLater.month }/${ weekLater.year }');
+        % endif
 
      });
 </script>
         <!-- CONTEXT HELP DIVS -->
-	    <div id="tooltipPool" style="display: none">
+        <div id="tooltipPool" style="display: none">
             <!-- Choose Button -->
             <div id="chooseButtonHelp" class="tip">
                 Directly choose the room.
             </div>
-<!--            ## includeTpl( 'CHBookingRepeatition' ) ##-->
         </div>
         <!-- END OF CONTEXT HELP DIVS -->
 
-		<table cellpadding="0" cellspacing="0" border="0" width="80%">
-	    <tr>
-	    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
-	    </tr>
+        <table cellpadding="0" cellspacing="0" border="0" width="80%">
         <tr>
-		<td class="bottomvtab" width="100%">
-		    <!-- Main cell -->
-			<table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
-				<tr>
-					<td class="maincell">
-						<p><span class="formTitle" style="border-bottom-width: 0px"> <%= _("Search for bookings")%></span></p>
-						<!-- Background table (adds image) -->
-						<table width="100%" class="ACtab">
-						    <tr>
-						        <td>
-                                    <form id="searchForm" method="post" action="<%= roomBookingBookingListURL %>">
+        <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
+        </tr>
+        <tr>
+        <td class="bottomvtab" width="100%">
+            <!-- Main cell -->
+            <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
+                <tr>
+                    <td class="maincell">
+                        <p><span class="formTitle" style="border-bottom-width: 0px"> ${ _("Search for bookings")}</span></p>
+                        <!-- Background table (adds image) -->
+                        <table width="100%" class="ACtab">
+                            <tr>
+                                <td>
+                                    <form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
                                     <table width="90%" align="center" border="0">
                                         <tr>
-                                            <td colspan="2" class="groupTitle"> <%= _("Simple Search")%></td>
+                                            <td colspan="2" class="groupTitle"> ${ _("Simple Search")}</td>
                                         </tr>
                                         <!-- For room -->
                                         <tr>
-                                            <td nowrap="nowrap" class="titleCellTD"><span class="titleCellFormat"> <%= _("Room")%></span></td>
+                                            <td nowrap="nowrap" class="titleCellTD"><span class="titleCellFormat"> ${ _("Room")}</span></td>
                                             <td width="80%">
                                                 <table width="100%">
                                                 <tr>
-                                                    <td class="subFieldWidthSmaller" align="right" ><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
+                                                    <td class="subFieldWidthSmaller" align="right" ><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
                                                     <td align="left" class="blacktext">
                                                         <select name="roomGUID" id="roomGUID" multiple="multiple" size="8">
                                                             <option value="allRooms"> All Rooms</option>
-											                <% for room in rooms: %>
-                                                                <option value="<%= str( room.guid ) %>" class="<%= roomClass( room ) %>"><%= room.locationName + " &nbsp; " + room.getFullName() %></option>
-											                <% end %>
+                                                            % for room in rooms:
+                                                                <option value="${ str( room.guid ) }" class="${ roomClass( room ) }">${ room.locationName + " &nbsp; " + room.getFullName() }</option>
+                                                            % endfor
                                                         </select>
-                                                        <% inlineContextHelp( _("You can select multiple rooms the same way you select multiple files in Windows - press (and hold) left mouse button and move the cursor. Alternatively you can use keyboard - hold SHIFT and press up/down arrows.") ) %>
-														<input type="hidden" name="search" value="on" />
+                                                        ${inlineContextHelp(_("You can select multiple rooms the same way you select multiple files in Windows - press (and hold) left mouse button and move the cursor. Alternatively you can use keyboard - hold SHIFT and press up/down arrows.") )}
+                                                        <input type="hidden" name="search" value="on" />
                                                         <!-- HACK to make form submitable with ENTER. This is just submit button copied and hidden. -->
-                                                        <input style="width: 0px; position:absolute; left: -50px;" type="submit" class="btn" onclick="if (!forms_are_valid( true )) { alert(  <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); return false; }; return confirm_search();" value="<%= _('Search') %>" />
+                                                        <input style="width: 0px; position:absolute; left: -50px;" type="submit" class="btn" onclick="if (!forms_are_valid( true )) { alert(  ${ _("'There are errors in the form. Please correct fields with red background.'")} ); return false; }; return confirm_search();" value="${ _('Search') }" />
                                                     </td>
                                                 </tr>
                                                 </table>
                                             </td>
                                         </tr>
                                         <tr >
-                                            <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Spans over")%></span></td>
+                                            <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> ${ _("Spans over")}</span></td>
                                             <td>
                                                 <table width="100%">
 
                                                 <tr id="sdatesTR" >
-                                            <td class="subFieldWidth" align="right" ><small> <%= _("Start Date")%>&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" ><small> ${ _("Start Date")}&nbsp;&nbsp;</small></td>
                                             <td class="blacktext">
                                                 <span id="sDatePlace"></span>
-                                                <input type="hidden" value="<%= today.day %>" name="sDay" id="sDay" onchange="this.form.eDay.value=this.value;"/>
-                                                <input type="hidden" value="<%= today.month %>" name="sMonth" id="sMonth" onchange="this.form.eMonth.value=this.value;"/>
-                                                <input type="hidden" value="<%= today.year %>" name="sYear" id="sYear" onchange="this.form.eYear.value=this.value;"/>
+                                                <input type="hidden" value="${ today.day }" name="sDay" id="sDay" onchange="this.form.eDay.value=this.value;"/>
+                                                <input type="hidden" value="${ today.month }" name="sMonth" id="sMonth" onchange="this.form.eMonth.value=this.value;"/>
+                                                <input type="hidden" value="${ today.year }" name="sYear" id="sYear" onchange="this.form.eYear.value=this.value;"/>
                                             </td>
                                           </tr>
                                          <tr id="edatesTR" >
-                                            <td class="subFieldWidth" align="right" ><small> <%= _("End Date")%>&nbsp;&nbsp;</small></td>
+                                            <td class="subFieldWidth" align="right" ><small> ${ _("End Date")}&nbsp;&nbsp;</small></td>
                                             <td>
                                                 <span id="eDatePlace"></span>
-                                                <input type="hidden" value="<%= weekLater.day %>" name="eDay" id="eDay"/>
-                                                <input type="hidden" value="<%= weekLater.month %>" name="eMonth" id="eMonth"/>
-                                                <input type="hidden" value="<%= weekLater.year %>" name="eYear" id="eYear"/>
+                                                <input type="hidden" value="${ weekLater.day }" name="eDay" id="eDay"/>
+                                                <input type="hidden" value="${ weekLater.month }" name="eMonth" id="eMonth"/>
+                                                <input type="hidden" value="${ weekLater.year }" name="eYear" id="eYear"/>
                                             </td>
                                         </tr>
 
 
                                                 <tr id="hoursTR" >
-                                                    <td align="right" ><small> <%= _("Hours")%>&nbsp;&nbsp;</small></td>
+                                                    <td align="right" ><small> ${ _("Hours")}&nbsp;&nbsp;</small></td>
                                                     <td align="left" class="blacktext">
                                                         <input name="sTime" id="sTime" maxlength="5" size="5" type="text" value="" /> &nbsp;&mdash;&nbsp;
                                                         <input name="eTime" id="eTime" maxlength="5" size="5" type="text" value="" />
@@ -197,11 +196,11 @@
                                         </tr>
                                         <!-- Booked for -->
                                         <tr>
-                                            <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Booked for")%></span></td>
+                                            <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> ${ _("Booked for")}</span></td>
                                             <td align="right">
                                                 <table width="100%">
                                                     <tr>
-                                                        <td class="subFieldWidthSmaller" align="right"><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
+                                                        <td class="subFieldWidthSmaller" align="right"><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
                                                             <input size="30" type="text" id="bookedForName" name="bookedForName" />
                                                         </td>
@@ -211,34 +210,34 @@
                                         </tr>
                                         <!-- Reason -->
                                         <tr>
-                                            <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Reason")%></span></td>
+                                            <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> ${ _("Reason")}</span></td>
                                             <td align="right">
                                                 <table width="100%">
                                                     <tr>
-                                                        <td class="subFieldWidthSmaller" align="right"><small> <%= _("Reason")%>&nbsp;&nbsp;</small></td>
+                                                        <td class="subFieldWidthSmaller" align="right"><small> ${ _("Reason")}&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
                                                             <input size="30" type="text" id="reason" name="reason" />
                                                         </td>
                                                     </tr>
                                                 </table>
-                                                <input id="submitBtn1" type="submit" class="btn" onclick="if (!forms_are_valid( true )) { alert(  <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); return false; }; return confirm_search();" value="<%= _('Search') %>" />
+                                                <input id="submitBtn1" type="submit" class="btn" onclick="if (!forms_are_valid( true )) { alert(  ${ _("'There are errors in the form. Please correct fields with red background.'")} ); return false; }; return confirm_search();" value="${ _('Search') }" />
                                             </td>
                                         </tr>
                                     </table>
                                     <br>
                                     <table width="90%" align="center" border="0">
                                         <tr>
-                                            <td colspan="2" class="groupTitle"> <%= _("Advanced search")%></td>
+                                            <td colspan="2" class="groupTitle"> ${ _("Advanced search")}</td>
                                         </tr>
                                         <tr>
-                                            <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Attributes")%></td>
+                                            <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> ${ _("Attributes")}</td>
                                             <td align="right">
                                                 <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td width="165px" align="right" valign="top"><small>Only Bookings&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="onlyBookings" name="onlyBookings" type="checkbox" onchange="javascript: if (this.checked) { $('onlyPrebookings').checked = false; }"/>
-                                                            <% inlineContextHelp( _("[v] Show only <b>Bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.") ) %>
+                                                            ${inlineContextHelp(_("[v] Show only <b>Bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.") )}
                                                             <br />
                                                         </td>
                                                     </tr>
@@ -246,7 +245,7 @@
                                                         <td width="165px" align="right" valign="top"><small>Only Pre-bookings&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="onlyPrebookings" name="onlyPrebookings" type="checkbox" onchange="javascript: if (this.checked) { $('onlyBookings').checked = false; }" />
-                                                            <% inlineContextHelp( _("[v] Show only <b>PRE-bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.") ) %>
+                                                            ${inlineContextHelp(_("[v] Show only <b>PRE-bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.") )}
                                                             <br />
                                                         </td>
                                                     </tr>
@@ -254,20 +253,20 @@
                                                         <td width="165px" align="right" valign="top"><small>Only mine&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="onlyMy" name="onlyMy" type="checkbox" />
-                                                            <% inlineContextHelp( '[v] Show only <b>your</b> bookings.' ) %>
+                                                            ${inlineContextHelp('[v] Show only <b>your</b> bookings.' )}
                                                             <br />
                                                         </td>
                                                     </tr>
-                                                    <% if user.isResponsibleForRooms(): %>
+                                                    % if user.isResponsibleForRooms():
                                                     <tr>
                                                         <td width="165px" align="right" valign="top"><small>Of my rooms&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
                                                             <input id="ofMyRooms" name="ofMyRooms" type="checkbox" />
-                                                            <% inlineContextHelp(  _("[v] Only bookings of rooms you are responsible for.") ) %>
+                                                            ${inlineContextHelp(_("[v] Only bookings of rooms you are responsible for.") )}
                                                             <br />
                                                         </td>
                                                     </tr>
-                                                    <% end %>
+                                                    % endif
                                                     <tr>
                                                         <td width="165px" align="right" valign="top"><small>Is rejected&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
@@ -290,7 +289,7 @@
                                                         <td width="165px" align="right" valign="top"><small>Uses video-conf.&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="usesAVC" name="usesAVC" type="checkbox" />
-                                                            <% inlineContextHelp( '[v] Show only bookings which will use video conferencing systems.' ) %>
+                                                            ${inlineContextHelp('[v] Show only bookings which will use video conferencing systems.' )}
                                                             <br />
                                                         </td>
                                                     </tr>
@@ -298,7 +297,7 @@
                                                         <td width="165px" align="right" valign="top"><small>Require Video-conf. support&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" />
-                                                            <% inlineContextHelp( '[v] Show only bookings which require video conferencing support.' ) %>
+                                                            ${inlineContextHelp('[v] Show only bookings which require video conferencing support.' )}
                                                             <br />
                                                         </td>
                                                     </tr>
@@ -306,12 +305,12 @@
                                                         <td width="165px" align="right" valign="top"><small>Is heavy&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
                                                             <input id="isHeavy" name="isHeavy" type="checkbox" />
-                                                            <% inlineContextHelp(  _("[v] Show only <b>heavy</b> bookings.") ) %>
+                                                            ${inlineContextHelp(_("[v] Show only <b>heavy</b> bookings.") )}
                                                             <br />
                                                         </td>
                                                     </tr>
                                                 </table>
-                                                <input id="submitBtn2" type="submit" class="btn" onclick="if (!forms_are_valid( true )) { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); return false; }; return confirm_search();" value="<%= _("Search")%>" />
+                                                <input id="submitBtn2" type="submit" class="btn" onclick="if (!forms_are_valid( true )) { alert( ${ _("'There are errors in the form. Please correct fields with red background.'")} ); return false; }; return confirm_search();" value="${ _("Search")}" />
                                             </td>
                                         </tr>
                                     </table>
@@ -320,11 +319,11 @@
                                 </td>
                             </tr>
                         </table>
-					</td>
-				</tr>
-	    		</table>
-		    </td>
-	    </tr>
+                    </td>
+                </tr>
+                </table>
+            </td>
+        </tr>
         </table>
         <!-- Just to initialize -->
         <script type="text/javascript">

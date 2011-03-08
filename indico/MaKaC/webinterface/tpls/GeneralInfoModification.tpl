@@ -1,75 +1,73 @@
-<%! from MaKaC.i18n import _,langList %>
-<form action="<%= postURL %>" method="POST">
+<% from MaKaC.i18n import _,langList %>
+<form action="${ postURL }" method="POST">
 <table width="95%" align="center" border="0">
 <tr>
-  <td colspan="2" width="100%" class="formTitle"><%= _("General admin data")%></td>
+  <td colspan="2" width="100%" class="formTitle">${ _("General admin data")}</td>
 </tr>
 <tr>
   <td>
     <br>
     <table width="90%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
-      <td colspan="2" class="groupTitle"><%= _("Modify System General Information")%></td>
+      <td colspan="2" class="groupTitle">${ _("Modify System General Information")}</td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("System title")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("System title")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="title" value="<%= title %>">
+        <input type="text" size="50" name="title" value="${ title }">
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Organisation/Institution")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Organisation/Institution")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="organisation" value="<%= organisation %>">
+        <input type="text" size="50" name="organisation" value="${ organisation }">
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Support email")%><br><%= _("(for automatic messages)")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Support email")}<br>${ _("(for automatic messages)")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="supportEmail" value="<%= supportEmail %>">
+        <input type="text" size="50" name="supportEmail" value="${ supportEmail }">
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Support email")%><br><%= _("(for public display in page footers)")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Support email")}<br>${ _("(for public display in page footers)")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="publicSupportEmail" value="<%= publicSupportEmail %>">
+        <input type="text" size="50" name="publicSupportEmail" value="${ publicSupportEmail }">
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("No reply email")%><br><%= _("(for automatic messages that don't need answer)")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("No reply email")}<br>${ _("(for automatic messages that don't need answer)")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
-        <input type="text" size="50" name="noReplyEmail" value="<%= noReplyEmail %>">
+        <input type="text" size="50" name="noReplyEmail" value="${ noReplyEmail }">
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Language")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Language")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
-	     <select name="lang">
-    	   <% for l in langList(): %>
-	       <option <% if l[0] == language: %>
-		       selected
-		     <% end %> value="<%= l[0] %>"><%= l[1] %></option>
-           <% end %>
-	     </select>
+         <select name="lang">
+           % for l in langList(): 
+           <option ${"selected" if l[0] == language else ""} value="${ l[0] }">${ l[1] }</option>
+           % endfor
+         </select>
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Timezone")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Timezone")}</span></td>
       <td bgcolor="white" width="50%">&nbsp;
-           <select name="timezone"><%= timezone %></select>
+           <select name="timezone">${ timezone }</select>
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Address")%></span></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Address")}</span></td>
       <td bgcolor="white" width="100%">
         <table width="100%">
         <tr>
-          <td align="right">&nbsp;<%= _("City")%></td>
-          <td width="100%"><input type="text" name="city" value="<%= city %>"></td>
+          <td align="right">&nbsp;${ _("City")}</td>
+          <td width="100%"><input type="text" name="city" value="${ city }"></td>
         </tr>
         <tr>
-          <td align="right">&nbsp;<%= _("Country")%></td>
-          <td><input type="text" name="country" value="<%= country %>"></td>
+          <td align="right">&nbsp;${ _("Country")}</td>
+          <td><input type="text" name="country" value="${ country }"></td>
         </tr>
         </table>
       </td>
@@ -79,10 +77,10 @@
         <table align="center">
         <tr>
           <td>
-            <input type="submit" class="btn" name="action" value="<%= _("ok")%>">
+            <input type="submit" class="btn" name="action" value="${ _("ok")}">
           </td>
           <td>
-            <input type="submit" class="btn" name="action" value="<%= _("cancel")%>">
+            <input type="submit" class="btn" name="action" value="${ _("cancel")}">
           </td>
         </tr>
         </table>

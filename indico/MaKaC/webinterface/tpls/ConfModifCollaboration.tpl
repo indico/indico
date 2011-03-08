@@ -2,18 +2,18 @@
 <% multipleBookingPluginCount = len(MultipleBookingPlugins) %>
 <% allPluginCount = singleBookingPluginCount + multipleBookingPluginCount %>
 
-<% if singleBookingPluginCount > 0: %>
-    <% includeTpl ('ConfModifCollaborationSingleBookings') %>
-<% end %>
+% if singleBookingPluginCount > 0: 
+    <%include file="ConfModifCollaborationSingleBookings.tpl"/>
+% endif
 
-<% if multipleBookingPluginCount > 0 : %>
-    <% if singleBookingPluginCount > 0: %>
+% if multipleBookingPluginCount > 0 : 
+    % if singleBookingPluginCount > 0: 
     <div class="horizontalLine" style="margin-top:1em;margin-bottom:1em;"></div>
-    <% end %>
+    % endif
 
-    <% includeTpl ('ConfModifCollaborationMultipleBookings') %>
+    <%include file="ConfModifCollaborationMultipleBookings.tpl"/>
 
-<% end %>
+% endif
 
 <div id="iframes" style="display: none;">
 </div>
@@ -43,7 +43,7 @@
  *               Its presence is optional (if it is not present, no custom text will be displayed).
  */
 var codes = {
-<%= ",\n". join(['"' + pluginId + '" \x3a ' + code for pluginId, code in JSCodes.items()]) %>
+${ ",\n". join(['"' + pluginId + '" \x3a ' + code for pluginId, code in JSCodes.items()]) }
 }
 
 /**
@@ -51,23 +51,22 @@ var codes = {
  * of the parent event changing dates / timezones.
  */
 var canBeNotifiedOnDateChanges = {
-     <%= ",\n". join(['"' + pluginId + '" \x3a ' + jsBoolean(canBeNotified) for pluginId, canBeNotified in CanBeNotified.items()]) %>
+     ${ ",\n". join(['"' + pluginId + '" \x3a ' + jsBoolean(canBeNotified) for pluginId, canBeNotified in CanBeNotified.items()]) }
 }
 
 /**
  * Variable that will store if the user is an admin that can Accept / Reject bookings
  */
-<% if UserIsAdmin: %>
+% if UserIsAdmin: 
 var userIsAdmin = true;
-<% end %>
-<% else: %>
+% else: 
 var userIsAdmin = false;
-<% end %>
+% endif
 
 /**
  * Stores the load time of the page, expressed in the timezone of the event
  */
-var eventLoadTime = IndicoUtil.parseDateTime("<%= EventDate %>");
+var eventLoadTime = IndicoUtil.parseDateTime("${ EventDate }");
 
 /**
  * Stores the load time of the page, expressed in localtime
@@ -81,7 +80,7 @@ var clientLoadTime = new Date();
  * It will call in turn 'startBooking' in Collaboration.js
  */
 var start = function(booking) {
-    startBooking(booking, '<%= Conference.getId() %>');
+    startBooking(booking, '${ Conference.getId() }');
 }
 
 /**
@@ -89,7 +88,7 @@ var start = function(booking) {
  * It will call in turn 'stopBooking' in Collaboration.js
  */
 var stop = function(booking) {
-    stopBooking(booking, '<%= Conference.getId() %>');
+    stopBooking(booking, '${ Conference.getId() }');
 }
 
 /**
@@ -98,15 +97,15 @@ var stop = function(booking) {
  * It will call in turn 'checkBookingStatus' in Collaboration.js
  */
 var checkStatus = function(booking) {
-    checkBookingStatus(booking, '<%= Conference.getId() %>');
+    checkBookingStatus(booking, '${ Conference.getId() }');
 }
 
 var accept = function(booking) {
-    acceptBooking(booking, '<%= Conference.getId() %>');
+    acceptBooking(booking, '${ Conference.getId() }');
 }
 
 var reject = function(booking) {
-    rejectBooking(booking, '<%= Conference.getId() %>');
+    rejectBooking(booking, '${ Conference.getId() }');
 }
 
 </script>

@@ -1,8 +1,8 @@
 
 <div class="container">
-<div class="groupTitleNoBorder"><%= _("Personal Area for")%>&nbsp;<%= userName %></div>
+<div class="groupTitleNoBorder">${ _("Personal Area for")}&nbsp;${ userName }</div>
 
 <!-- Body -->
-<%= body %>
+${ body }
 <!-- End of body -->
 </div>

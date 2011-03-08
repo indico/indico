@@ -5,255 +5,245 @@
 <% format = "%a %d %b %Y at %H\x3a%M" %>
 
 <div style="padding-left: 10px; padding-top: 10px; padding-bottom: 10px">
-<em><%= _("The reviewing mode chosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
+<em>${ _("The reviewing mode chosen for this conference is")}: ${ ConferenceChoiceStr}</em>
 </div>
 
-<% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
+% if ConferenceChoice == 2 or ConferenceChoice == 4:
 <table class="newsDisplayItem" width="90%" align="center" border="0" style="margin-bottom: 1em">
     <!-- Assign or remove a referee -->
     <tr>
-        <td id="assignRefereeHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Referee")%></td>
+        <td id="assignRefereeHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;">${ _("Assign a Referee")}</td>
     </tr>
 
         <tr>
             <td nowrap class="titleCellTD">
-                <span class="titleCellFormat"><%= _("Referee")%>:</span>
+                <span class="titleCellFormat">${ _("Referee")}:</span>
             </td>
-            <% if not ContributionReviewManager.hasReferee(): %>
+            % if not ContributionReviewManager.hasReferee():
             <td width="60%" class='bottom_line' style="padding-bottom: 10px;">
-                <%= _("not assigned yet")%>
+                ${ _("not assigned yet")}
             </td>
-            <% end %>
-            <% else: %>
+            % else:
             <td width="60%" class='bottom_line'>
-                <%= ContributionReviewManager.getReferee().getFullName() %>
+                ${ ContributionReviewManager.getReferee().getFullName() }
             </td>
-            <% if CanAssignReferee: %>
+            % if CanAssignReferee:
             <tr>
             <td>&nbsp;</td>
             <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
-                 <form id="removeReferee" action="<%= removeAssignRefereeURL %>" method="post" onsubmit="<%=removeRefereeConfirm%>">
+                 <form id="removeReferee" action="${ removeAssignRefereeURL }" method="post" onsubmit="${removeRefereeConfirm}">
                     <input type="submit" class=btn value="Remove">
                 </form>
             </td>
             </tr>
-            <% end %>
-            <% end %>
+            % endif
+            % endif
         </tr>
-        <% if ContributionReviewManager.hasReferee(): %>
+        % if ContributionReviewManager.hasReferee():
             <tr>
-	            <td class="dataCaptionTD">
-	                <span class="dataCaptionFormat"><%= _("Deadline")%></span>
-	            </td>
-	            <td class="blacktext">
-	                <span id="inPlaceEditRefereeDueDate">
-	                    <% date = ContributionReviewManager.getLastReview().getAdjustedRefereeDueDate() %>
-	                    <% if date is None: %>
-	                        <%= _("Date not set yet.")%>
-	                    <% end %>
-	                    <% else: %>
-	                        <%= formatDateTime(date) %>
-	                    <% end %>
-	                </span>
-	            </td>
-	        </tr>
-        <% end %>
-        <% else: %>
+                <td class="dataCaptionTD">
+                    <span class="dataCaptionFormat">${ _("Deadline")}</span>
+                </td>
+                <td class="blacktext">
+                    <span id="inPlaceEditRefereeDueDate">
+                        <% date = ContributionReviewManager.getLastReview().getAdjustedRefereeDueDate() %>
+                        % if date is None:
+                            ${ _("Date not set yet.")}
+                        % else:
+                            ${ formatDateTime(date) }
+                        % endif
+                    </span>
+                </td>
+            </tr>
+        % else:
         <tr>
             <td>&nbsp;</td>
             <td  width="60%" class='bottom_line'>
-                <span class="titleCellFormat"><%= _("Choose a referee to assign from the list")%>:</span>
+                <span class="titleCellFormat">${ _("Choose a referee to assign from the list")}:</span>
             </td>
          </tr>
          <tr>
             <td>&nbsp;</td>
-            <form action="<%=assignRefereeURL%>" method="post">
+            <form action="${assignRefereeURL}" method="post">
             <% showAssignButton = False %>
             <td width="80%" class='bottom_line' style="padding-top: 10px;">
-                <% if CanAssignReferee: %>
-                    <% if len(ConfReview.getRefereesList()) == 0: %>
-                        <%= _("No referees proposed for this conference.")%>
-                    <% end %>
-                    <% else: %>
+                % if CanAssignReferee:
+                    % if len(ConfReview.getRefereesList()) == 0:
+                        ${ _("No referees proposed for this conference.")}
+                    % else:
                         <% showAssignButton = True %>
                         <table cellspacing="0" cellpadding="5">
                         <% first = True %>
-                        <% for r in ConfReview.getRefereesList(): %>
+                        % for r in ConfReview.getRefereesList():
                             <tr>
                                 <td>
-                                    <input type="radio" name="refereeAssignSelection" value="<%= r.getId() %>"
-                                    <% if first: %>
+                                    <input type="radio" name="refereeAssignSelection" value="${ r.getId() }"
+                                    % if first:
                                         CHECKED
                                         <% first = False %>
-                                    <% end %>
+                                    % endif
                                     >
                                 </td>
                                 <td align="left">
-                                    <%= r.getFullName() %>
+                                    ${ r.getFullName() }
                                 </td>
                             </tr>
-                        <% end %>
+                        % endfor
                         </table>
-                    <% end %>
-                <% end %>
-                <% else: %>
-                    <%= _("You are not allowed to assign referees to this contribution.")%>
-                <% end %>
+                    % endif
+                % else:
+                    ${ _("You are not allowed to assign referees to this contribution.")}
+                % endif
             </td>
             <tr>
-            <% if showAssignButton: %>
+            % if showAssignButton:
                 <td>&nbsp;</td>
                 <td align="left">
                     <input type="submit" class=btn value="Assign">
                 </td>
-            <% end %>
+            % endif
             </form>
             </tr>
         </tr>
-        <% end %>
+        % endif
 </table>
-<% end %>
+% endif
 
-<% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
+% if ConferenceChoice == 3 or ConferenceChoice == 4:
 <!-- Assign / remove Editors -->
 <table class="newsDisplayItem" width="90%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
-            <td id="assignEditorHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Layout Reviewer")%></td>
+            <td id="assignEditorHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;">${ _("Assign a Layout Reviewer")}</td>
     </tr>
     <tr>
-	        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Layout reviewer")%>:</span></td>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Layout reviewer")}:</span></td>
 
-	   <% if ContributionReviewManager.hasEditor(): %>
-	         <td width="60%" class='bottom_line'>
-	         <%= ContributionReviewManager.getEditor().getFullName() %>
-	         </td>
-	</tr>
+       % if ContributionReviewManager.hasEditor():
+             <td width="60%" class='bottom_line'>
+             ${ ContributionReviewManager.getEditor().getFullName() }
+             </td>
+    </tr>
     <tr>
            <td>&nbsp;</td>
            <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
-              <form action="<%=removeAssignEditingURL%>" method="post">
+              <form action="${removeAssignEditingURL}" method="post">
                  <input type="submit" class=btn value="Remove">
                 </form>
            </td>
       </tr>
       <tr>
            <td class="dataCaptionTD">
-	               <span class="dataCaptionFormat"><%= _("Deadline")%></span>
-	       </td>
-	       <td class="blacktext">
-	            <span id="inPlaceEditEditorDueDate">
-	            <% date = ContributionReviewManager.getLastReview().getAdjustedEditorDueDate() %>
-	            <% if date is None: %>
-	                <%= _("Date not set yet.")%>
-	            <% end %>
-	            <% else: %>
-	                 <%= formatDateTime(date) %>
-	            <% end %>
-	            </span>
-	       </td>
+                   <span class="dataCaptionFormat">${ _("Deadline")}</span>
+           </td>
+           <td class="blacktext">
+                <span id="inPlaceEditEditorDueDate">
+                <% date = ContributionReviewManager.getLastReview().getAdjustedEditorDueDate() %>
+                % if date is None:
+                    ${ _("Date not set yet.")}
+                % else:
+                     ${ formatDateTime(date) }
+                % endif
+                </span>
+           </td>
       </tr>
-      <% end %>
-      <% else: %>
-	        <td width="60%" style="padding-bottom: 10px;">
-	           <%= _("not assigned yet")%>
-	        </td>
+      % else:
+            <td width="60%" style="padding-bottom: 10px;">
+               ${ _("not assigned yet")}
+            </td>
     </tr>
-    <form action="<%=assignEditingURL%>" method="post">
+    <form action="${assignEditingURL}" method="post">
     <tr>
         <% showAssignButton = False %>
-            <% if CanAssignEditorOrReviewers: %>
-                <% if not ContributionReviewManager.hasReferee() and not ConferenceChoice == 3: %>
+            % if CanAssignEditorOrReviewers:
+                % if not ContributionReviewManager.hasReferee() and not ConferenceChoice == 3:
                 <td>&nbsp;</td>
                 <td>
-                    <%= _("Please choose a referee first.")%>
+                    ${ _("Please choose a referee first.")}
                 </td>
                 </tr>
-                <% end %>
-                <% elif len(ConfReview.getEditorsList()) == 0: %>
+                % elif len(ConfReview.getEditorsList()) == 0:
                 <td>&nbsp;</td>
                 <td>
-                    <%= _("No editors proposed for this conference.")%>
+                    ${ _("No editors proposed for this conference.")}
                 </td>
                 </tr>
-                <% end %>
-                <% else: %>
+                % else:
                 <td>&nbsp;</td>
                 <td>
-		            <span class="titleCellFormat"><%= _("Choose a layout reviewer to assign from the list")%>:</span>
-		        </td>
-		        </tr>
-		        <tr>
-		        <td>&nbsp;</td>
-		        <td width="80%" class='bottom_line'>
+                    <span class="titleCellFormat">${ _("Choose a layout reviewer to assign from the list")}:</span>
+                </td>
+                </tr>
+                <tr>
+                <td>&nbsp;</td>
+                <td width="80%" class='bottom_line'>
                     <% showAssignButton = True %>
                     <table cellspacing="0" cellpadding="5">
                     <% first = True %>
-                    <% for e in ConfReview.getEditorsList(): %>
+                    % for e in ConfReview.getEditorsList():
                         <tr>
                             <td>
-                                <input type="radio" name="editorAssignSelection" value="<%= e.getId() %>"
-                                <% if first: %>
+                                <input type="radio" name="editorAssignSelection" value="${ e.getId() }"
+                                % if first:
                                     CHECKED
                                     <% first = False %>
-                                <% end %>
+                                % endif
                                 >
                             </td>
                             <td align="left">
-                                <%= e.getFullName() %>
+                                ${ e.getFullName() }
                             </td>
                         </tr>
-                    <% end %>
+                    % endfor
                     </table>
-                <% end %>
-            <% end %>
-            <% else: %>
-                <%= _("You are not allowed to assign layout reviewers to this contribution.")%>
-            <% end %>
+                % endif
+            % else:
+                ${ _("You are not allowed to assign layout reviewers to this contribution.")}
+            % endif
         </td>
-        <% if showAssignButton: %>
-        <\tr>
+        % if showAssignButton:
+        </tr>
         <tr>
             <td>&nbsp;</td>
             <td align="left">
                 <input type="submit" class=btn value="Assign">
             </td>
         </tr>
-        <% end %>
+        % endif
         </form>
         </tr>
-    <% end %>
+    % endif
     </tr>
 </table>
-<% end %>
+% endif
 
-<% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
+% if ConferenceChoice == 2 or ConferenceChoice == 4:
 <!-- Assign / remove content reviewers -->
 <table class="newsDisplayItem" width="90%" align="center" border="0" style="margin-bottom: 1em">
-	    <tr>
-	        <td id="assignReviewersHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign Content Reviewers")%></td>
-	    </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Content reviewers")%>:</span></td>
-            <% if ContributionReviewManager.hasReviewers(): %>
-                <form action="<%=removeAssignReviewingURL%>" method="post">
+            <td id="assignReviewersHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;">${ _("Assign Content Reviewers")}</td>
+        </tr>
+        <tr>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Content reviewers")}:</span></td>
+            % if ContributionReviewManager.hasReviewers():
+                <form action="${removeAssignReviewingURL}" method="post">
                 <td width="60%"  class='bottom_line'>
                     <table cellspacing="0" cellpadding="5">
                         <% first = True %>
-                        <% for r in ContributionReviewManager.getReviewersList(): %>
+                        % for r in ContributionReviewManager.getReviewersList():
                             <tr>
                                 <td>
-                                    <input type="radio" name="reviewerRemoveAssignSelection" value="<%= r.getId() %>"
-                                    <% if first: %>
+                                    <input type="radio" name="reviewerRemoveAssignSelection" value="${ r.getId() }"
+                                    % if first:
                                         CHECKED
                                         <% first = False %>
-                                    <% end %>
+                                    % endif
                                     >
                                 </td>
                                 <td align="left">
-                                    <%= r.getFullName() %>
+                                    ${ r.getFullName() }
                                 </td>
                             </tr>
-                        <% end %>
+                        % endfor
                     </table>
                 </td>
                 <tr>
@@ -265,57 +255,52 @@
                 </form>
                 <tr>
                 <td class="dataCaptionTD" style="padding-top: 5px; padding-bottom: 15px;">
-                    <span class="dataCaptionFormat"><%= _("Deadline")%></span>
+                    <span class="dataCaptionFormat">${ _("Deadline")}</span>
                 </td>
                 <td class="blacktext" style="padding-top: 5px; padding-bottom: 15px;">
                     <span id="inPlaceEditReviewerDueDate">
                     <% date = ContributionReviewManager.getLastReview().getAdjustedReviewerDueDate() %>
-                    <% if date is None: %>
-                        <%= _("Date not set yet.")%>
-                    <% end %>
-                    <% else: %>
-                        <%= formatDateTime(date) %>
-                    <% end %>
+                    % if date is None:
+                        ${ _("Date not set yet.")}
+                    % else:
+                        ${ formatDateTime(date) }
+                    % endif
                     </span>
                 </td>
             </tr>
-            <% end %>
-            <% else: %>
+            % else:
                 <td width="60%" class='bottom_line' style="padding-bottom: 10px;">
-                    <%= _("not assigned yet")%>
+                    ${ _("not assigned yet")}
                 </td>
-            <% end %>
+            % endif
             </td>
             </tr>
-    <form action="<%=assignReviewingURL%>" method="post">
+    <form action="${assignReviewingURL}" method="post">
     <tr>
         <% showAssignButton = False %>
-            <% if CanAssignEditorOrReviewers: %>
-                <% if not ContributionReviewManager.hasReferee(): %>
+            % if CanAssignEditorOrReviewers:
+                % if not ContributionReviewManager.hasReferee():
                 <td>&nbsp;</td>
                 <td>
-                    <%= _("Please choose a referee first.")%>
+                    ${ _("Please choose a referee first.")}
                 </td>
                 </tr>
-                <% end %>
-                <% elif len(ConfReview.getReviewersList()) == 0: %>
+                % elif len(ConfReview.getReviewersList()) == 0:
                 <td>&nbsp;</td>
                 <td>
-                    <%= _("No editors proposed for this conference.")%>
+                    ${ _("No editors proposed for this conference.")}
                 </td>
                 </tr>
-                <% end %>
-                <% elif len(AvailableReviewers) == 0: %>
+                % elif len(AvailableReviewers) == 0:
                 <td>&nbsp;</td>
                 <td>
-                        <%= _("No more content reviewers available to assign in this conference.")%>
+                        ${ _("No more content reviewers available to assign in this conference.")}
                 </td>
                 </tr>
-                <% end %>
-                <% else: %>
+                % else:
                 <td>&nbsp;</td>
                 <td>
-                    <span class="titleCellFormat"><%= _("Choose a content reviewer to assign from the list")%>:</span>
+                    <span class="titleCellFormat">${ _("Choose a content reviewer to assign from the list")}:</span>
                 </td>
                 </tr>
                 <tr>
@@ -324,40 +309,39 @@
                     <% showAssignButton = True %>
                     <table cellspacing="0" cellpadding="5">
                     <% first = True %>
-                        <% for r in AvailableReviewers: %>
+                        % for r in AvailableReviewers:
                             <tr>
                                 <td>
-                                    <input type="radio" name="reviewerAssignSelection" value="<%= r.getId() %>"
-                                    <% if first: %>
+                                    <input type="radio" name="reviewerAssignSelection" value="${ r.getId() }"
+                                    % if first:
                                         CHECKED
                                         <% first = False %>
-                                    <% end %>
+                                    % endif
                                     >
                                 </td>
                                 <td align="left">
-                                    <%= r.getFullName() %>
+                                    ${ r.getFullName() }
                                 </td>
                             </tr>
-                        <% end %>
+                        % endfor
                         </table>
-                    <% end %>
-                <% end %>
-                <% else: %>
-                    <%= _("You are not allowed to assign content reviewers to this contribution.")%>
-                <% end %>
+                    % endif
+                % else:
+                    ${ _("You are not allowed to assign content reviewers to this contribution.")}
+                % endif
             </td>
-            <% if showAssignButton: %>
+            % if showAssignButton:
             </tr>
             <tr>
                 <td>&nbsp;</td>
                 <td align="left">
                     <input type="submit" class=btn value="Assign">
                 </td>
-            <% end %>
+            % endif
             </form>
         </tr>
 </table>
-<% end %>
+% endif
 
 
 
@@ -365,35 +349,35 @@
 
 <script type="text/javascript">
 
-<% if CanEditDueDates: %>
-    <% if ContributionReviewManager.hasReferee(): %>
+% if CanEditDueDates:
+    % if ContributionReviewManager.hasReferee():
         new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditRefereeDueDate'),
                            'reviewing.contribution.changeDueDate',
-                           {conference: '<%= Conference.getId() %>',
-                            contribution: '<%= ContributionReviewManager.getContribution().getId() %>',
+                           {conference: '${ Conference.getId() }',
+                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
                             dueDateToChange: 'Referee'},
                            null, true);
-    <% end %>
+    % endif
 
-    <% if ContributionReviewManager.hasEditor(): %>
+    % if ContributionReviewManager.hasEditor():
         new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditEditorDueDate'),
                            'reviewing.contribution.changeDueDate',
-                           {conference: '<%= Conference.getId() %>',
-                            contribution: '<%= ContributionReviewManager.getContribution().getId() %>',
+                           {conference: '${ Conference.getId() }',
+                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
                             dueDateToChange: 'Editor'},
                            null, true);
-    <% end %>
+    % endif
 
-    <% if ContributionReviewManager.hasReviewers(): %>
+    % if ContributionReviewManager.hasReviewers():
         new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditReviewerDueDate'),
                            'reviewing.contribution.changeDueDate',
-                           {conference: '<%= Conference.getId() %>',
-                            contribution: '<%= ContributionReviewManager.getContribution().getId() %>',
+                           {conference: '${ Conference.getId() }',
+                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
                             dueDateToChange: 'Reviewer'},
                            null, true);
-    <% end %>
+    % endif
 
-<% end %>
+% endif
 
 
 </script>

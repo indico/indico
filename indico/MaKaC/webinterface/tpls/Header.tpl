@@ -1,51 +1,50 @@
-<% includeTpl('Announcement') %>
+<%include file="Announcement.tpl"/>
 
 <div class="pageHeader pageHeaderMainPage clearfix">
-        <% includeTpl('SessionBar') %>
+        <%include file="SessionBar.tpl" args="dark=False"/>
 
-        <% if searchBox != '': %>
-            <%= searchBox %>
-        <% end %>
+        % if searchBox != '': 
+            ${ searchBox }
+        % endif
 
         <!--
             set fixed height on anchor to assure that the height is
             corrected if the image cannot be retrieved (i.e. https problems) -->
-        <a style="min-height: 66px;" href="<%= urlHandlers.UHWelcome.getURL() %>">
-            <img class="headerLogo" src="<%= imgLogo %>" />
+        <a style="min-height: 66px;" href="${ urlHandlers.UHWelcome.getURL() }">
+            <img class="headerLogo" src="${ imgLogo }" />
         </a>
 
-		<% if isFrontPage: %>
-		    <div class="headerAboutIndico">
-		        <%= _("The Indico tool allows you to manage complex conferences, workshops and meetings.") %>
-		    </div>
-		<% end %>
+        % if isFrontPage: 
+            <div class="headerAboutIndico">
+                ${ _("The Indico tool allows you to manage complex conferences, workshops and meetings.") }
+            </div>
+        % endif
 
     <div class="globalMenu">
         <ul>
-            <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHWelcome.getURL() %>"><%= _("Home") %></a></li>
-        	<li id="createEventMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu"><%= _("Create event") %></span></li>
+            <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHWelcome.getURL() }">${ _("Home") }</a></li>
+            <li id="createEventMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Create event") }</span></li>
 
-            <% if roomBooking: %>
-                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHRoomBookingWelcome.getURL() %>"><%= _("Room booking") %></a></li>
-            <% end %>
+            % if roomBooking: 
+                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHRoomBookingWelcome.getURL() }">${ _("Room booking") }</a></li>
+            % endif
 
-            <% if len(adminItemList) == 1: %>
-                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= adminItemList[0]['url'] %>"><%= adminItemList[0]['text'] %></a></li>
-            <% end %>
-            <% elif len(adminItemList) > 1: %>
-                <li id="administrationMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu"><%= _("Administration") %></span></li>
-            <% end %>
+            % if len(adminItemList) == 1: 
+                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ adminItemList[0]['url'] }">${ adminItemList[0]['text'] }</a></li>
+            % elif len(adminItemList) > 1: 
+                <li id="administrationMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Administration") }</span></li>
+            % endif
 
-            <% if currentUser: %>
-                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHUserDetails.getURL(currentUser) %>"><%= _("My profile") %></a></li>
-            <% end %>
+            % if currentUser: 
+                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHUserDetails.getURL(currentUser) }">${ _("My profile") }</a></li>
+            % endif
 
-            <li id="helpMenu"  onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu"><%= _("Help") %></span></li>
-            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHContact.getURL() %>">Contact</a></li>
-            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHCategoryMap.getURL(categId=0) %>">Site Map</a></li>
-            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="<%= urlHandlers.UHAbout.getURL() %>">About Indico</a></li>
+            <li id="helpMenu"  onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Help") }</span></li>
+            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHContact.getURL() }">Contact</a></li>
+            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHCategoryMap.getURL(categId=0) }">Site Map</a></li>
+            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHAbout.getURL() }">About Indico</a></li>
 
-            <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''" style="display: none;"><a href="urlHandlers.UHGetUserEventPage.getURL()"><%= _("My Indico") %></a></li>
+            <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''" style="display: none;"><a href="urlHandlers.UHGetUserEventPage.getURL()">${ _("My Indico") }</a></li>
         </ul>
     </div>
 </div>
@@ -66,9 +65,9 @@ var createEventMenu = $E('createEventMenu');
 createEventMenu.observeClick(function(e) {
     var menuItems = {};
 
-    menuItems['<%= _("Create lecture") %>'] = "<%= urlLecture %>";
-    menuItems['<%= _("Create meeting") %>'] = "<%= urlMeeting %>";
-    menuItems['<%= _("Create conference") %>'] = "<%= urlConference %>";
+    menuItems['${ _("Create lecture") }'] = "${ urlLecture }";
+    menuItems['${ _("Create meeting") }'] = "${ urlMeeting }";
+    menuItems['${ _("Create conference") }'] = "${ urlConference }";
 
     var menu = new PopupMenu(menuItems, [createEventMenu], "globalMenuPopupList");
     var pos = createEventMenu.getAbsolutePosition();
@@ -76,30 +75,30 @@ createEventMenu.observeClick(function(e) {
     return false;
 });
 
-<% if len(adminItemList) > 1: %>
+% if len(adminItemList) > 1: 
 
     var administrationMenu = $E('administrationMenu');
     administrationMenu.observeClick(function(e) {
         var menuItems = {};
 
-        <% for item in adminItemList: %>
-        menuItems["<%= item['text']%>"] = "<%= item['url'] %>"
-        <% end %>
+        % for item in adminItemList: 
+        menuItems["${ item['text']}"] = "${ item['url'] }"
+        % endfor
         var menu = new PopupMenu(menuItems, [administrationMenu], "globalMenuPopupList");
         var pos = administrationMenu.getAbsolutePosition();
         menu.open(pos.x, pos.y + 30);
         return false;
     });
 
-<% end %>
+% endif
 
 var helpMenu = $E('helpMenu');
 helpMenu.observeClick(function(e) {
     var menuItems = {};
 
-    menuItems['<%= _("Indico help") %>'] = "<%= urlHandlers.UHConferenceHelp.getURL() %>";
-    menuItems['<%= _("About Indico") %>'] = "<%= urlHandlers.UHAbout.getURL() %>";
-    menuItems['<%= _("Contact") %>'] = "<%= urlHandlers.UHContact.getURL() %>";
+    menuItems['${ _("Indico help") }'] = "${ urlHandlers.UHConferenceHelp.getURL() }";
+    menuItems['${ _("About Indico") }'] = "${ urlHandlers.UHAbout.getURL() }";
+    menuItems['${ _("Contact") }'] = "${ urlHandlers.UHContact.getURL() }";
 
     var menu = new PopupMenu(menuItems, [helpMenu], "globalMenuPopupList");
     var pos = helpMenu.getAbsolutePosition();

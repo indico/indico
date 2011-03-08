@@ -1,8 +1,9 @@
+<%page args="modifying=None, showParent=None, conf=None, event=None, parentRoomInfo=None, eventId=None"/>
 <% import MaKaC %>
 <% import simplejson %>
 
 <tr>
-  <td class="titleCellTD"><span class="titleCellFormat"><%= _("Place")%></span></td>
+  <td class="titleCellTD"><span class="titleCellFormat">${ _("Place")}</span></td>
 
   <td>
     <div id ="roomChooser"></div>
@@ -12,40 +13,37 @@
 
 <script type="text/javascript">
 
-  <% if modifying: %>
-    var info = $O(<%= jsonEncode(roomInfo(event, level='own')) %>);
-  <% end %>
-  <% else: %>
+  % if modifying:
+    var info = $O(${ jsonEncode(roomInfo(event, level='own')) });
+  % else:
     var info = $O();
-  <% end %>
+  % endif
 
   var parentEvt =
-  <% if showParent: %>
-    $O(<%= jsonEncode(parentRoomInfo) %>)
-  <% end %>
-  <% else: %>
+  % if showParent:
+    $O(${ jsonEncode(parentRoomInfo) })
+  % else:
     false
-  <% end %>;
+  % endif
+;
 
   IndicoUI.executeOnLoad(function() {
 
-  <% if self._rh._target and not isinstance(self._rh._target, MaKaC.conference.Category): %>
-    <% eventFavorites = self._rh._target.getConference().getFavoriteRooms() %>
-  <% end %>
-  <% else: %>
+  % if self_._rh._target and not isinstance(self_._rh._target, MaKaC.conference.Category):
+    <% eventFavorites = self_._rh._target.getConference().getFavoriteRooms() %>
+  % else:
     <% eventFavorites = [] %>
-  <% end %>
+  % endif
 
-  <% if conf: %>
-      var ttdata = <%= simplejson.dumps(MaKaC.schedule.ScheduleToJson.process(conf.getSchedule(), conf.getTimezone(), None,
-                                                                                days = None, mgmtMode = True)) %> ;
+  % if conf:
+      var ttdata = ${ simplejson.dumps(MaKaC.schedule.ScheduleToJson.process(conf.getSchedule(), conf.getTimezone(), None,
+                                                                                days = None, mgmtMode = True)) } ;
       <% from MaKaC.common.Conversion import Conversion %>
-      var bookedRooms = <%= Conversion.reservationsList(conf.getRoomBookingList()) %>;
-      rbWidget = new RoomBookingReservationWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>, <% if modifying: %>null<%end%><%else:%>Indico.Data.DefaultLocation<%end%>, bookedRooms, ttdata, null, "<%= eventId %>");
-  <% end %>
-  <% else: %>
-      rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), <%= eventFavorites %>, <% if modifying: %>null<%end%><%else:%>Indico.Data.DefaultLocation<%end%>);
-  <% end %>
+      var bookedRooms = ${ Conversion.reservationsList(conf.getRoomBookingList()) };
+      rbWidget = new RoomBookingReservationWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), ${ eventFavorites }, ${"null" if modifying else "Indico.Data.DefaultLocation"}, bookedRooms, ttdata, null, "${ eventId }");
+  % else:
+      rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, parentEvt, nullRoomInfo(info), ${ eventFavorites }, ${"null" if modifying else "Indico.Data.DefaultLocation"});
+  % endif
 
   var domContent = rbWidget.draw();
 
@@ -60,16 +58,16 @@
      form.observeEvent('submit', function() {
         each({'room': 'roomName','location': 'locationName', 'address': 'locationAddress'},
              function(val, key) {
-	       // prevent problem with back button
-	       var input = $E('jsGenerated_'+key) || Html.input('hidden', {id: 'jsGenerated_'+key, name: val});
-	       if (info.get(key) != null) {
-	           input.set(info.get(key));
-	           form.append(input);
-	       }
-	     });
-	if (otherActions) {
-	   return otherActions();
-	}
+           // prevent problem with back button
+           var input = $E('jsGenerated_'+key) || Html.input('hidden', {id: 'jsGenerated_'+key, name: val});
+           if (info.get(key) != null) {
+               input.set(info.get(key));
+               form.append(input);
+           }
+         });
+    if (otherActions) {
+       return otherActions();
+    }
       });
 
     };

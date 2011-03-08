@@ -7,19 +7,19 @@
                     <td width="1%" valign="top">
                             <table cellpadding="1" cellspacing="1">
                                 <tr>
-                                    <td align="right" nowrap><font size="-1" ><%= startDate %></font>
+                                    <td align="right" nowrap><font size="-1" >${ startDate }</font>
                                     </td>
-                                    <td nowrap><font size="-1"><%= startTime %></font>
+                                    <td nowrap><font size="-1">${ startTime }</font>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="right" nowrap><font size="-1"><%= endDate %></font></td>
-                                    <td nowrap><font size="-1"><%= endTime %></font></td>
+                                    <td align="right" nowrap><font size="-1">${ endDate }</font></td>
+                                    <td nowrap><font size="-1">${ endTime }</font></td>
                                 </tr>
                             </table>
                     </td>
                     <td width="100%" valign="top">
-                        <b><a href="<%= detailsURL %>"><%= detailsIcon %></a> <font size="+1"><a href="<%= displayURL %>"><%= title %></a></font></b> <small><%= place %></small>
+                        <b><a href="${ detailsURL }">${ detailsIcon }</a> <font size="+1"><a href="${ displayURL }">${ title }</a></font></b> <small>${ place }</small>
                     </td>
                 </tr>
             </table>

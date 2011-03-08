@@ -21,7 +21,7 @@
     </tr>
 </table>
 
-<form id="mapOfRoomAvailabilityForm" method="post"  style="width:150px;" action="<%= roomBookingRoomListURL %>">
+<form id="mapOfRoomAvailabilityForm" method="post"  style="width:150px;" action="${ roomBookingRoomListURL }">
 <p>
   <span>
     <span><input id="isAvailable" class="mapFilterCheckbox" type="checkbox" style="margin-right:0px;"></span>
@@ -31,53 +31,53 @@
 
 <table>
     <tr id="sdatesTR" >
-        <td class="subFieldWidth" align="right" ><small> <%= _("From")%>&nbsp;</small></td>
+        <td class="subFieldWidth" align="right" ><small> ${ _("From")}&nbsp;</small></td>
         <td class="blacktext">
             <span id="sDatePlace"></span>
-            <input type="hidden" value="<%= startDT.day %>" name="sDay" id="sDay"/>
-            <input type="hidden" value="<%= startDT.month %>" name="sMonth" id="sMonth"/>
-            <input type="hidden" value="<%= startDT.year %>" name="sYear" id="sYear"/>
+            <input type="hidden" value="${ startDT.day }" name="sDay" id="sDay"/>
+            <input type="hidden" value="${ startDT.month }" name="sMonth" id="sMonth"/>
+            <input type="hidden" value="${ startDT.year }" name="sYear" id="sYear"/>
         </td>
       </tr>
      <tr id="edatesTR" >
-        <td class="subFieldWidth" align="right" ><small> <%= _("To")%>&nbsp;</small></td>
+        <td class="subFieldWidth" align="right" ><small> ${ _("To")}&nbsp;</small></td>
         <td>
             <span id="eDatePlace"></span>
-            <input type="hidden" value="<%= endDT.day %>" name="eDay" id="eDay"/>
-            <input type="hidden" value="<%= endDT.month %>" name="eMonth" id="eMonth"/>
-            <input type="hidden" value="<%= endDT.year %>" name="eYear" id="eYear"/>
+            <input type="hidden" value="${ endDT.day }" name="eDay" id="eDay"/>
+            <input type="hidden" value="${ endDT.month }" name="eMonth" id="eMonth"/>
+            <input type="hidden" value="${ endDT.year }" name="eYear" id="eYear"/>
         </td>
     </tr>
     <tr id="hoursTR" >
-        <td align="right" ><small> <%= _("Hours")%>&nbsp;</small></td>
+        <td align="right" ><small> ${ _("Hours")}&nbsp;</small></td>
         <td align="left" class="blacktext">
-            <input name="sTime" id="sTime" maxlength="5" size="4" type="text" value="<%= startT %>" onchange="" /> &nbsp;&mdash;&nbsp;
-            <input name="eTime" id="eTime" maxlength="5" size="4" type="text" value="<%= endT %>" onchange="" />
+            <input name="sTime" id="sTime" maxlength="5" size="4" type="text" value="${ startT }" onchange="" /> &nbsp;&mdash;&nbsp;
+            <input name="eTime" id="eTime" maxlength="5" size="4" type="text" value="${ endT }" onchange="" />
             <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
         </td>
     </tr>
     <tr id="repTypeTR" >
-        <td align="right" ><small> <%= _("Type")%>&nbsp;</small></td>
+        <td align="right" ><small> ${ _("Type")}&nbsp;</small></td>
         <td align="left" class="blacktext" >
             <select name="repeatability" id="repeatability" style="width:144px; margin-right:6px;">
             <% sel = [ "", "", "", "", "", "" ]; %>
-            <% if repeatability == None: %>
+            % if repeatability == None:
             <%     sel[5] = 'selected="selected"' %>
-            <% end %>
-            <% if repeatability != None: %>
+            % endif
+            % if repeatability != None:
             <%     sel[repeatability] = 'selected="selected"' %>
-            <% end %>
-                <option <%= sel[5] %> value="None"> <%= _("Single day")%></option>
-                <option <%= sel[0] %> value="0"> <%= _("Repeat daily")%></option>
-                <option <%= sel[1] %> value="1"> <%= _("Repeat once a week")%></option>
-                <option <%= sel[2] %> value="2"> <%= _("Repeat once every two weeks")%></option>
-                <option <%= sel[3] %> value="3"> <%= _("Repeat once every three weeks")%></option>
-                <option <%= sel[4] %> value="4"> <%= _("Repeat every month")%></option>
+            % endif
+                <option ${ sel[5] } value="None"> ${ _("Single day")}</option>
+                <option ${ sel[0] } value="0"> ${ _("Repeat daily")}</option>
+                <option ${ sel[1] } value="1"> ${ _("Repeat once a week")}</option>
+                <option ${ sel[2] } value="2"> ${ _("Repeat once every two weeks")}</option>
+                <option ${ sel[3] } value="3"> ${ _("Repeat once every three weeks")}</option>
+                <option ${ sel[4] } value="4"> ${ _("Repeat every month")}</option>
             </select>
         </td>
     </tr>
 </table>
-<input type="hidden" name="location" value="<%= defaultLocation %>" />
+<input type="hidden" name="location" value="${ defaultLocation }" />
 </form>
 
 <div style="display:none">
@@ -150,30 +150,30 @@ function buildingFilterEnabledIf(mapView) {
 var startupRoomFilters = [];
 var startupBuildingFilters = [];
 
-<% if roomID: %>
+% if roomID:
 startupRoomFilters.push(function(room) {
-    return room.id == <%= roomID %>;
+    return room.id == ${ roomID };
 });
-<% end %>
+% endif
 
-var positions = <%= jsonEncode(aspects) %>;
+var positions = ${ jsonEncode(aspects) };
 
-var buildings = <%= jsonEncode(buildings) %>;
+var buildings = ${ jsonEncode(buildings) };
 
 var filters = [
-   {label: "<%= _("Building") %>", filterType: "building", inputType: "text", property: "number", optional: true, defaultValue: "", activeIf: buildingFilterActiveIf},
-    {label: "<%= _("Around the building") %>", filterType: "building", inputType: "boolean", optional: true, defaultValue: false,
+   {label: "${ _("Building") }", filterType: "building", inputType: "text", property: "number", optional: true, defaultValue: "", activeIf: buildingFilterActiveIf},
+    {label: "${ _("Around the building") }", filterType: "building", inputType: "boolean", optional: true, defaultValue: false,
         filterFunction: distanceFilter, enabledIf: buildingFilterEnabledIf},
-    {label: "<%= _("Floor") %>", filterType: "room", inputType: "text", filterFunction: floorFilter, optional: true, defaultValue: ""},
-    {label: "<%= _("Description") %>", filterType: "room", inputType: "subtext", property: "comments", optional: true, defaultValue: ""},
-    {label: "<%= _("Min. capacity") %>", filterType: "room", inputType: "text", filterFunction: capacityFilter, optional: true, defaultValue: ""},
-<% if not forVideoConference: %>
-    {label: "<%= _("Video conference") %>", filterType: "room", inputType: "boolean", defaultValue: false, property: "needsAVCSetup", optional: true, defaultValue: false},
-<% end %>
-    {label: "<%= _("Only public rooms") %>", filterType: "room", inputType: "boolean", property: "isReservable", optional: true, defaultValue:false},
-    {label: "<%= _("Auto confirm") %>", filterType: "room", inputType: "boolean", property: "isAutoConfirm", optional: true, defaultValue:false},
-    {label: "<%= _("Only mine") %>", filterType: "room", inputType: "boolean", property: "responsibleId", optional: true, defaultValue:false, checkedValue: <%= user.id %>},
-    {label: "<%= _("Is active") %>", filterType: "room", inputType: "boolean", property: "isActive", optional: true, defaultValue:true}
+    {label: "${ _("Floor") }", filterType: "room", inputType: "text", filterFunction: floorFilter, optional: true, defaultValue: ""},
+    {label: "${ _("Description") }", filterType: "room", inputType: "subtext", property: "comments", optional: true, defaultValue: ""},
+    {label: "${ _("Min. capacity") }", filterType: "room", inputType: "text", filterFunction: capacityFilter, optional: true, defaultValue: ""},
+% if not forVideoConference:
+    {label: "${ _("Video conference") }", filterType: "room", inputType: "boolean", defaultValue: false, property: "needsAVCSetup", optional: true, defaultValue: false},
+% endif
+    {label: "${ _("Only public rooms") }", filterType: "room", inputType: "boolean", property: "isReservable", optional: true, defaultValue:false},
+    {label: "${ _("Auto confirm") }", filterType: "room", inputType: "boolean", property: "isAutoConfirm", optional: true, defaultValue:false},
+    {label: "${ _("Only mine") }", filterType: "room", inputType: "boolean", property: "responsibleId", optional: true, defaultValue:false, checkedValue: ${ user.id }},
+    {label: "${ _("Is active") }", filterType: "room", inputType: "boolean", property: "isActive", optional: true, defaultValue:true}
 ];
 
 function initializeAvailabilityFields() {
@@ -227,7 +227,7 @@ function availabilityFilterFunction(filtersCallback) {
         }
 
         params = fieldValues(['sDay', 'eDay', 'sMonth', 'eMonth', 'sYear', 'eYear', 'sTime', 'eTime', 'repeatability']);
-        params['location'] = '<%= defaultLocation %>';
+        params['location'] = '${ defaultLocation }';
         indicoRequest('roomBooking.rooms.availabilitySearch', params, indicoCallback);
     } else {
         filtersCallback([], []);
@@ -239,13 +239,13 @@ function setDefaultAvailabilityValues() {
     isAvailable.dom.checked = false;
     isAvailable.dispatchEvent('change');
 
-   <% if startDT.day != '': %>
-        startDate.set('<%= startDT.day %>/<%= startDT.month %>/<%= startDT.year %>');
-    <% end %>
+   % if startDT.day != '':
+        startDate.set('${ startDT.day }/${ startDT.month }/${ startDT.year }');
+    % endif
 
-    <% if endDT.day != '': %>
-        endDate.set('<%= endDT.day %>/<%= endDT.month %>/<%= endDT.year %>');
-    <% end %>
+    % if endDT.day != '':
+        endDate.set('${ endDT.day }/${ endDT.month }/${ endDT.year }');
+    % endif
 }
 
 function overrideCalendar() {

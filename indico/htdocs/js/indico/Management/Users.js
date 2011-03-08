@@ -803,7 +803,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 /**
  * Creates a form field whose value is a single user
  *
- * @param {Object} initialUser A user that will appear initially. Example: <%= AvatarHolder().getById(1).fossilize(IAvatarFossil) %>
+ * @param {Object} initialUser A user that will appear initially. Example: ${ AvatarHolder().getById(1).fossilize(IAvatarFossil) }
  *
  * @param {String} hiddenFieldName The name attribute for the hidden field that will be drawn along with the rest of the widget.
  *                                 This hidden field will have the currently selected user's id.
@@ -812,7 +812,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
  * @param {Boolean} allowChoose If true, a 'Choose User' dialog will be present when pressing on the "choose" button.
  *
  * @param {Boolean} includeFavourites If True, favourites will appear in the list of suggested users of the ChooseUsersPopup.
- * @param {list} suggestedUsers A list of users that will be offered as options to be added. Example: <%= jsonEncode(fossilize([AvatarHolder().getById(3), AvatarHolder().getById(4)], IAvatarFossil)) %>
+ * @param {list} suggestedUsers A list of users that will be offered as options to be added. Example: ${ jsonEncode(fossilize([AvatarHolder().getById(3), AvatarHolder().getById(4)], IAvatarFossil)) }
  *                              If left to null, there will be suggested Users. For an empty list of users, use {}
  *
  * @param {Integer} conferenceId If different from null, authors from that conference will be included in the search results.

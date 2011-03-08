@@ -1,9 +1,9 @@
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
-		<% if standalone: %>
-		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
-		    </tr>
-		<% end %>
+        % if standalone: 
+            <tr>
+            <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
+            </tr>
+        % endif
         <tr>
             <td class="bottomvtab" width="100%">
                 <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
@@ -19,36 +19,36 @@
                                     <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>Location&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= room.locationName %></td>
+                                            <td align="left" class="blacktext">${ room.locationName }</td>
                                         </tr>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>Name&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= room.name %></td>
+                                            <td align="left" class="blacktext">${ room.name }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small>Site&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= room.site %></td>
+                                            <td align="left" class="blacktext">${ room.site }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small>Building&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a href="http://building.web.cern.ch/map/building?bno=<%= room.building %>" title="Show on map"><%= room.building %></a></td>
+                                            <td align="left" class="blacktext"><a href="http://building.web.cern.ch/map/building?bno=${ room.building }" title="Show on map">${ room.building }</a></td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small>Floor&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= room.floor %></td>
+                                            <td align="left" class="blacktext">${ room.floor }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small>Room&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><%= room.roomNr %></td>
+                                            <td align="left" class="blacktext">${ room.roomNr }</td>
                                         </tr>
                                  </table>
                                 </td>
                                 <td width="20%" align="right" class="thumbnail">
-                                <% if room.photoId != None: %>
-                                    <a href="<%= room.getPhotoURL() %>" rel="lightbox" title="<%= room.photoId %>">
-                                        <img border="1px" height="100" src="<%= room.getPhotoURL() %>" alt="<%= str( room.photoId ) %>"/>
+                                % if room.photoId != None: 
+                                    <a href="${ room.getPhotoURL() }" rel="lightbox" title="${ room.photoId }">
+                                        <img border="1px" height="100" src="${ room.getPhotoURL() }" alt="${ str( room.photoId ) }"/>
                                     </a>
-                                <% end %>
+                                % endif
                                 </td>
                               </tr>
                               <tr><td>&nbsp;</td></tr>
@@ -67,25 +67,25 @@
           <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
             <table>
             <tr>
-          <form action=<%= statsURL %>>
-          <input type="hidden" name="roomLocation" value=<%= room.locationName %>>
-          <input type="hidden" name="roomID" value=<%= room.id %>>
+          <form action=${ statsURL }>
+          <input type="hidden" name="roomLocation" value=${ room.locationName }>
+          <input type="hidden" name="roomID" value=${ room.id }>
           <td bgcolor="white" valign="top" style="padding-left: 12px;">
             <select name="period" onChange="this.form.submit();">
-            <% if period=="pastmonth": %>
+            % if period=="pastmonth": 
               <option value="pastmonth" selected> past 30 days
               <option value="thisyear"> from beginning of this year
-            <% end %>
-            <% if period=="thisyear": %>
+            % endif
+            % if period=="thisyear": 
               <option value="pastmonth"> past 30 days
               <option value="thisyear" selected> from beginning of this year
-            <% end %>
+            % endif
             </select>
           </td>
           </form>
             </tr>
             <tr>
-                <td><span style="background-color: #C9FFC9; font-weight: bold;"><%= kpiAverageOccupation %></span> <% inlineContextHelp( 'Average room occupation over the selected period during working hours (8H30-17H30, Monday-Friday including holidays).' ) %></td>
+                <td><span style="background-color: #C9FFC9; font-weight: bold;">${ kpiAverageOccupation }</span> ${inlineContextHelp('Average room occupation over the selected period during working hours (8H30-17H30, Monday-Friday including holidays).' )}</td>
             </tr>
             </table>
           </td>
@@ -97,7 +97,7 @@
             <table>
             <tr>
                 <td>Total:</td>
-                <td><%=kbiTotalBookings%> <% inlineContextHelp( 'Total number of bookings including archival, cancelled and rejected.' ) %></td>
+                <td>${kbiTotalBookings} ${inlineContextHelp('Total number of bookings including archival, cancelled and rejected.' )}</td>
             </tr>
             </table>
             <br />
@@ -110,21 +110,21 @@
                 </tr>
                 <tr>
                     <td>Live</td>
-                    <td><span style="background-color: #C9FFC9; font-weight: bold;"><%= stats['liveValid'] %></span></td>
-                    <td><%= stats['liveCancelled'] %></td>
-                    <td><%= stats['liveRejected'] %></td>
+                    <td><span style="background-color: #C9FFC9; font-weight: bold;">${ stats['liveValid'] }</span></td>
+                    <td>${ stats['liveCancelled'] }</td>
+                    <td>${ stats['liveRejected'] }</td>
                 </tr>
                 <tr>
                     <td>Archival</td>
-                    <td><%= stats['archivalValid'] %></td>
-                    <td><%= stats['archivalCancelled'] %></td>
-                    <td><%= stats['archivalRejected'] %></td>
+                    <td>${ stats['archivalValid'] }</td>
+                    <td>${ stats['archivalCancelled'] }</td>
+                    <td>${ stats['archivalRejected'] }</td>
                 </tr>
                 <tr>
                     <td>Total</td>
-                    <td><%= stats['liveValid'] + stats['archivalValid'] %></td>
-                    <td><%= stats['liveCancelled'] + stats['archivalCancelled'] %></td>
-                    <td><%= stats['liveRejected'] + stats['archivalRejected'] %></td>
+                    <td>${ stats['liveValid'] + stats['archivalValid'] }</td>
+                    <td>${ stats['liveCancelled'] + stats['archivalCancelled'] }</td>
+                    <td>${ stats['liveRejected'] + stats['archivalRejected'] }</td>
                 </tr>
             </table>
           </td>

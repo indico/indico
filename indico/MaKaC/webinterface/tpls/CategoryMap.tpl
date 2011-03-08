@@ -1,11 +1,11 @@
 <div class="container categoryMap">
     <div class="categoryHeader">
         <ul>
-            <li><a href="<%= categDisplayURL %>"><%= _("Go back to category page") %></a></li>
+            <li><a href="${ categDisplayURL }">${ _("Go back to category page") }</a></li>
         </ul>
         <h1 class="categoryTitle">
-            <%= categName %>&nbsp;
-            <span style="font-style: italic; font-size: 0.8em;">(<%= _("category map") %>)</span>
+            ${ categName }&nbsp;
+            <span style="font-style: italic; font-size: 0.8em;">(${ _("category map") })</span>
         </h1>
     </div>
 
@@ -19,7 +19,7 @@
                                     cellpadding="0" cellspacing="1">
                                 <tr>
                                     <td>
-					                   <%= map %>
+                                       ${ map }
                                     </td>
                                 </tr>
                             </table>

@@ -10,7 +10,7 @@
       <td>
 <UL>
   <table width="80%">
-  <%= webcasts %>
+  ${ webcasts }
   </table>
 </UL>
       </td>

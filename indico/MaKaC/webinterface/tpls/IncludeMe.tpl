@@ -1,2 +1,2 @@
 
-<h1><%= _("IncludeMe")%> :)</h1>
+<h1>${ _("IncludeMe")} :)</h1>

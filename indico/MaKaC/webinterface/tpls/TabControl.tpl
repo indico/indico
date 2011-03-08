@@ -1,7 +1,7 @@
 <div class="tabContents">
-    <% if tabItems: %>
-        <%= tabItems %>
-    <% end %>
+    % if tabItems: 
+        ${ tabItems }
+    % endif
 
-    <%= body %>
+    ${ body }
 </div>

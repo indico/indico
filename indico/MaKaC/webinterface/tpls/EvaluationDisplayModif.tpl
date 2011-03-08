@@ -1,1 +1,1 @@
-<% includeTpl('EvaluationDisplay') %>
+<%include file="EvaluationDisplay.tpl"/>

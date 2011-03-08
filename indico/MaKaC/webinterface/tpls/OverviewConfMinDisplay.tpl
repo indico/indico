@@ -8,14 +8,14 @@
 
 <tr>
     <td>
-        <table class="item" cellspacing="0" cellpadding="0" style="<% if not details: %>padding-bottom: 10px;<% end %>">
+        <table class="item" cellspacing="0" cellpadding="0" style="${"padding-bottom: 10px;" if not details else ""}">
         <tr>
-            <td class="time"><%= startTime %></td>
+            <td class="time">${ startTime }</td>
             <td class="title">
-                <a href="<%= url %>" style="font-size: 1.0em;"><%= title %></a>
+                <a href="${ url }" style="font-size: 1.0em;">${ title }</a>
             </td>
         </tr>
-        <%= details %>
+        ${ details }
         </table>
     </td>
 </tr>

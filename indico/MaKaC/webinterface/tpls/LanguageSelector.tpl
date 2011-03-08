@@ -1,11 +1,12 @@
+<%page args="Languages=None, IsHeader=None, dark=None"/>
 
 
-            <form id="languageForm" method="post" action="<%= urlHandlers.UHChangeLang.getURL() %>" style="margin: 0px">
-                <input id="languageInputHidden" type="hidden" name="lang" value="<%= SelectedLanguage.lower() %>">
+            <form id="languageForm" method="post" action="${ urlHandlers.UHChangeLang.getURL() }" style="margin: 0px">
+                <input id="languageInputHidden" type="hidden" name="lang" value="${ SelectedLanguage.lower() }">
             </form>
 
         
-<a id="languageSelectorLink" href="#" class="dropDownMenu" id="selectLanguageLink"><%= SelectedLanguageName %></a>
+<a id="languageSelectorLink" href="#" class="dropDownMenu" id="selectLanguageLink">${ SelectedLanguageName }</a>
 
         
 <script type="text/javascript">
@@ -24,11 +25,11 @@ languageLink.observeClick(function(e) {
     var inputHidden = $E('languageInputHidden');
             
     // build a dictionary that represents the menu
-    <% for k,v in Languages.items(): %>
-        menuItems['<%= v %>'] = function() {inputHidden.dom.value = '<%= k %>'; form.dom.submit()};
-    <% end %>
+    % for k,v in Languages.items(): 
+        menuItems['${ v }'] = function() {inputHidden.dom.value = '${ k }'; form.dom.submit()};
+    % endfor
         
-    languageMenu = new PopupMenu(menuItems, [languageLink], <% if dark: %>'darkPopupList'<% end %><% else: %>null<% end %>, true, true);
+    languageMenu = new PopupMenu(menuItems, [languageLink], ${"'darkPopupList'" if dark else "null"}, true, true);
     var pos = languageLink.getAbsolutePosition();
     languageMenu.open(pos.x + languageLink.dom.offsetWidth + 10, pos.y + languageLink.dom.offsetHeight + 3, null, null, false, true);
 

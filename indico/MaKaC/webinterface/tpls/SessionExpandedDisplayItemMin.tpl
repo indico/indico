@@ -15,12 +15,12 @@
                             </table>
                     </td>
                     <td valign="top" width="100%">
-                        <b><a href="<%= detailsURL %>"><%= detailsIcon %></a> <font size="+1"><a href="<%= displayURL %>"><%= title %></a></font></b>
+                        <b><a href="${ detailsURL }">${ detailsIcon }</a> <font size="+1"><a href="${ displayURL }">${ title }</a></font></b>
                     </td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td><%= program %></td>
+                    <td>${ program }</td>
                 </tr>
             </table>
         </td>

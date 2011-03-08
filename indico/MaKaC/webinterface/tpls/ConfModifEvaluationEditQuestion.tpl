@@ -1,49 +1,49 @@
-    <form name="EvalEditQuestion" action="<%=actionUrl%>" method="post" onsubmit="return controle()">
+    <form name="EvalEditQuestion" action="${actionUrl}" method="post" onsubmit="return controle()">
       <!--general information start-->
       <table class="evalEditMain">
         <!--input Required-->
         <tr>
-          <td class="titleCellTD"><span class="titleCellFormat"><%= _("Required")%></span></td>
+          <td class="titleCellTD"><span class="titleCellFormat">${ _("Required")}</span></td>
           <td id="requiredCell" class="inputCelTD">
-            <input type="checkbox" name="required" <%=required%>/>            
+            <input type="checkbox" name="required" ${required}/>            
           </td>
         </tr>
         <!--input Question-->
         <tr>
-          <td class="titleCellTD"><span class="titleCellFormat">* <%= _("Question")%></span></td>
-          <td class="inputCelTD"><input type="text" class="textType" name="questionValue" value="<%=questionValue%>"/></td>
+          <td class="titleCellTD"><span class="titleCellFormat">* ${ _("Question")}</span></td>
+          <td class="inputCelTD"><input type="text" class="textType" name="questionValue" value="${questionValue}"/></td>
         </tr>
         <!--input Keyword-->
         <tr>
-          <td class="titleCellTD"><span class="titleCellFormat">*<%= _("Keyword")%></span></td>
+          <td class="titleCellTD"><span class="titleCellFormat">*${ _("Keyword")}</span></td>
           <td id="keywordCell" class="inputCelTD">
-            <input class="shortInput" type="text" name="keyword" maxlength="25" value="<%=keyword%>"/>           
+            <input class="shortInput" type="text" name="keyword" maxlength="25" value="${keyword}"/>           
           </td>
         </tr>
         <!--input Description of question-->
         <tr>
-          <td class="titleCellTD"><span class="titleCellFormat"><%= _("Description")%></span></td>
-          <td class="inputCelTD"><textarea name="description" rows="5" cols="50" ><%=description%></textarea></td>
+          <td class="titleCellTD"><span class="titleCellFormat">${ _("Description")}</span></td>
+          <td class="inputCelTD"><textarea name="description" rows="5" cols="50" >${description}</textarea></td>
         </tr>
         <!--input Help-->
         <tr>
-          <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Help")%></span></td>
-          <td class="inputCelTD"><input type="text" class="textType" name="help" value="<%=help%>"/></td>
+          <td class="titleCellTD"><span class="titleCellFormat"> ${ _("Help")}</span></td>
+          <td class="inputCelTD"><input type="text" class="textType" name="help" value="${help}"/></td>
         </tr>
         <!--input Default answer-->
-        <%=defaultAnswer%>
+        ${defaultAnswer}
         <!--input Postion-->
         <tr>
-          <td class="titleCellTD"><span class="titleCellFormat"> <%= _("Position in form")%></span></td>
+          <td class="titleCellTD"><span class="titleCellFormat"> ${ _("Position in form")}</span></td>
           <td class="inputCelTD">
-            <%=position%>
+            ${position}
           </td>
         </tr>
       </table>
       <!--general information end-->
       
       <!--ChoicesItems-->
-      <% if choiceItems.strip()!="" : %>
+      % if choiceItems.strip()!="" : 
         <table class="evalEditMain">
           <tr>
             <td class="titleCellTD">
@@ -52,22 +52,22 @@
               </span>
             </td>
             <td class="inputCelTD">
-            <%=choiceItems%>
+            ${choiceItems}
             </td>
           </tr>
         </table>
-      <% end %>
+      % endif
 
       
       <!--submission-->
       <table class="evalEditMain">
         <!--Error message-->
-        <tr><td class="errorCelTD"><%=error%></td></tr>
+        <tr><td class="errorCelTD">${error}</td></tr>
         <!--submit save question-->
         <tr>
           <td class="submitCelTD">
-            <input class="btn" type="submit" name="save" value="<%=saveButtonText%>" onfocus="saveIsFocused=true;" onblur="saveIsFocused=false;"/>
-            <input class="btn" type="submit" name="cancel" value="<%= _("cancel")%>"/>
+            <input class="btn" type="submit" name="save" value="${saveButtonText}" onfocus="saveIsFocused=true;" onblur="saveIsFocused=false;"/>
+            <input class="btn" type="submit" name="cancel" value="${ _("cancel")}"/>
           </td>
         </tr>
       </table>
@@ -84,23 +84,23 @@
       // we must enter choiceItems (in case of Radio buttons, Checkboxes, ...).
       function controle(){
         if (saveIsFocused && questionValue != null && questionValue.value == ""){
-          alert(" <%= _("Please enter a Question.")%>");
+          alert(" ${ _("Please enter a Question.")}");
           return false;
         }
         else if (saveIsFocused && keyword != null && keyword.value == ""){
-          alert(" <%= _("Please enter a Keyword.")%>");
+          alert(" ${ _("Please enter a Keyword.")}");
           return false;
         }
         else if (saveIsFocused && choiceItem_1 != null && choiceItem_1.value == ""){
-          alert(" <%= _("Please enter all value for Choice Items.")%>");
+          alert(" ${ _("Please enter all value for Choice Items.")}");
           return false;
         }
         else if (saveIsFocused && choiceItem_2 != null && choiceItem_2.value == ""){
-          alert(" <%= _("Please enter all values for Choice Items.")%>");
+          alert(" ${ _("Please enter all values for Choice Items.")}");
           return false;
         }
         else if (saveIsFocused && choiceItem_1 != null && choiceItem_2 != null && choiceItem_1.value == choiceItem_2.value){
-          alert(" <%= _("Please enter different values for Choice Items.")%>");
+          alert(" ${ _("Please enter different values for Choice Items.")}");
           return false;
         }
         else{
@@ -112,14 +112,14 @@
         var prev = current - 1;
         var next = current + 1;
         document.getElementById("field_"+current).innerHTML =
-          "<input type='<%=javascriptChoiceItemsType%>' name='selectedChoiceItems' value='"+current+"'><input class='choiceItemText' type='text' name='choiceItem_"+current+"'>\\n" +
-          "<div id='field_"+next+"'><a href='javascript:addField("+next+")' style='padding-left:40px;'><%=javascriptChoiceItemsAddImg%></a>\\n<a href='javascript:removeField("+current+")'><%=javascriptChoiceItemsRemoveImg%></a>\\n</div>\\n";
+          "<input type='${javascriptChoiceItemsType}' name='selectedChoiceItems' value='"+current+"'><input class='choiceItemText' type='text' name='choiceItem_"+current+"'>\n" +
+          "<div id='field_"+next+"'><a href='javascript:addField("+next+")' style='padding-left:40px;'>${javascriptChoiceItemsAddImg}</a>\n<a href='javascript:removeField("+current+")'>${javascriptChoiceItemsRemoveImg}</a>\n</div>\n";
       }
       function removeField(current) {
         var prev = current - 1;
         var next = current + 1;
-        if (current > <%=choiceItemsNb%>)
+        if (current > ${choiceItemsNb})
           document.getElementById("field_"+current).innerHTML =
-            "<a href='javascript:addField("+current+")' style='padding-left:40px;'><%=javascriptChoiceItemsAddImg%></a>\\n<a href='javascript:removeField("+prev+")'><%=javascriptChoiceItemsRemoveImg%></a>\\n</span>\\n";
+            "<a href='javascript:addField("+current+")' style='padding-left:40px;'>${javascriptChoiceItemsAddImg}</a>\n<a href='javascript:removeField("+prev+")'>${javascriptChoiceItemsRemoveImg}</a>\n</span>\n";
       }
     </script>

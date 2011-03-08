@@ -1,124 +1,121 @@
 <div class="container">
 
-<div class="categoryTitle"><%= _("Video Services Overview")%></div>
+<div class="categoryTitle">${ _("Video Services Overview")}</div>
 
 <ul class="CAIndexList">
 <% lastIndex = len(Indexes) - 1 %>
-<% for i, index in enumerate(Indexes): %>
+% for i, index in enumerate(Indexes): 
     <% indexName = index.getName() %>
     <li>
-        <% if i == lastIndex: %>
+        % if i == lastIndex: 
             <% additionalStyle = 'style="border-right\x3a 0px;"' %>
-        <% end %>
-        <% else: %>
+        % else: 
             <% additionalStyle = '' %>
-        <% end %>
+        % endif
 
-        <a id="index_<%=indexName%>" onclick="indexSelectedObs('<%=indexName%>', false)" class="CAIndexUnselected" <%=additionalStyle%> >
-            <%= indexName[0].upper() + indexName[1:] %>
+        <a id="index_${indexName}" onclick="indexSelectedObs('${indexName}', false)" class="CAIndexUnselected" ${additionalStyle} >
+            ${ indexName[0].upper() + indexName[1:] }
         </a>
     </li>
-<% end %>
+% endfor
 </ul>
 
 <div class="CADiv">
     <div id="pendingCategoryFilteringDiv">
         <div id="CAShowOnlyPendingDiv" class="CAShowOnlyPendingDiv" style="display:inline;">
-            <% if InitialOnlyPending: %>
+            % if InitialOnlyPending: 
                 <% checked = 'checked' %>
-            <% end %>
-            <% else: %>
+            % else: 
                  <% checked = '' %>
-            <% end %>
-            <input type="checkbox" id="pendingCB" onchange="updateFilterButton()" <%=checked %>/>
-            <label for="pendingCB"><%= _("Show only pending")%></label>
+            % endif
+            <input type="checkbox" id="pendingCB" onchange="updateFilterButton()" ${checked }/>
+            <label for="pendingCB">${ _("Show only pending")}</label>
         </div>
         <div class="CAFilterByCategoryDiv" id="CAFilterByCategoryDiv" style="display:inline;">
-            <span><%= _("Restrict to category id:")%></span>
-            <input type="text" size="5" id="categoryId" onkeypress="updateFilterButton()" value="<%= InitialCategoryId %>"/>
+            <span>${ _("Restrict to category id:")}</span>
+            <input type="text" size="5" id="categoryId" onkeypress="updateFilterButton()" value="${ InitialCategoryId }"/>
         </div>
         <div class="CAFilterByCategoryDiv" id="CAFilterByCategoryDiv" style="display:inline;">
-            <span><%= _("Restrict to conference id:")%></span>
-            <input type="text" size="5" id="conferenceId" onkeyup="confIdObs()" onkeypress="updateFilterButton()" value="<%= InitialConferenceId %>"/>
+            <span>${ _("Restrict to conference id:")}</span>
+            <input type="text" size="5" id="conferenceId" onkeyup="confIdObs()" onkeypress="updateFilterButton()" value="${ InitialConferenceId }"/>
         </div>
         <div class="CAResultsPerPageDiv">
-            <%= _("Results per page:")%> <input type="text" id="resultsPerPage" size="5" onkeypress="updateFilterButton()" value="<%= InitialResultsPerPage %>"/>
+            ${ _("Results per page:")} <input type="text" id="resultsPerPage" size="5" onkeypress="updateFilterButton()" value="${ InitialResultsPerPage }"/>
         </div>
     </div>
 
     <div id="dateFilter" style="padding-top: 10px">
         <div>
-            <% if InitialFromDays: %>
+            % if InitialFromDays: 
                 <% checked1 = '' %>
                 <% checked2 = 'checked' %>
-            <% end %>
-            <% else: %>
+            % else: 
                 <% checked1 = 'checked' %>
                 <% checked2 = '' %>
-            <% end %>
-            <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked1 %> />
-            <%= _("Since")%> <span id="sinceDateContainer"></span>
-            <%= _("to")%> <span id="toDateContainer"></span>
-            <span class="CAMinMaxKeySuggestion"><%= _("Please input dates") %></span>
+            % endif
+            <input type="radio" name="dateFilterType" id="sinceToDateRadio" onclick="updateDateFilterType()" class="CARadio" ${ checked1 } />
+            ${ _("Since")} <span id="sinceDateContainer"></span>
+            ${ _("to")} <span id="toDateContainer"></span>
+            <span class="CAMinMaxKeySuggestion">${ _("Please input dates") }</span>
         </div>
         <div style="padding-top: 5px">
-            <input type="radio" name="dateFilterType" id="fromToDaysRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked2 %> />
-            <%= _("From")%> <input type="text" size="3" id="fromDays" onkeypress="updateFilterButton()" value="<%= InitialFromDays %>"/>
-            <%= _("days ago to")%> <input type="text" size="3" id="toDays" onkeypress="updateFilterButton()" value="<%= InitialToDays %>"/>
-            <%= _("days in the future") %>
-            <span class="CAMinMaxKeySuggestion"><%= _("Please input integers") %></span>
+            <input type="radio" name="dateFilterType" id="fromToDaysRadio" onclick="updateDateFilterType()" class="CARadio" ${ checked2 } />
+            ${ _("From")} <input type="text" size="3" id="fromDays" onkeypress="updateFilterButton()" value="${ InitialFromDays }"/>
+            ${ _("days ago to")} <input type="text" size="3" id="toDays" onkeypress="updateFilterButton()" value="${ InitialToDays }"/>
+            ${ _("days in the future") }
+            <span class="CAMinMaxKeySuggestion">${ _("Please input integers") }</span>
         </div>
     </div>
     <div id="titleFilter" style="padding-top: 10px">
         <div>
-            <%= _("From")%> <input type="text" size="16" id="fromTitle" onkeypress="updateFilterButton()" value="<%= InitialFromTitle %>"/>
-            <%= _("to")%> <input type="text" size="16" id="toTitle" onkeypress="updateFilterButton()" value="<%= InitialToTitle %>"/>
-            <span class="CAMinMaxKeySuggestion"><%= _("Please input a conference title or the beginning of it") %></span>
+            ${ _("From")} <input type="text" size="16" id="fromTitle" onkeypress="updateFilterButton()" value="${ InitialFromTitle }"/>
+            ${ _("to")} <input type="text" size="16" id="toTitle" onkeypress="updateFilterButton()" value="${ InitialToTitle }"/>
+            <span class="CAMinMaxKeySuggestion">${ _("Please input a conference title or the beginning of it") }</span>
         </div>
     </div>
 
     <div style="padding-top: 10px">
-        <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="refresh()"/>
+        <input type="button" id="filterButton" value="${ _("Refresh")}" onclick="refresh()"/>
     </div>
 </div>
 
 <div class="CADiv">
     <div class="CAOrderByDiv">
-        <span class="CAViewBySpan"><%= _("Order:")%> </span>
-        <a class="CAViewByLink" id="ascendingViewBy" onclick="orderByObs('ascending')"><%= _("Ascending")%></a>
-        <a class="CAViewByLink" id="descendingViewBy" onclick="orderByObs('descending')" ><%= _("Descending")%></a>
+        <span class="CAViewBySpan">${ _("Order:")} </span>
+        <a class="CAViewByLink" id="ascendingViewBy" onclick="orderByObs('ascending')">${ _("Ascending")}</a>
+        <a class="CAViewByLink" id="descendingViewBy" onclick="orderByObs('descending')" >${ _("Descending")}</a>
     </div>
     <div class="CAViewByDiv">
-        <span class="CAViewBySpan"><%= _("View by:")%> </span>
-        <a class="CAViewByLink" id="conferenceTitleViewBy" onclick="viewByObs('conferenceTitle')"><%= _("Event Title")%></a>
-        <a class="CAViewByLink" id="conferenceStartDateViewBy" onclick="viewByObs('conferenceStartDate')"><%= _("Event Start Date")%></a>
-        <a class="CAViewByLink" id="creationDateViewBy" onclick="viewByObs('creationDate')"><%= _("Creation Date")%></a>
-        <a class="CAViewByLink" id="modificationDateViewBy" onclick="viewByObs('modificationDate')"><%= _("Modification Date")%></a>
-        <a class="CAViewByLink" id="startDateViewBy" onclick="viewByObs('startDate')"><%= _("Start Date")%></a>
+        <span class="CAViewBySpan">${ _("View by:")} </span>
+        <a class="CAViewByLink" id="conferenceTitleViewBy" onclick="viewByObs('conferenceTitle')">${ _("Event Title")}</a>
+        <a class="CAViewByLink" id="conferenceStartDateViewBy" onclick="viewByObs('conferenceStartDate')">${ _("Event Start Date")}</a>
+        <a class="CAViewByLink" id="creationDateViewBy" onclick="viewByObs('creationDate')">${ _("Creation Date")}</a>
+        <a class="CAViewByLink" id="modificationDateViewBy" onclick="viewByObs('modificationDate')">${ _("Modification Date")}</a>
+        <a class="CAViewByLink" id="startDateViewBy" onclick="viewByObs('startDate')">${ _("Start Date")}</a>
     </div>
 
     <div class="CAInfoDiv">
         <div class="CATypesDiv">
-            <%= _("This list can have bookings of the following type(s):")%> <span class="pluginNames" id="indexPluginTypes"></span>
+            ${ _("This list can have bookings of the following type(s):")} <span class="pluginNames" id="indexPluginTypes"></span>
         </div>
 
         <div class="CAStaticURLDiv">
-            <a class="CAStaticURLSwitch" onclick="staticURLSwitch()"><%= _("Static URL for this result")%></a> <%= _("(Use it for bookmarks)")%><br />
+            <a class="CAStaticURLSwitch" onclick="staticURLSwitch()">${ _("Static URL for this result")}</a> ${ _("(Use it for bookmarks)")}<br />
             <input type="text" id="staticURL" style="width: 50%; display: none; margin-top: 5px;"/>
-            <a id="staticURLLink" style="display: none;  margin-left: 5px;" href="<%= BaseURL %>"><%= _("Go to URL")%></a>
+            <a id="staticURLLink" style="display: none;  margin-left: 5px;" href="${ BaseURL }">${ _("Go to URL")}</a>
         </div>
     </div>
 </div>
 
 <div>
     <div class = "CAResultsDiv">
-        <span id="resultsMessage"><%= _("(Results will appear here)")%></span>
+        <span id="resultsMessage">${ _("(Results will appear here)")}</span>
         <div id="resultsInfo" style="display:none;">
             <div class="CATotalInIndexDiv">
-                <span id="totalInIndex"></span><span>&nbsp;<%= _("bookings in this index.") %></span>
+                <span id="totalInIndex"></span><span>&nbsp;${ _("bookings in this index.") }</span>
             </div>
             <div class="CANResultsDiv">
-                <span>Query returned&nbsp;</span><span id="nBookings"></span><span>&nbsp;<%= _("bookings.") %></span>
+                <span>Query returned&nbsp;</span><span id="nBookings"></span><span>&nbsp;${ _("bookings.") }</span>
             </div>
         </div>
         <table cellpadding="0" cellspacing="0" class="CAResultsTable" id ="results">
@@ -129,38 +126,38 @@
 </div>
 <script type="text/javascript">
 
-var bookings = <%= jsonEncode (InitialBookings) %>;
-var nBookings = <%= InitialNumberOfBookings %>
-var totalInIndex = <%= InitialTotalInIndex %>
-var nPages = <%= InitialNumberOfPages %>;
+var bookings = ${ jsonEncode (InitialBookings) };
+var nBookings = ${ InitialNumberOfBookings }
+var totalInIndex = ${ InitialTotalInIndex }
+var nPages = ${ InitialNumberOfPages };
 
-var indexNames = <%=[index.getName() for index in Indexes]%>;
-var indexInformation = <%= jsonEncode(IndexInformation)%>;
+var indexNames = ${[index.getName() for index in Indexes]};
+var indexInformation = ${ jsonEncode(IndexInformation)};
 var viewBy = ['conferenceTitle','conferenceStartDate', 'creationDate','modificationDate','startDate'];
 
 var queryParams = {
     indexName: '',
-    showOnlyPending: <%= jsonEncode(InitialOnlyPending) %>,
+    showOnlyPending: ${ jsonEncode(InitialOnlyPending) },
     filterByOnlyPending: true,
-    conferenceId: '<%= InitialConferenceId %>',
-    categoryId: '<%= InitialCategoryId %>',
-    sinceDate: '<%= InitialSinceDate %>',
-    toDate: '<%= InitialToDate %>',
-    fromDays: '<%= InitialFromDays %>',
-    toDays: '<%= InitialToDays %>',
-    fromTitle: '<%= InitialFromTitle %>',
-    toTitle: '<%= InitialToTitle %>',
+    conferenceId: '${ InitialConferenceId }',
+    categoryId: '${ InitialCategoryId }',
+    sinceDate: '${ InitialSinceDate }',
+    toDate: '${ InitialToDate }',
+    fromDays: '${ InitialFromDays }',
+    toDays: '${ InitialToDays }',
+    fromTitle: '${ InitialFromTitle }',
+    toTitle: '${ InitialToTitle }',
     viewBy: '',
     orderBy: '',
-    resultsPerPage: '<%= InitialResultsPerPage %>',
-    page: '<%= InitialPage %>'
+    resultsPerPage: '${ InitialResultsPerPage }',
+    page: '${ InitialPage }'
 }
 
 var dateParameterManager = new IndicoUtil.parameterManager();
 var resultsPerPageParameterManager = new IndicoUtil.parameterManager();
 
 var codes = {
-<%= ",\n". join(['"' + pluginName + '" \x3a ' + code for pluginName, code in JSCodes.items()]) %>
+${ ",\n". join(['"' + pluginName + '" \x3a ' + code for pluginName, code in JSCodes.items()]) }
 }
 
 var buildIndexTooltips = function() {
@@ -224,7 +221,7 @@ var viewByObs = function(viewBySelected, firstTime) {
         if (viewBySelected == name) {
             $E(name + 'ViewBy').dom.className = "CAViewBySelected";
         } else {
-        	$E(name + 'ViewBy').dom.className = "CAViewByUnselected";
+            $E(name + 'ViewBy').dom.className = "CAViewByUnselected";
         }
     }
 
@@ -289,7 +286,7 @@ var orderByObs = function(orderBySelected, firstTime) {
 }
 
 var confIdObs = function() {
-	$E('categoryId').dom.disabled = ($E('conferenceId').get() != '')
+    $E('categoryId').dom.disabled = ($E('conferenceId').get() != '')
 }
 
 var updateFilterButton = function() {
@@ -386,7 +383,7 @@ var query = function() {
 }
 
 var updateStaticURL = function() {
-    var url = '<%= BaseURL %>' +
+    var url = '${ BaseURL }' +
               '?queryOnLoad=true' +
               '&page=' + queryParams.page +
               '&resultsPerPage=' + queryParams.resultsPerPage +
@@ -563,29 +560,29 @@ var pageSelectedHandler = function(page) {
     query();
 }
 
-var pf = new PageFooter('<%= InitialNumberOfPages %>', '<%= InitialPage %>', 4, pageSelectedHandler)
+var pf = new PageFooter('${ InitialNumberOfPages }', '${ InitialPage }', 4, pageSelectedHandler)
 
 IndicoUI.executeOnLoad(function(){
 
     var sinceDate = IndicoUI.Widgets.Generic.dateField(true, {id:'sinceDate'});
     $E('sinceDateContainer').set(sinceDate);
-    sinceDate.set(<%= InitialSinceDate %>);
+    sinceDate.set(${ InitialSinceDate });
     sinceDate.observeEvent("keypress", function (e) { updateFilterButton(); });
     var toDate = IndicoUI.Widgets.Generic.dateField(true, {id:'toDate'});
     $E('toDateContainer').set(toDate);
-    toDate.set(<%= InitialToDate %>);
+    toDate.set(${ InitialToDate });
     toDate.observeEvent("keypress", function (e) { updateFilterButton(); });
 
     buildIndexTooltips();
     confIdObs();
-    viewByObs('<%=InitialViewBy %>', true);
+    viewByObs('${InitialViewBy }', true);
     updateDateFilterType();
-    <% if InitialOrderBy: %>
-        orderByObs('<%= InitialOrderBy %>', true);
-    <% end %>
-    <% if InitialIndex: %>
-        indexSelectedObs('<%= InitialIndex %>', true);
-    <% end %>
+    % if InitialOrderBy: 
+        orderByObs('${ InitialOrderBy }', true);
+    % endif
+    % if InitialIndex: 
+        indexSelectedObs('${ InitialIndex }', true);
+    % endif
     updateStaticURL();
 
     $E('pageNumberList').set(pf.draw());

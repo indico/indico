@@ -1,20 +1,20 @@
 <tr>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        <%= id %>
+        ${ id }
     </td>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        <%= startDate %>
+        ${ startDate }
     </td>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        <%= duration %>
+        ${ duration }
     </td>
     <td nowrap align="right" valign="top" style="border-bottom: 1px solid grey">
-        <%= type %>
+        ${ type }
     </td>
     <td width="100%" valign="top" style="border-bottom: 1px solid grey">
-        <a href=<%= displayURL %>><%= title %></a>
+        <a href=${ displayURL }>${ title }</a>
     </td>
     <td valign="top" nowrap style="border-bottom: 1px solid grey">
-       <%= speakers %>
+       ${ speakers }
     </td>
 </tr>

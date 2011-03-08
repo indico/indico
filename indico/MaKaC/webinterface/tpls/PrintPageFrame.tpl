@@ -1,4 +1,4 @@
-<%= content %>
+${ content }
 
 <style type="text/css">
 

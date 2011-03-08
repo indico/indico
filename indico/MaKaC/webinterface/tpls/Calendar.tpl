@@ -83,11 +83,11 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
 <div class="container">
     <div class="categoryHeader">
         <ul>
-            <li><a href="<%= categDisplayURL %>"><%= _("Go back to category page") %></a></li>
+            <li><a href="${ categDisplayURL }">${ _("Go back to category page") }</a></li>
         </ul>
         <h1 class="categoryTitle">
-            <%= categoryTitle %>&nbsp;
-            <span style="font-style: italic; font-size: 0.8em;">(<%= _("calendar overview") %>)</span>
+            ${ categoryTitle }&nbsp;
+            <span style="font-style: italic; font-size: 0.8em;">(${ _("calendar overview") })</span>
         </h1>
     </div>
 
@@ -99,13 +99,13 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
         <div class="rightCorner"></div>
         <div class="content clearfix">
 
-            <h1><%= _("Options") %></h1>
-                <form action="<%= changeMonthsURL %>" method="GET" id="calendarOptionsForm">
+            <h1>${ _("Options") }</h1>
+                <form action="${ changeMonthsURL }" method="GET" id="calendarOptionsForm">
                 <table style="margin: 10px 0 10px 20px; padding: 0; border: none;">
                 <tbody>
-                    <%= locatorNoMonth %>
+                    ${ locatorNoMonth }
                     <tr>
-                        <td><%= _("Number of months")%>:<td>
+                        <td>${ _("Number of months")}:<td>
                         <td>
                             <select name="months" style="min-width: 50px;">
                                 <option>1</option>
@@ -124,7 +124,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                         </td>
                     </tr>
                     <tr>
-                        <td><%= _("Starting month")%>:<td>
+                        <td>${ _("Starting month")}:<td>
                         <td nowrap="nowrap">
                             <select name="month" style="min-width: 50px;">
                                 <option>1</option>
@@ -162,7 +162,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                         </td>
                     </tr>
                     <tr>
-                        <td nowrap="nowrap"><%= _("Number of columns")%>:<td>
+                        <td nowrap="nowrap">${ _("Number of columns")}:<td>
                         <td>
                             <select name="columns" style="min-width: 50px;">
                                 <option>1</option>
@@ -178,28 +178,28 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                 </table>
 
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <input type="submit" class="btn" value="<%= _("apply")%>">
+                    <input type="submit" class="btn" value="${ _("apply")}">
                 </div>
                 </form>
                 <script type="text/javascript">
 
                 var calendarOptionsForm = $E("calendarOptionsForm");
 
-                calendarOptionsForm.dom.months.selectedIndex=<%= selectedmonths %>-1;
-                calendarOptionsForm.dom.columns.selectedIndex=<%= selectedcolumns %>-1;
-                calendarOptionsForm.dom.month.selectedIndex=<%= selectedmonth %>-1;
-                calendarOptionsForm.dom.year.selectedIndex=2012-<%= selectedyear %>;
+                calendarOptionsForm.dom.months.selectedIndex=${ selectedmonths }-1;
+                calendarOptionsForm.dom.columns.selectedIndex=${ selectedcolumns }-1;
+                calendarOptionsForm.dom.month.selectedIndex=${ selectedmonth }-1;
+                calendarOptionsForm.dom.year.selectedIndex=2012-${ selectedyear };
 
                 </script>
 
 
-            <h1><%= _("Color legend") %></h1>
+            <h1>${ _("Color legend") }</h1>
             <div class="calendarColorLegend clearfix">
-                <%= legend %>
+                ${ legend }
                 <div>
-                    <form action="<%= selCategsURL %>" method="POST" style="margin-top: 10px;">
-                        <%= locator %>
-                        <input type="submit" class="btn" value="<%= _("change")%>">
+                    <form action="${ selCategsURL }" method="POST" style="margin-top: 10px;">
+                        ${ locator }
+                        <input type="submit" class="btn" value="${ _("change")}">
                     </form>
                 </div>
             </div>
@@ -210,7 +210,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
     <td valign="top">
     <div style="margin-top: 20px; margin-left: 30px;">
         <table cellspacing="10" align="center" width="100%">
-            <%= calendar %>
+            ${ calendar }
         </table>
     </div>
     </td>

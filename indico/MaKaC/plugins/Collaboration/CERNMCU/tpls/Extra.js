@@ -8,9 +8,9 @@ var disableCustomId = function() {
 
 var pf = null; //place where to keep a ParticipantListField object to access later
 
-<% if RoomsWithH323IP: %>
-var existingRoomData = <%= jsonEncode(fossilize(RoomsWithH323IP)) %>;
-<% end %>
+% if RoomsWithH323IP: 
+var existingRoomData = ${ jsonEncode(fossilize(RoomsWithH323IP)) };
+% endif
 
 type("WithProtocolLinePopup", ["ExclusivePopupWithButtons"], {
 
@@ -438,7 +438,7 @@ type("ParticipantListField", ["IWidget"],
                 popup.open();
             });
 
-            <% if RoomsWithH323IP: %>
+            % if RoomsWithH323IP: 
 
                 var addExistingRoomButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Existing Rooms'));
 
@@ -453,16 +453,15 @@ type("ParticipantListField", ["IWidget"],
                     popup.open();
                 });
 
-            <% end %>
+            % endif
 
-            <% if RoomsWithH323IP: %>
+            % if RoomsWithH323IP: 
                 var buttonDiv1 = Html.div({}, addExistingRoomButton, addNewRoomButton);
                 var buttonDiv2 = Html.div({}, addExistingPersonButton, addNewPersonButton);
                 var buttonDiv = Html.div({style:{marginTop: pixels(10)}}, buttonDiv1, buttonDiv2);
-            <% end %>
-            <% else: %>
+            % else: 
                 var buttonDiv = Html.div({}, Html.div({}, addExistingPersonButton, addNewPersonButton, addNewRoomButton));
-            <% end %>
+            % endif
 
             return this.IWidget.prototype.draw.call(this,
                 Widget.block([Html.div("CERNMCUParticipantsDiv", this.participantList.draw()), buttonDiv])
@@ -493,7 +492,7 @@ type("CERNMCUBuildParticipantsInfo", ["IWidget"], {
             {
                 plugin: 'CERNMCU',
                 service: 'ConnectParticipant',
-                conference: '<%= ConferenceId %>',
+                conference: '${ ConferenceId }',
                 booking: self.booking.id,
                 participantId: participant.get("participantId")
             },
@@ -519,7 +518,7 @@ type("CERNMCUBuildParticipantsInfo", ["IWidget"], {
             {
                 plugin: 'CERNMCU',
                 service: 'DisconnectParticipant',
-                conference: '<%= ConferenceId %>',
+                conference: '${ ConferenceId }',
                 booking: self.booking.id,
                 participantId: participant.get("participantId")
             },

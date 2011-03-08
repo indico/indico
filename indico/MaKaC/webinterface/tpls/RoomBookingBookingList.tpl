@@ -8,18 +8,20 @@
                     <tr>
                         <td class="maincell">
                             <span class="formTitle" style="border-bottom-width: 0px">
-                            <% if not title: %>
+                            % if not title:
                                 <!-- Generic title -->
-                                <%= len( reservations ) %>  <%= " " + _("Booking(s) found")%>:
-                            <% end %>
-                            <% if title: %>
-                                <%= title + " (" + str(len(reservations)) + ")" %>:
-                            <% end %>
+                                ${ len( reservations ) } ${ _("Booking(s) found")}:
+                            % endif
+                            % if title:
+                                ${ title + " (" + str(len(reservations)) + ")" }:
+                            % endif
                             </span>
-                            <% if prebookingsRejected: %>
-                                <span class="actionSucceeded"><%= subtitle %></span>
-                                <p style="margin-left: 6px;"><%= description %></p>
-                            <% end %>
+
+                            % if prebookingsRejected:
+                                <br /><br />
+                                <span class="actionSucceeded">${ subtitle }</span>
+                                <p style="margin-left: 6px;">${ description }</p>
+                            % endif
                             <div style="margin: 12px 0px 16px 0px;" id="roomBookingCal"></div>
                         </td>
                     </tr>
@@ -30,10 +32,10 @@
     <br />
 
     <script type="text/javascript">
-    var roomBookingCalendar = new RoomBookingCalendar(<%= barsFossil %>, <%= str(overload).lower() %>,
-            {"prevURL" : "<%= prevURL %>", "nextURL" : "<%= nextURL %>", "formUrl" : "<%= calendarFormUrl %>",
-            "startD" : "<%= startD %>", "endD" : "<%= endD %>", "periodName" : "<%= periodName %>",
-            "params" : <%= calendarParams %>}, <%= str(manyRooms).lower() %>
-            <% if showRejectAllButton: %>,"<%= urlHandlers.UHRoomBookingRejectAllConflicting.getURL() %>"<% end %>);
+    var roomBookingCalendar = new RoomBookingCalendar(${ barsFossil }, ${ str(overload).lower() },
+            {"prevURL" : "${ prevURL }", "nextURL" : "${ nextURL }", "formUrl" : "${ calendarFormUrl }",
+            "startD" : "${ startD }", "endD" : "${ endD }", "periodName" : "${ periodName }",
+            "params" : ${ calendarParams }}, ${ str(manyRooms).lower() }
+            ${',"' + urlHandlers.UHRoomBookingRejectAllConflicting.getURL() + '"' if showRejectAllButton else ""} );
     $E("roomBookingCal").set(roomBookingCalendar.draw());
     </script>

@@ -1,10 +1,10 @@
-<%!
-location = self._conf.getLocation()
-room = self._conf.getRoom()
+<%
+location = self_._conf.getLocation()
+room = self_._conf.getRoom()
 
 if location:
     locationName = location.getName()
-    address = self._conf.getLocation().getAddress().replace('\r\n','\\n').replace('\n','\\n')
+    address = self_._conf.getLocation().getAddress().replace('\r\n','\n').replace('\n','\n')
 else:
     locationName = 'None'
     address = ''
@@ -16,15 +16,15 @@ else:
 
 %>
 
-<form action=<%= quickSearchURL %> method="POST">
-    <span class="titleCellFormat"> <%= _("Quick search: contribution ID")%></span> <input type="text" name="selContrib"><input type="submit" class="btn" value="<%= _("seek it")%>">
+<form action=${ quickSearchURL } method="POST">
+    <span class="titleCellFormat"> ${ _("Quick search: contribution ID")}</span> <input type="text" name="selContrib"><input type="submit" class="btn" value="${ _("seek it")}">
 </form>
 <br>
 
 <script type="text/javascript">
 <!--
 
-    <% includeTpl("ListJSHelpers") %>
+    <%include file="ListJSHelpers.tpl"/>
 
     window.onload = function(){
         isSelected("contribsItems");
@@ -64,34 +64,32 @@ else:
 <table width="100%" cellspacing="0" align="center" border="0" style="padding-left:2px">
      <tr>
        <td nowrap colspan="10">
-            <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> <%= numContribs %> </strong>
-            <% if numContribs == "1": %>
-                <%= _("contribution")%>
-            <% end %>
-            <% else: %>
-                <%= _("contributions")%>
-            <% end %>
-            <% if filterUsed: %>
-                (<%= _("Total")%>: <strong><%= totalNumContribs %></strong>)
-            <% end %>
+            <div class="CRLgroupTitleNoBorder">${ _("Displaying")}<strong> ${ numContribs } </strong>
+            % if numContribs == "1": 
+                ${ _("contribution")}
+            % else: 
+                ${ _("contributions")}
+            % endif
+            % if filterUsed: 
+                (${ _("Total")}: <strong>${ totalNumContribs }</strong>)
+            % endif
         </div>
-        <form action=<%= filterPostURL %> method="post" name="optionForm">
+        <form action=${ filterPostURL } method="post" name="optionForm">
         <div class="CRLIndexList" >
-            <% if filterUsed: %>
+            % if filterUsed: 
                 <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                 <span style="padding: 0px 6px 0px 6px">|</span>
-            <% end %>
+            % endif
             <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
-              <% if filterUsed: %>
-                <%= _("Show filters")%>
-              <% end %>
-              <% else: %>
-                <%= _("Apply filters")%>
-              <% end %>
+              % if filterUsed: 
+                ${ _("Show filters")}
+              % else: 
+                ${ _("Apply filters")}
+              % endif
             </a>
             <span style="padding: 0px 6px 0px 6px">|</span>
             <a id="index_display" onclick="staticURLSwitch()" class="CAIndexUnselected" font-size="16">
-                <%= _("Static URL for this result")%>
+                ${ _("Static URL for this result")}
             </a>
         </div>
         </form>
@@ -99,17 +97,17 @@ else:
      </tr>
      <tr>
         <td colspan="1000" align="left" width="100%">
-          <form action=<%= filterPostURL %> method="post" name="filterOptionForm">
+          <form action=${ filterPostURL } method="post" name="filterOptionForm">
             <input type="hidden" name="operationType" value="filter" />
-            <%= filterMenu %>
-            <%= sortingOptions %>
+            ${ filterMenu }
+            ${ sortingOptions }
           </form>
         </td>
     </tr>
     <tr>
         <td colspan="1000" align="left" width="100%">
-            <input type="text" id="staticURL" size="74" style="display: none;" readonly="readonly" value="<%= filterUrl %>" />
-            <a id="staticURLLink" style="display: none; margin-left: 5px;" href="<%= filterUrl %>"><%= _("Go to URL")%></a>
+            <input type="text" id="staticURL" size="74" style="display: none;" readonly="readonly" value="${ filterUrl }" />
+            <a id="staticURLLink" style="display: none; margin-left: 5px;" href="${ filterUrl }">${ _("Go to URL")}</a>
         </td>
     </tr>
     <tr>
@@ -117,30 +115,30 @@ else:
             <table>
                 <tbody>
                         <td>
-                          <form action="<%= newContribURL %>" method="POST" style="padding:0px;margin:0px; display:inline">
+                          <form action="${ newContribURL }" method="POST" style="padding:0px;margin:0px; display:inline">
                             <input type="hidden" name="contributionCreatedFrom" value="contributionList"/>
-                            <input type="button" onclick="addContribution()" class="btn" name="" value="<%= _("Add new")%>">
+                            <input type="button" onclick="addContribution()" class="btn" name="" value="${ _("Add new")}">
                           </form>
                         </td>
-                        <form action=<%= contribSelectionAction %> method="post" name="contribsForm" onsubmit="return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));">
+                        <form action=${ contribSelectionAction } method="post" name="contribsForm" onsubmit="return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));">
 
                         <td valign="bottom" align="left" class="eventModifButtonBar">
-                           <input type="submit" class="btn" name="move" value="<%= _("Move")%>">
+                           <input type="submit" class="btn" name="move" value="${ _("Move")}">
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="AUTH" value="<%= _("Author list")%>">
+                            <input type="submit" class="btn" name="AUTH" value="${ _("Author list")}">
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="PKG" value="<%= _("Material package")%>">
+                            <input type="submit" class="btn" name="PKG" value="${ _("Material package")}">
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="submit" class="btn" name="PROC" value="<%= _("Proceedings")%>">
+                            <input type="submit" class="btn" name="PROC" value="${ _("Proceedings")}">
                         </td>
                         <td valign="bottom" align="left">
-                          Export to:
+                          ${ _("Export to:") }
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="image" src=<%= pdfIconURL%> class="btn" name="PDF" value="<%= _("Create PDF")%>" onclick='this.form.action=<%= contributionsPDFURL %>;this.form.target="_blank";'>
+                            <input type="image" src=${ pdfIconURL} class="btn" name="PDF" value="${ _("Create PDF")}" onclick='this.form.action=${ contributionsPDFURL };this.form.target="_blank";'>
                         </td>
                 </tbody>
             </table>
@@ -159,45 +157,45 @@ else:
             </tr>
             <tr>
               <td></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= numberImg %><a href=<%= numberSortingURL %>> <%= _("Id")%></a></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= dateImg %><a href=<%= dateSortingURL %>> <%= _("Date")%></a></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= _("Duration")%></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= typeImg %><a href=<%= typeSortingURL %>> <%= _("Type")%></a></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= titleImg %><a href=<%= titleSortingURL %>> <%= _("Title")%></a></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= speakerImg %><a href=<%= speakerSortingURL %>> <%= _("Presenter")%></a></a></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= sessionImg %><a href=<%= sessionSortingURL %>> <%= _("Session")%></a></td>
-              <td nowrap class="titleCellFormat" style="Border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"><%= trackImg %><a href=<%= trackSortingURL %>> <%= _("Track")%></a></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> <%= _("Status")%></td>
-              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> <%= _("Material")%></td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ numberImg }<a href=${ numberSortingURL }> ${ _("Id")}</a></td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ dateImg }<a href=${ dateSortingURL }> ${ _("Date")}</a></td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ _("Duration")}</td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ typeImg }<a href=${ typeSortingURL }> ${ _("Type")}</a></td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ titleImg }<a href=${ titleSortingURL }> ${ _("Title")}</a></td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ speakerImg }<a href=${ speakerSortingURL }> ${ _("Presenter")}</a></a></td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ sessionImg }<a href=${ sessionSortingURL }> ${ _("Session")}</a></td>
+              <td nowrap class="titleCellFormat" style="Border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">${ trackImg }<a href=${ trackSortingURL }> ${ _("Track")}</a></td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> ${ _("Status")}</td>
+              <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> ${ _("Material")}</td>
             </tr>
           </thead>
           <tbody id="contribsItems">
-            <%= contributions %>
+            ${ contributions }
           </tbody>
           <tbody>
-            <tr><td style="padding-top: 3px; border-top: 2px solid #777777;" colspan="11" align="center"><font color="black"> <%= _("Total duration of displayed contributions")%>: <b><%= totaldur %></b></font></td></tr>
+            <tr><td style="padding-top: 3px; border-top: 2px solid #777777;" colspan="11" align="center"><font color="black"> ${ _("Total duration of displayed contributions")}: <b>${ totaldur }</b></font></td></tr>
 
             <tr>
                 <td colspan="40" valign="bottom" align="left">
                     <table>
                         <tbody>
                                 <td valign="bottom" align="left" class="eventModifButtonBar">
-                                    <input type="submit" class="btn" name="move" value="<%= _("Move")%>">
+                                    <input type="submit" class="btn" name="move" value="${ _("Move")}">
                                 </td>
                                 <td valign="bottom" align="left">
-                                    <input type="submit" class="btn" name="AUTH" value="<%= _("Author list")%>">
+                                    <input type="submit" class="btn" name="AUTH" value="${ _("Author list")}">
                                 </td>
                                 <td valign="bottom" align="left">
-                                    <input type="submit" class="btn" name="PKG" value="<%= _("Material package")%>">
+                                    <input type="submit" class="btn" name="PKG" value="${ _("Material package")}">
                                 </td>
                                 <td valign="bottom" align="left">
-                                    <input type="submit" class="btn" name="PROC" value="<%= _("Proceedings")%>">
+                                    <input type="submit" class="btn" name="PROC" value="${ _("Proceedings")}">
                                 </td>
                                 <td valign="bottom" align="left">
-                                  Export to:
+                                   ${ _("Export to:") }
                                 </td>
-                                <td valign="bottom" align="left">
-                                    <input type="image" src=<%= pdfIconURL%> class="btn" name="PDF" value="<%= _("Create PDF")%>" onclick='this.form.action=<%= contributionsPDFURL %>;this.form.target="_blank";'>
+                                <td valign="bottom " align="left">
+                                    <input type="image" src=${ pdfIconURL} class="btn" name="PDF" value="${ _("Create PDF")}" onclick='this.form.action=${ contributionsPDFURL };this.form.target="_blank";'>
                                 </td>
                         </tbody>
                     </table>
@@ -212,43 +210,42 @@ else:
 <script type="text/javascript">
     function showFilters() {
         if ($E("filterMenu").dom.style.display == "") {
-<% if filterUsed: %>
-            $E("index_filter").set('<%= _("Show filters")%>');
-<% end %>
-<% else: %>
-            $E("index_filter").set('<%= _("Apply filters")%>');
-<% end %>
+% if filterUsed: 
+            $E("index_filter").set('${ _("Show filters")}');
+% else: 
+            $E("index_filter").set('${ _("Apply filters")}');
+% endif
             $E('index_filter').dom.className = "CRLIndexUnselected";
             $E("filterMenu").dom.style.display = "none";
         }else {
-            $E("index_filter").set('<%= _("Hide filters")%>');
+            $E("index_filter").set('${ _("Hide filters")}');
             $E('index_filter').dom.className = "CRLIndexSelected";
             $E("filterMenu").dom.style.display = "";
         }
     }
 
-var parentEventRoomData = $O(<%= jsonEncode(roomInfo(self._rh._target)) %>);
+var parentEventRoomData = $O(${ jsonEncode(roomInfo(self_._rh._target)) });
 
 var addContribution = function() {
     var dialog = new AddNewContributionDialog(
                        'schedule.event.addContribution',
                        null,
-		       <%= jsonEncode({'conference': self._conf.id }) %>,
-		       <%= jsonEncode({'location': locationName,
-		       'room': roomName,
-		       'address': address }) %>,
+               ${ jsonEncode(dict(conference=self_._conf.id)) },
+               ${ jsonEncode(dict(location=locationName,
+                                   room=roomName,
+                                   address=address)) },
                        parentEventRoomData,
                        '',
                        '',
-                       <%= jsBoolean(self._conf.getType() != 'meeting') %>,
+                       ${ jsBoolean(self_._conf.getType() != 'meeting') },
                        [],
                        null,
                        null,
                        function() {
                           window.location.reload();
                        },
-                       <%= jsBoolean(self._conf.getAbstractMgr().isActive()) %>,
-                       <%= bookings %>
+                       ${ jsBoolean(self_._conf.getAbstractMgr().isActive()) },
+                       ${ bookings }
                        );
 
     dialog.execute();

@@ -12,169 +12,158 @@
     <tr>
       <td>
         <table align="center" width="95%" border="0">
-        <%= withdrawnNotice %>
+        ${ withdrawnNotice }
         <tr>
-          <td align="center"><%= modifIcon %><font size="+1" color="black"><b><%= title %></b></font></td>
-	</tr>
+          <td align="center">${ modifIcon }<font size="+1" color="black"><b>${ title }</b></font></td>
+    </tr>
         <tr>
-	  <td width="100%">&nbsp;<td>
-	</tr>
-        <%
-          if not self._rh._target.getConference().getAbstractMgr().isActive() or not self._rh._target.getConference().hasEnabledSection("cfa") or not self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-        %>
-	<tr>
-	  <td>
+      <td width="100%">&nbsp;<td>
+    </tr>
+        % if not self_._rh._target.getConference().getAbstractMgr().isActive() or not self_._rh._target.getConference().hasEnabledSection("cfa") or not self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField(): 
+    <tr>
+      <td>
             <table align="center">
             <tr>
-              <td><%= description %></td>
+              <td>${ description }</td>
             </tr>
             </table>
           </td>
         </tr>
         <tr>
-	  <td width="100%">&nbsp;<td>
-	</tr>
-    <%end%>
-	<tr>
-	  <td>
+      <td width="100%">&nbsp;<td>
+    </tr>
+    % endif
+    <tr>
+      <td>
             <table align="center" width="95%">
                 <tr>
                 <td colspan="2">
-                <% if hideInfo: %>
+                % if hideInfo: 
                     <% display = '' %>
-                <% end %>
-                <% else: %>
+                % else: 
                     <% display = 'none' %>
-                <% end %>
-                <div align="center" style="display:<%=display%>">
-                    <span id="hideContributionFull" class="collaborationDisplayMoreInfo" onclick="showGeneralInfo();"><%= _("Show general info")%></span>
+                % endif
+                <div align="center" style="display:${display}">
+                    <span id="hideContributionFull" class="collaborationDisplayMoreInfo" onclick="showGeneralInfo();">${ _("Show general info")}</span>
                 </div>
-                <% if hideInfo: %>
+                % if hideInfo: 
                     <% display = 'none' %>
-                <% end %>
-                <% else: %>
+                % else: 
                     <% display = '' %>
-                <% end %>
-                <div id="showContributionFull" style="display:<%=display%>">
+                % endif
+                <div id="showContributionFull" style="display:${display}">
                 <table align="center" width="95%">
-                <%
-                if self._rh._target.getConference().getAbstractMgr().isActive() and self._rh._target.getConference().hasEnabledSection("cfa") and self._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-                %>
-            <%= additionalFields %>
-                <%end%>
-	    <tr>
-	      <td align="right" valign="top" class="displayField"><b><%= _("Id")%>:</b></td>
-              <td><%= id %></td>
+                % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField(): 
+            ${ additionalFields }
+                % endif
+        <tr>
+          <td align="right" valign="top" class="displayField"><b>${ _("Id")}:</b></td>
+              <td>${ id }</td>
             </tr>
-	    <%= location %>
-		    <tr>
-		        <td align="right" valign="top" class="displayField"><b><%= _("Starting date")%>:</b></td>
-			<td width="100%">
-			    <table cellspacing="0" cellpadding="0" align="left">
-			    <tr>
-			        <td align="right"><%= startDate %></td>
-				<td>&nbsp;&nbsp;<%= startTime %></td>
-			    </tr>
-			    </table>
-			</td>
-		    </tr>
-		    <tr>
-		        <td align="right" valign="top" class="displayField"><b><%= _("Duration")%>:</b></td>
-			    <td width="100%"><%= duration %></td>
-		    </tr>
-					<%= contribType %>
-					<%= primaryAuthors %>
-					<%= coAuthors %>
-                    <%= speakers %>
-                    <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
+        ${ location }
+            <tr>
+                <td align="right" valign="top" class="displayField"><b>${ _("Starting date")}:</b></td>
+            <td width="100%">
+                <table cellspacing="0" cellpadding="0" align="left">
+                <tr>
+                    <td align="right">${ startDate }</td>
+                <td>&nbsp;&nbsp;${ startTime }</td>
+                </tr>
+                </table>
+            </td>
+            </tr>
+            <tr>
+                <td align="right" valign="top" class="displayField"><b>${ _("Duration")}:</b></td>
+                <td width="100%">${ duration }</td>
+            </tr>
+                    ${ contribType }
+                    ${ primaryAuthors }
+                    ${ coAuthors }
+                    ${ speakers }
+                    % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw): 
                         <td class="displayField" nowrap="" align="right" valign="top">
-                            <b><%=_("Material")%>:</b>
-                            <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() : %>
-                                <% inlineContextHelp(_('Here you should add the general materials for your contribution. They will not be subject of reviewing.')) %>
-                            <% end %>
+                            <b>${_("Material")}:</b>
+                            % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() : 
+                                ${inlineContextHelp(_('Here you should add the general materials for your contribution. They will not be subject of reviewing.'))}
+                            % endif
                         </td>
                         <td width="100%" valign="top" style="padding-top:5px;">
-                            <%=MaterialList%>
+                            ${MaterialList}
                         </td>
-                    <% end %>
-                    <% else: %>
-                        <%= material %>
-                    <% end %>
-                    <%= inSession %>
-                    <%= inTrack %>
-                    <%= subConts %>
-                    <% if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() : %>
-                        <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
+                    % else: 
+                        ${ material }
+                    % endif
+                    ${ inSession }
+                    ${ inTrack }
+                    ${ subConts }
+                    % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() : 
+                        % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw): 
                         </table>
                         </div>
                         </td>
                         </tr>
                         <tr><td align="right" valign="top" class="displayField" nowrap>
-                                <b><%=_("Reviewing material")%>:</b>
-                                <% inlineContextHelp(_('Here you should add the materials for reviewing. They will be judged by the reviewing team.')) %>
+                                <b>${_("Reviewing material")}:</b>
+                                ${inlineContextHelp(_('Here you should add the materials for reviewing. They will be judged by the reviewing team.'))}
                             </td>
                             <td>
-                                <%=ReviewingMatList%>
+                                ${ReviewingMatList}
                             </td>
                         </tr>
-                            <% if Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): %>
+                            % if Contribution.getReviewManager().getLastReview().isAuthorSubmitted(): 
                                     <tr>
-		                            <td align="right" valign="top" class="displayField" nowrap>
-		                                <b><%=_("Reviewing status")%>:</b>
-		                            </td>
+                                    <td align="right" valign="top" class="displayField" nowrap>
+                                        <b>${_("Reviewing status")}:</b>
+                                    </td>
                                     <td style="border-left:5px solid #FFFFFF;">
-                                        <%= "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) %>
+                                        ${ "<br>".join(Contribution.getReviewManager().getLastReview().getReviewingStatus(forAuthor = True)) }
                                     </td>
                                 </tr>
-                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING: %>
-                                    <% if not Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():%>
+                                % if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING: 
+                                    % if not Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
                                         <% display = 'table' %>
-                                    <% end %>
-                                    <% else: %>
+                                    % else: 
                                         <% display = 'none' %>
-                                    <% end %>
-                                <% end %>
-                                <% if Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING: %>
-                                    <% if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): %>
+                                    % endif
+                                % endif
+                                % if Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING: 
+                                    % if not (Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): 
                                         <% display = 'table' %>
-                                    <% end %>
-                                    <% else: %>
+                                    % else: 
                                         <% display = 'none' %>
-                                    <% end %>
-                                <% end %>
-                                <% if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING: %>
-                                    <% if Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): %>
+                                    % endif
+                                % endif
+                                % if  Contribution.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING: 
+                                    % if Contribution.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or Contribution.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or Contribution.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): 
                                         <% display = 'none' %>
-                                    <% end %>
-                                    <% else: %>
+                                    % else: 
                                         <% display = 'table' %>
-                                    <% end %>
-                                <% end %>
-                          <% end %>
-                          <% else: %>
+                                    % endif
+                                % endif
+                          % else: 
                             <tr>
                                 <td></td>
                                 <td>
 
                                 </td>
                             </tr>
-                          <% end %>
-                      <% if len(Contribution.getReviewManager().getVersioning()) > 1: %>
+                          % endif
+                      % if len(Contribution.getReviewManager().getVersioning()) > 1: 
                       <tr>
-		                      <td align="right" valign="top" class="displayField" nowrap>
-		                            <b><%=_("Reviewing history")%>:</b>
-		                      </td>
-		                      <td width="100%" valing="top"><div id="showHideHistory" style="display:inline"></div></td>
-	               </tr>
-	               <tr>
-	                   <td id="HistoryTable" align="center" width="100%" colspan="2">
-			               <%= reviewingHistoryStuffDisplay %>
-		               </td>
+                              <td align="right" valign="top" class="displayField" nowrap>
+                                    <b>${_("Reviewing history")}:</b>
+                              </td>
+                              <td width="100%" valing="top"><div id="showHideHistory" style="display:inline"></div></td>
+                   </tr>
+                   <tr>
+                       <td id="HistoryTable" align="center" width="100%" colspan="2">
+                           ${ reviewingHistoryStuffDisplay }
+                       </td>
                </tr>
 
-              <% end %>
-              <% end %>
-              <% end %>
+              % endif
+              % endif
+              % endif
               </table>
                  </td>
               </tr>
@@ -206,10 +195,10 @@ var buildShowHideHistory = function() {
     $E('showHideHistory').set(Widget.link(option));
 }
 
-<% if len(Contribution.getReviewManager().getVersioning()) > 1: %>
+% if len(Contribution.getReviewManager().getVersioning()) > 1: 
 buildShowHideHistory();
 $E('HistoryTable').dom.style.display = 'none';
-<% end %>
+% endif
 
 function showGeneralInfo() {
     if ($E('hideContributionFull').dom.innerHTML == 'Hide general info') {

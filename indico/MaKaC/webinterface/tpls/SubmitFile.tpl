@@ -1,1 +1,1 @@
- <%= _("submit a new file")%>
+ ${ _("submit a new file")}

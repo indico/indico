@@ -1,3 +1,3 @@
 <table width="100%">
-	<% includeTpl('EventModifMainData', evtType='lecture', confObj=self._conf) %>
+    <%include file="EventModifMainData.tpl" args="evtType='lecture', confObj=self_._conf"/>
 </table>

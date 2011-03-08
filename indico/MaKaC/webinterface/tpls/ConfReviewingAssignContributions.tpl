@@ -5,19 +5,17 @@
 
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>
-<% if not ConfReview.hasReviewing(): %>
-<p style="padding-left: 25px;"><font color="gray"><%= _("Type of reviewing has not been chosen yet")%></font></p>
-<% end %>
-<% else: %>
-<% if len(Conference.getContributionListSortedById()) == 0: %>
-<p style="padding-left: 25px;"><font color="gray"><%= _("There are no papers to assign.")%></font></p>
-<% end %>
-<%else:%>
+% if not ConfReview.hasReviewing(): 
+<p style="padding-left: 25px;"><font color="gray">${ _("Type of reviewing has not been chosen yet")}</font></p>
+% else: 
+% if len(Conference.getContributionListSortedById()) == 0: 
+<p style="padding-left: 25px;"><font color="gray">${ _("There are no papers to assign.")}</font></p>
+%else:
 <table style="margin-left:20px;">
     <tr>
         <td id="resetFilters" align="bottom" style="display: none;">
             <div style="padding-top:30px; ">
-                <span id="btnReset" class="btnRemove" name="resetFilters"><%= _("Reset filters")%></span>
+                <span id="btnReset" class="btnRemove" name="resetFilters">${ _("Reset filters")}</span>
                 <span style="padding: 0px 6px 0px 6px">|</span>
             </div>
         </td>
@@ -25,13 +23,13 @@
             <div id="showHideFilteringHelp" style="padding-top:30px;"><div id="showHideFiltering" style="display:inline"></div></div>
         </td>
         <td align="bottom" style="padding-left:10px; padding-top:27px;">
-           <div><%= _("Displaying  ")%><span id="contributionsToShow" style="font-size:15px; font-weight: bold;"></span>
+           <div>${ _("Displaying  ")}<span id="contributionsToShow" style="font-size:15px; font-weight: bold;"></span>
                 <span id="contributionText"></span>
            </div>
         </td>
         <td align="bottom" style="padding-top:27px;">
-            <div id="totalContributions" style="display:none;"><span><%=_("  ( Total:  ")%></span><span style="font-size:15px; font-weight: bold;"><%= len(Conference.getContributionListSortedById()) %></span>
-            <span><%=_(" )")%></span>
+            <div id="totalContributions" style="display:none;"><span>${_("  ( Total:  ")}</span><span style="font-size:15px; font-weight: bold;">${ len(Conference.getContributionListSortedById()) }</span>
+            <span>${_(" )")}</span>
             </div>
         </td>
     </tr>
@@ -41,16 +39,16 @@
     <thead>
         <tr style="text-align:left;">
             <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
-                <%= _("types ")%><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selTypes')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTypes')" style="border:none;">
+                ${ _("types ")}<img src="${ Config.getInstance().getSystemIconURL("checkAll") }" alt="Select all" title="Select all" onclick="selectAll('selTypes')" style="border:none;"><img src="${ Config.getInstance().getSystemIconURL("uncheckAll") }" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTypes')" style="border:none;">
             </td>
             <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
-                <%= _("sessions")%><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selSessions')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selSessions')" style="border:none;">
+                ${ _("sessions")}<img src="${ Config.getInstance().getSystemIconURL("checkAll") }" alt="Select all" title="Select all" onclick="selectAll('selSessions')" style="border:none;"><img src="${ Config.getInstance().getSystemIconURL("uncheckAll") }" alt="Deselect all" title="Deselect all" onclick="deselectAll('selSessions')" style="border:none;">
             </td>
             <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
-                <%= _("tracks")%><img src="<%= Config.getInstance().getSystemIconURL("checkAll") %>" alt="Select all" title="Select all" onclick="selectAll('selTracks')" style="border:none;"><img src="<%= Config.getInstance().getSystemIconURL("uncheckAll") %>" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTracks')" style="border:none;">
+                ${ _("tracks")}<img src="${ Config.getInstance().getSystemIconURL("checkAll") }" alt="Select all" title="Select all" onclick="selectAll('selTracks')" style="border:none;"><img src="${ Config.getInstance().getSystemIconURL("uncheckAll") }" alt="Deselect all" title="Deselect all" onclick="deselectAll('selTracks')" style="border:none;">
             </td>
             <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
-                <%= _("assign status")%>
+                ${ _("assign status")}
             </td>
         </tr>
     </thead>
@@ -60,51 +58,51 @@
                 <table cellpadding="0px" cellspacing="0px" border="0px">
                     <tr>
                         <td><input type="checkbox" id="typeShowNoValue" name="selTypes" value="not specified" checked/></td>
-                        <td> --<%= _("not specified")%>--</td>
+                        <td> --${ _("not specified")}--</td>
                     </tr>
-                    <% for type in self._conf.getContribTypeList(): %>
+                    % for type in self_._conf.getContribTypeList(): 
                         <tr>
-                            <td><input type="checkbox" name="selTypes" value="<%=type.getId()%>" checked></td>
-                            <td><%= type.getName() %></td>
+                            <td><input type="checkbox" name="selTypes" value="${type.getId()}" checked></td>
+                            <td>${ type.getName() }</td>
                         </tr>
-                    <% end %>
+                    % endfor
                 </table>
             </td>
             <td>
                 <table cellpadding="0px" cellspacing="0px" border="0px">
                     <tr>
                         <td><input type="checkbox" id="sessionShowNoValue" name="selSessions" value="not specified" checked/></td>
-                        <td> --<%= _("not specified")%>--</td>
+                        <td> --${ _("not specified")}--</td>
                     </tr>
-                    <% for s in self._conf.getSessionListSorted(): %>
+                    % for s in self_._conf.getSessionListSorted(): 
                         <tr>
-                            <td><input type="checkbox" name="selSessions" value="<%=s.getId()%>" checked></td>
-                            <td><%= s.getTitle() %></td>
+                            <td><input type="checkbox" name="selSessions" value="${s.getId()}" checked></td>
+                            <td>${ s.getTitle() }</td>
                         </tr>
-                    <% end %>
+                    % endfor
                 </table>
             </td>
             <td>
                 <table cellpadding="0px" cellspacing="0px" border="0px">
                     <tr>
                         <td><input type="checkbox" id="trackShowNoValue" name="selTracks" value="not specified" checked/></td>
-                        <td> --<%= _("not specified")%>--</td>
+                        <td> --${ _("not specified")}--</td>
                     </tr>
-                    <% for t in Conference.getTrackList(): %>
+                    % for t in Conference.getTrackList(): 
                         <tr>
-                            <td><input type="checkbox" name="selTracks" value="<%=t.getId()%>" checked></td>
-                            <td><%= t.getTitle() %></td>
+                            <td><input type="checkbox" name="selTracks" value="${t.getId()}" checked></td>
+                            <td>${ t.getTitle() }</td>
                         </tr>
-                    <% end %>
+                    % endfor
                 </table>
             </td>
             <td>
                 <table style="list-style-type:none">
-                    <% if not IsOnlyReferee: %>
-                        <tr><td><input type="checkbox" id="showWithReferee" checked/> <%= _("With Referee assigned")%></td></tr>
-                    <% end %>
-                    <tr><td><input type="checkbox" id="showWithEditor" checked/> <%= _("With Layout Reviewer assigned")%></td></tr>
-                    <tr><td><input type="checkbox" id="showWithReviewer" checked/> <%= _("With at least 1 Content Reviewer assigned")%></td></tr>
+                    % if not IsOnlyReferee: 
+                        <tr><td><input type="checkbox" id="showWithReferee" checked/> ${ _("With Referee assigned")}</td></tr>
+                    % endif
+                    <tr><td><input type="checkbox" id="showWithEditor" checked/> ${ _("With Layout Reviewer assigned")}</td></tr>
+                    <tr><td><input type="checkbox" id="showWithReviewer" checked/> ${ _("With at least 1 Content Reviewer assigned")}</td></tr>
 
                 </table>
             </td>
@@ -118,60 +116,60 @@
 </table>
 
 <table class="shadowRectangleSoft" width="95%">
-    <% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+    % if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
     <tr>
-        <td><%= _("Referee")%>:</td>
+        <td>${ _("Referee")}:</td>
         <td id="assignRefereeHelp">
-            <a id="assignRefereeButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <a id="assignRefereeButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_referee_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
             </span>|
-            <a id="removeRefereeButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
+            <a id="removeRefereeButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove")}</a>
         </td>
     </tr>
-    <% end %>
-    <%if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):%>
+    % endif
+    %if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     <tr>
-        <td><%= _("Layout Reviewer")%>:</td>
+        <td>${ _("Layout Reviewer")}:</td>
         <td id="assignEditorHelp">
-            <a id="assignEditorButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <a id="assignEditorButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_editor_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                <a id="assignEditorPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                <a id="assignEditorPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
             </span>|
-            <a id="removeEditorButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
+            <a id="removeEditorButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove")}</a>
         </td>
     </tr>
-    <% end %>
-    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+    % endif
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
     <tr>
-        <td><%= _("Content Reviewers")%>:</td>
+        <td>${ _("Content Reviewers")}:</td>
         <td id="assignReviewerHelp">
-            <a id="addReviewerButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <a id="addReviewerButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_reviewer_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                <a id="assignReviewerPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                <a id="assignReviewerPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
             </span>|
-            <a id="removeReviewerButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>|
-            <a id="removeAllReviewersButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove All")%>
+            <a id="removeReviewerButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove")}</a>|
+            <a id="removeAllReviewersButton_top" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove All")}
         </td>
     </tr>
-    <% end %>
+    % endif
 </table>
 <!--  and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING) -->
 
 <table style="padding-left:40px;">
         <tr>
             <td style="padding-bottom: 5px; padding-top: 5px">
-                <%= _("Select:") %>
+                ${ _("Select:") }
             </td>
             <td nowrap class="titleCellFormat" style="padding-bottom: 20px;  padding-top: 20px; border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
                  <span onclick="selectAll('selectedContributions')" align="left" style="cursor:pointer;padding-bottom:5px;color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
-                        <%= _("All")%>
+                        ${ _("All")}
                  </span>,
                  <span onclick="deselectAll('selectedContributions')" align="left" style="cursor:pointer;padding-bottom:5px;color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
-                        <%= _("None")%>
+                        ${ _("None")}
                  </span>
             </td>
         </tr>
@@ -186,28 +184,28 @@
         <tr>
             <td></td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Id")%>
+                ${ _("Id")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Title")%>
+                ${ _("Title")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Type")%>
+                ${ _("Type")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Track")%>
+                ${ _("Track")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Session")%>
+                ${ _("Session")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Status") %>
+                ${ _("Status") }
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Reviewing team")%>
+                ${ _("Reviewing team")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= _("Deadline")%>
+                ${ _("Deadline")}
             </td>
         </tr>
         <tr>
@@ -215,10 +213,10 @@
         </tr>
         <tr>
             <td id="noFilteredContribution" colspan="8" style="padding:15px 0px 15px 15px; display:none;">
-                <span><%= _("There are no papers with the selected filters criteria.")%></span>
-                <% if IsOnlyReferee: %>
-                    <span><%= _("It is also possible you do not have any assigned paper for the review yet.")%></span>
-                <% end %>
+                <span>${ _("There are no papers with the selected filters criteria.")}</span>
+                % if IsOnlyReferee: 
+                    <span>${ _("It is also possible you do not have any assigned paper for the review yet.")}</span>
+                % endif
             </td>
         </tr>
     </thead>
@@ -227,46 +225,46 @@
 </table>
 
 <table class="shadowRectangleSoft" width="95%" style="margin-top:10px;">
-    <% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+    % if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
     <tr>
-        <td><%= _("Referee")%>:</td>
+        <td>${ _("Referee")}:</td>
         <td id="assignRefereeHelp">
-            <a id="assignRefereeButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <a id="assignRefereeButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_referee_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
             </span>|
-            <a id="removeRefereeButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
+            <a id="removeRefereeButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove")}</a>
         </td>
     </tr>
-    <% end %>
-    <%if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):%>
+    % endif
+    %if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     <tr>
-        <td><%= _("Layout Reviewer")%>:</td>
+        <td>${ _("Layout Reviewer")}:</td>
         <td id="assignEditorHelp">
-            <a id="assignEditorButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <a id="assignEditorButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_editor_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                <a id="assignEditorPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                <a id="assignEditorPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
             </span>|
-            <a id="removeEditorButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>
+            <a id="removeEditorButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove")}</a>
         </td>
     </tr>
-    <% end %>
-    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+    % endif
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
     <tr>
-        <td><%= _("Content Reviewers")%>:</td>
+        <td>${ _("Content Reviewers")}:</td>
         <td id="assignReviewerHelp">
-            <a id="addReviewerButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px"><%= _("Assign")%></a>|
+            <a id="addReviewerButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_reviewer_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                <a id="assignReviewerPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Assign per ...")%>
+                <a id="assignReviewerPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
             </span>|
-            <a id="removeReviewerButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove")%></a>|
-            <a id="removeAllReviewersButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px"><%= _("Remove All")%>
+            <a id="removeReviewerButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove")}</a>|
+            <a id="removeAllReviewersButton_bottom" class="fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Remove All")}
         </td>
     </tr>
-   <% end %>
+   % endif
 </table>
 
 <div id="userSelection_bottom" style="margin-top: 1em">
@@ -464,7 +462,7 @@ var contributionTemplate = function(contribution) {
     var cell3 = Html.td({className:'contributionDataCell'});
     // Sadly this hack is necessary to get the link since getURL() needs a Contribution object (from Indico, not the local one from Javascript)
     // and contributions are loaded asynchronously...
-    linkString = "<%= urlHandlers.UHContributionModifReviewing.getURL() %>" + "?contribId=" + contribution.id + "&confId=<%= Conference.getId()%>"
+    linkString = "${ urlHandlers.UHContributionModifReviewing.getURL() }" + "?contribId=" + contribution.id + "&confId=${ Conference.getId()}"
     var link = Html.a({href: linkString});
     link.set(contribution.title);
     cell3.set(link);
@@ -530,7 +528,7 @@ var contributionTemplate = function(contribution) {
     ul.dom.style.padding = 0;
     ul.dom.style.marginLeft = '5px';
 
-    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
     var li1 = Html.li();
     var span1 = Html.span({}, $T('Referee: '))
     var span2 = contribution.reviewManager.referee ?
@@ -538,9 +536,9 @@ var contributionTemplate = function(contribution) {
                     Html.span({id: ("creferee" + contribution.id)},$T('No referee'));
     li1.set(Widget.block([span1,span2]));
     ul.append(li1);
-    <% end %>
+    % endif
 
-    <% if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+    % if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
     var li2 = Html.li();
     var span1 = Html.span({}, $T('Layout reviewer: '))
     var span2 = contribution.reviewManager.editor ?
@@ -548,9 +546,9 @@ var contributionTemplate = function(contribution) {
                     Html.span({id: ("ceditor" + contribution.id)},$T('No layout reviewer'));
     li2.set(Widget.block([span1,span2]));
     ul.append(li2);
-    <% end %>
+    % endif
 
-    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
     var li3 = Html.li();
     var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Content reviewers: '));
     li3.append(span);
@@ -569,7 +567,7 @@ var contributionTemplate = function(contribution) {
         li3.append(span);
     }
     ul.append(li3);
-    <% end %>
+    % endif
 
     cell8.set(ul);
     row.append(cell8);
@@ -927,12 +925,12 @@ var userSelected = function(user, contrPerAttribute){
 
 
     if (checkedContributions.length > 0){
-        var params = {conference: '<%= Conference.getId() %>',contributions: checkedContributions, user: user.id}
+        var params = {conference: '${ Conference.getId() }',contributions: checkedContributions, user: user.id}
       }
 
 
     if(checkedContributions.length == 0 && contrPerAttribute.length > 0){
-        var params = {conference: '<%= Conference.getId() %>',contributions: contrPerAttribute, user: user.id}
+        var params = {conference: '${ Conference.getId() }',contributions: contrPerAttribute, user: user.id}
         var checkedContributions = contrPerAttribute;
     }
 
@@ -1088,16 +1086,16 @@ var fetchContributions = function() {
     contributionsIndexes = []
     indicoRequest('event.contributions.list',
         {
-            conference: '<%= Conference.getId() %>',
+            conference: '${ Conference.getId() }',
             typeShowNoValue : $E('typeShowNoValue').dom.checked,
             trackShowNoValue : $E('trackShowNoValue').dom.checked,
             sessionShowNoValue : $E('sessionShowNoValue').dom.checked,
             selTypes : getCheckedBoxes('selTypes'),
             selTracks : getCheckedBoxes('selTracks'),
             selSessions : getCheckedBoxes('selSessions'),
-            <% if not IsOnlyReferee: %>
+            % if not IsOnlyReferee: 
             showWithReferee: $E('showWithReferee').dom.checked,
-            <% end %>
+            % endif
             showWithEditor: $E('showWithEditor').dom.checked,
             showWithReviewer: $E('showWithReviewer').dom.checked
         },
@@ -1141,11 +1139,11 @@ var fetchUsers = function(order, role) {
     }
 
     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-        <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+        % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
             if (!checkAllHaveReferee(checkedContributions, order, role, false)) {
                 return;
             }
-        <% end %>
+        % endif
    }
 
    if (order == 'remove' && role == 'reviewer')  {
@@ -1157,7 +1155,7 @@ var fetchUsers = function(order, role) {
 
     indicoRequest(
         'reviewing.conference.userCompetencesList',
-        {conference: '<%= Conference.getId() %>', role: role},
+        {conference: '${ Conference.getId() }', role: role},
         function(result,error) {
             if (!error) {
 
@@ -1254,7 +1252,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
 
     indicoRequest(
         'reviewing.conference.userCompetencesList',
-        {conference: '<%= Conference.getId() %>', role: role},
+        {conference: '${ Conference.getId() }', role: role},
         function(result,error) {
             if (!error) {
 
@@ -1280,7 +1278,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                      var attributeList = function () {
                         indicoRequest(
                         'reviewing.conference.attributeList',
-                        {conference: '<%= Conference.getId()%>', attribute: attribute},
+                        {conference: '${ Conference.getId()}', attribute: attribute},
                         function(result, error){
                             if(!error){
                                     var attributes = $L();
@@ -1335,18 +1333,18 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                      var contributionsIdList = function (user, chAtt){
                                     indicoRequest(
                                         'reviewing.conference.contributionsIdPerSelectedAttribute',
-                                        {conference: '<%= Conference.getId()%>', attribute: attribute, selectedAttributes:chAtt },
+                                        {conference: '${ Conference.getId()}', attribute: attribute, selectedAttributes:chAtt },
                                         function(result, error){
                                             if(!error){
                                                     for (i in result) {
                                                           contrPerAttribute.push(result[i]);
                                                     }
                                                     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-                                                            <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+                                                            % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
                                                                 if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
                                                                     return;
                                                                 }
-                                                            <% end %>
+                                                            % endif
                                                        }
                                                     userSelected(user, contrPerAttribute);
                                             }
@@ -1449,7 +1447,7 @@ var removeUser = function(role) {
         return;
     }
 
-    var params = {conference: '<%= Conference.getId() %>',contributions: checkedContributions}
+    var params = {conference: '${ Conference.getId() }',contributions: checkedContributions}
 
     switch(role) {
     case 'referee':
@@ -1539,7 +1537,7 @@ $E('filteringTable').dom.style.display = 'none';
 bind.element($E("tablebody"), contributions, contributionTemplate);
 
 $E('btnReset').observeClick(function(){
-    window.location = "<%= urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(Conference) %>";
+    window.location = "${ urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(Conference) }";
     $E('totalContributions').dom.style.display = 'none';
 });
 
@@ -1550,30 +1548,30 @@ $E('applyFilter').observeClick(function(){
     buildShowHideFiltering();
     appliedFilter = true;
     fetchContributions();
-    <% if not IsOnlyReferee: %>
+    % if not IsOnlyReferee: 
         $E('totalContributions').dom.style.display = '';
-    <% end %>
+    % endif
 });
 
-<% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
 $E('assignRefereeButton_top').observeClick(function(){ fetchUsers('assign', 'referee'); });
 assignPerTrackMenus('referee', 'top');
 assignPerTrackMenus('referee', 'bottom');
 $E('assignRefereeButton_bottom').observeClick(function(){ fetchUsers('assign', 'referee'); });
 $E('removeRefereeButton_top').observeClick(function(){ removeUser('referee') });
 $E('removeRefereeButton_bottom').observeClick(function(){ removeUser('referee') });
-<% end %>
+% endif
 
-<% if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+% if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
 $E('assignEditorButton_top').observeClick(function(){ fetchUsers('assign', 'editor'); });
 assignPerTrackMenus('editor', 'top');
 assignPerTrackMenus('editor', 'bottom');
 $E('assignEditorButton_bottom').observeClick(function(){ fetchUsers('assign', 'editor'); });
 $E('removeEditorButton_top').observeClick(function(){ removeUser('editor') });
 $E('removeEditorButton_bottom').observeClick(function(){ removeUser('editor') });
-<% end %>
+% endif
 
-<% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
 $E('addReviewerButton_top').observeClick(function(){ fetchUsers('add', 'reviewer'); });
 assignPerTrackMenus('reviewer', 'top');
 assignPerTrackMenus('reviewer', 'bottom');
@@ -1582,10 +1580,10 @@ $E('removeReviewerButton_top').observeClick(function(){ fetchUsers('remove', 're
 $E('removeReviewerButton_bottom').observeClick(function(){ fetchUsers('remove', 'reviewer'); });
 $E('removeAllReviewersButton_top').observeClick(function(){ removeUser('allReviewers') });
 $E('removeAllReviewersButton_bottom').observeClick(function(){ removeUser('allReviewers') });
-<% end %>
+% endif
 
 fetchContributions();
 
 </script>
-<% end %>
-<% end %>
+% endif
+% endif

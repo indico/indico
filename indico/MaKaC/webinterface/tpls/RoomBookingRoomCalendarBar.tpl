@@ -1,3 +1,5 @@
+<%page args="bar=None, DAY_WIDTH_PX=None, START_H=None, dayDT=None"/>
+
 <%
 r = bar.forReservation
 
@@ -8,43 +10,20 @@ id = "barDiv_" + str(room.id) + "_" + str( dayDT ) + "_" + str( bar.startDT.time
 
 resvInfo = "%s  -  %s<br />%s<br />%s" % (verbose_t( bar.startDT.time() ), verbose_t( bar.endDT.time() ), escapeAttrVal( r.bookedForName ), escapeAttrVal( r.reason ) )
 resvUrl = bookingDetailsUH.getURL( r )
-%>
-<%
+
 if bar.type == Bar.UNAVAILABLE:
     barClass = 'barUnaval'
-%>
-<% end %>
-
-<%
-if bar.type == Bar.CANDIDATE: 
+elif bar.type == Bar.CANDIDATE:
     barClass = 'barCand'
     resvUrl = "#conflicts"
-%>
-<% end %>
-
-<% 
-if bar.type == Bar.CONFLICT:
+elif bar.type == Bar.CONFLICT:
     barClass = 'barConf'
-%>
-<% end %>
-
-<%
-if bar.type == Bar.PREBOOKED: 
+elif bar.type == Bar.PREBOOKED:
     barClass = 'barPreB'
-%>
-<% end %>
-
-<%
-if bar.type == Bar.PRECONFLICT: 
+elif bar.type == Bar.PRECONFLICT:
     barClass = 'barPreC'
-%>
-<% end %>
-
-<%
-if bar.type == Bar.PRECONCURRENT: 
+elif bar.type == Bar.PRECONCURRENT:
     barClass = 'barPreConc'
 %>
-<% end %>
 
-
-<div id="<%= id %>" class="<%= barClass %>" style="cursor: pointer; width: <%= width %>px; left: <%= left %>px;" onmouseover="domTT_activate(this, event, 'content', '<%= resvInfo %>', 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );" onclick="window.location = '<%=resvUrl%>';"></div>
+<div id="${ id }" class="${ barClass }" style="cursor: pointer; width: ${ width }px; left: ${ left }px;" onmouseover="domTT_activate(this, event, 'content', '${ resvInfo }', 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );" onclick="window.location = '${resvUrl}';"></div>

@@ -1,3 +1,3 @@
 
-<%= pendingQueue %>
+${ pendingQueue }
 

@@ -1,3 +1,3 @@
 <table width="100%">
-<%= entries %>
+${ entries }
 </table>

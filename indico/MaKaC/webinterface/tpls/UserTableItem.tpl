@@ -1,32 +1,32 @@
 <li class="UIPerson clearfix" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'" >
 
-    <% if not selectable: %>
+    % if not selectable: 
         <input  type="image" style="padding: 3px;" class="UIRowButton"
-                onclick="javascript:removeItem(<%= id %>, this.form);return false;"
-                title="<%= _("Remove this person from the list")%>"
-                src="<%= systemIcon("remove") %>" />
-    <% end %>
+                onclick="javascript:removeItem(${ id }, this.form);return false;"
+                title="${ _("Remove this person from the list")}"
+                src="${ systemIcon("remove") }" />
+    % endif
 
-    <% if currentUserBasket: %>
+    % if currentUserBasket: 
         <% domId = id %>
-        <% if ParentPrincipalTableId: %>
+        % if ParentPrincipalTableId: 
             <% domId = "t" + str(ParentPrincipalTableId) + "av" + id %>
-        <% end %>
+        % endif
 
-        <span id="add_<%= domId %>_to_basket" class="UIRowButton" style="padding: 3px; height: 16px;"></span>
+        <span id="add_${ domId }_to_basket" class="UIRowButton" style="padding: 3px; height: 16px;"></span>
         <script type="text/javascript">
-            $E('add_<%= domId %>_to_basket').set(new ToggleFavouriteButton(<%= jsonEncode(avatar) %>, {}, <%= jsBoolean(currentUserBasket.hasUserId(id)) %>).draw());
+            $E('add_${ domId }_to_basket').set(new ToggleFavouriteButton(${ jsonEncode(avatar) }, {}, ${ jsBoolean(currentUserBasket.hasUserId(id)) }).draw());
         </script>
-    <% end %>
+    % endif
 
 
     <span class="nameLink">
 
-        <% if selectable: %>
-    	<input type="<%= inputType %>" name="selectedPrincipals" value="<%= id %>" <%= selected %>>
-        <% end %>
+        % if selectable: 
+        <input type="${ inputType }" name="selectedPrincipals" value="${ id }" ${ selected }>
+        % endif
 
-        <%= fullName %> <em>(<%= email %>)</em>
+        ${ fullName } <em>(${ email })</em>
     </span>
 
 </li>

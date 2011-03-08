@@ -1,4 +1,4 @@
-<iframe src="<%= mapOfRoomsWidgetURL %>"
+<iframe src="${ mapOfRoomsWidgetURL }"
     frameborder="0"
     width="100%"
     height="650px"

@@ -1,44 +1,44 @@
 
 <table width="100%" class="filesTab"><tr><td>
-<form action=<%= postURL %> method="POST" enctype="multipart/form-data" name="submitfile">
+<form action=${ postURL } method="POST" enctype="multipart/form-data" name="submitfile">
 <input type="hidden" name="numFieldChange" id="numFieldChange" value=""/>
 <table style="border-left: 1px solid #777777">
     <tr>
-        <td colspan="5" class="groupTitle"><%= _("Add new material")%></td>
+        <td colspan="5" class="groupTitle">${ _("Add new material")}</td>
     </tr>
-    <%= errors %>
+    ${ errors }
     <tr>
         <td class="titleCellTD">
-            <span class="titleCellFormat"><%= _("Number of files:")%>
+            <span class="titleCellFormat">${ _("Number of files:")}
             </span>
             <select name="nbFiles" onchange="$E('numFieldChange').set('true');this.form.submit();">
-                <%= selectNumberOfFiles %>
+                ${ selectNumberOfFiles }
             </select>
         </td>
         <td>
-            <%= fileSubmitForms %>
+            ${ fileSubmitForms }
         </td>
     </tr>
     <tr>
         <td class="titleCellTD">
-            <span class="titleCellFormat"><%= _("Number of urls:")%>
+            <span class="titleCellFormat">${ _("Number of urls:")}
             </span>
             <select name="nbLinks" onchange="$E('numFieldChange').set('true');this.form.submit();">
-                <%= selectNumberOfLinks %>
+                ${ selectNumberOfLinks }
             </select>
         </td>
         <td>
-            <%= linkSubmitForms %>
+            ${ linkSubmitForms }
         </td>
     </tr>
-    <%= conversion %>
+    ${ conversion }
     <tr>
         <td colspan="2">&nbsp;</td>
     </tr>
     <tr>
         <td>
             <input type="submit" class="btn" name="OK" value="submit">
-            <%= CancelButton %>
+            ${ CancelButton }
         </td>
     </tr>
 </table>

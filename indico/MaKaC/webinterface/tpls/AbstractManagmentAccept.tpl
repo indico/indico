@@ -1,44 +1,44 @@
 
 <table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
-	<tr>
-		<td class="groupTitle"><%= _("Accepting abstract")%></td>
+    <tr>
+        <td class="groupTitle">${ _("Accepting abstract")}</td>
     </tr>
     <tr>
         <td bgcolor="white">
             <table>
                 <tr>
-					<form action=<%= acceptURL %> method="POST">
-					<td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%></span></td>
-					<td><textarea name="comments" rows="6" cols="50"></textarea></td>
-				</tr>
+                    <form action=${ acceptURL } method="POST">
+                    <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Comments")}</span></td>
+                    <td><textarea name="comments" rows="6" cols="50"></textarea></td>
+                </tr>
                 <tr>
-                    <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Destination track")%></span></td>
+                    <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Destination track")}</span></td>
                     <td>
                         <select name="track">
-                            <%= tracks %>
+                            ${ tracks }
                         </select>
                     </td>
                 </tr>
                 <tr>
-                    <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Destination session")%></span></td>
+                    <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Destination session")}</span></td>
                     <td>
                         <select name="session">
-                            <%= sessions %>
+                            ${ sessions }
                         </select>
                     </td>
                 </tr>
                 <tr>
-                    <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Type of contribution")%></span></td>
+                    <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Type of contribution")}</span></td>
                     <td>
                         <select name="type">
-                            <%= types %>
+                            ${ types }
                         </select>
                     </td>
                 </tr>
                 <tr>
-                    <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Email Notification")%></span></td>
+                    <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Email Notification")}</span></td>
                     <td>
-                        <input type="checkbox" name="notify" value="true" checked><%= _(" Automatic Email Notification")%>
+                        <input type="checkbox" name="notify" value="true" checked>${ _(" Automatic Email Notification")}
                     </td>
                 </tr>
             </table>
@@ -50,14 +50,14 @@
             <table valign="bottom" align="left">
                 <tr>
                     <td valign="bottom" align="left">
-						<input type="submit" class="btn" name="accept" value="<%= _("accept")%>">
+                        <input type="submit" class="btn" name="accept" value="${ _("accept")}">
                     </td>
-					</form>
-					<form action=<%= cancelURL %> method="POST">
+                    </form>
+                    <form action=${ cancelURL } method="POST">
                     <td valign="bottom" align="left">
-						<input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
+                        <input type="submit" class="btn" name="cancel" value="${ _("cancel")}">
                     </td>
-					</form>
+                    </form>
                 </tr>
             </table>
         </td>

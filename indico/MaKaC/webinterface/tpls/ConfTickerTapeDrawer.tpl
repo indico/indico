@@ -1,12 +1,12 @@
 
-<% if nowHappeningArray: %>
+% if nowHappeningArray: 
 
-<span class="nowHappeningText"><%= _("Now happening:") %></span><div id="nowHappeningDiv" style="min-height: 20px;"></div>
+<span class="nowHappeningText">${ _("Now happening:") }</span><div id="nowHappeningDiv" style="min-height: 20px;"></div>
 
 
 <script type="text/javascript">
     var nowHappeningIndex = 0;
-    var nowHappeningArray = <%= nowHappeningArray %>;
+    var nowHappeningArray = ${ nowHappeningArray };
     var nowHappeningDiv = $E('nowHappeningDiv');
     var nowHappeningSpan = '';
 
@@ -38,5 +38,5 @@
 
 </script>
 
-<% end %>
+% endif
 

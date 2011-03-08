@@ -2,7 +2,7 @@
     <tr>
         <td>
             <table>
-                <%= items %>
+                ${ items }
             </table>
         </td>
     </tr>

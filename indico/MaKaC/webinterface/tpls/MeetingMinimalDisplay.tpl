@@ -8,8 +8,8 @@
                                 width="100%" class="headerselected"
                                 bgcolor="#000060">
                             <tr>
-                                <td width="35"><img src="<%= meetingIcon %>" width="32" height="32" alt="lecture" border="0"></td>
-                                <td class="headerselected" align="left"><b><strong><font size="+2" face="arial" color="white"><%= title %></font></strong></b><br><small></small></td>
+                                <td width="35"><img src="${ meetingIcon }" width="32" height="32" alt="lecture" border="0"></td>
+                                <td class="headerselected" align="left"><b><strong><font size="+2" face="arial" color="white">${ title }</font></strong></b><br><small></small></td>
                             </tr>
                         </table>
                     </td>
@@ -18,7 +18,7 @@
                     <td>
                         <table border="0" bgcolor="#f0c060" cellpadding="2"
                                 cellspacing="0" width="100%" class="results">
-                            <%= material %>
+                            ${ material }
                         </table>
                     </td>
                 </tr>
@@ -28,6 +28,6 @@
         </td>
     </tr>
     <tr>
-        <td><%= schedule %></td>
+        <td>${ schedule }</td>
     </tr>
 </table>

@@ -62,20 +62,20 @@ function alerta(id){
 <table align="center">
 <tr>
   <td>
-    <form name="formulary" action="<%= calendarURL %>" method="GET">
-    <%= locatorNoCategs %>
-     <%= _("Select the categories you want to appear in the calendar")%>
-    <br><%= categs %>
+    <form name="formulary" action="${ calendarURL }" method="GET">
+    ${ locatorNoCategs }
+     ${ _("Select the categories you want to appear in the calendar")}
+    <br>${ categs }
     <br>
-    <input type="submit" class="btn" value="<%= _("ok")%>">
+    <input type="submit" class="btn" value="${ _("ok")}">
     </form>
   </td>
 </tr>
 <tr>
   <td>
-    <form action="<%= calendarURL %>" method="GET">
-    <%= locator %>
-    <input type="submit" class="btn" value="<%= _("cancel")%>">
+    <form action="${ calendarURL }" method="GET">
+    ${ locator }
+    <input type="submit" class="btn" value="${ _("cancel")}">
     </form>
   </td>
 </tr>

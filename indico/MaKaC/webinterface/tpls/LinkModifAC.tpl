@@ -1,5 +1,5 @@
 <table width="100%" class="ACtab"><tr><td>
 <br>
-<%= accessControlFrame %>
+${ accessControlFrame }
 <br>
 </tr></td></table>

@@ -8,7 +8,7 @@
 </p>
 
 <div style="padding-bottom: 30px;">
-    <div class="groupTitle"><%= _("Video Services Managers")%></div>
+    <div class="groupTitle">${ _("Video Services Managers")}</div>
     <p style="font-style: italic;" >
         Users added here will be able to access <strong>all</strong> of the the Video Services section of this event, including this <strong>Protection</strong> tab.
     </p>
@@ -19,35 +19,35 @@
 <% allowedPluginNames = [p.getName() for p in CSBM.getAllowedPlugins() if not CollaborationTools.isAdminOnlyPlugin(p)] %>
 <% allowedPluginNames.sort() %>
 
-<div class="groupTitle"><%= _("Managers for individual systems") %></div>
+<div class="groupTitle">${ _("Managers for individual systems") }</div>
 <p style="font-style: italic;" >
     Users added here will be able to create, edit, delete, etc. bookings / requests for the corresponding plugin only.
 </p>
 
 <table>
-<% for name in allowedPluginNames: %>
+% for name in allowedPluginNames: 
     <tr>
         <td style="vertical-align: top; text-align: right;">
-            <span class="dataCaptionFormat"><%= _("Managers for ") + name %></span>
+            <span class="dataCaptionFormat">${ _("Managers for ") + name }</span>
         </td>
         <td style="padding-bottom: 30px;">
-            <div style="padding-left: 20px;" id="userList_<%= name %>">
+            <div style="padding-left: 20px;" id="userList_${ name }">
             </div>
         </td>
     </tr>
-<% end %>
+% endfor
 </table>
 
 <script type="text/javascript">
-    var allManagers = $L(<%= jsonEncode(AllManagers)%>);
+    var allManagers = $L(${ jsonEncode(AllManagers)});
 
-    <% for name in ["all"] + allowedPluginNames: %>
+    % for name in ["all"] + allowedPluginNames: 
     var newPersonsHandler = function(userList, setResult) {
         indicoRequest(
             'collaboration.addPluginManager',
             {
-                conference: "<%= Conference.getId() %>",
-                plugin: "<%= name %>",
+                conference: "${ Conference.getId() }",
+                plugin: "${ name }",
                 userList: userList
             },
             function(result,error) {
@@ -67,8 +67,8 @@
         indicoRequest(
             'collaboration.removePluginManager',
             {
-                conference: "<%= Conference.getId() %>",
-                plugin: "<%= name %>",
+                conference: "${ Conference.getId() }",
+                plugin: "${ name }",
                 user: user.get('id')
             },
             function(result,error) {
@@ -83,10 +83,10 @@
     }
 
     var uf = new UserListField('PeopleListDiv', 'PeopleList',
-                               <%= jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) %>, true, allManagers,
+                               ${ jsonEncode(fossilize(CSBM.getPluginManagers(name), IAvatarFossil)) }, true, allManagers,
                                true, false, null, null,
                                false, false, true,
                                newPersonsHandler, singleUserNothing, removePersonHandler)
-    $E('userList_<%=name%>').set(uf.draw())
-    <% end %>
+    $E('userList_${name}').set(uf.draw())
+    % endfor
 </script>

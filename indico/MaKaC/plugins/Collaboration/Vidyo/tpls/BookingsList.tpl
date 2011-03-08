@@ -4,26 +4,25 @@
 
 <% isEmpty = True %>
 <% totalCount = 0 %>
-<% for key, bookingsList in BookingsPerConfIterator: %>
+% for key, bookingsList in BookingsPerConfIterator: 
     <% isEmpty = False %>
     <li>
-        <%= _("Ending on: ") + formatDateTime(unixTimeToDatetime(key, tz=ServerTZ), showWeek = True) %>
+        ${ _("Ending on: ") + formatDateTime(unixTimeToDatetime(key, tz=ServerTZ), showWeek = True) }
     <ul>
     <% bookingsList = bookingsList.items() %>
     <% bookingsList.sort(key = PairSorter) %>
-    <% for conf, nBookings in bookingsList: %>
+    % for conf, nBookings in bookingsList: 
         <% totalCount = totalCount + nBookings %>
-        <li><%= _("Inside conference: ") + conf.getTitle() + ", " + str(nBookings) + _(" Vidyo bookings.") %></li>
-    <% end %>
+        <li>${ _("Inside conference: ") + conf.getTitle() + ", " + str(nBookings) + _(" Vidyo bookings.") }</li>
+    % endfor
     </ul>
     </li>
-<% end %>
+% endfor
 
-<% if isEmpty: %>
-    <li><%= _("No Vidyo rooms") %></li>
-<% end %>
-<% else: %>
-    <li><%= str(totalCount) + _(" bookings in total.") %></li>
-<% end %>
+% if isEmpty: 
+    <li>${ _("No Vidyo rooms") }</li>
+% else: 
+    <li>${ str(totalCount) + _(" bookings in total.") }</li>
+% endif
 
 </ul>

@@ -1,14 +1,14 @@
 
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-<div class="groupTitle" id="userSection"><%= _("Favorite users")%></div>
+<div class="groupTitle" id="userSection">${ _("Favorite users")}</div>
 <div id="basketContainer" style="padding: 10px;">
 <!-- Filled through DOM manipulation   -->
 </div>
 
 <script type="text/javascript">
 
-    var favouriteList = <%= offlineRequest(self._rh, 'user.favorites.listUsers') %>;
+    var favouriteList = ${ offlineRequest(self_._rh, 'user.favorites.listUsers') };
 
     var removeUser = function(user, setResult){
         jsonRpc(Indico.Urls.JsonRpcService, "user.favorites.removeUser",

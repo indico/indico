@@ -2,78 +2,77 @@
     <tbody>
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Title:')%>
+                ${ _('Title:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking._bookingParams["meetingTitle"] %>
+                ${ Booking._bookingParams["meetingTitle"] }
             </td>
         </tr>
 
-        <% if Booking.getHasAccessPassword(): %>
-            <% if not Booking.getBookingParamByName("displayPassword") and not Booking.getBookingParamByName("displayPhonePassword"): %>
+        % if Booking.getHasAccessPassword(): 
+            % if not Booking.getBookingParamByName("displayPassword") and not Booking.getBookingParamByName("displayPhonePassword"): 
             <tr>
                 <td class="collaborationConfDisplayInfoLeftCol">
-                    <%= _('Password:')%>
+                    ${ _('Password:')}
                 </td>
                 <td class="collaborationConfDisplayInfoRightCol">
-                    <%= _("This EVO meeting is protected by a private password.") %>
+                    ${ _("This EVO meeting is protected by a private password.") }
                 </td>
             </tr>
-            <% end %>
-            <% else: %>
-                <% if Booking.getBookingParamByName("displayPassword"): %>
+            % else: 
+                % if Booking.getBookingParamByName("displayPassword"): 
                 <tr>
                     <td class="collaborationConfDisplayInfoLeftCol">
-                        <%= _('Password:')%>
+                        ${ _('Password:')}
                     </td>
                     <td class="collaborationConfDisplayInfoRightCol">
-                        <%= Booking.getAccessPassword() %>
+                        ${ Booking.getAccessPassword() }
                     </td>
                 </tr>
-                <% end %>
-                <% if Booking.getBookingParamByName("displayPhonePassword"): %>
+                % endif
+                % if Booking.getBookingParamByName("displayPhonePassword"): 
                 <tr>
                     <td class="collaborationConfDisplayInfoLeftCol">
-                        <%= _('Phone Bridge Password:')%>
+                        ${ _('Phone Bridge Password:')}
                     </td>
                     <td class="collaborationConfDisplayInfoRightCol">
-                        <%= Booking.getPhoneBridgePassword() %>
+                        ${ Booking.getPhoneBridgePassword() }
                     </td>
                 </tr>
-                <% end %>
-            <% end %>
-        <% end %>
+                % endif
+            % endif
+        % endif
 
-        <% if Booking.getBookingParamByName("displayPhoneBridgeNumbers"): %>
+        % if Booking.getBookingParamByName("displayPhoneBridgeNumbers"): 
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Phone bridge numbers:')%>
+                ${ _('Phone bridge numbers:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <a target="_blank" href="<%= ListOfPhoneBridgeNumbersURL%>">
-                    <%= _('List of phone bridge numbers')%>
+                <a target="_blank" href="${ ListOfPhoneBridgeNumbersURL}">
+                    ${ _('List of phone bridge numbers')}
                 </a>
             </td>
         </tr>
-        <% end %>
+        % endif
 
-        <% if Booking.getBookingParamByName("displayURL"): %>
+        % if Booking.getBookingParamByName("displayURL"): 
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Auto-join URL:')%>
+                ${ _('Auto-join URL:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <a href="<%= Booking.getUrl() %>"><%= Booking.getUrl() %></a>
+                <a href="${ Booking.getUrl() }">${ Booking.getUrl() }</a>
             </td>
         </tr>
-        <% end %>
+        % endif
 
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                <%= _('Description:')%>
+                ${ _('Description:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                <%= Booking._bookingParams["meetingDescription"] %>
+                ${ Booking._bookingParams["meetingDescription"] }
             </td>
         </tr>
     </tbody>

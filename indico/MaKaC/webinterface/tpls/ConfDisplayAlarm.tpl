@@ -1,1 +1,1 @@
-<%= alarmFrame %>
+${ alarmFrame }

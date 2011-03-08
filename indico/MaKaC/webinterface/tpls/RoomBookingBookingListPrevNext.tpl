@@ -1,30 +1,27 @@
 
-<% if withPrevNext: %>
+% if withPrevNext:
     <table style="width: 98%; border-collapse: collapse; margin-top: 5px; background-color: #F5F5F5">
     <tr>
-    <td><a href="<%= prevURL %>" style="font-size: xx-small;">&lt; <%= _("previous")+" "%> <%= periodName %></a></td>
+    <td><a href="${ prevURL }" style="font-size: xx-small;">&lt; ${ _("previous") } ${ periodName }</a></td>
     <td style="text-align: center;">
-        <form id="dateSelect<%= prevNextNo %>" action="<%= urlHandlers.UHRoomBookingBookingList.getURL() %>" method="POST">
-            <% if title and rh._ofMyRooms: %>
+        <form id="dateSelect${ attributes["prevNextNo"] }" action="${ urlHandlers.UHRoomBookingBookingList.getURL() }" method="POST">
+            % if title and rh._ofMyRooms:
                 <input type="hidden" id="ofMyRooms" name="ofMyRooms" value="on" />
-            <% end %>
-            <% elif rh._onlyMy: %>
+            % elif rh._onlyMy:
                 <input type="hidden" id="onlyMy" name="onlyMy" value="on" />
-            <% end %>
-            <% elif rh._allRooms: %>
+            % elif rh._allRooms:
                 <input type="hidden" id="roomGUID" name="roomGUID" value="allRooms" />
-            <% end %>
-            <% else: %>
-                <% for room in rh._roomGUIDs: %>
-                    <input type="hidden" id="roomGUID" name="roomGUID" value="<%= room %>" />
-                <% end %>
-            <% end %>
-            <% if rh._onlyPrebookings: %>
+            % else:
+                % for room in rh._roomGUIDs:
+                    <input type="hidden" id="roomGUID" name="roomGUID" value="${ room }" />
+                % endfor
+            % endif
+            % if rh._onlyPrebookings:
                 <input type="hidden" id="onlyPrebookings" name="onlyPrebookings" value="on" />
-            <% end %>
-            <% if rh._onlyBookings: %>
+            % endif
+            % if rh._onlyBookings:
                 <input type="hidden" id="onlyBookings" name="onlyBookings" value="on" />
-            <% end %>
+            % endif
             <input type="hidden" id="sDay" name="sDay" />
             <input type="hidden" id="sMonth" name="sMonth" />
             <input type="hidden" id="sYear" name="sYear" />
@@ -32,21 +29,21 @@
             <input type="hidden" id="eMonth" name="eMonth" />
             <input type="hidden" id="eYear" name="eYear" />
             <input type="hidden" id="reason" name="reason" />
-            <%= verbosePeriod %>
+            ${ verbosePeriod }
         </form>
     </td>
-    <td style="text-align: right;"><a href="<%= nextURL %>" style="font-size: xx-small;"><%= _("next")+" "%> <%= periodName %> &gt;</a></td>
+    <td style="text-align: right;"><a href="${ nextURL }" style="font-size: xx-small;">${ _("next") } ${ periodName } &gt;</a></td>
     </tr>
     <tr>
-        <td colspan="3" style="text-align: center"><a href="#" style="font-size: x-small;" id="selectDateIcon<%= prevNextNo %>"><%=_("change period") %></a></td>
+        <td colspan="3" style="text-align: center"><a href="#" style="font-size: x-small;" id="selectDateIcon${ attributes["prevNextNo"] }">${_("change period") }</a></td>
     </tr>
     </table>
 
     <script type="text/javascript">
 
-    $('selectDateIcon<%= prevNextNo %>').observe('click', function() {
-        var dlg = new DateRangeSelector('<%= startD %>', '<%= endD %>', function(startDate, endDate) {
-            var form = $('dateSelect<%= prevNextNo %>');
+    $('selectDateIcon${ attributes["prevNextNo"] }').observe('click', function() {
+        var dlg = new DateRangeSelector('${ startD }', '${ endD }', function(startDate, endDate) {
+            var form = $('dateSelect${ attributes["prevNextNo"] }');
             form['sDay'].value = startDate.getDate();
             form['sMonth'].value = startDate.getMonth() + 1;
             form['sYear'].value = startDate.getFullYear();
@@ -56,9 +53,9 @@
             form['eYear'].value = endDate.getFullYear();
 
             form.submit();
-        }, '<%=_("Choose Period") %>', true);
+        }, '${_("Choose Period") }', true);
         dlg.open();
     });
     </script>
 
-<% end %>
+% endif

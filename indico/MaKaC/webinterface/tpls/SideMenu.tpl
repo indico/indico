@@ -1,63 +1,59 @@
 <% somethingVisible = False %>
 
-<div class="sideBar sideMenu <% if sideMenuType != "basic": %>managementSideMenu<%end%>">
-<% if sideMenuType == "basic": %>
+<div class="sideBar sideMenu ${"managementSideMenu" if sideMenuType != "basic" else ""}">
+% if sideMenuType == "basic": 
 <div class="leftCorner"></div>
 <div class="rightCorner"></div>
-<%end%>
-<%else:%>
+%else:
 <div class="corner"></div>
-<%end%>
+% endif
 
 <div class="content">
 <ul>
 
-<% for i, section in enumerate(menu.getSections()): %>
-    <% if section.isVisible(): %>
+% for i, section in enumerate(menu.getSections()): 
+    % if section.isVisible(): 
         <% somethingVisible = True %>
-        
-        <% if section.getTitle(): %>
-            <% menuHeaderClass = "" %>
-            <% if section.isActive(): %>
-                <% menuHeaderClass = "active" %>
-            <% end %>
-            <li class="separator"><%= section.getTitle() %></li>
-        <% end %>
-        <% elif i >= 1: %>
-            <li class="separatorNoText"></li>
-        <% end %>
-      
-        <% for item in section.getItems(): %>
-            <% if not item.isVisible(): continue %><%end%>
-            
-            <% liClass = "" %>
-            <% if item.isEnabled(): %>
-                <% if item.isActive(): %>
-                    <% liClass = "active" %>
-                <% end %>
-            <% end %>
-            <% else: %>        
-                <% liClass = "sideMenu_disabled " + item.getErrorMessage() %>
-            <% end %>
-            
-            <li id="sideMenu_<%= item.getTitle().replace(' ','')%> " class="<%= liClass %>">
-                <% if item.isEnabled(): %>
-                    <a href="<%= item.getURL() %>">
-                        <%= item.getTitle() %>
-                    </a>
-                <% end %>
-                <% else: %>
-                    <%= item.getTitle() %>
-                <% end %>
-            </li>
-        <% end %>
-        
-    <%end%>
-<% end %>
 
-<% if not somethingVisible: %>
+        % if section.getTitle(): 
+            <% menuHeaderClass = "" %>
+            % if section.isActive(): 
+                <% menuHeaderClass = "active" %>
+            % endif
+            <li class="separator">${ section.getTitle() }</li>
+        % elif i >= 1: 
+            <li class="separatorNoText"></li>
+        % endif
+
+        % for item in section.getItems(): 
+            % if item.isVisible(): 
+                <% liClass = "" %>
+                % if item.isEnabled(): 
+                    % if item.isActive(): 
+                        <% liClass = "active" %>
+                    % endif
+                % else: 
+                    <% liClass = "sideMenu_disabled " + item.getErrorMessage() %>
+                % endif
+
+                <li id="sideMenu_${ item.getTitle().replace(' ','')} " class="${ liClass }">
+                    % if item.isEnabled(): 
+                        <a href="${ item.getURL() }">
+                            ${ item.getTitle() }
+                        </a>
+                    % else: 
+                        ${ item.getTitle() }
+                    % endif
+                </li>
+            % endif
+        % endfor
+
+    % endif
+% endfor
+
+% if not somethingVisible: 
 &nbsp;
-<% end %>
+% endif
 </ul>
 </div>
 </div>

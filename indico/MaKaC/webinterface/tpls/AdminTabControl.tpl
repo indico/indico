@@ -1,4 +1,4 @@
-<%= tabItems %>
+${ tabItems }
 <div class="tabContent">
-		<%= body %>
+        ${ body }
 </div>

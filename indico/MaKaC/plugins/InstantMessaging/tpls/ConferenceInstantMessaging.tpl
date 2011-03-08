@@ -2,56 +2,53 @@
 
 <table width="100%" align="center" border="0" cellpadding="5px">
     <tr>
-        <td colspan="10" class="groupTitle"> <%= _("Chat rooms for ")%> <%= Conference.getTitle()%></td>
+        <td colspan="10" class="groupTitle"> ${ _("Chat rooms for ")} ${ Conference.getTitle()}</td>
     </tr>
 
         <tr>
             <td></td>
-            <td nowrap class="titleChat"> <%= _("Room")%></td>
-            <td nowrap class="titleChat"> <%= _("Server")%></td>
-            <td nowrap class="titleChat"> <%= _("Description")%></td>
-            <td nowrap class="titleChat"> <%= _("Requires password")%></td>
-            <td nowrap class="titleChat"> <%= _("Password")%></td>
+            <td nowrap class="titleChat"> ${ _("Room")}</td>
+            <td nowrap class="titleChat"> ${ _("Server")}</td>
+            <td nowrap class="titleChat"> ${ _("Description")}</td>
+            <td nowrap class="titleChat"> ${ _("Requires password")}</td>
+            <td nowrap class="titleChat"> ${ _("Password")}</td>
         </tr>
 
-        <% for cr in Chatrooms: %>
-            <% if cr.getCreatedInLocalServer():%>
+        % for cr in Chatrooms: 
+            % if cr.getCreatedInLocalServer():
                 <% server = 'conference.' + cr.getHost() %>
-            <% end %>
-            <% else:%>
+            % else:
                 <% server = cr.getHost() %>
-            <% end %>
+            % endif
 
             <tr style="vertical-align: baseline;">
                 <td></td>
-                <td> <%= cr.getTitle()%> </td>
+                <td> ${ cr.getTitle()} </td>
 
-                <td style="font-family:monospace;"> <%= server%></td>
+                <td style="font-family:monospace;"> ${ server}</td>
 
-                <td><div id='desc<%= cr.getId() %>'> <%= cr.getDescription()%></div></td>
+                <td><div id='desc${ cr.getId() }'> ${ cr.getDescription()}</div></td>
 
-                <td> <%= _('Yes') if cr.getPassword() else _('No')%></td>
+                <td> ${ _('Yes') if cr.getPassword() else _('No')}</td>
 
-                <% if cr.getShowPass() and cr.getPassword():%>
-                    <td> <%= cr.getPassword()%> </td>
-                <% end %>
-                <% elif not cr.getShowPass() and cr.getPassword():%>
-                    <td style="font-style:italic;"> <%= _('Not displayed')%> </td>
-                <% end %>
-                <% else:%>
+                % if cr.getShowPass() and cr.getPassword():
+                    <td> ${ cr.getPassword()} </td>
+                % elif not cr.getShowPass() and cr.getPassword():
+                    <td style="font-style:italic;"> ${ _('Not displayed')} </td>
+                % else:
                     <td style="font-style:italic;"> - </td>
-                <% end %>
-                <% if len(PluginFieldsWrapper('InstantMessaging').getOption('customLinks')) > 0: %>
-                    <td style="font-weight: bold;" nowrap><a id="joinLink<%= cr.getId() %>" name = "<%= cr.getId() %>" class="dropDownMenu highlight" href="#"><%= _("Join now!")%></a></td>
-                <% end %>
+                % endif
+                % if len(PluginFieldsWrapper('InstantMessaging').getOption('customLinks')) > 0: 
+                    <td style="font-weight: bold;" nowrap><a id="joinLink${ cr.getId() }" name = "${ cr.getId() }" class="dropDownMenu highlight" href="#">${ _("Join now!")}</a></td>
+                % endif
                 </tr>
-        <% end %>
+        % endfor
 </table>
 
-<%= PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor') %>
+${ PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor') }
 
 <script type="text/javascript">
-var crIdList = <%= [cr.getId() for cr in Chatrooms] %>;
+var crIdList = ${ [cr.getId() for cr in Chatrooms] };
 var joinLinkList = [];
 each(crIdList, function(crId){
     joinLinkList.push($E('joinLink'+crId));
@@ -68,7 +65,7 @@ each(joinLinkList, function(joinLink){
                 return;
             }
             var menuItems = {};
-            var links = <%= Links %>;
+            var links = ${ Links };
             var crId = joinLink.dom.name;
             each(links[crId].custom, function(linkType){
                 menuItems['Using ' + linkType.name] = linkType.link;

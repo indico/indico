@@ -1,19 +1,19 @@
 
-<div class="groupTitle"><%= _("Registration")%></div>
+<div class="groupTitle">${ _("Registration")}</div>
 <table width="100%">
     <tr>
         <td>
             <table width="100%" align="center">
                 <tr>
-                    <td nowrap class="displayField"><%= _("Registration opening day")%>:</td>
-                    <td width="100%" align="left"><%= startDate %></td>
+                    <td nowrap class="displayField">${ _("Registration opening day")}:</td>
+                    <td width="100%" align="left">${ startDate }</td>
                 </tr>
                 <tr>
-                    <td nowrap class="displayField"><%= _("Registration deadline")%>:</td>
-                    <td width="100%" align="left"><%= endDate %></td>
+                    <td nowrap class="displayField">${ _("Registration deadline")}:</td>
+                    <td width="100%" align="left">${ endDate }</td>
                 </tr>
-                <%= usersLimit %>
-                <%= contactInfo %>
+                ${ usersLimit }
+                ${ contactInfo }
             </table>
         </td>
     </tr>
@@ -24,16 +24,16 @@
         <td>
             <table width="100%" align="center">
                 <tr>
-                    <td><pre><%= announcement %></pre></td>
+                    <td><pre>${ announcement }</pre></td>
                 </tr>
             </table>
         </td>
     </tr>
-	<tr>
+    <tr>
         <td>
             <table width="100%" align="center" style="padding-top:20px">
                 <tr>
-                    <td><%= actions %></td>
+                    <td>${ actions }</td>
                 </tr>
             </table>
         </td>

@@ -1,6 +1,6 @@
 this is the scheduler<br>
 <table width="100%" bgcolor="black">
-    <%= entryTable %>
+    ${ entryTable }
 </table>
 <br>
-<%= _("Add a new entry:") + " "%> <%= entriesToAdd %>
+${ _("Add a new entry:") } ${ entriesToAdd }

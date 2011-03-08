@@ -1,1 +1,1 @@
-<%= confCreationControlFrame %>
+${ confCreationControlFrame }

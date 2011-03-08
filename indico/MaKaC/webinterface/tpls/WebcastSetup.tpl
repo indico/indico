@@ -8,8 +8,8 @@
     </tr>
     <tr>
       <td>
-  <%= channels %>
-  <form action="<%= postURL %>" method="POST">
+  ${ channels }
+  <form action="${ postURL }" method="POST">
   <table bgcolor="#bbbbbb">
   <tr bgcolor="#999999"><td colspan=2><font color=white>New Channel</font>
   </td></tr><tr><td>
@@ -37,9 +37,9 @@
     </tr>
     <tr>
       <td bgcolor="white" width="100%" valign="top" class="blacktext" style="padding-top: 10px;">
-        <form action="<%= saveWebcastSynchronizationURL %>" method="POST">
+        <form action="${ saveWebcastSynchronizationURL }" method="POST">
           <span>Synchronization URL: </span>
-          <input name="webcastSynchronizationURL" size="50" value="<%= webcastSynchronizationURL %>"/>
+          <input name="webcastSynchronizationURL" size="50" value="${ webcastSynchronizationURL }"/>
           <input type="submit" name="submit" value="Save">
         </form>
         <div style="padding-top: 10px;padding-bottom: 10px;">
@@ -54,7 +54,7 @@
           </ul>
           Leave empty for no automatic synchronization.
         </div>
-        <form action="<%= webcastManualSynchronize %>" method="POST">
+        <form action="${ webcastManualSynchronize }" method="POST">
             <input type="submit" name="submit" value="Synchronize manually">
             <span>Remember to save the URL first if you have modified it.</span>
         </form>
@@ -70,7 +70,7 @@
     </tr>
     <tr>
       <td bgcolor="white" width="100%" valign="top" class="blacktext">
-	<%= adminList %>
+    ${ adminList }
       </td>
     </tr>
     </table>

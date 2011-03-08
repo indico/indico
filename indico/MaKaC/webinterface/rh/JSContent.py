@@ -3,13 +3,14 @@ import os, datetime, time, hashlib
 from indico.web.wsgi import webinterface_handler_config as apache
 
 from MaKaC.common import Config
-from MaKaC.common.TemplateExec import TemplateExec
 from MaKaC.errors import MaKaCError
 
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh import base
 
 from email.Utils import formatdate
+
+import MaKaC.common.TemplateExec as templateEngine
 
 class RHTemplateContentJS(base.RH):
     _uh = urlHandlers.Build("JSContent.py")
@@ -68,14 +69,10 @@ class RHTemplateContentJS(base.RH):
         try:
             # regenerate file if needed
             if self._regenerate:
-                fh = open( self._tplFile, "r")
-                text = fh.read()
-                fh.close()
-
                 self._dict["__rh__"] = self
                 self._dict["user"] = None
 
-                htmlData = TemplateExec().executeTemplate( text, self._dict, self._tplName )
+                htmlData = templateEngine.render(self._tplFile, self._dict)
                 fh = open(self._htmlPath, "w")
                 fh.write(htmlData)
                 fh.close()

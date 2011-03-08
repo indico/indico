@@ -36,7 +36,7 @@
     var lastSelectedDiv;
 
     // Translation dictionary from key to name in current language.
-    var translate = <%=translateName%>;
+    var translate = ${translateName};
 
     // List of poster template items
     var items = [];
@@ -174,7 +174,7 @@
 
       // We set the inner html of the div depending on the type of item inserted
       switch($F('elementList')) {
-        <%= switchCases %>
+        ${ switchCases }
       }
 
       if (!lastSelectedDiv) {
@@ -641,7 +641,7 @@
   <table class="groupTable" cellpadding="0">
     <tbody>
       <tr>
-        <td class="groupTitle" colspan="6"><%= titleMessage %></td>
+        <td class="groupTitle" colspan="6">${ titleMessage }</td>
       </tr>
       <tr>
         <td class="titleCellTD">
@@ -655,14 +655,14 @@
         <td class="titleCellTD">
           <span class="titleCellFormat">Background</span>
         </td>
-        <form action="<%= saveBackgroundURL %>" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
+        <form action="${ saveBackgroundURL }" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
         <td height="20px" NOWRAP align="left" colspan="3">
           <input name="file" size="58" type="file">
           <input class="btn" value="Send File" type="submit">
           <input class="btn" type="button" value="Remove background" onclick="removeBackground()">
         </td>
         <td width="100%" align="left" colspan="4">
-          <img id="loadingIcon" src=<%= loadingIconURL %> width="20px" height="20px" style="display:none;">
+          <img id="loadingIcon" src=${ loadingIconURL } width="20px" height="20px" style="display:none;">
         </td>
       </tr>
       <tr>
@@ -721,7 +721,7 @@
           <br/><br/>
 
           <select name="Template Elements List" id="elementList">
-            <%= selectOptions %>
+            ${ selectOptions }
           </select>
 
           <br/>
@@ -937,14 +937,14 @@
       <tr>
         <td colspan="4" align="center" width="100%">
           <input class="btn" name="Save Template Button" value="Save" type="button" onclick="save()">
-          <input class="btn" name="Cancel Button" value="Cancel" type="button" onclick="location.href='<%= cancelURL %>'">
+          <input class="btn" name="Cancel Button" value="Cancel" type="button" onclick="location.href='${ cancelURL }'">
         </td>
       </tr>
     </tbody>
   </table>
 
-  <form name="hiddenform" action="<%= saveTemplateURL %>" method="POST">
-      <input name="templateId" value="<%= templateId %>" type="hidden">
+  <form name="hiddenform" action="${ saveTemplateURL }" method="POST">
+      <input name="templateId" value="${ templateId }" type="hidden">
       <input id="templateData" name="templateData" type="hidden">
   </form>
 
@@ -957,8 +957,8 @@
   <script type="text/javascript">
 
     // We load the template if we are editing a template
-    if (<%= editingTemplate %>) {
-       var template = eval(<%= templateData %>.unescapeHTML());
+    if (${ editingTemplate }) {
+       var template = eval(${ templateData }.unescapeHTML());
        $('template name').value = template[0];
        $('templateDiv').style.width = template[1].width;
        $('templateDiv').style.height = template[1].height;
@@ -983,10 +983,10 @@
     // This function displays the items, if any have been loaded, on the screen
     displayItems()
 
-    if (<%= editingTemplate %> && <%= hasBackground %>) {
-       backgroundId = <%= backgroundId %>
-       backgroundPos = '<%= backgroundPos %>'
-       displayBackground("<%= backgroundURL %>")
+    if (${ editingTemplate } && ${ hasBackground }) {
+       backgroundId = ${ backgroundId }
+       backgroundPos = '${ backgroundPos }'
+       displayBackground("${ backgroundURL }")
     }
 
   </script>

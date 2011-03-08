@@ -7,59 +7,57 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 <div class="container">
 <div class="categoryHeader">
 <ul>
-        <% if not isRootCategory: %>
-            <li><a href="<%= urlHandlers.UHCategoryDisplay.getURL(categ.owner) %>"><%= _("Go to parent category") %></a>|</li>
-        <% end %>
-            <% if categ.getConferenceList() != []: %>
-                <li><a href="<%= urlHandlers.UHCategoryToiCal.getURL(categ) %>"><%= _("iCal export")%></a>|</li>
-            <% end %>
-        <li><a id="moreLink" class="dropDownMenu" href="#"><%= _("View") %></a></li>
-        <% if allowCreateEvent: %>
-            <li>|<a id="createEventLink" class="dropDownMenu" href="#"><%= _("Create") %></a></li>
-        <% end %>
-        <% if allowUserModif: %>
-            <li style="font-weight: bold" >|<a id="manageLink" class="dropDownMenu highlight" href="#"><%= _("Manage")%></a></li>
-        <% end %>
+        % if not isRootCategory: 
+            <li><a href="${ urlHandlers.UHCategoryDisplay.getURL(categ.owner) }">${ _("Go to parent category") }</a>|</li>
+        % endif
+            % if categ.getConferenceList() != []: 
+                <li><a href="${ urlHandlers.UHCategoryToiCal.getURL(categ) }">${ _("iCal export")}</a>|</li>
+            % endif
+        <li><a id="moreLink" class="dropDownMenu" href="#">${ _("View") }</a></li>
+        % if allowCreateEvent: 
+            <li>|<a id="createEventLink" class="dropDownMenu" href="#">${ _("Create") }</a></li>
+        % endif
+        % if allowUserModif: 
+            <li style="font-weight: bold" >|<a id="manageLink" class="dropDownMenu highlight" href="#">${ _("Manage")}</a></li>
+        % endif
 </ul>
 <h1 class="categoryTitle">
-<% if isRootCategory and containsCategories: %>
-    <%= _("Main categories") %>
-<% end %>
-<% elif isRootCategory: %>
-    <%= _("All events") %>
-<% end %>
-<% else: %>
-    <%= name %>
-<% end %>
+% if isRootCategory and containsCategories: 
+    ${ _("Main categories") }
+% elif isRootCategory: 
+    ${ _("All events") }
+% else: 
+    ${ name }
+% endif
 </h1>
 
-<% if isRootCategory and containsCategories: %>
+% if isRootCategory and containsCategories: 
 <div class="categoryInfo">
-    <%= _("Click on a category to start browsing through the hierarchy") %>
+    ${ _("Click on a category to start browsing through the hierarchy") }
 </div>
-<% end %>
-<% if description: %>
+% endif
+% if description: 
 <div class="categoryInfo">
-    <%= description %>
+    ${ description }
 </div>
-<% end %>
+% endif
 
 
-<% if managers: %>
-	<div class="categoryManagers"><strong><%= _("Managers") %>:</strong> <%= managers %></div>
-<% end %>
+% if managers: 
+    <div class="categoryManagers"><strong>${ _("Managers") }:</strong> ${ managers }</div>
+% endif
 
 <!--
-<% if taskList: %>
+% if taskList: 
 <h2 class="subtitle">
-	<%= taskList %>
+    ${ taskList }
 </h2>
-<% end %>
+% endif
 -->
 </div>
 
 <div>
-<%= contents %>
+${ contents }
 </div>
 
 </div>
@@ -87,10 +85,10 @@ moreLink.observeClick(function(e) {
     }
 
     var menuItems = {};
-    menuItems["<%= _("Today's events") %>"] = "<%= urlHandlers.UHCategoryOverview.getURL(categ) %>";
-    menuItems['<%= _("Calendar") %>'] = "<%= urlHandlers.UHCalendar.getURL([categ]) %>";
-    menuItems['<%= _("Category map") %>'] = "<%= urlHandlers.UHCategoryMap.getURL(categ) %>";
-    menuItems['<%= _("Category statistics") %>'] = "<%= urlHandlers.UHCategoryStatistics.getURL(categ) %>";
+    menuItems["${ _("Today's events") }"] = "${ urlHandlers.UHCategoryOverview.getURL(categ) }";
+    menuItems['${ _("Calendar") }'] = "${ urlHandlers.UHCalendar.getURL([categ]) }";
+    menuItems['${ _("Category map") }'] = "${ urlHandlers.UHCategoryMap.getURL(categ) }";
+    menuItems['${ _("Category statistics") }'] = "${ urlHandlers.UHCategoryStatistics.getURL(categ) }";
     moreMenu = new PopupMenu(menuItems, [moreLink], 'categoryDisplayPopupList');
     var pos = moreLink.getAbsolutePosition();
     moreMenu.open(pos.x - 5, pos.y + moreLink.dom.offsetHeight + 3);
@@ -100,7 +98,7 @@ moreLink.observeClick(function(e) {
 
 
 
-<% if allowCreateEvent: %>
+% if allowCreateEvent: 
 <script type="text/javascript">
 var createEventLink2 = $E('createEventLink');
 var createEventMenu2 = null;
@@ -113,9 +111,9 @@ createEventLink2.observeClick(function(e) {
     }
 
     var menuItems = {};
-    menuItems['<%= _("Lecture") %>'] = "<%= urlLecture %>";
-    menuItems['<%= _("Meeting") %>'] = "<%= urlMeeting %>";
-    menuItems['<%= _("Conference") %>'] = "<%= urlConference %>";
+    menuItems['${ _("Lecture") }'] = "${ urlLecture }";
+    menuItems['${ _("Meeting") }'] = "${ urlMeeting }";
+    menuItems['${ _("Conference") }'] = "${ urlConference }";
 
     createEventMenu2 = new PopupMenu(menuItems, [createEventLink2], 'categoryDisplayPopupList');
     var pos = createEventLink2.getAbsolutePosition();
@@ -123,9 +121,9 @@ createEventLink2.observeClick(function(e) {
     return false;
 });
 </script>
-<% end %>
+% endif
 
-<% if allowUserModif: %>
+% if allowUserModif: 
 <script type="text/javascript">
 var manageLink = $E('manageLink');
 var manageMenu = null;
@@ -138,12 +136,12 @@ manageLink.observeClick(function(e) {
     }
 
     var menuItems = {};
-    menuItems['<%= _("Edit category") %>'] = "<%= urlHandlers.UHCategoryModification.getURL(categ) %>";
-    menuItems['<%= _("Add subcategory") %>'] = "<%= urlHandlers.UHCategoryCreation.getURL(categ) %>";
+    menuItems['${ _("Edit category") }'] = "${ urlHandlers.UHCategoryModification.getURL(categ) }";
+    menuItems['${ _("Add subcategory") }'] = "${ urlHandlers.UHCategoryCreation.getURL(categ) }";
     manageMenu = new PopupMenu(menuItems, [manageLink], 'categoryDisplayPopupList');
     var pos = manageLink.getAbsolutePosition();
     manageMenu.open(pos.x - 5, pos.y + manageLink.dom.offsetHeight + 2);
     return false;
 });
 </script>
-<% end %>
+% endif

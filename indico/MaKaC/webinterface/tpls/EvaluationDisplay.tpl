@@ -1,18 +1,19 @@
 
       <center>
       <% questions = evaluation.getQuestions() %>
-      <% if questions==None or len(questions)<=0: %>
+      % if questions==None or len(questions)<=0: 
         <br/>
         <br/>
         <font color="#E25300">
-          <b> <%= _("This evaluation form is not ready")%>:</b>  <%= _("It has no question.")%><br/><br/>
-           <%= _("Please advise the surveyor")%><% if evaluation.getContactInfo().strip()!="": %> : <%=evaluation.getContactInfo()%><% end %>.
+          <b> ${ _("This evaluation form is not ready")}:</b>  ${ _("It has no question.")}<br/><br/>
+           ${ _("Please advise the surveyor")}${" : "+evaluation.getContactInfo() if evaluation.getContactInfo().strip()!="" else ""}.
         </font>
         <br/>
         <br/>
         <br/>
         <br/>
-      <% end %>
-      <% if questions!=None and len(questions)>0: includeTpl('EvaluationShow') %>
-      <% end %>
+      % endif
+      % if questions!=None and len(questions)>0: 
+        <%include file="EvaluationShow.tpl"/>
+      % endif
       </center>

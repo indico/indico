@@ -8,8 +8,8 @@
                                 width="100%" class="headerselected"
                                 bgcolor="#000060">
                             <tr>
-                                <td width="35"><img src="<%= meetingIcon %>" width="32" height="32" alt="lecture" border="0"></a></td>
-                                <td class="headerselected" align="left"><b><strong><font size="+2" face="arial" color="white"><%= modifyIcon %><%= title %></font></strong></b><br></td>
+                                <td width="35"><img src="${ meetingIcon }" width="32" height="32" alt="lecture" border="0"></a></td>
+                                <td class="headerselected" align="left"><b><strong><font size="+2" face="arial" color="white">${ modifyIcon }${ title }</font></strong></b><br></td>
                             </tr>
                         </table>
                     </td>
@@ -19,15 +19,15 @@
                         <table border="0" bgcolor="#f0c060" cellpadding="2"
                                 cellspacing="0" width="100%" class="results">
                             <tr>
-                                <td valign="top" align="right"><b><strong><%= _("Date/Time:")%></strong></b></td>
-                                <td><font size="-1"><%= dateInterval %></font></td>
+                                <td valign="top" align="right"><b><strong>${ _("Date/Time:")}</strong></b></td>
+                                <td><font size="-1">${ dateInterval }</font></td>
                             </tr>
-                            <%= description %>
-                            <%= location %>
-                            <%= room %>
-                            <%= chairs %>
-                            <%= material %>
-                            <%= moreInfo %>
+                            ${ description }
+                            ${ location }
+                            ${ room }
+                            ${ chairs }
+                            ${ material }
+                            ${ moreInfo }
                         </table>
                     </td>
                 </tr>
@@ -36,6 +36,6 @@
         </td>
     </tr>
     <tr>
-        <td><%= schedule %></td>
+        <td>${ schedule }</td>
     </tr>
 </table>

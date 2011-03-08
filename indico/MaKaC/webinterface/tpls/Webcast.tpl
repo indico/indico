@@ -10,7 +10,7 @@
       <td>
 <UL>
   <table width="80%">
-  <%= onair %>
+  ${ onair }
   </table>
 </UL>
       </td>
@@ -25,10 +25,10 @@
       <td>
 <UL>
   <table width="80%">
-  <%= webcasts %>
+  ${ webcasts }
   </table>
 </UL>
-  <form action="<%= addwebcastURL %>" method="POST">
+  <form action="${ addwebcastURL }" method="POST">
   <table bgcolor="#bbbbbb">
   <tr bgcolor="#999999"><td colspan=2><font color=white>New Webcast</font>
   </td></tr><tr><td>

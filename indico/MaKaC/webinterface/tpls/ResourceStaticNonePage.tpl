@@ -11,7 +11,7 @@
     </tr>
     <tr>
         <td>
-            <center> <%= _("There are no resources for this material.")%></center>
+            <center> ${ _("There are no resources for this material.")}</center>
         </td>
     </tr>
 </table>

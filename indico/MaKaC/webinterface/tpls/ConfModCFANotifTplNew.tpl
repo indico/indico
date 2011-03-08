@@ -1,110 +1,110 @@
 <% from MaKaC.webinterface.common.abstractNotificator import EmailNotificator %>
 
-<form action=<%= postURL %> method="POST">
+<form action=${ postURL } method="POST">
 <table width="90%" cellspacing="0" align="center" border="0">
-    <% if len(errors) != 0: %>
-        <% for error in errors: %>
+    % if len(errors) != 0: 
+        % for error in errors: 
             <tr align="left">
                 <td></td>
                 <td bgcolor="white" nowrap colspan="3" style="font-weight: bold; color: #881122; padding-bottom:10px; padding-top:10px; padding-left:10px;">
-                    <%= error %>
+                    ${ error }
                 </td>
             </tr>
-        <% end %>
-    <% end %>
+        % endfor
+    % endif
     <tr>
         <td colspan="3">
-            <span class="groupTitle" style="border:0px;"><%= _("Step 1: Assign a name to the template")%></span>
+            <span class="groupTitle" style="border:0px;">${ _("Step 1: Assign a name to the template")}</span>
             <br/>
-            <em><%= _("Give this email template a name; this is for your own convenience so that you can edit it later.")%></em>
+            <em>${ _("Give this email template a name; this is for your own convenience so that you can edit it later.")}</em>
             <br /><br />
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Title")}</span></td>
         <td colspan="2" bgcolor="white" width="100%">&nbsp;
-            <input id="notificationTplTitle" type="text" name="title" value=<%= title %> style="width: 61%;" onfocus="selected('notificationTplTitle')">
+            <input id="notificationTplTitle" type="text" name="title" value=${ title } style="width: 61%;" onfocus="selected('notificationTplTitle')">
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Description")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Description")}</span></td>
         <td colspan="2" bgcolor="white" width="100%">&nbsp;
-            <textarea id="notificationTplDescription" name="description" rows="5"  style="width: 61%;" onfocus="selected('notificationTplDescription')" ><%= description %></textarea>
+            <textarea id="notificationTplDescription" name="description" rows="5"  style="width: 61%;" onfocus="selected('notificationTplDescription')" >${ description }</textarea>
         </td>
     </tr>
     <tr>
         <td colspan="3">
-            <span class="groupTitle" style="border:0px;"><%= _("Step 2: Compose the email")%></span>
+            <span class="groupTitle" style="border:0px;">${ _("Step 2: Compose the email")}</span>
             <br/>
-            <em><%= _("Compose the email that will be automatically sent in the abstract reviewing process, inserting tags as needed")%></em>
+            <em>${ _("Compose the email that will be automatically sent in the abstract reviewing process, inserting tags as needed")}</em>
             <br /><br />
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("From address")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("From address")}</span></td>
         <td colspan="2" bgcolor="white" width="100%">&nbsp;
-            <input id="notificationTplAddress" type="text" name="fromAddr"  style="width: 61%;" value=<%= fromAddr %> onfocus="selected('notificationTplAddress')">
+            <input id="notificationTplAddress" type="text" name="fromAddr"  style="width: 61%;" value=${ fromAddr } onfocus="selected('notificationTplAddress')">
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("To addresses")%></span></td>
-        <td colspan="2" bgcolor="white" width="100%">&nbsp;<%= toAddrs %>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("To addresses")}</span></td>
+        <td colspan="2" bgcolor="white" width="100%">&nbsp;${ toAddrs }
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("CC addresses")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("CC addresses")}</span></td>
         <td colspan="2" bgcolor="white" width="100%">&nbsp;
-            <input id="notificationTplCCAddress" type="text" name="CCAddrs"  style="width: 61%;" value=<%= CCAddrs %> onfocus="selected('notificationTplCCAddress')">
+            <input id="notificationTplCCAddress" type="text" name="CCAddrs"  style="width: 61%;" value=${ CCAddrs } onfocus="selected('notificationTplCCAddress')">
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Subject")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Subject")}</span></td>
         <td bgcolor="white" width="100%">&nbsp;
-            <input id="notificationTplSubject" type="text" name="subject" style="width: 97%;"  value=<%= subject %> onfocus="selected('notificationTplSubject')">
+            <input id="notificationTplSubject" type="text" name="subject" style="width: 97%;"  value=${ subject } onfocus="selected('notificationTplSubject')">
         </td>
         <td align="center" valign="top" rowspan="2" style="padding-left: 5px; padding-top:3px;">
             <table width="75%" class="legend" cellspacing="0" cellpadding="2">
                 <tr>
-                    <td class="titleTd"><b> <%= _("Available tags")%>:</b></td>
+                    <td class="titleTd"><b> ${ _("Available tags")}:</b></td>
                 </tr>
-                <% for var in EmailNotificator.getVarList(): %>
+                % for var in EmailNotificator.getVarList(): 
                 <tr class="legendTr">
-                    <td width="100%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px; text-align:left;">|<%= var.getName() %>|</td>
-                    <td class="legendTd" onClick="insertTag('|<%= var.getName() %>|')">Insert</td>
+                    <td width="100%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px; text-align:left;">|${ var.getName() }|</td>
+                    <td class="legendTd" onClick="insertTag('|${ var.getName() }|')">Insert</td>
                 </tr>
-                <% end %>
+                % endfor
             </table>
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Body")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Body")}</span></td>
         <td bgcolor="white">&nbsp;
-        <textarea id="notificationTplBody" name="body" rows="26" style="width: 97%;" onfocus="selected('notificationTplBody')"><%= body %></textarea>
+        <textarea id="notificationTplBody" name="body" rows="26" style="width: 97%;" onfocus="selected('notificationTplBody')">${ body }</textarea>
         </td>
     </tr>
     <tr>
         <td colspan="3">
-            <span class="groupTitle" style="border:0px;"><%= _("Step 3: Choose the condition that triggers the email")%></span>
+            <span class="groupTitle" style="border:0px;">${ _("Step 3: Choose the condition that triggers the email")}</span>
             <br/>
-            <em><%= _("This email will be sent when an abstract is accepted, rejected or merged, depending on the following choice.")%></em>
+            <em>${ _("This email will be sent when an abstract is accepted, rejected or merged, depending on the following choice.")}</em>
             <br /><br />
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Condition") %></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Condition") }</span></td>
         <td>
             <select name="condType">
-            <% for cond in availableConditions: %>
-                <option value= <%= quoteattr(cond.getId()) %> > <%= self.htmlText(cond.getLabel()) %> </option>
-            <% end %>
+            % for cond in availableConditions: 
+                <option value= ${ quoteattr(cond.getId()) } > ${ self_.htmlText(cond.getLabel()) } </option>
+            % endfor
             </select>
         </td>
     </tr>
     <tr><td colspan="3"><br></td></tr>
     <tr style="border-top: 1px dashed rgb(119, 119, 119); background-color: rgb(236, 236, 236);">
         <td colspan="3" style="border-top:1px solid #777777;" valign="bottom" align="center">
-            <input type="submit" class="btn" name="save" value="<%= _("save")%>">
-            <input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>">
+            <input type="submit" class="btn" name="save" value="${ _("save")}">
+            <input type="submit" class="btn" name="cancel" value="${ _("cancel")}">
         </td>
     </tr>
 </table>

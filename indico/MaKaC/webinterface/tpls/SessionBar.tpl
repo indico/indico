@@ -1,22 +1,23 @@
-<%!
-try:
-    dark
-except NameError:
-    dark = False;
+<%page args="dark=None"/>
+<%
+if dark is not UNDEFINED:
+    dark_ = dark
+else:
+    dark_ = False;
 %>
 
 
-<div class="sessionBar<% if dark == True: %> sessionBarDark<% end %>">
+<div class="sessionBar${" sessionBarDark" if dark_ == True else ""}">
     <div class="corner"></div>
     <div class="links">
         <ul>
             <li>
-                <% includeTpl('TimezoneSelector') %>
+                <%include file="TimezoneSelector.tpl"/>
             </li>
             <li id="languageSelector">
-                <% includeTpl('LanguageSelector', Languages = Languages, IsHeader = False, dark=dark) %>
+                <%include file="LanguageSelector.tpl" args="Languages = Languages, IsHeader = False, dark=dark_"/>
             </li>
-            <% includeTpl('LoginWidget') %>
+            <%include file="LoginWidget.tpl"/>
         </ul>
     </div>
 </div>

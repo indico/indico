@@ -31,19 +31,19 @@
 
                 //check start date is not in the past
                 var startDatePlusExtraTime = new Date();
-                startDatePlusExtraTime.setTime(startDate.getTime() + (<%= AllowedStartMinutes %> - 1) *60*1000);
+                startDatePlusExtraTime.setTime(startDate.getTime() + (${ AllowedStartMinutes } - 1) *60*1000);
                 if (beforeNow(startDatePlusExtraTime)) {
-                    errors.push($T("Start date cannot be before the past <%= AllowedStartMinutes %> minutes"));
+                    errors.push($T("Start date cannot be before the past ${ AllowedStartMinutes } minutes"));
                 }
 
-                // check start date is not before the minimum start date (event start date - <%= ExtraMinutesBefore %> min )
-                if (startDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("Start date cannot be more than <%= ExtraMinutesBefore %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                // check start date is not before the minimum start date (event start date - ${ ExtraMinutesBefore } min )
+                if (startDate < IndicoUtil.parseDateTime("${ MinStartDate }")) {
+                    errors.push($T("Start date cannot be more than ${ ExtraMinutesBefore } minutes before the Indico event start date. Please choose it after ${ MinStartDate }"));
                 }
 
-                // check start date is not after the maximum start date (event end date + <%= ExtraMinutesAfter %> min )
-                if (startDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("Start date cannot be more than <%= ExtraMinutesAfter %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                // check start date is not after the maximum start date (event end date + ${ ExtraMinutesAfter } min )
+                if (startDate > IndicoUtil.parseDateTime("${ MaxEndDate }")) {
+                    errors.push($T("Start date cannot be more than ${ ExtraMinutesAfter } minutes after the Indico event end date. Please choose it before ${ MaxEndDate }"));
                 }
 
                 // check start date is not after end date, if end date exists
@@ -63,17 +63,17 @@
 
                 //check end date is not in the past
                 if (beforeNow(endDate)) {
-                    errors.push($T("End date cannot be before the past <%= AllowedStartMinutes %> minutes"));
+                    errors.push($T("End date cannot be before the past ${ AllowedStartMinutes } minutes"));
                 }
 
-                // check end date is not after the maximum end date (event end date + <%= ExtraMinutesAfter %> min )
-                if (endDate > IndicoUtil.parseDateTime("<%= MaxEndDate %>")) {
-                    errors.push($T("End date cannot be more than <%= ExtraMinutesAfter %> minutes after the Indico event end date. Please choose it before <%= MaxEndDate %>"));
+                // check end date is not after the maximum end date (event end date + ${ ExtraMinutesAfter } min )
+                if (endDate > IndicoUtil.parseDateTime("${ MaxEndDate }")) {
+                    errors.push($T("End date cannot be more than ${ ExtraMinutesAfter } minutes after the Indico event end date. Please choose it before ${ MaxEndDate }"));
                 }
 
-                // check start date is not before the minimum start date (event start date - <%= ExtraMinutesBefore %> min )
-                if (endDate < IndicoUtil.parseDateTime("<%= MinStartDate %>")) {
-                    errors.push($T("End date cannot be more than <%= ExtraMinutesBefore %> minutes before the Indico event start date. Please choose it after <%= MinStartDate %>"));
+                // check start date is not before the minimum start date (event start date - ${ ExtraMinutesBefore } min )
+                if (endDate < IndicoUtil.parseDateTime("${ MinStartDate }")) {
+                    errors.push($T("End date cannot be more than ${ ExtraMinutesBefore } minutes before the Indico event start date. Please choose it after ${ MinStartDate }"));
                 }
 
                 // check start date is not after end date, if start date exists
@@ -241,18 +241,18 @@
         bookingPopup.addComponent(EVOPasswordField);
 
         EVODrawContextHelpIcons();
-        <% if not PossibleToCreateOrModify: %>
+        % if not PossibleToCreateOrModify: 
             var popup = new WarningPopup($T("Impossible to create an EVO booking"),
                     [$T("The start and ending dates of your event are in the past. " +
                         "It is not possible to create an EVO booking in the past " +
                         "or outside the start / ending times of your event."),
                      Html.br(),
                      $T("If you really need to create an EVO booking, please go first to " +
-                        "the [[" + "<%= GeneralSettingsURL %>" + " General Settings]] page and change " +
+                        "the [[" + "${ GeneralSettingsURL }" + " General Settings]] page and change " +
                         "the start / end time of your event.")
                      ]);
             popup.open();
-        <% end %>
+        % endif
     },
 
     onEdit: function(booking, bookingPopup) {
@@ -261,18 +261,18 @@
         bookingPopup.addComponent(EVOPasswordField);
 
         EVODrawContextHelpIcons();
-        <% if not PossibleToCreateOrModify: %>
+        % if not PossibleToCreateOrModify: 
             var popup = new WarningPopup($T("Impossible to modify this EVO booking"),
                 [$T("The start and ending dates of your event are in the past. " +
                     "It is not possible to modify an EVO booking in the past " +
                     "or outside the start / ending times of your event."),
                     Html.br(),
                  $T("If you really need to modify this EVO booking, please go first to " +
-                    "the [[" + "<%= GeneralSettingsURL %>" + " General Settings]] page and change " +
+                    "the [[" + "${ GeneralSettingsURL }" + " General Settings]] page and change " +
                     "the start / end time of your event.")
                  ]);
             popup.open();
-        <% end %>
+        % endif
     },
 
     postCheckStatus: function(booking) {

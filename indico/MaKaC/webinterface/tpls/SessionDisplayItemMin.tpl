@@ -15,7 +15,7 @@
                             </table>
                     </td>
                     <td width="100%" valign="top">
-                        <b><a href="<%= detailsURL %>"><%= detailsIcon %></a> <font size="+1"><a href="<%= displayURL %>"><%= title %></a></font></b>
+                        <b><a href="${ detailsURL }">${ detailsIcon }</a> <font size="+1"><a href="${ displayURL }">${ title }</a></font></b>
                     </td>
                 </tr>
             </table>

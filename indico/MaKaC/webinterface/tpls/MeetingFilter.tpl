@@ -1,17 +1,17 @@
-<%!
+<%
 if filterActive == "1": 
     filterActiveStyle = "color:#D7FF99; font-weight: bold;"
 else:
     filterActiveStyle = ""
 %>
 
-<a id="filterLink" href="#" style="<%= filterActiveStyle %>"><%= _('Filter') %><div class="leftCorner"></div></a>
+<a id="filterLink" href="#" style="${ filterActiveStyle }">${ _('Filter') }<div class="leftCorner"></div></a>
 
     <div id="filterDiv" class="filterDiv">
         <form id="filterForm" style="margin: 0pt;">
         
         
-        <input type="hidden" name="confId" value="<%= confId %>" />
+        <input type="hidden" name="confId" value="${ confId }" />
         <input type="hidden" id="filterActive" name="filterActive" value="1" />
         
         <div style="float: right;">
@@ -20,19 +20,19 @@ else:
         </div>
         
         
-        <strong><%= _("Focus on:")%>&nbsp;</strong>
+        <strong>${ _("Focus on:")}&nbsp;</strong>
         
         <select id="datesSelect" name="showDate" style="font-size:8pt;">
-            <%= datesMenu %>
+            ${ datesMenu }
         </select>
         
         <select id="showSessionSelect" name="showSession" style="font-size:8pt;">
-            <%= sessionsMenu %>
+            ${ sessionsMenu }
         </select>
         
         <span style="white-space: nowrap; margin-left: 65px;">
-            <input id="hideContributionsCheckbox" style="margin-right: 5px;" type="checkbox" name="detailLevel" value="session" <%= hideContributions %>></input>
-            <strong id="hideContributionsLabel"><%= _("Hide Contributions")%></strong>
+            <input id="hideContributionsCheckbox" style="margin-right: 5px;" type="checkbox" name="detailLevel" value="session" ${ hideContributions }></input>
+            <strong id="hideContributionsLabel">${ _("Hide Contributions")}</strong>
         </span>
         
         </form>
@@ -71,13 +71,12 @@ else:
         $E('datesSelect').dom.selectedIndex = "0";
         $E('showSessionSelect').dom.selectedIndex = "0";
 
-        <% if filterActive == "1": %>
+        % if filterActive == "1": 
             $E('filterActive').dom.value = "0";
             $E('filterForm').dom.submit(); 
-        <% end %>
-        <% else: %>
+        % else: 
             filterToggle();
-        <% end %>
+        % endif
     });
     
     // Tooltip on filter icon
@@ -85,25 +84,24 @@ else:
         IndicoUI.Widgets.Generic.tooltip(this, event,
             '<ul style="list-style-type:none;padding:3px;margin:0px">'+
             '<li>'+
-                <% if filterActive != "1": %>
+                % if filterActive != "1": 
                     'Add a filter'+
-                <% end %>
-                <% else: %>
+                % else: 
                     'The filtering is <strong>activated</strong>'+
                     '<\/li>'+
                     '<li>'+
-                        '<%= _("Click on Remove filter to deactivate it")%>'+
-                <% end %>
+                        '${ _("Click on Remove filter to deactivate it")}'+
+                % endif
             '<\/li>'+
             '<\/ul>'
         );
     };
     
     // Setup the hide contributions checkbox
-    <% if hideContributions == None: %>
+    % if hideContributions == None: 
         $E('hideContributionsLabel').dom.style.display = 'none';
         $E('hideContributionsCheckbox').dom.style.display = 'none'
-    <% end %>
+    % endif
 
     // Make the hide contributions label clickable
     $E('hideContributionsLabel').dom.style.cursor='pointer'

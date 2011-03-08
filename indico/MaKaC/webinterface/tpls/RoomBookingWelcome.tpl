@@ -1,5 +1,5 @@
 <table align="center" width="95%">
 <tr>
-  <td class="formTitle"><%= _("Room Booking")%></td>
+  <td class="formTitle">${ _("Room Booking")}</td>
 </tr>
 </table>

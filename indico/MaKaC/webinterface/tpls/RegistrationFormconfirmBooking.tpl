@@ -1,7 +1,7 @@
 <center>
   <table width="80%">
     <tr>
-      <td colspan="2" align="center" nowrap class="title"> <%= _("Registered new participant")%></td>
+      <td colspan="2" align="center" nowrap class="title"> ${ _("Registered new participant")}</td>
     </tr>
     <tr>
       <td colspan="2" align="center" width=100%>
@@ -18,7 +18,7 @@
                     <table>
                       <tr>
                         <td>
-                          <pre><%= modPayDetails %></pre>
+                          <pre>${ modPayDetails }</pre>
                         </td>
                       </tr>
                     </table>
@@ -30,7 +30,7 @@
                       <tr>
                         <td>
                           <table width="100%" align="left" border="0" style="border-top:2px solid black">
-                            <%= modPay %>
+                            ${ modPay }
                           </table>
                         </td>
                       </tr>

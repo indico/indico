@@ -48,9 +48,10 @@ from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from MaKaC.webinterface.common import contribFilters as contribFilters
 from MaKaC.common import filters, utils
+from MaKaC.common.TemplateExec import escapeHTMLForJS
 from MaKaC.errors import MaKaCError
 import MaKaC.webinterface.displayMgr as displayMgr
-from MaKaC.common.TemplateExec import TemplateExec, escapeHTMLForJS
+import MaKaC.common.TemplateExec as templateEngine
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
 
@@ -186,12 +187,6 @@ class WTemplated(OldObservable):
         self.__params = {}
         if params != None:
             self.__params = params
-        try:
-            fh = open( self.tplFile, "r")
-            text = fh.read()
-            fh.close()
-        except Exception, e:
-            raise MaKaCError( _("Could not open template: %s")%self.tplFile, _("Template"))
 
         # include context help info, if it exists
         helpText = None
@@ -205,9 +200,9 @@ class WTemplated(OldObservable):
 
         vars = self.getVars()
         vars['__rh__'] = self._rh
-        vars['self'] = self
+        vars['self_'] = self
 
-        tempHTML = TemplateExec.executeTemplate( text, vars, self.tplId )
+        tempHTML = templateEngine.render(self.tplFile, vars)
 
         if self._rh and self._rh._req.is_https():
             imagesBaseURL = Config.getInstance().getImagesBaseURL()
@@ -6324,7 +6319,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
 
         #Number of the RoomBookingBookingListPrevNext templates used in the code.
         #Variable increments when new template is put.
-        vars["prevNextNo"] = 0
+        vars["attributes"] = { "prevNextNo" : 0 }
         vars["withPrevNext"] = True
         vars["prevURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Previous )
         vars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Next )

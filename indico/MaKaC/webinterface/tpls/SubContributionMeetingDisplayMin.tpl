@@ -6,12 +6,12 @@
             <table width="100%" cellpadding="2" cellspacing="0"
                     bgcolor="#F6F6F6">
                 <tr>
-                    <td width="100%"><b><font size="+1"><%= title %></font></b></td>
+                    <td width="100%"><b><font size="+1">${ title }</font></b></td>
                 </tr>
                 <tr>
                     <td width="100%">
                         <table width="100%">
-                            <%= material %>
+                            ${ material }
                         </table>
                     </td>
                 </tr>

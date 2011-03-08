@@ -1,8 +1,8 @@
 <br><table width="100%" align="center">
     <tr>
         <td align="center">
-            <form action=<%= submitURL %> method="POST">
-            <%= submitBtn %>
+            <form action=${ submitURL } method="POST">
+            ${ submitBtn }
             </form>
         </td>
     </tr>
@@ -15,16 +15,16 @@
             <tr>
                 <td>
                     <table align="center" width="95%" border="0">
-                        <%= withdrawnNotice %>
+                        ${ withdrawnNotice }
                     <tr>
-                        <td align="center"><%= modifIcon %><font size="+1" color="black"><b><%= title %></b></font></td>
+                        <td align="center">${ modifIcon }<font size="+1" color="black"><b>${ title }</b></font></td>
                     </tr>
 
                     <tr>
                         <td>
                             <table align="center">
                                 <tr>
-                                    <td><%= description %></td>
+                                    <td>${ description }</td>
                                 </tr>
                             </table>
                         </td>
@@ -34,45 +34,44 @@
                         <td>
                             <table align="center" width="90%">
                                 <tr>
-                                    <td align="right" valign="top" class="displayField"><b> <%= _("Id")%>:</b></td>
-                                    <td><%= id %></td>
+                                    <td align="right" valign="top" class="displayField"><b> ${ _("Id")}:</b></td>
+                                    <td>${ id }</td>
             </tr>
-            <%= location %>
+            ${ location }
             <tr>
-                <td align="right" valign="top" class="displayField"><b> <%= _("Starting date")%>:</b></td>
+                <td align="right" valign="top" class="displayField"><b> ${ _("Starting date")}:</b></td>
             <td width="100%">
                 <table cellspacing="0" cellpadding="0" align="left">
                 <tr>
-                    <td align="right"><%= startDate %></td>
-                <td>&nbsp;&nbsp;<%= startTime %></td>
+                    <td align="right">${ startDate }</td>
+                <td>&nbsp;&nbsp;${ startTime }</td>
                 </tr>
                 </table>
             </td>
             </tr>
             <tr>
-                <td align="right" valign="top" class="displayField"><b> <%= _("Duration")%>:</b></td>
-            <td width="100%"><%= duration %></td>
+                <td align="right" valign="top" class="displayField"><b> ${ _("Duration")}:</b></td>
+            <td width="100%">${ duration }</td>
             </tr>
-                    <%= contribType %>
-                    <%= primaryAuthors %>
-                    <%= coAuthors %>
-                    <%= speakers %>
-                    <% if Contribution.canUserSubmit(self._aw.getUser()) or Contribution.canModify(self._aw): %>
+                    ${ contribType }
+                    ${ primaryAuthors }
+                    ${ coAuthors }
+                    ${ speakers }
+                    % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw): 
                     <td class="displayField" nowrap="" align="right" valign="top">
-                        <b><%= _("Material:")%></b>
+                        <b>${ _("Material:")}</b>
                     </td>
                     <td width="100%" valign="top">
-                        <%=MaterialList%>
+                        ${MaterialList}
                     </td>
-                    <% end %>
-                    <% else: %>
-                        <%= material %>
-                    <% end %>
+                    % else: 
+                        ${ material }
+                    % endif
                     <tr><td>&nbsp;</td></tr>
-                    <%= inSession %>
-                    <%= inTrack %>
+                    ${ inSession }
+                    ${ inTrack }
                     <tr><td>&nbsp;</td></tr>
-                    <%= subConts %>
+                    ${ subConts }
                  </table>
                  </td>
               </tr>
@@ -84,8 +83,8 @@
 </tr>
 <tr>
     <td align="center">
-        <form action=<%= submitURL %> method="POST">
-        <%= submitBtn %>
+        <form action=${ submitURL } method="POST">
+        ${ submitBtn }
         </form>
     </td>
 </tr>

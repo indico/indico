@@ -6,17 +6,17 @@
                     bgcolor="#F6F6F6">
                 <tr>
                     <td nowrap>
-                    <%= modifyItem %><b><font size="+1"><%= title %></font></b> <%= _("Duration")%> : <font size="-1" color="red"><%= duration %></font></td>
+                    ${ modifyItem }<b><font size="+1">${ title }</font></b> ${ _("Duration")} : <font size="-1" color="red">${ duration }</font></td>
                 </tr>
                 <tr>
                     <td>
                         <table width="100%">
                             <tr>
-                                <td><%= description %></td>
+                                <td>${ description }</td>
                                 <td>
                                      <table>
-                                        <%= speakers %>
-                                        <%= material %>
+                                        ${ speakers }
+                                        ${ material }
                                     </table>
                                 </td>
                             </tr>

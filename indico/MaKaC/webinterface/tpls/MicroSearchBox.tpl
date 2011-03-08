@@ -5,53 +5,53 @@ var dialog;
 
 function switchBox(item)
 {
-	if (state)
-	{
-		closeSearchBox(item);
-		state = false;
-	}
-	else
-	{
-		openSearchBox(item);
-		state = true;
-	}
+    if (state)
+    {
+        closeSearchBox(item);
+        state = false;
+    }
+    else
+    {
+        openSearchBox(item);
+        state = true;
+    }
 }
 
 function openSearchBox(item)
 {
-	item.style.background = '#AACCFF';
-	$(item).oldsrc = item.src
-	item.src = <%= closeIcon %>;
+    item.style.background = '#AACCFF';
+    $(item).oldsrc = item.src
+    item.src = ${ closeIcon };
 
-	dialog = new SimplePanel('microSearchBox',250, -1,document.body,'absolute');
-	dialog.setStyle('UIMicroSearchBox');
-	dialog.hide();
-	dialog.setInnerHTML("<%= innerBox %>");
+    dialog = new SimplePanel('microSearchBox',250, -1,document.body,'absolute');
+    dialog.setStyle('UIMicroSearchBox');
+    dialog.hide();
+    dialog.setInnerHTML("${ innerBox }");
 
-	var res = findPos(item);
+    var res = findPos(item);
 
-	var offLeft = res[0]
-	var offTop = res[1]
+    var offLeft = res[0]
+    var offTop = res[1]
 
-	// Prevent occlusion
-	if (offLeft < 250)
-	{
-		dialog.placeAt(offLeft,offTop+item.clientHeight);
-	}
-	else
-	{
-		dialog.placeAt(offLeft-250+item.clientWidth,offTop+item.clientHeight);
-	}
+    // Prevent occlusion
+    if (offLeft < 250)
+    {
+        dialog.placeAt(offLeft,offTop+item.clientHeight);
+    }
+    else
+    {
+        dialog.placeAt(offLeft-250+item.clientWidth,offTop+item.clientHeight);
+    }
 
-	Effect.Appear(dialog.mainPanel);
+    Effect.Appear(dialog.mainPanel);
 }
 
 function closeSearchBox(item)
 {
-	item.src = item.oldsrc;
-	item.style.background = 'none';
+    item.src = item.oldsrc;
+    item.style.background = 'none';
 
-	Effect.Fade(dialog.mainPanel);
+    Effect.Fade(dialog.mainPanel);
 }
 
 </script>

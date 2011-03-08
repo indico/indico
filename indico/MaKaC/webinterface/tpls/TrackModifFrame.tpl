@@ -1,2 +1,2 @@
-<% includeTpl('BannerModif') %>
-<%= body %>
+<%include file="BannerModif.tpl"/>
+${ body }

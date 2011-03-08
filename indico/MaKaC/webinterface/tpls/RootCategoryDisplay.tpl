@@ -1,2 +1,2 @@
 
-<%= contents %>
+${ contents }

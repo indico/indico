@@ -2,13 +2,13 @@
 <tr>
   <td>
   <div class="nav_alphabet">
-  <%= browseIndex %>
+  ${ browseIndex }
   </div>
   </td>
 </tr>
 <tr>
   <td>
-  <%= browseResult %>
+  ${ browseResult }
   </td>
 </tr>
 </table>

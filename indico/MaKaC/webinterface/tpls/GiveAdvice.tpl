@@ -1,57 +1,55 @@
 <% from MaKaC.paperReviewing import ConferencePaperReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-<% if not Review.isAuthorSubmitted(): %>
+% if not Review.isAuthorSubmitted(): 
 <table width="90%" align="center" border="0" style="margin-bottom: 1em">
-    <% if len(Review.getReviewManager().getVersioning()) == 1: %>
+    % if len(Review.getReviewManager().getVersioning()) == 1: 
     <tr>
         <td>
             <p style="padding-left: 25px;"><font color="gray">
-            <%= _("Warning: the author(s) of this contribution have still not marked their initial materials as submitted.")%><br>
-            <%= _("You must wait until then to start the reviewing process.")%>
+            ${ _("Warning: the author(s) of this contribution have still not marked their initial materials as submitted.")}<br>
+            ${ _("You must wait until then to start the reviewing process.")}
             </font></p>
         </td>
     </tr>
-    <% end %>
-    <% else: %>
+    % else: 
     <tr>
         <td>
             <p style="padding-left: 25px;"><font color="gray">
-            <%= _("Warning: since this contribution was marked 'To be corrected', the author(s) has not submitted new materials.")%><br>
-            <%= _("You must wait until then to restart the reviewing process.")%><br>
+            ${ _("Warning: since this contribution was marked 'To be corrected', the author(s) has not submitted new materials.")}<br>
+            ${ _("You must wait until then to restart the reviewing process.")}<br>
             </font></p>
         </td>
     </tr>
-    <% end %>
+    % endif
 </table>
-<% end %>
-<% else: %>
+% else: 
 <table width="90%" align="center" border="0" style="padding-top: 15px;">
     <tr>
-        <td colspan="5" class="groupTitle" style="border: none"><%= _("Give opinion on the content of a contribution")%>
-            <% inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.')) %>
+        <td colspan="5" class="groupTitle" style="border: none">${ _("Give opinion on the content of a contribution")}
+            ${inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.'))}
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}</span></td>
         <td width="60%" id="questionListDisplay">
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Comments")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Comments")}</span></td>
         <td>
             <div id="inPlaceEditComments"></div>
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Judgement")%></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Judgement")}</span></td>
         <td>
             <div id="statusDiv">
-                <div id="initialStatus" style="display:inline"><%= Advice.getJudgement() %></div>
+                <div id="initialStatus" style="display:inline">${ Advice.getJudgement() }</div>
                 <div id="inPlaceEditJudgement" style="display:inline"></div>
             </div>
             <div id="commentsMessage" style="padding-top:5px;">
-                <%= _("The comments and your judgement, will be sent by e-mail to the author(s)")%>
+                ${ _("The comments and your judgement, will be sent by e-mail to the author(s)")}
             </div>
         </td>
     </tr>
@@ -62,7 +60,7 @@
         </td>
     </tr>
 </table>
-
+% endif
 
 <script type="text/javascript">
 
@@ -77,41 +75,39 @@ var showWidgets = function(firstLoad) {
 
     new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditJudgement'),
                         'reviewing.contribution.changeJudgement',
-                        {conference: '<%= Contribution.getConference().getId() %>',
-                        contribution: '<%= Contribution.getId() %>',
+                        {conference: '${ Contribution.getConference().getId() }',
+                        contribution: '${ Contribution.getId() }',
                         current: 'reviewerJudgement'
-                        }, <%= ConfReview.getStatusesDictionary() %>,
-                        "<%= Advice.getJudgement() %>", observer);
+                        }, ${ ConfReview.getStatusesDictionary() },
+                        "${ Advice.getJudgement() }", observer);
 
-    var initialValue = '<%= Advice.getComments() %>';
+    var initialValue = '${ Advice.getComments() }';
     if (initialValue == '') {
         initialValue = 'No comments';
     }
 
     $E('inPlaceEditComments').set(new TextAreaEditWidget('reviewing.contribution.changeComments',
-            {conference: '<%= Contribution.getConference().getId() %>',
-             contribution: '<%= Contribution.getId() %>',
+            {conference: '${ Contribution.getConference().getId() }',
+             contribution: '${ Contribution.getId() }',
              current: 'reviewerJudgement'},initialValue).draw());
 
 
-    <% if len (ConfReview.getReviewingQuestions()) == 0 : %>
+    % if len (ConfReview.getReviewingQuestions()) == 0 : 
         $E('questionListDisplay').set("No reviewing questions proposed for this conference.");
-    <% end %>
-    <% else: %>
+    % else: 
         $E("questionListDisplay").set('');
-        <% for q in ConfReview.getReviewingQuestions(): %>
+        % for q in ConfReview.getReviewingQuestions(): 
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
 
-            newDiv.append(Html.span(null,"<%=q.getText()%>"));
+            newDiv.append(Html.span(null,"${q.getText()}"));
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                <% if Advice.getAnswer(q.getId()) is None: %>
-                    var initialValue = "<%= Advice.createAnswer(q.getId()).getRbValue() %>";
-                <% end %>
-                <% else: %>
-                    var initialValue = "<%= Advice.getAnswer(q.getId()).getRbValue() %>";
-                <% end %>
+                % if Advice.getAnswer(q.getId()) is None: 
+                    var initialValue = "${ Advice.createAnswer(q.getId()).getRbValue() }";
+                % else: 
+                    var initialValue = "${ Advice.getAnswer(q.getId()).getRbValue() }";
+                % endif
             } else {
                 var initialValue = false;
             }
@@ -119,28 +115,28 @@ var showWidgets = function(firstLoad) {
             newDiv.append(new IndicoUI.Widgets.Generic.radioButtonField(
                                                     null,
                                                     'horizontal2',
-                                                    <%= str(range(len(ConfReview.reviewingQuestionsAnswers))) %>,
-                                                    <%= str(ConfReview.reviewingQuestionsLabels) %>,
+                                                    ${ str(range(len(ConfReview.reviewingQuestionsAnswers))) },
+                                                    ${ str(ConfReview.reviewingQuestionsLabels) },
                                                     initialValue,
                                                     'reviewing.contribution.changeCriteria',
-                                                    {conference: '<%= Contribution.getConference().getId() %>',
-                                                    contribution: '<%= Contribution.getId() %>',
-                                                    criterion: '<%= q.getId() %>',
+                                                    {conference: '${ Contribution.getConference().getId() }',
+                                                    contribution: '${ Contribution.getId() }',
+                                                    criterion: '${ q.getId() }',
                                                     current: 'reviewerJudgement'
                                                     }));
 
             $E("questionListDisplay").append(newDiv);
             $E("questionListDisplay").append(Html.br());
 
-        <% end %>
-    <% end %>
+        % endfor
+    % endif
 }
 
 var showValues = function() {
     indicoRequest('reviewing.contribution.changeComments',
             {
-                conference: '<%= Contribution.getConference().getId() %>',
-                contribution: '<%= Contribution.getId() %>',
+                conference: '${ Contribution.getConference().getId() }',
+                contribution: '${ Contribution.getId() }',
                 current: 'reviewerJudgement'
             },
             function(result, error){
@@ -155,8 +151,8 @@ var showValues = function() {
         )
     indicoRequest('reviewing.contribution.changeJudgement',
             {
-                conference: '<%= Contribution.getConference().getId() %>',
-                contribution: '<%= Contribution.getId() %>',
+                conference: '${ Contribution.getConference().getId() }',
+                contribution: '${ Contribution.getId() }',
                 current: 'reviewerJudgement'
             },
             function(result, error){
@@ -168,8 +164,8 @@ var showValues = function() {
 
     indicoRequest('reviewing.contribution.getCriteria',
             {
-                conference: '<%= Contribution.getConference().getId() %>',
-                contribution: '<%= Contribution.getId() %>',
+                conference: '${ Contribution.getConference().getId() }',
+                contribution: '${ Contribution.getId() }',
                 current: 'reviewerJudgement'
             },
             function(result, error){
@@ -190,23 +186,22 @@ var showValues = function() {
 
 
 
-<% if Advice.isSubmitted():%>
+% if Advice.isSubmitted():
     var submitted = true;
-<% end %>
-<% else: %>
+% else: 
     var submitted = false;
-<% end %>
+% endif
 
 var updatePage = function (firstLoad){
     if (submitted) {
-    	if($E('initialStatus')) {
+        if($E('initialStatus')) {
             $E('statusDiv').remove($E('initialStatus'));
         }
         submitButton.set($T('Modify judgement'));
         $E('submittedmessage').set($T('Judgement has been submitted'));
         showValues();
     } else {
-        if ("<%= Advice.getJudgement() %>" == "None") {
+        if ("${ Advice.getJudgement() }" == "None") {
             submitButton.dom.disabled = true;
         }
         submitButton.set('Submit');
@@ -217,8 +212,8 @@ var updatePage = function (firstLoad){
 
 var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'), 'reviewing.contribution.setSubmitted',
         {
-            conference: '<%= Contribution.getConference().getId() %>',
-            contribution: '<%= Contribution.getId() %>',
+            conference: '${ Contribution.getConference().getId() }',
+            contribution: '${ Contribution.getId() }',
             current: 'reviewerJudgement',
             value: true
         },
@@ -226,10 +221,10 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
             if (!error) {
                 submitted = !submitted;
                 //updatePage(false);
-                location.href = "<%= urlHandlers.UHContributionModifReviewing.getURL(Contribution) %>";
+                location.href = "${ urlHandlers.UHContributionModifReviewing.getURL(Contribution) }";
                 location.reload(true);
             } else {
-            	alert (error.message);
+                alert (error.message);
                 //IndicoUtil.errorReport(error);
             }
         },

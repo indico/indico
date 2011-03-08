@@ -2,66 +2,65 @@
             "http://www.w3.org/TR/html4/loose.dtd">
 <html>
     <head>
-        <title><%= page._getTitle() %><%= area %></title>
+        <title>${ page._getTitle() }${ area }</title>
         <meta http-equiv="X-UA-Compatible" content="IE=8" />
 
-        <link rel="shortcut icon" type="image/x-icon" href="<%= systemIcon('addressBarIcon') %>">
-        <link rel="stylesheet" type="text/css" href="<%= baseurl %>/css/<%= stylesheet %>">
-        <link rel="stylesheet" type="text/css" href="<%= baseurl %>/css/calendar-blue.css" >
+        <link rel="shortcut icon" type="image/x-icon" href="${ systemIcon('addressBarIcon') }">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/${ stylesheet }">
+        <link rel="stylesheet" type="text/css" href="${ baseurl }/css/calendar-blue.css" >
 
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
         <script type="text/javascript">
-                var TextRoot = "<%= baseurl %>/js/indico/i18n/";
-                var ScriptRoot = "<%= baseurl %>/js/";
+                var TextRoot = "${ baseurl }/js/indico/i18n/";
+                var ScriptRoot = "${ baseurl }/js/";
         </script>
 
         <!-- Indico specific -->
-        <%= page._getJavaScriptInclude(baseurl + "/JSContent.py/getVars") %> <!-- Indico Variables -->
+        ${ page._getJavaScriptInclude(baseurl + "/JSContent.py/getVars") } <!-- Indico Variables -->
 
         <!-- Page Specific JS files-->
-        <% for JSFile in extraJSFiles: %>
-            <%= page._getJavaScriptInclude(baseurl + '/' + JSFile) %>
-        <% end %>
+        % for JSFile in extraJSFiles: 
+            ${ page._getJavaScriptInclude(baseurl + '/' + JSFile) }
+        % endfor
 
-	<script type="text/javascript">
-	  var currentLanguage = '<%= language %>';
-	  loadDictionary(currentLanguage);
-	</script>
+    <script type="text/javascript">
+      var currentLanguage = '${ language }';
+      loadDictionary(currentLanguage);
+    </script>
 
         <!-- Tooltip -->
-        <script type="text/javascript" src="<%= baseurl %>/js/tooltip/domLib.js"></script>
-        <script type="text/javascript" src="<%= baseurl %>/js/tooltip/domTT.js"></script>
-        <script type="text/javascript" src="<%= baseurl %>/js/tooltip/domTT_drag.js"></script>
+        <script type="text/javascript" src="${ baseurl }/js/tooltip/domLib.js"></script>
+        <script type="text/javascript" src="${ baseurl }/js/tooltip/domTT.js"></script>
+        <script type="text/javascript" src="${ baseurl }/js/tooltip/domTT_drag.js"></script>
 
         <!-- Calendar Widget -->
-        <%= page._getJavaScriptInclude(baseurl + "/js/calendar/calendar.js") %>
-        <%= page._getJavaScriptInclude(baseurl + "/js/calendar/calendar-setup.js") %>
+        ${ page._getJavaScriptInclude(baseurl + "/js/calendar/calendar.js") }
+        ${ page._getJavaScriptInclude(baseurl + "/js/calendar/calendar-setup.js") }
 
         <!-- Page Specific CSS files-->
-        <% for cssFile in extraCSS: %>
-            <link rel="stylesheet" type="text/css" href="<%= baseurl + '/' + cssFile %>">
-        <% end %>
+        % for cssFile in extraCSS: 
+            <link rel="stylesheet" type="text/css" href="${ baseurl + '/' + cssFile }">
+        % endfor
 
         <!-- Page Specific, directly inserted Javascript -->
         <script type="text/javascript">
-            <%= "\n\n".join(extraJS) %>
+            ${ "\n\n".join(extraJS) }
         </script>
 
         <!-- Indico page-wide global JS variables -->
         <script type="text/javascript">
         <% user = page._rh.getAW().getUser() %>
-        <% if user: %>
+        % if user: 
             IndicoGlobalVars.isUserAuthenticated = true;
-            IndicoGlobalVars.userData = <%= jsonEncode(page._getJavaScriptUserData()) %>;
-        <% end %>
-        <% else: %>
+            IndicoGlobalVars.userData = ${ jsonEncode(page._getJavaScriptUserData()) };
+        % else: 
             IndicoGlobalVars.isUserAuthenticated = false;
-        <% end %>
+        % endif
         </script>
 
         <!-- Other Page Specific -->
-        <%= page._getHeadContent() %>
+        ${ page._getHeadContent() }
     </head>
     <body>
-        <%= page._getWarningMessage() %>
+        ${ page._getWarningMessage() }

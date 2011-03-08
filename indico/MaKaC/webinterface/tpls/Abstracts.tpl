@@ -162,37 +162,35 @@ document.filterOptionForm.showSubmissionDate.checked=false
 <table width="100%" valign="top" align="left" cellspacing="0">
     <tr>
         <td class="titleCellFormat" nowrap colspan="10">
-            <form action=<%= accessAbstract %> method="post">
-            <%= _("Quick search: Abstract ID")%> <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="<%= _("seek it")%>"><br>
+            <form action=${ accessAbstract } method="post">
+            ${ _("Quick search: Abstract ID")} <input type="text" name="abstractId" size="4"><input type="submit" class="btn" value="${ _("seek it")}"><br>
             </form>
         </td>
     </tr>
     <tr>
        <td nowrap colspan="11">
-            <div class="CRLgroupTitleNoBorder"><%= _("Displaying")%><strong> <%= filteredNumberAbstracts %> </strong>
-            <% if filteredNumberAbstracts == "1": %>
-                <%= _("abstract")%>
-            <% end %>
-            <% else: %>
-                <%= _("abstracts")%>
-            <% end %>
-            <% if filterUsed: %>
-                (<%= _("Total")%>: <strong><%= totalNumberAbstracts %></strong>)
-            <% end %>
+            <div class="CRLgroupTitleNoBorder">${ _("Displaying")}<strong> ${ filteredNumberAbstracts } </strong>
+            % if filteredNumberAbstracts == "1": 
+                ${ _("abstract")}
+            % else: 
+                ${ _("abstracts")}
+            % endif
+            % if filterUsed: 
+                (${ _("Total")}: <strong>${ totalNumberAbstracts }</strong>)
+            % endif
             </div>
-            <form action=<%= filterPostURL %> method="post" name="optionForm">
+            <form action=${ filterPostURL } method="post" name="optionForm">
             <div class="CRLIndexList" >
-                <% if filterUsed: %>
+                % if filterUsed: 
                     <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                     <span style="padding: 0px 6px 0px 6px">|</span>
-                <% end %>
+                % endif
                 <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
-                  <% if filterUsed: %>
-                    <%= _("Show filters")%>
-                  <% end %>
-                  <% else: %>
-                    <%= _("Apply filters")%>
-                  <% end %>
+                  % if filterUsed: 
+                    ${ _("Show filters")}
+                  % else: 
+                    ${ _("Apply filters")}
+                  % endif
                 </a>
             </div>
             </form>
@@ -200,62 +198,60 @@ document.filterOptionForm.showSubmissionDate.checked=false
     </tr>
     <tr>
         <td colspan="11" align="left" width="100%">
-          <form action=<%= filterPostURL %> method="post" name="filterOptionForm">
+          <form action=${ filterPostURL } method="post" name="filterOptionForm">
             <input type="hidden" name="operationType" value="filter" />
-            <%= filterMenu %>
-            <%= sortingOptions %>
+            ${ filterMenu }
+            ${ sortingOptions }
           </form>
         </td>
     </tr>
     <tr>
         <td colspan="11" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
             <table>
-                <form action=<%= abstractSelectionAction %> method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
+                <form action=${ abstractSelectionAction } method="post" name="abstractsForm" onSubmit="return atLeastOneSelected()">
                 <tr>
-                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="<%= _("Add new")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("Accept") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("Reject") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("Merge")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="<%= _("Author list")%>"></td>
+                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="${ _("Add new")}"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="${ _("Accept") }">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="${ _("Reject") }">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="${ _("Merge")}"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="${ _("Author list")}"></td>
                     <td valign="bottom" align="left">Export to:</td>
-                    <td valign="bottom" align="left"><input type="image" name="excel" src=<%= excelIconURL%> border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="pdf" src=<%= pdfIconURL%> border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="xml" src=<%= xmlIconURL%> border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="excel" src=${ excelIconURL} border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="pdf" src=${ pdfIconURL} border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="xml" src=${ xmlIconURL} border="0"></td>
                 </tr>
             </table>
         </td>
     </tr>
-    <% if (totalNumberAbstracts == "0"): %>
+    % if (totalNumberAbstracts == "0"): 
     <tr>
-        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText"><%=_("There are no abstracts submitted yet")%></span></td>
+        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts submitted yet")}</span></td>
     </tr>
-    <% end %>
-    <% elif (filteredNumberAbstracts == "0"): %>
-        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText"><%=_("There are no abstracts with the filters criteria selected")%></span></td>
-    <% end %>
-    <% else: %>
+    % elif (filteredNumberAbstracts == "0"): 
+        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts with the filters criteria selected")}</span></td>
+    % else: 
         <tr>
-            <%= abstractTitleBar %>
+            ${ abstractTitleBar }
         </tr>
-    <% end %>
+    % endif
     <tr><td>
         <tbody id="abstractsItems">
-            <%= abstracts %>
+            ${ abstracts }
         </tbody>
     </td></tr>
     <tr>
         <td colspan="11" style="border-top: 2px solid #777777; padding-top: 3px;" valign="bottom" align="left">
             <table>
                 <tr>
-                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="<%= _("Add new")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="<%= _("Accept") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="<%= _("Reject") %>">
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="<%= _("Merge")%>"></td>
-                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="<%= _("Author list")%>"></td>
+                    <td valign="bottom" align="left" class="eventModifButtonBar"><input type="submit" class="btn" name="newAbstract" onclick="newAbst = true;" value="${ _("Add new")}"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="acceptMultiple" value="${ _("Accept") }">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="${ _("Reject") }">
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="${ _("Merge")}"></td>
+                    <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="${ _("Author list")}"></td>
                     <td valign="bottom" align="left">Export to:</td>
-                    <td valign="bottom" align="left"><input type="image" name="excel" src=<%= excelIconURL%> border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="pdf" src=<%= pdfIconURL%> border="0"></td>
-                    <td valign="bottom" align="left"><input type="image" name="xml" src=<%= xmlIconURL%> border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="excel" src=${ excelIconURL} border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="pdf" src=${ pdfIconURL} border="0"></td>
+                    <td valign="bottom" align="left"><input type="image" name="xml" src=${ xmlIconURL} border="0"></td>
             </tr>
             </form>
             </table>
@@ -351,16 +347,15 @@ document.filterOptionForm.showSubmissionDate.checked=false
 
     function showFilters() {
         if ($E("filterMenu").dom.style.display == "") {
-<% if filterUsed: %>
-            $E("index_filter").set('<%= _("Show filters")%>');
-<% end %>
-<% else: %>
-            $E("index_filter").set('<%= _("Apply filters")%>');
-<% end %>
+% if filterUsed: 
+            $E("index_filter").set('${ _("Show filters")}');
+% else: 
+            $E("index_filter").set('${ _("Apply filters")}');
+% endif
             $E('index_filter').dom.className = "CRLIndexUnselected";
             $E("filterMenu").dom.style.display = "none";
         }else {
-            $E("index_filter").set('<%= _("Hide filters")%>');
+            $E("index_filter").set('${ _("Hide filters")}');
             $E('index_filter').dom.className = "CRLIndexSelected";
             $E("filterMenu").dom.style.display = "";
         }
@@ -368,7 +363,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
 </script>
 <script>
 function showQuestionDetails(questions, answers) {
-	// Create the table and the headers
+    // Create the table and the headers
     var content = Html.div();
     var table = Html.table({className:'infoQuestionsTable', cellspacing:'0'});
     content.append(table);

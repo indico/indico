@@ -1,6 +1,6 @@
 <table align="center" width="95%">
 <tr>
-  <td class="formTitle"><a href="<%=backURL%>">&lt;&lt; back</a></td>
+  <td class="formTitle"><a href="${backURL}">&lt;&lt; back</a></td>
 </tr>
 <tr>
   <td>
@@ -8,7 +8,7 @@
     <table width="70%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td colspan="3" class="groupTitle">
-        Group <b><%=name%></b><br>
+        Group <b>${name}</b><br>
       </td>
     </tr>
     <tr>
@@ -16,21 +16,21 @@
         <table width="100%">
         <tr>
           <td nowrap class="titleCellTD"><span class="titleCellFormat">Description</span></td>
-          <td><%=description%></td>
+          <td>${description}</td>
         </tr>
         <tr>
           <td nowrap class="titleCellTD"><span class="titleCellFormat">Email</span></td>
-          <td><%=email%></td>
+          <td>${email}</td>
         </tr>
         <tr>
           <td nowrap class="titleCellTD"><span class="titleCellFormat">Obsolete</span></td>
-          <td><%= obsolete %></input></td>
+          <td>${ obsolete }</input></td>
         </tr>
         </table>
       </td>
-      <form action="<%=modifyURL%>" method="POST">
+      <form action="${modifyURL}" method="POST">
       <td valign="top" align="right">
-	<input type="submit" class="btn" value="modify"><br>
+    <input type="submit" class="btn" value="modify"><br>
       </td>
       </form>
     </tr>
@@ -46,7 +46,7 @@
     </tr>
     <tr>
       <td bgcolor="white" width="100%" valign="top" class="blacktext">
-	<%=membersList%>
+    ${membersList}
       </td>
     </tr>
     </table>

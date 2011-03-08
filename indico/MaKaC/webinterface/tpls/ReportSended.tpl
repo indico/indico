@@ -4,9 +4,9 @@
             <br>
 
             <table align="center"><tr><td>
-                 <%= _("The message was sent to the administrator.")%><br>
-                 <%= _("Your request will be process as soon as possible.")%><br><br>
-                 <%= _("Thank you to use the indico system.")%>
+                 ${ _("The message was sent to the administrator.")}<br>
+                 ${ _("Your request will be process as soon as possible.")}<br><br>
+                 ${ _("Thank you to use the indico system.")}
                 <br><br>
             </td></tr></table>
         </td>

@@ -4,9 +4,9 @@
                           <td align="center" width="100%"></td>
                         </tr>
                         <tr>
-                          <td colspan="2"><marquee scrolldelay="2" scrollamount="<%= speed %>" onmouseover="this.stop();" onmouseout="this.start();">
-						    <%= text %>
-						  </td>
+                          <td colspan="2"><marquee scrolldelay="2" scrollamount="${ speed }" onmouseover="this.stop();" onmouseout="this.start();">
+                            ${ text }
+                          </td>
                         </tr>
                       </table>
 

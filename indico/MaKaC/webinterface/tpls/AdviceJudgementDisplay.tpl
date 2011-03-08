@@ -1,44 +1,45 @@
+<%page args="advice=None, ShowReviewer=None, format=None"/>
 <% from MaKaC.paperReviewing import ConferencePaperReview %>
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Content judgement:")%></span>
+                        <span class="titleCellFormat" style="font-size: 12px;">${ _("Content judgement:")}</span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <%= advice.getJudgement() %>,
-                        <em><%= _(" submitted on ") %><%= advice.getAdjustedSubmissionDate().strftime(format) %></em>
+                        ${ advice.getJudgement() },
+                        <em>${ _(" submitted on ") }${ advice.getAdjustedSubmissionDate().strftime(format) }</em>
                     </td>
                 </tr>
-                <% if advice.getComments(): %>
+                % if advice.getComments():
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Comments:")%></span>
+                        <span class="titleCellFormat" style="font-size: 12px;">${ _("Comments:")}</span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <%= advice.getComments() %>
+                        ${ advice.getComments() }
                     </td>
                 </tr>
-                <% end %>
-                <% if advice.getAnswers(): %>
+                % endif
+                % if advice.getAnswers():
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Answered questions:")%></span>
+                        <span class="titleCellFormat" style="font-size: 12px;">${ _("Answered questions:")}</span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <% for a in advice.getAnswers(): %>
-                            <%= a %>
+                        % for a in advice.getAnswers():
+                            ${ a }
                             <br/>
-                        <% end %>
+                        % endfor
                     </td>
                 </tr>
-                <% end %>
-                <% if ShowReviewer: %>
+                % endif
+                % if ShowReviewer:
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
-                        <span class="titleCellFormat" style="font-size: 12px;"><%= _("Content Reviewer:")%></span>
+                        <span class="titleCellFormat" style="font-size: 12px;">${ _("Content Reviewer:")}</span>
                     </td>
                     <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                        <%= advice.getAuthor().getFullName() %>
+                        ${ advice.getAuthor().getFullName() }
                     </td>
                 </tr>
-                <% end %>
+                % endif
 

@@ -9,31 +9,31 @@
       <!--left menu start-->
       <table class="evalEditLeftMenu">
         <tr>
-          <th class="groupTitle"><%= _("New Question")%></th>
+          <th class="groupTitle">${ _("New Question")}</th>
         <tr>
         <tr><td>
           <!--button Textbox-->
-          <%= form_tbox %>
+          ${ form_tbox }
         </td></tr>
         <tr><td>
           <!--button Textarea-->
-          <%= form_area %>
+          ${ form_area }
         </td></tr>
         <tr><td>
           <!--button Password-->
-          <%= form_pswd %>
+          ${ form_pswd }
         </td></tr>
         <tr><td>
           <!--button Select-->
-          <%= form_slct %>
+          ${ form_slct }
         </td></tr>
         <tr><td>
           <!--button Radio-->
-          <%= form_radi %>
+          ${ form_radi }
         </td></tr>
         <tr><td>
           <!--button Checkbox-->
-          <%= form_chck %>
+          ${ form_chck }
         </td></tr>
       </table>
       <br/>
@@ -43,7 +43,7 @@
     <td style="margin-right:0px;padding-right:0px;border-spacing:0px;">
 
       <!--MAIN starts-->
-      <%= main %>
+      ${ main }
       <!--MAIN ends-->
 
     </td>

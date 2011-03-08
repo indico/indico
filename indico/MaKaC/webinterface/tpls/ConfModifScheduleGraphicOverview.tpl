@@ -1,1 +1,1 @@
-<%= schedule %>
+${ schedule }

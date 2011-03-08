@@ -1,3 +1,4 @@
+<%page args="Object=None, ObjectType=None, Favorites=None, Index=None, rbActive=None, baseURL=None"/>
 <% from MaKaC.fossils.user import IAvatarFossil %>
 
     <script type="text/javascript">
@@ -6,29 +7,27 @@
     var editor = { get: function(){} };
     </script>
 
-    <% if ObjectType == "PluginType" :%>
-    <form method="post" action="<%= urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) %>" >
-    <% end %>
-    <% else: %>
-    <form method="post" action="<%= urlHandlers.UHAdminPluginsSaveOptions.getURL(Object, subtab = Index) %>" >
-    <% end %>
+    % if ObjectType == "PluginType" :
+    <form method="post" action="${ urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) }" >
+    % else:
+    <form method="post" action="${ urlHandlers.UHAdminPluginsSaveOptions.getURL(Object, subtab = Index) }" >
+    % endif
 
     <table>
-        <% for option in Object.getOptionList(doSort = True, includeOnlyEditable = True, includeOnlyVisible = True): %>
+        % for option in Object.getOptionList(doSort = True, includeOnlyEditable = True, includeOnlyVisible = True):
         <tr>
             <td style="text-align: right;vertical-align:top; padding-right: 10px; width: 60%;">
-                <%= option.getDescription() %>:
+                ${ option.getDescription() }:
             </td>
             <td>
-                <% if ObjectType == "PluginType" :%>
+                % if ObjectType == "PluginType" :
                     <% name = Object.getId() + '.' + option.getName() %>
-                <% end %>
-                <% else: %>
+                % else:
                     <% name = Object.getOwner().getId() + '.' + Object.getId() + "." + option.getName() %>
-                <% end %>
+                % endif
 
-                <% if option.getType() == "users": %>
-                    <div id="userList<%=name%>" style="margin-bottom: 10px">
+                % if option.getType() == "users":
+                    <div id="userList${name}" style="margin-bottom: 10px">
                     </div>
 
                     <script type="text/javascript">
@@ -36,7 +35,7 @@
                             indicoRequest(
                                 'plugins.addUsers',
                                 {
-                                    optionName: "<%= name %>",
+                                    optionName: "${ name }",
                                     userList: userList
                                 },
                                 function(result,error) {
@@ -53,7 +52,7 @@
                             indicoRequest(
                                 'plugins.removeUser',
                                 {
-                                    optionName: "<%= name %>",
+                                    optionName: "${ name }",
                                     user: user.get('id')
                                 },
                                 function(result,error) {
@@ -68,16 +67,15 @@
                         }
 
                         var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
-                                                   <%= jsonEncode(fossilize(option.getValue(), IAvatarFossil)) %>, true, null,
+                                                   ${ jsonEncode(fossilize(option.getValue(), IAvatarFossil)) }, true, null,
                                                    true, false, null, null,
                                                    false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
-                        $E('userList<%=name%>').set(uf.draw())
+                        $E('userList${name}').set(uf.draw())
                     </script>
-                <% end %>
-                <% elif option.getType() == "links": %>
-                    <div id="links<%=name%>" style="margin-bottom: 10px;">
-                      <div id="linksContainer<%=name%>" style="margin-bottom: 10px;"></div>
+                % elif option.getType() == "links":
+                    <div id="links${name}" style="margin-bottom: 10px;">
+                      <div id="linksContainer${name}" style="margin-bottom: 10px;"></div>
                     </div>
                     <script type="text/javascript">
                         var addLinkText = $T('Add new link');
@@ -87,20 +85,19 @@
                         var linkNameHeader = $T('Link name');
                         var info = '';
                         var example = '';
-                        <% if option.getSubType() == 'instantMessaging': %>
+                        % if option.getSubType() == 'instantMessaging':
                             info = Html.ul({style: {fontWeight: "bold"}},$T('In the URL field, the following patterns will be changed:'),
                                     Html.li({style: {fontWeight: "lighter"}},$T('[chatroom] by the chat room name')),
                                     Html.li({style: {fontWeight: "lighter"}},$T('[host] by the specified host')),
                                     Html.li({style: {fontWeight: "lighter"}},$T('[nickname] by the nick chosen by the user.')));
                             example = $T('Example: http://[host]/resource/?x=[chatroom]@conference.[host]?join');
-                        <% end %>
-                        <% elif option.getSubType() == 'webcastAudiences': %>
+                        % elif option.getSubType() == 'webcastAudiences':
                             addLinkText = $T('Add new audience');
                             noLinksMsg = $T('No audiences created yet. Click "Add new audience" to create one');
                             popupTitle = $T('Enter the name of the audience and its URL');
                             linkNameLabel = $T('Audience name');
                             linkNameHeader = $T('Name');
-                        <% end %>
+                        % endif
 
                         var renderLinkTable = function(table) {
                             if(table.length > 0){
@@ -114,7 +111,7 @@
                                             indicoRequest(
                                                     'plugins.removeLink',
                                                 {
-                                                    optionName: "<%= name %>",
+                                                    optionName: "${ name }",
                                                     name: link.name
                                                 },
                                                 function(result,error) {
@@ -137,16 +134,16 @@
 
 
                                     });
-                                    $E('linksContainer<%=name%>').clear();
-                                    $E('linksContainer<%=name%>').append(linksTable);
+                                    $E('linksContainer${name}').clear();
+                                    $E('linksContainer${name}').append(linksTable);
                             }
                             else{
-                                $E('linksContainer<%=name%>').clear();
-                                $E('linksContainer<%=name%>').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, noLinksMsg));
+                                $E('linksContainer${name}').clear();
+                                $E('linksContainer${name}').append(Html.div({style: {marginTop: pixels(10), marginBottom: pixels(10), whiteSpace: "nowrap"}}, noLinksMsg));
                             }
                         };
 
-                        var optVal = <%= option.getValue() %>;
+                        var optVal = ${ option.getValue() };
                         renderLinkTable(optVal);
                         var addButton = Html.input("button", {style:{marginTop: pixels(5)}}, addLinkText);
 
@@ -168,7 +165,7 @@
                                                                                 indicoRequest(
                                                                                         'plugins.addLink',
                                                                                     {
-                                                                                        optionName: "<%= name %>",
+                                                                                        optionName: "${ name }",
                                                                                         name: linkName.get(),
                                                                                         structure: linkStructure.dom.value
                                                                                     },
@@ -196,23 +193,21 @@
                             linksPopup.open();
                         });
 
-                        $E('links<%=name%>').append(addButton);
+                        $E('links${name}').append(addButton);
                     </script>
-                <% end %>
-                <% elif option.getType() =="ckEditor": %>
-                    <input type="hidden" name="<%= name %>" id="<%= name %>" />
+                % elif option.getType() =="ckEditor":
+                    <input type="hidden" name="${ name }" id="${ name }" />
 
                     <div id="editor" style="margin-bottom: 10px"></div>
                     <script type="text/javascript">
                         var editor = new RichTextEditor(600, 300, 'IndicoFull');
                             $E('editor').set(editor.draw());
-                            editor.set('<%= escapeHTMLForJS(option.getValue()) %>');
+                            editor.set('${ escapeHTMLForJS(option.getValue()) }');
                             var fillText = function(text){
-                                $E("<%= name %>").dom.value = text;
+                                $E("${ name }").dom.value = text;
                             };
                     </script>
-                <% end %>
-                <% elif option.getType() =="rooms": %>
+                % elif option.getType() =="rooms":
                     <div id="roomList" class="PeopleListDiv"></div>
                     <div id="roomChooser"></div>
                     <div id="roomAddButton"></div>
@@ -225,7 +220,7 @@
                             indicoRequest(
                                     'plugins.removeRooms',
                                     {
-                                     optionName: "<%= name %>",
+                                     optionName: "${ name }",
                                      room: roomToRemove
                                      },function(result,error) {
                                          if (!error) {
@@ -246,7 +241,7 @@
                                 indicoRequest(
                                     'plugins.addRooms',
                                     {
-                                     optionName: "<%= name %>",
+                                     optionName: "${ name }",
                                      room: selectedValue
                                      },function(result,error) {
                                          if (!error) {
@@ -259,13 +254,13 @@
                         });
                         var roomList = new RoomListWidget('PeopleList',removeRoomHandler);
                         //var temp = roomChooser.source.get()["CERN:1"];
-                        var roomSelectedBefore=<%= option.getValue() %>
+                        var roomSelectedBefore=${ option.getValue() }
                         each (roomSelectedBefore,function(room){
                             roomList.set(room, room);
                         });
                         $E('roomList').set(roomList.draw());
 
-                        <% if rbActive: %>
+                        % if rbActive:
 
                             var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {}, callback);
                             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
@@ -275,7 +270,7 @@
                                     indicoRequest(
                                         'plugins.addRooms',
                                         {
-                                         optionName: "<%= name %>",
+                                         optionName: "${ name }",
                                          room: selectedValue
                                          },function(result,error) {
                                              if (!error) {
@@ -287,11 +282,10 @@
                                     );
                             });
                             $E('roomAddButton').set();
-                        <% end %>
+                        % endif
                     </script>
-               <% end %>
-               <% elif option.getType() == "usersGroups": %>
-                    <div id="userGroupList<%=name%>" style="margin-bottom: 10px">
+               % elif option.getType() == "usersGroups":
+                    <div id="userGroupList${name}" style="margin-bottom: 10px">
                     </div>
 
                     <script type="text/javascript">
@@ -299,7 +293,7 @@
                             indicoRequest(
                                 'plugins.addUsers',
                                 {
-                                    optionName: "<%= name %>",
+                                    optionName: "${ name }",
                                     userList: userList
                                 },
                                 function(result,error) {
@@ -316,7 +310,7 @@
                             indicoRequest(
                                 'plugins.removeUser',
                                 {
-                                    optionName: "<%= name %>",
+                                    optionName: "${ name }",
                                     user: user.get('id')
                                 },
                                 function(result,error) {
@@ -331,114 +325,103 @@
                         }
 
                         var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
-                                                   <%= jsonEncode(fossilize(option.getValue())) %>, true, null,
+                                                   ${ jsonEncode(fossilize(option.getValue())) }, true, null,
                                                    true, true, null, null,
                                                    false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
-                        $E('userGroupList<%=name%>').set(uf.draw())
+                        $E('userGroupList${name}').set(uf.draw())
                     </script>
-                <% end %>
-
-                <% elif option.getType() == "password": %>
-                    	<input name="<%= name %>" type="password" size="50" value="<%= option.getValue() %>">
-                <% end %>
-
-                <% else: %>
-                    <% if option.getType() == list: %>
+                % elif option.getType() == "password":
+                        <input name="${ name }" type="password" size="50" value="${ option.getValue() }">
+                % else:
+                    % if option.getType() == list:
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>
-                    <% end %>
-                    <% elif option.getType() == 'list_multiline': %>
+                    % elif option.getType() == 'list_multiline':
                         <% value=  "\n".join([str(v) for v in option.getValue()]) %>
-                    <% end %>
-                    <% else: %>
+                    % else:
                         <% value = str(option.getValue()) %>
-                    <% end %>
+                    % endif
 
-                    <% if option.getType() == bool: %>
+                    % if option.getType() == bool:
                         <% checked = '' %>
-                        <% if option.getValue(): %>
+                        % if option.getValue():
                             <% checked = 'checked' %>
-                        <% end %>
-                    <input name="<%= name %>" type="checkbox" size="50" <%=checked%>>
-                    <% end %>
-                    <% elif option.getType() == 'list_multiline': %>
-                    <textarea name="<%= name %>" cols="38"><%= value %></textarea>
-                    <% end %>
-                    <% else: %>
-                    <input name="<%= name %>" type="text" size="50" value="<%= value %>">
-                    <% end %>
+                        % endif
+                    <input name="${ name }" type="checkbox" size="50" ${checked}>
+                    % elif option.getType() == 'list_multiline':
+                    <textarea name="${ name }" cols="38">${ value }</textarea>
+                    % else:
+                    <input name="${ name }" type="text" size="50" value="${ value }">
+                    % endif
 
-                    <% if option.hasActions(): %>
-                        <% for action in option.getActions(): %>
-                            <% if action.isVisible():%>
-                                <input type="submit" name="<%= 'action.' + Object.getType() + '.' + Object.getName() + "." + action.getName() %>" value="<%= action.getButtonText() %>" />
-                            <% end %>
-                        <% end %>
-                    <% end %>
-                <% end %>
+                    % if option.hasActions():
+                        % for action in option.getActions():
+                            % if action.isVisible():
+                                <input type="submit" name="${ 'action.' + Object.getType() + '.' + Object.getName() + "." + action.getName() }" value="${ action.getButtonText() }" />
+                            % endif
+                        % endfor
+                    % endif
+                % endif
             </td>
-            <% if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict: %>
+            % if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict:
             <td style="width: 40%">
-                <% if option.getType() == int: %>
-                <span style="color: orange; font-size: smaller;"><%= _("Please input an integer")%></span>
-                <% end %>
-                <% elif option.getType() == list: %>
-                <span style="color: orange; font-size: smaller;"><%= _("Please separate values by commas: ','")%></span>
-                <% end %>
-                <% elif option.getType() == "list_multiline": %>
-                <span style="color: orange; font-size: smaller;"><%= _("Please input one value per line.")%></span>
-                <% end %>
-                <% elif option.getType() == dict: %>
-                <span style="color: orange; font-size: smaller;"><%= _("Please input keys and values in Python syntax. No unicode objects allowed. Example: {\"john\":\"tall\", \"pete\":\"short\"}")%></span>
-                <% end %>
+                % if option.getType() == int:
+                <span style="color: orange; font-size: smaller;">${ _("Please input an integer")}</span>
+                % elif option.getType() == list:
+                <span style="color: orange; font-size: smaller;">${ _("Please separate values by commas: ','")}</span>
+                % elif option.getType() == "list_multiline":
+                <span style="color: orange; font-size: smaller;">${ _("Please input one value per line.")}</span>
+                % elif option.getType() == dict:
+                <span style="color: orange; font-size: smaller;">
+                <% warningText = _("Please input keys and values in Python syntax. No unicode objects allowed. Example: {\"john\":\"tall\", \"pete\":\"short\"}") %>
+                ${ warningText }
+                </span>
+                % endif
             </td>
-            <% end %>
-            <% else: %>
+            % else:
             <td style="width: 40%">
             &nbsp;
             </td>
-            <% end %>
+            % endif
         </tr>
-        <% end %>
-        <% for option in Object.getOptionList(doSort = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
+        % endfor
+        % for option in Object.getOptionList(doSort = True, includeOnlyNonEditable = True, includeOnlyVisible = True):
         <tr>
             <td style="text-align: right; vertical-align:top; padding-right: 10px;width: 50%;">
-                <%= option.getDescription() %>:
+                ${ option.getDescription() }:
             </td>
             <td>
-                <%= beautify(option.getValue(), {"UlClassName": "optionList", "KeyClassName" : "optionKey"}) %>
-                <% if option.hasActions(): %>
-                    <% for action in option.getActions(): %>
-                        <input type="submit" name="<%= 'action.' + Object.getOwner().getName() + '.' + Object.getName() + "." + action.getName() %>" value="<%= action.getButtonText() %>" />
-                    <% end %>
-                <% end %>
+                ${ beautify(option.getValue(), dict(UlClassName="optionList", KeyClassName="optionKey")) }
+                % if option.hasActions():
+                    % for action in option.getActions():
+                        <input type="submit" name="${ 'action.' + Object.getOwner().getName() + '.' + Object.getName() + "." + action.getName() }" value="${ action.getButtonText() }" />
+                    % endfor
+                % endif
             </td>
         </tr>
-        <% end %>
+        % endfor
 
-        <% if Object.hasAnyActions(includeOnlyNonAssociated = True): %>
+        % if Object.hasAnyActions(includeOnlyNonAssociated = True):
         <tr>
             <td style="text-align: right; white-space: nowrap;padding-right: 10px;">
-                <%= _("Other actions:")%>
+                ${ _("Other actions:")}
             </td>
             <td>
-                <% for action in Object.getActionList(includeOnlyNonAssociated = True): %>
-                <% if ObjectType == "PluginType" :%>
+                % for action in Object.getActionList(includeOnlyNonAssociated = True):
+                % if ObjectType == "PluginType" :
                     <% name = 'action.' + Object.getName() + '.' + action.getName() %>
-                <% end %>
-                <% else: %>
+                % else:
                     <% name = 'action.' + Object.getOwner().getName() + '.' + Object.getName() + "." + action.getName() %>
-                <% end %>
-                    <input type="submit" name="<%= name %>" value="<%= action.getButtonText() %>"/>
-                <% end %>
+                % endif
+                    <input type="submit" name="${ name }" value="${ action.getButtonText() }"/>
+                % endfor
             </td>
         </tr>
-        <% end %>
+        % endif
         <tr>
             <td colspan="2" style="text-align: right;">
-                <input type="submit" name="Save" value="<%= _("Save settings") %>" onclick="fillText(editor.get());"/>
+                <input type="submit" name="Save" value="${ _("Save settings") }" onclick="fillText(editor.get());"/>
             </td>
         </tr>
     </table>
     </form>
-    <% end %>

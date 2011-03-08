@@ -1,54 +1,54 @@
 <br>
 <table class="groupTable">
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Current status")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Current status")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext" colspan="2">
-            <form action="<%= setStatusURL %>" method="POST">
-                <input name="changeTo" type="hidden" value="<%= changeTo %>">
-                <b><%= status %></b>
-                <small><input type="submit" class="btn" value="<%= changeStatus %>"></small>
+            <form action="${ setStatusURL }" method="POST">
+                <input name="changeTo" type="hidden" value="${ changeTo }">
+                <b>${ status }</b>
+                <small><input type="submit" class="btn" value="${ changeStatus }"></small>
             </form>
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Submission start date")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Submission start date")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <%= startDate %>
+            ${ startDate }
         </td>
-	<form action="<%= dataModificationURL %>" method="POST">
+    <form action="${ dataModificationURL }" method="POST">
         <td rowspan="5" valign="bottom" align="right">
-			<input type="submit" class="btn" value="<%= _("modify")%>" <%= disabled %>>
+            <input type="submit" class="btn" value="${ _("modify")}" ${ disabled }>
         </td>
     </form>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Submission end date")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Submission end date")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <%= endDate %>
+            ${ endDate }
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Modification deadline")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Modification deadline")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <%= modifDL %>
+            ${ modifDL }
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Announcement")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Announcement")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <%= announcement %>
+            ${ announcement }
         </td>
     </tr>
 
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Email notification on submission")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Email notification on submission")}</span></td>
         <td bgcolor="white" width="100%">
           <table>
             <tr>
-              <td class="blacktext"><%= notification %></td>
+              <td class="blacktext">${ notification }</td>
             </tr>
             <tr>
-              <td><font color="#777777"><small> <%= _("An email is automatically sent to the submitter after their abstract submission. This email will also be sent to the email addresses above this line.")%></small></font></td>
+              <td><font color="#777777"><small> ${ _("An email is automatically sent to the submitter after their abstract submission. This email will also be sent to the email addresses above this line.")}</small></font></td>
             </tr>
           </table>
         </td>
@@ -57,40 +57,40 @@
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Late submission authorised users")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Late submission authorised users")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext" colspan="2">
-            <%= submitters %>
+            ${ submitters }
         </td>
     </tr>
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Misc. Options")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Misc. Options")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
-            <%= miscOptions %>
+            ${ miscOptions }
         </td>
     </tr>
     </tr>
-	<tr>
+    <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
     <tr>
         <td class="dataCaptionTD">
           <a name="optional"></a>
-          <span class="dataCaptionFormat"> <%= _("Abstract fields")%></span>
+          <span class="dataCaptionFormat"> ${ _("Abstract fields")}</span>
           <br>
           <br>
-          <img src=<%= enablePic %> alt="<%= _("Click to disable")%>"> <small> <%= _("Enabled field")%></small><br>
-          <img src=<%= disablePic %> alt="<%= _("Click to enable")%>"> <small> <%= _("Disabled field")%></small>
+          <img src=${ enablePic } alt="${ _("Click to disable")}"> <small> ${ _("Enabled field")}</small><br>
+          <img src=${ disablePic } alt="${ _("Click to enable")}"> <small> ${ _("Disabled field")}</small>
         </td>
         <td bgcolor="white" width="100%" class="blacktext" style="padding-left:20px" colspan="2">
             <table align="left" width="100%">
-                    <%= abstractFields %>
+                    ${ abstractFields }
             </table>
         </td>
     </tr>
-	<tr>
+    <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
 </table>

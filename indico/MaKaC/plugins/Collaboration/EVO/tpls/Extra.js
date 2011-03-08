@@ -50,9 +50,9 @@ type("EVOLaunchClientPopup", ["ExclusivePopup"],
 var EVOStartDateHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px; width: 300px;"">' +
-            $T('Please create your booking between <strong><%= MinStartDate %></strong> and <strong><%= MaxEndDate %></strong> ' +
+            $T('Please create your booking between <strong>${ MinStartDate }</strong> and <strong>${ MaxEndDate }</strong> ' +
             "(Allowed dates \/ times based on your event's start date and end date). " +
-            'Also, please remember the start date cannot be more than <%= AllowedStartMinutes %> minutes in the past.') +
+            'Also, please remember the start date cannot be more than ${ AllowedStartMinutes } minutes in the past.') +
         '<\/div>');
 };
 
@@ -62,7 +62,7 @@ var EVOStartDateHelpPopup = function(event) {
 var EVOEndDateHelpPopup = function(event) {
     IndicoUI.Widgets.Generic.tooltip(this, event,
         '<div style="padding:3px; width: 300px;"">' +
-            $T('Please create your booking between <strong><%= MinStartDate %></strong> and <strong><%= MaxEndDate %></strong> ' +
+            $T('Please create your booking between <strong>${ MinStartDate }</strong> and <strong>${ MaxEndDate }</strong> ' +
             "(Allowed dates \/ times based on your event's start date and end date).") +
         '<\/div>');
 };

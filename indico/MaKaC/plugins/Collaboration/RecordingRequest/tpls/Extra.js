@@ -1,9 +1,9 @@
-var RR_multiDayEvent = <%= jsBoolean(IsMultiDayEvent) %>;
-<% if ConfStartDate: %>
-var RR_confStartDate = IndicoUtil.parseJsonDate(<%= jsonEncode(ConfStartDate) %>);
-<% end %>
-var RR_confLocation = <%= jsonEncode(ConfLocation) %>
-var RR_confRoom = <%= jsonEncode(ConfRoom) %>
+var RR_multiDayEvent = ${ jsBoolean(IsMultiDayEvent) };
+% if ConfStartDate: 
+var RR_confStartDate = IndicoUtil.parseJsonDate(${ jsonEncode(ConfStartDate) });
+% endif
+var RR_confLocation = ${ jsonEncode(ConfLocation) }
+var RR_confRoom = ${ jsonEncode(ConfRoom) }
 
 var RRSpeakersTemplate = function(speakerList) {
     var speakers = ", by "
@@ -142,7 +142,7 @@ var RR_loadTalks = function () {
                 {
                     plugin: 'RecordingRequest',
                     service: 'RRTalks',
-                    conference: '<%= ConferenceId %>'
+                    conference: '${ ConferenceId }'
                 },
             function(result, error){
                 if (!error) {

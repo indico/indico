@@ -11715,7 +11715,7 @@ msgid "x-large"
 msgstr ""
 
 #: webinterface\tpls\RoomBookingEmail_2AVCSupportAfterBookingCancellation.tpl:4
-msgid "A booking for the room <%= reservation.room.name %> has been CANCELLED"
+msgid "A booking for the room ${ reservation.room.name } has been CANCELLED"
 msgstr ""
 
 #: webinterface\tpls\ConferenceParticipantsPending.tpl:34
@@ -13887,7 +13887,7 @@ msgid "Of my rooms"
 msgstr ""
 
 #: webinterface\tpls\RoomBookingEmail_2ResponsibleAfterBookingInsertion.tpl:4
-msgid "There is a new <%= bookingMessage %>ing for your room."
+msgid "There is a new ${ bookingMessage }ing for your room."
 msgstr ""
 
 #: webinterface\tpls\MConfModifMainData.tpl:97

@@ -11,7 +11,7 @@
     checkParams: function() {
         return {
             'roomName' : ['text', false, function(name, values){
-                var maxNameLength = <%= MaxNameLength %>;
+                var maxNameLength = ${ MaxNameLength };
                 errors = [];
                 if (name.length > maxNameLength) {
                     errors.push($T("The room name cannot be longer than ") + maxNameLength + $T(" characters."));
@@ -38,7 +38,7 @@
             }
 
             if (error.errorType === 'nameTooLong') {
-                var message = $T("The room name cannot be longer than ") + <%= MaxNameLength %> + $T(" characters.");
+                var message = $T("The room name cannot be longer than ") + ${ MaxNameLength } + $T(" characters.");
                 IndicoUtil.markInvalidField($E('roomName'), message);
             }
 
@@ -138,7 +138,7 @@
     },
 
     onCreate: function(bookingPopup) {
-        vidyoOwnerField = new SingleUserField(<%= jsonEncode(LoggedInUser) %>,
+        vidyoOwnerField = new SingleUserField(${ jsonEncode(LoggedInUser) },
                 'owner',
                 true, true, null,
                 null, false,

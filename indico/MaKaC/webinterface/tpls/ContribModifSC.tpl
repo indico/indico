@@ -2,13 +2,13 @@
 <table width="90%" align="center" border="0"
                                     style="border-left: 1px solid #777777">
         <tr>
-            <td class="groupTitle" colspan="4"><%= _("Sub Contribution")%></td>
+            <td class="groupTitle" colspan="4">${ _("Sub Contribution")}</td>
     </tr>
     <tr>
         <td bgcolor="white" width="100%" colspan="4">
-            <form action="<%= deleteItemsURL %>" method="POST">
+            <form action="${ deleteItemsURL }" method="POST">
               <table bgcolor="white" border="0" cellspacing="0">
-                <%= subContList %>
+                ${ subContList }
 
 
         </td>
@@ -19,12 +19,12 @@
             <table align="center">
                 <tr>
                     <td valign="bottom" align="center">
-                            <input type="submit" class="btn" value="<%= _("remove selected")%>">
+                            <input type="submit" class="btn" value="${ _("remove selected")}">
                     </td>
                     </form>
-                    <form action="<%= addSubContURL %>" method="POST">
+                    <form action="${ addSubContURL }" method="POST">
                     <td>
-                        <input type="submit" class="btn" value="<%= _("add sub contribution")%>">
+                        <input type="submit" class="btn" value="${ _("add sub contribution")}">
                     </td>
                     </form>
                 </tr>

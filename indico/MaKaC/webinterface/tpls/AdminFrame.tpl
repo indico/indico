@@ -1,9 +1,9 @@
-<div class="banner"><span class="bannerTitle bannerTitle_0"><%= _("Server Administration") %></span></div>
+<div class="banner"><span class="bannerTitle bannerTitle_0">${ _("Server Administration") }</span></div>
 
-<%= sideMenu %>
+${ sideMenu }
 
 <!-- Body -->
 <div class="bodyWithSideMenu">
-    <%= body %>
+    ${ body }
 </div>
 <!-- End of body -->

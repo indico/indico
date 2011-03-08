@@ -19461,9 +19461,9 @@ msgstr "Changer la thématique"
 #~ msgstr "Archivage à long terme de la conférence"
 
 #~ msgid ""
-#~ "A booking for the room <%= reservation.room.name %> has been CANCELLED"
+#~ "A booking for the room ${ reservation.room.name } has been CANCELLED"
 #~ msgstr ""
-#~ "Une réservation pour la salle <%= reservation.room.name %> a été ANNULÉE"
+#~ "Une réservation pour la salle ${ reservation.room.name } a été ANNULÉE"
 
 #~ msgid "Feedback"
 #~ msgstr "Retour"
@@ -19621,9 +19621,9 @@ msgstr "Changer la thématique"
 #~ msgid "Of my rooms"
 #~ msgstr "De mes salles"
 
-#~ msgid "There is a new <%= bookingMessage %>ing for your room."
+#~ msgid "There is a new ${ bookingMessage }ing for your room."
 #~ msgstr ""
-#~ "Il y a une nouvelle<%= bookingMessage %>réservation pour votre salle."
+#~ "Il y a une nouvelle${ bookingMessage }réservation pour votre salle."
 
 #~ msgid ""
 #~ "this type is meant for events which contain several contributions or "

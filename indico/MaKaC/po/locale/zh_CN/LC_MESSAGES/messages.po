@@ -12378,8 +12378,8 @@ msgid "x-large"
 msgstr "x-large"
 
 #: C:\depot\indico\code\code\tpls\RoomBookingEmail_2AVCSupportAfterBookingCancellation.tpl:4
-msgid "A booking for the room <%= reservation.room.name %> has been CANCELLED"
-msgstr "房间预订 <%= reservation.room.name %> 已经被取消"
+msgid "A booking for the room ${ reservation.room.name } has been CANCELLED"
+msgstr "房间预订 ${ reservation.room.name } 已经被取消"
 
 #: C:\depot\indico\code\code\tpls\ConferenceParticipantsPending.tpl:34
 msgid "This is a list of persons who have applied for participation in this event"
@@ -14688,8 +14688,8 @@ msgid "Of my rooms"
 msgstr "我的房间"
 
 #: C:\depot\indico\code\code\tpls\RoomBookingEmail_2ResponsibleAfterBookingInsertion.tpl:4
-msgid "There is a new <%= bookingMessage %>ing for your room."
-msgstr "你的房间有一个新的 <%= bookingMessage %>"
+msgid "There is a new ${ bookingMessage }ing for your room."
+msgstr "你的房间有一个新的 ${ bookingMessage }"
 
 #: C:\depot\indico\code\code\tpls\MConfModifMainData.tpl:97
 #: C:\depot\indico\code\code\tpls\MContribModifMain.tpl:90

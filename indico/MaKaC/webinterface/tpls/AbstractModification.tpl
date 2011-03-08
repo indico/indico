@@ -10,10 +10,10 @@
         </td>
     </tr>
     <tr>
-        <td><%= error %></td>
+        <td>${ error }</td>
     </tr>
     <tr>
-        <td><%= dataModificationForm %></td>
+        <td>${ dataModificationForm }</td>
     </tr>
 </table>
 <br>

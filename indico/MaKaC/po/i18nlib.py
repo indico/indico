@@ -189,7 +189,7 @@ class i18nUtil:
                 toreplace = toreplace.replace(f,'')
             else:
                 toreplace = re.sub(f, '', toreplace)
-        
+
         return not re.search(self._re_only_whitespace, toreplace)
 
     def _findFirst(self, string, needles,begin=0):
@@ -230,9 +230,9 @@ class i18nUtil:
         @return: The function call
         '''
         if not ('\n' in toreplace):
-            return '<%= _("' + toreplace.replace('"', '\\"') + '")%>'
+            return '${ _("' + toreplace.replace('"', '\\"') + '")}'
         else:
-            return '<%= _("""' + toreplace.replace('"""', '\\"\\"\\"') + '""")%>'
+            return '${ _("""' + toreplace.replace('"""', '\\"\\"\\"') + '""")}'
 
     def _strToI18nPy(self,toreplace, delimiter,ur):
         '''Replaces the given text by a function call able to translate this string
@@ -326,7 +326,7 @@ class i18nUtil:
                 while first != delimiter:
                     (first, pos) = self._findFirst(inputBuffer,['\\' + delimiter, delimiter, '<%'],pos + 1)
                     if first == '<%':
-                        pos = inputBuffer.find('%>',pos) 
+                        pos = inputBuffer.find('%>',pos)
                     elif first == '\\' + delimiter:
                         pos += 1
                 string = inputBuffer[:pos]
@@ -526,7 +526,7 @@ class i18nUtil:
                             # Empty long string, no need to record it
                             # and no need to internationalize it
                             towrite += delimiter * 6
-                        countDelimiter = 0 
+                        countDelimiter = 0
                 elif recordShortString:
                     if countDelimiter == 0:
                         if nextEscapeChar == -1:
@@ -862,7 +862,7 @@ class i18nUtil:
                                 output = outpoutFakeFile.read()
                                 fileout.write(output)
                         linenumber += self._countNewlines(attr)
-                        
+
                         # Update read buffer
                         read = read[endattr:]
 

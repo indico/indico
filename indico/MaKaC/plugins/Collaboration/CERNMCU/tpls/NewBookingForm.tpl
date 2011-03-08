@@ -4,7 +4,7 @@
             <span>Name</span>
         </td>
         <td>
-            <input id="title" type="text" size="60" name="name" value="<%=EventTitle%>" />
+            <input id="title" type="text" size="60" name="name" value="${EventTitle}" />
         </td>
     </tr>
     <tr>
@@ -12,7 +12,7 @@
             <span>Description</span>
         </td>
         <td>
-            <textarea rows="3" cols="60" name="description"><%=EventDescription%></textarea>
+            <textarea rows="3" cols="60" name="description">${EventDescription}</textarea>
         </td>
     </tr>
     <tr>
@@ -25,7 +25,7 @@
             <input type="radio" id="autoNoRB" name="autoGenerateId" value="no" onclick="enableCustomId()" />
             <label for="autoNoRB">Choose one manually: </label>
             <input type="text" size="10" name="customId" id="customId" disabled />
-            <img id="customIdHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
+            <img id="customIdHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
     <tr>
@@ -33,7 +33,7 @@
             <span>Start date</span>
         </td>
         <td>
-            <input type="text" size="16" name="startDate" value="<%= DefaultStartDate %>" />
+            <input type="text" size="16" name="startDate" value="${ DefaultStartDate }" />
         </td>
     </tr>
     <tr>
@@ -41,7 +41,7 @@
             <span>End date</span>
         </td>
         <td>
-            <input type="text" size="16" name="endDate" value="<%= DefaultEndDate %>" />
+            <input type="text" size="16" name="endDate" value="${ DefaultEndDate }" />
         </td>
     </tr>
     <tr>
@@ -50,7 +50,7 @@
         </td>
         <td style="padding-top: 10px;">
             <span id="PINField"></span>
-            <img id="PINHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
+            <img id="PINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
     <tr>

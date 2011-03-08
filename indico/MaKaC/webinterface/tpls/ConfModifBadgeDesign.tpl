@@ -32,7 +32,7 @@
     var lastSelectedDiv;
 
     // Translation dictionary from key to name in current language.
-    var translate = <%=translateName%>;
+    var translate = ${translateName};
 
     // List of badge template items
     var items = [];
@@ -100,9 +100,9 @@
         return [xResult,yResult];
     }
 
-	// This function creates a new draggable div
-	function createDiv() {
-	//       Each div has:
+    // This function creates a new draggable div
+    function createDiv() {
+    //       Each div has:
     //       -an unique id, which is a natural number (0, 1, 2, ...)
     //       -a type (stored in the name attribute)
     //       -absolute x,y position
@@ -161,7 +161,7 @@
       newDiv.lastGoodPositionTop = 0;
 
       return newDiv;
-	}
+    }
 
     // This function inserts the selected element in the blank space where badge template designing takes place
     function insertElement() {
@@ -170,7 +170,7 @@
 
       // We set the inner html of the div depending on the type of item inserted
       switch($F('elementList')) {
-        <%=switchCases%>
+        ${switchCases}
       }
 
       if (!lastSelectedDiv) {
@@ -254,7 +254,7 @@
         for (i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i < Math.ceil(templateDimensions.width / pixelsPerCm); i++) {
           var newImg = document.createElement('td');
           newImg.id = "rulerh" + i;
-          newImg.innerHTML = '<img src="<%= baseURL %>/images/ruler/rulerh' + i + '.png" align="center"/>';
+          newImg.innerHTML = '<img src="${ baseURL }/images/ruler/rulerh' + i + '.png" align="center"/>';
           $E('horizontal ruler').dom.appendChild(newImg);
         }
       } else if (templateDimensions.width < previousTemplateDimensions.width) {
@@ -269,7 +269,7 @@
           var newImg2 = document.createElement('td');
           newImg.id = "rulerv" + i;
           newImg.appendChild(newImg2);
-          newImg2.innerHTML = '<img src="<%= baseURL %>//images/ruler/rulerv' + i + '.png" align="center"/>';
+          newImg2.innerHTML = '<img src="${ baseURL }//images/ruler/rulerv' + i + '.png" align="center"/>';
           $E('vertical ruler').dom.appendChild(newImg);
         }
       } else if (templateDimensions.height < previousTemplateDimensions.height) {
@@ -477,8 +477,8 @@
             Element.remove('background');
           }
           backgroundId = iframeDocument.getElementById('background id').innerHTML;
-    	  var backgroundURL = iframeDocument.getElementById('background url').innerHTML;
-	      displayBackground(backgroundURL);
+          var backgroundURL = iframeDocument.getElementById('background url').innerHTML;
+          displayBackground(backgroundURL);
         } catch (err) {
           Element.hide('loadingIcon')
         }
@@ -536,11 +536,11 @@
   <table class="groupTable" cellpadding="0">
     <tbody>
       <tr>
-        <td class="groupTitle" colspan="6"><%=titleMessage%></td>
+        <td class="groupTitle" colspan="6">${titleMessage}</td>
       </tr>
       <tr>
         <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Name")%></span>
+          <span class="titleCellFormat"> ${ _("Name")}</span>
         </td>
         <td colspan="5">
           <input id="template name" size="50" name="Template Name">
@@ -548,18 +548,18 @@
       </tr>
       <tr>
         <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Background")%><br><small>( <%= _("picture file in jpeg, png or gif")%>)</small></span>
+          <span class="titleCellFormat"> ${ _("Background")}<br><small>( ${ _("picture file in jpeg, png or gif")})</small></span>
         </td>
-        <form action="<%=saveBackgroundURL%>" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
+        <form action="${saveBackgroundURL}" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
         <td height="20px" NOWRAP align="left" colspan="3">
-	      <input name="file" size="58" type="file">
-          <input class="btn" value="<%= _("Send File")%>" type="submit">
-          <input class="btn" type="button" value="<%= _("Remove background")%>" onclick="removeBackground()">
+          <input name="file" size="58" type="file">
+          <input class="btn" value="${ _("Send File")}" type="submit">
+          <input class="btn" type="button" value="${ _("Remove background")}" onclick="removeBackground()">
         </td>
-	    </form>
-	    <td width="100%" align="left" colspan="4">
-          <img id="loadingIcon" src=<%=loadingIconURL%> width="20px" height="20px" style="display:none;">
-	    </td>
+        </form>
+        <td width="100%" align="left" colspan="4">
+          <img id="loadingIcon" src=${loadingIconURL} width="20px" height="20px" style="display:none;">
+        </td>
       </tr>
       <tr>
         <td class="titleCellTD" NOWRAP>
@@ -573,7 +573,7 @@
         </td>
         <td>
           <input id="badge height" name="Badge Height" size="5">
-          <input class="btn" value="<%= _("Change")%>" type="button" onclick="changeTemplateSize()">
+          <input class="btn" value="${ _("Change")}" type="button" onclick="changeTemplateSize()">
         </td>
       </tr>
     </tbody>
@@ -588,26 +588,26 @@
       <tr>
 
         <td width="220px" rowspan="2" valign="top"> <!-- Width attribute necessary so that the template design space doesn't move depending on selection text-->
-          <span class="titleCellFormat"><%= _("Elements")%></span>
+          <span class="titleCellFormat">${ _("Elements")}</span>
 
           <br/><br/>
 
-          <input name="Insert Template Element Button" class="btn" value="<%= _("Insert")%>" type="button" onclick="insertElement()">
-          <input name="Delete Template Element Button" class="btn" value="<%= _("Remove")%>" type="button" onclick="removeElement()">
+          <input name="Insert Template Element Button" class="btn" value="${ _("Insert")}" type="button" onclick="insertElement()">
+          <input name="Delete Template Element Button" class="btn" value="${ _("Remove")}" type="button" onclick="removeElement()">
 
           <br/><br/>
 
           <select name="Template Elements List" id="elementList">
-            <%=selectOptions%>
-          </select><% contextHelp( 'features' ) %>
+            ${selectOptions}
+          </select>${contextHelp('features' )}
 
           <br/>
           <br/>
 
-           <%= _("Selection")%>: <span id="selection text"></span>
+           ${ _("Selection")}: <span id="selection text"></span>
           <br/><br/>
 
-           <%= _("Position")%>:
+           ${ _("Position")}:
           <br/>
 
           <table>
@@ -615,25 +615,25 @@
               <tr>
                 <td></td>
                 <td align="center">
-                  <input name="Move Template Element Top Button" class="btn" value="<%= _("Top")%>" type="button" onclick="moveTop()">
+                  <input name="Move Template Element Top Button" class="btn" value="${ _("Top")}" type="button" onclick="moveTop()">
                 </td>
                 <td></td>
               </tr>
               <tr>
                 <td align="center">
-                  <input name="Move Template Element Left Button" class="btn" value="<%= _("Left")%>" type="button" onclick="moveLeft()">
+                  <input name="Move Template Element Left Button" class="btn" value="${ _("Left")}" type="button" onclick="moveLeft()">
                 </td>
                 <td align="center">
-                  <input name="Move Template Element Center Button" class="btn" value="<%= _("Center")%>" type="button" onclick="moveCenter()">
+                  <input name="Move Template Element Center Button" class="btn" value="${ _("Center")}" type="button" onclick="moveCenter()">
                 </td>
                 <td align="center">
-                  <input name="Move Template Element Right Button" class="btn" value="<%= _("Right")%>" type="button" onclick="moveRight()">
+                  <input name="Move Template Element Right Button" class="btn" value="${ _("Right")}" type="button" onclick="moveRight()">
                 </td>
               </tr>
               <tr>
                 <td></td>
                 <td align="center">
-                  <input name="Move Template Element Bottom Button" class="btn" value="<%= _("Bottom")%>" type="button" onclick="moveBottom()">
+                  <input name="Move Template Element Bottom Button" class="btn" value="${ _("Bottom")}" type="button" onclick="moveBottom()">
                 </td>
                 <td></td>
               </tr>
@@ -641,7 +641,7 @@
             </tbody>
           </table>
 
-          <input id="snap checkbox" type="checkbox" onclick="snapToGrid()"><label for="snap checkbox"> <%= _("Snap to grid")%></label>
+          <input id="snap checkbox" type="checkbox" onclick="snapToGrid()"><label for="snap checkbox"> ${ _("Snap to grid")}</label>
 
         </td>
 
@@ -685,7 +685,7 @@
     <tbody>
 
       <tr>
-        <td colspan="3" rowspan="1" class="titleCellFormat"> <%= _("Attributes")%></td>
+        <td colspan="3" rowspan="1" class="titleCellFormat"> ${ _("Attributes")}</td>
         <td></td>
         <td></td>
       </tr>
@@ -693,17 +693,17 @@
       <tr>
 
        <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Font")%>&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Font")}&nbsp;</span>
        </td>
 
         <td colspan="2">
           <select id='font selector' onChange="changeFont()" name="Template Element Font">
-            <optgroup label="<%= _('Normal Fonts') %>">
+            <optgroup label="${ _('Normal Fonts') }">
               <option>Times New Roman</option>
               <option>Courier</option>
               <option>Sans</option>
             </optgroup>
-            <optgroup label="<%= _('Special Character Fonts') %>">
+            <optgroup label="${ _('Special Character Fonts') }">
               <option>LinuxLibertine</option>
               <option>Kochi-Mincho</option>
               <option>Kochi-Gothic</option>
@@ -717,21 +717,21 @@
         </td>
 
         <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Color")%>&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Color")}&nbsp;</span>
         </td>
 
         <td width="100%">
           <select id='color selector' name="Template Element Color" onchange="changeColor()">
-            <option value="black"> <%= _("black")%></option>
-            <option value="red"> <%= _("red")%></option>
-            <option value="blue"> <%= _("blue")%></option>
-            <option value="green"> <%= _("green")%></option>
-            <option value="yellow"> <%= _("yellow")%></option>
-            <option value="brown"> <%= _("brown")%></option>
-            <option value="gold"> <%= _("gold")%></option>
-            <option value="pink"> <%= _("pink")%></option>
-            <option value="gray"> <%= _("gray")%></option>
-            <option value="white"> <%= _("white")%></option>
+            <option value="black"> ${ _("black")}</option>
+            <option value="red"> ${ _("red")}</option>
+            <option value="blue"> ${ _("blue")}</option>
+            <option value="green"> ${ _("green")}</option>
+            <option value="yellow"> ${ _("yellow")}</option>
+            <option value="brown"> ${ _("brown")}</option>
+            <option value="gold"> ${ _("gold")}</option>
+            <option value="pink"> ${ _("pink")}</option>
+            <option value="gray"> ${ _("gray")}</option>
+            <option value="white"> ${ _("white")}</option>
           </select>
         </td>
 
@@ -740,65 +740,65 @@
       <tr>
 
         <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Style")%>&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Style")}&nbsp;</span>
         </td>
 
         <td colspan="2">
           <select id='style selector' name="Template Element Style" onchange="changeStyle()">
-            <option value="Normal"> <%= _("Normal")%></option>
-            <option value="Bold"> <%= _("Bold")%></option>
-            <option value="Italic"> <%= _("Italic")%></option>
-            <option value="Bold &amp; Italic"> <%= _("Bold &amp; Italic")%></option>
+            <option value="Normal"> ${ _("Normal")}</option>
+            <option value="Bold"> ${ _("Bold")}</option>
+            <option value="Italic"> ${ _("Italic")}</option>
+            <option value="Bold &amp; Italic"> ${ _("Bold &amp; Italic")}</option>
           </select>
         </td>
 
         <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Size")%>&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Size")}&nbsp;</span>
         </td>
 
         <td width="100%">
           <select id='size selector' name="Template Element Size" onchange="changeSize()">
-            <option value="xx-small"> <%= _("xx-small")%></option>
-            <option value="x-small"> <%= _("x-small")%></option>
-            <option value="small"> <%= _("small")%></option>
-            <option value="medium" SELECTED> <%= _("medium")%></option>
-            <option value="large"> <%= _("large")%></option>
-            <option value="x-large"> <%= _("x-large")%></option>
-            <option value="xx-large"> <%= _("xx-large")%></option>
+            <option value="xx-small"> ${ _("xx-small")}</option>
+            <option value="x-small"> ${ _("x-small")}</option>
+            <option value="small"> ${ _("small")}</option>
+            <option value="medium" SELECTED> ${ _("medium")}</option>
+            <option value="large"> ${ _("large")}</option>
+            <option value="x-large"> ${ _("x-large")}</option>
+            <option value="xx-large"> ${ _("xx-large")}</option>
           </select>
         </td>
       </tr>
 
       <tr>
         <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Alignment")%>&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Alignment")}&nbsp;</span>
         </td>
         <td colspan="2">
           <select id='alignment selector' name="Template Element Alignment" onChange="changeAlignment()">
             <!-- Note: the text of the options is used directly in the style attribute of the items -->
-            <option value="Left"> <%= _("Left")%></option>
-            <option value="Right"> <%= _("Right")%></option>
-            <option value="Center"> <%= _("Center")%></option><br>
-            <option value="Justified"> <%= _("Justified")%></option>
+            <option value="Left"> ${ _("Left")}</option>
+            <option value="Right"> ${ _("Right")}</option>
+            <option value="Center"> ${ _("Center")}</option><br>
+            <option value="Justified"> ${ _("Justified")}</option>
           </select>
         </td>
         <td class="titleCellTD">
-          <span class="titleCellFormat"> <%= _("Width (cm)")%>&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Width (cm)")}&nbsp;</span>
         </td>
         <td width="100%">
           <input id="width field" size="5" name="Element Size">
-          <input class="btn" value="<%= _("Change")%>" type="button" onclick="changeWidth()">
+          <input class="btn" value="${ _("Change")}" type="button" onclick="changeWidth()">
         </td>
       </tr>
       <tr>
         <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat"> <%= _("Text (for Fixed Text)")%>&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Text (for Fixed Text)")}&nbsp;</span>
         </td>
         <td>
           <input id="fixed text field" size="30" name="Element Size">
         </td>
         <td>
-          <input class="btn" value="<%= _("Change")%>" type="button" onclick="changeText()">
+          <input class="btn" value="${ _("Change")}" type="button" onclick="changeText()">
         </td>
         <td></td>
         <td></td>
@@ -810,16 +810,16 @@
     <tbody>
       <tr>
         <td colspan="4" align="center" width="100%">
-          <input class="btn" name="Save Template Button" value="<%= _("Save")%>" type="button" onclick="save()">
-          <input class="btn" name="Cancel Button" value="<%= _("Cancel")%>" type="button" onclick="location.href='<%=cancelURL%>'">
+          <input class="btn" name="Save Template Button" value="${ _("Save")}" type="button" onclick="save()">
+          <input class="btn" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'">
         </td>
       </tr>
     </tbody>
   </table>
 
-  <form name="hiddenform" action="<%=saveTemplateURL%>" method="POST">
-  	<input name="templateId" value="<%=templateId%>" type="hidden">
-  	<input id="templateData" name="templateData" type="hidden">
+  <form name="hiddenform" action="${saveTemplateURL}" method="POST">
+      <input name="templateId" value="${templateId}" type="hidden">
+      <input id="templateData" name="templateData" type="hidden">
   </form>
 
 <!--
@@ -831,8 +831,8 @@
   <script type="text/javascript">
 
     // We load the template if we are editing a template
-    if (<%= editingTemplate %>) {
-       var template = <%= templateData %>
+    if (${ editingTemplate }) {
+       var template = ${ templateData }
        $E('template name').dom.value = template[0];
        $E('templateDiv').dom.style.width = template[1].width;
        $E('templateDiv').dom.style.height = template[1].height;
@@ -857,9 +857,9 @@
     // This function displays the items, if any have been loaded, on the screen
     displayItems();
 
-    if (<%=editingTemplate%> && <%=hasBackground%>) {
-       backgroundId = <%=backgroundId%>
-       displayBackground("<%=backgroundURL%>")
+    if (${editingTemplate} && ${hasBackground}) {
+       backgroundId = ${backgroundId}
+       displayBackground("${backgroundURL}")
     }
 
     changeTemplateSize();

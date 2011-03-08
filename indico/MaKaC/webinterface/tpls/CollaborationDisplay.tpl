@@ -1,25 +1,25 @@
-<% if not OngoingBookings and not ScheduledBookings: %>
-    <div class="collaborationDisplayTitle"><%= _("All video service events already finished.") %></div>
-<% end %>
+% if not OngoingBookings and not ScheduledBookings: 
+    <div class="collaborationDisplayTitle">${ _("All video service events already finished.") }</div>
+% endif
 
-<% if OngoingBookings: %>
+% if OngoingBookings: 
     <div class="groupTitleNoBorder collaborationDisplayTitle" style="margin-bottom: 5px;">Ongoing Today:</div>
-<% end %>
+% endif
 
-<% for booking in OngoingBookings: %>
-    <% includeTpl('BookingDisplay', Booking = booking, Kind = 'ongoing', Timezone = Timezone) %>
-<% end %>
+% for booking in OngoingBookings: 
+    <%include file="BookingDisplay.tpl" args="Booking = booking, Kind = 'ongoing', Timezone = Timezone"/>
+% endfor
 
 
-<% if ScheduledBookings: %>
+% if ScheduledBookings: 
     <div class="groupTitleNoBorder collaborationDisplayTitle">Upcoming:</div>
-<% end %>
+% endif
 
-<% for date, bookings in ScheduledBookings: %>
+% for date, bookings in ScheduledBookings: 
     <div class="collaborationDisplayDateGroup">
-        <div class="groupTitleSmallNoBackground" style="padding-left: 5px;">Scheduled for <%= formatDate (date, format = "%A %d/%m/%Y") %></div>
-        <% for b in bookings: %>
-            <% includeTpl('BookingDisplay', Booking = b, Kind = 'scheduled', Timezone = Timezone) %>
-        <% end %>
+        <div class="groupTitleSmallNoBackground" style="padding-left: 5px;">Scheduled for ${ formatDate (date, format = "%A %d/%m/%Y") }</div>
+        % for b in bookings: 
+            <%include file="BookingDisplay.tpl" args="Booking = b, Kind = 'scheduled', Timezone = Timezone"/>
+        % endfor
     </div>
-<% end %>
+% endfor

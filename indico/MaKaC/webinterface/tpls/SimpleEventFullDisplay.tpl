@@ -8,10 +8,10 @@
                         <img src="http://agenda.cern.ch/images/event.gif" width="32" height="32" alt="event">
                     </td>
                     <td align="left">
-                        <font size="+1" color="#bbbbbb"> <%= _("EVENT")%></font>
+                        <font size="+1" color="#bbbbbb"> ${ _("EVENT")}</font>
                     </td>
                     <td align="right">
-                        <font size="-1" color="white"><%= dateInterval %></font>
+                        <font size="-1" color="white">${ dateInterval }</font>
                     </td>
                 </tr>
             </table>
@@ -23,18 +23,18 @@
                     width="100%">
                 <tr>
                     <td align="right" valign="top" nowrap>
-                        <b><strong> <%= _("Name")%>:</strong></b>
+                        <b><strong> ${ _("Name")}:</strong></b>
                     </td>
                     <td width="100%">
-                        <font face="arial" color="#333333"><%= modifyItem %> <u><%= title %></u></font>
-	                </td>
+                        <font face="arial" color="#333333">${ modifyItem } <u>${ title }</u></font>
+                    </td>
                 </tr>
-                <%= description %>
-                <%= location %>
-                <%= room %>
-                <%= contact %>
-                <%= moreInfo %>
-                <%= material %>
+                ${ description }
+                ${ location }
+                ${ room }
+                ${ contact }
+                ${ moreInfo }
+                ${ material }
             </table>
         </td>
     </tr>

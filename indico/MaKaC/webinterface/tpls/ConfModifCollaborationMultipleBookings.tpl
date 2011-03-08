@@ -5,24 +5,24 @@
     <tr>
         <td class="titleCellNoBorderTD" style="white-space: nowrap;vertical-align: middle;">
             <span class="titleCellFormat createBookingText">
-                <%= _("Create booking")%>
+                ${ _("Create booking")}
             </span>
         </td>
         <td style="padding-left: 15px;">
             <% plugins = MultipleBookingPlugins %>
             <select id="pluginSelect" onchange="pluginSelectChanged()">
                 <option value="noneSelected">-- Choose a system --</option>
-                <% for p in plugins: %>
-                    <option value="<%=p.getId()%>"><%= p.getName() %></option>
-                <% end %>
+                % for p in plugins: 
+                    <option value="${p.getId()}">${ p.getName() }</option>
+                % endfor
             </select>
             <div id="createBookingDiv" style="display: inline;">
-                <input type="button" value="<%= _("Create")%>" disabled>
+                <input type="button" value="${ _("Create")}" disabled>
             </div>
             <div id="createBookingHelp" style="display: inline;">
             </div>
             <span style="margin-left: 5em;font-size: 9pt;">
-                <%= _("Timezone: ")%><%= Conference.getTimezone() %>
+                ${ _("Timezone: ")}${ Conference.getTimezone() }
             </span>
         </td>
     </tr>
@@ -30,7 +30,7 @@
 <table>
     <tr>
         <td class="groupTitle" style="white-space: nowrap;padding-top: 1em;" colspan="2">
-            <%= _("Current bookings")%>
+            ${ _("Current bookings")}
         </td>
     </tr>
     <tr>
@@ -47,12 +47,12 @@
                 <tr>
                     <td colspan="10" style="text-align: center; padding-top: 20px;">
                         <div id="startAll" style="display:none;">
-                            <img class="clickableImage" style="vertical-align: middle;" onClick="startAll()" src="<%=Config.getInstance().getSystemIconURL('play')%>" alt="<%= _("Start All")%>" />
-                            <span class="clickableText" style="font-size: large; margin-left: 5px;" onClick="startAll()"><%= _("Start All")%></span>
+                            <img class="clickableImage" style="vertical-align: middle;" onClick="startAll()" src="${Config.getInstance().getSystemIconURL('play')}" alt="${ _("Start All")}" />
+                            <span class="clickableText" style="font-size: large; margin-left: 5px;" onClick="startAll()">${ _("Start All")}</span>
                         </div>
                         <div id="stopAll" style="display:none;">
-                            <img class="clickableImage" style="vertical-align: middle; margin-left: 20px;" onClick="stopAll()" src="<%=Config.getInstance().getSystemIconURL('stop')%>" alt="<%= _("Stop All")%>" />
-                            <span class="clickableText" style="font-size: large; margin-left: 5px;" onClick="stopAll()"><%= _("Stop All")%></span>
+                            <img class="clickableImage" style="vertical-align: middle; margin-left: 20px;" onClick="stopAll()" src="${Config.getInstance().getSystemIconURL('stop')}" alt="${ _("Stop All")}" />
+                            <span class="clickableText" style="font-size: large; margin-left: 5px;" onClick="stopAll()">${ _("Stop All")}</span>
                         </div>
                     </td>
                 </tr>
@@ -68,7 +68,7 @@
 
 // HTML code for the popup dialog that will appear when adding or editing a booking, depending on the booking type
 var forms = {
-<%= ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm) + '", "' + escapeHTMLForJS(advancedTabForm) + '"]' for pluginName, (newBookingForm, advancedTabForm) in MultipleBookingForms.items()]) %>
+${ ",\n". join(['"' + pluginName + '" \x3a ["' + escapeHTMLForJS(newBookingForm) + '", "' + escapeHTMLForJS(advancedTabForm) + '"]' for pluginName, (newBookingForm, advancedTabForm) in MultipleBookingForms.items()]) }
 }
 
 /**
@@ -101,7 +101,7 @@ var forms = {
   *     -permissionToStop: Same as permissionToStart. Sometimes the booking should not be allowed to stop even if the "stop" button is available.
   */
 
-var bookings = $L(<%= jsonEncode(BookingsM) %>);
+var bookings = $L(${ jsonEncode(BookingsM) });
 
 var createButton;
 var createButtonTooltip;
@@ -137,7 +137,7 @@ var pluginSelectChanged = function() {
 var create = function() {
     selectedPlugin = getSelectedPlugin();
     if (exists(selectedPlugin)) {
-        createBooking(selectedPlugin, '<%= Conference.getId() %>');
+        createBooking(selectedPlugin, '${ Conference.getId() }');
     }
 }
 
@@ -146,7 +146,7 @@ var create = function() {
  * It will call in turn 'removeBooking' in Collaboration.js
  */
 var remove = function(booking) {
-    removeBooking(booking, '<%= Conference.getId() %>');
+    removeBooking(booking, '${ Conference.getId() }');
 };
 
 
@@ -155,7 +155,7 @@ var remove = function(booking) {
  * It will call in turn 'editBooking' in Collaboration.js
  */
 var edit = function(booking) {
-    editBooking(booking, '<%= Conference.getId() %>');
+    editBooking(booking, '${ Conference.getId() }');
 };
 
 /**
@@ -203,15 +203,15 @@ IndicoUI.executeOnLoad(function(){
     displayBookings();
 });
 
-<% if MultipleBookingPlugins: %>
+% if MultipleBookingPlugins: 
 IndicoUI.executeOnLoad(function(){
-    <% for plugin in MultipleBookingPlugins: %>
-    if (pluginHasFunction("<%=plugin.getName()%>", "onLoad")) {
-        codes["<%=plugin.getName()%>"]["onLoad"]();
+    % for plugin in MultipleBookingPlugins: 
+    if (pluginHasFunction("${plugin.getName()}", "onLoad")) {
+        codes["${plugin.getName()}"]["onLoad"]();
     }
-    <% end %>
+    % endfor
 });
-<% end %>
+% endif
 
 </script>
 

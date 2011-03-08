@@ -4,16 +4,16 @@
 <table width="90%" align="left" border="0" style="padding-top:10px;">
     <tbody>
     <tr>
-        <td id="revControlPRMHelp"  colspan="3" class="groupTitle"><%= _("Step 1 - Assign managers of paper reviewing")%></td>
+        <td id="revControlPRMHelp"  colspan="3" class="groupTitle">${ _("Step 1 - Assign managers of paper reviewing")}</td>
     </tr>
     <tr>
         <td colspan="3">
-            <% if ConfReview.getEnablePRMEmailNotif(): %>
+            % if ConfReview.getEnablePRMEmailNotif(): 
                 <div style="padding:5px; color:gray;">
-                    <span class="collShowBookingsText"><%=_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")%></span><br>
-                    <span class="collShowBookingsText"><%= _("You  can  modify this from the Paper Reviewing Setup.")%></span>
+                    <span class="collShowBookingsText">${_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")}</span><br>
+                    <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing Setup.")}</span>
                 </div>
-            <% end %>
+            % endif
         </td>
     </tr>
     </tbody>
@@ -22,11 +22,11 @@
 <table width="60%" style="padding-left:20px;">
     <tbody>
     <tr>
-        <td class="subGroupTitle"><%= _("Managers") %></td>
+        <td class="subGroupTitle">${ _("Managers") }</td>
     </tr>
     <tr>
         <td class="questionContent" style="padding-top:5px; padding-left:3px;">
-            <span><%= _("Responsibilities: Setup, assign contributions to Referees, define team competences") %></span></span>
+            <span>${ _("Responsibilities: Setup, assign contributions to Referees, define team competences") }</span></span>
         </td>
     </tr>
     <tr>
@@ -42,7 +42,7 @@
                             indicoRequest(
                                 'reviewing.conference.assignTeamPRM',
                                 {
-                                    conference: '<%= Conference %>',
+                                    conference: '${ Conference }',
                                     userList: userList
                                 },
                                 function(result,error) {
@@ -60,7 +60,7 @@
                             indicoRequest(
                                 'reviewing.conference.removeTeamPRM',
                                 {
-                                    conference: '<%= Conference %>',
+                                    conference: '${ Conference }',
                                     user: user.get('id')
                                 },
                                 function(result,error) {
@@ -75,7 +75,7 @@
                         };
 
                         var uf = new UserListField('managersPRUserListDiv', 'userList',
-                                <%= jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) %>,
+                                ${ jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) },
                                 true,null,
                                 true, false, null, null,
                                 false, false, true,

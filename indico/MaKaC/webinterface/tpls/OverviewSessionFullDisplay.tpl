@@ -10,15 +10,15 @@
     <td colspan="2">
         <table class="subItem" bgcolor="#fff1d5" cellspacing="0" cellpadding="0"><tbody>
             <tr>
-                <td class="time"><%= startTime %></td>
+                <td class="time">${ startTime }</td>
                 <td class="title">
-                    <%= title %>
+                    ${ title }
 
-                    <span style="color: darkgreen"><%= conveners %></span>
-                    <span style="color: darkblue"><%= location %></span>
+                    <span style="color: darkgreen">${ conveners }</span>
+                    <span style="color: darkblue">${ location }</span>
                 </td>
             </tr>
         </tbody></table>
     </td>
 </tr>
-<%= details %>
+${ details }

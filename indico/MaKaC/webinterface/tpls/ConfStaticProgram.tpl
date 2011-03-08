@@ -5,7 +5,7 @@
     </tr>
     <tr>
         <td>
-            <%= program %>
+            ${ program }
         </td>
     </tr>
     <tr>

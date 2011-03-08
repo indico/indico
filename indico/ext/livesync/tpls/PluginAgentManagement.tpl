@@ -8,38 +8,36 @@
 <th>Position</th>
 <th></th>
 </tr>
-<% for agentId, agent in agents.iteritems(): %>
+% for agentId, agent in agents.iteritems(): 
    <tr>
-      <td><%= agent.__class__.__name__ %></td>
-      <td><%= agentId %></td>
-      <td><%= agent.getName() %></td>
-      <td><%= agent.getDescription() %></td>
+      <td>${ agent.__class__.__name__ }</td>
+      <td>${ agentId }</td>
+      <td>${ agent.getName() }</td>
+      <td>${ agent.getDescription() }</td>
       <td>
-      <% if agent.isActive(): %>
-      <%= agent.getLastDT() %> (<%= agent.getLastTS() %>)
-      <% end %>
-      <% elif agent.isRecording(): %>
+      % if agent.isActive(): 
+      ${ agent.getLastDT() } (${ agent.getLastTS() })
+      % elif agent.isRecording(): 
       As soon as the export process has finished, click
-      <a href="#" onclick="javascript:activateAgent('<%= agent.getId() %>'); return false;">here</a>.
-      <% end %>
-      <% else: %>
-      Agent not active. Start the <a href="#" onclick="javascript:preActivateAgent('<%= agent.getId() %>'); return false;">activation process</a>.
-      <% end %>
+      <a href="#" onclick="javascript:activateAgent('${ agent.getId() }'); return false;">here</a>.
+      % else: 
+      Agent not active. Start the <a href="#" onclick="javascript:preActivateAgent('${ agent.getId() }'); return false;">activation process</a>.
+      % endif
       </td>
       <td>
-        <a href="#" onclick="javascript: editAgent('<%= agentId %>'); return false;">Edit</a> <a href="#" onclick="javascript: deleteAgent('<%= agentId %>'); return false;">Delete</a>
+        <a href="#" onclick="javascript: editAgent('${ agentId }'); return false;">Edit</a> <a href="#" onclick="javascript: deleteAgent('${ agentId }'); return false;">Delete</a>
       </td>
 </tr>
-<% end %>
+% endfor
 </table>
 
 <a href="#" onclick="javascript:addAgent(); return false;">Add new agent</a>
 
 <script type="text/javascript">
 
-  var availableTypes = <%= jsonEncode(availableTypes) %>;
-  var agentTableData = <%= jsonEncode(agentTableData) %>;
-  var agentExtraOptions = <%= jsonEncode(extraAgentOptions) %>;
+  var availableTypes = ${ jsonEncode(availableTypes) };
+  var agentTableData = ${ jsonEncode(agentTableData) };
+  var agentExtraOptions = ${ jsonEncode(extraAgentOptions) };
 
   function deleteAgent(agentId) {
       if (confirm($T("Are you sure you want to delete agent ") + agentId + "?")) {

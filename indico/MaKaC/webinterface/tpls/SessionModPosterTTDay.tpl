@@ -5,11 +5,11 @@
             <table cellpadding="0" cellspacing="0">
                 <tr>
                     <td align="left" width="100%">
-                        <b><%= day %></b>
+                        <b>${ day }</b>
                     </td>
-                    <form action=<%= newSlotURL %> method="POST">
+                    <form action=${ newSlotURL } method="POST">
                     <td>
-                        <%= newSlotBtn %>
+                        ${ newSlotBtn }
                     </td>
                     </form>
                 </tr>
@@ -18,7 +18,7 @@
     </tr>
     <tr>
         <td>
-            <%= slots %>
+            ${ slots }
         </td>
     </tr>
     <tr>

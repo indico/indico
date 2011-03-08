@@ -1,9 +1,9 @@
-var WR_multiDayEvent = <%= jsBoolean(IsMultiDayEvent) %>;
-<% if ConfStartDate: %>
-var WR_confStartDate = IndicoUtil.parseJsonDate(<%= jsonEncode(ConfStartDate) %>);
-<% end %>
-var WR_confLocation = <%= jsonEncode(ConfLocation) %>
-var WR_confRoom = <%= jsonEncode(ConfRoom) %>
+var WR_multiDayEvent = ${ jsBoolean(IsMultiDayEvent) };
+% if ConfStartDate: 
+var WR_confStartDate = IndicoUtil.parseJsonDate(${ jsonEncode(ConfStartDate) });
+% endif
+var WR_confLocation = ${ jsonEncode(ConfLocation) }
+var WR_confRoom = ${ jsonEncode(ConfRoom) }
 
 
 var WRSpeakersTemplate = function(speakerList) {
@@ -145,7 +145,7 @@ var WR_loadTalks = function () {
             {
                 plugin: 'WebcastRequest',
                 service: 'WebcastAbleTalks',
-                conference: '<%= ConferenceId %>'
+                conference: '${ ConferenceId }'
             },
             function(result, error){
                 if (!error) {

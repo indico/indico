@@ -4,7 +4,7 @@
             <span>Room name</span>
         </td>
         <td>
-            <input id="roomName" type="text" size="60" name="roomName" value="<%= EventTitle %>" />
+            <input id="roomName" type="text" size="60" name="roomName" value="${ EventTitle }" />
         </td>
     </tr>
 
@@ -13,7 +13,7 @@
             <span>Description</span>
         </td>
         <td>
-            <textarea rows="3" cols="60" name="roomDescription"><%= EventDescription %></textarea>
+            <textarea rows="3" cols="60" name="roomDescription">${ EventDescription }</textarea>
         </td>
     </tr>
 
@@ -23,7 +23,7 @@
         </td>
         <td>
             <span id="owner"></span>
-            <img id="ownerHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
+            <img id="ownerHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
 
@@ -33,7 +33,7 @@
         </td>
         <td>
             <span id="PINField"></span>
-            <img id="PINHelpImg" src="<%= systemIcon('help')%>" style="margin-left:5px; vertical-align:middle;" />
+            <img id="PINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
         </td>
     </tr>
 </table>

@@ -1,19 +1,19 @@
-<h2 class="formTitle"><%= _("User Preferences")%></h2>
+<h2 class="formTitle">${ _("User Preferences")}</h2>
 <table style="margin-left: 100px;">
     <tr>
-        <td class="titleCellTD"><span class="titleCellFormat"><%= _("Language")%></span></td>
+        <td class="titleCellTD"><span class="titleCellFormat">${ _("Language")}</span></td>
         <td class="blacktext spaceLeft"><div id="selectLanguage" class="userPrefOption"></div><div id="langStatus" class="userPrefOptionStatus"></div></td>
     </tr>
     <tr>
-        <td class="titleCellTD"><span class="titleCellFormat"><%= _("My Timezone")%></span></td>
+        <td class="titleCellTD"><span class="titleCellFormat">${ _("My Timezone")}</span></td>
         <td class="blacktext spaceLeft"><div id="myTimezone" class="userPrefOption"></div><div id="myTimezoneStatus" class="userPrefOptionStatus"></div></td>
     </tr>
     <tr>
-        <td class="titleCellTD"><span class="titleCellFormat"><%= _("Display Timezone")%></span></td>
+        <td class="titleCellTD"><span class="titleCellFormat">${ _("Display Timezone")}</span></td>
         <td class="blacktext spaceLeft"><div id="displayTimezone" class="userPrefOption"></div><div id="displayTimezoneStatus" class="userPrefOptionStatus"></div></td>
     </tr>
     <tr>
-        <td class="titleCellTD"><span class="titleCellFormat"><%= _("Show past events by default")%></span></td>
+        <td class="titleCellTD"><span class="titleCellFormat">${ _("Show past events by default")}</span></td>
         <td class="blacktext spaceLeft" nowrap><div id="tabShowPastEvents"></div></td>
     </tr>
 </table>
@@ -67,6 +67,6 @@
     };
     var displayTimezoneSelector = new SelectRemoteWidget("user.getDisplayTimezones",{},displayTzCallback);
 
-	$E("tabShowPastEvents").set(new RemoteSwitchButton(<% if showPastEvents: %>true<% end %><% else: %>false<% end %>,
+    $E("tabShowPastEvents").set(new RemoteSwitchButton(${"true" if showPastEvents else "false"},
             Html.img({src:imageSrc("tick.png")}), Html.img({src:imageSrc("cross.png")}), "user.hidePastEvents", "user.showPastEvents",{}).draw());
 </script>
