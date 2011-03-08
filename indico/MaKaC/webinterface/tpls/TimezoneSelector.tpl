@@ -1,4 +1,4 @@
-<a id="timezoneSelectorLink" class="dropDownMenu" href="#">
+<a id="timezoneSelectorLink" class="dropDownMenu" style="display: inline-block;" href="#">
     <%= ActiveTimezoneDisplay %>
 </a>
 
