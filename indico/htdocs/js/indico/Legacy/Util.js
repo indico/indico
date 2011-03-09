@@ -541,8 +541,10 @@ var IndicoUtil = {
                 }
 
                 //--- Check if there are errors ---
-                if (dataType == "radio" && !allowEmpty && !self.checkRadioButton(component)) {
-                    error = Html.span({}, "Please choose an option");
+                if (dataType == "radio") {
+                    if (!allowEmpty && !self.checkRadioButton(component)) {
+                        error = Html.span({}, "Please choose an option");
+                    }
                 }
                 else if (dataType == 'int' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
                     error = Html.span({}, "Field must be a number");
@@ -631,15 +633,17 @@ var IndicoUtil = {
                             Dom.List.remove(document.body, tooltip);
                         });
 
-                        component.observeEvent('click', function(event) {
-                            each($N(component.dom.name), function(component){
-                                component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
-                                $E(component.dom.id + 'Label').dom.className = component.dom.className.substring(0, component.dom.className.length-13);
+                        each($N(component.dom.name), function(component){
+                            component.observeEvent('click', function(event) {
+                                each($N(component.dom.name), function(component){
+                                    component.dom.className = component.dom.className.substring(0, component.dom.className.length-8);
+                                    $E(component.dom.id + 'Label').dom.className = component.dom.className.substring(0, component.dom.className.length-13);
+                                });
+                                if (exists(radioButtonLabelStopObserving[component.dom.name])) {
+                                    each (radioButtonLabelStopObserving[component.dom.name], function(stopObserver) {stopObserver()});
+                                }
+                                Dom.List.remove(document.body, tooltip);
                             });
-                            if (exists(radioButtonLabelStopObserving[component.dom.name])) {
-                                each (radioButtonLabelStopObserving[component.dom.name], function(stopObserver) {stopObserver()});
-                            }
-                            Dom.List.remove(document.body, tooltip);
                         });
                     }
 

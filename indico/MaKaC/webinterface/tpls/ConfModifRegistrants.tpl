@@ -121,7 +121,7 @@
 
         <tr>
           <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
-            <form action=<%= actionPostURL %> method="post" name="registrantsForm" onsubmit="return atLeastOneSelected($E("registrantsItems"), $T("No registrant selected! Please select at least one."));">
+            <form action=<%= actionPostURL %> method="post" name="registrantsForm" onsubmit="return atLeastOneSelected($E('registrantsItems'), $T('No registrant selected! Please select at least one.'));">
 	      <table>
                 <tr>
                   <td colspan="10">
