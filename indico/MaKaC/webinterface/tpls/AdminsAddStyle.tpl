@@ -12,7 +12,7 @@
     </tr>
     <% if len(availableStylesheets) == 0: %>
     <tr>
-      <td colspan="3"><%= _("All XSL stylesheets are already in use in a declared style. In order to add a new style, start by adding the corresponding .xsl file in")%> <%= styleMgr.getBaseXSLPath()%></td>
+      <td colspan="3"><%= _("All XSL stylesheets are already in use in a declared style. In order to add a new style, start by adding the corresponding .xsl file in") + " "%> <%= styleMgr.getBaseXSLPath()%></td>
     </tr>
     <% end %>
     <% else: %>

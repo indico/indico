@@ -100,7 +100,7 @@ def walktree(top='.'):
             for newtop, children in walktree(os.path.join(top, name)):
                 yield newtop, children
 
-for basepath, children in walktree('/home/marius/indico'):
+for basepath, children in walktree('cds-indico'):
     for child in children:
         if child.endswith('.tpl'):
             fix_template(os.path.join(basepath, child))

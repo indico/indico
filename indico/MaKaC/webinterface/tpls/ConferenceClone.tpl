@@ -96,7 +96,7 @@
 </script>
 
 
-<div class="groupTitle"><%= _("Clone the event:")%> <%= confTitle %></div>
+<div class="groupTitle"><%= _("Clone the event:") + " "%> <%= confTitle %></div>
 
 
 <h2><%= _("Step 1: What to clone?")%></h2>

@@ -17,7 +17,7 @@
                             <span class="formTitle" style="border-bottom-width: 0px">
                             <% if not title: %>
                                 <!-- Generic title -->
-                                <%= len( reservations ) %>  <%= _("Booking(s) found")%>:
+                                <%= len( reservations ) %>  <%= " " + _("Booking(s) found")%>:
                             <% end %>
                             <% if title: %>
                                 <%= title + " (" + str(len(reservations)) + ")" %>:

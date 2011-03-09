@@ -49,7 +49,7 @@
         </td>
         <td bgcolor="white" nowrap>
             <input type="hidden" name="auth_primary" value=<%= auth_id %>>
-            <input type="checkbox" name="auth_speaker" value=<%= auth_id %> <%= auth_speaker %>> <%= _("presenter")%>
+            <input type="checkbox" value=<%= auth_id %> name="auth_speaker" <%= auth_speaker %>> <%= _("presenter")%>
         </td>
     </tr>
 </table>

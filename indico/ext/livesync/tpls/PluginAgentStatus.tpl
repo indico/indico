@@ -14,7 +14,7 @@
       <% if ts == 'break': %>
         <tr>
         <td class="timestamp"></td>
-        <td class="content break"><%= dt %> <%= _("entrie(s)") %>, <%= nelems %> <%= _("changeset(s)") %> </td>
+        <td class="content break"><%= dt %> <%= " " + _("entrie(s)") %>, <%= nelems %> <%= _("changeset(s)") %> </td>
         <td class="agents"></td>
       <% end %>
       <% else: %>

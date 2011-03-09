@@ -12,7 +12,7 @@
 			<table border ="0" cellpadding="4" cellspacing="1"
                                 width="100%">
 			     <tr>
-                                <td bgcolor="#E5E5E5"><center><b><font size="+1" color="#3366AA"><%= _("Forbidden HTML tag detected in submitted data:")%> <%= msg %></font></b></center></td>
+                                <td bgcolor="#E5E5E5"><center><b><font size="+1" color="#3366AA"><%= _("Forbidden HTML tag detected in submitted data:") + " "%> <%= msg %></font></b></center></td>
                             </tr>
                         </table>
            	   </td>

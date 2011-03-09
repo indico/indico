@@ -27,7 +27,7 @@
                 <table>
                     <tr>
                         <td valign="top">
-                            <input type="radio" name="locationAction" value="inherit" <%= defaultInheritPlace %>> <%= _("Same as for the")%> <%= parentType %>: <i><small><%= confPlace %></small></i>
+                            <input type="radio" name="locationAction" value="inherit" <%= defaultInheritPlace %>> <%= _("Same as for the") + " "%> <%= parentType %>: <i><small><%= confPlace %></small></i>
                         </td>
                     </tr>
                     <tr>
@@ -54,7 +54,7 @@
                 <table>
                     <tr>
                         <td valign="top">
-                            <input type="radio" name="roomAction" value="inherit" <%= defaultInheritRoom %>> <%= _("Same as for the")%> <%= parentType %>: <i><small><%= confRoom %></small></i>
+                            <input type="radio" name="roomAction" value="inherit" <%= defaultInheritRoom %>> <%= _("Same as for the") + " "%> <%= parentType %>: <i><small><%= confRoom %></small></i>
                         </td>
                     </tr>
                     <tr>

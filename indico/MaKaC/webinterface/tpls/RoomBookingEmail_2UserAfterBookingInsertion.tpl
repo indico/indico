@@ -11,7 +11,7 @@ Dear <%= firstName %>,
 The conference room <%= reservation.room.getFullName() %>
 has been booked for <%= reservation.bookedForName %>
 reason: <%= reservation.reason %>
-from <%= formatDate(reservation.startDT.date()) %> to <%= formatDate(reservation.endDT.date()) %> between <%= reservation.startDT.strftime("%H:%M") %> and <%= reservation.endDT.strftime("%H:%M") %> <%= exclDays %>
+from <%= formatDate(reservation.startDT.date()) %> to <%= formatDate(reservation.endDT.date()) %> between <%= reservation.startDT.strftime("%H:%M") %> and <%= reservation.endDT.strftime("%H:%M") + " " %> <%= exclDays %>
 Access: <%= urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) %>
 
 If you find that you will not be using this room, please cancel this booking by going to this URL and clicking "Cancel Booking":

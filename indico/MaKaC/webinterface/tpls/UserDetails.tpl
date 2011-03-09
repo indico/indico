@@ -10,11 +10,11 @@
     </tr>
 	<tr>
         <td colspan="2">
-		    <div class="groupTitle"><%=  _("Details for")%> <%= title %> <%= fullName %></div>
+		    <div class="groupTitle"><%=  _("Details for") + " "%> <%= title + " " %> <%= fullName %></div>
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionormat"><%= _("Affiliation")%></span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Affiliation")%></span></td>
         <td class="blacktext"><%= organisation %></td>
     </tr>
     <tr>
@@ -72,7 +72,9 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Event Manager")%></span>
+        <td nowrap class="dataCaptionTD">
+            <span class="dataCaptionFormat"><%= _("Event Manager")%></span>
+        </td>
         <td class="blacktext">
             <%= eventManager %>
         </td>

@@ -2,7 +2,7 @@
 <br>
 <table width="60%" align="center" style="border-left:1px solid #777777;border-top:1px solid #777777;" cellspacing="0">
   <tr>
-    <td nowrap class="groupTitle" colspan="2"><b><%= _("Modifying")%> <%= title %></b></td>
+    <td nowrap class="groupTitle" colspan="2"><b><%= _("Modifying") + " "%> <%= title %></b></td>
   </tr>
   <tr><td><br></td></tr>
   <tr>

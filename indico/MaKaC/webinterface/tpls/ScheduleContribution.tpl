@@ -28,7 +28,7 @@
 		      <div style="overflow: auto;">
 				  <ul class="slotHorizontalMenu" style="float:right;">
 	                <li><a href="<%= urlHandlers.UHSubContributionModification.getURL(sub) %>">Edit</a></li>
-	                <li><a href="#" onclick="if (confirm('<%= _("Delete subcontribution")%> <%= escapeAttrVal(sub.getTitle()) %>?')) {IndicoUI.Services.deleteSubContribution('<%= self._contrib.getConference().getId() %>', '<%= self._contrib.getId() %>', '<%= sub.getId() %>');} return false;">Delete</a></li>
+	                <li><a href="#" onclick="if (confirm('<%= _("Delete subcontribution") + " "%> <%= escapeAttrVal(sub.getTitle()) %>?')) {IndicoUI.Services.deleteSubContribution('<%= self._contrib.getConference().getId() %>', '<%= self._contrib.getId() %>', '<%= sub.getId() %>');} return false;">Delete</a></li>
 	              </ul>
 				  <div style="overflow:visible; margin-top: 15px;"><%= truncateTitle(sub.getTitle(), 40) %></span>
 			  </div>

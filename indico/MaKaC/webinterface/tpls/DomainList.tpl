@@ -6,7 +6,7 @@
 </tr>
 <tr>
   <td></td>
-  <td class="blacktext"><em><%= _("The database currently hosts")%> <%= nbDomains %> <%= _("domains.")%></em></td>
+  <td class="blacktext"><em><%= _("The database currently hosts") + " "%> <%= nbDomains %> <%= " " +  _("domains.")%></em></td>
 </tr>
 <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Tools")%></span></td>

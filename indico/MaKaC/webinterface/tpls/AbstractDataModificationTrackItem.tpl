@@ -1,5 +1,5 @@
 <tr>
-    <td style="color:black"><input type="<%= type %>" name="tracks" value=<%= id %> <%= checked %>><%= title %></td>
+    <td style="color:black"><input type="<%= type %>" value=<%= id %> name="tracks" <%= checked %>><%= title %></td>
 </tr>
 <tr>
     <td>

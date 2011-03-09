@@ -19,7 +19,7 @@
                 </td>
                 <% end %>
                 <td style="vertical-align: top; width: 100%;">
-                	<div class="body clearfix <% if sideMenu: %>bodyWithSideMenu<% end %> <% if isFrontPage: %>bodyWithSideBar<% end %>" style="margin-left:0px;">
+                	<div class="body clearfix <% if sideMenu: %>bodyWithSideMenu<% end %><%= " " %><% if isFrontPage: %>bodyWithSideBar<% end %>" style="margin-left:0px;">
                         <%= body %>
                     </div>
                 </td>
@@ -51,7 +51,7 @@
             </div>
         <% end %>
 
-    	<div class="body clearfix <% if sideMenu: %>bodyWithSideMenu<% end %> <% if isFrontPage: %>bodyWithSideBar<% end %>">
+    	<div class="body clearfix <% if sideMenu: %>bodyWithSideMenu<% end %><%= " " %><% if isFrontPage: %>bodyWithSideBar<% end %>">
             <%= body %>
         </div>
     <% end %>

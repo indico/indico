@@ -3,4 +3,4 @@ this is the scheduler<br>
     <%= entryTable %>
 </table>
 <br>
-<%= _("Add a new entry:")%> <%= entriesToAdd %>
+<%= _("Add a new entry:") + " "%> <%= entriesToAdd %>

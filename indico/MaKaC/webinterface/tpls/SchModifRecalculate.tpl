@@ -1,7 +1,7 @@
 <form method="POST" action=<%= postURL %>>
     <table width="60%" align="center" border="0" style="border-left: 1px solid #777777;padding-left:2px">
 		<tr>
-			<td colspan="2" class="groupTitle"> <%= _("Reschedule entries within the")%> <%= entryType %></td>
+			<td colspan="2" class="groupTitle"> <%= _("Reschedule entries within the") + " "%> <%= entryType %></td>
         </tr>
         <tr>
             <td></td>

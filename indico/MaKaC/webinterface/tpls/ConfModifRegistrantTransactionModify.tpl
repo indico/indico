@@ -11,7 +11,7 @@
   </tr>
   <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Amount")%></span></td>
-    <td width="100%" align="left" style="padding-left:10px"><%= price %> <%= Currency %></td>
+    <td width="100%" align="left" style="padding-left:10px"><%= price %><%= " " %><%= Currency %></td>
   </tr>
   <tr><td>&nbsp;</td></tr>
   <tr>

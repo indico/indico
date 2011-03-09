@@ -30,7 +30,7 @@
 								<td>&nbsp;</td>
 								<td width="25%">&nbsp;</td>
 								<td rowspan="2" class="loginInfoHeader"><a <%= userDetails %>><img class="imglink" src="<%= imgLogin %>" alt="user"></a></td>
-								<td rowspan="2" nowrap class="loginInfoHeader" style="padding-top:3px"><%= userInfo %> <%= logMeAs %></td>
+								<td rowspan="2" nowrap class="loginInfoHeader" style="padding-top:3px"><%= userInfo %><%= " "%><%= logMeAs %></td>
 							</tr>
 							<tr>
 								<td colspan="3">&nbsp;</td>

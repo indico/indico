@@ -3,7 +3,7 @@
 <form action="<%=actionUrl%>" name="ResultsSubmitters" method="POST" <%=submitConfirm%>>
   <table width="50%" align="center" class="evalationResultsSubmitters">
       <tr>
-        <td class="groupTitle"><%=mode.title()%>  <%= _("submitters")%></td>
+        <td class="groupTitle"><%=mode.title()%>  <%= " " + _("submitters")%></td>
       </tr>
       <tr>
         <td>

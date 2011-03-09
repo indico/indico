@@ -5,7 +5,7 @@
 		    <br>
             <table width="100%" align="center" border="0" style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
               <tr>
-                <td colspan="3" class="groupTitle" style="background:#E5E5E5; color:gray"> <%= _("Details for")%> <%= title %> <%= fullName %></td>
+                <td colspan="3" class="groupTitle" style="background:#E5E5E5; color:gray"> <%= _("Details for") + " "%> <%= title + " " %> <%= fullName %></td>
               </tr>
               <tr>
                 <td bgcolor="white">

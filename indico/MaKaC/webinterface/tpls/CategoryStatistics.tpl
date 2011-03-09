@@ -20,7 +20,7 @@
 			<br>
 			<table cellpadding="0" cellspacing="0" width="100%">
  				<tr>
-    					<td colspan="2" align="right"> <%= _("Updated")%> <%= updated %>
+    					<td colspan="2" align="right"> <%= _("Updated") + " "%> <%= updated %>
     					</td>
   				</tr>
 			</table>

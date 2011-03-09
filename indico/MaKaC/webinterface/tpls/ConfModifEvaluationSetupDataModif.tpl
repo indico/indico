@@ -130,9 +130,9 @@
       </td>
     </tr>
     <!--<tr>
-      <td class="titleCellTD"><span class="titleCellFormat"><%= _("Must be a")%> <%=adherent%></span></td>
+      <td class="titleCellTD"><span class="titleCellFormat"><%= _("Must be a") + " "%> <%=adherent%></span></td>
       <td class="modifRight"><input type="checkbox" name="mandatoryParticipant" <%=mandatoryParticipant%>/>
-      (<%= _("Check if the survey can only be seen by the")%> <%=adherent%>s.)</td>
+      (<%= _("Check if the survey can only be seen by the") + " "%> <%=adherent%>s.)</td>
     </tr>-->
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"><%= _("Must have an account")%></span></td>

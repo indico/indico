@@ -19,9 +19,9 @@
         <tr>
             <td class="titleCellTD"><span class="titleCellFormat"> <%= _("End date")%></span></td>
             <td valign="top" bgcolor="white" width="100%">&nbsp;
-                <input type="text" size="2" name="eDay" value=<%= eDay %> <%= disabled %> onChange="">-
-                <input type="text" size="2" name="eMonth" value=<%= eMonth %> <%= disabled %> onChange="">-
-                <input type="text" size="4" name="eYear" value=<%= eYear %> <%= disabled %> onChange="">
+                <input type="text" size="2" value=<%= eDay %> name="eDay" <%= disabled %> onChange="">-
+                <input type="text" size="2" value=<%= eMonth %> name="eMonth" <%= disabled %> onChange="">-
+                <input type="text" size="4" value=<%= eYear %> name="eYear" <%= disabled %> onChange="">
                 <input type="image" src=<%= calendarIconURL %> alt="open calendar" border="0" onClick="javascript:window.open('<%= calendarSelectURL %>?daystring=eDay&monthstring=eMonth&yearstring=eYear&month='+this.form.eMonth.value+'&year='+this.form.eYear.value+'&date='+this.form.eDay.value+'-'+this.form.eMonth.value+'-'+this.form.eYear.value,'calendar','scrollbars=no,menubar=no,width=200,height=170');return false;" <%= disabled %>>
                 <input type="text" size="2" name="eHour" value=<%= eHour %>>:
                 <input type="text" size="2" name="eMinute" value=<%= eMinute %>>

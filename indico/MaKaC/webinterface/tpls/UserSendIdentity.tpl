@@ -8,7 +8,7 @@
             <table bgcolor="gray">
                 <tr>
                     <td bgcolor="white" >
-                        <center><b>&nbsp;<%= title %> <%= name %> <%= surName %>&nbsp;</b></center>
+                        <center><b>&nbsp;<%= title + " " %> <%= name + " " %> <%= surName %>&nbsp;</b></center>
                         <b>&nbsp; <%= _("Email")%> : </b><%= email %>&nbsp;
                     </td>
                 </tr>
