@@ -39,7 +39,7 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
             var sDate = Util.parseJSDateTime(this.startDateSel.get(), IndicoDateTimeFormats.ServerHourless);
             var eDate = Util.parseJSDateTime(this.endDateSel.get(), IndicoDateTimeFormats.ServerHourless);
 
-            if (sDate >= eDate) {
+            if (sDate > eDate || (!this.allowEqual && sDate == eDate)) {
                 valid = false;
                 this.startDateSel.setError($T('Start date should be before end date'));
                 this.endDateSel.setError($T('End date should be after start date'));
@@ -74,11 +74,12 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
         var self = this;
         return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget(), this._drawButtons());
     }
-}, function(startDate, endDate, callback, title) {
+}, function(startDate, endDate, callback, title, allowEqual) {
     var self = this;
 
     this.valid = true;
     this.callback = callback;
+    this.allowEqual = allowEqual || false;
 
     if(startDate) {
         this.startDate = this._dateFromString(startDate);

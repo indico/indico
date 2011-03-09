@@ -57,7 +57,7 @@
             form['eYear'].value = endDate.getFullYear();
 
             form.submit();
-        }, '<%=_("Choose Period") %>');
+        }, '<%=_("Choose Period") %>', true);
         dlg.open();
     });
     </script>
