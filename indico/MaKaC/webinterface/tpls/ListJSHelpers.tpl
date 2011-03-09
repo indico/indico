@@ -68,7 +68,6 @@ function isSelected(element) {
 }
 
 function atLeastOneSelected(items, errorText) {
-         debugger
     if(!newUser) {
         var inputNodes = IndicoUtil.findFormFields(items)
         for (i = 0; i < inputNodes.length; i++)
