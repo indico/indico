@@ -2,7 +2,7 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 <% if not Review.isAuthorSubmitted(): %>
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table width="90%" align="center" border="0" style="margin-bottom: 1em">
     <% if len(Review.getReviewManager().getVersioning()) == 1: %>
     <tr>
         <td>
@@ -26,7 +26,7 @@
 </table>
 <% end %>
 <% else: %>
-<table width="90%%" align="center" border="0" style="padding-top: 15px;">
+<table width="90%" align="center" border="0" style="padding-top: 15px;">
     <tr>
         <td colspan="5" class="groupTitle" style="border: none"><%= _("Give opinion on the content of a contribution")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.')) %>
@@ -34,7 +34,7 @@
     </tr>
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
-        <td width="60%%" id="questionListDisplay">
+        <td width="60%" id="questionListDisplay">
         </td>
     </tr>
     <tr>

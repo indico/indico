@@ -9,7 +9,7 @@
 <em><%= _("The reviewing mode chosen for this conference is")%>: <%= ConferenceChoiceStr%></em>
 </div>
 <% if not Review.isAuthorSubmitted(): %>
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table width="90%" align="center" border="0" style="margin-bottom: 1em">
     <% if len(Review.getReviewManager().getVersioning()) == 1: %>
     <tr>
         <td>
@@ -35,7 +35,7 @@
 <% else: %>
 <!-- Judgement of the editor -->
 <% if ConferenceChoice == 3 or ConferenceChoice == 4:%>
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
+<table width="90%" align="center" border="0" style="margin-bottom: 1em; margin-top: 1em">
     <tr>
         <td id="editingJudgementHelp" colspan="5" class="groupTitle" style="border-bottom: none"><%= _("Layout judgement details")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.')) %>
@@ -56,7 +56,7 @@
 
 <!-- List of advices from the reviewers -->
 <% if ConferenceChoice == 2 or ConferenceChoice == 4:%>
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table width="90%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="reviewingJudgementHelp" colspan="5" class="groupTitle" style="padding-top: 5px; border-bottom: none"><%= _("Content judgement details")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Content Reviewers<br/>Only the Content Reviewers of this contribution can change their respective judgements.')) %>
@@ -65,7 +65,7 @@
     <tr>
         <td>
                 <% if len(AdviceList) > 0: %>
-                    <table cellspacing="0" cellpadding="5" width="100%%">
+                    <table cellspacing="0" cellpadding="5" width="100%">
                     <% for advice in AdviceList: %>
                         <% includeTpl ('AdviceJudgementDisplay', advice = advice, ShowReviewer = True) %>
                     <% end %>
@@ -81,7 +81,7 @@
 
 <!-- Final reviewing of the referee -->
 <% if ConferenceChoice == 2 or ConferenceChoice == 4:%>
-<table width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table width="90%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
         <td id="finalJudgementHelp" colspan="5" class="groupTitle" style="padding-bottom: 15px; padding-top: 5px; border-bottom: none"><a name="FinalReviewing"></a><%= _("Final Judgement")%>
             <% inlineContextHelp(_('Here is displayed the judgement given by the Referee.<br/>If you are the Referee of this contribution, you can change this.')) %>
@@ -103,7 +103,7 @@
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"><%= _("Reviewing questions:")%></span>
             </td>
-            <td width="60%%" id="questionListDisplay">
+            <td width="60%" id="questionListDisplay">
             </td>
         </tr>
         <tr>

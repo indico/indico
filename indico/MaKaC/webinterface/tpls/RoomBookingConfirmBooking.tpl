@@ -1,15 +1,15 @@
 
     <form id="bookingForm" action="<%= saveBookingUH.getURL(conf) %>" method="post">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
-    <table cellpadding="0" cellspacing="0" border="0" width="80%%">
+    <table cellpadding="0" cellspacing="0" border="0" width="80%">
 		<% if standalone: %>
 		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
+		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
 		    </tr>
 		<% end %>
         <tr>
-            <td class="bottomvtab" width="100%%">
-                <table width="100%%" cellpadding="0" cellspacing="0" class="htab" border="0">
+            <td class="bottomvtab" width="100%">
+                <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
                             <span class="formTitle" style="border-bottom-width: 0px">
@@ -23,7 +23,7 @@
                             </span><br />
 
                             <br />
-                            <table width="100%%" align="left" border="0">
+                            <table width="100%" align="left" border="0">
                             <tr>
 						   		<td class="titleUpCellTD"><%=bookingMessage%>ing</td>
 							 	<td><ul>

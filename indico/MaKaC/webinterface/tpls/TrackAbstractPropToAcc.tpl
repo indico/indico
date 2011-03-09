@@ -17,7 +17,7 @@
         <% if len(abstractReview.getReviewingQuestions()) > 0: %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
-            <td width="60%%" id="questionListDisplay">
+            <td width="60%" id="questionListDisplay">
             </td>
         </tr>
         <% end %>
@@ -81,6 +81,7 @@ var showQuestions = function() {
 }
 
 showQuestions();
+
 
 </script>
 <% end %>

@@ -6,7 +6,7 @@
 
 <% if ConfReview.getReviewedContributions(User): %>
 
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
+<table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4><%= _("Give advice on content of the paper")%></td>
     </tr>

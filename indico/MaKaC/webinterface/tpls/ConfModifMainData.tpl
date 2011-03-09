@@ -15,9 +15,9 @@
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Types of contributions")%></span></td>
         <td bgcolor="white" colspan="2" class="blacktext">
             <form action="<%=removeTypeURL%>" method="post">
-				<table width="100%%">
+				<table width="100%">
 					<tr>
-						<td width="100%%">
+						<td width="100%">
 							<%=typeList%>
 						</td>
 						<td valign="bottom" align="right">

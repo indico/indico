@@ -9,7 +9,7 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
 %>
 <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Current status")%></span></td>
-    <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+    <td bgcolor="white" width="100%" valign="top" class="blacktext">
         <div class="ACStatusDiv">
             <%= _("Your " + termsDict[type]['name'] + " is currently") %> <span class="ACStatus" style="color: <%=statusColor%>;"><%= _(privacy) %></span>
             <% if privacy == 'INHERITING' : %>
@@ -128,7 +128,7 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
 </tr>
 <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Modify status")%></span></td>
-    <td bgcolor="white" width="100%%" valign="top" class="blacktext">
+    <td bgcolor="white" width="100%" valign="top" class="blacktext">
     <div class="ACModifDiv">
         <form action="<%= setPrivacyURL %>" method="POST">
             <%= locator %>

@@ -9,7 +9,7 @@
 <!-- END OF CONTEXT HELP DIVS -->
 
 
-<table align="center" width="95%%">
+<table align="center" width="95%">
 
 <tr>
   <td class="formTitle"><%= _("Room Booking Administration")%></td>
@@ -58,7 +58,7 @@
             <select name="defaultLocation" id="defaultLocation">
                 <% defaultLoc = Location.getDefaultLocation().friendlyName %>
                 <% for loc in Location.allLocations: %>
-                    <option value="<%=loc.friendlyName%>" <% if loc.friendlyName == defaultLoc: %> selected="selected" <%%> ><%= loc.friendlyName %></option>
+                    <option value="<%=loc.friendlyName%>" <% if loc.friendlyName == defaultLoc: %> selected="selected" <% end %> ><%= loc.friendlyName %></option>
                 <% end %>
             </select>
             <input type="submit" class="btn" value="<%= _("Change")%>">

@@ -51,7 +51,7 @@
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Start date")%></span></td>
-      <td bgcolor="white" width="100%%">
+      <td bgcolor="white" width="100%">
                 <span id="sDatePlace"></span>
                 <input type="hidden" value="<%= sDay %>" name="sDay" id="sDay"/>
                 <input type="hidden" value="<%= sMonth %>" name="sMonth" id="sMonth"/>
@@ -60,7 +60,7 @@
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("End date")%></span></td>
-      <td bgcolor="white" width="100%%">
+      <td bgcolor="white" width="100%">
                 <span id="eDatePlace"></span>
                 <input type="hidden" value="<%= eDay %>" name="eDay" id="eDay"/>
                 <input type="hidden" value="<%= eMonth %>" name="eMonth" id="eMonth"/>
@@ -162,4 +162,3 @@
     </tr>
   </table>
 </form>
-

@@ -1,4 +1,4 @@
-  <table class="groupTable" style="text-align: left; width: 100%%;" border="0" cellpadding="0">
+  <table class="groupTable" style="text-align: left; width: 100%;" border="0" cellpadding="0">
     <tbody>
       <tr>
         <td colspan="1" class="groupTitle"><%= _("Available Styles")%>

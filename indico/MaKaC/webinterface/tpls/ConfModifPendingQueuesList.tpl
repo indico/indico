@@ -29,7 +29,7 @@
                     <tr>
                       <td valign="top"><input type="checkbox" name="pendingSubmitters" value="<%= str(key) %>"></td>
                       <td valign="top" nowrap class="abstractLeftDataCell"><%= self.htmlText("%s <%s>"%(pList[0].getAbrName() or "&nbsp;", pList[0].getEmail() or "&nbsp;")) %></td>
-                      <td width="100%%" valign="top" align="left" class="abstractDataCell" style="padding-left:20px">
+                      <td width="100%" valign="top" align="left" class="abstractDataCell" style="padding-left:20px">
 			<% pList.sort(self._cmpByContribName) %>
 			<% for cp in pList: %>
                         <% contrib=cp.getContribution() %>

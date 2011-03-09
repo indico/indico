@@ -13,7 +13,7 @@
     }
 </script>
 
-<table width="80%%" class="filesTab">
+<table width="80%" class="filesTab">
 <tr>
 <td>
 	<table>

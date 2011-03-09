@@ -63,8 +63,8 @@
                     </table>
                     <table class="statsGraph">
                       <tr>
-                        <td class="yellow" width="<%=q.getPercentageAnswersLike(choiceItem1,selectedSubmissions)%>%%" />
-                        <td class="green" width="<%=q.getPercentageAnswersLike(choiceItem2,selectedSubmissions)%>%%" />
+                        <td class="yellow" width="<%=q.getPercentageAnswersLike(choiceItem1,selectedSubmissions)%>%" />
+                        <td class="green" width="<%=q.getPercentageAnswersLike(choiceItem2,selectedSubmissions)%>%" />
                       </tr>
                     </table>
                   </td>
@@ -83,12 +83,12 @@
                       <table class="statsGraph">
                         <tr>
                           <% if percent>=10: %>
-                            <td class="<% print colors[color%len(colors)]; color+=1 %>" width="<%=percent%>%%" align="right"><%=percent%>&#37;</td>
-                            <td width="<%=100-percent%>%%"/>
+                            <td class="<% print colors[color%len(colors)]; color+=1 %>" width="<%=percent%>%" align="right"><%=percent%>&#37;</td>
+                            <td width="<%=100-percent%>%"/>
                           <% end %>
                           <% if percent<10: %>
-                            <td class="<% print colors[color%len(colors)]; color+=1 %>" width="<%=percent%>%%" />
-                            <td width="<%=100-percent%>%%">&nbsp;<%=percent%>&#37;</td>
+                            <td class="<% print colors[color%len(colors)]; color+=1 %>" width="<%=percent%>%" />
+                            <td width="<%=100-percent%>%">&nbsp;<%=percent%>&#37;</td>
                           <% end %>
                         </tr>
                       </table>

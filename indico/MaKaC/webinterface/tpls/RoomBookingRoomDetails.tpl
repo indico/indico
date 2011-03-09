@@ -35,15 +35,15 @@
     <!-- END OF CONTEXT HELP DIVS -->
 
 
-    <table cellpadding="0" cellspacing="0" border="0" width="80%%">
+    <table cellpadding="0" cellspacing="0" border="0" width="80%">
 		<% if standalone: %>
 		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
+		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
 		    </tr>
 		<% end %>
         <tr>
-            <td class="bottomvtab" width="100%%">
-                <table width="100%%" cellpadding="0" cellspacing="0" class="htab" border="0">
+            <td class="bottomvtab" width="100%">
+                <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
                             <span class="formTitle" style="border-bottom-width: 0px">Room</span><br />
@@ -61,12 +61,12 @@
                                 <br />
                             <% end %>
                             <br />
-                            <table width="96%%" align="left" border="0">
+                            <table width="96%" align="left" border="0">
                               <!-- LOCATION -->
                               <tr>
-                                <td width="24%%" class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Location")%></span></td>
-                                <td width="76%%">
-                                    <table width="100%%">
+                                <td width="24%" class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Location")%></span></td>
+                                <td width="76%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Location")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= room.locationName %></td>
@@ -103,7 +103,7 @@
                                         <% end %>
                                  </table>
                                 </td>
-                                <td width="20%%" align="right" class="thumbnail">
+                                <td width="20%" align="right" class="thumbnail">
                                 <% if room.photoId != None: %>
                                     <a href="<%= room.getPhotoURL() %>" rel="lightbox" title="<%= room.photoId %>">
                                         <img border="1px" height="100" src="<%= room.getPhotoURL() %>" alt="<%= str( room.photoId ) %>"/>
@@ -140,7 +140,7 @@
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Information")%></span></td>
                                 <td colspan="2">
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Capacity")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= room.capacity %><%=" "%><%=_("people")%></td>
@@ -198,7 +198,7 @@
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Custom attributes")%></span></td>
                                 <td colspan="2">
-                                    <table width="100%%">
+                                    <table width="100%">
                                     <% for name, value in attrs.iteritems(): %>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small><%= name %>&nbsp;&nbsp;</small></td>
@@ -214,7 +214,7 @@
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Equipment")%></span></td>
                                 <td colspan="2">
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small><%= _("Room has")%>:&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">

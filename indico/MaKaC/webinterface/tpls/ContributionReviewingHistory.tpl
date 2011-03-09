@@ -5,7 +5,7 @@
 <% for review in Versioning: %>
         <% for m in review.getMaterials(): %>
            <% for res in m.getResourceList(): %>
-            <table width="90%%" align="center" border="0" style="padding-bottom: 10px;">
+            <table width="90%" align="center" border="0" style="padding-bottom: 10px;">
                 <tr>
 		            <td colspan="1" class="dataCaptionTD" style="width: 25%;padding-right: 1px">
 		             <em><%= _("Review ")%> <%= review.getVersion() %><span class="titleCellFormat" style="font-size: 12px;"><%= _(":")%></span></em>

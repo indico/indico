@@ -5,7 +5,7 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 
 <% if ConfReview.getJudgedContributions(User): %>
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
+<table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4 style=""><%= _("Contributions to judge as Referee")%></td>
     </tr>
@@ -15,7 +15,7 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;"><%= _("State")%></td>
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;"><%= _("Deadline")%></td>
     </tr>
-   
+
     <% for c in ConfReview.getJudgedContributions(User): %>
         <% if not isinstance(c.getStatus(), ContribStatusNone): %>
 	    <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
@@ -29,7 +29,7 @@
                 <span><%= _("Not judged yet")%></span><br>
                 <%= "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = False)) %>
             <% end %>
-            </td>    
+            </td>
             <td style="padding-right:5px;padding-left:5px;" onmouseover="this.style.borderColor='#ECECEC'" onmouseout="this.style.borderColor='transparent'">
                 <% date = c.getReviewManager().getLastReview().getAdjustedRefereeDueDate() %>
                 <% if date is None: %>
@@ -38,7 +38,7 @@
                 <% else: %>
                     <span><%= date.strftime(dueDateFormat) %></span>
                 <% end %>
-            </td>                    
+            </td>
         </tr>
         <% end %>
     <% end %>

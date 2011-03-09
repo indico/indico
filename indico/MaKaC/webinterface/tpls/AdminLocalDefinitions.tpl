@@ -1,11 +1,11 @@
 <% from MaKaC.i18n import _ %>
 
 <div class="groupTitle"> <%= _("Templates") %></div>
-<table align="center" width="100%%">
+<table align="center" width="100%">
 <tr>
 	<td>
 		<form action="<%= formURL %>" method="POST">
-    	<table width="100%%" align="center" border="0">
+    	<table width="100%" align="center" border="0">
 	    	<tr>
 	      		<td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Template Set")%></span></td>
 	      		<td bgcolor="white" valign="top" class="blacktext">

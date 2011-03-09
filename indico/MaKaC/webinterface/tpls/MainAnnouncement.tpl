@@ -1,7 +1,7 @@
 <div id="layer1" class="marquee">
-                      <table width="100%%">
+                      <table width="100%">
                         <tr>
-                          <td align="center" width="100%%"></td>
+                          <td align="center" width="100%"></td>
                         </tr>
                         <tr>
                           <td colspan="2"><marquee scrolldelay="2" scrollamount="<%= speed %>" onmouseover="this.stop();" onmouseout="this.start();">
@@ -36,7 +36,7 @@
                            document.getElementById("layer1").style.width=w-0;
                            document.getElementById("layer1").style.left = window.pageXOffset + ((window.innerWidth-w)/2);
                         }
-                        window.setTimeout("placeIt()", 10); 
+                        window.setTimeout("placeIt()", 10);
                     }
                     placeIt()
                     </script>

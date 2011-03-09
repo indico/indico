@@ -1,4 +1,4 @@
-<table align="center" width="95%%">
+<table align="center" width="95%">
 
 <tr>
   <td class="formTitle"><a href="<%=urlHandlers.UHRoomBookingAdmin.getURL()%>">&lt;&lt;Back</a></td>
@@ -105,8 +105,8 @@
                 <% for at in AttsManager.getAttributes(location = location.friendlyName): %>
                     <tr>
                         <td><%= at['name'] %></td>
-                        <td><input type="checkbox" name="<%= 'cattr_req_' + at['name'] %>" <% if at['required']:%>checked="checked"<%%> /></td>
-                        <td><input type="checkbox" name="<%= 'cattr_hid_' + at['name'] %>" <% if at.get('hidden',False):%>checked="checked"<%%> /></td>
+                        <td><input type="checkbox" name="<%= 'cattr_req_' + at['name'] %>" <% if at['required']:%>checked="checked"<% end %> /></td>
+                        <td><input type="checkbox" name="<%= 'cattr_hid_' + at['name'] %>" <% if at.get('hidden',False):%>checked="checked"<% end %> /></td>
                         <td><input type="button" class="btn" value="Remove" onclick="document.location = '<%= urlHandlers.UHRoomBookingDeleteCustomAttribute.getURL( location, removeCustomAttributeName = at['name'] ) %>'; return false;" /></td>
                     </tr>
                 <% end %>
@@ -318,4 +318,3 @@ var removeAspectHandler = function(aspect, setResult) {
   </td>
 </tr>
 </table>
-

@@ -1,4 +1,4 @@
-<td class="ttManagementBlock" style="vertical-align: top; background-color: <%= bgcolor %>" rowspan="<%= rowspan %>" width="<%= width %>%%" <%= colspan %> >
+<td class="ttManagementBlock" style="vertical-align: top; background-color: <%= bgcolor %>" rowspan="<%= rowspan %>" width="<%= width %>%" <%= colspan %> >
 <div style="height: 20px; width: 100%;">
   <div style="width: 60px; float: right;" class="nonLinked">
     <div class="ttModifIcon" style="margin: 3px;" onclick="return breakMenu($E(this), '<%= modifyAction(self._breakEntry) %>', '<%= deleteAction(self._breakEntry) %>', '<%= relocateAction(self._breakEntry, targetDay = self._breakEntry.getAdjustedStartDate().strftime("%Y-%m-%d")) %>')">

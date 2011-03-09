@@ -104,7 +104,7 @@
 
         <div class="CAStaticURLDiv">
             <a class="CAStaticURLSwitch" onclick="staticURLSwitch()"><%= _("Static URL for this result")%></a> <%= _("(Use it for bookmarks)")%><br />
-            <input type="text" id="staticURL" style="width: 50%%; display: none; margin-top: 5px;"/>
+            <input type="text" id="staticURL" style="width: 50%; display: none; margin-top: 5px;"/>
             <a id="staticURLLink" style="display: none;  margin-left: 5px;" href="<%= BaseURL %>"><%= _("Go to URL")%></a>
         </div>
     </div>

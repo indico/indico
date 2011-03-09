@@ -1,12 +1,12 @@
 <form action="<%=urlHandlers.UHAdminsStyles.getURL()%>" method="POST">
-<table align="center" width="95%%">
+<table align="center" width="95%">
 <tr>
   <td class="formTitle"><a href="<%=urlHandlers.UHAdminsStyles.getURL()%>">&lt;&lt;Back</a></td>
 </tr>
 <tr>
   <td>
     <br>
-    <table width="60%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td colspan="3" class="groupTitle"><%= _("New Display Style")%></td>
     </tr>
@@ -18,7 +18,7 @@
     <% else: %>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Name")%></span></td>
-      <td align="left" width="80%%"><input type="text" name="name" size="25"></td>
+      <td align="left" width="80%"><input type="text" name="name" size="25"></td>
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("XSL Stylesheet")%></span></td>

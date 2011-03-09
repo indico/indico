@@ -167,31 +167,31 @@
         <!-- END OF CONTEXT HELP DIVS -->
 
 
-		<table cellpadding="0" cellspacing="0" border="0" width="80%%">
+		<table cellpadding="0" cellspacing="0" border="0" width="80%">
 		<% if standalone: %>
 		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
+		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
 		    </tr>
 		<% end %>
         <tr>
-		<td class="bottomvtab" width="100%%">
+		<td class="bottomvtab" width="100%">
 		    <!-- Main cell -->
-			<table width="100%%" cellpadding="0" cellspacing="0" class="htab" border="0">
+			<table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
 				<tr>
 					<td class="maincell">
 						<p><span class="formTitle" style="border-bottom-width: 0px"> <%= _("Search for a room")%></span></p>
 						<!-- Background table (adds image) -->
-						<table width="100%%" class="ACtab">
+						<table width="100%" class="ACtab">
 						    <tr>
 						        <td>
 						            <!-- First section -->
-						            <table width="90%%" align="center" border="0">
+						            <table width="90%" align="center" border="0">
                                         <tr>
                                             <td colspan="2" class="groupTitle"><%= _("Choose a room")%></td>
                                         </tr>
                                         <tr>
                                         <td nowrap="nowrap" class="titleCellTD"><span class="titleCellFormat"> <%= _("Room")%></span></td>
-                                        <td width="80%%">
+                                        <td width="80%">
                                             <form id="chooseForm" method="post">
                                                 <select name="roomName" id="roomName">
                                                 <% for room in rooms: %>
@@ -222,7 +222,7 @@
                                     </table>
                                     <br />
                                     <form id="searchForm" method="post" action="<%= roomBookingRoomListURL %>">
-                                    <table width="90%%" align="center" border="0">
+                                    <table width="90%" align="center" border="0">
                                         <tr>
                                             <td colspan="2" class="groupTitle"><%= _("Search for a room") %></td>
                                         </tr>
@@ -230,7 +230,7 @@
                                         <tr>
                                             <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Location")%></span></td>
                                             <td>
-                                                <table width="100%%" cellspacing="4px">
+                                                <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td class="subFieldWidth" align="right" ><small> <%= _("Location")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
@@ -253,7 +253,7 @@
                                         <tr>
                                             <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Room description")%></span></td>
                                             <td>
-                                                <table width="100%%" cellspacing="4px">
+                                                <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td class="subFieldWidth" align="right" ><small> <%= _("Must contain")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
@@ -268,13 +268,13 @@
                                         <tr>
                                             <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Availability")%></span></td>
                                             <td >
-                                                <table width="100%%" cellspacing="4px">
+                                                <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td class="subFieldWidth" align="right" ><small> <%= _("Must be")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
-                                                            <input name="availability" type="radio" value="Available" onclick="display_availability( true ); " <% if forNewBooking: %>checked="checked"<%%> /> <%= _("Available")%>
+                                                            <input name="availability" type="radio" value="Available" onclick="display_availability( true ); " <% if forNewBooking: %>checked="checked"<% end %> /> <%= _("Available")%>
                                                             <input name="availability" type="radio" value="Booked" onclick="display_availability( true ); "/> <%= _("Booked")%>
-                                                            <input name="availability" type="radio" value="Don't care" onclick="display_availability( false )" <% if not forNewBooking: %>checked="checked"<%%>/> <%= _("Don't care")%>
+                                                            <input name="availability" type="radio" value="Don't care" onclick="display_availability( false )" <% if not forNewBooking: %>checked="checked"<% end %>/> <%= _("Don't care")%>
                                                             <% contextHelp( 'availabilityHelp' ) %>
                                                         </td>
                                                     </tr>
@@ -294,7 +294,7 @@
                                         <tr>
                                             <td class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Capacity")%></span></td>
                                             <td align="right">
-                                                <table width="100%%" cellspacing="4px">
+                                                <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td class="subFieldWidth" align="right"><small> <%= _("About")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
@@ -309,7 +309,7 @@
                                         <tr>
                                             <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Required equipment")%></td>
                                             <td align="right">
-                                                <table width="100%%" cellspacing="4px">
+                                                <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td width="80px" align="right" valign="top"><small> <%= _("I need...")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
@@ -323,7 +323,7 @@
                                         </tr>
                                         <tr>
                                             <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> <%= _("Special attributes")%></td>                                    <td align="right">
-                                                <table width="100%%" cellspacing="4px">
+                                                <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td width="80px" align="right" valign="top"><small> <%= _("Is public")%>&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >

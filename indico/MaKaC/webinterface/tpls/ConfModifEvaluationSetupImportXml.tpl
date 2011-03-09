@@ -9,7 +9,7 @@
 
 <br/><br/>
 <form action="<%=actionUrl%>" name="ResultsSubmitters" method="POST" enctype="multipart/form-data" onsubmit="return confirmation();">
-  <table width="50%%" align="center" class="evalationSetupImportXml">
+  <table width="50%" align="center" class="evalationSetupImportXml">
     <tr>
       <td class="groupTitle"> <%= _("Evaluation importation")%></td>
     </tr>

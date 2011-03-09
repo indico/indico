@@ -37,7 +37,7 @@
     </tr>
 </table>
 <br/>
-<table id="filteringTable" class="shadowRectangle" width="95%%" align="left" style="margin-left:20px; margin-bottom: 20px;">
+<table id="filteringTable" class="shadowRectangle" width="95%" align="left" style="margin-left:20px; margin-bottom: 20px;">
     <thead>
         <tr style="text-align:left;">
             <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
@@ -117,7 +117,7 @@
     </tbody>
 </table>
 
-<table class="shadowRectangleSoft" width="95%%">
+<table class="shadowRectangleSoft" width="95%">
     <% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     <tr>
         <td><%= _("Referee")%>:</td>
@@ -176,7 +176,7 @@
             </td>
         </tr>
 </table>
-<table class="Revtab" width="95%%" cellspacing="0" align="center" border="0" style="padding-left:20px; margin-bottom:1em">
+<table class="Revtab" width="95%" cellspacing="0" align="center" border="0" style="padding-left:20px; margin-bottom:1em">
 <!--
     <tr>
         <td nowrap class="groupTitle" colspan=4>Contributions to judge as Referee</td>
@@ -309,7 +309,7 @@
     </tbody>
 </table>
 
-<table class="shadowRectangleSoft" width="95%%" style="margin-top:10px;">
+<table class="shadowRectangleSoft" width="95%" style="margin-top:10px;">
     <% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
     <tr>
         <td><%= _("Referee")%>:</td>

@@ -1,6 +1,6 @@
 <center>
 
-    <table width="80%%">
+    <table width="80%">
         <tr>
             <td colspan="2" align="center"><font size="+2"><u><%= _("You have already registered yourself")%></u></font><br><br></td>
         </tr>

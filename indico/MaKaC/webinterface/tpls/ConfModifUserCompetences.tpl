@@ -7,7 +7,7 @@
 <table align="left" style="color:gray; font-style:italic; padding-left:10px;"><tr><td><%= _("The Reviewing Team has not been assigned yet.")%></td></tr></table>
 <% end %>
 <%else:%>
-<table class="Revtab" width="90%%" cellspacing="0" align="left" border="0" style="padding-left:2px; padding-top: 10px;">
+<table class="Revtab" width="90%" cellspacing="0" align="left" border="0" style="padding-left:2px; padding-top: 10px;">
     <tr>
         <td nowrap class="groupTitle" colspan=5>
             <%= _("Team competences")%>

@@ -6,7 +6,7 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 
 <% if ConfReview.getEditedContributions(User): %>
-<table class="Revtab" width="90%%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
+<table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4><%= _("Judge editing of the contribution")%></td>
     </tr>

@@ -1,10 +1,10 @@
-<table align="center" width="100%%">
+<table align="center" width="100%">
     <tr>
         <td align="center"><font size="+2"> <%= _("The modification of this event has been restricted by its owner and you are not authorised to use it.")%></font></td>
     </tr>
     <tr>
         <td>
-            <table width="90%%" align="center">
+            <table width="90%" align="center">
                 <tr>
                     <td>
                         <ul>
@@ -17,4 +17,3 @@
         </td>
     </tr>
 </table>
-

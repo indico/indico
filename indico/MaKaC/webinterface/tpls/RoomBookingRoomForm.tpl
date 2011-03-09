@@ -65,7 +65,7 @@
     <!-- END OF CONTEXT HELP DIVS -->
 
     <form action="<%= urlHandlers.UHRoomBookingSaveRoom.getURL( None ) %>" method="post" enctype="multipart/form-data">
-                <table width="95%%" cellpadding="0" cellspacing="0" border="0" align="center">
+                <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
                     <tr><td class="formTitle"><a href="<%=urlHandlers.UHRoomBookingAdminLocation.getURL(Location.parse(room.locationName))%>">&lt;&lt;Back</a></td></tr>
                     <tr>
                         <td>
@@ -89,12 +89,12 @@
                                 </ul>
                             <% end %>
                             <br /><br />
-                            <table width="90%%" align="center" border="0">
+                            <table width="90%" align="center" border="0">
                               <!-- LOCATION -->
                               <tr>
-                                <td width="24%%" class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Location")%></span></td>
-                                <td width="76%%">
-                                    <table width="100%%">
+                                <td width="24%" class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Location")%></span></td>
+                                <td width="76%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Location")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
@@ -202,7 +202,7 @@
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Information")%></span></td>
                                 <td colspan="2">
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Capacity")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="text" id="capacity" name="capacity" value="<%= verbose( room.capacity ) %>" /> people <% contextHelp( 'capacityCH' ) %> </td>
@@ -244,7 +244,7 @@
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Custom attributes")%></span></td>
                                 <td colspan="2">
-                                    <table width="100%%">
+                                    <table width="100%">
                                     <% for ca in attrs: %>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small><%=ca['name']%>&nbsp;&nbsp;</small></td>
@@ -271,15 +271,15 @@
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Equipment")%></span></td>
                                 <td colspan="2">
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Room has")%>:&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
                                                 <% for eq in possibleEquipment: %>
-                                                    <input id="<%= "equ_" + eq %>" name="<%= "equ_" + eq %>" type="checkbox" <% if room.hasEquipment( eq ): %> checked="checked" <%%> ><%= eq %></input><br />
+                                                    <input id="<%= "equ_" + eq %>" name="<%= "equ_" + eq %>" type="checkbox" <% if room.hasEquipment( eq ): %> checked="checked" <% end %> ><%= eq %></input><br />
                                                     <% if "video conference" in eq.lower(): %>
                                                         <% for vc in room.__class__.vcList: %>
-                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="<%= "vc_" + vc %>" name="<%= "vc_" + vc %>" type="checkbox" <% if vc in room.getAvailableVC(): %> checked="checked" <%%> ><%= vc %></input><br />
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="<%= "vc_" + vc %>" name="<%= "vc_" + vc %>" type="checkbox" <% if vc in room.getAvailableVC(): %> checked="checked" <% end %> ><%= vc %></input><br />
                                                         <% end %>
                                                     <% end %>
                                                 <% end %>

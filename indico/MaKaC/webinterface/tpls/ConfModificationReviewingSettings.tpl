@@ -4,7 +4,7 @@
 <% from MaKaC.common.utils import formatDateTime %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% import MaKaC.common.Configuration as Configuration %>
-<table width="90%%" border="0" style="padding-bottom:5px;">
+<table width="90%" border="0" style="padding-bottom:5px;">
     <tr>
         <td nowrap class="groupTitle"><%= _("Step 1 - Choose type of paper reviewing")%>
         </td>
@@ -27,7 +27,7 @@
 <% else: %>
     <% display = 'none' %>
 <% end %>
-<table id='steptitle' width="90%%" border="0" style="padding-bottom:5px; display:<%=display%>">
+<table id='steptitle' width="90%" border="0" style="padding-bottom:5px; display:<%=display%>">
     <tr>
         <td class="groupTitle">
             <%= _("Step 2 - Set up the options for ")%><span id="title">
@@ -374,11 +374,11 @@
        <% else: %>
          <% display = 'none' %>
        <% end %>
-    <table id="templateListTableAll" width="90%%" align="left" border="0" style="padding-left:3px; display:<%=display%>">
+    <table id="templateListTableAll" width="90%" align="left" border="0" style="padding-left:3px; display:<%=display%>">
     <!-- here to put table for the uploaded templates info :) -->
      <thead>
         <tr>
-            <td nowrap width="50%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
+            <td nowrap width="50%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
                 <%= _("Name")%>
             </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">

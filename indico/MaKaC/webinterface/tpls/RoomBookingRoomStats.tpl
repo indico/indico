@@ -1,22 +1,22 @@
-    <table cellpadding="0" cellspacing="0" border="0" width="80%%">
+    <table cellpadding="0" cellspacing="0" border="0" width="80%">
 		<% if standalone: %>
 		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
+		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
 		    </tr>
 		<% end %>
         <tr>
-            <td class="bottomvtab" width="100%%">
-                <table width="100%%" cellpadding="0" cellspacing="0" class="htab" border="0">
+            <td class="bottomvtab" width="100%">
+                <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
                             <span class="formTitle" style="border-bottom-width: 0px">Room</span><br />
                             <br />
-                            <table width="96%%" align="left" border="0">
+                            <table width="96%" align="left" border="0">
                               <!-- LOCATION -->
                               <tr>
-                                <td width="24%%" class="titleUpCellTD"><span class="titleCellFormat">Location</span></td>
-                                <td width="76%%">
-                                    <table width="100%%">
+                                <td width="24%" class="titleUpCellTD"><span class="titleCellFormat">Location</span></td>
+                                <td width="76%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>Location&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= room.locationName %></td>
@@ -43,7 +43,7 @@
                                         </tr>
                                  </table>
                                 </td>
-                                <td width="20%%" align="right" class="thumbnail">
+                                <td width="20%" align="right" class="thumbnail">
                                 <% if room.photoId != None: %>
                                     <a href="<%= room.getPhotoURL() %>" rel="lightbox" title="<%= room.photoId %>">
                                         <img border="1px" height="100" src="<%= room.getPhotoURL() %>" alt="<%= str( room.photoId ) %>"/>
@@ -53,12 +53,12 @@
                               </tr>
                               <tr><td>&nbsp;</td></tr>
                               <tr>
-                                <td width="24%%" class="titleUpCellTD"><span class="titleCellFormat">Stats</span></td>
-                                <td width="76%%">
+                                <td width="24%" class="titleUpCellTD"><span class="titleCellFormat">Stats</span></td>
+                                <td width="76%">
 <!-- ============== Key Performance Indicators ================= -->
 <!-- =========================================================== -->
     <a name="kpi"></a>
-    <table width="80%%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td colspan="5" class="groupTitle">Key Performance Indicators</td>
     </tr>

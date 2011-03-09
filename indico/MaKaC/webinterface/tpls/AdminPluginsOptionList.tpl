@@ -10,7 +10,7 @@
     <table>
         <% for option in Object.getOptionList(doSort = True, includeOnlyEditable = True, includeOnlyVisible = True): %>
         <tr>
-            <td style="text-align: right;vertical-align:top; padding-right: 10px; width: 60%%;">
+            <td style="text-align: right;vertical-align:top; padding-right: 10px; width: 60%;">
                 <%= option.getDescription() %>:
             </td>
             <td>
@@ -372,7 +372,7 @@
                 <% end %>
             </td>
             <% if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict: %>
-            <td style="width: 40%%">
+            <td style="width: 40%">
                 <% if option.getType() == int: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please input an integer")%></span>
                 <% end %>
@@ -388,7 +388,7 @@
             </td>
             <% end %>
             <% else: %>
-            <td style="width: 40%%">
+            <td style="width: 40%">
             &nbsp;
             </td>
             <% end %>
@@ -396,7 +396,7 @@
         <% end %>
         <% for option in Object.getOptionList(doSort = True, includeOnlyNonEditable = True, includeOnlyVisible = True): %>
         <tr>
-            <td style="text-align: right; vertical-align:top; padding-right: 10px;width: 50%%;">
+            <td style="text-align: right; vertical-align:top; padding-right: 10px;width: 50%;">
                 <%= option.getDescription() %>:
             </td>
             <td>

@@ -1,5 +1,5 @@
 
-<table id="reviewingQuestionsTable" width="90%%" border="0" style="padding-bottom: 5px;">
+<table id="reviewingQuestionsTable" width="90%" border="0" style="padding-bottom: 5px;">
     <tr>
         <td id="reviewingQuestionsHelp" colspan="5" class="groupTitle"><%= _("Reviewing questions")%></td>
     </tr>

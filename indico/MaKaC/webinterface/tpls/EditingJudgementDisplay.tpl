@@ -1,5 +1,5 @@
 <% from MaKaC.paperReviewing import ConferencePaperReview %>
-            <table cellspacing="0" cellpadding="2" width="100%%" >
+            <table cellspacing="0" cellpadding="2" width="100%" >
                 <tr>
                     <td class="dataCaptionTD" style="width: 25%;padding-right: 1px">
                         <span class="titleCellFormat" style="font-size: 12px;"><%= _("Layout judgement:")%></span>

@@ -1,4 +1,4 @@
-<table align="center" width="95%%">
+<table align="center" width="95%">
 <tr>
   <td class="formTitle"><%= ("Conference Room Booking")%></td>
 </tr>
@@ -10,10 +10,10 @@
     </tr>
     <tr>
       <td>
-        <table width="100%%" bgcolor="white" cellpadding="0" cellspacing="0">
+        <table width="100%" bgcolor="white" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <table width="100%%">
+            <table width="100%">
             <tr>
               <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Status")%>: </span></td>
               <td>
@@ -35,10 +35,10 @@
     </tr>
     <tr>
       <td>
-        <table width="100%%" bgcolor="white" cellpadding="0" cellspacing="0">
+        <table width="100%" bgcolor="white" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <table width="100%%">
+            <table width="100%">
             <% for plugin in plugins: %>
             <tr>
               <td class="titleCellTD"><span class="titleCellFormat"><%=plugin.__metadata__['name']%></span></td><td><%=plugin.__metadata__['description']%></td>
@@ -58,12 +58,12 @@
     </tr>
     <tr>
       <td>
-        <table width="100%%" bgcolor="white" cellpadding="0" cellspacing="0">
+        <table width="100%" bgcolor="white" cellpadding="0" cellspacing="0">
         <tr>
           <td>
             <%= _("You can use the main Indico ZODB backend simply by entering the same Host and Port.")%>
             <form action="<%= urlHandlers.UHRoomBookingPlugAdminZODBSave.getURL() %>" method="post">
-            <table width="100%%">
+            <table width="100%">
             <tr>
               <td class="titleCellTD"><span class="titleCellFormat"><%= _("Host")%></span></td>
               <td> &nbsp; <input type="text" value="<%= zodbHost %>" name="ZODBHost" /></td>

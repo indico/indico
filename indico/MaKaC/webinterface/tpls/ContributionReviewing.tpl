@@ -9,7 +9,7 @@
 </div>
 
 <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
-<table class="newsDisplayItem" width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table class="newsDisplayItem" width="90%" align="center" border="0" style="margin-bottom: 1em">
     <!-- Assign or remove a referee -->
     <tr>
         <td id="assignRefereeHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Referee")%></td>
@@ -20,12 +20,12 @@
                 <span class="titleCellFormat"><%= _("Referee")%>:</span>
             </td>
             <% if not ContributionReviewManager.hasReferee(): %>
-            <td width="60%%" class='bottom_line' style="padding-bottom: 10px;">
+            <td width="60%" class='bottom_line' style="padding-bottom: 10px;">
                 <%= _("not assigned yet")%>
             </td>
             <% end %>
             <% else: %>
-            <td width="60%%" class='bottom_line'>
+            <td width="60%" class='bottom_line'>
                 <%= ContributionReviewManager.getReferee().getFullName() %>
             </td>
             <% if CanAssignReferee: %>
@@ -61,7 +61,7 @@
         <% else: %>
         <tr>
             <td>&nbsp;</td>
-            <td  width="60%%" class='bottom_line'>
+            <td  width="60%" class='bottom_line'>
                 <span class="titleCellFormat"><%= _("Choose a referee to assign from the list")%>:</span>
             </td>
          </tr>
@@ -69,7 +69,7 @@
             <td>&nbsp;</td>
             <form action="<%=assignRefereeURL%>" method="post">
             <% showAssignButton = False %>
-            <td width="80%%" class='bottom_line' style="padding-top: 10px;">
+            <td width="80%" class='bottom_line' style="padding-top: 10px;">
                 <% if CanAssignReferee: %>
                     <% if len(ConfReview.getRefereesList()) == 0: %>
                         <%= _("No referees proposed for this conference.")%>
@@ -116,7 +116,7 @@
 
 <% if ConferenceChoice == 3 or ConferenceChoice == 4: %>
 <!-- Assign / remove Editors -->
-<table class="newsDisplayItem" width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table class="newsDisplayItem" width="90%" align="center" border="0" style="margin-bottom: 1em">
     <tr>
             <td id="assignEditorHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign a Layout Reviewer")%></td>
     </tr>
@@ -124,7 +124,7 @@
 	        <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Layout reviewer")%>:</span></td>
 
 	   <% if ContributionReviewManager.hasEditor(): %>
-	         <td width="60%%" class='bottom_line'>
+	         <td width="60%" class='bottom_line'>
 	         <%= ContributionReviewManager.getEditor().getFullName() %>
 	         </td>
 	</tr>
@@ -154,7 +154,7 @@
       </tr>
       <% end %>
       <% else: %>
-	        <td width="60%%" style="padding-bottom: 10px;">
+	        <td width="60%" style="padding-bottom: 10px;">
 	           <%= _("not assigned yet")%>
 	        </td>
     </tr>
@@ -184,7 +184,7 @@
 		        </tr>
 		        <tr>
 		        <td>&nbsp;</td>
-		        <td width="80%%" class='bottom_line'>
+		        <td width="80%" class='bottom_line'>
                     <% showAssignButton = True %>
                     <table cellspacing="0" cellpadding="5">
                     <% first = True %>
@@ -228,7 +228,7 @@
 
 <% if ConferenceChoice == 2 or ConferenceChoice == 4: %>
 <!-- Assign / remove content reviewers -->
-<table class="newsDisplayItem" width="90%%" align="center" border="0" style="margin-bottom: 1em">
+<table class="newsDisplayItem" width="90%" align="center" border="0" style="margin-bottom: 1em">
 	    <tr>
 	        <td id="assignReviewersHelp" colspan="5" class="groupTitle" style="border: none; padding-bottom:10px;"><%= _("Assign Content Reviewers")%></td>
 	    </tr>
@@ -236,7 +236,7 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Content reviewers")%>:</span></td>
             <% if ContributionReviewManager.hasReviewers(): %>
                 <form action="<%=removeAssignReviewingURL%>" method="post">
-                <td width="60%%"  class='bottom_line'>
+                <td width="60%"  class='bottom_line'>
                     <table cellspacing="0" cellpadding="5">
                         <% first = True %>
                         <% for r in ContributionReviewManager.getReviewersList(): %>
@@ -281,7 +281,7 @@
             </tr>
             <% end %>
             <% else: %>
-                <td width="60%%" class='bottom_line' style="padding-bottom: 10px;">
+                <td width="60%" class='bottom_line' style="padding-bottom: 10px;">
                     <%= _("not assigned yet")%>
                 </td>
             <% end %>
@@ -320,7 +320,7 @@
                 </tr>
                 <tr>
                 <td>&nbsp;</td>
-                <td width="80%%" class='bottom_line'>
+                <td width="80%" class='bottom_line'>
                     <% showAssignButton = True %>
                     <table cellspacing="0" cellpadding="5">
                     <% first = True %>

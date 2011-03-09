@@ -1,4 +1,4 @@
-<table width="40%%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="40%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
         <td class="groupTitle">
             <b><font color="white" size="-1"><%= _("Offline website")%></font></b>

@@ -32,7 +32,7 @@
  -->
 
 <% if PluginsHolder.getPluginTypes(includeNonVisible = False): %>
-<table style="width: 100%%; padding-top: 2em;">
+<table style="width: 100%; padding-top: 2em;">
     <tr>
         <td class="groupTitle" colspan="3">
             <%= _("Active plugin types ") %>
@@ -44,7 +44,7 @@
             <br />
             <img src="<%=Config.getInstance().getSystemIconURL( 'disabledSection' )%>" alt="<%= _("Click to enable")%>"> <small> <%= _("Disabled plugin type")%></small>
         </td>
-        <td bgcolor="white" width="100%%" class="blacktext" style="padding-left:20px;vertical-align: top">
+        <td bgcolor="white" width="100%" class="blacktext" style="padding-left:20px;vertical-align: top">
             <table align="left">
                 <% for pluginType in PluginsHolder.getPluginTypes(includeNonVisible = False): %>
                 <tr>

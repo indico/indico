@@ -4,7 +4,7 @@
     <% if ConfReview.hasTemplates(): %>
     <!-- here to put table for the uploaded templates info :) -->
     	<tr>
-            <td nowrap width="10%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
+            <td nowrap width="10%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
             	<%= _("Name")%>
     	    </td>
             <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
@@ -14,7 +14,7 @@
             	<%= _("Description")%>
     		</td>
         </tr>
-    	
+
     	<% keys = ConfReview.getTemplates().keys() %>
     	<% keys.sort() %>
     	<% for k in keys: %>
@@ -24,7 +24,7 @@
     		    <a style="color:#5FA5D4" href="<%= urlHandlers.UHDownloadContributionTemplate.getURL(t) %>">
     			    <%= t.getName() %>
     			</a>
-                
+
                 <% if CanDelete: %>
                 &nbsp;&nbsp;&nbsp;
                 <a href="<%= urlHandlers.UHDeleteContributionTemplate.getURL(t) %>">
@@ -46,5 +46,5 @@
         <tr><td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
             <%= _("No templates have been uploaded yet.")%>
         </td></tr>
-        
+
     <% end %>

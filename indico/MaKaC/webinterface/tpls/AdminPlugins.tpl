@@ -1,6 +1,6 @@
 <% pluginList = PluginType.getPluginList(doSort = True, includeNonPresent = False, includeNonActive = True) %>
 
-<table style="width: 100%%">
+<table style="width: 100%">
     <tr>
         <td class="groupTitle" colspan="3">
             <%= _("Active plugins for ") + PluginType.getName() %>
@@ -22,7 +22,7 @@
                 <input type="submit" value="<%= _("Reload")%>"/>
             </form>
         </td>
-        <td bgcolor="white" width="100%%" class="blacktext" style="padding-left:20px;vertical-align: top">
+        <td bgcolor="white" width="100%" class="blacktext" style="padding-left:20px;vertical-align: top">
             <% if PluginType.hasPlugins() : %>
             <table align="left">
                 <% for plugin in pluginList: %>
@@ -69,7 +69,7 @@
     </tr>
 </table>
 
-<table style="width: 100%%; margin-top: 2em;">
+<table style="width: 100%; margin-top: 2em;">
     <tr>
         <td class="groupTitle" colspan="3">
             <%= _("Global settings for ") + PluginType.getName() %>
@@ -96,7 +96,7 @@
 </table>
 
 <% if PluginType.hasPlugins() : %>
-    <div class="groupTitle" style="width: 100%%; margin-top: 2em;">
+    <div class="groupTitle" style="width: 100%; margin-top: 2em;">
         <%= _("Settings for individual plugins") %>
     </div>
     <div id="pluginTabs">

@@ -6,7 +6,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
 			<input type="text" name="title" size="80" value="<%= title %>"></td>
         </tr>
         <tr>
@@ -22,7 +22,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Place")%></span></td>
-            <td bgcolor="white" width="100%%">&nbsp;
+            <td bgcolor="white" width="100%">&nbsp;
                 <table>
                     <tr>
                         <td valign="top">

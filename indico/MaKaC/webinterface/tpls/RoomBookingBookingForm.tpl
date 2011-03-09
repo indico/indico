@@ -130,15 +130,15 @@
 
     <form id="bookingForm" action="#conflicts" method="post" onkeypress="return submit_on_enter(event);">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
-    <table cellpadding="0" cellspacing="0" border="0" width="80%%">
+    <table cellpadding="0" cellspacing="0" border="0" width="80%">
 		<% if standalone: %>
 		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%%">&nbsp;</td> <!-- lastvtabtitle -->
+		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
 		    </tr>
 		<% end %>
         <tr>
-            <td class="bottomvtab" width="100%%">
-                <table width="100%%" cellpadding="0" cellspacing="0" class="htab" border="0">
+            <td class="bottomvtab" width="100%">
+                <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
                             <span class="formTitle" style="border-bottom-width: 0px">
@@ -156,14 +156,14 @@
                                 <br /><a href="#conflicts" style="color: Red; margin-left: 6px;"> <%= _("Saving failed. Please review details below.")%></a><br /><br />
                             <% end %>
                             <br />
-                            <table width="100%%" align="left" border="0">
+                            <table width="100%" align="left" border="0">
                               <% includeTpl( "RoomBookingRoomMiniDetails", room = candResv.room ) %>
                               <tr><td>&nbsp;</td></tr>
                               <!-- WHEN -->
                               <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("When")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <% includeTpl( "RoomBookingPeriodForm", repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates() ) %>
                                     </table>
                                 </td>
@@ -173,7 +173,7 @@
                             <tr>
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Booked for")%></span></td>
                                 <td>
-                                    <table width="100%%">
+                                    <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
@@ -244,9 +244,9 @@
 	                               	<input type="hidden" name="conf" value="<%if conf:%><%= conf.getId() %><%end%>" />
 									<input type="hidden" name="standalone" value="<%= standalone %>" />
 	                               	<input type="submit" class="btn" value="<%= _("Re-check for conflicts")%>" onclick="if (!validate_period(document.forms[0], true, <%= allowPast %>)) { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); return false; }"/>
-	                               	<input type="submit" class="btn"  <% if formMode==FormMode.MODIF: %> value="Save" <%%> value="<%= bookingMessage %>" onclick="if (forms_are_valid( true )) { submit_booking(); } else { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); }; return false;" />
+	                               	<input type="submit" class="btn"  <% if formMode==FormMode.MODIF: %> value="Save" <% end %> value="<%= bookingMessage %>" onclick="if (forms_are_valid( true )) { submit_booking(); } else { alert( <%= _("'There are errors in the form. Please correct fields with red background.'")%> ); }; return false;" />
                                     (
-                                    <input type="checkbox" name="skipConflicting" id="skipConflicting" <% if skipConflicting: %> checked="checked" <%%> />
+                                    <input type="checkbox" name="skipConflicting" id="skipConflicting" <% if skipConflicting: %> checked="checked" <% end %> />
                                      <%= _("skip conflicting dates")%>
                                     <% contextHelp( 'skipConflictsHelp' ) %>
                                     )

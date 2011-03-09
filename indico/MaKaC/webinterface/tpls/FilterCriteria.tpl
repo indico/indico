@@ -1,5 +1,5 @@
 <div class="CRLDiv" style="display: none;" id="filterMenu">
-<table width="100%%" cellpadding="0" cellspacing="0" valign="top"  style="padding-bottom: 10px;">
+<table width="100%" cellpadding="0" cellspacing="0" valign="top"  style="padding-bottom: 10px;">
 
 <% counter = 0 %>
 
@@ -8,7 +8,7 @@
     <tr style="padding-bottom: 10px;">
   <% end %>
 
-  <td style="width:25%%; padding-left: 10px;" valign="top" align="left">
+  <td style="width:25%; padding-left: 10px;" valign="top" align="left">
     <table class="filterTable" id="<%= name %>">
       <%= section %>
     </table>
