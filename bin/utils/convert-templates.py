@@ -52,11 +52,30 @@ def fix_template(path):
         num_converted[0] += 1
         return '<%%= %s %%>' % name
 
-    fixed = MATCH_DECLARE_NEW.sub('', template)
+    def fix_if_syntax(tpl):
+        """Fix <% if expr: %>..<%%> to <% if expr: %>..<% end %>.
+        This is needed so we can do the replacement of %% to % later.
+        """
+        inline_if = r"""
+        (?P<if_construct>
+        <%\s*if\s+
+            (?:(?!<%|%>).)* # Matches strings not containing <% or %>
+        :\s*%>
+            (?:(?!<%|%>).)* # Matches strings not containing <% or %>
+        )
+        <%%>
+        """
+        prog = re.compile(inline_if, re.VERBOSE)
+        return prog.sub(r'\g<if_construct><% end %>', tpl)
+
+    fixed = fix_if_syntax(template)
+
+    fixed = MATCH_DECLARE_NEW.sub('', fixed)
     fixed = MATCH_PYTHON_BLOCK.sub(replace_blocks, fixed)
     fixed = MATCH_FORMAT.sub(convert_variables, fixed)
-    if num_converted[0]:
-        fixed = fixed.replace('%%', '%')
+
+    fixed = fixed.replace('%%', '%')
+
     for key, block in stored_blocks.iteritems():
         fixed = fixed.replace('{{{%s}}}' % key, block)
 
