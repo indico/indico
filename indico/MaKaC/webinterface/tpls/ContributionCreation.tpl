@@ -5,7 +5,7 @@
 			<td colspan="2" class="groupTitle"> <%= _("Creating a new contribution (basic data)")%></td>
         </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%<</span></td>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Title")%></span></td>
             <td bgcolor="white" width="100%%">&nbsp;
 			<input type="text" name="title" size="80" value="<%= title %>"></td>
         </tr>
@@ -21,7 +21,7 @@
 				<select name="type"><%= type %></select></td>
         </tr>
         <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Place")%<</span></td>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat"> <%= _("Place")%></span></td>
             <td bgcolor="white" width="100%%">&nbsp;
                 <table>
                     <tr>
