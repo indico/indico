@@ -428,6 +428,8 @@ class RHPropBase(RHAbstractModifBase):
             c = 0
             for question in conf.getConfAbstractReview().getReviewingQuestions():
                 c += 1
+                if not params.has_key("_GID"+str(c)):
+                    raise FormValuesError(_("Please, reply to all the reviewing questions. Question \"%s\" is missing the answer.")%question.getText())
                 rbValue = int(params.get("_GID"+str(c),scaleLower))
                 newId = conf.getConfAbstractReview().getNewAnswerId()
                 newAnswer = Answer(newId, rbValue, numberOfAnswers, question)

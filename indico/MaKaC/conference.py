@@ -3786,6 +3786,10 @@ class Conference(CommonObjectBase, Locatable):
             if track.isCoordinator( av ):
                 return True
 
+        # paper reviewing team should be also allowed to access
+        if self.getConfPaperReview().isInReviewingTeam(av):
+            return True
+
         # video services managers are also allowed to access the conference
         if PluginsHolder().hasPluginType("Collaboration"):
             if self.getCSBookingManager().isPluginManagerOfAnyPlugin(av):
@@ -11827,9 +11831,6 @@ class Track(CoreObject):
 
     def canUserCoordinate( self, av ):
         return self.isCoordinator( av ) or self.canUserModify( av )
-
-    def getModifKey( self ):
-        return self.getConference().getModifKey()
 
 
 class SubTrack(CoreObject):

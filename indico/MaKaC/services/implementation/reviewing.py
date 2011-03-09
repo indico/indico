@@ -80,7 +80,7 @@ class ConferenceReviewingPRMRefereeBase(ConferenceReviewingBase):
             ConferenceReviewingBase._checkProtection(self)
 
 
-class ConferenceReviewingAssignStaffBase(UserModificationBase, ConferenceReviewingBase):
+class ConferenceReviewingAssignStaffBase(ConferenceReviewingBase, UserModificationBase):
     """ Base class for assigning referees, editors, etc. to contributions.
         It will store a list of Contribution objects in self._contributions.
         The referee, editor, etc. will be added to those contributions.
@@ -334,6 +334,9 @@ class ConferenceReviewingCompetenceModification(ListModificationBase, Conference
         Note: don't change the order of the inheritance!
     """
 
+    def __init__(self, *params):
+        ConferenceReviewingPRMBase.__init__(self, *params)
+
     def _checkParams(self):
         ConferenceReviewingPRMBase._checkParams(self)
         userId = self._params.get("user", None)
@@ -353,6 +356,10 @@ class ConferenceReviewingContributionsAttributeList(ListModificationBase, Confer
     #Note: don't change the order of the inheritance here!
     """ Class to return all the tracks or sessions or types of the conference
     """
+
+    def __init__(self, *params):
+        ConferenceReviewingPRMRefereeBase.__init__(self, *params)
+
     def _checkParams(self):
         ConferenceReviewingPRMRefereeBase._checkParams(self)
         self._attribute = self._params.get("attribute", None)
@@ -385,6 +392,10 @@ class ConferenceReviewingContributionsPerSelectedAttributeList(ListModificationB
     #Note: don't change the order of the inheritance here!
     """ Class to return all the contributions ids for the selected track/session/type of the conference
     """
+
+    def __init__(self, *params):
+        ConferenceReviewingPRMRefereeBase.__init__(self, *params)
+
     def _checkParams(self):
         ConferenceReviewingPRMRefereeBase._checkParams(self)
         self._attribute = self._params.get("attribute", None)
@@ -421,6 +432,10 @@ class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceRevi
     """ Class to return all the referees / editors / reviewers of the conference,
         plus their competences.
     """
+
+    def __init__(self, *params):
+        ConferenceReviewingPRMRefereeBase.__init__(self, *params)
+
     def _checkParams(self):
         ConferenceReviewingPRMRefereeBase._checkParams(self)
         self._role = self._params.get("role", None)
@@ -434,6 +449,7 @@ class ConferenceReviewingUserCompetenceList(ListModificationBase, ConferenceRevi
 class ConferenceReviewingAssignReferee(ConferenceReviewingAssignStaffBasePRM):
     """ Assigns a referee to a list of contributions
     """
+
     def _getAnswer(self):
         if self._confPaperReview.getChoice() == ConferencePaperReview.NO_REVIEWING or self._confPaperReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
             raise ServiceError("ERR-REV6aa",_("can't assign referee"))

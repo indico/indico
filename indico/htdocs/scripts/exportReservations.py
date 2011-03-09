@@ -68,7 +68,7 @@ def index(req, **params):
 
     ################### checking params ###################
     if not (params.has_key("sd") and params.has_key("ed") and params.has_key("r")):
-        return """Missing parameters. The request should be like this: http://indico.cern.ch/exportReservations.py?sd=24-09-2010&ed=25-09-2010&r=1,18,114,42"""
+        return """Missing parameters. The request should be like this: http://indico.cern.ch/exportReservations.py?sd=2010-09-24&ed=2010-09-25&r=1,18,114,42"""
 
     try:
         sd = parseDate(params.get("sd"), "%Y-%m-%d")

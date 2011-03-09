@@ -33,6 +33,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.fossils.reviewing import IReviewingQuestionFossil, IReviewingStatusFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from persistent.list import PersistentList
+from MaKaC.i18n import _
 
 ###############################################
 # Conference-wide classes
@@ -846,7 +847,7 @@ class ConferencePaperReview(Persistent):
         return self._paperReviewManagersList
 
     # templates methods
-    def setTemplate(self, name, description, format, fd, id):
+    def setTemplate(self, name, description, format, fd, id, extension = ".template"):
         """ Stores a template.
             There can be 1 template for any format.
         """
@@ -857,11 +858,6 @@ class ConferencePaperReview(Persistent):
         f = open( tempFileName, "wb" )
         f.write( fd.read() )
         f.close()
-
-        if format in Template.formats:
-            extension = Template.formats[format]
-        else:
-            extension = ".template"
 
         #id = self.getNewTemplateId()
 
@@ -1023,15 +1019,11 @@ class Template(Persistent):
         A conference can have many of these templates.
     """
 
-    formats = {"Word":".doc",
-               "OpenOffice Writer":".odt",
-               "PowerPoint":".ppt",
-               "OpenOffice Impress":".odp",
-               "LaTeX":".tex"}
-    """ This dictionary contains the different formats proposed to the uploaders.
-        Also, if a template is uploaded with one of these formats, the file will have
-        an appropriate extension.
-    """
+    formats = [_("Word"),
+               _("OpenOffice Writer"),
+               _("PowerPoint"),
+               _("OpenOffice Impress"),
+               _("LaTeX")]
 
     def __init__(self, id, conference, name, description, format, file):
         self.__id = id
@@ -1081,7 +1073,7 @@ class ConferenceReviewingNotification(GenericNotification):
         You have been chosen as %s of the conference "%s" (id: %s), in order to help with the abstract / contribution reviewing process.
         You can go to the conference main page:
         %s
-        After logging in, you will find a link under 'My Conference' on which you can click to perform your new functions.
+        After logging in, you will find a link under 'Paper reviewing' on which you can click to perform your new functions.
 
         Best regards
         """ % ( role, conference.getTitle(), str(conference.getId()), urlHandlers.UHConferenceDisplay.getURL(conference)

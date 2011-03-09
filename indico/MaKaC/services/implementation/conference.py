@@ -480,6 +480,7 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
 class ConferenceListContributions (ConferenceListModificationBase):
     """ Returns a list of all contributions of a conference, ordered by id
     """
+
     def _checkParams(self):
         ConferenceListModificationBase._checkParams(self)
         pm = ParameterManager(self._params)

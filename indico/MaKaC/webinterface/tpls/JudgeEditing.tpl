@@ -112,7 +112,12 @@ var showWidgets = function(firstLoad) {
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                var initialValue = "<%= Editing.getAnswer(c.getId()).getRbValue() %>";
+                <% if Editing.getAnswer(c.getId()) is None: %>
+                    var initialValue = "<%= Editing.createAnswer(c.getId()).getRbValue() %>";
+                <% end %>
+                <% else: %>
+                    var initialValue = "<%= Editing.getAnswer(c.getId()).getRbValue() %>";
+                <% end %>
             } else {
                 var initialValue = false;
             }

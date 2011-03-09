@@ -108,7 +108,7 @@
 						</table>
 					</td>
 					<td colspan="3" bgcolor="white" align="center" style="border-top:1px solid #777777;border-left:1px solid #777777;color:black">
-						<b> <%= _("Total")%> : <%= number %>  <%= _("abstract(s)")%></b>
+						<b> <%= _("Total")%> : <%= number %>&nbsp;<%= _("abstract(s)")%></b>
 					</td>
 				</tr>
 			</table>

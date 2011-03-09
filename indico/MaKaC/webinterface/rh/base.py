@@ -836,7 +836,6 @@ class RHRoomBookingProtected( RHProtected ):
 class RHDisplayBaseProtected( RHProtected ):
 
     def _checkProtection( self ):
-
         if not self._target.canAccess( self.getAW() ):
             from MaKaC.conference import Link, LocalFile, Category
             if isinstance(self._target,Link) or isinstance(self._target,LocalFile):

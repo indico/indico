@@ -506,7 +506,7 @@ class EditorJudgement(Judgement):
             if (self.getConfPaperReview().getLayoutQuestionById(answer.getQuestion().getId()) == None):
                 self._answers.remove(answer)
 
-    def _getQuestionById(self):
+    def _getQuestionById(self, questionId):
         return self.getReviewManager().getConfPaperReview().getLayoutQuestionById(questionId)
 
     def getAnswers(self):

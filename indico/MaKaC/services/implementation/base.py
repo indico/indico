@@ -423,7 +423,7 @@ class DateTimeModificationBase( TextModificationBase ):
         except TimingError,e:
             raise ServiceError("ERR-E2", e.getMsg())
 
-class ListModificationBase ( object ):
+class ListModificationBase:
     """ Base class for a list modification.
         The class that inherits from this must have:
         -a _handleGet() method that returns a list.
@@ -444,7 +444,7 @@ class ListModificationBase ( object ):
 
         return self._value
 
-class TwoListModificationBase ( object ):
+class TwoListModificationBase:
     """ Base class for two lists modification.
         The class that inherits from this must have:
         -a _handleGet() method that returns a list, given self._destination

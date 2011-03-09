@@ -2467,20 +2467,20 @@ class AbstractJudgement( Persistent ):
     def calculateAnswersTotalValue(self):
         ''' Calculate the sum of all the ratings '''
         result = 0
-        for ans in self._answers:
+        for ans in self.getAnswers():
             result += ans.getValue()
         return result
 
     def recalculateJudgementValues(self, scaleLower, scaleHigher):
         ''' Update the values of the judgement. This function is called when the scale is changed.'''
-        for ans in self._answers:
+        for ans in self.getAnswers():
             ans.calculateRatingValue(scaleLower, scaleHigher)
         self._judValue = self.calculateJudgementAverage()
         self._totalJudValue = self.calculateAnswersTotalValue()
 
     def removeAnswer(self, questionId):
         ''' Remove the current answers of the questionId '''
-        for ans in self._answers:
+        for ans in self.getAnswers():
             if ans.getQuestion().getId() == questionId:
                 self._answers.remove(ans)
                 self._notifyModification()

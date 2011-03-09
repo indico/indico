@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import simplejson
+import simplejson, os
 
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
@@ -257,6 +257,7 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
             self._templatefd = params.get("file").file
         except AttributeError:
             raise MaKaCError("Problem when storing template file")
+        self._ext = os.path.splitext(params.get("file").filename)[1] or '.template'
 
     def _process( self ):
         import random
@@ -264,7 +265,7 @@ class RHSetTemplate(RHConfModifReviewingPRMBase):
         if self._templatefd == None:
             return {'status': 'ERROR'}
         else:
-            self._conf.getConfPaperReview().setTemplate(self._name, self._description, self._format, self._templatefd, self._id)
+            self._conf.getConfPaperReview().setTemplate(self._name, self._description, self._format, self._templatefd, self._id, self._ext)
             #self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
             return "<html><head></head><body>%s</body></html>"  % simplejson.dumps({'status': 'OK',
                                      'info': {'name': self._name, 'description': self._description, 'format': self._format, 'id': self._id}})

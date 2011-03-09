@@ -670,80 +670,80 @@ var TemplateList = function(){
 $E('PRMNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.PRMEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'PRM'},
-                                            'are added to/removed from the conference',
+                                            $T('are added to/removed from the conference'),
                                             'message1'
 ));
 
 $E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
-                                            'are added to/removed from the conference',
+                                            $T('are added to/removed from the conference'),
                                             'message2'
 ));
 $E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
-                                            'are added to/removed from the conference',
+                                            $T('are added to/removed from the conference'),
                                             'message3'
 ));
 $E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
-                                            'are added to/removed from the conference',
+                                            $T('are added to/removed from the conference'),
                                             'message4'
 ));
 $E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
-                                            'have assigned to /unassigned from contributions',
+                                            $T('have been assigned to/unassigned from contributions'),
                                             'message5'
 ));
 $E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
-                                            'have assigned to/unassigned from contributions',
+                                            $T('have been assigned to/unassigned from contributions'),
                                             'message6'
 ));
 $E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
-                                            'have assigned to/unassigned from contributions',
+                                            $T('have been assigned to/unassigned from contributions'),
                                             'message7'
 ));
 $E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
-                                            'Referee',
+                                            $T('Referee'),
                                             'message8'
 ));
 $E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
-                                            'Content Reviewer',
+                                            $T('Content Reviewer'),
                                             'message9'
 ));
 $E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
-                                            'Layout Reviewer',
+                                            $T('Layout Reviewer'),
                                             'message10'
 ));
 $E('authorSubmittedMatRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Referee'},
-                                            'the author submits a paper',
+                                            $T('the author submits a paper'),
                                             'message11'
 ));
 $E('authorSubmittedMatReviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Reviewer'},
-                                            'the author submits a paper',
+                                            $T('the author submits a paper'),
                                             'message12'
 ));
 $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif',
                                             {conference: '<%= ConfReview.getConference().getId() %>',
                                             AutoEmailsToChange: 'Editor'},
-                                            'the author submits a paper',
+                                            $T('the author submits a paper'),
                                             'message13'
 ));
 
@@ -753,7 +753,7 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
 
     $E('uploadTpl').observeClick(function(){ var popup = new UploadTemplateDialog( 'Upload Template',
         {conference: '<%= ConfReview.getConference().getId() %>'}, '350px', '30px',
-        <%= jsonEncode(Template.formats.keys()) %>, '<%= urlHandlers.UHSetTemplate.getURL() %>',
+        <%= jsonEncode(Template.formats) %>, '<%= urlHandlers.UHSetTemplate.getURL() %>',
         function(value) {
             $E('NoTemplateTable').dom.style.display = 'none';
             $E('templateListTableAll').dom.style.display = '';

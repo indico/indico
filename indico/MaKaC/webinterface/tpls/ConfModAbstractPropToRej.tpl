@@ -20,11 +20,13 @@
             </td>
         </tr>
         <% end %>
+        <% if len(abstractReview.getReviewingQuestions()) > 0: %>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"><%= _("Reviewing questions")%></span></td>
             <td width="60%" id="questionListDisplay">
             </td>
         </tr>
+        <% end %>
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> <%= _("Comment")%></span>
@@ -44,6 +46,8 @@
         </tr>
     </table>
 </form>
+
+<% if len(abstractReview.getReviewingQuestions()) > 0: %>
 <script type="text/javascript">
 
 var showQuestions = function() {
@@ -54,20 +58,16 @@ var showQuestions = function() {
     var range = <%= str(range(abstractReview.getNumberOfAnswers())) %>;
     var labels = <%= str(abstractReview.getRBLabels()) %>;
 
-    if (numQuestions == 0) {
-        $E('questionListDisplay').set("No reviewing questions proposed for the abstract review.");
-    } else {
-        $E("questionListDisplay").set('');
-        for (var i=0; i<numQuestions; i++) {
-            newDiv = Html.div({style:{marginLeft:'10px'}});
-            newDiv.append(Html.span(null, reviewingQuestions[i].text));
-            newDiv.append(Html.br());
+    $E("questionListDisplay").set('');
+    for (var i=0; i<numQuestions; i++) {
+        newDiv = Html.div({style:{marginLeft:'10px'}});
+        newDiv.append(Html.span(null, reviewingQuestions[i].text));
+        newDiv.append(Html.br());
 
-            newDiv.append(new RadioButtonSimpleField(null, range, labels).draw());
+        newDiv.append(new RadioButtonSimpleField(null, range, labels).draw());
 
-            $E("questionListDisplay").append(newDiv);
-            $E("questionListDisplay").append(Html.br());
-        }
+        $E("questionListDisplay").append(newDiv);
+        $E("questionListDisplay").append(Html.br());
     }
 
     var numAnswers = <%= abstractReview.getNumberOfAnswers() %>;
@@ -88,3 +88,4 @@ var showQuestions = function() {
 showQuestions();
 
 </script>
+<% end %>

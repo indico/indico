@@ -180,7 +180,12 @@ var showWidgets = function(firstLoad) {
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                var initialValue = "<%= Review.getRefereeJudgement().getAnswer(q.getId()).getRbValue() %>";
+                <% if Review.getRefereeJudgement().getAnswer(q.getId()) is None: %>
+                    var initialValue = "<%= Review.getRefereeJudgement().createAnswer(q.getId()).getRbValue() %>";
+                <% end %>
+                <% else: %>
+                    var initialValue = "<%= Review.getRefereeJudgement().getAnswer(q.getId()).getRbValue() %>";
+                <% end %>
             } else {
                 var initialValue = false;
             }
