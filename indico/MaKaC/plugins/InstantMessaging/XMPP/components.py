@@ -196,7 +196,7 @@ class ChatroomStorage(Component):
             #the title has been changed. Get rid of the old index and substitute it for the new one
             crNameIndex = IndexByCRName()
             crNameIndex.unindex(newRoom, oldTitle)
-            crNameIndex.index(newRoom.getTitle(), newRoom)
+            crNameIndex.index(newRoom)
 
     @classmethod
     def deleteChatroom(cls, obj, params):

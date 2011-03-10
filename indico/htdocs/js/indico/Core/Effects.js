@@ -124,7 +124,7 @@ IndicoUI.Effect = {
 
         if (time) {
             setTimeout(function() {
-                IndicoUI.Effect.removeHighlightBackground(elementId);
+                IndicoUI.Effect.removeHighlightBackground(element);
             }, time);
         }
     },

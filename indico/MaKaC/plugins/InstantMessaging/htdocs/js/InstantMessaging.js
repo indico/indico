@@ -14,11 +14,11 @@ var highlightColor = "#FFFF88";
  * Highlights a chatroom row during 3 seconds, in yellow color,
  * in order to let the user see which booking was just created or modified.
  */
-var hightlightChatroom = function(chatroom) {
-    IndicoUI.Effect.highLightBackground("chatroomRow" + chatroom.id, highlightColor, 3000);
+var highlightChatroom = function(chatroom) {
+    IndicoUI.Effect.highLightBackground($E("chatroomRow" + chatroom.id), highlightColor, 3000);
     var existingInfoRow = $E("infoRow" + chatroom.id);
     if (existingInfoRow != null) {
-        IndicoUI.Effect.highLightBackground("infoRow" + chatroom.id, highlightColor, 3000);
+        IndicoUI.Effect.highLightBackground($E("infoRow" + chatroom.id), highlightColor, 3000);
     }
 };
 
@@ -174,7 +174,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                                         refreshTableHead();
                                         killProgress();
                                         each(result, function(cr){
-                                            hightlightChatroom(cr);
+                                            highlightChatroom(cr);
                                         });
                                         self.close();
                                     } else {
@@ -430,7 +430,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                                     addIFrame(result);
                                     refreshTableHead();
                                     killProgress();
-                                    hightlightChatroom(result);
+                                    highlightChatroom(result);
                                     self.close();
                                 } else {
                                     if(error.explanation == 'roomExists'){
@@ -566,7 +566,7 @@ var refreshChatroom = function(chatroom, doHighlight) {
     chatrooms.insert(chatroom, index+"");
     showAllInfoRows(false);
     if (doHighlight) {
-        hightlightChatroom(chatroom);
+        highlightChatroom(chatroom);
     }
 };
 
