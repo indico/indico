@@ -48,7 +48,7 @@ class ContributionDisplayBase(ProtectedDisplayService, ContributionBase):
         ContributionBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
 
-class ContributionModifBase(ContributionBase, ProtectedModificationService):
+class ContributionModifBase(ProtectedModificationService, ContributionBase):
 
     def _checkParams(self):
         ContributionBase._checkParams(self)
@@ -68,19 +68,6 @@ class ContributionHTMLModificationBase(HTMLModificationBase, ContributionBase):
 
 class ContributionDateTimeModificationBase (DateTimeModificationBase, ContributionBase):
     pass
-
-class ContributionDeleteSubContribution(ContributionModifBase):
-    def _checkParams(self):
-        ContributionModifBase._checkParams(self)
-
-        subcId = self._params.get('subContribution',None)
-
-        self._subCont = self._target.getSubContributionById(subcId)
-
-        ProtectedModificationService._checkProtection(self)
-
-    def _getAnswer(self):
-        self._subCont.getOwner().removeSubContribution(self._subCont)
 
 class ContributionAddSubContribution(ContributionModifBase):
     def _checkParams(self):
@@ -124,7 +111,6 @@ class ContributionAddSubContribution(ContributionModifBase):
         logInfo["subject"] = "Create new subcontribution: %s"%sc.getTitle()
         self._target.getConference().getLogHandler().logAction(logInfo, "Timetable/SubContribution", self._getUser())
 
-#TODO: this class is duplicated. check if the good one is the one before or this one!
 class ContributionDeleteSubContribution(ContributionModifBase):
 
     # contribution.deleteSubContribution

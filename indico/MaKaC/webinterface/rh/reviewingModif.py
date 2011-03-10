@@ -68,7 +68,7 @@ class RCReviewer:
         """
         return request._conf.getConfPaperReview().isReviewer(request.getAW().getUser())
 
-class RHConfModifReviewingAccess(RHConferenceModifKey):
+class RHConfModifReviewingAccess(RHConferenceModifBase):
     """ Class used when the user clicks on the main 'Reviewing' tab
         Depending if the user is PRM or AM, etc. the user will be redirected
         to one of the subtabs of the reviewing tab.
@@ -78,26 +78,25 @@ class RHConfModifReviewingAccess(RHConferenceModifKey):
     """
 
     def _checkParams(self, params):
-        RHConferenceModifKey._checkParams(self, params)
+        RHConferenceModifBase._checkParams(self, params)
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._isReviewingStaff = RCReviewingStaff.hasRights(self)
         self._isEditor = RCEditor.hasRights(self)
         self._isReviewer = RCReviewer.hasRights(self)
-
-    def _checkProtection(self):
-
-        if not self._isReviewingStaff:
-            if self._getUser() == None:
-                self._checkSessionUser()
-            else:
-                RHConferenceModifKey._checkProtection(self)
+#
+#    def _checkProtection(self):
+#        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
+#        if not self._isReviewingStaff:
+#            if self._getUser() == None:
+#                self._checkSessionUser()
+#            else:
+#                RHConferenceModifBase._checkProtection(self)
 
     def _process( self ):
 
-        if self._redirectURL != "":
+        if hasattr(self, "_redirectURL") and self._redirectURL != "":
             url = self._redirectURL
-
         elif self._isPRM:
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isReferee:
