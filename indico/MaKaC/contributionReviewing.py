@@ -96,7 +96,10 @@ class ReviewManager(Persistent, Fossilizable):
         return self._versioning
 
     def getReviewById(self, reviewId):
-        return self._versioning[int(reviewId)]
+        for i in self._versioning:
+            if i.getId() == int(reviewId):
+                return i
+        return None
 
     def getSortedVerioning(self):
         versioning = self._versioning

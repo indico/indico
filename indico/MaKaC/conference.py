@@ -38,6 +38,7 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
     ICategoryFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
+from MaKaC.contributionReviewing import Review
 
 
 import re, os
@@ -10809,6 +10810,11 @@ class Reviewing(Material):
 
     def setId( self, newId ):
         return
+
+    def getContribution(self):
+        if isinstance(self.getOwner(), Review):
+            return self.getOwner().getContribution()
+        return Material.getContribution(self)
 
 class Paper(Material):
 
