@@ -24,7 +24,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
 
 
     _iFrameLoaded : function(iframeId) {
-
         var doc;
 
         if (Browser.IE) {
@@ -1472,15 +1471,10 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         var self = this;
     },
 
-    drawContent: function() {
+
+    makeMaterialLoadFunction: function() {
         var self = this;
-
-        $O(self.source).each(function(value, key){
-            var obj = watchize(value);
-            self.set(key, obj);
-        });
-
-        var materialLoadFunction = function(infoList) {
+        return function(infoList) {
             for(var i = 0; i < infoList.length; i++) {
                 var info = infoList[i];
                 if (self.get(info.material)) {
@@ -1489,7 +1483,17 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                     self._loadMaterial(info.material);
                 }
             }
-        };
+        }
+    },
+
+
+    drawContent: function() {
+        var self = this;
+
+        $O(self.source).each(function(value, key){
+            var obj = watchize(value);
+            self.set(key, obj);
+        });
 
         var link = Widget.link(command(function(){
 
@@ -1497,7 +1501,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                                           self,
                                           self.types,
                                           self.uploadAction,
-                                          materialLoadFunction);
+                                          self.makeMaterialLoadFunction());
         }, $T("Add Material")));
 
 
@@ -1541,22 +1545,13 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
             self.set(key, obj);
         });
 
-        var materialLoadFunction = function(info) {
-
-            if (self.get(info.material)) {
-                self.get(info.material).get('resources').append(watchize(info));
-            } else {
-                self._loadMaterial(info.material);
-            }
-        };
-
 
         var link = Widget.link(command(function(){
                     IndicoUI.Dialogs.Material.add(self.args,
                                                   self,
                                                   self.types,
                                                   self.uploadAction,
-                                                  materialLoadFunction,
+                                                  self.makeMaterialLoadFunction(),
                                                   true);
                 }, $T("Upload paper")));
         return Html.div(
