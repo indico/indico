@@ -1,5 +1,11 @@
 <% from MaKaC.fossils.user import IAvatarFossil %>
 
+    <script type="text/javascript">
+    // dummies which will be redefined if ckEditor is used
+    var fillText = function() {};
+    var editor = { get: function(){} };
+    </script>
+
     <% if ObjectType == "PluginType" :%>
     <form method="post" action="<%= urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) %>" >
     <% end %>
@@ -430,7 +436,7 @@
         <% end %>
         <tr>
             <td colspan="2" style="text-align: right;">
-                <input type="submit" name="Save" value="<%= _("Save settings") %>" onClick="fillText(editor.get())"/>
+                <input type="submit" name="Save" value="<%= _("Save settings") %>" onclick="fillText(editor.get());"/>
             </td>
         </tr>
     </table>
