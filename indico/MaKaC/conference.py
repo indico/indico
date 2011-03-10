@@ -1129,7 +1129,7 @@ class Category(CommonObjectBase):
             sortType=2--> Alphabetically
             sortType=3--> Alphabetically - Reversed
         """
-        res = list(self.conferences)
+        res = sorted(self.conferences)
         if sortType==2:
             res.sort(Conference._cmpTitle)
         elif sortType==3:
@@ -1141,15 +1141,6 @@ class Category(CommonObjectBase):
         """returns the iterator for conferences.
         """
         return self.conferences
-
-    def getAllConferenceList(self):
-        if self.getConferenceList():
-            return self.getConferenceList
-        else:
-            l = []
-            for cat in self.getSubCategoryList():
-                l[:0] = cat.getAllConferenceList()
-            return l
 
     def getAllConferenceList( self ):
         """returns the list of all conferences included in the current category
@@ -2135,7 +2126,7 @@ class Conference(CommonObjectBase, Locatable):
         return "<Conference %s@%s>" % (self.getId(), hex(id(self)))
 
     def __cmp__(self, toCmp):
-        if toCmp != Conference:
+        if not isinstance(toCmp, Conference):
             return cmp(hash(self), hash(toCmp))
         res = cmp(self.getStartDate(), toCmp.getStartDate())
         if res != 0:
