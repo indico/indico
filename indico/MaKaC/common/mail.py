@@ -50,7 +50,8 @@ class GenericMailer:
                 notification.getCCList().remove(cc)
 
         to=", ".join(notification.getToList())
-#        raise to
+        if not to:
+            return
         cc=""
         if len(notification.getCCList())>0:
             cc="Cc: %s\r\n"%", ".join(notification.getCCList())
