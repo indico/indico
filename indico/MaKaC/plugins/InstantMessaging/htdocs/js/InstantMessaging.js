@@ -299,7 +299,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
 
             self.crName = new AutocheckTextBox({style: {width: '300px'}, name: 'title', id:"CRname"}, self.errorLabel);
             //replace all the invalid characters
-            self.crName.set((conferenceName+eventDate).replace(/(\s)|\/|\"|&|\\|:|<|>|@/g,"_"));
+            self.crName.set((conferenceName+eventDate).replace(/(\s)|\/|"|'|&|\\|:|<|>|@/g, "_"));
 
             this.basicTabForm = Html.div({style:{textAlign: 'left'}},
                 IndicoUtil.createFormFromMap([
