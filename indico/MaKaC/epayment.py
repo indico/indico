@@ -22,7 +22,7 @@
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 from MaKaC.trashCan import TrashCanManager
-from MaKaC.plugins import PluginLoader, pluginId
+from MaKaC.plugins import PluginLoader
 
 class EPayment(Persistent):
 
@@ -53,7 +53,7 @@ class EPayment(Persistent):
         epaymentModules = PluginLoader.getPluginsByType("EPayment")
         changed = False
         for mod in epaymentModules:
-            name = pluginId(mod)
+            name = mod.MODULE_ID
             if name not in self.payMods:
                 self.payMods[name] = mod.epayment.getPayMod()
                 changed = True
@@ -63,7 +63,7 @@ class EPayment(Persistent):
                 if not isinstance(self.payMods[name],
                                   mod.epayment.getPayModClass()):
                     newMod = mod.epayment.getPayMod()
-                    self.payMods[pluginId(mod)] = newMod
+                    self.payMods[mod.MODULE_ID] = newMod
                     changed = True
 
         if changed:

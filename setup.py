@@ -673,6 +673,7 @@ if __name__ == '__main__':
             EPayment.worldPay = MaKaC.plugins.EPayment.worldPay
             EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
             EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
+            EPayment.CERNYellowPay = MaKaC.plugins.EPayment.CERNYellowPay
 
             InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
 

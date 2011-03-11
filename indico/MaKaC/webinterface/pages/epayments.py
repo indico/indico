@@ -70,14 +70,15 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 text = disabledText
 
             # CERN Plugin: Just admins can see and modify it
-            if gs.getId() == "CERNYellowPay":
+            from MaKaC.plugins.EPayment.CERNYellowPay import  MODULE_ID
+            if gs.getId() == MODULE_ID:
                 minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
                 al = minfo.getAdminList()
                 if not al.isAdmin( self._user ):
                     from MaKaC.plugins.base import PluginsHolder
                     endis="enable"
-                    departmentName = PluginsHolder().getPluginType("EPayment").getPlugin("CERNYellowPay").getOption("FPDepartmentName").getValue()
-                    emailAddress = PluginsHolder().getPluginType("EPayment").getPlugin("CERNYellowPay").getOption("FPEmaillAddress").getValue()
+                    departmentName = PluginsHolder().getPluginType("EPayment").getPlugin(MODULE_ID).getOption("FPDepartmentName").getValue()
+                    emailAddress = PluginsHolder().getPluginType("EPayment").getPlugin(MODULE_ID).getOption("FPEmaillAddress").getValue()
                     if gs.isEnabled():
                         endis="disable"
                         emailAddress = minfo.getSupportEmail()
