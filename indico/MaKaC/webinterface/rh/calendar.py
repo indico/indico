@@ -32,7 +32,7 @@ from pytz import timezone
 
 class RHCalendar( base.RH ):
     _uh = urlHandlers.UHCalendar
-    
+
     def _checkParams( self, params ):
         categIdList = self._normaliseListParam( params.get("selCateg", []) )
         self._categList = []
@@ -44,7 +44,7 @@ class RHCalendar( base.RH ):
             cm = conference.CategoryManager()
             self._categList.append( cm.getRoot() )
         tz = DisplayTZ(self._aw).getDisplayTZ()
-        months = params.get("months", 6)
+        months = params.get("months", 3)
         columns = params.get("columns",3)
         month = int( params.get("month", nowutc().astimezone(timezone(tz)).month) )
         year = int( params.get("year", nowutc().astimezone(timezone(tz)).year) )
@@ -55,7 +55,7 @@ class RHCalendar( base.RH ):
                                                 columns, \
                                                 self._categList )
         self._categ = self._categList[0]
-    
+
     def _process( self ):
         p = calendar.WPCalendar( self, self._cal, self._categ )
         return p.display()
@@ -63,7 +63,7 @@ class RHCalendar( base.RH ):
 
 class RHCalendarSelectCategories( base.RH ):
     _uh = urlHandlers.UHCalendarSelectCategories
-    
+
     def _checkParams( self, params ):
         categIdList = self._normaliseListParam( params.get("selCateg", []) )
         self._categList = []
@@ -92,7 +92,7 @@ class RHCalendarSelectCategories( base.RH ):
 
 class RHSimpleCalendar( base.RH ):
     _uh = urlHandlers.UHSimpleCalendar
-    
+
     def _checkParams( self, params ):
         # month/year indicates which month should be displayed in the calendar
         # date indicates if a day should be highlighted in the calendar
@@ -108,7 +108,7 @@ class RHSimpleCalendar( base.RH ):
         else:
             self._date = ""
         self._form = int(params.get('form',0) )
-    
+
     def _process( self ):
         p = calendar.WPSimpleCalendar( self, self._month, self._year, self._date, self._form )
         return p.display()
