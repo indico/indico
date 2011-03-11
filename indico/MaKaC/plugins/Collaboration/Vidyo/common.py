@@ -48,7 +48,12 @@ class VidyoTools(object):
 
     @classmethod
     def defaultRoomName(cls, conf):
-        return cls.replaceSpacesInName(conf.getTitle())[:cls.maxRoomNameLength(conf)]
+        title = conf.getTitle()
+        # Ensure first character is not a number or non-alphanumerical character (underscore is fine)
+        title = re.compile(ur"^[\W\d]$", re.UNICODE).sub('_', title)
+        # Get rid of everything else that's not allowed
+        title = re.compile(ur"[^\w._\- ]|'$", re.UNICODE).sub('_', title)
+        return cls.replaceSpacesInName(title)[:cls.maxRoomNameLength(conf)]
 
     @classmethod
     def maxRoomNameLength(cls, conf):
