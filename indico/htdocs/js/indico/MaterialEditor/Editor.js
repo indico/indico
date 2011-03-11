@@ -422,7 +422,12 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
             // depending on whether we are selecting a material from the list
             // or adding a new one, we'll send either an id or a name
 
-            this.formDict.materialId.set(this.typeSelector.get());
+            var type = this.typeSelector.get();
+            // in IE nothing is selected in the hidden select field -> it returns an empty type
+            if(this.forReviewing && !type) {
+                type = this.types[0][0];
+            }
+            this.formDict.materialId.set(type);
 
             this.form.dom.submit();
 
