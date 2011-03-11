@@ -164,8 +164,17 @@ class ObjectChangeListener(Component):
         self._add(obj, ['deleted'])
 
     # IMetadataChangeListener
-    def titleChanged(self, obj, oldTitle, newTitle):
+    def _titleChanged(self, obj, oldTitle, newTitle):
         self._objectInfoChanged(obj, 'title')
+
+    def categoryTitleChanged(self, obj, oldTitle, newTitle):
+        self._titleChanged(obj, oldTitle, newTitle)
+
+    def eventTitleChanged(self, obj, oldTitle, newTitle):
+        self._titleChanged(obj, oldTitle, newTitle)
+
+    def contributionTitleChanged(self, obj, oldTitle, newTitle):
+        self._titleChanged(obj, oldTitle, newTitle)
 
     def infoChanged(self, obj):
         self._objectInfoChanged(obj, 'data')

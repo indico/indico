@@ -93,7 +93,13 @@ class IObjectLifeCycleListener(IListener):
 
 class IMetadataChangeListener(IListener):
 
-    def titleChanged(self, obj, oldTitle, newTitle):
+    def categoryTitleChanged(self, obj, oldTitle, newTitle):
+        pass
+
+    def eventTitleChanged(self, obj, oldTitle, newTitle):
+        pass
+
+    def contributionTitleChanged(self, obj, oldTitle, newTitle):
         pass
 
     def infoChanged(self, obj):

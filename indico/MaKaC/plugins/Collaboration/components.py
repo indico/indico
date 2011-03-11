@@ -96,7 +96,8 @@ class EventCollaborationListener(Component):
             Logger.get('PluginNotifier').error("Exception while trying to access to the date parameters when changing an event date" + str(e))
 
     @classmethod
-    def titleChanged(cls, obj, oldTitle, newTitle):
+    def eventTitleChanged(cls, obj, oldTitle, newTitle):
+
         obj = obj.getCSBookingManager()
         try:
             obj.notifyTitleChange(oldTitle, newTitle)

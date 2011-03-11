@@ -973,7 +973,7 @@ class Category(CommonObjectBase):
         nameIdx.unindex(self.getId())
         nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
 
-        self._notify('titleChanged', oldName, newName)
+        self._notify('categoryTitleChanged', oldName, newName)
 
         self.cleanCache()
 
@@ -3141,7 +3141,7 @@ class Conference(CommonObjectBase, Locatable):
 
         #we notify the observers that the conference's title has changed
         try:
-            self._notify('titleChanged', oldTitle, title)
+            self._notify('eventTitleChanged', oldTitle, title)
         except Exception, e:
             Logger.get('Conference').exception("Exception while notifying the observer of a conference title change for conference %s: %s" %
                                                (self.getId(), str(e)))
@@ -8028,7 +8028,7 @@ class Contribution(CommonObjectBase, Locatable):
         self.title = newTitle.strip()
 
         if notify:
-            self._notify('titleChanged', oldTitle, newTitle)
+            self._notify('contributionTitleChanged', oldTitle, newTitle)
             self.notifyModification()
 
     def getTitle( self ):
