@@ -211,7 +211,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="8" style="border-bottom: 1px solid grey"></td>
+            <td colspan="9" style="border-bottom: 1px solid grey"></td>
         </tr>
         <tr>
             <td id="noFilteredContribution" colspan="8" style="padding:15px 0px 15px 15px; display:none;">
