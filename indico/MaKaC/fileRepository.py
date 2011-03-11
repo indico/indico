@@ -56,7 +56,7 @@ class Repository:
 
 
 class MaterialLocalRepository(Persistent):
-    """File repository keeping the files under a certain path in the local 
+    """File repository keeping the files under a certain path in the local
         filesystem (machine where the system is installed).
     """
     def __init__(self):
@@ -68,13 +68,13 @@ class MaterialLocalRepository(Persistent):
             id=str(random.randint(0,sys.maxint))
             if not self.__files.has_key(id):
                 return id
-                
-        #due to concurrency problems it will be mandatory to check that the 
-        #   directory does not exist, otherwise we'll generate a new id till 
+
+        #due to concurrency problems it will be mandatory to check that the
+        #   directory does not exist, otherwise we'll generate a new id till
         #   it does not exist
-        #concurrency problems could be avoided if we used the file system as 
+        #concurrency problems could be avoided if we used the file system as
         #   concurrency control system (creating a dir is an atomic operation)
-        #   but this would imply searching for the last id which could be 
+        #   but this would imply searching for the last id which could be
         #   very very low in case of having a big directory list
         #while 1:
         #    id = str(self.__idGen.newCount())
@@ -86,10 +86,10 @@ class MaterialLocalRepository(Persistent):
         from MaKaC.common.Configuration import Config
         cfg = Config.getInstance()
         return cfg.getArchiveDir()
-    
+
     def getRepositoryPath( self ):
         return self.__getRepositoryPath()
-    
+
     def getFiles(self):
         return self.__files
 
@@ -107,7 +107,7 @@ class MaterialLocalRepository(Persistent):
             return path.decode("utf-8",'replace').encode(sys.getfilesystemencoding(),'replace')
         else:
             return path
-    
+
     def getFilePath( self, id ):
         return self.__getFilePath(id)
 
@@ -130,22 +130,22 @@ class MaterialLocalRepository(Persistent):
         if cat:
             interPath = os.path.join("categories", "%s"%cat.getId())
         else:
-            
+
             conf = newFile.getConference()
-            
+
             session = newFile.getSession()
             cont = newFile.getContribution()
             subcont = newFile.getSubContribution()
-            try:        
+            try:
                 year = str(conf.getCreationDate().year)
             except:
                 year= str(datetime.datetime.now().year)
             interPath = os.path.join(year, "C%s"%conf.getId())
             if cont:
                 #the file is in a contribution, then create a directory for the contribution
-              
+
                 interPath = os.path.join( interPath, "c%s"%cont.getId())
-                
+
                 if subcont:
                     #the file is in a subcontribution, then create a directory for the subcontribution
                     interPath = os.path.join( interPath, "sc%s"%subcont.getId())
@@ -217,14 +217,18 @@ class MaterialLocalRepository(Persistent):
 
     def getFileSize( self, id ):
         filePath = self.__getFilePath( id )
+        if not os.path.exists(filePath):
+            return 0
         return int(os.stat(filePath)[stat.ST_SIZE])
-        
+
     def getCreationDate( self, id):
         """
         This method returns the creation date of one file in the repository.
         The file is got with the "id" argument.
         """
         filePath = self.__getFilePath( id )
+        if not os.path.exists(filePath):
+            return datetime.datetime.fromtimestamp(0)
         return datetime.datetime.fromtimestamp(os.path.getctime(filePath))
 
     def readFile( self, id ):
@@ -251,7 +255,7 @@ class MaterialLocalRepository(Persistent):
 
 # The following class seems to be not used at all (26.02.2007)
 class LocalRepository(Persistent):
-    """File repositroy keeping the files under a certain path in the local 
+    """File repositroy keeping the files under a certain path in the local
         filesystem (machine where the system is installed).
     """
     def __init__(self):
@@ -259,12 +263,12 @@ class LocalRepository(Persistent):
         self.__idGen = Counter()
 
     def __getNewFileId( self ):
-        #due to concurrency problems it will be mandatory to check that the 
-        #   directory does not exist, otherwise we'll generate a new id till 
+        #due to concurrency problems it will be mandatory to check that the
+        #   directory does not exist, otherwise we'll generate a new id till
         #   it does not exist
-        #concurrency problems could be avoided if we used the file system as 
+        #concurrency problems could be avoided if we used the file system as
         #   concurrency control system (creating a dir is an atomic operation)
-        #   but this would imply searching for the last id which could be 
+        #   but this would imply searching for the last id which could be
         #   very very low in case of having a big directory list
         while 1:
             id = str(self.__idGen.newCount())
@@ -281,7 +285,7 @@ class LocalRepository(Persistent):
         # this os.path.split is to be removed, just to keep compatibility with
         #   old filerepository where the full path was stored
         return os.path.join( self.__getRepositoryPath(), id, os.path.split(self.__files[id])[1] )
-    
+
 
     def storeFile( self, newFile, forcedFileId=None ):
         #this id generation can cause concurrency problems as it is not writen
@@ -311,7 +315,7 @@ class LocalRepository(Persistent):
     def getFileSize( self, id ):
         filePath = self.getFilePath( id )
         return int(os.stat( filePath )[stat.ST_SIZE])
-        
+
     def getCreationDate( self, id):
         """
         This method returns the creation date of one file in the repository.
@@ -342,7 +346,7 @@ class LocalRepository(Persistent):
 
 
 class SimpleRepository:
-    """File repository keeping the files under a certain path in the local 
+    """File repository keeping the files under a certain path in the local
         filesystem (machine where the system is installed).
     """
 
@@ -350,7 +354,7 @@ class SimpleRepository:
         from MaKaC.common.Configuration import Config
         cfg = Config.getInstance()
         return cfg.getArchiveDir()
-        
+
     def getFullPath( self, relativePath ):
         return os.path.join( self.getRepositoryPath(), relativePath )
 
@@ -381,10 +385,10 @@ class SimpleRepository:
 if __name__ == "__main__":
     from MaKaC.common.db import DBMgr
     DBMgr.getInstance().startRequest()
-    
+
     repository = SimpleRepository()
     f = open( r'E:\Indico\code\code\htdocs\abstractsManagment.py', 'r' )
     print repository.storeFile( 'small_rooms/abstractManagement.py', f )
     f.close()
-    
+
     DBMgr.getInstance().endRequest()
