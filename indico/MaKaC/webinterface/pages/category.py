@@ -1438,16 +1438,24 @@ class WCategModifMain(wcomponents.WTemplated):
                 </select>"""
             temp.append("""
                 <tr>
-                    <td>
+                    <td width="3%%">
                         <input type="checkbox" name="selectedCateg" value="%s">
-                        %s
-                        &nbsp;<a href="%s">%s</a>
+                    </td>
+                    <td>%s</td>
+                    <td style="padding-left:10px;">
+                        <a href="%s">%s</a>
                     </td>
                 </tr>"""%(id, selbox,modifURLGen( categ ), categ.getName().strip() or "[no title]"))
-        html = """
+        html = _("""
                 <input type="hidden" name="oldpos">
-                <table align="center">%s
-                </table>"""%"".join( temp )
+                <table align="left" width="100%%">
+                <tr>
+                    <td width="3%%" nowrap><img src="%s" border="0" alt="Select all" onclick="javascript:selectAll(document.contentForm.selectedCateg)"><img src="%s" border="0" alt="Deselect all" onclick="javascript:deselectAll(document.contentForm.selectedCateg)"></td>
+                    <td></td>
+                    <td class="titleCellFormat" width="100%%" style="padding-left:10px;"> _("Category name")</td>
+                </tr>
+                %s
+                </table>""")%(Config.getInstance().getSystemIconURL("checkAll"), Config.getInstance().getSystemIconURL("uncheckAll"), "".join( temp ))
         return html
 
     def __getConferenceItems( self, cl, modifURLGen, modifURLOpen ):
@@ -1468,7 +1476,7 @@ class WCategModifMain(wcomponents.WTemplated):
                 </tr>"""%(conf.getId(), conf.getAdjustedStartDate().date(), conf.getAdjustedEndDate().date(),modifURLGen(conf), conf.getTitle(), textopen))
         html = _("""<table align="left" width="100%%">
                 <tr>
-                    <td width="3%%" nowrap><img src="%s" border="0" alt="Select all" onclick="javascript:selectAll()"><img src="%s" border="0" alt="Deselect all" onclick="javascript:deselectAll()"></td>
+                    <td width="3%%" nowrap><img src="%s" border="0" alt="Select all" onclick="javascript:selectAll(document.contentForm.selectedConf)"><img src="%s" border="0" alt="Deselect all" onclick="javascript:deselectAll(document.contentForm.selectedConf)"></td>
                     <td align="center" width="17%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF; border-bottom: 1px solid #FFFFFF;"> _("Start date")</td>
                     <td align="center" width="17%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF; border-bottom: 1px solid #FFFFFF;"> _("End date")</td>
                     <td width="100%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF; border-bottom: 1px solid #FFFFFF;"> _("Conference title")</td>
@@ -1493,9 +1501,11 @@ class WCategModifMain(wcomponents.WTemplated):
             vars["dataModifButton"] = _("""<input type="submit" class="btn" value="_("modify")">""")
         vars["removeItemsURL"] = vars["actionSubCategsURL"]
         if not self._categ.getSubCategoryList():
-             vars["removeItemsURL"] = vars["actionConferencesURL"]
-             vars["items"] = self.__getConferenceItems( reversed(self._categ.getConferenceList()), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
+            vars['containsEvents'] = True
+            vars["removeItemsURL"] = vars["actionConferencesURL"]
+            vars["items"] = self.__getConferenceItems( reversed(self._categ.getConferenceList()), vars["confModifyURLGen"],  vars["confModifyURLOpen"])
         else:
+            vars['containsEvents'] = False
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         vars["defaultMeetingStyle"] = styleMgr.getStylesheetName(self._categ.getDefaultStyle("meeting"))

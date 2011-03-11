@@ -19,9 +19,9 @@
       <td class="dataCaptionTD"><span class="dataCaptionFormat"> <%= _("Name")%></span></td>
       <td bgcolor="white" width="100%" class="blacktext"><%= name %></td>
       <td rowspan="2" valign="bottom" align="right">
-	<form action="<%= dataModificationURL %>" method="POST">
-	<%= dataModifButton %>
-	</form>
+    <form action="<%= dataModificationURL %>" method="POST">
+    <%= dataModifButton %>
+    </form>
       </td>
     </tr>
     <tr>
@@ -66,7 +66,7 @@
             <table align="left">
             <tr>
               <td>
-				<%= tasksManagement %>
+                <%= tasksManagement %>
               </td>
             </tr>
             </table>
@@ -84,43 +84,53 @@
     <table width="90%" align="left" border="0">
     <tr>
       <td class="dataCaptionTD">
-	<span class="dataCaptionFormat"> <%= _("Contents")%></span>
+    <span class="dataCaptionFormat"> <%= _("Contents")%></span>
       </td>
       <td>
-	<form action="<%= removeItemsURL %>" name="contentForm" method="POST">
-	<%= locator %>
-	<table width="100%">
-	<tr>
-	  <td bgcolor="white" width="100%">
-	    <%= items %>
-	  </td>
-	  <td align="center">
-	    <table cellspacing="0" cellpadding="0" align="right">
-	    <tr>
-	      <td align="right" valign="bottom">
-		<input type="submit" class="btn" name="sort" value="<%= _("sort alphabetically")%>">
-	      </td>
-	    </tr>
-	    <tr>
-	      <td align="right" valign="bottom">
-		<input type="submit" class="btn" name="remove" value="<%= _("remove")%>">
-	      </td>
-	    </tr>
-	    <tr>
-	      <td align="right" valign="bottom">
-		<input type="submit" class="btn" name="reallocate" value="<%= _("re-allocate")%>">
-	      </td>
-	    </tr>
-	    <tr>
-	      <td align="right" valign="bottom">
-		<input type="submit" class="btn" value="<%= _("add subcateg")%>" onClick="this.form.action='<%= addSubCategoryURL %>';">
-	      </td>
-	    </tr>
-	    </table>
-	  </td>
-	</tr>
-	</table>
-	</form>
+    <form action="<%= removeItemsURL %>" name="contentForm" method="POST">
+    <%= locator %>
+    <table width="100%">
+        <tr>
+            <td align="left" style="border-bottom: 2px solid rgb(119, 119, 119);">
+                <table cellspacing="0" cellpadding="0" align="left">
+                    <tr>
+                        <td align="left" valign="bottom">
+                            <input type="submit" class="btn" value="<%= _("add subcateg")%>" onClick="this.form.action='<%= addSubCategoryURL %>';">
+                            <input type="submit" class="btn" name="reallocate" value="<%= _("re-allocate")%>">
+                            <input type="submit" class="btn" name="remove" value="<%= _("remove")%>">
+                            <% if not containsEvents: %>
+                            <input type="submit" class="btn" name="sort" value="<%= _("sort alphabetically")%>">
+                            <% end %>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr><td></td></tr>
+        <tr>
+            <td bgcolor="white" width="100%">
+                <%= items %>
+            </td>
+        </tr>
+        <tr><td></td></tr>
+        <tr>
+            <td align="left" style="border-top: 2px solid rgb(119, 119, 119); padding-bottom: 5px;">
+                <table cellspacing="0" cellpadding="0" align="left">
+                    <tr>
+                        <td align="left" valign="bottom">
+                            <input type="submit" class="btn" value="<%= _("add subcateg")%>" onClick="this.form.action='<%= addSubCategoryURL %>';">
+                            <input type="submit" class="btn" name="reallocate" value="<%= _("re-allocate")%>">
+                            <input type="submit" class="btn" name="remove" value="<%= _("remove")%>">
+                            <% if not containsEvents: %>
+                            <input type="submit" class="btn" name="sort" value="<%= _("sort alphabetically")%>">
+                            <% end %>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    </form>
       </td>
     </tr>
     <tr>
@@ -133,26 +143,27 @@
 
 <script type="text/javascript">
 
-function selectAll()
+function selectAll(element)
 {
-	if (!document.contentForm.selectedConf.length){
-		document.contentForm.selectedConf.checked=true
+    if (!element.length){
+        element.checked=true
     } else {
-		for (i = 0; i < document.contentForm.selectedConf.length; i++) {
-		    document.contentForm.selectedConf[i].checked=true
-    	}
-	}
+        for (i = 0; i < element.length; i++) {
+            element[i].checked=true
+        }
+    }
 }
 
-function deselectAll()
+function deselectAll(element)
 {
-	if (!document.contentForm.selectedConf.length)	{
-	    document.contentForm.selectedConf.checked=false
+    if (!element.length)    {
+        element.checked=false
     } else {
-	   for (i = 0; i < document.contentForm.selectedConf.length; i++) {
-	       document.contentForm.selectedConf[i].checked=false
+       for (i = 0; i < element.length; i++) {
+           element[i].checked=false
        }
-	}
+    }
 }
+
 
 </script>
