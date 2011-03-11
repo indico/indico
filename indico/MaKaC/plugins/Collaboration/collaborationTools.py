@@ -135,7 +135,7 @@ class CollaborationTools(object):
         """
         templateClass = cls.getTemplateClass(plugin.getId(), "WExtra")
         if templateClass:
-            return templateClass(conf, plugin, user).getHTML()
+            return templateClass(conf, plugin.getId(), user).getHTML()
         else:
             return None
 

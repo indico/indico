@@ -170,7 +170,7 @@ class WAdminCollaboration(wcomponents.WTemplated):
             templateClass = CollaborationTools.getTemplateClass(plugin.getId(),
                                                                 "WIndexing")
             if templateClass:
-                jsCodes[plugin.getId()] = templateClass(None, plugin, self._user).getHTML()
+                jsCodes[plugin.getId()] = templateClass(None, plugin.getId(), self._user).getHTML()
 
         vars["JSCodes"] = jsCodes
 
@@ -296,16 +296,16 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         for plugin in singleBookingPlugins:
             pluginId = plugin.getId()
             templateClass = CollaborationTools.getTemplateClass(pluginId, "WNewBookingForm")
-            singleBookingForms[pluginId] = templateClass(self._conf, plugin, self._user).getHTML()
+            singleBookingForms[pluginId] = templateClass(self._conf, plugin.getId(), self._user).getHTML()
 
         for plugin in multipleBookingPlugins:
             pluginId = plugin.getId()
             templateClass = CollaborationTools.getTemplateClass(pluginId, "WNewBookingForm")
-            newBookingFormHTML = templateClass(self._conf, plugin, self._user).getHTML()
+            newBookingFormHTML = templateClass(self._conf, plugin.getId(), self._user).getHTML()
 
             advancedTabClass = CollaborationTools.getTemplateClass(pluginId, "WAdvancedTab")
             if advancedTabClass:
-                advancedTabClassHTML = advancedTabClass(self._conf, plugin, self._user).getHTML()
+                advancedTabClassHTML = advancedTabClass(self._conf, plugin.getId(), self._user).getHTML()
             else:
                 advancedTabClassHTML = WConfModifCollaborationDefaultAdvancedTab(self._conf, plugin, self._user).getHTML()
             multipleBookingForms[pluginId] = (newBookingFormHTML, advancedTabClassHTML)
@@ -314,7 +314,7 @@ class WConfModifCollaboration(wcomponents.WTemplated):
             pluginId = plugin.getId()
 
             templateClass = CollaborationTools.getTemplateClass(pluginId, "WMain")
-            jsCodes[pluginId] = templateClass(self._conf, plugin, self._user).getHTML()
+            jsCodes[pluginId] = templateClass(self._conf, plugin.getId(), self._user).getHTML()
 
             bookingClass = CollaborationTools.getCSBookingClass(pluginId)
             canBeNotified[pluginId] = bookingClass._canBeNotifiedOfEventDateChanges
