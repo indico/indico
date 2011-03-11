@@ -972,6 +972,7 @@ class SystemLinkData(Observable):
                                         "mytracks",
                                         "mysessions",
                                         "mycontribs",
+                                        "paperreviewing",
                                         "managepaperreviewing",
                                         "assigncontributions",
                                         "judgelist",
