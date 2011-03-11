@@ -214,6 +214,8 @@ i.e. try 'easy_install jstools'"""
     os.chdir('./etc/js')
     os.system('%s -o ../../indico/htdocs/js/indico/pack indico.cfg' % jsbuildPath)
     os.system('%s -o ../../indico/htdocs/js/presentation/pack presentation.cfg' % jsbuildPath )
+    os.system('%s -o ../../indico/MaKaC/plugins/InstantMessaging/htdocs/js instantmessaging.cfg ' % jsbuildPath )
+    os.system('%s -o ../../indico/ext/livesync/htdocs/js livesync.cfg' % jsbuildPath )
     os.chdir('../..')
 
 
