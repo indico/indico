@@ -200,11 +200,9 @@
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Session")%>
             </td>
-            <!--
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-                State
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+                <%= _("Status") %>
             </td>
-            -->
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 <%= _("Reviewing team")%>
             </td>
@@ -225,88 +223,7 @@
         </tr>
     </thead>
 
-   <tbody id="tablebody">
-    <% for c in Conference.getContributionListSortedById(): %>
-        <% rm = c.getReviewManager() %>
-        <% if not isinstance(c.getStatus(), ContribStatusNone): %>
-         <tr valign="top">
-            <td></td>
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <%= c.getId() %>
-            </td>
-
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <a href="<%= urlHandlers.UHContributionModifReviewing.getURL(c) %>">
-                    <%= c.getTitle() %>
-                </a>
-            </td>
-
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <% if c.getType(): %>
-                    <%= c.getType().getName() %>
-                <% end %>
-            </td>
-
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <% if c.getTrack(): %>
-                    <%= c.getTrack().getTitle() %>
-                <% end %>
-            </td>
-
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-                <% if c.getSession(): %>
-                    <%= c.getSession().getTitle() %>
-                <% end %>
-            </td>
-
-            <!--
-            <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
-            <% if rm.getLastReview().getRefereeJudgement().isSubmitted(): %>
-                <span style="color:green;">
-                    Judged: <%= rm.getLastReview().getRefereeJudgement().getJudgement() %>
-                </span>
-            <% end %>
-            <% else: %>
-                <span style="color:red;">Not judged yet<br>
-                <%= "<br>".join(rm.getLastReview().getReviewingStatus()) %>
-                </span>
-            <% end %>
-            </td>
-            -->
-            <td>
-                <ul>
-                    <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
-                    <li>
-                        <em><%= _("Referee")%>:</em>
-                    </li>
-                    <% end %>
-                    <li>
-                        <em><%= _("Layout Reviewer")%>:</em>
-                    </li>
-                    <li>
-                        <em><%= _("Content Reviewers")%>:</em>
-                        <ul>
-                        <% for reviewer in rm.getReviewersList() :%>
-                            <li>a</li>
-                        <% end %>
-                        </ul>
-                    </li>
-                </ul>
-            </td>
-
-            <td style="border-right:5px solid #FFFFFF; border-left:5px solid #FFFFFF;">
-                <% date = rm.getLastReview().getAdjustedRefereeDueDate() %>
-                <% if date is None: %>
-                    <%= _("Deadline not set.")%>
-                <% end %>
-                <% else: %>
-                    <%= date.strftime(dueDateFormat) %>
-                <% end %>
-            </td>
-        </tr>
-        <% end %>
-    <% end %>
-    </tbody>
+   <tbody id="tablebody"></tbody>
 </table>
 
 <table class="shadowRectangleSoft" width="95%" style="margin-top:10px;">
@@ -568,25 +485,29 @@ var contributionTemplate = function(contribution) {
     cell6.set(contribution.session ? contribution.session : "")
     row.append(cell6);
 
-    /*
     // Cell7: contribution status
-    var cell7 = Html.td();
+    var cell7 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
 
     if (contribution.reviewManager.lastReview.refereeJudgement.isSubmitted) {
         var span = Html.span();
-        span.dom.style.color = 'green';
-        span.set("Judged" + contribution.reviewManager.lastReview.refereeJudgement.judgement);
+        var judgement = contribution.reviewManager.lastReview.refereeJudgement.judgement;
+        span.dom.style.color = '#D15600';
+        if (judgement == "Reject")
+            span.dom.style.color = '#881122';
+        else if (judgement == "Accept")
+            span.dom.style.color = '#118822';
+        span.set($T("Judged") + ": " + judgement);
         cell7.set(span);
 
     } else {
         var ul = Html.ul();
-        ul.dom.style.color = 'red';
+        ul.dom.style.color = '#3F4C6B';
         ul.dom.style.listStyleType = 'none';
         ul.dom.style.padding = 0;
         ul.dom.style.marginLeft = '5px';
 
         var li = Html.li();
-        li.set("Not judged yet");
+        li.set($T("Not judged yet:"));
         ul.append(li);
 
         statusList = contribution.reviewManager.lastReview.reviewingStatus;
@@ -600,7 +521,6 @@ var contributionTemplate = function(contribution) {
     }
 
     row.append(cell7);
-    */
 
     // Cell8: reviewing team assigned to the contribution
     var cell8 = Html.td({className:'contributionDataCell'});

@@ -22,6 +22,17 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.user import IAvatarMinimalFossil
 
+class IJudgementFossil(IFossil):
+    """
+    Fossil for the Judgement object
+    """
+
+    def isSubmitted(self):
+        pass
+
+    def getJudgement(self):
+        pass
+
 class IReviewFossil(IFossil):
     """
     Fossil for the review object
@@ -30,6 +41,13 @@ class IReviewFossil(IFossil):
     def getRefereeDueDate(self):
         pass
     getRefereeDueDate.convert = Conversion.datetime
+
+    def getRefereeJudgement(self):
+        pass
+    getRefereeJudgement.result = IJudgementFossil
+
+    def getReviewingStatus(self):
+        pass
 
 
 class IReviewManagerFossil(IFossil):

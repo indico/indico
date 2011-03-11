@@ -30,7 +30,7 @@ import datetime
 from MaKaC.common import Config
 from MaKaC.i18n import _
 from MaKaC.fossils.reviewing import IReviewManagerFossil,\
-    IReviewFossil
+    IReviewFossil, IJudgementFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.paperReviewing import Answer
 from MaKaC.common.Counter import Counter
@@ -291,9 +291,11 @@ class ReviewManager(Persistent, Fossilizable):
         self._p_changed = 1
 
 
-class Judgement(Persistent):
+class Judgement(Persistent, Fossilizable):
     """ Parent class for RefereeJudgement, EditorJudgement and ReviewerJudgement
     """
+
+    fossilizes(IJudgementFossil)
 
     def __init__(self, review, author = None, judgement = None, comments = "", submitted = False, submissionDate = None):
         self._review = review #the parent Review object for this Judgement
