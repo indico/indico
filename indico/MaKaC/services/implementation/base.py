@@ -34,7 +34,7 @@ from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag, TimingEr
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
     ResultWithWarning
 
-from MaKaC.webinterface.rh.base import RequestHandlerBase
+from MaKaC.webinterface.rh.base import RequestHandlerBase, RH
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from MaKaC.accessControl import AccessWrapper
