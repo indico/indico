@@ -65,13 +65,13 @@ class _Worker(object):
         # times and if it continues failing we abort it
         i = 0
 
+        self._dbi.startRequest()
         # RoomBooking forces us to connect to its own DB if needed
         # Maybe we should add some extension point here that lets plugins
         # define their own actions on DB connect/disconnect/commit/abort
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
         rbEnabled = info.getRoomBookingModuleActive()
 
-        self._dbi.startRequest()
         if rbEnabled:
             DALManager.connect()
 

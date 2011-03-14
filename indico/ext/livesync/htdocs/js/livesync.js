@@ -103,7 +103,6 @@ type("AgentModificationDialog", ["ExclusivePopupWithButtons"],
              var buttonDiv = Html.div({}, button);
 
              button.observeClick(function() {
-                 console.log(Json.write(self.info));
                  self._submit(self.info, parameterManager, pmExtra, self.fullyEditable);
              });
 

@@ -70,7 +70,7 @@ class Scheduler(object):
         'awol_tasks_thresold': 6000,
 
         # Number of times to try to run a task before aborting (min 1)
-        'task_max_tries': 2
+        'task_max_tries': 5
         }
 
     def __init__(self, **config):
