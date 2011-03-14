@@ -52,8 +52,8 @@ class XMPPChatroomService( ChatroomServiceBase ):
                  'CRdeletedFromClient': _('Someone deleted the chat room from the XMPP server since this page was loaded. We recommend you to delete the chatroom from Indico as well')
                  }
 
-    def __init__(self, params, remoteHost, session):
-        ChatroomServiceBase.__init__(self, params, remoteHost, session)
+    def __init__(self, params, remoteHost, session, req):
+        ChatroomServiceBase.__init__(self, params, remoteHost, session, req)
         #we want the data from the XMPP plugin in the InstantMessaging Plugin type
         oh = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         self._botJID = oh.getOption('indicoUsername') + '@' + oh.getOption('chatServerHost')
@@ -152,9 +152,6 @@ class XMPPChatroomService( ChatroomServiceBase ):
 
 class CreateChatroom( XMPPChatroomService ):
 
-    def __init__(self, params, remoteHost, session):
-        XMPPChatroomService.__init__(self, params, remoteHost, session)
-
     def _checkParams(self):
         XMPPChatroomService._checkParams(self)
         self._user = self._getUser()
@@ -209,9 +206,6 @@ class CreateChatroom( XMPPChatroomService ):
 
 
 class EditChatroom( XMPPChatroomService ):
-
-    def __init__(self, params, remoteHost, session):
-        XMPPChatroomService.__init__(self, params, remoteHost, session)
 
     def _checkParams(self):
         XMPPChatroomService._checkParams(self)
@@ -293,9 +287,6 @@ class EditChatroom( XMPPChatroomService ):
 
 class DeleteChatroom( XMPPChatroomService ):
 
-    def __init__(self, params, remoteHost, session):
-        XMPPChatroomService.__init__(self, params, remoteHost, session)
-
     def _checkParams(self):
         XMPPChatroomService._checkParams(self)
         pm = ParameterManager(self._params.get('chatroomParams'))
@@ -331,9 +322,6 @@ class DeleteChatroom( XMPPChatroomService ):
 
 class GetRoomPreferences( XMPPChatroomService ):
 
-    def __init__(self, params, remoteHost, session):
-        XMPPChatroomService.__init__(self, params, remoteHost, session)
-
     def _checkParams(self):
         XMPPChatroomService._checkParams(self)
         pm = ParameterManager(self._params.get('chatroomParams'))
@@ -363,9 +351,6 @@ class GetRoomPreferences( XMPPChatroomService ):
 
 class GetRoomsByUser( ServiceBase ):
 
-    def __init__(self, params, remoteHost, session):
-        ServiceBase.__init__(self, params, remoteHost, session)
-
     def _checkParams(self):
         self._user = self._params['usr']
 
@@ -375,9 +360,6 @@ class GetRoomsByUser( ServiceBase ):
 
 
 class AddConference2Room( ServiceBase, Observable ):
-
-    def __init__(self, params, remoteHost, session):
-        ServiceBase.__init__(self, params, remoteHost, session)
 
     def _checkParams(self):
         self._rooms = self._params['rooms']
@@ -410,9 +392,6 @@ class AddConference2Room( ServiceBase, Observable ):
 
 
 class AddLogs2Material( ServiceBase ):
-
-    def __init__(self, params, remoteHost, session):
-        ServiceBase.__init__(self, params, remoteHost, session)
 
     def _checkParams(self):
         self._conf = ConferenceHolder().getById(self._params['confId'])
