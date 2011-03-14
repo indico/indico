@@ -28,6 +28,8 @@ from MaKaC.common.info import HelperMaKaCInfo
 import multiprocessing
 import threading
 
+from ZODB.POSException import ConflictError
+
 class _Worker(object):
 
     def __init__(self, taskId, configData):
@@ -46,19 +48,21 @@ class _Worker(object):
         self._prepareDB()
         self._dbi.startRequest()
 
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        schedMod = SchedulerModule.getDBInstance()
-        self._rbEnabled = info.getRoomBookingModuleActive()
+        with self._dbi.transaction():
+            schedMod = SchedulerModule.getDBInstance()
+            self._task = schedMod.getTaskById(self._taskId)
 
-        if self._rbEnabled:
-            self._rbdbi = DBConnection(info)
+            info = HelperMaKaCInfo.getMaKaCInfoInstance()
+            self._rbEnabled = info.getRoomBookingModuleActive()
 
-        self._task = schedMod.getTaskById(self._taskId)
+            if self._rbEnabled:
+                self._rbdbi = DALManager.getInstance()
+                self._rbdbi.connect()
+            else:
+                self._rbdbi = DALManager.dummyConnection()
 
         # open a logging channel
         self._task.plugLogger(self._logger)
-
-        self._dbi.endRequest()
 
     def run(self):
 
@@ -70,37 +74,37 @@ class _Worker(object):
         # times and if it continues failing we abort it
         i = 0
 
-        self._dbi.startRequest()
         # RoomBooking forces us to connect to its own DB if needed
         # Maybe we should add some extension point here that lets plugins
         # define their own actions on DB connect/disconnect/commit/abort
 
-        if self._rbEnabled:
-            self._rbdbi.connect()
-
         # potentially conflict-prone (!)
-        self._task.prepare()
-        self._dbi.commit()
-        if self._rbEnabled:
-            self._rbdbi.commit()
+        with self._dbi.transaction():
+            with self._rbdbi.transaction():
+                self._task.prepare()
 
         while i < self._config.task_max_tries:
-
-            self._logger.info('Task cycle %d' % i)
-
-            i = i + 1
             try:
-                self._task.start()
+                with self._dbi.transaction():
+                    with self._rbdbi.transaction():
 
-            except Exception, e:
-                nextRunIn = i * 10 # secs
+                        self._logger.info('Task cycle %d' % i)
+                        i = i + 1
+                        try:
+                            self._task.start()
+                            break
+
+                        except Exception, e:
+                            nextRunIn = i * 10  # secs
+                            self._logger.exception('Error message')
+
+                            raise
+            except:
                 self._logger.warning("Task %s failed with exception '%s'. " %
-                                     (self._task.id, e))
-
-                self._logger.exception('Error message')
+                                             (self._task.id, e))
 
                 if  i < self._config.task_max_tries:
-                    self._logger.warning("Retrying for the %dth time in %d secs.." %
+                    self._logger.warning("Retrying for the %dth time in %d secs.." % \
                                          (i + 1, nextRunIn))
 
                     # if i is still low enough, we sleep progressively more
@@ -108,30 +112,22 @@ class _Worker(object):
                     # the problem worse by hammering the server.
                     base.TimeSource.get().sleep(nextRunIn)
 
-                # abort transaction and synchronize
-                self._dbi.sync()
-                if self._rbEnabled:
-                    self._rbdbi.abort()
-            else:
-                break
-
         self._logger.info('Ended on: %s' % self._task.endedOn)
 
-        if self._task.endedOn: # task successfully finished
-            self._setResult(True)
+        # task successfully finished
+        if self._task.endedOn:
+            with self._dbi.transaction():
+                self._setResult(True)
             if i > 1:
                 self._logger.warning("Task %s failed %d times before "
                                      "finishing correctly" % (self._task.id, i - 1))
         else:
-            self._setResult(False)
+            with self._dbi.transaction():
+                self._setResult(False)
             self._logger.error("Task %s failed too many (%d) times. "
                                "Aborting its execution.." % (self._task.id, i))
 
-        if self._rbEnabled:
-            self._rbdbi.commit()
-            self._rbdbi.disconnect()
-        self._dbi.endRequest()
-        self._logger.info("exiting")
+            self._logger.info("exiting")
 
 
 class ThreadWorker(_Worker, threading.Thread):

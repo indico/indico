@@ -18,20 +18,15 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import copy, logging, time, os
+import copy, logging, os
 from dateutil import rrule
 
-from datetime import timedelta
-from pytz import timezone
-from pytz import common_timezones
 import zope.interface
 
 # Required by specific tasks
 from MaKaC.user import Avatar
 from MaKaC.i18n import _
 from MaKaC.common import Config
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.Counter import Counter
 # end required
 
 from persistent import Persistent
@@ -372,6 +367,11 @@ class SendMailTask(OneShotTask):
         addrs = [smtplib.quoteaddr(x) for x in self.toAddr]
         ccaddrs = [smtplib.quoteaddr(x) for x in self.ccAddr]
 
+        if len(addrs) + len(ccaddrs) == 0:
+            self._v_logger.warning("Attention: mail contains no recipients!")
+        else:
+            self._v_logger.info("Sending mail To: %s, CC: %s" % (addrs, ccaddrs))
+
         for user in self.toUser:
             addrs.append(smtplib.quoteaddr(user.getEmail()))
 
@@ -566,8 +566,13 @@ class AlarmTask(SendMailTask):
         # Date checks...
         if check:
             from MaKaC.conference import ConferenceHolder
-            if not ConferenceHolder().hasKey(self.conf.getId()) or \
-                   self.conf.getStartDate() <= self._getCurrentDateTime():
+            if not ConferenceHolder().hasKey(self.conf.getId()):
+                self._logger.warning("Conference %s no longer exists! "
+                                     "Deleting alarm." % self.conf.getId())
+                self.conf.removeAlarm(self)
+            elif self.conf.getStartDate() <= self._getCurrentDateTime():
+                self._logger.warning("Conference %s already started. "
+                                     "Deleting alarm." % self.conf.getId())
                 self.conf.removeAlarm(self)
                 return True
 

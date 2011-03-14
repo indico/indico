@@ -18,6 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import threading
+from contextlib import contextmanager
+
 from MaKaC.common import Configuration
 from MaKaC.common.db import DBMgr
 from MaKaC.rb_dalManager import DALManagerBase
@@ -29,6 +32,22 @@ from BTrees.OOBTree import OOBTree
 from ZEO import ClientStorage
 from ZODB.DB import DB
 import transaction
+
+
+@contextmanager
+def dummyContextManager():
+    yield
+
+
+class DummyConnection():
+    """
+    Used so that we can use context managers for database connections
+    without producing failures when RB is not active.
+    Of course tis is not the ideal solution, but it's the best possible
+    without changing the whole RB DB code.
+    """
+    def transaction(self):
+        return dummyContextManager()
 
 
 class DBConnection:
@@ -109,11 +128,17 @@ class DBConnection:
             return
         self.db.pack(days=days)
 
+    def transaction(self):
+        """
+        Calls the ZODB context manager for the connection
+        """
+        return self.db.transaction()
+
 
 class DALManager(DALManagerBase):
     """ ZODB specific implementation. """
 
-    _instance = None
+    _instances = {}
 
     @staticmethod
     def usesMainIndicoDB():
@@ -125,24 +150,29 @@ class DALManager(DALManagerBase):
             return False
 
     @staticmethod
-    def getInstance():
-        if not DALManager._instance:
+    def getInstance(create=True):
+        tid = threading._get_ident()
+        instance = DALManager._instances.get(tid)
+
+        if not instance and create:
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            DALManager._instance = DBConnection(minfo)
-        if not DALManager._instance:
-            raise "cannot open DB backend"
-        return DALManager._instance
+            instance = DBConnection(minfo)
+            DALManager._instances[tid] = instance
+        return instance
 
     @staticmethod
     def isConnected():
         """
         Returns true if the current DALManager is connected
         """
-        return DALManager._instance.isConnected()
+        if DALManager.getInstance(create=False):
+            return DALManager.getInstance().isConnected()
+        else:
+            return False
 
     @staticmethod
     def getRoot(name=""):
-        return DALManager._instance.getRoot(name)
+        return DALManager.getInstance().getRoot(name)
 
     @staticmethod
     def connect():
@@ -150,20 +180,24 @@ class DALManager(DALManagerBase):
 
     @staticmethod
     def disconnect():
-        DALManager._instance.disconnect()
+        DALManager.getInstance().disconnect()
 
     @staticmethod
     def commit():
-        DALManager._instance.commit()
+        DALManager.getInstance().commit()
 
     @staticmethod
     def rollback():
-        DALManager._instance.rollback()
+        DALManager.getInstance().rollback()
 
     @staticmethod
     def sync():
-        DALManager._instance.sync()
+        DALManager.getInstance().sync()
 
     @staticmethod
     def pack(days=1):
-        DALManager._instance.pack()
+        DALManager.getInstance().pack()
+
+    @staticmethod
+    def dummyConnection():
+        return DummyConnection()

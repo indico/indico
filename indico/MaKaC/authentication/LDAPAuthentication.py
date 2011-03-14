@@ -379,8 +379,8 @@ class LDAPUserCreator(object):
 def dictToAv(ret):
     av = {}
     av["email"] = [ret['mail']]
-    av["name"] = ret['givenName']
-    av["surName"] = ret['sn']
+    av["name"] = ret.get('givenName', '')
+    av["surName"] = ret.get('sn', '')
 
     if 'o' in ret:
         av["organisation"] = [ret.get('o', '')]

@@ -196,6 +196,12 @@ class DBMgr:
     def tpcFinish(self, trans):
         self._storage.tpc_finish(trans)
 
+    def transaction(self):
+        """
+        Calls the ZODB context manager (`with`)
+        """
+        return self._db.transaction()
+
     # ZODB version check
     try:
         zodbPkg = pkg_resources.require('ZODB3')[0]
