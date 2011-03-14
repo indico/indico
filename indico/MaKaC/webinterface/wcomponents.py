@@ -50,7 +50,7 @@ from MaKaC.webinterface.common import contribFilters as contribFilters
 from MaKaC.common import filters, utils
 from MaKaC.errors import MaKaCError
 import MaKaC.webinterface.displayMgr as displayMgr
-from MaKaC.common.TemplateExec import TemplateExec
+from MaKaC.common.TemplateExec import TemplateExec, escapeHTMLForJS
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
 
@@ -91,8 +91,8 @@ class WTemplated(OldObservable):
             self.tplId = tpl_name
 
         #if ( '_rh' in ','.join( dir( self ) ) ):
-        from MaKaC.webinterface.rh.base import RH
-        self._rh = RH._currentRH
+        from MaKaC.webinterface.rh.base import RequestHandlerBase
+        self._rh = RequestHandlerBase._currentRH
 
         cfg = Configuration.Config.getInstance()
         self._dir = cfg.getTPLDir()
@@ -151,8 +151,8 @@ class WTemplated(OldObservable):
            Classes inheriting from this one will have to take care of adding
             their variables to the ones returned by this method.
         """
-        from MaKaC.webinterface.rh.base import RH
-        self._rh = RH._currentRH
+        from MaKaC.webinterface.rh.base import RequestHandlerBase
+        self._rh = RequestHandlerBase._currentRH
 
         cfg = Configuration.Config.getInstance()
         vars = cfg.getTPLVars()
@@ -178,8 +178,8 @@ class WTemplated(OldObservable):
             Params:
                 params -- additional paramters received from the caller
         """
-        from MaKaC.webinterface.rh.base import RH
-        self._rh = RH._currentRH
+        from MaKaC.webinterface.rh.base import RequestHandlerBase
+        self._rh = RequestHandlerBase._currentRH
         if self.tplId == None:
             self.tplId = self.__class__.__name__[1:]
         self._setTPLFile()
@@ -209,6 +209,15 @@ class WTemplated(OldObservable):
 
         tempHTML = TemplateExec.executeTemplate( text, vars, self.tplId )
 
+        if self._rh._req.is_https():
+            imagesBaseURL = Config.getInstance().getImagesBaseURL()
+            imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
+            baseURL = Config.getInstance().getBaseURL()
+            baseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getBaseSecureURL())
+            tempHTML = tempHTML.replace(imagesBaseURL, imagesBaseSecureURL)
+            tempHTML = tempHTML.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
+            tempHTML = tempHTML.replace(baseURL, baseSecureURL)
+            tempHTML = tempHTML.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
 
         if helpText == None:
             return tempHTML

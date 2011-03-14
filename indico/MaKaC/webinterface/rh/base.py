@@ -65,6 +65,10 @@ from MaKaC.plugins.base import OldObservable
 class RequestHandlerBase(OldObservable):
 
     _uh = None
+    _currentRH = None
+
+    def __init__( self ):
+        RequestHandlerBase._currentRH = self
 
     def _checkProtection( self ):
         """
@@ -153,7 +157,6 @@ class RH(RequestHandlerBase):
                  python data types. The key is the parameter name while the
                  value should be the received paramter value (or values).
     """
-    _currentRH = None
     _tohttps = False
     _doNotSanitizeFields = []
 
@@ -165,6 +168,7 @@ class RH(RequestHandlerBase):
                 req - (mod_python.Request) mod_python request received for the
                     current rh.
         """
+        RequestHandlerBase.__init__(self)
         if req == None:
             raise Exception("Request object not initialised")
         self._req = req
@@ -181,7 +185,6 @@ class RH(RequestHandlerBase):
                                 #   the checkProtection methods when they
                                 #   detect that an inmediate redirection is
                                 #   needed
-        RH._currentRH = self
 
     # Methods =============================================================
 
@@ -624,18 +627,6 @@ class RH(RequestHandlerBase):
             except NameError:
                 pass
 
-
-
-        #if we have an https request, we replace the links by https ones.
-        if self._req.is_https() and res is not None:
-            imagesBaseURL = Config.getInstance().getImagesBaseURL()
-            imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
-            baseURL = Config.getInstance().getBaseURL()
-            baseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getBaseSecureURL())
-            res = res.replace(imagesBaseURL, imagesBaseSecureURL)
-            res = res.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
-            res = res.replace(baseURL, baseSecureURL)
-            res = res.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
 
         # destroy the context
         ContextManager.destroy()

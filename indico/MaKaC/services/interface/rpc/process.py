@@ -47,9 +47,9 @@ def processRequest(method, params, req):
 
     # invoke handler
     if hasattr(handler, "process"):
-        result = handler(params, req.get_remote_host(), getSession(req)).process()
+        result = handler(params, req.get_remote_host(), getSession(req), req).process()
     else:
-        result = handler(params, req.get_remote_host(), getSession(req))
+        result = handler(params, req.get_remote_host(), getSession(req), req)
 
     return result
 

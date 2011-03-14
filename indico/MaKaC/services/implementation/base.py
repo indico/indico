@@ -152,11 +152,13 @@ class ServiceBase(RequestHandlerBase):
     The ServiceBase class is the basic class for services.
     """
 
-    def __init__(self, params, remoteHost, session):
+    def __init__(self, params, remoteHost, session, req=None):
         """
         Constructor.  Initializes provate variables
         @param req: HTTP Request provided by the previous layer
         """
+        RequestHandlerBase.__init__(self)
+        self._req = req
         self._params = params
         self._requestStarted = False
         self._websession = session
