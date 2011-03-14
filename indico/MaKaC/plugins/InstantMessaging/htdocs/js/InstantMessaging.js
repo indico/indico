@@ -686,10 +686,8 @@ var checkCRStatus = function(chatroom){
                 showInfo[result.id] = true;
                 refreshChatroom(result);
                 killProgress();
-                self.close();
             } else {
                 killProgress();
-                self.close();
                 IndicoUtil.errorReport(error);
             }
         }
