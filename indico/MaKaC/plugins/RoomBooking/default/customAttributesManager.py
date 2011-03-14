@@ -72,7 +72,7 @@ class CustomAttributesManager( CustomAttributesManagerBase ):
 
         dic = CustomAttributesManager.getRoot()
         dic[location] = attsList
-        root = Factory.getDALManager().root
+        root = Factory.getDALManager().getRoot()
         root[_CUSTOM_ATTRIBUTES_LIST] = dic
     
     @staticmethod

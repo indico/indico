@@ -46,7 +46,7 @@ class EquipmentManager( EquipmentManagerBase ):
         lst = EquipmentManager.getRoot()
         if lst.get( location ) == None:
             lst[location] = []
-            Factory.getDALManager().root[_EQUIPMENT_LIST] = lst
+            Factory.getDALManager().getRoot()[_EQUIPMENT_LIST] = lst
         return lst[location]
 
     @staticmethod
@@ -56,7 +56,7 @@ class EquipmentManager( EquipmentManagerBase ):
         
         lst = EquipmentManager.getRoot()
         lst[location] = equipmentList
-        Factory.getDALManager().root[_EQUIPMENT_LIST] = lst     # Force update
+        Factory.getDALManager().getRoot()[_EQUIPMENT_LIST] = lst     # Force update
 
     @staticmethod
     def insertEquipment( equipmentName, *args, **kwargs ):
@@ -67,7 +67,7 @@ class EquipmentManager( EquipmentManagerBase ):
         if lst.get( location ) == None:
             lst[location] = []
         lst[location].append( equipmentName )
-        Factory.getDALManager().root[_EQUIPMENT_LIST] = lst
+        Factory.getDALManager().getRoot()[_EQUIPMENT_LIST] = lst
 
     @staticmethod
     def removeEquipment( equipmentName, *args, **kwargs ):
@@ -76,7 +76,7 @@ class EquipmentManager( EquipmentManagerBase ):
 
         lst = EquipmentManager.getRoot()
         lst[location].remove( equipmentName )
-        Factory.getDALManager().root[_EQUIPMENT_LIST] = lst
+        Factory.getDALManager().getRoot()[_EQUIPMENT_LIST] = lst
 
     @staticmethod
     def removalIsPossible( equipmentName, *args, **kwargs ):

@@ -22,7 +22,7 @@ import time, logging
 
 from indico.modules.scheduler import SchedulerModule, base
 from MaKaC.common import DBMgr
-from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
+from MaKaC.plugins.RoomBooking.default.dalManager import DBConnection, DALManager
 from MaKaC.common.info import HelperMaKaCInfo
 
 import multiprocessing
@@ -46,7 +46,12 @@ class _Worker(object):
         self._prepareDB()
         self._dbi.startRequest()
 
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         schedMod = SchedulerModule.getDBInstance()
+        self._rbEnabled = info.getRoomBookingModuleActive()
+
+        if self._rbEnabled:
+            self._rbdbi = DBConnection(info)
 
         self._task = schedMod.getTaskById(self._taskId)
 
@@ -69,21 +74,19 @@ class _Worker(object):
         # RoomBooking forces us to connect to its own DB if needed
         # Maybe we should add some extension point here that lets plugins
         # define their own actions on DB connect/disconnect/commit/abort
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        rbEnabled = info.getRoomBookingModuleActive()
 
-        if rbEnabled:
-            DALManager.connect()
+        if self._rbEnabled:
+            self._rbdbi.connect()
 
         # potentially conflict-prone (!)
         self._task.prepare()
         self._dbi.commit()
-        if rbEnabled:
-            DALManager.commit()
+        if self._rbEnabled:
+            self._rbdbi.commit()
 
         while i < self._config.task_max_tries:
 
-            self._logger.info('cycle %d' % i)
+            self._logger.info('Task cycle %d' % i)
 
             i = i + 1
             try:
@@ -107,8 +110,8 @@ class _Worker(object):
 
                 # abort transaction and synchronize
                 self._dbi.sync()
-                if rbEnabled:
-                    DALManager.abort()
+                if self._rbEnabled:
+                    self._rbdbi.abort()
             else:
                 break
 
@@ -124,9 +127,9 @@ class _Worker(object):
             self._logger.error("Task %s failed too many (%d) times. "
                                "Aborting its execution.." % (self._task.id, i))
 
-        if rbEnabled:
-            DALManager.commit()
-            DALManager.disconnect()
+        if self._rbEnabled:
+            self._rbdbi.commit()
+            self._rbdbi.disconnect()
         self._dbi.endRequest()
         self._logger.info("exiting")
 
@@ -138,7 +141,6 @@ class ThreadWorker(_Worker, threading.Thread):
         self._result = 0
 
     def _prepareDB(self):
-
         self._dbi = DBMgr.getInstance()
 
     def _setResult(self, res):
@@ -155,7 +157,6 @@ class ProcessWorker(_Worker, multiprocessing.Process):
         self._result = multiprocessing.Value('i', 0)
 
     def _prepareDB(self):
-
         # since the DBMgr instance will be replicated across objects,
         # we just set it as None for this one.
 

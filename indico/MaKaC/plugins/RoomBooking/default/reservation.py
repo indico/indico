@@ -196,7 +196,7 @@ class Reservation( Persistent, ReservationBase ):
 
         ret_lst = []
         counter = 0
-        root = Factory.getDALManager().root
+        root = Factory.getDALManager().getRoot()
 
         if resvID != None:
             return root[_RESERVATIONS].get( resvID )
@@ -713,7 +713,7 @@ class Test( object ):
 
         DBMgr.getInstance().startRequest()
         CrossLocationDB.connect()
-        root = DALManager.root
+        root = DALManager.getRoot()
 
         resvEx = ReservationBase()
         resvEx.isConfirmed = None

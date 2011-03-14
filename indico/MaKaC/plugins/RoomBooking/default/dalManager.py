@@ -30,16 +30,90 @@ from ZEO import ClientStorage
 from ZODB.DB import DB
 import transaction
 
-class TheInstance:
-    pass
 
-# Version for ZEO.
-class DALManager( DALManagerBase ):
+class DBConnection:
+
+    def __init__(self, minfo):
+        self.connection = None
+        self.root = None
+
+        self.storage = ClientStorage.ClientStorage(
+            minfo.getRoomBookingDBConnectionParams(),
+            username=minfo.getRoomBookingDBUserName(),
+            password=minfo.getRoomBookingDBPassword(),
+            realm=minfo.getRoomBookingDBRealm())
+        self.db = DB(self.storage)
+
+    def connect(self):
+        if not self.isConnected():
+            if DALManager.usesMainIndicoDB():
+                self.connection = DBMgr.getInstance().getDBConnection()
+            else:
+                self.connection = self.db.open()
+            self.root = self.connection.root()
+
+    def isConnected(self):
+        if not self.connection:
+            return False
+        return True
+
+    def getRoot(self, name=""):
+        if name == "":
+            return self.root
+        elif self.root != None:
+            if name in self.root.keys() and self.root[name]:
+                return self.root[name]
+            else:
+                # create the branch
+                if name in ["Rooms", "Reservations"]:
+                    self.root[name] = IOBTree()
+                elif name in ["RoomReservationsIndex", "UserReservationsIndex",
+                              "DayReservationsIndex"]:
+                    self.root[name] = OOBTree()
+                elif name in ["EquipmentList", "CustomAttributesList"]:
+                    self.root[name] = {}
+                else:
+                    return None
+                return self.root[name]
+        else:
+            raise MaKaCError("Cannot connect to the room booking database")
+
+    def disconnect(self):
+        if DALManager.usesMainIndicoDB():
+            return
+        if self.isConnected():
+            self.connection.close()
+            self.root = None
+            self.connection = None
+
+    def commit(self):
+        if DALManager.usesMainIndicoDB():
+            return
+        if self.isConnected():
+            self.connection.transaction_manager.get().commit()
+
+    def rollback(self):
+        if DALManager.usesMainIndicoDB():
+            return
+        if self.isConnected():
+            self.connection.transaction_manager.get().abort()
+
+    def sync(self):
+        if DALManager.usesMainIndicoDB():
+            return
+        if self.isConnected():
+            self.connection.sync()
+
+    def pack(self, days=1):
+        if DALManager.usesMainIndicoDB():
+            return
+        self.db.pack(days=days)
+
+
+class DALManager(DALManagerBase):
     """ ZODB specific implementation. """
 
     _instance = None
-    connection = None
-    root = None
 
     @staticmethod
     def usesMainIndicoDB():
@@ -51,12 +125,10 @@ class DALManager( DALManagerBase ):
             return False
 
     @staticmethod
-    def theInstance():
+    def getInstance():
         if not DALManager._instance:
-            DALManager._instance = TheInstance()
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            DALManager._instance.storage = ClientStorage.ClientStorage( minfo.getRoomBookingDBConnectionParams(), username=minfo.getRoomBookingDBUserName(), password=minfo.getRoomBookingDBPassword(), realm=minfo.getRoomBookingDBRealm() )
-            DALManager._instance.db = DB( DALManager._instance.storage ) # Should it be MaKaCDB( self._storage )?
+            DALManager._instance = DBConnection(minfo)
         if not DALManager._instance:
             raise "cannot open DB backend"
         return DALManager._instance
@@ -66,74 +138,32 @@ class DALManager( DALManagerBase ):
         """
         Returns true if the current DALManager is connected
         """
-        if not DALManager.connection:
-            return False
-        return True
+        return DALManager._instance.isConnected()
 
     @staticmethod
     def getRoot(name=""):
-
-        if name == "":
-            return DALManager.root
-        elif DALManager.root != None:
-            if name in DALManager.root.keys() and DALManager.root[name]:
-                return DALManager.root[name]
-            else:
-                # create the branch
-                if name in ["Rooms","Reservations"]:
-                    DALManager.root[name] = IOBTree()
-                elif name in ["RoomReservationsIndex", "UserReservationsIndex", "DayReservationsIndex"]:
-                    DALManager.root[name] = OOBTree()
-                elif name in ["EquipmentList","CustomAttributesList"]:
-                    DALManager.root[name] = {}
-                else:
-                    return None
-                return DALManager.root[name]
-        else:
-            raise MaKaCError("Cannot connect to the room booking database")
+        return DALManager._instance.getRoot(name)
 
     @staticmethod
     def connect():
-        if not DALManager.isConnected():
-            if DALManager.usesMainIndicoDB():
-                DALManager.connection = DBMgr.getInstance().getDBConnection()
-            else:
-                DALManager.connection = DALManager.theInstance().db.open()
-            DALManager.root = DALManager.connection.root()
+        DALManager.getInstance().connect()
 
     @staticmethod
     def disconnect():
-        if DALManager.usesMainIndicoDB():
-            return
-        if DALManager.isConnected():
-            DALManager.connection.close()
-        DALManager.root = None
-        DALManager.connection = None
+        DALManager._instance.disconnect()
 
     @staticmethod
     def commit():
-        if DALManager.usesMainIndicoDB():
-            return
-        if DALManager.isConnected():
-            DALManager.connection.transaction_manager.get().commit()
+        DALManager._instance.commit()
 
     @staticmethod
     def rollback():
-        if DALManager.usesMainIndicoDB():
-            return
-        if DALManager.isConnected():
-            DALManager.connection.transaction_manager.get().abort()
+        DALManager._instance.rollback()
 
     @staticmethod
     def sync():
-        if DALManager.usesMainIndicoDB():
-            return
-        if DALManager.isConnected():
-            DALManager.connection.sync()
+        DALManager._instance.sync()
 
     @staticmethod
-    def pack(days = 1):
-        if DALManager.usesMainIndicoDB():
-            return
-        DALManager.theInstance().db.pack(days=days)
-
+    def pack(days=1):
+        DALManager._instance.pack()

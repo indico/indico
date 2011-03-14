@@ -539,7 +539,7 @@ class CrossLocationDB( object ):
         """
 
         for factory in Location.allFactories():
-            if not factory.getDALManager().connection:
+            if not factory.getDALManager().isConnected():
                 return False
         return True
 

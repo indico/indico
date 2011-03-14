@@ -50,7 +50,7 @@ def deleteRoomBookingBranches( force = False ):
         raise 'nothing done'
     
     indicoRoot = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
-    root = DALManagerCERN().root
+    root = DALManagerCERN().getRoot()
     minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
     
     # 1. INDICO -----------------------------------------
@@ -91,7 +91,7 @@ def initializeRoomBookingDB( location, force = False ):
     - several indexes
     """
     indicoRoot = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
-    root = DALManagerCERN().root
+    root = DALManagerCERN().getRoot()
     
     # 1. Location -----------------------------------------------------------
     
