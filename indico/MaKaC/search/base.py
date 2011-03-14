@@ -106,7 +106,7 @@ class SearchResult(object):
     @classmethod
     def create(cls, id, title, location, startDate, materials, authors, description):
         
-        regexp = r'^INDICO\.\w(\w+)(\.(\w+)(\.(\w)+)?)?$'
+        regexp = r'^INDICO\.(\w+)(\.(\w+)(\.(\w)+)?)?$'
 
         m = re.match(regexp, str(id))
 
@@ -128,8 +128,6 @@ class ContributionEntry(SearchResult):
         SearchResult.__init__(self, id, title, location, startDate, materials, authors, description)
 
         self._parent = parent
-
-        materials.append((urlHandlers.UHConferenceDisplay.getURL(confId=parent), 'Event details'))
 
     def getConferenceId(self):
         return self._parent

@@ -159,7 +159,7 @@ class InvenioSEA(base.SearchEngineAdapter):
             # we're looking inside an event
 
             # search for event identifier
-            self._marcQuery = 'AND (970__:"INDICO.p%s*" OR 970__:"INDICO.r%s*")' % (target.getId(), target.getId())
+            self._marcQuery = 'AND 970__:"INDICO.%s*"' % (target.getId(), target.getId())
             self._searchCategories = False
 
         else:
@@ -219,18 +219,19 @@ class InvenioSEA(base.SearchEngineAdapter):
     def translateField(self, field):
         return field
 
-    @SEATranslator ('collections',[],'c')
+    @SEATranslator ('collections',[],('c', 'p'))
     def translateCollection(self, collection):
 
-        if self._private:
-            repository = 'INDICOSEARCH'
-        else:
-            repository = 'INDICOPUBLIC'
-
         if collection == 'Events':
-            return '%s.events' % repository
-        elif collection == 'Contributions':
-            return '%s.contribs' % repository
+            query = "AND 65027a:'*'"
+        else:
+            query = "AND 65027a:"
+
+        if self._private:
+            return ('INDICOSEARCH', query)
+        else:
+            return ('INDICOSEARCH.PUBLIC', query)
+
 
     @SEATranslator ('startRecord',[],'jrec')
     def translateStartRecord(self, startRecord):
