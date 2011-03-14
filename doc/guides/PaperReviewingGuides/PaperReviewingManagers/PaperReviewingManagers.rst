@@ -2,21 +2,6 @@
 Paper reviewing module manager's guide
 =======================================
 
-How to activate the module
---------------------------
-
- You can activate the Paper Reviewing module from the General
- Settings of your conference. Go to the bottom of the page 
- and click ``Paper Reviewing`` to make the icon green. Once the icon
- is green you will have a new ``Reviewing`` link in the side menu. 
- 
- You will be able to access it by
- clicking on "Reviewing" from the Side Menu.
-
-        |image6|
-
------------------
-
 Manager of the paper reviewing module
 -------------------------------------
 
@@ -90,7 +75,7 @@ Options for layout reviewing mode
 Options for content and layout reviewing mode
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-- You can set up all the options in the previous two sections - 1.3.1.1 / 1.3.1.2.
+- You can set up all the options in the previous two sections - 2.1.2.1.1 / 2.1.2.1.2.
 
 - You can set due dates for the reviewing team to give their 
   judgments. They will not be able to judge the papers after the 
@@ -132,7 +117,7 @@ accessing the ``Team`` tab.
 
         |image16|
     
- From the ``Assign Managers of the Paper Reviewing Module`` area,
+ From the ``Assign managers of paper reviewing`` area,
  click on the button ``Add Existing`` to search for the user.
     
                  |image15|
@@ -177,18 +162,18 @@ users will be offered after you access the ``Competences`` tab.
 
 -------------------------
 
-Assign contributions to the reviewers
+Assign papers to the reviewers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- You can assign contributions by clicking on the link: ``Assign Contributions`` (see the figure below). 
+ You can assign papers by clicking on the link: ``Assign papers`` (see the figure below). 
 
         |image20|
 
  The paper reviewing module gives you the 
- opportunity to assign more than one contributions 
+ opportunity to assign more than one paper 
  to the same reviewers by selecting them using the check boxes.
  Depending on the chosen reviewing mode you need to assign different
- teams of reviewers (see section 1.3.1). 
+ teams of reviewers (see section 2.1.2.1). 
  
         |image21| 
 
@@ -213,10 +198,10 @@ How to access the "Reviewing" area for a contribution
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
  Click on the link ``Contributions`` from the side menu. The list of all contributions will be displaied.
- Click on the contribution's title and then the ``Reviewing`` tab. 
+ Click on the contribution's title and then the ``Paper Reviewing`` tab. 
         
-Assign reviewers for a contribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Assign reviewers for a paper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  You can assign reviewers by clicking on ``Assign Team`` tab. A lists of referees, layout and content reviewers
  will be offered. Click on the button next to the user's name and then click the ``Assign`` button.
@@ -225,8 +210,8 @@ Assign reviewers for a contribution
         |image23|        
 
 
-Judgement details for a contribution
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Judgement details for a paper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
  You can see the reviewer judgement details for the current review.
  
@@ -251,7 +236,6 @@ Reviewing history for a contribution
         
 -------------------------
 
-.. |image6| image:: PaperReviewingManagersPics/confmanagers.png
 .. |image7| image:: PaperReviewingManagersPics/confmanagers2.png
 .. |image8| image:: PaperReviewingManagersPics/confmanagers3.png
 .. |image9| image:: PaperReviewingManagersPics/confmanagers4.png

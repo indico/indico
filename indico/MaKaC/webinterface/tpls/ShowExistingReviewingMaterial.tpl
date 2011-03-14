@@ -15,7 +15,7 @@
 <div id="showStep2" class="groupTitleSmallPaper"><span><%= _("Step 2 - Submit the paper") %></span></div>
 <form id="SendBtnForm" action="<%=urlHandlers.UHContributionSubmitForRewiewing.getURL(self._target)%>" method="POST" style="disabled:true; display:<%=display%>">
     <div id="reviewingWarning" style="padding-bottom:3px; padding-left:3px;">
-        <span class="collaborationWarning">Note that you cannot modify the reviewing materials after submitting them.</span>
+        <span class="collaborationWarning">Note that you cannot modify the reviewing material after submitting it.</span>
     </div>
     <input id="SendBtn" type="submit" onclick="javascript:return confirm($T('Do you want to send the paper for reviewing? After sending it, you will not be able to submit another file until it is reviewed.'));" class="btn" value="Submit" disabled="disabled" style="display:<%=display%>">
     <span id="SendHelp" style="display:<%=display%>">
