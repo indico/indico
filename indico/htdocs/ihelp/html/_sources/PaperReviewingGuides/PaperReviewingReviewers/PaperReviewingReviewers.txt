@@ -5,9 +5,9 @@ Paper reviewing module - content reviewers's guide
 Getting started
 ---------------
 
- As a content reviewer your responsibility is to give your opinion about the contribution's content. 
+ As a content reviewer your responsibility is to give your opinion about the papers' content. 
  Firstly, you must log in to the system, then you will find a link ``Content Reviewer Area`` in the left 
- menu under ``My Conference``.
+ menu under ``Paper Reviewing``.
 
         |image1|
 

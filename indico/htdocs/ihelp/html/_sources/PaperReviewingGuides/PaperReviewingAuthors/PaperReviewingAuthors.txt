@@ -5,47 +5,60 @@ Paper reviewing module author's guide
 Getting started
 ---------------
 
- Firstly, you must log in to the system; you will find a link ``My contributions`` in the left 
- menu under ``My Conference``.
+ Firstly, you must log in to the system; you will find a link ``Download Template`` in the left 
+ menu under ``Paper Reviewing``.
 
-        |image1|
+        |image10|
 
 -----------------
 
-My Contributions Area
-----------------------        
+Download template area
+----------------------
+
+ If the paper reviewing manager provides you a template for the papers, you can download it by clicking on 
+ the template name.
+
+        |image11|
+ 
+
+Upload paper area
+-----------------        
   
- You can access the list of contributions and follow their status from ``My contributions``: 
+ You can access the list of contributions and follow their status from ``Upload paper``: 
         
        |image2|
    
-   By clicking on the name you can access the specific information for the contribution.
+   By clicking on the ``Upload paper`` link you can access the specific information for the contribution
+   where you can upload a new paper.
         
-How to submit the material for the contribution 
------------------------------------------------
+How to submit the reviewing material 
+------------------------------------
  
- * The next step will be to submit your material. You can do this by clicking on the contribution name. 
-   Use ``Add Material`` link, next to ``Reviewing materials``. Here you must add the material to be reviewed.
-   Only the material added in this section will be judged by the reviewing team.
+ * The next step will be to submit your reviewing material. You can do this by clicking on the ``Upload paper`` link. 
+   You have to follow these two steps to submit your paper. 
+  
+   * Step 1: Use ``Upload paper`` link, next to ``Reviewing material``. Here you must add the material to be 
+     reviewed.
         
        |image3|
         
- * Choose the file(s) for your contribution. You may add a description and convert your file to PDF format. 
-   After that click on ``Upload``.
+     Choose the file(s) for your contribution. If you want you can add a description and a display name for the file(s) in 
+     the ``Advanced`` tab. After that click on ``Create Resource``.
  
        |image4|
-       
+
+       |image9|
+
+   * Step 2: You have to submit the reviewing material by clicking on ``Submit`` button. You need to be sure that 
+     the material you are submitting is correct because you cannot modify it after submitting.
+
        |image5|
    
-  * You can send your added material for reviewing only by clicking on the ``Send`` button. 
-    By doing this you will "lock" your material until the end of the reviewing process.
-    You cannot add or remove material any more, unless you have made
-    a mistake while sending. In this case, use the ``UNDO sending`` button.
-    Now you see the ``Reviewing status`` of your contribution.
+  * Now you can see the ``Reviewing status`` of your paper.
     
-      |image6|
+       |image6|
       
-  * The reviewing process ends when the final judgement for your contribution is ``Accepted`` or ``Rejected``.
+  * The reviewing process ends when the final judgement for your paper is ``Accepted`` or ``Rejected``.
   
      |image7|
      
@@ -65,4 +78,7 @@ How to submit the material for the contribution
 .. |image6| image:: PaperReviewingAuthorsPics/author6.png
 .. |image7| image:: PaperReviewingAuthorsPics/author7.png
 .. |image8| image:: PaperReviewingAuthorsPics/author8.png
+.. |image9| image:: PaperReviewingAuthorsPics/author9.png
+.. |image10| image:: PaperReviewingAuthorsPics/author10.png
+.. |image11| image:: PaperReviewingAuthorsPics/author11.png
 

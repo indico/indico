@@ -5,9 +5,9 @@ Paper reviewing module - layout reviewer's guide
 Getting started
 ---------------
 
- As a layout reviewer, your responsibility is to judge the layout of all of the contributions
+ As a layout reviewer, your responsibility is to judge the layout of all of the papers
  are assigned to you. Firstly, you must log in to the system and you will find a link in the left menu under 
- ``My Conference``, called ``Layout Reviewer area``.
+ ``Paper Reviewing``, called ``Layouit Reviewer Area``.
 
         |image1|
 
