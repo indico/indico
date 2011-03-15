@@ -1271,7 +1271,7 @@ class WTrackModContribList(wcomponents.WTemplated):
         vars["authSearch"]=""
         authField=self._filterCrit.getField("author")
         if authField is not None:
-            vars["authSearch"]=quoteattr(str(authField.getValues()))
+            vars["authSearch"]=quoteattr(str(authField.getValues()[0]))
         vars["types"]=self._getTypeItemsHTML()
         vars["sessions"]=self._getSessionItemsHTML()
         vars["status"]=self._getStatusItemsHTML()

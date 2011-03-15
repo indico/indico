@@ -2361,7 +2361,7 @@ class WSessionModContribList(wcomponents.WTemplated):
         vars["authSearch"]=""
         authField=self._filterCrit.getField("author")
         if authField is not None:
-            vars["authSearch"]=quoteattr(str(authField.getValues()))
+            vars["authSearch"]=quoteattr(str(authField.getValues()[0]))
         sortingField = self._sortingCrit.getField()
         self._currentSorting=""
         if sortingField is not None:
