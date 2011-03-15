@@ -48,7 +48,7 @@ class _Worker(object):
         self._prepareDB()
         self._dbi.startRequest()
 
-        with self._dbi.transaction():
+        with self._dbi.transaction() as conn:
             schedMod = SchedulerModule.getDBInstance()
             self._task = schedMod.getTaskById(self._taskId)
 
@@ -61,8 +61,9 @@ class _Worker(object):
             else:
                 self._rbdbi = DALManager.dummyConnection()
 
-        # open a logging channel
-        self._task.plugLogger(self._logger)
+            # open a logging channel
+            self._task.plugLogger(self._logger)
+
 
     def run(self):
 
@@ -85,22 +86,23 @@ class _Worker(object):
 
         while i < self._config.task_max_tries:
             try:
+                if i > 0:
+                    self._dbi.abort()
+                    # restore logger
+                    self._task.plugLogger(self._logger)
+
                 with self._dbi.transaction():
                     with self._rbdbi.transaction():
 
                         self._logger.info('Task cycle %d' % i)
                         i = i + 1
-                        try:
-                            self._task.start()
-                            break
 
-                        except Exception, e:
-                            nextRunIn = i * 10  # secs
-                            self._logger.exception('Error message')
+                        self._task.start()
+                        break
 
-                            raise
-            except:
-                self._logger.warning("Task %s failed with exception '%s'. " %
+            except Exception, e:
+                nextRunIn = i * 10  # secs
+                self._logger.exception("Task %s failed with exception '%s'. " %
                                              (self._task.id, e))
 
                 if  i < self._config.task_max_tries:
@@ -128,6 +130,8 @@ class _Worker(object):
                                "Aborting its execution.." % (self._task.id, i))
 
             self._logger.info("exiting")
+
+        self._dbi.endRequest()
 
 
 class ThreadWorker(_Worker, threading.Thread):

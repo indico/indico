@@ -25,6 +25,7 @@ import os
 import sys
 import threading
 import pkg_resources
+from contextlib import contextmanager
 
 from ZEO.ClientStorage import ClientStorage
 from ZODB.DB import DB
@@ -103,6 +104,10 @@ class DBMgr:
     def _getConnObject(self):
         tid = DBMgr._getUniqueIdentifier()
         return self._conn[tid]
+
+    def _setConnObject(self, obj):
+        tid = DBMgr._getUniqueIdentifier()
+        self._conn[tid] = obj
 
     def _delConnObject(self):
         tid = DBMgr._getUniqueIdentifier()
@@ -196,11 +201,13 @@ class DBMgr:
     def tpcFinish(self, trans):
         self._storage.tpc_finish(trans)
 
+    @contextmanager
     def transaction(self):
         """
-        Calls the ZODB context manager (`with`)
+        context manager (`with`)
         """
-        return self._db.transaction()
+        yield
+        self.commit()
 
     # ZODB version check
     try:
