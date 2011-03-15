@@ -20,7 +20,7 @@
 
 import copy, logging, os
 from dateutil import rrule
-
+from datetime import timedelta
 import zope.interface
 
 # Required by specific tasks
@@ -221,8 +221,9 @@ class PeriodicTask(BaseTask):
             **kwargs
             )
 
-        self._nextOccurrence = self._rule.after(kwargs['dtstart'],
-                                                inc = True)
+        self._nextOccurrence = self._rule.after(
+            kwargs['dtstart'] - timedelta(seconds=1),
+            inc = True)
 
 
 
@@ -323,7 +324,8 @@ class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
 
     def run(self):
         from MaKaC.statistics import CategoryStatistics
-        CategoryStatistics.updateStatistics(self._cat)
+        CategoryStatistics.updateStatistics(self._cat,
+                                            self._v_logger)
 
 
 # TODO: Isolate CERN Specific

@@ -1441,64 +1441,6 @@ class Category(CommonObjectBase):
             self._statistics = {}
         return self._statistics
 
-    def updateStatistics( self ):
-        self._statistics = self.getStatistics()
-        self._statistics["events"] = {}
-        self._statistics["contributions"] = {}
-        self._statistics["resources"] = 0
-        if len(self.getSubCategoryList())>0:
-            for cat in self.getSubCategoryList():
-                self._p_changed = 1
-                cat.updateStatistics()
-                for year in cat._statistics["events"].keys():
-                    if year in self._statistics["events"].keys():
-                        self._statistics["events"][year] += cat._statistics["events"][year]
-                    else:
-                        self._statistics["events"][year] = cat._statistics["events"][year]
-                for year in cat._statistics["contributions"].keys():
-                    if year in self._statistics["contributions"].keys():
-                        self._statistics["contributions"][year] += cat._statistics["contributions"][year]
-                    else:
-                        self._statistics["contributions"][year] = cat._statistics["contributions"][year]
-                self._statistics["resources"] += cat._statistics["resources"]
-        elif len(self.getConferenceList())>0:
-            for conf in self.getConferenceList():
-                year = conf.getStartDate().year
-                if year in self._statistics["events"].keys():
-                    self._statistics["events"][year] += 1
-                else:
-                    self._statistics["events"][year] = 1
-                if len(conf.getContributionList())>0:
-                    for cont in conf.getContributionList():
-                        if cont.getStartDate() != None:
-                            year = cont.getStartDate().year
-                            if year in self._statistics["contributions"].keys():
-                                self._statistics["contributions"][year] += 1
-                            else:
-                                self._statistics["contributions"][year] = 1
-                            if len(cont.getSubContributionList())>0:
-                                for scont in cont.getSubContributionList():
-                                    l = scont.getAllMaterialList()
-                                    for m in l:
-                                        self._statistics["resources"] += m.getNbResources()
-                            l = cont.getAllMaterialList()
-                            for m in l:
-                                self._statistics["resources"] += m.getNbResources()
-                if len(conf.getSessionList())>0:
-                    for sess in conf.getSessionList():
-                        l = sess.getAllMaterialList()
-                        for m in l:
-                            self._statistics["resources"] += m.getNbResources()
-                l = conf.getAllMaterialList()
-                for m in l:
-                    self._statistics["resources"] += m.getNbResources()
-        else:
-            pass
-        self._statistics["updated"] = nowutc()
-        self._p_changed = 1
-        DBMgr.getInstance().commit()
-        DBMgr.getInstance()._db.cacheFullSweep()
-
     def notifyModification( self ):
         """Method called to notify the current category has been modified.
         """
