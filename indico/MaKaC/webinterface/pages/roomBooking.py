@@ -372,7 +372,7 @@ class WPRoomBookingBookingDetails( WPRoomBookingBase ):
         self._bookingListSearchOpt.setActive(True)
 
     def _getBody( self, params ):
-        wc = wcomponents.WRoomBookingDetails( self._rh, standalone = True )
+        wc = wcomponents.WRoomBookingDetails( self._rh )
         return wc.getHTML( params )
 
 # 4. New booking

@@ -3,71 +3,71 @@
         {
             if ( !confirm(  <%= _("'Are you sure you want to CANCEL your booking?'")%> ) )
                 return;
-            var frm = document.forms['submits']
-            frm.action = '<%= urlHandlers.UHRoomBookingCancelBooking.getURL( reservation ) %>'
-            frm.submit()
+            var frm = document.forms['submits'];
+            frm.action = '<%= urlHandlers.UHRoomBookingCancelBooking.getURL( reservation ) %>';
+            frm.submit();
         }
         function submit_accept()
         {
             if ( !confirm(  <%= _("'Are you sure you want to ACCEPT this booking?'")%> ) )
                 return;
-            var frm = document.forms['submits']
-            frm.action = '<%= urlHandlers.UHRoomBookingAcceptBooking.getURL( reservation ) %>'
-            frm.submit()
+            var frm = document.forms['submits'];
+            frm.action = '<%= urlHandlers.UHRoomBookingAcceptBooking.getURL( reservation ) %>';
+            frm.submit();
         }
         function submit_reject()
         {
             reason = prompt(  <%= _("'Are you sure you want to REJECT THE _WHOLE_ BOOKING? If so, please give a reason:'")%>, '' );
             if ( reason == null )
                 return;
-            var frm = document.forms['submits']
-            frm.action = '<%= urlHandlers.UHRoomBookingRejectBooking.getURL( reservation ) %>' + '&reason=' + encodeURI( reason )
-            frm.submit()
+            var frm = document.forms['submits'];
+            frm.action = '<%= urlHandlers.UHRoomBookingRejectBooking.getURL( reservation ) %>' + '&reason=' + encodeURI( reason );
+            frm.submit();
         }
         function submit_reject_occurrence( action )
         {
             reason = prompt(  <%= _("'Are you sure you want to REJECT the booking for the selected date? If so, please give a reason:'")%>, '' );
             if ( reason == null )
                 return;
-            var frm = document.forms['submits']
-            frm.action = action + '&reason=' + encodeURI( reason )
-            frm.submit()
+            var frm = document.forms['submits'];
+            frm.action = action + '&reason=' + encodeURI( reason );
+            frm.submit();
         }
         function submit_cancel_occurrence( action )
         {
-	    if (confirm('Are you sure you want to cancel the selected date from the booking?')) {
-	      var frm = document.forms['submits']
+            if (confirm('Are you sure you want to cancel the selected date from the booking?')) {
+              var frm = document.forms['submits'];
               frm.action = action;
               frm.submit();
-	    }
+            }
         }
         function submit_modify()
         {
-            var frm = document.forms['submits']
-            frm.action = '<%= urlHandlers.UHRoomBookingBookingForm.getURL( reservation ) %>'
-            frm.submit()
+            var frm = document.forms['submits'];
+            frm.action = '<%= modifyBookingUH.getURL( reservation ) %>';
+            frm.submit();
         }
         function submit_delete()
         {
             if ( !confirm(  <%= _("'THIS ACTION IS IRREVERSIBLE. Are you sure you want to DELETE the booking?'")%> ) )
                 return;
-            var frm = document.forms['submits']
-            frm.action = '<%= urlHandlers.UHRoomBookingDeleteBooking.getURL( reservation ) %>'
-            frm.submit()
+            var frm = document.forms['submits'];
+            frm.action = '<%= urlHandlers.UHRoomBookingDeleteBooking.getURL( reservation ) %>';
+            frm.submit();
         }
         function submit_clone()
         {
-            var frm = document.forms['submits']
-            frm.action = '<%= urlHandlers.UHRoomBookingCloneBooking.getURL( reservation ) %>'
-            frm.submit()
+            var frm = document.forms['submits'];
+            frm.action = '<%= cloneURL %>';
+            frm.submit();
         }
     </script>
 
     <!-- CONTEXT HELP DIVS -->
-	<div id="tooltipPool" style="display: none">
+    <div id="tooltipPool" style="display: none">
 
         <!-- Status -->
-		<div id="statusHelp" class="tip">
+        <div id="statusHelp" class="tip">
              <%= _("Validity")%>:<br />
             <ul>
                 <li class="tip-no-borders"> <%= _("<b>Not confirmed</b> - the pre-booking is not confirmed (yet) by person responsible.")%></li>
@@ -80,7 +80,7 @@
                 <li class="tip-no-borders"> <%= _("<b>Live</b> - the booking will take place in the future.")%> </li>
                 <li class="tip-no-borders"> <%= _("<b>Archival</b> - the booking already past. It will never repeat in the future.")%></li>
             </ul>
-		</div>
+        </div>
         <img style="border-style: solid; border-width: thick; border-color: #101010;" />
         <!-- Repetition type -->
         <div id="repetitionTypeHelp" class="tip">
@@ -102,16 +102,16 @@
              <%= _("Has user requested support for video-conferencing equipment?")%><br />
         </div>
 
-	</div>
+    </div>
 
     <!-- END OF CONTEXT HELP DIVS -->
 
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
-		<% if standalone: %>
-		    <tr>
-		    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
-		    </tr>
-		<% end %>
+        <% if standalone: %>
+            <tr>
+            <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
+            </tr>
+        <% end %>
         <tr>
             <td class="bottomvtab" width="100%">
                 <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">

@@ -1,18 +1,3 @@
-<script type="text/javascript">
-    isOver = false
-    function handleMouseOverResv( id ) {
-	    if ( isOver ) return
-	    isOver = true
-	    resvTR = document.getElementById( id )
-	    resvTR.bgColor = '#f0f0f0'
-    }
-    function handleMouseOutResv( id ) {
-        isOver = false
-        resvTR = document.getElementById( id )
-        resvTR.bgColor = ''
-    }
-</script>
-
 <table width="80%" class="filesTab">
 <tr>
 <td>
@@ -24,7 +9,7 @@
 		</tr>
 		<tr>
 			<td style="white-space: nowrap;">
-				<table>
+				<table class="resvTable">
 					<tr>
 					  <td class="dataCaptionFormat"><%= _("Photo")%></td>
 					  <td class="dataCaptionFormat"><%= _("Room")%></td>

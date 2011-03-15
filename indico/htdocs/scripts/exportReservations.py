@@ -18,6 +18,8 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.common.xmlGen import XMLGen
+from MaKaC.rb_location import CrossLocationQueries
+from MaKaC.rb_reservation import Collision
 import os, sys, csv, tempfile, stat
 from datetime import datetime, timedelta
 from indico.web.wsgi import webinterface_handler_config as apache
@@ -101,13 +103,17 @@ def index(req, **params):
     resvEx = Factory.newReservation()
     resvEx.startDT = datetime(sd.year, sd.month, sd.day, 0, 0)
     resvEx.endDT = datetime(ed.year, ed.month, ed.day, 23, 59)
-    resvs = resvEx.getCollisions(rooms = rooms )
+    resvs = CrossLocationQueries.getReservations(location="CERN", resvExample=resvEx, rooms=rooms)
+    collisions = []
+    for resv in resvs:
+        for p in resv.splitToPeriods(endDT=resvEx.endDT, startDT=resvEx.startDT):
+            collisions.append(Collision( ( p.startDT, p.endDT ), resv ))
 
     of = params.get("of", "csv")
     if of == "xml":
-        result = createXML(resvs, req)
+        result = createXML(collisions, req)
     else:
-        result = createCSV(resvs, req)
+        result = createCSV(collisions, req)
 
     Factory.getDALManager().disconnect()
     DBMgr.getInstance().endRequest()

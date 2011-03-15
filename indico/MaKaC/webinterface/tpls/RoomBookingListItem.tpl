@@ -40,7 +40,7 @@
     classText = ''
 
     if not reservation.isConfirmed:
-        classText = 'class="rowPreB"'
+        classText = ' rowPreB'
 
 
     onClickDetails = 'onclick="window.location=\'%s\'"' % myDetails
@@ -55,7 +55,7 @@
     <% end %>
 
 
-    <tr <%= classText %> style="height: <%= height %>px; " id="<%= occurrenceId %>" onmouseover="handleMouseOverResv( '<%= occurrenceId %>' )" onmouseout="handleMouseOutResv( '<%= occurrenceId %>' )" >
+    <tr class="resvHover<%= classText %>" style="height: <%= height %>px; " id="<%= occurrenceId %>">
 
         <% if withPhoto: %>
             <td <%=onClickDetails%> style="padding: 0px 10px 6px 0px; cursor: pointer;">

@@ -99,7 +99,7 @@ class XMLGenerator(object):
 
     @classmethod
     def getDisplayName(cls):
-        return _("Vidyo public room: ")
+        return _("Vidyo public room")
 
     @classmethod
     def getFirstLineInfo(cls, booking, displayTz):

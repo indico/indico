@@ -1041,12 +1041,17 @@
                       <xsl:value-of select="substring(./endDate,12,5)"/>
                     </xsl:otherwise>
                   </xsl:choose>
-                  <xsl:text>. </xsl:text>
                   </xsl:if>
 
-                  <xsl:if test="count(child::firstLineInfo) = 1">
-                    <xsl:value-of select="./firstLineInfo"/>
-                  </xsl:if>
+                  <xsl:choose>
+                    <xsl:when test="count(child::firstLineInfo) = 1">
+                      <xsl:text>: </xsl:text>
+                      <xsl:value-of select="./firstLineInfo"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>.</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
 
                   <span style="margin-left:20px;"></span>
 

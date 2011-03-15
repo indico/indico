@@ -249,11 +249,12 @@ class XMLGenerator(object):
 
     @classmethod
     def getFirstLineInfo(cls, booking, displayTz):
-        return None
+        return booking._bookingParams["name"]
 
     @classmethod
     def getCustomBookingXML(cls, booking, displayTz, out):
 
+        out.writeTag("firstLineInfo", booking._bookingParams["name"])
         out.openTag("information")
 
         out.openTag("section")
