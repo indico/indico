@@ -62,14 +62,14 @@ def includeTpl( tplFileName, *args, **kwargs ):
     # In the recurrent exec, we still need an old dictCopy.
     # This old dictCopy is resurrected from the global scope.
     objDict = globals()['_dictCopy']
+    codeOut = objDict['_tpl_out']
     for k, v in kwargs.iteritems():
         objDict[k] = v
     objDict["isIncluded"] = True
 
     from MaKaC.webinterface import wcomponents
     result = wcomponents.WTemplated(tplFileName).getHTML(objDict)
-
-    print result
+    codeOut.write(result)
 
 def contextHelp( helpId ):
     """
@@ -209,9 +209,6 @@ def systemIcon( s ):
 
 def iconFileName( s ):
     return Config.getInstance().getSystemIconFileName(s)
-
-def htmlOutput( s ):
-    sys.stdout.write(str(s))
 
 def truncateTitle(title, maxSize=30):
     if len(title) > maxSize:
@@ -353,6 +350,7 @@ class TemplateExec:
         # In child template, we will also need it.
         # This is the simpliest way to pass it to the child eval.
         #if not globals().has_key( '_dictCopy' ):
+        oldDictCopy = globals().get('_dictCopy')
         globals()['_dictCopy'] = dictCopy
         globals()['_objDict'] = objDict
 
@@ -363,7 +361,7 @@ class TemplateExec:
             humanText = tpl[lastIx:ixSt]
             if len( humanText.strip() ) > 0:
                 humanText = TemplateExec.__neutralizeLastChar( humanText )
-                pythonCode += '\n%ssys.stdout.write( """%s""" )' % ( TemplateExec.__indent( indentLevel ), humanText )
+                pythonCode += '\n%s_tpl_out.write( """%s""" )' % ( TemplateExec.__indent( indentLevel ), humanText )
 
             if TemplateExec.__isBlockEnd( statement ):
                 indentLevel -= 1
@@ -373,7 +371,7 @@ class TemplateExec:
                 break
 
             if type == 'Expression':
-                pythonCode += '\n%ssys.stdout.write( str( %s ) )' % ( TemplateExec.__indent( indentLevel ), statement )
+                pythonCode += '\n%s_tpl_out.write( str( %s ) )' % ( TemplateExec.__indent( indentLevel ), statement )
             elif type == 'IndentBlock':
                 for line in statement.split('\n'):
                     pythonCode += "\n%s%s" % (TemplateExec.__indent( indentLevel ), line)
@@ -410,6 +408,8 @@ class TemplateExec:
             #del _dictCopy
             #del recurrenceLevel
 
+        globals()['_dictCopy'] = oldDictCopy
+
         return newTpl
 
     # PRIVATE ================================================================
@@ -430,25 +430,15 @@ class TemplateExec:
     def __executePythonCode( pythonCode, objDict, tplFilename ):
         global recurrenceLevel
         # Execute the pythonCode -------------------------
-
         # create file-like string to capture output
         codeOut = StringIO.StringIO()
-        codeErr = StringIO.StringIO()
+        oldCodeOut = objDict.get('_tpl_out')
+        objDict['_tpl_out'] = codeOut
 
-        # remember stdout and stderr
-        stdoutBackup = sys.stdout
-        stderrBackup = sys.stderr
-
-        # capture output and errors
-        sys.stdout = codeOut
-        #sys.stderr = codeErr
         try:
             exec pythonCode in objDict
 
         except Exception, e:
-            # restore stdout and stderr in case of error
-            sys.stdout = sys.__stdout__
-            sys.stderr = sys.__stderr__
 #            try: open( ERROR_PATH + "/" + tplFilename + ".tpl.py", "w" ).write( pythonCode )
 #            except: pass
 
@@ -457,20 +447,10 @@ class TemplateExec:
 
             raise e
 
-        sys.stdout = stdoutBackup
-        sys.stderr = stderrBackup
+        objDict['_tpl_out'] = oldCodeOut
 
-        newTpl = ""
-
-        s = codeErr.getvalue()
-        if s: newTpl += "<font color='red'>%s</font>" % s
-
-        s = codeOut.getvalue()
-        if s: newTpl += s
-
+        newTpl = codeOut.getvalue()
         codeOut.close()
-        codeErr.close()
-
         return newTpl
 
     @staticmethod
@@ -558,8 +538,6 @@ class TemplateExec:
             objDict['systemIcon'] = systemIcon
         if not 'iconFileName' in objDict:
             objDict['iconFileName'] = iconFileName
-        if not 'htmlOutput' in objDict:
-            objDict['htmlOutput'] = htmlOutput
         if not 'escapeHTMLForJS' in objDict:
             objDict['escapeHTMLForJS'] = escapeHTMLForJS
         if not 'deepstr' in objDict:

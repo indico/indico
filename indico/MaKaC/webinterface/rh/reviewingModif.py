@@ -86,7 +86,6 @@ class RHConfModifReviewingAccess(RHConferenceModifBase):
         self._isReviewer = RCReviewer.hasRights(self)
 #
 #    def _checkProtection(self):
-#        import pydevd; pydevd.settrace(stdoutToServer = True, stderrToServer = True)
 #        if not self._isReviewingStaff:
 #            if self._getUser() == None:
 #                self._checkSessionUser()

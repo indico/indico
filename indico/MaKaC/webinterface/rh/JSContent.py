@@ -65,7 +65,6 @@ class RHTemplateContentJS(base.RH):
 
 
     def _process( self ):
-
         try:
             # regenerate file if needed
             if self._regenerate:
