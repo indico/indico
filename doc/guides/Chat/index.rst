@@ -12,9 +12,8 @@ Contents:
    :numbered:
    :maxdepth: 1
 
-   ./Introduction/index.rst
-   ./Pidgin/index.rst
-   ./Adium/index.rst
+   ./ChatUserGuide.rst
+   ./XMPPClients.rst
 
 .. Indices and tables
 .. ==================

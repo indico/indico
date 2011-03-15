@@ -9,13 +9,13 @@
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/IndicoAdminGuide.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <a href="ihelp/html/AdminGuide/index.html"><%= _("Admin Guide")%></a>
-        	</div>
+            </div>
             <% end %>
 
-        	<div class="item clearfix">
+            <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/IndicoUserGuide.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <a href="ihelp/html/UserGuide/index.html"><%= _("User Guide")%></a>
-        	</div>
+            </div>
         </div>
 
         <% if HasCollaboration: %>
@@ -30,7 +30,6 @@
                     </a>
                 </div>
                 <a href="ihelp/html/VideoServicesGuides/AdminGuide/index.html"><%= _("Administrator Guide")%></a>
-                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
 
             </div>
             <% end %>
@@ -43,7 +42,6 @@
                     </a>
                 </div>
                 <a href="ihelp/html/VideoServicesGuides/ManagerOverview/index.html"><%= _("Manager Overview")%></a>
-                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
 
             </div>
             <% end %>
@@ -71,74 +69,33 @@
         <% end %>
 
         <% if HasChat: %>
-        <div class="title"><%= _("Chat Guides")%></div>
+        <div class="title"><%= _("Chat Guides")%><img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" /></div>
             <div class="content">
 
             <div class="item clearfix">
                 <div class="icons">
-                    <a href="ihelp/pdf/IndicoChatIntro.pdf">
+                    <a href="ihelp/pdf/IndicoChatUserGuide.pdf">
                         <img src="images/pdf_small.png" alt="PDF version">
                     </a>
                 </div>
-                <a href="ihelp/html/Chat/Introduction/index.html"><%= _("Introduction to XMPP/Jabber")%></a>
-                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
+                <a href="ihelp/html/Chat/ChatUserGuide.html"><%= _("Chat User Guide")%></a>
 
             </div>
 
             <div class="item clearfix">
                 <div class="icons">
-                    <a href="ihelp/pdf/IndicoChatPidgin.pdf">
+                    <a href="ihelp/pdf/IndicoChatXMPPClients.pdf">
                         <img src="images/pdf_small.png" alt="PDF version">
                     </a>
                 </div>
-                <a href="ihelp/html/Chat/Pidgin/index.html"><%= _("Using Pidgin")%></a>
-                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
+                <a href="ihelp/html/Chat/XMPPClients.html"><%= _("Recommended Chat Clients")%></a>
 
             </div>
 
-            <div class="item clearfix">
-                <div class="icons">
-                    <a href="ihelp/pdf/IndicoChatAdium.pdf">
-                        <img src="images/pdf_small.png" alt="PDF version">
-                    </a>
-                </div>
-                <a href="ihelp/html/Chat/Adium/index.html"><%= _("Using Adium")%></a>
-                <img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" />
-            </div>
         </div>
         <% end %>
 
-
-    	<div class="title"><%= _("Quick Start Guides")%></div>
-        <div class="content">
-        	<div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/IndicoQSGContributionManager.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/QuickStartGuides/QSGContributionManager/index.html"><%= _("Contribution Manager")%></a>
-        	</div>
-
-        	<div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/IndicoQSGSessionCoordinator.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/QuickStartGuides/QSGSessionCoordinator/index.html"><%= _("Session Coordinator")%></a>
-        	</div>
-
-        	<div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/IndicoQSGSessionManager.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/QuickStartGuides/QSGSessionManager/index.html"><%= _("Session Manager") %></a>
-        	</div>
-
-        	<div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/IndicoQSGSubmitter.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/QuickStartGuides/QSGSubmitter/index.html"><%= _("Submitter / Presenter")%></a>
-        	</div>
-
-        	<div class="item clearfix">
-                <div class="icons"><a href="ihelp/pdf/IndicoQSGTrackCoordinator.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
-                <a href="ihelp/html/QuickStartGuides/QSGTrackCoordinator/index.html"><%= _("Track Coordinator") %></a>
-        	</div>
-        </div>
-
-
-        <div class="title"><%= _("Paper Reviewing Guides")%></div>
+        <div class="title"><%= _("Paper Reviewing Guides")%><img src="<%= systemIcon('new') %>" style="padding-left: 5px;" alt="new" /></div>
         <div class="content">
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/IndicoReviewingRole.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
@@ -165,10 +122,39 @@
                 <a href="ihelp/html/PaperReviewingGuides/PaperReviewingAuthors/index.html"><%= _("Contributions' authors")%></a>
             </div>
        </div>
-    	<div class="title"><%= _("General Help") %></div>
+
+        <div class="title"><%= _("Quick Start Guides")%></div>
+        <div class="content">
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoQSGContributionManager.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/QuickStartGuides/QSGContributionManager/index.html"><%= _("Contribution Manager")%></a>
+            </div>
+
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoQSGSessionCoordinator.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/QuickStartGuides/QSGSessionCoordinator/index.html"><%= _("Session Coordinator")%></a>
+            </div>
+
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoQSGSessionManager.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/QuickStartGuides/QSGSessionManager/index.html"><%= _("Session Manager") %></a>
+            </div>
+
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoQSGSubmitter.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/QuickStartGuides/QSGSubmitter/index.html"><%= _("Submitter / Presenter")%></a>
+            </div>
+
+            <div class="item clearfix">
+                <div class="icons"><a href="ihelp/pdf/IndicoQSGTrackCoordinator.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
+                <a href="ihelp/html/QuickStartGuides/QSGTrackCoordinator/index.html"><%= _("Track Coordinator") %></a>
+            </div>
+        </div>
+
+        <div class="title"><%= _("General Help") %></div>
 
         <div class="content">
-        	<div class="item clearfix">
+            <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/IndicoFAQ.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <a href="ihelp/html/FAQ/FAQ.html"><%= _("FAQ") %></a>
             </div>
@@ -180,23 +166,23 @@
         </div>
 
 
-    	<div class="title"><%= _("Training doc") %></div>
+        <div class="title"><%= _("Training doc") %></div>
 
         <div class="content">
-        	<div class="item clearfix">
+            <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/handsonmeetings.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <%= _("Hands-on - Meetings") %>
-        	</div>
+            </div>
 
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/handsonconferences.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <%= _("Hands-on - Conferences") %>
-        	</div>
+            </div>
 
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/slides.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <%= _("Slides") %>
-        	</div>
+            </div>
         </div>
     </div>
 

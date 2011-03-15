@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>1. Introduction &mdash; Indico v0.97 documentation</title>
+    <title>1.1. Introduction &mdash; Indico v0.97 documentation</title>
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -54,7 +54,7 @@
           <div class="body">
             
   <div class="section" id="introduction">
-<h1>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<h1>1.1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>Welcome to the Video Services User Guide for the Indico Server
 Administrator.</p>
 <p>As an Indico Server Administrator, you have rights to access and modify
@@ -72,7 +72,7 @@ that you will be able to see: the plug-in administration and
 configuration pages.</p>
 </div>
 <div class="section" id="plug-in-administration-and-configuration">
-<h1>2. Plug-in administration and configuration<a class="headerlink" href="#plug-in-administration-and-configuration" title="Permalink to this headline">¶</a></h1>
+<h1>1.2. Plug-in administration and configuration<a class="headerlink" href="#plug-in-administration-and-configuration" title="Permalink to this headline">¶</a></h1>
 <p>Go to the Server Admin pages by clicking on Server admin menu entry
 in the Administration menu:</p>
 <p><img alt="image01" src="../../_images/index_html_10323a5a.png" /></p>
@@ -89,7 +89,7 @@ Collaboration (the plug-ins this guide concerned by), Epayment,
 RoomBooking.</li>
 </ul>
 <div class="section" id="main-tab">
-<h2>2.1. Main tab<a class="headerlink" href="#main-tab" title="Permalink to this headline">¶</a></h2>
+<h2>1.2.1. Main tab<a class="headerlink" href="#main-tab" title="Permalink to this headline">¶</a></h2>
 <p>In this tab you can perform actions that affect all plug-in types.</p>
 <p><img alt="image03" src="../../_images/index_html_m592cc7ef.png" /></p>
 <p>Figure 3. Plugins administration section.</p>
@@ -117,7 +117,7 @@ interface, it will be as if the <em>Reload</em> button is pressed. It&#8217;s
 useful to disable it for debugging.</p>
 </div>
 <div class="section" id="collaboration-tab">
-<h2>2.2. Collaboration tab<a class="headerlink" href="#collaboration-tab" title="Permalink to this headline">¶</a></h2>
+<h2>1.2.2. Collaboration tab<a class="headerlink" href="#collaboration-tab" title="Permalink to this headline">¶</a></h2>
 <p>In this tab you can perform actions that affect the Collaboration
 plug-ins.</p>
 <p><img alt="image04" src="../../_images/index_html_m62d03def.png" /></p>
@@ -127,7 +127,7 @@ tab.</p>
 this tab, but since this is a Video Services User Guide, we will
 only go into the details for this tab.</p>
 <div class="section" id="active-plug-ins">
-<h3>2.2.1. Active plug-ins<a class="headerlink" href="#active-plug-ins" title="Permalink to this headline">¶</a></h3>
+<h3>1.2.2.1. Active plug-ins<a class="headerlink" href="#active-plug-ins" title="Permalink to this headline">¶</a></h3>
 <p>The first part of the page shows you a list of the plug-ins that
 are in the Indico source code. Exception: plug-ins that have been
 marked as ignored (ignore = True in their __init__.py file).</p>
@@ -147,7 +147,7 @@ desirable because you should configure their settings before
 activating them.</p>
 </div>
 <div class="section" id="collaboration-settings-and-plug-in-settings">
-<h3>2.2.2. Collaboration settings and plug-in settings<a class="headerlink" href="#collaboration-settings-and-plug-in-settings" title="Permalink to this headline">¶</a></h3>
+<h3>1.2.2.2. Collaboration settings and plug-in settings<a class="headerlink" href="#collaboration-settings-and-plug-in-settings" title="Permalink to this headline">¶</a></h3>
 <p>Under the Active plugins section, you can change settings. These
 are separated into two categories.</p>
 <ul class="simple">
@@ -164,7 +164,7 @@ Javascript-powered, so the page is not reloaded every time):</p>
 <p>There are two kinds of settings: Options and Actions</p>
 </div>
 <div class="section" id="options">
-<h3>2.2.3. Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<h3>1.2.2.3. Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
 <p>Options are objects in the database that hold a value. The value
 can be of many types, and depending on the type of value, what will
 appear in the page will be different:</p>
@@ -229,7 +229,7 @@ button.</li>
 </ul>
 </div>
 <div class="section" id="actions">
-<h3>2.2.4. Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h3>
+<h3>1.2.2.4. Actions<a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h3>
 <p>Actions are code that can be executed from the settings page.
 Usually, the goal of this code is to update one of the values of the
 the options, or they can execute some maintenance code.</p>
@@ -238,7 +238,7 @@ to find the executed code in the file actions.py inside the
 Collaboration folder or inside the folder of the respective.</p>
 </div>
 <div class="section" id="important-options-and-actions">
-<h3>2.2.5. Important options and actions<a class="headerlink" href="#important-options-and-actions" title="Permalink to this headline">¶</a></h3>
+<h3>1.2.2.5. Important options and actions<a class="headerlink" href="#important-options-and-actions" title="Permalink to this headline">¶</a></h3>
 <p>Here is the meaning of some options and actions that you should
 know about:</p>
 <ul>
@@ -317,15 +317,15 @@ re-index all of the bookings again. This may take a lot of time.</p>
 
             <h3><a href="../../index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="#">1. Introduction</a></li>
-<li><a class="reference external" href="#plug-in-administration-and-configuration">2. Plug-in administration and configuration</a><ul>
-<li><a class="reference external" href="#main-tab">2.1. Main tab</a></li>
-<li><a class="reference external" href="#collaboration-tab">2.2. Collaboration tab</a><ul>
-<li><a class="reference external" href="#active-plug-ins">2.2.1. Active plug-ins</a></li>
-<li><a class="reference external" href="#collaboration-settings-and-plug-in-settings">2.2.2. Collaboration settings and plug-in settings</a></li>
-<li><a class="reference external" href="#options">2.2.3. Options</a></li>
-<li><a class="reference external" href="#actions">2.2.4. Actions</a></li>
-<li><a class="reference external" href="#important-options-and-actions">2.2.5. Important options and actions</a></li>
+<li><a class="reference external" href="#">1.1. Introduction</a></li>
+<li><a class="reference external" href="#plug-in-administration-and-configuration">1.2. Plug-in administration and configuration</a><ul>
+<li><a class="reference external" href="#main-tab">1.2.1. Main tab</a></li>
+<li><a class="reference external" href="#collaboration-tab">1.2.2. Collaboration tab</a><ul>
+<li><a class="reference external" href="#active-plug-ins">1.2.2.1. Active plug-ins</a></li>
+<li><a class="reference external" href="#collaboration-settings-and-plug-in-settings">1.2.2.2. Collaboration settings and plug-in settings</a></li>
+<li><a class="reference external" href="#options">1.2.2.3. Options</a></li>
+<li><a class="reference external" href="#actions">1.2.2.4. Actions</a></li>
+<li><a class="reference external" href="#important-options-and-actions">1.2.2.5. Important options and actions</a></li>
 </ul>
 </li>
 </ul>

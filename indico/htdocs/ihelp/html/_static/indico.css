@@ -9,3 +9,8 @@ div.related {
 div.document {
     background-color: #02345A;
 }
+
+.warning {
+    color: #881122;
+    font-weight: bold;
+}
