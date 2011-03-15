@@ -157,8 +157,8 @@ class WebFactory(WebFactory):
 
 ############# Contribution Display #############################################
 
-    def getContributionDisplay(rh, contrib):
-        return WPMContributionDisplay(rh,contrib)
+    def getContributionDisplay(rh, contrib, hideFull = 0 ):
+        return WPMContributionDisplay(rh,contrib, hideFull)
     getContributionDisplay = staticmethod(getContributionDisplay)
 
 ############# Contribution modification #########################################
