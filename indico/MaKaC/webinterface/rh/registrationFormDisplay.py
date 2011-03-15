@@ -22,7 +22,6 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC import registration
-import MaKaC.webinterface.pages.epayments as epayments
 from MaKaC.errors import FormValuesError,MaKaCError, AccessError
 from MaKaC.common import Config
 from MaKaC.user import AvatarHolder
@@ -167,6 +166,8 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             if user.isRegisteredInConf(self._conf):
                 self._redirect(urlHandlers.UHConfRegistrationForm.getURL(self._conf))
                 return
+            if self._conf.hasRegistrantByEmail(self._getUser().getEmail()):
+                raise FormValuesError("You have already registered with the email address \"%s\". If you need to modify your registration, please contact the managers of the conference."%self._getUser().getEmail())
         rp = registration.Registrant()
         self._conf.addRegistrant(rp)
         rp.setValues(self._getRequestParams(), user)
