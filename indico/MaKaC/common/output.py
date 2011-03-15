@@ -1986,11 +1986,10 @@ class XMLCache(MultiLevelCache):
         Generate the actual hierarchical location
         """
 
-        # by default, use the dots and first char
-        # a205.0 -> /cachedir/a/a205/0
+        # a205.0 -> /cachedir/a/a2/a205/0
 
         tree = entry.getId().split('.')
-        return [tree[0][0]]+tree
+        return [tree[0][0], tree[0][0:2]] + tree
 
 
 class ProtectedXMLCache(XMLCache):
