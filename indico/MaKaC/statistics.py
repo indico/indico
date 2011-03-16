@@ -47,9 +47,12 @@ class CategoryStatistics(Statistics):
     @classmethod
     def updateStatistics(cls, cat, logger=None):
         dbi = DBMgr.getInstance()
+
         cls._updateStatistics(cat, dbi, 0, logger)
         if logger:
             logger.info("Statistics calculation finished")
+
+        dbi.commit()
 
     @classmethod
     def _processEvent(cls, dbi, event, statistics):
@@ -91,41 +94,43 @@ class CategoryStatistics(Statistics):
     @classmethod
     def _updateStatistics(cls, cat, dbi, level=0, logger=None):
 
-        statistics = cat.getStatistics()
-        statistics["events"] = {}
-        statistics["contributions"] = {}
-        statistics["resources"] = 0
+        stats = cat.getStatistics()
+        stats["events"] = {}
+        stats["contributions"] = {}
+        stats["resources"] = 0
 
         if len(cat.getSubCategoryList()) > 0:
-            for cat in cat.getSubCategoryList():
-                cat._p_changed = 1
-
+            for scat in cat.getSubCategoryList():
                 # only at top level
                 if level == 0 and logger:
-                    logger.info("Processing '%s' (%s)" % (cat.getTitle(),
-                                                          cat.getId()))
+                    logger.info("Processing '%s' (%s)" % (scat.getTitle(),
+                                                          scat.getId()))
 
-                cls._updateStatistics(cat, dbi, level + 1, logger)
-                # commit after each category
-                dbi.commit()
+                cls._updateStatistics(scat, dbi, level + 1, logger)
 
-                for year in cat._statistics["events"]:
-                    if year in statistics["events"]:
-                        statistics["events"][year] += cat._statistics["events"][year]
+                for year in scat._statistics["events"]:
+                    if year in stats["events"]:
+                        stats["events"][year] += scat._statistics["events"][year]
                     else:
-                        statistics["events"][year] = cat._statistics["events"][year]
-                for year in cat._statistics["contributions"]:
-                    if year in statistics["contributions"]:
-                        statistics["contributions"][year] += cat._statistics["contributions"][year]
+                        stats["events"][year] = scat._statistics["events"][year]
+                for year in scat._statistics["contributions"]:
+                    if year in stats["contributions"]:
+                        stats["contributions"][year] += scat._statistics["contributions"][year]
                     else:
-                        statistics["contributions"][year] = cat._statistics["contributions"][year]
-                statistics["resources"] += cat._statistics["resources"]
+                        stats["contributions"][year] = scat._statistics["contributions"][year]
+                stats["resources"] += scat._statistics["resources"]
 
         elif len(cat.getConferenceList()) > 0:
             for event in cat.getConferenceList():
-                cls._processEvent(dbi, event, statistics)
+                cls._processEvent(dbi, event, stats)
 
-        statistics["updated"] = nowutc()
-        cat._statistics = statistics
+        stats["updated"] = nowutc()
+        cat._statistics = stats
         cat._p_changed = 1
-        return statistics
+
+        dbi.commit()
+
+        if level == 1:
+            logger.info("%s : %s" % (cat.getId(), cat._statistics))
+
+        return stats

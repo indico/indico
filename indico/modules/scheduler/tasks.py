@@ -325,7 +325,7 @@ class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
     def run(self):
         from MaKaC.statistics import CategoryStatistics
         CategoryStatistics.updateStatistics(self._cat,
-                                            self._v_logger)
+                                            self.getLogger())
 
 
 # TODO: Isolate CERN Specific
