@@ -1,4 +1,9 @@
-include(location.protocol+"//maps.google.com/maps/api/js?sensor=false");
+var gmapVer = '';
+if(Browser.Gecko) {
+    // firefox/gecko has an issue with the canvas used by 3.4+: http://stackoverflow.com/q/982000/298479
+    gmapVer = '&v=3.3';
+}
+include(location.protocol+"//maps.google.com/maps/api/js?sensor=false" + gmapVer);
 
 function contains(collection, item) {
     for(var i = 0; i < collection.length; i++){
