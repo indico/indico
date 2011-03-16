@@ -18,6 +18,7 @@ if (location.protocol == "https:") {
     indicoSource = curry(jsonRpcValue, Indico.Urls.SecureJsonRpcService);
     indicoRequest = curry(jsonRpc, Indico.Urls.SecureJsonRpcService);
     imageSrc = imageFunctionGenerator(Indico.Urls.SecureImagesBase);
+    Indico.Urls.JsonRpcService = Indico.Urls.SecureJsonRpcService;
 } else {
     indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
     indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
