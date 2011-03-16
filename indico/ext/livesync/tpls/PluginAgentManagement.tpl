@@ -20,10 +20,10 @@
       <% end %>
       <% elif agent.isRecording(): %>
       As soon as the export process has finished, click
-      <a href="javascript:activateAgent('<%= agent.getId() %>'); return false;">here</a>.
+      <a href="#" onclick="javascript:activateAgent('<%= agent.getId() %>'); return false;">here</a>.
       <% end %>
       <% else: %>
-      Agent not active. Start the <a href="javascript:preActivateAgent('<%= agent.getId() %>'); return false;">activation process</a>.
+      Agent not active. Start the <a href="#" onclick="javascript:preActivateAgent('<%= agent.getId() %>'); return false;">activation process</a>.
       <% end %>
       </td>
       <td>

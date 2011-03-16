@@ -230,9 +230,10 @@ class AgentCommand(ConsoleLiveSyncCommand):
             c = Client()
             task = LiveSyncUpdateTask(MINUTELY, interval=args.interval)
             c.enqueue(task)
+            self._dbi.commit()
         elif args.action == 'export':
             self._export(args)
-        self._dbi.abort()
+            self._dbi.abort()
 
 
 def main():
