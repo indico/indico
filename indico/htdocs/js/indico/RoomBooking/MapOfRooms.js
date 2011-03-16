@@ -800,7 +800,7 @@ type ("RoomMap", ["IWidget"],
         isBrowserIE7: function() {
             var isIE = window.ActiveXObject ? true : false;
             var agent = navigator.userAgent.toLowerCase();
-            return isIE && /msie 7/.test(agent) && document.documentMode == 7;
+            return isIE && (/msie 7/.test(agent) || document.documentMode == 7);
         },
 
         embedWidgets: function() {
