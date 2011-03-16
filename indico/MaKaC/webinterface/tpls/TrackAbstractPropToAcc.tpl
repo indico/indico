@@ -1,6 +1,6 @@
 <% from MaKaC.common.fossilize import fossilize %>
 
-<form action="<%= postURL %>" method="POST">
+<form action="<%= postURL %>" method="POST" onsubmit="return checkQuestionsAnswered();">
     <table align="left" width="50%" border="0" cellspacing="6" cellpadding="2" style="padding-left:15px;">
         <tr>
             <td class="groupTitle" colspan="2"> <%= _("Propose to be accepted")%></td>
@@ -36,7 +36,7 @@
         <tr>
             <td class="buttonsSeparator" colspan="2" align="center" style="padding:10px">
                 <input type="submit" class="btn" name="OK" value="<%= _("submit")%>">
-                <input type="submit" class="btn" name="CANCEL" value="<%= _("cancel")%>">
+                <input type="submit" class="btn" name="CANCEL" onclick="this.form.onsubmit = function(){ return true; };" value="<%= _("cancel")%>">
             </td>
         </tr>
     </table>
@@ -44,6 +44,8 @@
 
 <% if len(abstractReview.getReviewingQuestions()) > 0: %>
 <script type="text/javascript">
+
+var questionPM = new IndicoUtil.parameterManager();
 
 var showQuestions = function() {
 
@@ -59,7 +61,9 @@ var showQuestions = function() {
         newDiv.append(Html.span(null, reviewingQuestions[i].text));
         newDiv.append(Html.br());
 
-        newDiv.append(new RadioButtonSimpleField(null, range, labels).draw());
+        var rbsf = new RadioButtonSimpleField(null, range, labels);
+        rbsf.plugParameterManager(questionPM);
+        newDiv.append(rbsf.draw());
 
         $E("questionListDisplay").append(newDiv);
         $E("questionListDisplay").append(Html.br());
@@ -77,8 +81,16 @@ var showQuestions = function() {
             };
         }
     }
+};
 
-}
+var checkQuestionsAnswered = function() {
+    if(questionPM.check()) {
+        return true;
+    }
+
+    alert($T('Please answer all questions.'));
+    return false;
+};
 
 showQuestions();
 

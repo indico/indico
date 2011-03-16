@@ -189,8 +189,26 @@ type("ExampleQuestionWidget", ["InlineWidget"],
  * @param {Dictionary} attributes The attributes that will be passed to the method.
  * @param {Function} handler A custom function that will be called after values are saved. It will receive 2 arguments, 'result' and 'error'
  */
-type("RadioButtonSimpleField", [],
+type("RadioButtonSimpleField", ["ErrorAware"],
         {
+            _checkErrorState: function() {
+                var checked = false;
+                each(this.radioButtons, function(radio) {
+                    if(radio.get()) {
+                        checked = true;
+                    }
+                });
+                return !checked;
+            },
+
+            _setErrorState: function(text) {
+                // do nothing. field error display doesn't work well with radio buttons and labels
+            },
+
+            get: function() {
+                // dummy so ParameterManager doesn't break
+            },
+
             draw: function() {
 
                 var groupName = Html.generateId(); // The common name for all the radio buttons
@@ -252,6 +270,7 @@ type("RadioButtonSimpleField", [],
                     this.element.set(table);
                 }
 
+                this.radioButtons = radioButtons;
                 return table;
             }
         },
