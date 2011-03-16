@@ -327,6 +327,10 @@ class CalendarIndex(Persistent):
         """
         confid   = conf.getId()
         sdate = date2utctimestamp(conf.getStartDate())
+        edate = date2utctimestamp(conf.getEndDate())
+        #checking if 2038 problem occurs
+        if type(sdate) == type(1L) or type(edate) == type(1L):
+            return
         if self._idxSdate.has_key( sdate ):
             res = self._idxSdate[sdate]
         else:
@@ -334,7 +338,6 @@ class CalendarIndex(Persistent):
         if not confid in res:
             res.append(confid)
             self._idxSdate[sdate] = res
-        edate = date2utctimestamp(conf.getEndDate())
         if self._idxEdate.has_key( edate ):
             res = self._idxEdate[edate]
         else:
@@ -362,6 +365,9 @@ class CalendarIndex(Persistent):
         confid = conf.getId()
         sdate = date2utctimestamp(conf.getStartDate())
         edate = date2utctimestamp(conf.getEndDate())
+        #checking if 2038 problem occurs
+        if type(sdate) == type(1L) or type(edate) == type(1L):
+            return
         if not self._idxSdate.has_key( sdate ):
             for key in self._idxSdate.keys():
                 res = self._idxSdate[key]
@@ -595,6 +601,7 @@ class CalendarDayIndex(Persistent):
         startDate = datetime(conf.getStartDate().year, conf.getStartDate().month, conf.getStartDate().day)
         for dayNumber in range(days + 1):
             day = int(datetimeToUnixTime(startDate + timedelta(dayNumber)))
+            #checking if 2038 problem occurs
             if type(day) == type(1L):
                 continue
             if self._idxDay.has_key( day ):
