@@ -92,7 +92,6 @@ class CategoryStatistics(Statistics):
     @classmethod
     def _updateStatistics(cls, cat, dbi, level=0, logger=None):
 
-        ncat = 0
         statistics = cat.getStatistics()
         statistics["events"] = {}
         statistics["contributions"] = {}
@@ -101,6 +100,12 @@ class CategoryStatistics(Statistics):
         if len(cat.getSubCategoryList()) > 0:
             for cat in cat.getSubCategoryList():
                 cat._p_changed = 1
+
+                # only at top level
+                if level == 0 and logger:
+                    logger.info("Processing '%s' (%s)" % (cat.getTitle(),
+                                                          cat.getId()))
+
                 cls._updateStatistics(cat, dbi, level + 1, logger)
                 # commit after each category
                 dbi.commit()
@@ -116,14 +121,6 @@ class CategoryStatistics(Statistics):
                     else:
                         statistics["contributions"][year] = cat._statistics["contributions"][year]
                 statistics["resources"] += cat._statistics["resources"]
-
-                ncat += 1
-
-                # only at top level
-                if level == 0:
-                    # notify each 100 categories:
-                    if logger and ncat > 0 and ncat % 100 == 0:
-                        logger.info("%d categories already processed" % ncat)
 
         elif len(cat.getConferenceList()) > 0:
             for event in cat.getConferenceList():
