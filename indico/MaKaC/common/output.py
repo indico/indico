@@ -204,10 +204,9 @@ class outputGenerator(Observable):
 
         return accounts
 
-    def _generateLinkField(self, obj, text, out):
+    def _generateLinkField(self, url, obj, text, out):
         out.openTag("datafield", [["tag", "856"], ["ind1", "4"], ["ind2", " "]])
-        url = str(urlHandlers.UHConferenceDisplay.getURL(obj))
-        out.writeTag("subfield", url, [["code", "u"]])
+        out.writeTag("subfield", str(url.getURL(obj)), [["code", "u"]])
         out.writeTag("subfield", text, [["code", "y"]])
         out.closeTag("datafield")
 
@@ -1412,7 +1411,8 @@ class outputGenerator(Observable):
         out.writeTag("subfield","INDICO." + self.dataInt.objToId(conf),[["code","a"]])
         out.closeTag("datafield")
 
-        self._generateLinkField(conf, "Event details", out)
+        self._generateLinkField(urlHandlers.UHConferenceDisplay, conf,
+                                "Event details", out)
 
         self._generateAccessList(conf, out, specifyId=False)
 
@@ -1696,8 +1696,10 @@ class outputGenerator(Observable):
         out.writeTag("subfield", self._getRecordCollection(cont), [["code","a"]])
         out.closeTag("datafield")
 
-        self._generateLinkField(cont, "Contribution details", out)
-        self._generateLinkField(cont.getConference(), "Event details", out)
+        self._generateLinkField(urlHandlers.UHContributionDisplay,
+                                cont, "Contribution details", out)
+        self._generateLinkField(urlHandlers.UHConferenceDisplay,
+                                cont.getConference(), "Event details", out)
 
         self._generateAccessList(cont, out, specifyId=False)
     ####
@@ -1867,8 +1869,10 @@ class outputGenerator(Observable):
         out.writeTag("subfield", self._getRecordCollection(subCont), [["code","a"]])
         out.closeTag("datafield")
 
-        self._generateLinkField(subCont, "Contribution details", out)
-        self._generateLinkField(subCont.getConference(), "Event details", out)
+        self._generateLinkField(urlHandlers.UHSubContributionDisplay, subCont,
+                                "Contribution details", out)
+        self._generateLinkField(urlHandlers.UHConferenceDisplay,
+                                subCont.getConference(), "Event details", out)
 
         self._generateAccessList(subCont, out, specifyId=None)
 
