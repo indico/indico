@@ -1,4 +1,4 @@
-include(location.procotol+"//maps.google.com/maps/api/js?sensor=false");
+include(location.protocol+"//maps.google.com/maps/api/js?sensor=false");
 
 function contains(collection, item) {
     for(var i = 0; i < collection.length; i++){
