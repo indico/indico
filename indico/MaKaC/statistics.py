@@ -47,8 +47,7 @@ class CategoryStatistics(Statistics):
     @classmethod
     def updateStatistics(cls, cat, logger=None):
         dbi = DBMgr.getInstance()
-        cat._statistics = cls._updateStatistics(cat, dbi, 0, logger)
-        cat._p_changed = 1
+        cls._updateStatistics(cat, dbi, 0, logger)
         if logger:
             logger.info("Statistics calculation finished")
 
@@ -127,4 +126,6 @@ class CategoryStatistics(Statistics):
                 cls._processEvent(dbi, event, statistics)
 
         statistics["updated"] = nowutc()
+        cat._statistics = statistics
+        cat._p_changed = 1
         return statistics
