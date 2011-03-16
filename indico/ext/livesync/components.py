@@ -42,7 +42,7 @@ from indico.ext.livesync.agent import SyncManager
 # legacy indico imports
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.logger import Logger
-from MaKaC import conference
+from MaKaC import conference, accessControl
 
 
 class RequestListener(Component):
@@ -73,8 +73,8 @@ class RequestListener(Component):
             for action in actions:
                 Logger.get('ext.livesync').debug((obj, action))
                 # TODO: remove redundant items
-                sm.add(timestamp,
-                       ActionWrapper(timestamp, obj, actions))
+            sm.add(timestamp,
+                   ActionWrapper(timestamp, obj, actions))
 
     def requestRetry(self, obj, req, nretry):
         # reset the context manager
@@ -195,6 +195,8 @@ class ObjectChangeListener(Component):
                 self._objectInfoChanged(obj, 'data')
             else:
                 self._objectInfoChanged(obj, 'acl')
+        elif isinstance(obj, accessControl.AccessController):
+            self._aclChanged(obj.getOwner(), child=False)
         else:
             self._aclChanged(obj.getOwner(), child=True)
 

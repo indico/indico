@@ -92,29 +92,23 @@ class BistateRecordProcessor(object):
         for __, aw in data:
             obj = aw.getObject()
 
-            if  isinstance(obj, conference.Category) or \
-                   not obj.canAccess(AccessWrapper(access)):
-                # category? no access? jump over this one
-                continue
-
-            if obj not in records:
-                records[obj] = 0
+            ## TODO: enable this, whenn config is possible from interface
+            ## if obj.canAccess(AccessWrapper(access)):
+            ##     # no access? jump over this one
+            ##     continue
 
             for action in aw.getActions():
-                if action == 'deleted':
+                if action == 'deleted' and not isinstance(obj, conference.Category):
                     # if the record has been deleted, mark it as such
                     # nothing else will matter
-                    records[obj] |= STATUS_DELETED
+                    cls._setStatus(records, obj, STATUS_DELETED)
 
-                elif action == 'created':
+                elif action == 'created' and not isinstance(obj, conference.Category):
                     # if the record has been created, mark it as such
-                    records[obj] |= STATUS_CREATED
+                    cls._setStatus(records, obj, STATUS_CREATED)
 
-                elif action in ['data_changed', 'acl_changed', 'moved']:
-                    # categories are ignored
-                    records[obj] |= STATUS_CHANGED
-
-                elif action in ['set_private', 'set_public']:
+                elif action in ['set_private', 'set_public', 'data_changed',
+                                'acl_changed', 'moved']:
                     # protection changes have to be handled more carefully
                     cls._computeProtectionChanges(obj, action, records)
 
