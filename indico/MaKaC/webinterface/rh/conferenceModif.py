@@ -7105,6 +7105,12 @@ class RHConfPerformAddAbstractField( RHConfModifCFABase ):
         self._fieldName = params.get("fieldName", "")
         self._fieldCaption = params.get("fieldCaption", "")
         self._fieldMaxLength = params.get("fieldMaxLength", 0)
+        if self._fieldMaxLength.strip() == "":
+            self._fieldMaxLength = 0
+        try:
+            self._fieldMaxLength = int(self._fieldMaxLength)
+        except ValueError:
+            raise FormValuesError(_("The field Max Length must be a number"))
         self._fieldIsMandatory = params.get("fieldIsMandatory", False)
         self._fieldType = params.get("fieldType", "textarea")
         if self._fieldIsMandatory == "Yes":
