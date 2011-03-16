@@ -4245,9 +4245,6 @@ URL Handlers for Javascript Packages
 class UHJsonRpcService (URLHandler):
     _relativeURL = "services/json-rpc"
 
-class UHSecureJsonRpcService (SecureURLHandler):
-    _relativeURL = "services/json-rpc"
-
 class UHJavascriptCalendar (URLHandler):
     _relativeURL = "js/calendar/calendar.js"
 

@@ -15,10 +15,6 @@ function imageFunctionGenerator(url) {
 }
 
 if (location.protocol == "https:") {
-    indicoSource = curry(jsonRpcValue, Indico.Urls.SecureJsonRpcService);
-    indicoRequest = curry(jsonRpc, Indico.Urls.SecureJsonRpcService);
-    imageSrc = imageFunctionGenerator(Indico.Urls.SecureImagesBase);
-
     function fixUrls(urls) {
         for(var key in urls) {
             // not a string -> assume object and recurse
@@ -27,21 +23,27 @@ if (location.protocol == "https:") {
                 continue;
             }
 
-            // skip if the url starts with https
+            // skip if the url starts with https or it's ImagesBase
             if(urls[key].indexOf('https:') === 0) {
                 continue;
             }
 
-            urls[key] = urls[key].replace(/^http:/, 'https:');
+            if(urls['Secure' + key]) {
+                // we alraedy have a secure url, e.g. for ImageBase
+                urls[key] = urls['Secure' + key];
+            }
+            else {
+                urls[key] = urls[key].replace(/^http:/, 'https:');
+            }
         }
     }
 
     fixUrls(Indico.Urls);
-} else {
-    indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
-    indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
-    imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
 }
+
+indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
+indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
+imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
 
 
 function getPx(pixVal) {

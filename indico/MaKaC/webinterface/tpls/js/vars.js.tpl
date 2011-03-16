@@ -94,7 +94,6 @@ var Indico = {
     ,
     Urls: {
         JsonRpcService: "<%= urlHandlers.UHJsonRpcService.getURL() %>",
-        SecureJsonRpcService: "<%= urlHandlers.UHSecureJsonRpcService.getURL() %>",
 
         ImagesBase: "<%= Config.getInstance().getImagesBaseURL() %>",
         SecureImagesBase: "<%= Config.getInstance().getImagesBaseSecureURL() %>",
