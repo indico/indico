@@ -4327,7 +4327,7 @@ class WNewPerson(WTemplated):
         if vars.get("disabledAddress", False) :
             vars["address"] = """<input type="hidden" name="address" value="%s"></input>%s"""%(vars["addressValue"],vars["addressValue"])
         else :
-            vars["address"] = """<textarea name="address" rows="5" cols="38" value="%s"></textarea>"""%vars["emailValue"]
+            vars["address"] = """<textarea name="address" rows="5" cols="38">%s</textarea>"""%vars["addressValue"]
 
         if vars.get("disabledPhone", False) :
             vars["phone"] = """<input type="hidden" name="phone" value="%s"></input>%s"""%(vars["phoneValue"],vars["phoneValue"])
