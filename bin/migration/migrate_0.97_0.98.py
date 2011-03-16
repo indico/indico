@@ -113,6 +113,15 @@ def _convertAlarms(obj):
     obj.alarmList = alarms
 
 
+def runCategoryACMigration(dbi, withRBDB):
+    """
+    Fixing AccessController for categories
+    """
+    for categ in CategoryManager()._getIdx().itervalues():
+        _fixAC(categ)
+        dbi.commit()
+
+
 def runConferenceMigration(dbi, withRBDB):
     """
     Adding missing attributes to conference objects and children
@@ -227,6 +236,7 @@ def runCategoryConfDictToTreeSet(dbi, withRBDB):
 def runMigration(withRBDB=False):
 
     tasks = [runPluginMigration,
+             runCategoryACMigration,
              runConferenceMigration,
              runTaskMigration,
              runCategoryConfDictToTreeSet,
