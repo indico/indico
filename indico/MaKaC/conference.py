@@ -1129,7 +1129,7 @@ class Category(CommonObjectBase):
             sortType=2--> Alphabetically
             sortType=3--> Alphabetically - Reversed
         """
-        res = sorted(self.conferences)
+        res = sorted(self.conferences, cmp=Conference._cmpByDate)
         if sortType==2:
             res.sort(Conference._cmpTitle)
         elif sortType==3:
@@ -2067,14 +2067,20 @@ class Conference(CommonObjectBase, Locatable):
     def __str__(self):
         return "<Conference %s@%s>" % (self.getId(), hex(id(self)))
 
-    def __cmp__(self, toCmp):
+    @staticmethod
+    def _cmpByDate(self, toCmp):
         if not isinstance(toCmp, Conference):
             return cmp(hash(self), hash(toCmp))
         res = cmp(self.getStartDate(), toCmp.getStartDate())
         if res != 0:
             return res
         else:
-            return cmp(self.getId(), toCmp.getId())
+            return cmp(self, toCmp)
+
+    def __cmp__(self, toCmp):
+        if not isinstance(toCmp, Conference):
+            return cmp(hash(self), hash(toCmp))
+        return cmp(self.getId(), toCmp.getId())
 
     def __eq__(self, toCmp):
         return self is toCmp

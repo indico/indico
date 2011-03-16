@@ -230,7 +230,7 @@ def runCategoryConfDictToTreeSet(dbi, withRBDB):
         categ.conferencesBackup = categ.conferences.values()
         categ.conferences = OOTreeSet(categ.conferences.values())
         if len(categ.conferences) != len(categ.conferencesBackup):
-            print categ.getId()
+            print "Problem migrating conf dict to tree set: %s" % categ.getId()
 
 
 def runMigration(withRBDB=False):
