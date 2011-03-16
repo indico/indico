@@ -300,7 +300,7 @@ class ChatroomsNotification(GenericNotification):
         """ If conference is None it means we're creating the chat room for the first time
         if not it means we're re-using an existing chat room """
         if conference is None:
-            conference = room.getConference()
+            conference = room.getConferences()[0]
         self.setSubject('[Indico] Chat room succesfully created')
         self.setBody("""    Dear Indico user,
 The chat room with name %s has been successfully created in the conference %s (id: %s)

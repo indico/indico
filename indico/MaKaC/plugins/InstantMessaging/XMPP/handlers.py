@@ -176,8 +176,8 @@ class CreateChatroom( XMPPChatroomService ):
             self._notify('createChatroom', {'room': self._room,
                                             'conference': conference})
         except ServiceError, e:
-            Logger.get('ext.im').error("Exception while notifying observers: %s" %e)
-            raise ServiceError( message=self.messages['sameId']+e )
+            Logger.get('ext.im').exception("Exception while notifying observers: %s" %e)
+            raise ServiceError( message=self.messages['sameId']+str(e) )
         except NoReportError, e:
             Logger.get('ext.im').error("Room exists: %s" %e)
             raise NoReportError(self.messages['sameName'], explanation='roomExists')
