@@ -1833,7 +1833,7 @@ class UHLogMeAs( URLHandler ):
     getURL = classmethod( getURL )
 
 
-class UHConfSignIn( URLHandler ):
+class UHConfSignIn( SecureURLHandler ):
     _relativeURL = "confLogin.py"
 
     def getURL( cls, conf, returnURL="" ):
