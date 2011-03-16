@@ -18,7 +18,25 @@ if (location.protocol == "https:") {
     indicoSource = curry(jsonRpcValue, Indico.Urls.SecureJsonRpcService);
     indicoRequest = curry(jsonRpc, Indico.Urls.SecureJsonRpcService);
     imageSrc = imageFunctionGenerator(Indico.Urls.SecureImagesBase);
-    Indico.Urls.JsonRpcService = Indico.Urls.SecureJsonRpcService;
+
+    function fixUrls(urls) {
+        for(var key in urls) {
+            // not a string -> assume object and recurse
+            if(urls[key].replace === undefined) {
+                fixUrls(urls[key]);
+                continue;
+            }
+
+            // skip if the url starts with https
+            if(urls[key].indexOf('https:') === 0) {
+                continue;
+            }
+
+            urls[key] = urls[key].replace(/^http:/, 'https:');
+        }
+    }
+
+    fixUrls(Indico.Urls);
 } else {
     indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
     indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
