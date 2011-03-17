@@ -46,8 +46,8 @@ def buildCache(ids):
             continue
         print i, ":", conf.getId()
         og = outputGenerator(AccessWrapper())
-        x = og.confToXML(conf,1,1,1, forceCache=True)
-        y = og.confToXMLMarc21(conf,1,1,1, forceCache=True)
+        x = og.confToXML(conf, 1, 1, 1, overrideCache=True)
+        y = og.confToXMLMarc21(conf, 1, 1, 1, overrideCache=True)
         i += 1
         DBMgr.getInstance().endRequest()
 

@@ -75,7 +75,7 @@ class RHContributionToXML(RHContributionDisplay):
         xmlgen.initXml()
         outgen = outputGenerator(self.getAW(), xmlgen)
         xmlgen.openTag("event")
-        outgen.confToXML(self._target.getConference(),0,1,1,showContribution=self._target.getId(), forceCache=True)
+        outgen.confToXML(self._target.getConference(),0,1,1,showContribution=self._target.getId(), overrideCache=True)
         xmlgen.closeTag("event")
         basexml = xmlgen.getXml()
         path = Config.getInstance().getStylesheetsDir()

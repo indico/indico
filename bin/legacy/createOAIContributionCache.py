@@ -48,10 +48,10 @@ def buildCache(ids):
         for cont in conf.getContributionList():
             print "conf %d:%s - contrib %d:%s"%(i, conf.getId(), j, cont.getId())
             og = outputGenerator(AccessWrapper())
-            x = og.contribToXMLMarc21(cont,1, forceCache=True)
+            x = og.contribToXMLMarc21(cont, 1, overrideCache=True)
             for subCont in cont.getSubContributionList():
                 print "conf %d:%s - contrib %d:%s - subContrib:%s"%(i, conf.getId(), j, cont.getId(), subCont.getId())
-                y = og.subContribToXMLMarc21(subCont,1, forceCache=True)
+                y = og.subContribToXMLMarc21(subCont, 1, overrideCache=True)
             j += 1
         i += 1
         DBMgr.getInstance().endRequest()

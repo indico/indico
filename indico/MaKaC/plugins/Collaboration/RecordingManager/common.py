@@ -493,7 +493,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
     # showSession - create XML for a particular session, identified by ID
     # showContribution - create XML for a particular contribution, identified by ID
     # showSubContribution - create XML for a particular subcontribution, identified by ID
-    # forceCache - True means force it NOT to use the cache, the opposite of what you would expect.
+    # overrideCache - True means force it NOT to use the cache.
     # recordingManagerTags - this is how we pass along all the necessary RecordingManager args to the outputGenerator methods.
     #
     # Nobody outside CERN should have access to CERN access lists.
@@ -508,7 +508,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
                      showSession         = None,
                      showContribution    = None,
                      showSubContribution = None,
-                     forceCache          = True,
+                     overrideCache       = True,
                      recordingManagerTags = tags)
     elif parsed["type"] == 'session':
 #        Logger.get('RecMan').info("generating MARC XML for a session")
@@ -519,7 +519,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
                      showSession         = parsed["session"],
                      showContribution    = None,
                      showSubContribution = None,
-                     forceCache          = True,
+                     overrideCache       = True,
                      recordingManagerTags = tags)
     elif parsed["type"] == 'contribution':
 #        Logger.get('RecMan').info("generating MARC XML for a contribution")
@@ -530,7 +530,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
                      showSession         = parsed["session"],
                      showContribution    = parsed["contribution"],
                      showSubContribution = None,
-                     forceCache          = True,
+                     overrideCache       = True,
                      recordingManagerTags = tags)
     elif parsed["type"] == 'subcontribution':
 #        Logger.get('RecMan').info("generating MARC XML for a subcontribution")
@@ -541,7 +541,7 @@ def getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
                      showSession         = None,
                      showContribution    = parsed["contribution"], # maybe I should turn this on?
                      showSubContribution = parsed["subcontribution"],
-                     forceCache          = True,
+                     overrideCache       = True,
                      recordingManagerTags = tags)
     else:
         raise RecordingManagerException(_("IndicoID %s is not a known conference, session, contribution or subcontribution.") % IndicoID)
