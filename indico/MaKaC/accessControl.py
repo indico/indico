@@ -25,7 +25,6 @@ from MaKaC.common import DBMgr
 from MaKaC.common import info
 import MaKaC
 from MaKaC.common.contextManager import ContextManager
-
 from MaKaC.plugins import Observable
 
 
@@ -80,7 +79,12 @@ class AccessController( Persistent, Observable ):
 
     def _getFatherProtection( self ):
         try:
-            for o in self.getOwner().getOwnerList():
+            from MaKaC.conference import Conference
+            if isinstance(self.getOwner(), Conference):
+                ownerList = self.getOwner().getOwnerList()
+            else:
+                ownerList = [self.getOwner().getOwner()]
+            for o in ownerList:
                 if o.isProtected():
                     return 1
             return 0
