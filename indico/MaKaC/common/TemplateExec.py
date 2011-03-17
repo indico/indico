@@ -61,7 +61,7 @@ def includeTpl( tplFileName, *args, **kwargs ):
     # Resurrect dictionary from globals - ugly hack.
     # In the recurrent exec, we still need an old dictCopy.
     # This old dictCopy is resurrected from the global scope.
-    objDict = globals()['_dictCopy']
+    objDict = globals()['_dictCopy'].copy()
     codeOut = objDict['_tpl_out']
     for k, v in kwargs.iteritems():
         objDict[k] = v

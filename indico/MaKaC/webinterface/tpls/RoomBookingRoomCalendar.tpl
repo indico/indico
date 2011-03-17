@@ -54,6 +54,7 @@ Calendar 1-----* DayRow 1-----* Bar
     <!-- Schedule Header: hours -->
     <% includeTpl( 'RoomBookingCalendarHeader', DAY_WIDTH_PX = DAY_WIDTH_PX, START_H = START_H, dayD = None ) %>
 
+
     <!-- Render each day -->
     <% for day in iterdays( calendarStartDT, calendarEndDT ): %>
         <% includeTpl( 'RoomBookingRoomCalendarDayRow', room = room, dayDT = day.date(), bars = bars[day.date()], DAY_WIDTH_PX = DAY_WIDTH_PX, START_H = START_H ) %>
