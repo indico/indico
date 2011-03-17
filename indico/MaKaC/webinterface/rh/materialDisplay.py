@@ -70,13 +70,13 @@ class RHMaterialDisplayCommon:
             elif isinstance(res, conference.LocalFile):
                 self._redirect( urlHandlers.UHFileAccess.getURL( res ), noCache=True )
         else:
-            self._processManyMaterials()
+            return self._processManyMaterials()
 
 class RHMaterialDisplay( RHMaterialDisplayBase, RHMaterialDisplayCommon ):
     _uh = urlHandlers.UHMaterialDisplay
 
     def _process(self):
-        RHMaterialDisplayCommon._process(self)
+        return RHMaterialDisplayCommon._process(self)
 
     def _processManyMaterials( self ):
         if self._material.getConference()!=None:

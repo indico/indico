@@ -1258,7 +1258,7 @@ class RHContribModifMaterialBrowse( RHContribModifBase, RHMaterialDisplayCommon 
         self._material = self._target = self._contrib.getMaterialById(materialId)
 
     def _process(self):
-        RHMaterialDisplayCommon._process(self)
+        return RHMaterialDisplayCommon._process(self)
 
     def _processManyMaterials( self ):
         self._redirect( urlHandlers.UHContribModifMaterials.getURL( self._material ))
