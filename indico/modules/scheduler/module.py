@@ -67,14 +67,13 @@ class SchedulerModule(Module):
 
         if task.status != status:
             raise base.TaskInconsistentStatusException(
-                "%s's status is not %s" %
-                (task, status))
+                "%s status is not %s" %
+                (task, base.status(status)))
 
         if status == base.TASK_STATUS_RUNNING and \
                task not in self._runningList:
                 raise base.TaskInconsistentStatusException(
-                    'task %s (%s) was not found in the running task list' %
-                    (task.id, task))
+                    'task %s was not found in the running task list' % task)
 
         # TODO: remaining elifs
 
@@ -139,11 +138,20 @@ class SchedulerModule(Module):
 
         return True
 
-    def moveTask(self, task, moveFrom, status, occurrence = None, nocheck = False):
+    def removeRunningTask(self, task):
         """
         Remove a task from the running list
         """
+        try:
+            self._runningList.remove(task)
+            self._p_changed = True
+        except ValueError:
+            logging.getLogger('scheduler').exception()
 
+    def moveTask(self, task, moveFrom, status, occurrence=None, nocheck=False):
+        """
+        Move a task somewhere
+        """
         if not occurrence:
             occurrence = task
 
@@ -152,8 +160,8 @@ class SchedulerModule(Module):
 
         if moveFrom == base.TASK_STATUS_RUNNING:
             # actually remove it from list
-            self._runningList.remove(task)
-            self._p_changed = True
+            self.removeRunningTask(task)
+
         elif moveFrom == base.TASK_STATUS_QUEUED:
             idx_timestamp = int_timestamp(task.getStartOn())
             self._waitingQueue.dequeue(idx_timestamp, task)
@@ -164,13 +172,13 @@ class SchedulerModule(Module):
         # (or queue it up again)
         if status == base.TASK_STATUS_FINISHED:
             self._finishedIndex.index_obj(occurrence)
-        elif status == base.TASK_STATUS_FAILED:
+        elif status in [base.TASK_STATUS_FAILED,
+                        base.TASK_STATUS_TERMINATED]:
             self._failedIndex.index_obj(occurrence)
         elif status == base.TASK_STATUS_QUEUED:
             self.addTaskToWaitingQueue(occurrence)
 
-
-    def addTaskToWaitingQueue(self, task, index = False):
+    def addTaskToWaitingQueue(self, task, index=False):
 
         if index:
             self._indexTask(task)
@@ -184,7 +192,7 @@ class SchedulerModule(Module):
         task.setStatus(base.TASK_STATUS_QUEUED)
 
         logging.getLogger('scheduler').debug(
-            'Added task %s to waitingQueue..' % task.id)
+            'Added %s to waitingQueue..' % task)
 
     def popNextWaitingTask(self):
         return self._waitingQueue.pop()

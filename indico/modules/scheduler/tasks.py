@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import copy, logging, os
+import copy, logging, os, time
 from dateutil import rrule
 from datetime import timedelta
 import zope.interface
@@ -78,6 +78,7 @@ class BaseTask(TimedEvent):
         self.typeId = self.__class__.__name__
         self.id = None
         self.reset()
+        self.status = 0
 
         self.startedOn = None
         self.endedOn = None
@@ -110,8 +111,7 @@ class BaseTask(TimedEvent):
         return self.onRunningListSince
 
     def setStatus(self, newstatus):
-        if hasattr(self, '_v_logger'):
-            self._v_logger.info("%s set status %s" % (self, newstatus))
+        self.getLogger().info("%s set status %s" % (self, base.status(newstatus)))
         self.status = newstatus
 
     def getStatus(self):
@@ -177,7 +177,8 @@ class BaseTask(TimedEvent):
         pass
 
     def __str__(self):
-        return "<%s %s %s %s>" % (self.typeId, self.id, self.status, self.getStartOn())
+        return "[%s:%s|%s]" % (self.typeId, self.id,
+                               base.status(self.status))
 
 
 class OneShotTask(BaseTask):
@@ -194,6 +195,10 @@ class OneShotTask(BaseTask):
 
     def setStartOn(self, newtime):
         self.startDateTime = newtime
+
+    def suicide(self):
+        self.setStatus(base.TASK_STATUS_TERMINATED)
+        self.setEndedOn(self._getCurrentDateTime())
 
 
 class PeriodicTask(BaseTask):
@@ -343,7 +348,7 @@ class FoundationSyncTask(PeriodicUniqueTask):
 
     def run(self):
         from MaKaC.common.FoundationSync.foundationSync import FoundationSync
-        FoundationSync(self._v_logger).doAll()
+        FoundationSync(self.getLogger()).doAll()
 
 
 class SendMailTask(OneShotTask):
@@ -583,10 +588,12 @@ class AlarmTask(SendMailTask):
                 self.getLogger().warning("Conference %s no longer exists! "
                                      "Deleting alarm." % self.conf.getId())
                 self.conf.removeAlarm(self)
+                self.suicide()
             elif self.conf.getStartDate() <= self._getCurrentDateTime():
                 self.getLogger().warning("Conference %s already started. "
                                      "Deleting alarm." % self.conf.getId())
                 self.conf.removeAlarm(self)
+                self.suicide()
                 return False
 
         # Email

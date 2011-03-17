@@ -110,9 +110,12 @@ class Scheduler(object):
         self._schedModule.setSchedulerRunningStatus(value)
 
     @base.OperationManager
-    def _db_moveTask(self, task, moveFrom, status, occurrence = None, nocheck = False):
+    def _db_moveTask(self, task, moveFrom, status, occurrence = None,
+                     nocheck = False, setStatus = False):
         self._schedModule.moveTask(task, moveFrom, status,
                                    occurrence = occurrence, nocheck = nocheck)
+        if setStatus:
+            task.setStatus(status)
 
     @base.OperationManager
     def _db_addTaskToQueue(self, task, index = True):
@@ -143,14 +146,27 @@ class Scheduler(object):
         """
 
         if status == base.TASK_STATUS_FINISHED:
-            self._logger.info('Task %s says it has finished..' % task)
+            self._logger.info('Task %s says it has finished...' % task)
         elif status == base.TASK_STATUS_FAILED:
             self._logger.error('Task %s says it has failed..' % task)
         else:
-            raise Exception('Impossible task state')
+            raise Exception('Impossible task/slave state')
 
             # clean up the mess
             task.tearDown()
+
+        # task forcefully terminated?
+        if task.getStatus() == base.TASK_STATUS_TERMINATED:
+            # well, we have a final status already, and the task is
+            # by now properly indexed
+            self._logger.warning("%s finished after being terminated, with status %s" % (task, base.status(status)))
+
+            # If the task has been left running
+            if task in self._schedModule.getRunningList():
+                self._schedModule.removeRunningTask(task)
+            # We end here!
+            return
+        # else...
 
         task.setStatus(status)
 
@@ -298,7 +314,7 @@ class Scheduler(object):
         need to be moved to the correct places
         """
 
-        self._logger.info("Checking finished tasks")
+        self._logger.debug("Checking finished tasks")
 
         for taskId, thread in self._runningWorkers.items():
 
@@ -432,11 +448,12 @@ class Scheduler(object):
                           oldStatus,
                           base.TASK_STATUS_FAILED)
 
-        self._logger.info("Task %s dequeued from status %s" % (task, oldStatus))
+        self._logger.info("%s dequeued from status %s" % \
+                          (task, base.status(oldStatus)))
 
     def _checkAWOLTasks(self):
 
-        self._logger.info('Checking AWOL tasks...')
+        self._logger.debug('Checking AWOL tasks...')
 
         for task in self._schedModule.getRunningList():
             if not task.getOnRunningListSince():
@@ -463,4 +480,7 @@ class Scheduler(object):
                     self._db_moveTask(
                         task,
                         base.TASK_STATUS_RUNNING,
-                        base.TASK_STATUS_FAILED)
+                        base.TASK_STATUS_TERMINATED,
+                        setStatus=True)
+
+                    self._logger.info("Task %s terminated." % (task.id))

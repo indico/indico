@@ -19,17 +19,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import time, types
-from contextlib import contextmanager
 from ZODB.POSException import ConflictError
 
 from indico.util.date_time import nowutc
 
-TASK_STATUS_NONE, TASK_STATUS_SPOOLED, TASK_STATUS_QUEUED, TASK_STATUS_RUNNING, \
-TASK_STATUS_FAILED, TASK_STATUS_ABORTED, TASK_STATUS_FINISHED = range(0,7)
+TASK_STATUS_NONE, TASK_STATUS_SPOOLED, TASK_STATUS_QUEUED, \
+TASK_STATUS_RUNNING, TASK_STATUS_FAILED, TASK_STATUS_ABORTED, \
+TASK_STATUS_FINISHED, TASK_STATUS_TERMINATED = range(0,8)
 
-# threading vs. multiprocessing
+
+def status(num):
+    return ['NN', 'SP', 'QD', 'RN', 'FA', 'AB',
+            'FI', 'TD'][num]
+
 
 CONFLICTERROR_MAX_RETRIES = 10
+
 
 class OperationManager(object):
     """
@@ -73,6 +78,7 @@ class OperationManager(object):
 
         return retValue
 
+
 ## Time Sources
 
 class TimeSource(object):
@@ -96,7 +102,7 @@ class TimeSource(object):
     def sleep(self, amount):
         time.sleep(amount)
 
-    def getCurrentTime():
+    def getCurrentTime(self):
         """
         Returns the current datetime
         """
@@ -110,6 +116,7 @@ class UTCTimeSource(TimeSource):
 
 TimeSource._source = UTCTimeSource()
 
+
 ## Exceptions
 
 class SchedulerException(Exception):
@@ -118,8 +125,8 @@ class SchedulerException(Exception):
 
 class TaskStillRunningException(SchedulerException):
     def __init__(self, task):
-        SchedulerException.__init__(self, 'Task %s (%s) is currently running' %
-                                    (task.id, task.typeId))
+        SchedulerException.__init__(self, '%s is currently running' % task)
+
 
 class TaskNotFoundException(SchedulerException):
     pass
@@ -128,12 +135,14 @@ class TaskNotFoundException(SchedulerException):
 class TaskInconsistentStatusException(SchedulerException):
     pass
 
+
 class SchedulerQuitException(SchedulerException):
     pass
+
 
 class SchedulerUnknownOperationException(SchedulerException):
     pass
 
+
 class SchedulerConfigurationException(SchedulerException):
     pass
-

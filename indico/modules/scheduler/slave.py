@@ -102,8 +102,8 @@ class _Worker(object):
 
             except Exception, e:
                 nextRunIn = i * 10  # secs
-                self._logger.exception("Task %s failed with exception '%s'. " %
-                                             (self._task.id, e))
+                self._logger.exception("%s failed with exception '%s'. " % \
+                                       (self._task, e))
 
                 if  i < self._config.task_max_tries:
                     self._logger.warning("Retrying for the %dth time in %d secs.." % \
@@ -121,13 +121,13 @@ class _Worker(object):
             with self._dbi.transaction():
                 self._setResult(True)
             if i > 1:
-                self._logger.warning("Task %s failed %d times before "
-                                     "finishing correctly" % (self._task.id, i - 1))
+                self._logger.warning("%s failed %d times before "
+                                     "finishing correctly" % (self._task, i - 1))
         else:
             with self._dbi.transaction():
                 self._setResult(False)
-            self._logger.error("Task %s failed too many (%d) times. "
-                               "Aborting its execution.." % (self._task.id, i))
+            self._logger.error("%s failed too many (%d) times. "
+                               "Aborting its execution.." % (self._task, i))
 
             self._logger.info("exiting")
 
