@@ -10260,7 +10260,7 @@ class SubContribution(CommonObjectBase, Locatable):
         self.removeMinutes()
         TrashCanManager().add(self)
 
-        self.unindex()
+        #self.unindex()
 
     def recover(self):
         TrashCanManager().remove(self)
