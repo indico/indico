@@ -156,10 +156,10 @@ class ConfDisplayMgr(DisplayMgr):
     #################################
     def getDefaultTimezone(self):
         try:
-           return self._defaulttimezone
+            return self._defaulttimezone
         except:
-           self._defaulttimezone = ""
-           return self._defaulttimezone
+            self._defaulttimezone = ""
+            return self._defaulttimezone
 
     def setDefaultTimezone(self, tz):
         self._defaulttimezone = tz
@@ -280,7 +280,7 @@ class Menu(Persistent):
         linksDataOrderedKeys = systemLinkData.getLinkDataOrderedKeys()
 
         #remove system links (and sublinks) which are not define in linksData
-        for link in self.getAllLinks():
+        for link in self.getAllLinks()[:]:
             if isinstance(link, SystemLink):
                 if link.getParent() is not None:
                     if not link.getName() in linksData:
