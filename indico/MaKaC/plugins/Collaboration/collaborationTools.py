@@ -104,7 +104,7 @@ class CollaborationTools(object):
         entry = pmodules.get('Collaboration.%s' % pluginId, None)
         if entry:
             __import__(entry.module_name, globals(), locals(),
-                       ['collaboration', 'pages', 'actions'])
+                       ['collaboration', 'pages', 'actions', 'fossils'])
             return sys.modules[entry.module_name]
         else:
             return None
