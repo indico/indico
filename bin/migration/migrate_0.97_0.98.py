@@ -118,7 +118,7 @@ def runCategoryACMigration(dbi, withRBDB):
     Fixing AccessController for categories
     """
     for categ in CategoryManager()._getIdx().itervalues():
-        _fixAC(categ)
+        _fixAccessController(categ)
         dbi.commit()
 
 
@@ -133,6 +133,11 @@ def runConferenceMigration(dbi, withRBDB):
     for (level, obj) in console.conferenceHolderIterator(ch, deepness='contrib'):
         # only for conferences
         if level == 'event':
+
+            # handle sessions, that our iterator ignores
+            for session in obj.getSessions():
+                _fixAccessController(session)
+
             if hasattr(obj, '_Conference__alarmCounter'):
                 raise Exception("Conference Object %s (%s) seems to have been "
                                 "already converted" % (obj, obj.id))
@@ -146,6 +151,7 @@ def runConferenceMigration(dbi, withRBDB):
             # convert them to the new object classes.
             # It is important to save the state of the alarm (sent or not)
             _convertAlarms(obj)
+
         _fixAccessController(obj)
 
         if i % 1000 == 999:
