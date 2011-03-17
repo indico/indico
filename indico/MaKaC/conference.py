@@ -3452,8 +3452,8 @@ class Conference(CommonObjectBase, Locatable):
         del self.contributions[ contrib.getId() ]
         if callDelete:
             contrib.delete()
-        else:
-            contrib.unindex()
+        #else:
+        #    contrib.unindex()
         self.notifyModification()
 
     def recoverContribution(self, contrib):
