@@ -128,7 +128,7 @@ class LogLinkGenerator(LinkGenerator):
         return 'https://'+ \
                 PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost') + \
                 '/code.py/?cr=' + \
-                self._chatroom.getTitle() + \
+                self._chatroom.getTitle().lower() + \
                 '@conference.' + \
                 self._chatroom.getHost() + \
                 dates
