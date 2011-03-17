@@ -119,9 +119,9 @@ class AdminApi(ApiBase):
             return answer
 
         except WebFault, e:
-            Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's getRooms operation got WebFault: %s""" %
+            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRooms operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
-            raise e
+            raise
 
         except Exception, e:
             cls._handleServiceCallException(e)

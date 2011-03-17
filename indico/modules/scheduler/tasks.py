@@ -359,12 +359,12 @@ class SendMailTask(OneShotTask):
         self.text = ""
         self.smtpServer = Config.getInstance().getSmtpServer()
 
-    def run(self, check=False):
+    def run(self, check=True):
         import smtplib
         from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
         # prepare the mail
-        self._prepare(check=check);
+        self._prepare(check=check)
 
         addrs = [smtplib.quoteaddr(x) for x in self.toAddr]
         ccaddrs = [smtplib.quoteaddr(x) for x in self.ccAddr]
