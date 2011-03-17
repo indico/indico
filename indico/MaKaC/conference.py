@@ -4228,7 +4228,8 @@ class Conference(CommonObjectBase, Locatable):
         # conference's alerts
         if options.get("alerts",False) :
             for alarm in self.getAlarmList() :
-                conf.addAlarm(alarm.clone(conf))
+                # .clone takes care of enqueuing it
+                alarm.clone(conf)
         # Meetings' and conferences' contributions cloning
         if options.get("contributions",False) :
             sch = conf.getSchedule()

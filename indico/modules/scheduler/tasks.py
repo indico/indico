@@ -359,20 +359,29 @@ class SendMailTask(OneShotTask):
         self.text = ""
         self.smtpServer = Config.getInstance().getSmtpServer()
 
+    def _prepare(self, check):
+        """
+        Overloaded by descendants
+        """
+
     def run(self, check=True):
         import smtplib
         from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
         # prepare the mail
-        self._prepare(check=check)
+        send = self._prepare(check=check)
+
+        # _prepare decided we shouldn't send the mail?
+        if not send:
+            return
 
         addrs = [smtplib.quoteaddr(x) for x in self.toAddr]
         ccaddrs = [smtplib.quoteaddr(x) for x in self.ccAddr]
 
         if len(addrs) + len(ccaddrs) == 0:
-            self._v_logger.warning("Attention: mail contains no recipients!")
+            self.getLogger().warning("Attention: mail contains no recipients!")
         else:
-            self._v_logger.info("Sending mail To: %s, CC: %s" % (addrs, ccaddrs))
+            self.getLogger().info("Sending mail To: %s, CC: %s" % (addrs, ccaddrs))
 
         for user in self.toUser:
             addrs.append(smtplib.quoteaddr(user.getEmail()))
@@ -382,9 +391,6 @@ class SendMailTask(OneShotTask):
                                                 "ccList": ccaddrs,
                                                 "subject": self.subject,
                                                 "body": self.text }))
-
-    def getConference(self):
-        return self.conf
 
     def setFromAddr(self, addr):
         self.fromAddr = addr
@@ -464,6 +470,9 @@ class AlarmTask(SendMailTask):
         self.toAllParticipants = False
         self._confRelId = confRelId
 
+    def getConference(self):
+        return self.conf
+
     def getConfRelativeId(self):
         return self._confRelId
 
@@ -478,13 +487,15 @@ class AlarmTask(SendMailTask):
         self.toAllParticipants = toAllParticipants
 
     def clone(self, conference):
-        alarm = AlarmTask(conference)
-        alarm.initialiseToAddr()
+        """
+        Clone the alarm, changing only the conference
+        """
+        alarm = conference.newAlarm(self.getStartOn())
         for addr in self.getToAddrList():
             alarm.addToAddr(addr)
         alarm.setFromAddr(self.getFromAddr())
         alarm.setSubject(self.getSubject())
-        alarm.setConfSumary(self.getConfSumary())
+        alarm.setConfSummary(self.getConfSummary())
         alarm.setNote(self.getNote())
         alarm.setText(self.getText())
         alarm.setStartOn(copy.copy(self.getStartOn()))
@@ -569,14 +580,14 @@ class AlarmTask(SendMailTask):
         if check:
             from MaKaC.conference import ConferenceHolder
             if not ConferenceHolder().hasKey(self.conf.getId()):
-                self._logger.warning("Conference %s no longer exists! "
+                self.getLogger().warning("Conference %s no longer exists! "
                                      "Deleting alarm." % self.conf.getId())
                 self.conf.removeAlarm(self)
             elif self.conf.getStartDate() <= self._getCurrentDateTime():
-                self._logger.warning("Conference %s already started. "
+                self.getLogger().warning("Conference %s already started. "
                                      "Deleting alarm." % self.conf.getId())
                 self.conf.removeAlarm(self)
-                return True
+                return False
 
         # Email
         self.setSubject("Event reminder: %s"%self.conf.getTitle())
@@ -616,7 +627,7 @@ Best Regards
                 url,\
                 ))
         self._setMailText()
-        return False
+        return True
 
 
 class SampleOneShotTask(OneShotTask):
