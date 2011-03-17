@@ -8998,7 +8998,7 @@ class Contribution(CommonObjectBase, Locatable):
         self.notifyModification()
 
     def removeReviewing( self ):
-        if self.reviewing is None:
+        if self.getReviewing() is None:
             return
         self.reviewing.delete()
         self.reviewing.setOwner(None)
