@@ -48,6 +48,7 @@ from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.plugins.base import Observable
 from MaKaC.user import Avatar, CERNGroup
+from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 
 # TODO This really needs to be fixed... no i18n and strange implementation using month names as keys
@@ -138,13 +139,22 @@ class outputGenerator(Observable):
         return self.text
 
 
-    def getFormattedOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
+    def getFormattedOutput(self, rh, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
         """
         conf: conference object
         stylesheet: path to the xsl file
         """
         self.getOutput(conf, stylesheet, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution)
         html = self.text
+        if rh._req.is_https():
+            imagesBaseURL = Config.getInstance().getImagesBaseURL()
+            imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
+            baseURL = Config.getInstance().getBaseURL()
+            baseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getBaseSecureURL())
+            html = html.replace(imagesBaseURL, imagesBaseSecureURL)
+            html = html.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
+            html = html.replace(baseURL, baseSecureURL)
+            html = html.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
         if DEVELOPMENT:
             stat_text = _("""<br><br><font size="-2">_("XML creation"): %s<br>_("HTML creation"): %s</font>""") % (self.time_XML,self.time_HTML)
         else:
