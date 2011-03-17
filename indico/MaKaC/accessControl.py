@@ -91,7 +91,7 @@ class AccessController( Persistent, Observable ):
 
             #return self._fatherProtection
         except:
-            Logger.get('accessController').exception('_getFatherProtection')
+            #Logger.get('accessController').exception('_getFatherProtection')
             self._fatherProtection = 0
             return 0
 
