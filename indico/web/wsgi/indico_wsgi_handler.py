@@ -36,7 +36,6 @@ from indico.web.rh import RHHtdocs
 from MaKaC.common import Config
 
 
-
 # Path update
 
 DIR_HTDOCS = Config.getInstance().getHtdocsDir()
@@ -284,6 +283,7 @@ class SimulatedModPythonRequest(object):
         self.__write = None
         self.__errors = environ['wsgi.errors']
         self.__headers_in = table([])
+        self.__write_error = False
 
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
@@ -347,11 +347,14 @@ class SimulatedModPythonRequest(object):
         if self.__buffer:
             self.__bytes_sent += len(self.__buffer)
             try:
-                self.__write(self.__buffer)
+                if not self.__write_error:
+                    self.__write(self.__buffer)
             except IOError, err:
                 if "failed to write data" in str(err) \
                        or "client connection closed" in str(err):
                     registerException()
+                    # do not over-report error
+                    self.__write_error = True
                 else:
                     raise
             self.__buffer = ''
