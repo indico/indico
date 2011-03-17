@@ -85,7 +85,7 @@ class AccessController( Persistent, Observable ):
             else:
                 ownerList = [self.getOwner().getOwner()]
             for o in ownerList:
-                if o.isProtected():
+                if o is not None and o.isProtected():
                     return 1
             return 0
 
