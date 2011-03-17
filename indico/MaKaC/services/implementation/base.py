@@ -152,19 +152,18 @@ class ServiceBase(RequestHandlerBase):
     The ServiceBase class is the basic class for services.
     """
 
-    def __init__(self, params, remoteHost, session, req=None):
+    def __init__(self, params, session, req):
         """
         Constructor.  Initializes provate variables
         @param req: HTTP Request provided by the previous layer
         """
-        RequestHandlerBase.__init__(self)
-        self._req = req
+        RequestHandlerBase.__init__(self, req)
         self._params = params
         self._requestStarted = False
         self._websession = session
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
-        self._aw.setIP(remoteHost)
+        self._aw.setIP(self.getHostIP())
         self._aw.setSession(session)
         self._aw.setUser(session.getUser())
         self._target = None

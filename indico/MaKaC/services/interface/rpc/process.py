@@ -16,6 +16,7 @@ from MaKaC.services.interface.rpc.common import CausedError
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 
+
 def lookupHandler(method):
 
     # TODO: better way to do this without the need of DB connection?
@@ -41,15 +42,16 @@ def lookupHandler(method):
 
     return handler
 
+
 def processRequest(method, params, req):
     # lookup handler
     handler = lookupHandler(method)
 
     # invoke handler
     if hasattr(handler, "process"):
-        result = handler(params, req.get_remote_host(), getSession(req), req).process()
+        result = handler(params, getSession(req), req).process()
     else:
-        result = handler(params, req.get_remote_host(), getSession(req), req)
+        result = handler(params, getSession(req), req)
 
     return result
 

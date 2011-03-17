@@ -26,7 +26,7 @@ from MaKaC.common import info
 import MaKaC
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins import Observable
-
+from MaKaC.common.logger import Logger
 
 class AccessController( Persistent, Observable ):
     """This class keeps access control information both for accessing and
@@ -91,6 +91,7 @@ class AccessController( Persistent, Observable ):
 
             #return self._fatherProtection
         except:
+            Logger.get('accessController').exception('_getFatherProtection')
             self._fatherProtection = 0
             return 0
 

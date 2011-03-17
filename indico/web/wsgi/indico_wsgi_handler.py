@@ -284,6 +284,7 @@ class SimulatedModPythonRequest(object):
         self.__write = None
         self.__errors = environ['wsgi.errors']
         self.__headers_in = table([])
+
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
                 self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value
@@ -291,6 +292,7 @@ class SimulatedModPythonRequest(object):
             self.__headers_in['content-length'] = environ['CONTENT_LENGTH']
         if environ.get('CONTENT_TYPE'):
             self.__headers_in['content-type'] = environ['CONTENT_TYPE']
+
         ## HTTP headers variables
         ## We might want to add some other fields in the future
         self.URLFields = {'URL_SCHEME':   environ['wsgi.url_scheme'], \

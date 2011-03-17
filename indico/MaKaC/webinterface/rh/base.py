@@ -62,13 +62,20 @@ from MaKaC.accessControl import AdminList
 
 from MaKaC.plugins.base import OldObservable
 
+
 class RequestHandlerBase(OldObservable):
 
     _uh = None
     _currentRH = None
 
-    def __init__( self ):
+    def __init__(self, req):
+
+        # attention: not thread-safe
         RequestHandlerBase._currentRH = self
+
+        if req == None:
+            raise Exception("Request object not initialised")
+        self._req = req
 
     def _checkProtection( self ):
         """
@@ -117,6 +124,26 @@ class RequestHandlerBase(OldObservable):
             lang = "en_US"
         from MaKaC import i18n
         i18n.install('messages', lang, unicode=True)
+
+    def getHostIP(self):
+        import socket
+
+        host = str(self._req.get_remote_host(apache.REMOTE_NOLOOKUP))
+
+        try:
+            hostIP = socket.gethostbyname(host)
+            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+            if minfo.useProxy():
+                # if we're behind a proxy, use X-Forwarded-For
+                xff = self._req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
+                return socket.gethostbyname(xff)
+            else:
+                return hostIP
+        except socket.gaierror, e:
+            # in case host resolution fails
+            raise HostnameResolveError("Error resolving host '%s' : %s" % (host, e))
+
+
 
 
     accessWrapper = property( getAW )
@@ -168,10 +195,7 @@ class RH(RequestHandlerBase):
                 req - (mod_python.Request) mod_python request received for the
                     current rh.
         """
-        RequestHandlerBase.__init__(self)
-        if req == None:
-            raise Exception("Request object not initialised")
-        self._req = req
+        RequestHandlerBase.__init__(self, req)
         self._requestStarted = False
         self._websession = None
         self._aw = AccessWrapper()  #Fill in the aw instance with the current information
@@ -187,25 +211,6 @@ class RH(RequestHandlerBase):
                                 #   needed
 
     # Methods =============================================================
-
-    def getHostIP(self):
-        import socket
-
-        host = str(self._req.get_remote_host(apache.REMOTE_NOLOOKUP))
-
-        try:
-            hostIP = socket.gethostbyname(host)
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.useProxy():
-                # if we're behind a proxy, use X-Forwarded-For
-                xff = self._req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
-                return socket.gethostbyname(xff)
-            else:
-                return hostIP
-        except socket.gaierror, e:
-            # in case host resolution fails
-            raise HostnameResolveError("Error resolving host '%s' : %s" % (host, e))
-
 
     def getTarget( self ):
         return self._target
