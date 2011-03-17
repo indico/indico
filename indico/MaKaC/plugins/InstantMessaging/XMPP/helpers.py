@@ -40,7 +40,7 @@ class GeneralLinkGenerator(LinkGenerator):
         self._nick = nick
 
     def generate(self):
-        link = re.sub('\[chatroom\]', self._chatroom.getTitle(), self._structure)
+        link = re.sub('\[chatroom\]', self._chatroom.getTitle().lower(), self._structure)
         link = re.sub('\[host\]', self._chatroom.getHost(), link)
 
         if self._nick:
