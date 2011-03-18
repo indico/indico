@@ -2201,8 +2201,10 @@ class WAlarmFrame(WTemplated):
             if al.getEndedOn() != None:
                 sent = " (Sent the %s)" % \
                        al.getStartedOn().astimezone(confTZ).strftime(dtFormat)
+                isSent = True
             else:
                 sent = ""
+                isSent = False
             sd = ""
             if al.getTimeBefore() is not None:
                 tb = al.getTimeBefore()
@@ -2217,13 +2219,22 @@ class WAlarmFrame(WTemplated):
                 sd = dateStart.strftime(dtFormat)
             else:
                 sd = "not set"
-            stri = stri +  _("""<tr> <td nowrap>%s</td> <td width=\"60%%\"><a href=\"%s\">%s</a>%s</td> <td nowrap>%s</td>  <td align=\"center\"><a href=\"%s\"> _("Delete")</a></td>   </tr>""")%(\
-                                    sd, \
-                                    str(self._modifyAlarmURL) + "?" + al.getLocator().getURLForm(), \
-                                    al.getSubject(), \
-                                    sent, \
-                                    addr, \
-                                    str(self._deleteAlarmURL) + "?" + al.getLocator().getURLForm())
+
+            # if the alarm is already assigned to a task
+            if al.getId():
+                if isSent:
+                    # if it was sent, show no link
+                    link = '%s' % al.getSubject()
+                else:
+                    # if it was not yet send, show a link
+                    link = '<a href=\"%s\">%s</a>' % \
+                           (str(self._modifyAlarmURL) + "?" + al.getLocator().getURLForm(), al.getSubject())
+                delete = '<a href=\"%s\">%s</a>' % (str(self._deleteAlarmURL) + "?" + al.getLocator().getURLForm(),  _("Delete"))
+            else:
+                link = '%s' % al.getSubject()
+                delete = ''
+            stri = stri +  _("""<tr> <td nowrap>%s</td> <td width=\"60%%\">%s%s</td> <td nowrap>%s</td>  <td align=\"center\">%s</td>   </tr>""") % \
+                   (sd, link, sent, addr, delete)
         vars["alarms"] = stri
         #vars["timezone"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         vars["timezone"] = self.__target.getTimezone()

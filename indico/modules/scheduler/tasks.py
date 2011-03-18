@@ -465,15 +465,23 @@ class AlarmTask(SendMailTask):
     """
     implement an alarm componment
     """
-    def __init__(self, conf, confRelId, startDateTime):
-        super(AlarmTask, self).__init__(startDateTime)
+    def __init__(self, conf, confRelId, startDateTime=None, relative=None):
+
         self.conf = conf
-        self.timeBefore = None
+        super(AlarmTask, self).__init__(startDateTime)
+
+        if not startDateTime:
+            startDateTime = self.conf.getStartDate() - relative
+
+        self.setRelative(relative)
+        self.setStartOn(startDateTime)
+
         self.text = ""
         self.note = ""
         self.confSumary = False
         self.toAllParticipants = False
         self._confRelId = confRelId
+        self._relative = relative
 
     def getConference(self):
         return self.conf
@@ -488,6 +496,9 @@ class AlarmTask(SendMailTask):
             self.toAllParticipants = False
             return self.toAllParticipants
 
+    def setRelative(self, relative):
+        self._relative = relative
+
     def setToAllParticipants(self, toAllParticipants):
         self.toAllParticipants = toAllParticipants
 
@@ -495,7 +506,7 @@ class AlarmTask(SendMailTask):
         """
         Clone the alarm, changing only the conference
         """
-        alarm = conference.newAlarm(self.getStartOn())
+        alarm = conference.newAlarm(self._relative or self.getStartOn())
         for addr in self.getToAddrList():
             alarm.addToAddr(addr)
         alarm.setFromAddr(self.getFromAddr())
@@ -503,12 +514,11 @@ class AlarmTask(SendMailTask):
         alarm.setConfSummary(self.getConfSummary())
         alarm.setNote(self.getNote())
         alarm.setText(self.getText())
-        alarm.setStartOn(copy.copy(self.getStartOn()))
         alarm.setToAllParticipants(self.getToAllParticipants())
         return alarm
 
     def getTimeBefore(self):
-        return self.getConference().getStartDate() - self.getStartOn()
+        return self._relative
 
     def addToUser(self, user):
         super(AlarmTask, self).addToUser(user)

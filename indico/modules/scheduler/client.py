@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from indico.modules.scheduler import SchedulerModule, base
+from indico.util.date_time import int_timestamp
 
 class Client(object):
 
@@ -48,7 +49,12 @@ class Client(object):
 
         return self._schedMod.spool('del', task)
 
-    def shutdown(self, msg = ""):
+    def moveTask(self, task, newDate):
+        oldTS = int_timestamp(task.getStartOn())
+        task.setStartOn(newDate)
+        return self._schedMod.spool('change', (oldTS, task))
+
+    def shutdown(self, msg=""):
         """
         Shuts down the scheduler. `msg` is an optional paramater that provides
         an information message that will be written in the logs

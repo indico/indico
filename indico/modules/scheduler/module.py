@@ -178,6 +178,26 @@ class SchedulerModule(Module):
         elif status == base.TASK_STATUS_QUEUED:
             self.addTaskToWaitingQueue(occurrence)
 
+    def changeTaskStartDate(self, oldTS, task):
+        i = 0
+
+        newTS = int_timestamp(task.getStartOn())
+
+        # enqueue-dequeue
+        try:
+            self._waitingQueue.dequeue(oldTS, task)
+        except:
+            logging.getLogger('scheduler').error(
+                "%s was supposed to be changed but it was not "
+                "found in the waiting queue!" % task)
+            return
+
+        self._waitingQueue.enqueue(newTS, task)
+
+        logging.getLogger('scheduler').info(
+            '%s moved from bin %s to %s...' % (task, oldTS, newTS))
+
+
     def addTaskToWaitingQueue(self, task, index=False):
 
         if index:

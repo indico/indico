@@ -2827,6 +2827,9 @@ class Conference(CommonObjectBase, Locatable):
         if index:
             self.indexConf()
 
+        # update the time for the alarms to be sent
+        self._updateAlarms()
+
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             try:
@@ -2838,6 +2841,15 @@ class Conference(CommonObjectBase, Locatable):
                 except Exception, e2:
                     Logger.get('Conference').error("Exception while notifying a start date change: %s (origin: %s)" % (str(e2), str(e)))
 
+
+    def _updateAlarms(self):
+        c = Client()
+        # are there any alarms? if so, update the relative ones
+        for alarm in self.getAlarmList():
+            tbef = alarm.getTimeBefore()
+            if tbef:
+                # only relative alarms
+                c.moveTask(alarm, self.getStartDate() - tbef)
 
     def verifyStartDate(self, sdate, check=1):
         if sdate>self.getEndDate():
@@ -4254,9 +4266,19 @@ class Conference(CommonObjectBase, Locatable):
         self._notify('cloneEvent', {'conf': conf, 'user': userPerformingClone, 'options': options})
         return conf
 
-    def newAlarm(self, dtStart):
+    def newAlarm(self, when):
+
+        if type(when) == timedelta:
+            relative = when
+            dtStart = None
+        else:
+            relative = None
+            dtStart = when
+
         confRelId = self._getNextAlarmId()
-        al = tasks.AlarmTask(self, confRelId, dtStart)
+        al = tasks.AlarmTask(self, confRelId,
+                             startDateTime=dtStart,
+                             relative=relative)
 
         self.addAlarm(al)
         return al

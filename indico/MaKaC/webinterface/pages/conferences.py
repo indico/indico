@@ -5208,7 +5208,7 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
             "confTitle": self._conf.getTitle() }
         vars["selec1"] = vars["selec2"] = vars["selec3"] = ""
         year = month = day = hour = dayBefore = hourBefore = -1
-        if self._alarm.getTimeBefore() > timedelta(0):
+        if self._alarm.getTimeBefore():
             #the date is calculated from the conference startdate
             if self._alarm.getTimeBefore() < timedelta(days=1):
                 vars["selec3"] = "checked"

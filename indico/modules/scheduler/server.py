@@ -110,12 +110,16 @@ class Scheduler(object):
         self._schedModule.setSchedulerRunningStatus(value)
 
     @base.OperationManager
-    def _db_moveTask(self, task, moveFrom, status, occurrence = None,
+    def _db_moveTask(self, task, moveFrom, status, occurrence=None,
                      nocheck = False, setStatus = False):
         self._schedModule.moveTask(task, moveFrom, status,
-                                   occurrence = occurrence, nocheck = nocheck)
+                                   occurrence=occurrence, nocheck=nocheck)
         if setStatus:
             task.setStatus(status)
+
+    @base.OperationManager
+    def _db_changeTaskStartDate(self, oldTS, task):
+        self._schedModule.changeTaskStartDate(oldTS, task)
 
     @base.OperationManager
     def _db_addTaskToQueue(self, task, index = True):
@@ -411,6 +415,9 @@ class Scheduler(object):
 
             if op == 'add':
                 self._db_addTaskToQueue(obj)
+            elif op == 'change':
+                # pass oldTS and task
+                self._db_changeTaskStartDate(*obj)
             elif op == 'del':
                 self._deleteTaskFromQueue(obj)
             elif op == 'shutdown':

@@ -87,7 +87,7 @@ from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.rb_tools import FormMode
 
-from indico.modules.scheduler import tasks
+from indico.modules.scheduler import tasks, Client
 
 from MaKaC.webinterface.pages.abstractReviewing import *
 
@@ -3177,26 +3177,33 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
 
     def _initializeAlarm(self, dryRun = False):
 
-        if self._alarmId:
-            al = self._conf.getAlarmById(self._alarmId)
+        if self._dateType == "1":
+            dtStart = timezone(self._conf.getTimezone()).localize(
+                datetime(self._year,
+                         self._month,
+                         self._day,
+                         self._hour)).astimezone(timezone('UTC'))
+            relative = None
         else:
-            if self._dateType == "1":
-                dtStart = timezone(self._conf.getTimezone()).localize(
-                    datetime(self._year,
-                             self._month,
-                             self._day,
-                             self._hour)).astimezone(timezone('UTC'))
-            else:
-                if self._dateType == "2":
-                    delta = timedelta(days=int(self._dayBefore))
-                elif self._dateType == "3":
-                    delta = timedelta(0, int(self._hourBefore) * 3600)
-                dtStart = self._target.getStartDate() - delta
+            if self._dateType == "2":
+                delta = timedelta(days=int(self._dayBefore))
+            elif self._dateType == "3":
+                delta = timedelta(0, int(self._hourBefore) * 3600)
+            dtStart = self._target.getStartDate() - delta
+            relative = delta
 
+        if self._alarmId:
+            # Alarm modification
+            al = self._conf.getAlarmById(self._alarmId)
+            c = Client()
+            c.moveTask(al, dtStart)
+            al.setRelative(relative)
+        else:
+            # Alarm creation
             if dryRun:
-                al = tasks.AlarmTask(self._conf, 0, dtStart)
+                al = tasks.AlarmTask(self._conf, 0, dtStart, relative=relative)
             else:
-                al = self._conf.newAlarm(dtStart)
+                al = self._conf.newAlarm(relative or dtStart)
 
         for addr in self._emails.split(","):
             al.addToAddr(addr.strip())
