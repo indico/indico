@@ -242,6 +242,8 @@ def escape_html(text, escape_quotes=False):
                           " => &quot;
                           ' => &#34;
     """
+    if type(text) != str:
+        return ""
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
     text = text.replace('>', '&gt;')

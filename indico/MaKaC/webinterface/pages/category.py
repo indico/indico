@@ -467,7 +467,7 @@ class WOverviewConfBase( wcomponents.WTemplated ):
         if self._conf.getLocation() != None:
             loc = self._conf.getLocation().getName()
         room = ""
-        if self._conf.getRoom() != None:
+        if self._conf.getRoom() != None and self._conf.getRoom().getName() != None:
             room = self._conf.getRoom().getName()
             url = "javascript:redirectToRoomLoc('" + escape_html(room) + "','" + escape_html(loc) +"')"
             loc = "%s: "%loc
