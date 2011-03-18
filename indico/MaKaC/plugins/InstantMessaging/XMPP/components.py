@@ -301,7 +301,7 @@ class ChatroomsNotification(GenericNotification):
         if not it means we're re-using an existing chat room """
         if conference is None:
             conference = room.getConferences().values()[0]
-        self.setSubject('[Indico] Chat room succesfully created')
+        self.setSubject("[Indico] [IM] Chat room created in conference %s: %s" % (conference.getId(), room.getTitle()))
         self.setBody("""    Dear Indico user,
 The chat room with name %s has been successfully created in the conference %s (id: %s)
 by the user %s.
@@ -310,7 +310,7 @@ Thank you for using our system.""" %(room.getTitle(), conference.getTitle(), con
         return self
 
     def edit(self, room, conference):
-        self.setSubject("""[Indico] Chat room succesfully edited""")
+        self.setSubject("[Indico] [IM] Chat room edited in conference %s: %s" % (conference.getId(), room.getTitle()))
         self.setBody("""    Dear Indico user,
 The chat room with name %s has been successfully edited in the conference %s (id: %s)
 by the user %s.
@@ -319,7 +319,7 @@ Thank you for using our system.""" %(room.getTitle(), conference.getTitle(), con
         return self
 
     def delete(self, room, conference):
-        self.setSubject("""[Indico] Chat room succesfully deleted""")
+        self.setSubject("[Indico] [IM] Chat room deleted in conference %s: %s" % (conference.getId(), room.getTitle()))
         self.setBody("""    Dear Indico user,
 The chat room with name %s has been successfully deleted from the conference %s (id: %s)
 by the user %s.
