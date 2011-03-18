@@ -164,13 +164,13 @@
         var shortTags = Html.input('text', {name: "shortURLTag", size: "30"}, <%= shortURLTag %>);
         $E('shortTag').set(shortTags);
 
-        var submitButton = Html.input('button', {className: 'btn'}, $T("ok"));
+        var submitButton = Html.input('submit', {className: 'btn'}, $T("ok"));
         var cancelButton = Html.input('button', {className: 'btn', name: 'cancel'}, $T("cancel"));
         $E('submitPlace').set(submitButton, cancelButton);
 
         submitButton.observeClick(function(){
-            if (parameterManager.check()) {
-                document.getElementById('eventModificationForm').submit();
+            if (!parameterManager.check()) {
+                return false;
             }
         });
 
