@@ -186,7 +186,7 @@ class AgentCommand(ConsoleLiveSyncCommand):
             except KeyError:
                 raise Exception("Agent '%s' was not found!" % args.agent)
 
-            root = CategoryManager().getById(0)
+            root = CategoryManager().getById(args.cat or 0)
 
             if args.monitor:
                 monitor = open(args.monitor, 'w')
@@ -306,6 +306,10 @@ def main():
 
     parser_agent_export.add_argument("--fast", "-f", action='store_true',
                                      dest="fast",
+                                     help="Iterate ConferenceHolder instead of tree" )
+
+    parser_agent_export.add_argument("--only-category", "-c", type=str,
+                                     dest="cat", default=None,
                                      help="Iterate ConferenceHolder instead of tree" )
 
     parser_agent_export.add_argument("--output", "-o", type=str,

@@ -135,7 +135,7 @@ def runConferenceMigration(dbi, withRBDB):
         if level == 'event':
 
             # handle sessions, that our iterator ignores
-            for session in obj.getSessions():
+            for session in obj.getSessionList():
                 _fixAccessController(session)
 
             if hasattr(obj, '_Conference__alarmCounter'):
