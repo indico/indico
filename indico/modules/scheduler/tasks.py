@@ -518,6 +518,9 @@ class AlarmTask(SendMailTask):
         return alarm
 
     def getTimeBefore(self):
+        # TODO: remove this
+        if not hasattr(self, '_relative'):
+            self._relative = None
         return self._relative
 
     def addToUser(self, user):
