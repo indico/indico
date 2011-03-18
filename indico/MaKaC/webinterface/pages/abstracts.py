@@ -970,6 +970,15 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 review.AbstractStatusProposedToReject,\
                 review.AbstractStatusProposedToAccept]:
             vars["disableWithdraw"]=" disabled"
+
+        rating = self._abstract.getRating()
+        if rating == None:
+            vars["rating"] = ""
+        else:
+            vars["rating"] = "%.2f" % rating
+        vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
+        vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
+
         return vars
 
 

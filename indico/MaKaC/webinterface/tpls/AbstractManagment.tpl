@@ -93,6 +93,17 @@
                     </form>
                 </tr>
                 <tr>
+                    <td class="dataCaptionTD" nowrap><span class="dataCaptionFormat"><% inlineContextHelp(_('Average of all the answers given by the reviewers for this abstract.')) %><%= _("Average rating")%></span></td>
+                    <td bgcolor="white" valign="top" colspan="3"><%= rating %>
+                        <% if rating != "": %>
+                            <%= _(" (in ") %><%= scaleLower %><%= _(" to ") %><%= scaleHigher %><%= _(" scale) ") %>
+                        <% end %>
+                        <% else: %>
+                        <%= _("No rating yet") %>
+                        <% end %>
+                    </td>
+                </tr>
+                <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Submitted by")%></span></td>
                     <form action=<%= changeSubmitterURL %> method="POST">
                     <td><%= submitter %></td>
@@ -107,7 +118,7 @@
                     <td bgcolor="white" valign="top" colspan="3"><%= submitDate %></td>
                 </tr>
                 <tr>
-                    <td class="dataCaptionTD" style="text-align:left; padding-right: 13px;"><span class="dataCaptionFormat"><%= _("Last modified on")%></span></td>
+                    <td class="dataCaptionTD"><span class="dataCaptionFormat"><%= _("Last modified on")%></span></td>
                     <td bgcolor="white" valign="top" colspan="3"><%= modificationDate %></td>
                 </tr>
                 <tr>

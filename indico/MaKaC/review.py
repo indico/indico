@@ -2387,6 +2387,13 @@ class Abstract(Persistent):
             for jud in self.getJudgementHistoryByTrack(track):
                 jud.removeAnswer(questionId)
 
+    def getRatingPerReviewer(self, user, track):
+        """
+            Get the rating of the user for the abstract in the track given.
+        """
+        for jud in self.getJudgementHistoryByTrack(track):
+            if (jud.getResponsible() == user):
+                return jud.getJudValue()
 
 
 class AbstractJudgement( Persistent ):

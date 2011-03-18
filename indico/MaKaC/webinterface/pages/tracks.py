@@ -31,6 +31,7 @@ from MaKaC.common import Config
 from MaKaC.common import filters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.i18n import _
+import MaKaC.user as user
 
 class WPTrackBase(WPConferenceBase):
 
@@ -912,34 +913,43 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         vars["statusDetails"] = self._getStatusDetailsHTML( aStatus )
         vars["statusComment"] = self._getStatusCommentsHTML( aStatus )
         vars["statusColor"] = aStatus.getColor()
-        vars["modifyStatusURL"],vars["modifyStatusBtn"]=quoteattr(""),""
-        vars["PA_defaults"]=""
+        vars["modifyStatusURL"],vars["modifyStatusBtn"] = quoteattr(""),""
+        vars["PA_defaults"] = ""
 
         vars["proposeToAcceptButton"] = _("""<input type="submit" class="btn" value="_("propose to be accepted")" style="width:205px">""")
         vars["proposeToRejectButton"] = _("""<input type="submit" class="btn" value="_("propose to be rejected")" style="width:205px">""")
         vars["proposeForOtherTracksButton"] = _("""<input type="submit" class="btn" value="_("propose for other tracks")" style="width:205px">""")
 
         if isinstance(aStatus,_ASTrackViewPA):
-            vars["PA_defaults"]="""
+            vars["PA_defaults"] = """
                 <input type="hidden" name="comment" value=%s>
                 <input type="hidden" name="contribType" value=%s>
                                 """%(quoteattr(str(aStatus.getComment())),\
                                     quoteattr(str(aStatus.getContribType())))
-            vars["modifyStatusBtn"]= _("""<input type="submit" class="btn" value="_("modify proposition")">""")
-            vars["modifyStatusURL"]=quoteattr(str(urlHandlers.UHTrackAbstractPropToAcc.getURL(self._track,self._abstract)))
-        vars["proposeToAccURL"]=quoteattr(str(urlHandlers.UHTrackAbstractPropToAcc.getURL(self._track,self._abstract)))
-        vars["proposeToRejURL"]=quoteattr(str(urlHandlers.UHTrackAbstractPropToRej.getURL(self._track,self._abstract)))
+            vars["modifyStatusBtn"] = _("""<input type="submit" class="btn" value="_("modify proposition")">""")
+            vars["modifyStatusURL"] = quoteattr(str(urlHandlers.UHTrackAbstractPropToAcc.getURL(self._track,self._abstract)))
+        vars["proposeToAccURL"] = quoteattr(str(urlHandlers.UHTrackAbstractPropToAcc.getURL(self._track,self._abstract)))
+        vars["proposeToRejURL"] = quoteattr(str(urlHandlers.UHTrackAbstractPropToRej.getURL(self._track,self._abstract)))
         vars["proposeForOtherTracksURL"] = quoteattr( str( urlHandlers.UHTrackAbstractPropForOtherTrack.getURL( self._track, self._abstract) ) )
         vars["comments"] = self._abstract.getComments()
         vars["abstractId"] = self._abstract.getId()
-        vars["duplicatedURL"]=quoteattr(str(urlHandlers.UHTrackAbstractModMarkAsDup.getURL(self._track,self._abstract)))
-        vars["duplicatedButton"]=""
+        vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModMarkAsDup.getURL(self._track,self._abstract)))
+        vars["duplicatedButton"] = ""
         if aStatus.__class__ in [_ASTrackViewPA,_ASTrackViewPR,_ASTrackViewSubmitted,_ASTrackViewPFOT]:
-            vars["duplicatedButton"]= _("""<input type="submit" class="btn" value="_("mark as duplicated")" style="width:205px">""")
+            vars["duplicatedButton"] = _("""<input type="submit" class="btn" value="_("mark as duplicated")" style="width:205px">""")
         elif aStatus.__class__ == _ASTrackViewDuplicated:
-            vars["duplicatedButton"]= _("""<input type="submit" class="btn" value="_("unmark as duplicated") style="width:205px">""")
-            vars["duplicatedURL"]=quoteattr(str(urlHandlers.UHTrackAbstractModUnMarkAsDup.getURL(self._track,self._abstract)))
-        vars["contribution"]=self._getContribHTML()
+            vars["duplicatedButton"] = _("""<input type="submit" class="btn" value="_("unmark as duplicated") style="width:205px">""")
+            vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModUnMarkAsDup.getURL(self._track,self._abstract)))
+        vars["contribution"] = self._getContribHTML()
+
+        rating = self._abstract.getRatingPerReviewer(self._rh.getAW().getUser(), self._track)
+        if (rating == None):
+            vars["rating"] = ""
+        else:
+            vars["rating"] = "%.2f" % rating
+        vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
+        vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
+
         return vars
 
 
