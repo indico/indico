@@ -19,7 +19,7 @@
      59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<xsl:stylesheet version='1.0' xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version='1.0' xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 <xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"/>
 
@@ -145,7 +145,7 @@
   <xsl:text disable-output-escaping="yes">, </xsl:text>
   </xsl:if>
   <xsl:value-of select="./@first" disable-output-escaping="yes"/>
-</xsl:template>	
+</xsl:template>
 
 </xsl:stylesheet>
 
