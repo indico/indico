@@ -144,7 +144,7 @@ class _RoomMapperFFName(filters.FilterField):
 
     def satisfies(self,roomMapper, exact=False):
         for value in self._values:
-            if value.strip() != "":
+            if value is not None and value.strip() != "":
                 if value.strip() == "*":
                     return True
                 if exact:
