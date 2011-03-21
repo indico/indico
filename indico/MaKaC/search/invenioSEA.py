@@ -159,7 +159,7 @@ class InvenioSEA(base.SearchEngineAdapter):
             # we're looking inside an event
 
             # search for event identifier
-            self._marcQuery = 'AND 970__:"INDICO.%s*")' % (target.getId(), target.getId())
+            self._marcQuery = 'AND 970__a:"INDICO.%s.*"' % target.getId()
             self._searchCategories = False
 
         else:
@@ -223,9 +223,9 @@ class InvenioSEA(base.SearchEngineAdapter):
     def translateCollection(self, collection):
 
         if collection == 'Events':
-            query = "AND 65027a:'*'"
+            query = " AND 65027a:'*'"
         else:
-            query = "AND NOT 65027a:'*'"
+            query = " AND NOT 65027a:'*'"
 
         if self._private:
             return ('INDICOSEARCH', query)
