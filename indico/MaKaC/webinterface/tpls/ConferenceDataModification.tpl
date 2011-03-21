@@ -157,6 +157,25 @@
             endDate.set('<%= eDay %>/<%= eMonth %>/<%= eYear %><%= " " %><%if len (eHour) == 1:%>0<%= eHour %><%end%><%else:%><%= eHour %><%end%>:<% if len (eMinute) == 1:%>0<%= eMinute %><%end%><%else:%><%= eMinute %><%end%>');
         <% end %>
 
+        var shortTags = Html.input('text', {name: "shortURLTag", size: "30"}, <%= shortURLTag %>);
+        $E('shortTag').set(shortTags);
+
+        var submitButton = Html.input('submit', {className: 'btn'}, $T("ok"));
+        var cancelButton = Html.input('button', {className: 'btn', name: 'cancel'}, $T("cancel"));
+        $E('submitPlace').set(submitButton, cancelButton);
+
+        submitButton.observeClick(function(){
+            if (!parameterManager.check()) {
+                return false;
+            }
+        });
+
+        cancelButton.observeClick(function(){
+            document.getElementById('eventModificationForm').submit();
+        });
+
+        parameterManager.add(shortTags, 'shortURL', true);
+
 		injectValuesInForm($E('eventModificationForm'));
 	});
 </script>
