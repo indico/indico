@@ -217,7 +217,12 @@ class TableOfContentsEntry(Paragraph):
         """
         Draws row of dots from the end of the abstract title to the page number.
         """
-        freeSpace = int(self.blPara.lines[-1][0])
+        try:
+            freeSpace = int(self.blPara.lines[-1][0])
+        except AttributeError:
+            # Sometimes we get an ABag instead of a tuple.. in this case we use the extraSpace attribute
+            # as it seems to contain just what we need.
+            freeSpace = int(self.blPara.lines[-1].extraSpace)
         while( freeSpace > 10 ):
             dot = self.beginText(self.width + 10 - freeSpace, self.style.leading - self.style.fontSize)
             dot.textLine(".")
