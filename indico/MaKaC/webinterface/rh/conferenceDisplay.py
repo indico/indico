@@ -710,8 +710,8 @@ class RHTimeTablePDF(RHConferenceTimeTable):
                 except LayoutError, e:
                     if not self._reduceFontSize():
                         raise MaKaCError("Error in PDF generation - One of the paragraphs does not fit on a page")
-                except Exception, e:
-                    raise e
+                except Exception:
+                    raise
 
     ##        tries = 5
     ##        while tries:
