@@ -542,7 +542,7 @@ class RHConferenceGetPic(RHConferenceBaseDisplay):
             self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%pic.getFileName()
             return pic.readBin()
         else:
-            from mod_python import apache
+            from indico.web.wsgi import webinterface_handler_config as apache
             self._req.status = apache.HTTP_NOT_FOUND
             return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
