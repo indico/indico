@@ -172,7 +172,7 @@
                 <select name="audience">
                     <option value=""><%=_("Public")%></option>
                     <% for audience in Audiences: %>
-                        <option><%= audience['name'] %></option>
+                        <option value=<%= quoteattr(audience['name']) %>><%= audience['name'] %></option>
                     <% end %>
                 </select>
             </div>
