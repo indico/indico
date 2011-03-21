@@ -39,7 +39,7 @@ class RHCollaborationHtdocs(RHHtdocs):
     Static file handler for Collaboration plugin
     """
 
-    _url = r"^/Collaboration/(?P<plugin>.*)/(?P<filepath>.*)$"
+    _url = r"^/Collaboration/(?P<plugin>.*?)/(?P<filepath>.*)$"
 
     @classmethod
     def calculatePath(cls, plugin, filepath):
