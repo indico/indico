@@ -27,7 +27,7 @@ function activateAgentText(agentId) {
         Html.div({style: {fontFamily: 'monospace',
                           marginTop: '10px',
                           marginBottom: '10px'}},
-                 'indico_livesync agent export -a '+agentId),
+                 'indico_livesync agent ' + agentId + ' export'),
         Html.div({}, $T("When it finishes, press the 'activate' button in the agent list.")),
         Html.div({}, $T("Press 'Cancel' if you don't want to proceed with the activation.")))
 };
