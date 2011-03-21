@@ -506,7 +506,7 @@ class AlarmTask(SendMailTask):
         """
         Clone the alarm, changing only the conference
         """
-        alarm = conference.newAlarm(self._relative or self.getStartOn())
+        alarm = conference.newAlarm(self.getTimeBefore() or self.getStartOn())
         for addr in self.getToAddrList():
             alarm.addToAddr(addr)
         alarm.setFromAddr(self.getFromAddr())
