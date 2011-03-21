@@ -130,6 +130,22 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             aid, name, description, updateTime, access)
         self._url = url
 
+    def record_str(self, (obj, status)):
+        """
+        Translates the objects/states to an easy to read textual representation
+        """
+
+        states = {1: 'DEL', 2: 'CRT', 4: 'MOD'}
+
+        # unfold status
+        parts = []
+        k = 4
+        while (k > 0):
+            if status & k:
+                parts.append(states[k])
+            k /= 2
+        return "{0:<40} {1}".format(obj, ' '.join(parts))
+
     def _getMetadata(self, records):
         """
         Retrieves the MARCXML metadata for the record

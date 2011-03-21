@@ -345,6 +345,9 @@ class Category(CommonObjectBase):
         self.__materialGenerator = Counter()
         self._notifyCreationList = ""
 
+    def __str__(self):
+        return "<Category %s@%s>" % (self.getId(), hex(id(self)))
+
     def getAccessController(self):
         return self.__ac
 
@@ -7568,6 +7571,13 @@ class Contribution(CommonObjectBase, Locatable):
         self._keywords = ""
         self._reviewManager = ReviewManager(self)
 
+    def __str__(self):
+        if self.parent:
+            parentId = self.parent.getId()
+        else:
+            parentId = None
+        return "<Contribution %s:%s@%s>" % (self.getId(), parentId, hex(id(self)))
+
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
@@ -9738,6 +9748,18 @@ class SubContribution(CommonObjectBase, Locatable):
         self.minutes = None
         self._authorGen = Counter()
         self._keywords = ""
+
+    def __str__(self):
+        if self.parent:
+            parentId = self.parent.getId()
+            if self.getConference():
+                grandpaId = self.getConference().getId()
+            else:
+                grandpaId = None
+        else:
+            parentId = None
+            grandpaId = None
+        return "<SubCont %s:%s:%s@%s>" % (self.getId(), parentId, grandpaId, hex(id(self)))
 
     def isFullyPublic( self ):
         if hasattr(self, "_fullyPublic"):

@@ -93,7 +93,7 @@ class SyncAgent(Fossilizable, Persistent):
 
     # TODO: Subclass into PushSyncAgent(task)/PullSyncAgent?
 
-    def __init__(self, aid, name, description, updateTime, access = None):
+    def __init__(self, aid, name, description, updateTime, access=None):
         self._id = aid
         self._name = name
         self._description = description
@@ -102,6 +102,11 @@ class SyncAgent(Fossilizable, Persistent):
         self._active = False
         self._recording = False
         self._access = access
+
+    def record_str(self, (obj, status)):
+        """
+        Translates the objects/states to an easy to read textual representation
+        """
 
     def setManager(self, manager):
         self._manager = manager

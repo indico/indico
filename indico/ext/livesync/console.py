@@ -37,9 +37,9 @@ from indico.util import console
 # plugin imports
 from indico.ext.livesync import SyncManager
 from indico.ext.livesync.tasks import LiveSyncUpdateTask
-from indico.ext.livesync.agent import ThreadedRecordUploader
 
 SIZE_BATCH_PER_FILE = 1000
+
 
 class ConsoleLiveSyncCommand(object):
 
@@ -224,6 +224,15 @@ class AgentCommand(ConsoleLiveSyncCommand):
             if monitor:
                     monitor.close()
 
+    def _simulate(self, args):
+        agent = self._sm.getAllAgents()[args.agent]
+
+        data = self._sm.query(agentId=args.agent,
+                              till=args.till)
+
+        for record in agent._generateRecords(data, args.till):
+            print agent.record_str(record)
+
     def _run(self, args):
 
         if args.action == 'add_task':
@@ -233,6 +242,9 @@ class AgentCommand(ConsoleLiveSyncCommand):
             self._dbi.commit()
         elif args.action == 'export':
             self._export(args)
+            self._dbi.abort()
+        elif args.action == 'simulate':
+            self._simulate(args)
             self._dbi.abort()
 
 
@@ -267,12 +279,25 @@ def main():
     parser_agent = subparsers.add_parser("agent", help=AgentCommand.__doc__)
     parser_agent.set_defaults(cmd=AgentCommand)
 
+    parser_agent.add_argument(type=str,
+                              metavar="AGENT_ID",
+                              dest="agent",
+                              help="agent to export data with" )
+
     parser_agent_subparsers = parser_agent.add_subparsers(help="agent action")
 
     parser_agent_add_task = parser_agent_subparsers.add_parser(
         "add_task",
         help="create a task that will periodically run all agents")
     parser_agent_add_task.set_defaults(action='add_task')
+
+    parser_agent_simulate = parser_agent_subparsers.add_parser(
+        "simulate", help="simulate data submission")
+    parser_agent_simulate.set_defaults(action='simulate')
+
+    parser_agent_simulate.add_argument("--till", "-t",
+                                       dest="till",
+                                       help="timestamp (granular)" )
 
     parser_agent_export = parser_agent_subparsers.add_parser(
         "export",
@@ -288,12 +313,6 @@ def main():
     ##                                  dest="fromTS",
     ##                                  metavar="TIMESTAMP",
     ##                                  help="timestamp to start at" )
-
-    parser_agent_export.add_argument("--agent", "-a", type=str,
-                                     metavar="AGENT_ID",
-                                     dest="agent",
-                                     required=True,
-                                     help="agent to export data with" )
 
     parser_agent_export.add_argument("--monitor", "-m", type=str,
                                      metavar="FILE_PATH",
