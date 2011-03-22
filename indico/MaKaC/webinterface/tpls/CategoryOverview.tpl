@@ -48,7 +48,7 @@
                             </form>
                             <% if key: %>
                                 <br><h1><%= _("Legend") %>:</h1>
-                                <div style="margin: 10px 0 30px 10px;width:180px;"><%= key %></div>
+                                <div style="margin: 10px 0 30px 10px;width:180px;overflow:hidden;white-space:nowrap;"><%= key %></div>
                             <% end %>
                         </div>
                     </div>

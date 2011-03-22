@@ -41,6 +41,7 @@ from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
 from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 from pytz import timezone
+from MaKaC.common.TemplateExec import truncateTitle
 
 
 class WPCategoryBase ( main.WPMainBase ):
@@ -823,10 +824,11 @@ class WCategoryOverview(wcomponents.WTemplated):
                 cm= CategoryManager()
                 categ=cm.getById(str(icon))
                 otherOW = self._ow.getOverviewOtherCateg(categ)
-                a=(""" <a href="%s" style="font-size: 1.0em;"><img src="%s" width="16" height="16" border="0">&nbsp;%s</a>  <br/>""" %(\
-                                        vars["categOverviewURLGen"]( otherOW ),\
-                                        urlHandlers.UHCategoryIcon.getURL(categ),\
-                                        categ.getName().replace(" ","&nbsp;")))
+                a=(""" <a href="%s" style="font-size: 1.0em;" onmouseover="IndicoUI.Widgets.Generic.tooltip(this, event, '%s')"><img src="%s" width="16" height="16" border="0">&nbsp;%s</a>  <br/>""" %(
+                                        vars["categOverviewURLGen"]( otherOW ),
+                                        categ.getName(),
+                                        urlHandlers.UHCategoryIcon.getURL(categ),
+                                        truncateTitle(categ.getName(), 20)))
                 if not a in l:
                     l.append(a)
         return "". join(l)
@@ -1595,7 +1597,6 @@ class WCategoryDataModification(wcomponents.WTemplated):
             if level == visibility:
                 selected = "selected"
             if topcat.getId() != "0":
-                from MaKaC.common.TemplateExec import truncateTitle
                 vis.append("""<option value="%s" %s>%s</option>""" % (level, selected, truncateTitle(topcat.getName(), 70)))
             topcat = topcat.getOwner()
         selected = ""
