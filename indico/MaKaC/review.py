@@ -888,6 +888,9 @@ class AbstractMgr(Persistent):
             #       - If it's an accepted abstract-->remove abstract from contribution
             if isinstance(abstract.getCurrentStatus(), AbstractStatusAccepted):
                 raise MaKaCError( _("Cannot remove an accepted abstract before removing the contribution linked to it"))
+            # If it's a withdrawn abstract-->remove abstract from contribution
+            if isinstance(abstract.getCurrentStatus(), AbstractStatusWithdrawn) and abstract.getContribution():
+                raise MaKaCError( _("Cannot remove the abstract before removing the contribution linked to it"))
             for abs in self._abstracts.values():
                 if abs != abstract:
                     st = abs.getCurrentStatus()
