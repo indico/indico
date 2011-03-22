@@ -196,7 +196,31 @@ type ("RoomMap", ["IWidget"],
             var addr = Html.span({className:'mapRoomAddress'}, address).dom;
 
             // "Book" link
-            var book = Html.a({href:room.bookingUrl, target:'_parent', className:'mapBookRoomLink'}, $T("Book"));
+            var bookingUrl = room.bookingUrl;
+            if($E('isAvailable').dom.checked) {
+                bookingUrl += '&ignoreSession=on';
+                each({
+                    sDay: 'day',
+                    sMonth: 'month',
+                    sYear: 'year',
+                    eDay: 'dayEnd',
+                    eMonth: 'monthEnd',
+                    eYear: 'yearEnd',
+                    repeatability: 'repeatability'
+                }, function(param, field) {
+                    bookingUrl += '&' + param + '=' + encodeURIComponent($E(field).dom.value);
+                });
+
+                var sTime = $E('sTime').dom.value.split(':');
+                var eTime = $E('eTime').dom.value.split(':');
+                if(sTime.length == 2 && eTime.length == 2) {
+                    bookingUrl += '&hour=' + parseInt(sTime[0], 10);
+                    bookingUrl += '&minute=' + parseInt(sTime[1], 10);
+                    bookingUrl += '&hourEnd=' + parseInt(eTime[0], 10);
+                    bookingUrl += '&minuteEnd=' + parseInt(eTime[1], 10);
+                }
+            }
+            var book = Html.a({href:bookingUrl, target:'_parent', className:'mapBookRoomLink'}, $T("Book"));
 
             // "More" link - for room details
             var more = Html.a({href:"#", className:'mapRoomInfoLink'}, $T("More") + "...");

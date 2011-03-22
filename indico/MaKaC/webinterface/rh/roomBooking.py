@@ -514,17 +514,52 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         dayD = params.get("day")
         monthM = params.get("month")
         yearY = params.get("year")
+        dayEnd = params.get("dayEnd")
+        monthEnd = params.get("monthEnd")
+        yearEnd = params.get("yearEnd")
+
+        hourStart = params.get("hour")
+        minuteStart = params.get("minute")
+        hourEnd = params.get("hourEnd")
+        minuteEnd = params.get("minuteEnd")
+        repeatability = params.get("repeatability")
+
+        if hourStart and minuteStart and hourStart.isdigit() and minuteStart.isdigit():
+            hourStart = int(hourStart)
+            minuteStart = int(minuteStart)
+        else:
+            hourStart = 8
+            minuteStart = 30
+
+        if hourEnd and minuteEnd and hourEnd.isdigit() and minuteEnd.isdigit():
+            hourEnd = int(hourEnd)
+            minuteEnd = int(minuteEnd)
+        else:
+            hourEnd = 17
+            minuteEnd = 30
 
         if dayD != None and dayD.isdigit() and \
            monthM != None and monthM.isdigit() and \
            yearY != None and yearY.isdigit():
-            candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), 8, 30)
-            candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), 17, 30)
+            candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), hourStart, minuteStart)
+            if dayEnd != None and dayEnd.isdigit() and \
+               monthEnd != None and monthEnd.isdigit() and \
+               yearEnd!= None and yearEnd.isdigit():
+                candResv.endDT = datetime(int(yearEnd), int(monthEnd), int(dayEnd), hourEnd, minuteEnd)
+                if candResv.endDT.date() != candResv.startDT.date() and candResv.repeatability is None:
+                    candResv.repeatability = RepeatabilityEnum.daily
+            else:
+                candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), hourEnd, minuteEnd)
         else:
             if candResv.startDT == None:
-                candResv.startDT = datetime( now.year, now.month, now.day, 8, 30 )
+                candResv.startDT = datetime( now.year, now.month, now.day, hourStart, minuteStart )
             if candResv.endDT == None:
-                candResv.endDT = datetime( now.year, now.month, now.day, 17, 30 )
+                candResv.endDT = datetime( now.year, now.month, now.day, hourEnd, minuteEnd )
+        if repeatability is not None:
+            if repeatability == 'None':
+                candResv.repeatability = None
+            else:
+                candResv.repeatability = int(repeatability)
         if self._getUser():
             if candResv.bookedForName == None:
                 candResv.bookedForName = self._getUser().getFullName()
@@ -541,7 +576,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         if candResv.needsAVCSupport == None:
             candResv.needsAVCSupport = False
 
-        if not ws.getVar( "dontAssign" ):
+        if not ws.getVar( "dontAssign" ) and not params.get("ignoreSession"):
             if ws.getVar( "defaultStartDT" ):
                 candResv.startDT = ws.getVar( "defaultStartDT" )
             if ws.getVar( "defaultEndDT" ):
