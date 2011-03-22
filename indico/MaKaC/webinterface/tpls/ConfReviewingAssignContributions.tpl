@@ -1209,10 +1209,12 @@ var fetchUsers = function(order, role) {
                         users.append(result[i]);
                         }
 
-                        var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
+                       var cancelButton = Html.input('button', null, $T('Cancel'));
                           cancelButton.observeClick(function(){
-                          popup.close();
-                           });
+                              popup.close();
+                          });
+                       var divButton = Html.div({style:{textAlign: 'center'}});
+                       divButton.append(cancelButton);
 
                        var span1 = Html.span({}, "");
                        var message = '';
@@ -1227,7 +1229,11 @@ var fetchUsers = function(order, role) {
                                 }
                             span1 = Html.span({}, message);
                        }
-                        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, userList, cancelButton]));
+                       if (!result.length)
+                           var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + $T("s proposed for this conference. "));
+                       else
+                           var content = userList;
+                       return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, content, divButton]));
                 };
              popup.open();
 
@@ -1321,7 +1327,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                             }
                             return checkedAttributes;
                      }
-                     var assignButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Assign"));
+                     var assignButton = Html.input('button', null, $T('Assign'));
 
                      var users = $L();
                      var contrPerAttribute = [];
@@ -1404,12 +1410,23 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                 }
                             });
 
-                     var cancelButton = Html.button({style:{marginLeft:pixels(5)}}, $T("Cancel"));
-                          cancelButton.observeClick(function(){
-                          popup.close();
+                     var cancelButton = Html.input('button', null, $T('Cancel'));
+                     cancelButton.observeClick(function(){
+                         popup.close();
                      });
+                     var divButtons = Html.div({style:{textAlign: 'center'}});
 
-                     return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList, assignButton, cancelButton])));
+                     if (!result.length) {
+                         divButtons.append(cancelButton);
+                         var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + $T("s proposed for this conference. "));
+                         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([content, divButtons])));
+                     }
+                     else {
+                         divButtons.append(assignButton);
+                         divButtons.append(cancelButton);
+                         return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([AttributeDiv, step2, userList, divButtons])));
+                     }
+
                 };
               popup.open();
 
