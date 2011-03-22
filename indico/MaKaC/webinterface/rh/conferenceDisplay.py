@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from datetime import timedelta,datetime, time
-import os, sys
+import os, re, sys
 import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
@@ -210,35 +210,38 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
     def _process( self ):
         save = False
         ih = AuthenticatorMgr()
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._params["msg"] = ""
         if self._save:
             save = True
             #check submited data
             if not self._params.get("name",""):
-                self._params["msg"] += "You must enter a name.<br>"
+                self._params["msg"] += _("You must enter a name.")+"<br>"
                 save = False
             if not self._params.get("surName",""):
-                self._params["msg"] += "You must enter a surname.<br>"
+                self._params["msg"] += _("You must enter a surname.")+"<br>"
                 save = False
             if not self._params.get("organisation",""):
-                self._params["msg"] += "You must enter the name of your organisation.<br>"
+                self._params["msg"] += _("You must enter the name of your organisation.")+"<br>"
                 save = False
             if not self._params.get("email",""):
-                self._params["msg"] += "You must enter an email address.<br>"
+                self._params["msg"] += _("You must enter an email address.")+"<br>"
                 save = False
             if not self._params.get("login",""):
-                self._params["msg"] += "You must enter a login.<br>"
+                self._params["msg"] += _("You must enter a login.")+"<br>"
                 save = False
             if not self._params.get("password",""):
-                self._params["msg"] += "You must define a password.<br>"
+                self._params["msg"] += _("You must define a password.")+"<br>"
                 save = False
             if self._params.get("password","") != self._params.get("passwordBis",""):
-                self._params["msg"] += "You must enter the same password two time.<br>"
+                self._params["msg"] += _("You must enter the same password two time.")+"<br>"
                 save = False
             if not ih.isLoginFree(self._params.get("login","")):
-                self._params["msg"] += "Sorry, the login you requested is already in use. Please choose another one.<br>"
+                self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
                 save = False
-
+            if not self._validMail(self._params.get("email","")):
+                self._params["msg"] += _("You must enter a valid email adress")
+                save = False
         if save:
             #Data are OK, Now check if there is an existing user or create a new one
             ah = user.AvatarHolder()
@@ -256,8 +259,12 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
                     id = ih.createIdentity( li, a, "Local" )
                     ih.add( id )
                     DBMgr.getInstance().commit()
-                    notif = _AccountActivationNotification( a, self._conf, self._returnURL )
-                    mail.Mailer.send( notif )
+                    if minfo.getModerateAccountCreation():
+                        mail.sendAccountCreationModeration(a).send()
+                    else:
+                        mail.sendConfirmationRequest(a).send()
+                        if minfo.getNotifyAccountCreation():
+                            mail.sendAccountCreationNotification(a).send()
             else:
                 a = user.Avatar()
                 _UserUtils.setUserData( a, self._params )
@@ -266,50 +273,21 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
                 id = ih.createIdentity( li, a, "Local" )
                 ih.add( id )
                 DBMgr.getInstance().commit()
-                notif = _AccountActivationNotification( a, self._conf, self._returnURL )
-                mail.Mailer.send( notif )
+                if minfo.getModerateAccountCreation():
+                    mail.sendAccountCreationModeration(a).send()
+                else:
+                    mail.sendConfirmationRequest(a).send()
+                    if minfo.getNotifyAccountCreation():
+                        mail.sendAccountCreationNotification(a).send()
             self._redirect( urlHandlers.UHConfUserCreated.getURL( self._conf, a ) )
         else:
             p = conferences.WPConfUserCreation( self, self._conf, self._params )
             return p.display()
 
-
-class _AccountActivationNotification:
-
-    def __init__( self, dest, conf, returnURL=""):
-        self._destination = dest
-        self._conf = conf
-        self._returnURL=returnURL
-
-    def getSubject( self ):
-        return "User account activation (%s)"%self._conf.getTitle()
-
-    def getDestination( self ):
-        return self._destination
-
-    def getCCList(self):
-        return []
-
-    def getToList(self):
-        return []
-
-    def getMsg( self ):
-        url = urlHandlers.UHConfActiveAccount.getURL( self._conf, self._destination )
-        url.addParam( "key", self._destination.getKey() )
-        if self._returnURL.strip() != "":
-            url.addParam( "returnURL", self._returnURL )
-        return """Welcome to Indico,
-You have created a new account on the Indico conference management system.
-
-In order to activate your new account and being able to be authenticated by the system, please open on your web browser the following URL:
-
-%s
-
-Once you've done it, your account will be fully operational so you can log in and start using the system normally.
-
-Good luck and thank you for using our system.
-                """%( url )
-
+    def _validMail(self,email):
+        if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",email):
+            return True
+        return False
 
 class RHConfUserCreated( conferenceBase.RHConferenceBase ):
 
