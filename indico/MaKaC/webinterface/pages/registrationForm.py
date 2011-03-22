@@ -1384,7 +1384,7 @@ class WConfModifRegFormGeneralSectionFieldEdit( wcomponents.WTemplated ):
         self._generalField = generalField
 
     def _getFieldTypesHTML(self):
-        html=["""<select name="input" onchange="javascript:$E(WConfModifRegFormGeneralSectionFieldEdit).dom.submit();">"""]
+        html=["""<select name="input" onchange="javascript:$E('WConfModifRegFormGeneralSectionFieldEdit').dom.submit();  $E('submitButton').dom.disabled=true; $E('cancelButton').dom.disabled=true;">"""]
         keylist=registration.FieldInputs.getAvailableInputKeys()
         keylist.sort()
         for key in keylist:

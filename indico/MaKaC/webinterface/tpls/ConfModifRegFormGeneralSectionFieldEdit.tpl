@@ -34,7 +34,7 @@
   }
 </script>
 
-<form id="WConfModifRegFormGeneralSectionFieldEdit" name="WConfModifRegFormGeneralSectionFieldEdit" action=<%= postURL %> method="POST" onsubmit="return controle()">
+<form id="WConfModifRegFormGeneralSectionFieldEdit" name="WConfModifRegFormGeneralSectionFieldEdit" action=<%= postURL %> method="POST" onsubmit="return controle();">
   <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
       <td class="groupTitle" colspan="2"> <%= _("Modify general field")%></td>
@@ -70,8 +70,8 @@
     </tr>
     <tr>
       <td valign="bottom" align="left" colspan="2">
-      <input type="submit" class="btn" name="save" value="<%= _("save")%>" style="width:80px" onFocus="saveIsFocused=true;" onBlur="saveIsFocused=false;">
-      <input type="submit" class="btn" name="cancel" value="<%= _("cancel")%>" style="width:80px">
+      <input id="submitButton" type="submit" class="btn" name="save" value="<%= _("save")%>" style="width:80px" onFocus="saveIsFocused=true;" onBlur="saveIsFocused=false;">
+      <input id="cancelButton" type="submit" class="btn" name="cancel" value="<%= _("cancel")%>" style="width:80px">
       </td>
     </tr>
   </table>
