@@ -33,6 +33,7 @@
 <table width="100%" class="filesTab">
 <tr>
 <td>
+    <% prevNextNo += 1 %>
     <% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
 
     <% if not overload: %>
@@ -51,6 +52,7 @@
             </tr>
         </table>
         <br /><br />
+        <% prevNextNo += 1 %>
         <% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
     <% end %>
 
@@ -108,6 +110,7 @@
         </tr>
     </table>
 
+    <% prevNextNo += 1 %>
     <% includeTpl( 'RoomBookingBookingListPrevNext' ) %>
 
 

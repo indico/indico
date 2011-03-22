@@ -1,6 +1,5 @@
 
 <% if withPrevNext: %>
-    <% prevNextNo += 1%>
     <table style="width: 98%; border-collapse: collapse; margin-top: 5px; background-color: #F5F5F5">
     <tr>
     <td><a href="<%= prevURL %>" style="font-size: xx-small;">&lt; <%= _("previous")+" "%> <%= periodName %></a></td>
