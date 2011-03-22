@@ -11,7 +11,7 @@
             </span>
         <% end %>
         <% else: %>
-            <a href="<%= urlHandlers.UHRoomBookingBookingForm.getURL( room )%>&day=<%= dayDT.day %>&month=<%= dayDT.month %>&year=<%= dayDT.year %>" class="dateLink <%= dateclass %>">
+            <a href="<%= urlHandlers.UHRoomBookingBookingForm.getURL( room )%>&day=<%= dayDT.day %>&month=<%= dayDT.month %>&year=<%= dayDT.year %>&ignoreSession=1" class="dateLink <%= dateclass %>">
                 <span>
                     <%= formatDate(dayDT) %>
                 </span>

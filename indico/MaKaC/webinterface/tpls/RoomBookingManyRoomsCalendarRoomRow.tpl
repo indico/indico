@@ -1,7 +1,7 @@
 <tr>
     <!-- Room Column -->
     <td width="120px">
-        <a href="<%= urlHandlers.UHRoomBookingBookingForm.getURL( room )%>&day=<%= dayD.day %>&month=<%= dayD.month %>&year=<%= dayD.year %>" class="roomLink <%= roomClass( room ) %>">
+        <a href="<%= urlHandlers.UHRoomBookingBookingForm.getURL( room )%>&day=<%= dayD.day %>&month=<%= dayD.month %>&year=<%= dayD.year %>&ignoreSession=1" class="roomLink <%= roomClass( room ) %>">
             <span class="<%= roomClass( room ) %>" >
                 <%= room.building %>-<%= room.floor %>-<%= room.roomNr %>
                 <% if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr): %>
