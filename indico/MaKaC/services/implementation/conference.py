@@ -228,12 +228,12 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
             locName = loc.getName()
             locAddress = loc.getAddress()
         else:
-            locName = None
+            locName = ''
             locAddress = ''
         if room:
             roomName = room.name
         else:
-            roomName = None
+            roomName = ''
 
         return { 'location': locName,
                  'room': roomName,
