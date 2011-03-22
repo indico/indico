@@ -569,8 +569,8 @@ def getHierarchicalId(obj):
         ret="%s.%s"%(obj.getConference().getId(),ret)
     elif isinstance(obj, conference.SubContribution):
         ret="%s.%s.%s"%(obj.getConference().getId(), obj.getContribution().getId(), ret)
-#    elif isinstance(obj, conference.DeletedObject):
-#        ret=obj.getId().replace(':','.')
+    #elif isinstance(obj, conference.DeletedObject):
+    #    ret=obj.getId().replace(':','.')
     elif isinstance(obj, conference.Session):
         ret="%s.s%s"%(obj.getConference().getId(), ret)
     elif isinstance(obj, conference.SessionSlot):

@@ -209,7 +209,7 @@ class PushSyncAgent(SyncAgent):
         self._lastTry = None
         self._access = access
 
-    def _run(self, data, logger=None, monitor=None):
+    def _run(self, data, logger=None, monitor=None, dbi=None):
         """
         Overloaded - will contain the specific agent code
         """
@@ -230,7 +230,7 @@ class PushSyncAgent(SyncAgent):
         Overloaded by agents
         """
 
-    def run(self, currentTS, logger=None, monitor=None):
+    def run(self, currentTS, logger=None, monitor=None, dbi=None):
         """
         Main method, called when agent needs to be run
         """
@@ -255,7 +255,7 @@ class PushSyncAgent(SyncAgent):
         try:
             records = self._generateRecords(data, till)
             # run agent-specific cycle
-            result = self._run(records, logger=logger, monitor=monitor)
+            result = self._run(records, logger=logger, monitor=monitor, dbi=dbi)
         except:
             if logger:
                 logger.exception("Problem running agent %s" % self.getId())
@@ -391,9 +391,10 @@ class RecordUploader(object):
         """
         raise Exception("Unimplemented method!")
 
-    def iterateOver(self, iterator):
+    def iterateOver(self, iterator, dbi=None):
         """
         Consumes an iterator, uploading the records that are returned
+        `dbi` can be passed, so that the cache is cleared once in a while
         """
 
         currentBatch = []
@@ -407,10 +408,14 @@ class RecordUploader(object):
 
             currentBatch.append(record)
 
+        if dbi:
+            dbi.abort()
+
         if currentBatch:
             self._uploadBatch(currentBatch)
 
         return True
+
 
 ###################
 # This code is now unused.

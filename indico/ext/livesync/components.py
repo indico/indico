@@ -30,13 +30,12 @@ from zope.interface import implements
 from indico.core.api import Component
 from indico.core.api.events import IAccessControlListener, IObjectLifeCycleListener, \
      IMetadataChangeListener
-from indico.core.api.db import IDBUpdateListener, DBUpdateException
 from indico.core.api.rh import IServerRequestListener
 from indico.util.date_time import int_timestamp, nowutc
+from indico.util.event import uniqueId
 
 # plugin imports
 from indico.ext.livesync.base import ActionWrapper
-from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.agent import SyncManager
 
 # legacy indico imports
@@ -58,8 +57,8 @@ class RequestListener(Component):
     def requestFinished(self, obj, req):
 
         sm = SyncManager.getDBInstance()
-        track = sm.getTrack()
         cm = ContextManager.get('indico.ext.livesync:actions')
+        cm_ids = ContextManager.get('indico.ext.livesync:ids')
 
         timestamp = int_timestamp(nowutc())
 
@@ -70,19 +69,22 @@ class RequestListener(Component):
         # Insert the elements from the temporary index
         # into the permanent one (MPT)
         for obj, actions in cm.iteritems():
+            objId = cm_ids[obj]
             for action in actions:
-                Logger.get('ext.livesync').debug((obj, action))
+                Logger.get('ext.livesync').debug((objId, action))
                 # TODO: remove redundant items
             sm.add(timestamp,
-                   ActionWrapper(timestamp, obj, actions))
+                   ActionWrapper(timestamp, obj, actions, objId))
 
     def requestRetry(self, obj, req, nretry):
         # reset the context manager
         ContextManager.set('indico.ext.livesync:actions', {})
+        ContextManager.set('indico.ext.livesync:ids', {})
 
     def requestStarted(self, obj, req):
         # reset the context manager
         ContextManager.set('indico.ext.livesync:actions', {})
+        ContextManager.set('indico.ext.livesync:ids', {})
 
 
 class ObjectChangeListener(Component):
@@ -104,9 +106,12 @@ class ObjectChangeListener(Component):
         cm_set = ContextManager.get('indico.ext.livesync:actions').setdefault(
             obj, set([]))
 
+
         # the context may not be initialized
         if cm_set != None:
             cm_set |= set(actions)
+        ContextManager.get('indico.ext.livesync:ids').setdefault(
+            obj, uniqueId(obj))
 
     def _protectionChanged(self, obj, oldValue, newValue):
         """

@@ -522,11 +522,15 @@ class DataInt:
         if not out:
             out = self._XMLGen
 
+
         if deleted:
+            if type(obj) != str:
+                raise AttributeError("Expected int id, got '%s'" % obj)
+
             out.openTag("record")
 
             out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
-            out.writeTag("subfield","INDICO.%s" % self.getItemId(obj),[["code","a"]])
+            out.writeTag("subfield","INDICO.%s" % obj,[["code","a"]])
             out.closeTag("datafield")
 
             out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])

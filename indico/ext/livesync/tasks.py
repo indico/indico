@@ -18,6 +18,9 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# legacy imports
+from MaKaC.common import DBMgr
+
 # indico imports
 from indico.modules.scheduler import PeriodicTask
 from indico.util.date_time import nowutc, int_timestamp
@@ -46,8 +49,9 @@ class LiveSyncUpdateTask(PeriodicTask):
 
             logger.info("Starting agent '%s'" % agtName)
             try:
+                dbi = DBMgr.getInstance()
                 # pass the current time and a logger
-                result = agent.run(int_timestamp(nowutc()), logger=logger)
+                result = agent.run(int_timestamp(nowutc()), logger=logger, dbi=dbi)
             except:
                 logger.exception("Problem running agent '%s'" % agtName)
                 return

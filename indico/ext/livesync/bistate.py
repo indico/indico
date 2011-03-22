@@ -113,7 +113,7 @@ class BistateRecordProcessor(object):
                     cls._computeProtectionChanges(obj, action, records)
 
         for record, state in records.iteritems():
-            yield record, state
+            yield record, aw.getObjectId(), state
 
 
 class BistateBatchUploaderAgent(PushSyncAgent):
@@ -146,7 +146,7 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             k /= 2
         return "{0:<40} {1}".format(obj, ' '.join(parts))
 
-    def _getMetadata(self, records):
+    def _getMetadata(self, records, logger=None):
         """
         Retrieves the MARCXML metadata for the record
         """
@@ -159,9 +159,14 @@ class BistateBatchUploaderAgent(PushSyncAgent):
 
         xg.openTag("collection", [["xmlns", "http://www.loc.gov/MARC21/slim"]])
 
-        for record, operation in records:
-            di.toMarc(record, overrideCache=True,
-                      deleted=(operation & STATUS_DELETED))
+        for record, recId, operation in records:
+            deleted = operation & STATUS_DELETED
+            try:
+                di.toMarc(recId if deleted else record, overrideCache=True, deleted=deleted)
+            # TODO: Replace with MetadataGenerationException or similar?
+            except AttributeError:
+                if logger:
+                    logger.exception("Problem generating metadata for %s!" % record)
 
         xg.closeTag("collection")
 

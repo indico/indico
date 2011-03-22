@@ -49,7 +49,7 @@ class CERNSearchUploadAgent(BistateBatchUploaderAgent):
         self._username = username
         self._password = password
 
-    def _run(self, records, logger=None, monitor=None):
+    def _run(self, records, logger=None, monitor=None, dbi=None):
 
         self._v_logger = logger
 
@@ -62,7 +62,7 @@ class CERNSearchUploadAgent(BistateBatchUploaderAgent):
             self._v_logger.info('Starting metadata/upload cycle')
 
         # iterate over the returned records and upload them
-        return uploader.iterateOver(records)
+        return uploader.iterateOver(records, dbi=dbi)
 
 
 class CERNSearchRecordUploader(RecordUploader):

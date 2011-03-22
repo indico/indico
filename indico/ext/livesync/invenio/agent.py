@@ -33,7 +33,7 @@ from indico.ext.livesync.invenio.invenio_connector import InvenioConnector
 
 class InvenioBatchUploaderAgent(BistateBatchUploaderAgent):
 
-    def _run(self, records, logger=None, monitor=None):
+    def _run(self, records, logger=None, monitor=None, dbi=None):
 
         self._v_logger = logger
 
@@ -47,7 +47,7 @@ class InvenioBatchUploaderAgent(BistateBatchUploaderAgent):
             self._v_logger.info('Starting metadata/upload cycle')
 
         # iterate over the returned records and upload them
-        return uploader.iterateOver(records)
+        return uploader.iterateOver(records, dbi=None)
 
 
 class InvenioRecordUploader(RecordUploader):
@@ -70,7 +70,7 @@ class InvenioRecordUploader(RecordUploader):
         # get a batch
 
         self._logger.info('Generating metadata')
-        data = self._agent._getMetadata(batch)
+        data = self._agent._getMetadata(batch, logger=self._logger)
         self._logger.info('Metadata ready ')
 
         tgen = time.time() - tstart

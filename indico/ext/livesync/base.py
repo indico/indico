@@ -45,13 +45,17 @@ class ActionWrapper(Persistent):
     operation
     """
 
-    def __init__(self, timestamp, obj, actions):
+    def __init__(self, timestamp, obj, actions, objId):
         self._timestamp = timestamp
         self._obj = obj
+        self._objId = objId
         self._actions = actions
 
     def getObject(self):
         return self._obj
+
+    def getObjectId(self):
+        return self._objId
 
     def getActions(self):
         return self._actions

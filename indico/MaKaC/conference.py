@@ -7576,7 +7576,7 @@ class Contribution(CommonObjectBase, Locatable):
             parentId = self.parent.getId()
         else:
             parentId = None
-        return "<Contribution %s:%s@%s>" % (self.getId(), parentId, hex(id(self)))
+        return "<Contribution %s:%s@%s>" % (parentId, self.getId(), hex(id(self)))
 
     def getTimezone( self ):
         return self.getConference().getTimezone()
@@ -9759,7 +9759,7 @@ class SubContribution(CommonObjectBase, Locatable):
         else:
             parentId = None
             grandpaId = None
-        return "<SubCont %s:%s:%s@%s>" % (self.getId(), parentId, grandpaId, hex(id(self)))
+        return "<SubCont %s:%s:%s@%s>" % (grandpaId, parentId, self.getId(), hex(id(self)))
 
     def isFullyPublic( self ):
         if hasattr(self, "_fullyPublic"):
