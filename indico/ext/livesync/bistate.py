@@ -38,6 +38,15 @@ STATUS_DELETED, STATUS_CREATED, STATUS_CHANGED = 1, 2, 4
 
 class BistateRecordProcessor(object):
 
+    _lastCacheSweep = 0
+
+    @classmethod
+    def _cacheControl(cls, dbi, chgSet):
+        if dbi and len(chgSet) > (cls._lastCacheSweep + 1000):
+            # cache sweep
+            dbi.sync()
+            cls._lastCacheSweep = len(chgSet)
+
     @classmethod
     def _setStatus(cls, chgSet, obj, state):
         if obj not in chgSet:
@@ -46,12 +55,13 @@ class BistateRecordProcessor(object):
         chgSet[obj] |= state
 
     @classmethod
-    def _breakDownCategory(cls, categ, chgSet, state):
+    def _breakDownCategory(cls, categ, chgSet, state, dbi=None):
 
         # categories are never converted to records
 
         for conf in categ.getAllConferenceList():
             cls._breakDownConference(conf, chgSet, state)
+            cls._cacheControl(dbi, chgSet)
 
     @classmethod
     def _breakDownConference(cls, conf, chgSet, state):
@@ -70,18 +80,19 @@ class BistateRecordProcessor(object):
             cls._setStatus(chgSet, scontrib, state)
 
     @classmethod
-    def _computeProtectionChanges(cls, obj, action, chgSet):
+    def _computeProtectionChanges(cls, obj, action, chgSet, dbi=None):
         if isinstance(obj, conference.Category):
-            cls._breakDownCategory(obj, chgSet, STATUS_CHANGED)
+            cls._breakDownCategory(obj, chgSet, STATUS_CHANGED, dbi=dbi)
         elif isinstance(obj, conference.Conference):
             cls._breakDownConference(obj, chgSet, STATUS_CHANGED)
         elif isinstance(obj, conference.Contribution):
             cls._breakDownContribution(obj, chgSet, STATUS_CHANGED)
         elif isinstance(obj, conference.SubContribution):
             cls._setStatus(chgSet, obj, STATUS_CHANGED)
+        cls._cacheControl(dbi, chgSet)
 
     @classmethod
-    def computeRecords(cls, data, access):
+    def computeRecords(cls, data, access, dbi=None):
         """
         Receives a sequence of ActionWrappers and returns a sequence
         of records to be updated (created, changed or deleted)
@@ -110,7 +121,7 @@ class BistateRecordProcessor(object):
                 elif action in ['set_private', 'set_public', 'data_changed',
                                 'acl_changed', 'moved']:
                     # protection changes have to be handled more carefully
-                    cls._computeProtectionChanges(obj, action, records)
+                    cls._computeProtectionChanges(obj, action, records, dbi=dbi)
 
         for record, state in records.iteritems():
             yield record, aw.getObjectId(), state
@@ -130,7 +141,7 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             aid, name, description, updateTime, access)
         self._url = url
 
-    def record_str(self, (obj, status)):
+    def record_str(self, (obj, objId, status)):
         """
         Translates the objects/states to an easy to read textual representation
         """
@@ -172,5 +183,5 @@ class BistateBatchUploaderAgent(PushSyncAgent):
 
         return xg.getXml()
 
-    def _generateRecords(self, data, lastTS):
-        return BistateRecordProcessor.computeRecords(data, self._access)
+    def _generateRecords(self, data, lastTS, dbi=None):
+        return BistateRecordProcessor.computeRecords(data, self._access, dbi=dbi)

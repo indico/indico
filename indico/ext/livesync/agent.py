@@ -103,7 +103,7 @@ class SyncAgent(Fossilizable, Persistent):
         self._recording = False
         self._access = access
 
-    def record_str(self, (obj, status)):
+    def record_str(self, (obj, objId, status)):
         """
         Translates the objects/states to an easy to read textual representation
         """
@@ -215,7 +215,7 @@ class PushSyncAgent(SyncAgent):
         """
         raise Exception("Undefined method")
 
-    def _generateRecords(self, data, lastTS):
+    def _generateRecords(self, data, lastTS, dbi=None):
         """
         :param data: iterable containing data to be converted
         :param lastTS:
@@ -253,7 +253,7 @@ class PushSyncAgent(SyncAgent):
                         (self.getId(), till))
 
         try:
-            records = self._generateRecords(data, till)
+            records = self._generateRecords(data, till, dbi=dbi)
             # run agent-specific cycle
             result = self._run(records, logger=logger, monitor=monitor, dbi=dbi)
         except:
@@ -408,8 +408,8 @@ class RecordUploader(object):
 
             currentBatch.append(record)
 
-        if dbi:
-            dbi.abort()
+            if dbi:
+                dbi.abort()
 
         if currentBatch:
             self._uploadBatch(currentBatch)

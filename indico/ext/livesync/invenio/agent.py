@@ -47,7 +47,7 @@ class InvenioBatchUploaderAgent(BistateBatchUploaderAgent):
             self._v_logger.info('Starting metadata/upload cycle')
 
         # iterate over the returned records and upload them
-        return uploader.iterateOver(records, dbi=None)
+        return uploader.iterateOver(records, dbi=dbi)
 
 
 class InvenioRecordUploader(RecordUploader):
