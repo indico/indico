@@ -1400,32 +1400,11 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
         il = []
         am = AuthenticatorMgr()
         authTagList = [i.getId() for i in am.getList()]
-        for item in self._avatar.getIdentityList():
-            if not item.getAuthenticatorTag() in authTagList:
-                continue
-            changePassword = ""
-            if item.getAuthenticatorTag() != "Local" :
-                changePassword = _("External account")
-            else :
-                changeURL = urlHandlers.UHUserIdentityChangePassword.getURL()
-                changeURL.addParam("userId",self._avatar.getId())
-                changeURL.addParam("identityId",item.getId())
-                changePassword = _("""<a href="%s"><small> _("Change password")</small></a>""")%changeURL
-            il.append("""
-                        <tr>
-                            <td width="60%%">
-                                <input type="checkbox" name="selIdentities" value="%s"> %s
-                            </td>
-                            <td width="20%%">
-                                <small>%s</small>
-                            </td>
-                            <td width="20%%">
-                                %s
-                            </td>
-                        </tr>
-                        """%(item.getId(), item.getLogin(), item.getAuthenticatorTag(), changePassword) )
-        vars["items"] = "".join( il )
+
+        vars["identityItems"] = filter(lambda x: not x.getAuthenticatorTag() in authTagList, self._avatar.getIdentityList())
+        vars["avatar"] = self._avatar
         vars["locator"] = self._avatar.getLocator().getWebForm()
+        vars["accountManagementActive"] = 'Local' in authTagList
         return vars
 
 
