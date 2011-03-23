@@ -18,9 +18,16 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.i18n import _
 
-class CountryHolder:
+class CountryHolder(object):
+    """
+    Contains all countries in the world
+    """
+
+    # old countries that no longer exist
+    _oldCountries = {
+        'SU': "USSR"
+        }
 
     _countries = {}
     _countries['AF'] = "AFGHANISTAN"
@@ -217,7 +224,6 @@ class CountryHolder:
     _countries['GB'] = "UNITED KINGDOM"
     _countries['US'] = "UNITED STATES OF AMERICA"
     _countries['UY'] = "URUGUAY"
-    _countries['SU'] = "USSR"
     _countries['UZ'] = "UZBEKISTAN"
     _countries['VA'] = "VATICAN CITY STATE"
     _countries['VE'] = "VENEZUELA"
@@ -230,26 +236,45 @@ class CountryHolder:
 
     @classmethod
     def getCountries(cls):
+        """
+        Return the whole country dictionary
+        """
         return cls._countries
 
     @classmethod
     def getCountryList( cls ):
+        """
+        Returns all country names
+        """
         return cls._countries.values()
 
     @classmethod
-    def getCountryById( cls, id ):
-        return cls._countries.get(id, "")
+    def getCountryById( cls, cid ):
+        """
+        Returns the country, given its ID
+        """
+        return cls._countries.get(cid,
+                                  cls._oldCountries.get(cid, cid))
 
     @classmethod
     def getCountryKeys(cls):
+        """
+        Returns all country ids
+        """
         return cls._countries.keys()
 
     @classmethod
     def getCountrySortedKeys(cls):
+        """
+        Country ids, sorted alphabetically by country name
+        """
         keys = cls.getCountryKeys()
         keys.sort(cls._sortByValue)
         return keys
 
     @classmethod
     def _sortByValue(cls, v1, v2):
+        """
+        Auxiliar function for country id sorting
+        """
         return cmp(cls._countries[v1], cls._countries[v2])
