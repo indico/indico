@@ -337,11 +337,20 @@ class Judgement(Persistent, Fossilizable):
         """
         pass
 
+    def _getAnswerCounter(self):
+        try:
+            if self._answerCounter:
+                pass
+        except AttributeError:
+            self._answerCounter = Counter(1)
+        return self._answerCounter
+
+
     def getNewAnswerId(self):
         """ Returns a new an unused answerId
             Increments the answerId counter
         """
-        return self._answerCounter.newCount()
+        return self._getAnswerCounter().newCount()
 
     def getAllAnswers(self):
         return self._answers
@@ -387,7 +396,11 @@ class Judgement(Persistent, Fossilizable):
         numberOfAnswers = len(ConferencePaperReview.reviewingQuestionsAnswers)
         question = self._getQuestionById(questionId)
         newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
-        self._answers.append(newAnswer)
+        try:
+            self._answers.append(newAnswer)
+        except AttributeError:
+            self._answers = []
+            self._answers.append(newAnswer)
         self.notifyModification()
         return newAnswer
 
