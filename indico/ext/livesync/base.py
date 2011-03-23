@@ -79,8 +79,9 @@ class ActionWrapper(Persistent):
             return tscmp
 
     def __str__(self):
-        return "<ActionWrapper@%s (%s) [%s] %s>" % (hex(id(self)),
+        return "<ActionWrapper@%s (%s %s) [%s] %s>" % (hex(id(self)),
                                                     self._obj,
+                                                    self._objId,
                                                     ','.join(self._actions),
                                                     self._timestamp)
 

@@ -54,7 +54,6 @@ class BistateRecordProcessor(object):
     def _setStatus(cls, chgSet, obj, state):
         if obj not in chgSet:
             chgSet[obj] = 0
-
         chgSet[obj] |= state
 
     @classmethod
@@ -102,6 +101,7 @@ class BistateRecordProcessor(object):
         """
 
         records = dict()
+        deletedIds = dict()
 
         for __, aw in data:
             obj = aw.getObject()
@@ -115,6 +115,7 @@ class BistateRecordProcessor(object):
                 if action == 'deleted' and not isinstance(obj, conference.Category):
                     # if the record has been deleted, mark it as such
                     # nothing else will matter
+                    deletedIds[obj] = aw.getObjectId()
                     cls._setStatus(records, obj, STATUS_DELETED)
 
                 elif action == 'created' and not isinstance(obj, conference.Category):
@@ -129,8 +130,11 @@ class BistateRecordProcessor(object):
                     if not isinstance(obj, conference.Category):
                         cls._setStatus(records, obj, STATUS_CHANGED)
 
-        for record, state in records.iteritems():
-            yield record, aw.getObjectId(), state
+        for robj, state in records.iteritems():
+            if state & STATUS_DELETED:
+                yield robj, deletedIds[robj], state
+            else:
+                yield robj, None, state
 
 
 class BistateBatchUploaderAgent(PushSyncAgent):
@@ -161,7 +165,7 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             if status & k:
                 parts.append(states[k])
             k /= 2
-        return "{0:<40} {1}".format(obj, ' '.join(parts))
+        return "{0:<40} {1:<20} {2}".format(obj, objId, ' '.join(parts))
 
     def _getMetadata(self, records, logger=None):
         """
