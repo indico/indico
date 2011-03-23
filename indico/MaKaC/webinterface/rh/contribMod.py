@@ -1518,6 +1518,8 @@ class RHContributionPerformMove(RHContribModifBaseSpecialSesCoordRights):
     def _checkParams(self, params):
         RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
         self._dest = params["Destination"]
+        if self._dest == "--no-sessions--":
+            raise MaKaCError( _("Undefined destination for the contribution."))
 
     def _process(self):
         conf = self._target.getConference()

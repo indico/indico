@@ -942,7 +942,7 @@ var userSelected = function(user, contrPerAttribute){
 
         switch(action) {
         case 'assign_referee':
-        	var killProgress = IndicoUI.Dialogs.Util.progress();
+            var killProgress = IndicoUI.Dialogs.Util.progress();
             indicoRequest(
                 'reviewing.conference.assignReferee',
                 params,
@@ -959,7 +959,7 @@ var userSelected = function(user, contrPerAttribute){
                         }
                         killProgress();
                     } else {
-                    	killProgress();
+                        killProgress();
                         IndicoUtil.errorReport(error);
                     }
                 }
@@ -967,7 +967,7 @@ var userSelected = function(user, contrPerAttribute){
             break;
 
         case 'assign_editor':
-        	var killProgress = IndicoUI.Dialogs.Util.progress();
+            var killProgress = IndicoUI.Dialogs.Util.progress();
             indicoRequest(
                 'reviewing.conference.assignEditor',
                 params,
@@ -984,7 +984,7 @@ var userSelected = function(user, contrPerAttribute){
                         }
                         killProgress();
                     } else {
-                    	killProgress();
+                        killProgress();
                         IndicoUtil.errorReport(error);
                     }
                 }
@@ -992,7 +992,7 @@ var userSelected = function(user, contrPerAttribute){
             break;
 
         case 'add_reviewer':
-        	var killProgress = IndicoUI.Dialogs.Util.progress();
+            var killProgress = IndicoUI.Dialogs.Util.progress();
             indicoRequest(
                 'reviewing.conference.addReviewer',
                 params,
@@ -1020,7 +1020,7 @@ var userSelected = function(user, contrPerAttribute){
                         }
                         killProgress();
                     } else {
-                    	killProgress();
+                        killProgress();
                         IndicoUtil.errorReport(error);
                     }
                 }
@@ -1230,7 +1230,7 @@ var fetchUsers = function(order, role) {
                             span1 = Html.span({}, message);
                        }
                        if (!result.length)
-                           var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + $T("s proposed for this conference. "));
+                           var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."));
                        else
                            var content = userList;
                        return this.ExclusivePopup.prototype.draw.call(this, Widget.block([span1, content, divButton]));
@@ -1285,28 +1285,28 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                             if(!error){
                                     var attributes = $L();
                                     var attributeTemplate = function(att){
-		                                var li = Html.li({style:{listStyleType:"none", paddingBottom:'3px'}});
-		                                var id = (att.id);
-		                                var name = ("selected"+attribute);
-		                                var checkbox = Html.input('checkbox', {id: id, name: name});
-		                                var attributeName = Html.span({style:{marginLeft:'5px', fontSize: '13px'}}, att.title);
+                                        var li = Html.li({style:{listStyleType:"none", paddingBottom:'3px'}});
+                                        var id = (att.id);
+                                        var name = ("selected"+attribute);
+                                        var checkbox = Html.input('checkbox', {id: id, name: name});
+                                        var attributeName = Html.span({style:{marginLeft:'5px', fontSize: '13px'}}, att.title);
 
-		                                li.set(Widget.inline([checkbox, attributeName]));
+                                        li.set(Widget.inline([checkbox, attributeName]));
 
-		                                return li;
+                                        return li;
                                     }
-	                                var step1 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 1: Choose a '+ attribute);
-	                                var attList = Html.ul();
-	                                bind.element(attList, attributes, attributeTemplate);
+                                    var step1 = Html.span({style:{fontSize:'18px'}, className:'groupTitle groupTitleNoBorder'}, 'Step 1: Choose a '+ attribute);
+                                    var attList = Html.ul();
+                                    bind.element(attList, attributes, attributeTemplate);
                                     if(result.length==0) {
                                         var killProgress = IndicoUI.Dialogs.Util.progress()
                                         popup.close();
                                         killProgress();
                                         alert('There is no '+attribute+' define.');
                                     }
-	                                for (i in result) {
-	                                attributes.append(result[i]);
-	                                }
+                                    for (i in result) {
+                                    attributes.append(result[i]);
+                                    }
 
                                     AttributeDiv.set(Widget.block([step1,attList]));
                             } else {
@@ -1342,12 +1342,12 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                                           contrPerAttribute.push(result[i]);
                                                     }
                                                     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-													        <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
-													            if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
-													                return;
-													            }
-													        <% end %>
-													   }
+                                                            <% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): %>
+                                                                if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
+                                                                    return;
+                                                                }
+                                                            <% end %>
+                                                       }
                                                     userSelected(user, contrPerAttribute);
                                             }
                                             else {
@@ -1384,29 +1384,29 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                 if(chAtt.length == 0){
                                     alert($T('You must select at least one attribute.'));
                                 } else {
-	                                var checkedBtn = function(){
-		                                var allBtn = document.getElementsByName('radioBtn');
-			                            for (var i=0; i<allBtn.length; i++) {
-			                                var cb = allBtn[i];
-			                                if (cb.checked) {
-			                                   return cb.id
-			                                }
-			                            }
-		                           }
-		                           var checkedBtnId = checkedBtn();
-		                           if(checkedBtnId == null){
-		                               alert($T('You must select at least one user.'));
-		                           } else {
-									   for (var i=0; i < users.length.get(); i++) {
-									       user = users.item(i);
-									       if (user.id == checkedBtnId) {
-									           contributionsIdList(user, chAtt);
-									       }
-									   }
-		                               var killProgress = IndicoUI.Dialogs.Util.progress()
-		                               popup.close();
-		                               killProgress();
-	                               }
+                                    var checkedBtn = function(){
+                                        var allBtn = document.getElementsByName('radioBtn');
+                                        for (var i=0; i<allBtn.length; i++) {
+                                            var cb = allBtn[i];
+                                            if (cb.checked) {
+                                               return cb.id
+                                            }
+                                        }
+                                   }
+                                   var checkedBtnId = checkedBtn();
+                                   if(checkedBtnId == null){
+                                       alert($T('You must select at least one user.'));
+                                   } else {
+                                       for (var i=0; i < users.length.get(); i++) {
+                                           user = users.item(i);
+                                           if (user.id == checkedBtnId) {
+                                               contributionsIdList(user, chAtt);
+                                           }
+                                       }
+                                       var killProgress = IndicoUI.Dialogs.Util.progress()
+                                       popup.close();
+                                       killProgress();
+                                   }
                                 }
                             });
 
@@ -1418,7 +1418,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
 
                      if (!result.length) {
                          divButtons.append(cancelButton);
-                         var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + $T("s proposed for this conference. "));
+                         var content = Html.div({style:{textAlign:'center', paddingBottom:'10px'}}, $T("No ") + role + " " + $T("in the reviewing team yet. Please, assign them from the 'Team' tab."));
                          return this.ExclusivePopup.prototype.draw.call(this, Html.div({style: {height: 'auto', width: 'auto'}},Widget.block([content, divButtons])));
                      }
                      else {
@@ -1546,8 +1546,8 @@ $E('btnReset').observeClick(function(){
 var appliedFilter = false;
 
 $E('applyFilter').observeClick(function(){
-	$E('filteringTable').dom.style.display = 'none';
-	buildShowHideFiltering();
+    $E('filteringTable').dom.style.display = 'none';
+    buildShowHideFiltering();
     appliedFilter = true;
     fetchContributions();
     <% if not IsOnlyReferee: %>
