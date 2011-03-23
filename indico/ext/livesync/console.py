@@ -230,7 +230,7 @@ class AgentCommand(ConsoleLiveSyncCommand):
         data = self._sm.query(agentId=args.agent,
                               till=args.till)
 
-        for record in agent._generateRecords(data, args.till):
+        for record in agent._generateRecords(data, args.till, dbi=self._dbi):
             print agent.record_str(record)
 
     def _run(self, args):

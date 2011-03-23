@@ -33,6 +33,9 @@ from MaKaC.common.xmlGen import XMLGen
 STATUS_DELETED, STATUS_CREATED, STATUS_CHANGED = 1, 2, 4
 
 
+# clear the ZEO local cache each new N records
+CACHE_SWEEP_LIMIT = 10000
+
 # Attention: if this class is not declared, the LiveSync management interface
 # will never know this plugin exists!
 
@@ -42,7 +45,7 @@ class BistateRecordProcessor(object):
 
     @classmethod
     def _cacheControl(cls, dbi, chgSet):
-        if dbi and len(chgSet) > (cls._lastCacheSweep + 1000):
+        if dbi and len(chgSet) > (cls._lastCacheSweep + CACHE_SWEEP_LIMIT):
             # cache sweep
             dbi.sync()
             cls._lastCacheSweep = len(chgSet)
@@ -118,10 +121,13 @@ class BistateRecordProcessor(object):
                     # if the record has been created, mark it as such
                     cls._setStatus(records, obj, STATUS_CREATED)
 
-                elif action in ['set_private', 'set_public', 'data_changed',
-                                'acl_changed', 'moved']:
+                elif action in ['set_private', 'set_public','acl_changed', 'moved']:
                     # protection changes have to be handled more carefully
                     cls._computeProtectionChanges(obj, action, records, dbi=dbi)
+
+                elif action == 'data_changed':
+                    if not isinstance(obj, conference.Category):
+                        cls._setStatus(records, obj, STATUS_CHANGED)
 
         for record, state in records.iteritems():
             yield record, aw.getObjectId(), state
