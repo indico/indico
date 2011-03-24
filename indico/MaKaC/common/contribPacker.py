@@ -346,3 +346,34 @@ class ProceedingsPacker:
         return fileHandler.getPath()
 
 
+class ReviewingPacker:
+
+    """
+        Package the reviewing materials for the accepted papers
+    """
+
+    def __init__(self, conf):
+        self._conf = conf
+        self._confDirName = "%s" % self._normalisePathItem(self._conf.getTitle().strip())
+
+    def _normalisePathItem(self, name):
+        return str(name).translate(string.maketrans("",""),"\\/")
+
+    def pack(self, fileHandler=None):
+        for contribution in self._conf.getContributionList():
+            reviewingStatus = contribution.getReviewManager().getLastReview().getRefereeJudgement().getJudgement()
+            if reviewingStatus == "Accept":
+                dirName = "%s" % self._normalisePathItem(contribution.getTitle().strip())
+                self._packContribution(contribution, dirName, fileHandler)
+
+        fileHandler.close()
+        return fileHandler.getPath()
+
+    def _packContribution(self, contribution, dirName="", fileHandler=None):
+
+        for mat in contribution.getReviewManager().getLastReview().getMaterials():
+            for res in mat.getResourceList():
+                fileHandler.add("%s" % (os.path.join(self._confDirName,
+                                                     self._normalisePathItem(contribution.getId()) + "-" + dirName,
+                                                     self._normalisePathItem(res.getFileName()))),
+                                        res.getFilePath())

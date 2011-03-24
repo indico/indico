@@ -4506,6 +4506,9 @@ class UHConfModifReviewingAssignContributionsList( URLHandler ):
 class UHConfModifReviewingAssignContributionsAssign( URLHandler ):
     _relativeURL = "assignContributions.py/assign"
 
+class UHConfModifReviewingDownloadAcceptedPapers( URLHandler ):
+    _relativeURL = "assignContributions.py/downloadAcceptedPapers"
+
 
 #Contribution reviewing
 class UHContributionModifReviewing( URLHandler ):

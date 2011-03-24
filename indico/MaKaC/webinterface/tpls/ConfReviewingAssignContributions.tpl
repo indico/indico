@@ -120,7 +120,7 @@
     <tr>
         <td>${ _("Referee")}:</td>
         <td id="assignRefereeHelp">
-            <a id="assignRefereeButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
+            <a id="assignRefereeButton_top" class="fakeLink" style="margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_referee_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                 <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
@@ -133,7 +133,7 @@
     <tr>
         <td>${ _("Layout Reviewer")}:</td>
         <td id="assignEditorHelp">
-            <a id="assignEditorButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
+            <a id="assignEditorButton_top" class="fakeLink" style="margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_editor_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                 <a id="assignEditorPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
@@ -146,7 +146,7 @@
     <tr>
         <td>${ _("Content Reviewers")}:</td>
         <td id="assignReviewerHelp">
-            <a id="addReviewerButton_top" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
+            <a id="addReviewerButton_top" class="fakeLink" style="margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_reviewer_top" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                 <a id="assignReviewerPerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
@@ -156,15 +156,21 @@
         </td>
     </tr>
     % endif
+    % if not IsOnlyReferee:
+    <tr>
+        <td>${ _("More")}:</td>
+        <td>
+            <a id="btnDownloadUp" class="fakeLink" style="margin-right: 15px">${ _("Download accepted papers")}</a>
+        </td>
+    </tr>
+    % endif
 </table>
-<!--  and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING) -->
-
 <table style="padding-left:40px;">
         <tr>
-            <td style="padding-bottom: 5px; padding-top: 5px">
+            <td>
                 ${ _("Select:") }
             </td>
-            <td nowrap class="titleCellFormat" style="padding-bottom: 20px;  padding-top: 20px; border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
+            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF">
                  <span onclick="selectAll('selectedContributions')" align="left" style="cursor:pointer;padding-bottom:5px;color:#0B63A5;list-style-type:none;" onmouseover="this.style.color='#E25300'" onmouseout="this.style.color='#0B63A5'">
                         ${ _("All")}
                  </span>,
@@ -223,13 +229,12 @@
 
    <tbody id="tablebody"></tbody>
 </table>
-
-<table class="shadowRectangleSoft" width="95%" style="margin-top:10px;">
+<table class="shadowRectangleSoft" width="95%" style="margin-top:5px;">
     % if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     <tr>
         <td>${ _("Referee")}:</td>
         <td id="assignRefereeHelp">
-            <a id="assignRefereeButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
+            <a id="assignRefereeButton_bottom" class="fakeLink" style="margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_referee_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                 <a id="assignRefereePerTrackButton_top" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
@@ -242,7 +247,7 @@
     <tr>
         <td>${ _("Layout Reviewer")}:</td>
         <td id="assignEditorHelp">
-            <a id="assignEditorButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
+            <a id="assignEditorButton_bottom" class="fakeLink" style="margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_editor_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                 <a id="assignEditorPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
@@ -255,7 +260,7 @@
     <tr>
         <td>${ _("Content Reviewers")}:</td>
         <td id="assignReviewerHelp">
-            <a id="addReviewerButton_bottom" class="fakeLink" style="margin-left: 15px; margin-right: 15px">${ _("Assign")}</a>|
+            <a id="addReviewerButton_bottom" class="fakeLink" style="margin-right: 15px">${ _("Assign")}</a>|
             <span id="assignMenu_reviewer_bottom" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                 <a id="assignReviewerPerTrackButton_bottom" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Assign per ...")}
                 </a>
@@ -265,6 +270,14 @@
         </td>
     </tr>
    % endif
+   % if not IsOnlyReferee:
+    <tr>
+        <td>${ _("More")}:</td>
+        <td>
+            <a id="btnDownloadDown" class="fakeLink" style="margin-right: 15px">${ _("Download accepted papers")}</a>
+        </td>
+    </tr>
+    % endif
 </table>
 
 <div id="userSelection_bottom" style="margin-top: 1em">
@@ -1530,6 +1543,15 @@ var removeUser = function(role) {
 }
 
 // Code to be executed on page load
+
+% if not IsOnlyReferee:
+$E('btnDownloadUp').observeClick(function(){
+    window.location = "${ urlHandlers.UHConfModifReviewingDownloadAcceptedPapers.getURL(Conference) }";
+});
+$E('btnDownloadDown').observeClick(function(){
+    window.location = "${ urlHandlers.UHConfModifReviewingDownloadAcceptedPapers.getURL(Conference) }";
+});
+% endif
 
 buildShowHideFiltering();
 $E('filteringTable').dom.style.display = 'none';
