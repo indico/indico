@@ -560,7 +560,7 @@ type ("RoomMap", ["IWidget"],
             } else if (inputType == 'subtext') {
                 return function(obj) {
                     // search for substring in the string
-                    return contains(obj[propertyName], indexOf(expectedValue));
+                    return str(obj[propertyName]).match(new RegExp(expectedValue, "gi"));
                 }
             } else {
                 return function(obj) {
