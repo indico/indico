@@ -172,7 +172,7 @@ class WPluginAgentStatus(WTemplated):
     NUM_CELLS = 10
 
     def _tsToDate(self, ts, granularity):
-        return datetime.datetime.utcfromtimestamp(ts * granularity)
+        return datetime.datetime.fromtimestamp(ts * granularity)
 
     def _calculateTrackData(self, smanager):
         """

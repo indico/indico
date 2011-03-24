@@ -18,9 +18,25 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import time, pytz
+import time, pytz, calendar
 
 from MaKaC.common.timezoneUtils import nowutc
 
+
+def utc_timestamp(datetimeVal):
+    return int(calendar.timegm(datetimeVal.utctimetuple()))
+
+
+## ATTENTION: Do not use this one for new developments ##
+# It is flawed, as even though the returned value is DST-safe,
+# it is in the _local timezone_, meaning that the number of seconds
+# returned is the one for the hour with the same "value" for the
+# local timezone.
+
 def int_timestamp(datetimeVal, tz = pytz.timezone('UTC')):
+    """
+    Returns the number of seconds from the local epoch to the UTC time
+    """
     return int(time.mktime(datetimeVal.astimezone(tz).timetuple()))
+
+##
