@@ -33,23 +33,6 @@
 
     <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
     <tr>
-      <td class="groupTitle">Webcast Service URL</td>
-    </tr>
-    <tr>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext" style="padding-top: 10px;">
-        <form action="<%= saveWebcastServiceURL %>" method="POST">
-          <input name="webcastServiceURL" value="<%= webcastServiceURL %>"/>
-          <input type="submit" name="submit" value="Save">
-          <span>Used for forthcoming webcast display in event public pages.</span>
-        </form>
-      </td>
-    </tr>
-    </table>
-
-    <br /><br />
-
-    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
-    <tr>
       <td class="groupTitle">Webcast Synchronization</td>
     </tr>
     <tr>
