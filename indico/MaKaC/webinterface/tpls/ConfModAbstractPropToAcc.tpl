@@ -1,6 +1,6 @@
 <% from MaKaC.common.fossilize import fossilize %>
 
-<form action=${ postURL } method="POST" onsubmit="return checkQuestionsAnswered();">
+<form action=${ postURL } method="POST" onsubmit="return questionsManager.checkQuestionsAnswered();">
     <table width="60%" align="left" border="0" cellspacing="6" cellpadding="2" style="padding-top:15px; padding-left:15px;">
         <tr>
             <td class="groupTitle" colspan="2"> ${ _("Propose to be accepted")}</td>
@@ -56,55 +56,18 @@
 
 % if len(abstractReview.getReviewingQuestions()) > 0:
 <script type="text/javascript">
+// JS vars needed from the server.
+var numQuestions = ${ len(abstractReview.getReviewingQuestions()) };
+var reviewingQuestions = ${ fossilize(abstractReview.getReviewingQuestions()) };
+var range = ${ str(range(abstractReview.getNumberOfAnswers())) };
+var labels = ${ str(abstractReview.getRBLabels()) };
+var numAnswers = ${ abstractReview.getNumberOfAnswers() };
+var rbValues = ${ str(abstractReview.getRBTitles()) };
 
-var questionPM = new IndicoUtil.parameterManager();
+var divId = 'questionListDisplay';
 
-var showQuestions = function() {
-
-    var numQuestions = ${ len(abstractReview.getReviewingQuestions()) };
-    var newDiv;
-    var reviewingQuestions = ${ fossilize(abstractReview.getReviewingQuestions()) };
-    var range = ${ str(range(abstractReview.getNumberOfAnswers())) };
-    var labels = ${ str(abstractReview.getRBLabels()) };
-
-    $E("questionListDisplay").set('');
-    for (var i=0; i<numQuestions; i++) {
-        newDiv = Html.div({style:{marginLeft:'10px'}});
-        newDiv.append(Html.span(null, reviewingQuestions[i].text));
-        newDiv.append(Html.br());
-
-        var rbsf = new RadioButtonSimpleField(null, range, labels);
-        rbsf.plugParameterManager(questionPM);
-        newDiv.append(rbsf.draw());
-
-        $E("questionListDisplay").append(newDiv);
-        $E("questionListDisplay").append(Html.br());
-    }
-
-    var numAnswers = ${ abstractReview.getNumberOfAnswers() };
-    var rbValues = ${ str(abstractReview.getRBTitles()) };
-    var groupName = "_GID" // The common name for all the radio buttons
-
-    for (var i=1; i<numQuestions+1; i++) {
-        for (var j=0; j<numAnswers; j++) {
-            $E(groupName+i + "_" + j).dom.onmouseover = function(event) {
-                var value = rbValues[this.defaultValue];
-                IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>"+value+"</span>");
-            };
-        }
-    }
-};
-
-var checkQuestionsAnswered = function() {
-    if(questionPM.check()) {
-        return true;
-    }
-
-    alert($T('Please answer all questions.'));
-    return false;
-};
-
-showQuestions();
+var questionsManager = new QuestionsManager(divId, numQuestions, reviewingQuestions, range, labels, numAnswers, rbValues);
+questionsManager.showQuestions();
 
 </script>
 % endif

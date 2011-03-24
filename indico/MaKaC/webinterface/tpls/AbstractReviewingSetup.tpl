@@ -53,7 +53,7 @@ var question = "How would you rate this abstract?";
 
 // Component for example question
 var previewQuestion =  new ExampleQuestionWidget('abstractReviewing.questions.updateExampleQuestion',
-        {conference: '${ abstractReview.getConference().getId() }'});
+        {conference: '${ abstractReview.getConference().getId() }'}, 'inPlaceShowExample');
 previewQuestion.draw();
 
 // Components to change the number of answers and the scale

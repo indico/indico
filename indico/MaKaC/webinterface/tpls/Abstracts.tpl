@@ -367,8 +367,10 @@ function showQuestionDetails(questions, answers) {
     var content = Html.div();
     var table = Html.table({className:'infoQuestionsTable', cellspacing:'0'});
     content.append(table);
+    var tbody = Html.tbody();
+    table.append(tbody);
     var trHeaders = Html.tr();
-    table.append(trHeaders);
+    tbody.append(trHeaders);
     var tdQuestion = Html.td({className:'dataHeader'},'Question');
     var tdValues = Html.td({className:'dataHeader'},'Average');
     trHeaders.append(tdQuestion);
@@ -382,21 +384,10 @@ function showQuestionDetails(questions, answers) {
         tr = Html.tr({className: 'infoTR'});
         tdQ = Html.td({className: 'content'}, questions[i]);
         tdA = Html.td({className: 'content'}, answers[i]);
-        table.append(tr);
+        tbody.append(tr);
         tr.append(tdQ);
         tr.append(tdA);
     }
-
-    // Create the last row with the average
-    //var trFooter = Html.tr();
-    //var tdAverage = Html.td();
-    //var tdValue = Html.td();
-    //tdAverage = Html.td({className:'dataFooter'}, 'Total abstract');
-    //tdValue = Html.td({className:'dataFooter'}, average);
-    //table.append(trFooter);
-    //trFooter.append(tdAverage);
-    //trFooter.append(tdValue);
-
 
     popup = new AlertPopup('Average per question',content);
     popup.open();

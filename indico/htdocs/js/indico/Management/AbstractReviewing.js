@@ -135,7 +135,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
 type("ExampleQuestionWidget", ["InlineWidget"],
         {
             draw: function() {
-                this.numReq += 1;
+
                 var self = this;
                 // Request to get the new values of number of answers and labels
                 indicoRequest(this.method, this.attributes,
@@ -147,17 +147,12 @@ type("ExampleQuestionWidget", ["InlineWidget"],
                                 var content = Html.div({className:'questionPreview'});
                                 content.append(Html.span(null,question));
                                 content.append(Html.br());
-                                content.append(new RadioButtonPreviewQuestion(
-                                        numberAnswers,
-                                        labels,
-                                        self.numReq).draw());
-                                $E('inPlaceShowExample').set(content);
-                                for (var j=0; j<numberAnswers.length; j++) {
-                                    $E("_GID"+self.numReq+"_" + j).dom.onmouseover = function(event) {
-                                        var value = rbValues[this.defaultValue];
-                                        IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>"+value+"</span>");
-                                    };
-                                }
+                                var rbuttons = new RadioButtonSimpleField(null, numberAnswers, labels, rbValues);
+                                content.append(rbuttons.draw());
+
+                                $E(self.divId).set(content);
+
+                                rbuttons.addRBTitles();
                             } else {
                                 IndicoUtil.errorReport(error);
                             }
@@ -165,11 +160,11 @@ type("ExampleQuestionWidget", ["InlineWidget"],
                  }
         },
 
-        function(method, attributes) {
+        function(method, attributes, divId) {
             this.method = method;
             this.attributes = attributes;
-            this.numReq = 0;
             this.InlineWidget();
+            this.divId = divId;
         });
 
 
@@ -211,15 +206,15 @@ type("RadioButtonSimpleField", ["ErrorAware"],
 
             draw: function() {
 
-                var groupName = Html.generateId(); // The common name for all the radio buttons
+                this.groupName = Html.generateId(); // The common name for all the radio buttons
 
                 var radioButtons = []; // List of radio buttons
 
                 for (var i=0; i<this.options.length; i++) {
                     // For every option we create a radio button
                     var rb = Html.radio({
-                        name: groupName,
-                        id: groupName + "_" + i,
+                        name: this.name,
+                        id: this.groupName + "_" + i,
                         className: "radioButtonAnswer"
                     });
                     rb.dom.value = this.options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
@@ -250,7 +245,7 @@ type("RadioButtonSimpleField", ["ErrorAware"],
                     cell1.dom.vAlign = 'bottom';
                     cell1.dom.align = 'center';
                     cell1.append(Html.label({
-                        htmlFor: groupName + "_" + l
+                        htmlFor: this.groupName + "_" + l
                     }, this.labels[l]));
                     row1.append(cell1);
 
@@ -271,77 +266,30 @@ type("RadioButtonSimpleField", ["ErrorAware"],
                 }
 
                 this.radioButtons = radioButtons;
+
                 return table;
+            },
+
+            addRBTitles: function() {
+                var self = this;
+                // Add the titles for the radio buttons
+                for (var i=0; i<this.radioButtons.length; i++) {
+                    $E(this.radioButtons[i].dom.id).dom.onmouseover = function(event) {
+                        var value = self.rbValues[this.defaultValue];
+                        IndicoUI.Widgets.Generic.tooltip(this, event, "<span style='padding:3px'>"+value+"</span>");
+                    };
+                }
             }
         },
 
-        function(element, options, labels, initialValue, handler) {
+        function(element, options, labels, rbValues, name, initialValue, handler) {
             this.element = element;
             this.options = options;
             this.labels = labels;
             this.initialValue = initialValue;
             this.handler = handler;
-        });
-
-
-type("RadioButtonPreviewQuestion", [],
-        {
-            draw: function() {
-
-                var groupName = "_GID"+this.numId; // The common name for all the radio buttons
-
-                var radioButtons = []; // List of radio buttons
-
-                for (var i=0; i<this.options.length; i++) {
-                    // For every option we create a radio button
-                    var rb = Html.radio({
-                        name: groupName,
-                        id: groupName + "_" + i,
-                        className: "radioButtonAnswer"
-                    });
-                    rb.dom.value = this.options[i]; //For some reason we have to set the value like this and not in the constructor for it to work in IE
-                    radioButtons.push(rb);
-                }
-
-                Logic.onlyOne(radioButtons, false); //Ensures that only 1 radio button will be selected at a given time
-
-                var table = Html.table();
-                table.dom.style.display = 'inline';
-                var tbody = Html.tbody();
-                table.set(tbody);
-
-                var row1 = Html.tr();
-                var row2 = Html.tr();
-
-                for (var l = 0; l < radioButtons.length; l++) {
-                    var cell1 = Html.td();
-                    cell1.dom.vAlign = 'bottom';
-                    cell1.dom.align = 'center';
-                    cell1.append(Html.label({
-                        htmlFor: groupName + "_" + l
-                    }, this.labels[l]));
-                    row1.append(cell1);
-
-                    var cell2 = Html.td();
-                    cell2.append(radioButtons[l]);
-                    row2.append(cell2);
-                }
-
-                cellMessage = Html.td();
-                cellMessage.dom.style.verticalAlign = "middle";
-                cellMessage.dom.rowSpan = 2;
-
-                tbody.append(row1);
-                tbody.append(row2);
-
-                return table;
-            }
-        },
-
-        function(options, labels, numId) {
-            this.options = options;
-            this.labels = labels;
-            this.numId = numId;
+            this.rbValues = rbValues;
+            this.name = name;
         });
 
 
@@ -546,4 +494,60 @@ type("ManageListOfElements", [],
             this.kindOfElement = kindOfElement;
             this.divsIdRoot = divsIdRoot;
             this.specialRemove = specialRemove;
+        });
+
+
+
+/* Class manager to show questions in the abstract reviewing
+@param divId: Identifier of the div destination
+@param numQuestions: number of questions
+@param reviewingQuestions: questions dictionary
+@param range: range for the number of radio buttons
+@param labels: labels shown over between the question and the radio buttons to inform the user of the first and last possible values
+@param numAnswers: number of radio buttons (possible answers)
+@param rbValues: titles for each radio button
+@return none. the div is built inside the showQuestions method
+*/
+type("QuestionsManager", [],
+        {
+            showQuestions: function() {
+
+                var newDiv;
+
+                $E(divId).set('');
+                for (var i=0; i<this.numQuestions; i++) {
+                    newDiv = Html.div({style:{marginLeft:'10px'}});
+                    newDiv.append(Html.span(null, this.reviewingQuestions[i].text));
+                    newDiv.append(Html.br());
+
+                    var name = 'RB_' + (i+1); // Name of the rb component
+
+                    var rbsf = new RadioButtonSimpleField(null, this.range, this.labels, this.rbValues, name);
+                    rbsf.plugParameterManager(this.questionPM);
+                    newDiv.append(rbsf.draw());
+
+                    $E(divId).append(newDiv);
+                    $E(divId).append(Html.br());
+                    rbsf.addRBTitles();
+                }
+            },
+
+            checkQuestionsAnswered: function() {
+                if(this.questionPM.check()) {
+                    return true;
+                }
+                alert($T('Please answer all questions.'));
+                return false;
+            }
+        },
+
+        function(divId, numQuestions, reviewingQuestions, range, labels, numAnswers, rbValues) {
+            this.divId = divId;
+            this.numQuestions = numQuestions;
+            this.reviewingQuestions = reviewingQuestions;
+            this.range = range;
+            this.labels = labels;
+            this.numAnswers = numAnswers;
+            this.rbValues = rbValues;
+            this.questionPM = new IndicoUtil.parameterManager();
         });

@@ -30,7 +30,7 @@ import MaKaC.webinterface.common.abstractFilters as abstractFilters
 import MaKaC.review as review
 from MaKaC.webinterface.rh.conferenceBase import RHTrackBase
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.PDFinterface.conference import TrackManagerAbstractToPDF, TrackManagerAbstractsToPDF
 from MaKaC.common import Config
 import MaKaC.common.filters as filters
@@ -427,7 +427,9 @@ class RHTrackAbstractPropBase(RHTrackAbstractBase):
             c = 0
             for question in self._target.getConference().getConfAbstractReview().getReviewingQuestions():
                 c += 1
-                rbValue = int(params.get("_GID"+str(c),scaleLower))
+                if not params.has_key("RB_"+str(c)):
+                    raise FormValuesError(_("Please, reply to all the reviewing questions. Question \"%s\" is missing the answer.")%question.getText())
+                rbValue = int(params.get("RB_"+str(c),scaleLower))
                 newId = self._target.getConference().getConfAbstractReview().getNewAnswerId()
                 newAnswer = Answer(newId, rbValue, numberOfAnswers, question)
                 newAnswer.calculateRatingValue(scaleLower, scaleHigher)
