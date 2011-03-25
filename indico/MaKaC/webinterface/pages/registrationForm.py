@@ -2321,6 +2321,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             fieldInput = None
             if miscGroup is not None:
                 miscItem=miscGroup.getResponseItemById(f.getId())
+                if miscItem is None: continue # for fields created after the registration of the user, we skip it.
                 fieldInput = miscItem.getGeneralField().getInput()
             v= _("""--_("no value selected")--""")
             if f.isBillable():

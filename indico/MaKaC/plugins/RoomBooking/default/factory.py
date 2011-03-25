@@ -25,24 +25,24 @@ class Factory( object ):
 
     @staticmethod
     def getName():
-        return MaKaC.plugins.RoomBooking.default.pluginName
-        
+        return MaKaC.plugins.RoomBooking.default.__metadata__['name']
+
     @staticmethod
     def getDescription():
-        return MaKaC.plugins.RoomBooking.default.pluginDescription
-    
+        return MaKaC.plugins.RoomBooking.default.__metadata__.get('description')
+
     @staticmethod
     def newRoom( locationName = "" ):
         import MaKaC.plugins.RoomBooking.default.room as room
         newRoom = room.Room()
         newRoom.locationName = locationName
         return newRoom
-    
+
     @staticmethod
     def newReservation():
         import MaKaC.plugins.RoomBooking.default.reservation as reservation
         return reservation.Reservation()
-    
+
     @staticmethod
     def getEquipmentManager():
         import MaKaC.plugins.RoomBooking.default.equipmentManager as equipmentManager

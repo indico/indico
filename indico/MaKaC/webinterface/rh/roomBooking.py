@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.plugins.base import pluginId
 
 # Most of the following imports are probably not necessary - to clean
 
@@ -1957,7 +1958,7 @@ class RHRoomBookingSaveLocation( RHRoomBookingAdminBase ):
         name = params.get("pluginName","default")
         plugs = PluginLoader.getPluginsByType("RoomBooking")
         for plug in plugs:
-            if plug.pluginName == name:
+            if pluginId(plug) == name:
                 self._pluginClass = plug.roombooking.getRBClass()
         if self._pluginClass == None:
             raise MaKaCError( "%s: Cannot find requested plugin" % name )

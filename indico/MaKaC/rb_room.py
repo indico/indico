@@ -738,7 +738,9 @@ rNeedConfirmation: #{self.resvsNeedConfirmation}
             if c == 0:
                 c = cmp( self.floor, other.floor )
                 if c == 0:
-                    c = cmp( self.name, other.name )
+                    c = cmp( self.roomNr, other.roomNr )
+                    if c == 0:
+                        c = cmp( self.name, other.name )
 
         return c
 

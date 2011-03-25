@@ -21,7 +21,7 @@
 from MaKaC.i18n import _
 
 __metadata__ = {
-    'type': "roombooking",
+    'type': "RoomBooking",
     'name': "CERN",
     'description': _("This is the CERN Indico Room Booking plugin. It relies on a ZODB separate backend. It support custom room attributes, and equipment")
     }
