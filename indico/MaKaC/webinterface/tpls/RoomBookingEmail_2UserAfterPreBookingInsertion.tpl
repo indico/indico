@@ -24,4 +24,4 @@ HOW TO GET A KEY (if necessary):
 Telephone: ${ reservation.room.whereIsKey }
 
 If you are the creator of the bookings, you can check them here:
-<%= urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True ) %>
+${ urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True ) }

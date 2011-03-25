@@ -4,7 +4,11 @@
    </tr>
 
    % if hasPaperReviewing:
+   <tr>
+       <table class="infoTable" cellspacing="0" width="100%">
        ${ ContributionReviewingTemplatesList }
+       </table>
+   </tr>
    % else:
    <tr>
       <td nowrap class="displayField" style="padding-top: 5px; padding-left: 10px;">

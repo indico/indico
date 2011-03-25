@@ -172,7 +172,7 @@
 </table>
 
 <table id="automaticNotification" style="padding-left: 20px; padding-bottom: 20px;">
-    % if ConfReview.hasReviewing():
+        % if ConfReview.hasReviewing():
             <% display = 'table' %>
         % else:
             <% display = 'none' %>
@@ -348,24 +348,27 @@
     <tr>
         <td id="uploadTemplateHelp" class="subGroupTitle" style="width:500px;">${ _("Upload a template")}</td>
     </tr>
-    <tr><td>
+    <tr><td style="padding-top: 10px;">
         % if ConfReview.hasTemplates():
          <% display = 'table' %>
        % else:
          <% display = 'none' %>
        % endif
-    <table id="templateListTableAll" width="90%" align="left" border="0" style="padding-left:3px; display:${display}">
+    <table id="templateListTableAll" class="infoTable" cellspacing="0" width="100%" style="display:${display}">
     <!-- here to put table for the uploaded templates info :) -->
      <thead>
         <tr>
-            <td nowrap width="50%" class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
-                ${ _("Name")}
+            <td nowrap width="20%" class="data">
+                <span style="font-weight:bold;">${ _("Name")}</span>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
-                ${ _("Format")}
+            <td nowrap class="data">
+                <span style="font-weight:bold;">${ _("Format")}</span>
             </td>
-            <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #DDDDDD;">
-                ${ _("Description")}
+            <td nowrap class="data">
+                <span style="font-weight:bold;">${ _("Description")}</span>
+            </td>
+            <td nowrap width="27%" class="data" style="text-align:center;">
+                <span style="font-weight:bold;">${ _("Actions")}</span>
             </td>
         </tr>
         </thead>
@@ -384,7 +387,7 @@
         </table>
     </tr></td>
     <tr><a name="UploadTemplate" />
-        <td style="padding-left: 7px;" ><input id='uploadTpl' type="button" value="${ _('Upload Template')}"></a>
+        <td style="padding-top: 5px;" ><input id='uploadTpl' type="button" value="${ _('Upload Template')}"></a>
         </td>
     </tr>
     <tr><td style="padding-bottom:15px;"></td></tr>
@@ -601,45 +604,59 @@ var TemplateList = function(){
             <% keys = ConfReview.getTemplates().keys() %>
             % for k in keys:
                 <% t = ConfReview.getTemplates()[k] %>
-                    var row = Html.tr({id:'TemplateRow_'+'${t.getId()}'});
-                var menu;
-                    menu = Html.span(
-                        {},
-                        Widget.link(command( function(){
-                            var params = {conference: ${ ConfReview.getConference().getId() },templateId: '${t.getId()}'}
-                            if (confirm("Are you sure you want to delete '"+ '${t.getName()}'+"'?")) {
-                                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
-                                jsonRpc(Indico.Urls.JsonRpcService,
-                                    'reviewing.conference.deleteTemplate',
-                                    params,
-                                    function(response,error) {
-                                            if (exists(error)) {
-                                                killProgress();
-                                                IndicoUtil.errorReport(error);
-                                            } else {
-                                                killProgress();
-                                                $E('templateListTable').remove($E('TemplateRow_'+'${t.getId()}'));
-                                                tablerows = document.getElementById('templateListTableAll').rows.length;
-                                                if(tablerows == '1'){
-                                                    $E('NoTemplateTable').dom.style.display = '';
-                                                    $E('templateListTableAll').dom.style.display = 'none';}
-                                            }
+                    var row = Html.tr({id:'TemplateRow_'+'${t.getId()}', className:'infoTR'});
+
+                    var deleteTpl = function(selectedRow) {
+                        var params = {conference: ${ ConfReview.getConference().getId() },
+                                      templateId: selectedRow.dom.id.split("TemplateRow_")[1]};
+                        var name = $E('TemplateSpanName_' + selectedRow.dom.id.split("TemplateRow_")[1]).dom.innerHTML;
+                        if (confirm("Are you sure you want to delete '"+ name +"'?")) {
+                            var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+                            jsonRpc(Indico.Urls.JsonRpcService,
+                                'reviewing.conference.deleteTemplate',
+                                params,
+                                function(response,error) {
+                                        if (exists(error)) {
+                                            killProgress();
+                                            IndicoUtil.errorReport(error);
+                                        } else {
+                                            killProgress();
+                                            $E('templateListTable').remove(selectedRow);
+                                            tablerows = document.getElementById('templateListTableAll').rows.length;
+                                            if(tablerows == '1'){
+                                                $E('NoTemplateTable').dom.style.display = '';
+                                                $E('templateListTableAll').dom.style.display = 'none';}
                                         }
-                            );}
-                           },
-                            IndicoUI.Buttons.removeButton()
-                        )));
-                    var linkName = Html.a({href: "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + '${ t.getId()}' + "&confId=${ ConfReview.getConference().getId()}", style:{color:'#5FA5D4'}}, '${ t.getName()}');
-                    var cellName = Html.td({id:'TemplateName_'+'${ t.getId()}', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, linkName);
-                    cellName.append(linkName);
-                    % if CanDelete:
-                        cellName.append(menu);
-                    % endif
-                    var cellFormat = Html.td({id:'TemplateName_'+'${ t.getId()}', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, '${ t.getFormat()}');
-                    var cellDescription = Html.td({id:'TemplateName_'+'${ t.getId()}', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, '${ t.getDescription()}');
+                                    });
+                        }
+                    };
+
+                    var nameSpan = Html.span({id:'TemplateSpanName_'+'${ t.getId()}'}, '${ t.getName()}');
+                    var cellName = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, nameSpan);
+
+                    var cellFormat = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, '${ t.getFormat()}');
+                    var cellDescription = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, '${ t.getDescription()}');
+                    var downloadSpan = Html.span({className:'link'}, "Download");
+                    var barSpan = Html.span({className:'horizontalSeparator'}, "|");
+                    var removeSpan = Html.span({className:'link'}, "Remove");
+                    var cellActions = Html.td({className:'content', style:{textAlign: 'right'}});
+                    cellActions.append(downloadSpan);
+                    cellActions.append(barSpan);
+                    cellActions.append(removeSpan);
                     row.append(cellName);
                     row.append(cellFormat);
                     row.append(cellDescription);
+                    row.append(cellActions);
+
+                    downloadSpan.observeClick(function() {
+                        window.location = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + '${ t.getId()}' + "&confId=${ ConfReview.getConference().getId()}";
+                    });
+                    removeSpan.observeClick(function(event){
+                        var selectedRow = $E('TemplateRow_'+'${t.getId()}');
+                        deleteTpl(selectedRow);
+                    });
+
+
                     $E('templateListTable').append(row);
              % endfor
 
@@ -742,45 +759,50 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
             //var deleteIcon = Html.img({className: 'imglink',style:{paddingLeft: '20px', verticalAlign: 'bottom', width: '15px', height: '15px'}, alt: 'delete template', src: imageSrc("remove")});
             //var deleteLink = Html.a({href: linkDelete},deleteIcon);
 
-            var row = Html.tr();
+            var row = Html.tr({id:'TemplateRow_' + value.id, className:'infoTR'});
             var params = {conference: '${ ConfReview.getConference().getId() }',templateId: value.id}
             var deleteTemplate = function() {
-            if (confirm("Are you sure you want to delete '"+ value.name+"'?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
-                jsonRpc(Indico.Urls.JsonRpcService,
-                    'reviewing.conference.deleteTemplate',
-                    params,
-                    function(response,error) {
-                            if (exists(error)) {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            } else {
-                                killProgress();
-                                $E('templateListTable').remove(row);
-                                tablerows = document.getElementById('templateListTableAll').rows.length;
-                                if(tablerows == '1'){
-                                    $E('NoTemplateTable').dom.style.display = '';
-                                    $E('templateListTableAll').dom.style.display = 'none';}
-                            }
-                        });}};
-        var menu;
-            menu = Html.span(
-                {},
-                Widget.link(command(
-                    deleteTemplate,
-                    IndicoUI.Buttons.removeButton()
-                )));
-            var linkName = Html.a({href: "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + value.id + "&confId=${ ConfReview.getConference().getId()}", style:{color:'#5FA5D4'}}, value.name);
-            var cellName = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, linkName);
-            cellName.append(linkName);
-            % if CanDelete:
-                cellName.append(menu);
-            % endif
-            var cellFormat = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, value.format);
-            var cellDescription = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, value.description);
+                if (confirm("Are you sure you want to delete '"+ value.name+"'?")) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+                        jsonRpc(Indico.Urls.JsonRpcService,
+                        'reviewing.conference.deleteTemplate',
+                        params,
+                            function(response,error) {
+                                if (exists(error)) {
+                                    killProgress();
+                                    IndicoUtil.errorReport(error);
+                                } else {
+                                    killProgress();
+                                    $E('templateListTable').remove(row);
+                                    tablerows = document.getElementById('templateListTableAll').rows.length;
+                                    if(tablerows == '1'){
+                                        $E('NoTemplateTable').dom.style.display = '';
+                                        $E('templateListTableAll').dom.style.display = 'none';}
+                                }
+                            });
+                }
+            };
+
+            var nameSpan = Html.span({}, value.name);
+            var cellName = Html.td({id:'TemplateName_'+ value.id, className:'content'}, nameSpan);
+            var cellFormat = Html.td({id:'TemplateName_'+ value.id, className:'content'}, value.format);
+            var cellDescription = Html.td({id:'TemplateName_'+ value.id, className:'content'}, value.description);
+            var downloadSpan = Html.span({className:'link'}, "Download");
+            var barSpan = Html.span({className:'horizontalSeparator'}, "|");
+            var removeSpan = Html.span({className:'link'}, "Remove");
+            var cellActions = Html.td({className:'content', style:{textAlign: 'right'}});
+            cellActions.append(downloadSpan);
+            cellActions.append(barSpan);
+            cellActions.append(removeSpan);
             row.append(cellName);
             row.append(cellFormat);
             row.append(cellDescription);
+            row.append(cellActions);
+
+            downloadSpan.observeClick(function() {
+                window.location = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + value.id + "&confId=${ ConfReview.getConference().getId()}";
+            });
+            removeSpan.observeClick(deleteTemplate);
 
             return $E('templateListTable').append(row);
 

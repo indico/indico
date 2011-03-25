@@ -6635,7 +6635,7 @@ table.schedTaskList th {
     border:1px solid #999999;
 }
 
-table.infoTable td.data {
+table.infoTable td.tableHeader {
     font-size: 13px;
     font-family: Verdana, Arial;
     color: #523D04;
