@@ -294,7 +294,7 @@ class Menu(Persistent):
             link = self.getLinkByName(name)
             if link:
                 # only update the caption if it has been already customized
-                if not link.wasChanged():
+                if not link.wasChanged() or link.getCaption() == '':
                     link.setCaption(data["caption"], silent=True)
                 link.setURL(data["URL"])
             else:
