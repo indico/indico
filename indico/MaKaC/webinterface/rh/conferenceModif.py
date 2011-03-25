@@ -5023,7 +5023,7 @@ class RHConfModifDisplayModifySystemData( RHConferenceModifBase ):
                 name=self._params.get("name","[empty name]")
                 if name.strip()=="":
                     name="[empty name]"
-                link.setCaption(name, True)
+                link.setCaption(name)
         else:
             menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
             link = menu.getLinkById(self._linkId)

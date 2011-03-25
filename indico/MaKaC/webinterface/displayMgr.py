@@ -293,9 +293,10 @@ class Menu(Persistent):
             data = linksData[name]
             link = self.getLinkByName(name)
             if link:
-                link.setCaption(data["caption"])
+                # only update the caption if it has been already customized
+                if not link.wasChanged():
+                    link.setCaption(data["caption"], silent=True)
                 link.setURL(data["URL"])
-                link.setStaticURL(data["staticURL"])
             else:
                 #we must create the link
                 self._createSystemLink(name, linksData)
@@ -307,9 +308,8 @@ class Menu(Persistent):
         if data["parent"] == "":
             #create the link at the fisrt level
             link = SystemLink(name)
-            link.setCaption(data["caption"])
+            link.setCaption(data["caption"], silent=True)
             link.setURL(data["URL"])
-            link.setStaticURL(data["staticURL"])
             self.addLink(link)
             link.disable()
             if data.get("visibilityByDefault", True):
@@ -322,9 +322,8 @@ class Menu(Persistent):
                 parent = self.getLinkByName(data["parent"])
             #We can create the link under the parent
             link = SystemLink(name)
-            link.setCaption(data["caption"])
+            link.setCaption(data["caption"], silent=True)
             link.setURL(data["URL"])
-            link.setStaticURL(data["staticURL"])
             parent.addLink(link)
             link.disable()
             if data.get("visibilityByDefault", True):
@@ -749,15 +748,21 @@ class SystemLink(Link):
     """
     Type = "system"
 
+    def __init__(self, name, parent=None, changed=False):
+        Link.__init__(self, name, parent)
+
+        # by default, this link will be updated when there are version
+        # changes that modify its default name
+        self._changed = changed
+
     def clone(self, newMenu):
-        newLink = SystemLink(self.getName(), newMenu)
+        newLink = SystemLink(self.getName(), parent=newMenu, changed=self.wasChanged())
         newLink.setEnabled(self.isEnabled())
         newLink.setVisible(self.isVisible())
         newLink.setId(self.getId())
         newLink.setDisplayTarget(self.getDisplayTarget())
-        newLink.setCaption(self.getCaption(), store = True)
+        newLink.setCaption(self.getCaption(), silent=True)
         newLink.setURL(self.getURL())
-        newLink.setStaticURL(self.getStaticURL())
 
         listLink = []
         for link in self.getLinkList():
@@ -767,27 +772,31 @@ class SystemLink(Link):
 
         return newLink
 
+    def wasChanged(self):
+        # old conferences, before `_changed` was introduced
+        if hasattr(self, '_changed'):
+            return self._changed
+        else:
+            # for old conferences, just keeps things as people
+            # left them
+            return True
+
     def getURL(self):
         return self._v_URL
 
     def setURL(self, url):
         self._v_URL = url
 
-    def getStaticURL(self):
-        return self._v_staticURL
-
-    def setStaticURL(self, url):
-        self._v_staticURL = url
-
     def getCaption(self):
-        if self._caption != "":
-            return self._caption
-        return self._v_caption
+        return self._caption
 
-    def setCaption(self, caption, store=False):
-        if store:
-            self._caption = caption
-        self._v_caption = caption
+    def setCaption(self, caption, silent=False):
+        self._caption = caption
+
+        if not silent:
+            # if the caption was changed, do not update it when the default
+            # value get an update
+            self._changed = True
 
 
 class SystemLinkData(Observable):
@@ -800,159 +809,128 @@ class SystemLinkData(Observable):
             "overview": {\
                 "caption": _("Overview"), \
                 "URL": str(urlHandlers.UHConferenceOverview.getURL(conf)), \
-                "staticURL": str(urlHandlers.UHStaticConferenceDisplay.getRelativeURL()), \
                 "parent": ""}, \
             "programme": { \
                 "caption": _("Scientific Programme"), \
                 "URL": str(urlHandlers.UHConferenceProgram.getURL(conf)), \
-                "staticURL": str(urlHandlers.UHStaticConferenceProgram.getRelativeURL()), \
                 "parent": ""}, \
             "CFA": { \
                 "caption": _("Call for Abstracts"), \
                 "URL": str(urlHandlers.UHConferenceCFA.getURL(conf)), \
-                "staticURL": "", \
                 "parent": ""}, \
             "ViewAbstracts": { \
                 "caption": _("View my abstracts"), \
                 "URL": str(urlHandlers.UHUserAbstracts.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "CFA"}, \
             "SubmitAbstract": { \
                 "caption": _("Submit a new abstract"), \
                 "URL": str(urlHandlers.UHAbstractSubmission.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "CFA"}, \
             "manageTrack": { \
                 "caption": _("Manage my track"), \
                 "URL": str(urlHandlers.UHTrackModifAbstracts.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "programme"}, \
             "timetable": { \
                 "caption": _("Timetable"), \
                 "URL": str(urlHandlers.UHConferenceTimeTable.getURL( conf )), \
-                "staticURL": str(urlHandlers.UHStaticConferenceTimeTable.getRelativeURL()), \
                 "parent": ""}, \
             "contributionList": { \
                 "caption": _("Contribution List"), \
                 "URL": str(urlHandlers.UHContributionList.getURL( conf )), \
-                "staticURL": str(urlHandlers.UHStaticContributionList.getRelativeURL()), \
                 "parent": ""}, \
             "authorIndex": { \
                 "caption": _("Author index"), \
                 "URL": str(urlHandlers.UHConfAuthorIndex.getURL( conf )), \
-                "staticURL": str(urlHandlers.UHStaticConfAuthorIndex.getRelativeURL()), \
                 "parent": ""} ,\
             "speakerIndex": { \
                 "caption": _("Speaker index"), \
                 "URL": str(urlHandlers.UHConfSpeakerIndex.getURL( conf )), \
-                "staticURL": "", \
                 "parent": "", \
                 "visibilityByDefault": False}, \
             "mystuff": { \
                 "caption": _("My conference"), \
                 "URL": str(urlHandlers.UHConfMyStuff.getURL(conf)), \
-                "staticURL": "", \
                 "parent": ""}, \
             "mytracks": { \
                 "caption": _("My tracks"), \
                 "URL": str(str(urlHandlers.UHConfMyStuffMyTracks.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "mystuff"}, \
             "mysessions": { \
                 "caption": _("My sessions"), \
                 "URL": str(str(urlHandlers.UHConfMyStuffMySessions.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "mystuff"}, \
             "mycontribs": { \
                 "caption": _("My contributions"), \
                 "URL": str(str(urlHandlers.UHConfMyStuffMyContributions.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "mystuff"}, \
             "paperreviewing": { \
                 "caption": _("Paper Reviewing"), \
                 "URL": str(urlHandlers.UHPaperReviewingDisplay.getURL(conf)), \
-                "staticURL": "", \
                 "parent": ""}, \
             "managepaperreviewing": { \
                 "caption": _("Manage Paper Reviewing"), \
                 "URL": str(str(urlHandlers.UHConfModifReviewingPaperSetup.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "assigncontributions": { \
                 "caption": _("Assign papers"), \
                 "URL": str(str(urlHandlers.UHConfModifReviewingAssignContributionsList.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "judgelist": { \
                 "caption": _("Referee Area"), \
                 "URL": str(str(urlHandlers.UHConfModifListContribToJudge.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "judgelistreviewer": { \
                 "caption": _("Content Reviewer Area"), \
                 "URL": str(str(urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "judgelisteditor": { \
                 "caption": _("Layout Reviewer Area"), \
                 "URL": str(str(urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "uploadpaper": { \
                 "caption": _("Upload paper"), \
                 "URL": str(str(urlHandlers.UHUploadPaper.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "downloadtemplate": { \
                 "caption": _("Download template"), \
                 "URL": str(str(urlHandlers.UHDownloadPRTemplate.getURL(conf))), \
-                "staticURL": "", \
                 "parent": "paperreviewing"}, \
             "abstractsBook": { \
                 "caption": _("Book of abstracts"), \
                 "URL": str(urlHandlers.UHConfAbstractBook.getURL(conf)), \
-                "staticURL": str(urlHandlers.UHStaticConfAbstractBook.getRelativeURL()), \
                 "parent": ""}, \
             "registrationForm": { \
                 "caption": _("Registration"), \
                 "URL": str(urlHandlers.UHConfRegistrationForm.getURL(conf)), \
-                "staticURL": "", \
                 "parent": ""}, \
             "ViewMyRegistration": { \
                 "caption": _("Modify my registration"), \
                 "URL": str(urlHandlers.UHConfRegistrationFormModify.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "registrationForm"}, \
             "NewRegistration": { \
                 "caption": _("Registration Form"), \
                 "URL": str(urlHandlers.UHConfRegistrationFormDisplay.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "registrationForm"}, \
             "registrants": { \
                 "caption": _("List of registrants"), \
                 "URL": str(urlHandlers.UHConfRegistrantsList.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "", \
                 "visibilityByDefault": False}, \
             "evaluation": { \
                 "caption": _("Evaluation"), \
                 "URL": str(urlHandlers.UHConfEvaluationMainInformation.getURL(conf)), \
-                "staticURL": "", \
                 "parent": ""}, \
             "newEvaluation": { \
                 "caption": _("Evaluation Form"), \
                 "URL": str(urlHandlers.UHConfEvaluationDisplay.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "evaluation"}, \
             "viewMyEvaluation": { \
                 "caption": _("Modify my evaluation"), \
                 "URL": str(urlHandlers.UHConfEvaluationDisplayModif.getURL(conf)), \
-                "staticURL": "", \
                 "parent": "evaluation"},
             "collaboration": { \
                 "caption": _("Video Services"), \
                 "URL": str(urlHandlers.UHCollaborationDisplay.getURL(conf)), \
-                "staticURL": "", \
                 "parent": ""} \
             }
             self._notify('confDisplaySMFillDict', {'dict': self._linkData, 'conf': conf})
