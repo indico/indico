@@ -722,7 +722,6 @@ class CategoryDateIndex(Persistent):
     def dump(self):
         return map(lambda idx: (idx[0], idx[1].dump()), list(self._idxCategItem.items()))
 
-    # TOREMOVE?? defined in CategoryDayIndex
     def unindexConf(self, conf):
         for owner in conf.getOwnerPath():
             if self._idxCategItem.has_key(owner.getId()):
@@ -821,6 +820,10 @@ class CategoryDayIndex(CategoryDateIndex):
             res = CalendarDayIndex()
         res.indexConf(conf)
         self._idxCategItem[categid] = res
+
+    def reindexConf(self, conf):
+        self.unindexConf(conf)
+        self.indexConf(conf)
 
     def indexConf(self, conf):
         level = 0

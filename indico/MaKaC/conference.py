@@ -2412,6 +2412,8 @@ class Conference(CommonObjectBase, Locatable):
         self._visibility = int(visibility)
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.reindexConf(self)
+        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
+        catDateIdx.reindexConf(self)
 
     def isClosed( self ):
         try:
