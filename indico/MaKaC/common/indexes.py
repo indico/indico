@@ -722,12 +722,35 @@ class CategoryDateIndex(Persistent):
     def dump(self):
         return map(lambda idx: (idx[0], idx[1].dump()), list(self._idxCategItem.items()))
 
+    # TOREMOVE?? defined in CategoryDayIndex
     def unindexConf(self, conf):
         for owner in conf.getOwnerPath():
             if self._idxCategItem.has_key(owner.getId()):
                 self._idxCategItem[owner.getId()].unindexConf(conf)
         if self._idxCategItem.has_key('0'):
             self._idxCategItem['0'].unindexConf(conf)
+
+
+    def reindexCateg(self, categ):
+        for subcat in categ.getSubCategoryList():
+            self.reindexCateg(subcat)
+        for conf in categ.getConferenceList():
+            self.unindexConf(conf)
+            self.indexConf(conf)
+#        from MaKaC.common import DBMgr
+#        dbi = DBMgr.getInstance()
+#        for subcat in categ.getSubCategoryList():
+#            self.reindexCateg(subcat)
+#        for conf in categ.getConferenceList():
+#            while True:
+#                try:
+#                    dbi.sync()
+#                    self.unindexConf(conf)
+#                    self.indexConf(conf)
+#                    dbi.commit()
+#                    break
+#                except:
+#                    print 'Exception commiting conf %s'%conf.getId()
 
     def unindexCateg(self, categ):
         for subcat in categ.getSubCategoryList():
@@ -750,6 +773,7 @@ class CategoryDateIndex(Persistent):
         res.indexConf(conf)
         self._idxCategItem[categid] = res
 
+    # TOREMOVE?? defined in CategoryDayIndex
     def indexConf(self, conf):
         for categ in conf.getOwnerPath():
             self._indexConf(categ.getId(), conf)

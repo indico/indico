@@ -825,6 +825,8 @@ class Category(CommonObjectBase):
     def _reindex( self ):
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.reindexCateg(self)
+        catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
+        catDateIdx.reindexCateg(self)
 
     def isRoot( self ):
         #to be improved
