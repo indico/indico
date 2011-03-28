@@ -49,6 +49,7 @@ Tasks can be in one of the following states:
 * ``TASK_STATUS_RUNNING`` - The task is being executed;
 * ``TASK_STATUS_FAILED`` - The task has failed (execution threw an exception, maybe it was cancelled);
 * ``TASK_STATUS_FINISHED`` - The task has successfully finished;
+* ``TASK_STATUS_TERMINATED`` - The task has been cancelled by the scheduler (i.e. was AWOL for too long);
 
 ...
 
