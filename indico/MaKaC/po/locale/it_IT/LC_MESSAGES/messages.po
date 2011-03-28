@@ -6590,7 +6590,7 @@ msgid "Merge users"
 msgstr "Merge users"
 
 #: C:\depot\indico\code\code\MaKaC\webinterface\rh\users.py:114
-msgid "You must enter a valid email adress"
+msgid "You must enter a valid email address"
 msgstr "You must enter a valid email adress"
 
 #: C:\depot\indico\code\code\MaKaC\posterDesignConf.py:101

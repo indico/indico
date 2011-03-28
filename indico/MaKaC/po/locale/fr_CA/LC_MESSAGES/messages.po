@@ -1,10 +1,10 @@
 #
 # This file is part of Indico.
-# Copyright (C) 2007 CERN.                                                                                       
-#                                                                    
-# Indico is free software; you can redistribute it and/or                     
-# modify it under the terms of the GNU General Pulic License as                                      
-# published by the Free Software Foundation; either version 2 the                         
+# Copyright (C) 2007 CERN.
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Pulic License as
+# published by the Free Software Foundation; either version 2 the
 # License, or (at your option) any later version.
 #
 # Indico is distributed in the hope that it will be useful, but
@@ -6652,7 +6652,7 @@ msgid "Merge users"
 msgstr "Fusionner les utilisateurs"
 
 #: C:\depot\indico\code\code\MaKaC\webinterface\rh\users.py:114
-msgid "You must enter a valid email adress"
+msgid "You must enter a valid email address"
 msgstr "Vous devez entrer une adrelle valide"
 
 #: C:\depot\indico\code\code\MaKaC\posterDesignConf.py:101

@@ -6156,7 +6156,7 @@ msgid "Merge users"
 msgstr "合并用户"
 
 #: C:\depot\indico\code\code\MaKaC\webinterface\rh\users.py:114
-msgid "You must enter a valid email adress"
+msgid "You must enter a valid email address"
 msgstr "你必须输入一个有效的邮件地址"
 
 #: C:\depot\indico\code\code\MaKaC\posterDesignConf.py:101

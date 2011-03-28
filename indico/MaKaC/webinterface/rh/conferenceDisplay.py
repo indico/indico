@@ -240,7 +240,7 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
                 self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
                 save = False
             if not self._validMail(self._params.get("email","")):
-                self._params["msg"] += _("You must enter a valid email adress")
+                self._params["msg"] += _("You must enter a valid email address")
                 save = False
         if save:
             #Data are OK, Now check if there is an existing user or create a new one

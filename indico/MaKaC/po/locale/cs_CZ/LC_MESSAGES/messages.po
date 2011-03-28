@@ -5828,7 +5828,7 @@ msgid "Merge users"
 msgstr ""
 
 #: webinterface\rh\users.py:114
-msgid "You must enter a valid email adress"
+msgid "You must enter a valid email address"
 msgstr ""
 
 #: posterDesignConf.py:101 posterDesignConf.py:112

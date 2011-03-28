@@ -7111,7 +7111,7 @@ msgid "Show advanced options..."
 msgstr "Montrer les options avancées..."
 
 #: /home/pferreir/indico/cds-indico/indico/MaKaC/webinterface/rh/users.py:165
-msgid "You must enter a valid email adress"
+msgid "You must enter a valid email address"
 msgstr "Vous devez entrer une adresse valide"
 
 #: terDesignConf.py:136 terDesignConf.py:148

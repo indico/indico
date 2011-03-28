@@ -5696,7 +5696,7 @@ msgid "Merge users"
 msgstr ""
 
 #: /home/pferreir/projects/indico/indico-development/code/code/MaKaC/webinterface/rh/users.py:162
-msgid "You must enter a valid email adress"
+msgid "You must enter a valid email address"
 msgstr ""
 
 #: terDesignConf.py:136 terDesignConf.py:148
