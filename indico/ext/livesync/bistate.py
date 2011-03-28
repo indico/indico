@@ -36,8 +36,6 @@ STATUS_DELETED, STATUS_CREATED, STATUS_CHANGED = 1, 2, 4
 # clear the ZEO local cache each new N records
 CACHE_SWEEP_LIMIT = 10000
 
-# Attention: if this class is not declared, the LiveSync management interface
-# will never know this plugin exists!
 
 class BistateRecordProcessor(object):
 
@@ -106,8 +104,8 @@ class BistateRecordProcessor(object):
         for __, aw in data:
             obj = aw.getObject()
 
-            ## TODO: enable this, whenn config is possible from interface
-            ## if obj.canAccess(AccessWrapper(access)):
+            ## TODO: enable this, when config is possible from interface
+            ## if not obj.canAccess(AccessWrapper(access)):
             ##     # no access? jump over this one
             ##     continue
 

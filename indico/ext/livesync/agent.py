@@ -22,9 +22,7 @@
 Module containing the persistent classes that will be stored in the DB
 """
 # standard lib imports
-import datetime, time
-from threading import Thread
-from Queue import Queue, Empty
+import datetime
 
 # dependency libs
 import zope.interface
@@ -40,9 +38,8 @@ from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.struct import EmptyTrackException
 from indico.ext.livesync.base import ILiveSyncAgentProvider, MPT_GRANULARITY
 
-# legacy indico
-from MaKaC.common import DBMgr
-
+# legacy indico imports
+from MaKaC import conference
 
 class QueryException(Exception):
     """
@@ -370,6 +367,18 @@ class SyncManager(Persistent):
         """
         return self._agents
 
+    def objectExcluded(self, obj):
+        """
+        Decides whether a particular object should be ignored or not
+        """
+        excluded = getPluginType().getOption('excludedCategories').getValue()
+        if isinstance(obj, conference.Category):
+            return obj.getId() in excluded
+        elif isinstance(obj, conference.Conference):
+            return obj.getOwner().getId() in excluded
+        else:
+            return obj.getConference().getOwner().getId() in excluded
+
 
 class RecordUploader(object):
     """
@@ -415,206 +424,3 @@ class RecordUploader(object):
             self._uploadBatch(currentBatch)
 
         return True
-
-
-###################
-# This code is now unused.
-#
-#
-
-class ThreadedRecordUploader(object):
-    """
-    A record uploading mechanism, based on worker threads
-    """
-
-    DEFAULT_BATCH_SIZE, DEFAULT_NUM_SLAVES = 1000, 2
-    MAX_DELAYED_BATCHES = 5
-    MAX_THREAD_REQUEST_TIME = 300
-
-    def __init__(self, slaveClass, agent, logger,
-                 extraSlaveArgs=(),
-                 batchSize=DEFAULT_BATCH_SIZE,
-                 numSlaves=DEFAULT_NUM_SLAVES,
-                 maxDelayed=MAX_DELAYED_BATCHES,
-                 monitor=None):
-        self._logger = logger
-        self._agent = agent
-        self._slaveClass = slaveClass
-        self._batchSize = batchSize
-        self._numSlaves = numSlaves
-        self._queue = Queue()
-        self._slaves = {}
-        self._currentBatch = []
-        self._extraSlaveArgs = extraSlaveArgs
-        self._enqueued = 0
-        self._monitor = monitor
-        self._maxDelayed = maxDelayed
-
-    def spawn(self):
-        """
-        Starts the uploader (spawns slave threads)
-        """
-        for i in range(0, self._numSlaves):
-            self._slaves[i] = self._slaveClass("Uploader%s" % i,
-                                               self._queue,
-                                               self._logger,
-                                               self._agent,
-                                               *self._extraSlaveArgs)
-            self._slaves[i].start()
-
-    def enqueue(self, record):
-        """
-        Adds a record to the queue.
-        We actually accumulate them and queue them in batches.
-        """
-
-        # when BATCH_SIZE is passed, enqueue it
-        if len(self._currentBatch) > (self._batchSize - 1):
-            self._queue.put(self._currentBatch)
-            self._enqueued += len(self._currentBatch)
-            self._currentBatch = []
-
-            if self._monitor:
-                self.reportStatus(self._monitor)
-
-        self._currentBatch.append(record)
-
-    def join(self):
-        """
-        Waits for the slave threads to finish working
-        """
-
-        result = True
-
-        # first, if there is an incomplete batch remaining, enqueue it first
-        if self._currentBatch:
-            self._queue.put(self._currentBatch)
-
-        # now, join the queue (wait for them to be uploaded)
-        self._logger.debug('joining queue')
-        self._queue.join()
-        self._logger.debug('joining slaves')
-
-        for slave in self._slaves.values():
-            slave.terminate()
-            slave.join()
-            result &= (not slave.is_alive() and slave.result)
-
-        return result
-
-    def _checkThreadHealth(self):
-        for i in range(0, self._numSlaves):
-            slave = self._slaves[i]
-            if time.time() > (slave._startTime + \
-                              ThreadedRecordUploader.MAX_THREAD_REQUEST_TIME) \
-               and slave._dead == False:
-                self._logger.warning("Slave '%s' seems to be dead. "
-                                     "Adding another one and recovering batch." % \
-                                     slave.getName())
-
-                if slave._currentBatch:
-                    self._queue.put(slave._currentBatch)
-
-                newSlave = self._slaveClass("Uploader%s" % self._numSlaves,
-                                            self._queue,
-                                            self._logger,
-                                            self._agent,
-                                            *self._extraSlaveArgs)
-                self._slaves[self._numSlaves] = newSlave
-                slave._dead = True
-                self._numSlaves += 1
-
-                newSlave.start()
-
-    def iterateOver(self, iterator):
-        """
-        Consumes an iterator
-        """
-        # take operations and choose which records to send
-        for entry in iterator:
-            self.enqueue(entry)
-
-            while (self._queue.qsize() > self._maxDelayed):
-                self._logger.info('Too many delayed batches, sleeping')
-                time.sleep(10)
-
-            self._checkThreadHealth()
-
-    def reportStatus(self, stream):
-        totalUp = 0
-        stream.write("%d enqueued\n" % self._enqueued)
-        for i in range(0, self._numSlaves):
-            slave = self._slaves[i]
-            stream.write("\t [wrk %s] %d uploaded\n" % (slave.getName(),
-                                                     slave._uploaded))
-            totalUp += slave._uploaded
-        stream.write("%d uploaded (total)\n\n" % totalUp)
-        stream.flush()
-
-
-class UploaderSlave(Thread):
-    """
-    A generic threaded "work slave" for agents
-    """
-
-    def __init__(self, name, queue, logger, agent):
-        self._keepRunning = True
-        self._logger = logger
-        self._terminate = False
-        self.result = True
-        self._queue = queue
-        self._name = name
-        self._uploaded = 0
-        self._agent = agent
-        self._startTime = time.time()
-        self._currentBatch = []
-        self._dead = False
-
-        super(UploaderSlave, self).__init__(name=name)
-
-    def run(self):
-
-        DBMgr.getInstance().startRequest()
-
-        self._logger.debug('Worker [%s] started' % self._name)
-        try:
-            while True:
-                taskFetched = False
-                try:
-                    self._currentBatch = self._queue.get(True, 2)
-                    taskFetched = True
-                    self._startTime = time.time()
-                    self.result &= self._uploadBatch(self._currentBatch)
-                    self._uploaded += len(self._currentBatch)
-                except Empty:
-                    pass
-                finally:
-                    if taskFetched:
-                        self._queue.task_done()
-
-                if self._terminate:
-                    break
-        except:
-            self._logger.exception('Worker [%s]:' % self._name)
-            return 1
-        finally:
-            DBMgr.getInstance().endRequest()
-            self._logger.debug('Worker [%s] finished' % self._name)
-        self._logger.debug('Worker [%s] returning %s' % (self._name, self.result))
-
-    def terminate(self):
-        self._terminate = True
-
-    def _uploadBatch(self, batch):
-        """
-        Sends a batch of records
-        Overloaded by agent.
-        """
-        raise Exception("Unimplemented method")
-
-    def _getMetadata(self, records):
-        """
-        Generates the metadata for a batch of records.
-        Should be overloaded.
-        """
-        raise Exception("Unimplemented method")

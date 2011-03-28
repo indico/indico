@@ -75,10 +75,7 @@
             <%= _("Global settings for ") + PluginType.getName() %>
         </td>
     </tr>
-    <% if PluginType.getOptions() is not None and len(PluginType.getOptions()) > 0: %>
-        <% includeTpl('AdminPluginsOptionList', Object = PluginType, ObjectType = "PluginType", Favorites = Favorites, Index = 0, rbActive = rbActive, baseURL = baseURL) %>
-    <% end %>
-    <% elif True in self._notify('hasPluginSettings', PluginType.getId(), None): %>
+    <% if True in self._notify('hasPluginSettings', PluginType.getId(), None): %>
     <tr>
         <td>
 
@@ -86,7 +83,10 @@
         </td>
     </tr>
     <% end %>
-    <% else: %>
+    <% if PluginType.getOptions() is not None and len(PluginType.getOptions()) > 0: %>
+        <% includeTpl('AdminPluginsOptionList', Object = PluginType, ObjectType = "PluginType", Favorites = Favorites, Index = 0, rbActive = rbActive, baseURL = baseURL) %>
+    <% end %>
+    <% if not PluginType.getOptions() and True not in self._notify('hasPluginSettings', PluginType.getId(), None): %>
     <tr>
         <td>
             <span><%= _("No global options defined for all ") + PluginType.getName() + _(" plugins")%></span>

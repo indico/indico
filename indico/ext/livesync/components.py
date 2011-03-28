@@ -73,8 +73,9 @@ class RequestListener(Component):
             for action in actions:
                 Logger.get('ext.livesync').debug((objId, action))
                 # TODO: remove redundant items
-            sm.add(timestamp,
-                   ActionWrapper(timestamp, obj, actions, objId))
+            if not sm.objectExcluded(obj):
+                sm.add(timestamp,
+                       ActionWrapper(timestamp, obj, actions, objId))
 
     def requestRetry(self, obj, req, nretry):
         # reset the context manager
