@@ -379,9 +379,11 @@ class SyncManager(Persistent):
             if owner:
                 return owner.getId() in excluded
         else:
-            owner = obj.getConference().getOwner()
-            if owner:
-                return owner.getId() in excluded
+            conf = obj.getConference()
+            if conf:
+                owner = conf.getOwner()
+                if owner:
+                    return owner.getId() in excluded
 
         return False
 
