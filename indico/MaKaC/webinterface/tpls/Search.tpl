@@ -135,7 +135,7 @@
 <div id="events">
   <% includeTpl('SearchNavigationBar', target = "Events", shortResult = evtShortResult) %>
 
-  <ul class="searchResultList" style="list-style-type: none;">
+  <ul class="searchResultList">
     <% for result in eventResults: %>
     <% includeTpl('SearchResult', accessWrapper=self._aw, result=result) %>
     <% end %>
@@ -148,7 +148,7 @@
 <div id="contribs">
   <% includeTpl('SearchNavigationBar', target = "Contributions", shortResult = contShortResult) %>
 
-  <ul class="searchResultList" style="list-style-type: none;">
+  <ul class="searchResultList">
     <% for result in contribResults: %>
     <% includeTpl('SearchResult', accessWrapper=self._aw, result=result) %>
     <% end %>
@@ -196,8 +196,10 @@ IndicoUI.executeOnLoad(function(){
 <% if len(contribResults) > 0: %>
     tabList.push(['Contributions', $E('contribs')]);
 <% end %>
-    var tabCtrl = new TabWidget(tabList, $E('container').dom.clientWidth);
+
+    var tabCtrl = new TabWidget(tabList, $E('container').dom.clientWidth?$E('container').dom.clientWidth:null);
     $E('container').set(tabCtrl.draw());
+
 
 <% end %>
 

@@ -5841,6 +5841,7 @@ a.searchResultLink{
 
 ul.searchResultList {
     padding: 0px;
+    list-style-type: none;
 }
 
 li.searchResultEvent {
