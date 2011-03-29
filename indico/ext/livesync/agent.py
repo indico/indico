@@ -375,9 +375,15 @@ class SyncManager(Persistent):
         if isinstance(obj, conference.Category):
             return obj.getId() in excluded
         elif isinstance(obj, conference.Conference):
-            return obj.getOwner().getId() in excluded
+            owner = obj.getOwner()
+            if owner:
+                return owner.getId() in excluded
         else:
-            return obj.getConference().getOwner().getId() in excluded
+            owner = obj.getConference().getOwner()
+            if owner:
+                return owner.getId() in excluded
+
+        return False
 
 
 class RecordUploader(object):
