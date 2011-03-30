@@ -1,24 +1,24 @@
-<br>
-<table width="80%" align="center" style="border-top:1px solid #777777; border-left:1px solid #777777">
+<div style="padding-top:15px; padding-left:15px;">
+<table width="80%" align="left">
     <tr>
-        <td style="color: #5294CC;border-bottom:1px solid #5294CC;"> ${ _("From")}</td>
-        <td style="color: black; padding-left: 10px;"><b>${ From }</b></span></td>
+        <td class="emailFieldTitle"> ${ _("From")}</td>
+        <td class="emailFieldContent">${ From }</td>
     </tr>
     <tr>
-        <td style="color: #5294CC;border-bottom:1px solid #5294CC"> ${ _("To")}</td>
-        <td style="color: black; padding-left: 10px;"><b>${ to }</b></span></td>
+        <td class="emailFieldTitle"> ${ _("To")}</td>
+        <td class="emailFieldContent">${ to }</td>
     </tr>
     <tr>
-        <td style="color: #5294CC;border-bottom:1px solid #5294CC"> ${ _("Cc")}</td>
-        <td style="color: black; padding-left: 10px;"><b>${ cc }</b></span></td>
+        <td class="emailFieldTitle" style="padding-bottom:15px;"> ${ _("Cc")}</td>
+        <td class="emailFieldContent" style="padding-bottom:15px;">${ cc }</td>
     </tr>
     <tr>
-        <td style="color: #5294CC;border-bottom:1px solid #5294CC;"> ${ _("Subject")}</td>
-        <td style="color: black; padding-left: 10px;"><b>${ subject }</b></span></td>
+        <td class="emailFieldTitle" style="padding-bottom:15px;"> ${ _("Subject")}</td>
+        <td class="emailFieldContent" style="padding-bottom:15px;">${ subject }</td>
     </tr>
     <tr>
-        <td style="color: #5294CC;border-bottom:1px solid #5294CC"> ${ _("Body")}</td>
-        <td width="100%" style="color:black; padding-left: 10px;"><pre>${ body }</pre></td>
+        <td valign="top" class="emailFieldTitle"> ${ _("Body")}</td>
+        <td width="100%" class="emailFieldContent"><pre>${ body }</pre></td>
     </tr>
 </table>
-<br>
+</div>

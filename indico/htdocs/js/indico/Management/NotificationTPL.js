@@ -117,3 +117,55 @@ function checkID() {
         else
             return false;
 }
+
+
+//Manager to add/modify notificaton templates
+type("NotificationTemplateManager", [],
+        {
+            // Add elements to the PM
+            addToPM: function(elem, type, allowEmpty) {
+                this.__parameterManager.add(elem, type, allowEmpty);
+            },
+
+			// Check if there are some erros in the fields of the form
+			checkFields: function() {
+			    // Make sure that both functions are executed
+                var checkPM = this.__parameterManager.check();
+
+                if (checkPM) {
+                    this.errorElement.dom.style.display = 'none';
+                    return true;
+                } else {
+                    this.errorElement.dom.style.display = '';
+                    return false;
+                }
+             },
+
+             removeCheckBoxError: function() {
+                 if (this.cbParent.dom.className.slice(-7) == "invalid") {
+                     this.cbParent.dom.className = "";
+                 }
+             },
+
+             // Check the condition of the select in the 3rd step
+             checkSelectCondition: function(mainSelect, elem1, elem2) {
+                 if (mainSelect.dom.value != 'accepted') {
+                     elem1.dom.style.display = 'none';
+                     elem2.dom.style.display = 'none';
+                 } else {
+                     elem1.dom.style.display = '';
+                     elem2.dom.style.display = '';
+                 }
+             }
+        },
+
+
+        /* Manage the
+        @param cbParent: parent of the checkboxes element
+        @return the manager class for the ConfModCFANotifTplNew.tpl and ConfModCFANotifTplEditData
+        */
+		function(cbParent, errorElement) {
+            this.__parameterManager = new IndicoUtil.parameterManager();
+            this.cbParent = cbParent;
+            this.errorElement = errorElement;
+		});

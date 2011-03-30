@@ -1,5 +1,6 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 <% from MaKaC.common import Config %>
+<div style="padding-bottom:35px;">
 <table class="groupTable">
     <tr>
         <td id="reviewingModeHelp" colspan="5" class="groupTitle">
@@ -44,3 +45,4 @@
         </table>
     </tr>
 </table>
+</div>

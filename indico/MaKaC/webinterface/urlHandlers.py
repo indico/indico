@@ -3035,26 +3035,26 @@ class UHTrackAbstractModIntCommentRem(UHTrackAbstractModCommentBase):
 
 
 class UHAbstractReviewingNotifTpl(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTpl"
+    _relativeURL = "abstractReviewing.py/notifTpl"
 
 class UHAbstractModNotifTplNew(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplNew"
+    _relativeURL = "abstractReviewing.py/notifTplNew"
 
 
 class UHAbstractModNotifTplRem(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplRem"
+    _relativeURL = "abstractReviewing.py/notifTplRem"
 
 
 class UHAbstractModNotifTplEdit(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplEdit"
+    _relativeURL = "abstractReviewing.py/notifTplEdit"
 
 
 class UHAbstractModNotifTplDisplay(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplDisplay"
+    _relativeURL = "abstractReviewing.py/notifTplDisplay"
 
 
 class UHAbstractModNotifTplPreview(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplPreview"
+    _relativeURL = "abstractReviewing.py/notifTplPreview"
 
 
 class UHTrackAbstractModMarkAsDup(UHTrackAbstractBase):
@@ -3086,11 +3086,11 @@ class UHConfModNewAbstract(URLHandler):
 
 
 class UHConfModNotifTplConditionNew(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplCondNew"
+    _relativeURL = "abstractReviewing.py/notifTplCondNew"
 
 
 class UHConfModNotifTplConditionRem(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplCondRem"
+    _relativeURL = "abstractReviewing.py/notifTplCondRem"
 
 
 class UHConfModifCFASelectSubmitter( URLHandler ):
@@ -3214,10 +3214,10 @@ class UHSessionModToPDF( URLHandler ):
     _relativeURL = "sessionModification.py/contribsToPDF"
 
 class UHConfModCFANotifTplUp(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplUp"
+    _relativeURL = "abstractReviewing.py/notifTplUp"
 
 class UHConfModCFANotifTplDown(URLHandler):
-    _relativeURL = "confModifCFA.py/notifTplDown"
+    _relativeURL = "abstractReviewing.py/notifTplDown"
 
 class UHConfAuthorIndex(URLHandler):
     _relativeURL = "confAuthorIndex.py"
@@ -3350,10 +3350,10 @@ class UHConfModAbstractBookEdit( URLHandler ):
     _relativeURL = "confModBOA.py/edit"
 
 class UHAbstractReviewingSetup(URLHandler):
-    _relativeURL = "confModifCFA.py/reviewingSetup"
+    _relativeURL = "abstractReviewing.py/reviewingSetup"
 
 class UHAbstractReviewingTeam (URLHandler):
-    _relativeURL = "confModifCFA.py/reviewingTeam"
+    _relativeURL = "abstractReviewing.py/reviewingTeam"
 
 class UHConfModScheduleDataEdit( URLHandler ):
     _relativeURL = "confModifSchedule.py/edit"

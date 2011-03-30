@@ -53,49 +53,6 @@ def selectSubmitter( req, **params ):
 def removeSubmitter( req, **params ):
     return conferenceModif.RHConfModifCFARemoveSubmitter( req ).process( params )
 
-def reviewingSetup(req, **params):
-    return conferenceModif.RHAbstractReviewingSetup(req).process(params)
-
-def reviewingTeam(req, **params):
-    return conferenceModif.RHAbstractReviewingTeam(req).process(params)
-
-def notifTpl( req, **params ):
-    return conferenceModif.RHNotifTpl( req ).process( params )
-
-def notifTplNew(req,**params):
-    return conferenceModif.RHCFANotifTplNew(req).process(params)
-
-
-def notifTplRem(req,**params):
-    return conferenceModif.RHCFANotifTplRem(req).process(params)
-
-
-def notifTplEdit(req,**params):
-    return conferenceModif.RHCFANotifTplEdit(req).process(params)
-
-
-def notifTplDisplay(req,**params):
-    return conferenceModif.RHCFANotifTplDisplay(req).process(params)
-
-
-def notifTplPreview(req,**params):
-    return conferenceModif.RHCFANotifTplPreview(req).process(params)
-
-
-def notifTplCondNew(req,**params):
-    return conferenceModif.RHNotifTplConditionNew(req).process(params)
-
-
-def notifTplCondRem(req,**params):
-    return conferenceModif.RHNotifTplConditionRem(req).process(params)
-
-
-def notifTplUp(req,**params):
-    return conferenceModif.RHCFANotifTplUp(req).process(params)
-
-def notifTplDown(req,**params):
-    return conferenceModif.RHCFANotifTplDown(req).process(params)
-
 def abstractFields(req, **params):
     return conferenceModif.RHConfAbstractFields(req).process(params)
 

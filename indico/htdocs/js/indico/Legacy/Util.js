@@ -425,10 +425,15 @@ var IndicoUtil = {
     markInvalidField: function(component, error, passive) {
 
         // passive - don't check actively for changes / keypresses
-
-        if ( startsWith(component.dom.type, 'select')) {
-            if (component.dom.className.slice(-13) != "invalidSelect") {
-                component.dom.className += ' invalidSelect';
+        if (component.dom.type) {
+            if ( startsWith(component.dom.type, 'select')) {
+                if (component.dom.className.slice(-13) != "invalidSelect") {
+                    component.dom.className += ' invalidSelect';
+                }
+            } else {
+                if (component.dom.className.slice(-7) != "invalid") {
+                    component.dom.className += ' invalid';
+                }
             }
         } else {
             if (component.dom.className.slice(-7) != "invalid") {
@@ -541,7 +546,12 @@ var IndicoUtil = {
                 }
 
                 //--- Check if there are errors ---
-                if (dataType == "radio") {
+                if (dataType == "checkBoxList") {
+                    if (!allowEmpty && !self.checkCheckBoxes(component)) { // component must be the parent element of all the checkboxes
+                        error = Html.span({}, "At least one must be selected");
+                    }
+                }
+                else if (dataType == "radio") {
                     if (!allowEmpty && !self.checkRadioButton(component)) {
                         error = Html.span({}, "Please choose an option");
                     }
@@ -599,6 +609,9 @@ var IndicoUtil = {
                     if (component.ErrorAware) {
                         oList = component.setError(error);
 
+                    } else if (dataType == 'checkBoxList') {
+                        var result = IndicoUtil.markInvalidField(component, error, true);
+                        oList = result[1];
                     } else if (component.dom.type != 'radio') {
                         var result = IndicoUtil.markInvalidField(component, error);
                         oList = result[1];
@@ -676,6 +689,17 @@ var IndicoUtil = {
                 }
             });
             return radioButtonChecks;
+        };
+
+        // component must be the parent element of all the checkboxes
+        this.checkCheckBoxes = function(component) {
+            for (var i=0; i<component.dom.childNodes.length; i++) {
+                var node = component.dom.childNodes[i];
+                if (node.type == "checkbox" && node.checked) {
+                    return true;
+                }
+            }
+            return false;
         };
 
         /**

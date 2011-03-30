@@ -3424,6 +3424,11 @@ class NotificationTemplate(Persistent):
         result = result.replace("%%", "%")
         return result
 
+    def getModifKey( self ):
+        return self.getConference().getModifKey()
+
+
+
 class NotifTplToAddr(Persistent):
     """
     """

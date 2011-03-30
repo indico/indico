@@ -91,6 +91,7 @@ class WPConfModifAbstractsReviewingNotifTplBase( WPConferenceModifAbstractBase )
         self._tabCFAR.setActive()
         self._subTabARNotifTpl.setActive()
 
+
 class WPConfModifAbstractsReviewingNotifTplList( WPConfModifAbstractsReviewingNotifTplBase ):
 
     def _getTabContent( self, params ):
@@ -126,7 +127,7 @@ class NotifTplToAddrWrapper:
     getToAddrKlass=classmethod(getToAddrKlass)
 
     def addToAddr(cls,tpl):
-         tpl.addToAddr(cls._klass())
+        tpl.addToAddr(cls._klass())
     addToAddr=classmethod(addToAddr)
 
     def isSelectedByDefault(cls):
@@ -169,13 +170,7 @@ class NotifTplToAddrsFactory:
 class WConfModCFANotifTplNew(wcomponents.WTemplated):
 
     def __init__(self,conf):
-        self._conf=conf
-
-    def _getToAddrsHTML(self):
-        res=[]
-        for toAddr in NotifTplToAddrsFactory.getToAddrList():
-            res.append("""<input name="toAddrs" type="checkbox" value=%s>%s<br>"""%(quoteattr(toAddr.getId()),self.htmlText(toAddr.getLabel())))
-        return "&nbsp;".join(res)
+        self._conf = conf
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
@@ -187,8 +182,10 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
         vars["body"] = self.htmlText(vars.get("body",""))
         vars["fromAddr"] = quoteattr(str(vars.get("fromAddr","")))
         vars["CCAddrs"] = quoteattr(str(",".join(vars.get("ccList",[]))))
-        vars["toAddrs"] = self._getToAddrsHTML()
+        vars["toAddrsList"] = NotifTplToAddrsFactory.getToAddrList()
         vars["availableConditions"] = NotifTplConditionsFactory.getConditionList()
+        vars["contribTypeList"] = self._conf.getContribTypeList()
+        vars["trackList"] = self._conf.getTrackList()
         return vars
 
 
@@ -208,7 +205,7 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
                 if toAddr.isSelectedByDefault():
                     checked = "checked"
             res.append("""<input name="toAddrs" type="checkbox" value=%s %s>%s<br>"""%(quoteattr(toAddr.getId()),checked,self.htmlText(toAddr.getLabel())))
-        return "&nbsp;".join(res)
+        return "".join(res)
 
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
@@ -234,7 +231,8 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
             vars["fromAddr"] = quoteattr(str(self._notifTpl.getFromAddr()))
         else:
             vars["fromAddr"] = quoteattr(str(vars["fromAddr"]))
-        vars["toAddrs"] = self._getToAddrsHTML()
+        vars["toAddrsList"] = NotifTplToAddrsFactory.getToAddrList()
+        vars["notifTpl"] = self._notifTpl
         if not vars.has_key("ccList"):
             vars["CCAddrs"] = quoteattr(str(",".join(self._notifTpl.getCCAddrList())))
         else:
@@ -250,7 +248,7 @@ class WPModCFANotifTplNew(WPConfModifAbstractsReviewingNotifTplBase):
 
     def getJSFiles(self):
         return WPConfModifAbstractsReviewingNotifTplBase.getJSFiles(self) + \
-           self._includeJSPackage('Abstracts')
+           self._includeJSPackage('Management')
 
 class WPModCFANotifTplBase(WPConferenceModifAbstractBase):
 
@@ -334,7 +332,7 @@ class WPModCFANotifTplPreview(WPModCFANotifTplBase):
 class WConfModCFANotifTplPreview(wcomponents.WTemplated):
 
     def __init__(self,notifTpl):
-        self._notifTpl=notifTpl
+        self._notifTpl = notifTpl
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -342,16 +340,16 @@ class WConfModCFANotifTplPreview(wcomponents.WTemplated):
         vars["conf"] = conf
         if conf.getAbstractMgr().getAbstractList():
             abstract = conf.getAbstractMgr().getAbstractList()[0]
-            notif=EmailNotificator().apply(abstract,self._notifTpl)
-            vars["From"]=notif.getFromAddr()
-            vars["to"]=notif.getToList()
-            vars["cc"]=notif.getCCList()
-            vars["subject"]=notif.getSubject()
+            notif = EmailNotificator().apply(abstract, self._notifTpl)
+            vars["From"] = notif.getFromAddr()
+            vars["to"] =  ", ".join(notif.getToList())
+            vars["cc"] = ", ".join(notif.getCCList())
+            vars["subject"] = notif.getSubject()
             vars["body"] = notif.getBody()
         else:
-            vars["From"]= vars["to"] = vars["cc"] = vars["subject"]= _("No preview available")
+            vars["From"] = vars["to"] = vars["cc"] = vars["subject"]= _("No preview available")
             vars["body"] = _("An abstract must be submitted to display the preview")
-        vars["cfaURL"]=quoteattr(str(urlHandlers.UHConfModifCFA.getURL(conf)))
+        vars["cfaURL"] = quoteattr(str(urlHandlers.UHConfModifCFA.getURL(conf)))
         return vars
 
 class NotifTplConditionWrapper:
@@ -375,19 +373,20 @@ class NotifTplConditionWrapper:
         pass
     addCondition=classmethod(addCondition)
 
-    def needsDialog(cls,**data):
-        return False
-    needsDialog=classmethod(needsDialog)
-
-    def getDialogKlass(cls):
-        return None
-    getDialogKlass=classmethod(getDialogKlass)
+# Could be useful in the future for new conditions
+#    def needsDialog(cls,**data):
+#        return False
+#    needsDialog=classmethod(needsDialog)
+#
+#    def getDialogKlass(cls):
+#        return None
+#    getDialogKlass=classmethod(getDialogKlass)
 
 
 class NotifTplCondAcceptedWrapper(NotifTplConditionWrapper):
 
     _id="accepted"
-    _label= _("in status ACCEPTED")
+    _label= _("ACCEPTED")
     _klass=review.NotifTplCondAccepted
 
     @classmethod
@@ -396,21 +395,21 @@ class NotifTplCondAcceptedWrapper(NotifTplConditionWrapper):
         t=data.get("track","--any--")
         tpl.addCondition(cls._klass(track=t,contribType=cType))
 
-    @classmethod
-    def needsDialog(cls,**data):
-        if data.has_key("contribType") and data["contribType"]!="":
-            return False
-        return True
-
-    @classmethod
-    def getDialogKlass(cls):
-        return WPModNotifTplCondAcc
+#    @classmethod
+#    def needsDialog(cls,**data):
+#        if data.has_key("contribType") and data["contribType"]!="":
+#            return False
+#        return True
+#
+#    @classmethod
+#    def getDialogKlass(cls):
+#        return WPModNotifTplCondAcc
 
 
 class NotifTplCondRejectedWrapper(NotifTplConditionWrapper):
 
     _id="rejected"
-    _label= _("in status REJECTED")
+    _label= _("REJECTED")
     _klass=review.NotifTplCondRejected
 
     @classmethod
@@ -420,7 +419,7 @@ class NotifTplCondRejectedWrapper(NotifTplConditionWrapper):
 class NotifTplCondMergedWrapper(NotifTplConditionWrapper):
 
     _id="merged"
-    _label= _("in status MERGED")
+    _label= _("MERGED")
     _klass=review.NotifTplCondMerged
 
     @classmethod
@@ -442,41 +441,6 @@ class NotifTplConditionsFactory:
     def getConditionById(cls,id):
         return cls._avail_conds.get(id,None)
     getConditionById=classmethod(getConditionById)
-
-
-class WConfModNotifTplCondAcc(wcomponents.WTemplated):
-
-    def __init__(self,tpl):
-        self._notifTpl=tpl
-
-    def _getContribTypeItemsHTML(self):
-        res=["""<option value="--any--">--any--</option>""",
-                """<option value="--none--">--none--</option>"""]
-        for t in self._notifTpl.getConference().getContribTypeList():
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(t.getId()),self.htmlText(t.getName())))
-        return "".join(res)
-
-    def _getTrackItemsHTML(self):
-        res=["""<option value="--any--">--any--</option>""",
-                """<option value="--none--">--none--</option>"""]
-        for t in self._notifTpl.getConference().getTrackList():
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(t.getId()),self.htmlText(t.getTitle())))
-
-        return "".join(res)
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=urlHandlers.UHConfModNotifTplConditionNew.getURL(self._notifTpl)
-        vars["condType"]=quoteattr(str(NotifTplCondAcceptedWrapper.getId()))
-        vars["contribTypeItems"]=self._getContribTypeItemsHTML()
-        vars["trackItems"]=self._getTrackItemsHTML()
-        return vars
-
-
-class WPModNotifTplCondAcc(WPModCFANotifTplBase):
-
-    def _getTabContent( self, params ):
-        wc=WConfModNotifTplCondAcc(self._notifTpl)
-        return wc.getHTML()
 
 
 class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
@@ -527,14 +491,17 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
         vars["description"] = self._notifTpl.getDescription()
         vars["From"] = self._notifTpl.getFromAddr()
         vars["toAddrs"] = self._getToAddrsHTML()
-        vars["CCAddrs"]=",".join(self._notifTpl.getCCAddrList())
+        vars["CCAddrs"] = ", ".join(self._notifTpl.getCCAddrList())
         vars["subject"] = self._notifTpl.getTplSubjectShow(EmailNotificator.getVarList())
         vars["body"] = self._notifTpl.getTplBodyShow(EmailNotificator.getVarList())
-        vars["conditions"]=self._getConditionsHTML()
-        vars["availableConditions"]=self._getConditionItemsHTML()
-        vars["remConditionsURL"]=quoteattr(str(urlHandlers.UHConfModNotifTplConditionRem.getURL(self._notifTpl)))
-        vars["newConditionURL"]=quoteattr(str(urlHandlers.UHConfModNotifTplConditionNew.getURL(self._notifTpl)))
-        vars["modifDataURL"]=quoteattr(str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
+        vars["conditions"] = self._getConditionsHTML()
+        vars["availableConditions"] = self._getConditionItemsHTML()
+        vars["remConditionsURL"] = quoteattr(str(urlHandlers.UHConfModNotifTplConditionRem.getURL(self._notifTpl)))
+        vars["newConditionURL"] = quoteattr(str(urlHandlers.UHConfModNotifTplConditionNew.getURL(self._notifTpl)))
+        vars["modifDataURL"] = quoteattr(str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
+        vars["contribTypeList"] = self._conf.getContribTypeList()
+        vars["trackList"] = self._conf.getTrackList()
+
         return vars
 
 ### End of Notification Templates classes ###
