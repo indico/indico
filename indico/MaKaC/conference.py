@@ -242,8 +242,8 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
                 for av in al:
                     av_set.add(av)
 
-        # If access settings are inherited from its owners, look at those.
-        elif apl == 0:
+        # If access settings are inherited (and PRIVATE) from its owners, look at those.
+        elif apl == 0 and self.isProtected():
             # If event is protected, then get list of people/groups allowed
             # to access, and add that to the set of avatars.
             al = self.getAllowedToAccessList() + self.getManagerList()
