@@ -230,7 +230,7 @@ type ("RoomMap", ["IWidget"],
             details = Html.span({className:'mapRoomDetailsLink'}, details);
 
             // room details elements
-            title = Html.table({className: 'mapRoomTooltipTitle', width: '100%', cellpadding: 0, cellspacing: 0}, Html.tbody({}, Html.tr({}, Html.td({width: '75%'}, caption.dom), Html.td({width: '25%'}, details.dom))));
+            var title = Html.table({className: 'mapRoomTooltipTitle', width: '100%', cellpadding: 0, cellspacing: 0}, Html.tbody({}, Html.tr({}, Html.td({width: '75%'}, caption.dom), Html.td({width: '25%'}, details.dom))));
             var img = Html.img({src: room.tipPhotoURL, width: 212, height: 140, className: 'mapRoomTooltipImage'});
             var desc = Html.div({className: 'mapRoomTooltipDescription'}, room.markerDescription);
             var all = Widget.lines([img, desc]);
