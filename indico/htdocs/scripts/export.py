@@ -76,9 +76,10 @@ def index(req, **params):
   # filter with event type
   if event_types != ['']:
     finalres = []
-    ch = ConferenceHolder()
-    for confId in res:
-      conf = ch.getById(confId)
+    #ch = ConferenceHolder()
+    #for confId in res:
+    #  conf = ch.getById(confId)
+    for conf in res:
       type = conf.getType()
       if type in event_types:
         finalres.append(confId)
@@ -88,9 +89,10 @@ def index(req, **params):
   # filter with room name
   if rooms != []:
     finalres = []
-    ch = ConferenceHolder()
-    for confId in res:
-      conf = ch.getById(confId)
+    #ch = ConferenceHolder()
+    #for confId in res:
+    #  conf = ch.getById(confId)
+    for conf in res:
       if conf.getRoom():
         confroom = conf.getRoom().getName()
         if confroom in rooms:
@@ -98,10 +100,10 @@ def index(req, **params):
   else:
     finalres = res
   # filter protected events
-  ch = ConferenceHolder()
+  #ch = ConferenceHolder()
   if not protected:
     for id in finalres:
-      conf = ch.getById(id)
+      #conf = ch.getById(id)
       if conf.isProtected():
         finalres.remove(id)
   if of=='xml':
@@ -198,7 +200,7 @@ def displayConf(conf,displayCateg,day,tz):
   return t
 
 def displayXMLList(res, req, tz, dc=1):
-  ch = ConferenceHolder()
+  #ch = ConferenceHolder()
   xml = xmlGen.XMLGen()
   xml.openTag("collection")
   for c in res:
@@ -250,7 +252,7 @@ def getCategText(categ,dc=1):
     return "%s&nbsp;/&nbsp;%s" % (getCategText(categ.getOwner()),categ.getName())
 
 def displayRSSList(res,req,tz):
-  ch = ConferenceHolder()
+  #ch = ConferenceHolder()
   rss = xmlGen.XMLGen()
   rss.openTag('rss version="2.0"')
   rss.openTag("channel")
