@@ -912,10 +912,16 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
         }
 
         // Check if the result overflows the conference ending time
+        var latestTime = null;
+        for(var key in result.entry) {
+            if(!latestTime || result.entry[key].endDate.time.replaceAll(':','') > latestTime.replaceAll(':','')) {
+                latestTime = result.entry[key].endDate.time;
+            }
+        }
         if ((result.day == this.eventInfo.endDate.date.replaceAll('-','')) &&
-            (result.entry.endDate.time.replaceAll(':','') >
+            (latestTime.replaceAll(':','') >
              this.eventInfo.endDate.time.replaceAll(':',''))) {
-            this.eventInfo.endDate.time = result.entry.endDate.time;
+            this.eventInfo.endDate.time = latestTime;
         }
 
         this.timetableDrawer.redraw();
