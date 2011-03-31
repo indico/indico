@@ -27,7 +27,8 @@ import sets
 from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.common.info as info
- 
+
+
 class CategoryToRSS:
 
     def __init__(self, categ, date=None, tz=None):
@@ -39,19 +40,15 @@ class CategoryToRSS:
             self._tz = tz
 
     def getBody(self):
-        res = sets.Set()
         im = indexes.IndexesHolder()
-        catIdx = im.getIndex('category')
-        calIdx = im.getIndex('calendar')
+        calIdx = im.getIndex('categoryDate')
+
         if self._date == None:
-            c1 = calIdx.getObjectsEndingAfter(nowutc().astimezone(timezone(self._tz)))
+            confs = calIdx.getObjectsEndingAfter(self._categ.getId(), nowutc().astimezone(timezone(self._tz)))
         else:
-            date = self._date
-            c1 = calIdx.getObjectsInDay(date)
-        confIds=sets.Set(catIdx.getItems(self._categ.getId()))
-        confIds.intersection_update(c1)
-        res.union_update(confIds)
-        res = list(res)
+            confs = calIdx.getObjectsInDay(self._categ.getId(), self._date)
+
+        res = list(confs)
         res.sort(sortByStartDate)
         rss = xmlGen.XMLGen()
         rss.openTag('rss version="2.0"')
@@ -67,9 +64,7 @@ class CategoryToRSS:
         rss.writeTag("generator", "CDS Indico %s" % Config.getInstance().getVersion())
         rss.writeTag("webMaster", info.HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         rss.writeTag("ttl","1440")
-        for confId in res:
-            ch = ConferenceHolder()
-            conf = ch.getById(confId)
+        for conf in res:
             rss = ConferenceToRSS(conf, tz=self._tz).getCore(rss)
         rss.closeTag("channel")
         rss.closeTag("rss")
@@ -109,5 +104,4 @@ class ConferenceToRSS:
         return rss
 
 def sortByStartDate(conf1,conf2):
-  ch = ConferenceHolder()
-  return cmp(ch.getById(conf1).getStartDate(),ch.getById(conf2).getStartDate())
+  return cmp(conf1.getStartDate(), conf2.getStartDate())

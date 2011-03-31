@@ -29,6 +29,7 @@ import MaKaC.common.info as info
 from MaKaC.common.timezoneUtils import nowutc
 from pytz import timezone
 
+
 def index(req, **params):
   """This script displays the list of meetings taking place in a given category
   at a given date"""
@@ -36,7 +37,6 @@ def index(req, **params):
   try:
     fid = params['fid']
     date = params['date']
-    days = params['days']
   except:
     return usage()
 
@@ -53,13 +53,10 @@ def index(req, **params):
 
   #instanciate indexes
   im = indexes.IndexesHolder()
-  catIdx = im.getIndex('category')
-  calIdx = im.getIndex('calendar')
+  calIdx = im.getIndex('categoryDate')
 
-  c1 = calIdx.getObjectsIn(startdate, enddate)
-  for id in ids:
-    confIds=sets.Set(catIdx.getItems(id))
-    confIds.intersection_update(c1)
+  for cid in ids:
+    confIds = calIdx.getObjectsInDays(cid, startdate, enddate)
     res.union_update(confIds)
 
   res = list(res)
@@ -69,18 +66,18 @@ def index(req, **params):
 
 
 def usage():
-  return "usage: createCategoryHeader.py?fid=xxx&date=yyyy-mm-dd&days=xxx";
+  return "usage: createCategoryHeader.py?fid=xxx&date=yyyy-mm-dd";
 
 def sortByStartDate(conf1,conf2):
   ch = ConferenceHolder()
-  return cmp(ch.getById(conf1).getStartDate().time(),ch.getById(conf2).getStartDate().time())
+  return cmp(conf1.getStartDate().time(), conf2.getStartDate().time())
 
 def displayList(res,tz):
   text = ""
   ch = ConferenceHolder()
   curDate = None
-  for confId in res:
-    c = ch.getById(confId)
+
+  for c in res:
     if curDate!=c.getAdjustedStartDate(tz):
       curDate = c.getAdjustedStartDate(tz)
       text += "%s<br>" % curDate.strftime("%A %B %d, %Y")
@@ -88,8 +85,9 @@ def displayList(res,tz):
   return text
 
 def displayConf(conf,tz):
-  t = "<b>%s</b>&nbsp;/&nbsp;%s&nbsp;/&nbsp;<a href=\"http://indico.cern.ch/conferenceDisplay.py?confId=%s\">%s</a>/%s" % (conf.getAdjustedStartDate(tz).time().isoformat()[0:5],getCategText(conf.getOwnerList()[0]),conf.getId(),conf.getTitle(),conf.getRoom().getName())
-  return t
+    room = conf.getRoom()
+    t = "<b>%s</b>&nbsp;/&nbsp;%s&nbsp;/&nbsp;<a href=\"http://indico.cern.ch/conferenceDisplay.py?confId=%s\">%s</a>/%s" % (conf.getAdjustedStartDate(tz).time().isoformat()[0:5],getCategText(conf.getOwnerList()[0]),conf.getId(),conf.getTitle(), (room.getName() if room else ''))
+    return t
 
 def getCategText(categ):
   global ids

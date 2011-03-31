@@ -792,6 +792,20 @@ class CategoryDateIndex(Persistent):
         else:
             return []
 
+    def getObjectsInDay( self, categid, sDate):
+        categid = str(categid)
+        if self._idxCategItem.has_key(categid):
+            return self._idxCategItem[categid].getObjectsInday(sDate)
+        else:
+            return []
+
+    def getObjectsEndingAfter( self, categid, sDate):
+        categid = str(categid)
+        if self._idxCategItem.has_key(categid):
+            return self._idxCategItem[categid].getObjectsEndingAfter(sDate)
+        else:
+            return []
+
 class CategoryDateIndexLtd(CategoryDateIndex):
     """ Version of CategoryDateIndex whiself.ch indexing events
         on the base of their visibility
@@ -1459,7 +1473,7 @@ class IndexesHolder( ObjectHolder ):
             elif id=="category":
                 Idx[str(id)] = CategoryIndex()
             elif id=="categoryDate":
-                Idx[str(id)] = CategoryDateIndex()
+                Idx[str(id)] = CategoryDayIndex()
             elif id=="categoryName":
                 Idx[str(id)] = TextIndex()
             elif id=="pendingSubmitters":

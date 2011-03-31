@@ -24,6 +24,8 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.review as review
 from MaKaC.ICALinterface.base import ICALBase
 from MaKaC.common.utils import encodeUnicode
+from MaKaC.common.indexes import IndexesHolder
+from indico.util.date_time import nowutc
 
 
 class ProgrammeToiCal(ICALBase):
@@ -53,8 +55,13 @@ class CategoryToiCal(ICALBase):
         self._categ = categ
 
     def getBody(self):
+        im = IndexesHolder()
+        calIdx = im.getIndex('categoryDate')
+
         text = self._printHeader()
-        for conf in self._categ.getAllConferenceList():
+        confs = calIdx.getObjectsEndingAfter(self._categ.getId(),
+                                             nowutc())
+        for conf in confs:
             text += ConferenceToiCal(conf).getCore()
         text += self._printFooter()
         return text

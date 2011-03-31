@@ -139,9 +139,7 @@ def displayICalList(res,req):
   icalBase = ICALBase()
   data = icalBase._printHeader()
 
-  ch = ConferenceHolder()
-  for confId in res:
-    conf = ch.getById(confId)
+  for conf in res:
     ical = ConferenceToiCal(conf.getConference())
     data += ical.getCore()
   data += icalBase._printFooter()
@@ -154,13 +152,11 @@ def displayICalList(res,req):
 
 def displayList(res,startdate,enddate,repeat,displayCateg,tz):
   text = ""
-  ch = ConferenceHolder()
   day = startdate
   days = {}
   found = {}
   while day <= enddate:
-    for confId in res:
-      c = ch.getById(confId)
+    for c in res:
       if day.date() >= c.getAdjustedStartDate(tz).date() and day.date() <= c.getAdjustedEndDate(tz).date() and (repeat==1 or not found.has_key(c)):
         if not days.has_key(day):
 	  days[day]=[]
@@ -205,8 +201,7 @@ def displayXMLList(res, req, tz, dc=1):
   ch = ConferenceHolder()
   xml = xmlGen.XMLGen()
   xml.openTag("collection")
-  for confId in res:
-    c = ch.getById(confId)
+  for c in res:
     xml = displayXMLConf(c,xml,tz,dc)
   xml.closeTag("collection")
   return xml.getXml()
@@ -268,8 +263,7 @@ def displayRSSList(res,req,tz):
   rss.writeTag("generator", "CDS Indico %s" % Config.getInstance().getVersion())
   rss.writeTag("webMaster", HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
   rss.writeTag("ttl","1440")
-  for confId in res:
-    c = ch.getById(confId)
+  for c in res:
     rss = displayRSSConf(c,rss,tz)
   rss.closeTag("channel")
   rss.closeTag("rss")
@@ -297,21 +291,17 @@ def displayRSSConf(conf,rss,tz):
   return rss
 
 def sortByStartDate(conf1,conf2):
-  ch = ConferenceHolder()
-  return cmp(ch.getById(conf1).getStartDate(),ch.getById(conf2).getStartDate())
+  return cmp(conf1.getStartDate(),conf2.getStartDate())
 
 def getConfList(startdate,enddate,ids):
   #create result set
   res = sets.Set()
   #instanciate indexes
   im = indexes.IndexesHolder()
-  catIdx = im.getIndex('category')
-  calIdx = im.getIndex('calendar')
-  c1 = calIdx.getObjectsIn(startdate, enddate)
-  for id in ids:
-    confIds=sets.Set(catIdx.getItems(id))
-    confIds.intersection_update(c1)
-    res.union_update(confIds)
+  calIdx = im.getIndex('categoryDate')
+  for cid in ids:
+      confs = calIdx.getObjectsInDays(cid, startdate, enddate)
+      res.union_update(confs)
   res = list(res)
   res.sort(sortByStartDate)
   return res
