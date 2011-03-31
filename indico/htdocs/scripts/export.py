@@ -82,7 +82,7 @@ def index(req, **params):
     for conf in res:
       type = conf.getType()
       if type in event_types:
-        finalres.append(confId)
+        finalres.append(conf)
   else:
     finalres = res
   res = finalres
@@ -96,16 +96,17 @@ def index(req, **params):
       if conf.getRoom():
         confroom = conf.getRoom().getName()
         if confroom in rooms:
-          finalres.append(confId)
+          finalres.append(conf)
   else:
     finalres = res
   # filter protected events
   #ch = ConferenceHolder()
   if not protected:
-    for id in finalres:
+    #for id in finalres:
       #conf = ch.getById(id)
+    for conf in finalres:
       if conf.isProtected():
-        finalres.remove(id)
+        finalres.remove(conf)
   if of=='xml':
     req.content_type="text/xml"
     return displayXMLList(finalres, req, tzstring, displayCateg)
