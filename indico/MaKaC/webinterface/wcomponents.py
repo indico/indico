@@ -209,7 +209,7 @@ class WTemplated(OldObservable):
 
         tempHTML = TemplateExec.executeTemplate( text, vars, self.tplId )
 
-        if self._rh._req.is_https():
+        if self._rh and self._rh._req.is_https():
             imagesBaseURL = Config.getInstance().getImagesBaseURL()
             imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
             baseURL = Config.getInstance().getBaseURL()

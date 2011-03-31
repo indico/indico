@@ -501,7 +501,7 @@ class RH(RequestHandlerBase):
                         self._setLang(params)
 
                         if self._getUser():
-                            Logger.get('requestHandler').debug('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))
+                            Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))
                             if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
                                 self._tohttps = True
                                 if self._checkHttpsRedirect():
