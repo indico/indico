@@ -77,8 +77,10 @@ def _fixAC(obj):
     ac.setOwner(obj)
 
 
-def _fixAccessController(obj):
-    _fixAC(obj)
+def _fixAccessController(obj, fixSelf=True):
+    # i.e. subcontributions do not have their own AccessController
+    if fixSelf:
+        _fixAC(obj)
 
     for mat in obj.getAllMaterialList():
         for res in mat.getResourceList():
@@ -130,7 +132,7 @@ def runConferenceMigration(dbi, withRBDB):
     ch = ConferenceHolder()
     i = 0
 
-    for (level, obj) in console.conferenceHolderIterator(ch, deepness='contrib'):
+    for (level, obj) in console.conferenceHolderIterator(ch, deepness='subcontrib'):
         # only for conferences
         if level == 'event':
 
@@ -152,7 +154,8 @@ def runConferenceMigration(dbi, withRBDB):
             # It is important to save the state of the alarm (sent or not)
             _convertAlarms(obj)
 
-        _fixAccessController(obj)
+        _fixAccessController(obj,
+                             fixSelf=(level != 'subcontrib'))
 
         if i % 1000 == 999:
             dbi.commit()
