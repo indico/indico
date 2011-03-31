@@ -148,7 +148,7 @@ def _wrapper(iterator, operation, dbi):
         if i % 10000 == 0:
             dbi.abort()
 
-        yield elem, operation
+        yield elem, '', operation
 
 
 def _only_second(tupleIterator):
@@ -202,7 +202,7 @@ class AgentCommand(ConsoleLiveSyncCommand):
             if args.output:
                 nbatch = 0
                 batch = []
-                for record, operation in _wrapper(_only_second(iterator),
+                for record, rid, operation in _wrapper(_only_second(iterator),
                                                   agent._creationState,
                                                   self._dbi):
                     if len(batch) > SIZE_BATCH_PER_FILE:
@@ -211,7 +211,7 @@ class AgentCommand(ConsoleLiveSyncCommand):
                         nbatch += 1
                         batch = []
 
-                    batch.append((record, operation))
+                    batch.append((record, rid, operation))
 
                 if batch:
                     self._writeFile(agent, args.output, nbatch, batch, logger)
