@@ -23,7 +23,7 @@ import datetime,sets
 
 from MaKaC.common.general import *
 from MaKaC.common import db
-from MaKaC.conference import ConferenceHolder,CategoryManager
+from MaKaC.conference import CategoryManager
 from MaKaC.common import indexes
 import MaKaC.common.info as info
 from MaKaC.common.timezoneUtils import nowutc
@@ -69,12 +69,10 @@ def usage():
   return "usage: createCategoryHeader.py?fid=xxx&date=yyyy-mm-dd";
 
 def sortByStartDate(conf1,conf2):
-  ch = ConferenceHolder()
   return cmp(conf1.getStartDate().time(), conf2.getStartDate().time())
 
 def displayList(res,tz):
   text = ""
-  ch = ConferenceHolder()
   curDate = None
 
   for c in res:
