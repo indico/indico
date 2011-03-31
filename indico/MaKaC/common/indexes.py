@@ -795,7 +795,7 @@ class CategoryDateIndex(Persistent):
     def getObjectsInDay( self, categid, sDate):
         categid = str(categid)
         if self._idxCategItem.has_key(categid):
-            return self._idxCategItem[categid].getObjectsInday(sDate)
+            return self._idxCategItem[categid].getObjectsInDay(sDate)
         else:
             return []
 
