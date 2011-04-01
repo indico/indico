@@ -171,9 +171,11 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
     _postDrawPositionDialog: function(){
         var left = Math.floor((this.winDim.width - this.container.dom.offsetWidth) / 2);
         var top = Math.floor((this.winDim.height - this.container.dom.offsetHeight) / 2);
-
-        this.canvas.dom.style.left = pixels(left);
-        this.canvas.dom.style.top = top >= 0 ? pixels(top) : 0;
+        var scrollOffset = getScrollOffset();
+        left += scrollOffset.x;
+        top += scrollOffset.y;
+        this.canvas.dom.style.left = pixels(Math.max(0, left));
+        this.canvas.dom.style.top = pixels(Math.max(0, top));
     },
 
     _postDrawAdjustTitle: function() {
