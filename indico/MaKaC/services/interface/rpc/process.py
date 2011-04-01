@@ -15,6 +15,7 @@ from MaKaC.common.contextManager import ContextManager
 from MaKaC.services.interface.rpc.common import CausedError
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
+import copy
 
 
 def lookupHandler(method):
@@ -81,7 +82,7 @@ class ServiceRunner(Observable):
                     try:
                         DBMgr.getInstance().sync()
 
-                        result = processRequest(method, params, req)
+                        result = processRequest(method, copy.copy(params), req)
 
                         # notify components that the request has ended
                         self._notify('requestFinished', req)
