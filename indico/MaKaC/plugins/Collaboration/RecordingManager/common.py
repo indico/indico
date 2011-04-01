@@ -638,7 +638,6 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
             # first need to get DB ids for stuff
             idMachine = MicalaCommunication.getIdMachine(CollaborationTools.getOptionValue("RecordingManager", "micalaDBMachineName"))
             idTask    = MicalaCommunication.getIdTask(CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"))
-            idLecture = "" # declare idLecture outside of blocks (is this necessary or just a perl thing?)
             # Look for the current talk in the Lectures table of the micala database
             # If it is a plain_video talk, look for its IndicoID;
             # if it is a web_lecture talk, use its LODBID

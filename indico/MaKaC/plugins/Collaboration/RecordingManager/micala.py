@@ -207,8 +207,7 @@ class MicalaCommunication(object):
         cleanedLectureTitle    = cls.cleanSQLData(lectureTitle)
         cleanedLectureSpeakers = cls.cleanSQLData(lectureSpeakers)
 
-#        Logger.get('RecMan').debug("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""" %
-#                       (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
+        Logger.get('RecMan').info("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""" % (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
 
         cursor.execute("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""", \
                        (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
@@ -304,6 +303,8 @@ class MicalaCommunication(object):
             result += _("Unknown error %d: %s") % (e.args[0], e.args[1])
 
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
+        Logger.get('RecMan').info("UPDATE Lectures SET IndicoID=%s, contentType=%s WHERE idLecture=%s" % (IndicoID, "WEBLECTURE", LODBID))
 
         try:
             cursor.execute("UPDATE Lectures SET IndicoID=%s, contentType=%s WHERE idLecture=%s",
