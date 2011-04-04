@@ -219,19 +219,20 @@ class InvenioSEA(base.SearchEngineAdapter):
     def translateField(self, field):
         return field
 
-    @SEATranslator ('collections',[],('c', 'p'))
+    @SEATranslator ('collections',[], 'c')
     def translateCollection(self, collection):
 
         if collection == 'Events':
-            query = " AND 65027a:'*'"
+            suffix = 'EVENTS'
         else:
-            query = " AND NOT 65027a:'*'"
+            suffix = 'CONTRIBS'
 
         if self._private:
-            return ('INDICOSEARCH', query)
+            prefix = 'INDICOSEARCH'
         else:
-            return ('INDICOSEARCH.PUBLIC', query)
+            prefix = 'INDICOSEARCH.PUBLIC'
 
+        return "%s.%s" % (prefix, suffix)
 
     @SEATranslator ('startRecord',[],'jrec')
     def translateStartRecord(self, startRecord):
