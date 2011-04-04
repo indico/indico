@@ -782,10 +782,10 @@ class SystemLink(Link):
             return True
 
     def getURL(self):
-        return self._v_URL
+        return self._URL
 
     def setURL(self, url):
-        self._v_URL = url
+        self._URL = url
 
     def getCaption(self):
         return self._caption
