@@ -755,12 +755,6 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         for room in rooms:
             if room.building:
 
-                # FIXME: a hack to check if the room's comments are OK for serialization
-                try:
-                    unicode(room.comments)
-                except:
-                    room.comments = ''
-
                 # if it's the first room in that building, initialize the building
                 building = buildings.get(room.building, None)
                 if building is None:
