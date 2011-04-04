@@ -431,7 +431,7 @@ class RH(RequestHandlerBase):
         return p.display()
 
     def _processFormValuesError(self,e):
-        """Treats timing errors occured during the process of a RH.
+        """Treats user input related errors occured during the process of a RH.
         """
 
         Logger.get('requestHandler').info('Request %s finished with FormValuesError: "%s"' % (id(self._req), e))
