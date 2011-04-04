@@ -25,6 +25,12 @@
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Room key")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><%= room.whereIsKey %><% contextHelp( 'whereIsKeyHelp' ) %></td>
                                         </tr>
+                                        <% if room.comments: %>
+                                        <tr>
+                                            <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Comments")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><%= room.comments %></td>
+                                        </tr>
+                                        <% end %>
                                     </table>
                                 </td>
                               </tr>
