@@ -1,6 +1,6 @@
 type("PopupDialog", ["PopupWidget"], {
     draw: function(content, x, y) {
-        return this.PopupWidget.prototype.draw.call(this, content, x, y);
+        return this.PopupWidget.prototype.draw.call(this, content, x, y, null, true);
     },
 
     clickTriggersClosing: function(target) {
@@ -120,7 +120,7 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
         }
 
 
-        return this.PopupWidget.prototype.draw.call(this, this.container, 0, 0);
+        return this.PopupWidget.prototype.draw.call(this, this.container, 0, 0, null, true);
     },
 
     close: function() {
