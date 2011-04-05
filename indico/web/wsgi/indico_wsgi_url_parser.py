@@ -99,7 +99,7 @@ def is_mp_legacy_publisher_path(req):
 
 class WSGIRedirection(object):
     """
-    Redirections that need a especial treatment are handled through this class.
+    Redirections that need special treatment are handled by this class.
     """
     def __init__(self, req, module, handler, dir):
         self._dir = dir
@@ -128,7 +128,14 @@ class WSGIRedirection(object):
         http://indico.cern.ch/fileName?query=index.py?my=messy/short.py?tag=true
         """
         newQueryString = query + '='
-        newQueryString += '/'.join(self._path[self._index+1:])
+
+        # remove trailing slashes
+        filteredPath = self._path[self._index + 1:]
+        if filteredPath[-1] == '':
+            filteredPath = filteredPath[:-1]
+
+        newQueryString += '/'.join(filteredPath)
+
         if self._req.URLFields['QUERY_STRING']:
             newQueryString += '?' + self._req.URLFields['QUERY_STRING']
         self._req.URLFields['QUERY_STRING'] = newQueryString
