@@ -892,11 +892,18 @@ type("PopupWidget", [], {
             this.canvas = Html.div();
         }
 
+        // taken from jQuery width() function. TODO: replace with less-ugly code as soon as we have jquery embedded globally
+        var width = ('scrollTo' in document && document) ?
+                document.compatMode === "CSS1Compat" && document.documentElement.clientWidth || document.body.clientWidth :
+                Math.max(document.documentElement.clientWidth, document.body.scrollWidth, document.documentElement.scrollWidth,
+                         document.body.offsetWidth, document.documentElement.offsetWidth);
+        width -= x;
         styles = any(styles, {
             // If the canvas has been set to fixed position don't change it
             position: this.canvas.dom.style.position == 'fixed' ? 'fixed' : 'absolute',
             left: pixels(x),
-            top: pixels(y)
+            top: pixels(y),
+            width: pixels(width)
         });
 
         each(styles, function(value, key) {
