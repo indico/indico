@@ -116,7 +116,7 @@ class WSGIRedirection(object):
         and then add the module to the path:
         '/indico/DIR/...' => '/indico' => '/indico/fileName'
         """
-        newPathInfo = os.path.sep.join(self._path[:self._index]) + fileName
+        newPathInfo = os.path.sep.join(self._path[:self._index]) + '/' + fileName
         self._req.URLFields['PATH_INFO'] = newPathInfo
 
     def _queryRewrite(self, query):
