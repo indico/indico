@@ -452,14 +452,12 @@ class RoomBase( object ):
         FINAL (not intented to be overriden)
         Returns a globaly unique identification encapsulated in a Locator object
         """
-#        owner = self.getOwner()
-#        if owner:
-#            loc = owner.getLocator()
-#        else:
-#            from MaKaC.common.Locators import Locator
-#            loc = Locator()
-        from MaKaC.common.Locators import Locator
-        loc = Locator()
+        owner = self.getOwner()
+        if owner:
+            loc = owner.getLocator()
+        else:
+            from MaKaC.common.Locators import Locator
+            loc = Locator()
         loc["roomLocation"] = self.locationName
         loc["roomID"] = self.id
         return loc
@@ -487,8 +485,9 @@ class RoomBase( object ):
             else:
                 self.__owner=None
         ####---ENDO OF FIXING THE USE OF IMPERSISTANT CLASS-----
-        if self.__owner:
-            return ConferenceHolder().getById(self.__owner) #self.__owner.getObject() # Wrapped in Impersistant
+        ch = ConferenceHolder()
+        if self.__owner and self.__owner in ch._getIdx():
+            return ch.getById(self.__owner)
 
         return None
 
