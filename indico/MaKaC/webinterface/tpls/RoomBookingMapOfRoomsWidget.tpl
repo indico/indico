@@ -24,7 +24,7 @@
 <form id="mapOfRoomAvailabilityForm" method="post"  style="width:150px;" action="<%= roomBookingRoomListURL %>">
 <p>
   <span>
-    <span><input id="isAvailable" class="mapFilterCheckbox" type="checkbox"></span>
+    <span><input id="isAvailable" class="mapFilterCheckbox" type="checkbox" style="margin-right:0px;"></span>
     <span class="mapFilterLabel">Is available:</span>
   </span>
 </p>
