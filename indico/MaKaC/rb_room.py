@@ -452,12 +452,14 @@ class RoomBase( object ):
         FINAL (not intented to be overriden)
         Returns a globaly unique identification encapsulated in a Locator object
         """
-        owner = self.getOwner()
-        if owner:
-            loc = owner.getLocator()
-        else:
-            from MaKaC.common.Locators import Locator
-            loc = Locator()
+#        owner = self.getOwner()
+#        if owner:
+#            loc = owner.getLocator()
+#        else:
+#            from MaKaC.common.Locators import Locator
+#            loc = Locator()
+        from MaKaC.common.Locators import Locator
+        loc = Locator()
         loc["roomLocation"] = self.locationName
         loc["roomID"] = self.id
         return loc
