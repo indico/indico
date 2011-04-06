@@ -44,6 +44,7 @@ from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator, ldapFindG
 from datetime import datetime, timedelta
 
 from MaKaC.common.PickleJar import Updates
+from MaKaC.common.logger import Logger
 
 #import ldap
 from pytz import all_timezones
@@ -1585,38 +1586,44 @@ class AvatarHolder( ObjectHolder ):
         for objType in links.keys():
             if objType == "category":
                 for role in links[objType].keys():
-                    if role == "creator":
-                        for cat in links[objType][role]:
+                    for cat in links[objType][role]:
+                        # if the category has been deleted
+                        if cat.getOwner() == None and cat.getId() != '0':
+                            Logger.get('user.merge').warning(
+                                "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
+                                (cat, prin.getId(), role))
+                            continue
+                        elif role == "creator":
                             cat.revokeConferenceCreation(merged)
                             cat.grantConferenceCreation(prin)
-                    elif role == "manager":
-                        for cat in links[objType][role]:
+                        elif role == "manager":
                             cat.revokeModification(merged)
                             cat.grantModification(prin)
-                    elif role == "access":
-                        for cat in links[objType][role]:
+                        elif role == "access":
                             cat.revokeAccess(merged)
                             cat.grantAccess(prin)
 
             elif objType == "conference":
                 for role in links[objType].keys():
-                    if role == "creator":
-                        for conf in links[objType][role]:
+                    for conf in links[objType][role]:
+                        # if the conference has been deleted
+                        if conf.getOwner() == None:
+                            Logger.get('user.merge').warning(
+                                "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
+                                (conf, prin.getId(), role))
+                            continue
+                        elif role == "creator":
                             conf._setCreator(prin)
-                    elif role == "chair":
-                        for conf in links[objType][role]:
+                        elif role == "chair":
                             conf.removeChair(merged)
                             conf.addChair(prin)
-                    elif role == "manager":
-                        for conf in links[objType][role]:
+                        elif role == "manager":
                             conf.revokeModification(merged)
                             conf.grantModification(prin)
-                    elif role == "access":
-                        for conf in links[objType][role]:
+                        elif role == "access":
                             conf.revokeAccess(merged)
                             conf.grantAccess(prin)
-                    elif role == "abstractSubmitter":
-                        for conf in links[objType][role]:
+                        elif role == "abstractSubmitter":
                             conf.removeAuthorizedSubmitter(merged)
                             conf.addAuthorizedSubmitter(prin)
 
