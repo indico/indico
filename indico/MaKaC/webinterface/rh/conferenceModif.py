@@ -76,7 +76,7 @@ from MaKaC.common import pendingQueues
 from MaKaC.common import mail
 import httplib
 from MaKaC import booking
-from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel
+from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
 from MaKaC.plugins.base import Observable
@@ -6537,6 +6537,8 @@ class RHContribsActions:
     def process(self, params):
         if params.has_key("PDF"):
             return RHContribsToPDF(self._req).process(params)
+        elif params.has_key("excel.x"):
+            return  RHContribsToExcel(self._req).process(params)
         elif params.has_key("AUTH"):
             return RHContribsParticipantList(self._req).process(params)
         elif params.has_key("move"):
@@ -6629,6 +6631,30 @@ class RHContribsToPDF(RHConferenceModifBase):
         self._req.content_type = """%s"""%(mimetype)
         self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
         return data
+
+class RHContribsToExcel(RHConferenceModifBase):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        self._contribIds = self._normaliseListParam( params.get("contributions", []) )
+        self._contribs = []
+        for id in self._contribIds:
+            self._contribs.append(self._conf.getContributionById(id))
+
+    def _process( self ):
+        tz = self._conf.getTimezone()
+        filename = "Contributions.csv"
+        if not self._contribs:
+            return "No contributions to print"
+        excel = ContributionsListToExcel(self._conf, self._contribs, tz=tz)
+        data = excel.getExcelFile()
+        self._req.set_content_length(len(data))
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType( "CSV" )
+        self._req.content_type = """%s"""%(mimetype)
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        return data
+
 
 class RHContribsParticipantList(RHConferenceModifBase):
 

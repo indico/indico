@@ -140,6 +140,9 @@ else:
                         <td valign="bottom" align="left">
                             <input type="image" src=${ pdfIconURL} class="btn" name="PDF" value="${ _("Create PDF")}" onclick='this.form.action=${ contributionsPDFURL };this.form.target="_blank";'>
                         </td>
+                        <td valign="bottom" align="left">
+                            <input type="image" name="excel" src=${ excelIconURL} border="0">
+                        </td>
                 </tbody>
             </table>
         </td>
@@ -196,6 +199,9 @@ else:
                                 </td>
                                 <td valign="bottom " align="left">
                                     <input type="image" src=${ pdfIconURL} class="btn" name="PDF" value="${ _("Create PDF")}" onclick='this.form.action=${ contributionsPDFURL };this.form.target="_blank";'>
+                                </td>
+                                <td valign="bottom" align="left">
+                                    <input type="image" name="excel" src=${ excelIconURL} border="0">
                                 </td>
                         </tbody>
                     </table>

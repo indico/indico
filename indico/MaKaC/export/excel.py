@@ -19,7 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from MaKaC.webinterface.common.countries import CountryHolder
+from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common import utils
+from datetime import datetime
+from MaKaC.conference import Link
+from MaKaC.webinterface import urlHandlers
 
 import csv
 
@@ -314,4 +318,72 @@ class ParticipantsListToExcel:
             excelGen.addNumberAsString(reg.getTelephone(), self._excelSpecific)
             excelGen.addNumberAsString(reg.getFax(), self._excelSpecific)
             excelGen.newLine()
+        return excelGen.getExcelContent()
+
+
+
+class ContributionsListToExcel:
+
+    def __init__(self, conf,contribList=None, tz=None):
+        self._conf = conf
+        self._contribList = contribList
+        if not tz:
+            self._tz = self._conf.getTimezone()
+        else:
+            self._tz = tz
+
+    def getExcelFile(self):
+        excelGen=ExcelGenerator()
+        excelGen.addValue("Id")
+        excelGen.addValue("Date")
+        excelGen.addValue("Duration")
+        excelGen.addValue("Type")
+        excelGen.addValue("Title")
+        excelGen.addValue("Presenter")
+        excelGen.addValue("Session")
+        excelGen.addValue("Track")
+        excelGen.addValue("Status")
+        excelGen.addValue("Material")
+        excelGen.newLine()
+
+        for contrib in self._contribList:
+            excelGen.addValue(contrib.getId())
+            startDate = contrib.getAdjustedStartDate(self._tz)
+            if startDate:
+                excelGen.addValue(startDate.strftime("%A %d %b %Y at %H:%M"))
+            else:
+                excelGen.addValue("")
+            excelGen.addValue((datetime(1900,1,1)+contrib.getDuration()).strftime("%Hh%M'"))
+            type = contrib.getType()
+            if type:
+                excelGen.addValue(type.getName())
+            else:
+                excelGen.addValue("")
+            excelGen.addValue(contrib.getTitle())
+            listSpeaker = []
+            for speaker in contrib.getSpeakerList():
+                listSpeaker.append(speaker.getFullName())
+            excelGen.addValue("\n".join(listSpeaker))
+            session = contrib.getSession()
+            if session:
+                excelGen.addValue(session.getTitle())
+            else:
+                excelGen.addValue("")
+            track = contrib.getTrack()
+            if track:
+                excelGen.addValue(track.getTitle())
+            else:
+                excelGen.addValue("")
+            status=contrib.getCurrentStatus()
+            excelGen.addValue(ContribStatusList().getCaption(status.__class__))
+            listResource = []
+            for material in contrib.getAllMaterialList():
+                for resource in material.getResourceList():
+                    if isinstance(resource, Link):
+                        listResource.append(resource.getURL())
+                    else:
+                        listResource.append(str(urlHandlers.UHFileAccess.getURL( resource )))
+            excelGen.addValue("\n".join(listResource))
+            excelGen.newLine()
+
         return excelGen.getExcelContent()
