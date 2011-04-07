@@ -225,7 +225,7 @@ class RHModifModule:
         epaymentModules = PluginLoader.getPluginsByType("EPayment")
         module = None
         for mod in epaymentModules:
-            if pluginId(mod) == params.get("EPaymentName","No module name"):
+            if mod.MODULE_ID == params.get("EPaymentName","No module name"):
                 module = mod
                 break
 
