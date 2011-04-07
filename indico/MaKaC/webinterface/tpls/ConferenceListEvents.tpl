@@ -4,10 +4,12 @@ from MaKaC.common.timezoneUtils import nowutc
 todayDate = nowutc()
 %>
 <% currentMonth = -1 %>
+<% currentYear = -1 %>
 <% for item in reversed(items): %>
         <% itemStartDate = item.getStartDate() %>
-        <% if currentMonth != itemStartDate.month: %>
+        <% if currentYear != itemStartDate.year or currentMonth != itemStartDate.month: %>
             <% currentMonth = itemStartDate.month %>
+            <% currentYear = itemStartDate.year %>
     		<h4
                 <% if todayDate.year  == itemStartDate.year and todayDate.month  == itemStartDate.month: %>
                     <%= "class='currentMonth'" %>
