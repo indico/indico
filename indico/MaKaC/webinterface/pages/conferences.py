@@ -251,6 +251,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 self._trackMgtOpt.setCaption( _("Manage my tracks"))
                 url = urlHandlers.UHConferenceProgram.getURL( self._conf )
             else:
+                self._trackMgtOpt.setCaption( _("Manage my track"))
                 url = urlHandlers.UHTrackModifAbstracts.getURL( tracks[0] )
             self._trackMgtOpt.setURL(str(url))
             self._trackMgtOpt.setVisible(True)

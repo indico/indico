@@ -63,7 +63,7 @@ class SessionFilterField( filters.FilterField ):
                 for sess in reg.getSessionList():
                     if sess.getId() in self._values:
                         return True
-                    elif sess not in reg.getRegistrationForm().getSessionsForm().getSessionList():
+                    elif sess.getRegSession() not in reg.getRegistrationForm().getSessionsForm().getSessionList():
                         return self._showNoValue
             else:
                 return self._showNoValue
