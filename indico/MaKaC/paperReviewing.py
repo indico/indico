@@ -1064,13 +1064,13 @@ class ConferenceReviewingNotification(GenericNotification):
 
     def __init__(self, user, role, conference):
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been chosen as %s for the conference "%s" (id: %s)"""
                         % (role, conference.getTitle(), str(conference.getId())))
         self.setBody("""Dear Sir or Madam,
 
-        You have been chosen as %s of the conference "%s" (id: %s), in order to help with the abstract / contribution reviewing process.
+        You have been chosen as %s of the conference "%s" (id: %s), in order to help with the paper reviewing process.
         You can go to the conference main page:
         %s
         After logging in, you will find a link under 'Paper reviewing' on which you can click to perform your new functions.
@@ -1085,7 +1085,7 @@ class ConferenceReviewingRemoveNotification(GenericNotification):
 
     def __init__(self, user, role, conference):
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been removed as %s of the conference "%s" (id: %s)"""
                         % (role, conference.getTitle(), str(conference.getId())))
