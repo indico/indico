@@ -34,7 +34,7 @@ from MaKaC.common.Configuration import Config
 from MaKaC.webinterface import urlHandlers
 import MaKaC.common.info as info
 from MaKaC.common.timezoneUtils import nowutc
-from indico.MaKaC.rb_location import CrossLocationQueries
+from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
 from pytz import timezone
 from pytz import all_timezones
