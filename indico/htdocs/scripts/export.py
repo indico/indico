@@ -34,6 +34,8 @@ from MaKaC.common.Configuration import Config
 from MaKaC.webinterface import urlHandlers
 import MaKaC.common.info as info
 from MaKaC.common.timezoneUtils import nowutc
+from indico.MaKaC.rb_location import CrossLocationQueries
+from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
 from pytz import timezone
 from pytz import all_timezones
 
@@ -42,6 +44,9 @@ def index(req, **params):
   at a given date"""
   global ids
   db.DBMgr.getInstance().startRequest()
+  minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+  if minfo.getRoomBookingModuleActive():
+        DALManagerCERN.connect()
   try:
     fid = params['fid']
     date = params['date']
@@ -223,15 +228,24 @@ def displayXMLConf(conf,xml,tz,dc=1):
   xml.writeTag("start_time",conf.getAdjustedStartDate(tz).time().isoformat()[0:5])
   xml.writeTag("end_date",conf.getAdjustedEndDate(tz).date().isoformat())
   xml.writeTag("end_time",conf.getAdjustedEndDate(tz).time().isoformat()[0:5])
+  room= " "
+  building = ""
   if conf.getRoom():
     room = conf.getRoom().getName()
     xml.writeTag("room",room)
-  else:
-    room=""
-  if room.find('-') != -1:
-    building = room[0:room.find('-')]
-  else:
-    building = room.replace(' ','+')
+
+    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+    if minfo.getRoomBookingModuleActive():
+        rooms = CrossLocationQueries.getRooms(roomName = room)
+        rooms = [r for r in rooms if r is not None]
+        if rooms and rooms[0]:
+            building = str(rooms[0].building)
+    else:
+        if room.find('-') != -1:
+            building = room[0:room.find('-')]
+        else:
+            building = room.replace(' ','+')
+
   if building != '':
     xml.writeTag("building",building)
   mats = conf.getMaterialList()
