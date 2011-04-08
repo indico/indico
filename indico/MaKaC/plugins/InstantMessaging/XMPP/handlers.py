@@ -460,7 +460,7 @@ class AddLogs2Material( ServiceBase ):
         if mat is None:
             mat = mf.create(self._conf)
             mat.setProtection(1)
-            mat.setTitle('Logs')
+            mat.setTitle('Chat room Logs')
             mat.setDescription('Chat logs for this event')
 
         # create the resource
@@ -471,9 +471,6 @@ class AddLogs2Material( ServiceBase ):
         resource.setName(resource.getFileName())
 
         self._conf.getLogHandler().logAction({"subject":"Added file %s%s" % (self._file["fileName"],'')},"Files",self._aw.getUser())
-
-        status = "OK"
-        info = resource
 
         # forcedFileId - in case there is a conflict, use the file that is
         # already stored
