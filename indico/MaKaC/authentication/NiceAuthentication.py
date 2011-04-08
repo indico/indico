@@ -58,6 +58,9 @@ class NiceAuthenticator(Authenthicator):
         if  req.subprocess_env.has_key("ADFS_EMAIL"):
             email = req.subprocess_env["ADFS_EMAIL"]
             login = req.subprocess_env["ADFS_LOGIN"]
+            personId = req.subprocess_env["ADFS_PERSONID"]
+            if personId == '-1':
+                personId = None
             from MaKaC.user import AvatarHolder
             ah = AvatarHolder()
             av = ah.match({"email":email},exact=1, forceWithoutExtAuth=True)
@@ -78,6 +81,8 @@ class NiceAuthenticator(Authenthicator):
                     av.setName(firstname)
                 if institute != '' and institute != av.getAffiliation():
                     av.setAffiliation(institute)
+                if personId != None and personId != av.getPersonId():
+                    av.setPersonId(personId)
                 return av
             else:
                 avDict = NiceUser().getByLoginOrUPN(login)
@@ -107,6 +112,8 @@ class NiceAuthenticator(Authenthicator):
                         av = Avatar(avDict)
                         ah.add(av)
                         av.activateAccount()
+                    if not av.getPersonId():
+                        av.setPersonId(personId)
                     return av
         return None
 

@@ -361,7 +361,7 @@
                         <% end %>
                     <input name="<%= name %>" type="checkbox" size="50" <%=checked%>>
                     <% end %>
-                    <% elif option.getType() == 'list_multiline': %>
+                    <% elif option.getType() in ('list_multiline', 'textarea'): %>
                     <textarea name="<%= name %>" cols="38"><%= value %></textarea>
                     <% end %>
                     <% else: %>
@@ -377,7 +377,7 @@
                     <% end %>
                 <% end %>
             </td>
-            <% if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict: %>
+            <% if option.getType() == int or option.getType() == list or option.getType() == "list_multiline" or option.getType() == dict or option.getNote(): %>
             <td style="width: 40%">
                 <% if option.getType() == int: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please input an integer")%></span>
@@ -390,6 +390,9 @@
                 <% end %>
                 <% elif option.getType() == dict: %>
                 <span style="color: orange; font-size: smaller;"><%= _("Please input keys and values in Python syntax. No unicode objects allowed. Example: {\"john\":\"tall\", \"pete\":\"short\"}")%></span>
+                <% end %>
+                <% elif option.getNote(): %>
+                <span style="color: orange; font-size: smaller;"><%= option.getNote() %></span>
                 <% end %>
             </td>
             <% end %>

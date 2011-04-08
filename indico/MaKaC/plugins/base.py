@@ -507,6 +507,7 @@ class PluginBase(Persistent):
             raise PluginError('Option ' + str(name) + ' does not have a "type" attribute')
 
         return {"description": description,
+                "note": attributes.get("note", None),
                 "type": optionType,
                 "subType": attributes.get("subType", None),
                 "defaultValue": attributes.get("defaultValue", None),
@@ -581,7 +582,7 @@ class PluginBase(Persistent):
         """
         self.__options[name] = PluginOption(name, attributes["description"], attributes["type"],
                                             attributes["defaultValue"], attributes["editable"], attributes["visible"],
-                                            attributes["mustReload"], True, order, attributes["subType"])
+                                            attributes["mustReload"], True, order, attributes["subType"], attributes["note"])
         self._notifyModification()
 
     def updateOption(self, name, attributes, order):
@@ -593,6 +594,7 @@ class PluginBase(Persistent):
         option = self.getOption(name)
         option.setPresent(True)
         option.setDescription(attributes["description"])
+        option.setNote(attributes["note"])
         option.setType(attributes["type"])
         option.setSubType(attributes["subType"])
         option.setEditable(attributes["editable"])
@@ -1138,13 +1140,15 @@ class PluginOption(Persistent):
         'rooms': list,
         'password': str,
         'ckEditor': str,
+        'textarea': str,
         'list_multiline': list,
         'links': list
     }
 
-    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None):
+    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None):
         self.__name = name
         self.__description = description
+        self.__note = note
         self.__type = valueType
         self.__subType = subType
         self.__present = present
@@ -1164,6 +1168,9 @@ class PluginOption(Persistent):
     def getDescription(self):
         return self.__description
 
+    def getNote(self):
+        return self.__note
+
     def getType(self):
         return self.__type
 
@@ -1178,6 +1185,9 @@ class PluginOption(Persistent):
 
     def setDescription(self, description):
         self.__description = description
+
+    def setNote(self, note):
+        self.__note = note
 
     def isPresent(self):
         return self.__present

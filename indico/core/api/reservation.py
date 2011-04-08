@@ -18,16 +18,24 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-The ``scheduler`` module provides Indico with a scheduling API that allows specific jobs
-(tasks to be run at given times, with a certain repeatibility, if needed).
-"""
+from indico.core.api import IListener
 
-class TaskDelayed(Exception):
-    def __init__(self, seconds):
-        self.delaySeconds = seconds
 
-from indico.modules.scheduler.module import SchedulerModule
-from indico.modules.scheduler.server import Scheduler
-from indico.modules.scheduler.client import Client
-from indico.modules.scheduler.tasks import PeriodicTask, OneShotTask
+class IReservationListener(IListener):
+    """Used for handling events related to room reservations"""
+
+    def reservationCreated(self):
+        """Sent when a reservation is created"""
+
+    def reservationUpdated(self):
+        """Sent when a reservation is modified"""
+
+    def reservationDeleted(self):
+        """Sent when a reservation is deleted"""
+
+class IReservationStartStopListener(IListener):
+    def reservationStarted(self, resv):
+        """Sent when a reservation has started (executed by task daemon) """
+
+    def reservationFinished(self, resv):
+        """Sent when a reservation has started (executed by task daemon) """

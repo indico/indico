@@ -20,7 +20,7 @@
 
 import time, logging
 
-from indico.modules.scheduler import SchedulerModule, base
+from indico.modules.scheduler import SchedulerModule, base, TaskDelayed
 from MaKaC.common import DBMgr
 from MaKaC.plugins.RoomBooking.default.dalManager import DBConnection, DALManager
 from MaKaC.common.info import HelperMaKaCInfo
@@ -32,12 +32,13 @@ from ZODB.POSException import ConflictError
 
 class _Worker(object):
 
-    def __init__(self, taskId, configData):
+    def __init__(self, taskId, configData, delay):
         super(_Worker, self).__init__()
 
         self._logger = logging.getLogger('worker/%s' % taskId)
         self._taskId = taskId
         self._config = configData
+        self._executionDelay = delay
 
     def _prepare(self):
         """
@@ -69,7 +70,7 @@ class _Worker(object):
 
         self._prepare()
 
-        self._logger.info('Running task %s..' % self._task.id)
+        self._logger.info('Running task %s.. (delay: %s)' % (self._task.id, self._executionDelay))
 
         # We will try to run the task TASK_MAX_RETRIES
         # times and if it continues failing we abort it
@@ -84,7 +85,12 @@ class _Worker(object):
             with self._rbdbi.transaction():
                 self._task.prepare()
 
+        delayed = False
         while i < self._config.task_max_tries:
+            # Otherwise objects modified in indico itself are not updated here
+            if hasattr(self._rbdbi, 'sync'):
+                self._rbdbi.sync()
+
             try:
                 if i > 0:
                     self._dbi.abort()
@@ -97,8 +103,15 @@ class _Worker(object):
                         self._logger.info('Task cycle %d' % i)
                         i = i + 1
 
-                        self._task.start()
+                        self._task.start(self._executionDelay)
                         break
+
+            except TaskDelayed, e:
+                nextRunIn = e.delaySeconds
+                self._executionDelay = 0
+                delayed = True
+                self._logger.info("%s delayed by %d seconds" % (self._task, e.delaySeconds))
+                base.TimeSource.get().sleep(nextRunIn)
 
             except Exception, e:
                 nextRunIn = i * 10  # secs
@@ -109,10 +122,10 @@ class _Worker(object):
                     self._logger.warning("Retrying for the %dth time in %d secs.." % \
                                          (i + 1, nextRunIn))
 
-                    # if i is still low enough, we sleep progressively more
-                    # so that if the error is caused by concurrency we don't make
-                    # the problem worse by hammering the server.
-                    base.TimeSource.get().sleep(nextRunIn)
+                # if i is still low enough, we sleep progressively more
+                # so that if the error is caused by concurrency we don't make
+                # the problem worse by hammering the server.
+                base.TimeSource.get().sleep(nextRunIn)
 
         self._logger.info('Ended on: %s' % self._task.endedOn)
 
@@ -120,9 +133,9 @@ class _Worker(object):
         if self._task.endedOn:
             with self._dbi.transaction():
                 self._setResult(True)
-            if i > 1:
+            if i > (1 + int(delayed)):
                 self._logger.warning("%s failed %d times before "
-                                     "finishing correctly" % (self._task, i - 1))
+                                     "finishing correctly" % (self._task, i - int(delayed) - 1))
         else:
             with self._dbi.transaction():
                 self._setResult(False)
@@ -136,8 +149,8 @@ class _Worker(object):
 
 class ThreadWorker(_Worker, threading.Thread):
 
-    def __init__(self, tid, configData):
-        super(ThreadWorker, self).__init__(tid, configData)
+    def __init__(self, tid, configData, delay):
+        super(ThreadWorker, self).__init__(tid, configData, delay)
         self._result = 0
 
     def _prepareDB(self):
@@ -152,8 +165,8 @@ class ThreadWorker(_Worker, threading.Thread):
 
 class ProcessWorker(_Worker, multiprocessing.Process):
 
-    def __init__(self, tid, configData):
-        super(ProcessWorker, self).__init__(tid, configData)
+    def __init__(self, tid, configData, delay):
+        super(ProcessWorker, self).__init__(tid, configData, delay)
         self._result = multiprocessing.Value('i', 0)
 
     def _prepareDB(self):

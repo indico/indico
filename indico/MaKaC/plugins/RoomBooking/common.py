@@ -17,17 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.plugins.base import PluginsHolder
 
-"""
-The ``scheduler`` module provides Indico with a scheduling API that allows specific jobs
-(tasks to be run at given times, with a certain repeatibility, if needed).
-"""
-
-class TaskDelayed(Exception):
-    def __init__(self, seconds):
-        self.delaySeconds = seconds
-
-from indico.modules.scheduler.module import SchedulerModule
-from indico.modules.scheduler.server import Scheduler
-from indico.modules.scheduler.client import Client
-from indico.modules.scheduler.tasks import PeriodicTask, OneShotTask
+def getRoomBookingOption(opt):
+    return PluginsHolder().getPluginType('RoomBooking').getOption(opt).getValue()

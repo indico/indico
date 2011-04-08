@@ -712,6 +712,8 @@ class RoomBase( object ):
            roomNr: #{self.roomNr}
      isReservable: #{self.isReservable}
 rNeedConfirmation: #{self.resvsNeedConfirmation}
+startNotification: #{self.resvStartNotification}
+  endNotification: #{self.resvEndNotification}
 
              site: #{self.site}
          capacity: #{self.capacity}
@@ -777,6 +779,9 @@ rNeedConfirmation: #{self.resvsNeedConfirmation}
     isReservable = None   # bool - whether the room is reservable
     photoId = property( _getPhotoId, _setPhotoId )        # str - room picture id
     externalId = None     # str - custom external room id, i.e. for locating on the map
+
+    resvStartNotification = False # bool - whether to send notifications on booking start
+    resvEndNotification = False # bool - whether to send notifications on booking end
 
     telephone = None      # str
     surfaceArea = None    # int, positive - in meters^2

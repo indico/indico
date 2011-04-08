@@ -46,6 +46,7 @@ from MaKaC.plugins import PluginLoader
 from MaKaC import plugins
 from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
 from MaKaC.search.cache import MapOfRoomsCache
+from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 
 class CandidateDataFrom( object ):
     DEFAULTS, PARAMS, SESSION = xrange( 3 )
@@ -209,6 +210,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         session.setVar( "isActive", c.isActive )
         session.setVar( "isReservable", c.isReservable )
         session.setVar( "resvsNeedConfirmation", c.resvsNeedConfirmation )
+        session.setVar( "resvStartNotification", c.resvStartNotification )
+        session.setVar( "resvEndNotification", c.resvEndNotification )
 
         session.setVar( "responsibleId", c.responsibleId )
         session.setVar( "whereIsKey", c.whereIsKey )
@@ -282,6 +285,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.division = None
         candRoom.isReservable = True
         candRoom.resvsNeedConfirmation = False
+        candRoom.resvStartNotification = False
+        candRoom.resvEndNotification = False
         candRoom.photoId = None
         candRoom.externalId = None
 
@@ -305,6 +310,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.isActive = bool( session.getVar( "isActive" ) )
         candRoom.isReservable = bool( session.getVar( "isReservable" ) )
         candRoom.resvsNeedConfirmation = bool( session.getVar( "resvsNeedConfirmation" ) )
+        candRoom.resvStartNotification = bool( session.getVar( "resvStartNotification" ) )
+        candRoom.resvEndNotification = bool( session.getVar( "resvEndNotification" ) )
 
         candRoom.responsibleId = session.getVar( "responsibleId" )
         candRoom.whereIsKey = session.getVar( "whereIsKey" )
@@ -339,6 +346,9 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candRoom.isActive = bool( params.get( "isActive" ) ) # Safe
         candRoom.isReservable = bool( params.get( "isReservable" ) ) # Safe
         candRoom.resvsNeedConfirmation = bool( params.get( "resvsNeedConfirmation" ) ) # Safe
+        candRoom.resvStartNotification = bool( params.get( "resvStartNotification" ) )
+        candRoom.resvEndNotification = bool( params.get( "resvEndNotification" ) )
+
 
         candRoom.responsibleId = params.get( "responsibleId" )
         if candRoom.responsibleId == "None":
@@ -385,7 +395,11 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         session.setVar( "startDT", c.startDT )
         session.setVar( "endDT", c.endDT )
         session.setVar( "repeatability", c.repeatability )
-        session.setVar( "bookedForName", c.bookedForName )
+        session.setVar( "bookedForId", c.bookedForId )
+        if c.bookedForId:
+            session.setVar( "bookedForName", c.bookedForUser.getFullName() )
+        else:
+            session.setVar( "bookedForName", c.bookedForName )
         session.setVar( "contactPhone", c.contactPhone )
         session.setVar( "contactEmail", c.contactEmail )
         session.setVar( "reason", c.reason )
@@ -406,7 +420,9 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
     def _getErrorsOfResvCandidate( self, c ):
         errors = []
         self._thereAreConflicts = False
-        if not c.bookedForName:
+        if getRoomBookingOption('bookingsForRealUsers') and not c.bookedForUser:
+            errors.append( "Booked for can not be blank" )
+        elif not getRoomBookingOption('bookingsForRealUsers') and not c.bookedForName:
             errors.append( "Booked for can not be blank" )
         if not c.reason:
             errors.append( "Purpose can not be blank" )
@@ -445,6 +461,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candResv.startDT = session.getVar( "startDT" )
         candResv.endDT = session.getVar( "endDT" )
         candResv.repeatability = session.getVar( "repeatability" )
+        candResv.bookedForId = session.getVar( "bookedForId" )
         candResv.bookedForName = session.getVar( "bookedForName" )
         candResv.contactPhone = session.getVar( "contactPhone" )
         candResv.contactEmail = setValidEmailSeparators(session.getVar( "contactEmail" ))
@@ -477,7 +494,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         candResv.startDT = self._startDT
         candResv.endDT = self._endDT
         candResv.repeatability = self._repeatability
-        candResv.bookedForName = params["bookedForName"]
+        candResv.bookedForId = params.get("bookedForId")
+        candResv.bookedForName = params.get("bookedForName")
         candResv.contactEmail = setValidEmailSeparators(params["contactEmail"])
         candResv.contactPhone = params["contactPhone"]
         candResv.reason = params["reason"]
@@ -561,6 +579,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             else:
                 candResv.repeatability = int(repeatability)
         if self._getUser():
+            if candResv.bookedForUser is None:
+                candResv.bookedForUser = self._getUser()
             if candResv.bookedForName == None:
                 candResv.bookedForName = self._getUser().getFullName()
             if candResv.contactEmail == None:
@@ -568,6 +588,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             if candResv.contactPhone == None:
                 candResv.contactPhone = self._getUser().getTelephone()
         else:
+            candResv.bookedForUser = None
             candResv.bookedForName = candResv.contactEmail = candResv.contactPhone = ""
         if candResv.reason == None:
             candResv.reason = ""
@@ -583,6 +604,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
                 candResv.endDT = ws.getVar( "defaultEndDT" )
             if ws.getVar( "defaultRepeatability" ) != None:
                 candResv.repeatability = ws.getVar( "defaultRepeatability" )
+            if ws.getVar( "defaultBookedForId" ):
+                candResv.bookedForId = ws.getVar( "defaultBookedForId" )
             if ws.getVar( "defaultBookedForName" ):
                 candResv.bookedForName = ws.getVar( "defaultBookedForName" )
             if ws.getVar( "defaultReason" ):
@@ -626,6 +649,7 @@ class RHRoomBookingSearch4Rooms( RHRoomBookingBase ):
         websession.setVar( "defaultStartDT", None )
         websession.setVar( "defaultEndDT", None )
         websession.setVar( "defaultRepeatability", None )
+        websession.setVar( "defaultBookedForId", None )
         websession.setVar( "defaultBookedForName", None )
         websession.setVar( "defaultReason", None )
         websession.setVar( "assign2Session", None )
@@ -1225,6 +1249,7 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
         self._candResv = candResv
 
         self._clearSessionState()
+        self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
 
 
     def _checkProtection( self ):

@@ -1340,6 +1340,14 @@ class ReservationBase( object ):
 
         return addrs
 
+    def _getBookedForUser(self):
+        if not self.bookedForId:
+            return None
+        return AvatarHolder().getById(self.bookedForId)
+
+    def _setBookedForUser(self, avatar):
+        self.bookedForId = avatar and avatar.getId()
+
     def _eval_str( self, s ):
         ixPrv = 0
         ret = ""
@@ -1482,6 +1490,8 @@ class ReservationBase( object ):
     weekNumber = property( _getWeekNumber )
 
     # Who and why
+    bookedForId = None    # str - for whom it is booked; avatar id (if enabled in options)
+    bookedForUser = property(_getBookedForUser, _setBookedForUser)
     bookedForName = None  # str - for whom it is booked; free text
     contactEmail = None   # str - contact; typically the person for whom the booking is done
     contactPhone = None   # str - contact; typically the person for whom the booking is done

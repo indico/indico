@@ -174,13 +174,26 @@
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> <%= _("Booked for")%></span></td>
                                 <td>
                                     <table width="100%">
-                                        <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">
-                                                <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="<%= verbose( candResv.bookedForName ) %>" />
-                                                <% inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) %>
-                                            </td>
-                                        </tr>
+                                        <% if rh._requireRealUsers: %>
+                                            <tr>
+                                                <td class="subFieldWidth" align="right" valign="top"><small> <%= _("User")%>&nbsp;&nbsp;</small></td>
+                                                <td align="left" class="blacktext">
+                                                    <input type="hidden" id="bookedForId" name="bookedForId" value="<%= candResv.bookedForId or '' %>" />
+                                                    <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="<%= candResv.bookedForUser.getFullName() if candResv.bookedForId else candResv.bookedForName %>" onclick="searchForUsers();" readonly="readonly" />
+                                                    <input type="button" value="Search" onclick="searchForUsers();" />
+                                                    <% inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) %>
+                                                </td>
+                                            </tr>
+                                        <% end %>
+                                        <% else: %>
+                                            <tr>
+                                                <td class="subFieldWidth" align="right" valign="top"><small> <%= _("Name")%>&nbsp;&nbsp;</small></td>
+                                                <td align="left" class="blacktext">
+                                                    <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="<%= verbose( candResv.bookedForName ) %>" />
+                                                    <% inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) %>
+                                                </td>
+                                            </tr>
+                                        <% end %>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> <%= _("E-mail")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
@@ -278,6 +291,22 @@
                 new Form.Observer( 'bookingForm', 0.4, forms_are_valid );
             }
         );
+
+        function searchForUsers() {
+            var popup = new ChooseUsersPopup($T('Select a user'),
+                                         true,
+                                         null, false,
+                                         true, null,
+                                         true, true,
+                                         function(users) {
+                                             $E('bookedForName').set(users[0].name);
+                                             $E('bookedForId').set(users[0].id);
+                                             $E('contactEmail').set(users[0].email);
+                                         });
+
+            popup.execute();
+        }
+
         <% if candResv.room.needsAVCSetup: %>
             alert("The conference room you have chosen is equiped\\nfor video-conferencing and video-projection.\\nIf you need this equipment, DO NOT FORGET to select it.\\nIf you don't need any of this equipment please choose\\nanother room, if a suitable one is free on a suitable\\nlocation for your meeting.\\n\\n\\n                    Thank you for your understanding.")
         <% end %>

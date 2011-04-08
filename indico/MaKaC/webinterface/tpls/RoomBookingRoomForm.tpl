@@ -30,6 +30,12 @@
         <div id="resvsNeedConfirmationCH" class="tip">
              <%= _("Whether bookings must be accepted by person responsible.")%>
         </div>
+        <div id="resvStartNotificationCH" class="tip">
+             <%= _("Whether to trigger notifications when a booking for the room begins.")%>
+        </div>
+        <div id="resvEndNotificationCH" class="tip">
+             <%= _("Whether to trigger notifications when a booking for the room ends.")%>
+        </div>
         <div id="whereIsKeyCH" class="tip">
              <%= _("How to obtain a key. Typically a phone number.")%>
         </div>
@@ -151,7 +157,15 @@
                                             <td align="right" valign="top"><small> <%= _("Confirmations")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="checkbox" <% if room.resvsNeedConfirmation: %> checked="checked" <% end %> id="resvsNeedConfirmation" name="resvsNeedConfirmation" /> <% contextHelp( 'resvsNeedConfirmationCH' ) %></td>
                                         </tr>
-                                 </table>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Notification on booking start")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="checkbox" <% if room.resvStartNotification: %> checked="checked" <% end %> id="resvStartNotification" name="resvStartNotification" /> <% contextHelp( 'resvStartNotificationCH' ) %></td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right" valign="top"><small> <%= _("Notification on booking end")%>&nbsp;&nbsp;</small></td>
+                                            <td align="left" class="blacktext"><input type="checkbox" <% if room.resvEndNotification: %> checked="checked" <% end %> id="resvEndNotification" name="resvEndNotification" /> <% contextHelp( 'resvEndNotificationCH' ) %></td>
+                                        </tr>
+                                    </table>
                                 </td>
                               </tr>
                               <tr><td>&nbsp;</td></tr>
@@ -177,7 +191,7 @@
                                             <td align="right" valign="top"><small> <%= _("Telephone")%>&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="text" id="telephone" name="telephone" value="<%= verbose( room.telephone ) %>" /><% contextHelp( 'telephoneCH' ) %></td>
                                         </tr>
-                                 </table>
+                                    </table>
                                 </td>
                               </tr>
                               <tr><td>&nbsp;</td></tr>

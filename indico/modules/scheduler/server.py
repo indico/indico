@@ -397,7 +397,8 @@ class Scheduler(object):
             wclass = ProcessWorker
         else:
             wclass = ThreadWorker
-        self._runningWorkers[curTask.id] = wclass(curTask.id, self._config)
+        delay = int_timestamp(self._getCurrentDateTime()) - timestamp
+        self._runningWorkers[curTask.id] = wclass(curTask.id, self._config, delay)
         self._runningWorkers[curTask.id].start()
 
     def _processSpool(self):

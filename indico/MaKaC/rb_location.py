@@ -363,16 +363,15 @@ class ReservationGUID( Persistent, object ):
         """
         Parses guidString into ReservationGUID object.
         """
-        # TODO: check if this code is used. self is not defined, so it will fail
         try:
             loc, id = guidString.split( "|" )
             loc = loc.strip(); id = int( id.strip() )
-            self.location = Location.parse( loc )
-            if not self.location:
+            location = Location.parse( loc )
+            if not location:
                 raise MaKaCError('invalid location')
-            self.id = id
+            return ReservationGUID(location, id)
         except:
-            raise guidString + ' - invalid ReservationGUID string'
+            raise MaKaCError(guidString + ' - invalid ReservationGUID string')
 
     def getReservation( self ):
         """

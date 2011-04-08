@@ -379,6 +379,10 @@ class WPRoomBookingBookingDetails( WPRoomBookingBase ):
 
 class WPRoomBookingBookingForm( WPRoomBookingBase ):
 
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+               self._includeJSPackage('Management')
+
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )

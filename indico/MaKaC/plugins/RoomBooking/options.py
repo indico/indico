@@ -18,10 +18,59 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+_emailReplacerNote = """
+You can use the following placeholders:<br />{bookedForUser}, {roomName}, {roomAtts[ATTNAME]}, {bookingStart}, {bookingEnd}, {detailsLink}
+""".strip()
+
+_emailSubjectReplacerNote = """
+You can use the following placeholders:<br />{roomName}, {roomAtts[ATTNAME]}, {bookingStart}, {bookingEnd}
+""".strip()
+
 globalOptions = [
-                 ( "AuthorisedUsersGroups", {"description": "Users and Groups authorised for roombooking module",
-                                       "type": 'usersGroups',
-                                       "defaultValue": [],
-                                       "editable": True,
-                                       "visible": True})
-                 ]
+    ("AuthorisedUsersGroups", {"description": "Users and Groups authorised for roombooking module",
+                          "type": 'usersGroups',
+                          "defaultValue": [],
+                          "editable": True,
+                          "visible": True}),
+    ("bookingsForRealUsers", {
+        "description": _("Should bookings require an existing user in the 'booked for' field"),
+        "type" : bool,
+        "defaultValue": False}),
+    ("notificationEnabled", {
+        "description": _("Enable the tasks for booking start/end notification. Only bookings created/modified after enabling it will trigger notifications"),
+        "type" : bool,
+        "defaultValue": False}),
+    ("notificationEmails", {
+        "description": _("Email addresses which will receive booking start/end notifications"),
+        "type": list,
+        "defaultValue": [],
+        "editable": True,
+        "visible": True}),
+    ("notificationEmailsToBookedFor", {
+        "description": _("Should the emails listed in 'booked for' also receive notification emails"),
+        "type" : bool,
+        "defaultValue": False}),
+    ("startNotificationEmailSubject", {
+        "description": _("Email subject when a booking starts"),
+        "type" : str,
+        "defaultValue": '',
+        "note": _emailSubjectReplacerNote}),
+    ("startNotificationEmail", {
+        "description": _("Email to send when a booking starts"),
+        "type" : 'textarea',
+        "defaultValue": '',
+        "note": _emailReplacerNote}),
+    ("endNotificationEmailSubject", {
+        "description": _("Email subject when a booking ends"),
+        "type" : str,
+        "defaultValue": '',
+        "note": _emailSubjectReplacerNote}),
+    ("endNotificationEmail", {
+        "description": _("Email to send when a booking ends"),
+        "type" : 'textarea',
+        "defaultValue": '',
+        "note": _emailReplacerNote}),
+    ("notificationBefore", {"description" : _("Trigger start notifications X minutes before the booking starts. Changes will not affect existing bookings"),
+                           "type": int,
+                           "defaultValue": 0} )
+]

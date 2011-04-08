@@ -537,6 +537,7 @@ class Avatar(Persistent, Fossilizable):
                                 email*, telephone*, fax*
         """
         self.id = ""
+        self.personId = None
         self.name = ""
         self.surName = ""
         self.title = ""
@@ -978,6 +979,12 @@ class Avatar(Persistent, Fossilizable):
 
     def getId(self):
         return self.id
+
+    def setPersonId(self, personId):
+        self.personId = personId
+
+    def getPersonId(self):
+        return getattr(self, 'personId', None)
 
     def setName(self, name):
         self.name = name

@@ -22,15 +22,20 @@ from ZODB import FileStorage, DB
 from ZODB.DB import DB, transaction
 from ZODB.PersistentMapping import PersistentMapping
 from persistent import Persistent
+from pytz import timezone
 
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum, WeekDayEnum
 from MaKaC.rb_tools import qbeMatch, doesPeriodsOverlap, iterdays, overlap, weekNumber, containsExactly_OR_containsAny, fromUTC
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.plugins.RoomBooking.default.factory import Factory
+from modules.scheduler import Client, tasks
 
 from datetime import datetime
 from MaKaC.common.logger import Logger
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.plugins.base import Observable
+from MaKaC.plugins.RoomBooking.notifications import ReservationStartEndNotification
 
 # Branch name in ZODB root
 _RESERVATIONS = 'Reservations'
@@ -38,7 +43,7 @@ _ROOM_RESERVATIONS_INDEX = 'RoomReservationsIndex'
 _USER_RESERVATIONS_INDEX = 'UserReservationsIndex'
 _DAY_RESERVATIONS_INDEX = 'DayReservationsIndex'
 
-class Reservation( Persistent, ReservationBase ):
+class Reservation( Persistent, ReservationBase, Observable ):
     """
     ZODB specific implementation.
 
@@ -52,6 +57,7 @@ class Reservation( Persistent, ReservationBase ):
         self._excludedDays = []
         self.useVC = []
         self.resvHistory = ResvHistoryHandler()
+        self.startEndNotification = None
 
     def getUseVC( self ):
         try:
@@ -124,9 +130,29 @@ class Reservation( Persistent, ReservationBase ):
         # Update day => reservations index
         self._addToDayReservationsIndex()
 
+        self._notify('reservationCreated')
+
         # Warning:
         # createdBy, once assigned to rerservation, CAN NOT be changed later (index!)
         # room, once assigned to reservation, CAN NOT be changed later (index!)
+
+    def update(self):
+        ReservationBase.update(self)
+        self._notify('reservationUpdated')
+
+    def getStartEndNotification(self):
+        if hasattr(self, '_startEndNotification') and self._startEndNotification is not None:
+            return self._startEndNotification
+        self._startEndNotification = ReservationStartEndNotification(self)
+        return self._startEndNotification
+
+    def getLocalizedStartDT(self):
+        tz = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        return timezone(tz).localize(self._utcStartDT)
+
+    def getLocalizedEndDT(self):
+        tz = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        return timezone(tz).localize(self._utcEndDT)
 
     def indexDayReservations( self ):
         self._addToDayReservationsIndex()
@@ -155,6 +181,8 @@ class Reservation( Persistent, ReservationBase ):
 
         # Update day => reservations index
         self._removeFromDayReservationsIndex()
+
+        self._notify('reservationDeleted')
 
     def _addToDayReservationsIndex( self ):
         dayReservationsIndexBTree = Reservation.getDayReservationsIndexRoot()
