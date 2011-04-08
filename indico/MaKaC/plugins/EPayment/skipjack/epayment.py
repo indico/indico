@@ -116,7 +116,7 @@ class SkipjackMod( BaseEPayMod ):
 
         confId = conf.getId()
         registrantId = registrant.getId()
-        s="""<form name="Button" action="https://vpos.skipjack.com/ezPay/order.asp" method="post">
+        s="""<form name="Button" action="%s" method="post">
              <input type="hidden" name="skipjack" value="v9RmPSdKf+6q4J93Mz8atwxwFlt1zopZckVx4+uFvIR0Y1dw8/6PcxmfMJwCYGhU1NcMIVp5TlJ5FmaWrECDR5g2AqQ2LgclQt9tCFtnK2S11B+qCpES2H2R0MLXIomO089EIb9HLkN0i0kGLPW2u5b88SD7cibsGXNtYTRRu0RTXmTHyKmkANufwDXlmZ4GjwNmTWTj6W76tikblKyzBw1MEcQ4KEA0OdNsjTIQY4O28/a0PF8bk8jYL03zP5u5gxUdxL9L+K1Gu9ITsXO3U3sjvJC5x2wP/pixl0SZ6SJl+bq50FCnjETicwLkxAgPUTuBgUI8PdzBArlCspDhdQrou++KyORRGbCAuamHfdJ4Hl9cabj7YAugUBPRVt0FhNg+aKv4Y/VgXF626ZMsiC1q9YrP/jMy78DKr5XYpUIJxNMJuDFslzskboAVNF9mdpo1+PuEIiLMKFs9O2q6omel0LqscMOc+96AdRL15iRcraiImHz9VgOUN5slcLOGrwXCr4r2/ksRqD33at26o2Vxgrst4Y0RVafsO70jWZht5Al4hrTFKtktSHIDJ/ypMU8t8qb/JsUzlryLfpWuAhiHHnmJprruoMvvK5NlMI42zQCzhdTIGjWUMrlav6V4X6uPUy6BjtY6ycqbZz9dnw==" />
              <input type="hidden" name="ezPay" value="0pwX0LyFqo/neAMW/8avcxpnQJmlVjudDtdXHa0IFDc=" />
              <input type="hidden" name="creator" value="uPvEbaODYgLAoPjMf0mO7Q==" />
@@ -125,7 +125,7 @@ class SkipjackMod( BaseEPayMod ):
              </td>
              <input type="hidden" name="UserDefined1" value="%s" />
              <input type="hidden" name="UserDefined2"  value="%s" />
-             </form>""" % (confId, registrantId)
+             </form>""" % (url, confId, registrantId)
 
 
         return s
