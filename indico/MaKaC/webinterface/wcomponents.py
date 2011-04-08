@@ -4532,30 +4532,11 @@ class WAbstractModMarkAsDup(WTemplated):
     def __init__(self,abstract):
         self._abstract=abstract
 
-    def _getErrorHTML(self,msg):
-        if msg.strip()=="":
-            return ""
-        return """
-            <tr>
-                <td align="center" colspan="2">
-                    <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <td><font color="red">%s</font></td>
-                            <td>&nbsp;</td>
-                        </tr>
-                        <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                    </table>
-                </td>
-            </tr>
-                """%self.htmlText(msg)
-
     def getVars(self):
         vars=WTemplated.getVars(self)
         vars["duplicateURL"]=quoteattr(str(vars["duplicateURL"]))
         vars["cancelURL"]=quoteattr(str(vars["cancelURL"]))
-        vars["error"]=self._getErrorHTML(vars.get("errorMsg",""))
+        vars["error"] = vars.get("errorMsg","")
         return vars
 
 
