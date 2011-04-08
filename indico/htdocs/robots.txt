@@ -1,17 +1,7 @@
-# robots.txt for indico: filter fot robots
+# recommended robots.txt for indico
 
 User-agent: *
-Allow: /categoryDisplay.py/ical?
-Allow: /conferenceDisplay.py/ical?
-Disallow: /
-
-User-agent: Anarchie
-Disallow: /
-
-User-agent: Ultraseek
-Disallow: /icons/
-
-User-agent: wget
-Allow: /
-
-
+Disallow: /categoryMap.py
+Disallow: /wcalendar.py
+Disallow: /categOverview.py
+Crawl-delay: 10
