@@ -43,14 +43,15 @@ arrowImage = systemIcon( "breadcrumb_arrow.png" )
 %>
 
 <div class="mainBreadcrumb" <% if bgColor: %>style="background-color: <%= bgColor %>;" <% end %>>
+
 <span class="path">
     <% for i in range (0, len(l)): %>
         <% if i > 0: %>
             <img src="<%= arrowImage %>" />
         <% end %>
         <% name, url = l[i] %>
-        <a href="<%= url %>">
-            <%= truncateTitle(name, 40) %>
+        <a href="<%= url %>" itemscope itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url">
+            <span itemprop="title"><%= truncateTitle(name, 40) %></span>
         </a>
     <% end %>
 

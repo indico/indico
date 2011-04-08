@@ -31,12 +31,12 @@ if lItem.getType() == "simple_event":
         eventTitle = "%s, \"%s\"" % (", ".join(speakerList),eventTitle)
 
 %>
-<li>
+<li itemscope itemtype="http://data-vocabulary.org/Event">
     <span class="ical">
         <a href="<%= urlHandlers.UHConferenceToiCal.getURL(lItem) %>"><img src="<%= systemIcon("ical_grey") %>" alt="iCal export" /></a>
     </span>
     <span class="listName">
-        <span class="date <%= happeningNowClass %>"><%= evtDate %></span><a href="<%= conferenceDisplayURLGen(lItem) %>"><%= eventTitle %></a>
+        <span class="date <%= happeningNowClass %>"><%= evtDate %><time itemprop="startDate" datetime="<%= startDate.strftime("%Y-%m-%d") %>" /></span><a href="<%= conferenceDisplayURLGen(lItem)%>" itemprop="url" ><span itemprop="summary"><%= eventTitle %></span></a>
 
       	<span class="protected">
 
