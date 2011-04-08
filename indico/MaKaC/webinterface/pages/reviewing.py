@@ -333,7 +333,11 @@ class WConfModifReviewingControl(wcomponents.WTemplated):
         rcPRM=""
 
         if self._conf.getConfPaperReview().getChoice() == CPR.NO_REVIEWING:
-            return """<table align="left"><tr><td>Type of reviewing has not been chosen yet</td></tr></table>"""
+            message = _("Type of reviewing has not been chosen yet. You can choose it from Paper Reviewing ")
+            setupText = _("Setup.")
+            return """<table align="left"><tr><td style="padding-left: 25px; padding-top:10px; color:gray;">
+                    %s
+                    <a href="%s">%s</a></td></tr></table>"""% (message, urlHandlers.UHConfModifReviewingPaperSetup.getURL(self._conf), setupText)
         else:
             rcPRM = WConfModificationReviewingFramePRM().getHTML(self._conf, \
                                                 params["addPaperReviewManagerURL"], \

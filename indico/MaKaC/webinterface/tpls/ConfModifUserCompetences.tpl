@@ -1,7 +1,7 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 % if not ConfReview.hasReviewing():
-<p style="padding-left: 25px;"><font color="gray">${ _("Type of reviewing has not been chosen yet")}</font></p>
+<p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not been chosen yet. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
 % elif ConfReview.getAllUserCompetences() == []:
 <table align="left" style="color:gray; font-style:italic; padding-left:10px;"><tr><td>${ _("The Reviewing Team has not been assigned yet.")}</td></tr></table>
 %else:

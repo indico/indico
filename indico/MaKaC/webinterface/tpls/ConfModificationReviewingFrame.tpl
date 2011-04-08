@@ -12,7 +12,7 @@
     % if not ConfReview.hasReviewing():
     <tr>
         <td style="padding-left: 25px; padding-top:10px; color:gray;">
-            <span>${ _("Type of reviewing has not been chosen yet.")}</span>
+            <span>${ _("Type of reviewing has not been chosen yet. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></span>
         </td>
     </tr>
     % else:
@@ -21,7 +21,7 @@
             % if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif():
                 <div style="padding:5px; color:gray;">
                     <span class="collShowBookingsText">${_("An automatically generated e-mail will be sent to newly assigned Reviewers.")}</span><br>
-                    <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing Setup.")}</span>
+                    <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></span>
                 </div>
             % endif
         </td>

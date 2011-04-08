@@ -6,7 +6,7 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>
 % if not ConfReview.hasReviewing():
-<p style="padding-left: 25px;"><font color="gray">${ _("Type of reviewing has not been chosen yet")}</font></p>
+<p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not been chosen yet. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
 % else:
 % if len(Conference.getContributionListSortedById()) == 0:
 <p style="padding-left: 25px;"><font color="gray">${ _("There are no papers to assign.")}</font></p>
