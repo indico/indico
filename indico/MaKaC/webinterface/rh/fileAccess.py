@@ -69,7 +69,13 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
             except KeyError:
                 pass
             self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
-            return self._file.readBin()
+
+            if cfg.getUseXSendFile():
+                # X-Send-File support makes it easier, just let the web server
+                # do all the heavy lifting
+                return self._req.send_x_file(self._file.getFilePath())
+            else:
+                return self._file.readBin()
         else:
             p = files.WPMinutesDisplay(self, self._file )
             return p.display()

@@ -459,6 +459,24 @@ class SimulatedModPythonRequest(object):
                 raise
         return self.__bytes_sent
 
+    def send_x_file(self, fullpath, fullname=None, mime=None):
+        """
+        Sends a file using X-Send-File
+        """
+        if fullname is None:
+            fullname = os.path.basename(fullpath)
+        self.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+        self.headers_out["X-Sendfile"] = fullpath
+
+        if mime is None:
+            from indico.web.wsgi.indico_wsgi_file_handler import _mimes
+            (mime, encoding) = _mimes.guess_type(fullpath)
+            if mime is None:
+                mime = "application/octet-stream"
+        self.content_type = mime
+
+        return ""
+
     def set_content_length(self, content_length):
         if content_length is not None:
             self.__headers['content-length'] = str(content_length)
