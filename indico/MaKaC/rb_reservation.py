@@ -62,9 +62,6 @@ class WeekDayEnum( object ):
 
     week2desc = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ]
 
-# Room booking module notifications will be send to this e-mail when debug is on
-EMAIL_FROM_PREFIX = "noreply-"
-
 class ReservationBase( object ):
     """
     Generic reservation, Data Access Layer independant.
@@ -144,7 +141,7 @@ class ReservationBase( object ):
                 subject = "[" + self.room.getFullName() + "] PRE-Booking waiting Acceptance"
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterPreBookingInsertion' )
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
             if to:
                 addrs.append( to )
@@ -168,7 +165,7 @@ class ReservationBase( object ):
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingInsertion' )
         text = wc.getHTML( { 'reservation':self, 'bookingMessage': bookingMessage } )
 
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
         addrs.append( toMain )
         if toMain in toCustom:
@@ -185,7 +182,7 @@ class ReservationBase( object ):
                 subject = "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
                 text = wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
                 addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -223,7 +220,7 @@ class ReservationBase( object ):
             subject = "[" + self.room.getFullName() + "] Cancellation Confirmation on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingCancellation' )
             text = wc.getHTML( { 'reservation':self, 'date':date, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
             if to:
                 addrs.append( to )
@@ -241,7 +238,7 @@ class ReservationBase( object ):
         subject = "[" + self.room.getFullName() + "] Cancelled Booking on " + startDate + " %s" % occurrenceText
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingCancellation' )
         text = wc.getHTML( { 'reservation':self, 'date':date } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
         addrs.append( toMain )
         if toMain in toCustom:
@@ -258,7 +255,7 @@ class ReservationBase( object ):
                 subject = "[" + self.room.getFullName() + "] Booking Cancelled on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingCancellation' )
                 text = wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
                 addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -297,7 +294,7 @@ class ReservationBase( object ):
             subject = "[" + self.room.getFullName() + "] REJECTED Booking on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingRejection' )
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName, 'reason':reason, 'date':date } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
             if to:
                 addrs.append(to)
@@ -314,7 +311,7 @@ class ReservationBase( object ):
         subject = "[" + self.room.getFullName() + "] Rejected Booking on " + startDate + " %s" % occurrenceText
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingRejection' )
         text = wc.getHTML( { 'reservation':self, 'date':date, 'reason':reason } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
         addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -348,7 +345,7 @@ class ReservationBase( object ):
             subject = "[" + self.room.getFullName() + "] Confirmed Booking on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingConfirmation' )
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
             if to:
                 addrs.append(to)
@@ -365,7 +362,7 @@ class ReservationBase( object ):
         subject = "[" + self.room.getFullName() + "] Confirmed Booking on " + startDate
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingConfirmation' )
         text = wc.getHTML( { 'reservation':self } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
         addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -379,7 +376,7 @@ class ReservationBase( object ):
                 subject = "[" + self.room.getFullName() + "] New Booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
                 text = wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
                 addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -412,7 +409,7 @@ class ReservationBase( object ):
             subject = "[" + self.room.getFullName() + "] Booking Modified on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingModification' )
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
             if to:
                 addrs.append(to)
@@ -430,7 +427,7 @@ class ReservationBase( object ):
         subject = "[" + self.room.getFullName() + "] Booking Modified on " + startDate
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingModification' )
         text = wc.getHTML( { 'reservation':self } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
         addrs.append( toMain )
         if toMain in toCustom :
@@ -447,7 +444,7 @@ class ReservationBase( object ):
                 subject = "[" + self.room.getFullName() + "] Modified booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingModification' )
                 text = wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
                 addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
@@ -482,7 +479,7 @@ class ReservationBase( object ):
             subject = "[" + self.room.getFullName() + "] Request for Booking Prolongation on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserRequestProlongation' )
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
             if to:
                 addrs.append(to)
@@ -510,7 +507,7 @@ class ReservationBase( object ):
         subject = "[" + self.room.getFullName() + "] Consider Rejecting This Booking"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleConsiderRejecting' )
         text = wc.getHTML( { 'reservation':self } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
         addrs.append( toMain )
         if toMain in toCustom:
