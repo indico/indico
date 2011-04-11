@@ -837,9 +837,9 @@ type("EditMaterialDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
 
         var statusSelection = Widget.select(
             $L({
-                0:(self.material.get('protectedOwner')?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
-                1:$T('Private (by itself)'),
-                '-1':$T('Public (by itself)')
+                0: (self.material.get('hasProtectedOwner')?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
+                1: $T('Private (by itself)'),
+                '-1': $T('Public (by itself)')
             })
         );
 
