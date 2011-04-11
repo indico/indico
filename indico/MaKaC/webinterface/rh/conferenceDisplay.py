@@ -425,7 +425,7 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
                 else:
                     p = conferences.WPInternalPageDisplay(self,self._target, self._page)
         elif view != "static" and isLibxml:
-            p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
+            p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:
             if view != "static":
                 warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"

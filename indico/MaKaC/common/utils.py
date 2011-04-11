@@ -442,6 +442,26 @@ def parseDate(dateStr, format='%d/%m/%Y'):
     t=time.strptime(dateStr, format)
     return datetime(t.tm_year,t.tm_mon, t.tm_mday).date()
 
+def prettyDate(dateTime):
+    """Return the XML dateTime in a 'pretty' format."""
+    date = parseDate(dateTime[:10], format('%Y-%m-%d'))
+    return formatDate(date, format='%A %d %B %Y')
+
+def prettyDuration(duration):
+    """Return duration 01:05 in a pretty format 1h05'"""
+    hours, minutes = duration.split(':')
+    if hours != '00':
+        return "%sh%s'" % (hours.replace('0', ''), minutes)
+    else:
+        return "%s'" % minutes
+
+def extractTime(dateTime, seconds=False):
+    """Extract '16:45' from '2011-03-09T16:45:00'."""
+    if seconds:
+        length = 8
+    else:
+        length = 5
+    return dateTime[11:][:length]
 
 def formatDuration(duration, units = 'minutes', truncate = True):
     """ Formats a duration (a timedelta object)

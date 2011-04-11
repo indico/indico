@@ -26,7 +26,8 @@ import simplejson
 
 from datetime import timedelta,datetime
 from xml.sax.saxutils import quoteattr, escape
-
+import lxml.etree
+import lxml.objectify
 
 from MaKaC import user
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -40,6 +41,7 @@ import MaKaC.conference as conference
 import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.common.filters as filters
 from MaKaC.common.utils import isStringHTML, formatDateTime
+import MaKaC.common.utils
 import MaKaC.review as review
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
@@ -1032,7 +1034,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
             return ""
         return WPConferenceBase._getHTMLFooter(self)
 
-    def _getBody( self, params ):
+    def _getBodyVariables(self):
         pars = { \
         "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
         "minutesURL":  urlHandlers.UHConferenceDisplayWriteMinutes.getURL(self._conf), \
@@ -1048,11 +1050,16 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         "resourceURLGen": urlHandlers.UHFileAccess.getURL, \
         "frame": self._params.get("frame","") or self._params.get("fr","") }
 
+        pars.update({ 'firstDay' : self._firstDay, 'lastDay' : self._lastDay, 'daysPerRow' : self._daysPerRow })
+
         if self._webcastadd:
             urladdwebcast = urlHandlers.UHWebcastAddWebcast.getURL()
             urladdwebcast.addParam("eventid",self._conf.getId())
             pars['webcastAdminURL'] = urladdwebcast
+        return pars
 
+    def _getBody( self, params ):
+        vars = self._getBodyVariables()
         frame = self._params.get("frame","") != "no" and self._params.get("fr","") != "no"
         view = self._view
         outGen = outputGenerator(self._getAW())
@@ -1076,8 +1083,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
                     includeContribution = 1
                 else:
                     includeContribution = 0
-                pars.update({'firstDay':self._firstDay, 'lastDay':self._lastDay, 'daysPerRow':self._daysPerRow})
-                body = outGen.getFormattedOutput(self._rh, self._conf, stylepath, pars, 1, includeContribution, 1, 1, self._params.get("showSession",""), self._params.get("showDate",""))
+                body = outGen.getFormattedOutput(self._rh, self._conf, stylepath, vars, 1, includeContribution, 1, 1, self._params.get("showSession",""), self._params.get("showDate",""))
             if useManagerCache or useNormalCache:
                 cache.saveCachePage( body )
             if not frame:
@@ -1097,6 +1103,111 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
+
+
+class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
+    """Overrides XSL related functions in WPXSLConferenceDisplay
+    class and re-implements them using normal Indico templates.
+    """
+
+    class NonUnicodeStringElement(lxml.objectify.StringElement):
+        """Converts lxml StringElement unicode values to bytestrings.
+
+        This behaviour is implemented only for some methods:
+            - accessing attribute through element.get('attr')
+            - str(element) or in templates ${element}
+            - element.text, which is used when we need to pass a string
+              to some other function, e.g. ${extractTime(date.text)}
+        """
+        def get(self, key, default=None):
+            value = lxml.objectify.StringElement.get(self, key, default)
+            if value is not None:
+                value = value.encode('utf-8')
+            return value
+        def __str__(self):
+            return lxml.objectify.StringElement.__str__(self).encode('utf-8')
+        def __getattribute__(self, name):
+            if name == 'text':
+                return str(self)
+            return lxml.objectify.StringElement.__getattribute__(self, name)
+
+    @staticmethod
+    def _hasDifferentLocation(item):
+        """Check if the item takes place in a different location than
+        its parent. Parameter item must be lxml objectified Element."""
+        parentLocationText= item.getparent().findall('location/*/text()')
+        itemLocationText = item.findall('location/*/text()')
+        return sorted(parentLocationText) != sorted(itemLocationText)
+
+    def _getConferenceXML(self):
+        """Return XML representing the conference to be displayed."""
+        generator = outputGenerator(self._getAW())
+        if self._params.get("detailLevel", "contribution") == "contribution":
+            includeContribution = 1
+        else:
+            includeContribution = 0
+        variables = self._getBodyVariables()
+        return generator._getBasicXML(conf=self._conf,
+                                      vars=variables,
+                                      includeSession=1,
+                                      includeContribution=includeContribution,
+                                      includeSubContribution=1,
+                                      includeMaterial=1,
+                                      showSession=self._params.get("showSession", ""),
+                                      showDate=self._params.get("showDate", ""))
+
+    def _splitMaterials(self, oldMaterials):
+        """Split 'materials' into normal materials, lectures and webcast."""
+        webcastTitles = ['live webcast', 'forthcoming webcast']
+        lectureTitles = ['part%s' % nr for nr in xrange(1, 11)]
+        materials, lectures, webcast = [], [], None
+        for material in oldMaterials:
+            if material.title in webcastTitles:
+                webcast = material
+            elif material.title in lectureTitles:
+                lectures.append(material)
+            else:
+                materials.append(material)
+        byTitleNumber = lambda x, y: int(x.title.text[4:]) - int(y.title.text[4:])
+        return (materials, sorted(lectures, cmp=byTitleNumber), webcast)
+
+    def _getBody(self, params):
+        """Return main information about the conference."""
+        xmlConf = self._getConferenceXML()
+
+        parser = lxml.objectify.makeparser(remove_blank_text=False)
+        elementClass = WPTPLConferenceDisplay.NonUnicodeStringElement
+        parserLookup = lxml.etree.ElementDefaultClassLookup(element=elementClass)
+        parser.set_element_class_lookup(parserLookup)
+
+        vars = {}
+        vars['iconf'] = lxml.objectify.fromstring(xmlConf, parser=parser)
+
+        oldMaterials = vars['iconf'].findall('material')
+        materials, lectures, webcast = self._splitMaterials(oldMaterials)
+        vars['materials'] = materials
+        vars['lectures'] = lectures
+        vars['webcast'] = webcast
+
+        vars['extractTime'] = MaKaC.common.utils.extractTime
+        vars['prettyDate'] = MaKaC.common.utils.prettyDate
+        vars['prettyDuration'] = MaKaC.common.utils.prettyDuration
+        vars['parseDate'] = MaKaC.common.utils.parseDate
+        vars['formatDate'] = MaKaC.common.utils.formatDate
+        vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
+        vars['hasDifferentLocation'] = self._hasDifferentLocation
+
+        body = wcomponents.WTemplated("events/Meeting").getHTML(vars)
+
+        frame = all(self._params.get(key, "") != "no" for key in ("frame", "fr"))
+        if not frame:
+            html = body
+        else:
+            errorMessage = wcomponents.WErrorMessage().getHTML(params)
+            infoMessage = wcomponents.WInfoMessage().getHTML(params)
+            html = "%s\n%s\n%s" % (errorMessage, infoMessage, body)
+        return html
+
 
 class WPrintPageFrame ( wcomponents.WTemplated ):
     pass
