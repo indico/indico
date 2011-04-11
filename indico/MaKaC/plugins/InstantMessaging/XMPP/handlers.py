@@ -482,7 +482,7 @@ class AddLogs2Material( ServiceBase ):
             self._repositoryId = resource.getRepositoryId()
 
         protectedObject = resource
-        protectedObject.setProtection(1)
+        protectedObject.setProtection(0)
 
         return mat.getId()
 
