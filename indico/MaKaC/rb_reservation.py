@@ -66,9 +66,6 @@ class WeekDayEnum( object ):
 EMAIL_FOR_DEBUG_NOTIFICATIONS = ""
 EMAIL_FROM_PREFIX = "noreply-"
 
-# Carbon copy of ALL room booking notifications will be send to this email
-EMAIL_FOR_CATCH_ALL_NOTIFICATIONS = ""
-
 class ReservationBase( object ):
     """
     Generic reservation, Data Access Layer independant.
@@ -159,8 +156,6 @@ class ReservationBase( object ):
                     if to in to2:
                         to2.remove(to)
                 addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -184,8 +179,6 @@ class ReservationBase( object ):
             addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
         else:
             addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             if toMain in toCustom :
                 toCustom.remove( toMain )
             addrs.extend( toCustom )
@@ -206,8 +199,6 @@ class ReservationBase( object ):
                     addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
                 else:
                     addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -254,8 +245,6 @@ class ReservationBase( object ):
                     if to in to2:
                         to2.remove(to)
                 addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -273,8 +262,6 @@ class ReservationBase( object ):
             addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
         else:
             addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             if toMain in toCustom :
                 toCustom.remove( toMain )
             addrs.extend( toCustom )
@@ -295,8 +282,6 @@ class ReservationBase( object ):
                     addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
                 else:
                     addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -344,8 +329,6 @@ class ReservationBase( object ):
                     if to in to2:
                         to2.remove(to)
                 addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -362,8 +345,6 @@ class ReservationBase( object ):
             addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
         else:
             addrs.extend( toCustom )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -406,8 +387,6 @@ class ReservationBase( object ):
                     if to in to2:
                         to2.remove(to)
                 addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -424,8 +403,6 @@ class ReservationBase( object ):
             addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
         else:
             addrs.extend( toCustom )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -443,8 +420,6 @@ class ReservationBase( object ):
                     addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
                 else:
                     addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -486,8 +461,6 @@ class ReservationBase( object ):
                     if to in to2:
                         to2.remove(to)
                 addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -505,8 +478,6 @@ class ReservationBase( object ):
             addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
         else:
             addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             if toMain in toCustom :
                 toCustom.remove( toMain )
             addrs.extend( toCustom )
@@ -527,8 +498,6 @@ class ReservationBase( object ):
                     addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
                 else:
                     addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
 
@@ -572,8 +541,6 @@ class ReservationBase( object ):
                     if to in to2:
                         to2.remove(to)
                 addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
         return emails
@@ -602,8 +569,6 @@ class ReservationBase( object ):
             addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
         else:
             addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
             if toMain in toCustom :
                 toCustom.remove( toMain )
             addrs.extend( toCustom )
