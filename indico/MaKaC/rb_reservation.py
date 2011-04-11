@@ -63,7 +63,6 @@ class WeekDayEnum( object ):
     week2desc = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ]
 
 # Room booking module notifications will be send to this e-mail when debug is on
-EMAIL_FOR_DEBUG_NOTIFICATIONS = ""
 EMAIL_FROM_PREFIX = "noreply-"
 
 class ReservationBase( object ):
@@ -129,7 +128,6 @@ class ReservationBase( object ):
         Called after insert().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
         # ---- Email creator and contact ----
 
@@ -148,14 +146,11 @@ class ReservationBase( object ):
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append( to )
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
+            if to:
+                addrs.append( to )
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -175,13 +170,10 @@ class ReservationBase( object ):
 
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom:
+            toCustom.remove( toMain )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -195,10 +187,7 @@ class ReservationBase( object ):
                 text = wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -210,7 +199,6 @@ class ReservationBase( object ):
         Called after cancel().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         if date:
@@ -237,14 +225,11 @@ class ReservationBase( object ):
             text = wc.getHTML( { 'reservation':self, 'date':date, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append( to )
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
+            if to:
+                addrs.append( to )
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -258,13 +243,10 @@ class ReservationBase( object ):
         text = wc.getHTML( { 'reservation':self, 'date':date } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom:
+            toCustom.remove( toMain )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -278,10 +260,7 @@ class ReservationBase( object ):
                 text = wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -293,7 +272,6 @@ class ReservationBase( object ):
         Called after reject().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
         reason = self.rejectionReason or reason
 
@@ -321,14 +299,11 @@ class ReservationBase( object ):
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName, 'reason':reason, 'date':date } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -341,10 +316,7 @@ class ReservationBase( object ):
         text = wc.getHTML( { 'reservation':self, 'date':date, 'reason':reason } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.extend( toCustom )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -357,7 +329,6 @@ class ReservationBase( object ):
         Called after reject().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
@@ -379,14 +350,11 @@ class ReservationBase( object ):
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -399,10 +367,7 @@ class ReservationBase( object ):
         text = wc.getHTML( { 'reservation':self } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.extend( toCustom )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -416,10 +381,7 @@ class ReservationBase( object ):
                 text = wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -431,7 +393,6 @@ class ReservationBase( object ):
         Called after update().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
@@ -453,14 +414,11 @@ class ReservationBase( object ):
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -474,13 +432,10 @@ class ReservationBase( object ):
         text = wc.getHTML( { 'reservation':self } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom :
+            toCustom.remove( toMain )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -494,10 +449,7 @@ class ReservationBase( object ):
                 text = wc.getHTML( { 'reservation': self } )
                 fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
 
@@ -511,7 +463,6 @@ class ReservationBase( object ):
         the reservation for the next x weeks.
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
@@ -533,14 +484,11 @@ class ReservationBase( object ):
             text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
             fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
         return emails
@@ -552,7 +500,6 @@ class ReservationBase( object ):
         did not prolong his HEAVY booking.
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # ---- Email responsible ----
@@ -565,13 +512,10 @@ class ReservationBase( object ):
         text = wc.getHTML( { 'reservation':self } )
         fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom:
+            toCustom.remove(toMain)
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
         return emails
