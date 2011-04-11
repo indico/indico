@@ -19,13 +19,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from xml.sax.saxutils import quoteattr, escape
-from textwrap import wrap, fill
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.review as review
 from MaKaC.ICALinterface.base import ICALBase
 from MaKaC.common.utils import encodeUnicode
 from MaKaC.common.indexes import IndexesHolder
-from indico.util.date_time import nowutc
 
 
 class ProgrammeToiCal(ICALBase):
@@ -35,6 +32,7 @@ class ProgrammeToiCal(ICALBase):
 
     def getBody(self):
         return ""
+
 
 class WebcastToiCal(ICALBase):
 
@@ -49,6 +47,7 @@ class WebcastToiCal(ICALBase):
         text += self._printFooter()
         return text
 
+
 class CategoryToiCal(ICALBase):
 
     def __init__(self, categ):
@@ -59,12 +58,13 @@ class CategoryToiCal(ICALBase):
         calIdx = im.getIndex('categoryDate')
 
         text = self._printHeader()
-        confs = calIdx.getObjectsEndingAfter(self._categ.getId(),
-                                             nowutc())
+        # get all visible events in category
+        confs = calIdx.getObjectsInDays(self._categ.getId(), None, None)
         for conf in confs:
             text += ConferenceToiCal(conf).getCore()
         text += self._printFooter()
         return text
+
 
 class ConferenceToiCal(ICALBase):
 

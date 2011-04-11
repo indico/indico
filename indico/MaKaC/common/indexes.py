@@ -681,9 +681,9 @@ class CalendarDayIndex(Persistent):
             res.update(self.getObjectsInDays( sDay + timedelta(1), eDay - timedelta(1) ))
         return res
 
-    def getObjectsInDays( self, sDate, eDate ):
-        sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day)))
-        eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day)))
+    def getObjectsInDays( self, sDate=None, eDate=None ):
+        sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day))) if sDate else None
+        eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day))) if eDate else None
         res = set()
         for day in self._idxDay.values(sDay, eDay):
             res.update(day)
