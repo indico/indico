@@ -31,19 +31,24 @@
           </table>
         </td>
       </tr>
+
+      <% types = (("simple_event", _("Styles for Lectures")),
+                  ("meeting",      _("Styles for Meetings")),
+                  ("conference",   _("Styles for Conferences")))%>
+      % for eventType, groupTitle in types:
       <tr>
-        <td colspan="1" class="groupTitle">${ _("Styles for Lectures")}
-        </td>
+        <td colspan="1" class="groupTitle">${groupTitle}</td>
       </tr>
       <tr>
         <td>
           <form action="${ urlHandlers.UHAdminsStyles.getURL() }" method="POST">
-          <input type="hidden" name="event_type" value="simple_event">
-          <% styles = styleMgr.getStylesheetListForEventType("simple_event") %>
+          <input type="hidden" name="event_type" value="${eventType}">
+          <% styles = styleMgr.getStylesheetListForEventType(eventType) %>
           <% styles.sort() %>
           ${ _("current list:")} <select name="xslfile">
           % for style in styles:
-          <option value="${style}"${'style="font-weight: bold;" selected' if style.strip()==styleMgr.getDefaultStylesheetForEventType("simple_event").strip() else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if style.strip()==styleMgr.getDefaultStylesheetForEventType("simple_event").strip() else ""}</option>
+          <% isDefault = style.strip()==styleMgr.getDefaultStylesheetForEventType(eventType).strip() %>
+          <option value="${style}"${'style="font-weight: bold;" selected' if isDefault else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if isDefault else ""}</option>
           % endfor
           </select>
           <input type="submit" class="btn" name="action" value="${ _("default")}">
@@ -60,63 +65,6 @@
           </form>
         </td>
       </tr>
-      <tr>
-        <td colspan="1" class="groupTitle">${ _("Styles for Meetings")}
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <form action="${ urlHandlers.UHAdminsStyles.getURL() }" method="POST">
-          <input type="hidden" name="event_type" value="meeting">
-          <% styles = styleMgr.getStylesheetListForEventType("meeting") %>
-          <% styles.sort() %>
-          ${ _("current list:")} <select name="xslfile">
-          % for style in styles:
-          <option value="${style}"${'style="font-weight: bold;" selected' if style.strip()==styleMgr.getDefaultStylesheetForEventType("meeting").strip() else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if style.strip()==styleMgr.getDefaultStylesheetForEventType("meeting").strip() else ""}</option>
-          % endfor
-          </select>
-          <input type="submit" class="btn" name="action" value="${ _("default")}">
-          <input type="submit" class="btn" name="action" value="${ _("delete")}"><br>
-          ${ _("add new style:")}
-           <select name="newstyle">
-             % for style in styleMgr.getStylesheets():
-               % if style not in styles:
-               <option value="${ style }">${styleMgr.getStylesheetName(style)}</option>
-               % endif
-             % endfor
-           </select>
-           <input type="submit" class="btn" name="action" value="${ _("add")}">
-          </form>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="1" class="groupTitle">${ _("Styles for Conferences")}
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <form action="${ urlHandlers.UHAdminsStyles.getURL() }" method="POST">
-          <input type="hidden" name="event_type" value="conference">
-          <% styles = styleMgr.getStylesheetListForEventType("conference") %>
-          <% styles.sort() %>
-          ${ _("current list")}: <select name="xslfile">
-          % for style in styles:
-          <option value="${style}"${'style="font-weight: bold;" selected' if style.strip()==styleMgr.getDefaultStylesheetForEventType("conference").strip() else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if style.strip()==styleMgr.getDefaultStylesheetForEventType("conference").strip() else ""}</option>
-          % endfor
-          </select>
-          <input type="submit" class="btn" name="action" value="${ _("default")}">
-          <input type="submit" class="btn" name="action" value="${ _("delete")}"><br>
-          ${ _("add new style:")}
-           <select name="newstyle">
-             % for style in styleMgr.getStylesheets():
-               % if style not in styles:
-               <option value="${ style }">${styleMgr.getStylesheetName(style)}</option>
-               % endif
-             % endfor
-           </select>
-           <input type="submit" class="btn" name="action" value="${ _("add")}">
-          </form>
-        </td>
-      </tr>
+      % endfor
     </tbody>
   </table>
