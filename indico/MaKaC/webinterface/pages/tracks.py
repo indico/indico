@@ -938,7 +938,7 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
         if aStatus.__class__ in [_ASTrackViewPA,_ASTrackViewPR,_ASTrackViewSubmitted,_ASTrackViewPFOT]:
             vars["duplicatedButton"] = _("""<input type="submit" class="btn" value="_("mark as duplicated")" style="width:205px">""")
         elif aStatus.__class__ == _ASTrackViewDuplicated:
-            vars["duplicatedButton"] = _("""<input type="submit" class="btn" value="_("unmark as duplicated") style="width:205px">""")
+            vars["duplicatedButton"] = _("""<input type="submit" class="btn" value="_("unmark as duplicated")" style="width:205px">""")
             vars["duplicatedURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModUnMarkAsDup.getURL(self._track,self._abstract)))
         vars["contribution"] = self._getContribHTML()
 

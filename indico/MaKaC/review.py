@@ -2050,15 +2050,17 @@ class Abstract(Persistent):
         #We trigger the state transition
         self.getCurrentStatus().proposeToReject()
 
-    def proposeForOtherTracks( self, responsible, track, comment, propTracks ):
+    def proposeForOtherTracks( self, responsible, track, comment, propTracks, answers=[] ):
         """
         """
         #We check the track which proposes to allocate the abstract is in the
         #   current abstract
         if not self.isProposedForTrack( track ):
             raise MaKaCError( _("Cannot propose to reallocate an abstract which is not proposed for the specified track"))
+        # check if there is a previous judgement of this author in for this abstract in this track
+        self._removePreviousJud(responsible, track)
         #We keep the track judgement
-        jud = AbstractReallocation( track, responsible, propTracks )
+        jud = AbstractReallocation( track, responsible, propTracks, answers )
         jud.setComment( comment )
         self._addTrackReallocation( jud )
         #We add the proposed tracks to the abstract
@@ -2066,6 +2068,8 @@ class Abstract(Persistent):
             self._addTrack( track )
         #We trigger the state transition
         self.getCurrentStatus().proposeToReallocate()
+        # Update the rating of the abstract
+        self.updateRating()
 
     def withdraw(self,resp,comment=""):
         """
@@ -2246,22 +2250,26 @@ class Abstract(Persistent):
         self.addIntComment(comment)
         comment.recover()
 
-    def markAsDuplicated(self,responsible,originalAbstract,comments="", track=None):
+    def markAsDuplicated(self,responsible,originalAbstract,comments="", track=None, answers=[]):
         """
         """
         self.getCurrentStatus().markAsDuplicated(responsible,originalAbstract,comments)
+        # check if there is a previous judgement of this author in for this abstract in this track
+        self._removePreviousJud(responsible, track)
 
         if track is not None:
-            jud = AbstractMarkedAsDuplicated( track, responsible, originalAbstract )
+            jud = AbstractMarkedAsDuplicated( track, responsible, originalAbstract, answers )
             jud.setComment( comments )
             self._addTrackJudgementToHistorical(jud)
         else:
             for t in self.getTrackList():
-                jud = AbstractMarkedAsDuplicated( t, responsible, originalAbstract )
+                jud = AbstractMarkedAsDuplicated( t, responsible, originalAbstract, answers )
                 jud.setComment( comments )
                 self._addTrackJudgementToHistorical(jud)
+        # Update the rating of the abstract
+        self.updateRating()
 
-    def unMarkAsDuplicated(self,responsible,comments="", track=None):
+    def unMarkAsDuplicated(self,responsible,comments="", track=None, answers=[]):
         """
         """
 
@@ -2272,16 +2280,20 @@ class Abstract(Persistent):
         #self.getCurrentStatus().recover() #status change
         self.getCurrentStatus().unMarkAsDuplicated(responsible,comments)
 
+        # check if there is a previous judgement of this author in for this abstract in this track
+        self._removePreviousJud(responsible, track)
+
         if track is not None:
-            jud = AbstractUnMarkedAsDuplicated(track, responsible )
+            jud = AbstractUnMarkedAsDuplicated(track, responsible, answers )
             jud.setComment( comments )
             self._addTrackJudgementToHistorical(jud)
         else:
             for t in self.getTrackList():
-                jud = AbstractUnMarkedAsDuplicated( t, responsible )
+                jud = AbstractUnMarkedAsDuplicated( t, responsible, answers )
                 jud.setComment( comments )
                 self._addTrackJudgementToHistorical(jud)
-
+        # Update the rating of the abstract
+        self.updateRating()
         self._notifyModification()
 
     def mergeInto(self,responsible,targetAbs,mergeAuthors=False,comments=""):
@@ -2526,12 +2538,12 @@ class AbstractRejection( AbstractJudgement ):
 
 class AbstractReallocation( AbstractJudgement ):
 
-    def __init__( self, track, responsible, propTracks ):
-        AbstractJudgement.__init__( self, track, responsible )
+    def __init__( self, track, responsible, propTracks, answers ):
+        AbstractJudgement.__init__( self, track, responsible, answers )
         self._proposedTracks = PersistentList( propTracks )
 
     def clone(self, track):
-        arl = AbstractReallocation(track, self.getResponsible(), self.getProposedTrackList())
+        arl = AbstractReallocation(track, self.getResponsible(), self.getProposedTrackList(), self.getAnswers())
         return arl
 
     def getProposedTrackList( self ):
@@ -2539,12 +2551,12 @@ class AbstractReallocation( AbstractJudgement ):
 
 class AbstractMarkedAsDuplicated( AbstractJudgement ):
 
-    def __init__( self, track, responsible, originalAbst ):
-        AbstractJudgement.__init__( self, track, responsible )
+    def __init__( self, track, responsible, originalAbst, answers ):
+        AbstractJudgement.__init__( self, track, responsible, answers )
         self._originalAbst=originalAbst
 
     def clone(self,track):
-        amad = AbstractMarkedAsDuplicated(track,self.getResponsible(), self.getOriginalAbstract())
+        amad = AbstractMarkedAsDuplicated(track,self.getResponsible(), self.getOriginalAbstract(), self.getAnswers())
         return amad
 
     def getOriginalAbstract(self):
