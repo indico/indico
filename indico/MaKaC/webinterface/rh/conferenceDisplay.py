@@ -402,7 +402,7 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
             # if no default view was attributed, then get the configuration default
             if view == "":
                 styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-                view =styleMgr.getDefaultStylesheetForEventType( type )
+                view =styleMgr.getDefaultStyleForEventType( type )
                 displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
         isLibxml = True
         warningText = ""
@@ -461,7 +461,7 @@ class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
             # if no default view was attributed, then get the configuration default
             if view == "":
                 styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-                view =styleMgr.getDefaultStylesheetForEventType( type )
+                view =styleMgr.getDefaultStyleForEventType( type )
                 displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
         # create the html factory
         if view != "static":

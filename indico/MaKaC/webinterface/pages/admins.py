@@ -851,9 +851,9 @@ class WAdminsStyles(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         vars["styleMgr"] = styleMgr
-        baseXSLPath = styleMgr.getBaseXSLPath()
+        baseTPLPath = styleMgr.getBaseTPLPath()
         baseCSSPath = styleMgr.getBaseCSSPath()
-        vars["contextHelpText"] = i18nformat("""- <b>_("XSL files")</b> _("are mandatory and located in"):<br/>%s<br/>- <b>_("CSS files")</b> _("are optional and located in"):<br/>%s<br/>- <b>_("Lines in red")</b> _("indicate a missing .xsl file (these styles will not be presented to the users"))<br/>- <b>_("XSL and CSS files")</b> _("should be named after the ID of the style (+extension: .xsl or .css)")""") % (baseXSLPath,baseCSSPath)
+        vars["contextHelpText"] = i18nformat("""- <b>_("TPL files")</b> _("are mandatory and located in"):<br/>%s<br/>- <b>_("CSS files")</b> _("are optional and located in"):<br/>%s<br/>- <b>_("Lines in red")</b> _("indicate a missing .tpl file (these styles will not be presented to the users"))<br/>- <b>_("CSS files")</b> _("should be named after the ID of the style (plus extension .css)")""") % (baseTPLPath,baseCSSPath)
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("remove")
         return vars
 
@@ -869,16 +869,15 @@ class WAdminsAddStyle(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         vars["styleMgr"] = styleMgr
-        availableStylesheets = []
-        XSLBasePath = styleMgr.getBaseXSLPath()
-        if os.path.exists(XSLBasePath):
-            for file in os.listdir(XSLBasePath):
-                if os.path.isfile(os.path.join(XSLBasePath,file)) and ".xsl" in file:
-                    filename = file.replace(".xsl","")
-                    if filename not in styleMgr.getStylesheets().keys():
-                        availableStylesheets.append(filename)
-        vars["availableStylesheets"] = availableStylesheets
-        vars["contextHelpText"] = "Lists all XSL files in %s which are not already used in a declared style" % XSLBasePath
+        availableStyles = []
+        TPLBasePath = styleMgr.getBaseTPLPath()
+        if os.path.exists(TPLBasePath):
+            for filename in os.listdir(TPLBasePath):
+                if os.path.isfile(os.path.join(TPLBasePath, filename)) and filename.endswith(".tpl"):
+                    if filename not in styleMgr.getStyleFilenames():
+                        availableStyles.append(filename)
+        vars["availableStyles"] = availableStyles
+        vars["contextHelpText"] = "Lists all TPL files in %s which are not already used in a declared style" % TPLBasePath
         return vars
 
 class WAdminTemplates(wcomponents.WTemplated):

@@ -485,15 +485,6 @@ class WMenuConferenceHeader( WConferenceHeader ):
             url = urlHandlers.UHConfCloseModifKey.getURL(self._conf)
             url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
             vars["confModif"] = i18nformat("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        stylesheets = styleMgr.getStylesheetListForEventType(vars["type"])
-
-        # View Menu
-        viewoptions = []
-        if len(stylesheets) != 0:
-            stylesheets.sort()
-            for stylesheet in stylesheets:
-                viewoptions.append({"id": styleMgr.getStylesheetName(stylesheet), "name": stylesheet})
 
         # Dates Menu
         tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
@@ -603,15 +594,15 @@ class WMenuMeetingHeader( WConferenceHeader ):
         #if not self._conf.canAccess(self._aw) and self._conf.getAccessKey() != "":
         #    vars["confModif"] += i18nformat("""<a href=%s>_("full agenda")</a>&nbsp;|&nbsp;""")%(quoteattr(str(urlHandlers.UHConfForceEnterAccessKey.getURL(self._conf))))
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        stylesheets = styleMgr.getStylesheetListForEventType(vars["type"])
+        styles = styleMgr.getExistingStylesForEventType(vars["type"])
 
         viewoptions = []
-        if len(stylesheets) != 0:
-            stylesheets.sort(key=styleMgr.getStylesheetName)
-            for stylesheet in stylesheets:
-                viewoptions.append({"id": stylesheet, "name": styleMgr.getStylesheetName(stylesheet) })
+        if len(styles) != 0:
+            styles.sort(key=styleMgr.getStyleName)
+            for styleId in styles:
+                viewoptions.append({"id": styleId, "name": styleMgr.getStyleName(styleId) })
         vars["viewoptions"] = viewoptions
-        vars["SelectedStyle"] = styleMgr.getStylesheetName(vars["currentView"])
+        vars["SelectedStyle"] = styleMgr.getStyleName(vars["currentView"])
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._rh._conf)
 
         # Setting the buttons that will be displayed in the header menu

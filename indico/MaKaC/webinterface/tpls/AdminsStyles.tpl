@@ -11,19 +11,32 @@
           <input type="submit" class="btn" value="${ _("New")}">
           </form>
           <table cellspacing="1" align="center">
-          <tr style="border-bottom: 1px;"><th>${ _("Name (ID)")}</th><th>${ _("XSL file")}</th><th>${ _("CSS file")}</th><th>${ _("Actions")}</th></tr>
-          <% styles = styleMgr.getStylesheets().keys() %>
+          <tr style="border-bottom: 1px;">
+            <th>${ _("Name")}</th>
+            <th>${ _("ID")}</th>
+            <th>${ _("TPL file")}</th>
+            <th>${ _("CSS file")}</th>
+            <th>${ _("Actions")}</th>
+          </tr>
+          <% styles = styleMgr.getStyles().keys() %>
           <% styles.sort() %>
           % for style in styles:
-          <tr style="background-color: ${"#faa" if styleMgr.getXSLPath(style) == "" and style != 'static' else "lightgreen"}">
-            <td align="right">${ styleMgr.getStylesheetName(style) } (${style})</td>
-            <td align="center">${ _("found") if styleMgr.getXSLPath(style) else  _("not found")}</td>
+          <tr style="background-color: ${"#faa" if not styleMgr.existsTPLFile(style) and style != 'static' else "lightgreen"}">
+            <td align="left">${ styleMgr.getStyleName(style) }</td>
+            <td align="left">${style}</td>
+            <td align="left">
+            % if style != 'static':
+                ${styleMgr.getTPLFilename(style)}
+            % else:
+                -
+            % endif
+            </td>
             <td align="center">${ _("yes") if styleMgr.getCSSPath(style) else  _("no")}</td>
             <td>
             % if style == "static":
-            ${inlineContextHelp(_('This style cannot be deleted. this is the default style for conferences.<br/>It does not rely on an XSL file.'))}
+            ${inlineContextHelp(_('This style cannot be deleted. This is the default style for conferences.'))}
             % else:
-            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(xslfile=style)}" onClick="if (!confirm('${ _("Are you sure you want to delete this style?")}')) { return false; }"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
+            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(tplfile=style)}" onClick="if (!confirm('${ _("Are you sure you want to delete this style?")}')) { return false; }"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
             % endif
             </td>
           </tr>
@@ -43,21 +56,21 @@
         <td>
           <form action="${ urlHandlers.UHAdminsStyles.getURL() }" method="POST">
           <input type="hidden" name="event_type" value="${eventType}">
-          <% styles = styleMgr.getStylesheetListForEventType(eventType) %>
+          <% styles = styleMgr.getStyleListForEventType(eventType) %>
           <% styles.sort() %>
-          ${ _("current list:")} <select name="xslfile">
+          ${ _("current list:")} <select name="tplfile">
           % for style in styles:
-          <% isDefault = style.strip()==styleMgr.getDefaultStylesheetForEventType(eventType).strip() %>
-          <option value="${style}"${'style="font-weight: bold;" selected' if isDefault else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if isDefault else ""}</option>
+          <% isDefault = style.strip() == styleMgr.getDefaultStyleForEventType(eventType).strip() %>
+          <option value="${style}"${'style="font-weight: bold;" selected' if isDefault else ""}>${styleMgr.getStyleName(style)}${" (default)" if isDefault else ""}</option>
           % endfor
           </select>
           <input type="submit" class="btn" name="action" value="${ _("default")}">
           <input type="submit" class="btn" name="action" value="${ _("delete")}"><br>
           ${ _("add new style:")}
            <select name="newstyle">
-             % for style in styleMgr.getStylesheets():
+             % for style in styleMgr.getStyles():
                % if style not in styles:
-               <option value="${ style }">${styleMgr.getStylesheetName(style)}</option>
+               <option value="${ style }">${styleMgr.getStyleName(style)}</option>
                % endif
              % endfor
            </select>

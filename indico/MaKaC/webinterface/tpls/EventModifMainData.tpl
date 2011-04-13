@@ -246,7 +246,7 @@ $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', $
 
 <%  from MaKaC.common import info %>
 
-${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStylesheetDictForEventType(confObj.getType()), orderOptionsBy = "value") }
+${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditDefaultStyle', 'event.main.changeDefaultStyle', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager().getStyleDictForEventType(confObj.getType()), orderOptionsBy = "value") }
 
 ${ macros.genericField(macros.FIELD_SELECT, 'inPlaceEditVisibility', 'event.main.changeVisibility', dict(conference="%s"%conferenceId), preCache=True, rh=self_._rh, options=visibilityList, orderOptionsBy = "key") }
 

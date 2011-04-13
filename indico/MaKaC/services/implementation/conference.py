@@ -181,7 +181,7 @@ class ConferenceTypeModification( ConferenceTextModificationBase ):
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
 
             dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
-            dispMgr.setDefaultStyle(styleMgr.getDefaultStylesheetForEventType(newType))
+            dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
 
     def _handleGet(self):
         return self._target.getType()

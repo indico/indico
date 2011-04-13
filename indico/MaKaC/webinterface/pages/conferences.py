@@ -1197,7 +1197,12 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
         vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
         vars['hasDifferentLocation'] = self._hasDifferentLocation
 
-        body = wcomponents.WTemplated("events/Meeting").getHTML(vars)
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        if styleMgr.existsTPLFile(self._view):
+            fileName = os.path.splitext(styleMgr.getTPLFilename(self._view))[0]
+            body = wcomponents.WTemplated(os.path.join("events", fileName)).getHTML(vars)
+        else:
+            return _("Template could not be found.")
 
         frame = all(self._params.get(key, "") != "no" for key in ("frame", "fr"))
         if not frame:
@@ -2844,7 +2849,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         defaultStyle = i18nformat("""--_("not set")--""")
         defStyle = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDefaultStyle()
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        defaultStyle = styleMgr.getStylesheetName(defStyle)
+        defaultStyle = styleMgr.getStyleName(defStyle)
         vars["defaultStyle"] = defaultStyle
         visibility = self._conf.getVisibility()
         categpath = self._conf.getCategoriesPath()[0]
@@ -3062,17 +3067,17 @@ class WConferenceDataModification(wcomponents.WTemplated):
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         type = self._conf.getType()
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(self._conf.getTimezone())
-        stylesheets=styleMgr.getStylesheetListForEventType(type)
+        styles=styleMgr.getExistingStylesForEventType(type)
         styleoptions = ""
         defStyle = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDefaultStyle()
-        if defStyle not in stylesheets:
+        if defStyle not in styles:
             defStyle = ""
-        for stylesheet in stylesheets:
-            if stylesheet == defStyle or (defStyle == "" and stylesheet == "static"):
+        for styleId in styles:
+            if styleId == defStyle or (defStyle == "" and styleId == "static"):
                 selected = "selected"
             else:
                 selected = ""
-            styleoptions += "<option value=\"%s\" %s>%s</option>" % (stylesheet,selected,styleMgr.getStylesheetName(stylesheet))
+            styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
         vars["conference"] = self._conf
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
         vars["styleOptions"] = styleoptions

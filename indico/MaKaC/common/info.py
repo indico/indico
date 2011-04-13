@@ -431,73 +431,75 @@ class HelperMaKaCInfo:
 
 
 class StyleManager(Persistent):
-    """This class manages the stylesheets used by the server for the display
+    """This class manages the styles used by the server for the display
        of events timetables
     """
 
     def __init__( self ):
-        self._stylesheets = Config.getInstance().getStylesheets()
+        self._styles = Config.getInstance().getStyles()
         self._eventStylesheets = Config.getInstance().getEventStylesheets()
         self._defaultEventStylesheet = Config.getInstance().getDefaultEventStylesheet()
 
-    def getStylesheets(self):
-        """gives back the entire stylesheet list.
-        """
-        return self._stylesheets
+    def getStyles(self):
+        try:
+            return self._styles
+        except AttributeError:
+            self._styles = Config.getInstance().getStyles()
+            return self._styles
 
-    def setStylesheets(self, sList=[]):
-        self._stylesheets = sList
+    def setStyles(self, newStyles):
+        self._styles = newStyles
 
-    def getEventStylesheets(self):
-        """gives back the entire stylesheet/event association list.
+    def getEventStyles(self):
+        """gives back the entire style/event association list.
         """
         return self._eventStylesheets
 
-    def setEventStylesheets(self, sDict={}):
+    def setEventStyles(self, sDict={}):
         self._eventStylesheets = sDict
 
-    def getDefaultEventStylesheet(self):
-        """gives back the default stylesheet/event association
+    def getDefaultEventStyles(self):
+        """gives back the default styles/event association
         """
         return self._defaultEventStylesheet
 
-    def setDefaultEventStylesheet(self, sDict={}):
+    def setDefaultEventStyle(self, sDict={}):
         self._defaultEventStylesheet = sDict
 
-    def getDefaultStylesheetForEventType(self, type):
+    def getDefaultStyleForEventType(self, eventType):
         """gives back the default stylesheet for the given type of event
         """
-        return self._defaultEventStylesheet.get(type,"")
+        return self._defaultEventStylesheet.get(eventType, "")
 
-    def removeStyle( self, style, type="" ):
+    def removeStyle(self, styleId, type=""):
         if type == "":
             # style globally removed
-            if style in self.getStylesheets().keys():
-                styles = self.getStylesheets()
-                del styles[style]
-                self.setStylesheets(styles)
-                self.removeStyleFromAllTypes(style)
+            styles = self.getStyles()
+            if styleId in styles.keys():
+                del styles[styleId]
+                self.setStyles(styles)
+                self.removeStyleFromAllTypes(styleId)
         else:
             # style removed only in the type list
-            self.removeStyleFromEventType(style, type)
+            self.removeStyleFromEventType(styleId, type)
 
     def addStyleToEventType( self, style, type ):
-        dict = self.getEventStylesheets()
+        dict = self.getEventStyles()
         styles = dict.get(type,[])
         if style not in styles:
             styles.append(style)
             dict[type] = styles
-            self.setEventStylesheets(dict)
+            self.setEventStyles(dict)
 
     def removeStyleFromEventType( self, style, type ):
         # style removed only in the type list
-        dict = self.getEventStylesheets()
+        dict = self.getEventStyles()
         styles = dict.get(type,[])
-        defaultStyle = self.getDefaultStylesheetForEventType(type)
+        defaultStyle = self.getDefaultStyleForEventType(type)
         if style != "" and style in styles:
             styles.remove(style)
             dict[type] = styles
-            self.setEventStylesheets(dict)
+            self.setEventStyles(dict)
             if style.strip() == defaultStyle.strip():
                 if len(styles) > 0:
                     newDefaultStyle = styles[0]
@@ -507,48 +509,69 @@ class StyleManager(Persistent):
 
     def setDefaultStyle( self, style, type ):
         if style != "":
-            dict = self.getDefaultEventStylesheet()
+            dict = self.getDefaultEventStyles()
             dict[type] = style
-            self.setDefaultEventStylesheet(dict)
+            self.setDefaultEventStyle(dict)
 
     def removeStyleFromAllTypes( self, style ):
         for type in ["simple_event", "meeting", "conference"]:
             self.removeStyleFromEventType(style, type)
 
-    def getStylesheetListForEventType(self, type):
-        """gives back the stylesheet list associated to a given type of event.
+    def getStyleListForEventType(self, eventType):
+        """gives back the style list associated to a given type of event.
         If no event was specified it returns the empty list.
            Params:
                 type -- unique identifier of the event type
         """
-        return self._eventStylesheets.get( type, [] )
+        return self._eventStylesheets.get(eventType, [])
 
-    def getStylesheetDictForEventType(self, type):
-        """gives back the stylesheet list associated to a given type of event.
+    def getExistingStylesForEventType(self, eventType):
+        result = []
+        for style in self.getStyleListForEventType(eventType):
+            if self.existsTPLFile(style) or style == 'static':
+                result.append(style)
+        return result
+
+    def getStyleDictForEventType(self, type):
+        """gives back the style list associated to a given type of event.
         If no event was specified it returns the empty list.
            Params:
                 type -- unique identifier of the event type
         """
-        return dict((ssid, self._stylesheets[ssid]) for ssid in self._eventStylesheets.get( type, [] ))
+        styles = self.getStyles()
+        return dict((styleID, styles[styleID]) for styleID in self._eventStylesheets.get(type, []))
 
-    def getStylesheetName( self, stylesheet ):
-        return self._stylesheets.get( stylesheet, "" )
+    def getStyleName(self, styleId):
+        styles = self.getStyles()
+        if styleId in styles:
+            return styles[styleId][0]
+        else:
+            return ""
 
-    def getBaseXSLPath( self ):
-        return Config.getInstance().getStylesheetsDir()
+    def getBaseTPLPath(self):
+        tplDir = Config.getInstance().getTPLDir()
+        return os.path.join(tplDir, "events")
 
-    def getXSLPath( self, stylesheet ):
-        if stylesheet.strip() != "":
-            basepath = Config.getInstance().getStylesheetsDir()
-            path = os.path.join( basepath, "%s.xsl" % stylesheet )
+    def existsTPLFile(self, styleId):
+        if styleId.strip() != "":
+            tplFile = self.getTPLFilename(styleId)
+            if not tplFile:
+                return False
+            path = os.path.join(self.getBaseTPLPath(), tplFile)
             if os.path.exists(path):
-                return path
-        return ""
+                return True
+        return False
 
-    def getXSLFile( self, stylesheet ):
-        if self.getXSLPath( stylesheet ):
-            return "%s.xsl" % stylesheet
-        return ""
+    def getStyleFilenames(self):
+        return [fileName for styleName, fileName in self.getStyles().values()]
+
+    def getTPLFilename(self, styleId):
+        styles = self.getStyles()
+        if styleId in styles:
+            fileName = styles[styleId][1]
+            return fileName
+        else:
+            return None
 
     def getBaseCSSPath( self ):
         return os.path.join(Config.getInstance().getHtdocsDir(),"css")

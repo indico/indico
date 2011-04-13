@@ -296,7 +296,8 @@ class RHStyles(RHAdminBase):
         RHAdminBase._checkParams( self, params )
         self._new = params.get("new", "")
         self._name = params.get("name", "")
-        self._xslfile = params.get("xslfile", "")
+        self._styleID = params.get("styleID", "")
+        self._tplfile = params.get("tplfile", "")
         self._eventType = params.get("event_type", "")
         self._action = params.get("action", "")
         self._newstyle = params.get("newstyle","")
@@ -304,14 +305,14 @@ class RHStyles(RHAdminBase):
     def _process( self ):
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         if self._new != "":
-            if self._xslfile not in styleMgr.getStylesheets().keys() and self._name != "":
-                styles = styleMgr.getStylesheets()
-                styles[self._xslfile] = self._name
-                styleMgr.setStylesheets(styles)
-        if self._action == "default" and self._eventType != "" and self._xslfile != "":
-            styleMgr.setDefaultStyle(self._xslfile, self._eventType)
-        if self._action == "delete" and self._eventType != "" and self._xslfile != "":
-            styleMgr.removeStyle(self._xslfile, self._eventType)
+            if self._styleID not in styleMgr.getStyles().keys() and self._name != "" and self._styleID != "":
+                styles = styleMgr.getStyles()
+                styles[self._styleID] = (self._name, self._tplfile)
+                styleMgr.setStyles(styles)
+        if self._action == "default" and self._eventType != "" and self._tplfile != "":
+            styleMgr.setDefaultStyle(self._tplfile, self._eventType)
+        if self._action == "delete" and self._eventType != "" and self._tplfile != "":
+            styleMgr.removeStyle(self._tplfile, self._eventType)
         if self._action == "add" and self._eventType != "" and self._newstyle != "":
             styleMgr.addStyleToEventType(self._newstyle, self._eventType)
         p = admins.WPAdminsStyles( self )
@@ -322,13 +323,13 @@ class RHDeleteStyle(RHAdminBase):
 
     def _checkParams( self, params ):
         RHAdminBase._checkParams( self, params )
-        self._xslfile = params.get("xslfile", "")
+        self._tplfile = params.get("tplfile", "")
         self._eventType = params.get("event_type","")
 
     def _process( self ):
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        if self._xslfile != "":
-            styleMgr.removeStyle(self._xslfile, self._eventType)
+        if self._tplfile != "":
+            styleMgr.removeStyle(self._tplfile, self._eventType)
         self._redirect(urlHandlers.UHAdminsStyles.getURL())
 
 class RHAddStyle(RHAdminBase):

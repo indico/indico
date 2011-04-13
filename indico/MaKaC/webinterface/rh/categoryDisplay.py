@@ -511,7 +511,7 @@ class UtilsConference:
             wr.registerFactory(c,factory)
             dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c)
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            dispMgr.setDefaultStyle(styleMgr.getDefaultStylesheetForEventType(newType))
+            dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
     setValues = staticmethod( setValues )
 
 

@@ -1221,19 +1221,19 @@ class WConferenceCreation( wcomponents.WTemplated ):
         vars["chairText"] = vars.get("chairText","")
         vars["supportEmail"] = vars.get("supportEmail","")
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        stylesheets = styleMgr.getStylesheetListForEventType(self._type)
+        styles = styleMgr.getExistingStylesForEventType(self._type)
         styleoptions = ""
-        for stylesheet in stylesheets:
+        for styleId in styles:
             defStyle = ""
             if self._categ:
                 defStyle = self._categ.getDefaultStyle(self._type)
             if defStyle == "":
-                defStyle = styleMgr.getDefaultStylesheetForEventType(self._type)
-            if stylesheet == defStyle:
+                defStyle = styleMgr.getDefaultStyleForEventType(self._type)
+            if styleId == defStyle:
                 selected = "selected"
             else:
                 selected = ""
-            styleoptions += "<option value=\"%s\" %s>%s</option>" % (stylesheet,selected,styleMgr.getStylesheetName(stylesheet))
+            styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
         vars["styleOptions"] = styleoptions
 
         vars["chairpersonDefined"] = vars.get("chairpersonDefined", [])
@@ -1478,8 +1478,8 @@ class WCategModifMain(wcomponents.WTemplated):
             vars['containsEvents'] = False
             vars["items"] = self.__getSubCategoryItems( self._categ.getSubCategoryList(), vars["categModifyURLGen"] )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        vars["defaultMeetingStyle"] = styleMgr.getStylesheetName(self._categ.getDefaultStyle("meeting"))
-        vars["defaultLectureStyle"] = styleMgr.getStylesheetName(self._categ.getDefaultStyle("simple_event"))
+        vars["defaultMeetingStyle"] = styleMgr.getStyleName(self._categ.getDefaultStyle("meeting"))
+        vars["defaultLectureStyle"] = styleMgr.getStyleName(self._categ.getDefaultStyle("simple_event"))
 
 ##        vars["defaultVisibility"] = self._categ.getVisibility()
         vars["defaultTimezone"] = self._categ.getTimezone()
@@ -1587,17 +1587,17 @@ class WCategoryDataModification(wcomponents.WTemplated):
             vars["icon"] = "None"
         for type in [ "simple_event", "meeting" ]:
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            stylesheets = styleMgr.getStylesheetListForEventType(type)
+            styles = styleMgr.getExistingStylesForEventType(type)
             styleoptions = ""
-            for stylesheet in stylesheets:
+            for styleId in styles:
                 defStyle = self._categ.getDefaultStyle(type)
                 if defStyle == "":
-                    defStyle = styleMgr.getDefaultStylesheetForEventType(type)
-                if stylesheet == defStyle:
+                    defStyle = styleMgr.getDefaultStyleForEventType(type)
+                if styleId == defStyle:
                     selected = "selected"
                 else:
                     selected = ""
-                styleoptions += "<option value=\"%s\" %s>%s</option>" % (stylesheet,selected,styleMgr.getStylesheetName(stylesheet))
+                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
 
 
@@ -1622,17 +1622,17 @@ class WCategoryCreation(wcomponents.WTemplated):
         vars["locator"] = self.__target.getLocator().getWebForm()
         for type in [ "simple_event", "meeting" ]:
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-            stylesheets = styleMgr.getStylesheetListForEventType(type)
+            styles = styleMgr.getExistingStylesForEventType(type)
             styleoptions = ""
-            for stylesheet in stylesheets:
+            for styleId in styles:
                 defStyle = self.__target.getDefaultStyle(type)
                 if defStyle == "":
-                    defStyle = styleMgr.getDefaultStylesheetForEventType(type)
-                if stylesheet == defStyle:
+                    defStyle = styleMgr.getDefaultStyleForEventType(type)
+                if styleId == defStyle:
                     selected = "selected"
                 else:
                     selected = ""
-                styleoptions += "<option value=\"%s\" %s>%s</option>" % (stylesheet,selected,styleMgr.getStylesheetName(stylesheet))
+                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         try:
