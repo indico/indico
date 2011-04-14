@@ -17,12 +17,10 @@
                             <% end %>
                             </span>
                             <% if prebookingsRejected: %>
-                                <br /><br />
                                 <span class="actionSucceeded"><%= subtitle %></span>
                                 <p style="margin-left: 6px;"><%= description %></p>
                             <% end %>
-                            <br /><br />
-                            <div style="margin: 22px 0px 16px 0px;" id="roomBookingCal"></div>
+                            <div style="margin: 12px 0px 16px 0px;" id="roomBookingCal"></div>
                         </td>
                     </tr>
                 </table>

@@ -203,7 +203,7 @@ type ("RoomBookingCalendarDrawer", [],
                     window.location = bar.bookingUrl;
                 });
                 barDiv.observeEvent('mouseover', function(event){
-                    domTT_activate(this, event, 'content', resvInfo, 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );
+                    domTT_activate(barDiv.dom, event, 'content', resvInfo, 'delay', 100, 'maxWidth', 320, 'styleClass', 'tip' );
                 });
                 return barDiv;
             },
@@ -226,7 +226,7 @@ type ("RoomBookingCalendarDrawer", [],
                         Html.div( {className:"barUnaval", style:{display: 'inline', position:'relative', fontSize: '80%', marginLeft: pixels(8), padding: "0px 5px 0px 5px"}}, $T("Booking")),
                         Html.div( {className:"barPreB", style:{display: 'inline', position:'relative', fontSize: '80%', marginLeft: pixels(8), padding: "0px 5px 0px 5px"}}, $T("PRE-Booking")),
                         Html.div( {className:"barCand", style:{display: 'inline', position:'relative', fontSize: '80%', marginLeft: pixels(8), padding: "0px 5px 0px 5px"}}, $T("New Booking")),
-                        Html.div( {className:"barConf", style:{display: 'inline', position:'relative', fontSize: '80%', marginLeft: pixels(8), padding: "0px 5px 0px 5px"}}, $T("Conflict")),
+                        Html.div( {className:"barConf", style:{display: 'inline', position:'relative', fontSize: '80%', marginLeft: pixels(8), padding: "0px 5px 0px 5px", color: "white"}}, $T("Conflict")),
                         Html.div( {className:"barPreC", style:{display: 'inline', position:'relative', fontSize: '80%', marginLeft: pixels(8), padding: "0px 5px 0px 5px"}}, $T("Conflict with PRE-Booking")),
                         Html.div( {className:"barPreConc", style:{display: 'inline', position:'relative', fontSize: '80%', marginLeft: pixels(8), padding: "0px 5px 0px 5px"}}, $T("Concurrent PRE-Bookings")));
             },
@@ -312,7 +312,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                             rooms.push(roomDiv);
                 })
                 if(rooms.size() > 0)
-                    return Html.div({style:{width:pixels(840), marginTop:pixels(40)}}, Html.div({style:{width:pixels(120), height:pixels(20)}}, Html.div({style:{cssFloat:'left', fontWeight:'bold'}},day.date), this.drawHours()), rooms);
+                    return Html.div({style:{width:pixels(840), marginTop:pixels(40)}}, Html.div({style:{width:pixels(120), height:pixels(20)}}, Html.div({style:{cssFloat:'left', fontWeight:'bold'}}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d")), this.drawHours()), rooms);
             },
 
             /**
@@ -347,18 +347,30 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 each(day.rooms[0].bars,
                         function(bar){
                     bars.push(self.drawBar(bar));
-                })
-                return Html.div({style:{clear:'both', width:pixels(120), paddingTop:pixels(5)}},
-                        Html.a({href:this.room.getBookingFormUrl(day.date), style:{display:'block', cssFloat:'left', width:pixels(125)}},day.date),
+                });
+
+
+                var dateClass = "weekday";
+                var dateArray = day.date.split('-');
+                var date = new Date(dateArray[0], dateArray[1]-1, dateArray[2]);
+                if (date.getDay() == 0 || date.getDay() == 6)
+                    dateClass = "weekend";
+                if (this.room.nonBookableDates) {
+                    return Html.span({title: $T("This room cannot be booked for this date due to maintenance reasons"), className: "unavailable"}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
+                } else {
+                    return Html.div({style:{clear:'both', width:pixels(120), paddingTop:pixels(5)}},
+                        Html.a({href:this.room.getBookingFormUrl(day.date),  className : 'dateLink ' + dateClass,
+                            style:{display:'block', cssFloat:'left', width:pixels(125)}}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d")),
                         Html.div({style:{cssFloat:'left'}},
                         Html.div('dayCalendarDiv',bars, this.drawSmallHours())));
+                }
             },
 
             drawHeader: function(){
                 if( this.room )
-                    var singleDayHeader = Html.div({className:"formTitle", style:{borderBottom: pixels(0), margin: pixels(20)}},
-                                          $T("Availability for "), this.data.days[0].rooms[0].room.getFullName(false),
-                                          Html.a({href:this.room.getDetailsUrl(), style:{fontSize:"x-small"}}, $T("  ( show 3 months preview)" )));
+                    var singleDayHeader = Html.div({style:{marginBottom: pixels(20)}}, Html.span({className:"formTitle", style:{borderBottom: pixels(0)}},
+                                                  $T("Availability for "), this.data.days[0].rooms[0].room.getFullName(false)),
+                                                  Html.a({href:this.room.getDetailsUrl(), style:{fontSize:"x-small"}}, $T("  ( show 3 months preview)" )));
                 else
                     var singleDayHeader = Html.div({className:"formTitle", style:{borderBottom: pixels(0), margin: pixels(20)}},
                                           $T("No bookings were made "));
@@ -575,7 +587,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     contentLoaded = false;
                     showContent = false;
                     var arrowDown = Html.img({src:imageSrc("menu_arrow_black.png"), style:{display:"inline"}});
-                    var toggleSummary = Html.span({className:"fakeLink"},
+                    var toggleSummary = Html.span({className:"fakeLink", style:{paddingRight:pixels(2)}},
                             $T("Display room booking summary "));
                     toggleSummary.observeClick(function(){
                         if(!contentLoaded) {
@@ -597,7 +609,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     })
                     content = Html.div({});
                     return Html.div({style:{clear:'both', marginTop: pixels(45)}},
-                            Html.div({style:{background:"#F5F5F5", width:pixels(820), textAlign:'center'}},toggleSummary, arrowDown), content);
+                            Html.div({style:{background:"#F5F5F5", width:pixels(820), textAlign:'center', padding: pixels(10)}},toggleSummary, arrowDown), content);
                 }
             }
 
@@ -612,8 +624,8 @@ type ("RoomBookingCalendarSummaryDrawer", [],
 /**
  * A bar used to change calendar date. It supports going to next and previous period
  * and choosing a specified date from a calendar as well.
- * @param {string} prevUrl url of the previous period
- * @param {string} nextUrl url of the next period
+ * @param {string} prevURL url of the previous period
+ * @param {string} nextURL url of the next period
  * @param {string} formUrl url of the calendar form
  * @param {string} startD period's start date
  * @param {string} endD period's end date
@@ -628,9 +640,9 @@ type("RoomBookingPrevNext", [],
              */
             draw: function(){
                 var self = this;
-                var prevLink = Html.a({href:this.prevUrl, style:{fontSize:'xx-small', cssFloat: 'left', width:"15%"}}, "< " + $T('previous') + " " + this.periodName);
-                var nextLink = Html.a({href:this.nextUrl, style:{fontSize:'xx-small', cssFloat: 'right'}}, $T('next') + " " + this.periodName + " >");
-                var calendarButton = Html.div("fakeLink", $T("change period"));
+                var prevLink = Html.a({href:this.prevURL, style:{fontSize:'xx-small', cssFloat: 'left', width:"15%"}}, "< " + $T('previous') + " " + this.periodName);
+                var nextLink = Html.a({href:this.nextURL, style:{fontSize:'xx-small', cssFloat: 'right'}}, $T('next') + " " + this.periodName + " >");
+                var calendarButton = Html.span("fakeLink", $T("change period"));
 
                 calendarButton.observeClick(function() {
                     var dlg = new DateRangeSelector(self.startD, self.endD, function(startDate, endDate) {
@@ -650,12 +662,12 @@ type("RoomBookingPrevNext", [],
                 var verbosePeriod = this.startD == this.endD? this.endD : this.startD + " -> " + this.endD;
 
                 return Html.div({style:{height:pixels(33), width:pixels(820), backgroundColor:"#F5F5F5", clear:"both", marginTop:pixels(35), marginBottom:pixels(20)}},
-                        prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, calendarButton), nextLink);
+                        prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, Html.br(), calendarButton), nextLink);
             }
         },
         function(prevNextBarArgs){
-            this.prevUrl = prevNextBarArgs.prevUrl;
-            this.nextUrl = prevNextBarArgs.nextUrl;
+            this.prevURL = prevNextBarArgs.prevURL;
+            this.nextURL = prevNextBarArgs.nextURL;
             this.formUrl = prevNextBarArgs.formUrl;
             this.periodName = prevNextBarArgs.periodName;
             this.startD = prevNextBarArgs.startD;
