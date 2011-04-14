@@ -718,6 +718,11 @@ class CalendarDayIndex(Persistent):
         return res
 
     def getObjectsIn( self, sDate, eDate ):
+        """
+        TODO: Reimplement using iterateObjectsIn!!
+        (or get rid of this one, as the other should be faster)
+        """
+
         sDay = datetime(sDate.year, sDate.month, sDate.day)
         eDay = datetime(eDate.year, eDate.month, eDate.day)
         res = set()
@@ -733,13 +738,56 @@ class CalendarDayIndex(Persistent):
             res.update(self.getObjectsInDays( sDay + timedelta(1), eDay - timedelta(1) ))
         return res
 
+    def iterateObjectsIn(self, sDate, eDate):
+        sDay = datetime(sDate.year, sDate.month, sDate.day) if sDate else None
+        eDay = datetime(eDate.year, eDate.month, eDate.day) if eDate else None
+
+        if sDay and sDay == eDay:
+            if int(datetimeToUnixTime(sDay)) in self._idxDay:
+                for event in self._idxDay[int(datetimeToUnixTime(sDay))]:
+                    if event.getStartDate() <= eDate and event.getEndDate() >= sDate:
+                        yield event
+            return
+
+        # keep track of the records that have been already sent
+
+        if sDay and int(datetimeToUnixTime(sDay)) in self._idxDay:
+            for event in self._idxDay[int(datetimeToUnixTime(sDay))]:
+                if event.getEndDate() >= sDate:
+                    yield event
+
+        if sDay and eDay:
+            fromTS, toTS = sDay + timedelta(1), eDay - timedelta(1)
+        elif sDay:
+            fromTS, toTS = sDay + timedelta(), None
+        elif eDay:
+            fromTS, toTS = None, eDay - timedelta(1)
+        else:
+            fromTS, toTS = None, None
+
+        for evt in self.iterateObjectsInDays(fromTS, toTS):
+            yield evt
+
+        if eDay and int(datetimeToUnixTime(eDay)) in self._idxDay:
+            for event in self._idxDay[int(datetimeToUnixTime(eDay))]:
+                if event.getStartDate() <= eDate:
+                    yield event
+
     def getObjectsInDays( self, sDate=None, eDate=None ):
         sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day))) if sDate else None
         eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day))) if eDate else None
         res = set()
-        for day in self._idxDay.values(sDay, eDay):
-            res.update(day)
+        for event in self._idxDay.values(sDay, eDay):
+            res.update(event)
         return res
+
+    def iterateObjectsInDays(self, sDate=None, eDate=None):
+
+        sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day))) if sDate else None
+        eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day))) if eDate else None
+        for day in self._idxDay.itervalues(sDay, eDay):
+            for event in day:
+                yield event
 
     def getObjectsEndingAfter( self, date ):
         day = datetime(date.year, date.month, date.day)

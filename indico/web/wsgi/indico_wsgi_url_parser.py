@@ -25,8 +25,11 @@ import os
 from MaKaC.common import Config
 from MaKaC.services import handler
 
+from indico.web.http_api import handlers as export_handlers
+
 DIR_HTDOCS = Config.getInstance().getHtdocsDir()
 DIR_SERVICES = os.path.dirname(handler.__file__)
+DIR_MODULES = os.path.dirname(export_handlers.__file__)
 
 """
 urlMapping stores the modules and handlers for every page we want,
@@ -44,7 +47,8 @@ urlMapping = {'':   ((DIR_HTDOCS, 'index.py'), 'index', '', None), \
     'event':        ((DIR_HTDOCS, 'events.py'), 'index', 'genericRewrite', \
                         {'queryReplacement': 'tag'}), \
     'categ':        ((DIR_HTDOCS, 'categoryDisplay.py'), 'index', 'genericRewrite', \
-                        {'queryReplacement': 'categId'})
+                        {'queryReplacement': 'categId'}),
+    'export':       ((DIR_MODULES, 'handlers.py'), 'handler', '', None)
 }
 
 def is_static_path(path):
