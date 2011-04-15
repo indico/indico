@@ -2586,7 +2586,6 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
     def _getModPayHTML(self):
         forms=""
         html=[]
-
         regForm = self._conf.getRegistrationForm()
         for m in self.modPay.getSortedModPay():
             if m.isEnabled():
