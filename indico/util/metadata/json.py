@@ -38,3 +38,6 @@ class JSONSerializer(Serializer):
 
     def __call__(self, fossil):
         return json.encode(fossil, pretty=self.pretty)
+
+
+Serializer.register('json', JSONSerializer)

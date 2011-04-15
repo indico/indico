@@ -38,7 +38,7 @@ class XMLSerializer(Serializer):
         if type(value) == datetime:
             return value.isoformat()
         else:
-            return value
+            return value.decode('utf-8') if type(value) == str else value
 
     def _xmlForFossil(self, fossil, doc=None):
         attribs = {'fossil': fossil['_fossil']}
@@ -53,7 +53,10 @@ class XMLSerializer(Serializer):
         for k, v in fossil.iteritems():
             if k not in ['_fossil', '_type', 'id']:
                 elem = etree.SubElement(felement, k)
-                elem.text = str(self._convert(v))
+                try:
+                    elem.text = self._convert(v)
+                except:
+                    raise Exception((attribs['id'], self._convert(v)))
 
     def __call__(self, fossil):
         xml_declaration = False
@@ -69,3 +72,6 @@ class XMLSerializer(Serializer):
 
         return etree.tostring(result, pretty_print=self.pretty,
                               xml_declaration=xml_declaration, encoding='utf-8')
+
+
+Serializer.register('xml', XMLSerializer)

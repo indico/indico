@@ -48,6 +48,10 @@ class IConferenceMetadataFossil(IFossil):
     def getType(self):
         pass
 
+    def getOwner(self):
+        pass
+    getOwner.convert = lambda x: x.getTitle()
+
     def getTimezone(self):
         pass
 

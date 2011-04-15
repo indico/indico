@@ -321,8 +321,8 @@ def registerHelpers(objDict):
             objDict['user'] = "ERROR: Assign self._rh = rh in your WTemplated.__init__( self, rh ) method."
         else:
             objDict['user'] = objDict['__rh__']._getUser()  # The '__rh__' is set by framework
-    if not 'rh' in objDict:
-        objDict['rh'] = objDict.get('__rh__', None)
+    if 'rh' not in objDict and '__rh__' in objDict:
+        objDict['rh'] = objDict['__rh__']
     if not roomClass in objDict:
         objDict['roomClass'] = roomClass
     if not 'systemIcon' in objDict:

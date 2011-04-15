@@ -36,6 +36,7 @@ from indico.util.date_time import nowutc
 from indico.util.fossilize import fossilize
 
 from indico.util.metadata import Serializer
+from indico.web.http_api.html import HTML4Serializer
 from indico.web.http_api.fossils import IConferenceMetadataFossil
 
 # indico legacy imports
@@ -170,6 +171,7 @@ class ExportInterface(object):
 
         self._dbi.endRequest(False)
 
+        Serializer.register('html', HTML4Serializer)
         serializer = Serializer.create(dformat, pretty=pretty)
 
         # TODO: set content-type

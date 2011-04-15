@@ -20,8 +20,14 @@
 
 class Serializer(object):
 
+    registry = {}
+
     def __init__(self, pretty=False):
         self.pretty = pretty
+
+    @classmethod
+    def register(cls, tag, serializer):
+        cls.registry[tag] = serializer
 
     @classmethod
     def create(cls, dformat, **kwargs):
@@ -29,15 +35,7 @@ class Serializer(object):
         A serializer factory
         """
 
-        from indico.util.metadata.html import HTML4Serializer
-        from indico.util.metadata.json import JSONSerializer
-        from indico.util.metadata.xml import XMLSerializer
-
-        registry = {'json': JSONSerializer,
-                    'xml': XMLSerializer,
-                    'html': HTML4Serializer}
-
-        serializer = registry.get(dformat)
+        serializer = cls.registry.get(dformat)
 
         if serializer:
             return serializer(**kwargs)
