@@ -34,7 +34,7 @@ class Conversion:
                 date = dt.astimezone(tz)
             else:
                 date = dt
-            return {'date': str(date.date()), 'time': str(date.time())}
+            return date
         else:
             return None
 

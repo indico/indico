@@ -19,7 +19,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.common.security import Sanitization
 
-import simplejson
 from MaKaC.common.fossilize import fossilize, NonFossilizableException
 from MaKaC.fossils.error import ICausedErrorFossil
 try:
@@ -34,13 +33,7 @@ from MaKaC.services.interface.rpc.common import NoReportError
 from MaKaC.services.interface.rpc.process import ServiceRunner
 
 from MaKaC.common.logger import Logger
-
-# Test if simplejson escapes forward slashes. It changed its behaviour im some version.
-if '\\/' in simplejson.dumps('/'):
-    dumps = simplejson.dumps
-else:
-    def dumps(*args, **kwargs):
-        return simplejson.dumps(*args, **kwargs).replace('/', '\\/')
+from indico.util.json import dumps
 
 class Json:
     def __init__(self, content):

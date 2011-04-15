@@ -23,16 +23,25 @@ try:
 except ImportError:
     import json as _json
 
+from datetime import datetime
 from indico.util.i18n import LazyProxy
 
+# Test if simplejson escapes forward slashes. It changed its behaviour im some version.
+if '\\/' in _json.dumps('/'):
+    _json_dumps = simplejson.dumps
+else:
+    def _json_dumps(*args, **kwargs):
+        return _json.dumps(*args, **kwargs).replace('/', '\\/')
 
-class I18nJSONEncoder(_json.JSONEncoder):
+class _JSONEncoder(_json.JSONEncoder):
     """
-    Custom JSON encoder that supports i18n lazy strings
+    Custom JSON encoder that supports more types
     """
     def default(self, o):
         if isinstance(o, LazyProxy):
             return str(o)
+        elif type(o) is datetime:
+            return {'date': str(o.date()), 'time': str(o.time()), 'tz': str(o.tzinfo)}
         return _json.JSONEncoder.default(self, o)
 
 
@@ -40,7 +49,9 @@ def dumps(obj, **kwargs):
     """
     Simple wrapper around json.dumps()
     """
-    return _json.dumps(obj, cls=I18nJSONEncoder, **kwargs)
+    if kwargs.pop('pretty', False):
+        kwargs['indent'] = 4 * ' '
+    return _json_dumps(obj, cls=_JSONEncoder, **kwargs)
 
 
 def loads(string):
@@ -54,4 +65,4 @@ def json_filter(obj):
     """
     Mako filter
     """
-    return _json.dumps(obj)
+    return _json_dumps(obj)

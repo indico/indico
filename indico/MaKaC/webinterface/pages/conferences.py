@@ -22,8 +22,7 @@ import urllib
 import os
 import string
 import random
-import simplejson
-import os.path
+from indico.util import json
 
 from datetime import timedelta,datetime
 from xml.sax.saxutils import quoteattr, escape
@@ -1335,7 +1334,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             vars['extractInfoForButton'] = lambda item : self._extractInfoForButton(item)
             vars['getItemType'] = lambda item : self._getItemType(item)
             vars['getLocationInfo'] = MaKaC.common.utils.getLocationInfo
-            vars['dumps'] = simplejson.dumps
+            vars['dumps'] = json.dumps
         else:
             outGen = outputGenerator(self._rh._aw)
             varsForGenerator = self._getBodyVariables()
@@ -1470,12 +1469,12 @@ class WConferenceTimeTable(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        vars["ttdata"] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
+        vars["ttdata"] = json.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                                                           tz, self._aw,
                                                                           useAttrCache = True))
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        vars['eventInfo'] = simplejson.dumps(eventInfo)
+        vars['eventInfo'] = json.dumps(eventInfo)
         vars['timetableLayout'] = vars.get('ttLyt','')
         return vars
 
@@ -3427,13 +3426,13 @@ class WConfModifScheduleGraphic(wcomponents.WTemplated):
         #################################
         vars["editURL"]=quoteattr(str(urlHandlers.UHConfModScheduleDataEdit.getURL(self._conf)))
 
-        vars['ttdata'] = simplejson.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
+        vars['ttdata'] = json.dumps(schedule.ScheduleToJson.process(self._conf.getSchedule(), tz, None,
                                                                             days = None, mgmtMode = True))
         vars['customLinks'] = self._customLinks
 
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz = tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        vars['eventInfo'] = simplejson.dumps(eventInfo)
+        vars['eventInfo'] = json.dumps(eventInfo)
 
         return vars
 

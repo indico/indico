@@ -67,6 +67,8 @@ def handler(req, **params):
         orderBy = get_query_parameter(qdata, ['o', 'order'])
         descending = get_query_parameter(qdata, ['c', 'descending'], False)
         detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
+        pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no')
+        tz = get_query_parameter(qdata, ['tz'], None)
 
         expInt = ExportInterface(DBMgr.getInstance())
 
@@ -77,7 +79,8 @@ def handler(req, **params):
             limit = get_query_parameter(qdata, ['n', 'limit'], integer=True)
 
             return expInt.category(idlist, dformat, fromDT, toDT, location,
-                                   limit, orderBy, descending, detail)
+                                   limit, orderBy, descending, detail, tz,
+                                   True if pretty == 'yes' else False)
     else:
         # TODO: usage page
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND

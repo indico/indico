@@ -33,6 +33,10 @@ from simplejson import dumps
 
 # indico imports
 from indico.util.date_time import nowutc
+from indico.util.fossilize import fossilize
+
+from indico.util.metadata import Serializer
+from indico.web.http_api.fossils import IConferenceMetadataFossil
 
 # indico legacy imports
 from MaKaC.common.indexes import IndexesHolder
@@ -48,12 +52,13 @@ class ArgumentValueError(Exception):
 class IExport(Interface):
 
     def category(cls, idlist, dformat, fromDT, toDT, location=None, limit=None,
-               orderBy=None, descending=False, detail="events"):
+               orderBy=None, descending=False, detail="events", pretty=False):
         """
         TODO: Document this
         """
 
-    def event(cls, idlist, dformat, orderBy=None, descending=False, detail="events"):
+    def event(cls, idlist, dformat, orderBy=None, descending=False, detail="events",
+              pretty=False):
         """
         TODO: Document this
         """
@@ -129,13 +134,15 @@ class ExportInterface(object):
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
 
     def category(self, idlist, dformat, fromDT, toDT, location=None, limit=None,
-                 orderBy=None, descending=False, detail="events", tz=None):
+                 orderBy=None, descending=False, detail="events", tzName=None, pretty=False):
 
         self._dbi.startRequest()
 
-        if tz == None:
+        if tzName == None:
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            tz = pytz.timezone(info.getTimezone())
+            tzName = info.getTimezone()
+
+        tz = pytz.timezone(tzName)
 
         fromDT = ExportInterface._getDateTime('from', fromDT, tz) if fromDT != None else None
         toDT = ExportInterface._getDateTime('to', toDT, tz, aux=fromDT) if toDT != None else None
@@ -155,7 +162,7 @@ class ExportInterface(object):
                     terminate = True
                     break
                 if obj not in exclude:
-                    results.append(obj.id)
+                    results.append(fossilize(obj, IConferenceMetadataFossil, tz=tz))
                     exclude.add(obj)
                     counter += 1
             if terminate:
@@ -163,7 +170,11 @@ class ExportInterface(object):
 
         self._dbi.endRequest(False)
 
-        return dumps(results)
+        serializer = Serializer.create(dformat, pretty=pretty)
+
+        # TODO: set content-type
+
+        return serializer(results)
 
     def event(self, idlist, dformat, orderBy=None, descending=False, detail="events"):
         """

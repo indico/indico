@@ -187,13 +187,6 @@ class Fossilizable(object):
         else:
             interface = interfaceArg
 
-        if not interface.providedBy(self):
-
-            raise WrongFossilTypeException("Interface '%s' not provided"
-                                           " by '%s'" %
-                                           (interface.__name__,
-                                            self.__class__.__name__))
-
         return interface
 
     @classmethod
