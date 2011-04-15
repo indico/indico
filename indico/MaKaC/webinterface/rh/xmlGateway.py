@@ -183,7 +183,8 @@ class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
         webcasts.sort(webcast.sortWebcastByDate)
         for wc in webcasts:
             if not wc in wm.whatsOnAir():
-                self._printWebcast(wc,XG)
+                if not wc.getEvent().isProtected():
+                    self._printWebcast(wc,XG)
         XG.closeTag("webcasts")
         XG.closeTag("response")
         self._req.content_type = "text/xml"
