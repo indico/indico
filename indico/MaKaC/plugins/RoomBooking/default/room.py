@@ -29,7 +29,7 @@ from MaKaC.common.Configuration import Config
 from MaKaC.webinterface import urlHandlers
 
 # fossils
-from MaKaC.fossils.room import IRoomMapFossil
+from MaKaC.fossils.roomBooking import IRoomMapFossil, IRoomCalendarFossil
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 # Branch name in ZODB root
@@ -42,7 +42,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
     For documentation of methods see base class.
     """
 
-    fossilizes(IRoomMapFossil)
+    fossilizes(IRoomMapFossil, IRoomCalendarFossil)
 
     __dalManager = Factory.getDALManager()
     vcList = []

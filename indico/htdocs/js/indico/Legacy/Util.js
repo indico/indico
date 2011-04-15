@@ -789,6 +789,17 @@ var IndicoUtil = {
     onclickFunctions : new WatchList(),
 
     // DEPRECATED, in favor of IndicoUI.Dialogs.Util.error
-    errorReport: IndicoUI.Dialogs.Util.error
+    errorReport: IndicoUI.Dialogs.Util.error,
 
+    /**
+     * Simple function used in sorting
+     */
+    compare: function(elem1, elem2){
+        if(elem1 > elem2)
+            return 1;
+        if(elem1 < elem2)
+            return -1;
+        if(elem1 == elem2)
+            return 0;
+    }
 };

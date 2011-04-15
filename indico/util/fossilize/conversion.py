@@ -154,6 +154,15 @@ class Conversion:
             res[resv.room.getFullName()].extend([{'startDateTime': cls.datetime(period.startDT), 'endDateTime':  cls.datetime(period.endDT)} for period in resv.splitToPeriods()])
         return res
 
+    @classmethod
+    def iterable(cls, conversion):
+        def iter(iteList):
+            res = []
+            for i in iteList:
+                res.append(conversion(i))
+            return res
+        return iter
+
 #    @classmethod
 #    def resourceType(cls, obj):
 #

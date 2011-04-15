@@ -5966,11 +5966,14 @@ from MaKaC.rb_factory import Factory
 from MaKaC.rb_tools import iterdays
 from calendar import day_name
 from MaKaC.rb_location import Location, CrossLocationFactory
+from indico.util.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.roomBooking import IRoomBarFossil, IBarFossil
 
-class Bar:
+class Bar( Fossilizable ):
     """
     Keeps data necessary for graphical bar on calendar.
     """
+    fossilizes(IBarFossil)
     PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = xrange( 0, 6 )
     # I know this names are not wisely choosed; it's due to unexpected additions
     # without refactoring
@@ -5990,9 +5993,13 @@ class Bar:
     def __cmp__( self, obj ):
         return cmp( self.type, obj.type )
 
-class RoomBars:
+class RoomBars( Fossilizable ):
+
+    fossilizes(IRoomBarFossil)
+
     room = None
     bars = []
+
     def __init__( self, room, bars ):
         self.room = room
         self.bars = bars
@@ -6232,7 +6239,6 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
     def getVars( self ):
         vars = WTemplated.getVars( self )
         rh = self._rh
-
         vars["reservations"] = rh._resvs
 
         #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
@@ -6246,8 +6252,6 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         vars["description"] = rh._description
         yesterday = datetime.now() - timedelta( 1 )
         vars["yesterday"] = yesterday #datetime( dm.year, dm.month, dm.day, 0, 0, 1 )
-
-        overload = ( len( rh._resvs ) > 300 ) or self._rh._overload
 
         ed = None
         sd = rh._resvEx.startDT.date()
@@ -6273,10 +6277,8 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
 
         if  calendarStartDT.date() == calendarEndDT.date():
             vars["periodName"] = "day"
-            vars["verbosePeriod"] = formatDate(calendarStartDT)
         else:
             vars["periodName"] = "period"
-            vars["verbosePeriod"] = "%s -> %s" % ( formatDate(calendarStartDT), formatDate(calendarEndDT) )
         vars["startD"] = formatDate(calendarStartDT)
         vars["endD"] = formatDate(calendarEndDT)
 
@@ -6297,11 +6299,11 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         if endD != startD:
             period = endD - startD
 
-            prevStartD = startD - period
+            prevStartD = startD - period - timedelta(1)
             prevEndD = startD - timedelta(1)
 
             nextStartD = endD + timedelta(1)
-            nextEndD = endD + period
+            nextEndD = endD + period + timedelta(1)
         else:
             prevStartD = prevEndD = startD - timedelta(1)
             nextStartD = nextEndD = endD + timedelta(1)
@@ -6327,6 +6329,8 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         vars["prevURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Previous )
         vars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL( newParams = newParams4Next )
 
+        vars['overload'] = self._rh._overload
+
         # empty days are shown for "User bookings" and "User pre-bookings"
         # and for the calendar as well
         # but not for the booking search
@@ -6342,7 +6346,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         collisionsOfResvs = []
 
         # there's at least one reservation
-        if len( rh._resvs ) > 0 and not overload:
+        if len( rh._resvs ) > 0:
 
 
             # Prepare the list of Collisions
@@ -6353,42 +6357,33 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                     if p.startDT >= calendarStartDT and p.endDT <= calendarEndDT:
                         collisionsOfResvs.append( Collision( ( p.startDT, p.endDT ), r ) )
 
-            if len( collisionsOfResvs ) > 500:
-                overload = True
-            else:
+            # Translate collisions to Bars
+            for c in collisionsOfResvs:
+                if c.withReservation.isConfirmed:
+                    bars.append( Bar( c, Bar.UNAVAILABLE ) )
+                else:
+                    bars.append( Bar( c, Bar.PREBOOKED ) )
 
-                # Translate collisions to Bars
-                for c in collisionsOfResvs:
-                    if c.withReservation.isConfirmed:
-                        bars.append( Bar( c, Bar.UNAVAILABLE ) )
-                    else:
-                        bars.append( Bar( c, Bar.PREBOOKED ) )
+            bars = barsList2Dictionary( bars )
+            bars = addOverlappingPrebookings( bars )
+            bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
 
-                bars = barsList2Dictionary( bars )
-                bars = addOverlappingPrebookings( bars )
-                bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
+            rooms = []
+            for r in rh._resvs:
+                rooms.append(r.room)
 
-                rooms = []
-                for r in rh._resvs:
-                    rooms.append(r.room)
+            #CrossLocationQueries.getRooms( location = self.location )
+            if not self._rh._onlyMy:
+                rooms = self._rh._rooms
 
-                #rooms = {}
-                #for r in rh._resvs:
-                #    rooms[r.room] = None
-                #rooms = rooms.keys()
+            bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms, user = rh._aw.getUser() )
 
-                #CrossLocationQueries.getRooms( location = self.location )
-                if not self._rh._onlyMy:
-                    rooms = self._rh._rooms
+            vars["Bar"] = Bar
 
-                bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms )
-
-                vars["Bar"] = Bar
-
-                self.__sortUsingCriterion(rh._order, collisionsOfResvs)
+            self.__sortUsingCriterion(rh._order, collisionsOfResvs)
 
         # we want to display every room, with or without reservation
-        elif not overload:
+        else:
             # initialize collision bars
             bars = {}
             bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
@@ -6399,29 +6394,30 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             else:
                     rooms = []
 
-            bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms )
+            bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms, user = rh._aw.getUser() )
 
-
-        vars["unrolledReservations"] = collisionsOfResvs
-        vars["bars"] = bars
-        vars["calendarStartDT"] = calendarStartDT
-        vars["calendarEndDT"] = calendarEndDT
-        vars["iterdays"] = iterdays
-        vars['overload'] = overload
+        fossilizedBars = {}
+        for key in bars:
+            fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
+        vars["barsFossil"] = fossilizedBars
+        vars["showEmptyRooms"] = showEmptyRooms
         vars["manyRooms"] = not self._rh._rooms or len(self._rh._rooms) > 1
-        if not vars["manyRooms"]:
-            vars["room"] = self._rh._rooms[0]
-            vars["withConflicts"] = False
-            bars = []
-            for c in collisionsOfResvs:
-                if c.withReservation.isConfirmed:
-                    bars.append( Bar( c, Bar.UNAVAILABLE ) )
-                else:
-                    bars.append( Bar( c, Bar.PREBOOKED ) )
-            bars = barsList2Dictionary( bars )
-            bars = addOverlappingPrebookings( bars )
-            bars = sortBarsByImportance( bars, calendarStartDT, calendarEndDT )
-            vars["bars"] = bars
+        vars["calendarParams"] = {}
+        if self._title and rh._ofMyRooms:
+            vars["calendarParams"]["ofMyRooms"] ="on"
+        elif rh._onlyMy:
+            vars["calendarParams"]["onlyMy"] = "on"
+        elif rh._allRooms:
+            vars["calendarParams"]["roomGUID"] = "allRooms"
+        else:
+            for room in rh._roomGUIDs:
+                vars["calendarParams"]["roomGUID"]= room
+        if rh._onlyPrebookings:
+            vars["calendarParams"]["onlyPrebookings"] = "on"
+        if rh._onlyBookings:
+            vars["calendarParams"]["onlyBookings"] ="on"
+
+        vars["calendarFormUrl"] = urlHandlers.UHRoomBookingBookingList.getURL()
 
         return vars
 
@@ -6515,22 +6511,26 @@ def getRoomBarsList( rooms ):
     roomBarsList.sort()
     return roomBarsList
 
-def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmptyDays=True, showEmptyRooms=True ):
+def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmptyDays=True, showEmptyRooms=True, user = None ):
     # Input:
     # dayBarsDic is a dictionary date => [bar1, bar2, bar3, ...]
     #
     # Output:
     # newDayBarsDic is a dictionary date => [roomBars1, roomBars2, roomBars3, ...],
     # where roomBars is object JSON:{ room: RoomBase, bars: [bar1, bar2, bar3, ...] }
-    import copy
-    cleanRoomBarsList = getRoomBarsList( rooms )
+    #import copy
+    #cleanRoomBarsList = getRoomBarsList( rooms )
     newDayBarsDic = {}
-
-    s = ""
+    from MaKaC.common.utils import formatDate
     for day in iterdays( calendarStartDT, calendarEndDT ):
         dayBars = dayBarsDic[day.date()]
         roomBarsDic = {}
         for bar in dayBars:
+            bar.canReject = bar.forReservation.canReject(user)
+            if bar.forReservation.repeatability != None:
+                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( bar.forReservation, formatDate(bar.startDT.date()) ))
+            else:
+                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL( bar.forReservation ))
             room = bar.forReservation.room
             if not roomBarsDic.has_key( room ):
                 roomBarsDic[room] = []
@@ -6651,7 +6651,11 @@ class WRoomBookingRoomDetails( WTemplated ):
 
         vars["calendarStartDT"] = calendarStartDT
         vars["calendarEndDT"] = calendarEndDT
-        vars["bars"] = bars
+        bars = introduceRooms( [self._rh._room], bars, calendarStartDT, calendarEndDT, user = self._rh._aw.getUser() )
+        fossilizedBars = {}
+        for key in bars:
+            fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
+        vars["barsFossil"] = fossilizedBars
         vars["iterdays"] = iterdays
         vars["day_name"] = day_name
         vars["Bar"] = Bar
@@ -6912,7 +6916,11 @@ class WRoomBookingRoomCalendar( WTemplated ):
 
         vars["calendarStartDT"] = calendarStartDT
         vars["calendarEndDT"] = calendarEndDT
-        vars["bars"] = bars
+        bars = introduceRooms( [room], bars, calendarStartDT, calendarEndDT, user = self._rh._aw.getUser() )
+        fossilizedBars = {}
+        for key in bars:
+            fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
+        vars["barsFossil"] = fossilizedBars
         vars["iterdays"] = iterdays
         vars["day_name"] = day_name
         vars["Bar"] = Bar

@@ -36,6 +36,7 @@ from MaKaC.common.utils import HolidaysHolder, isWeekend
 from MaKaC.errors import NoReportError
 from MaKaC.webinterface.rh.roomBooking import RoomBookingAvailabilityParamsMixin
 import MaKaC.webinterface.linking as linking
+from MaKaC.common.fossilize import fossilize
 
 class RoomBookingListLocations( ServiceBase ):
 

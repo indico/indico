@@ -129,7 +129,10 @@ var Indico = {
             session: '<%= str(urlHandlers.UHSessionModifAddMaterials.getURL()) %>',
             conference: '<%= str(urlHandlers.UHConfModifAddMaterials.getURL()) %>',
             category: '<%= str(urlHandlers.UHCategoryAddMaterial.getURL()) %>'
-        }
+        },
+
+        RoomBookingForm: "<%= urlHandlers.UHRoomBookingBookingForm.getURL() %>",
+        RoomBookingDetails: "<%= urlHandlers.UHRoomBookingRoomDetails.getURL() %>"
     },
 
     Data: {

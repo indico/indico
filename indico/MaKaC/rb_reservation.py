@@ -31,6 +31,9 @@ from MaKaC.user import AvatarHolder, Avatar
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
+from indico.util.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.roomBooking import IReservationFossil
+
 
 class RepeatabilityEnum( object ):
     """
@@ -75,11 +78,12 @@ NOTIFICATION_SUBJECT_PREFIX = ""
 # Carbon copy of ALL room booking notifications will be send to this email
 EMAIL_FOR_CATCH_ALL_NOTIFICATIONS = ""
 
-class ReservationBase( object ):
+class ReservationBase( Fossilizable ):
     """
     Generic reservation, Data Access Layer independant.
     Represents physical room reservation.
     """
+    fossilizes(IReservationFossil)
 
     # !=> Properties are in the end of class definition
 
