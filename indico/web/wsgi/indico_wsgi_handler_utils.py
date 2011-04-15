@@ -600,36 +600,31 @@ def _check_result(req, result):
     @note: that this function actually takes care of writing the result
         to the client.
     """
-    if result or req.bytes_sent > 0:
-
-        if result is (None or 0):
-            result = ""
-        else:
-            result = str(result)
-
-        # unless content_type was manually set, we will attempt
-        # to guess it
-        if not req.content_type_set_p:
-            # make an attempt to guess content-type
-            if result[:100].strip()[:6].lower() == '<html>' \
-               or result.find('</') > 0:
-                req.content_type = 'text/html'
-            else:
-                req.content_type = 'text/plain'
-
-        if req.header_only:
-            if req.status in (apache.HTTP_NOT_FOUND, ):
-                raise apache.SERVER_RETURN, req.status
-        else:
-            # It might be interesting in future not to use the write callable
-            # with all the web pages. <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
-            req.write(result)
-
-        return apache.OK
-
+    if result is (None or 0):
+        result = ""
     else:
-        req.log_error("publisher: %s returned nothing." % `object`)
-        return apache.HTTP_INTERNAL_SERVER_ERROR
+        result = str(result)
+
+    # unless content_type was manually set, we will attempt
+    # to guess it
+    if not req.content_type_set_p:
+        # make an attempt to guess content-type
+        if result[:100].strip()[:6].lower() == '<html>' \
+           or result.find('</') > 0:
+            req.content_type = 'text/html'
+        else:
+            req.content_type = 'text/plain'
+
+    if req.header_only:
+        if req.status in (apache.HTTP_NOT_FOUND, ):
+            raise apache.SERVER_RETURN, req.status
+    else:
+        # It might be interesting in future not to use the write callable
+        # with all the web pages. <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
+        req.write(result)
+        return req.status
+
+    return apache.OK
 
 def registerException(errorText=""):
     """

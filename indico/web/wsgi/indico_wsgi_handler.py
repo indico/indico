@@ -98,7 +98,7 @@ def application(environ, start_response):
                     if m:
 
                         if type(rh) == ClassType or RHHtdocs not in rh.mro():
-                            plugin_publisher(req, url, rh, m.groupdict())
+                            raise SERVER_RETURN, plugin_publisher(req, url, rh, m.groupdict())
                         else:
                             # calculate the path to the resource
                             possible_static_path = rh.calculatePath(**m.groupdict())
@@ -186,7 +186,7 @@ def plugin_publisher(req, path, rh, urlparams):
     form = dict(req.form)
 
     _convert_to_string(form)
-    _check_result(req, rh(req, **urlparams).process( form ))
+    return _check_result(req, rh(req, **urlparams).process( form ))
 
 def mp_legacy_publisher(req, possible_module, possible_handler):
     """
