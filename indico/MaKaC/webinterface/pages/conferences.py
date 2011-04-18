@@ -5284,10 +5284,12 @@ class WConfModifCFAAddField( wcomponents.WTemplated ):
                 selectedYes = "checked"
                 selectedNo = ""
             fieldType = abf.getType()
+            vars["limitationOption"] = abf.getLimitation()
         else:
             vars["id"] = vars["name"] = vars["caption"] = quoteattr("")
             vars["maxlength"] = 0
             vars["action"] = "Add"
+            vars["limitationOption"] = "words" # by default we show selected the "words" option
         #vars["fieldName"] = """<input type="text" name="fieldId" value=%s size="60">""" % quoteattr(self._fieldId)
         #if self._fieldId == "content":
         #    vars["fieldName"] = """%s<input type="hidden" name="fieldId" value=%s size="60">""" % (self._fieldId, quoteattr(self._fieldId))
@@ -5327,9 +5329,9 @@ class WConfModifCFA( wcomponents.WTemplated ):
                 mandatoryText = _("optional")
             maxCharText = ""
             if int(af.getMaxLength()) != 0:
-                maxCharText = _("max: %s char.") % af.getMaxLength()
+                maxCharText = _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())
             else:
-                maxCharText = _("no char. limit")
+                maxCharText = _("no limited")
             addInfo = "(%s - %s)" % (mandatoryText,maxCharText)
             url=urlHandlers.UHConfModifCFAOptFld.getURL(self._conf)
             url.addParam("fieldId", af.getId())
@@ -5379,29 +5381,6 @@ class WConfModifCFA( wcomponents.WTemplated ):
     </form>""") % urlRemove)
         laf.append("</form>")
         return "".join(laf)
-
-    def _getNotifTplsHTML(self):
-        res=[]
-        for tpl in self._conf.getAbstractMgr().getNotificationTplList():
-            res.append("""
-                <tr>
-                    <td bgcolor="white" nowrap>
-                        <a href=%s><img src=%s border="0" alt=""></a>
-                        <a href=%s><img src=%s border="0" alt=""></a>
-                        <input type="checkbox" name="selTpls" value=%s>
-                    </td>
-                    <td bgcolor="white" align="left" nowrap><a href=%s>%s</a></td>
-                    <td>&nbsp;<td>
-                    <td bgcolor="white" align="left" width="90%%"><font size="-1">%s</font></td>
-                </tr>"""%(quoteattr(str(urlHandlers.UHConfModCFANotifTplUp.getURL(tpl))),\
-                            quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))),\
-                            quoteattr(str(urlHandlers.UHConfModCFANotifTplDown.getURL(tpl))),\
-                            quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),\
-                            quoteattr(str(tpl.getId())), \
-                            quoteattr(str(urlHandlers.UHAbstractModNotifTplDisplay.getURL(tpl))), \
-                            self.htmlText(tpl.getName()), \
-                            self.htmlText(tpl.getDescription())))
-        return "".join(res)
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
@@ -5469,7 +5448,6 @@ class WConfModifCFA( wcomponents.WTemplated ):
         vars["enablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "enabledSection" )))
         vars["disablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "disabledSection" )))
         vars["abstractFields"]=self._getAbstractFieldsHTML(vars)
-        vars["notifTpls"]=self._getNotifTplsHTML()
         vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
         vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
         return vars

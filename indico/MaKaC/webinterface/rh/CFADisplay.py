@@ -41,6 +41,7 @@ import MaKaC.conference as conference
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+import util.text as textUtils
 
 
 class RHBaseCFA( RHConferenceBaseDisplay ):
@@ -242,10 +243,14 @@ class AbstractData:
             id = f.getId()
             caption = f.getCaption()
             ml = f.getMaxLength()
+            limitation = f.getLimitation()
             if f.isMandatory() and self._otherFields.get(id,"") == "":
                 errors.append(_("The field <b>%s</b> is mandatory") % caption)
-            if ml != 0 and len(self._otherFields.get(id,"")) > ml:
-                errors.append(_("The field <b>%s</b> cannot be more than %s characters") % (caption,ml))
+            if ml != 0:
+                if limitation == "words" and textUtils.wordsCounter(self._otherFields.get(id,"")) > ml:
+                    errors.append(_("The field <b>%s</b> cannot be more than %s words") % (caption,ml))
+                elif limitation == "chars" and len(self._otherFields.get(id,"")) > ml:
+                    errors.append(_("The field <b>%s</b> cannot be more than %s characters") % (caption,ml))
         if len( self.authors.getPrimaryList() ) == 0:
             errors.append( _("No PRIMARY AUTHOR has been specified. You must define at least one primary author") )
         speakerCount = 0
@@ -276,7 +281,9 @@ class AbstractData:
         if speakerCount == 0:
             errors.append( _("At least ONE PRESENTER must be specified") )
         if not self.tracks and self._absMgr.areTracksMandatory():
-            errors.append( _("At least ONE TRACK must be seleted") )
+            # check if there are tracks, otherwise the user cannot select at least one
+            if len(self._absMgr.getConference().getTrackList()) != 0:
+                errors.append( _("At least ONE TRACK must be seleted") )
         return errors
 
     def toDict( self ):

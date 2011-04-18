@@ -85,7 +85,7 @@ class Abstract:
         self._otherFields = {}
         for f in self._afm.getFields():
             id = f.getId()
-            self._otherFields[id] = data.get(id,"").strip()
+            self._otherFields[id] = data.get("f_"+id,"").strip()
         self._contribTypeId=data.get("contribType", "")
         self._primAuthors=[]
         for i in range(len(data.get("auth_prim_id",[]))):

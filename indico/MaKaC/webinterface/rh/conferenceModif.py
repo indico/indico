@@ -90,6 +90,7 @@ from MaKaC.rb_tools import FormMode
 from indico.modules.scheduler import tasks, Client
 
 
+
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
 
     def _checkParams( self, params ):
@@ -6988,6 +6989,7 @@ class RHConfPerformAddAbstractField( RHConfModifCFABase ):
         self._fieldMaxLength = params.get("fieldMaxLength", 0)
         if self._fieldMaxLength.strip() == "":
             self._fieldMaxLength = 0
+        self._fieldLimitation = params.get("limitation", "chars")
         try:
             self._fieldMaxLength = int(self._fieldMaxLength)
         except ValueError:
@@ -7003,7 +7005,9 @@ class RHConfPerformAddAbstractField( RHConfModifCFABase ):
 
     def _process( self ):
         if not self._cancel:
-            id=self._conf.getAbstractMgr().addAbstractField(self._fieldId, self._fieldName, self._fieldCaption, self._fieldMaxLength, self._fieldIsMandatory, self._fieldType)
+            id=self._conf.getAbstractMgr().addAbstractField(self._fieldId, self._fieldName, self._fieldCaption, \
+                                                            self._fieldMaxLength, self._fieldIsMandatory, self._fieldType, \
+                                                            self._fieldLimitation)
         self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
 
 class RHConfRemoveAbstractField( RHConfModifCFABase ):

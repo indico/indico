@@ -1,12 +1,13 @@
 <% from MaKaC.webinterface.common.abstractNotificator import EmailNotificator %>
 
 <form action=${ postURL } method="POST" onsubmit="return notifTplManager.checkFields();">
-<table width="90%" cellspacing="2" align="left" border="0" style="padding-left:5px;">
+<table width="90%" cellspacing="0" align="center" border="0">
     % if len(errors) != 0:
         % for error in errors:
-            <tr>
-                <td nowrap colspan="3" class="formError">
-                    <span>${ error }</span>
+            <tr align="left">
+                <td></td>
+                <td bgcolor="white" nowrap colspan="3" style="font-weight: bold; color: #881122; padding-bottom:10px; padding-top:10px; padding-left:10px;">
+                    ${ error }
                 </td>
             </tr>
         % endfor
@@ -79,8 +80,8 @@
                 </tr>
                 % for var in EmailNotificator.getVarList():
                 <tr class="legendTr">
-                    <td width="100%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px; text-align:left;">|${ var.getName() }|</td>
-                    <td class="legendTd" onClick="insertTag('|${ var.getName() }|')">Insert</td>
+                    <td width="100%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px; text-align:left;">{${ var.getName() }}</td>
+                    <td class="legendTd" onClick="insertTag('{${ var.getName() }}')">${ _("Insert")}</td>
                 </tr>
                 % endfor
             </table>

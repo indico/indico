@@ -164,6 +164,10 @@ class WNewAbstractSubmission( wcomponents.WTemplated ):
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAbstractSubmission
 
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+               self._includeJSPackage('Management')
+
     def _getBody( self, params ):
         wc = WNewAbstractSubmission( self._getAW(), self._conf )
         return wc.getHTML( params )
@@ -518,6 +522,8 @@ class WAbstractDataModification( wcomponents.WTemplated ):
 
     def __init__( self, conf ):
         self._conf = conf
+        self._limitedFieldList = []
+        self._mandatoryFieldList = [] # all mandatory fields ids, except which are also limited
 
     def _getAdditionalFieldsHTML(self, vars):
         html = ""
@@ -537,16 +543,25 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                 else:
                     mandatoryText = ""
                 nbRows = 10
-                if maxLength > 0:
-                    nbRows = int(int(maxLength)/85) + 1
-                    maxLengthJS = i18nformat("""<small><input name="maxchars%s" size="4" value="%s" disabled> _("char. left")</small>""") % (id.replace(" ", "_"),maxLength)
-                    maxLengthText = """ onkeyup="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}; this.form.maxchars%s.value = %s - this.value.length;" onchange="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}" """ % (maxLength,maxLength,id.replace(" ", "_"),maxLength,maxLength,maxLength)
+                if maxLength > 0: # it means there is a limit for the field in words or in characters
+                    self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), f.getLimitation(), str(isMandatory)]) # append the textarea/input id
+                    if f.getLimitation() == "words":
+                        nbRows = int((int(maxLength)*4.5)/85) + 1 # ~5 (4.5 + 1 space) is the average size of one word in english
+                        maxLengthJS = i18nformat("""<small><input name="maxwords%s" id="maxLimitionCounter_%s" size="4" value="%s" disabled> _("words left")</small>""") % (id.replace(" ", "_"), id.replace(" ", "_"), maxLength)
+                    else:
+                        nbRows = int(int(maxLength)/85) + 1
+                        maxLengthJS = i18nformat("""<small><input name="maxchars%s" id="maxLimitionCounter_%s" size="4" value="%s" disabled> _("chars left")</small>""") % (id.replace(" ", "_"), id.replace(" ", "_"), maxLength)
+                    if (nbRows > 30):
+                        nbRows = 30 # maximum size of the field.
                 else:
-                    maxLengthJS = maxLengthText = ""
+                    maxLengthJS =  ""
+                    # check if the field is mandatory (it is not limited)
+                    if isMandatory:
+                        self._mandatoryFieldList.append("f_"+id)
                 if type == "textarea":
-                    field = """<textarea name="%s" width="100%%" rows="%s" %s style="width:100%%">%s</textarea>""" % ( "f_%s"%id, nbRows, maxLengthText, value )
+                    field = """<textarea id="%s" name="%s" width="100%%" rows="%s" style="width:100%%">%s</textarea>""" % ( "f_%s"%id, "f_%s"%id, nbRows, value )
                 elif type == "input":
-                    field = """<input name="%s" value="%s" style="width:100%%" %s>""" % ("f_%s"%id, value, maxLengthText)
+                    field = """<input id="%s" name="%s" value="%s" style="width:100%%">""" % ("f_%s"%id, "f_%s"%id, value)
 
                 html+="""
                     <tr>
@@ -619,6 +634,8 @@ class WAbstractDataModification( wcomponents.WTemplated ):
 
         vars["comments"] = str( vars.get("comments", "") )
         vars["additionalFields"] = self._getAdditionalFieldsHTML(vars)
+        vars["limitedFieldList"] = self._limitedFieldList
+        vars["mandatoryFieldList"] = self._mandatoryFieldList
         return vars
 
 
@@ -660,6 +677,10 @@ class WAbstractModification( wcomponents.WTemplated ):
 
 class WPAbstractModify( WPAbstractDisplayBase ):
     navigationEntry = navigation.NEAbstractModify
+
+    def getJSFiles(self):
+        return WPAbstractDisplayBase.getJSFiles(self) + \
+               self._includeJSPackage('Management')
 
     def _getBody( self, params ):
         wc = WAbstractModification( self._getAW(), self._abstract )

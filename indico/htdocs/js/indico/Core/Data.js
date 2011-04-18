@@ -222,6 +222,22 @@ Util.DateTime = {
     }
 };
 
+Util.Text = {
+    wordsCounter: function(value) {
+        var fullStr = value + " ";
+        var initialWhitespaceRExp = /^[^A-Za-z0-9]+/gi;
+        var leftTrimmedStr = fullStr.replace(initialWhitespaceRExp, "");
+        var nonAlphanumericsRExp = /[^A-Za-z0-9]+/gi;
+        var cleanedStr = leftTrimmedStr.replace(nonAlphanumericsRExp, " ");
+        var splitString = cleanedStr.split(" ");
+        var wordCount = splitString.length - 1;
+        if (fullStr.length < 2) {
+            wordCount = 0;
+        }
+        return wordCount;
+    }
+};
+
 Protection = {
 
     ParentRestrictionMessages: {

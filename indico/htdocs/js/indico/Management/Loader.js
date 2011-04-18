@@ -6,3 +6,4 @@ include(ScriptRoot + "indico/Management/Timetable.js");
 include(ScriptRoot + "indico/Management/RoomBookingMapOfRooms.js");
 include(ScriptRoot + "indico/Management/NotificationTPL.js");
 include(ScriptRoot + "indico/Management/AbstractReviewing.js");
+include(ScriptRoot + "indico/Management/CFA.js");

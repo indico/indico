@@ -426,7 +426,7 @@ class _PrimAuthIdx(_AuthIdx):
 class AbstractField(Persistent):
     _fieldTypes = [ 'input', 'textarea' ]
 
-    def __init__(self, id, name, caption, maxlength=0, isMandatory=False, type="textarea"):
+    def __init__(self, id, name, caption, maxlength=0, isMandatory=False, type="textarea", limitation="chars"):
         self._id = id
         self._name = name
         self._caption = caption
@@ -434,9 +434,10 @@ class AbstractField(Persistent):
         self._maxLength = maxlength
         self._isMandatory = isMandatory
         self._type = type
+        self._limitation = limitation # possible values: chars, words
 
     def clone(self):
-        af = AbstractField(self.getId(),self.getName(),self.getCaption(),self.getMaxLength(), self.isMandatory(), self.getType())
+        af = AbstractField(self.getId(),self.getName(),self.getCaption(),self.getMaxLength(), self.isMandatory(), self.getType(), self.getLimitation())
         return af
 
     def _notifyModification(self):
@@ -451,6 +452,16 @@ class AbstractField(Persistent):
 
     def setType(self, type):
         self._type = type
+
+    def getLimitation(self):
+        try:
+            return self._limitation
+        except:
+            self._limitation = "chars"
+            return self._limitation
+
+    def setLimitation(self, limitation):
+        self._limitation = limitation
 
     def isMandatory(self):
         try:
@@ -470,12 +481,13 @@ class AbstractField(Persistent):
             self._maxLength=0
             return self._maxLength
 
-    def setValues(self, name, caption, maxlength, isMandatory, fieldType):
+    def setValues(self, name, caption, maxlength, isMandatory, fieldType, fieldLimitation):
         self._name = name
         self._caption = caption
         self._maxLength = maxlength
         self._isMandatory = isMandatory
         self._type = fieldType
+        self._limitation = fieldLimitation
         self._notifyModification()
 
     def setMaxLength(self, maxLength=0):
@@ -604,12 +616,12 @@ class AbstractFieldsMgr(Persistent):
     def _addField(self, field):
         self._fields.append(field)
 
-    def addField(self, id, name, caption, maxlength=0, isMandatory=False, fieldType="textarea"):
+    def addField(self, id, name, caption, maxlength=0, isMandatory=False, fieldType="textarea", fieldLimitation="chars"):
         if self.hasField(id):
-            self.getFieldById(id).setValues(name, caption, maxlength, isMandatory, fieldType)
+            self.getFieldById(id).setValues(name, caption, maxlength, isMandatory, fieldType, fieldLimitation)
         else:
             id=str(self.getFieldGenerator().newCount())
-            absf = AbstractField(id, name, caption, maxlength, isMandatory, fieldType)
+            absf = AbstractField(id, name, caption, maxlength, isMandatory, fieldType, fieldLimitation)
             self._fields.append(absf)
         self._notifyModification()
         return id
@@ -1102,8 +1114,8 @@ class AbstractMgr(Persistent):
         res=self._getPrimAuthIndex().match(query)
         return [self.getAbstractById(id) for id in res]
 
-    def addAbstractField(self, id, name, caption, maxLength=0, isMandatory=False, fieldType="textarea"):
-        return self.getAbstractFieldsMgr().addField(id, name, caption, maxLength, isMandatory, fieldType)
+    def addAbstractField(self, id, name, caption, maxLength=0, isMandatory=False, fieldType="textarea", fieldLimitation="chars"):
+        return self.getAbstractFieldsMgr().addField(id, name, caption, maxLength, isMandatory, fieldType, fieldLimitation)
 
     def removeAbstractField(self, id):
         self.getAbstractFieldsMgr().removeField(id)
@@ -3435,14 +3447,14 @@ class NotificationTemplate(Persistent):
         result = content.replace("%", "%%")
         # find the vars and make the expressions, it is necessary to do in reverse in order to find the longest tags first
         for var in varList:
-            result = result.replace("|"+var.getName()+"|", "%("+var.getName()+")s")
+            result = result.replace("{"+var.getName()+"}", "%("+var.getName()+")s")
         return result
 
     def parseTplContentUndo(self, content, varList):
         # The body content is shown without "%()" and with "%" in instead of "%%" but it is not modified
         result = content
         for var in varList:
-            result = result.replace("%("+var.getName()+")s", "|"+var.getName()+"|")
+            result = result.replace("%("+var.getName()+")s", "{"+var.getName()+"}")
         # replace the %% by %
         result = result.replace("%%", "%")
         return result

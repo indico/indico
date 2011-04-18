@@ -4586,16 +4586,7 @@ class WConfModAbstractEditData(WTemplated):
     def __init__(self,conference,abstractData):
         self._ad=abstractData
         self._conf=conference
-
-    #def _getTitleItemsHTML(self,selected=""):
-    #    titles=["", "Mr.", "Mrs.", "Miss.", "Prof.", "Dr."]
-    #    res=[]
-    #    for t in titles:
-    #        sel=""
-    #        if t==selected:
-    #            sel=" selected"
-    #        res.append("""<option value=%s%s>%s</option>"""%(quoteattr(t),sel,self.htmlText(t)))
-    #    return "".join(res)
+        self._limitedFieldList = []
 
     def _getContribTypeItemsHTML(self):
         res=[ i18nformat("""<option value="">--_("not specified")--</option>""")]
@@ -4764,29 +4755,43 @@ class WConfModAbstractEditData(WTemplated):
                 caption = f.getName()
                 maxLength = int(f.getMaxLength())
                 isMandatory = f.isMandatory()
+                type = f.getType()
                 if isMandatory:
                     mandatoryText = """<font color="red">*</font>"""
                 else:
                     mandatoryText = ""
                 nbRows = 10
                 if maxLength > 0:
-                    nbRows = int(int(maxLength)/85) + 1
-                    maxLengthJS = """<small><br><input name="maxchars%s" size="4" value="%s" disabled> char. remain</small>""" % (id.replace(" ", "_"),maxLength)
-                    maxLengthText = """ onkeyup="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}; this.form.maxchars%s.value = %s - this.value.length;" onchange="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}" """ % (maxLength,maxLength,id.replace(" ", "_"),maxLength,maxLength,maxLength)
+                    self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), f.getLimitation(), str(isMandatory)]) # append the textarea/input id
+                    if f.getLimitation() == "words":
+                        nbRows = int((int(maxLength)*4.5)/85) + 1 # ~5 (4.5 + 1 space) is the average size of one word in english
+                        maxLengthJS = _("""<small><input name="maxwords%s" id="maxLimitionCounter_%s" size="4" value="%s" disabled> _("words left")</small>""") % (id.replace(" ", "_"), id.replace(" ", "_"), maxLength)
+                    else:
+                        nbRows = int(int(maxLength)/85) + 1
+                        maxLengthJS = _("""<small><input name="maxchars%s" id="maxLimitionCounter_%s" size="4" value="%s" disabled> _("chars left")</small>""") % (id.replace(" ", "_"), id.replace(" ", "_"), maxLength)
+                    if (nbRows > 30):
+                        nbRows = 30 # maximum size of the field.
                 else:
-                    maxLengthJS = maxLengthText = ""
-                html += """
+                    maxLengthJS = ""
+                if type == "textarea":
+                    field = """<textarea id="%s" name="%s" width="100%%" rows="%s" style="width:100%%">%s</textarea>""" % ( "f_%s"%id, "f_%s"%id, nbRows, value )
+                elif type == "input":
+                    field = """<input id="%s" name="%s" value="%s" style="width:100%%">""" % ("f_%s"%id, "f_%s"%id, value)
+
+                html+= _("""
                     <tr>
                         <td align="right" valign="top" class="titleCellTD">
                             <span class="titleCellFormat">
-                            %s%s%s
+                            %s%s
+                            <br>
+                            %s
                             </span>
                         </td>
                         <td valign="top">
-                            <textarea name="%s" cols="85" rows="%s" %s>%s</textarea>
+                            %s
                         </td>
                     </tr>
-                """ % ( mandatoryText, _(caption), maxLengthJS, id, nbRows, maxLengthText, value )
+                """) % ( mandatoryText, caption, maxLengthJS, field )
         return html
 
     def getVars(self):
@@ -4797,6 +4802,7 @@ class WConfModAbstractEditData(WTemplated):
         vars["contribTypeItems"]=self._getContribTypeItemsHTML()
         vars["primaryAuthors"]=self._getPrimaryAuthorsHTML()
         vars["coAuthors"]=self._getCoAuthorsHTML()
+        vars["limitedFieldList"] = self._limitedFieldList
         return vars
 
 
