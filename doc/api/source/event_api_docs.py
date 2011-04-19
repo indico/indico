@@ -7,7 +7,7 @@ import conf
 
 PATH = '../../../indico/'
 
-from indico.core.api import IListener, IContributor
+from indico.core.extpoint import IListener, IContributor
 
 
 def iterate_sources(dir, exclude=[]):

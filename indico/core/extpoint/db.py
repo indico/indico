@@ -23,7 +23,7 @@ This is the part of the API that deals with database updates, and initialization
 of database structures for new components
 """
 
-from indico.core.api import IListener
+from indico.core.extpoint import IListener
 
 
 class IDBUpdateListener(IListener):

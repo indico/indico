@@ -132,8 +132,8 @@ var Indico = {
 
         RoomBookingForm: "${ urlHandlers.UHRoomBookingBookingForm.getURL() }",
         RoomBookingDetails: "${ urlHandlers.UHRoomBookingRoomDetails.getURL() }",
-        ConfModifSchedule: "<%= urlHandlers.UHConfModifSchedule.getURL() %>",
-        SubcontrModif: "<%= urlHandlers.UHContribModifSubCont.getURL() %>"
+        ConfModifSchedule: "${ urlHandlers.UHConfModifSchedule.getURL() }",
+        SubcontrModif: "${ urlHandlers.UHContribModifSubCont.getURL() }"
     },
 
     Data: {

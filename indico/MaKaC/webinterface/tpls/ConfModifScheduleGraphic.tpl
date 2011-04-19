@@ -16,7 +16,7 @@ var eventInfo = ${ eventInfo };
 var minWidth = 900;
 var widthOffset = 300;
 var historyBroker = new BrowserHistoryBroker();
-var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset < minWidth ? minWidth : document.body.clientWidth - widthOffset,$E('timetableDiv'), false, historyBroker, false, <%= customLinks %>);
+var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset < minWidth ? minWidth : document.body.clientWidth - widthOffset,$E('timetableDiv'), false, historyBroker, false, ${ customLinks });
 
 IndicoUI.executeOnLoad(function(){
 

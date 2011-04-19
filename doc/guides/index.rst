@@ -16,10 +16,10 @@ Contents:
    ./VideoServicesGuides/index.rst
    ./Chat/index.rst
    ./PaperReviewingGuides/index.rst
+   ./Importer/Importer.rst
    ./AdminGuide/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
-   ./Importer/Importer.rst
 
 
 .. Indices and tables
