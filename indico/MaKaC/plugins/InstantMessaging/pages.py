@@ -34,7 +34,7 @@ from MaKaC.plugins.InstantMessaging.XMPP.helpers import generateCustomLinks, gen
 from MaKaC.i18n import _
 import zope.interface
 from indico.core.extpoint import Component
-from indico.core.extpoint.conference import IEventDisplayContributor
+from indico.core.extpoint.events import IEventDisplayContributor
 
 
 class WPConfModifChat(WPConferenceModifBase):

@@ -37,7 +37,7 @@ from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import zope.interface
 
 from indico.core.extpoint import Component
-from indico.core.extpoint.conference import INavigationContributor
+from indico.core.extpoint.events import INavigationContributor
 
 
 class ChatSMContributor(Component, Observable):

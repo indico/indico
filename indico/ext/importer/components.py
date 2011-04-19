@@ -20,7 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from indico.core.extpoint import Component
-from indico.core.extpoint.conference import ITimetableContributor
+from indico.core.extpoint.events import ITimetableContributor
 from MaKaC.plugins.base import Observable
 import zope.interface
 
