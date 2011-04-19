@@ -28,7 +28,7 @@ This should be easy to adapt to InTRePId 2, in the case of its acceptance.
 from indico.ext.livesync.util import getPluginType
 from indico.ext.livesync.agent import SyncManager
 from indico.ext.livesync.base import MPT_GRANULARITY
-from indico.core.api.db import DBUpdateException
+from indico.core.extpoint.db import DBUpdateException
 
 
 def updateDBStructures(root, granularity=MPT_GRANULARITY):

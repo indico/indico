@@ -1,4 +1,4 @@
-from indico.core.api import IListener
+from indico.core.extpoint import IListener
 
 class IInstantMessagingListener(IListener):
     """ Inserts or deletes objects related to plugins in the DB. To do so, it retrieves the _storage parameter of the Plugin class,

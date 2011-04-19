@@ -22,10 +22,10 @@
 from MaKaC.common.utils import *
 from MaKaC.conference import Conference
 
-from indico.core.api import Component, IListener
-from indico.core.api.events import IObjectLifeCycleListener, ITimeActionListener, \
+from indico.core.extpoint import Component, IListener
+from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, \
      IMetadataChangeListener
-from indico.core.api.location import ILocationActionListener
+from indico.core.extpoint.location import ILocationActionListener
 
 from MaKaC.common.logger import Logger
 import zope.interface

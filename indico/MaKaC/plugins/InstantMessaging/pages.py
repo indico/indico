@@ -33,8 +33,8 @@ from MaKaC.webinterface.rh.conferenceModif import RHMaterialsShow
 from MaKaC.plugins.InstantMessaging.XMPP.helpers import generateCustomLinks, generateLogLink, XMPPLogsActivated, DesktopLinkGenerator, WebLinkGenerator
 from MaKaC.i18n import _
 import zope.interface
-from indico.core.api import Component
-from indico.core.api.conference import IEventDisplayContributor
+from indico.core.extpoint import Component
+from indico.core.extpoint.conference import IEventDisplayContributor
 
 
 class WPConfModifChat(WPConferenceModifBase):

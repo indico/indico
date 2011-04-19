@@ -36,8 +36,8 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import zope.interface
 
-from indico.core.api import Component
-from indico.core.api.conference import INavigationContributor
+from indico.core.extpoint import Component
+from indico.core.extpoint.conference import INavigationContributor
 
 
 class ChatSMContributor(Component, Observable):

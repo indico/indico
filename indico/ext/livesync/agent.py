@@ -28,8 +28,8 @@ import datetime
 import zope.interface
 from persistent import Persistent, mapping
 
-# indico api imports
-from indico.core.api import Component
+# indico extpoint imports
+from indico.core.extpoint import Component
 from indico.util.fossilize import IFossil, fossilizes, Fossilizable, conversion
 
 # plugin imports

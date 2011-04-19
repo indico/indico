@@ -38,7 +38,7 @@ from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata
 
-from indico.core.api import Component, IListener, IContributor
+from indico.core.extpoint import Component, IListener, IContributor
 from indico.web import rh as newrh
 
 

@@ -24,7 +24,7 @@ Base module
 
 # dependency libs
 from persistent import Persistent
-from indico.core.api import IContributor
+from indico.core.extpoint import IContributor
 
 
 MPT_GRANULARITY = 100

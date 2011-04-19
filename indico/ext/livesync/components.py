@@ -27,10 +27,10 @@ Here are included the listeners and other components that are part of the
 from zope.interface import implements
 
 # indico imports
-from indico.core.api import Component
-from indico.core.api.events import IAccessControlListener, IObjectLifeCycleListener, \
+from indico.core.extpoint import Component
+from indico.core.extpoint.events import IAccessControlListener, IObjectLifeCycleListener, \
      IMetadataChangeListener
-from indico.core.api.rh import IServerRequestListener
+from indico.core.extpoint.rh import IServerRequestListener
 from indico.util.date_time import int_timestamp, nowutc
 from indico.util.event import uniqueId
 
