@@ -322,7 +322,7 @@
           <xsl:if test="./broadcasturl != ''">
             <tr>
               <td class="leftCol">Video broadcast</td>
-              <td><a href="{./broadcasturl}">View now</a></td>
+              <td><a href="{./broadcasturl}" target="_blank">View now</a></td>
             </tr>
           </xsl:if>
 
@@ -497,7 +497,7 @@
 
       <xsl:if test="./broadcasturl != ''">
         <br/>
-        <a href="{./broadcasturl}">
+        <a href="{./broadcasturl}" target="_blank">
           <br/>(video broadcast)</a>
       </xsl:if>
      <xsl:if test="count(./location) != 0 and normalize-space(string(../location)) != normalize-space(string(./location))"
@@ -623,7 +623,7 @@
 
 
                 <xsl:if test="./title='live webcast' and ./displayURL != ''">
-                  <a href="{./displayURL}">
+                  <a href="{./displayURL}" target="_blank">
                     <strong>View the live webcast</strong>
                   </a>
                   <xsl:if test="./locked = 'yes'">
@@ -633,7 +633,7 @@
 
                 <xsl:if test="./title='forthcoming webcast' and ./displayURL != ''">
                   Please note that this event will be available <em>live</em> via the
-                  <a href="{./displayURL}">
+                  <a href="{./displayURL}" target="_blank">
                     <strong>Webcast Service</strong>.
                   </a>
                 </xsl:if>
@@ -698,7 +698,7 @@
                       ]]>
                   </xsl:text>
 
-                  <a href="materialDisplay.py?materialId={./ID}&#38;confId={/iconf/ID}">
+                  <a href="materialDisplay.py?materialId={./ID}&#38;confId={/iconf/ID}" target="_blank">
                     <img src="images/{./title}.png" alt="{./title}"/>
                   </a>
                   <xsl:text disable-output-escaping="yes">&#38;nbsp;</xsl:text>
@@ -908,7 +908,7 @@
                                                 </xsl:for-each>
 
                                              <xsl:text disable-output-escaping="yes"><![CDATA[
-                                            joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList');
+                                            joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList', true, false, null, null,true);
                                             var pos = joinLink.getAbsolutePosition();
                                             joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
                                             return false;
@@ -1105,7 +1105,7 @@
                               </xsl:for-each>
                               <xsl:for-each select="./linkLine">
                                 <div>
-                                  <a href="{./href}">
+                                  <a href="{./href}" target="_blank">
                                     <xsl:value-of select="./caption"/>
                                   </a>
                                 </div>
