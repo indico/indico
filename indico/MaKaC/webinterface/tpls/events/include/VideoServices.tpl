@@ -1,24 +1,24 @@
-% if iconf.find('plugins/collaboration/booking'):
+% if bookings:
 <tr>
 <td class="leftCol">Video Services</td>
 <td>
 <div>
-% for position, booking in enumerate(iconf.plugins.collaboration.booking):
-
-    % if position == 2:
+% for pos, booking in enumerate(bookings):
+    <% bookingId = booking.getId() %>
+    % if pos == 2:
         <div id="collShowBookingsDiv">
             <span class="collShowHideBookingsText">
                 <%
-                moreOngoing = len(booking.findall("following-sibling::booking[kind = 'ongoing']"))
-                moreScheduled = len(booking.findall("following-sibling::booking[kind = 'scheduled']"))
+                moreOngoing = sum(1 for b in bookings[pos + 1:] if getBookingKind(b) == 'ongoing')
+                moreScheduled = sum(1 for b in bookings[pos + 1:] if getBookingKind(b) == 'scheduled')
                 %>
                 There are
-                % if booking.kind == 'ongoing':
+                % if getBookingKind(booking) == 'ongoing':
                     ${ 1 + moreOngoing } more ongoing bookings
                     % if moreScheduled > 0:
                         and ${moreScheduled} more scheduled bookings.
                     % endif
-                % elif booking.kind == 'scheduled':
+                % elif getBookingKind(booking) == 'scheduled':
                     ${ 1 + moreScheduled } more scheduled bookings.
                 % endif
             </span>
@@ -30,82 +30,60 @@
     % endif
 
     <!-- Start of a booking line -->
+    <% data = bookingData[booking.getType()] %>
+    <% launchInfo = data.getLaunchInfo(booking) %>
+    <% bookingInfo = data.getInformation(booking) %>
     <div class="collaborationDisplayBookingLine">
-    <span class="collaborationDisplayBookingType">${booking.typeDisplayName}</span>\
-    % if booking.find('startDate'):
-        <%
-        collaborationToday = iconf.plugins.collaboration.todayReference
-        collaborationTomorrow = iconf.plugins.collaboration.tomorrowReference
-        startDate, endDate = booking.startDate.text, booking.endDate.text
-        %>
-        <%def name="shortDate(dateTime)">
-            <% date = dateTime[:10] %>
-            % if date == collaborationToday:
-                today
-            % elif date == collaborationTomorrow:
-                tomorrow
-            % else:
-                <% date = parseDate(dateTime[:10], format('%Y-%m-%d')) %>
-                ${ formatDate(date, format='%a %d/%m') }
-            % endif
-        </%def>
-        % if booking.kind == 'scheduled' and startDate[:10] == endDate[:10]:
-            % if startDate[:10] not in (collaborationToday, collaborationTomorrow):
-                on
-            % endif
-            ${shortDate(startDate)} from ${extractTime(startDate)} to ${extractTime(endDate)}\
-        % else:
-            % if booking.kind == 'scheduled':
-                from ${shortDate(startDate)} at ${extractTime(startDate)} until
-            % elif booking.kind == 'ongoing':
-                ongoing until
-            % endif
-            ${shortDate(endDate)} at ${extractTime(endDate)}\
-        % endif
+    <span class="collaborationDisplayBookingType">${data.getDisplayName()}</span>\
+    % if booking.hasStartDate():
+        ${getBookingKind(booking)}
+        ${formatTwoDates(booking.getAdjustedStartDate(timezone),
+                         booking.getAdjustedEndDate(timezone),
+                         useToday=True, useTomorrow=True, dayFormat='%a %d/%m', capitalize=False)}\
     % endif
-    % if booking.find('firstLineInfo'):
-: ${booking.firstLineInfo}\
+    % if data.getFirstLineInfo(booking):
+: ${data.getFirstLineInfo(booking)}\
     % else:
 .\
 % endif
 <span style="margin-left:20px;"></span>\
-    % if booking.find('information'):
-<span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo${booking.id}">More Info</span>
+    % if bookingInfo:
+<span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo${bookingId}">More Info</span>
     % endif
 
-    % if booking.find('information') and booking.find('launchInfo'):
+    % if bookingInfo and launchInfo:
     <span style="margin-left:8px;margin-right:8px;">|</span>
     % endif
 
-    % if booking.find('launchInfo'):
-    <a target="_blank" href="${booking.launchInfo.launchLink}" id="bookingLaunchLink${booking.id}">
-        ${booking.launchInfo.launchText}
+    % if launchInfo:
+    <a target="_blank" href="${launchInfo['launchLink']}" id="bookingLaunchLink${bookingId}">
+        ${launchInfo['launchText']}
     </a>
     <script type="text/javascript">
-        $E('bookingLaunchLink${booking.id}').dom.onmouseover = function (event) {
-            IndicoUI.Widgets.Generic.tooltip($E('bookingLaunchLink${booking.id}').dom, event,
-                '<div class="collaborationLinkTooltipMeetingLecture">${booking.launchInfo.launchTooltip}</div>');
+        $E('bookingLaunchLink${bookingId}').dom.onmouseover = function (event) {
+            IndicoUI.Widgets.Generic.tooltip($E('bookingLaunchLink${bookingId}').dom, event,
+                '<div class="collaborationLinkTooltipMeetingLecture">${launchInfo['launchTooltip']}</div>');
         }
     </script>
     % endif
 
-    % if booking.find('information'):
+    % if bookingInfo:
     <!-- Start of a booking info line -->
-    <div id="collaborationInfoLine${booking.id}" style="visibility: hidden; overflow: hidden;">
+    <div id="collaborationInfoLine${bookingId}" style="visibility: hidden; overflow: hidden;">
         <div class="collaborationDisplayInfoLine">
             <table>
                 <tbody>
-                % for section in booking.findall('information/section'):
+                % for section in bookingInfo:
                 <tr>
                     <td class="collaborationDisplayInfoLeftCol">
-                        <span>${section.title}</span>
+                        <span>${section['title']}</span>
                     </td>
                     <td class="collaborationDisplayInfoRightCol">
-                        % for line in section.findall('line'):
+                        % for line in section.get('lines', []):
                         <div>${line}</div>
                         % endfor
-                        % for linkLine in section.findall('linkLine'):
-                        <div><a href="${linkLine.href}">${linkLine.caption}</a></div>
+                        % for caption, href in section.get('linkLines', []):
+                        <div><a href="${href}">${caption}</a></div>
                         % endfor
                     </td>
                 </tr>
@@ -116,24 +94,24 @@
     </div>
 
     <script type="text/javascript">
-        $E('collaborationBookingMoreInfo${booking.id}').dom.onmouseover = function (event) {
-            IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo${booking.id}').dom, event,
+        $E('collaborationBookingMoreInfo${bookingId}').dom.onmouseover = function (event) {
+            IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo${bookingId}').dom, event,
                 '<div class="collaborationLinkTooltipMeetingLecture">Click here to show / hide detailed information.</div>');
         }
-        var bookingInfoState${booking.id} = false;
-        var height${booking.id} = IndicoUI.Effect.prepareForSlide('collaborationInfoLine${booking.id}', true);
+        var bookingInfoState${bookingId} = false;
+        var height${bookingId} = IndicoUI.Effect.prepareForSlide('collaborationInfoLine${bookingId}', true);
 
-        $E('collaborationBookingMoreInfo${booking.id}').observeClick(function() {
-            if (bookingInfoState${booking.id}) {
-                IndicoUI.Effect.slide('collaborationInfoLine${booking.id}', height${booking.id});
-                $E('collaborationBookingMoreInfo${booking.id}').set('More Info');
-                $E('collaborationBookingMoreInfo${booking.id}').dom.className = "collaborationDisplayMoreInfo";
+        $E('collaborationBookingMoreInfo${bookingId}').observeClick(function() {
+            if (bookingInfoState${bookingId}) {
+                IndicoUI.Effect.slide('collaborationInfoLine${bookingId}', height${bookingId});
+                $E('collaborationBookingMoreInfo${bookingId}').set('More Info');
+                $E('collaborationBookingMoreInfo${bookingId}').dom.className = "collaborationDisplayMoreInfo";
             } else {
-                IndicoUI.Effect.slide('collaborationInfoLine${booking.id}', height${booking.id});
-                $E('collaborationBookingMoreInfo${booking.id}').set('Hide Info');
-                $E('collaborationBookingMoreInfo${booking.id}').dom.className = "collaborationDisplayHideInfo";
+                IndicoUI.Effect.slide('collaborationInfoLine${bookingId}', height${bookingId});
+                $E('collaborationBookingMoreInfo${bookingId}').set('Hide Info');
+                $E('collaborationBookingMoreInfo${bookingId}').dom.className = "collaborationDisplayHideInfo";
             }
-            bookingInfoState${booking.id} = !bookingInfoState${booking.id}
+            bookingInfoState${bookingId} = !bookingInfoState${bookingId}
         });
     </script>
 
@@ -144,7 +122,7 @@
     <!-- End of a booking line -->
 % endfor
 
-% if len(iconf.plugins.collaboration.booking) > 2:
+% if len(bookings) > 2:
     <div class="collHideBookingsDiv">
       <span class="fakeLink collHideBookingsText" id="collHideBookings">Hide additional bookings</span>
     </div>

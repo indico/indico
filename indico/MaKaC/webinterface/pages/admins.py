@@ -853,7 +853,7 @@ class WAdminsStyles(wcomponents.WTemplated):
         vars["styleMgr"] = styleMgr
         baseTPLPath = styleMgr.getBaseTPLPath()
         baseCSSPath = styleMgr.getBaseCSSPath()
-        vars["contextHelpText"] = i18nformat("""- <b>_("TPL files")</b> _("are mandatory and located in"):<br/>%s<br/>- <b>_("CSS files")</b> _("are optional and located in"):<br/>%s<br/>- <b>_("Lines in red")</b> _("indicate a missing .tpl file (these styles will not be presented to the users"))<br/>- <b>_("CSS files")</b> _("should be named after the ID of the style (plus extension .css)")""") % (baseTPLPath,baseCSSPath)
+        vars["contextHelpText"] = i18nformat("""- <b>_("TPL files")</b> _("are mandatory and located in"):<br/>%s<br/>- <b>_("CSS files")</b> _("are optional and located in"):<br/>%s<br/>- <b>_("Lines in red")</b> _("indicate missing .tpl or .css files (these styles will not be presented to the users"))""") % (baseTPLPath,baseCSSPath)
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("remove")
         return vars
 
@@ -865,19 +865,31 @@ class WPAdminsAddStyle( WPAdminsStyles ):
 
 class WAdminsAddStyle(wcomponents.WTemplated):
 
+    def _getAllFiles(self, basePath, extension, excludedDirs=[]):
+        collectedFiles = []
+        for root, dirs, files in os.walk(basePath):
+            for excluded in excludedDirs:
+                if excluded in dirs:
+                    dirs.remove(excluded)
+            for filename in files:
+                fullPath = os.path.join(root, filename)
+                if os.path.isfile(fullPath) and filename.endswith(extension):
+                    collectedFiles.append(os.path.relpath(fullPath, basePath))
+        return sorted(collectedFiles)
+
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         vars["styleMgr"] = styleMgr
-        availableStyles = []
-        TPLBasePath = styleMgr.getBaseTPLPath()
-        if os.path.exists(TPLBasePath):
-            for filename in os.listdir(TPLBasePath):
-                if os.path.isfile(os.path.join(TPLBasePath, filename)) and filename.endswith(".tpl"):
-                    if filename not in styleMgr.getStyleFilenames():
-                        availableStyles.append(filename)
-        vars["availableStyles"] = availableStyles
-        vars["contextHelpText"] = "Lists all TPL files in %s which are not already used in a declared style" % TPLBasePath
+        baseTPLPath = styleMgr.getBaseTPLPath()
+        baseCSSPath = styleMgr.getBaseCSSPath()
+        baseXSLPath = styleMgr.getBaseXSLPath()
+        vars["availableTemplates"] = self._getAllFiles(baseTPLPath, '.tpl', excludedDirs=['include'])
+        vars["availableStyleSheets"] = self._getAllFiles(baseXSLPath, '.xsl', excludedDirs=['include'])
+        vars["availableCSS"] = self._getAllFiles(baseCSSPath, '.css')
+        vars["xslContextHelpText"] = r"Lists all XSL files in %s (except special folders named \'include\', which are reserved)" % baseXSLPath
+        vars["tplContextHelpText"] = r"Lists all TPL files in %s (except special folders named \'include\', which are reserved)" % baseTPLPath
+        vars["cssContextHelpText"] = "Lists all CSS files in %s" % baseCSSPath
         return vars
 
 class WAdminTemplates(wcomponents.WTemplated):

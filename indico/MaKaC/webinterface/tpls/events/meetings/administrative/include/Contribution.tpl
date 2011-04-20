@@ -1,0 +1,81 @@
+<%page args="item, parent, hideTime=False, allMaterial=False, minutes=False, order=1" />
+
+<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+
+<tr>
+    <td colspan="4"></td>
+</tr>
+<tr>
+    <td class="itemTopAlign">
+        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+    </td>
+    <td class="itemTopAlign itemLeftAlign ">
+        % if not hideTime:
+            <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>&nbsp;&nbsp;${order}.
+        % else:
+            ${order}.
+        % endif
+    </td>
+    <td class="itemTopAlign itemLeftAlign">
+        ${item.getTitle()}
+        <br/>
+        % if minutes:
+            % for minutesText in extractMinutes(item.getAllMaterialList()):
+                ${common.renderDescription(minutesText)}
+            % endfor
+        % endif
+        % if item.getDescription():
+           <br/>
+           ${common.renderDescription(item.getDescription())}
+        % endif
+
+    </td>
+    <td class="itemTopAlign itemRightAlign">
+        % if item.getSpeakerList() or item.getSpeakerText():
+            <span class="participantText">
+                ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), title=False, italicAffilation=True, separator=' ')}
+            </span>
+            <br/>
+        % endif
+        % if not allMaterial:
+            <% materialDocuments = False %>
+            % for material in item.getAllMaterialList():
+                % if material.getTitle()=='document' and item.getReportNumberHolder().listReportNumbers():
+                    <%
+                    materialDocuments = True
+                    %>
+                    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">
+                    % for rn in item.getReportNumberHolder().listReportNumbers():
+                         ${rn[1]}
+                    % endfor
+                    </a><br>
+                % endif
+            % endfor
+            % if not materialDocuments and item.getReportNumberHolder().listReportNumbers():
+                % for rn in item.getReportNumberHolder().listReportNumbers():
+                    ${rn[1]}<br>
+                % endfor
+            % endif
+            % if len(item.getAllMaterialList()) > 0:
+                % for material in item.getAllMaterialList():
+                    % if material.getTitle()!='document' or not item.getReportNumberHolder().listReportNumbers():
+                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
+                    % endif
+                % endfor
+            % endif
+        % else:
+            % if len(item.getAllMaterialList()) > 0:
+                % for material in item.getAllMaterialList():
+                    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
+                % endfor
+            % endif
+        % endif
+    </td>
+</tr>
+% if item.getSubContributionList():
+    <% suborder = 1 %>
+    % for subcont in item.getSubContributionList():
+        <%include file="SubContribution.tpl" args="item=subcont, allMaterial=allMaterial, minutes=minutes, order = order, suborder=suborder"/>
+        <% suborder += 1 %>
+    % endfor
+% endif

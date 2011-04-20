@@ -318,3 +318,64 @@ class XMLGenerator(object):
 
         out.closeTag("information")
 
+
+class ServiceInformation(object):
+
+    @classmethod
+    def getDisplayName(cls):
+        return _("MCU Conference")
+
+    @classmethod
+    def getFirstLineInfo(cls, booking, displayTz=None):
+        return booking._bookingParams["name"]
+
+    @classmethod
+    def getLaunchInfo(cls, booking, displayTz=None):
+        return {}
+
+    @classmethod
+    def getInformation(cls, booking, displayTz=None):
+        sections = []
+        sections.append({
+            'title' : _('Name:'),
+            'lines' : [booking._bookingParams["name"]],
+        })
+        if booking.getHasPin():
+            pinSection = {}
+            pinSection['title'] = _('PIN:')
+            if booking.getBookingParamByName("displayPin"):
+                pinSection['lines'] = [str(booking.getPin())]
+            else:
+                pinSection['lines'] = [_('This conference is protected by a PIN.')]
+            sections.append(pinSection)
+        sections.append({
+            'title' : _('Description:'),
+            'lines' : [booking._bookingParams["description"]],
+        })
+        participantsSection = {}
+        participantsSection['title'] = _('Participants:')
+        participantsLines = []
+        if booking.getParticipantList():
+            for p in booking.getParticipantList():
+                participantsLines.append(p.getDisplayName())
+        else:
+            participantsLines.append(_("No participants yet"))
+        participantsSection['lines'] = participantsLines
+        sections.append(participantsSection)
+
+        bookingIdInMCU = str(booking._bookingParams["id"])
+        howtoSection = {}
+        howtoSection['title'] = _("How to join:")
+        howtoSection['lines'] = [
+            "".join([_( '1) If you are registered in the CERN Gatekeeper, please dial '),
+                     getCERNMCUOptionValueByName("CERNGatekeeperPrefix"), bookingIdInMCU]),
+            "".join([_('2) If you have GDS enabled in your endpoint, please call '),
+                     getCERNMCUOptionValueByName("GDSPrefix"), bookingIdInMCU]),
+            "".join([_('3) Otherwise dial '), getCERNMCUOptionValueByName("MCU_IP"),
+                     _(' and using FEC (Far-End Controls) with your remote, enter "'),
+                     bookingIdInMCU, _('" followed by the "#".')]),
+            "".join([_('4) To join by phone dial '), getCERNMCUOptionValueByName("Phone_number"),
+                     _(' enter "'), bookingIdInMCU, _('" followed by the "#".')])
+        ]
+        sections.append(howtoSection)
+        return sections

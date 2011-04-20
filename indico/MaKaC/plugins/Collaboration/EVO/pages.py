@@ -186,3 +186,65 @@ class XMLGenerator(object):
         out.closeTag("section")
 
         out.closeTag("information")
+
+
+class ServiceInformation(object):
+
+    @classmethod
+    def getDisplayName(cls):
+        return _("EVO Meeting")
+
+    @classmethod
+    def getFirstLineInfo(cls, booking, displayTz=None):
+        return _('Phone Bridge ID:') + booking.getPhoneBridgeId()+ '.'
+
+    @classmethod
+    def getLaunchInfo(cls, booking, displayTz=None):
+        booking.checkCanStart()
+        if (booking.canBeStarted()):
+            return {
+                "launchText" : _("Join Now!"),
+                "launchLink" : booking.getUrl(),
+                "launchTooltip" : _('Click here to join the EVO meeting!')
+            }
+        return None
+
+    @classmethod
+    def getInformation(cls, booking, displayTz=None):
+        sections = []
+        sections.append({
+            "title" : _('Title:'),
+            "lines" : [booking._bookingParams["meetingTitle"]]
+        })
+        if booking.getHasAccessPassword():
+            if not booking.getBookingParamByName("displayPassword") and not booking.getBookingParamByName("displayPhonePassword"):
+                sections.append({
+                    "title" : _('Password:'),
+                    "lines" : [_('This EVO meeting is protected by a private password.')]
+                })
+            else:
+                if booking.getBookingParamByName("displayPassword"):
+                    sections.append({
+                        "title" : _('Password:'),
+                        "lines" : [booking.getAccessPassword()]
+                    })
+                if booking.getBookingParamByName("displayPhonePassword"):
+                    sections.append({
+                        "title" : _('Phone Bridge Password:'),
+                        "lines" : [booking.getPhoneBridgePassword()]
+                    })
+        if booking.getBookingParamByName("displayPhoneBridgeNumbers"):
+            sections.append({
+                "title" : _('Phone bridge numbers:'),
+                "linkLines" : [(_("List of phone bridge numbers"), getEVOOptionValueByName("phoneBridgeNumberList"))]
+            })
+        if booking.getBookingParamByName("displayURL"):
+            sections.append({
+                "title" : _('Auto-join URL:'),
+                "linkLines" : [(booking.getUrl(), booking.getUrl())]
+            })
+        sections.append({
+            "title" : _('Description:'),
+            "lines" : [booking._bookingParams["meetingDescription"]]
+        })
+        return sections

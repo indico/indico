@@ -1,13 +1,13 @@
-<%page args="item, confId, uploadURL, sessId='', sessCode='',
-             contId='', subContId='', manageLink='',
-             manageLinkBgColor='#ECECEC', alignMenuRight='false'"/>
+<%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False"/>
 
-<% menuName = 'menu%s%s%s%s' % (confId, sessCode.replace('-', ''), contId, subContId) %>
-
-% if iconf.closed == 'False' and any(item.find(x) for x in ['itemmodifyLink', 'materialLink', 'minutesLink']):
+<%
+    info = extractInfoForButton(item)
+    menuName = 'menu%(confId)s%(sessId)s%(contId)s%(subContId)s' % info
+%>
+% if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink']):
 
     % if manageLink:
-        <div class="manageLink" style="background: ${manageLinkBgColor};">
+        <div class="manageLink" style="background: ${bgColor};">
         <div class="dropDownMenu fakeLink" id="${menuName}">Manage</div></div>
     % else:
         <span class="confModifIcon" id="${menuName}"></span>
@@ -16,55 +16,57 @@
     <script type="text/javascript"> $E('${menuName}').observeClick(function() {
         var element = $E('${menuName}');
         ${menuName}.open(element.getAbsolutePosition().x
-        % if alignMenuRight == 'true':
+        % if alignRight:
             + element.dom.offsetWidth + 1
         % endif
-        % if manageLink != '':
+        % if manageLink:
             + 9
         % endif
-        , element.getAbsolutePosition().y+element.dom.offsetHeight);});
+        , element.getAbsolutePosition().y + element.dom.offsetHeight);});
         var ${menuName} = new PopupMenu({
-        % if item.find('modifyLink') and not any([sessCode, contId, subContId]):
-            'Edit event': '${item.modifyLink}',
-        % elif item.find('modifyLink') and subContId != 'null':
-            'Edit subcontribution': '${item.modifyLink}',
-        % elif item.find('modifyLink') and contId != 'null':
-            'Edit contribution': '${item.modifyLink}',
-        % elif item.find('slotId') and item.find('slotId') != 'null' and item.ID != 'null' and confId != 'null':
-            'Edit session': function(){
-                IndicoUI.Dialogs.__addSessionSlot("${item.slotId}","${item.ID}","${confId}")},
-        % elif item.find('modifyLink'):
-            'Edit entry': '${item.modifyLink}',
+        % if 'modifyLink' in info:
+            % if getItemType(item) == 'Conference':
+                'Edit event': '${info["modifyLink"]}',
+            % elif getItemType(item) == 'SubContribution':
+                'Edit subcontribution': '${info["modifyLink"]}',
+            % elif getItemType(item) == 'Contribution':
+                'Edit contribution': '${info["modifyLink"]}',
+            % elif getItemType(item) == 'Session':
+                'Edit session': function(){
+                    IndicoUI.Dialogs.__addSessionSlot("${info['slotId']}","${item.getSession().getId()}","${conf.getId()}")},
+            % else:
+                 'Edit entry': '${info["modifyLink"]}',
+            % endif
         % endif
 
-        % if item.find('cloneLink'):
-            'Clone event': '${item.cloneLink}',
+        % if 'cloneLink' in info:
+            'Clone event': '${info["cloneLink"]}',
         % endif
 
-        % if item.find('minutesLink'):
+        % if 'minutesLink' in info:
             'Edit minutes': function(m) {
-                IndicoUI.Dialogs.writeMinutes('${confId}','${sessId}','${contId}','${subContId}');
+                IndicoUI.Dialogs.writeMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
                 m.close();
                 return false;},
         % endif
 
-        % if not any([sessCode, contId, subContId]):
+        % if getItemType(item) == 'Conference':
             'Compile minutes': function(m) {
                 if (confirm('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.')) {
-                    IndicoUI.Dialogs.writeMinutes('${confId}','${sessId}','${contId}','${subContId}',true);
+                    IndicoUI.Dialogs.writeMinutes('${conf.getId()}','','','',true);
                     m.close();
                 }
                 return false;},
         % endif
 
-        % if item.find('materialLink'):
+        % if 'materialLink' in info:
             'Manage material': function(m) {
-                IndicoUI.Dialogs.Material.editor('${confId}','${sessId}','${contId}','${subContId}',
-                    ${item.parentProtection}, ${item.materialList}, ${uploadURL}, true);
+                IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
+                    ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true);
                 m.close();
                 return false;}
         % endif
-        },[$E("${menuName}")],null, false, ${alignMenuRight});
+        }, [$E("${menuName}")], null, false, ${dumps(alignRight)});
     </script>
 
 % endif

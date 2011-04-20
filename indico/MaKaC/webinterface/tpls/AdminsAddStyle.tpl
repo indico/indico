@@ -10,11 +10,6 @@
     <tr>
       <td colspan="3" class="groupTitle">${ _("New Display Style")}</td>
     </tr>
-    % if len(availableStyles) == 0:
-    <tr>
-      <td colspan="3">${ _("All template files are already in use in a declared style. In order to add a new style, start by adding the corresponding .tpl file in") } ${ styleMgr.getBaseTPLPath()}</td>
-    </tr>
-    % else:
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Name")}</span></td>
       <td align="left" width="80%"><input type="text" name="name" size="25"></td>
@@ -22,26 +17,80 @@
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("ID")}</span></td>
       <td align="left" width="80%"><input type="text" name="styleID" size="25">
-      ${inlineContextHelp(_("Style ID is used in URLs and for naming the CSS file. It must be unique for every style."))}
+      ${inlineContextHelp(_("Style ID is used in URLs. It must be unique for every style."))}
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Template type")}</span></td>
+      <td align="left">
+          <input type="radio" value="tpl" name="templatetype" onclick="enableTypeTemplate('xsl')">TPL
+          <input type="radio" value="xsl" name="templatetype" onclick="enableTypeTemplate('tpl')">XSL
       </td>
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Template file")}</span></td>
       <td align="left">
-        <select name="tplfile">
-        % for style in availableStyles:
+        <select id="tplfile" name="tplfile" disabled>
+        % for style in availableTemplates:
           <option value="${ style }">${ style }</option>
         % endfor
         </select>
-        ${inlineContextHelp(contextHelpText)}
+        ${inlineContextHelp(tplContextHelpText)}
       </td>
     </tr>
     <tr>
-      <td colspan="2" align="center"><input type="submit" class="btn" name="new" value="ok"></td>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Stylesheet file")}</span></td>
+      <td align="left">
+        <select id="stylesheetfile" name="stylesheetfile" disabled>
+        % for style in availableStyleSheets:
+          <option value="${ style }">${ style }</option>
+        % endfor
+        </select>
+        ${inlineContextHelp(xslContextHelpText)}
+      </td>
     </tr>
-    % endif
+    <tr>
+      <td nowrap class="titleCellTD"></td>
+      <td align="left">
+            <input type="checkbox" id="cssCheckbox" name="useCss" value="use" checked="checked""/> Use CSS file for this style
+      </td>
+    </tr>
+    <tr>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("CSS file")}</span></td>
+      <td align="left">
+        <select id="cssFileList" name="cssfile">
+        % for css in availableCSS:
+          <option value="${ css }">${ css }</option>
+        % endfor
+        </select>
+        ${inlineContextHelp(cssContextHelpText)}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" align="center"><input type="submit" class="btn" id="new" name="new" value="ok" disabled></td>
+    </tr>
     </table>
   </td>
 </tr>
 </table>
 </form>
+<script type="text/javascript">
+
+    function enableTypeTemplate (type) {
+        if (type == 'xsl') {
+            $('stylesheetfile').disabled=true;
+            $('tplfile').disabled=false;
+        }
+        else {
+            $('stylesheetfile').disabled=false;
+            $('tplfile').disabled=true;
+        }
+        $('new').disabled=false;
+    }
+
+    var cssFileList = $('cssFileList');
+    $('cssCheckbox').onclick = function(event) {
+        if (this.checked) cssFileList.enable();
+        else cssFileList.disable();
+    };
+</script>

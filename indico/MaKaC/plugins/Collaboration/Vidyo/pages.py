@@ -164,6 +164,65 @@ class XMLGenerator(object):
         out.closeTag("information")
 
 
+class ServiceInformation(object):
+
+    @classmethod
+    def getDisplayName(cls):
+        return _("Vidyo public room")
+
+    @classmethod
+    def getFirstLineInfo(cls, booking, displayTz=None):
+        return booking.getBookingParamByName('roomName')
+
+    @classmethod
+    def getLaunchInfo(cls, booking, displayTz=None):
+        if (booking.canBeStarted()):
+            return {
+                "launchText" : _("Join Now!"),
+                "launchLink" : booking.getURL(),
+                "launchTooltip" : _('Click here to join the Vidyo room!')
+            }
+        return {}
+
+    @classmethod
+    def getInformation(cls, booking, displayTz=None):
+        sections = []
+        sections.append({
+            "title" : _('Room name:'),
+            'lines' : [booking.getBookingParamByName("roomName")],
+        })
+        sections.append({
+            "title" : _('Extension:'),
+            'lines' : [booking.getExtension()],
+        })
+        if booking.getHasPin():
+            pinSection = {}
+            pinSection['title'] = _('PIN:')
+            if booking.getBookingParamByName("displayPin"):
+                pinSection['lines'] = [booking.getPin()]
+            else:
+                pinSection['lines'] = [_('This Vidyo room is protected by a PIN')]
+        sections.append({
+            "title" : _('Owner:'),
+            'lines' : [booking.getOwnerObject().getFullName()],
+        })
+
+        if booking.getBookingParamByName("displayURL"):
+            autojoinSection = {}
+            autojoinSection['title'] = _('Auto-join URL:')
+            autojoinSection['linkLines'] = [(booking.getURL(), booking.getURL())]
+            sections.append(autojoinSection)
+        if booking.getBookingParamByName("displayPhoneNumbers") and getVidyoOptionValue("phoneNumbers"):
+            sections.append({
+                "title" : _('VidyoVoice phone numbers:'),
+                'lines' : [', '.join(getVidyoOptionValue("phoneNumbers"))],
+            })
+        sections.append({
+            "title" : _('Description:'),
+            'lines' : [booking.getBookingParamByName("roomDescription")],
+        })
+        return sections
+
 
 ## Vidyo custom classes for action results
 

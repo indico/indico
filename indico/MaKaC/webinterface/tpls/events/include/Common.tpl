@@ -6,47 +6,125 @@
     % endif
 </%def>
 
-<%def name="renderLocation(location, span='')">
-    <%
-    correctRoomName = location.room not in ['', '0--', 'Select:']
-    prevLocation = location.find('../../location/name')
-    %>
-    % if not prevLocation or prevLocation != location.find('name'):
-        % if location.find('name'):
-            ${location.name}
-            % if correctRoomName:
-            (
-            % endif
-        % endif
+<%def name="renderLocation(item, parent=None, span='')">
+    <% location, room, url = getLocationInfo(item) %>
+    % if location and not parent or getLocationInfo(parent)[0] != location:
+         ${location}
+         % if room:
+             (
+         % endif
     % endif
-    % if correctRoomName:
-        % if location.find('roomMapURL'):
-            <a href="${location.roomMapURL.text}">
-        % endif
-        <span class="${span}">${location.room}</span>
-        % if location.find('roomMapURL'):
-            </a>
-        % endif
-        % if not prevLocation or prevLocation != location.find('name'):
-            % if location.find('name') and correctRoomName:
+    % if room:
+        ${'<a href="%s">' % url if url else ''}
+            <span class="${span}">${room}</span>
+        ${'</a>' if url else ''}
+        % if location and not parent or getLocationInfo(parent)[0] != location:
             )
-            % endif
         % endif
     % endif
 </%def>
 
-<%def name="renderSpeakers(speaker, span='', title=True)">
-    <%
-    chairs = []
-    for u in speaker.findall('user'):
-        user = "%s %s" % (u.name.get('first'), u.name.get('last'))
-        if title:
-            user = u.title.text + " " + user
-        if u.find('organization'):
-            user = user + ' (%s)' % u.organization.text
-        chairs.append('<span class="%s">%s</span>' % (span, user))
-    if speaker.find('UnformatedUser'):
-        chairs.append(iconf.chair.UnformatedUser)
-    %>
-    ${', '.join(chairs)}
+<%def name="renderLocationAdministrative(item, parent=None)">
+<% location, room, url = getLocationInfo(item) %>
+    % if location and not parent or getLocationInfo(parent)[0] != location:
+         <b>${location}</b>
+         % if room:
+             ( ${room} )
+         % endif
+    % elif room:
+         ${room}
+    % endif
 </%def>
+
+<%def name="renderLocationText(item, parent=None)">
+    <% location, room, url = getLocationInfo(item) %>
+    % if location and not parent or getLocationInfo(parent)[0] != location:
+         <b>${location}</b>
+         % if room:
+             (
+         % endif
+    % endif
+    % if room:
+        ${room}
+        % if location and not parent or getLocationInfo(parent)[0] != location:
+            )
+        % endif
+    % endif
+</%def>
+
+<%def name="renderUsers(userList, unformatted='', spanClass='', title=True, italicAffilation=False, useSpan=True, separator=', ')">
+    <%
+    result = []
+    for user in userList:
+        userText = "%s %s" % (user.getFirstName(), user.getFamilyName())
+        if title:
+            userText = user.getTitle() + " " + userText
+        if user.getAffiliation():
+            affiliation = user.getAffiliation()
+            if italicAffilation:
+                affiliation = '<i>' +  affiliation + '</i>'
+            userText += ' (%s)' % affiliation
+        if useSpan:
+            result.append('<span class="%s">%s</span>' % (spanClass, userText))
+        else:
+            result.append(userText)
+    if unformatted:
+        result.append(unformatted)
+    %>
+    ${separator.join(result)}
+</%def>
+
+<%def name="renderEventTime(startDate, endDate, timezone, strong=True)">
+    <% timeFormat = "<strong>%s</strong>" if strong else "%s" %>
+    % if getDate(startDate) == getDate(endDate):
+        ${prettyDate(startDate)}
+        % if getTime(startDate) != '00:00':
+            from ${timeFormat % getTime(startDate)}
+        % endif
+        % if getTime(endDate) != '00:00':
+            to ${timeFormat % getTime(endDate)}
+        % endif
+    % else:
+        from ${prettyDate(startDate)} at ${timeFormat % getTime(startDate)}
+        to ${prettyDate(endDate)} at ${timeFormat % getTime(endDate)}
+    % endif
+    (${str(timezone)})
+</%def>
+
+<%def name="renderEventTime2(startDate, endDate, timezone='')">
+    % if getDate(startDate) == getDate(endDate):
+        ${prettyDate(startDate)}
+        % if getTime(startDate) != '00:00':
+            - <u>${timeFormat % getTime(startDate)}</u>
+        % endif
+    % else:
+        from ${prettyDate(startDate)} (${getTime(startDate)})
+        to ${prettyDate(endDate)} (${getTime(endDate)})
+    % endif
+    % if timezone!='':
+        (${str(timezone)})
+    % endif
+
+</%def>
+
+<%def name="renderEventTimeText(startDate, endDate)">
+    % if getDate(startDate) == getDate(endDate):
+        ${prettyDate(startDate)}
+    % else:
+        ${prettyDate(startDate)} to ${prettyDate(endDate)}
+    % endif
+
+</%def>
+
+<%def name="renderEventTimeCompact(startDate, endDate)">
+    % if getDate(startDate) == getDate(endDate):
+        ${prettyDate(startDate)}
+        % if getTime(startDate) != '00:00':
+            - <u>${timeFormat % getTime(startDate)}</u>
+        % endif
+    % else:
+        from <b>${prettyDate(startDate)} (${getTime(startDate)})</b>
+        to <b>${prettyDate(endDate)} (${getTime(endDate)})</b>
+    % endif
+</%def>
+

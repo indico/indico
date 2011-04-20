@@ -14,29 +14,32 @@
           <tr style="border-bottom: 1px;">
             <th>${ _("Name")}</th>
             <th>${ _("ID")}</th>
-            <th>${ _("TPL file")}</th>
-            <th>${ _("CSS file")}</th>
+            <th>${ _("Files")}</th>
             <th>${ _("Actions")}</th>
           </tr>
           <% styles = styleMgr.getStyles().keys() %>
           <% styles.sort() %>
           % for style in styles:
-          <tr style="background-color: ${"#faa" if not styleMgr.existsTPLFile(style) and style != 'static' else "lightgreen"}">
+          <tr style="background-color: ${"#faa" if not styleMgr.isCorrectStyle(style) else "lightgreen"}">
             <td align="left">${ styleMgr.getStyleName(style) }</td>
             <td align="left">${style}</td>
             <td align="left">
-            % if style != 'static':
-                ${styleMgr.getTPLFilename(style)}
-            % else:
+            % if style == 'static':
                 -
+            % else:
+                ${styleMgr.getTemplateFilename(style)} ${"(not found)" if not styleMgr.existsTPLFile(style) and not styleMgr.existsXSLFile(style) else ""}<br/>
+                % if styleMgr.getCSSFilename(style) != None:
+                    ${styleMgr.getCSSFilename(style)} ${"(not found)" if not styleMgr.existsCSSFile(style) else ""}
+                % else:
+                    <em>(CSS is not used for this style)</em>
+                % endif
             % endif
             </td>
-            <td align="center">${ _("yes") if styleMgr.getCSSPath(style) else  _("no")}</td>
             <td>
             % if style == "static":
             ${inlineContextHelp(_('This style cannot be deleted. This is the default style for conferences.'))}
             % else:
-            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(tplfile=style)}" onClick="if (!confirm('${ _("Are you sure you want to delete this style?")}')) { return false; }"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
+            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(templatefile=style)}" onClick="if (!confirm('${ _("Are you sure you want to delete this style?")}')) { return false; }"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
             % endif
             </td>
           </tr>

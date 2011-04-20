@@ -410,15 +410,6 @@ class outputGenerator(Observable):
 
         out.writeTag("closed", str(conf.isClosed()))
 
-#        if len(conf.getBookingsList()):
-#            out.openTag("videoconference")
-#            for b in conf.getBookingsList():
-#                out.openTag(b.getSystem())
-#                if b.getSystem() == "VRVS":
-#                    out.writeTag("description",b.getPublicDescription())
-#                out.closeTag(b.getSystem())
-#            out.closeTag("videoconference")
-
         if conf.getLocationList()!=[] or conf.getRoom():
             out.openTag("location")
             loc=None

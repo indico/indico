@@ -320,6 +320,10 @@ class CollaborationTools(object):
     def getXMLGenerator(cls, pluginName):
         return cls.getModule(pluginName).pages.XMLGenerator
 
+    @classmethod
+    def getServiceInformation(cls, pluginName):
+        return cls.getModule(pluginName).pages.ServiceInformation
+
 
 class MailTools(object):
 

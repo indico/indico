@@ -525,10 +525,16 @@ class StyleManager(Persistent):
         """
         return self._eventStylesheets.get(eventType, [])
 
+    def isCorrectStyle(self, styleId):
+        if styleId not in self._styles:
+            return False
+        correctCSS = self.existsCSSFile(styleId) or not self.getCSSFilename(styleId)
+        return styleId == 'static' or (self.existsTPLFile(styleId) and correctCSS) or (self.existsXSLFile(styleId) and correctCSS)
+
     def getExistingStylesForEventType(self, eventType):
         result = []
         for style in self.getStyleListForEventType(eventType):
-            if self.existsTPLFile(style) or style == 'static':
+            if self.isCorrectStyle(style):
                 result.append(style)
         return result
 
@@ -552,9 +558,13 @@ class StyleManager(Persistent):
         tplDir = Config.getInstance().getTPLDir()
         return os.path.join(tplDir, "events")
 
+    def getBaseXSLPath(self):
+        xslDir = Config.getInstance().getStylesheetsDir()
+        return os.path.join(xslDir, "events")
+
     def existsTPLFile(self, styleId):
         if styleId.strip() != "":
-            tplFile = self.getTPLFilename(styleId)
+            tplFile = self.getTemplateFilename(styleId)
             if not tplFile:
                 return False
             path = os.path.join(self.getBaseTPLPath(), tplFile)
@@ -562,10 +572,17 @@ class StyleManager(Persistent):
                 return True
         return False
 
-    def getStyleFilenames(self):
-        return [fileName for styleName, fileName in self.getStyles().values()]
+    def existsXSLFile(self, styleId):
+        if styleId.strip() != "":
+            xslFile = self.getTemplateFilename(styleId)
+            if not xslFile:
+                return False
+            path = os.path.join(self.getBaseXSLPath(), xslFile)
+            if os.path.exists(path):
+                return True
+        return False
 
-    def getTPLFilename(self, styleId):
+    def getTemplateFilename(self, styleId):
         styles = self.getStyles()
         if styleId in styles:
             fileName = styles[styleId][1]
@@ -574,17 +591,37 @@ class StyleManager(Persistent):
             return None
 
     def getBaseCSSPath( self ):
-        return os.path.join(Config.getInstance().getHtdocsDir(),"css")
+        return os.path.join(Config.getInstance().getHtdocsDir(),"css", "events")
 
-    def getCSSPath( self, stylesheet ):
-        if stylesheet.strip() != "":
-            basepath = Config.getInstance().getHtdocsDir()
-            path = os.path.join( basepath, "css", "%s.css" % stylesheet )
+    def existsCSSFile(self, styleId):
+        if styleId.strip() != "":
+            basepath = self.getBaseCSSPath()
+            filename = self.getCSSFilename(styleId)
+            if not filename:
+                return False
+            path = os.path.join(basepath, filename)
             if os.path.exists(path):
-                return path
-        return ""
+                return True
+        return False
 
-    def getCSSFile( self, stylesheet ):
-        if self.getCSSPath( stylesheet ):
-            return "%s.css" % stylesheet
-        return ""
+    def getCSSFilename( self, stylesheet ):
+        if stylesheet.strip() != "" and stylesheet in self._styles:
+            return self._styles[stylesheet][2]
+        return None
+
+    def getXSLStyles(self):
+        xslStyles = []
+        for style in self._styles.keys():
+            if self._styles[style][1]!= None and self._styles[style][1].endswith(".xsl"):
+                xslStyles.append(style)
+        return xslStyles
+
+    def existsStyle(self, styleId):
+        styles = self.getStyles()
+        if styleId in styles:
+            return True
+        else:
+            return False
+
+
+

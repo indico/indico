@@ -1,32 +1,28 @@
-<%page args="item, minutes='off', hideEndTime='false', timeClass='topLevelTime',
+<%page args="item, parent, minutes=False, hideEndTime=False, timeClass='topLevelTime',
              titleClass='topLevelTitle', abstractClass=None, scListClass=None"/>
 
 <%namespace name="common" file="Common.tpl"/>
 
 <li class="breakListItem">
     <span class="${timeClass}">
-        ${extractTime(item.startDate.text)}
-        % if hideEndTime == 'false':
-        - ${extractTime(item.endDate.text)}
+        ${getTime(item.getAdjustedStartDate(timezone))}
+        % if not hideEndTime:
+        - ${getTime(item.getAdjustedEndDate(timezone))}
         % endif
     </span>
 
     <span class="confModifPadding">
-        <span class="${titleClass}" style="color: #69856e">${item.name}</span>
-        % if hideEndTime == 'true' and item.duration != '00:00':
-            <em> ${prettyDuration(item.duration.text)}</em>
+        <span class="${titleClass}" style="color: #69856e">${item.getTitle()}</span>
+        % if hideEndTime and formatDuration(item.getDuration()) != '00:00':
+            <em> ${prettyDuration(formatDuration(item.getDuration()))}</em>
         % endif
     </span>
 
-    % if item.find('broadcast'):
-    <br/><a href="${item.broadcasturl}"><br/>(video broadcast)</a>
+    % if getLocationInfo(item) != getLocationInfo(parent):
+        (${common.renderLocation(item, parent)})
     % endif
 
-    % if item.find('location') and hasDifferentLocation(item):
-        (${common.renderLocation(item.location)})
-    % endif
-
-    % if item.find('description'):
-        <span class="description">${common.renderDescription(item.description)}</span>
+    % if item.getDescription():
+        <span class="description">${common.renderDescription(item.getDescription())}</span>
     % endif
 </li>

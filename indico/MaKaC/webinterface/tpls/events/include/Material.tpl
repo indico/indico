@@ -1,26 +1,25 @@
 <%page args="material, sessionId='', contribId='', subContId=''"/>
 
 <span class="materialGroup">
-    <a href="${material.displayURL}" class="material materialGroup">
+    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}" class="material materialGroup">
         ${material.type}
         ${material.title}
-        % if material.find('locked') == 'yes':
+        % if material.isItselfProtected():
             <img src="images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
         % endif
     </a>
 
-    % for materialType in material.types.type:
+    % for typeName, typeInfo in types.items():
         <%
-        typeName = materialType.name
-        filesWithType = [f for f in material.findall('files/file') if f.type == typeName]
+        filesWithType = [f for f in getMaterialFiles(material) if f['type'] == typeName]
         %>
         % if len(filesWithType) == 1:
-            <a href="${filesWithType[0].url}" class="material">
-            <img src="${materialType.imgURL}" border="0" alt="${materialType.imgAlt}"/></a>
+            <a href="${filesWithType[0]['url']}" class="material">
+            <img src="${typeInfo['imgURL']}" border="0" alt="${typeInfo['imgAlt']}}"/></a>
         % elif len(filesWithType) > 1:
-            <% materialMenuName = 'materialMenu%s%s%s%s%s' % (material.ID, typeName, sessionId, contribId, subContId) %>
+            <% materialMenuName = 'materialMenu%s%s%s%s%s' % (material.getId(), typeName, sessionId, contribId, subContId) %>
             <a class="material dropDownMaterialMenu" id="${materialMenuName}">
-                <img class="resourceIcon" src="${materialType.imgURL}" border="0" alt="${materialType.imgAlt}"/><img class="arrow" src="images/menu_arrow_black.png" border='0' alt="down arrow"/>
+                <img class="resourceIcon" src="${typeInfo['imgURL']}" border="0" alt="${typeInfo['imgAlt']}"/><img class="arrow" src="images/menu_arrow_black.png" border='0' alt="down arrow"/>
             </a>
             <script type="text/javascript">
                 $E('${materialMenuName}').observeClick(function() {
@@ -29,7 +28,7 @@
                     }
                 );
                 var ${materialMenuName} = new PopupMenu({
-                    ${', '.join(["'%s' : '%s'" % (f.name, f.url) for f in filesWithType])}
+                    ${', '.join(["'%s' : '%s'" % (f['name'], f['url']) for f in filesWithType])}
                 }, [$E("${materialMenuName}")], 'materialMenuPopupList', false, false);
             </script>
         % endif

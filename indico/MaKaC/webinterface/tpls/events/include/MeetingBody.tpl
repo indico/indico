@@ -1,8 +1,12 @@
-<%page args="minutes='off'"/>
+<%page args="minutes=False"/>
 <%namespace name="common" file="include/Common.tpl"/>
 
 <div class="meetingEventSubHeader">
-    <%include file="EventDetails.tpl" args="minutes=minutes"/>
+    <table class="eventDetails">
+        <tbody>
+            <%include file="${INCLUDE}/EventDetails.tpl" args="minutes=minutes"/>
+        </tbody>
+    </table>
 </div>
 
 <div class="meetingEventBody">
@@ -11,11 +15,13 @@
         var goToDayMenuItems = {};
 
         <% addedDates = set() %>
-        % for item in iconf.findall('session|contribution|break'):
-            <% startDate = item.startDate.text[:10] %>
-            % if date not in addedDates:
-                goToDayMenuItems['${prettyDate(startDate)}'] = '#${startDate}';
-                <% addedDates.add(startDate) %>
+        % for item in entries:
+            % if item.getAdjustedStartDate(timezone):
+                <% date = getDate(item.getAdjustedStartDate(timezone)) %>
+                % if date not in addedDates:
+                    goToDayMenuItems['${prettyDate(item.getAdjustedStartDate(timezone))}'] = '#${date}';
+                    <% addedDates.add(date) %>
+                % endif
             % endif
         % endfor
 
@@ -40,25 +46,24 @@
     </script>
 
     <ul class="dayList">
-        <% items = iconf.findall('session|contribution|break') %>
-        % for index, item in enumerate(items):
+        % for index, item in enumerate(entries):
             <%
-            startDate = item.startDate.text[:10]
-            previousItem = items[index - 1] if index - 1 >= 0 else None
-            nextItem = items[index + 1] if index + 1 < len(items) else None
+                date = getDate(item.getAdjustedStartDate(timezone))
+                previousItem = entries[index - 1] if index - 1 >= 0 else None
+                nextItem = entries[index + 1] if index + 1 < len(entries) else None
             %>
-            % if not previousItem or startDate != previousItem.startDate.text[:10]:
+            % if not previousItem or date != getDate(previousItem.getAdjustedStartDate(timezone)):
                 <li>
                 <div style="width: 100%;">
-                    <a name="${startDate}"></a>
-                    <span class="day">${prettyDate(startDate)}</span>
+                    <a name="${getDate(item.getAdjustedStartDate(timezone))}"></a>
+                    <span class="day">${prettyDate(item.getAdjustedStartDate(timezone))}</span>
                 </div>
                 <ul class="meetingTimetable">
             % endif
 
-            <%include file="${item.tag.capitalize()}.tpl" args="item=item, minutes=minutes"/>
+            <%include file="${getItemType(item)}.tpl" args="item=item, parent=conf, minutes=minutes"/>
 
-            % if not nextItem or startDate != nextItem.startDate.text[:10]:
+            % if not nextItem or date != getDate(nextItem.getAdjustedStartDate(timezone)):
                 </ul>
                 </li>
             % endif

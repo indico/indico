@@ -3429,6 +3429,9 @@ class Conference(CommonObjectBase, Locatable):
                     res.append(session)
         return res
 
+    def getNumberOfSessions( self ):
+        return len(self.sessions)
+
     def _generateNewContributionId( self ):
         """Returns a new unique identifier for the current conference
             contributions
@@ -6153,6 +6156,9 @@ class Session(CommonObjectBase, Locatable):
 
     def getContributionList( self ):
         return self.contributions.values()
+
+    def getNumberOfContributions( self ):
+        return len(self.contributions)
 
     def canIPAccess( self, ip ):
         if not self.__ac.canIPAccess( ip ):
@@ -8919,6 +8925,9 @@ class Contribution(CommonObjectBase, Locatable):
 
     def iterSubContributions(self):
         return iter(self._subConts)
+
+    def getNumberOfSubcontributions(self):
+        return len(self._subConts)
 
     def upSubContribution(self, subcont):
         if subcont in self._subConts:

@@ -85,3 +85,17 @@ class OutputGenerator(object):
             out.closeTag("booking")
 
         out.closeTag("collaboration")
+
+    @classmethod
+    def getCollaborationParams(cls, conf):
+        params = {}
+        csbm = conf.getCSBookingManager()
+        pluginNames = csbm.getEventDisplayPlugins()
+        bookingData = {}
+        for pluginName in pluginNames:
+            bookingData[pluginName] = CollaborationTools.getServiceInformation(pluginName)
+        bookings = csbm.getBookingList(filterByType=pluginNames, notify=True, onlyPublic=True)
+        bookings.sort(key=lambda b: b.getStartDate() or minDatetime())
+        params['bookings'] = bookings
+        params['bookingData'] = bookingData
+        return params

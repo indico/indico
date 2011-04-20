@@ -395,13 +395,13 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
             type = self.getWebFactory().getId()
         else:
             type = "conference"
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
             view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
             # if no default view was attributed, then get the configuration default
-            if view == "":
-                styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+            if view == "" or not styleMgr.existsStyle(view):
                 view =styleMgr.getDefaultStyleForEventType( type )
                 displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
         isLibxml = True
@@ -424,6 +424,8 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
                     p = conferences.WPConferenceDisplay( self, self._target )
                 else:
                     p = conferences.WPInternalPageDisplay(self,self._target, self._page)
+        elif view in styleMgr.getXSLStyles():
+            p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
         elif view != "static" and isLibxml:
             p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:
@@ -454,16 +456,23 @@ class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
         #get default/selected view
         view = "standard"
         type = "conference"
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        isLibxml = True
+        try:
+            import lxml
+        except:
+            isLibxml = False
         if self._reqParams.has_key("view"):
             view = self._reqParams["view"]
         else:
             view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
             # if no default view was attributed, then get the configuration default
             if view == "":
-                styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
                 view =styleMgr.getDefaultStyleForEventType( type )
                 displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
         # create the html factory
+        #if view in styleMgr.getXSLStyles():
+        #    p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
         if view != "static":
             p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:

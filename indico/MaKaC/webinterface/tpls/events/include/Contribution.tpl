@@ -1,91 +1,77 @@
-<%page args="item, minutes='off', hideEndTime='false', timeClass='topLevelTime',
+<%page args="item, parent, minutes=False, hideEndTime=False, timeClass='topLevelTime',
      titleClass='topLevelTitle', abstractClass='topLevelAbstract', scListClass='topLevelSCList'"/>
 
 <%namespace name="common" file="Common.tpl"/>
 
 <li class="meetingContrib">
-    % if item.getparent().tag == 'session':
-        <%include file="ManageButton.tpl"
-            args="item=item, confId=iconf.ID.text, alignMenuRight='true', subContId='null',
-            sessId=item.getparent().ID.text, sessCode=item.getparent().code.text,
-            contId=item.ID.text, uploadURL='Indico.Urls.UploadAction.contribution'"/>
-    % else:
-        <%include file="ManageButton.tpl"
-            args="item=item, confId=iconf.ID.text, alignMenuRight='true',
-            contId=item.ID.text, sessId='null', sessCode='null', subContId='null',
-            uploadURL='Indico.Urls.UploadAction.contribution'"/>
-    % endif
+        <%include file="ManageButton.tpl" args="item=item, alignRight=True"/>
 
     <span class="${timeClass}">
-        ${extractTime(item.startDate.text)}
-        % if hideEndTime == 'false':
-        - ${extractTime(item.endDate.text)}
+        ${getTime(item.getAdjustedStartDate(timezone))}
+        % if not hideEndTime:
+            - ${getTime(item.getAdjustedEndDate(timezone))}
         % endif
     </span>
 
     <span class="confModifPadding">
-        <span class="${titleClass}">${item.title}</span>
+        <span class="${titleClass}">${item.getTitle()}</span>
 
-        % if item.duration != '00:00':
-            <em>${prettyDuration(item.duration.text)}</em>\
+        % if formatDuration(item.getDuration()) != '00:00':
+            <em>${prettyDuration(formatDuration(item.getDuration()))}</em>\
         % endif
-        % if item.find('location') and hasDifferentLocation(item):
+        % if getLocationInfo(item) != getLocationInfo(parent):
 <span style="margin-left: 15px;">\
-(${common.renderLocation(item.location, span='span')})
+(${common.renderLocation(item, parent=parent, span='span')})
 </span>
         % endif
+
     </span>
 
-    % if item.find('abstract'):
-        <br /><span class="description">${common.renderDescription(item.abstract)}</span>
+    % if item.getDescription():
+        <br /><span class="description">${common.renderDescription(item.getDescription())}</span>
     % endif
 
     <table class="sessionDetails">
         <tbody>
-        % if item.find('speakers'):
+        % if item.getSpeakerList() or item.getSpeakerText():
         <tr>
-            <td class="leftCol">Speaker${'s' if len(item.findall('speakers/*')) > 1 else ''}:</td>
-            <td>${common.renderSpeakers(item.speakers)}</td>
+            <td class="leftCol">Speaker${'s' if len(item.getSpeakerList()) > 1 else ''}:</td>
+            <td>${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText())}</td>
         </tr>
         % endif
 
-        % if item.find('broadcasturl'):
-        <tr>
-            <td class="leftCol">Video broadcast</td>
-            <td><a href="${item.broadcasturl}">View now</a></td>
-        </tr>
+        % if item.getReportNumberHolder().listReportNumbers():
+            (${ ' '.join([rn[1] for rn in item.getReportNumberHolder().listReportNumbers()])})
         % endif
 
-        % if item.find('repno'):
-            ( ${ ' '.join([repno.rn for repno in item.findall('repno')])} )
-        % endif
-
-        % if item.find('material'):
+        % if len(item.getAllMaterialList()) > 0:
         <tr>
             <td class="leftCol">Material:</td>
             <td>
-                % for material in item.material:
-                    <%include file="Material.tpl" args="material=material, contribId=item.ID.text"/>
-                % endfor
+            % for material in item.getAllMaterialList():
+                % if material.canView(accessWrapper):
+                <%include file="Material.tpl" args="material=material, contribId=item.getId()"/>
+                % endif
+            % endfor
             </td>
         </tr>
         % endif
         </tbody>
     </table>
 
-    % if item.find('subcontribution'):
+    % if item.getSubContributionList():
     <ul class="${scListClass}">
-        % for subc in item.subcontribution:
-            <%include file="Subcontribution.tpl" args="item=subc, minutes=minutes"/>
+        % for subcont in item.getSubContributionList():
+            <%include file="SubContribution.tpl" args="item=subcont, minutes=minutes"/>
         % endfor
     </ul>
     % endif
 
-    % if minutes == 'on':
-        % for minutes in item.findall('material/minutesText'):
+    % if minutes:
+        % for minutesText in extractMinutes(item.getAllMaterialList()):
             <div class="minutesTable">
                 <h2>Minutes</h2>
-                <span>${common.renderDescription(minutes.text)}</span>
+                <span>${common.renderDescription(minutesText)}</span>
             </div>
         % endfor
     % endif

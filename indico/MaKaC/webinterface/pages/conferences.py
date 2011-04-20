@@ -23,6 +23,7 @@ import os
 import string
 import random
 import simplejson
+import os.path
 
 from datetime import timedelta,datetime
 from xml.sax.saxutils import quoteattr, escape
@@ -76,6 +77,14 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.common import Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
+from MaKaC.conference import Minutes
+from MaKaC.common.Configuration import Config
+from MaKaC.common.utils import formatDateTime
+from MaKaC.plugins.helpers import DBHelpers
+from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.util import PluginFieldsWrapper
+
+
 
 def stringToDate( str ):
     #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
@@ -1104,102 +1113,272 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
-
 class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
     """Overrides XSL related functions in WPXSLConferenceDisplay
     class and re-implements them using normal Indico templates.
     """
+    _ImagesBaseURL = Config.getInstance().getImagesBaseURL()
+    _Types = {
+        "pdf"   :{"mapsTo" : "pdf",   "imgURL" : os.path.join(_ImagesBaseURL, "pdf_small.png"),  "imgAlt" : "pdf file"},
+        "doc"   :{"mapsTo" : "doc",   "imgURL" : os.path.join(_ImagesBaseURL, "word.png"),       "imgAlt" : "word file"},
+        "docx"  :{"mapsTo" : "doc",   "imgURL" : os.path.join(_ImagesBaseURL, "word.png"),       "imgAlt" : "word file"},
+        "ppt"   :{"mapsTo" : "ppt",   "imgURL" : os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
+        "pptx"  :{"mapsTo" : "ppt",   "imgURL" : os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
+        "sxi"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(_ImagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
+        "odp"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(_ImagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
+        "sxw"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(_ImagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
+        "odt"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(_ImagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
+        "sxc"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(_ImagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
+        "ods"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(_ImagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
+        "other" :{"mapsTo" : "other", "imgURL" : os.path.join(_ImagesBaseURL, "file_small.png"), "imgAlt" : "unknown type file"},
+        "link"  :{"mapsTo" : "link",  "imgURL" : os.path.join(_ImagesBaseURL, "link.png"),       "imgAlt" : "link"}
+    }
 
-    class NonUnicodeStringElement(lxml.objectify.StringElement):
-        """Converts lxml StringElement unicode values to bytestrings.
+    def _getVariables(self, conf):
+        vars = {}
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        vars['INCLUDE'] = os.path.join(styleMgr.getBaseTPLPath(), 'include')
+        vars['INCLUDEADM'] = os.path.join(styleMgr.getBaseTPLPath(),'meetings', 'administrative', 'include')
+        vars['INCLUDECDS'] = os.path.join(styleMgr.getBaseTPLPath(),'meetings', 'cdsagenda', 'include')
 
-        This behaviour is implemented only for some methods:
-            - accessing attribute through element.get('attr')
-            - str(element) or in templates ${element}
-            - element.text, which is used when we need to pass a string
-              to some other function, e.g. ${extractTime(date.text)}
-        """
-        def get(self, key, default=None):
-            value = lxml.objectify.StringElement.get(self, key, default)
-            if value is not None:
-                value = value.encode('utf-8')
-            return value
-        def __str__(self):
-            return lxml.objectify.StringElement.__str__(self).encode('utf-8')
-        def __getattribute__(self, name):
-            if name == 'text':
-                return str(self)
-            return lxml.objectify.StringElement.__getattribute__(self, name)
-
-    @staticmethod
-    def _hasDifferentLocation(item):
-        """Check if the item takes place in a different location than
-        its parent. Parameter item must be lxml objectified Element."""
-        parentLocationText= item.getparent().findall('location/*/text()')
-        itemLocationText = item.findall('location/*/text()')
-        return sorted(parentLocationText) != sorted(itemLocationText)
-
-    def _getConferenceXML(self):
-        """Return XML representing the conference to be displayed."""
-        generator = outputGenerator(self._getAW())
-        if self._params.get("detailLevel", "contribution") == "contribution":
-            includeContribution = 1
+        vars['accessWrapper'] = accessWrapper = self._rh._aw
+        vars['conf'] = conf
+        if conf.getOwnerList():
+            vars['category'] = conf.getOwnerList()[0].getName()
         else:
-            includeContribution = 0
-        variables = self._getBodyVariables()
-        return generator._getBasicXML(conf=self._conf,
-                                      vars=variables,
-                                      includeSession=1,
-                                      includeContribution=includeContribution,
-                                      includeSubContribution=1,
-                                      includeMaterial=1,
-                                      showSession=self._params.get("showSession", ""),
-                                      showDate=self._params.get("showDate", ""))
+            vars['category'] = ''
 
-    def _splitMaterials(self, oldMaterials):
-        """Split 'materials' into normal materials, lectures and webcast."""
-        webcastTitles = ['live webcast', 'forthcoming webcast']
+        timezoneUtil = DisplayTZ(accessWrapper, conf)
+        timezone = timezoneUtil.getDisplayTZ()
+        vars['startDate'] = conf.getAdjustedStartDate(timezone)
+        vars['endDate'] = conf.getAdjustedEndDate(timezone)
+        vars['timezone'] = timezone
+
+        if conf.getParticipation().displayParticipantList() :
+            vars['participants']  = conf.getParticipation().getPresentParticipantListText()
+
+        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
+        vars['webcastOnAirURL'] = wm.isOnAir(conf)
+        forthcomingWebcast = wm.getForthcomingWebcast(conf)
+        vars['forthcomingWebcast'] = forthcomingWebcast
+        if forthcomingWebcast:
+            vars['forthcomingWebcastURL'] = wm.getWebcastServiceURL(forthcomingWebcast)
+
+        vars['files'] = {}
         lectureTitles = ['part%s' % nr for nr in xrange(1, 11)]
-        materials, lectures, webcast = [], [], None
-        for material in oldMaterials:
-            if material.title in webcastTitles:
-                webcast = material
-            elif material.title in lectureTitles:
+        materials, lectures, minutesText = [], [], []
+        for material in conf.getAllMaterialList():
+            if not material.canView(accessWrapper):
+                continue
+            if material.getTitle() in lectureTitles:
                 lectures.append(material)
-            else:
+            elif material.getTitle() != "Internal Page Files":
                 materials.append(material)
-        byTitleNumber = lambda x, y: int(x.title.text[4:]) - int(y.title.text[4:])
-        return (materials, sorted(lectures, cmp=byTitleNumber), webcast)
+
+        vars['materials'] = materials
+        vars['minutesText'] = minutesText
+        byTitleNumber = lambda x, y: int(x.getTitle()[4:]) - int(y.getTitle()[4:])
+        vars['lectures'] = sorted(lectures, cmp=byTitleNumber)
+
+        if (conf.getType() in ("meeting", "simple_event")
+                and conf.getParticipation().isAllowedForApplying()
+                and conf.getStartDate() > nowutc()):
+            vars['registrationOpen'] = True
+        evaluation = conf.getEvaluation()
+        if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions() > 0:
+            vars['evaluationLink'] = urlHandlers.UHConfEvaluationDisplay.getURL(conf)
+        vars['supportEmailCaption'] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getSupportEmailCaption()
+
+        vars['types'] = WPTPLConferenceDisplay._Types
+
+        vars['entries'] = []
+        confSchedule = conf.getSchedule()
+        entrylist = confSchedule.getEntries()
+        for entry in entrylist:
+            if entry.getOwner().canView(accessWrapper):
+                if type(entry) is schedule.BreakTimeSchEntry:
+                    newItem = entry
+                else:
+                    newItem = entry.getOwner()
+                vars['entries'].append(newItem)
+
+        if PluginsHolder().hasPluginType("InstantMessaging") and DBHelpers.roomsToShow(conf):
+            vars['chatrooms'] = DBHelpers.getShowableRooms(conf)
+            vars['linksList'] = PluginsHolder().getPluginType('InstantMessaging').getOption('customLinks').getValue()
+            vars['how2connect'] = PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor')
+
+        if PluginsHolder().hasPluginType("Collaboration"):
+            from MaKaC.plugins.Collaboration.output import OutputGenerator
+            vars.update(OutputGenerator.getCollaborationParams(conf))
+
+        vars["daysPerRow"] = self._daysPerRow
+        vars["firstDay"] = self._firstDay
+        vars["lastDay"] = self._lastDay
+
+        return vars
+
+    def _getBookingKind(self, booking):
+        if booking.canBeStarted():
+            return "ongoing"
+        elif booking.hasStartDate() and booking.getAdjustedStartDate('UTC') > nowutc():
+            return "scheduled"
+
+    def _getMaterialFiles(self, material):
+        processedFiles = []
+        files = []
+        for res in material.getResourceList():
+            try:
+                fileType = res.getFileType().lower()
+                try:
+                    fileType = WPTPLConferenceDisplay._Types[fileType]["mapsTo"]
+                except KeyError:
+                    fileType = "other"
+                filename = res.getFileName()
+                if filename in processedFiles:
+                    filename = "%s-%s" % (processedFiles.count(filename) + 1, filename)
+                fileURL = urlHandlers.UHFileAccess.getURL(res)
+                processedFiles.append(res.getFileName())
+            except:
+                filename, fileType, fileURL = str(res.getURL()), "link", str(res.getURL())
+            files.append({'name' : filename, 'type' : fileType, 'url' : fileURL})
+        return files
+
+    def _extractMinutes(self, materials):
+        result = []
+        for material in materials:
+            if material.canView(self._rh._aw) and isinstance(material, Minutes):
+                result.append(material.getText())
+        return result
+
+    def _getItemType(self, item):
+        itemClass = item.__class__.__name__
+        if itemClass == 'BreakTimeSchEntry':
+            return 'Break'
+        elif itemClass == 'SessionSlot':
+            return 'Session'
+        else:
+            # return Conference, Contribution or SubContribution
+            return itemClass
+
+    def _generateMaterialList(self, obj):
+        """
+        Generates a list containing all the materials, with the
+        corresponding Ids for those that already exist
+        """
+        # yes, this may look a bit redundant, but materialRegistry isn't
+        # bound to a particular target
+        materialRegistry = obj.getMaterialRegistry()
+        return materialRegistry.getMaterialList(obj.getConference())
+
+    def _extractInfoForButton(self, item):
+        info = {}
+        for key in ['sessId', 'contId', 'subContId']:
+            info[key] = 'null'
+        info['confId'] = self._conf.getId()
+
+        itemType = self._getItemType(item)
+        info['uploadURL'] = 'Indico.Urls.UploadAction.%s' % itemType.lower()
+
+        if itemType != 'Session':
+            info['materialList'] = self._generateMaterialList(item)
+        else:
+            info['materialList'] = self._generateMaterialList(item.getSession())
+
+        if itemType == 'Conference':
+            info['parentProtection'] = item.getAccessController().isProtected()
+            if item.canModify(self._rh._aw):
+                info["modifyLink"] = urlHandlers.UHConferenceModification.getURL(item)
+                info["minutesLink"] = True
+                info["materialLink"] = True
+                info["cloneLink"] = urlHandlers.UHConfClone.getURL(item)
+
+        elif itemType == 'Session':
+            session = item.getSession()
+            info['parentProtection'] = session.getAccessController().isProtected()
+            if session.canModify(self._rh._aw) or session.canCoordinate(self._rh._aw):
+                info['modifyLink'] = True
+            info['slotId'] = session.getSortedSlotList().index(item)
+            info['sessId'] = session.getId()
+            if session.canModify(self._rh._aw) or session.canCoordinate(self._rh._aw):
+                info["minutesLink"] = True
+                info["materialLink"] = True
+
+        elif itemType == 'Contribution':
+            info['parentProtection'] = item.getAccessController().isProtected()
+            if item.canModify(self._rh._aw):
+                info["modifyLink"] = urlHandlers.UHContributionModification.getURL(item)
+            if item.canModify(self._rh._aw) or item.canUserSubmit(self._rh._aw.getUser()):
+                info["minutesLink"] = True
+                info["materialLink"] = True
+            info["contId"] = item.getId()
+            owner = item.getOwner()
+            if self._getItemType(owner) == 'Session':
+                info['sessId'] = owner.getId()
+
+        elif itemType == 'SubContribution':
+            info['parentProtection'] = item.getContribution().getAccessController().isProtected()
+            if item.canModify(self._rh._aw):
+                info["modifyLink"] = urlHandlers.UHSubContributionDisplayWriteMinutes.getURL(item)
+            if item.canModify(self._rh._aw) or item.canUserSubmit(self._rh._aw.getUser()):
+                info["minutesLink"] = True
+                info["materialLink"] = True
+            info["subContId"] = item.getId()
+            info["contId"] = item.getContribution().getId()
+            owner = item.getOwner()
+            if self._getItemType(owner) == 'Session':
+                info['sessId'] = owner.getId()
+
+        return info
+
+    def _getHeadContent( self ):
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        htdocs = Config.getInstance().getHtdocsDir()
+        # First include the default Indico stylesheet
+        styleText = """<link rel="stylesheet" href="%s/css/%s">\n""" % \
+            (self._getBaseURL(), Config.getInstance().getCssStylesheetName())
+        # Then the common event display stylesheet
+        if os.path.exists("%s/css/common.css" % htdocs):
+            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css">\n""" % self._getBaseURL()
+        if self._type == "simple_event":
+            lectureStyle = styleMgr.getDefaultStyleForEventType("simple_event")
+            cssPath = os.path.join(self._getBaseURL(), 'css', 'events', styleMgr.getCSSFilename(lectureStyle))
+            styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
+        # And finally the specific display stylesheet
+        if styleMgr.existsCSSFile(self._view):
+            cssPath = os.path.join(self._getBaseURL(), 'css', 'events', styleMgr.getCSSFilename(self._view))
+            styleText += """        <link rel="stylesheet" href="%s">\n""" % cssPath
+        return styleText
 
     def _getBody(self, params):
-        """Return main information about the conference."""
-        xmlConf = self._getConferenceXML()
+        """Return main information about the event."""
 
-        parser = lxml.objectify.makeparser(remove_blank_text=False)
-        elementClass = WPTPLConferenceDisplay.NonUnicodeStringElement
-        parserLookup = lxml.etree.ElementDefaultClassLookup(element=elementClass)
-        parser.set_element_class_lookup(parserLookup)
-
-        vars = {}
-        vars['iconf'] = lxml.objectify.fromstring(xmlConf, parser=parser)
-
-        oldMaterials = vars['iconf'].findall('material')
-        materials, lectures, webcast = self._splitMaterials(oldMaterials)
-        vars['materials'] = materials
-        vars['lectures'] = lectures
-        vars['webcast'] = webcast
-
-        vars['extractTime'] = MaKaC.common.utils.extractTime
-        vars['prettyDate'] = MaKaC.common.utils.prettyDate
-        vars['prettyDuration'] = MaKaC.common.utils.prettyDuration
-        vars['parseDate'] = MaKaC.common.utils.parseDate
-        vars['formatDate'] = MaKaC.common.utils.formatDate
-        vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
-        vars['hasDifferentLocation'] = self._hasDifferentLocation
+        if self._view != 'xml':
+            vars = self._getVariables(self._conf)
+            vars['getTime'] = lambda date : formatDateTime(date, format='%H:%M')
+            vars['getDate'] = lambda date : formatDateTime(date, format='%Y-%m-%d')
+            vars['formatDuration'] = lambda duration : formatDateTime(datetime(1900,1,1) + duration, format='%H:%M')
+            vars['prettyDate'] = lambda date : formatDateTime(date, format='%A %d %B %Y')
+            vars['extractMinutes'] = lambda materials : self._extractMinutes(materials)
+            vars['prettyDuration'] = MaKaC.common.utils.prettyDuration
+            vars['parseDate'] = MaKaC.common.utils.parseDate
+            vars['formatDate'] = MaKaC.common.utils.formatDate
+            vars['isStringHTML'] = MaKaC.common.utils.isStringHTML
+            vars['formatTwoDates'] = MaKaC.common.utils.formatTwoDates
+            vars['getMaterialFiles'] = lambda material : self._getMaterialFiles(material)
+            vars['getBookingKind'] = lambda b : self._getBookingKind(b)
+            vars['extractInfoForButton'] = lambda item : self._extractInfoForButton(item)
+            vars['getItemType'] = lambda item : self._getItemType(item)
+            vars['getLocationInfo'] = MaKaC.common.utils.getLocationInfo
+            vars['dumps'] = simplejson.dumps
+        else:
+            outGen = outputGenerator(self._rh._aw)
+            varsForGenerator = self._getBodyVariables()
+            vars = {}
+            vars['xml'] = outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)
 
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         if styleMgr.existsTPLFile(self._view):
-            fileName = os.path.splitext(styleMgr.getTPLFilename(self._view))[0]
+            fileName = os.path.splitext(styleMgr.getTemplateFilename(self._view))[0]
             body = wcomponents.WTemplated(os.path.join("events", fileName)).getHTML(vars)
         else:
             return _("Template could not be found.")
@@ -1212,7 +1391,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
             infoMessage = wcomponents.WInfoMessage().getHTML(params)
             html = "%s\n%s\n%s" % (errorMessage, infoMessage, body)
         return html
-
 
 class WPrintPageFrame ( wcomponents.WTemplated ):
     pass
