@@ -181,11 +181,15 @@ class BistateBatchUploaderAgent(PushSyncAgent):
         for record, recId, operation in records:
             deleted = operation & STATUS_DELETED
             try:
-                di.toMarc(recId if deleted else record, overrideCache=True, deleted=deleted)
+                if record.getOwner():
+                    di.toMarc(recId if deleted else record, overrideCache=True, deleted=deleted)
+                else:
+                    logger.warning('%s (%s) seems to have been deleted meanwhile!' % \
+                                   (record, recId))
             # TODO: Replace with MetadataGenerationException or similar?
             except AttributeError:
                 if logger:
-                    logger.exception("Problem generating metadata for %s!" % record)
+                    logger.exception("Problem generating metadata for %s (deleted=%s)!" % (record, deleted))
 
         xg.closeTag("collection")
 
