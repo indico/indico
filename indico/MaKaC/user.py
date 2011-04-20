@@ -1604,10 +1604,12 @@ class AvatarHolder( ObjectHolder ):
                             cat.grantAccess(prin)
 
             elif objType == "conference":
+                confHolderIdx = MaKaC.conference.ConferenceHolder()._getIdx()
+
                 for role in links[objType].keys():
                     for conf in links[objType][role]:
                         # if the conference has been deleted
-                        if conf.getOwner() == None:
+                        if conf.getId() not in confHolderIdx:
                             Logger.get('user.merge').warning(
                                 "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
                                 (conf, prin.getId(), role))
