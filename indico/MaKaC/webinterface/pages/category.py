@@ -1137,44 +1137,6 @@ class WPCategoryStatistics( WPCategoryDisplayBase ):
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, type = "Statistics" )
 
-class WEventTypeSelectionItem(wcomponents.WTemplated):
-
-    def __init__(self, webFactory ):
-        self.__webFactory = webFactory
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["id"] = self.__webFactory.getId()
-        vars["name"] = self.__webFactory.getName()
-        vars["description"] = self.__webFactory.getDescription()
-        return vars
-
-
-class WEventTypeSelection(wcomponents.WTemplated):
-
-    def __init__( self, targetCateg, webFactoryList ):
-        self.__webFactoryList = webFactoryList
-        self.__categ = targetCateg
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        l = []
-        for webFact in self.__webFactoryList:
-            l.append( WEventTypeSelectionItem( webFact ).getHTML() )
-        vars["eventTypes"] = "".join(l)
-        return vars
-
-
-class WPConferenceCreationSelectType( WPCategoryDisplayBase ):
-
-    def _getBody( self, params ):
-        #p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL }
-        wp = WEventTypeSelection( self._target,\
-                                                params.get("wfs", [] ) )
-        p = {"postURL":  urlHandlers.UHConferenceCreation.getURL(self._target)}
-        return "%s"%wp.getHTML( p )
-
-
 
 #---------------------------------------------------------------------------
 
