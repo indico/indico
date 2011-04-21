@@ -11451,11 +11451,12 @@ class TCIndex( Persistent ):
             return
         if not self._idx.has_key( av.getId() ):
             l = []
-            self._idx[ av.getId() ] = l
         else:
-            l = self._idx[ av.getId() ]
+            l = self._idx[av.getId()]
         if track not in l:
-            l.append( track )
+            l.append(track)
+            # necessary, otherwise ZODB won't know it needs to update the BTree
+            self._idx[av.getId()] = l
         self.notifyModification()
 
     def unindexCoordinator( self, av, track ):
@@ -11464,10 +11465,10 @@ class TCIndex( Persistent ):
         l = self._idx.get( av.getId(), [] )
         if track in l:
             l.remove( track )
+            self._idx[av.getId()] = l
         self.notifyModification()
 
     def notifyModification(self):
-        self._idx._p_changed = 1
         self._p_changed = 1
 
 
@@ -11702,6 +11703,7 @@ class Track(CoreObject):
                 av -- (MaKaC.user.Avatar) the user to which
                     coordination privileges must be granted.
         """
+
         try:
             if self._coordinators:
                 pass
