@@ -24,6 +24,7 @@ Basic fossils for data export
 
 from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
+from MaKaC.webinterface import urlHandlers
 
 
 class IConferenceMetadataFossil(IFossil):
@@ -58,6 +59,11 @@ class IConferenceMetadataFossil(IFossil):
     def getLocation(self):
         """ Location (CERN/...) """
     getLocation.convert = lambda l: l and l.getName()
+
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHConferenceDisplay)
+    getLocator.name = 'url'
 
     def getRoom(self):
         """ Room (inside location) """

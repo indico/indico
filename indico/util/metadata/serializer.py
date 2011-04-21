@@ -30,6 +30,10 @@ class Serializer(object):
         cls.registry[tag] = serializer
 
     @classmethod
+    def getAllFormats(cls):
+        return list(cls.registry)
+
+    @classmethod
     def create(cls, dformat, **kwargs):
         """
         A serializer factory
@@ -41,3 +45,10 @@ class Serializer(object):
             return serializer(**kwargs)
         else:
             raise Exception("Serializer for '%s' does not exist!" % dformat)
+
+    def getMIMEType(self):
+        return self._mime
+
+
+from indico.util.metadata.json import JSONSerializer
+from indico.util.metadata.xml import XMLSerializer

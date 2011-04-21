@@ -163,6 +163,14 @@ class Conversion:
             return res
         return iter
 
+    @classmethod
+    def url(cls, handler):
+        def _url(locator):
+            url = handler.getURL()
+            url.addParams(locator)
+            return str(url)
+        return _url
+
 #    @classmethod
 #    def resourceType(cls, obj):
 #
@@ -171,4 +179,3 @@ class Conversion:
 #            return 'external'
 #        else:
 #            return 'stored'
-

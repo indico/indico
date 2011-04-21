@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
 ##
 ## CDS Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,29 +18,26 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# python stdlib imports
-import os
-from collections import OrderedDict
-
-# module imports
-from indico.util.metadata.serializer import Serializer
-
-# legacy indico imports
-from MaKaC.common.TemplateExec import render
+"""
+Utility functions
+"""
 
 
-class HTML4Serializer(Serializer):
+def get_query_parameter(qdata, keys, default=None, integer=False):
+    if type(keys) != list:
+        keys = list(keys)
+    for k in keys:
+        paramlist = qdata.get(k)
+        if paramlist:
+            if len(paramlist) == 1:
+                val = paramlist[0]
+                if integer:
+                    val = int(val)
+                del qdata[k]
+                return val
+            else:
+                raise Exception("duplicate argument' %s'!" % k)
+    return None
 
-    _mime = 'text/html'
-
-    def __call__(self, fossils):
-        if type(fossils) != list:
-            fossils = [fossils]
-
-        orderedFossils = OrderedDict()
-
-        for fossil in fossils:
-            orderedFossils.setdefault(fossil['startDate'].date(), []).append(fossil)
-
-        return render(os.path.join(os.path.dirname(__file__), 'html4.tpl'),
-                      {'fossils': orderedFossils})
+def remove_lists(data):
+    return dict((k, v[0]) for (k, v) in data.iteritems() if v != None)
