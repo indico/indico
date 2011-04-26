@@ -26,7 +26,7 @@
                 </tr>
             % if alarms == "":
                 <tr><td colspan="4"><em>${ _("There are not alarms yet")}</em></td></tr>
-            % else: 
+            % else:
                 ${ alarms }
             % endif
             </table>

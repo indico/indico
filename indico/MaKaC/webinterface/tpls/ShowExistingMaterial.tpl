@@ -22,7 +22,7 @@ var mode = '${ mode }';
 <% from MaKaC.conference import IMaterialFossil %>
 
 
-% if isinstance(self_._target, conference.SubContribution): 
+% if isinstance(self_._target, conference.SubContribution):
 
 
     var args = {
@@ -36,7 +36,7 @@ var mode = '${ mode }';
     };
     var uploadAction = Indico.Urls.UploadAction.subContribution;
     var targetType = '${ self_._target.getConference().getType() }';
-% elif isinstance(self_._target, conference.Contribution): 
+% elif isinstance(self_._target, conference.Contribution):
     var args = {
         conference: '${ self_._target.getConference().getId() }',
         confId: '${ self_._target.getConference().getId() }',
@@ -49,7 +49,7 @@ var mode = '${ mode }';
     if (targetType == "conference" && mode == 'management') {
         showMainResourceOption = true;
     }
-% elif isinstance(self_._target, conference.Session): 
+% elif isinstance(self_._target, conference.Session):
     var args = {
         conference: '${ self_._target.getConference().getId() }',
         confId: '${ self_._target.getConference().getId() }',
@@ -59,7 +59,7 @@ var mode = '${ mode }';
     };
     var uploadAction = Indico.Urls.UploadAction.session;
     var targetType = '${ self_._target.getConference().getType() }';
-% elif isinstance(self_._target, conference.Conference): 
+% elif isinstance(self_._target, conference.Conference):
     var args = {
         conference: '${ self_._target.getId() }',
         confId: '${ self_._target.getId() }',
@@ -67,7 +67,7 @@ var mode = '${ mode }';
     };
     var uploadAction = Indico.Urls.UploadAction.conference;
     var targetType = '${ self_._target.getConference().getType() }';
-% elif isinstance(self_._target, conference.Category): 
+% elif isinstance(self_._target, conference.Category):
     var args = {
         category: '${ self_._target.getId() }',
         categId: '${ self_._target.getId() }',

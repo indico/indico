@@ -146,7 +146,7 @@ def translateToMako(tplText):
                     line = "%s%%%s" % (indentation, endsWithColon(expression))
                 else:
                     line = "%s<%%%s%%>" % (indentation, expression)
-            result.append(line)
+            result.append(line.rstrip())
             nr += 1
         if len(stack) > 0:
             raise Exception, "stack is not empty: " + str(stack)

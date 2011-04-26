@@ -1,15 +1,15 @@
 <li class="UIPerson clearfix" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'" >
 
-    % if not selectable: 
+    % if not selectable:
         <input  type="image" style="padding: 3px;" class="UIRowButton"
                 onclick="javascript:removeItem(${ id }, this.form);return false;"
                 title="${ _("Remove this person from the list")}"
                 src="${ systemIcon("remove") }" />
     % endif
 
-    % if currentUserBasket: 
+    % if currentUserBasket:
         <% domId = id %>
-        % if ParentPrincipalTableId: 
+        % if ParentPrincipalTableId:
             <% domId = "t" + str(ParentPrincipalTableId) + "av" + id %>
         % endif
 
@@ -22,7 +22,7 @@
 
     <span class="nameLink">
 
-        % if selectable: 
+        % if selectable:
         <input type="${ inputType }" name="selectedPrincipals" value="${ id }" ${ selected }>
         % endif
 

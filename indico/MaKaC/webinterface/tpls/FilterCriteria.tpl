@@ -3,8 +3,8 @@
 
 <% counter = 0 %>
 
-% for name, section in content: 
-  % if counter % 4 == 0: 
+% for name, section in content:
+  % if counter % 4 == 0:
     <tr style="padding-bottom: 10px;">
   % endif
 
@@ -15,7 +15,7 @@
   </td>
 
   <% counter += 1 %>
-  % if counter % 4 == 0: 
+  % if counter % 4 == 0:
     </tr>
   % endif
 

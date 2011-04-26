@@ -2,9 +2,9 @@
     <form action="${ saveCSS }" method="POST" ENCTYPE="multipart/form-data">
         <label for="demo">${ _("Select to switch templates")}</label>
         <select id="selectedTpl" name="selectedTpl" onchange="location.href='${ previewURL }&cssId=' + this.options[this.selectedIndex].value">
-        % for tpl in templatesList:  
+        % for tpl in templatesList:
             <% selectedV = "" %>
-            % if tpl.getId() == selectedCSSId: 
+            % if tpl.getId() == selectedCSSId:
                 <% selectedV = """ selected="selected" """%>
             % endif
             <option value="${ tpl.getId() }"${ selectedV }>${ tpl.getFileName(extension=False) }</option>

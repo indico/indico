@@ -1,4 +1,4 @@
-% if not HasRoom: 
+% if not HasRoom:
 <div style="margin-bottom: 1em;">
     <span class="RRNoteTitle">${_("Warning:")}</span>
     <span class="RRNoteText">
@@ -8,7 +8,7 @@
 </div>
 % endif
 
-% if IsSingleBooking: 
+% if IsSingleBooking:
 <div style="margin-bottom: 1em;">
     <div id="sendRecordingRequestTop" style="display:none;">
         <button onclick="send('RecordingRequest')">${ _('Send request') }</button>
@@ -29,7 +29,7 @@
 <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
 <div class="RRFormSection">
     <!-- WHICH CONTRIBUTIONS SHOULD BE RECORDED -->
-% if not IsLecture: 
+% if not IsLecture:
     <div class="RRFormSubsection">
         <span class="RRQuestion">${ _('Which talks would you like to have recorded?') }</span>
         <div>
@@ -45,7 +45,7 @@
     <div id="contributionsDiv" class="RRFormSubsection" style="display: ${ displayText };">
         <span class="RRQuestion">${ _('Please choose among the contributions below:') }</span>
 
-        % if HasTalks: 
+        % if HasTalks:
         <span class="fakeLink" style="margin-left: 20px;" onclick="RRSelectAllContributions()">${ _('Select all') }</span>
         <span class="horizontalSeparator">|</span>
         <span class="fakeLink" onclick="RRUnselectAllContributions()">${ _('Select none') }</span>
@@ -105,9 +105,9 @@
         <br />
         <select name="postingUrgency" id="postingUrgency">
             % for value, text in PostingUrgency:
-            % if value == "withinWeek" : 
+            % if value == "withinWeek" :
                 <% selectedText = "selected" %>
-            % else: 
+            % else:
                 <% selectedText = "" %>
             % endif
             <option value="${value}" ${selectedText }>${text}</option>
@@ -137,7 +137,7 @@
     <div class="RRFormSubsection">
         <span class="RRQuestion">${ _('Why do you need this event recorded? (check all that apply)') }</span>
         <ul class="RROptionList">
-            % for value, text in RecordingPurpose: 
+            % for value, text in RecordingPurpose:
             <li>
                 <input type="checkbox" name="recordingPurpose" value="${value}" id="${value}CB">
                 <label for="${value}CB">${text}</label>
@@ -149,7 +149,7 @@
     <div class="RRFormSubsection">
         <span class="RRQuestion">${ _('Who is the intended audience? (check all that apply)') }</span>
         <ul class="RROptionList">
-            % for value, text in IntendedAudience: 
+            % for value, text in IntendedAudience:
             <li>
                 <input type="checkbox" name="intendedAudience" value="${value}" id="${value}CB">
                 <label for="${value}CB">${text}</label>
@@ -161,7 +161,7 @@
     <div class="RRFormSubsection">
         <span class="RRQuestion">${ _('What is the subject matter? (check all that apply)') }</span>
         <ul class="RROptionList">
-            % for value, text in SubjectMatter: 
+            % for value, text in SubjectMatter:
             <li>
                 <input type="checkbox" name="subjectMatter" value="${value}" id="${value}CB">
                 <label for="${value}CB">${text}</label>
@@ -179,7 +179,7 @@
     </div>
 </div>
 
-% if IsSingleBooking: 
+% if IsSingleBooking:
 <div style="margin-top: 1em;">
     <div id="sendRecordingRequestBottom" style="display:none;">
         <button onclick="send('RecordingRequest')">${ _('Send request') }</button>

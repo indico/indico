@@ -1,9 +1,9 @@
 <% from MaKaC.paperReviewing import ConferencePaperReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-% if not Review.isAuthorSubmitted(): 
+% if not Review.isAuthorSubmitted():
 <table width="90%" align="center" border="0" style="margin-bottom: 1em">
-    % if len(Review.getReviewManager().getVersioning()) == 1: 
+    % if len(Review.getReviewManager().getVersioning()) == 1:
     <tr>
         <td>
             <p style="padding-left: 25px;"><font color="gray">
@@ -12,7 +12,7 @@
             </font></p>
         </td>
     </tr>
-    % else: 
+    % else:
     <tr>
         <td>
             <p style="padding-left: 25px;"><font color="gray">
@@ -23,7 +23,7 @@
     </tr>
     % endif
 </table>
-% else: 
+% else:
 <table width="90%" align="center" border="0" style="padding-top: 15px;">
     <tr>
         <td colspan="5" class="groupTitle" style="border: none">${ _("Give opinion on the content of a contribution")}
@@ -92,20 +92,20 @@ var showWidgets = function(firstLoad) {
              current: 'reviewerJudgement'},initialValue).draw());
 
 
-    % if len (ConfReview.getReviewingQuestions()) == 0 : 
+    % if len (ConfReview.getReviewingQuestions()) == 0 :
         $E('questionListDisplay').set("No reviewing questions proposed for this conference.");
-    % else: 
+    % else:
         $E("questionListDisplay").set('');
-        % for q in ConfReview.getReviewingQuestions(): 
+        % for q in ConfReview.getReviewingQuestions():
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
 
             newDiv.append(Html.span(null,"${q.getText()}"));
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                % if Advice.getAnswer(q.getId()) is None: 
+                % if Advice.getAnswer(q.getId()) is None:
                     var initialValue = "${ Advice.createAnswer(q.getId()).getRbValue() }";
-                % else: 
+                % else:
                     var initialValue = "${ Advice.getAnswer(q.getId()).getRbValue() }";
                 % endif
             } else {
@@ -188,7 +188,7 @@ var showValues = function() {
 
 % if Advice.isSubmitted():
     var submitted = true;
-% else: 
+% else:
     var submitted = false;
 % endif
 

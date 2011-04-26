@@ -2,10 +2,10 @@
 
     <input id="colorTextField" size="7" type="text" value="${ colorCode }" name="colorCode">
 
-    % if colorCode == "": 
+    % if colorCode == "":
         <% colorPreview = "white" %>
         <% removeColorDisplay = "none" %>
-    % else: 
+    % else:
         <% colorPreview = colorCode %>
         <% removeColorDisplay = "inline" %>
     % endif

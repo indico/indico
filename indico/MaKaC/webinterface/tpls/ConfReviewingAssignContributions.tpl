@@ -5,10 +5,10 @@
 
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>
-% if not ConfReview.hasReviewing(): 
+% if not ConfReview.hasReviewing():
 <p style="padding-left: 25px;"><font color="gray">${ _("Type of reviewing has not been chosen yet")}</font></p>
-% else: 
-% if len(Conference.getContributionListSortedById()) == 0: 
+% else:
+% if len(Conference.getContributionListSortedById()) == 0:
 <p style="padding-left: 25px;"><font color="gray">${ _("There are no papers to assign.")}</font></p>
 %else:
 <table style="margin-left:20px;">
@@ -60,7 +60,7 @@
                         <td><input type="checkbox" id="typeShowNoValue" name="selTypes" value="not specified" checked/></td>
                         <td> --${ _("not specified")}--</td>
                     </tr>
-                    % for type in self_._conf.getContribTypeList(): 
+                    % for type in self_._conf.getContribTypeList():
                         <tr>
                             <td><input type="checkbox" name="selTypes" value="${type.getId()}" checked></td>
                             <td>${ type.getName() }</td>
@@ -74,7 +74,7 @@
                         <td><input type="checkbox" id="sessionShowNoValue" name="selSessions" value="not specified" checked/></td>
                         <td> --${ _("not specified")}--</td>
                     </tr>
-                    % for s in self_._conf.getSessionListSorted(): 
+                    % for s in self_._conf.getSessionListSorted():
                         <tr>
                             <td><input type="checkbox" name="selSessions" value="${s.getId()}" checked></td>
                             <td>${ s.getTitle() }</td>
@@ -88,7 +88,7 @@
                         <td><input type="checkbox" id="trackShowNoValue" name="selTracks" value="not specified" checked/></td>
                         <td> --${ _("not specified")}--</td>
                     </tr>
-                    % for t in Conference.getTrackList(): 
+                    % for t in Conference.getTrackList():
                         <tr>
                             <td><input type="checkbox" name="selTracks" value="${t.getId()}" checked></td>
                             <td>${ t.getTitle() }</td>
@@ -98,7 +98,7 @@
             </td>
             <td>
                 <table style="list-style-type:none">
-                    % if not IsOnlyReferee: 
+                    % if not IsOnlyReferee:
                         <tr><td><input type="checkbox" id="showWithReferee" checked/> ${ _("With Referee assigned")}</td></tr>
                     % endif
                     <tr><td><input type="checkbox" id="showWithEditor" checked/> ${ _("With Layout Reviewer assigned")}</td></tr>
@@ -116,7 +116,7 @@
 </table>
 
 <table class="shadowRectangleSoft" width="95%">
-    % if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+    % if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     <tr>
         <td>${ _("Referee")}:</td>
         <td id="assignRefereeHelp">
@@ -142,7 +142,7 @@
         </td>
     </tr>
     % endif
-    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     <tr>
         <td>${ _("Content Reviewers")}:</td>
         <td id="assignReviewerHelp">
@@ -214,7 +214,7 @@
         <tr>
             <td id="noFilteredContribution" colspan="8" style="padding:15px 0px 15px 15px; display:none;">
                 <span>${ _("There are no papers with the selected filters criteria.")}</span>
-                % if IsOnlyReferee: 
+                % if IsOnlyReferee:
                     <span>${ _("It is also possible you do not have any assigned paper for the review yet.")}</span>
                 % endif
             </td>
@@ -225,7 +225,7 @@
 </table>
 
 <table class="shadowRectangleSoft" width="95%" style="margin-top:10px;">
-    % if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+    % if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     <tr>
         <td>${ _("Referee")}:</td>
         <td id="assignRefereeHelp">
@@ -251,7 +251,7 @@
         </td>
     </tr>
     % endif
-    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     <tr>
         <td>${ _("Content Reviewers")}:</td>
         <td id="assignReviewerHelp">
@@ -528,7 +528,7 @@ var contributionTemplate = function(contribution) {
     ul.dom.style.padding = 0;
     ul.dom.style.marginLeft = '5px';
 
-    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     var li1 = Html.li();
     var span1 = Html.span({}, $T('Referee: '))
     var span2 = contribution.reviewManager.referee ?
@@ -538,7 +538,7 @@ var contributionTemplate = function(contribution) {
     ul.append(li1);
     % endif
 
-    % if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+    % if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     var li2 = Html.li();
     var span1 = Html.span({}, $T('Layout reviewer: '))
     var span2 = contribution.reviewManager.editor ?
@@ -548,7 +548,7 @@ var contributionTemplate = function(contribution) {
     ul.append(li2);
     % endif
 
-    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+    % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
     var li3 = Html.li();
     var span = Html.span({id : ("creviewerstitle" + contribution.id)}, $T('Content reviewers: '));
     li3.append(span);
@@ -1093,7 +1093,7 @@ var fetchContributions = function() {
             selTypes : getCheckedBoxes('selTypes'),
             selTracks : getCheckedBoxes('selTracks'),
             selSessions : getCheckedBoxes('selSessions'),
-            % if not IsOnlyReferee: 
+            % if not IsOnlyReferee:
             showWithReferee: $E('showWithReferee').dom.checked,
             % endif
             showWithEditor: $E('showWithEditor').dom.checked,
@@ -1139,7 +1139,7 @@ var fetchUsers = function(order, role) {
     }
 
     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-        % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+        % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
             if (!checkAllHaveReferee(checkedContributions, order, role, false)) {
                 return;
             }
@@ -1340,7 +1340,7 @@ var fetchUsersPerAttribute = function(order, role, attribute) {
                                                           contrPerAttribute.push(result[i]);
                                                     }
                                                     if ((order == 'assign' && role == 'editor') || (order == 'add' && role == 'reviewer')) {
-                                                            % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+                                                            % if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
                                                                 if (!checkAllHaveReferee(contrPerAttribute, order, role, true)) {
                                                                     return;
                                                                 }
@@ -1548,12 +1548,12 @@ $E('applyFilter').observeClick(function(){
     buildShowHideFiltering();
     appliedFilter = true;
     fetchContributions();
-    % if not IsOnlyReferee: 
+    % if not IsOnlyReferee:
         $E('totalContributions').dom.style.display = '';
     % endif
 });
 
-% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+% if not IsOnlyReferee and not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
 $E('assignRefereeButton_top').observeClick(function(){ fetchUsers('assign', 'referee'); });
 assignPerTrackMenus('referee', 'top');
 assignPerTrackMenus('referee', 'bottom');
@@ -1562,7 +1562,7 @@ $E('removeRefereeButton_top').observeClick(function(){ removeUser('referee') });
 $E('removeRefereeButton_bottom').observeClick(function(){ removeUser('referee') });
 % endif
 
-% if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+% if not (ConfReview.getChoice() == CPR.CONTENT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
 $E('assignEditorButton_top').observeClick(function(){ fetchUsers('assign', 'editor'); });
 assignPerTrackMenus('editor', 'top');
 assignPerTrackMenus('editor', 'bottom');
@@ -1571,7 +1571,7 @@ $E('removeEditorButton_top').observeClick(function(){ removeUser('editor') });
 $E('removeEditorButton_bottom').observeClick(function(){ removeUser('editor') });
 % endif
 
-% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING): 
+% if not (ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or ConfReview.getChoice() == CPR.NO_REVIEWING):
 $E('addReviewerButton_top').observeClick(function(){ fetchUsers('add', 'reviewer'); });
 assignPerTrackMenus('reviewer', 'top');
 assignPerTrackMenus('reviewer', 'bottom');

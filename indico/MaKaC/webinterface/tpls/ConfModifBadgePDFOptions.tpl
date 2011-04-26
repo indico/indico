@@ -1,5 +1,5 @@
 
-    % if ShowKeepValues: 
+    % if ShowKeepValues:
     <tr>
       <td>
         <input id="keepPDFOptions" type="checkbox" value="keepPDFOptions" name="keepPDFOptions" checked />
@@ -74,20 +74,20 @@
       <td>
         ${ _("Page size")}
         <select name="pagesize">
-            % for pagesizeName in PagesizeNames : 
-                % if pagesizeName == PDFOptions.getPagesize(): 
+            % for pagesizeName in PagesizeNames :
+                % if pagesizeName == PDFOptions.getPagesize():
                     <% selectedText = " SELECTED" %>
-                % else: 
+                % else:
                     <% selectedText = "" %>
                 % endif
                 <option ${ selectedText }>
                     ${ pagesizeName }
-                </option>            
+                </option>
             % endfor
         </select>
       </td>
     </tr>
-    % if ShowTip: 
+    % if ShowTip:
     <tr>
       <td>
         <div style="border-top:1px solid; margin-right: 10px; margin-top:1em;">

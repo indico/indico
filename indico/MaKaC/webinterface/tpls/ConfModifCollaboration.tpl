@@ -2,12 +2,12 @@
 <% multipleBookingPluginCount = len(MultipleBookingPlugins) %>
 <% allPluginCount = singleBookingPluginCount + multipleBookingPluginCount %>
 
-% if singleBookingPluginCount > 0: 
+% if singleBookingPluginCount > 0:
     <%include file="ConfModifCollaborationSingleBookings.tpl"/>
 % endif
 
-% if multipleBookingPluginCount > 0 : 
-    % if singleBookingPluginCount > 0: 
+% if multipleBookingPluginCount > 0 :
+    % if singleBookingPluginCount > 0:
     <div class="horizontalLine" style="margin-top:1em;margin-bottom:1em;"></div>
     % endif
 
@@ -57,9 +57,9 @@ var canBeNotifiedOnDateChanges = {
 /**
  * Variable that will store if the user is an admin that can Accept / Reject bookings
  */
-% if UserIsAdmin: 
+% if UserIsAdmin:
 var userIsAdmin = true;
-% else: 
+% else:
 var userIsAdmin = false;
 % endif
 

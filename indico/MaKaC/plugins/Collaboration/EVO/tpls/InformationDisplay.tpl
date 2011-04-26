@@ -9,8 +9,8 @@
             </td>
         </tr>
 
-        % if Booking.getHasAccessPassword(): 
-            % if not Booking.getBookingParamByName("displayPassword") and not Booking.getBookingParamByName("displayPhonePassword"): 
+        % if Booking.getHasAccessPassword():
+            % if not Booking.getBookingParamByName("displayPassword") and not Booking.getBookingParamByName("displayPhonePassword"):
             <tr>
                 <td class="collaborationConfDisplayInfoLeftCol">
                     ${ _('Password:')}
@@ -19,8 +19,8 @@
                     ${ _("This EVO meeting is protected by a private password.") }
                 </td>
             </tr>
-            % else: 
-                % if Booking.getBookingParamByName("displayPassword"): 
+            % else:
+                % if Booking.getBookingParamByName("displayPassword"):
                 <tr>
                     <td class="collaborationConfDisplayInfoLeftCol">
                         ${ _('Password:')}
@@ -30,7 +30,7 @@
                     </td>
                 </tr>
                 % endif
-                % if Booking.getBookingParamByName("displayPhonePassword"): 
+                % if Booking.getBookingParamByName("displayPhonePassword"):
                 <tr>
                     <td class="collaborationConfDisplayInfoLeftCol">
                         ${ _('Phone Bridge Password:')}
@@ -43,7 +43,7 @@
             % endif
         % endif
 
-        % if Booking.getBookingParamByName("displayPhoneBridgeNumbers"): 
+        % if Booking.getBookingParamByName("displayPhoneBridgeNumbers"):
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 ${ _('Phone bridge numbers:')}
@@ -56,7 +56,7 @@
         </tr>
         % endif
 
-        % if Booking.getBookingParamByName("displayURL"): 
+        % if Booking.getBookingParamByName("displayURL"):
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 ${ _('Auto-join URL:')}

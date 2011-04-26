@@ -47,7 +47,7 @@
         </td>
     </tr>
 
-    % if NiceMsg: 
+    % if NiceMsg:
     <tr>
         <td class="titleCellTD">&nbsp;</td>
         <td class="contentCellTD">
@@ -56,7 +56,7 @@
     </tr>
     % endif
 
-    % if msg: 
+    % if msg:
         <tr>
             <td class="titleCellTD">&nbsp;</td>
             <td class="contentCellTD">
@@ -111,9 +111,9 @@
                 </div>
                 <div style="padding: 5px 0; color: #444;">
                       <% from MaKaC.common.Configuration import Config    %>
-                      % if "Local" not in Config.getInstance().getAuthenticatorList(): 
+                      % if "Local" not in Config.getInstance().getAuthenticatorList():
                            <em>${ ("If you <b>can't remember your password</b>, please click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ ("here") }</a></em>
-                      % else: 
+                      % else:
                            <em>${ _("<b>Note:</b> this works only with Indico local accounts, not with CERN NICE/External accounts; for these click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ _("here") }</a></em>.
                       % endif
                 </div>

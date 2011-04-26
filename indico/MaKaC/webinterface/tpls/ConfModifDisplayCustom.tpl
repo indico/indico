@@ -14,10 +14,10 @@
             <span class="dataCaptionFormat">${ _("Currently used stylesheet") }</span>
         </td>
         <td class="blacktext" style="width: 100%">
-            % if currentCSSFileName: 
+            % if currentCSSFileName:
                 <strong style="margin-right: 30px;">${ currentCSSFileName }</strong>
                 <input type="button" class="btn" onclick="window.location = '${ removeCSS }'" value="${ _("Remove stylesheet")}">
-            % else: 
+            % else:
                 <em>${ _("No stylesheet has been applied") }</em>
             % endif
         </td>

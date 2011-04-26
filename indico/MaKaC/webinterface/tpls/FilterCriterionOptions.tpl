@@ -11,7 +11,7 @@
        <%  checked=" checked" %>
     % endif
     <tr><td align="left" valign="top"><input type="checkbox" name="${ htmlFormName + "ShowNoValue" }" ${ checked } value= "--none--" ></td><td width="100%" align="left" valign="top"> ${ _("--not set--")}</td></tr>
-    % for itemId in form: 
+    % for itemId in form:
        <% checked="" %>
        % if form[itemId].getId() in filterCrit.getField(critFormName).getValues():
           <%  checked=" checked" %>

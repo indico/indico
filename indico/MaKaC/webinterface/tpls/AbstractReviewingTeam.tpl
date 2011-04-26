@@ -7,9 +7,9 @@
     <tr>
         <td colspan="3">
             <div style="padding:5px; color:gray;">
-                % if tracks: 
+                % if tracks:
                     <span class="collShowBookingsText">${_("Note that the reviewers will be track coordinators of that track.")}</span>
-                % else: 
+                % else:
                     <span class="collShowBookingsText">${_("There are no tracks created yet. Please go to the menu ")}<a href="${ urlHandlers.UHConfModifProgram.getURL(conf) }">${ _("Programme")}</a>${_(" to create tracks.")}</span>
                 % endif
             </div>
@@ -17,7 +17,7 @@
     </tr>
 </table>
 <table width="50%" align="left">
-% for track in tracks: 
+% for track in tracks:
     <tr>
         <td>
             <table width="50%" align="left" style="padding-left:20px; padding-bottom:15px; width:500px;">
@@ -39,7 +39,7 @@ var trackIds = ${ trackIds };
 
 var listOfAddHandlers = {};
 
-% for i in trackIds: 
+% for i in trackIds:
     // set the track id
     trackId = 'track_'+ '${ i }';
 

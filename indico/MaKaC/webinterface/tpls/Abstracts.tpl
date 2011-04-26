@@ -170,25 +170,25 @@ document.filterOptionForm.showSubmissionDate.checked=false
     <tr>
        <td nowrap colspan="11">
             <div class="CRLgroupTitleNoBorder">${ _("Displaying")}<strong> ${ filteredNumberAbstracts } </strong>
-            % if filteredNumberAbstracts == "1": 
+            % if filteredNumberAbstracts == "1":
                 ${ _("abstract")}
-            % else: 
+            % else:
                 ${ _("abstracts")}
             % endif
-            % if filterUsed: 
+            % if filterUsed:
                 (${ _("Total")}: <strong>${ totalNumberAbstracts }</strong>)
             % endif
             </div>
             <form action=${ filterPostURL } method="post" name="optionForm">
             <div class="CRLIndexList" >
-                % if filterUsed: 
+                % if filterUsed:
                     <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                     <span style="padding: 0px 6px 0px 6px">|</span>
                 % endif
                 <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
-                  % if filterUsed: 
+                  % if filterUsed:
                     ${ _("Show filters")}
-                  % else: 
+                  % else:
                     ${ _("Apply filters")}
                   % endif
                 </a>
@@ -223,13 +223,13 @@ document.filterOptionForm.showSubmissionDate.checked=false
             </table>
         </td>
     </tr>
-    % if (totalNumberAbstracts == "0"): 
+    % if (totalNumberAbstracts == "0"):
     <tr>
         <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts submitted yet")}</span></td>
     </tr>
-    % elif (filteredNumberAbstracts == "0"): 
+    % elif (filteredNumberAbstracts == "0"):
         <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts with the filters criteria selected")}</span></td>
-    % else: 
+    % else:
         <tr>
             ${ abstractTitleBar }
         </tr>
@@ -347,9 +347,9 @@ document.filterOptionForm.showSubmissionDate.checked=false
 
     function showFilters() {
         if ($E("filterMenu").dom.style.display == "") {
-% if filterUsed: 
+% if filterUsed:
             $E("index_filter").set('${ _("Show filters")}');
-% else: 
+% else:
             $E("index_filter").set('${ _("Apply filters")}');
 % endif
             $E('index_filter').dom.className = "CRLIndexUnselected";

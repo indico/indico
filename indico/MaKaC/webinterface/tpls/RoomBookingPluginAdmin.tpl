@@ -39,7 +39,7 @@
         <tr>
           <td>
             <table width="100%">
-            % for plugin in plugins: 
+            % for plugin in plugins:
             <tr>
               <td class="titleCellTD"><span class="titleCellFormat">${plugin.__metadata__['name']}</span></td><td>${plugin.__metadata__['description']}</td>
             </tr>

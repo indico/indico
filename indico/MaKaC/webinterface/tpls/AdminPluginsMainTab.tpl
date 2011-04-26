@@ -1,9 +1,9 @@
 <div style="padding-top: 1em;">
 <form action="${ urlHandlers.UHAdminPluginsSaveOptionReloadAll.getURL()}" method="post">
 
-    % if PluginsHolder.getGlobalPluginOptions().getReloadAllWhenViewingAdminTab(): 
+    % if PluginsHolder.getGlobalPluginOptions().getReloadAllWhenViewingAdminTab():
         <% checked = "checked" %>
-    % else: 
+    % else:
         <% checked = "" %>
     % endif
 
@@ -30,7 +30,7 @@
 </form>
  -->
 
-% if PluginsHolder.getPluginTypes(includeNonVisible = False): 
+% if PluginsHolder.getPluginTypes(includeNonVisible = False):
 <table style="width: 100%; padding-top: 2em;">
     <tr>
         <td class="groupTitle" colspan="3">
@@ -45,29 +45,29 @@
         </td>
         <td bgcolor="white" width="100%" class="blacktext" style="padding-left:20px;vertical-align: top">
             <table align="left">
-                % for pluginType in PluginsHolder.getPluginTypes(includeNonVisible = False): 
+                % for pluginType in PluginsHolder.getPluginTypes(includeNonVisible = False):
                 <tr>
                     <td>
                         <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}">
-                        % if not pluginType.isUsable(): 
+                        % if not pluginType.isUsable():
                             <img class="imglink" alt="${ _("Not in usable state")}" src="${Config.getInstance().getSystemIconURL( 'greyedOutSection' )}"/>
-                        % elif pluginType.isActive(): 
+                        % elif pluginType.isActive():
                                 <img class="imglink" alt="${ _("Click to disable")}" src="${Config.getInstance().getSystemIconURL( 'enabledSection' )}"/>
-                        % else: 
+                        % else:
                                 <img class="imglink" alt="${ _("Click to enable")}" src="${Config.getInstance().getSystemIconURL( 'disabledSection' )}"/>
                         % endif
                         </a>
-                        % if not pluginType.isUsable(): 
+                        % if not pluginType.isUsable():
                             ${ pluginType.getName() }
                             <small class="smallRed">
                                 (${ pluginType.getNotUsableReason() })
                             </small>
-                        % else: 
+                        % else:
                             <a href="${urlHandlers.UHAdminTogglePluginType.getURL(pluginType)}" onclick="return confirm('${ _('This will reload all the plugins too. Do you want to continue?')}');">
                                 ${ pluginType.getName() }
                             </a>
                         % endif
-                        % if pluginType.hasDescription(): 
+                        % if pluginType.hasDescription():
                             <span style="margin-left: 2em;">
                                 (${ pluginType.getDescription() })
                             </span>
@@ -79,6 +79,6 @@
         </td>
     </tr>
 </table>
-% else: 
+% else:
     ${ _("No plugin types in the system (or non marked as visible)") }
 % endif

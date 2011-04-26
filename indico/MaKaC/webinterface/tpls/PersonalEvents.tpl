@@ -14,5 +14,5 @@
                         {
                             var events = new MyEventsList('myEvents', -1, -1, $('myEventsContainer'), 10);
                         };
-    
+
 </script>

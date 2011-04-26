@@ -31,9 +31,9 @@
             <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Protection")}</span></td>
             <td class="blacktext">
                 <div>
-                    % if categProtection == 'public' : 
+                    % if categProtection == 'public' :
                         <% color = "#128F33" %>
-                    % else : 
+                    % else :
                         <% color = "#B02B2C" %>
                     % endif
                     <span id="inheritRadioButtonWrapper" class="categProtectionRadioEntry">
@@ -47,7 +47,7 @@
                     </span>
                     <div id="userListWrapper">
                     </div>
-                    % if categProtection != 'public' : 
+                    % if categProtection != 'public' :
                     <span id="publicRadioButtonWrapper" class='categProtectionRadioEntry'>
                         <input type="radio" id="publicRadioButton" class="eventProtectionRadioButton" name="categProtection" value='public' onclick="hideUserList();"/><label for="publicRadioButton"><span style="color: #128F33">${ _("Public") }</span>${ _(" : Can be viewed by everyone") }</label>
                     </span>

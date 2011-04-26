@@ -168,7 +168,7 @@
 
 
         <table cellpadding="0" cellspacing="0" border="0" width="80%">
-        % if standalone: 
+        % if standalone:
             <tr>
             <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
             </tr>
@@ -194,23 +194,23 @@
                                         <td width="80%">
                                             <form id="chooseForm" method="post">
                                                 <select name="roomName" id="roomName">
-                                                % for room in rooms: 
+                                                % for room in rooms:
                                                   <% selected = "" %>
-                                                  % if room.name == eventRoomName: 
+                                                  % if room.name == eventRoomName:
                                                     <% selected = 'selected="selected"' %>
                                                   % endif
                                                   <% url = detailsUH.getURL( room ) %>
-                                                  % if forNewBooking: 
+                                                  % if forNewBooking:
                                                       <% url = bookingFormUH.getURL( room ) %>
                                                   % endif
                                                   <option value="${ url }" ${ selected } class="${roomClass( room )}">${ room.locationName + ": &nbsp; " + room.getFullName() }</option>
                                                 % endfor
                                                 </select>
 
-                                                % if forNewBooking: 
+                                                % if forNewBooking:
                                                     <span id="bookButtonWrapper"><input id="bookButton" class="btn" type="button" value="${ _("Book")}" onclick="isBookable();" /></span>
                                                 % endif
-                                                % if not forNewBooking: 
+                                                % if not forNewBooking:
                                                     <input class="btn" type="button" value="${ _("Room details")}" onclick="document.location = $F( 'roomName' ); return false;" />
                                                 % endif
 
@@ -236,8 +236,8 @@
                                                         <td align="left" class="blacktext">
                                                             <select name="roomLocation" id="roomLocation">
                                                                 <option value="">${ Location.getDefaultLocation().friendlyName }</option>
-                                                                % for loc in Location.allLocations: 
-                                                                    % if loc.friendlyName != Location.getDefaultLocation().friendlyName: 
+                                                                % for loc in Location.allLocations:
+                                                                    % if loc.friendlyName != Location.getDefaultLocation().friendlyName:
                                                                         <option value="${loc.friendlyName}" >${ loc.friendlyName }</option>
                                                                     % endif
                                                                 % endfor
@@ -313,7 +313,7 @@
                                                     <tr>
                                                         <td width="80px" align="right" valign="top"><small> ${ _("I need...")}&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext" >
-                                                            % for eq in possibleEquipment: 
+                                                            % for eq in possibleEquipment:
                                                                 <input id="${ "equ_" + eq }" name="${ "equ_" + eq }" type="checkbox">${ eq }</input><br />
                                                             % endfor
                                                         </td>
@@ -340,7 +340,7 @@
                                                             <br />
                                                         </td>
                                                     </tr>
-                                                    % if user.isResponsibleForRooms(): 
+                                                    % if user.isResponsibleForRooms():
                                                         <tr>
                                                             <td width="80px" align="right" valign="top"><small> ${ _("Only mine")}&nbsp;&nbsp;</small></td>
                                                             <td align="left" class="blacktext">
@@ -350,7 +350,7 @@
                                                             </td>
                                                         </tr>
                                                     % endif
-                                                    % if user.isAdmin(): 
+                                                    % if user.isAdmin():
                                                         <tr>
                                                             <td width="80px" align="right" valign="top"><small> ${ _("Active?")}&nbsp;&nbsp;</small></td>
                                                             <td align="left" class="blacktext">

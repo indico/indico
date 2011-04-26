@@ -8,16 +8,16 @@
                 ${ Booking._bookingParams["name"] }
             </td>
         </tr>
-        % if Booking.getHasPin(): 
+        % if Booking.getHasPin():
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 ${ _('PIN:')}
             </td>
-            % if Booking.getBookingParamByName("displayPin"): 
+            % if Booking.getBookingParamByName("displayPin"):
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getPin() }
             </td>
-            % else: 
+            % else:
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ _("This conference is protected by a PIN.") }
             </td>
@@ -37,11 +37,11 @@
                 ${ _('Participants:')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
-                % if Booking.getParticipantList(): 
-                    % for p in Booking.getParticipantList(): 
+                % if Booking.getParticipantList():
+                    % for p in Booking.getParticipantList():
                         <div>${ p.getDisplayName(truncate=False) }</div>
                     % endfor
-                % else: 
+                % else:
                     ${ _("No participants yet.") }
                 % endif
             </td>

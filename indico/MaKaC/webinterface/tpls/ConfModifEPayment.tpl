@@ -27,7 +27,7 @@ from MaKaC.common import HelperMaKaCInfo
 minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 al = minfo.getAdminList()
 %>
-% if al.isAdmin( self_._rh._getUser() ): 
+% if al.isAdmin( self_._rh._getUser() ):
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Mandatory Conditions")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">

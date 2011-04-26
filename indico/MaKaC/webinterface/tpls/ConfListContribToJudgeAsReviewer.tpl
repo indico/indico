@@ -4,7 +4,7 @@
 
 <% dueDateFormat = "%a %d %b %Y" %>
 
-% if ConfReview.getReviewedContributions(User): 
+% if ConfReview.getReviewedContributions(User):
 
 <table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
@@ -17,21 +17,21 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("Deadline")}</td>
     </tr>
 
-    % for c in ConfReview.getReviewedContributions(User): 
-        % if not isinstance(c.getStatus(), ContribStatusNone): 
+    % for c in ConfReview.getReviewedContributions(User):
+        % if not isinstance(c.getStatus(), ContribStatusNone):
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
             <td style="padding-right:5px;padding-left:5px;">${ c.getId() }</td>
-            % if not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and c.getReviewManager().getLastReview().isAuthorSubmitted(): 
+            % if not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and c.getReviewManager().getLastReview().isAuthorSubmitted():
                     <td style="padding-right:5px;padding-left:5px;">
                         <a href="${ urlHandlers.UHContributionGiveAdvice.getURL(c) }">${ c.getTitle() }</a>
                     </td>
                 % endif
-                % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): 
+                % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                     <td style="padding-right:5px;padding-left:5px;">
                         <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final judgement already given by the referee')">${ c.getTitle() }</span>
                     </td>
                 % endif
-                % if not c.getReviewManager().getLastReview().isAuthorSubmitted(): 
+                % if not c.getReviewManager().getLastReview().isAuthorSubmitted():
                        <td style="padding-right:5px;padding-left:5px;">
                                 <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you judge the contribution.')">
                                    ${ c.getTitle() }
@@ -39,20 +39,20 @@
                        </td>
                    % endif
             <td style="padding-right:5px;padding-left:5px;">
-                % if c.getReviewManager().getLastReview().hasGivenAdvice(User): 
+                % if c.getReviewManager().getLastReview().hasGivenAdvice(User):
                     <span>${ _("Advice given")}</span>
-                % else: 
+                % else:
                     <span>${ _("Advice not given yet")}</span>
-                    % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): 
+                    % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                     <span><br>${ _("but Referee already judged contribution")}</span>
                     % endif
                 % endif
             </td>
             <td style="padding-right:5px;padding-left:5px;">
             <% date = c.getReviewManager().getLastReview().getAdjustedReviewerDueDate() %>
-            % if date is None: 
+            % if date is None:
                 ${ _("Deadline not set.")}
-            % else: 
+            % else:
                 <span>${ date.strftime(dueDateFormat) }</span>
             % endif
             </td>

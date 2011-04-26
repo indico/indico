@@ -8,7 +8,7 @@ var disableCustomId = function() {
 
 var pf = null; //place where to keep a ParticipantListField object to access later
 
-% if RoomsWithH323IP: 
+% if RoomsWithH323IP:
 var existingRoomData = ${ jsonEncode(fossilize(RoomsWithH323IP)) };
 % endif
 
@@ -438,7 +438,7 @@ type("ParticipantListField", ["IWidget"],
                 popup.open();
             });
 
-            % if RoomsWithH323IP: 
+            % if RoomsWithH323IP:
 
                 var addExistingRoomButton = Html.button({style:{marginRight: pixels(5)}}, $T('Add Existing Rooms'));
 
@@ -455,11 +455,11 @@ type("ParticipantListField", ["IWidget"],
 
             % endif
 
-            % if RoomsWithH323IP: 
+            % if RoomsWithH323IP:
                 var buttonDiv1 = Html.div({}, addExistingRoomButton, addNewRoomButton);
                 var buttonDiv2 = Html.div({}, addExistingPersonButton, addNewPersonButton);
                 var buttonDiv = Html.div({style:{marginTop: pixels(10)}}, buttonDiv1, buttonDiv2);
-            % else: 
+            % else:
                 var buttonDiv = Html.div({}, Html.div({}, addExistingPersonButton, addNewPersonButton, addNewRoomButton));
             % endif
 

@@ -5,21 +5,21 @@
         <tr>
             <td class="groupTitle" colspan="2"> ${ _("Propose to be rejected")}</td>
         </tr>
-        % if len(tracks) > 0: 
+        % if len(tracks) > 0:
         <tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> ${ _("Proposed track")}</span>
             </td>
             <td><select name="track">${ tracks }</select></td>
         </tr>
-        % else: 
+        % else:
         <tr>
             <td colspan="2">
                 <span class="titleCellFormat"> <b>${ _("This abstract has not been included in any track, if you want to include it now click")} <a href=${ changeTrackURL }>${ _("here")}</a></b> </span>
             </td>
         </tr>
         % endif
-        % if len(abstractReview.getReviewingQuestions()) > 0: 
+        % if len(abstractReview.getReviewingQuestions()) > 0:
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}</span></td>
             <td width="60%" id="questionListDisplay">
@@ -46,7 +46,7 @@
     </table>
 </form>
 
-% if len(abstractReview.getReviewingQuestions()) > 0: 
+% if len(abstractReview.getReviewingQuestions()) > 0:
 <script type="text/javascript">
 
 var questionPM = new IndicoUtil.parameterManager();

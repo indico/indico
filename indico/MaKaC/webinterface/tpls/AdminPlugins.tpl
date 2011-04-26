@@ -23,34 +23,34 @@
             </form>
         </td>
         <td bgcolor="white" width="100%" class="blacktext" style="padding-left:20px;vertical-align: top">
-            % if PluginType.hasPlugins() : 
+            % if PluginType.hasPlugins() :
             <table align="left">
-                % for plugin in pluginList: 
+                % for plugin in pluginList:
                 <tr>
                     <td>
-                        % if not plugin.isUsable(): 
+                        % if not plugin.isUsable():
                             <img class="imglink" alt="${ _("Not in usable state")}" src="${Config.getInstance().getSystemIconURL( 'greyedOutSection' )}"/>
-                        % elif plugin.isActive(): 
+                        % elif plugin.isActive():
                             <a href="${urlHandlers.UHAdminTogglePlugin.getURL(plugin)}">
                                 <img class="imglink" alt="${ _("Click to disable")}" src="${Config.getInstance().getSystemIconURL( 'enabledSection' )}"/>
-                    
+
                             </a>
-                        % else: 
+                        % else:
                             <a href="${urlHandlers.UHAdminTogglePlugin.getURL(plugin)}">
                                 <img class="imglink" alt="${ _("Click to enable")}" src="${Config.getInstance().getSystemIconURL( 'disabledSection' )}"/>
                             </a>
                         % endif
-                        % if not plugin.isUsable(): 
+                        % if not plugin.isUsable():
                             ${ plugin.getName() }
                             <small class="smallRed">
                                 (${ plugin.getNotUsableReason() })
                             </small>
-                        % else: 
+                        % else:
                         <a href="${urlHandlers.UHAdminTogglePlugin.getURL(plugin)}">
                             ${ plugin.getName() }
                         </a>
                         % endif
-                        % if plugin.hasDescription(): 
+                        % if plugin.hasDescription():
                             <span style="margin-left: 2em;">
                                 (${ plugin.getDescription() })
                             </span>
@@ -59,7 +59,7 @@
                 </tr>
                 % endfor
             </table>
-            % else: 
+            % else:
                 ${ _("No plugins for ") + PluginType.getName() }
             % endif
         </td>
@@ -91,7 +91,7 @@
     % endif
 </table>
 
-% if PluginType.hasPlugins() : 
+% if PluginType.hasPlugins() :
     <div class="groupTitle" style="width: 100%; margin-top: 2em;">
         ${ _("Settings for individual plugins") }
     </div>
@@ -99,13 +99,13 @@
     </div>
 
     <div>
-        % for i, plugin in enumerate(pluginList): 
+        % for i, plugin in enumerate(pluginList):
         <div id="${plugin.getName()}OptionsDiv" style="display:none;">
-            % if plugin.hasAnyOptions(): 
+            % if plugin.hasAnyOptions():
                 <%include file="AdminPluginsOptionList.tpl" args="Object = plugin, ObjectType = 'Plugin', Favorites = Favorites, Index = i, rbActive = rbActive, baseURL = baseURL"/>
-            % elif True in self_._notify('hasPluginSettings', PluginType.getId(), plugin.getId()): 
+            % elif True in self_._notify('hasPluginSettings', PluginType.getId(), plugin.getId()):
                 ${ ''.join(list(elem for elem in self_._notify('getPluginSettingsHTML', PluginType.getId(), plugin.getId()) if elem != None)) }
-            % else: 
+            % else:
                 <span>${_("No options defined for this plugin")}</span>
             % endif
         </div>

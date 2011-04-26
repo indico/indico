@@ -6,7 +6,7 @@
     <tr>
         <td colspan="5" style="height: 10px"></td>
     </tr>
-    <%include file="AccessControlStatusFrame.tpl" args="parentName=parentName, privacy=privacy, 
+    <%include file="AccessControlStatusFrame.tpl" args="parentName=parentName, privacy=privacy,
     parentPrivacy=parentPrivacy, statusColor = statusColor, parentStatusColor=parentStatusColor,
     locator=locator, isFullyPublic=isFullyPublic"/>
     <tr>

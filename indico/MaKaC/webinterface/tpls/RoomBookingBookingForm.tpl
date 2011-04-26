@@ -71,7 +71,7 @@
             });
         }
 
-    % if candResv.room.needsAVCSetup: 
+    % if candResv.room.needsAVCSetup:
 
     $('vcSystemList').className=''
 
@@ -131,7 +131,7 @@
     <form id="bookingForm" action="#conflicts" method="post" onkeypress="return submit_on_enter(event);">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
-        % if standalone: 
+        % if standalone:
             <tr>
             <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
             </tr>
@@ -144,15 +144,15 @@
                             <span class="formTitle" style="border-bottom-width: 0px">
                             <input type="hidden" name="roomID" id="roomID" value="${candResv.room.id}" />
                             <input type="hidden" name="roomLocation" id="roomLocation" value="${candResv.room.locationName}" />
-                            % if formMode == FormMode.NEW: 
+                            % if formMode == FormMode.NEW:
                                  ${ _("New")}&nbsp;${bookingMessage}ing
                             % endif
-                            % if formMode == FormMode.MODIF: 
+                            % if formMode == FormMode.MODIF:
                                  ${ _("Modify")}&nbsp;${bookingMessage}ing
                                 <input type="hidden" name="resvID" id="resvID" value="${candResv.id}" />
                             % endif
                             </span><br />
-                            % if showErrors: 
+                            % if showErrors:
                                 <br /><a href="#conflicts" style="color: Red; margin-left: 6px;"> ${ _("Saving failed. Please review details below.")}</a><br /><br />
                             % endif
                             <br />
@@ -202,7 +202,7 @@
                                                 ${inlineContextHelp(_("<b>Required.</b> The justification for booking. Why do you need this room?"))}
                                             </td>
                                         </tr>
-                                        % if candResv.room.needsAVCSetup: 
+                                        % if candResv.room.needsAVCSetup:
                                             <tr>
                                                 <td align="right" class="subFieldWidth" valign="top"><small><span style="color: Red;">${ _("I will use video-conf. equipment (please check only what you need)")}</span>&nbsp;&nbsp;</small></td>
                                                 <td align="left" class="blacktext">
@@ -215,9 +215,9 @@
                                             <tr>
                                                 <td align="right" class="subFieldWidth" valign="middle"><small><span style="color: Red;">I will use video-conf. system</span>&nbsp;&nbsp;</small></td>
                                                 <td align="left" id="vcSystemList" class="blacktext">
-                                                    % for vc in candResv.room.getAvailableVC(): 
+                                                    % for vc in candResv.room.getAvailableVC():
                                                         <% checked = "" %>
-                                                        % if vc in candResv.getUseVC(): 
+                                                        % if vc in candResv.getUseVC():
                                                             <% checked = """checked="checked" """ %>
                                                         % endif
                                                         <% htmlCheckbox = """<br>\n<input id="vc_%s" name="vc_%s" class="videoConferenceOption" type="checkbox" onclick="if(this.checked){$(usesAVC).checked=true;}" %s /> %s""" %>
@@ -279,7 +279,7 @@
                 new Form.Observer( 'bookingForm', 0.4, forms_are_valid );
             }
         );
-        % if candResv.room.needsAVCSetup: 
+        % if candResv.room.needsAVCSetup:
             alert("The conference room you have chosen is equiped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\n                    Thank you for your understanding.")
         % endif
 

@@ -13,7 +13,7 @@
 
 
   <p style="font-size: 12pt; margin-top: 5px; margin-bottom: 2px;
-        % if self_._breakEntry.isTextColorToLinks(): 
+        % if self_._breakEntry.isTextColorToLinks():
             color:${ self_._breakEntry.getTextColor() };
         % endif
 ">
@@ -21,7 +21,7 @@
     ${ self_.htmlText(truncateTitle(self_._breakEntry.getTitle(), 40)) }
   </p>
   <small class="ttMBlockExtraInfo">
-    % if self_._breakEntry.getRoom() != None: 
+    % if self_._breakEntry.getRoom() != None:
     ${ "%s: "%self_._breakEntry.getRoom().getName() }
     % endif
     ${ self_.htmlText(self_._breakEntry.getAdjustedStartDate().strftime("%H:%M")) }-${ self_.htmlText(self_._breakEntry.getAdjustedEndDate().strftime("%H:%M")) }

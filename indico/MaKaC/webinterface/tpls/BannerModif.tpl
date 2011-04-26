@@ -20,18 +20,18 @@ arrowImage = systemIcon( "breadcrumbArrow" )
 
 
 
-% if len(path) > 0: 
+% if len(path) > 0:
 
     <tr>
         <td align="right" valign="top"><span style="padding-right: 5px">${ _("Go back to:")}</td>
         <td>
         <div style="color: #444;">
 
-            % for i in range(0, len(path)): 
+            % for i in range(0, len(path)):
 
                 <% object = path[i] %>
 
-                % if i > 0: 
+                % if i > 0:
                     <img src="${ arrowImage }" />
                 % endif
 

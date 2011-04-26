@@ -154,20 +154,20 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Keywords")}</span>
     </td>
     <td class="blacktext">
-        %if keywords: 
+        %if keywords:
 <pre>${ keywords }</pre>
         % endif
     </td>
 </tr>
 
 <tr>
-    % if Config.getInstance().getShortEventURL() != "": 
+    % if Config.getInstance().getShortEventURL() != "":
       <td class="dataCaptionTD">
         <span class="dataCaptionFormat">${ _("Short display URL")}</span>
       </td>
-      % if shortURL == "" : 
+      % if shortURL == "" :
         <td class="blacktext"><em>${ _("There is not any short url yet. Click \"Modify\" to setup.")}</em></td>
-      % else : 
+      % else :
       <td class="blacktext">${shortURL}</td>
       % endif
     % endif
@@ -190,7 +190,7 @@ additionalInfo = confObj.getContactInfo()
                     <form action=${ remChairsURL } method="post">
                         <input type="hidden" name="selChair" value="" />
                         <ul class="UIPeopleList">
-                            % for chair in chairs: 
+                            % for chair in chairs:
                                 <li class="UIPerson">
                                     <a href="${ urlHandlers.UHConfModChairEdit.getURL(chair) }" class="nameLink">
                                         ${ escape (chair.getFullName()) }

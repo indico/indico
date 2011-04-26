@@ -14,7 +14,7 @@ reason: ${ reservation.reason }
 from ${ formatDate(reservation.startDT.date()) } to ${ formatDate(reservation.endDT.date()) } between ${ reservation.startDT.strftime("%H:%M") } and ${ reservation.endDT.strftime("%H:%M") }
 Access: ${ urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) }
 
-% if reservation.usesAVC: 
+% if reservation.usesAVC:
 You have booked a room equipped with remote collaboration features and indicated that you intend to use them. After your meeting, you will be able to give IT service managers feedback about your video/phone conference by accessing this URL:
 https://espace.cern.ch/AVC-workspace/videoconference/Lists/User%20Satisfaction%20in%20CERN%20Videoconference%20Rooms/NewForm.aspx
 Thanks in advance for your feedback

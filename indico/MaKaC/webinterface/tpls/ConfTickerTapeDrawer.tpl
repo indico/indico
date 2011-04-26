@@ -1,5 +1,5 @@
 
-% if nowHappeningArray: 
+% if nowHappeningArray:
 
 <span class="nowHappeningText">${ _("Now happening:") }</span><div id="nowHappeningDiv" style="min-height: 20px;"></div>
 

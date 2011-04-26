@@ -4,9 +4,9 @@
     <td bgcolor="white" width="100%" valign="top" class="blacktext">
         <div class="ACStatusDiv">
             ${ _("The 'Home' Category is currently") }
-            % if privacy == 'INHERITING' : 
+            % if privacy == 'INHERITING' :
                 <span class="ACStatus" style="color: #128F33;">${ _("PUBLIC") }</span>
-            % elif privacy == 'PRIVATE' : 
+            % elif privacy == 'PRIVATE' :
                 <span class="ACStatus" style="color: #B02B2C;">${ _("PRIVATE") }</span>
             % endif
             .
@@ -86,7 +86,7 @@
                     ${ _("Make it")} <input type="submit" class="btn" name="visibility" value="${ _("PUBLIC")}"> ${ _("(viewable by all the users). This operation may take a while to complete.") }
                 </div>
                 % endif
-                % if privacy == 'INHERITING': 
+                % if privacy == 'INHERITING':
                 <div class="ACModifButtonEntry">
                     ${ _("Make it")} <input type="submit" class="btn" name="visibility" value="${ _("PRIVATE")}"> ${ _("(viewable only by the users you choose). This operation may take a while to complete.") }
                 </div>

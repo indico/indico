@@ -4,7 +4,7 @@
 
 <% dueDateFormat = "%a %d %b %Y" %>
 
-% if ConfReview.getJudgedContributions(User): 
+% if ConfReview.getJudgedContributions(User):
 <table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4 style="">${ _("Contributions to judge as Referee")}</td>
@@ -16,24 +16,24 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("Deadline")}</td>
     </tr>
 
-    % for c in ConfReview.getJudgedContributions(User): 
-        % if not isinstance(c.getStatus(), ContribStatusNone): 
+    % for c in ConfReview.getJudgedContributions(User):
+        % if not isinstance(c.getStatus(), ContribStatusNone):
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
             <td style="padding-right:5px;padding-left:5px;">${ c.getId() }</td>
             <td style="padding-right:5px;padding-left:5px;"><a href="${ urlHandlers.UHContributionModifReviewing.getURL(c) }">${ c.getTitle() }</a></td>
             <td style="padding-right:5px;padding-left:5px;">
-            % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): 
+            % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                 <span>${ _("Judged:")}</span> ${ c.getReviewManager().getLastReview().getRefereeJudgement().getJudgement() }
-            % else: 
+            % else:
                 <span>${ _("Not judged yet")}</span><br>
                 ${ "<br>".join(c.getReviewManager().getLastReview().getReviewingStatus(forAuthor = False)) }
             % endif
             </td>
             <td style="padding-right:5px;padding-left:5px;" onmouseover="this.style.borderColor='#ECECEC'" onmouseout="this.style.borderColor='transparent'">
                 <% date = c.getReviewManager().getLastReview().getAdjustedRefereeDueDate() %>
-                % if date is None: 
+                % if date is None:
                     ${ _("Deadline not set.")}
-                % else: 
+                % else:
                     <span>${ date.strftime(dueDateFormat) }</span>
                 % endif
             </td>

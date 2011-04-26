@@ -28,9 +28,9 @@
                     </td>
                     </form>
                 </tr>
-                % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField(): 
+                % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
                 ${ additionalFields }
-                % else: 
+                % else:
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Description")}</span></td>
                     <td bgcolor="white" class="blacktext">
@@ -45,9 +45,9 @@
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Date/time")}</span</td>
                     <td bgcolor="white" class="blacktext" colspan="2">
-              % if contrib.isScheduled(): 
+              % if contrib.isScheduled():
                         ${ self_.htmlText(self_._contrib.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M")) }
-              % else: 
+              % else:
                 <em>${ _("Not scheduled")}</em>
               % endif
             </td>
@@ -168,7 +168,7 @@
                     <td align="center" colspan="3" style="border-top: 2px solid #777777">
                         <table align="center" border="0">
                             <tr>
-                                % if withdrawDisabled: 
+                                % if withdrawDisabled:
                                 <form action=${ withdrawURL } method="POST">
                                 <td>
                                     ${ _("This contribution is withdrawn:")}
@@ -176,7 +176,7 @@
                                 </td>
 
                                 % endif
-                                % if not withdrawDisabled: 
+                                % if not withdrawDisabled:
 
                                 <form action=${ withdrawURL } method="POST">
                                 <td>

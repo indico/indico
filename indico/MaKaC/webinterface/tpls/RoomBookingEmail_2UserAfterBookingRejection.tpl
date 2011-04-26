@@ -5,10 +5,10 @@ Your booking has been REJECTED by the person responsible for a room.
 
 Room: ${ reservation.room.getFullName() }
 For:  ${ reservation.bookedForName }
-% if date: 
+% if date:
 Date: ${ date } ( ONLY THIS DAY IS REJECTED)
 % endif
-% if not date: 
+% if not date:
 Dates: ${ formatDate(reservation.startDT.date()) } -- ${ formatDate(reservation.endDT.date()) }
 % endif
 Hours: ${ reservation.startDT.strftime("%H:%M") } -- ${ reservation.endDT.strftime("%H:%M") }

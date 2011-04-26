@@ -9,16 +9,16 @@
             ${ _("Step 2 - Assign Reviewers")}
         </td>
     </tr>
-    % if not ConfReview.hasReviewing(): 
+    % if not ConfReview.hasReviewing():
     <tr>
         <td style="padding-left: 25px; padding-top:10px; color:gray;">
             <span>${ _("Type of reviewing has not been chosen yet.")}</span>
         </td>
     </tr>
-    % else: 
+    % else:
     <tr>
         <td>
-            % if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif(): 
+            % if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif():
                 <div style="padding:5px; color:gray;">
                     <span class="collShowBookingsText">${_("An automatically generated e-mail will be sent to newly assigned Reviewers.")}</span><br>
                     <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing Setup.")}</span>
@@ -32,9 +32,9 @@
 <tr><td>
 <table align="left" border="0" width="60%" style="padding-left:20px;">
 <tbody>
-% if ConfReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or ConfReview.getChoice() == ConferencePaperReview.NO_REVIEWING: 
+% if ConfReview.getChoice() == ConferencePaperReview.LAYOUT_REVIEWING or ConfReview.getChoice() == ConferencePaperReview.NO_REVIEWING:
 <% pass %>
-% else: 
+% else:
     <tr>
         <td class="subGroupTitle">${ _("Referees") }</td>
     </tr>
@@ -177,9 +177,9 @@
 </script>
     </tr>
 % endif
-% if ConfReview.getChoice() == ConferencePaperReview.CONTENT_REVIEWING or ConfReview.getChoice() == ConferencePaperReview.NO_REVIEWING: 
+% if ConfReview.getChoice() == ConferencePaperReview.CONTENT_REVIEWING or ConfReview.getChoice() == ConferencePaperReview.NO_REVIEWING:
 <% pass %>
-% else: 
+% else:
     <tr>
         <td class="subGroupTitle" style="padding-top:15px;">${ _("Layout Reviewers") }</td>
     </tr>

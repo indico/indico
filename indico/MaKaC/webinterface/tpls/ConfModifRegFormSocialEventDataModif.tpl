@@ -20,9 +20,9 @@
             <td align="left">
                 <select name="selectionType">
                 <% stl=socEvent.getSelectionTypeList() %>
-                % for se in stl.keys(): 
+                % for se in stl.keys():
                     <% check="" %>
-                    % if se == socEvent.getSelectionTypeId(): 
+                    % if se == socEvent.getSelectionTypeId():
                         <% check="selected" %>
                     % endif
                         <option value="${se}" ${check}>${stl[se]}</option>

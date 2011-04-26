@@ -34,7 +34,7 @@ function deselectAll()
 
 ${ errorMsg }
 ${ infoMsg }
-        
+
 <form action="${ pendingAction }" method="post" name="pendingForm">
     <table>
         <tr>
@@ -44,8 +44,8 @@ ${ infoMsg }
                 &nbsp;${ _("Name")}
             </td>
             <td class="titleCellFormat">&nbsp;${ _("Status")}</td>
-        </tr>        
-        % for (key, p) in pending: 
+        </tr>
+        % for (key, p) in pending:
             <% url = urlHandlers.UHConfModifParticipantsPendingDetails.getURL(conf) %>
             <% url.addParam("pendingId",key) %>
             <tr>
@@ -57,15 +57,15 @@ ${ infoMsg }
             </tr>
         % endfor
     </table>
-    % if not conferenceStarted : 
-        <div style="margin-top: 20px;">   
+    % if not conferenceStarted :
+        <div style="margin-top: 20px;">
             <input type="submit" class="btn" value="${ _("Accept selected")}" name="pendingAction" style="margin-right: 20px;"/>
             <input type="submit" class="btn" value="${ _("Reject selected")}" name="pendingAction" />
             <select name="emailNotification">
-                <option value="yes" selected>${ _("with email notification")}</option> 
+                <option value="yes" selected>${ _("with email notification")}</option>
                 <option value="no">${ _("without email notification")}</option>
             </select>
         </div>
     % endif
-</form>    
+</form>
 

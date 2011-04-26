@@ -1,5 +1,5 @@
 <%
-if filterActive == "1": 
+if filterActive == "1":
     filterActiveStyle = "color:#D7FF99; font-weight: bold;"
 else:
     filterActiveStyle = ""
@@ -9,32 +9,32 @@ else:
 
     <div id="filterDiv" class="filterDiv">
         <form id="filterForm" style="margin: 0pt;">
-        
-        
+
+
         <input type="hidden" name="confId" value="${ confId }" />
         <input type="hidden" id="filterActive" name="filterActive" value="1" />
-        
+
         <div style="float: right;">
             <input type="submit" class="btn" value="Apply filter" />&nbsp;
             <input type="button" id="removeFilterButton" class="btn" value="Remove filter">
         </div>
-        
-        
+
+
         <strong>${ _("Focus on:")}&nbsp;</strong>
-        
+
         <select id="datesSelect" name="showDate" style="font-size:8pt;">
             ${ datesMenu }
         </select>
-        
+
         <select id="showSessionSelect" name="showSession" style="font-size:8pt;">
             ${ sessionsMenu }
         </select>
-        
+
         <span style="white-space: nowrap; margin-left: 65px;">
             <input id="hideContributionsCheckbox" style="margin-right: 5px;" type="checkbox" name="detailLevel" value="session" ${ hideContributions }></input>
             <strong id="hideContributionsLabel">${ _("Hide Contributions")}</strong>
         </span>
-        
+
         </form>
     </div>
 
@@ -59,7 +59,7 @@ else:
         }
         filterButtonState = !filterButtonState;
     };
-    
+
     // Setup the filter button in the toolbar
     filterLink.observeClick(function(event) { filterToggle() });
 
@@ -71,22 +71,22 @@ else:
         $E('datesSelect').dom.selectedIndex = "0";
         $E('showSessionSelect').dom.selectedIndex = "0";
 
-        % if filterActive == "1": 
+        % if filterActive == "1":
             $E('filterActive').dom.value = "0";
-            $E('filterForm').dom.submit(); 
-        % else: 
+            $E('filterForm').dom.submit();
+        % else:
             filterToggle();
         % endif
     });
-    
+
     // Tooltip on filter icon
     filterLink.dom.onmouseover = function(event) {
         IndicoUI.Widgets.Generic.tooltip(this, event,
             '<ul style="list-style-type:none;padding:3px;margin:0px">'+
             '<li>'+
-                % if filterActive != "1": 
+                % if filterActive != "1":
                     'Add a filter'+
-                % else: 
+                % else:
                     'The filtering is <strong>activated</strong>'+
                     '<\/li>'+
                     '<li>'+
@@ -96,9 +96,9 @@ else:
             '<\/ul>'
         );
     };
-    
+
     // Setup the hide contributions checkbox
-    % if hideContributions == None: 
+    % if hideContributions == None:
         $E('hideContributionsLabel').dom.style.display = 'none';
         $E('hideContributionsCheckbox').dom.style.display = 'none'
     % endif
@@ -106,5 +106,5 @@ else:
     // Make the hide contributions label clickable
     $E('hideContributionsLabel').dom.style.cursor='pointer'
     $E('hideContributionsLabel').observeClick(function() {$E('hideContributionsCheckbox').dom.checked = !$E('hideContributionsCheckbox').dom.checked;});
-    
+
 </script>

@@ -2,8 +2,8 @@
 
 <form action=${ postURL } method="POST">
 <table width="90%" cellspacing="0" align="center" border="0">
-    % if len(errors) != 0: 
-        % for error in errors: 
+    % if len(errors) != 0:
+        % for error in errors:
             <tr align="left">
                 <td></td>
                 <td bgcolor="white" nowrap colspan="3" style="font-weight: bold; color: #881122; padding-bottom:10px; padding-top:10px; padding-left:10px;">
@@ -67,7 +67,7 @@
                 <tr>
                     <td class="titleTd"><b> ${ _("Available tags")}:</b></td>
                 </tr>
-                % for var in EmailNotificator.getVarList(): 
+                % for var in EmailNotificator.getVarList():
                 <tr class="legendTr">
                     <td width="100%" nowrap class="blacktext" style="padding-left:10px;padding-right:5px; text-align:left;">|${ var.getName() }|</td>
                     <td class="legendTd" onClick="insertTag('|${ var.getName() }|')">Insert</td>

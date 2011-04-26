@@ -5,7 +5,7 @@
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">${ _("Required")}</span></td>
           <td id="requiredCell" class="inputCelTD">
-            <input type="checkbox" name="required" ${required}/>            
+            <input type="checkbox" name="required" ${required}/>
           </td>
         </tr>
         <!--input Question-->
@@ -17,7 +17,7 @@
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">*${ _("Keyword")}</span></td>
           <td id="keywordCell" class="inputCelTD">
-            <input class="shortInput" type="text" name="keyword" maxlength="25" value="${keyword}"/>           
+            <input class="shortInput" type="text" name="keyword" maxlength="25" value="${keyword}"/>
           </td>
         </tr>
         <!--input Description of question-->
@@ -41,9 +41,9 @@
         </tr>
       </table>
       <!--general information end-->
-      
+
       <!--ChoicesItems-->
-      % if choiceItems.strip()!="" : 
+      % if choiceItems.strip()!="" :
         <table class="evalEditMain">
           <tr>
             <td class="titleCellTD">
@@ -58,7 +58,7 @@
         </table>
       % endif
 
-      
+
       <!--submission-->
       <table class="evalEditMain">
         <!--Error message-->

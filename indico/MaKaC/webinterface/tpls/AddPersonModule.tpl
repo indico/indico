@@ -27,13 +27,13 @@
           <ul class="UIPeopleList" style="width:300px">
               <% counter = 0 %>
 
-           % if personDefined != None: 
-                % for person in personDefined: 
+           % if personDefined != None:
+                % for person in personDefined:
                      <li class="UIPerson">
                          <input type="hidden" id="removeParams" />
                          <span class="nameLink">
                ${ person[0].getFullName() }
-               % if person[1]: 
+               % if person[1]:
                   <em>${ _("(submitter)")}
                % endif
              </span>

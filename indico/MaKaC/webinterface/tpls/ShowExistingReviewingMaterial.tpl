@@ -6,9 +6,9 @@
 ${ existingMaterialsTitle }
 <div id="reviewingMaterialListPlace"><!-- DOM-filled materials list --></div>
 <span id="container"></span>
-% if self_._target.getReviewManager().getLastReview().isAuthorSubmitted(): 
+% if self_._target.getReviewManager().getLastReview().isAuthorSubmitted():
     <% display = 'none' %>
-% else: 
+% else:
     <% display = 'form' %>
 % endif
 <div id="showStep2" class="groupTitleSmallPaper"><span>${ _("Step 2 - Submit the paper") }</span></div>
@@ -36,36 +36,36 @@ var args = {
 
     var uploadAction = Indico.Urls.UploadAction.contribution;
     var visibility = '';
-     % if  self_._target.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING: 
+     % if  self_._target.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
         % if not self_._target.getReviewManager().getLastReview().isAuthorSubmitted() and not self_._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
-            % if showSendButton: 
+            % if showSendButton:
                 visibility = 'visible';
-            % else: 
+            % else:
                 visibility = 'hidden';
             % endif
-        % else: 
+        % else:
             visibility = 'hidden';
         % endif
     % endif
-    % if self_._target.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING: 
-        % if not self_._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self_._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self_._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()): 
-            % if showSendButton: 
+    % if self_._target.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING:
+        % if not self_._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self_._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self_._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice()):
+            % if showSendButton:
                 visibility = 'visible';
-            % else: 
+            % else:
                 visibility = 'hidden';
             % endif
-        % else: 
+        % else:
             visibility = 'hidden';
         % endif
     % endif
-    % if  self_._target.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING: 
-        % if not self_._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self_._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self_._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self_._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()): 
-            % if showSendButton: 
+    % if  self_._target.getConference().getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
+        % if not self_._target.getReviewManager().getLastReview().isAuthorSubmitted() and not (self_._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() or self_._target.getReviewManager().getLastReview().anyReviewerHasGivenAdvice() or self_._target.getReviewManager().getLastReview().getEditorJudgement().isSubmitted()):
+            % if showSendButton:
                 visibility = 'visible';
-            % else: 
+            % else:
                 visibility = 'hidden';
             % endif
-        % else: 
+        % else:
             visibility = 'hidden';
         % endif
     % endif
@@ -74,13 +74,13 @@ var mlist = new ReviewingMaterialListWidget(args, [["reviewing", "Reviewing"]], 
 
 $E('reviewingMaterialListPlace').set(mlist.draw());
 
-% if self_._target.getReviewManager().getLastReview().isAuthorSubmitted(): 
+% if self_._target.getReviewManager().getLastReview().isAuthorSubmitted():
    $E('SendBtnForm').dom.style.display = 'none';
 % endif
 
-% if showSendButton: 
+% if showSendButton:
     $E('SendBtnForm').dom.style.display = '';
-% else: 
+% else:
     $E('SendBtnForm').dom.style.display = 'none';
 % endif
 

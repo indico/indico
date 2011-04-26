@@ -16,7 +16,7 @@ var layoutForm = $E('layoutForm');
 var layoutFormInput = $E('layoutFormInput');
 
 var layoutMenuItems = {};
-% for item in viewoptions: 
+% for item in viewoptions:
 layoutMenuItems["${ item['name']}"] = function() {
     layoutFormInput.setAttribute('value', '${ item['id'] }');
     layoutForm.dom.submit();
@@ -27,17 +27,17 @@ moreMenu.observeClick(function(e) {
     var menuItems = {}
     var menu = new PopupMenu(menuItems, [moreMenu], ${"'darkPopupList'" if dark else "null"});
 
-    % if showExportToICal: 
+    % if showExportToICal:
     menuItems['${ _("Export event to iCal") }'] = '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "top") }';
     menuItems['${ _("Export timetable to iCal") }'] = '${ urlHandlers.UHConferenceToiCal.getURL(self_._rh._conf, detailLevel = "contributions") }';
     % endif
-    % if showExportToPDF: 
+    % if showExportToPDF:
     menuItems['${ _("Export to PDF") }'] = '${ pdfURL }';
     % endif
-    % if showDLMaterial: 
+    % if showDLMaterial:
     menuItems['${ _("Download material") }'] = '${ urlHandlers.UHConferenceDisplayMaterialPackage.getURL(self_._rh._conf) }';
     % endif
-    % if showLayout: 
+    % if showLayout:
     menuItems['${ _("Layout") }'] = new PopupMenu(layoutMenuItems, [moreMenu, menu], ${"'darkPopupList'" if dark else "null"}, null, null, null, '${ SelectedStyle }');
     % endif
 

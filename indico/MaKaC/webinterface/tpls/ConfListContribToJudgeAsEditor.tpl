@@ -5,7 +5,7 @@
 
 <% dueDateFormat = "%a %d %b %Y" %>
 
-% if ConfReview.getEditedContributions(User): 
+% if ConfReview.getEditedContributions(User):
 <table class="Revtab" width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-top: 10px">
     <tr>
         <td nowrap class="groupTitle" colspan=4>${ _("Judge editing of the contribution")}</td>
@@ -17,24 +17,24 @@
         <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;padding-top:10px; padding-bottom:10px;">${ _("Deadline")}</td>
     </tr>
 
-    % for c in ConfReview.getEditedContributions(User): 
-        % if not isinstance(c.getStatus(), ContribStatusNone): 
+    % for c in ConfReview.getEditedContributions(User):
+        % if not isinstance(c.getStatus(), ContribStatusNone):
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
             <td style="padding-right:5px;padding-left:5px;">${ c.getId() }</td>
-            % if c.getReviewManager().getLastReview().isAuthorSubmitted(): 
-                % if ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted(): 
+            % if c.getReviewManager().getLastReview().isAuthorSubmitted():
+                % if ConfReview.getChoice() == CPR.LAYOUT_REVIEWING or not c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
                         <td style="padding-right:5px;padding-left:5px;">
                             <a href="${ urlHandlers.UHContributionEditingJudgement.getURL(c) }">${ c.getTitle() }</a>
                         </td>
                 % endif
-                % if ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING and c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() : 
+                % if ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING and c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() :
                        <td style="padding-right:5px;padding-left:5px;">
                                 <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'Final judgement already given by the referee')">
                                    ${ c.getTitle() }
                                 </span>
                         </td>
                 % endif
-            % else: 
+            % else:
                        <td style="padding-right:5px;padding-left:5px;">
                                 <span onmouseover=" IndicoUI.Widgets.Generic.tooltip(this, event, 'You must wait for the author to submit the materials<br/> before you judge the contribution.')">
                                    ${ c.getTitle() }
@@ -42,20 +42,20 @@
                        </td>
             % endif
             <td style="padding-right:5px;padding-left:5px;">
-                % if c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted(): 
+                % if c.getReviewManager().getLastReview().getEditorJudgement().isSubmitted():
                     <span>${ _("Layout judgement given")}</span>
-                % else: 
+                % else:
                     <span>${ _("Layout judgement not given yet")}</span>
-                    % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING: 
+                    % if c.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and ConfReview.getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING:
                     <span><br>${ _("but Referee already judged contribution")}</span>
                     % endif
                 % endif
             </td>
             <td style="padding-right:5px;padding-left:5px;">
             <% date = c.getReviewManager().getLastReview().getAdjustedEditorDueDate() %>
-            % if date is None: 
+            % if date is None:
                 ${ _("Deadline not set.")}
-            % else: 
+            % else:
                 <span>${ date.strftime(dueDateFormat) }</span>
             % endif
             </td>

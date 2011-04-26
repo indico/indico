@@ -21,9 +21,9 @@
         </td>
     </tr>
 </table>
-% if ConfReview.hasReviewing(): 
+% if ConfReview.hasReviewing():
     <% display = 'table' %>
-% else: 
+% else:
     <% display = 'none' %>
 % endif
 <table id='steptitle' width="90%" border="0" style="padding-bottom:5px; display:${display}">
@@ -37,9 +37,9 @@
         </td>
     </tr>
 </table>
-% if ConfReview.hasPaperReviewing(): 
+% if ConfReview.hasPaperReviewing():
     <% display = 'table' %>
-% else: 
+% else:
     <% display = 'none' %>
 % endif
 <table id='statusTable' style="padding-left: 20px; padding-bottom: 20px; display:${display}">
@@ -61,9 +61,9 @@
     </tr>
 </table>
 
-% if ConfReview.hasPaperReviewing(): 
+% if ConfReview.hasPaperReviewing():
     <% display = 'table' %>
-% else: 
+% else:
     <% display = 'none' %>
 % endif
 <table id="reviewingQuestionsTable" style="padding-left: 20px; padding-bottom: 20px; display:${display}">
@@ -78,9 +78,9 @@
 </table>
 
 
-% if ConfReview.hasPaperEditing(): 
+% if ConfReview.hasPaperEditing():
     <% display = 'table' %>
-% else: 
+% else:
     <% display = 'none' %>
 % endif
 <table id="editingCriteriaTable" style="padding-left: 20px; padding-bottom: 20px; display:${display}">
@@ -95,18 +95,18 @@
 </table>
 
 
-% if ConfReview.hasReviewing(): 
+% if ConfReview.hasReviewing():
     <% display = 'table' %>
-% else: 
+% else:
     <% display = 'none' %>
 % endif
 <table id="defaultDueDatesTable" style="padding-left: 20px; padding-bottom: 20px; min-width: 320px; display:${display}">
     <tr>
         <td id="defaultDatesHelp" colspan="2" class="subGroupTitle" style="min-width:500px;">${ _("Default deadlines for the judgements")}</td>
     </tr>
-    % if ConfReview.hasPaperReviewing(): 
+    % if ConfReview.hasPaperReviewing():
         <% display = 'table-row' %>
-    % else: 
+    % else:
         <% display = 'none' %>
     % endif
     <tr id="refereeDefaultDateRow" style="white-space:nowrap; display: ${display}">
@@ -116,17 +116,17 @@
         <td style="color: #000000;">
             <span id="inPlaceEditDefaultRefereeDueDate">
                 <% date = ConfReview.getAdjustedDefaultRefereeDueDate() %>
-                % if date is None: 
+                % if date is None:
                     ${ _("Date has not been set yet.")}
-                % else: 
+                % else:
                     ${ formatDateTime(date) }
                 % endif
             </span>
         </td>
     </tr>
-    % if ConfReview.hasPaperEditing(): 
+    % if ConfReview.hasPaperEditing():
         <% display = 'table-row' %>
-    % else: 
+    % else:
         <% display = 'none' %>
     % endif
     <tr id="editorDefaultDateRow" style="white-space:nowrap; display: ${display}">
@@ -136,22 +136,22 @@
         <td  style="color: #000000;">
             <span id="inPlaceEditDefaultEditorDueDate">
                 <% date = ConfReview.getAdjustedDefaultEditorDueDate() %>
-                % if date is None: 
+                % if date is None:
                     ${ _("Date has not been set yet.")}
-                % else: 
+                % else:
                     ${ formatDateTime(date) }
                 % endif
             </span>
         </td>
-        % if not ConfReview.hasPaperReviewing(): 
+        % if not ConfReview.hasPaperReviewing():
             <% display = 'table-row' %>
-        % else: 
+        % else:
             <% display = 'none' %>
         % endif
     </tr>
-    % if ConfReview.hasPaperReviewing(): 
+    % if ConfReview.hasPaperReviewing():
         <% display = 'table-row' %>
-    % else: 
+    % else:
         <% display = 'none' %>
     % endif
     <tr id="reviewerDefaultDateRow" style="white-space:nowrap;display: ${display}">
@@ -161,9 +161,9 @@
         <td style="color: #000000;">
             <span id="inPlaceEditDefaultReviewerDueDate">
                 <% date = ConfReview.getAdjustedDefaultReviewerDueDate() %>
-                % if date is None: 
+                % if date is None:
                     ${ _("Date has not been set yet.")}
-                % else: 
+                % else:
                     ${ formatDateTime(date) }
                 % endif
             </span>
@@ -172,9 +172,9 @@
 </table>
 
 <table id="automaticNotification" style="padding-left: 20px; padding-bottom: 20px;">
-    % if ConfReview.hasReviewing(): 
+    % if ConfReview.hasReviewing():
             <% display = 'table' %>
-        % else: 
+        % else:
             <% display = 'none' %>
         % endif
         <tr id="autoEmails" style="display:${display}">
@@ -195,9 +195,9 @@
             </div>
         </td>
        </tr>
-        % if ConfReview.hasPaperReviewing(): 
+        % if ConfReview.hasPaperReviewing():
             <% display = 'table-row' %>
-        % else: 
+        % else:
             <% display = 'none' %>
         % endif
         <tr id="autoEmailsRefereeLabel" style="display:${display}">
@@ -258,9 +258,9 @@
             </div>
         </td>
        </tr>
-        % if ConfReview.hasPaperEditing(): 
+        % if ConfReview.hasPaperEditing():
             <% display = 'table-row' %>
-        % else: 
+        % else:
             <% display = 'none' %>
         % endif
         <tr id="autoEmailsEditorLabel" style="display:${display}">
@@ -292,9 +292,9 @@
             </div>
          </td>
        </tr>
-       % if ConfReview.hasReviewing(): 
+       % if ConfReview.hasReviewing():
             <% display = 'table-row' %>
-        % else: 
+        % else:
             <% display = 'none' %>
         % endif
         <tr id="autoEmailsAuthor" style="display:${display}">
@@ -302,9 +302,9 @@
                ${ _("To the Author of the paper when a judgement is submitted by")}:
            </td>
         </tr>
-         % if ConfReview.hasPaperReviewing(): 
+         % if ConfReview.hasPaperReviewing():
             <% display = 'table-row' %>
-        % else: 
+        % else:
             <% display = 'none' %>
         % endif
        <tr id="refereeJudgementNotif" style="white-space:nowrap; display: ${display}">
@@ -323,9 +323,9 @@
             </div>
         </td>
        </tr>
-        % if ConfReview.hasPaperEditing(): 
+        % if ConfReview.hasPaperEditing():
             <% display = 'table-row' %>
-        % else: 
+        % else:
             <% display = 'none' %>
         % endif
        <tr id="editorJudgementNotif" style="white-space:nowrap; display: ${display}">
@@ -338,9 +338,9 @@
        </tr>
 </table>
 
-% if ConfReview.hasReviewing(): 
+% if ConfReview.hasReviewing():
     <% display = 'table' %>
-% else: 
+% else:
     <% display = 'none' %>
 % endif
 <form action="${ setTemplateURL }" method="post" ENCTYPE="multipart/form-data">
@@ -349,9 +349,9 @@
         <td id="uploadTemplateHelp" class="subGroupTitle" style="width:500px;">${ _("Upload a template")}</td>
     </tr>
     <tr><td>
-        % if ConfReview.hasTemplates(): 
+        % if ConfReview.hasTemplates():
          <% display = 'table' %>
-       % else: 
+       % else:
          <% display = 'none' %>
        % endif
     <table id="templateListTableAll" width="90%" align="left" border="0" style="padding-left:3px; display:${display}">
@@ -372,9 +372,9 @@
         <tbody id="templateListTable">
         </tbody>
         </table>
-        % if ConfReview.hasTemplates(): 
+        % if ConfReview.hasTemplates():
          <% display = 'none' %>
-       % else: 
+       % else:
          <% display = 'table' %>
        % endif
         <table id="NoTemplateTable" style="display:${display}">
@@ -599,7 +599,7 @@ var showDefaultReviewerDate = function() {
 
 var TemplateList = function(){
             <% keys = ConfReview.getTemplates().keys() %>
-            % for k in keys: 
+            % for k in keys:
                 <% t = ConfReview.getTemplates()[k] %>
                     var row = Html.tr({id:'TemplateRow_'+'${t.getId()}'});
                 var menu;
@@ -632,7 +632,7 @@ var TemplateList = function(){
                     var linkName = Html.a({href: "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + '${ t.getId()}' + "&confId=${ ConfReview.getConference().getId()}", style:{color:'#5FA5D4'}}, '${ t.getName()}');
                     var cellName = Html.td({id:'TemplateName_'+'${ t.getId()}', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, linkName);
                     cellName.append(linkName);
-                    % if CanDelete: 
+                    % if CanDelete:
                         cellName.append(menu);
                     % endif
                     var cellFormat = Html.td({id:'TemplateName_'+'${ t.getId()}', style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, '${ t.getFormat()}');
@@ -727,7 +727,7 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
 ));
 
 
-% if ConfReview.hasReviewing(): 
+% if ConfReview.hasReviewing():
     TemplateList();
 
     $E('uploadTpl').observeClick(function(){ var popup = new UploadTemplateDialog( 'Upload Template',
@@ -773,7 +773,7 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
             var linkName = Html.a({href: "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + value.id + "&confId=${ ConfReview.getConference().getId()}", style:{color:'#5FA5D4'}}, value.name);
             var cellName = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, linkName);
             cellName.append(linkName);
-            % if CanDelete: 
+            % if CanDelete:
                 cellName.append(menu);
             % endif
             var cellFormat = Html.td({id:'TemplateName_'+value.id, style:{borderRight: '5px solid #FFFFFF', borderLeft:'5px solid #FFFFFF'}}, value.format);
@@ -788,13 +788,13 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
             }
             );
 % endif
-% if ConfReview.hasPaperReviewing(): 
+% if ConfReview.hasPaperReviewing():
     showReviewingStates();
     showReviewingQuestions();
     showDefaultReviewerDate();
     showDefaultRefereeDate();
 % endif
-% if ConfReview.hasPaperEditing(): 
+% if ConfReview.hasPaperEditing():
     showEditingCriteria();
     showDefaultEditorDate();
 % endif

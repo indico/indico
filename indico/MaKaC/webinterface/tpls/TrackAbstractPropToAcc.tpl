@@ -14,7 +14,7 @@
             </td>
         </tr>
         ${ contribTypes }
-        % if len(abstractReview.getReviewingQuestions()) > 0: 
+        % if len(abstractReview.getReviewingQuestions()) > 0:
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}</span></td>
             <td width="60%" id="questionListDisplay">
@@ -42,7 +42,7 @@
     </table>
 </form>
 
-% if len(abstractReview.getReviewingQuestions()) > 0: 
+% if len(abstractReview.getReviewingQuestions()) > 0:
 <script type="text/javascript">
 
 var questionPM = new IndicoUtil.parameterManager();

@@ -57,14 +57,14 @@
                     ${ primaryAuthors }
                     ${ coAuthors }
                     ${ speakers }
-                    % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw): 
+                    % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw):
                     <td class="displayField" nowrap="" align="right" valign="top">
                         <b>${ _("Material:")}</b>
                     </td>
                     <td width="100%" valign="top">
                         ${MaterialList}
                     </td>
-                    % else: 
+                    % else:
                         ${ material }
                     % endif
                     <tr><td>&nbsp;</td></tr>

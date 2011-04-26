@@ -60,7 +60,7 @@
                         </form>
                     </td>
                 </tr>
-                % if confType == "conference" : 
+                % if confType == "conference" :
                 <tr>
                     <td>
                         <form action=${ navigationBoxURL } method="POST" id="navBoxForm">

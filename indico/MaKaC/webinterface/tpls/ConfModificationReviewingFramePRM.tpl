@@ -8,7 +8,7 @@
     </tr>
     <tr>
         <td colspan="3">
-            % if ConfReview.getEnablePRMEmailNotif(): 
+            % if ConfReview.getEnablePRMEmailNotif():
                 <div style="padding:5px; color:gray;">
                     <span class="collShowBookingsText">${_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")}</span><br>
                     <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing Setup.")}</span>

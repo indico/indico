@@ -20,7 +20,7 @@
         return true;
     }
 </script>
-% for collision in unrolledReservations: 
+% for collision in unrolledReservations:
     <%
     reservation = collision.withReservation if hasattr(collision, 'withReservation') else collision
 
@@ -44,18 +44,18 @@
 
     <tr class="resvHover${ classText }" style="height: ${ height }px; " id="${ occurrenceId }">
 
-        % if withPhoto: 
+        % if withPhoto:
             <td ${onClickDetails} style="padding: 0px 10px 6px 0px; cursor: pointer;">
-              % if reservation.room.photoId != None: 
+              % if reservation.room.photoId != None:
                   <img src="${ reservation.room.getSmallPhotoURL() }" />
               % endif
-              % if reservation.room.photoId == None: 
+              % if reservation.room.photoId == None:
                   &nbsp;
               % endif
             </td>
         % endif
         <td ${onClickDetails} style="padding: 0px 10px 6px 0px; cursor: pointer;"><nobr>${ reservation.room.building }-${ reservation.room.floor }-${ reservation.room.roomNr }
-            % if reservation.room.name != str(reservation.room.building) + '-' + str(reservation.room.floor) + '-' + str(reservation.room.roomNr): 
+            % if reservation.room.name != str(reservation.room.building) + '-' + str(reservation.room.floor) + '-' + str(reservation.room.roomNr):
                 <small>(${ reservation.room.name })</small>
             % endif
             </nobr>
@@ -66,10 +66,10 @@
         </td>
         <td ${onClickDetails} style="padding: 0px 10px 6px 0px; cursor: pointer;">${ verbose_t( reservation.startDT.time() ) }<br />${ verbose_t( reservation.endDT.time() ) }</td>
         <td style="padding: 0px 10px 6px 0px;">
-            % if canReject and not reservation.isCancelled and not reservation.isRejected: 
-                % if reservation.repeatability != None: 
+            % if canReject and not reservation.isCancelled and not reservation.isRejected:
+                % if reservation.repeatability != None:
                     <a href="${ rejectOccurrence }" onclick="return confirm_reject_occurrence(this, '${ occurrence.startDT }');" >${ _("reject")}</a><br />
-                % else: 
+                % else:
                     <a href="${ rejectReservation }" onclick="return confirm_reject_reservation(this, '${ occurrence.startDT }');" >${ _("reject")}</a><br />
                 % endif
             % endif

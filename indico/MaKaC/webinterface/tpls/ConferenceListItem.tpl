@@ -41,22 +41,22 @@ if lItem.getType() == "simple_event":
 
           <span class="protected">
 
-            % if lItem.hasAnyProtection(): 
-                % if not lItem.isProtected(): 
+            % if lItem.hasAnyProtection():
+                % if not lItem.isProtected():
                     <% d=[] %>
-                    % for domain in lItem.getDomainList(): 
+                    % for domain in lItem.getDomainList():
                         <% d.append(domain.getName()) %>
                     % endfor
-                    % if d != []: 
+                    % if d != []:
                         ${ "%s domain only"%", ".join(d) }
-                    % else: 
+                    % else:
                         ${ _("(protected by parent category)")}
                     % endif
-                % else: 
+                % else:
                     ${ _("(protected)")}
                 % endif
             % endif
-            % if creatDate > nowutc() - timedelta(weeks = 1): 
+            % if creatDate > nowutc() - timedelta(weeks = 1):
                    <img src="${ systemIcon('new') }" style="vertical-align:middle" alt="New" title="${ _("This event is New")}" />
             % endif
         </span>

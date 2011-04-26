@@ -32,7 +32,7 @@ function deselectAll()
             <!-- <tr>
                 <td>
                     <div>
-                        % if not nowutc() > self_._conf.getStartDate(): 
+                        % if not nowutc() > self_._conf.getStartDate():
                             <form action="${ urlHandlers.UHConfModifParticipantsObligatory.getURL(self_._conf) }" method="post">
                                 Attendance to this event is
                                     <select onchange="javascript:this.form.submit()">
@@ -40,11 +40,11 @@ function deselectAll()
                                         <option ${"selected" if not self_._conf.getParticipation().isObligatory() else ""}>not mandatory</option>
                                     </select>
                             </form>
-                        % else: 
+                        % else:
                             The attendance to this event is&nbsp;
-                                % if self_._conf.getParticipation().isObligatory(): 
+                                % if self_._conf.getParticipation().isObligatory():
                                     <strong>mandatory</strong>
-                                % else: 
+                                % else:
                                     <strong>not mandatory</strong>
                                 % endif
                         % endif
@@ -55,7 +55,7 @@ function deselectAll()
             <tr>
                 <td>
                     <div>
-                        % if not nowutc() > self_._conf.getStartDate(): 
+                        % if not nowutc() > self_._conf.getStartDate():
                             <form action="${ urlHandlers.UHConfModifParticipantsAddedInfo.getURL(self_._conf) }" method="post">
                                 ${ _("When an event manager adds a participant, email notification will")}
                                     <select onchange="javascript:this.form.submit()">
@@ -63,11 +63,11 @@ function deselectAll()
                                         <option ${"selected" if not self_._conf.getParticipation().isAddedInfo() else ""}>${ _("not be sent")}</option>
                                     </select> ${ _("to the participant")}
                             </form>
-                        % else: 
+                        % else:
                             ${ _("When an event manager adds a participant, email notification will")}&nbsp;
-                                % if self_._conf.getParticipation().isAddedInfo(): 
+                                % if self_._conf.getParticipation().isAddedInfo():
                                     <strong>${ _("be sent")}</strong>
-                                % else: 
+                                % else:
                                     <strong>${ _("not be sent")}</strong>
                                 % endif
                         % endif
@@ -90,7 +90,7 @@ function deselectAll()
             <tr>
                 <td>
                     <div>
-                        % if not nowutc() > self_._conf.getStartDate(): 
+                        % if not nowutc() > self_._conf.getStartDate():
                             <form action="${ urlHandlers.UHConfModifParticipantsAllowForApplying.getURL(self_._conf) }" method="post">
                                 ${ _("Users")}
                                     <select onchange="javascript:this.form.submit()">
@@ -98,11 +98,11 @@ function deselectAll()
                                         <option ${"selected" if not self_._conf.getParticipation().isAllowedForApplying() else ""}>${ _("may not apply")}</option>
                                     </select> ${ _("to participate in this event")}
                             </form>
-                        % else: 
+                        % else:
                             ${ _("Users")}&nbsp;
-                                % if self_._conf.getParticipation().isAllowedForApplying(): 
+                                % if self_._conf.getParticipation().isAllowedForApplying():
                                     <strong>${ _("may apply")}</strong>
-                                % else: 
+                                % else:
                                     <strong>${ _("may not apply")}</strong>
                                 % endif
  ${ _("to participate in this event")}
@@ -114,7 +114,7 @@ function deselectAll()
             <tr>
                 <td>
                     <div>
-                        % if not nowutc() > self_._conf.getStartDate(): 
+                        % if not nowutc() > self_._conf.getStartDate():
                             <form action="${ urlHandlers.UHConfModifParticipantsToggleAutoAccept.getURL(self_._conf) }" method="post">
                             ${ _("Participation requests")}
                                 <select onchange="javascript:this.form.submit()" ${'disabled="disabled"' if not self_._conf.getParticipation().isAllowedForApplying() else ""}>
@@ -122,11 +122,11 @@ function deselectAll()
                                     <option ${"selected" if not self_._conf.getParticipation().getAutoAccept() else ""}>${ _("must be approved by the event managers (you)")}</option>
                                 </select>
                             </form>
-                        % else: 
+                        % else:
                             ${ _("Participation requests")}&nbsp;
-                                % if self_._conf.getParticipation().getAutoAccept(): 
+                                % if self_._conf.getParticipation().getAutoAccept():
                                     <strong>${ _("are auto-approved")}</strong>
-                                % else: 
+                                % else:
                                     <strong>${ _("must be approved by the event managers (you)")}</strong>
                                 % endif
                         % endif
@@ -134,7 +134,7 @@ function deselectAll()
                 </td>
             </tr>
 
-               % if self_._conf.getParticipation().getPendingNumber() > 0 : 
+               % if self_._conf.getParticipation().getPendingNumber() > 0 :
                 <tr>
                     <td>
                           <span style="color:green">${ _("""Some users have applied for participation in this event.
@@ -164,7 +164,7 @@ function deselectAll()
                         </form>
                     </td>
 
-                    % if inviteAction: 
+                    % if inviteAction:
                     <td>
 
                         <form action="${ inviteAction }" method="post">
@@ -203,27 +203,27 @@ function deselectAll()
 
                             <div><input type="button" class="btn" style="margin-bottom: 20px" value="${ _("View attendance") }" onclick="javascript:$E('statisticsForm').dom.submit();" /></div>
 
-                            % if presenceButton: 
+                            % if presenceButton:
                                 <div>${ presenceButton }</div>
                             % endif
 
-                            % if absenceButton: 
+                            % if absenceButton:
                                 <div>${ absenceButton }</div>
                             % endif
 
-                            % if askButton: 
+                            % if askButton:
                                 <div>${ askButton }</div>
                             % endif
 
-                            % if excuseButton: 
+                            % if excuseButton:
                                 <div>${ excuseButton }</div>
                             % endif
 
-                            % if sendButton: 
+                            % if sendButton:
                                 <div style="margin-bottom: 20px">${ sendButton }</div>
                             % endif
 
-                            % if sendAddedInfoButton: 
+                            % if sendAddedInfoButton:
                                 <div>${ sendAddedInfoButton }</div>
                             % endif
                             <div>${ excelButton }</div>

@@ -1,12 +1,12 @@
 <span id="${ name }DatePlace"></span>
 
-% if date: 
+% if date:
 <input type="hidden" value="${ date.day }" name="${ name }Day" id="${ name }Day"/>
 <input type="hidden" value="${ date.month }" name="${ name }Month" id="${ name }Month"/>
 <input type="hidden" value="${ date.year }" name="${ name }Year" id="${ name }Year"/>
 <input type="hidden" value="${ date.hour }" name="${ name }Hour" id="${ name }Hour" />
 <input type="hidden" value="${ date.minute }" name="${ name }Min" id="${ name }Min" />
-% else: 
+% else:
 <input type="hidden" value="" name="${ name }Day" id="${ name }Day"/>
 <input type="hidden" value="" name="${ name }Month" id="${ name }Month"/>
 <input type="hidden" value="" name="${ name }Year" id="${ name }Year"/>

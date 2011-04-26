@@ -4,12 +4,12 @@
 
 <ul class="CAIndexList">
 <% lastIndex = len(Indexes) - 1 %>
-% for i, index in enumerate(Indexes): 
+% for i, index in enumerate(Indexes):
     <% indexName = index.getName() %>
     <li>
-        % if i == lastIndex: 
+        % if i == lastIndex:
             <% additionalStyle = 'style="border-right\x3a 0px;"' %>
-        % else: 
+        % else:
             <% additionalStyle = '' %>
         % endif
 
@@ -23,9 +23,9 @@
 <div class="CADiv">
     <div id="pendingCategoryFilteringDiv">
         <div id="CAShowOnlyPendingDiv" class="CAShowOnlyPendingDiv" style="display:inline;">
-            % if InitialOnlyPending: 
+            % if InitialOnlyPending:
                 <% checked = 'checked' %>
-            % else: 
+            % else:
                  <% checked = '' %>
             % endif
             <input type="checkbox" id="pendingCB" onchange="updateFilterButton()" ${checked }/>
@@ -46,10 +46,10 @@
 
     <div id="dateFilter" style="padding-top: 10px">
         <div>
-            % if InitialFromDays: 
+            % if InitialFromDays:
                 <% checked1 = '' %>
                 <% checked2 = 'checked' %>
-            % else: 
+            % else:
                 <% checked1 = 'checked' %>
                 <% checked2 = '' %>
             % endif
@@ -577,10 +577,10 @@ IndicoUI.executeOnLoad(function(){
     confIdObs();
     viewByObs('${InitialViewBy }', true);
     updateDateFilterType();
-    % if InitialOrderBy: 
+    % if InitialOrderBy:
         orderByObs('${ InitialOrderBy }', true);
     % endif
-    % if InitialIndex: 
+    % if InitialIndex:
         indexSelectedObs('${ InitialIndex }', true);
     % endif
     updateStaticURL();

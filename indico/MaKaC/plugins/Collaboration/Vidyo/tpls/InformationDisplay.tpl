@@ -16,16 +16,16 @@
                 ${ Booking.getExtension() }
             </td>
         </tr>
-        % if Booking.getHasPin(): 
+        % if Booking.getHasPin():
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 ${ _('PIN:')}
             </td>
-            % if Booking.getBookingParamByName("displayPin"): 
+            % if Booking.getBookingParamByName("displayPin"):
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getPin() }
             </td>
-            % else: 
+            % else:
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ _("This Vidyo room is protected by a PIN.") }
             </td>
@@ -40,7 +40,7 @@
                 ${ Booking.getOwnerObject().getFullName() }
             </td>
         </tr>
-        % if Booking.getBookingParamByName("displayURL"): 
+        % if Booking.getBookingParamByName("displayURL"):
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 ${ _('Auto-join URL:')}
@@ -50,7 +50,7 @@
             </td>
         </tr>
         % endif
-        % if Booking.getBookingParamByName("displayPhoneNumbers") and PhoneNumbers: 
+        % if Booking.getBookingParamByName("displayPhoneNumbers") and PhoneNumbers:
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
                 ${ _('VidyoVoice phone numbers:')}

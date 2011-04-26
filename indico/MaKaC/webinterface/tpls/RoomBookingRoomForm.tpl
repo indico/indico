@@ -70,20 +70,20 @@
                     <tr>
                         <td>
                             <span class="formTitle" style="border-bottom-width: 0px">
-                            % if insert: 
+                            % if insert:
                                  ${ _("New Room")}
                             % endif
-                            % if not insert: 
+                            % if not insert:
                                  ${ _("Modify Room")}
                                 <input type="hidden" name="roomID" id="roomID" value="${room.id}" />
                             % endif
                             <input type="hidden" name="roomLocation" id="roomLocation" value="${room.locationName}" />
                             </span>
                             <br />
-                            % if showErrors: 
+                            % if showErrors:
                                 <br /><span style="color: Red; margin-left: 6px;">Saving failed. There is/are ${ len( errors ) } error(s):</span>
                                 <ul>
-                                % for error in errors: 
+                                % for error in errors:
                                     <li>${ error }</li>
                                 % endfor
                                 </ul>
@@ -224,7 +224,7 @@
                                             <td align="left" class="blacktext">
                                                 <span id="nonBookablePeriods" name="nonBookablePeriods" >
                                                     <table><tbody>
-                                                        % for i in range(0, len(nonBookableDates)): 
+                                                        % for i in range(0, len(nonBookableDates)):
                                                         <tr class="startEndDate">
                                                             <td class="startEndDateEntry">${ _("from") }:</td>
                                                             <td><span id="startDateNonBookablePeriod${ i }"></span></td>
@@ -245,17 +245,17 @@
                                 <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("Custom attributes")}</span></td>
                                 <td colspan="2">
                                     <table width="100%">
-                                    % for ca in attrs: 
+                                    % for ca in attrs:
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>${ca['name']}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext"><input type="text" name="cattr_${ca['name']}" value=${ quoteattr(verbose( room.customAtts.get( ca['name'] ) )) } />
-                                            % if ca['name'] == 'notification email' : 
-                                                % if ca['required'] : 
+                                            % if ca['name'] == 'notification email' :
+                                                % if ca['required'] :
                                                     ${inlineContextHelp('<b>Required.</b> You can specify more than one email address separated by commas, semicolons or whitespaces.' )}
-                                                % else : 
+                                                % else :
                                                     ${inlineContextHelp('You can specify more than one email address separated by commas, semicolons or whitespaces.' )}
                                                 % endif
-                                            % elif ca['required'] : 
+                                            % elif ca['required'] :
                                                 ${inlineContextHelp('<b>Required.</b>' )}
                                             % endif
                                             </td>
@@ -273,10 +273,10 @@
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Room has")}:&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                % for eq in possibleEquipment: 
+                                                % for eq in possibleEquipment:
                                                     <input id="${ "equ_" + eq }" name="${ "equ_" + eq }" type="checkbox" ${' checked="checked" ' if room.hasEquipment( eq ) else ""} >${ eq }</input><br />
-                                                    % if "video conference" in eq.lower(): 
-                                                        % for vc in room.__class__.vcList: 
+                                                    % if "video conference" in eq.lower():
+                                                        % for vc in room.__class__.vcList:
                                                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="${ "vc_" + vc }" name="${ "vc_" + vc }" type="checkbox" ${' checked="checked" ' if vc in room.getAvailableVC() else ""} >${ vc }</input><br />
                                                         % endfor
                                                     % endif
@@ -301,18 +301,18 @@
 
 <script type="text/javascript">
     IndicoUI.executeOnLoad(function(){
-    % for i in range(0, len(nonBookableDates)): 
+    % for i in range(0, len(nonBookableDates)):
         <% nbd = nonBookableDates[i] %>
         var startDateNonBookablePeriod${ i } = IndicoUI.Widgets.Generic.dateField(false,{id:'startDateNonBookablePeriod${ i }', name:'startDateNonBookablePeriod${ i }'});
         $E('startDateNonBookablePeriod${ i }').set(startDateNonBookablePeriod${ i });
-        % if nbd.getStartDate() is not None: 
+        % if nbd.getStartDate() is not None:
             startDateNonBookablePeriod${ i }.set('${ nbd.getStartDate().strftime("%d/%m/%Y") }');
         % endif
 
 
         var endDateNonBookablePeriod${ i } = IndicoUI.Widgets.Generic.dateField(false,{id:'endDateNonBookablePeriod${ i }', name:'endDateNonBookablePeriod${ i }'});
         $E('endDateNonBookablePeriod${ i }').set(endDateNonBookablePeriod${ i });
-        % if nbd.getStartDate() is not None: 
+        % if nbd.getStartDate() is not None:
             endDateNonBookablePeriod${ i }.set('${ nbd.getEndDate().strftime("%d/%m/%Y") }');
         % endif
     % endfor

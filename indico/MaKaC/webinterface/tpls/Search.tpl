@@ -1,18 +1,18 @@
 <% import MaKaC %>
 <% from MaKaC.search.base import ConferenceEntry %>
 
-% if categId: 
-  % if categId == '0': 
+% if categId:
+  % if categId == '0':
     <% name = "" %>
-  % else: 
+  % else:
     <% name = "category" %>
   % endif
-% elif confId: 
+% elif confId:
 <% name = "Event" %>
 % endif
 
 <div class="container">
-% if searchingPublicWarning: 
+% if searchingPublicWarning:
 <div class="searchPublicWarning" style="float: right;" >
 ${ _("Warning: since you are not logged in, only results from public events will appear.")}
 </div>
@@ -31,10 +31,10 @@ ${ _("Warning: since you are not logged in, only results from public events will
 
 <form method="GET" action="${ urlHandlers.UHSearch.getURL() }" style="width: 400px;">
 
-% if categId: 
+% if categId:
   <input type="hidden" name="categId" value="${ categId }"/>
 % endif
-% if confId: 
+% if confId:
   <input type="hidden" name="confId" value="${ confId }"/>
 % endif
 
@@ -114,27 +114,27 @@ ${ _("Warning: since you are not logged in, only results from public events will
 <%include file="SearchNavigationForm.tpl" args="target = 'Events', direction='Prev'"/>
 <%include file="SearchNavigationForm.tpl" args="target = 'Contributions', direction='Prev'"/>
 
-% if p != '': 
+% if p != '':
 <h3 style="float:right">Hits: ${ numHits }</h3>
 % endif
 
 <div id="container">
 
 <ul id="tabList">
-% if len(eventResults) > 0: 
+% if len(eventResults) > 0:
 <li><a href="#events">Events</a></li>
 % endif
-% if len(contribResults) > 0: 
+% if len(contribResults) > 0:
   <li><a href="#contribs">Contributions</a></li>
 % endif
 </ul>
 
-% if len(eventResults) > 0: 
+% if len(eventResults) > 0:
 <div id="events">
   <%include file="SearchNavigationBar.tpl" args="target = 'Events', shortResult = evtShortResult"/>
 
   <ul class="searchResultList">
-    % for result in eventResults: 
+    % for result in eventResults:
     <%include file="SearchResult.tpl" args="accessWrapper=self_._aw, result=result"/>
     % endfor
   </ul>
@@ -142,12 +142,12 @@ ${ _("Warning: since you are not logged in, only results from public events will
 </div>
 % endif
 
-% if len(contribResults) > 0: 
+% if len(contribResults) > 0:
 <div id="contribs">
   <%include file="SearchNavigationBar.tpl" args="target = 'Contributions', shortResult = contShortResult"/>
 
   <ul class="searchResultList">
-    % for result in contribResults: 
+    % for result in contribResults:
     <%include file="SearchResult.tpl" args="accessWrapper=self_._aw, result=result"/>
     % endfor
   </ul>
@@ -158,7 +158,7 @@ ${ _("Warning: since you are not logged in, only results from public events will
 </div>
 
 
-% if len(contribResults) == 0 and len(eventResults) == 0 and p != '': 
+% if len(contribResults) == 0 and len(eventResults) == 0 and p != '':
   <div style="margin-top: 20px; color: red;">No results found</div>
 % endif
 </div>
@@ -185,13 +185,13 @@ function toogleAdvancedOptions() {
 
 IndicoUI.executeOnLoad(function(){
 
-% if len(eventResults) > 0 or len(contribResults) > 0: 
+% if len(eventResults) > 0 or len(contribResults) > 0:
     var tabList = [];
 
-% if len(eventResults) > 0: 
+% if len(eventResults) > 0:
     tabList.push(['Events', $E('events')]);
 % endif
-% if len(contribResults) > 0: 
+% if len(contribResults) > 0:
     tabList.push(['Contributions', $E('contribs')]);
 % endif
     var tabCtrl = new TabWidget(tabList, $E('container').dom.clientWidth?$E('container').dom.clientWidth:null);

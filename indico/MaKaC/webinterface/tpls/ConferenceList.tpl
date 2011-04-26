@@ -1,13 +1,13 @@
 <% from MaKaC.conference import Conference %>
 <div class="eventList">
 
-    % if material: 
+    % if material:
         <span>
             ${ material }
         </span>
     % endif
 
-    % if numOfEventsInTheFuture > 0: 
+    % if numOfEventsInTheFuture > 0:
     <div class="topBar" style="margin-bottom: 10px">
         <div class="content smaller"><span id="futureEventsText">There are ${ numOfEventsInTheFuture } more events in the <em>future</em>. <span class='fakeLink' onclick='toogleFutureEvents();'>Show them.</span></span></div>
     </div>
@@ -20,7 +20,7 @@
     <%include file="ConferenceListEvents.tpl" args="items=presentItems, aw=self_._aw, conferenceDisplayURLGen=conferenceDisplayURLGen"/>
     </div>
 
-    % if numOfEventsInThePast > 0: 
+    % if numOfEventsInThePast > 0:
     <div id="pastEvents" style="display:none"></div>
 
     <div class="topBar">
@@ -34,7 +34,7 @@
     <!-- the following line is left in case we want to go back to the old implementation of the language selector -->
     <!--$E('tzSelector').set(IndicoUI.Widgets.timezoneSelector('${ urlHandlers.UHResetSession.getURL() }'));-->
 
-    % if numOfEventsInTheFuture > 0: 
+    % if numOfEventsInTheFuture > 0:
     var futureSwitch = false;
     var futureEvents = $E("futureEvents");
     var futureEventsDivHeight=futureEvents.dom.offsetHeight;
@@ -53,7 +53,7 @@
     }
     % endif
 
-    % if numOfEventsInThePast > 0: 
+    % if numOfEventsInThePast > 0:
     var callDone = false;
     var pastSwitch = false;
 
@@ -102,7 +102,7 @@
                 }
             )
     }
-    % if showPastEvents: 
+    % if showPastEvents:
         $E("loadingPast").dom.style.display = "inline";
         fetchPastEvents()
     % endif

@@ -61,25 +61,25 @@
         <tr>
            <td nowrap colspan="10">
                 <div class="CRLgroupTitleNoBorder">${ _("Displaying")}<strong> ${ filteredNumberRegistrants } </strong>
-                % if filteredNumberRegistrants == "1": 
+                % if filteredNumberRegistrants == "1":
                     ${ _("registrant")}
-                % else: 
+                % else:
                     ${ _("registrants")}
                 % endif
-                % if filterUsed: 
+                % if filterUsed:
                     (${ _("Total")}: <strong>${ totalNumberRegistrants }</strong>)
                 % endif
             </div>
             <form action=${ filterPostURL } method="post" name="optionForm">
             <div class="CRLIndexList" >
-                % if filterUsed: 
+                % if filterUsed:
                     <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                     <span style="padding: 0px 6px 0px 6px">|</span>
                 % endif
                 <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
-                  % if filterUsed: 
+                  % if filterUsed:
                     ${ _("Show filters")}
-                  % else: 
+                  % else:
                     ${ _("Apply filters")}
                   % endif
                 </a>
@@ -211,9 +211,9 @@
             $E("displayMenu").dom.style.display = "none";
         }
         if ($E("filterMenu").dom.style.display == "") {
-% if filterUsed: 
+% if filterUsed:
             $E("index_filter").set('${ _("Show filters")}');
-% else: 
+% else:
             $E("index_filter").set('${ _("Apply filters")}');
 % endif
             $E('index_filter').dom.className = "CRLIndexUnselected";
@@ -226,9 +226,9 @@
     }
     function showDisplay() {
         if ($E("filterMenu").dom.style.display == "") {
-% if filterUsed: 
+% if filterUsed:
             $E("index_filter").set('${ _("Show filters")}')
-% else: 
+% else:
             $E("index_filter").set('${ _("Apply filters")}');
 % endif
            $E('index_filter').dom.className = "CRLIndexUnselected";

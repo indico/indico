@@ -13,7 +13,7 @@ from MaKaC.common import HelperMaKaCInfo
 minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 al = minfo.getAdminList()
 %>
-% if al.isAdmin( self_._rh._getUser() ): 
+% if al.isAdmin( self_._rh._getUser() ):
         <tr>
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat">${ _("Enable conditions")}</span></td>
             <td align="left"><input type="checkbox" name="conditionsEnabled" ${ conditionsEnabled }/> ${ _("Check the box to activate the conditions")}</TEXTAREA></td>

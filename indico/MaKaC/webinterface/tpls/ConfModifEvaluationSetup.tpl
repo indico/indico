@@ -34,7 +34,7 @@
     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Announcement")}</span></td>
     <td class="blacktext" colspan="2">
         <pre>
-          % if evaluation.getAnnouncement(): 
+          % if evaluation.getAnnouncement():
               ${ evaluation.getAnnouncement() }
       % endif
     </pre>

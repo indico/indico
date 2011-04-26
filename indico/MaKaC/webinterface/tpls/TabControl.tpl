@@ -1,5 +1,5 @@
 <div class="tabContents">
-    % if tabItems: 
+    % if tabItems:
         ${ tabItems }
     % endif
 

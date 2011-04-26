@@ -7,7 +7,7 @@
             switch(booking.faultCode) {
             case 2:
                 customText += "Duplicated Name"
-                break;    
+                break;
             case 18:
                 customText += "Duplicated ID"
                 break;

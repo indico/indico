@@ -25,7 +25,7 @@
 </p>
 
 <table>
-% for name in allowedPluginNames: 
+% for name in allowedPluginNames:
     <tr>
         <td style="vertical-align: top; text-align: right;">
             <span class="dataCaptionFormat">${ _("Managers for ") + name }</span>
@@ -41,7 +41,7 @@
 <script type="text/javascript">
     var allManagers = $L(${ jsonEncode(AllManagers)});
 
-    % for name in ["all"] + allowedPluginNames: 
+    % for name in ["all"] + allowedPluginNames:
     var newPersonsHandler = function(userList, setResult) {
         indicoRequest(
             'collaboration.addPluginManager',

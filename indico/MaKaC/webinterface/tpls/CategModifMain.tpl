@@ -98,7 +98,7 @@
                             <input type="submit" class="btn" value="${ _("add subcateg")}" onClick="this.form.action='${ addSubCategoryURL }';">
                             <input type="submit" class="btn" name="reallocate" value="${ _("re-allocate")}">
                             <input type="submit" class="btn" name="remove" value="${ _("remove")}">
-                            % if not containsEvents: 
+                            % if not containsEvents:
                             <input type="submit" class="btn" name="sort" value="${ _("sort alphabetically")}">
                             % endif
                         </td>
@@ -121,7 +121,7 @@
                             <input type="submit" class="btn" value="${ _("add subcateg")}" onClick="this.form.action='${ addSubCategoryURL }';">
                             <input type="submit" class="btn" name="reallocate" value="${ _("re-allocate")}">
                             <input type="submit" class="btn" name="remove" value="${ _("remove")}">
-                            % if not containsEvents: 
+                            % if not containsEvents:
                             <input type="submit" class="btn" name="sort" value="${ _("sort alphabetically")}">
                             % endif
                         </td>

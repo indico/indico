@@ -57,7 +57,7 @@
         <tr>
             <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Default Timezone")}</span></td>
             <td class="blacktext"><select name="defaultTimezone">${ timezoneOptions }</select>
-            % if not rh._target.getSubCategoryList(): 
+            % if not rh._target.getSubCategoryList():
             <input type=checkbox name="modifyConfTZ" value=False>${ _("Modify timezone for all conferences")}</td>
             % endif
         </tr>

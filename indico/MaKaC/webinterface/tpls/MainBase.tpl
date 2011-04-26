@@ -1,18 +1,18 @@
-% if not isFrontPage and navigation: 
+% if not isFrontPage and navigation:
     ${ navigation }
-% else: 
+% else:
     <div class="mainNoBreadcrumb">
     </div>
 % endif
 
 <div class="clearfix">
-    % if isRoomBooking: 
-        % if sideMenu: 
+    % if isRoomBooking:
+        % if sideMenu:
             <div class="emptyVerticalGap"></div>
         % endif
         <table border="0" cellSpacing="0" cellPadding="0">
             <tr>
-                % if sideMenu: 
+                % if sideMenu:
                 <td style="vertical-align: top;">
                     ${ sideMenu }
                 </td>
@@ -25,16 +25,16 @@
             </tr>
         </table>
 
-    % else: 
+    % else:
 
-       % if sideMenu: 
+       % if sideMenu:
 
            <div class="emptyVerticalGap"></div>
            ${ sideMenu }
 
        % endif
 
-        % if isFrontPage: 
+        % if isFrontPage:
             <div class="frontPageSideBarContainer">
                 <div class="sideBar">
                     <div class="leftCorner"></div>

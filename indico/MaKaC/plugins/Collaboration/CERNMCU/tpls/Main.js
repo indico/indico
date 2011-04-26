@@ -255,7 +255,7 @@
     onCreate : function(bookingPopup) {
         $E('autoYesRB').dom.checked = true;
         disableCustomId();
-        % if IncludeInitialRoom: 
+        % if IncludeInitialRoom:
             pf = new ParticipantListField([{type: 'room',
                                            name: "${ InitialRoomName }",
                                            institution: "${ InitialRoomInstitution }",
@@ -290,7 +290,7 @@
                 break;
             }
 
-        % else: 
+        % else:
             pf = new ParticipantListField();
         % endif
 

@@ -24,27 +24,27 @@
     <fieldset class="evalationResultsFieldset" style="margin-top: 20px;">
       <legend>${ _("Statistics")}</legend>
 
-      % if evaluation.getNbOfSubmissions()>0 : 
-        % for q in evaluation.getQuestions(): 
+      % if evaluation.getNbOfSubmissions()>0 :
+        % for q in evaluation.getQuestions():
         <!--stat of question : start-->
           ${'<font color="red">*</font>' if q.isRequired() else ""}
           <b>${ "%s. %s"%(q.getPosition(), q.getQuestionValue()) }</b>
           ${inlineContextHelp(_("Participation for this question = %s/%s")%(q.getNbOfFilledAnswers(selectedSubmissions),q.getNbOfAnswers(selectedSubmissions)))}
-          % if isinstance(q, Box): 
+          % if isinstance(q, Box):
             <ul>
-              % for a in q.getAnswers(selectedSubmissions): 
+              % for a in q.getAnswers(selectedSubmissions):
                 ${"<li>"+a.getAnswerValue()+"</li>" if a.getAnswerValue()!="" else ""}
               % endfor
             </ul>
           % endif
-          % if isinstance(q, Choice): 
+          % if isinstance(q, Choice):
 <% choiceItemsNb=q.getNbOfChoiceItems() %>
             <p>
-              % if choiceItemsNb<2: 
+              % if choiceItemsNb<2:
                 <i> ${ _("[Warning] it's strange: you have less than 2 choice items for this kind of question...")}</i>
               % endif
 
-              % if choiceItemsNb==2 and q.areAllAnswersFilled(selectedSubmissions): 
+              % if choiceItemsNb==2 and q.areAllAnswersFilled(selectedSubmissions):
 <% choiceItem1=q.getChoiceItemsKeyAt(1); choiceItem2=q.getChoiceItemsKeyAt(2); %>
               <!--inline graphic : start-->
               <table class="statsGraphContainer">
@@ -75,22 +75,22 @@
               <!--inline graphic : end-->
               % endif
 
-              % if choiceItemsNb>2 or ( choiceItemsNb==2 and not q.areAllAnswersFilled(selectedSubmissions) ): 
+              % if choiceItemsNb>2 or ( choiceItemsNb==2 and not q.areAllAnswersFilled(selectedSubmissions) ):
 <% color=0 %>
               <!--multilines graphic : start-->
               <table class="statsGraphContainer">
-                % for choiceItem in q.getChoiceItemsOrderedKeys(): 
+                % for choiceItem in q.getChoiceItemsOrderedKeys():
 <% percent=q.getPercentageAnswersLike(choiceItem,selectedSubmissions) %>
                   <tr>
                     <td class="statsGraphHead">${choiceItem}</td>
                     <td>
                       <table class="statsGraph">
                         <tr>
-                          % if percent>=10: 
+                          % if percent>=10:
                             <td class="<% print colors[color%len(colors)]; color+=1 %>" width="${percent}%" align="right">${percent}&#37;</td>
                             <td width="${100-percent}%"/>
                           % endif
-                          % if percent<10: 
+                          % if percent<10:
                             <td class="<% print colors[color%len(colors)]; color+=1 %>" width="${percent}%" />
                             <td width="${100-percent}%">&nbsp;${percent}&#37;</td>
                           % endif
@@ -108,7 +108,7 @@
         <!--stat of question : end-->
         % endfor
       % endif
-      % if evaluation.getNbOfSubmissions()<1 : 
+      % if evaluation.getNbOfSubmissions()<1 :
         <span style="color:#E25300">${ _("No submission yet...")}</span>
       % endif
     </fieldset>

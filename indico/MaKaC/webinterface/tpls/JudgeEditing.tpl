@@ -1,9 +1,9 @@
 <% from MaKaC.paperReviewing import ConferencePaperReview %>
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-% if not Review.isAuthorSubmitted(): 
+% if not Review.isAuthorSubmitted():
 <table width="90%" align="center" border="0" style="margin-bottom: 1em">
-    % if len(Review.getReviewManager().getVersioning()) == 1: 
+    % if len(Review.getReviewManager().getVersioning()) == 1:
     <tr>
         <td>
             <p style="padding-left: 25px;"><font color="gray">
@@ -12,7 +12,7 @@
             </font></p>
         </td>
     </tr>
-    % else: 
+    % else:
     <tr>
         <td>
             <p style="padding-left: 25px;"><font color="gray">
@@ -23,7 +23,7 @@
     </tr>
     % endif
 </table>
-% else: 
+% else:
 <table width="90%" align="center" border="0" style="padding-top: 15px;">
     <tr>
         <td colspan="5" class="groupTitle" style="border: none">${ _("Give opinion on the layout of a contribution")}
@@ -53,9 +53,9 @@
             </div>
         </td>
     </tr>
-    % if not Editing.getJudgement(): 
+    % if not Editing.getJudgement():
         <% display = 'span' %>
-    % else: 
+    % else:
             <% display = 'none' %>
     % endif
     <tr>
@@ -96,21 +96,21 @@ var showWidgets = function(firstLoad) {
              current: 'editorJudgement'},initialValue).draw());
 
 
-    % if len (ConfReview.getLayoutQuestions()) == 0 : 
+    % if len (ConfReview.getLayoutQuestions()) == 0 :
         $E('criteriaListDisplay').set("No form criteria proposed for this conference.");
-    % else: 
+    % else:
         $E("criteriaListDisplay").set('');
 
-        % for c in ConfReview.getLayoutQuestions(): 
+        % for c in ConfReview.getLayoutQuestions():
 
             var newDiv = Html.div({style:{borderLeft:'1px solid #777777', paddingLeft:'5px', marginLeft:'10px'}});
             newDiv.append(Html.span(null,"${c.getText()}"));
             newDiv.append(Html.br());
 
             if (firstLoad) {
-                % if Editing.getAnswer(c.getId()) is None: 
+                % if Editing.getAnswer(c.getId()) is None:
                     var initialValue = "${ Editing.createAnswer(c.getId()).getRbValue() }";
-                % else: 
+                % else:
                     var initialValue = "${ Editing.getAnswer(c.getId()).getRbValue() }";
                 % endif
             } else {
@@ -195,7 +195,7 @@ var showValues = function() {
 
 % if Editing.isSubmitted():
 var submitted = true;
-% else: 
+% else:
 var submitted = false;
 
 % endif

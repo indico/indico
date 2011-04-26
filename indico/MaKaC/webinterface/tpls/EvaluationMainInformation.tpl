@@ -19,13 +19,13 @@
           <td class="displayField"><b>${ _("Evaluation deadline")}:</b></td>
           <td >${endDate}</td>
         </tr>
-        % if submissionsLimit>0 : 
+        % if submissionsLimit>0 :
           <tr>
             <td class="displayField"><b>${ _("Max Nb of submissions")}:</b></td>
             <td>${submissionsLimit}</td>
           </tr>
         % endif
-        % if contactInfo.strip()!="" : 
+        % if contactInfo.strip()!="" :
           <tr>
             <td class="displayField"><b>${ _("Contact info")}:</b></td>
             <td>${contactInfo}</td>
@@ -51,13 +51,13 @@
       <table style="padding-top:20px">
         <tr>
           <td>
-            % if actionsShow: 
+            % if actionsShow:
               <b> ${ _("Possible actions you can carry out")}:</b>
               <ul>
-                % if actionsDisplayEval!=None: 
+                % if actionsDisplayEval!=None:
                   <li><a href="${actionsDisplayEval}"> ${ _("Show evaluation form.")}</a></li>
                 % endif
-                % if actionsModifyEval!=None: 
+                % if actionsModifyEval!=None:
                   <li><a href="${actionsModifyEval}"> ${ _("Modify your submitted evaluation.")}</a></li>
                 % endif
               </ul>

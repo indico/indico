@@ -1,12 +1,12 @@
 <h2>OAI Private Harvesters</h2>
-% if addedIP: 
+% if addedIP:
   IP Address '${ addedIP }' was added!
 % endif
-% if len(ipList) == 0: 
+% if len(ipList) == 0:
   <em>None - you can add one using the form below</em>
-% else: 
+% else:
   <ul style="display: block; width: 150px;">
-    % for ip in ipList: 
+    % for ip in ipList:
       <li style="display: block; height:20px;">
     <div style="float: left;">${ ip }</div>
        <form action="${ urlHandlers.UHOAIPrivateConfigRemoveIP.getURL() }" method="POST" style="display:inline;">

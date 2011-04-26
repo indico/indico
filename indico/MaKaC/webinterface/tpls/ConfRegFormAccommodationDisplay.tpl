@@ -30,7 +30,7 @@
         </td>
     </tr>
     <tr><td>&nbsp;</td></tr>
-% if accommodationTypes != "": 
+% if accommodationTypes != "":
     <tr>
         <td style="padding-left:10px">
             <table align="left">

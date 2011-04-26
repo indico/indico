@@ -86,15 +86,15 @@
         var modDate = IndicoUI.Widgets.Generic.dateField(false,null,['mDay', 'mMonth', 'mYear']);
         $E('mDatePlace').set(modDate);
 
-        % if sDay != '': 
+        % if sDay != '':
             startDate.set('${ sDay }/${ sMonth }/${ sYear }');
         % endif
 
-        % if eDay != '': 
+        % if eDay != '':
             endDate.set('${ eDay }/${ eMonth }/${ eYear }');
         % endif
 
-        % if mDay != '': 
+        % if mDay != '':
             modDate.set('${ mDay }/${ mMonth }/${ mYear }');
         % endif
 

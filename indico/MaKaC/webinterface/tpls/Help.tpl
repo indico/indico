@@ -5,7 +5,7 @@
         <div class="title">${ _("User Guides")}</div>
 
         <div class="content">
-            % if IsAdmin: 
+            % if IsAdmin:
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/pdf/IndicoAdminGuide.pdf"><img src="images/pdf_small.png" alt="PDF version"></a></div>
                 <a href="ihelp/html/AdminGuide/index.html">${ _("Admin Guide")}</a>
@@ -18,11 +18,11 @@
             </div>
         </div>
 
-        % if HasCollaboration: 
+        % if HasCollaboration:
         <div class="title">${ _("Video Services Guides")}</div>
             <div class="content">
 
-            % if IsAdmin: 
+            % if IsAdmin:
             <div class="item clearfix">
                 <div class="icons">
                     <a href="ihelp/pdf/IndicoVSAdminGuide.pdf">
@@ -34,7 +34,7 @@
             </div>
             % endif
 
-            % if IsCollaborationAdmin: 
+            % if IsCollaborationAdmin:
             <div class="item clearfix">
                 <div class="icons">
                     <a href="ihelp/pdf/IndicoVSManagerOverview.pdf">
@@ -68,7 +68,7 @@
         </div>
         % endif
 
-        % if HasChat: 
+        % if HasChat:
         <div class="title">${ _("Chat Guides")}<img src="${ systemIcon('new') }" style="padding-left: 5px;" alt="new" /></div>
             <div class="content">
 

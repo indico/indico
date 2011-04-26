@@ -6,13 +6,13 @@ todayDate = nowutc()
 %>
 <% currentMonth = -1 %>
 <% currentYear = -1 %>
-% for item in reversed(items): 
+% for item in reversed(items):
         <% itemStartDate = item.getStartDate() %>
-        % if currentYear != itemStartDate.year or currentMonth != itemStartDate.month: 
+        % if currentYear != itemStartDate.year or currentMonth != itemStartDate.month:
             <% currentMonth = itemStartDate.month %>
             <% currentYear = itemStartDate.year %>
             <h4
-                % if todayDate.year  == itemStartDate.year and todayDate.month  == itemStartDate.month: 
+                % if todayDate.year  == itemStartDate.year and todayDate.month  == itemStartDate.month:
                     ${ "class='currentMonth'" }
                 % endif
             >

@@ -47,7 +47,7 @@
     </tr>
     </form>
 
-    % if searchResultsTable: 
+    % if searchResultsTable:
         <form action="${ addURL }" method="POST">
         ${ params }
             <tr>

@@ -13,10 +13,10 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
     <td bgcolor="white" width="100%" valign="top" class="blacktext">
         <div class="ACStatusDiv">
             ${ _("Your " + termsDict[type]['name'] + " is currently") } <span class="ACStatus" style="color: ${statusColor};">${ _(privacy) }</span>
-            % if privacy == 'INHERITING' : 
+            % if privacy == 'INHERITING' :
                 ${ _("from a")} <span style="color: ${parentStatusColor};">${ _(parentPrivacy)}</span> ${ _(termsDict[type]['parentName'])}
             % endif
-            % if not isFullyPublic and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')): 
+            % if not isFullyPublic and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')):
                 ${ _(", but be aware that some parts of your " + termsDict[type]['name'] + " are")} <span style="color: #B02B2C;">${ _("protected") }</span>
             % endif
             .
@@ -29,7 +29,7 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             % elif privacy == 'INHERITING' :
                 ${ _("This means that it has the same access protection as its parent " + termsDict[type]['parentName']) } '${ parentName }' ${ _("which is currently ")}
                 <span class='ACStatus' style="color: ${parentStatusColor};">${ _(parentPrivacy)}</span> ${ _("(but this may change).")}
-                % if parentPrivacy == 'PRIVATE' : 
+                % if parentPrivacy == 'PRIVATE' :
                 <br/>
                 ${ _("You can specify users allowed to access your " + termsDict[type]['name'])} <strong>${ _("in addition")}</strong>
                 ${ _(" of the ones already allowed to access the parent " + termsDict[type]['parentName'])} '${ parentName }'
@@ -37,39 +37,39 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
                 % endif
             % endif
         </div>
-        % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') : 
+        % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE') :
         <div class="ACUserListDiv">
             <div class="ACUserListWrapper" id="ACUserListWrapper">
             </div>
         </div>
 
         <script type="text/javascript">
-            % if type != 'Category' and type!= 'Home' and type != 'Event': 
+            % if type != 'Category' and type!= 'Home' and type != 'Event':
             var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId()), ('confId', target.getConference().getId())])) };
-            % else : 
+            % else :
             var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId())])) };
             % endif
 
             var removeUser = function(user, setResult){
                 // This operation may be very expensive for categories
-                % if type == 'Category' or type == 'Home' : 
+                % if type == 'Category' or type == 'Home' :
                 var killProgress = IndicoUI.Dialogs.Util.progress($T("This operation may take a few minutes..."));
                 % endif
                 jsonRpc(Indico.Urls.JsonRpcService, "${ termsDict[type]['name'] }.protection.removeAllowedUser",
                         {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
-                        % if type != 'Category' and type!= 'Home' and type != 'Event': 
+                        % if type != 'Category' and type!= 'Home' and type != 'Event':
                             'confId' : '${ target.getConference().getId() }',
                         % endif
                             value: {'id': user.get('id')}},
                         function(result, error){
                             if (exists(error)) {
-                                % if type == 'Category' or type == 'Home' : 
+                                % if type == 'Category' or type == 'Home' :
                                 killProgress();
                                 % endif
                                 IndicoUtil.errorReport(error);
                                 setResult(false);
                             } else {
-                                % if type == 'Category' or type == 'Home' : 
+                                % if type == 'Category' or type == 'Home' :
                                 killProgress();
                                 % endif
                                 setResult(true);
@@ -79,24 +79,24 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
 
             var addUsers = function(list, setResult){
                 // This operation may be very expensive for categories
-                % if type == 'Category' or type == 'Home' : 
+                % if type == 'Category' or type == 'Home' :
                 var killProgress = IndicoUI.Dialogs.Util.progress($T("This operation may take a few minutes..."));
                 % endif
                 jsonRpc(Indico.Urls.JsonRpcService, "${termsDict[type]['name']}.protection.addAllowedUsers",
                         {${ termsDict[type]['paramsKey'] }: '${ target.getId() }',
-                        % if type != 'Category' and type!= 'Home' and type != 'Event': 
+                        % if type != 'Category' and type!= 'Home' and type != 'Event':
                             'confId' : '${ target.getConference().getId() }',
                         % endif
                             value: list },
                         function(result, error){
                             if (exists(error)) {
-                                % if type == 'Category' or type == 'Home' : 
+                                % if type == 'Category' or type == 'Home' :
                                 killProgress();
                                 % endif
                                 IndicoUtil.errorReport(error);
                                 setResult(false);
                             } else {
-                                % if type == 'Category' or type == 'Home' : 
+                                % if type == 'Category' or type == 'Home' :
                                 killProgress();
                                 % endif
                                 setResult(true);
@@ -131,17 +131,17 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
         <form action="${ setPrivacyURL }" method="POST">
             ${ locator }
             <div class="ACModifButtonsDiv">
-                % if privacy == 'PRIVATE' or privacy == 'INHERITING': 
+                % if privacy == 'PRIVATE' or privacy == 'INHERITING':
                 <div class="ACModifButtonEntry">
                     ${ _("Make it")} <input type="submit" class="btn" name="changeToPublic" value="${ _("PUBLIC")}"> ${ _("(viewable by all the users, regardless of the access protection of the parent " + termsDict[type]['parentName'])} '${ parentName }').
                 </div>
                 % endif
-                % if privacy == 'PUBLIC' or privacy == 'INHERITING': 
+                % if privacy == 'PUBLIC' or privacy == 'INHERITING':
                 <div class="ACModifButtonEntry">
                     ${ _("Make it")} <input type="submit" class="btn" name="changeToPrivate" value="${ _("PRIVATE")}"> ${ _("(viewable only by the users you choose, regardless of the access protection of the parent " + termsDict[type]['parentName'])} '${ parentName }').
                 </div>
                 % endif
-                % if privacy == 'PUBLIC' or privacy == 'PRIVATE': 
+                % if privacy == 'PUBLIC' or privacy == 'PRIVATE':
                 <div class="ACModifButtonEntry">
                     ${ _("Make it")} <input type="submit" class="btn" name="changeToInheriting" value="${ _("INHERITING")}"> ${ _("the access protection from its parent " + termsDict[type]['parentName'])} '${ parentName }' (<span class=ACStatus style="color: ${parentStatusColor};">${ _(parentPrivacy)}</span> ${ _("for the moment).")}
                 </div>

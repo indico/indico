@@ -9,7 +9,7 @@ Explanation:
 - The booking is heavy
 
 Details:
-For "heavy" bookings, system sends "ask for prolongation" 
+For "heavy" bookings, system sends "ask for prolongation"
 e-mail to the user from time to time. User is asked
 to express his interest in the booking by just clicking
 a link. Creator of this booking didn't do that.

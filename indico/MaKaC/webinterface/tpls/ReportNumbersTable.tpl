@@ -25,7 +25,7 @@
         <td class="blacktext">
             <form action=${ deleteURL } method="POST">
                 <ul style="display:block; list-style-type: none; padding-left: 0px;">
-                    % for (id, number, name) in items: 
+                    % for (id, number, name) in items:
                     <li style="margin: 0; display: block; height: 20px;">
                         <span style="float:left">
                             <strong>${ name } :</strong>  ${ number }

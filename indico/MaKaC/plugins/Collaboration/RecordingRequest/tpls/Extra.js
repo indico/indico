@@ -1,5 +1,5 @@
 var RR_multiDayEvent = ${ jsBoolean(IsMultiDayEvent) };
-% if ConfStartDate: 
+% if ConfStartDate:
 var RR_confStartDate = IndicoUtil.parseJsonDate(${ jsonEncode(ConfStartDate) });
 % endif
 var RR_confLocation = ${ jsonEncode(ConfLocation) }

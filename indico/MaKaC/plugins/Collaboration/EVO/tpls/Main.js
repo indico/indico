@@ -241,7 +241,7 @@
         bookingPopup.addComponent(EVOPasswordField);
 
         EVODrawContextHelpIcons();
-        % if not PossibleToCreateOrModify: 
+        % if not PossibleToCreateOrModify:
             var popup = new WarningPopup($T("Impossible to create an EVO booking"),
                     [$T("The start and ending dates of your event are in the past. " +
                         "It is not possible to create an EVO booking in the past " +
@@ -261,7 +261,7 @@
         bookingPopup.addComponent(EVOPasswordField);
 
         EVODrawContextHelpIcons();
-        % if not PossibleToCreateOrModify: 
+        % if not PossibleToCreateOrModify:
             var popup = new WarningPopup($T("Impossible to modify this EVO booking"),
                 [$T("The start and ending dates of your event are in the past. " +
                     "It is not possible to modify an EVO booking in the past " +

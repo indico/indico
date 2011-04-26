@@ -4,9 +4,9 @@
             <span style="float: left; margin-right: 5px;">Contribution:</span>
             <form action="${ handler.getURL(self_._conf) }" method="GET">
                 <select name="contribId" onchange="javascript: this.form.submit();">
-                    % for contrib in contribList: 
+                    % for contrib in contribList:
                         <option value="${ contrib.getId() }"
-                            % if self_._contrib == contrib: 
+                            % if self_._contrib == contrib:
                                 selected
                             % endif
 >

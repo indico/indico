@@ -1,4 +1,4 @@
-% if CanBeNotified: 
+% if CanBeNotified:
 <!-- // If this booking in particular cannot be notified of date changes any more, we disable the checkbox -->
 <div class="collaborationAdvancedTabCheckboxDiv">
     <input type="checkbox" id="dateSyncCheckBox" class="centeredCheckBox" name="notifyOnDateChanges" value="yes" checked />

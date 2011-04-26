@@ -8,19 +8,19 @@
 <th>Position</th>
 <th></th>
 </tr>
-% for agentId, agent in agents.iteritems(): 
+% for agentId, agent in agents.iteritems():
    <tr>
       <td>${ agent.__class__.__name__ }</td>
       <td>${ agentId }</td>
       <td>${ agent.getName() }</td>
       <td>${ agent.getDescription() }</td>
       <td>
-      % if agent.isActive(): 
+      % if agent.isActive():
       ${ agent.getLastDT() } (${ agent.getLastTS() })
-      % elif agent.isRecording(): 
+      % elif agent.isRecording():
       As soon as the export process has finished, click
       <a href="#" onclick="javascript:activateAgent('${ agent.getId() }'); return false;">here</a>.
-      % else: 
+      % else:
       Agent not active. Start the <a href="#" onclick="javascript:preActivateAgent('${ agent.getId() }'); return false;">activation process</a>.
       % endif
       </td>

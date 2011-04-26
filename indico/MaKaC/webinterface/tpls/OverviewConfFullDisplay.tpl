@@ -12,7 +12,7 @@
         <tr>
             <td class="time">${ startTime }</td>
             <td class="title">
-                % if icon: 
+                % if icon:
                     <div style="float: right; padding-left: 5px;">${ icon }</div>
                 % endif
                 <a href="${ url }" style="font-size: 1.0em;">${ title }</a>

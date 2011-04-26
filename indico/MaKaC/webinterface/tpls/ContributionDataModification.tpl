@@ -11,9 +11,9 @@
                 <input type="text" name="title" size="80" value=${ title } />
             </td>
         </tr>
-        % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField(): 
+        % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
         ${ additionalFields }
-        % else: 
+        % else:
         <tr>
             <td class="titleCellTD">
                 <span class="titleCellFormat">${ _("Description")}</span>
@@ -24,7 +24,7 @@
 
         </tr>
         % endif
-    % if sessionType != 'poster': 
+    % if sessionType != 'poster':
     <tr>
       <td style="text-align: right;">
         <span class="titleCellFormat">${ _("Date/Time")}</span>
@@ -66,8 +66,8 @@ IndicoUI.executeOnLoad(function()
         {
             var info = new WatchObject();
 
-% if contrib.isScheduled(): 
-    % if sessionType != 'poster': 
+% if contrib.isScheduled():
+    % if sessionType != 'poster':
         var dateTime = IndicoUI.Widgets.Generic.dateField(true, {name: 'dateTime'});
         dateTime.set('${ dateTime }');
         dateTime.observeChange(function() {
@@ -76,10 +76,10 @@ IndicoUI.executeOnLoad(function()
         $E('dateTime').set(dateTime)
         info.set('startDate', dateTime.get());
     % endif
-% else: 
+% else:
 $E('dateTime').set('Not scheduled')
 % endif
-% if sessionType != 'poster': 
+% if sessionType != 'poster':
     var duration = IndicoUI.Widgets.Generic.durationField('${ duration }', {name: 'duration'});
     $E('duration').set(duration);
     $E('duration').observeChange(function() {

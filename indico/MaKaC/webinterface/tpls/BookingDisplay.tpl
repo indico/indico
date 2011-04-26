@@ -13,14 +13,14 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
         ${ Booking._getTypeDisplayName() }
         ${":" if not Booking.getStartDate() else ""}
     </span>
-    % if Booking.getStartDate(): 
-        % if Kind == 'scheduled' and isSameDay(Booking.getStartDate(), Booking.getEndDate(), Timezone): 
+    % if Booking.getStartDate():
+        % if Kind == 'scheduled' and isSameDay(Booking.getStartDate(), Booking.getEndDate(), Timezone):
             <span>
-            % if isToday(Booking.getStartDate(), Timezone) : 
+            % if isToday(Booking.getStartDate(), Timezone) :
             today
-            % elif isTomorrow(Booking.getStartDate(), Timezone) : 
+            % elif isTomorrow(Booking.getStartDate(), Timezone) :
                 tomorrow
-            % else: 
+            % else:
                 ${ formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") }
             % endif
             </span>
@@ -28,14 +28,14 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
             ${ formatTime(Booking.getAdjustedStartDate(Timezone).time()) }
             to
             ${ formatTime(Booking.getAdjustedEndDate(Timezone).time()) }
-        % else: 
-            % if Kind == 'scheduled' : 
+        % else:
+            % if Kind == 'scheduled' :
                 from
-                % if isToday(Booking.getStartDate(), Timezone) : 
+                % if isToday(Booking.getStartDate(), Timezone) :
                     today at
-                % elif isTomorrow(Booking.getStartDate(), Timezone) : 
+                % elif isTomorrow(Booking.getStartDate(), Timezone) :
                     tomorrow at
-                % else: 
+                % else:
                     ${ formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") } at
                 % endif
 
@@ -43,17 +43,17 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
 
                 until
 
-            % else: 
+            % else:
                 ongoing until
             % endif
 
 
 
-            % if isToday(Booking.getEndDate(), Timezone) : 
+            % if isToday(Booking.getEndDate(), Timezone) :
                 today at
-            % elif isTomorrow(Booking.getEndDate(), Timezone) : 
+            % elif isTomorrow(Booking.getEndDate(), Timezone) :
                 tomorrow at
-            % else: 
+            % else:
                 ${ formatDate(Booking.getAdjustedEndDate(Timezone).date(), format = "%a %d/%m") } at
             % endif
 
@@ -62,26 +62,26 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
         ${":" if firstLineInfo else "."}
     % endif
 
-    % if firstLineInfo: 
+    % if firstLineInfo:
         <strong>${ firstLineInfo }</strong>
     % endif
 
     <% displayInfo = Booking._getInformationDisplay(Timezone) %>
     <% launchInfo = Booking._getLaunchDisplayInfo() %>
 
-    % if displayInfo or launchInfo: 
+    % if displayInfo or launchInfo:
     <span style="margin-left:20px;"></span>
     % endif
 
-    % if displayInfo: 
+    % if displayInfo:
         <span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo${id}">${ _("More Info") }</span>
     % endif
 
-    % if displayInfo and Kind == 'ongoing' and launchInfo: 
+    % if displayInfo and Kind == 'ongoing' and launchInfo:
         <span style="margin-left: 5px; margin-right:5px;">|</span>
     % endif
 
-    % if Kind == 'ongoing' and launchInfo: 
+    % if Kind == 'ongoing' and launchInfo:
         <a href="${ launchInfo['launchLink'] }" id="bookingLink${id}">
             ${ launchInfo['launchText'] }
         </a>
@@ -94,7 +94,7 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
     % endif
     </div>
 
-    % if displayInfo: 
+    % if displayInfo:
         <div id="collaborationInfoLine${id}" style="visibility: hidden; overflow: hidden;">
             <div class="collaborationDisplayInfoLine">
             ${ Booking._getInformationDisplay(Timezone) }

@@ -14,7 +14,7 @@
             <td nowrap class="titleChat"> ${ _("Password")}</td>
         </tr>
 
-        % for cr in Chatrooms: 
+        % for cr in Chatrooms:
             % if cr.getCreatedInLocalServer():
                 <% server = 'conference.' + cr.getHost() %>
             % else:
@@ -38,7 +38,7 @@
                 % else:
                     <td style="font-style:italic;"> - </td>
                 % endif
-                % if len(PluginFieldsWrapper('InstantMessaging').getOption('customLinks')) > 0: 
+                % if len(PluginFieldsWrapper('InstantMessaging').getOption('customLinks')) > 0:
                     <td style="font-weight: bold;" nowrap><a id="joinLink${ cr.getId() }" name = "${ cr.getId() }" class="dropDownMenu highlight" href="#">${ _("Join now!")}</a></td>
                 % endif
                 </tr>

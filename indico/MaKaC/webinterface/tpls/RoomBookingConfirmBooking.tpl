@@ -2,7 +2,7 @@
     <form id="bookingForm" action="${ saveBookingUH.getURL(conf) }" method="post">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
-        % if standalone: 
+        % if standalone:
             <tr>
             <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
             </tr>
@@ -13,10 +13,10 @@
                     <tr>
                         <td class="maincell">
                             <span class="formTitle" style="border-bottom-width: 0px">
-                            % if formMode == FormMode.NEW: 
+                            % if formMode == FormMode.NEW:
                                 Confirm ${bookingMessage}ing
                             % endif
-                            % if formMode == FormMode.MODIF: 
+                            % if formMode == FormMode.MODIF:
                                 Modify ${bookingMessage}ing
                                 <input type="hidden" name="resvID" id="resvID" value="${candResv.id}" />
                             % endif
@@ -36,15 +36,15 @@
                                    <td class="titleUpCellTD"></td>
                                 <td><span style="color: red;">This ${bookingMessage}ing collides with the following ${bookingMessageOther}ings:</span>
                                 <ul>
-                                    % for col in collisions: 
+                                    % for col in collisions:
                                     <li>${ col.withReservation.bookedForName }, ${ verbose_dt(col.withReservation.startDT) } - ${ verbose_dt(col.withReservation.endDT) }
                                         (<a href="${ urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) }">more info</a>)</li>
                                     % endfor
                                 </ul>
-                                % if rejectOthers: 
+                                % if rejectOthers:
                                     <p>Those PRE-Bookings will be automatically rejected. For recurring bookings, only the conflicting days will be rejected.</p>
                                     <strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
-                                % else: 
+                                % else:
                                     <p>It is probable that yours will be rejected in their favour.</p>
                                     <strong>Are you sure</strong> you want to <strong>book it anyway</strong>?
                                 % endif

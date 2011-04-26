@@ -12,10 +12,10 @@
     <tr><td>&nbsp;</td></tr>
     ${ tracks }
 </table>
-% if not judgements: 
+% if not judgements:
     <span style="padding-left: 10px;">There are no judgements yet.</span>
 % endif
-% if ratingAverage: 
+% if ratingAverage:
     <br>
     <span>The abstract's average rating is: <b>${ ratingAverage }</b></span>
 % endif

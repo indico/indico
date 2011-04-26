@@ -14,7 +14,7 @@ var layoutFormInput = $E('layoutFormInput');
 layoutMenu.observeClick(function(e) {
     var menuItems = {};
 
-    % for item in viewoptions: 
+    % for item in viewoptions:
     menuItems["${ item['name']}"] = function() {
         layoutFormInput.setAttribute('value', '${ item['id'] }');
         layoutForm.dom.submit();

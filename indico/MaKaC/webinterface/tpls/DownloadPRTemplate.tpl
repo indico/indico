@@ -3,9 +3,9 @@
        <td colspan="3"><div class="groupTitle">${ _("List of contribution templates")}</div></td>
    </tr>
 
-   % if hasPaperReviewing: 
+   % if hasPaperReviewing:
        ${ ContributionReviewingTemplatesList }
-   % else: 
+   % else:
    <tr>
       <td nowrap class="displayField" style="padding-top: 5px; padding-left: 10px;">
             ${ _("There is no paper reviewing for this conference.")}

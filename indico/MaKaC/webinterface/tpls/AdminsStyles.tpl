@@ -14,15 +14,15 @@
           <tr style="border-bottom: 1px;"><th>${ _("Name (ID)")}</th><th>${ _("XSL file")}</th><th>${ _("CSS file")}</th><th>${ _("Actions")}</th></tr>
           <% styles = styleMgr.getStylesheets().keys() %>
           <% styles.sort() %>
-          % for style in styles: 
+          % for style in styles:
           <tr style="background-color: ${"#faa" if styleMgr.getXSLPath(style) == "" and style != 'static' else "lightgreen"}">
             <td align="right">${ styleMgr.getStylesheetName(style) } (${style})</td>
             <td align="center">${ _("found") if styleMgr.getXSLPath(style) else  _("not found")}</td>
             <td align="center">${ _("yes") if styleMgr.getCSSPath(style) else  _("no")}</td>
             <td>
-            % if style == "static": 
+            % if style == "static":
             ${inlineContextHelp(_('This style cannot be deleted. this is the default style for conferences.<br/>It does not rely on an XSL file.'))}
-            % else: 
+            % else:
             <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(xslfile=style)}" onClick="if (!confirm('${ _("Are you sure you want to delete this style?")}')) { return false; }"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
             % endif
             </td>
@@ -42,7 +42,7 @@
           <% styles = styleMgr.getStylesheetListForEventType("simple_event") %>
           <% styles.sort() %>
           ${ _("current list:")} <select name="xslfile">
-          % for style in styles: 
+          % for style in styles:
           <option value="${style}"${'style="font-weight: bold;" selected' if style.strip()==styleMgr.getDefaultStylesheetForEventType("simple_event").strip() else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if style.strip()==styleMgr.getDefaultStylesheetForEventType("simple_event").strip() else ""}</option>
           % endfor
           </select>
@@ -50,8 +50,8 @@
           <input type="submit" class="btn" name="action" value="${ _("delete")}"><br>
           ${ _("add new style:")}
            <select name="newstyle">
-             % for style in styleMgr.getStylesheets(): 
-               % if style not in styles: 
+             % for style in styleMgr.getStylesheets():
+               % if style not in styles:
                <option value="${ style }">${styleMgr.getStylesheetName(style)}</option>
                % endif
              % endfor
@@ -71,7 +71,7 @@
           <% styles = styleMgr.getStylesheetListForEventType("meeting") %>
           <% styles.sort() %>
           ${ _("current list:")} <select name="xslfile">
-          % for style in styles: 
+          % for style in styles:
           <option value="${style}"${'style="font-weight: bold;" selected' if style.strip()==styleMgr.getDefaultStylesheetForEventType("meeting").strip() else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if style.strip()==styleMgr.getDefaultStylesheetForEventType("meeting").strip() else ""}</option>
           % endfor
           </select>
@@ -79,8 +79,8 @@
           <input type="submit" class="btn" name="action" value="${ _("delete")}"><br>
           ${ _("add new style:")}
            <select name="newstyle">
-             % for style in styleMgr.getStylesheets(): 
-               % if style not in styles: 
+             % for style in styleMgr.getStylesheets():
+               % if style not in styles:
                <option value="${ style }">${styleMgr.getStylesheetName(style)}</option>
                % endif
              % endfor
@@ -100,7 +100,7 @@
           <% styles = styleMgr.getStylesheetListForEventType("conference") %>
           <% styles.sort() %>
           ${ _("current list")}: <select name="xslfile">
-          % for style in styles: 
+          % for style in styles:
           <option value="${style}"${'style="font-weight: bold;" selected' if style.strip()==styleMgr.getDefaultStylesheetForEventType("conference").strip() else ""}>${styleMgr.getStylesheetName(style)}${" (default)" if style.strip()==styleMgr.getDefaultStylesheetForEventType("conference").strip() else ""}</option>
           % endfor
           </select>
@@ -108,8 +108,8 @@
           <input type="submit" class="btn" name="action" value="${ _("delete")}"><br>
           ${ _("add new style:")}
            <select name="newstyle">
-             % for style in styleMgr.getStylesheets(): 
-               % if style not in styles: 
+             % for style in styleMgr.getStylesheets():
+               % if style not in styles:
                <option value="${ style }">${styleMgr.getStylesheetName(style)}</option>
                % endif
              % endfor

@@ -1,5 +1,5 @@
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
-        % if standalone: 
+        % if standalone:
             <tr>
             <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
             </tr>
@@ -44,7 +44,7 @@
                                  </table>
                                 </td>
                                 <td width="20%" align="right" class="thumbnail">
-                                % if room.photoId != None: 
+                                % if room.photoId != None:
                                     <a href="${ room.getPhotoURL() }" rel="lightbox" title="${ room.photoId }">
                                         <img border="1px" height="100" src="${ room.getPhotoURL() }" alt="${ str( room.photoId ) }"/>
                                     </a>
@@ -72,11 +72,11 @@
           <input type="hidden" name="roomID" value=${ room.id }>
           <td bgcolor="white" valign="top" style="padding-left: 12px;">
             <select name="period" onChange="this.form.submit();">
-            % if period=="pastmonth": 
+            % if period=="pastmonth":
               <option value="pastmonth" selected> past 30 days
               <option value="thisyear"> from beginning of this year
             % endif
-            % if period=="thisyear": 
+            % if period=="thisyear":
               <option value="pastmonth"> past 30 days
               <option value="thisyear" selected> from beginning of this year
             % endif

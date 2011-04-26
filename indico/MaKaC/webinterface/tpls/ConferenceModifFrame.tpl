@@ -10,11 +10,11 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
           <a style="vertical-align: middle;" href="${ urlHandlers.UHConfClone.getURL(conf) }">
               ${ _("Clone") }<div class="leftCorner"></div>
           </a>
-    % if not conf.isClosed(): 
+    % if not conf.isClosed():
           <a style="vertical-align: middle;" href="${ urlHandlers.UHConferenceClose.getURL(conf) }">
               ${ _("Lock") }<div class="leftCorner"></div>
           </a>
-    % else: 
+    % else:
           <a style="vertical-align: middle;" href="${ urlHandlers.UHConferenceOpen.getURL(conf) }">
               ${ _("Unlock") }<div class="leftCorner"></div>
           </a>
@@ -29,16 +29,16 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
     <a href="${ UHConferenceModification.getURL(conf) }">
         <span class="bannerTitle bannerTitle_0">
             ${ conf.getTitle() } &nbsp;<span style="font-size: 0.8em; font-style: italic;">
-            % if startDate == endDate: 
+            % if startDate == endDate:
                 ${ startDate }
-            % else: 
+            % else:
                 ${ startDate } - ${ endDate }
             % endif
             </span>
         </span>
     </a>
     <div class="banner_creator">
-        % if conf.getCreator(): 
+        % if conf.getCreator():
             ${ _("Created by")}&nbsp;${ conf.getCreator().getStraightFullName() }
         % endif
 

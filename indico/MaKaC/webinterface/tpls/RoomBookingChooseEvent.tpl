@@ -26,13 +26,13 @@
                                     <form action="${ urlHandlers.UHConfModifRoomBookingSearch4Rooms.getURL( conference ) }" method="post">
                                         <ul style="margin-bottom: 20px; list-style-type: none;">
                                             <li><input type="radio" name="event" onclick="this.form.action='${ urlHandlers.UHConfModifRoomBookingSearch4Rooms.getURL( conference ) }';" checked />Lecture: <strong>${escape( conference.getTitle() )}</strong></li>
-                                            % for session in conference.getSessionList(): 
+                                            % for session in conference.getSessionList():
                                                 <li><input type="radio" name="event" onclick="this.form.action='${ urlHandlers.UHConfModifRoomBookingSearch4Rooms.getURL( session ) }';" />
                                                      Session:
                                                         <strong>${escape( session.getTitle() )}</strong>
                                                 </li>
                                             % endfor
-                                            % for contribution in contributions: 
+                                            % for contribution in contributions:
                                                 <li><input type="radio" name="event" onclick="this.form.action='${ urlHandlers.UHConfModifRoomBookingSearch4Rooms.getURL( contribution ) }';" />
                                                      Contribution:
                                                     <strong>${escape( contribution.getTitle() )}</strong>

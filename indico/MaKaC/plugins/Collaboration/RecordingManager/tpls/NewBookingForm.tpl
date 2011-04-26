@@ -12,7 +12,7 @@
         <br />
         <div class="nicebox">
         <div class="RMMatchPane">
-            % for talk in Talks: 
+            % for talk in Talks:
                 <% IndicoID = talk["IndicoID"] %>
 
                   <span>
@@ -40,7 +40,7 @@
                             </td>
                             <td width="190px" colspan="1" align="left">
                             <em>
-                            % if talk["speakers"] != '': 
+                            % if talk["speakers"] != '':
                             ${    talk["speakers"] }
                             % endif
                             </em>
@@ -51,33 +51,33 @@
                     </td>
                     <!--  This column shows whether the talk has a matching LOID associated with it (only makes sense for web lectures, not plain video). -->
                     <td width="50px" valign="top">
-                        % if talk["LOID"] != '': 
+                        % if talk["LOID"] != '':
                             <div class="RMcolumnStatusMicalaDone">
                             </div>
-                        % else: 
+                        % else:
                             <div class="RMcolumnStatusNone">
                             </div>
                         % endif
                     </td>
                     <!--  This column shows whether a CDS record for this talk exists, or if it is pending. -->
                     <td width="50px" valign="top">
-                        % if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending': 
+                        % if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending':
                             <div class="RMcolumnStatusCDSDone" id="divCDS${ talk["IndicoID"] }" onclick="RMCDSDoneClick('${ talk["CDSURL"] }');" onmouseover="RMCDSDoneOnHover('${ talk["IndicoID"] }');" onmouseout="RMCDSDoneOffHover('${ talk["IndicoID"] }');">
                             </div>
-                        % elif talk["CDSID"] == 'pending': 
+                        % elif talk["CDSID"] == 'pending':
                             <div class="RMcolumnStatusCDSPending">
                             </div>
-                        % else: 
+                        % else:
                             <div class="RMcolumnStatusNone">
                             </div>
                         % endif
                     </td>
                     <!--  This column shows whether a link has been created from Indico to the CDS record. -->
                     <td width="50px" valign="top">
-                        % if talk["IndicoLink"] == True: 
+                        % if talk["IndicoLink"] == True:
                             <div class="RMcolumnStatusIndicoDone">
                             </div>
-                        % else: 
+                        % else:
                             <div class="RMcolumnStatusNone">
                             </div>
                         % endif
@@ -99,13 +99,13 @@
             <strong>3. ${ _("Select an orphan lecture object: ") }</strong>
         <div class="nicebox">
         <div class="RMMatchPane">
-            % for orphan in Orphans: 
+            % for orphan in Orphans:
                 <% lectureDBid = orphan["idLecture"] %>
                 <% LOID        = orphan["LOID"] %>
                 <div id="lo${ lectureDBid }" class="RMLODisplay" onclick="RMLOSelect(${ lectureDBid })" onmouseover="RMLOBoxOnHover(${ lectureDBid });" onmouseout="RMLOBoxOffHover(${ lectureDBid });">
                     ${ orphan["date"] }&nbsp;&nbsp;&nbsp;${ orphan["time"] }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${ orphan["niceDuration"] }<br />
                     ${ orphan["RoomName"] }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${ orphan["Hostname"] }<br />
-                    % if orphan["preview"]: 
+                    % if orphan["preview"]:
                     <img src="${ PreviewURL }/${ LOID }/camera.gif">
                     <img src="${ PreviewURL }/${ LOID }/slides.gif">
                     % endif
@@ -135,15 +135,15 @@
         <br />
         <strong>4. ${ _("Select language(s) in which the talk was given") }</strong>
         <br />
-        % if not FlagLanguageDataOK: 
+        % if not FlagLanguageDataOK:
             <font color="red">${ _("ERROR: Malformed language data. Please check Recording Manager plugin settings.") }
             <ul>
-                % for msg in LanguageErrorMessages: 
+                % for msg in LanguageErrorMessages:
                 <li>${ msg }</li>
                 % endfor
             </ul>
             </font>
-        % else: 
+        % else:
         <!-- http://www.loc.gov/marc/languages/ -->
         <input type="checkbox" value="${ LanguageCodePrimary }" id="RMLanguagePrimary" onclick="RMLanguageTogglePrimary('${ LanguageCodePrimary }')">${ LanguageDictionary[LanguageCodePrimary] }</input>
         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -152,8 +152,8 @@
         <input type="checkbox" name="Other" value="other" id="RMLanguageOther" onclick="RMLanguageToggleOther()">Other</input>
         <select id="RMLanguageOtherSelect">
             <option value="chooseOne" onclick="RMLanguageSelectOther(0)">-- ${ _('Choose one') } --</option>
-            % for languageCode in LanguageCodes: 
-                % if languageCode != LanguageCodePrimary and languageCode != LanguageCodeSecondary: 
+            % for languageCode in LanguageCodes:
+                % if languageCode != LanguageCodePrimary and languageCode != LanguageCodeSecondary:
                 <option value="${languageCode}" onclick="RMLanguageSelectOther('${languageCode}')">${LanguageDictionary[languageCode]}</option>
                 % endif
             % endfor
@@ -202,7 +202,7 @@
     // convert Python list of dictionaries Talks into a Javascript dictionary of dictionaries RMTalkList
     // (even though it's called RMTalkList, which is confusing)
     var RMTalkList = {
-    % for talk in Talks: 
+    % for talk in Talks:
     "${ talk["IndicoID"] }": ${ jsonEncode(talk) },
     % endfor
     };
@@ -211,7 +211,7 @@
     // convert Python list of dictionaries Orphans into a Javascript dictionary of dictionaries RMLOList
     // (even though it's called RMLOList, which is confusing)
     var RMLOList = {
-    % for orphan in Orphans: 
+    % for orphan in Orphans:
         "${ orphan["idLecture"]   }": ${ jsonEncode(orphan) },
     % endfor
     };

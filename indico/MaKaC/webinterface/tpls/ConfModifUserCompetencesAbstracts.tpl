@@ -15,7 +15,7 @@
     </tr>
 
 
-    % for user, competences in ConfReview.getAllUserCompetences(): 
+    % for user, competences in ConfReview.getAllUserCompetences():
     % if ConfReview.isAbstractManager(user) or ConfReview.isAbstractReviewer(user):
         <tr valign="top">
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;">${ user.getId() }</td>
@@ -34,7 +34,7 @@
 <script type="text/javascript">
 
 var keyWordfieldList = new Array()
-% for user, competences in ConfReview.getAllUserCompetences(): 
+% for user, competences in ConfReview.getAllUserCompetences():
   % if ConfReview.isAbstractManager(user) or ConfReview.isAbstractReviewer(user):
     new IndicoUI.Widgets.Generic.keywordField(
         $E('competences_${ user.getId() }'),

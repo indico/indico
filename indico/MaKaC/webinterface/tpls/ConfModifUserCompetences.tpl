@@ -1,8 +1,8 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
-% if not ConfReview.hasReviewing(): 
+% if not ConfReview.hasReviewing():
 <p style="padding-left: 25px;"><font color="gray">${ _("Type of reviewing has not been chosen yet")}</font></p>
-% elif ConfReview.getAllUserCompetences() == []: 
+% elif ConfReview.getAllUserCompetences() == []:
 <table align="left" style="color:gray; font-style:italic; padding-left:10px;"><tr><td>${ _("The Reviewing Team has not been assigned yet.")}</td></tr></table>
 %else:
 <table class="Revtab" width="90%" cellspacing="0" align="left" border="0" style="padding-left:2px; padding-top: 10px;">
@@ -27,8 +27,8 @@
     </tr>
 
 
-    % for user, competences in ConfReview.getAllUserCompetences(): 
-    % if ConfReview.getUserReviewingRoles(user): 
+    % for user, competences in ConfReview.getAllUserCompetences():
+    % if ConfReview.getUserReviewingRoles(user):
     % if ConfReview.isPaperReviewManager(user) or ConfReview.isReferee(user) or ConfReview.isEditor(user) or ConfReview.isReviewer(user):
         <tr valign="top">
             <td style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF; padding-top: 5px;">${ user.getId() }</td>
@@ -51,7 +51,7 @@
 <script type="text/javascript">
 
 var keyWordfieldList = new Array()
-% for user, competences in ConfReview.getAllUserCompetences(): 
+% for user, competences in ConfReview.getAllUserCompetences():
  % if ConfReview.isPaperReviewManager(user) or ConfReview.isReferee(user) or ConfReview.isEditor(user) or ConfReview.isReviewer(user):
     new IndicoUI.Widgets.Generic.keywordField(
         $E('competences_${ user.getId() }'),

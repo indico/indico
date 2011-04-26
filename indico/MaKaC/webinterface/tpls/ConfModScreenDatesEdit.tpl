@@ -84,14 +84,14 @@ function enddisable()
 }
 IndicoUI.executeOnLoad(function()
 {
- %if start_date_own_sel == "": 
+ %if start_date_own_sel == "":
   document.getElementById("sDay").disabled=true;
   document.getElementById("sMonth").disabled=true;
   document.getElementById("sYear").disabled=true;
   document.getElementById("sHour").disabled=true;
   document.getElementById("sMin").disabled=true;
  % endif
- %if end_date_own_sel == "": 
+ %if end_date_own_sel == "":
   document.getElementById("eDay").disabled=true;
   document.getElementById("eMonth").disabled=true;
   document.getElementById("eYear").disabled=true;

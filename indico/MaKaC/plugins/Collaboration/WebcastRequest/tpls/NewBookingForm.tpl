@@ -1,6 +1,6 @@
-% if not WebcastCapable: 
+% if not WebcastCapable:
 <div style="margin-bottom: 1em;">
-    % if WebcastCapableRooms: 
+    % if WebcastCapableRooms:
     <table>
         <tr>
             <td>
@@ -40,7 +40,7 @@
             </td>
         </tr>
     </table>
-    % else: 
+    % else:
     <div>
         <span class="WRNoteTitle">${_("Note:")}</span>
         <span class="WRNoteText">
@@ -49,7 +49,7 @@
     </div>
     % endif
 </div>
-% else: 
+% else:
 <div style="margin-bottom: 1em;">
     <span class="WRNoteTitle">${_("Note:")}</span>
     <span class="WRNoteText">
@@ -61,7 +61,7 @@
 
 <div id="WRForm">
 
-    % if IsSingleBooking: 
+    % if IsSingleBooking:
     <div style="margin-bottom: 1em;">
         <div id="sendWebcastRequestTop" style="display:none;">
             <button onclick="send('WebcastRequest')">${_("Send request")}</button>
@@ -81,7 +81,7 @@
 
 
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
-% if not IsLecture: 
+% if not IsLecture:
     <div class="WRFormSection" id="contributionselectionDiv">
         <!-- WHICH CONTRIBUTIONS SHOULD BE WEBCASTED -->
         <div class="WRFormSubsection">
@@ -92,13 +92,13 @@
                         <input type="radio" name="talks" value="all" id="allTalksRB" onclick="WR_hideTalks()" checked />
                     </td>
                     <td>
-                        % if NTalks == NWebcastCapableContributions: 
+                        % if NTalks == NWebcastCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >All talks</label>
-                        % else: 
+                        % else:
                         <label for="allTalksRB" id="allTalksRBLabel">${_("All webcast-able talks.")}</label>
                     </td>
                 </tr>
-                            % if WebcastCapable: 
+                            % if WebcastCapable:
                 <tr>
                     <td></td>
                     <td>
@@ -137,7 +137,7 @@
                         <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks()" />
                     </td>
                     <td>
-                        % if NTalks == NWebcastCapableContributions: 
+                        % if NTalks == NWebcastCapableContributions:
                         <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose talks.")}</label>
                         % else:
                         <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among webcast-able talks.")}</label>
@@ -151,7 +151,7 @@
         <div id="contributionsDiv" class="WRFormSubsection" style="display: ${ displayText };">
             <span class="WRQuestion">${_("Please choose among the webcast-able contributions below:")}</span>
 
-            % if HasWebcastCapableTalks: 
+            % if HasWebcastCapableTalks:
             <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
             <span class="horizontalSeparator">|</span>
             <span class="fakeLink" onclick="WRUnselectAllContributions()">Select none</span>
@@ -167,7 +167,7 @@
             <div>
                 <select name="audience">
                     <option value="">${_("Public")}</option>
-                    % for audience in Audiences: 
+                    % for audience in Audiences:
                         <option value=${ quoteattr(audience['name']) }>${ audience['name'] }</option>
                     % endfor
                 </select>
@@ -201,7 +201,7 @@
     </div>
 
 
-    % if IsSingleBooking: 
+    % if IsSingleBooking:
     <div style="margin-top: 1em;">
         <div id="sendWebcastRequestBottom" style="display:none;">
             <button onclick="send('WebcastRequest')">${_("Send request")}</button>
@@ -228,7 +228,7 @@
     var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
 </script>
 
-% if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable): 
+% if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable):
 <script type="text/javascript">
     var webcastSwitch = false;
     var toggleWebcastCapableRooms = function () {

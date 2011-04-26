@@ -3,7 +3,7 @@
 <tr>
   <td class="formTitle"><a href="${urlHandlers.UHRoomBookingAdmin.getURL()}">&lt;&lt;Back</a></td>
 </tr>
-% if actionSucceeded: 
+% if actionSucceeded:
 <tr>
   <td>
     <div class="successfulAction">
@@ -36,7 +36,7 @@
         <form method="post" action="${url}">
         <input type="hidden" name="roomLocation" value="${location.friendlyName}">
         <select name="roomID">
-          % for room in Rooms: 
+          % for room in Rooms:
             <option value="${room.id}" class="${roomClass( room )}">${ room.getFullName() }</option>
           % endfor
         </select>
@@ -61,7 +61,7 @@
     <tr>
       <td class="titleUpCellTD" style="width: 160px;"><span class="titleCellFormat">Possible equipment</span></td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-        % if AttsManager.supportsAttributeManagement(): 
+        % if AttsManager.supportsAttributeManagement():
             <p style="color: Green;">This location supports dynamic equipment management.</p>
             <form action="${urlHandlers.UHRoomBookingSaveEquipment.getURL(location) }" method="POST">
               <p>
@@ -72,7 +72,7 @@
             <form action="${urlHandlers.UHRoomBookingDeleteEquipment.getURL(location) }" method="POST">
               <p>
                 <select name="removeEquipmentName" id="removeEquipmentName">
-                    % for eq in possibleEquipment: 
+                    % for eq in possibleEquipment:
                         <option value="${eq}">${eq}</option>
                     % endfor
                 </select>
@@ -86,7 +86,7 @@
                 <li>On new room creation form, you will be able to choose equipment from this set.</li>
             </ul>
         % endif
-        % if not AttsManager.supportsAttributeManagement(): 
+        % if not AttsManager.supportsAttributeManagement():
             <span style="color: Red;">This location does not support dynamic equipment management.</span><br />
         % endif
       </td>
@@ -95,14 +95,14 @@
     <tr>
       <td class="titleUpCellTD" style="width: 160px;"><span class="titleCellFormat">Custom room attributes</span></td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-        % if AttsManager.supportsAttributeManagement(): 
+        % if AttsManager.supportsAttributeManagement():
             <p style="color: Green;">This location supports dynamic attributes management.</p>
             <form action="${urlHandlers.UHRoomBookingSaveCustomAttributes.getURL(location)}" method="post">
                 <table>
                 <tr>
                     <td style="width: 200px;"><b>Name</b></td><td style="width: 70px;"><b>Required</b></td><td style="width: 70px;"><b>Hidden</b></td><td style="width: 260px;"><b>Actions</b></td>
                 </tr>
-                % for at in AttsManager.getAttributes(location = location.friendlyName): 
+                % for at in AttsManager.getAttributes(location = location.friendlyName):
                     <tr>
                         <td>${ at['name'] }</td>
                         <td><input type="checkbox" name="${ 'cattr_req_' + at['name'] }" ${'checked="checked"' if at['required'] else ""} /></td>
@@ -133,7 +133,7 @@
                 <li>Custom attributes does not have type. They are kept as free text. It is impossible to add any kind of validation without coding.</li>
             </ul>
         % endif
-        % if not AttsManager.supportsAttributeManagement(): 
+        % if not AttsManager.supportsAttributeManagement():
             <span style="color: Red;">This location does not support dynamic attributes management.</span><br />
         % endif
       </td>
@@ -230,7 +230,7 @@ var removeAspectHandler = function(aspect, setResult) {
     <tr>
       <td colspan="5" class="groupTitle">Key Performance Indicators</td>
     </tr>
-    % if not withKPI: 
+    % if not withKPI:
         <tr>
           <td colspan="2" style="padding-left: 30px; padding-top: 30px;">
             <a href="${urlHandlers.UHRoomBookingAdminLocation.getURL(location, withKPI=True)}">Show Key Performance Indicators</a><br />
@@ -239,7 +239,7 @@ var removeAspectHandler = function(aspect, setResult) {
           <br /><br />
         </tr>
     % endif
-    % if withKPI: 
+    % if withKPI:
         <tr>
           <td class="titleUpCellTD" style="width: 100px;"><span class="titleCellFormat">Rooms</span></td>
           <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">

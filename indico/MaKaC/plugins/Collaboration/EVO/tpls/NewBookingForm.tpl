@@ -6,7 +6,7 @@
         <td>
             <select name="communityId">
                 <option value="chooseOne">-- Choose one --</option>
-                % for k,v in Communities: 
+                % for k,v in Communities:
                 <option value="${k}">${v}</option>
                 % endfor
             </select>

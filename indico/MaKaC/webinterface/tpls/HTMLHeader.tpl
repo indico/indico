@@ -20,7 +20,7 @@
         ${ page._getJavaScriptInclude(baseurl + "/JSContent.py/getVars") } <!-- Indico Variables -->
 
         <!-- Page Specific JS files-->
-        % for JSFile in extraJSFiles: 
+        % for JSFile in extraJSFiles:
             ${ page._getJavaScriptInclude(baseurl + '/' + JSFile) }
         % endfor
 
@@ -39,7 +39,7 @@
         ${ page._getJavaScriptInclude(baseurl + "/js/calendar/calendar-setup.js") }
 
         <!-- Page Specific CSS files-->
-        % for cssFile in extraCSS: 
+        % for cssFile in extraCSS:
             <link rel="stylesheet" type="text/css" href="${ baseurl + '/' + cssFile }">
         % endfor
 
@@ -51,10 +51,10 @@
         <!-- Indico page-wide global JS variables -->
         <script type="text/javascript">
         <% user = page._rh.getAW().getUser() %>
-        % if user: 
+        % if user:
             IndicoGlobalVars.isUserAuthenticated = true;
             IndicoGlobalVars.userData = ${ jsonEncode(page._getJavaScriptUserData()) };
-        % else: 
+        % else:
             IndicoGlobalVars.isUserAuthenticated = false;
         % endif
         </script>

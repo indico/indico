@@ -3,7 +3,7 @@
 
 
     <div class="indicoHelp">
-        % if supportEmail.strip(): 
+        % if supportEmail.strip():
         <div class="title">${ _("Helpdesk")}</div>
 
         <div class="content">
@@ -12,7 +12,7 @@
             <div style="margin: 15px 50px;"><a href="mailto:${ supportEmail }">${ supportEmail }</a></div>
         </div>
         % endif
-        %if teamEmail.strip(): 
+        %if teamEmail.strip():
         <div class="title">${ _("Development and Software support")}</div>
 
         <div class="content">

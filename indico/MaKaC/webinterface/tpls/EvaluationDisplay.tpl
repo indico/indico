@@ -1,7 +1,7 @@
 
       <center>
       <% questions = evaluation.getQuestions() %>
-      % if questions==None or len(questions)<=0: 
+      % if questions==None or len(questions)<=0:
         <br/>
         <br/>
         <font color="#E25300">
@@ -13,7 +13,7 @@
         <br/>
         <br/>
       % endif
-      % if questions!=None and len(questions)>0: 
+      % if questions!=None and len(questions)>0:
         <%include file="EvaluationShow.tpl"/>
       % endif
       </center>

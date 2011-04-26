@@ -29,7 +29,7 @@
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Registration end date")}</span></td>
     <td class="blacktext">
       ${ endDate }
-      % if extraTimeAmount: 
+      % if extraTimeAmount:
       (${ _("Allow")}&nbsp;${ extraTimeAmount }&nbsp;${ extraTimeUnit }&nbsp;${ _("after")})
       % endif
     </td>
@@ -79,7 +79,7 @@
   <tr>
     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Email registrant")}</span></td>
     <td bgcolor="white" width="100%">
-      % if activated: 
+      % if activated:
       <table>
         <tr>
           <td align="right"><strong>${ _("After registration")}</strong>:</td>

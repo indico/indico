@@ -12,7 +12,7 @@
             <% plugins = MultipleBookingPlugins %>
             <select id="pluginSelect" onchange="pluginSelectChanged()">
                 <option value="noneSelected">-- Choose a system --</option>
-                % for p in plugins: 
+                % for p in plugins:
                     <option value="${p.getId()}">${ p.getName() }</option>
                 % endfor
             </select>
@@ -203,9 +203,9 @@ IndicoUI.executeOnLoad(function(){
     displayBookings();
 });
 
-% if MultipleBookingPlugins: 
+% if MultipleBookingPlugins:
 IndicoUI.executeOnLoad(function(){
-    % for plugin in MultipleBookingPlugins: 
+    % for plugin in MultipleBookingPlugins:
     if (pluginHasFunction("${plugin.getName()}", "onLoad")) {
         codes["${plugin.getName()}"]["onLoad"]();
     }
