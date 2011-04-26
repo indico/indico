@@ -84,20 +84,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
             var self = this;
             var value = pair.get();
             var link = Html.a('fakeLink', pair.key);
-            var id = Html.generateId();
-
-            /* Build <span> tags.
-             * The content will be added only if drawBubbles is called.
-             * Done like that because span.set() doesn't interpret html tags,
-             * by using drawBubbles, the html tags can be interpreted. */
-            var span = Html.span('infoBubble');
-            span.setAttribute("id", pair.key);
-            link.append(span);
-
-            if(this.infoItems != null){
-                var span = Html.span(null, this.infoItems[pair.key]);
-                link.append(span);
-            }
+            link.setAttribute("id", pair.key);
 
             if(typeof value == "string" ) {
                 link.setAttribute('href', value);
@@ -161,8 +148,10 @@ type("PopupMenu", ["ChainedPopupWidget"],
         },
         drawInfoBubbles: function(infoItems){
             for(var item in infoItems){
-                $E(item).dom.innerHTML = infoItems[item];
-                $E(item).dom.style.visibility = "visible";
+                var span = Html.span('infoBubble');
+                $E(item).append(span);
+                span.dom.innerHTML = infoItems[item];
+                span.dom.style.visibility = "visible";
             }
         },
         draw: function(x, y) {
@@ -180,7 +169,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
     function(items, chainElements, cssClass, closeOnClick, alignRight, closeHandler, currentItem, linkToExternalWindow) {
         this.ChainedPopupWidget(chainElements, alignRight);
         this.items = items;
-        this.currentItem = currentItem;
+        this.currentItem = any(currentItem, []);
         this.selected = null;
         this.cssClass = "popupList " + any(cssClass,"");
         this.closeOnClick = any(closeOnClick, false);
