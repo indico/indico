@@ -1530,7 +1530,7 @@ type("TimetableDrawer", ["IWidget"],
              each(data, function(entry, key) {
                  // sessions that are not poster sessions will be
                  // 'converted' to contributions
-                 if (entry.entryType == 'Session' && !entry.isPoster) {
+                 if (entry.entryType == 'Session' && !entry.isPoster && keys(entry.entries).length > 0) {
                      each(entry.entries, function(subentry, subkey) {
                          result[subkey] = clone(subentry);
                          result[subkey].color = subentry.entryType == 'Break' ? subentry.color:entry.color;
