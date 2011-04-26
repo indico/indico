@@ -28,10 +28,24 @@ from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.general import *
 from datetime import datetime
 from pytz import timezone
+from MaKaC.errors import AccessError
 
 
-class RHCalendar( base.RH ):
+class RHCalendar(base.RHProtected):
     _uh = urlHandlers.UHCalendar
+
+    def _checkProtection(self):
+        if self._getUser() == None:
+            self._checkSessionUser()
+
+        for item in self._categList:
+            if not item.canAccess(self.getAW()):
+                self._categList.remove(item)
+        self._target = self._categList
+        if len(self._categList) > 0:
+            self._categ = self._categList[0]
+        else:
+            raise AccessError()
 
     def _checkParams( self, params ):
         categIdList = self._normaliseListParam( params.get("selCateg", []) )
