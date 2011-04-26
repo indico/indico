@@ -1,2 +1,2 @@
-<tag1 attr="${ _("str")}">
+<tag1 title="${_("str")}">
 <tag2>

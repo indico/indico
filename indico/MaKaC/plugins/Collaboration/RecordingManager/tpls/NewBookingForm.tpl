@@ -25,7 +25,7 @@
                             <td colspan="2" width="370px" style="white-space: nowrap;">
                             <tt><strong>${ dict(conference="E&nbsp;",
                                                  session="S&nbsp;&nbsp;",
-                                                 contribution'="C&nbsp;&nbsp;&nbsp;",
+                                                 contribution="C&nbsp;&nbsp;&nbsp;",
                                                  subcontribution="SC&nbsp;&nbsp;&nbsp;&nbsp;")[talk["type"]] }</strong></tt>
                             <strong>${ talk["titleshort"] }</strong>&nbsp;
                             </td>

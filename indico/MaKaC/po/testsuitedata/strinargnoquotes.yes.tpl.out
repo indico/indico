@@ -1,1 +1,1 @@
-<tag arg=${ _("aaa")} arg2=${ _("bbb")}>
+<tag arg=aaa arg2=bbb alt=${_("aaa")}>

@@ -1,2 +1,2 @@
-<tag1 attr="str">
+<tag1 title="str">
 <tag2>
