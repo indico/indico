@@ -181,7 +181,7 @@ class BistateBatchUploaderAgent(PushSyncAgent):
         for record, recId, operation in records:
             deleted = operation & STATUS_DELETED
             try:
-                if record.getOwner():
+                if record.getOwner() or recId:
                     di.toMarc(recId if deleted else record, overrideCache=True, deleted=deleted)
                 else:
                     logger.warning('%s (%s) seems to have been deleted meanwhile!' % \
