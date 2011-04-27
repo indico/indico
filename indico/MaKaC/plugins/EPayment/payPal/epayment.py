@@ -64,9 +64,7 @@ class PayPalMod(BaseEPayMod):
     def setBusiness(self,business):
         self._business= business
 
-
-
-    def getFormHTML(self,prix,Currency,conf,registrant,lang = "en_US"):
+    def getFormHTML(self,prix,Currency,conf,registrant,lang = "en_US", secure=False):
         url_return=localUrlHandlers.UHPayConfirmPayPal.getURL(registrant)
         url_cancel_return=localUrlHandlers.UHPayCancelPayPal.getURL(registrant)
         url_notify=localUrlHandlers.UHPayParamsPayPal.getURL(registrant)

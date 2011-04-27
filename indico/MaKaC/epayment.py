@@ -338,7 +338,7 @@ class BaseEPayMod(Persistent):
             self._enabled = False
         return self._enabled
 
-    def getFormHTML(self, price, currency, registrant, lang = "en_US"):
+    def getFormHTML(self, price, currency, registrant, lang = "en_US", secure=False):
         """
         Returns the html form that will be used to send the information to the epayment server.
         """

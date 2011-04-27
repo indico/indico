@@ -2595,7 +2595,7 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
                 <td><b>%s</b></td>
                 %s
                 </tr>
-                """%(m.getTitle(),m.getFormHTML(self._registrant.getTotal(),regForm.getCurrency(),self._conf,self._registrant, lang = self._rh._getSession().getLang()))
+                """%(m.getTitle(),m.getFormHTML(self._registrant.getTotal(),regForm.getCurrency(),self._conf,self._registrant, lang = self._rh._getSession().getLang(), secure=self._rh._req.is_https()))
         #forms=forms+"</table>"
 
         if forms:
