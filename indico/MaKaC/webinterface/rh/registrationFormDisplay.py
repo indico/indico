@@ -140,19 +140,19 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         params["socialEvents"] = se
 
     def _process( self ):
-        user = self._getUser()
-        canManageRegistration = self._conf.canManageRegistration(user)
-        if not canManageRegistration and (not self._regForm.isActivated() or not self._conf.hasEnabledSection("regForm")):
+        canManageRegistration = self._conf.canManageRegistration(self._getUser())
+        if not canManageRegistration and not self._regForm.isActivated():
             p = registrationForm.WPRegFormInactive( self, self._conf )
             return p.display()
         params = self._getRequestParams()
-        if canManageRegistration:
-            matchedUsers = AvatarHolder().match({"email": params["email"]})
-            if matchedUsers:
-                user = matchedUsers[0]
-            else:
-                user = None
+
+        matchedUsers = AvatarHolder().match({"email": params["email"]})
+        if matchedUsers:
+            user = matchedUsers[0]
         else:
+            user = None
+        # Check if the user can register
+        if not canManageRegistration: # normal user registering. Managers can.
             if self._conf.getRegistrationForm().isFull():
                 self._redirect(urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf))
                 return
@@ -166,7 +166,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             if user.isRegisteredInConf(self._conf):
                 self._redirect(urlHandlers.UHConfRegistrationForm.getURL(self._conf))
                 return
-            if self._conf.hasRegistrantByEmail(self._getUser().getEmail()):
+            if self._conf.hasRegistrantByEmail(user.getEmail()):
                 raise FormValuesError("You have already registered with the email address \"%s\". If you need to modify your registration, please contact the managers of the conference."%self._getUser().getEmail())
         rp = registration.Registrant()
         self._conf.addRegistrant(rp)
