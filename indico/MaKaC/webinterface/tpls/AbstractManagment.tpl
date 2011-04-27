@@ -106,9 +106,7 @@
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Status")}</span></td>
                     <td bgcolor="white" valign="top">${ status }</td>
-                    <form action=${ backToSubmittedURL } method="POST">
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2">${'<input type="submit" class="btn" value="'+ _("back to submitted")+'">' if showBackToSubmitted else ""}</td>
-                    </form>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2">${'<input type="submit" onclick="showWarning();" class="btn" value="'+ _("back to submitted")+'">' if showBackToSubmitted else ""}</td>
                 </tr>
                 <tr>
                     <td class="dataCaptionTD" nowrap><span class="dataCaptionFormat">${ inlineContextHelp(_('Average of all the answers given by the reviewers for this abstract.')) }${ _("Average rating") }</span></td>
@@ -218,6 +216,34 @@
 </table>
 
 <script>
+
+var status = '${ statusName }';
+
+function showWarning() {
+    if (status=="ACCEPTED") {
+        var content = Html.div({}, Html.table({}, Html.tbody({},
+                Html.tr({}, Html.td({style:{textAlign:'center'}},
+                        Html.span({},"The contribution associated with this abstract will be "),
+                        Html.span({style:{fontWeight:'bold'}}, "deleted."))),
+                Html.tr({}, Html.td({style:{textAlign:'center'}},
+                        Html.span({style:{fontWeight:'bold'}}, "All"),
+                        Html.span({}, " the existing sub-contributions within the above contribution will also be "),
+                        Html.span({style:{fontWeight:'bold'}}, "deleted."))),
+                Html.tr({}, Html.td({style:{textAlign:'center'}},
+                        Html.span({},"The abstract status will be "),
+                        Html.span({style:{fontWeight:'bold'}}, "Submitted."))),
+                Html.tr({}, Html.td({style:{textAlign:'center'}}, "Do you want to continue?")))));
+        var popup = new ConfirmPopup("Back to submitted status", content,
+                function(action) {
+                    if (action) {
+                        window.location = ${ backToSubmittedURL };
+                    }
+                }, "Confirm");
+        popup.open();
+    } else {
+        window.location = ${ backToSubmittedURL };
+    }
+}
 
 var changeSubmitterHandler = function(user) {
 	indicoRequest(

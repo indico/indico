@@ -631,7 +631,10 @@ class WAbstractManagment( wcomponents.WTemplated ):
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
         vars["organisation"] = self.htmlText(self._abstract.getSubmitter().getAffiliation())
         vars["status"] = self._getStatusHTML()
-        vars["showBackToSubmitted"] = isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusWithdrawn)
+        vars["statusName"] = AbstractStatusList.getInstance().getCaption(self._abstract.getCurrentStatus().__class__).upper()
+        vars["showBackToSubmitted"] = self._abstract.getCurrentStatus().__class__ in [review.AbstractStatusWithdrawn, \
+                                                                                      review.AbstractStatusRejected, \
+                                                                                      review.AbstractStatusAccepted]
         #for author in self._abstract.getAuthorList():
         #    if self._abstract.isPrimaryAuthor( author ):
         #        primary_authors.append( self._getAuthorHTML( author ) )

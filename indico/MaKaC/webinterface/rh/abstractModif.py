@@ -479,9 +479,19 @@ class RHWithdraw(RHAbstractModifBase):
 
 class RHBackToSubmitted(RHAbstractModifBase):
 
+    def _removeAssociatedContribution(self):
+        contribution = self._abstract.getContribution()
+        contribution.getOwner().getSchedule().removeEntry(contribution.getSchEntry())
+        contribution.delete()
+
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
-        if isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusWithdrawn):
+        if self._abstract.getCurrentStatus().__class__ in [review.AbstractStatusWithdrawn, review.AbstractStatusRejected]:
+            self._abstract.setCurrentStatus(review.AbstractStatusSubmitted(self._abstract))
+        elif isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusAccepted):
+            # remove the associated contribution
+            self._removeAssociatedContribution()
+            # set submittted status
             self._abstract.setCurrentStatus(review.AbstractStatusSubmitted(self._abstract))
         self._redirect(url)
 
