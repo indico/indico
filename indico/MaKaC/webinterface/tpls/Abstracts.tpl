@@ -161,7 +161,7 @@
             <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Primary Author(s)")}</td>
         % endif
         % if "Tracks" in displayColumns:
-            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> ${_("Tracks")}</td>
+            <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${trackSortingURL}> ${_("Tracks")}</a>${tracksImg}</td>
         % endif
         % if "Type" in displayColumns:
             <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=${typeSortingURL}> ${_("Type")}</a>${typeImg}</td>

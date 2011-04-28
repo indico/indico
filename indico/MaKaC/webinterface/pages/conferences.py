@@ -3993,6 +3993,20 @@ class WAbstracts( wcomponents.WTemplated ):
                 url.addParam("order","down")
         vars["ratingSortingURL"] = quoteattr( str( url ) )
 
+        # sort by track
+        url = self._getURL()
+        url.addParam("sortBy", "track")
+        vars["trackImg"] = ""
+        if sortingField and sortingField.getId() == "track":
+            vars["currentSorting"] = """<input type="hidden" name="sortBy" value="track">"""
+            if self._order == "down":
+                vars["trackImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order","up")
+            elif self._order == "up":
+                vars["trackImg"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order","down")
+        vars["trackSortingURL"] = quoteattr(str(url))
+
         url=self._getURL()
         url.addParam("sortBy","number")
         vars["numberImg"]=""

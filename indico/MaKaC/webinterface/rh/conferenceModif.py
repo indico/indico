@@ -1677,6 +1677,27 @@ class _AbstractRatingSF( filters.SortingField ):
             b = -1.0
         return cmp( a, b )
 
+class _AbstractTrackSF( filters.SortingField ):
+    _id = "track"
+
+    def compare( self, a1, a2 ):
+        trackList1 = a1.getTrackList()
+        trackList2 = a2.getTrackList()
+        # check if there is track assignement for the abstract and get the list of ids if needed
+        if len(trackList1) == 0:
+            a = [-1.0]
+        else:
+            a = []
+            for track in trackList1:
+                a.append(track.getId())
+        if len(trackList2) == 0:
+            b = [-1.0]
+        else:
+            b = []
+            for track in trackList2:
+                b.append(track.getId())
+
+        return cmp( a, b )
 
 class AbstractSortingCriteria( filters.SortingCriteria ):
     """
@@ -1684,6 +1705,7 @@ class AbstractSortingCriteria( filters.SortingCriteria ):
     _availableFields = {
         abstractFilters.ContribTypeSortingField.getId(): \
                                 abstractFilters.ContribTypeSortingField, \
+		_AbstractTrackSF.getId(): _AbstractTrackSF, \
         _AbstractStatusSF.getId(): _AbstractStatusSF, \
         _AbstractIdSF.getId(): _AbstractIdSF, \
         _AbstractRatingSF.getId(): _AbstractRatingSF, \
