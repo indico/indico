@@ -52,7 +52,7 @@ import httplib
 import urllib
 import base64
 from xml.dom.minidom import parseString
-from copy import copy
+from copy import deepcopy
 
 """Contains the classes that implement the user management subsystem
 """
@@ -692,7 +692,7 @@ class Avatar(Persistent, Fossilizable):
         return self.key
 
     def resetLinkedTo(self):
-        self.linkedTo = copy(self.linkedToBase)
+        self.linkedTo = deepcopy(self.linkedToBase)
         self._p_changed = 1
 
     def getLinkedTo(self):
