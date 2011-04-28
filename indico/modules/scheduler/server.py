@@ -56,7 +56,7 @@ class Scheduler(object):
     # configuration options
     _options = {
         # either 'threads' or 'processes'
-        'multitask_mode': 'threads',
+        'multitask_mode': 'processes',
 
         # time to wait between cycles
         'sleep_interval': 10,
@@ -245,16 +245,15 @@ class Scheduler(object):
                 self._db_moveTask(task,
                                   base.TASK_STATUS_RUNNING,
                                   base.TASK_STATUS_QUEUED)
-            except base.TaskInconsistentStatusException, e:
+            except base.TaskInconsistentStatusException:
                 self._logger.exception("Problem relaunching task %s - "
                                        "setting it as failed" % task)
-                self._db_moveTask(
-                    task,
-                    base.TASK_STATUS_RUNNING,
-                    base.TASK_STATUS_FAILED,
-                    nocheck=True)
+                self._db_moveTask(task,
+                                  base.TASK_STATUS_RUNNING,
+                                  base.TASK_STATUS_FAILED,
+                                  nocheck=True)
 
-                self._dbi.commit();
+                self._dbi.commit()
 
     def _iterateTasks(self):
         """
@@ -328,6 +327,7 @@ class Scheduler(object):
 
                 # let's check if it was successful or not
                 # and write it in the db
+
                 if thread.getResult() == True:
                     self._db_notifyTaskStatus(task, base.TASK_STATUS_FINISHED)
                 elif thread.getResult() == False:

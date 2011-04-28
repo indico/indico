@@ -165,9 +165,9 @@ class BaseTask(TimedEvent):
 
         try:
             self.run()
+            self.endedOn = self._getCurrentDateTime()
         finally:
             self.running = False
-            self.endedOn = self._getCurrentDateTime()
 
     def tearDown(self):
         """
