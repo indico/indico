@@ -1,0 +1,43 @@
+.EATitle{
+    border-bottom: 1px solid #777777;
+    color: #4E4C46;
+    font-family: "Times New Roman",Verdana,Arial;
+    font-size: 24px;
+    letter-spacing: 1px;
+    margin: 10px 0px 10px 0px; /*top right bottom left*/
+    padding: 3px 3px 5px 3px;
+    text-align: center;
+}
+
+div.EABody{
+    text-align: center;
+}
+
+div.EAContent{
+    text-align: left;
+    /*margin: 0 10% /*top,bottom=0 and left,right=10%*/
+}
+
+div.EAFormSection{
+    background-color: #F6F6F6;
+    border-bottom: 1px solid #AAAAAA;
+    border-right: 1px solid #AAAAAA;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    margin: 10px 10px;
+    padding: 10px 20px 10px 20px;
+}
+
+form.EAChoiceButton{
+    text-align: center;
+}
+
+.EAInfo{
+    font-weight: bold;
+ }
+
+ .EATable{
+    margin: 5px 10px;
+ }
