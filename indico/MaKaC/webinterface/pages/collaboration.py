@@ -36,6 +36,8 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.services.implementation.user import UserComparator
 from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil
 
+#from MaKaC.fossils.contribution import IContributionWithSpeakersMinimalFossil
+
 ################################################### Server Wide pages #########################################
 
 class WPAdminCollaboration(WPMainBase):
@@ -192,13 +194,22 @@ class WPConfModifCSBase (WPConferenceModifBase):
         self._tabs = {} # list of Indico's Tab objects
         self._tabNames = rh._tabs
         self._activeTabName = rh._activeTabName
-
+        self.rh = rh
         self._tabCtrl = wcomponents.TabControl()
 
     def _createTabCtrl(self):
         isUsingHTTPS = CollaborationTools.isUsingHTTPS()
+
         for tabName in self._tabNames:
-            if tabName == 'Managers':
+            isPlugin = False
+
+            for plugin in CollaborationTools.getPluginsByTab(tabName, self._conf, self.rh._getUser()):
+                isPlugin = True
+
+            if tabName != 'Managers' and not isPlugin:
+                from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgreement
+                url = UHCollaborationElectronicAgreement.getURL(self._conf)
+            elif tabName == 'Managers':
                 url = urlHandlers.UHConfModifCollaborationManagers.getURL(self._conf)
             else:
                 url = urlHandlers.UHConfModifCollaboration.getURL(self._conf, secure = isUsingHTTPS, tab = tabName)
@@ -247,7 +258,6 @@ class WPConfModifCollaboration(WPConfModifCSBase):
             return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(wc.getHTML({}))
         else:
             return _("No available plugins, or no active plugins")
-
 
 class WConfModifCollaboration(wcomponents.WTemplated):
 

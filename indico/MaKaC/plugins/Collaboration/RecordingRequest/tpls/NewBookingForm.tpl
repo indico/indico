@@ -62,14 +62,12 @@
     </div>
 % endif
     <div class="RRFormSubsection">
-        <span class="RRQuestion">${ _('Do you commit to ensure that the speakers will give their permission to have their talks recorded?') }</span>
+        <span class="RRQuestion">
+            ${ _('Once your request accepted, all speakers will need to sign an electronic agreement.')}<br/>
+            ${ _('For more details about how to do so, please go ') }
+           <a href="${ linkToEA }">${ _('here')}</a>.
+        </span>
         <br/>
-        <input type="radio" name="permission" id="permissionYesRB" value="Yes" >
-        <label for="permissionYesRB" id="permissionYesRBLabel">${ _('Yes') }</label>
-        <input type="radio" name="permission" id="permissionNoRB"value="No" >
-        <label for="permissionNoRB" id="permissionNoRBLabel">${ _('No') }</label>
-        <br/>
-        ${'<span style="margin-left: 2em;">'+ ConsentForm +'</span>' if ConsentForm else ""}
     </div>
 </div>
 

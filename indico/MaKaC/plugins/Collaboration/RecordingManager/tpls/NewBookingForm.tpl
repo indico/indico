@@ -14,7 +14,6 @@
         <div class="RMMatchPane">
             % for talk in Talks:
                 <% IndicoID = talk["IndicoID"] %>
-
                   <span>
                     <table cellspacing="0px" cellpadding="0px" border="0">
                     <tr>
@@ -49,8 +48,29 @@
                             </table>
                         </div>
                     </td>
+                    <!--  This column shows whether all the speaker of a contribution agreed or not -->
+                    <td width="40px" valign="top" style="vertical-align:middle;">
+                        <% manager = Conference.getCSBookingManager() %>
+                        % if talk["contId"] != "":
+                            % if manager.isContributionReadyToBePublished(talk["contId"]):
+                                <div class="RMcolumnStatusAgreedDone">
+                                </div>
+                            % else:
+                                <div class="RMcolumnStatusAgreedNotDone">
+                                </div>
+                            % endif
+                        % elif talk["type"] == 'conference' and Conference.getType() == "simple_event" :
+                            % if manager.isContributionReadyToBePublished(Conference.getId()):
+                                <div class="RMcolumnStatusAgreedDone">
+                                </div>
+                            % else:
+                                <div class="RMcolumnStatusAgreedNotDone">
+                                </div>
+                            % endif
+                        % endif
+                    </td>
                     <!--  This column shows whether the talk has a matching LOID associated with it (only makes sense for web lectures, not plain video). -->
-                    <td width="50px" valign="top">
+                    <td width="40px" valign="top" style="vertical-align:middle;">
                         % if talk["LOID"] != '':
                             <div class="RMcolumnStatusMicalaDone">
                             </div>
@@ -60,7 +80,7 @@
                         % endif
                     </td>
                     <!--  This column shows whether a CDS record for this talk exists, or if it is pending. -->
-                    <td width="50px" valign="top">
+                    <td width="40px" valign="top" style="vertical-align:middle;">
                         % if talk["CDSID"] != 'none' and talk["CDSID"] != 'pending':
                             <div class="RMcolumnStatusCDSDone" id="divCDS${ talk["IndicoID"] }" onclick="RMCDSDoneClick('${ talk["CDSURL"] }');" onmouseover="RMCDSDoneOnHover('${ talk["IndicoID"] }');" onmouseout="RMCDSDoneOffHover('${ talk["IndicoID"] }');">
                             </div>
@@ -73,7 +93,7 @@
                         % endif
                     </td>
                     <!--  This column shows whether a link has been created from Indico to the CDS record. -->
-                    <td width="50px" valign="top">
+                    <td width="40px" valign="top" style="vertical-align:middle;">
                         % if talk["IndicoLink"] == True:
                             <div class="RMcolumnStatusIndicoDone">
                             </div>

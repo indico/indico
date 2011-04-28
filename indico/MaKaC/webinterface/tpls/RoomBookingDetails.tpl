@@ -35,7 +35,7 @@
         }
         function submit_cancel_occurrence( action )
         {
-            if (confirm('Are you sure you want to cancel the selected date from the booking?')) {
+            if (confirm('Are you sure you want to remove the selected date from the booking?')) {
               var frm = document.forms['submits'];
               frm.action = action;
               frm.submit();

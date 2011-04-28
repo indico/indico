@@ -62,10 +62,6 @@ class CSBooking(CSBookingBase):
         CSBookingBase.__init__(self, type, conf)
 
     def _checkBookingParams(self):
-        if not self._bookingParams["permission"]:
-            raise RecordingRequestException("permission parameter cannot be left empty")
-        elif self._bookingParams["permission"] == 'No':
-            raise RecordingRequestException("""permission parameter cannot have the "no" value""")
 
         if self._bookingParams["lectureOptions"] == 'chooseOne': #change when list of community names is ok
             raise RecordingRequestException("lectureOptions parameter cannot be 'chooseOne'")
@@ -136,7 +132,8 @@ class CSBooking(CSBookingBase):
                     """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return RecordingRequestError('accept', e)
 
-
+        manager = self._conf.getCSBookingManager()
+        manager.notifyInfoChange()
 
     def _reject(self):
         self._statusMessage = "Request rejected by responsible"

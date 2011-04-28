@@ -869,23 +869,32 @@ class PluginType (PluginBase):
                     PluginsHolder().getRHMap().addRH(obj)
 
     def _updateHandlerInfo(self, plugin, module):
-        """
-        """
 
-        # TODO: Maybe let handlers be defined anywhere?
+        for attribute in module.__dict__.values():
+            if isinstance(attribute, types.ModuleType):
+                if hasattr(attribute, 'methodMap') and type(attribute.methodMap) == dict:
+                    PluginsHolder().getById('ajaxMethodMap').addMethods2AJAXDict(
+                       attribute.methodMap)
+                    Logger.get('plugins.holder').warning("Found methodMap in module: %s"% \
+                                                            module.__name__)
 
-        # By default, use module.handlers.methodMap
-        if hasattr(module, 'handlers') and \
-           isinstance(module.handlers, types.ModuleType):
-            if hasattr(module.handlers, 'methodMap') and \
-               type(module.handlers.methodMap) == dict:
-                PluginsHolder().getById('ajaxMethodMap').addMethods2AJAXDict(
-                    module.handlers.methodMap)
-            else:
-                # in case there's no methodMap, skip it and leave a warning
-                Logger.get('plugins.holder').warning("%s has no methodMap? "
-                                                     "(or is it invalid?)" % \
-                                                     module.__name__)
+        # Old way to do it, only looked in handlers.py
+        #=======================================================================
+        # #By default, use module.handlers.methodMap
+        # if hasattr(module, 'handlers') and \
+        #  isinstance(module.handlers, types.ModuleType):
+        #    if hasattr(module.handlers, 'methodMap') and \
+        #       type(module.handlers.methodMap) == dict:
+        #        PluginsHolder().getById('ajaxMethodMap').addMethods2AJAXDict(
+        #           module.handlers.methodMap)
+        #    else:
+        #        # in case there's no methodMap, skip it and leave a warning
+        #        Logger.get('plugins.holder').warning("%s has no methodMap? "
+        #                                            "(or is it invalid?)" % \
+        #                                            module.__name__)
+        #=======================================================================
+
+
 
     def _retrievePluginTypeOptions(self):
 

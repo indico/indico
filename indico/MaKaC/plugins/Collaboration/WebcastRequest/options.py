@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from MaKaC.i18n import _
 
 globalOptions = [
     #Collaboration options necessary in all plugins
@@ -37,6 +38,11 @@ globalOptions = [
                       "defaultValue": [],
                       "editable": True,
                       "visible": True} ),
+    ("ElectronicAgreementTab", {"description": _("Name of tab where the Electronic Agreement will be placed"),
+               "defaultValue": "Electronic Agreement",
+               "type": str,
+               "editable": False
+               }),
     #WebcastRequest options
     ("sendMailNotifications", {"description" : "Should mail notifications be sent to responsibles?",
                "type": bool,
@@ -55,7 +61,7 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("ConsentForm", {"description" : "Webcast consent form information",
+    ("ConsentFormURL", {"description" : "Link to the paper agreement",
                "type": str,
                "defaultValue": "",
                "editable": True,

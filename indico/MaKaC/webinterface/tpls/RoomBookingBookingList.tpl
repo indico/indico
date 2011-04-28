@@ -30,6 +30,8 @@
         </tr>
     </table>
     <br />
+<<<<<<< HEAD
+=======
 
     <script type="text/javascript">
     var roomBookingCalendar = new RoomBookingCalendar(${ jsonEncode(barsFossil) }, ${ jsonEncode(dayAttrs) }, ${ str(overload).lower() },

@@ -721,7 +721,6 @@ class _Needs_Rewriting_TestWithdrawal(unittest.TestCase):
         self._conf.setDates(sd,ed)
 
     def testBasicWithdrawal(self):
-
         c1, c2 = Contribution(),Contribution()
         auth1, auth2 = ContributionParticipation(), ContributionParticipation()
         self._conf.addContribution(c1)

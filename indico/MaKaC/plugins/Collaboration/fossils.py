@@ -31,6 +31,20 @@ from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.Conversion import Conversion
 
 
+class ISpeakerWrapperBaseFossil(IFossil):
+
+    def getUniqueId(self):
+        pass
+
+    def getStatus(self):
+        pass
+
+    def getContId(self):
+        pass
+
+    def getSpeakerId(self):
+        pass
+
 ##################### Booking fossils #####################
 class ICSBookingBaseFossil(IFossil):
 
@@ -134,8 +148,6 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
 
     def isAllowMultiple(self):
         """ Returns if this booking belongs to a type that allows multiple bookings per event. """
-
-
 
 class ICSBookingBaseIndexingFossil(ICSBookingBaseFossil):
 

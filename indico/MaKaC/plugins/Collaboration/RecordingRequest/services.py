@@ -24,7 +24,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 
 class RRTalksService(CollaborationPluginServiceBase):
-    
+
     def _getAnswer(self):
         talks = getTalks(self._conf, sort = True)
         return fossilize(talks, IContributionWithSpeakersFossil,

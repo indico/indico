@@ -169,7 +169,6 @@ class RHConfModifCSBase(RHConferenceModifBase):
         if self._target.canModify(self.getAW()) or RCVideoServicesManager.hasRights(self):
             allowedTabs.append('Managers')
 
-        # we order the list of allowedTabs into the self._tabs list
         tabOrder = CollaborationTools.getCollaborationOptionValue('tabOrder')
         self._tabs = []
 
@@ -184,7 +183,6 @@ class RHConfModifCSBase(RHConferenceModifBase):
 
         if 'Managers' in allowedTabs:
             self._tabs.append('Managers')
-
 
 class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
     _uh = urlHandlers.UHConfModifCollaboration
@@ -213,8 +211,6 @@ class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
         if not hasRights:
             RHConferenceModifBase._checkProtection(self)
 
-
-
     def _process( self ):
 
         if self._conf.isClosed():
@@ -232,7 +228,6 @@ class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
             else:
                 p = collaboration.WPConfModifCollaboration( self, self._conf)
                 return p.display()
-
 
 class RHConfModifCSProtection(RHConfModifCSBase):
     _uh = urlHandlers.UHConfModifCollaborationManagers

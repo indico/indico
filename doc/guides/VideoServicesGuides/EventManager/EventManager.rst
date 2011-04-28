@@ -1623,6 +1623,10 @@ reload / update the status.
 Even after a request is accepted or rejected, you can still modify
 it, which will trigger another mail being sent to the responsible.
 
+*Note: Once the request is accepted, the manager will need to send to every speaker that
+will be recorded an email asking to accept some conditions. This will be done through the
+Electronic Agreement tab. More details are available in the* `Electronic Agreement system <#the-electronic-agreement-system>`_ section.
+
 --------------------------
 The Webcast Request system
 --------------------------
@@ -1856,7 +1860,83 @@ reload (update) the status.
 Even after a request is accepted or rejected, you can still modify
 it, which will trigger another mail being sent to the responsible.
 
+*Note: Once the request is accepted, the manager will need to send to every speaker that
+will be webcasted an email asking to accept some conditions. This will be done through the
+Electronic Agreement tab. More details are available in the* `Electronic Agreement system <#the-electronic-agreement-system>`_ section.
 
+-------------------------------
+The Electronic Agreement system
+-------------------------------
+
+.. _here:
+The Electronic Agreement system can be found under the *Electronic Agreement* tab.
+The content of this page is only showed when either a Recording or a Webcast Request has been accepted.
+
+This page will list the speakers of every contribution that had been asked to be recorded or webcasted.
+The Electronic Agreement is a form that give the image rights to publish the contribution online.
+From this page, the manager will be able to send emails to the speakers asking them to accept the conditions.
+However, if the email of a speaker is not available for a reason or another, the manager can still download a Paper Agreement available through that same page. Once downloaded it, he can ask to the speaker to sign it, once this done, the manager can scan the document and upload it.
+
+~~~~~~~~~~~~~~~~
+List of speakers
+~~~~~~~~~~~~~~~~
+
+In this section we will look in more details to the list of speakers and detail every field.
+
+|figure76|
+
+The list of speaker contains the following fields:
+
+- The **Speaker** column, as you can expect, give you the name of the speaker. 
+- The **Email** column shows you the email address of the speaker, however, if in case the email would be wrong, the manager can click on the edit button in order to change his email.
+- The **Status** column shows the current status of the agreement. A help icon is there to remind you their meaning.
+	- *No Email*: The speaker does not have an email address.
+	- *Not Signed*: The speaker has not signed the agreement and no email has been sent to him.
+	- *Pending...*: The email has been sent to the speaker.
+	- *Signed*: The agreement has been signed electronically.
+	- *Uploaded*: The agreement has been signed through the paper form.
+	- *Refused*: The speaker did not agree with the conditions and refused the agreement. In addition to this status, a help button will appear which will show you the rejection reason.
+- The **Request Type** column shows you for which request (recording or webcast) the speaker is involved to. A help icon is there to remind you their meaning.
+	- *REC*: Only the recording request has been requested.
+	- *WEB*: Only the webcast request has been requested.
+	- *REC/WEB*: Both requests have been requested.
+	- *NA*: The information is not available.
+- The **Contribution** column shows you the name of the contribution that the speaker will attend.
+- The **Upload Agreement** column give you the link to upload the Paper Agreement, once uploaded, a pdf icon will appear with a link to the file.
+
+~~~~~~~~~~~~~~~~~~~~~~
+Send Email to Speakers
+~~~~~~~~~~~~~~~~~~~~~~
+To send an email to the speaker, the manager need first to select at least one entry. Once done, clicking the *Send Email* button will popup a window with the default text that will be sent, as you can see here.
+
+|figure77|
+
+The window above is a simple form that allow you to choose with which one of your email address you want to send the emails.
+Then, you will have a text field showing a default text that can be sent. This text can be personalized by the manager as he wants. 
+
+However, there is one and unique condition to respect: **keep the [url] tag**. 
+In the legend you can see some tags that can be inserted, none of them are mandatory except the **[url]** one. 
+
+Indeed, the [url] tag will be replaced by the link to the agreement form. If this one is not present, the system will refuse to send the email until you input this tag. Once the email is sent, the status of the speaker will change to *Pending...*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+Upload the Paper Agreement
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+When the email of the speaker is not available, you can still provide a *Paper Agreement*. To do so you will need to perform the following steps:
+
+1. Upload the form needed, the link can be found in the introduction text on this same page.
+
+     |figure78|
+
+2. Contact the speaker and ask him to sign the paper.
+
+3. Scan the paper agreement.
+
+4. Upload the pdf scan through this page, by clicking to the *Upload* link. A popup will appear asking you to provide the file.
+
+     |figure79|
+
+Once the file submited, the page will refresh and a pdf icon will appear. Clicking on this icon will show you the pdf that you have just uploaded.
 
 .. |image0| image:: images/html_4108b437.png
 .. |image1| image:: images/html_m7f295075.png
@@ -1950,3 +2030,7 @@ it, which will trigger another mail being sent to the responsible.
 .. |figure73| image:: images/html_6c4d7305.png
 .. |figure74| image:: images/html_m5dc464a0.png
 .. |figure75| image:: images/html_32473d75.png
+.. |figure76| image:: images/fig76.png
+.. |figure77| image:: images/fig77.png
+.. |figure78| image:: images/fig78.png
+.. |figure79| image:: images/fig79.png

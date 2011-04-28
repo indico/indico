@@ -26,7 +26,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.timezoneUtils import isSameDay
-
+from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -81,9 +81,7 @@ class WNewBookingForm(WCSPageTemplateBase):
             vars["Contributions"] = []
 
         vars["Audiences"] = CollaborationTools.getOptionValue('WebcastRequest', "webcastAudiences")
-
-        vars["ConsentForm"] = self._WebcastRequestOptions["ConsentForm"].getValue()
-
+        vars["linkToEA"] = collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(self._conf)
         return vars
 
 

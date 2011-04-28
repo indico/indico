@@ -28,17 +28,17 @@ class CollaborationNotificationBase(GenericNotification):
     """
     def __init__(self, booking):
         GenericNotification.__init__(self)
-        
+
         self._booking = booking
         self._bp = booking._bookingParams
         self._conference = booking.getConference()
-        
+
         self._modifLink = str(self._booking.getModificationURL())
-        
+
         self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
         self.setToList(MailTools.getAdminEmailList())
         self.setContentType("text/html")
-        
+
     def _getBookingDetails(self, typeOfMail):
         return """
 Booking / request details:<br />
@@ -97,13 +97,13 @@ Booking / request details:<br />
 class NewBookingNotification(CollaborationNotificationBase):
     """ Template to build an email notification to a Collaboration responsible
     """
-    
+
     def __init__(self, booking):
         CollaborationNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[Video Services] New booking / request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody(
 """
 A new booking / request was created in <a href="%s">%s</a>
@@ -119,19 +119,19 @@ A new booking / request was created in <a href="%s">%s</a>
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference)
         ))
-        
-        
-        
+
+
+
 class BookingModifiedNotification(CollaborationNotificationBase):
     """ Template to build an email notification to a Collaboration responsible
     """
-    
+
     def __init__(self, booking):
         CollaborationNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[Video Services] Booking / request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody(
 """
 A booking / request was modified in <a href="%s">%s</a>
@@ -147,19 +147,19 @@ A booking / request was modified in <a href="%s">%s</a>
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference)
         ))
-        
-        
-        
+
+
+
 class BookingDeletedNotification(CollaborationNotificationBase):
     """ Template to build an email notification to a Collaboration responsible
     """
-    
+
     def __init__(self, booking):
         CollaborationNotificationBase.__init__(self, booking)
-        
+
         self.setSubject("""[Video Services] Booking / request deleted: %s (event id: %s)"""
                 % (self._conference.getTitle(), str(self._conference.getId())))
-        
+
         self.setBody(
 """
 A booking / request was deleted in <a href="%s">%s</a>
@@ -175,3 +175,23 @@ A booking / request was deleted in <a href="%s">%s</a>
         MailTools.eventDetails(self._conference),
         MailTools.organizerDetails(self._conference)
         ))
+
+class SpeakersNotificationBase(GenericNotification):
+    """ Base class to build an email notification to Speakers
+    """
+    def __init__(self, sendToList, fromEmail):
+        GenericNotification.__init__(self)
+
+        self.setContentType("text/html")
+        self.setFromAddr("Indico Mailer<%s>"%fromEmail)
+        self.setToList(sendToList)
+
+class ElectroniAgreementNotification(SpeakersNotificationBase):
+    """ Template to build an email notification to the speakers
+        to sign the electronic agreement.
+    """
+
+    def __init__(self, sendToList, fromEmail, content, subject):
+        SpeakersNotificationBase.__init__(self, sendToList, fromEmail)
+        self.setSubject(subject)
+        self.setBody(content)

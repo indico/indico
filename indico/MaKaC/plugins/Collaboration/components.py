@@ -20,7 +20,7 @@
 
 
 from MaKaC.common.utils import *
-from MaKaC.conference import Conference
+from MaKaC.conference import Conference, Contribution
 
 from indico.core.extpoint import Component, IListener
 from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, \
@@ -103,6 +103,18 @@ class EventCollaborationListener(Component):
             obj.notifyTitleChange(oldTitle, newTitle)
         except Exception, e:
             Logger.get('PluginNotifier').error("Exception while trying to access to the title parameters when changing an event title" + str(e))
+
+    @classmethod
+    def infoChanged(cls, obj):
+        #Update Speaker Wrapper only if obj is a Conference
+        if isinstance(obj, Conference) or isinstance(obj, Contribution):
+            bookingManager = obj.getCSBookingManager()
+
+            try:
+                bookingManager.notifyInfoChange()
+            except Exception, e:
+                Logger.get('PluginNotifier').error("Exception while trying to access the info changes " + str(e))
+
 
     @classmethod
     def deleted(cls, obj, params={}):

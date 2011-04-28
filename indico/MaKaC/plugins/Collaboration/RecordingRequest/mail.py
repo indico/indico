@@ -287,7 +287,6 @@ class RecordingRequestManagerNotificationBase(RecordingRequestNotificationBase):
         RecordingRequestNotificationBase.__init__(self, booking)
         self.setToList(MailTools.getManagersEmailList(self._conference, 'RecordingRequest'))
 
-
 class NewRequestNotification(RecordingRequestAdminNotificationBase):
     """ Template to build an email notification to the recording responsible
     """

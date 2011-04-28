@@ -182,13 +182,12 @@
 
     <div class="WRFormSection">
         <div class="WRFormSubsection">
-        <span class="WRQuestion">${_("Have all the speakers given permission to have their talks webcasted?")}</span>
+        <span class="WRQuestion">
+            ${ _('Once your request accepted, all speakers will need to sign an electronic agreement.')}<br/>
+            ${ _('For more details about how to do so, please go ') }
+            <a href="${ linkToEA }">${ _('here')}</a>.
+        </span>
         <br/>
-        <input type="radio" name="permission" id="permissionYesRB" value="Yes" >
-        <label for="permissionYesRB" id="permissionYesRBLabel">Yes</label>
-        <input type="radio" name="permission" id="permissionNoRB"value="No" >
-        <label for="permissionNoRB" id="permissionNoRBLabel">No</label>
-        ${'<span style="margin-left: 2em;">'+ ConsentForm +'</span>' if ConsentForm else ""}
         </div>
     </div>
 

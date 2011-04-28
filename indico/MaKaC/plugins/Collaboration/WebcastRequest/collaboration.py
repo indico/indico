@@ -55,10 +55,6 @@ class CSBooking(CSBookingBase):
         CSBookingBase.__init__(self, type, conf)
 
     def _checkBookingParams(self):
-        if not self._bookingParams["permission"]:
-            raise WebcastRequestException("permission parameter cannot be left empty")
-    #    if self._bookingParams["talks"] == 'choose':
-    #       raise WebcastRequestException("You cannot choose choose")
         return False
 
     def _create(self):
@@ -122,6 +118,9 @@ class CSBooking(CSBookingBase):
                 Logger.get('RecReq').exception(
                     """Could not send RequestAcceptedNotificationAdmin for request with id %s of event %s, exception: %s""" % (self._id, self.getConference().getId(), str(e)))
                 return WebcastRequestError('accept', e)
+
+        manager = self._conf.getCSBookingManager()
+        manager.notifyInfoChange()
 
     def _reject(self):
         self._statusMessage = "Request rejected by responsible"

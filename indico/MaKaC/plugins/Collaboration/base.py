@@ -17,8 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+import time
 from persistent import Persistent
+from hashlib import md5
 from MaKaC.common.Counter import Counter
 from MaKaC.common.utils import formatDateTime, parseDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate, setAdjustedDate,\
@@ -44,8 +45,8 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 
 from MaKaC.plugins.Collaboration.fossils import ICSErrorBaseFossil, ICSSanitizationErrorFossil,\
-    ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil
-
+    ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil,\
+    ISpeakerWrapperBaseFossil
 
 class CSBookingManager(Persistent, Observer):
     """ Class for managing the bookins of a meeting.
@@ -74,6 +75,10 @@ class CSBookingManager(Persistent, Observer):
 
         # an index of video services managers for each plugin. key: plugin name, value: list of users
         self._managers = {}
+
+        # list of speaker wrapper for a conference
+        self._speakerWrapperList = []
+        self.updateSpeakerWrapperList()
 
     def getOwner(self):
         """ Returns the Conference (the meeting) that owns this CSBookingManager object.
@@ -519,6 +524,8 @@ class CSBookingManager(Persistent, Observer):
             except Exception, e:
                 Logger.get('VideoServ').exception("Exception while reindexing a booking in the event title index because its event's title changed: " + str(e))
 
+    def notifyInfoChange(self):
+        self.updateSpeakerWrapperList()
 
     def notifyEventDateChanges(self, oldStartDate = None, newStartDate = None, oldEndDate = None, newEndDate = None):
         """ Notifies the CSBookingManager that the start and / or end dates of the event it's attached to have changed.
@@ -640,7 +647,6 @@ class CSBookingManager(Persistent, Observer):
             except Exception, e:
                 Logger.get('VideoServ').exception("Exception while deleting a booking of type %s after deleting an event: %s" % (booking.getType(), str(e)))
 
-
     def getEventDisplayPlugins(self, sorted = False):
         """ Returns a list of names (strings) of plugins which have been configured
             as showing bookings in the event display page, and which have bookings
@@ -685,7 +691,211 @@ class CSBookingManager(Persistent, Observer):
     def _notifyModification(self):
         self._p_changed = 1
 
+    def getSortedContributionSpeaker(self, exclusive):
+        ''' This method will create a dictionary by sorting the contribution/speakers
+            that they are in recording, webcast or in both.
+            bool: exclusive - if True, every dicts (recording, webcast, both) will
+                                have different speaker list (no repetition allowed)
+                                if an element is present in 'both', it will be deleted from
+                                'recording and 'webcast'
 
+            returns dict = { 'recording': {}, 'webcast' : {}, 'both': {} }
+        '''
+
+        recordingBooking = self.getSingleBooking("RecordingRequest")
+        webcastBooking = self.getSingleBooking("WebcastRequest")
+
+        dict = {}
+        if recordingBooking:
+            dict["recording"] = recordingBooking.getContributionSpeakerSingleBooking()
+        else:
+            dict["recording"] = {}
+
+        if webcastBooking:
+            dict["webcast"] = webcastBooking.getContributionSpeakerSingleBooking()
+        else:
+            dict["webcast"] = {}
+
+        contributions = {}
+        ''' Look for speaker intersections between 'recording' and 'webcast' dicts
+            and put them in 'both' dict. Additionally, if any intersection has been found,
+            we exclude them from the original dictionary.
+        '''
+        for cont in dict["recording"].copy():
+            if cont in dict["webcast"].copy():
+                # Check if same contribution/speaker in 'recording' and 'webcast'
+                intersection = list(set(dict['recording'][cont]) & set(dict['webcast'][cont]))
+                if intersection:
+                    contributions[cont] = intersection
+
+                    #if exclusive is True, amd as we found same contribution/speaker,
+                    #we delete them from 'recording' and 'webcast' dicts
+                    if exclusive:
+                        exclusion = list(set(dict['recording'][cont]) ^ set(contributions[cont]))
+                        if not exclusion:
+                            del dict["recording"][cont]
+                        else:
+                            dict["recording"][cont] = exclusion
+
+                        exclusion = list(set(dict['webcast'][cont]) ^ set(contributions[cont]))
+                        if not exclusion:
+                            del dict["webcast"][cont]
+                        else:
+                            dict["webcast"][cont] = exclusion
+
+        dict["both"] = contributions
+
+        return dict
+
+    def getContributionSpeakerByType(self, requestType):
+        ''' Return a plain dict of contribution/speaker according to the requestType
+            if the request type is 'both', we need to merge the lists
+        '''
+        dict = self.getSortedContributionSpeaker(False) # We want non exclusive dict
+
+        if requestType == "recording":
+            return dict['recording']
+        elif requestType == "webcast":
+            return dict['webcast']
+        elif requestType == "both":
+            #We merge the 3 dict 'recording', 'webcast' and 'both'
+            result = dict['webcast'].copy()
+            for elem in dict['recording']:
+                temp = dict['recording'][elem]
+                temp.extend(x for x in result.get(elem, []) if x not in temp)
+                result[elem] = temp
+
+            for elem in dict['both']:
+                temp = dict['both'][elem]
+                temp.extend(x for x in result.get(elem,[]) if x not in temp)
+                result[elem] = temp
+
+            return result
+        else:
+            return {}
+
+    def updateSpeakerWrapperList(self):
+        SWList = []
+        contributions = self.getSortedContributionSpeaker(True)
+        requestType = ['recording', 'webcast', 'both']
+
+        for type in requestType:
+            for cont in contributions[type]:
+                for spk in contributions[type][cont]:
+                    sw = self.getSpeakerWrapperByUniqueId("%s.%s"%(cont, spk.getId()))
+                    if sw:
+                        if not sw.getObject().getEmail():
+                            if sw.getStatus() != SpeakerStatusEnum.SIGNED and \
+                                sw.getStatus() != SpeakerStatusEnum.FROMFILE and \
+                                 sw.getStatus() != SpeakerStatusEnum.REFUSED:
+                                sw.setStatus(SpeakerStatusEnum.NOEMAIL)
+                        elif sw.getStatus() == SpeakerStatusEnum.NOEMAIL:
+                            sw.setStatus(SpeakerStatusEnum.NOTSIGNED)
+                        sw.setRequestType(type)
+                        SWList.append(sw)
+                    else:
+                        newSw = SpeakerWrapper(spk, cont, type)
+                        if not newSw.getObject().getEmail():
+                            newSw.setStatus(SpeakerStatusEnum.NOEMAIL)
+                        SWList.append(newSw)
+
+        self._speakerWrapperList = SWList
+
+    def getSpeakerWrapperList(self):
+        if not hasattr(self, "_speakerWrapperList"):#TODO: remove when safe
+            self._speakerWrapperList = []
+
+        return self._speakerWrapperList
+
+    def getSpeakerWrapperByUniqueId(self, id):
+
+        if not hasattr(self, "_speakerWrapperList"):#TODO: remove when safe
+            return None
+
+        for spkWrap in self._speakerWrapperList:
+            if spkWrap.getUniqueId() == id:
+                return spkWrap
+
+        return None
+
+    def areSignatureCompleted(self):
+        value = True;
+        for spkWrap in self._speakerWrapperList:
+            if spkWrap.getStatus() != SpeakerStatusEnum.FROMFILE and \
+                spkWrap.getStatus() != SpeakerStatusEnum.SIGNED:
+                value = False;
+
+        return value
+
+    def getSpeakerWrapperListByStatus(self, status):
+        '''Return a list of SpeakerWrapper matching the status.
+        '''
+        list = []
+        for spkWrap in self._speakerWrapperList:
+            if spkWrap.getStatus() == status:
+                list.append(spkWrap)
+
+        return list
+
+    def getSpeakerEmailByUniqueId(self, id, user):
+        ''' Return the email of a speaker according to the uniqueId.
+            id: uniqueId of the speaker wrapper.
+            user: user object of the sender of the emails, in order to check the rights.
+        '''
+
+        canManageRequest = CollaborationTools.getRequestTypeUserCanManage(self._conf, user)
+        requestTypeAccepted = ""
+
+        if canManageRequest == "recording":
+            requestTypeAccepted = ["recording"]
+        elif canManageRequest == "webcast":
+            requestTypeAccepted = ["webcast"]
+        elif canManageRequest == "both":
+            requestTypeAccepted = ["recording", "webcast", "both"]
+
+        list = []
+        for spkWrap in self._speakerWrapperList:
+            if spkWrap.getUniqueId() == id and \
+                spkWrap.hasEmail() and \
+                    spkWrap.getStatus() != SpeakerStatusEnum.SIGNED and \
+                        spkWrap.getStatus() != SpeakerStatusEnum.FROMFILE and \
+                            spkWrap.getRequestType() in requestTypeAccepted:
+
+                list.append(spkWrap.getObject().getEmail())
+
+        return list
+
+    def isAnyRequestAccepted(self):
+        '''
+            Return true if at least one between recording and webcast request
+            has been accepted.
+        '''
+        value = False
+        rr = self.getSingleBooking("RecordingRequest")
+        wr = self.getSingleBooking("WebcastRequest")
+
+        if rr:
+            value = rr.getAcceptRejectStatus()
+
+        if wr:
+            value = value or wr.getAcceptRejectStatus()
+
+        return value
+
+    def isContributionReadyToBePublished(self, contId):
+        if not hasattr(self, "_speakerWrapperList"):#TODO: remove when safe
+            return False
+
+        exists = False
+        for spkWrap in self._speakerWrapperList:
+            if spkWrap.getContId() == contId:
+                exists = True
+                if spkWrap.getStatus() != SpeakerStatusEnum.SIGNED and \
+                    spkWrap.getStatus() != SpeakerStatusEnum.FROMFILE:
+                    return False
+
+        #The list has to have at least one spkWrap with the given contId
+        return exists
 
 class CSBookingBase(Persistent, Fossilizable):
     fossilizes(ICSBookingBaseConfModifFossil, ICSBookingBaseIndexingFossil)
@@ -791,7 +1001,8 @@ class CSBookingBase(Persistent, Fossilizable):
         self._hidden = False
 
         setattr(self, "_" + bookingType + "Options", CollaborationTools.getPlugin(bookingType).getOptions())
-
+        #NOTE:  Should maybe notify the creation of a new booking, specially if it's a single booking
+        #       like that can update requestType of the speaker wrapper...
 
     def getId(self):
         """ Returns the internal, per-conference id of the booking.
@@ -1136,6 +1347,33 @@ class CSBookingBase(Persistent, Fossilizable):
         else:
             raise CollaborationServiceException("Tried to retrieve parameter " + str(paramName) + " but this parameter does not exist")
 
+    def getContributionSpeakerSingleBooking(self):
+        ''' Return a dictionnary with the contributions and their speakers that need to be recorded
+            e.g: {contId:[Spk1Object, Spk2Object, Spk3Object], cont2:[Spk1Object]}...
+        '''
+        request = {}
+
+        recordingTalksChoice = self.getBookingParams()["talks"] #either "all", "choose" or ""
+        listTalksToRecord = self.getBookingParams()["talkSelection"]
+
+        if self._conf.getType() == "simple_event":
+            request[self._conf.getId()] = []
+            for chair in self._conf.getChairList():
+                request[self._conf.getId()].append(chair)
+        else:
+            for cont in self._conf.getContributionList():
+                ''' We select the contributions that respect the following conditions:
+                    - They have Speakers assigned.
+                    - They are scheduled. (to discuss...)
+                    - They have been chosen for the recording request.
+                '''
+                if recordingTalksChoice != "choose" or cont.getId() in listTalksToRecord:
+                    if cont.isScheduled():
+                        request[cont.getId()] = []
+                        for spk in cont.getSpeakerList():
+                            request[cont.getId()].append(spk)
+
+        return request
 
     def setBookingParams(self, params):
         """ Sets new booking parameters.
@@ -1563,7 +1801,6 @@ class CSBookingBase(Persistent, Fossilizable):
                     (self.getId(), self._conf.getId(), str(e)))
                 raise
 
-
 class WCSTemplateBase(wcomponents.WTemplated):
     """ Base class for Collaboration templates.
         It stores the following attributes:
@@ -1684,3 +1921,145 @@ class CollaborationServiceException(ServiceError):
     """
     def __init__(self, message, inner = None):
         ServiceError.__init__(self, "ERR-COLL", message, inner)
+
+class SpeakerStatusEnum:
+    (NOEMAIL, NOTSIGNED, SIGNED, FROMFILE, PENDING, REFUSED) = xrange(6)
+
+class SpeakerWrapper(Persistent, Fossilizable):
+
+    fossilizes(ISpeakerWrapperBaseFossil)
+
+    def __init__(self, speaker, contId, requestType):
+        self.status = not speaker.getEmail() and SpeakerStatusEnum.NOEMAIL or SpeakerStatusEnum.NOTSIGNED
+        self.speaker = speaker
+        self.contId = contId
+        self.requestType = requestType
+        self.reason = ""
+        self.localFile = None
+        self.dateAgreement = 0
+        self.ipSignature = None
+        self.modificationDate = time.time()
+        self.uniqueIdHash = md5("%s.%s"%(time.time(), self.getUniqueId())).hexdigest()
+        self.statusString = {
+                            SpeakerStatusEnum.NOEMAIL:_("No Email"),
+                            SpeakerStatusEnum.NOTSIGNED:_("Not Signed"),
+                            SpeakerStatusEnum.SIGNED: _("Signed"),
+                            SpeakerStatusEnum.FROMFILE: _("Uploaded"),
+                            SpeakerStatusEnum.PENDING: _("Pending..."),
+                            SpeakerStatusEnum.REFUSED: _("Refused")
+                            }
+    def getUniqueId(self):
+        return "%s.%s"%(self.contId, self.speaker.getId())
+
+    def getUniqueIdHash(self):
+        # to remove once saved
+        if not hasattr(self, "uniqueIdHash"):#TODO: remove when safe
+            return md5(self.getUniqueId()).hexdigest()
+        else:
+            return self.uniqueIdHash
+
+    def getStatus(self):
+        return self.status
+
+    def getStatusString(self):
+        return self.statusString[self.status]
+
+    def setStatus(self, newStatus, ip=None):
+        try:
+            self.status = newStatus;
+            if newStatus == SpeakerStatusEnum.SIGNED or newStatus == SpeakerStatusEnum.FROMFILE:
+                self.dateAgreement = time.time()
+                if newStatus == SpeakerStatusEnum.SIGNED:
+                    self.ipSignature = ip
+        except Exception, e:
+            Logger.get('VideoServ').error("Exception while changing the speaker status. Exception: " + str(e))
+
+    def getDateAgreementSigned(self):
+        if hasattr(self, "dateAgreement"):#TODO: remove when safe
+            return self.dateAgreement
+        return 0
+
+    def getIpAddressWhenSigned(self):
+        if hasattr(self, "ipSignature"):#TODO: remove when safe
+            return self.ipSignature
+        return None
+
+    def getRejectReason(self):
+        if hasattr(self, "reason"):#TODO: remove when safe
+            if self.status == SpeakerStatusEnum.REFUSED and hasattr(self, "reason"):
+                return self.reason
+            else:
+                return "This speaker has not refused the agreement."
+        else:
+            return "Information not available."
+
+    def setRejectReason(self, reason):
+        if hasattr(self, "reason"):#TODO: remove when safe
+            self.reason = reason
+
+    def getObject(self):
+        return self.speaker
+
+    def getContId(self):
+        return self.contId
+
+    def getRequestType(self):
+        if hasattr(self, "requestType"):#TODO: remove when safe
+            return self.requestType
+        return "NA"
+
+    def setRequestType(self, type):
+        self.requestType = type
+
+    def getSpeakerId(self):
+        return self.speaker.getId()
+
+    def getLocalFile(self):
+        '''
+        If exists, return path to paper agreement
+        '''
+        if hasattr(self, "localFile"):#TODO: remove when safe
+            return self.localFile
+
+    def setLocalFile(self, localFile):
+        '''
+        Set localFile of paper agreement
+        '''
+        if hasattr(self, "localFile"):#TODO: remove when safe
+            self.localFile = localFile
+
+    def hasEmail(self):
+        if self.speaker.getEmail():
+            return True
+        return False
+
+    def getCategory(self):
+        return None
+
+    def getConference(self):
+        return self.speaker.getConference()
+
+    def getContribution(self):
+        # if the conference is a lecture, the getContribution will fail.
+        if self.getConference().getType() == "simple_event":
+            return None
+        else:
+            return self.speaker.getContribution()
+
+    def getSession(self):
+        return None
+
+    def getSubContribution(self):
+        return None
+
+    def getModificationDate(self):
+        if hasattr(self, "modificationDate"):#TODO: remove when safe
+            return self.modificationDate
+        return None
+
+    def setModificationDate(self):
+        if hasattr(self, "modificationDate"):#TODO: remove when safe
+            self.modificationDate = time.time()
+
+    def getLocator(self):
+        return self.getContribution().getLocator()

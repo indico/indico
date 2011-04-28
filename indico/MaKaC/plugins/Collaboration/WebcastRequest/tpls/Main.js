@@ -53,9 +53,6 @@
             $E('allTalksRB').dom.checked = true;
             IndicoUI.Effect.disappear($E('contributionsDiv'));
         }
-
-        $E('permissionYesRB').dom.checked = false;
-        $E('permissionNoRB').dom.checked = false;
     },
 
     onLoad : function() {

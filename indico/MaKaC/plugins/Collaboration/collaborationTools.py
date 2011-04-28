@@ -174,9 +174,10 @@ class CollaborationTools(object):
         for plugin in allowedForThisEvent:
 
             if cls.canUserManagePlugin(conference, plugin, user):
-
                 tabNamesSet.add(cls.getPluginTab(plugin))
-
+                EATab = cls.getEATab(plugin)
+                if EATab is not None:
+                    tabNamesSet.add(EATab)
 
         tabNames = list(tabNamesSet)
         return tabNames
@@ -190,6 +191,17 @@ class CollaborationTools(object):
             return pluginObject.getOption("tab").getValue()
         else:
             return "Collaboration"
+
+    @classmethod
+    def getEATab(cls, pluginObject):
+        """ Utility function that returns the Electronic Agreement Tab
+            (to be defined in options.py of each plugin that need it) a Collaboration plugin belongs to.
+            If the option was not defined, None is returned.
+        """
+        if pluginObject.hasOption("ElectronicAgreementTab"):
+            return pluginObject.getOption("ElectronicAgreementTab").getValue()
+        else:
+            return None
 
     @classmethod
     def getPluginsByTab(cls, tabName, conference, user):
@@ -333,6 +345,19 @@ class CollaborationTools(object):
     def getServiceInformation(cls, pluginName):
         return cls.getModule(pluginName).pages.ServiceInformation
 
+    @classmethod
+    def getRequestTypeUserCanManage(cls, conf, user):
+        requestType = ""
+        if CollaborationTools.canUserManagePlugin(conf, CollaborationTools.getPlugin("RecordingRequest"), user):
+            if CollaborationTools.canUserManagePlugin(conf, CollaborationTools.getPlugin("WebcastRequest"), user):
+                requestType = "both"
+            else:
+                requestType = "recording"
+        else:
+            if CollaborationTools.canUserManagePlugin(conf, CollaborationTools.getPlugin("WebcastRequest"), user):
+                requestType = "webcast"
+
+        return requestType
 
 class MailTools(object):
 

@@ -49,6 +49,11 @@ globalOptions = [
                           "defaultValue": [],
                           "editable": True,
                           "visible": True} ),
+    ("ElectronicAgreementTab", {"description": _("Name of tab where the Electronic Agreement will be placed"),
+               "defaultValue": "Electronic Agreement",
+               "type": str,
+               "editable": False
+               }),
 
     ("contributionLoadLimit", {"description" : _("Allowed number of talks fetched on new request page load"),
                "type": int,
@@ -56,7 +61,7 @@ globalOptions = [
                "editable": True,
                "visible": True} ),
 
-    ("ConsentForm", {"description" : _("Recording consent form information"),
+    ("ConsentFormURL", {"description" : _("Link to the paper agreement"),
                "type": str,
                "defaultValue": "",
                "editable": True,

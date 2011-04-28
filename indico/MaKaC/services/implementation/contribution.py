@@ -207,5 +207,5 @@ methodMap = {
     "getBooking": ContributionGetBooking,
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
-    "protection.removeAllowedUser": ContributionProtectionRemoveUser
+    "protection.removeAllowedUser": ContributionProtectionRemoveUser,
 }

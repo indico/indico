@@ -745,7 +745,6 @@ class ConferenceProtectionSetModifKey(ConferenceModifBase):
     def _getAnswer(self):
         self._conf.setModifKey(self._modifKey)
 
-
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupportEmail": ConferenceSupportEmailModification,

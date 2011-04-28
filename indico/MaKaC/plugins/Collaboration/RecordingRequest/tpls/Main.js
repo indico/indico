@@ -54,8 +54,6 @@
             $E('allTalksRB').dom.checked = true;
             IndicoUI.Effect.disappear($E('contributionsDiv'));
         }
-        $E('permissionYesRB').dom.checked = false;
-        $E('permissionNoRB').dom.checked = false;
         $E('lectureOptions').dom.value = "chooseOne";
         $E('lectureStyle').dom.value = "chooseOne";
         $E('postingUrgency').dom.value = "withinWeek";

@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from MaKaC.plugins.Collaboration.base import CSErrorBase
+from MaKaC.plugins.Collaboration.base import CSErrorBase, CSBookingManager
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.conference import ConferenceHolder, Contribution
@@ -66,6 +66,7 @@ def getTalks(conference, sort = False):
         speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
 
     event_info = {}
+    event_info["contId"] = ""
     event_info["speakers"]   = speaker_str
     event_info["type"]       = "conference"
     event_info["IndicoID"]   = generateIndicoID(conference = conference.getId(),
@@ -87,7 +88,6 @@ def getTalks(conference, sort = False):
     filter = PosterFilterField(conference, False, False)
     for contribution in conference.getContributionList():
         if filter.satisfies(contribution):
-
             talks.append(contribution)
             speaker_str = ""
             speaker_list = contribution.getSpeakerList()
@@ -95,6 +95,7 @@ def getTalks(conference, sort = False):
                 speaker_str = ", ".join(["%s %s"%(speaker.getFirstName(), speaker.getFamilyName()) for speaker in speaker_list])
 
             event_info = {}
+            event_info["contId"] = contribution.getId()
             event_info["speakers"]   = speaker_str
             event_info["type"]       = "contribution"
             event_info["IndicoID"]   = generateIndicoID(conference = conference.getId(),
@@ -119,6 +120,7 @@ def getTalks(conference, sort = False):
             for subcontribution in contribution.getSubContributionList():
                 ctr_sc += 1
                 event_info = {}
+                event_info["contId"] = contribution.getId()
                 speaker_str = ""
                 speaker_list = subcontribution.getSpeakerList()
 
@@ -610,7 +612,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
     try:
         f = urlopen(req)
         cds_response = f.read()
-#        cds_response = "testing" # uncomment for debugging
+ #        cds_response = "testing" # uncomment for debugging
         # Successful operations should result in a one-line message that looks like this:
         # [INFO] Some message here
         # anything else means there was an error
@@ -737,7 +739,7 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LODBID, LOID, videoFormat, l
             if request_result == 'no data':
                 result += _("micala web upload returned an unknown error when submitting to ") + "%s\n" % \
                     (CollaborationTools.getOptionValue("RecordingManager", "micalaUploadURL"))
-#            Logger.get('RecMan').debug("micala result = %s" % str(request_result))
+ #            Logger.get('RecMan').debug("micala result = %s" % str(request_result))
         except HTTPError, e:
             flagSuccess = False
             result += _("micala web upload returned an error when submitting to ") + "%s: %s\n" % \
