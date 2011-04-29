@@ -55,7 +55,7 @@ def stringToDate( str ):
 
 class RegistrationForm(Persistent):
 
-    def __init__(self, conf, groupData=None):
+    def __init__(self, conf, groupData=None, skipPersonalData=False):
         self._conf = conf
         if groupData is None:
             self.activated = False
@@ -90,8 +90,8 @@ class RegistrationForm(Persistent):
         self._statuses={}
         self._statusesGenerator=Counter()
         #Multiple-Subforms
-        self.personalData = PersonalData()
-        self.personalDataNew = PersonalDataForm(self)
+        if not skipPersonalData:
+            self.personalData = PersonalDataForm(self)
         #Simple-SubForms
         self.sessionsForm = SessionsForm()
         self.accommodationForm = AccommodationForm(self)
@@ -101,10 +101,12 @@ class RegistrationForm(Persistent):
         #General-SubForms
         self._generalSectionGenerator = Counter()
         self.generalSectionForms={}
-        self.addGeneralSectionForm(self.personalDataNew, True)
+        if not skipPersonalData:
+            self.addGeneralSectionForm(self.personalData, True)
         #All SortedForms
         self._sortedForms=[]
-        self.addToSortedForms(self.personalDataNew)
+        if not skipPersonalData:
+            self.addToSortedForms(self.personalData)
         self.addToSortedForms(self.reasonParticipationForm)
         self.addToSortedForms(self.sessionsForm)
         self.addToSortedForms(self.accommodationForm)
@@ -114,7 +116,7 @@ class RegistrationForm(Persistent):
         self.setAllSessions()
 
     def clone(self, conference):
-        form = RegistrationForm(conference)
+        form = RegistrationForm(conference, skipPersonalData=True)
         form.setConference(conference)
         form.setAnnouncement(self.getAnnouncement())
         form.setContactInfo(self.getContactInfo())
@@ -138,7 +140,8 @@ class RegistrationForm(Persistent):
         form.setSendPaidEmail(self.isSendPaidEmail())
         form.setAllSessions()
         form.notification=self.getNotification().clone()
-        form.personalData = self.getPersonalData().clone()
+        form.personalData = self.getPersonalData().clone(form)
+        form.generalSectionForms[form.personalData.getId()] = form.personalData
         acf = self.getAccommodationForm()
         if acf is not None :
             form.accommodationForm = acf.clone(form)
@@ -411,11 +414,26 @@ class RegistrationForm(Persistent):
             self.notification = Notification()
         return self.notification
 
-    def getPersonalData(self):
-        return self.personalData
+    def _convertPersonalData(self):
+        if isinstance(self.personalData, PersonalDataForm):
+            return
+        pd = PersonalDataForm(self)
+        self.addGeneralSectionForm(pd, True, 0)
+        for f in pd.getSortedFields():
+            f.setDisabled(not self.personalData.getDataItem(f.getPDField()).isEnabled())
+            f.setMandatory(self.personalData.getDataItem(f.getPDField()).isMandatory())
+        for registrant in self.getConference().getRegistrants().itervalues():
+            mg = MiscellaneousInfoGroup(registrant, pd)
+            registrant.addMiscellaneousGroup(mg)
+            for f in pd.getSortedFields():
+                val = getattr(registrant, '_' + f.getPDField())
+                fakeParams = {f.getInput().getHTMLName(): val}
+                f.getInput().setResponseValue(mg.getResponseItemById(f.getId()), fakeParams, registrant, mg)
+        self.personalData = pd
 
-    def getPersonalDataNew(self):
-        return self.personalDataNew
+    def getPersonalData(self):
+        self._convertPersonalData()
+        return self.personalData
 
     def getFurtherInformationForm(self):
         return self.furtherInformation
@@ -467,7 +485,7 @@ class RegistrationForm(Persistent):
     def getGeneralSectionFormsList(self):
         return self.getGeneralSectionForms().values()
 
-    def addGeneralSectionForm(self, gsf, preserveTitle=False):
+    def addGeneralSectionForm(self, gsf, preserveTitle=False, pos=None):
         id = str(self._getGeneralSectionGenerator().newCount())
         while self.getGeneralSectionFormById(id) != None:
             id = str(self._getGeneralSectionGenerator().newCount())
@@ -475,7 +493,7 @@ class RegistrationForm(Persistent):
         if not preserveTitle:
             gsf.setTitle(  _("Miscellaneous information %s")%gsf.getId())
         self.generalSectionForms[gsf.getId()]=gsf
-        self.addToSortedForms(gsf)
+        self.addToSortedForms(gsf, pos)
         self.notifyModification()
 
     def removeGeneralSectionForm(self, gsf):
@@ -2933,8 +2951,8 @@ class GeneralSectionForm(BaseForm):
         self._p_changed=1
 
 class PersonalDataForm(GeneralSectionForm):
-    def __init__(self, regForm):
-        GeneralSectionForm.__init__(self, regForm, {'title': 'Personal Data (New)'}, True)
+    def __init__(self, regForm, createFields=True):
+        GeneralSectionForm.__init__(self, regForm, {'title': 'Personal Data'}, True)
 
         fields = (
             { 'pd': 'title',
@@ -2961,10 +2979,24 @@ class PersonalDataForm(GeneralSectionForm):
         )
 
         self._pdMap = {}
-        for fieldInfo in fields:
-            field = GeneralField(self, fieldInfo)
-            self._pdMap[fieldInfo['pd']] = field
-            self.addToSortedFields(field)
+        if createFields:
+            for fieldInfo in fields:
+                field = GeneralField(self, fieldInfo)
+                self._pdMap[fieldInfo['pd']] = field
+                self.addToSortedFields(field)
+
+    def clone(self, regForm):
+        pf = PersonalDataForm(regForm, False)
+        pf.setId(self.getId())
+        pf.setValues(self.getValues())
+        pf.setEnabled(self.isEnabled())
+        pf.setRequired(self.isRequired())
+        for field in self.getSortedFields():
+            f = field.clone(pf)
+            pf.addToSortedFields(f)
+            if f.getPDField():
+                self._pdMap[f.getPDField()] = f
+        return pf
 
     def getValueFromParams(self, params, field):
         return params.get(self._pdMap[field].getInput().getHTMLName())
@@ -2972,7 +3004,7 @@ class PersonalDataForm(GeneralSectionForm):
     def getField(self, field):
         return self._pdMap[field]
 
-    def getValues(self, registrant):
+    def getRegistrantValues(self, registrant):
         mg = registrant.getMiscellaneousGroupById(self.getId())
         return dict((name, mg.getResponseItemById(field.getId()).getValue()) for name, field in self._pdMap.iteritems())
 
@@ -4606,7 +4638,7 @@ class Registrant(Persistent):
                 total += item.getPrice() * item.getQuantity()
         if not self.getPayed():
             self.setTotal(total)
-        self.setPersonalData(self.getRegistrationForm().getPersonalDataNew().getValues(self))
+        self.setPersonalData(self.getRegistrationForm().getPersonalData().getRegistrantValues(self))
         self._complete = True
 
     def isComplete(self):

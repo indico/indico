@@ -1810,16 +1810,16 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
     def _getRegistrantsHTML( self, reg ):
         fullName = reg.getFullName()
         institution = ""
-        if not self._regForm.getPersonalDataNew().getField("institution").isDisabled():
+        if not self._regForm.getPersonalData().getField("institution").isDisabled():
             institution = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getInstitution()) or "&nbsp;")
         position = ""
-        if not self._regForm.getPersonalDataNew().getField("position").isDisabled():
+        if not self._regForm.getPersonalData().getField("position").isDisabled():
             position = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getPosition()) or "&nbsp;")
         city = ""
-        if not self._regForm.getPersonalDataNew().getField("city").isDisabled():
+        if not self._regForm.getPersonalData().getField("city").isDisabled():
             city = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getCity()) or "&nbsp;")
         country = ""
-        if not self._regForm.getPersonalDataNew().getField("country").isDisabled():
+        if not self._regForm.getPersonalData().getField("country").isDisabled():
             country = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(CountryHolder().getCountryById(reg.getCountry())) or "&nbsp;")
         sessions=""
         if self._regForm.getSessionsForm().isEnabled():

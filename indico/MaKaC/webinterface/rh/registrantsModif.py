@@ -750,7 +750,7 @@ class RHRegistrantMiscInfoPerformModify( RHRegistrantModifBase ):
     def _process( self ):
         if not self._cancel:
             params = self._getRequestParams()
-            pdForm = self._registrant.getRegistrationForm().getPersonalDataNew()
+            pdForm = self._registrant.getRegistrationForm().getPersonalData()
             if self._miscInfo.getGeneralSection() is pdForm:
                 email = pdForm.getValueFromParams(params, 'email')
                 if self._conf.hasRegistrantByEmail(email, self._registrant):
@@ -759,7 +759,7 @@ class RHRegistrantMiscInfoPerformModify( RHRegistrantModifBase ):
                 if not f.isDisabled():
                     f.getInput().setResponseValue(self._miscInfo.getResponseItemById(f.getId()), params, self._registrant, self._miscInfo)
             if self._miscInfo.getGeneralSection() is pdForm:
-                self._registrant.setPersonalData(pdForm.getValues(self._registrant))
+                self._registrant.setPersonalData(pdForm.getRegistrantValues(self._registrant))
         self._registrant.updateTotal()
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 

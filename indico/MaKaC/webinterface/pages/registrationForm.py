@@ -1314,7 +1314,7 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
                 imgAlt = disabledText
 
             toggle = ""
-            if not f.isLocked('disable') and self._generalSection is self._generalSection.getRegistrationForm().getPersonalDataNew():
+            if not f.isLocked('disable') and self._generalSection is self._generalSection.getRegistrationForm().getPersonalData():
                 toggle = """<a href=%s><img src="%s" alt="%s" class="imglink"></a>""" % (quoteattr(str(urlStatus)), img, imgAlt)
 
             html.append("""<tr>
@@ -1594,11 +1594,11 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
 
     def _getOtherSectionsHTML(self):
         regForm = self._conf.getRegistrationForm()
-        personalDataNew = regForm.getPersonalDataNew()
+        personalData = regForm.getPersonalData()
         if self._currentUser is not None and self._currentUser.isRegisteredInConf(self._conf):
-            pdFormValues = personalDataNew.getValuesFromRegistrant(self._currentUser.getRegistrantById(self._conf.getId()))
+            pdFormValues = personalData.getValuesFromRegistrant(self._currentUser.getRegistrantById(self._conf.getId()))
         else:
-            pdFormValues = personalDataNew.getValuesFromAvatar(self._currentUser)
+            pdFormValues = personalData.getValuesFromAvatar(self._currentUser)
 
         html=[]
         for gs in regForm.getSortedForms():
@@ -1653,7 +1653,7 @@ class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
             if miscGroup is not None and miscGroup.getResponseItemById(f.getId()) is not None:
                 miscItem=miscGroup.getResponseItemById(f.getId())
             default = ""
-            if self._generalSection is self._generalSection.getRegistrationForm().getPersonalDataNew():
+            if self._generalSection is self._generalSection.getRegistrationForm().getPersonalData():
                 default = self._pdFormValues.get(f.getPDField(), "")
             html.append("""
                         <tr>

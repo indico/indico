@@ -48,6 +48,7 @@ class RHRegistrationFormModif( RHRegistrationFormModifBase ):
     _uh = urlHandlers.UHConfModifRegForm
 
     def _process( self ):
+        self._conf.getRegistrationForm()._convertPersonalData()
         p = registrationForm.WPConfModifRegForm( self, self._conf )
         return p.display()
 
@@ -503,7 +504,7 @@ class RHRegistrationFormModifEnablePersonalField( RHRegistrationFormModifBase ):
         self._personalfield = params.get("personalfield", "")
 
     def _process( self ):
-        pdForm = self._conf.getRegistrationForm().getPersonalDataNew()
+        pdForm = self._conf.getRegistrationForm().getPersonalData()
         field = pdForm.getFieldById(self._personalfield)
         if field and not field.isLocked('disable'):
             field.setDisabled(not field.isDisabled())

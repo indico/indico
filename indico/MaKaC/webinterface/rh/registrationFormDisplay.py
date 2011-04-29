@@ -140,7 +140,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             p = registrationForm.WPRegFormInactive( self, self._conf )
             return p.display()
         params = self._getRequestParams()
-        email = self._regForm.getPersonalDataNew().getValueFromParams(params, 'email')
+        email = self._regForm.getPersonalData().getValueFromParams(params, 'email')
         if canManageRegistration:
             matchedUsers = AvatarHolder().match({"email": email})
             if matchedUsers:
