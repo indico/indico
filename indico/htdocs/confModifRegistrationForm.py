@@ -123,9 +123,6 @@ def enableSection(req, **params):
 def enablePersonalField(req, **params):
     return registrationFormModif.RHRegistrationFormModifEnablePersonalField( req ).process( params )
 
-def switchPersonalField(req, **params):
-    return registrationFormModif.RHRegistrationFormModifSwitchPersonalField( req ).process( params )
-
 def modifySocialEventItem(req, **params):
     return registrationFormModif.RHRegistrationFormSocialEventItemModify( req ).process( params )
 

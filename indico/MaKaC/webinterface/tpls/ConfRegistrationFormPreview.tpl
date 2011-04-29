@@ -19,11 +19,6 @@
     <tr>
         <td><br></td>
     </tr>
-    <tr>
-        <td>
-            ${ personalData }
-        </td>
-    </tr>
     ${ otherSections }
     <tr>
         <td><br></td>

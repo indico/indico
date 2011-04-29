@@ -121,11 +121,6 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
     def _checkParams( self, params ):
         RHBaseRegistrationForm._checkParams(self, params)
         self._regForm = self._conf.getRegistrationForm()
-        pd = self._regForm.getPersonalData()
-        keys = pd.getMandatoryItems()
-        for key in keys:
-            if key not in params.keys() or params.get(key,"").strip() == "":
-                raise FormValuesError("The field \"%s\" is mandatory and you must fill it in order to register"%(pd.getData()[key].getName()))
         # SESSIONS
         sessionForm = self._regForm.getSessionsForm()
         sessions = sessionForm.getSessionsFromParams(params)
@@ -145,10 +140,13 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             p = registrationForm.WPRegFormInactive( self, self._conf )
             return p.display()
         params = self._getRequestParams()
-
-        matchedUsers = AvatarHolder().match({"email": params["email"]})
-        if matchedUsers:
-            user = matchedUsers[0]
+        email = self._regForm.getPersonalDataNew().getValueFromParams(params, 'email')
+        if canManageRegistration:
+            matchedUsers = AvatarHolder().match({"email": email})
+            if matchedUsers:
+                user = matchedUsers[0]
+            else:
+                user = None
         else:
             user = None
         # Check if the user can register
@@ -160,14 +158,16 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
                 p = registrationForm.WPRegistrationFormClosed(self, self._conf)
                 return p.display()
         if user is None:
-            if self._conf.hasRegistrantByEmail(self._getRequestParams().get("email","")):
-                raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%self._getRequestParams().get("email","--no email--"))
+            if self._conf.hasRegistrantByEmail(email):
+                raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%email)
         else:
             if user.isRegisteredInConf(self._conf):
                 self._redirect(urlHandlers.UHConfRegistrationForm.getURL(self._conf))
                 return
             if self._conf.hasRegistrantByEmail(user.getEmail()):
                 raise FormValuesError("You have already registered with the email address \"%s\". If you need to modify your registration, please contact the managers of the conference."%self._getUser().getEmail())
+            elif self._conf.hasRegistrantByEmail(email):
+                raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%email)
         rp = registration.Registrant()
         self._conf.addRegistrant(rp)
         rp.setValues(self._getRequestParams(), user)

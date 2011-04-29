@@ -44,6 +44,7 @@ from MaKaC.webinterface.common.countries import CountryHolder
 import re
 
 import string
+from MaKaC.webinterface.common.person_titles import TitlesRegistry
 
 PRICE_PATTERN = re.compile(r'^(\d+(?:[\.]\d+)?)$')
 
@@ -90,6 +91,7 @@ class RegistrationForm(Persistent):
         self._statusesGenerator=Counter()
         #Multiple-Subforms
         self.personalData = PersonalData()
+        self.personalDataNew = PersonalDataForm(self)
         #Simple-SubForms
         self.sessionsForm = SessionsForm()
         self.accommodationForm = AccommodationForm(self)
@@ -99,8 +101,10 @@ class RegistrationForm(Persistent):
         #General-SubForms
         self._generalSectionGenerator = Counter()
         self.generalSectionForms={}
+        self.addGeneralSectionForm(self.personalDataNew, True)
         #All SortedForms
         self._sortedForms=[]
+        self.addToSortedForms(self.personalDataNew)
         self.addToSortedForms(self.reasonParticipationForm)
         self.addToSortedForms(self.sessionsForm)
         self.addToSortedForms(self.accommodationForm)
@@ -410,6 +414,9 @@ class RegistrationForm(Persistent):
     def getPersonalData(self):
         return self.personalData
 
+    def getPersonalDataNew(self):
+        return self.personalDataNew
+
     def getFurtherInformationForm(self):
         return self.furtherInformation
 
@@ -460,12 +467,13 @@ class RegistrationForm(Persistent):
     def getGeneralSectionFormsList(self):
         return self.getGeneralSectionForms().values()
 
-    def addGeneralSectionForm(self, gsf):
+    def addGeneralSectionForm(self, gsf, preserveTitle=False):
         id = str(self._getGeneralSectionGenerator().newCount())
         while self.getGeneralSectionFormById(id) != None:
             id = str(self._getGeneralSectionGenerator().newCount())
         gsf.setId( id )
-        gsf.setTitle(  _("Miscellaneous information %s")%gsf.getId())
+        if not preserveTitle:
+            gsf.setTitle(  _("Miscellaneous information %s")%gsf.getId())
         self.generalSectionForms[gsf.getId()]=gsf
         self.addToSortedForms(gsf)
         self.notifyModification()
@@ -708,42 +716,6 @@ class Notification(Persistent):
 
         return body
 
-    def _getPDInfoText(self, regForm, rp):
-        personalData = regForm.getPersonalData()
-        sortedKeys = personalData.getSortedKeys()
-        text = ""
-        for key in sortedKeys:
-            pdfield = personalData.getDataItem(key)
-            fieldTitle = pdfield.getName()
-            fieldValue = ""
-            if key == "title":
-                fieldValue = rp.getTitle()
-            elif key == "firstName":
-                fieldValue = rp.getFirstName()
-            elif key == "surname":
-                fieldValue = rp.getFamilyName()
-            elif key == "position":
-                fieldValue = rp.getPosition()
-            elif key == "institution":
-                fieldValue = rp.getInstitution()
-            elif key == "address":
-                fieldValue = rp.getAddress()
-            elif key == "city":
-                fieldValue = rp.getCity()
-            elif key == "country":
-                fieldValue = rp.getCountry()
-            elif key == "phone":
-                fieldValue = rp.getPhone()
-            elif key == "email":
-                fieldValue = rp.getEmail()
-            elif key == "fax":
-                fieldValue = rp.getFax()
-            elif key == "personalHomepage":
-                fieldValue = rp.getPersonalHomepage()
-            if pdfield.isEnabled():
-                text += """\n%s: %s""" % (_(fieldTitle), fieldValue)
-        return text
-
     def createEmailNewRegistrant(self, regForm, rp):
         """
             Creates an email to be sent to the user after registration
@@ -762,10 +734,9 @@ class Notification(Persistent):
         subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
         body = i18nformat("""
 _("Event"): %s
-_("Registrant Id"): %s%s
+_("Registrant Id"): %s
 %s
 """) % (url, rp.getId(), \
-                     self._getPDInfoText(regForm, rp), \
                      self._printAllSections(regForm, rp))
 
         # send mail to organisers
@@ -1068,16 +1039,16 @@ class FieldInputType(Persistent):
         """
         return "*genfield*%s-%s"%(self.getParent().getParent().getId(), self.getParent().getId())
 
-    def getModifHTML(self, item, registrant):
+    def getModifHTML(self, item, registrant, default=""):
         """
         Method that display the form web which represents this object.
         """
         mandatory='<td class="beforeRegistrationInput"></td>'
         if (item is not None and item.isMandatory())or self.getParent().isMandatory():
             mandatory = """<td class="beforeRegistrationInput" valign="top"><font color="red">*</font></td>"""
-        return "<table><tr>%s%s</tr></table>"%(mandatory, self._getModifHTML(item, registrant))
+        return "<table><tr>%s%s</tr></table>"%(mandatory, self._getModifHTML(item, registrant, default))
 
-    def _getModifHTML(self,item, registrant):
+    def _getModifHTML(self,item, registrant, default=""):
         """
         Method that should be overwritten by the classes inheriting from this one in order to display
         the form web which represents this object.
@@ -1156,14 +1127,14 @@ class TextInput(FieldInputType):
         FieldInputType.__init__(self, field)
         self._length = ''
 
-    def _getModifHTML(self,item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
-        v=""
+        v=default
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
@@ -1257,12 +1228,12 @@ class TelephoneInput(FieldInputType):
         FieldInputType.__init__(self, field)
         self._length = ''
 
-    def _getModifHTML(self, item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         htmlName = self.getHTMLName()
 
-        v = ""
+        v = default
         if item is not None:
             v = item.getValue()
             htmlName = item.getHTMLName()
@@ -1351,14 +1322,14 @@ class TextareaInput(FieldInputType):
         self._numberOfRows = ''
         self._numberOfColumns = ''
 
-    def _getModifHTML(self,item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
-        v=""
+        v=default
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
@@ -1477,14 +1448,14 @@ class NumberInput(FieldInputType):
         self._length = ''
         self._minValue = 0
 
-    def _getModifHTML(self,item, registrant):
+    def _getModifHTML(self,item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
-        v="0"
+        v=default or "0"
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
@@ -1625,14 +1596,14 @@ class LabelInput(FieldInputType):
         return "Label"
     getName=classmethod(getName)
 
-    def _getModifHTML(self,item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
-        v=""
+        v=default
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
@@ -1682,7 +1653,7 @@ class CheckboxInput(FieldInputType):
         return "Multiple choices/checkbox"
     getName=classmethod(getName)
 
-    def _getModifHTML(self, item,registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         disable=""
         checked=""
         caption = self._parent.getCaption()
@@ -1691,7 +1662,7 @@ class CheckboxInput(FieldInputType):
         billable = self._parent.isBillable()
         currency = self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName = self.getHTMLName()
-        v = ""
+        v = default
         quantity = 0
         if item is not None:
             v = item.getValue()
@@ -1753,7 +1724,7 @@ class YesNoInput(FieldInputType):
         return "Yes/No"
     getName=classmethod(getName)
 
-    def _getModifHTML(self,item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
@@ -1761,7 +1732,7 @@ class YesNoInput(FieldInputType):
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
         caption=self._parent.getCaption()
-        v=""
+        v=default
         if item is not None:
             v=item.getValue()
             caption = self._parent.getCaption()
@@ -1984,6 +1955,7 @@ class RadioGroupInput(FieldInputType):
         self._radioItemGenerator = Counter()
         self._defaultItem=None
         self._inputType = "radiogroup"
+        self._emptyCaption = '-- Choose a value --'
 
     def getValues(self):
         d={}
@@ -1998,6 +1970,7 @@ class RadioGroupInput(FieldInputType):
             d["radioitems"].append(tmp)
         d["defaultItem"]=self.getDefaultItem()
         d["inputType"] = self.getInputType()
+        d["emptyCaption"] = self.getEmptyCaption()
         return d
 
     def setValues(self, data):
@@ -2008,15 +1981,17 @@ class RadioGroupInput(FieldInputType):
             for c in ris:
                 ri=RadioItem(self)
                 ri.setCaption(c["caption"])
-                ri.setBillable(c["billable"])
-                ri.setPrice(c["price"])
-                ri.setEnabled(c["isEnabled"])
+                ri.setBillable(c.get("billable", False))
+                ri.setPrice(c.get("price", ""))
+                ri.setEnabled(c.get("isEnabled", True))
                 ri.setPlacesLimit(c.get("placesLimit"))
                 self.addItem(ri)
         if data.has_key("defaultItem"):
             self.setDefaultItem(data.get("defaultItem",None))
         if data.has_key("inputType"):
             self._inputType = data.get("inputType")
+        if data.has_key("emptyCaption"):
+            self._emptyCaption = data["emptyCaption"]
 
     def _beforeValueChange(self, item, newItem):
         # if the item had a quantity, make the place available again
@@ -2125,13 +2100,20 @@ class RadioGroupInput(FieldInputType):
     def _getRadioItemGenerator(self):
         return self._radioItemGenerator
 
-    def _getRadioGroupModifHTML(self, item, registrant):
+    def getEmptyCaption(self):
+        try:
+            return self._emptyCaption
+        except:
+            self._emptyCaption = '-- Choose a value --'
+            return self._emptyCaption
+
+    def _getRadioGroupModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getCaption()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
-        value = ""
+        value = default
         if item is not None:
             billable = item.isBillable()
             currency = item.getCurrency()
@@ -2184,12 +2166,12 @@ class RadioGroupInput(FieldInputType):
 
         return "".join(tmp)
 
-    def _getDropDownModifHTML(self, item, registrant):
+    def _getDropDownModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         billable = self._parent.isBillable()
         currency = self._parent.getParent().getRegistrationForm().getCurrency()
-        value = ""
+        value = default
         if item is not None:
             billable = item.isBillable()
             currency = item.getCurrency()
@@ -2210,7 +2192,7 @@ class RadioGroupInput(FieldInputType):
 
         tmp.append("""<td><select id="%s" name="%s">""" % (self.getHTMLName(), self.getHTMLName()))
 
-        tmp.append("""<option value="">-- Choose a value --</option>""")
+        tmp.append("""<option value="">%s</option>""" % self.getEmptyCaption())
 
         for radioItem in self.getItemsList():
             if radioItem.isEnabled() and not (registrant is not None and (radioItem.isBillable() or billable) and registrant.getPayed()):
@@ -2243,11 +2225,11 @@ class RadioGroupInput(FieldInputType):
 
         return "".join(tmp)
 
-    def _getModifHTML(self, item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         if self.getInputType() == 'radiogroup':
-            return self._getRadioGroupModifHTML(item, registrant)
+            return self._getRadioGroupModifHTML(item, registrant, default)
         else:
-            return self._getDropDownModifHTML(item, registrant)
+            return self._getDropDownModifHTML(item, registrant, default)
 
     def _setResponseValue(self, item, params, registrant):
         v=params.get(self.getHTMLName(),"")
@@ -2377,11 +2359,11 @@ class CountryInput(FieldInputType):
     def getValueDisplay(self, value):
         return CountryHolder().getCountryById(value)
 
-    def _getModifHTML(self, item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         htmlName = self.getHTMLName()
-        value = ""
+        value = default
         if item is not None:
             value = item.getValue()
             caption = self._parent.getCaption()
@@ -2455,14 +2437,14 @@ class DateInput(FieldInputType):
     def getHTMLName(self):
         return "_genfield_%s_%s_" % (self.getParent().getParent().getId(), self.getParent().getId())
 
-    def _getModifHTML(self, item, registrant):
+    def _getModifHTML(self, item, registrant, default=""):
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         if item is not None:
             date = item.getValue()
             htmlName = item.getHTMLName()
         else:
-            date = None
+            date = default or None
             htmlName = self.getHTMLName()
 
         from MaKaC.webinterface.wcomponents import WDateField
@@ -2573,48 +2555,79 @@ class GeneralField(Persistent):
             self._input = FieldInputs.getAvailableInputKlassById("text")(self)
             self._input.setValues(data)
             self._mandatory = False
+            self._locked = ()
             self._description = ""
             self._billable =False
             self._price = "0"
             self._placesLimit = 0
             self._currentNoPlaces = 0
+            self._disabled = True
+            self._pdField = None
         else:
-            self.setValues(data)
+            self._mandatory = False
+            self.setValues(data, True)
 
     def clone(self, newsection):
         field = GeneralField(newsection, self.getValues())
         return field
 
-    def setValues(self, data):
+    def setValues(self, data, firstTime=False):
         caption=data.get("caption","")
         if caption=="":
             caption= _("General Field")
         self.setCaption(caption)
-        self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input","text"))(self))
+        if firstTime or not self.isLocked('input'):
+            self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input","text"))(self))
         if data.has_key("inputObj"):
             self._input.setValues(data["inputObj"].getValues())
+        elif data.has_key('inputValues'):
+            self._input.setValues(data["inputValues"])
         else:
             self._input.setValues(data)
-        self.setMandatory(data.has_key("mandatory") and data["mandatory"])
+        if firstTime:
+            self.setLocked(data.get("lock", ()))
+        if self.isMandatory() and self.isLocked('mandatory'):
+            self.setMandatory(True)
+        else:
+            self.setMandatory(data.has_key("mandatory") and data["mandatory"])
+        if self.isLocked('disable'):
+            self.setDisabled(False)
+        else:
+            self.setDisabled(data.has_key("disabled") and data["disabled"])
         self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price",""))
         self.setPlacesLimit(data.get("placesLimit", "0"))
         self.setDescription(data.get("description",""))
+        if firstTime:
+            self.setPDField(data.get("pd"))
 
     def getValues(self):
         values = {}
         values["caption"] = self.getCaption()
         values["input"] = self.getInput().getId()
         values["inputObj"] = self.getInput()
+        values["lock"] = self.getLocked()
         values["mandatory"] = self.isMandatory()
+        values["disabled"] = self.isDisabled()
         values["billable"]=self.isBillable()
         values["price"]=self.getPrice()
         values["placesLimit"] = self.getPlacesLimit()
         values["description"]=self.getDescription()
+        values["pd"] = self.getPDField()
         return values
 
     def isTemporary(self):
         return False
+
+    def setPDField(self, v):
+        self._pdField = v
+
+    def getPDField(self):
+        try:
+            return self._pdField
+        except:
+            self._pdField = None
+            return self._pdField
 
     def isBillable(self):
         try:
@@ -2727,6 +2740,29 @@ class GeneralField(Persistent):
     def setMandatory(self, v):
         self._mandatory = v
 
+    def getLocked(self):
+        try:
+            return self._locked
+        except:
+            self._locked = ()
+            return self._locked
+
+    def isLocked(self, what):
+        return what in self.getLocked()
+
+    def setLocked(self, v):
+        self._locked = v
+
+    def isDisabled(self):
+        try:
+            return self._disabled
+        except:
+            self._disabled = False
+            return self._disabled
+
+    def setDisabled(self, v):
+        self._disabled = v
+
     def getParent(self):
         return self._parent
 
@@ -2741,12 +2777,13 @@ class GeneralField(Persistent):
 
 class GeneralSectionForm(BaseForm):
 
-    def __init__(self, regForm, data=None):
+    def __init__(self, regForm, data=None, required=False):
         BaseForm.__init__(self)
         self._regForm=regForm
         self._id=""
         self._title = _("Miscellaneous information")
         self._description = ""
+        self._required = required
 
         #####
         #Mods to support sorting fields
@@ -2765,12 +2802,15 @@ class GeneralSectionForm(BaseForm):
             title= _("Miscellaneous information %s")%self.getId()
         self.setTitle(title)
         self.setDescription(data.get("description", ""))
+        if 'required' in data:
+            self.setRequired(data['required'])
 
     def getValues(self):
         values = {}
         values["title"] = self.getTitle()
         values["description"] = self.getDescription()
         values["enabled"] = self.isEnabled()
+        values["required"] = self.isRequired()
         return values
 
     def clone(self, regForm):
@@ -2778,6 +2818,7 @@ class GeneralSectionForm(BaseForm):
         gsf.setId(self.getId())
         gsf.setValues(self.getValues())
         gsf.setEnabled(self.isEnabled())
+        gsf.setRequired(self.isRequired())
 
         #Mods to support sorting fields
         #for field in self.getFields():
@@ -2811,6 +2852,16 @@ class GeneralSectionForm(BaseForm):
 
     def setDescription(self, n):
         self._description = n
+
+    def isRequired(self):
+        try:
+            return self._required
+        except:
+            self._required = False
+            return False
+
+    def setRequired(self, required):
+        self._required = required
 
     ###########
     #Mods to support sorting fields
@@ -2881,7 +2932,92 @@ class GeneralSectionForm(BaseForm):
     def notifyModification(self):
         self._p_changed=1
 
-class PersonalDataFormItem(Persistent):
+class PersonalDataForm(GeneralSectionForm):
+    def __init__(self, regForm):
+        GeneralSectionForm.__init__(self, regForm, {'title': 'Personal Data (New)'}, True)
+
+        fields = (
+            { 'pd': 'title',
+              'caption': 'Title',
+              'input': 'radio',
+              'inputValues': {
+                  'inputType':'dropdown',
+                  'emptyCaption': '',
+                  'radioitems': [{'caption':title} for title in TitlesRegistry.getList()[1:]]
+              },
+              'lock': ('input', 'delete')
+            },
+            { 'pd':'firstName', 'caption':'First Name', 'mandatory':True, 'lock':('mandatory', 'input', 'delete', 'disable') },
+            { 'pd':'surname', 'caption':'Surname', 'mandatory':True, 'lock':('mandatory', 'input', 'delete', 'disable') },
+            { 'pd':'position', 'caption':'Position', 'lock':('input', 'delete') },
+            { 'pd':'institution', 'caption':'Institution', 'mandatory':True, 'lock':('input', 'delete') },
+            { 'pd':'address', 'caption':'Address', 'lock':('input', 'delete') },
+            { 'pd':'city', 'caption':'City', 'mandatory':True, 'lock':('input', 'delete') },
+            { 'pd':'country', 'caption':'Country', 'input':'country', 'mandatory':True, 'lock':('input', 'delete') },
+            { 'pd':'phone', 'caption':'Phone', 'lock':('input', 'delete') },
+            { 'pd':'fax', 'caption':'Fax', 'lock':('input', 'delete') },
+            { 'pd':'email', 'caption':'Email', 'mandatory':True, 'lock':('mandatory', 'input', 'delete', 'disable') },
+            { 'pd':'personalHomepage', 'caption':'Personal homepage', 'lock':('input', 'delete') },
+        )
+
+        self._pdMap = {}
+        for fieldInfo in fields:
+            field = GeneralField(self, fieldInfo)
+            self._pdMap[fieldInfo['pd']] = field
+            self.addToSortedFields(field)
+
+    def getValueFromParams(self, params, field):
+        return params.get(self._pdMap[field].getInput().getHTMLName())
+
+    def getField(self, field):
+        return self._pdMap[field]
+
+    def getValues(self, registrant):
+        mg = registrant.getMiscellaneousGroupById(self.getId())
+        return dict((name, mg.getResponseItemById(field.getId()).getValue()) for name, field in self._pdMap.iteritems())
+
+    def getValuesFromAvatar(self, av):
+        r = {}
+        r['title'] = ''
+        r['firstName'] = ''
+        r['surname'] = ''
+        r['institution'] = ''
+        r['email'] = ''
+        r['address'] = ''
+        r['phone'] = ''
+        r['fax'] = ''
+        if av is not None:
+            r['title'] = av.getTitle()
+            r['firstName'] = av.getFirstName()
+            r['surname'] = av.getFamilyName()
+            r['institution'] = av.getOrganisation()
+            r['email'] = av.getEmail()
+            r['address'] = av.getAddress()
+            r['phone'] = av.getTelephone()
+            faxes = av.getFaxes()
+            fax = ''
+            if len(faxes)>0:
+                fax = faxes[0]
+            r['fax'] = fax
+        return r
+
+    def getValuesFromRegistrant(self, reg):
+        r = {}
+        r['title'] = reg.getTitle()
+        r['firstName'] = reg.getFirstName()
+        r['surname'] = reg.getFamilyName()
+        r['position'] = reg.getPosition()
+        r['institution'] = reg.getInstitution()
+        r['address'] = reg.getAddress()
+        r['city'] = reg.getCity()
+        r['country'] = reg.getCountry()
+        r['phone'] = reg.getPhone()
+        r['fax'] = reg.getFax()
+        r['email'] = reg.getEmail()
+        r['personalHomepage'] = reg.getPersonalHomepage()
+        return r
+
+class PersonalDataFormItem(Persistent): # old
 
     def __init__(self, data=None):
         if data is None:
@@ -4377,8 +4513,6 @@ class Registrant(Persistent):
     def setValues(self, data, av):
         self._avatar = av
 
-        self.setPersonalData(data)
-
         if self.getRegistrationForm().getReasonParticipationForm().isEnabled():
             self.setReasonParticipation(data.get("reason",""))
 
@@ -4458,7 +4592,8 @@ class Registrant(Persistent):
                 #Mods to support sorting fields
                 #for f in gs.getFields():
                 for f in gs.getSortedFields():
-                    f.getInput().setResponseValue(mg.getResponseItemById(f.getId()),data, self, mg)
+                    if not f.isDisabled():
+                        f.getInput().setResponseValue(mg.getResponseItemById(f.getId()),data, self, mg)
                 for miscItem in mg.getResponseItemList():
                     if miscItem.isBillable():
                         price = float(miscItem.getPrice() or 0)
@@ -4471,6 +4606,7 @@ class Registrant(Persistent):
                 total += item.getPrice() * item.getQuantity()
         if not self.getPayed():
             self.setTotal(total)
+        self.setPersonalData(self.getRegistrationForm().getPersonalDataNew().getValues(self))
         self._complete = True
 
     def isComplete(self):

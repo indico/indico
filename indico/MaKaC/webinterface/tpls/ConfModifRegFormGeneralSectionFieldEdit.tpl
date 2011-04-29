@@ -60,7 +60,7 @@
     <tr>
       <td class="titleCellTD"><span class="titleCellFormat"> ${ _("Mandatory field")}</span></td>
       <td bgcolor="white" class="blacktext" width="100%">
-      <input type="checkbox" name="mandatory" size="60" ${ mandatory }> ( ${ _("uncheck if it is not a mandatory field")})
+      <input type="checkbox" name="mandatory" size="60" ${ mandatory } ${ 'disabled="disabled"' if mandatoryLocked else '' }> ( ${ _("uncheck if it is not a mandatory field")})
       </td>
     </tr>
 

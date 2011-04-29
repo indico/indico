@@ -460,12 +460,6 @@ class RHRegistrantModification( RHRegistrantModifBase ):
         p = registrants.WPRegistrantModification( self, self._registrant )
         return p.display()
 
-class RHRegistrantDataModification( RHRegistrantModifBase ):
-
-    def _process( self ):
-        p = registrants.WPRegistrantDataModification( self, self._registrant )
-        return p.display()
-
 class RHRegistrantSendEmail( RHRegistrationFormModifBase ):
 
     def _checkParams(self, params):
@@ -755,9 +749,17 @@ class RHRegistrantMiscInfoPerformModify( RHRegistrantModifBase ):
 
     def _process( self ):
         if not self._cancel:
-            params=self._getRequestParams()
+            params = self._getRequestParams()
+            pdForm = self._registrant.getRegistrationForm().getPersonalDataNew()
+            if self._miscInfo.getGeneralSection() is pdForm:
+                email = pdForm.getValueFromParams(params, 'email')
+                if self._conf.hasRegistrantByEmail(email, self._registrant):
+                    raise FormValuesError("""There is already a user with the email "%s". Please choose another one""" % email)
             for f in self._miscInfo.getGeneralSection().getSortedFields():
-                f.getInput().setResponseValue(self._miscInfo.getResponseItemById(f.getId()),params, self._registrant, self._miscInfo)
+                if not f.isDisabled():
+                    f.getInput().setResponseValue(self._miscInfo.getResponseItemById(f.getId()), params, self._registrant, self._miscInfo)
+            if self._miscInfo.getGeneralSection() is pdForm:
+                self._registrant.setPersonalData(pdForm.getValues(self._registrant))
         self._registrant.updateTotal()
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 

@@ -491,7 +491,8 @@ class RHRegistrationFormModifEnableSection( RHRegistrationFormModifBase ):
     def _process( self ):
         section = self._conf.getRegistrationForm().getSectionById(self._section)
         if section is not None:
-            section.setEnabled(not section.isEnabled())
+            if not isinstance(section, GeneralSectionForm) or not section.isRequired():
+                section.setEnabled(not section.isEnabled())
         self._redirect(str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#sections", True)
 
 
@@ -502,25 +503,13 @@ class RHRegistrationFormModifEnablePersonalField( RHRegistrationFormModifBase ):
         self._personalfield = params.get("personalfield", "")
 
     def _process( self ):
-        pdfield = self._conf.getRegistrationForm().getPersonalData().getDataItem(self._personalfield)
-        if pdfield is not None:
-            pdfield.setEnabled(not pdfield.isEnabled())
-        url = str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#personalfields"
+        pdForm = self._conf.getRegistrationForm().getPersonalDataNew()
+        field = pdForm.getFieldById(self._personalfield)
+        if field and not field.isLocked('disable'):
+            field.setDisabled(not field.isDisabled())
+        url = urlHandlers.UHConfModifRegFormGeneralSection.getURL(pdForm)
         self._redirect(url, True)
 
-
-class RHRegistrationFormModifSwitchPersonalField( RHRegistrationFormModifBase ):
-
-    def _checkParams( self, params ):
-        RHRegistrationFormModifBase._checkParams( self, params )
-        self._personalfield = params.get("personalfield", "")
-
-    def _process( self ):
-        pdfield = self._conf.getRegistrationForm().getPersonalData().getDataItem(self._personalfield)
-        if pdfield is not None:
-            pdfield.setMandatory(not pdfield.isMandatory())
-        url = str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#personalfields"
-        self._redirect(url, True)
 
 
 class RHRegistrationFormActionSection( RHRegistrationFormModifBase ):
@@ -572,7 +561,8 @@ class _ActionRemoveSection:
         if not self._cancel and self._sections!=[]:
             if self._confirm:
                 for sect in self._sections:
-                    self._conf.getRegistrationForm().removeGeneralSectionForm(sect)
+                    if not sect.isRequired():
+                        self._conf.getRegistrationForm().removeGeneralSectionForm(sect)
             else:
                 return registrationForm.WPConfModifRegFormGeneralSectionRemConfirm( self._rh, self._conf, self.sects).display()
 
@@ -618,11 +608,13 @@ class _RemoveFields:
     def perform(self):
         if type(self._fields) == type('string'):
             field = self._gsf.getFieldById(self._fields)
-            self._gsf.removeField(field)
+            if not field.isLocked('delete'):
+                self._gsf.removeField(field)
         elif self._fields is not None:
             for fieldID in self._fields:
                 field = self._gsf.getFieldById(fieldID)
-                self._gsf.removeField(field)
+                if not field.isLocked('delete'):
+                    self._gsf.removeField(field)
 
 
 
@@ -659,6 +651,7 @@ class _TmpSectionField:
     def __init__(self, params={}, generalField=None):
         self._caption=""
         self._mandatory=""
+        self._locked = ()
         self._description=""
         self._input=None
         self._billable =""
@@ -667,6 +660,7 @@ class _TmpSectionField:
         if generalField is not None:
             self._caption=generalField.getCaption()
             self._mandatory=generalField.isMandatory()
+            self._locked = generalField.getLocked()
             self._description = generalField.getDescription()
             self._input=generalField.getInput().clone(self)
             self._billable =generalField.isBillable()
@@ -682,11 +676,12 @@ class _TmpSectionField:
         d['price']=self.getPrice()
         d['placesLimit']=self.getPlacesLimit()
 
-        if self.isMandatory():
+        if self.isMandatory() and not self.isLocked('mandatory'):
             d['mandatory']='True'
         if self.isBillable():
             d['billable']='True'
-        d['input']=self.getInput().getId()
+        if not self.isLocked('input'):
+            d['input']=self.getInput().getId()
         d.update(self.getInput().getValues())
         return d
 
@@ -803,6 +798,10 @@ class _TmpSectionField:
 
     def getRegistrationForm(self):
         return None
+
+    def isLocked(self, what):
+        return what in self._locked
+
 
 class RHRegistrationFormModifGeneralSectionFieldAdd( RHRegistrationFormModifGeneralSectionBase ):
 

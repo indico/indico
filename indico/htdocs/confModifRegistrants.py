@@ -34,12 +34,6 @@ def newRegistrant(req, **params):
 def modification(req, **params):
     return registrantsModif.RHRegistrantModification( req ).process( params )
 
-def dataModification(req, **params):
-    return registrantsModif.RHRegistrantDataModification( req ).process( params )
-
-def performDataModification(req, **params):
-    return registrantsModif.RHRegistrantPerformDataModification( req ).process( params )
-
 def getPDF(req, **params):
     return registrantsModif.RHRegistrantListPDF( req ).process( params )
 
@@ -51,7 +45,7 @@ def modifySessions(req, **params):
 
 def modifyTransaction(req, **params):
     return registrantsModif.RHRegistrantTransactionModify( req ).process( params )
-    
+
 def peformModifyTransaction (req, **params):
     return registrantsModif.RHRegistrantTransactionPerformModify( req ).process( params )
 

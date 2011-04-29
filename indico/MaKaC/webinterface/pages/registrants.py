@@ -126,7 +126,8 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             self._dispopts[sect.getId()]=[]
 
             for fld in sect.getSortedFields():
-                self._dispopts[sect.getId()].append("%s-%s"%(sect.getId(),fld.getId()))
+                if not fld.getPDField():
+                    self._dispopts[sect.getId()].append("%s-%s"%(sect.getId(),fld.getId()))
 
     def _getKeyDispOpts(self, value):
         """
@@ -186,7 +187,8 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 #for fld in sect.getFields():
                 #    columns["%s-%s"%(sect.getId(),fld.getId())]=fld.getCaption()
                 for fld in sect.getSortedFields():
-                    columns["%s-%s"%(sect.getId(),fld.getId())]=fld.getCaption()
+                    if not fld.getPDField():
+                        columns["%s-%s"%(sect.getId(),fld.getId())]=fld.getCaption()
                 # jmf-end
                 ############
             self._columns=columns
@@ -1240,7 +1242,6 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                        <td align="left" style="max-width: 25%%" valign="top"><b>%s:</b></td>
                        <td align="left" valign="top">%s</td>
                     </tr>
-                    <tr><td>&nbsp;</td></tr>
                     """%(f.getCaption(), v))
         if miscGroup is not None:
             for miscItem in miscGroup.getResponseItemList():
@@ -1251,7 +1252,6 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                                        <td align="left" style="max-width: 25%%"><b>%s:</b></td>
                                        <td align="left">%s <font color="red">(cancelled)</font></td>
                                     </tr>
-                                    <tr><td>&nbsp;</td></tr>
                                     """) %(miscItem.getCaption(), self._getItemValueDisplay(miscItem)) )
         if len(html)==1:
             html.append( i18nformat("""
@@ -1346,69 +1346,10 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         vars["registrationDate"] = i18nformat("""--_("date unknown")--""")
         if self._registrant.getRegistrationDate() is not None:
             vars["registrationDate"] = "%s (%s)"%(self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M"), self._conf.getTimezone())
-        vars["dataModificationURL"] = quoteattr(str(urlHandlers.UHRegistrantDataModification.getURL(self._registrant)))
         vars["sections"] = self._getFormSections()
         vars["statuses"]=self._getStatusesHTML()
 
         vars["transaction"]=self._getTransactionHTML()
-        return vars
-
-class WPRegistrantDataModification( WPRegistrantModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WRegistrantDataModification(self._registrant)
-        return wc.getHTML()
-
-class WRegistrantDataModification( wcomponents.WTemplated ):
-
-    def __init__( self, registrant ):
-        self._registrant = registrant
-        self._conf = self._registrant.getConference()
-
-    def _getItemHTML(self, item, value):
-        inputHTML = ""
-        if item.getInput() == "list":
-            if item.getId() == "title":
-                for title in TitlesRegistry().getList():
-                    selected = ""
-                    if value == title:
-                        selected = "selected"
-                    inputHTML += """<option value="%s" %s>%s</option>"""%(title, selected, title)
-                inputHTML = """<select name="%s">%s</select>"""%(item.getId(), inputHTML)
-            elif item.getId() == "country":
-                for ck in CountryHolder().getCountrySortedKeys():
-                    selected = ""
-                    if value == ck:
-                        selected = "selected"
-                    inputHTML += """<option value="%s" %s>%s</option>"""%(ck, selected, CountryHolder().getCountryById(ck))
-                inputHTML = """<select name="%s">%s</select>"""%(item.getId(), inputHTML)
-        else:
-            input = item.getInput()
-            if item.getId() == "email":
-                input = "text"
-            inputHTML = """<input type="%s" name="%s" size="40" value="%s">"""%(input, item.getId(), value)
-        mandatory="&nbsp; &nbsp;"
-        if item.isMandatory():
-            mandatory = """<font color="red">* </font>"""
-        html = """
-                <tr>
-                    <td nowrap class="titleCellTD">%s<span class="titleCellFormat">%s</span></td>
-                    <td width="100%%" align="left" bgcolor="white" class="blacktext">%s</td>
-                </tr>
-                """%(mandatory, item.getName(), inputHTML)
-        return html
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        personalData = self._conf.getRegistrationForm().getPersonalData()
-        data = []
-        sortedKeys = personalData.getSortedKeys()
-        formValues = personalData.getValuesFromRegistrant(self._registrant)
-        for key in sortedKeys:
-            item = personalData.getDataItem(key)
-            data.append(self._getItemHTML(item, formValues.get(item.getId(), "")))
-        vars["data"] = "".join(data)
-        vars["postURL"] = quoteattr(str(urlHandlers.UHRegistrantPerformDataModification.getURL(self._registrant)))
         return vars
 
 class WConfModifRegistrantSessionsBase(wcomponents.WTemplated):
@@ -1724,6 +1665,8 @@ class WConfModifRegistrantMiscInfoModify(wcomponents.WTemplated):
         # jmf-start
         #for f in self._miscGroup.getGeneralSection().getFields():
         for f in self._miscGroup.getGeneralSection().getSortedFields():
+            if f.isDisabled():
+                continue
         # jmf-start
         ############
             v=""
@@ -1867,16 +1810,16 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
     def _getRegistrantsHTML( self, reg ):
         fullName = reg.getFullName()
         institution = ""
-        if self._regForm.getPersonalData().getDataItem("institution").isEnabled():
+        if not self._regForm.getPersonalDataNew().getField("institution").isDisabled():
             institution = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getInstitution()) or "&nbsp;")
         position = ""
-        if self._regForm.getPersonalData().getDataItem("position").isEnabled():
+        if not self._regForm.getPersonalDataNew().getField("position").isDisabled():
             position = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getPosition()) or "&nbsp;")
         city = ""
-        if self._regForm.getPersonalData().getDataItem("city").isEnabled():
+        if not self._regForm.getPersonalDataNew().getField("city").isDisabled():
             city = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(reg.getCity()) or "&nbsp;")
         country = ""
-        if self._regForm.getPersonalData().getDataItem("country").isEnabled():
+        if not self._regForm.getPersonalDataNew().getField("country").isDisabled():
             country = """<td valign="top" class="abstractDataCell">%s</td>"""%(self.htmlText(CountryHolder().getCountryById(reg.getCountry())) or "&nbsp;")
         sessions=""
         if self._regForm.getSessionsForm().isEnabled():

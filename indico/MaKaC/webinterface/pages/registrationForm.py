@@ -108,46 +108,6 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             return urlHandlers.UHConfModifRegFormSocialEvent.getURL(self._conf)
         return urlHandlers.UHConfModifRegFormGeneralSection.getURL(sect)
 
-    def _getPersonalFieldsHTML(self):
-        regForm=self._conf.getRegistrationForm()
-        html=[]
-        enabledBulb = Configuration.Config.getInstance().getSystemIconURL( "enabledSection" )
-        notEnabledBulb = Configuration.Config.getInstance().getSystemIconURL( "disabledSection" )
-        enabledText = "Click to disable"
-        disabledText = "Click to enable"
-        keys = regForm.getPersonalData().getSortedKeys()
-        for key in keys:
-            pdfield = regForm.getPersonalData().getDataItem(key)
-            urlStatus = urlHandlers.UHConfModifRegFormEnablePersonalField.getURL(self._conf)
-            urlStatus.addParam("personalfield", pdfield.getId())
-            img = enabledBulb
-            text = enabledText
-            if not pdfield.isEnabled():
-                img = notEnabledBulb
-                text = disabledText
-            urlSwitch = urlHandlers.UHConfModifRegFormSwitchPersonalField.getURL(self._conf)
-            urlSwitch.addParam("personalfield", pdfield.getId())
-            switch = "optional"
-            if pdfield.isMandatory():
-                switch = "mandatory"
-            if pdfield.getId() not in ["email","firstName","surname"]:
-                html.append("""
-                        <tr>
-                        <td><a href=%s><img src="%s" alt="%s" class="imglink"></a></td><td>&nbsp;%s</td><td>&nbsp;<a href="%s">%s</a></td>
-                        </tr>
-                        """%(quoteattr(str(urlStatus)), img, text, pdfield.getName(), urlSwitch, switch) )
-            else:
-                html.append("""
-                        <tr>
-                        <td></td><td>&nbsp;%s</td><td>&nbsp;%s</td>
-                        </tr>
-                        """%(pdfield.getName(), switch) )
-
-        html.insert(0, """<table>""")
-        html.append("</table>")
-        return "".join(html)
-
-
     def _getSectionsHTML(self):
         regForm=self._conf.getRegistrationForm()
         html=[]
@@ -165,7 +125,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
                 img = notEnabledBulb
                 text = disabledText
             checkbox="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-            if isinstance(gs, registration.GeneralSectionForm):
+            if isinstance(gs, registration.GeneralSectionForm) and not gs.isRequired():
                 checkbox="""
                         <input type="checkbox" name="sectionsIds" value="%s">&nbsp;
                         """%gs.getId()
@@ -177,13 +137,16 @@ class WConfModifRegForm( wcomponents.WTemplated ):
                     selbox += "<option value='%s'>%s" % (i-1,i)
             selbox += """
                 </select>"""
+            if not isinstance(gs, registration.GeneralSectionForm) or not gs.isRequired():
+                toggleLink = """<a href=%s><img src="%s" alt="%s" class="imglink"></a>""" % (quoteattr(str(urlStatus)), img, text)
+            else:
+                toggleLink = ""
             html.append("""
                         <tr>
-                        <td>
-                            <a href=%s><img src="%s" alt="%s" class="imglink"></a>&nbsp;%s&nbsp;%s<a href=%s>%s</a>
-                        </td>
+                        <td>%s</td>
+                        <td>%s&nbsp;%s<a href=%s>%s</a></td>
                         </tr>
-                        """%(quoteattr(str(urlStatus)), img, text, selbox, checkbox, quoteattr(str(urlModif)), gs.getTitle()) )
+                        """%(toggleLink, selbox, checkbox, quoteattr(str(urlModif)), gs.getTitle()) )
         html.insert(0, """<input type="hidden" name="oldpos"><table>""")
         html.append("</table>")
         return "".join(html)
@@ -289,7 +252,6 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["sendPaidEmail"] = ""
             vars["Currency"]=""
         vars["sections"] = self._getSectionsHTML()
-        vars["personalfields"] = self._getPersonalFieldsHTML()
         vars["actionSectionURL"]=quoteattr(str(urlHandlers.UHConfModifRegFormActionSection.getURL(self._conf)))
         vars["statuses"] = self._getStatusesHTML()
         vars["actionStatusesURL"]=quoteattr(str(urlHandlers.UHConfModifRegFormActionStatuses.getURL(self._conf)))
@@ -1305,6 +1267,10 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
 
     def _getGeneralFieldsHTML(self):
         html=[]
+        enabledBulb = Configuration.Config.getInstance().getSystemIconURL("enabledSection")
+        notEnabledBulb = Configuration.Config.getInstance().getSystemIconURL("disabledSection")
+        enabledText = "Click to disable"
+        disabledText = "Click to enable"
         ##############
         #jmf-start
         #for f in self._generalSection.getFields():
@@ -1335,10 +1301,26 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
             selbox += """
                 </select>"""
 
+            chkbox = ""
+            if not f.isLocked('delete'):
+                chkbox = """<input type="checkbox" name="fieldsIds" value="%s">""" % f.getId()
+
+            urlStatus = urlHandlers.UHConfModifRegFormEnablePersonalField.getURL(self._conf)
+            urlStatus.addParam("personalfield", f.getId())
+            img = enabledBulb
+            imgAlt = enabledText
+            if f.isDisabled():
+                img = notEnabledBulb
+                imgAlt = disabledText
+
+            toggle = ""
+            if not f.isLocked('disable') and self._generalSection is self._generalSection.getRegistrationForm().getPersonalDataNew():
+                toggle = """<a href=%s><img src="%s" alt="%s" class="imglink"></a>""" % (quoteattr(str(urlStatus)), img, imgAlt)
+
             html.append("""<tr>
-                                <td align="left" style="padding-left:10px">%s<input type="checkbox" name="fieldsIds" value="%s"><a href=%s>%s</a>%s</td>
+                                <td align="left" style="padding-left:10px">%s</td><td>%s</td><td>%s</td><td><a href=%s>%s</a>%s</td>
                             </tr>
-                        """%(selbox,f.getId(), url, self.htmlText(f.getCaption()),spec) )
+                        """%(toggle, selbox, chkbox, url, self.htmlText(f.getCaption()),spec) )
                         #"""%(f.getId(), url, f.getCaption(),spec) )
         html.insert(0,"""<a href="" name="sections"></a><input type="hidden" name="oldpos"><table align="left">""")
         html.append("</table>")
@@ -1388,7 +1370,10 @@ class WConfModifRegFormGeneralSectionFieldEdit( wcomponents.WTemplated ):
         self._generalField = generalField
 
     def _getFieldTypesHTML(self):
-        html=["""<select name="input" onchange="javascript:$E('WConfModifRegFormGeneralSectionFieldEdit').dom.submit();  $E('submitButton').dom.disabled=true; $E('cancelButton').dom.disabled=true;">"""]
+        disabled = ""
+        if self._generalField and self._generalField.isLocked('input'):
+            disabled = """ disabled="disabled"""
+        html=["""<select name="input" onchange="javascript:$E('WConfModifRegFormGeneralSectionFieldEdit').dom.submit();  $E('submitButton').dom.disabled=true; $E('cancelButton').dom.disabled=true;"%s>""" % disabled]
         keylist=registration.FieldInputs.getAvailableInputKeys()
         keylist.sort()
         for key in keylist:
@@ -1407,6 +1392,7 @@ class WConfModifRegFormGeneralSectionFieldEdit( wcomponents.WTemplated ):
         vars["caption"] = ""
         vars["description"] = ""
         vars["mandatory"] =  """ checked="checked" """
+        vars["mandatoryLocked"] = False
         #vars["billable"]= """ checked="checked" """
         #vars["price"]=""
         if self._generalField is not None:
@@ -1415,6 +1401,7 @@ class WConfModifRegFormGeneralSectionFieldEdit( wcomponents.WTemplated ):
             #vars["price"]= quoteattr(self._generalField.getPrice())
             if not self._generalField.isMandatory():
                 vars["mandatory"] =  ""
+            vars["mandatoryLocked"] = self._generalField.isLocked('mandatory')
             #if not self._generalField.isBillable():
             #    vars["billable"] =  ""
         vars["inputtypes"]=self._getFieldTypesHTML()
@@ -1589,7 +1576,7 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
         self._currentUser = user
         self._conf = conf
 
-    def _getWComp(self, sect):
+    def _getWComp(self, sect, pdFormValues):
         if sect == self._conf.getRegistrationForm().getReasonParticipationForm():
             return WConfRegFormReasonParticipationDisplay(self._conf, self._currentUser)
         if sect == self._conf.getRegistrationForm().getSessionsForm():
@@ -1603,13 +1590,19 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
             return WConfRegFormFurtherInformationDisplay(self._conf)
         if sect == self._conf.getRegistrationForm().getSocialEventForm():
             return WConfRegFormSocialEventDisplay(self._conf, self._currentUser)
-        return WConfRegFormGeneralSectionDisplay(sect, self._currentUser)
+        return WConfRegFormGeneralSectionDisplay(sect, self._currentUser, pdFormValues)
 
     def _getOtherSectionsHTML(self):
-        regForm=self._conf.getRegistrationForm()
+        regForm = self._conf.getRegistrationForm()
+        personalDataNew = regForm.getPersonalDataNew()
+        if self._currentUser is not None and self._currentUser.isRegisteredInConf(self._conf):
+            pdFormValues = personalDataNew.getValuesFromRegistrant(self._currentUser.getRegistrantById(self._conf.getId()))
+        else:
+            pdFormValues = personalDataNew.getValuesFromAvatar(self._currentUser)
+
         html=[]
         for gs in regForm.getSortedForms():
-            wcomp=self._getWComp(gs)
+            wcomp=self._getWComp(gs, pdFormValues)
             if gs.isEnabled():
                 html.append( """
                             <tr>
@@ -1628,7 +1621,6 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
         regForm = self._conf.getRegistrationForm()
         vars["title"] = regForm.getTitle()
         vars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
-        vars["personalData"] = WConfRegFormPersonalDataDisplay(self._conf, self._currentUser).getHTML()
         vars["otherSections"]=self._getOtherSectionsHTML()
         return vars
 
@@ -1643,9 +1635,10 @@ class WConfRegistrationFormPreview( WConfRegistrationFormDisplay ):
 
 class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
 
-    def __init__(self, gs, currentUser):
+    def __init__(self, gs, currentUser, pdFormValues=None):
         self._generalSection = gs
         self._currentUser = currentUser
+        self._pdFormValues = pdFormValues
 
     def _getFieldsHTML(self, miscGroup=None):
         html=[]
@@ -1654,16 +1647,21 @@ class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
             registrant = self._currentUser.getRegistrantById(self._generalSection.getConference().getId())
         #jmf
         for f in self._generalSection.getSortedFields():
+            if f.isDisabled():
+                continue
             miscItem=None
             if miscGroup is not None and miscGroup.getResponseItemById(f.getId()) is not None:
                 miscItem=miscGroup.getResponseItemById(f.getId())
+            default = ""
+            if self._generalSection is self._generalSection.getRegistrationForm().getPersonalDataNew():
+                default = self._pdFormValues.get(f.getPDField(), "")
             html.append("""
                         <tr>
                           <td>
                              %s
                           </td>
                         </tr>
-                        """%(f.getInput().getModifHTML(miscItem, registrant)) )
+                        """%(f.getInput().getModifHTML(miscItem, registrant, default)) )
         return "".join(html)
 
     def getVars(self):
@@ -1676,6 +1674,7 @@ class WConfRegFormGeneralSectionDisplay(wcomponents.WTemplated):
             miscGroup = registrant.getMiscellaneousGroupById(self._generalSection.getId())
         vars["fields"]=self._getFieldsHTML(miscGroup)
         return vars
+
 
 class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
 
@@ -1742,6 +1741,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
                 data.append(self._getItemHTML(item, formValues.get(item.getId(), "")))
         vars["data"] = "".join(data)
         return vars
+
 
 class WConfRegFormReasonParticipationDisplay(wcomponents.WTemplated):
 
@@ -2492,46 +2492,6 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                             """)%(total["value"],regForm.getCurrency(),url,condChecking))
         return "".join(html)
 
-    def _getPDInfoHTML(self):
-        personalData = self._conf.getRegistrationForm().getPersonalData()
-        sortedKeys = personalData.getSortedKeys()
-        html = ""
-        for key in sortedKeys:
-            pdfield = personalData.getDataItem(key)
-            fieldTitle = pdfield.getName()
-            fieldValue = ""
-            if key == "title":
-                fieldValue = self.htmlText( self._registrant.getTitle() )
-            elif key == "firstName":
-                fieldValue = self.htmlText( self._registrant.getFirstName() )
-            elif key == "surname":
-                fieldValue = self.htmlText( self._registrant.getFamilyName() )
-            elif key == "position":
-                fieldValue = self.htmlText( self._registrant.getPosition() )
-            elif key == "institution":
-                fieldValue = self.htmlText( self._registrant.getInstitution() )
-            elif key == "address":
-                fieldValue = self.htmlText( self._registrant.getAddress() )
-            elif key == "city":
-                fieldValue = self.htmlText( self._registrant.getCity() )
-            elif key == "country":
-                fieldValue = self.htmlText( self._registrant.getCountry() )
-            elif key == "phone":
-                fieldValue = self.htmlText( self._registrant.getPhone() )
-            elif key == "email":
-                fieldValue = self.htmlText( self._registrant.getEmail() )
-            elif key == "fax":
-                fieldValue = self.htmlText( self._registrant.getFax() )
-            elif key == "personalHomepage":
-                fieldValue = self.htmlText( self._registrant.getPersonalHomepage() )
-            if pdfield.isEnabled():
-                html += """
-                            <tr>
-                              <td style="color:black"><b>%s</b></td>
-                              <td bgcolor="white" class="blacktext">%s</td>
-                            </tr>""" % (fieldTitle,fieldValue)
-        return html
-
     def _getFormSections(self):
         sects = []
         regForm = self._conf.getRegistrationForm()
@@ -2555,9 +2515,9 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         vars["id"] = self._registrant.getId()
         vars["pdfields"] = self._getPDInfoHTML()
         vars["registrationDate"] = i18nformat("""--_("date unknown")--""")
+
         if self._registrant.getRegistrationDate() is not None:
             vars["registrationDate"] = self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
-        vars["dataModificationURL"] = quoteattr(str(urlHandlers.UHRegistrantDataModification.getURL(self._registrant)))
         vars["otherSections"] = self._getFormSections()
         vars["paymentInfo"]  = self._getPaymentInfo()
         vars["epaymentAnnounce"] = ""

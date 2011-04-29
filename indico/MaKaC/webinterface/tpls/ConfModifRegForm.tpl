@@ -114,25 +114,6 @@
   </tr>
   <tr>
     <td class="dataCaptionTD">
-      <a name="personalfields"></a>
-      <span class="dataCaptionFormat">${ _("Personal Data")}</span>
-      <br/>
-      <br/>
-      <img src=${ enablePic } alt="${ _("Click to disable")}"> <small>${ _("Enabled field") }</small>
-      <br/>
-      <img src=${ disablePic } alt="${ _("Click to enable")}"> <small>${ _("Disabled field") }</small>
-    </td>
-    <td class="blacktext" style="padding-left:20px">
-      ${ personalfields }
-    </td>
-    <td>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="3" class="horizontalLine">&nbsp;</td>
-  </tr>
-  <tr>
-    <td class="dataCaptionTD">
       <a name="sections"></a>
       <span class="dataCaptionFormat">${ _("Sections of the form")}</span>
       <br/>

@@ -40,7 +40,6 @@ function checkConditions(){
                               <td style="color:black"><b>${ _("Registrant ID")}</b></td>
                               <td bgcolor="white">${ id }</td>
                             </tr>
-                            ${ pdfields }
                             <tr>
                               <td style="color:black"><b>${ _("Registration date")}</b></td>
                               <td bgcolor="white" class="blacktext">${ registrationDate }</td>
