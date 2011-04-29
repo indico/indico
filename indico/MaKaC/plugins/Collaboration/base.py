@@ -774,7 +774,11 @@ class CSBookingManager(Persistent, Observer):
         else:
             return {}
 
-    def updateSpeakerWrapperList(self):
+    def updateSpeakerWrapperList(self, newList = False):
+        """
+        if newList arg is True, don't check if there is an existing speakerWrapperList
+        and create a new one straight forward. (Done to avoid loops)
+        """
         SWList = []
         contributions = self.getSortedContributionSpeaker(True)
         requestType = ['recording', 'webcast', 'both']
@@ -782,7 +786,11 @@ class CSBookingManager(Persistent, Observer):
         for type in requestType:
             for cont in contributions[type]:
                 for spk in contributions[type][cont]:
-                    sw = self.getSpeakerWrapperByUniqueId("%s.%s"%(cont, spk.getId()))
+                    if newList:
+                        sw = None
+                    else:
+                        sw = self.getSpeakerWrapperByUniqueId("%s.%s"%(cont, spk.getId()))
+
                     if sw:
                         if not sw.getObject().getEmail():
                             if sw.getStatus() != SpeakerStatusEnum.SIGNED and \
@@ -803,14 +811,14 @@ class CSBookingManager(Persistent, Observer):
 
     def getSpeakerWrapperList(self):
         if not hasattr(self, "_speakerWrapperList"):#TODO: remove when safe
-            self._speakerWrapperList = []
+            self.updateSpeakerWrapperList(True)
 
         return self._speakerWrapperList
 
     def getSpeakerWrapperByUniqueId(self, id):
 
         if not hasattr(self, "_speakerWrapperList"):#TODO: remove when safe
-            return None
+            self.updateSpeakerWrapperList(True)
 
         for spkWrap in self._speakerWrapperList:
             if spkWrap.getUniqueId() == id:
@@ -884,7 +892,7 @@ class CSBookingManager(Persistent, Observer):
 
     def isContributionReadyToBePublished(self, contId):
         if not hasattr(self, "_speakerWrapperList"):#TODO: remove when safe
-            return False
+            self.updateSpeakerWrapperList(True)
 
         exists = False
         for spkWrap in self._speakerWrapperList:
