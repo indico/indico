@@ -1779,7 +1779,7 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
                 indicoRequest(
                     "collaboration.sendElectronicAgreement",
                     {
-                        conference : self.conf["id"],
+                        conference : self.confId,
                         uniqueIdList: self.uniqueIdList,
                         from: $E("fromEmailAddress"),
                         content: self.rtWidget.get(),
@@ -1832,9 +1832,10 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
 
             // Text editor with default message
             self.rtWidget = new ParsedRichTextEditor(700, 400, 'IndicoMinimal');
+
             self.rtWidget.set("Dear {name},<br />" +
                     "<br />" +
-                    "The organiser asked to record the following event: <strong>"+self.conf["title"]+"</strong><br />" +
+                    "The organiser asked to record the following event: <strong>"+self.confTitle+"</strong><br />" +
                     "In order to allow us to publish the video recording of your talk, please sign the agreement form at this page:" +
                     "<br/><br/> {url} <br/>"+
                     "<br/>" +
@@ -1866,9 +1867,10 @@ type("SpeakersEmailPopup", ["ExclusivePopupWithButtons"],{
                     );
         }
     },
-    function(conf, uniqueIdList, fromList, userId){
+    function(confTitle, confId, uniqueIdList, fromList, userId){
         var self = this;
-        self.conf = conf;
+        self.confTitle = confTitle;
+        self.confId = confId;
         self.uniqueIdList = uniqueIdList;
         self.fromList = fromList;
         self.userId = userId

@@ -19,7 +19,7 @@ function sendEmails(){
         }
     }
     if (uniqueIdList.length != 0){
-        var popup = new SpeakersEmailPopup( ${fossilize(conf)}, uniqueIdList, ${fromList} , ${user.getId()});
+        var popup = new SpeakersEmailPopup("${conf.getTitle()}", ${conf.getId()}, uniqueIdList, ${fromList} , ${user.getId()});
         popup.open();
     }
     return false;

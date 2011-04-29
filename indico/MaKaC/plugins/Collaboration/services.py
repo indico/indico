@@ -81,14 +81,10 @@ class SendElectronicAgreement(ConferenceModifBase):
             self.emailToList.extend(manager.getSpeakerEmailByUniqueId(uniqueId, self._aw.getUser()))
 
     def processContent(self, speakerWrapper):
-        #newContent = self.content
         fullUrl = UHCollaborationElectronicAgreementForm().getURL(self._conf.getId(), speakerWrapper.getUniqueIdHash())
         url = "<a href='%s'>%s</a>"%(fullUrl, fullUrl)
 
         return self.content.format(url=url, name= speakerWrapper.getObject().getDirectFullName())
-
-        #newContent = newContent.replace("[url]", "<a href='%s'>%s</a>"%(url, url))
-        #newContent = newContent.replace("[name]", "%s"%speakerWrapper.getObject().getDirectFullName())
 
         #cont = self._conf.getContributionById(speakerWrapper.getContId())
         #=======================================================================
