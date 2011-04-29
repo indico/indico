@@ -39,7 +39,11 @@
   </tr>
   <tr><td><br></td></tr>
   <tr>
-    <td align="left" valign="top">&nbsp;&nbsp;${ fields }</td>
+    <td align="left" valign="top">
+      <table>
+        ${ fields }
+      </table>
+    </td>
   </tr>
   <tr><td>&nbsp;</td></tr>
   <tr>

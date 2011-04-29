@@ -1026,6 +1026,7 @@ class BaseForm(Persistent):
 
 class FieldInputType(Persistent):
     _id=""
+    _useLabelCol = True
 
     def __init__(self, field):
         self._parent = field
@@ -1057,14 +1058,22 @@ class FieldInputType(Persistent):
         """
         return "*genfield*%s-%s"%(self.getParent().getParent().getId(), self.getParent().getId())
 
+    def getModifLabelCol(self):
+        if not self._useLabelCol:
+            return ""
+        return self._parent.getCaption()
+
+    def getMandatoryCol(self, item):
+        mandatory = ""
+        if (item is not None and item.isMandatory()) or self.getParent().isMandatory():
+            mandatory = """<span style="color:red;">*</span>"""
+        return mandatory
+
     def getModifHTML(self, item, registrant, default=""):
         """
         Method that display the form web which represents this object.
         """
-        mandatory='<td class="beforeRegistrationInput"></td>'
-        if (item is not None and item.isMandatory())or self.getParent().isMandatory():
-            mandatory = """<td class="beforeRegistrationInput" valign="top"><font color="red">*</font></td>"""
-        return "<table><tr>%s%s</tr></table>"%(mandatory, self._getModifHTML(item, registrant, default))
+        return "<table><tr>%s</tr></table>" % (self._getModifHTML(item, registrant, default))
 
     def _getModifHTML(self,item, registrant, default=""):
         """
@@ -1146,7 +1155,6 @@ class TextInput(FieldInputType):
         self._length = ''
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
@@ -1155,7 +1163,6 @@ class TextInput(FieldInputType):
         v=default
         if item is not None:
             v=item.getValue()
-            caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
             currency=item.getCurrency()
@@ -1172,14 +1179,14 @@ class TextInput(FieldInputType):
             length = 'size="%s"' % self.getLength()
         else:
             length = 'size="60"'
-        tmp = """%s <input type="text" id="%s" name="%s" value="%s" %s %s >%s""" % (caption, htmlName, htmlName, v , disable, length, param)
+        tmp = """<input type="text" id="%s" name="%s" value="%s" %s %s >%s""" % (htmlName, htmlName, v , disable, length, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1247,7 +1254,6 @@ class TelephoneInput(FieldInputType):
         self._length = ''
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         htmlName = self.getHTMLName()
 
@@ -1272,11 +1278,10 @@ class TelephoneInput(FieldInputType):
         else:
             length = 'size="30"'
         format = """&nbsp;<span class="inputDescription">(+) 999 99 99 99</span>"""
-        tmp = """&nbsp;%s <input type="text" id="%s" name="%s" value="%s" %s %s>%s%s""" % (caption, htmlName, htmlName, v , disable, length, format, param)
-        tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
-        tmp = """%s </td> """ % tmp
+        tmp = """<input type="text" id="%s" name="%s" value="%s" %s %s>%s%s""" % (htmlName, htmlName, v , disable, length, format, param)
+        tmp = """ <td>%s</td>""" % tmp
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td>%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1341,7 +1346,6 @@ class TextareaInput(FieldInputType):
         self._numberOfColumns = ''
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
@@ -1350,7 +1354,6 @@ class TextareaInput(FieldInputType):
         v=default
         if item is not None:
             v=item.getValue()
-            caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
             currency=item.getCurrency()
@@ -1376,7 +1379,7 @@ class TextareaInput(FieldInputType):
         if not rows:
             rows = 4
 
-        tmp = """&nbsp;%s<br>%s<textarea id="%s" name="%s" cols="%s" rows="%s" %s >%s</textarea>%s"""%(caption, desc, htmlName, htmlName, cols, rows, disable, v, param)
+        tmp = """%s<textarea id="%s" name="%s" cols="%s" rows="%s" %s >%s</textarea>%s"""%(desc, htmlName, htmlName, cols, rows, disable, v, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         tmp= """%s </td> """%tmp
 
@@ -1457,6 +1460,8 @@ class TextareaInput(FieldInputType):
 
 class NumberInput(FieldInputType):
     _id="number"
+    _useLabelCol = False
+
     def getName(cls):
         return "Number"
     getName=classmethod(getName)
@@ -1476,7 +1481,6 @@ class NumberInput(FieldInputType):
         v=default or "0"
         if item is not None:
             v=item.getValue()
-            caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
             currency=item.getCurrency()
@@ -1501,14 +1505,12 @@ class NumberInput(FieldInputType):
                 onkeyup="$E('subtotal-%s').dom.innerHTML = ((isNaN(parseInt(this.value, 10)) || parseInt(this.value, 10) < 0) ? 0 : parseInt(this.value, 10)) * %s;"
             """ % (htmlName, price)
         tmp = """&nbsp;<input type="text" id="%s" name="%s" value="%s" %s %s %s />&nbsp;&nbsp;<span class="regFormNumberCaption">%s</span> %s""" % (htmlName, htmlName, v, onkeyup, disable, length, caption, param)
-        tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
+        tmp= """ <td>%s</td>"""%tmp
         if billable:
             subTotal = (float(price)*int(v) or 0)
-            tmp= """%s&nbsp;&nbsp;<span class="regFormPrice">%s&nbsp;%s</span><span class="regFormSubtotal">Total: <span id="subtotal-%s">%s</span>&nbsp;%s</span></td> """%(tmp,price,currency,htmlName,subTotal,currency)
-        else:
-            tmp= """%s </td> """%tmp
+            tmp= """%s<td align="right" align="bottom">&nbsp;&nbsp;<span class="regFormPrice">%s&nbsp;%s</span><span class="regFormSubtotal">Total: <span id="subtotal-%s">%s</span>&nbsp;%s</span></td> """%(tmp,price,currency,htmlName,subTotal,currency)
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1615,7 +1617,6 @@ class LabelInput(FieldInputType):
     getName=classmethod(getName)
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
@@ -1624,7 +1625,6 @@ class LabelInput(FieldInputType):
         v=default
         if item is not None:
             v=item.getValue()
-            caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
             currency=item.getCurrency()
@@ -1634,14 +1634,13 @@ class LabelInput(FieldInputType):
         if ( registrant is not None and billable and registrant.getPayed()):
             disable="disabled=\"true\""
             #pass
-        tmp = """%s"""%(caption)
-        tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
+        tmp= """ <td></td><td align="right" align="bottom">"""
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
         else:
             tmp= """%s </td> """%tmp
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1667,6 +1666,8 @@ class LabelInput(FieldInputType):
 
 class CheckboxInput(FieldInputType):
     _id="checkbox"
+    _useLabelCol=False
+
     def getName(cls):
         return "Multiple choices/checkbox"
     getName=classmethod(getName)
@@ -1684,7 +1685,6 @@ class CheckboxInput(FieldInputType):
         quantity = 0
         if item is not None:
             v = item.getValue()
-            caption = self._parent.getCaption()
             price = item.getPrice()
             billable = item.isBillable()
             currency = item.getCurrency()
@@ -1704,7 +1704,7 @@ class CheckboxInput(FieldInputType):
             tmp += """&nbsp;<span style='color:green; font-style:italic;'>[%s place(s) left]</span>""" % (self.getParent().getNoPlacesLeft())
         tmp += """</td>"""
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -1743,22 +1743,18 @@ class YesNoInput(FieldInputType):
     getName=classmethod(getName)
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getPrice()
         billable=self._parent.isBillable()
         currency=self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName=self.getHTMLName()
-        caption=self._parent.getCaption()
         v=default
         if item is not None:
             v=item.getValue()
-            caption = self._parent.getCaption()
             price= item.getPrice()
             billable=item.isBillable()
             currency=item.getCurrency()
             htmlName=item.getHTMLName()
-            caption=item.getCaption()
         disable=""
 
         if self._parent.isMandatory():
@@ -1775,6 +1771,7 @@ class YesNoInput(FieldInputType):
             checkedYes="selected"
         elif v=="no":
             checkedNo="selected"
+
         placesInfo = ""
         if self.getParent().getPlacesLimit():
             placesInfo = """&nbsp;[%s place(s) left]""" % (self.getParent().getNoPlacesLeft())
@@ -1787,7 +1784,7 @@ class YesNoInput(FieldInputType):
         else:
             tmp= """%s </td> """%tmp
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
 
@@ -2126,7 +2123,6 @@ class RadioGroupInput(FieldInputType):
             return self._emptyCaption
 
     def _getRadioGroupModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price= self._parent.getCaption()
         billable=self._parent.isBillable()
@@ -2135,7 +2131,6 @@ class RadioGroupInput(FieldInputType):
         if item is not None:
             billable = item.isBillable()
             currency = item.getCurrency()
-            caption = item.getCaption()
             value = item.getValue()
 
         tmp = """%s""" % (caption)
@@ -2157,7 +2152,7 @@ class RadioGroupInput(FieldInputType):
                 checked = "checked"
             elif not value and val.getCaption() == self.getDefaultItem():
                 checked = "checked"
-            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" id="%s" name="%s" value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
+            tmp.append("""<tr><td></td><td><input type="radio" id="%s" name="%s" value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
             if val.isBillable():
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;%s""" % (val.getPrice(), currency))
             tmp.append("""</td><td align="right" style="vertical-align: bottom;" >""")
@@ -2185,7 +2180,6 @@ class RadioGroupInput(FieldInputType):
         return "".join(tmp)
 
     def _getDropDownModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         billable = self._parent.isBillable()
         currency = self._parent.getParent().getRegistrationForm().getCurrency()
@@ -2193,7 +2187,6 @@ class RadioGroupInput(FieldInputType):
         if item is not None:
             billable = item.isBillable()
             currency = item.getCurrency()
-            caption = item.getCaption()
             value = item.getValue()
 
         if not value:
@@ -2204,10 +2197,7 @@ class RadioGroupInput(FieldInputType):
         else:
             param = ''
 
-        tmp = """%s""" % (caption)
-        tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
-        tmp.append(""" </td> """)
-
+        tmp = []
         tmp.append("""<td><select id="%s" name="%s">""" % (self.getHTMLName(), self.getHTMLName()))
 
         tmp.append("""<option value="">%s</option>""" % self.getEmptyCaption())
@@ -2239,7 +2229,7 @@ class RadioGroupInput(FieldInputType):
         tmp.append("""</select>%s</td>""" % param)
 
         if description:
-            tmp.append("""<tr><td></td><td colspan="2">%s</td></tr>""" % (self._getDescriptionHTML(description)))
+            tmp.append("""<tr><td colspan="2">%s</td></tr>""" % (self._getDescriptionHTML(description)))
 
         return "".join(tmp)
 
@@ -2378,13 +2368,11 @@ class CountryInput(FieldInputType):
         return CountryHolder().getCountryById(value)
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         htmlName = self.getHTMLName()
         value = default
         if item is not None:
             value = item.getValue()
-            caption = self._parent.getCaption()
             htmlName = item.getHTMLName()
         disable = ""
 
@@ -2401,11 +2389,9 @@ class CountryInput(FieldInputType):
             inputHTML += """<option value="%s" %s>%s</option>""" % (countryKey, selected, CountryHolder().getCountryById(countryKey))
         inputHTML = """<select id="%s" name="%s" %s>%s</select>%s""" % (htmlName, htmlName, disable, inputHTML, param)
 
-        tmp = "%s %s " % (caption, inputHTML)
-        tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
-        tmp = """%s </td> """ % tmp
+        tmp = """ <td>%s</td>""" % inputHTML
         if description:
-            tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
+            tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
 
     def _setResponseValue(self, item, params, registrant):
@@ -2456,7 +2442,6 @@ class DateInput(FieldInputType):
         return "_genfield_%s_%s_" % (self.getParent().getParent().getId(), self.getParent().getId())
 
     def _getModifHTML(self, item, registrant, default=""):
-        caption = self._parent.getCaption()
         description = self._parent.getDescription()
         if item is not None:
             date = item.getValue()
@@ -2466,7 +2451,7 @@ class DateInput(FieldInputType):
             htmlName = self.getHTMLName()
 
         from MaKaC.webinterface.wcomponents import WDateField
-        inputHTML = WDateField(caption, htmlName, date, self.dateFormat, True, self._parent.isMandatory()).getHTML()
+        inputHTML = WDateField("", htmlName, date, self.dateFormat, True, self._parent.isMandatory()).getHTML()
 
         dateFormat = self.dateFormat
         dateFormat = re.sub('%d', 'DD', dateFormat)
@@ -2476,7 +2461,7 @@ class DateInput(FieldInputType):
         dateFormat = re.sub('%M', 'mm', dateFormat)
 
         dformat = """&nbsp;<span class="inputDescription">%s</span>""" % dateFormat
-        tmp = "%s %s %s" % (caption, inputHTML, dformat)
+        tmp = "%s %s" % (inputHTML, dformat)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         tmp = """%s </td> """ % tmp
         if description:

@@ -1677,11 +1677,13 @@ class WConfModifRegistrantMiscInfoModify(wcomponents.WTemplated):
                 price=v=miscItem.getPrice()
             html.append("""
                         <tr>
+                          <td nowrap="nowrap" valign="top">%s</td>
+                          <td valign="top" style="width:10px;">%s</td>
                           <td>
                              %s
                           </td>
                         </tr>
-                        """%(f.getInput().getModifHTML(miscItem, self._registrant)) )
+                        """%(f.getInput().getModifLabelCol(), f.getInput().getMandatoryCol(miscItem), f.getInput().getModifHTML(miscItem, self._registrant)) )
         return "".join(html)
 
 
