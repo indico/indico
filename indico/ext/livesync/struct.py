@@ -179,6 +179,9 @@ class MultiPointerTrack(Persistent):
         return self.iterate(self._pointers[pid], till, func)
 
     def iterate(self, fromPos=None, till=None, func=(lambda x: x)):
+        """
+        Generator that iterates through the data structure
+        """
         if till != None:
             till = timestamp(till)
             # negative numbers mean "last but one", "last but two", etc...
@@ -189,10 +192,7 @@ class MultiPointerTrack(Persistent):
         if fromPos != None:
             fromPos = timestamp(fromPos)
 
-        it = self._container.iteritems(till, fromPos)
-
-        # consume a single position
-        for ts, entry in it:
+        for ts, entry in self._container.iteritems(till, fromPos):
             if fromPos and ts == fromPos:
                 # stop immediately if we're past fromPos
                 raise StopIteration
@@ -252,15 +252,10 @@ class MultiPointerTrack(Persistent):
         if pid not in self._pointers:
             raise KeyError("Pointer '%s' doesn't seem to exist!" % pid)
 
-        ts = timestamp(pos)
-
         # check that the tree has something
         if len(self._container) == 0:
             raise EmptyTrackException()
 
-        # logic should be inverted here, minKey is actually a maxKey,
-        # numerically - since our logics have inverted comparison, it
-        # ends up like this
         self._pointers[pid] = pos
 
     def __len__(self):

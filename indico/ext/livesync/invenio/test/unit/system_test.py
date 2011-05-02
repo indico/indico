@@ -36,7 +36,7 @@ from lxml import etree
 
 # plugin imports
 from indico.ext.livesync.invenio.agent import InvenioBatchUploaderAgent
-from indico.ext.livesync.test.unit.base import _TestUpload
+from indico.ext.livesync.test.unit.base import _TUpload
 
 
 class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -102,6 +102,6 @@ class FakeInvenio(Thread):
             self._server.server_close()
 
 
-class TestUpload(_TestUpload):
+class TestUpload(_TUpload):
     _server = FakeInvenio
     _agent = InvenioBatchUploaderAgent

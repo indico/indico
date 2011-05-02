@@ -424,6 +424,7 @@ class HelperMaKaCInfo:
             minfo = MaKaCInfo()
             root["MaKaCInfo"] = OOBTree.OOBTree()
             root["MaKaCInfo"]["main"] = minfo
+
         return minfo
 
     getMaKaCInfoInstance = classmethod( getMaKaCInfoInstance )

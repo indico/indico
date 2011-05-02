@@ -25,10 +25,13 @@ other TestRunners should inherit from.
 
 # System modules
 import os, sys
+from threading import Thread
 
 # Python stdlib
 import StringIO
 import pkg_resources
+from smtpd import SMTPServer
+import asyncore
 
 # Indico
 from indico.util.console import colored
@@ -298,3 +301,21 @@ class BaseTestRunner(IOMixin):
         self.options.call(self, method, *args)
 
 
+# Some utils
+
+class FakeMailServer(SMTPServer):
+    def process_message(self, peer, mailfrom, rcpttos, data):
+        print "mail from %s" % mailfrom
+
+
+class FakeMailThread(Thread):
+    def __init__(self, addr):
+        super(FakeMailThread, self).__init__()
+        self.addr = addr
+
+    def run(self):
+        self.server = FakeMailServer(self.addr, '')
+        asyncore.loop()
+
+    def close(self):
+        self.server.close()

@@ -18,9 +18,6 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# system imports
-import contextlib
-
 # ZODB imports
 import ZODB
 from ZODB import ConflictResolution, MappingStorage
@@ -33,7 +30,6 @@ from MaKaC.conference import CategoryManager, DefaultConference
 from MaKaC import user
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import HelperMaKaCInfo
-from MaKaC.common.info import HelperMaKaCInfo
 
 # indico imports
 from indico.tests.python.unit.util import IndicoTestFeature
@@ -78,11 +74,11 @@ class Database_Feature(IndicoTestFeature):
     def start(self, obj):
         super(Database_Feature, self).start(obj)
 
-        obj._dbi = DBMgr.getInstance()
+        obj._dbmgr = DBMgr.getInstance()
+        obj._db = obj._dbmgr._db
 
         # Reset everything
-        with obj._context('database'):
-            conn = obj._dbi._getConnObject()
+        with obj._context('database') as conn:
             r = conn.root._root
 
             for e in r.keys():
@@ -90,24 +86,31 @@ class Database_Feature(IndicoTestFeature):
 
             # initialize db root
             cm = CategoryManager()
+
             cm.getRoot()
 
             obj._home = cm.getById('0')
 
     def _action_startDBReq(obj):
-        obj._dbi.startRequest()
+        obj._conn = obj._db.open()
+        obj._dbmgr._setConnObject(obj._conn)
+        return obj._conn
 
     def _action_stopDBReq(obj):
-        obj._dbi.endRequest()
+        transaction.commit()
+        obj._conn.close()
 
-    def _context_database(self):
-        if DBMgr.getInstance().isConnected():
-            yield
-            return
+    def _context_database(self, sync=False):
+        conn = self._startDBReq()
+        if sync:
+            conn.sync()
+        try:
+            yield conn
+        finally:
+            self._stopDBReq()
 
-        self._startDBReq()
-        yield
-        self._stopDBReq()
+    def destroy(self, obj):
+        obj._conn = None
 
 
 class DummyUser_Feature(IndicoTestFeature):
@@ -120,36 +123,39 @@ class DummyUser_Feature(IndicoTestFeature):
 
     def start(self, obj):
         super(DummyUser_Feature, self).start(obj)
-        with obj._context('database'):
+
+        with obj._context('database', sync=True):
 
             #filling info to new user
             avatar = user.Avatar()
-            avatar.setName( "fake" )
-            avatar.setSurName( "fake" )
-            avatar.setOrganisation( "fake" )
-            avatar.setLang( "en_US" )
-            avatar.setEmail( "fake@fake.fake" )
+
+            avatar.setName("fake")
+            avatar.setSurName("fake")
+            avatar.setOrganisation("fake")
+            avatar.setLang("en_US")
+            avatar.setEmail("fake@fake.fake")
 
             #registering user
             ah = user.AvatarHolder()
             ah.add(avatar)
 
             #setting up the login info
-            li = user.LoginInfo( "dummyuser", "dummyuser" )
+            li = user.LoginInfo("dummyuser", "dummyuser")
             ih = AuthenticatorMgr()
-            userid = ih.createIdentity( li, avatar, "Local" )
-            ih.add( userid )
+            userid = ih.createIdentity(li, avatar, "Local")
+            ih.add(userid)
 
             #activate the account
             avatar.activateAccount()
 
             #since the DB is empty, we have to add dummy user as admin
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+
             al = minfo.getAdminList()
-            al.grant( avatar )
+            al.grant(avatar)
 
             obj._dummy = avatar
 
-            HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
+            dc = DefaultConference()
 
-
+            HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(dc)

@@ -107,7 +107,6 @@ class ObjectChangeListener(Component):
         cm_set = ContextManager.get('indico.ext.livesync:actions').setdefault(
             obj, set([]))
 
-
         # the context may not be initialized
         if cm_set != None:
             cm_set |= set(actions)

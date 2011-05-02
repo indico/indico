@@ -396,52 +396,11 @@ class test_indico(Command):
         # get only options that are active
         options = dict((k,v) for (k,v) in options.iteritems() if v)
 
-        #this variable will tell what to do with the databases
-        fakeDBPolicy = self.checkDBStatus(testsToRun, self.specify)
-
         manager = TestManager()
 
-        result = manager.main(fakeDBPolicy, testsToRun, options)
+        result = manager.main(testsToRun, options)
 
         sys.exit(result)
-
-    def checkDBStatus(self, testsToRun, specify):
-        from indico.tests import TestConfig
-        from indico.tests.util import TestZEOServer
-        from MaKaC.common.Configuration import Config
-
-        fakeDBPolicy = 0
-        if ('functional' in testsToRun) or ('grid' in testsToRun):
-
-            params = Config.getInstance().getDBConnectionParams()
-
-            #checking if production db is running
-            server = TestZEOServer(params[1],
-                                   'test',
-                                   hostname = params[0])
-
-
-            if server.server.can_connect(server.options.family, server.options.address):
-                print """Your production database is currently running.
-Do you want to stop it using this command '%s' and run the tests?
-(We will restart your produduction after the tests with this command '%s')""" % \
-(TestConfig.getInstance().getStopDBCmd(), TestConfig.getInstance().getStartDBCmd())
-
-                userInput = raw_input("Type 'yes' to accept, 'no' to exit or 'usedb' to use current DB. [yes]: ")
-                if userInput == 'yes' or userInput == '':
-                    fakeDBPolicy = 3
-                elif userInput == 'usedb':
-                    fakeDBPolicy = 0
-                else:
-                    print "Exiting testing framework..."
-                    sys.exit(1)
-
-            else:
-                fakeDBPolicy = 2
-        elif 'unit' in testsToRun:
-            fakeDBPolicy = 1
-
-        return fakeDBPolicy
 
     def checkTestPackages(self):
         packagesList = ['figleaf',

@@ -17,23 +17,21 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
 from MaKaC.common.db import DBMgr
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.Vidyo.tests.python.unit.vidyoTestTools import VidyoTestSetup
 
-def setUpModule():
-    DBMgr.getInstance().startRequest()
-    VidyoTestSetup.setup()
+from indico.tests.python.unit.util import IndicoTestCase
 
-def tearDownModule():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
 
-class TestVidyoPluginOptions(unittest.TestCase):
+class TestVidyoPluginOptions(IndicoTestCase):
+
+    _requires = ['plugins.Plugins']
 
     def setUp(self):
-        self.plugin = CollaborationTools.getPlugin("Vidyo")
+        super(TestVidyoPluginOptions, self).setUp()
+        with self._context('database'):
+            self.plugin = CollaborationTools.getPlugin("Vidyo")
 
     def testCommonOptions(self):
         assert(self.plugin.hasOption("tab"))

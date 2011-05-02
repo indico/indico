@@ -122,7 +122,7 @@ class TestBasicOperations(_TestSynchronization):
 
         self.checkActions(ts, set([(categ3, 'moved set_public')]))
 
-    def testEventCreateDeleteInside(self):
+    def testEventeCreateDeleteInside(self):
         """
         Create an event (and things inside) and delete it
         """

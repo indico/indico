@@ -36,7 +36,7 @@ from lxml import etree
 
 # plugin imports
 from indico.ext.livesync.cern_search import CERNSearchUploadAgent
-from indico.ext.livesync.test.unit.base import _TestUpload
+from indico.ext.livesync.test.unit.base import _TUpload
 
 
 class FakeHTTPHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -103,6 +103,6 @@ class FakeCERNSearch(Thread):
             self._server.server_close()
 
 
-class TestUpload(_TestUpload):
+class TestUpload(_TUpload):
     _server = FakeCERNSearch
     _agent = CERNSearchUploadAgent

@@ -45,14 +45,15 @@ class TestAgent(PushSyncAgent):
         super(TestAgent, self).__init__(aid, name, description, updateTime)
         self._service = service
 
-    def _generateRecords(self, data, lastTS):
+    def _generateRecords(self, data, lastTS, dbi=None):
 
         data = list(data)
+
         data.reverse()
 
         return data
 
-    def _run(self, data, logger=None, monitor=None):
+    def _run(self, data, logger=None, monitor=None, dbi=None):
 
         ts = None
 
@@ -138,8 +139,8 @@ class TestPushAgentBehavior(_TestAgentBehavior):
 
     def testSimpleRecordCreation(self):
         currentTS = 0
-        a1 = ActionWrapper(currentTS, self._objs[1], ['add'])
-        a2 = ActionWrapper(currentTS, self._objs[2], ['add'])
+        a1 = ActionWrapper(currentTS, self._objs[1], ['add'], None)
+        a2 = ActionWrapper(currentTS, self._objs[2], ['add'], None)
 
         self._mgr.add(currentTS, [a1, a2])
 
@@ -167,9 +168,9 @@ class TestPushAgentBehavior(_TestAgentBehavior):
 
     def testDeletionNotification(self):
         currentTS = 0
-        a1 = ActionWrapper(currentTS, self._objs[1], ['add'])
-        a2 = ActionWrapper(currentTS, self._objs[2], ['add'])
-        a3 = ActionWrapper(currentTS + 1, self._objs[2], ['del'])
+        a1 = ActionWrapper(currentTS, self._objs[1], ['add'], None)
+        a2 = ActionWrapper(currentTS, self._objs[2], ['add'], None)
+        a3 = ActionWrapper(currentTS + 1, self._objs[2], ['del'], None)
 
         self._mgr.add(currentTS, [a1, a2])
 
@@ -194,9 +195,9 @@ class TestPushAgentBehavior(_TestAgentBehavior):
 
     def testChangeNotification(self):
         currentTS = 0
-        a1 = ActionWrapper(currentTS, self._objs[0], ['add'])
-        a2 = ActionWrapper(currentTS + 1, self._objs[0], ['chg'])
-        a3 = ActionWrapper(currentTS + 2, self._objs[0], ['chg'])
+        a1 = ActionWrapper(currentTS, self._objs[0], ['add'], None)
+        a2 = ActionWrapper(currentTS + 1, self._objs[0], ['chg'], None)
+        a3 = ActionWrapper(currentTS + 2, self._objs[0], ['chg'], None)
 
         self._mgr.add(currentTS, [a1])
 

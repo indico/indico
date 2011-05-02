@@ -86,7 +86,7 @@ XMLCacheDir          = "/opt/indico/cache"
 #------------------------------------------------------------------------------
 # SMTP
 #------------------------------------------------------------------------------
-SmtpServer           = "localhost"
+SmtpServer           = ("localhost", 25)
 SmtpLogin            = ""
 SmtpPassword         = ""
 

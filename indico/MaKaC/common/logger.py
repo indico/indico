@@ -1,5 +1,5 @@
 import os, string
-import logging.handlers, logging.config
+import logging.handlers, logging.config, logging
 import ConfigParser
 
 from MaKaC.common.Configuration import Config
@@ -40,17 +40,11 @@ class LoggerUtils:
             logging._handlers.clear()
             del logging._handlerList[:]
             handlers = cls._install_handlers(cp, defaultArgs, formatters, filters)
-            try:
-                logging.config._install_loggers(cp, handlers)
-            except:
-                #TODO: this is just for backwards compatibility. It should be removed in v0.98 with p2.6
-                try:
-                    logging.config._install_loggers(cp, handlers, False)
-                except:
-                    cls._install_loggers(cp, handlers)
+            logging.config._install_loggers(cp, handlers, False)
 
         finally:
             logging._releaseLock()
+        return handlers
 
     @classmethod
     def _install_handlers(self, cp, defaultArgs, formatters, filters = None):
@@ -209,8 +203,8 @@ class Logger:
     # Default arguments for the handlers, taken mostly for the configuration
     defaultArgs = { 'indico' : "('%s', 'a')" %os.path.join(configDir, 'indico.log'),
                     'other'  : "('%s', 'a')" %os.path.join(configDir, 'other.log'),
-                    'smtp'   : "('%s', 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
-                                %(smtpServer, serverName, config.getSupportEmail(), serverName)
+                    'smtp'   : "(\"%s\", 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
+                                % (smtpServer, serverName, config.getSupportEmail(), serverName)
                     }
 
     # Lists of filters for each handler
@@ -221,7 +215,15 @@ class Logger:
     logConfFilepath = os.path.join(config.getConfigurationDir(), "logging.conf")
 
     #logging.config.fileConfig(logConfFilepath)
-    LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
+    handlers = LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
+
+    @classmethod
+    def removeHandler(cls, handlerName):
+        handler = cls.handlers.get(handlerName)
+
+        if handler:
+            del cls.handlers[handlerName]
+            logging.root.handlers.remove(handler)
 
     @classmethod
     def get(cls, module=''):

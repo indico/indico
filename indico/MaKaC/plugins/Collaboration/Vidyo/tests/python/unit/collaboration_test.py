@@ -23,21 +23,20 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.Vidyo.collaboration import CSBooking
 from MaKaC.plugins.Collaboration.Vidyo.tests.python.unit.vidyoTestTools import VidyoTestSetup
 
-def setUpModule():
-    DBMgr.getInstance().startRequest()
-    VidyoTestSetup.setup()
+from indico.tests.python.unit.util import IndicoTestCase
 
-def tearDownModule():
-    DBMgr.getInstance().abort()
-    DBMgr.getInstance().endRequest()
 
-class TestCSBookingClass(unittest.TestCase):
+class TestCSBookingClass(IndicoTestCase):
+
+    _requires = ['plugins.Plugins']
 
     def testObtainVidyoClass(self):
-        self.assertEquals(CollaborationTools.getCSBookingClass("Vidyo"),
-                          CSBooking)
+        with self._context('database'):
+            self.assertEquals(CollaborationTools.getCSBookingClass("Vidyo"),
+                              CSBooking)
 
     def testCreateCSBookingObject(self):
-        # we don't bother setting a proper Conference as 2nd argument
-        self.assertEquals(type(CollaborationTools.getCSBookingClass("Vidyo")("Vidyo", None)),
-                          CSBooking)
+        with self._context('database'):
+            # we don't bother setting a proper Conference as 2nd argument
+            self.assertEquals(type(CollaborationTools.getCSBookingClass("Vidyo")("Vidyo", None)),
+                              CSBooking)

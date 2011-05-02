@@ -20,7 +20,6 @@
 
 import logging
 import os
-import thread
 import time
 import random
 

@@ -26,6 +26,8 @@ Some utils for unit tests
 import unittest, sys, new, contextlib
 
 # indico imports
+from MaKaC.common import Config
+from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 
 loadedFeatures = []
@@ -95,21 +97,22 @@ class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
         FeatureLoadingObject.__init__(self)
 
     def setUp(self):
+        Logger.removeHandler('smtp')
         self._configFeatures(self)
 
-    def _closeEnvironment(self):
+    def tearDown(self):
         self._unconfigFeatures(self)
 
     @contextlib.contextmanager
-    def _context(self, *contexts):
+    def _context(self, *contexts, **kwargs):
         ctxs = []
+        res = []
         for ctxname in contexts:
-            ctx = getattr(self, '_context_%s' % ctxname)()
-
-            ctx.next()
+            ctx = getattr(self, '_context_%s' % ctxname)(**kwargs)
+            res.append(ctx.next())
             ctxs.append(ctx)
 
-        yield
+        yield res if len(res) > 1 else res[0]
 
         for ctx in ctxs[::-1]:
             ctx.next()
@@ -132,8 +135,6 @@ class ContextManager_Feature(IndicoTestFeature):
     Creates a context manager
     """
 
-    _requires = []
-
     def start(self, obj):
         super(ContextManager_Feature, self).start(obj)
 
@@ -151,8 +152,6 @@ class RequestEnvironment_Feature(IndicoTestFeature):
     """
     Creates an environment that should be similar to a regular request
     """
-
-    _requires = []
 
     def _action_endRequest(self):
         self._do._notify('requestFinished', None)

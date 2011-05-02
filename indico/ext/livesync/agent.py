@@ -241,13 +241,13 @@ class PushSyncAgent(SyncAgent):
             raise AgentExecutionException("SyncAgent '%s' has no manager!" % \
                                           self._id)
 
-        # query till currentTS - 1, for integrity reasons
-        data = self._manager.query(agentId=self.getId(),
-                                   till=till)
-
         if logger:
             logger.info("Querying agent %s for events till %s" % \
                         (self.getId(), till))
+
+        # query till currentTS - 1, for integrity reasons
+        data = self._manager.query(agentId=self.getId(),
+                                   till=till)
 
         try:
             records = self._generateRecords(data, till, dbi=dbi)

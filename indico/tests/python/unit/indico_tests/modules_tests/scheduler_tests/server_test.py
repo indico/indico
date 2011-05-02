@@ -31,6 +31,7 @@ from MaKaC.common.db import DBMgr
 from indico.util.date_time import nowutc
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 from indico.modules.scheduler.tasks import OneShotTask, PeriodicTask
+from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
 
 terminated = None
 
@@ -117,25 +118,29 @@ class SchedulerThread(threading.Thread):
         self._mode = mode
 
     def run(self):
-        DBMgr.getInstance().startRequest()
-        s = Scheduler(sleep_interval = 1,
-                      task_max_tries = 1,
-                      multitask_mode = self._mode)
+
+        s = Scheduler(sleep_interval=1,
+                      task_max_tries=1,
+                      multitask_mode=self._mode)
         self.result = s.run()
-        DBMgr.getInstance().endRequest()
 
 
-class _TestScheduler(unittest.TestCase):
+class _TestScheduler(IndicoTestCase):
+
+    _requires = ['db.DummyUser']
+
+    def tearDown(self):
+        with self._context('database'):
+            self._smodule.destroyDBInstance()
+        super(_TestScheduler, self).tearDown()
 
     def setUp(self):
+        super(_TestScheduler, self).setUp()
 
         base.TimeSource.set(TestTimeSource(2))
 
-        DBMgr.getInstance()._conn = {}
-
-        DBMgr.getInstance().startRequest()
-        self._smodule = SchedulerModule.getDBInstance()
-        DBMgr.getInstance().commit()
+        with self._context('database'):
+            self._smodule = SchedulerModule.getDBInstance()
 
         self._sched = SchedulerThread(self._mode)
         self._sched.start()
@@ -153,8 +158,8 @@ class _TestScheduler(unittest.TestCase):
                     base.TimeSource.get().sleep(1)
                     timewaited += 1
                 else:
-                    # print "bad news... timeout @ %s, value=%s" % \
-                    #       (w, terminated[w])
+                    ## print "bad news... timeout @ %s, value=%s" % \
+                    ##        (w, terminated[w])
                     return False
         return True
 
@@ -162,7 +167,7 @@ class _TestScheduler(unittest.TestCase):
         self._workers = {}
 
         global terminated
-        terminated= multiprocessing.Array('i',[0]*len(type_tasks))
+        terminated= multiprocessing.Array('i', [0]*len(type_tasks))
 
         for i in range(0, len(type_tasks)):
             w = Worker(i, type_tasks[i], time_tasks[i], **kwargs)
@@ -173,18 +178,17 @@ class _TestScheduler(unittest.TestCase):
             self._workers[i].join()
 
     def _shutdown(self):
-        c = Client()
-        c.shutdown()
 
-        DBMgr.getInstance().commit()
+        with self._context('database', sync=True):
+            c = Client()
+            c.shutdown()
 
         self._sched.join()
 
     def _assertStatus(self, expectedStatus):
-        DBMgr.getInstance().sync()
-        status = self._smodule.getStatus()
-
-        self.assertEqual(status, expectedStatus)
+        with self._context('database'):
+            status = self._smodule.getStatus()
+            self.assertEqual(expectedStatus, status)
 
     def testSimpleFinish(self):
         """
@@ -239,9 +243,7 @@ class _TestScheduler(unittest.TestCase):
         self.assertEqual(self._checkWorkersFinished(10),
                          True)
 
-        c = Client()
-        c.shutdown()
-        DBMgr.getInstance().commit()
+        self._shutdown()
 
         self._sched.join()
 
@@ -252,12 +254,12 @@ class _TestScheduler(unittest.TestCase):
                             'finished': 2,
                             'failed': 0})
 
+        with self._context('database'):
+            c = Client()
+            t1 = c.getTask(0)
+            t2 = c.getTask(1)
 
-        t1 = c.getTask(0)
-        t2 = c.getTask(1)
-
-
-        self.assertEqual(t1.endedOn > t2.endedOn, True)
+            self.assertEqual(t1.endedOn > t2.endedOn, True)
 
     def testSeveralFailFinish(self):
         """
@@ -314,16 +316,16 @@ class _TestScheduler(unittest.TestCase):
 
         s = ((now.second / 10) + 1) % 6
 
-        seconds = [s*10]
+        seconds = [s * 10]
 
         # get intervals of 10 seconds
-        for i in range(0,2):
+        for i in range(0, 2):
             s = s + 1
             seconds.append((s % 6) * 10)
 
         self._startSomeWorkers([TestPeriodicTask] * 5,
                                [rrule.MINUTELY] * 5,
-                               bysecond = tuple(seconds))
+                               bysecond=tuple(seconds))
 
         # Not all workers will have finished
         self.assertEqual(self._checkWorkersFinished(100, value=3),
@@ -347,16 +349,16 @@ class _TestScheduler(unittest.TestCase):
 
         s = ((now.second / 10) + 1) % 6
 
-        seconds = [s*10]
+        seconds = [s * 10]
 
         # get intervals of 10 seconds
-        for i in range(0,3):
+        for i in range(0, 3):
             s = s + 1
             seconds.append((s % 6) * 10)
 
         self._startSomeWorkers([TestPeriodicFailTask],
                                [rrule.MINUTELY],
-                               bysecond = tuple(seconds))
+                               bysecond=tuple(seconds))
 
         # All workers will have finished
         self.assertEqual(self._checkWorkersFinished(60, value=4),
@@ -375,15 +377,10 @@ class _TestScheduler(unittest.TestCase):
  # some tasks running (test resume)
  # some tasks spooled (test resume)
 
-    def tearDown(self):
-
-        self._smodule.destroyDBInstance()
-        DBMgr.getInstance().endRequest()
-
 
 class TestProcessScheduler(_TestScheduler):
     _mode = 'processes'
 
 
-class TestThreadScheduler(_TestScheduler):
-    _mode = 'threads'
+#class TestThreadScheduler(_TestScheduler):
+#    _mode = 'threads'

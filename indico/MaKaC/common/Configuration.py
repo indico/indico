@@ -351,6 +351,84 @@ class Config:
             "simple_event":"lecture",
             "meeting":"standard" }
 
+    default_values = {
+        'DBConnectionParams'        : ("localhost", 9675),
+        'DBUserName'                : '',
+        'DBPassword'                : '',
+        'DBRealm'                   : '',
+        'SanitizationLevel'         : 1,
+        'BaseURL'                   : 'http://localhost/',
+        'BaseSecureURL'             : 'https://localhost/',
+        'LoginURL'                  : "",
+        'RegistrationURL'           : "",
+        'ShortEventTag'             : "/event/",
+        'ShortCategTag'             : "/categ/",
+        'ConfigurationDir'          : "/opt/indico/etc",
+        'DocumentationDir'          : "/opt/indico/doc",
+        'HtdocsDir'                 : "/opt/indico/htdocs",
+        'LogDir'                    : "/opt/indico/log" ,
+        'ArchiveDir'                : "/opt/indico/archive",
+        'BinDir'                    : "/opt/indico/bin",
+        'UploadedFilesTempDir'      : "/opt/indico/tmp",
+        'UploadedFilesSharedTempDir': "",
+        'XMLCacheDir'               : "/opt/indico/cache",
+        'SmtpServer'                : ('localhost', 25),
+        'SmtpLogin'                 : '',
+        'SmtpPassword'              : '',
+        'SmtpUseTLS'                : 'no',
+        'SupportEmail'              : 'root@localhost',
+        'PublicSupportEmail'        : 'root@localhost',
+        'NoReplyEmail'              : 'noreply-root@localhost',
+        'IndicoSearchServer'        : '',
+        'IndicoSearchClass'         : 'MaKaC.search.invenioSEA.InvenioSEA',
+        'FileConverter'             : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
+        'AuthenticatorList'         : ['Local'],
+        'NiceLogin'                 : '',
+        'NicePassword'              : '',
+        'CssStylesheetName'         : 'indico.css',
+        'PublicFolder'              : "/opt/indico/htdocs/results",
+        'ReportNumberSystems'       : {},
+        'OAILogFile'                : "/opt/indico/log/oai.log",
+        'NbRecordsInResume'         : 100,
+        'NbIdentifiersInResume'     : 100,
+        'OAIRtExpire'               : 90000,
+        'OAINamespace'              : '',
+        'IconfNamespace'            : "http://localhost/",
+        'IconfXSD'                  : "http://localhost/iconf.xsd",
+        'RepositoryName'            : '',
+        'RepositoryIdentifier'      : '',
+        'ApacheUser'                : 'nobody',
+        'ApacheGroup'               : 'nogroup',
+        'Profile'                   : 'no',
+        'UseXSendFile'              : 'no',
+        'AuthenticatedEnforceSecure': 'yes',
+
+        # Authentication
+        'LDAPConfig': {'host': 'myldapserver.example.com',
+                       'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
+                       'groupDNQuery': ('cn={0}',
+                                        'OU=Groups,DC=example,DC=com'),
+                       'membershipQuery': 'memberof={0}',
+                       'accessCredentials': ('CN=user,OU=Users,'
+                                             'DC=example,DC=com',
+                                             'secret_password')},
+        # Room Booking Related
+        'LightboxCssStylesheetName' : "lightbox/lightbox.css",
+        'LightboxJavascriptName'    : "lightbox/lightbox.js"
+        }
+
+    if sys.platform == 'win32':
+        default_values.update({
+            "ConfigurationDir"     : "C:\\indico\\etc",
+            "DocumentationDir"     : "C:\\indico\\doc",
+            "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\MaKaC",
+            "LogDir"               : "C:\\indico\\log",
+            "ArchiveDir"           : "C:\\indico\\archive",
+            "BinDir"               : "C:\\indico\\archive",
+            "UploadedFilesTempDir" : "C:\\indico\\temp",
+            "XMLCacheDir"          : "C:\\indico\\cache",
+                               })
+
     def __init__(self, filePath = None):
         self.filePath = filePath
         self.__readConfigFile()
@@ -376,7 +454,6 @@ class Config:
             if k in new_vals:
                 self._configVars[k] = new_vals[k]
 
-
     def __readConfigFile(self):
         """initializes configuration parameters (Search order: indico.conf, default_values)
 
@@ -387,94 +464,15 @@ class Config:
                 #### Indico will not see options that don't appear here ####
         """
 
-        default_values = {
-            'DBConnectionParams'        : ("localhost", 9675),
-            'DBUserName'                : '',
-            'DBPassword'                : '',
-            'DBRealm'                   : '',
-            'SanitizationLevel'         : 1,
-            'BaseURL'                   : 'http://localhost/',
-            'BaseSecureURL'             : 'https://localhost/',
-            'LoginURL'                  : "",
-            'RegistrationURL'           : "",
-            'ShortEventTag'             : "/event/",
-            'ShortCategTag'             : "/categ/",
-            'ConfigurationDir'          : "/opt/indico/etc",
-            'DocumentationDir'          : "/opt/indico/doc",
-            'HtdocsDir'                 : "/opt/indico/htdocs",
-            'LogDir'                    : "/opt/indico/log" ,
-            'ArchiveDir'                : "/opt/indico/archive",
-            'BinDir'                    : "/opt/indico/bin",
-            'UploadedFilesTempDir'      : "/opt/indico/tmp",
-            'UploadedFilesSharedTempDir': "",
-            'XMLCacheDir'               : "/opt/indico/cache",
-            'SmtpServer'                : 'localhost',
-            'SmtpLogin'                 : '',
-            'SmtpPassword'              : '',
-            'SmtpUseTLS'                : 'no',
-            'SupportEmail'              : 'root@localhost',
-            'PublicSupportEmail'        : 'root@localhost',
-            'NoReplyEmail'              : 'noreply-root@localhost',
-            'IndicoSearchServer'        : '',
-            'IndicoSearchClass'         : 'MaKaC.search.invenioSEA.InvenioSEA',
-            'FileConverter'             : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
-            'AuthenticatorList'         : ['Local'],
-            'NiceLogin'                 : '',
-            'NicePassword'              : '',
-            'CssStylesheetName'         : 'indico.css',
-            'PublicFolder'              : "/opt/indico/htdocs/results",
-            'ReportNumberSystems'       : {},
-            'OAILogFile'                : "/opt/indico/log/oai.log",
-            'NbRecordsInResume'         : 100,
-            'NbIdentifiersInResume'     : 100,
-            'OAIRtExpire'               : 90000,
-            'OAINamespace'              : '',
-            'IconfNamespace'            : "http://localhost/",
-            'IconfXSD'                  : "http://localhost/iconf.xsd",
-            'RepositoryName'            : '',
-            'RepositoryIdentifier'      : '',
-            'ApacheUser'                : 'nobody',
-            'ApacheGroup'               : 'nogroup',
-            'Profile'                   : 'no',
-            'UseXSendFile'              : 'no',
-            'AuthenticatedEnforceSecure': 'yes',
-
-            # Authentication
-            'LDAPConfig': {'host': 'myldapserver.example.com',
-                           'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
-                           'groupDNQuery': ('cn={0}',
-                                            'OU=Groups,DC=example,DC=com'),
-                           'membershipQuery': 'memberof={0}',
-                           'accessCredentials': ('CN=user,OU=Users,'
-                                                 'DC=example,DC=com',
-                                                 'secret_password')},
-            # Room Booking Related
-            'LightboxCssStylesheetName' : "lightbox/lightbox.css",
-            'LightboxJavascriptName'    : "lightbox/lightbox.js"
-            }
-
-        if sys.platform == 'win32':
-            default_values.update({
-                "ConfigurationDir"     : "C:\\indico\\etc",
-                "DocumentationDir"     : "C:\\indico\\doc",
-                "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\MaKaC",
-                "LogDir"               : "C:\\indico\\log",
-                "ArchiveDir"           : "C:\\indico\\archive",
-                "BinDir"               : "C:\\indico\\archive",
-                "UploadedFilesTempDir" : "C:\\indico\\temp",
-                "XMLCacheDir"          : "C:\\indico\\cache",
-                                   })
-
-
         self._configVars = {}
         declared_values = dir(MaKaCConfig)
 
         # When populating configuration variables indico.conf's values have priority
-        for k in default_values:
+        for k in self.default_values:
             if k in declared_values:
                 self._configVars[k] = MaKaCConfig.__getattribute__(k) # declared_values[k] doesn't work, don't ask me why
             else: # key is not declared in indico.conf, using its default value
-                self._configVars[k] = default_values[k]
+                self._configVars[k] = self.default_values[k]
 
 
         # Variables whose value is derived automatically
@@ -569,6 +567,9 @@ class Config:
 
     getInstance = classmethod( getInstance )
 
+    @classmethod
+    def setInstance(cls, instance):
+        cls.__instance = instance
 
     def getCurrentDBDir(self):
         """gives back the path of the directory where the current database

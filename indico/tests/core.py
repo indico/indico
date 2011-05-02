@@ -37,8 +37,9 @@ from MaKaC.common.Configuration import Config
 
 from indico.util.console import colored
 from indico.tests.config import TestConfig
+from indico.tests.base import TestOptionException, FakeMailThread
+
 from indico.tests.runners import *
-from indico.tests.base import TestOptionException
 
 TEST_RUNNERS = {'unit': UnitTestRunner,
                 'functional': FunctionalTestRunner,
@@ -93,11 +94,10 @@ class TestManager(object):
         """
         print colored("-- " + str(message), 'grey')
 
-    def main(self, fakeDBPolicy, testsToRun, options):
+    def main(self, testsToRun, options):
         """
         Runs the main test cycle, iterating over all the TestRunners available
 
-         * fakeDBPolicy - see startManageDB()
          * testsToRun - a list of strings specifying which tests to run
          * options - test options (such as verbosity...)
         """
@@ -106,99 +106,70 @@ class TestManager(object):
         print
         TestManager._title("Starting test framework\n")
 
-        #To not pollute the installation of Indico
-        self._configureTempFolders()
+        self._setFakeConfig()
 
-        self._startManageDB(fakeDBPolicy)
+        self._startSMTPServer()
+        self._startManageDB()
 
-        for test in testsToRun:
-            if test in TEST_RUNNERS:
-                try:
-                    result = TEST_RUNNERS[test](**options).run()
-                except TestOptionException, e:
-                    TestManager._error(e)
-            else:
-                print colored("[ERR] Test set '%s' does not exist. "
-                              "It has to be added in the TEST_RUNNERS variable\n",
-                              'red') % test
-
-        self._stopManageDB(fakeDBPolicy)
-
-        self._deleteTempFolders()
+        try:
+            for test in testsToRun:
+                if test in TEST_RUNNERS:
+                    try:
+                        result = TEST_RUNNERS[test](**options).run()
+                    except TestOptionException, e:
+                        TestManager._error(e)
+                else:
+                    print colored("[ERR] Test set '%s' does not exist. "
+                                  "It has to be added in the TEST_RUNNERS variable\n",
+                                  'red') % test
+        finally:
+            # whatever happens, clean this mess up
+            self._stopManageDB()
+            self._stopSMTPServer()
 
         if result:
             return 0
         else:
             return -1
 
-    def _configureTempFolders(self):
-        """
-        Creates temporary directories for the archive and uploaded files
-        """
+    def _setFakeConfig(self):
+        config = Config.getInstance()
+        config.updateValues(Config.default_values)
+        config.updateValues({
+            'SmtpServer': ('localhost', 8025),
+            'SmtpUseTLS': 'no',
+            'DBConnectionParams': ('localhost', 59675)
+            })
 
-        keyNames = [#'LogDir',
-                    'ArchiveDir',
-                    'UploadedFilesTempDir']
+        temp = tempfile.mkdtemp(prefix="indico_")
+        self._info('Using %s as temporary dir' % temp)
 
-        for key in keyNames:
-            self.tempDirs[key] = tempfile.mkdtemp()
+        config.updateValues({
+            'LogDir': os.path.join(temp, 'log'),
+            'XMLCacheDir': os.path.join(temp, 'cache'),
+            'ArchiveDir': os.path.join(temp, 'archive'),
+            'UploadedFilesTempDir': os.path.join(temp, 'tmp')
+            })
 
-        Config.getInstance().updateValues(self.tempDirs)
-
-    def _deleteTempFolders(self):
-        """
-        Deletes the temporary folders
-        """
-        for k in self.tempDirs:
-            shutil.rmtree(self.tempDirs[k])
+        Config.setInstance(config)
+        self._cfg = config
 
 ################## Start of DB Managing functions ##################
-    def _startManageDB(self, fakeDBPolicy):
-        """
-        Stops the production DB (if needed) and starts a temporary / fake DB
-
-        * fakeDBPolicy == 0, the tests to run do not need any DB
-        * fakeDBPolicy == 1, unit tests need a fake DB that can be run in parallel
-        with the production DB
-        * fakeDBPolicy == 2, production DB is not running and functional tests
-        need fake DB which is going to be run on production port.
-        fakeDBPolicy == 3, production DB is running, we need to stop it and
-        and start a fake DB on the production port. we will restart production DB
-        """
+    def _startManageDB(self):
 
         params = Config.getInstance().getDBConnectionParams()
+        port = TestConfig.getInstance().getFakeDBPort()
 
-        if fakeDBPolicy == 1:
-            self._info("Starting fake DB in non-standard port")
-            self._startFakeDB('localhost', TestConfig.getInstance().getFakeDBPort())
-            TestManager._createDummyUser()
-        elif fakeDBPolicy == 2:
-            self._info("Starting fake DB in standard port")
-            self._startFakeDB(params[0], params[1])
-            TestManager._createDummyUser()
-        elif fakeDBPolicy == 3:
-            self._info("Stopping production DB and" +
-                       " Starting fake DB in standard port")
-            TestManager._stopProductionDB()
-            self._startFakeDB(params[0], params[1])
-            TestManager._createDummyUser()
-        else:
-            self._info("No DB is needed")
+        self._info("Starting fake DB in port %s" % port)
+        self._startFakeDB('localhost', port)
+        TestManager._createDummyUser()
+        TestManager._setDebugMode()
 
-        if fakeDBPolicy > 0:
-            TestManager._setDebugMode()
-
-    def _stopManageDB(self, fakeDBPolicy):
+    def _stopManageDB(self):
         """
-        Stops the temporary DB and restarts the production DB if needed
+        Stops the temporary DB
         """
-        if fakeDBPolicy == 1 or fakeDBPolicy == 2:
-            self._stopFakeDB()
-            TestManager._restoreDBInstance()
-        elif fakeDBPolicy == 3:
-            self._stopFakeDB()
-            TestManager._startProductionDB()
-            TestManager._restoreDBInstance()
+        self._stopFakeDB()
 
     def _startFakeDB(self, zeoHost, zeoPort):
         """
@@ -219,46 +190,13 @@ class TestManager(object):
         Stops the temporary DB
         """
 
-        print colored("-- Stoppping test DB", "cyan")
+        print colored("-- Stopping test DB", "cyan")
 
         try:
             self.zeoServer.shutdown()
             self._removeDBFile()
         except OSError, e:
             print ("Problem terminating ZEO Server: " + str(e))
-
-    @staticmethod
-    def _restoreDBInstance():
-        """
-        Resets the DB instance in the DBMgr
-        """
-        DBMgr.setInstance(None)
-
-    @staticmethod
-    def _startProductionDB():
-        """
-        Starts the 'production' db (the one configured in indico.conf)
-        """
-        TestManager._info("Starting production DB")
-        try:
-            commands.getstatusoutput(TestConfig.getInstance().getStartDBCmd())
-        except KeyError:
-            print "[ERR] Not found in tests.conf: command to start production DB\n"
-            sys.exit(1)
-
-    @staticmethod
-    def _stopProductionDB():
-        """
-        Stops the 'production' DB
-        """
-        TestManager._info("Stopping production DB")
-        try:
-            TestManager._debug(
-                commands.getstatusoutput(
-                    TestConfig.getInstance().getStopDBCmd()))
-        except KeyError:
-            print "[ERR] Not found in tests.conf: command to stop production DB\n"
-            sys.exit(1)
 
     def _createNewDBFile(self):
         """
@@ -285,6 +223,15 @@ class TestManager(object):
         Removes the files of the temporary DB
         """
         shutil.rmtree(self.dbFolder)
+
+    @classmethod
+    def _startSMTPServer(cls):
+        cls._smtpd = FakeMailThread(('localhost', 8025))
+        cls._smtpd.start()
+
+    @classmethod
+    def _stopSMTPServer(cls):
+        cls._smtpd.close()
 
     @staticmethod
     def _createDBServer(dbFile, host, port):

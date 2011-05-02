@@ -28,15 +28,14 @@ from indico.ext.livesync.tasks import LiveSyncUpdateTask
 FAKE_SERVICE_PORT = 12380
 
 class LiveSync_Feature(IndicoTestFeature):
-    _requires = ['plugins.Plugins', 'util.ContextManager']
+    _requires = ['plugins.Plugins', 'util.ContextManager', 'db.Database']
 
     def start(self, obj):
         super(LiveSync_Feature, self).start(obj)
 
-        with obj._context('database'):
+        with obj._context('database') as conn:
             obj._ph.getPluginType('livesync').toggleActive()
-            db.updateDBStructures(obj._dbi._getConnObject().root._root,
-                                  granularity=1)
+            db.updateDBStructures(conn.root._root, granularity=1)
 
             obj._sm = SyncManager.getDBInstance()
 
@@ -47,13 +46,6 @@ class LiveSync_Feature(IndicoTestFeature):
 class _TestSynchronization(IndicoTestCase):
 
     _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
-
-    def setUp(self):
-        super(_TestSynchronization, self).setUp()
-
-    def tearDown(self):
-        super(_TestSynchronization, self).tearDown()
-        self._closeEnvironment()
 
     def _prettyActions(self, iter):
 
@@ -68,18 +60,14 @@ class _TestSynchronization(IndicoTestCase):
 
     def checkActions(self, fromTS, expected):
         res = self._prettyActions(
-            self._sm.getTrack().iterate(fromTS-1, func=(lambda x: x[1])))
+            self._sm.getTrack().iterate(fromTS - 1, func=(lambda x: x[1])))
 
-        self.assertEqual(res, expected)
+        self.assertEqual(expected, res)
 
 
-class _TestUpload(IndicoTestCase):
+class _TUpload(IndicoTestCase):
 
     _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
-
-    def tearDown(self):
-        super(_TestUpload, self).tearDown()
-        self._closeEnvironment()
 
     @contextlib.contextmanager
     def _generateTestResult(self):
@@ -101,15 +89,16 @@ class _TestUpload(IndicoTestCase):
             # execute code
             yield
 
-        time.sleep(1)
-
         fakeInvenio.start()
 
         # params won't be used
         task = LiveSyncUpdateTask(dateutil.rrule.MINUTELY)
 
+        time.sleep(3)
+
         try:
-            task.run()
+            with self._context('database'):
+                task.run()
         finally:
             fakeInvenio.shutdown()
             fakeInvenio.join()
@@ -148,4 +137,3 @@ class _TestUpload(IndicoTestCase):
             dict(('INDICO.%s' % nconf,
                   {'title': 'Test Conference %s' % nconf}) \
                  for nconf in range(0, 100)))
-

@@ -38,6 +38,13 @@ class DummyType(object):
     def __str__(self):
         return "<DT %s>" % self._value
 
+    def __cmp__(self, obj):
+        val = cmp(self._value, obj._value)
+        if val == 0:
+            return cmp(id(self), id(obj))
+        else:
+            return val
+
 
 class TestMultiPointerTrack(unittest.TestCase):
 
@@ -142,6 +149,9 @@ class TestMultiPointerTrack(unittest.TestCase):
 
 class TestSetMultiPointerTrack(unittest.TestCase):
 
+    def _val(self, iter):
+        return list(e._value for e in iter)
+
     def setUp(self):
         self._mpt = SetMultiPointerTrack()
         self._a = DummyType(1  + 2)
@@ -163,8 +173,8 @@ class TestSetMultiPointerTrack(unittest.TestCase):
         self._addSome()
 
         self.assertEqual(
-            list(e for ts, e in self._mpt),
-            [self._f, self._b, self._e, self._a, self._c, self._d])
+            list(e._value for ts, e in self._mpt),
+            [7, 3, 4, 2, 3, 3])
 
     def testPointerIterator(self):
         self._addSome()
@@ -172,23 +182,22 @@ class TestSetMultiPointerTrack(unittest.TestCase):
         self._mpt.addPointer("foo")
         self._mpt.addPointer("bar", 2)
 
-        self.assertEqual(list(self._mpt.pointerIterValues("foo")),
-                         [self._f, self._b, self._e, self._a, self._c, self._d])
+        self.assertEqual(self._val(self._mpt.pointerIterValues("foo")),
+                         [7, 3, 4, 2, 3, 3])
 
-        self.assertEqual(list(self._mpt.pointerIterValues("bar")),
-                         [self._f])
+        self.assertEqual(self._val(self._mpt.pointerIterValues("bar")),
+                         [7])
 
     def testPointerIteratorTill(self):
+        """
+        Iterate till a certain timestamp
+        """
         self._addSome()
 
         self._mpt.addPointer("foo")
-        self._mpt.addPointer("bar", 2 )
 
-        self.assertEqual(
-            list(self._mpt.pointerIterValues(
-                "foo",
-                till=2 )),
-            [self._b, self._e, self._a, self._c, self._d])
+        self.assertEqual(self._val(self._mpt.pointerIterValues("foo", till=2 )),
+                         [3, 4, 2, 3, 3])
 
 
 class TestSetMultiPointerTrackDB(unittest.TestCase):
