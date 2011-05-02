@@ -37,17 +37,19 @@ def getCommonTalkInformation(conference):
     talks = [cont for cont in conference.getContributionList() if filter.satisfies(cont)]
 
     #list of "locationName:roomName" strings
-    webcastCapableRooms = CollaborationTools.getOptionValue('WebcastRequest', "webcastCapableRooms")
+    webcastCapableRooms = CollaborationTools.getOptionValueRooms('WebcastRequest', "webcastCapableRooms")
+    wcRoomFullNames = [r.locationName + ':' + r.getFullName() for r in webcastCapableRooms]
+    wcRoomNames = [r.locationName + ':' + r.name for r in webcastCapableRooms]
 
     #a webcast-able talk is defined as a talk talking place in a webcast-able room
     webcastAbleTalks = []
     for t in talks:
         location = t.getLocation()
         room = t.getRoom()
-        if location and room and (location.getName() + ":" + room.getName() in webcastCapableRooms):
+        if location and room and (location.getName() + ":" + room.getName() in wcRoomNames):
             webcastAbleTalks.append(t)
 
-    return (talks, webcastCapableRooms, webcastAbleTalks)
+    return (talks, wcRoomFullNames, webcastAbleTalks)
 
 class WebcastRequestError(CSErrorBase): #already fossilizable
     fossilizes(IWebcastRequestErrorFossil)

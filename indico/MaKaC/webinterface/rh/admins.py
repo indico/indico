@@ -25,7 +25,7 @@ import MaKaC.user as user
 import MaKaC.common.info as info
 from MaKaC.errors import AdminError, MaKaCError, PluginError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
-from MaKaC.webinterface.rh.base import RHProtected
+from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
 from MaKaC.common.cache import CategoryCache, EventCache
 from MaKaC.plugins import PluginsHolder
 from MaKaC.i18n import _
@@ -351,7 +351,7 @@ class RHAddStyle(RHAdminBase):
         return p.display()
 
 #Plugin admin start
-class RHAdminPluginsBase(RHAdminBase):
+class RHAdminPluginsBase(RoomBookingDBMixin, RHAdminBase):
     """ Base RH class for all plugin management requests.
         It will store 2 string parameters: pluginType and pluginId.
         Example: pluginType = "COllaboration" & pluginId = "EVO"

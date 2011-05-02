@@ -22,6 +22,7 @@ from MaKaC.services.implementation.base import AdminService
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
+from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 
 class PluginOptionsBase (AdminService):
 
@@ -85,7 +86,7 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
 
         return True
 
-class PluginOptionsAddRooms ( PluginOptionsBase ):
+class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
 
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)

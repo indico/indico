@@ -28,6 +28,7 @@ from MaKaC.plugins import PluginsHolder, Plugin
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.webinterface.rh.admins import RCAdmin, RHAdminBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 
 class RCCollaborationAdmin(object):
     @staticmethod
@@ -185,7 +186,7 @@ class RHConfModifCSBase(RHConferenceModifBase):
             self._tabs.append('Managers')
 
 
-class RHConfModifCSBookings(RHConfModifCSBase):
+class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
     _uh = urlHandlers.UHConfModifCollaboration
 
     def _checkParams(self, params):

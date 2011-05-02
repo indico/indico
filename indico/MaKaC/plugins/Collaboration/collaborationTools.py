@@ -79,6 +79,15 @@ class CollaborationTools(object):
         return ph.getPluginType("Collaboration").getPlugin(pluginId).getOption(optionName).getValue()
 
     @classmethod
+    def getOptionValueRooms(cls, pluginId, optionName):
+        """ Returns the room list of an option with type 'rooms' of a plugin (plugins/Collaboration/XXXXX/options.py)
+            pluginName: a string with the name of the plugin
+            optionName: a string with the name of the option
+        """
+        ph = PluginsHolder()
+        return ph.getPluginType("Collaboration").getPlugin(pluginId).getOption(optionName).getRooms()
+
+    @classmethod
     def hasCollaborationOption(cls, optionName):
         return cls.getCollaborationPluginType().hasOption(optionName)
 

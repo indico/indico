@@ -47,7 +47,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["DisplayTalks"] = initialDisplay
         vars["InitialChoose"] = initialChoose
 
-        talks, webcastCapableRooms, webcastAbleTalks = getCommonTalkInformation(self._conf)
+        talks, wcRoomNames, webcastAbleTalks = getCommonTalkInformation(self._conf)
         nTalks = len(talks)
         nWebcastCapable = len(webcastAbleTalks)
 
@@ -55,14 +55,14 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["NTalks"] = nTalks
 
         #list of "locationName:roomName" strings
-        vars["WebcastCapableRooms"] = webcastCapableRooms
+        vars["WebcastCapableRooms"] = wcRoomNames
 
         vars["NWebcastCapableContributions"] = nWebcastCapable
 
         #we see if the event itself is webcast capable (depends on event's room)
         confLocation = self._conf.getLocation()
         confRoom = self._conf.getRoom()
-        if confLocation and confRoom and (confLocation.getName() + ":" + confRoom.getName() in webcastCapableRooms):
+        if confLocation and confRoom and (confLocation.getName() + ":" + confRoom.getName() in wcRoomNames):
             topLevelWebcastCapable = True
         else:
             topLevelWebcastCapable = False

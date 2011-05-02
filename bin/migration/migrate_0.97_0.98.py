@@ -268,7 +268,17 @@ def runLangToGB(dbi, withRBDB):
     for av in avatars:
         if av.getLang() == "en_US":
             av.setLang("en_GB")
-    dbi.commit()
+
+def runPluginOptionsRoomGUIDs(dbi, withRBDB):
+    ph = PluginsHolder()
+    opt = ph.getPluginType('Collaboration').getPlugin('WebcastRequest').getOption('webcastCapableRooms')
+    newValue = []
+    for name in opt.getValue():
+        loc, name = name.split(':')
+        room = CrossLocationQueries.getRooms(location=loc, roomName=name)
+        if room:
+            newValue.append(str(room.guid))
+    opt.setValue(newValue)
 
 def runMigration(withRBDB=False):
 

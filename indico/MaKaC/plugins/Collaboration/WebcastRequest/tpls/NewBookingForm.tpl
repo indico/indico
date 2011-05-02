@@ -23,7 +23,7 @@
                             % for roomName in WebcastCapableRooms:
                                 <tr>
                                     <td>
-                                        ${roomName.split(":")[0] }
+                                        ${roomName.split(":")[0] }:
                                     </td>
                                     <td>
                                         ${roomName.split(":")[1] }

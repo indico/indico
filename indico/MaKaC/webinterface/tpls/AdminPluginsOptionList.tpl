@@ -233,11 +233,12 @@
                                     }
                                 );
                             }
-                        var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {})
+                        var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {})
                         var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
                         addRoomButton.observeClick(
                             function(setResult){
                                 var selectedValue = roomChooser.select.get();
+                                var roomName = roomChooser.select.dom.options[roomChooser.select.dom.selectedIndex].innerHTML; // horrible..
                                 indicoRequest(
                                     'plugins.addRooms',
                                     {
@@ -245,28 +246,34 @@
                                      room: selectedValue
                                      },function(result,error) {
                                          if (!error) {
-                                             roomList.set(selectedValue,$O(selectedValue));
+                                             roomList.set(selectedValue, roomName);
                                          } else {
-                                                IndicoUtil.errorReport(error);
+                                             IndicoUtil.errorReport(error);
                                          }
                                     }
                                 );
                         });
-                        var roomList = new RoomListWidget('PeopleList',removeRoomHandler);
-                        //var temp = roomChooser.source.get()["CERN:1"];
-                        var roomSelectedBefore=${ option.getValue() }
-                        each (roomSelectedBefore,function(room){
-                            roomList.set(room, room);
+                        var roomList = new RoomListWidget('PeopleList', removeRoomHandler, true);
+                        <%
+                            rooms = {}
+                            for room in option.getRooms():
+                                rooms[str(room.guid)] = '%s: %s' % (room.locationName, room.getFullName())
+                        %>
+
+                        var roomSelectedBefore = ${ fossilize(rooms) };
+                        each (roomSelectedBefore,function(room, guid){
+                            roomList.set(guid, room);
                         });
                         $E('roomList').set(roomList.draw());
 
                         % if rbActive:
 
-                            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.list', {}, callback);
+                            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, callback);
                             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
                             addRoomButton.observeClick(
                                 function(setResult){
                                     var selectedValue = roomChooser.select.get();
+                                    var roomName = roomChooser.select.dom.options[roomChooser.select.dom.selectedIndex].innerHTML; // horrible..
                                     indicoRequest(
                                         'plugins.addRooms',
                                         {
@@ -274,9 +281,9 @@
                                          room: selectedValue
                                          },function(result,error) {
                                              if (!error) {
-                                                 roomList.set(selectedValue,$O(selectedValue));
+                                                 roomList.set(selectedValue, roomName);
                                              } else {
-                                                    IndicoUtil.errorReport(error);
+                                                 IndicoUtil.errorReport(error);
                                              }
                                         }
                                     );

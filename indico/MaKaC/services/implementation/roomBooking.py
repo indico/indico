@@ -38,6 +38,7 @@ from MaKaC.errors import NoReportError
 from MaKaC.webinterface.rh.roomBooking import RoomBookingAvailabilityParamsMixin
 import MaKaC.webinterface.linking as linking
 from MaKaC.common.fossilize import fossilize
+from MaKaC.rb_factory import Factory
 
 class RoomBookingListLocations( ServiceBase ):
 
@@ -134,11 +135,12 @@ class RoomBookingListLocationsAndRoomsWithGuids( ServiceBase ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         result = {}
         if minfo.getRoomBookingModuleActive():
-            for location in Location.allLocations:
-                roomEx = location.factory.newRoom()
+            locationNames = map(lambda l: l.friendlyName, Location.allLocations)
+            for loc in locationNames:
+                roomEx = Factory.newRoom()
                 roomEx.isActive = self._isActive
-                for room in CrossLocationQueries.getRooms(location=location.friendlyName, roomExample=roomEx):
-                    result[str(room.guid)] = "%s: %s" % (location.friendlyName, room.getFullName())
+                for room in CrossLocationQueries.getRooms( location = loc, roomExample=roomEx ):
+                    result[str(room.guid)] = "%s: %s" % (loc, room.getFullName())
         return result
 
 class GetBookingBase(object):
