@@ -513,13 +513,13 @@ class RHRegistrantPerformDataModification( RHRegistrantModifBase ):
         keys = pd.getMandatoryItems()
         for key in keys:
             if key not in params.keys() or params.get(key,"").strip() == "":
-                raise FormValuesError("The field \"%s\" is mandatory and you must fill it in order to modify the registrant"%(pd.getData()[key].getName()))
+                raise FormValuesError(_("The field \"%s\" is mandatory and you must fill it in order to modify the registrant")%(pd.getData()[key].getName()))
         self._cancel = params.has_key("cancel")
 
     def _process( self ):
         if not self._cancel:
-            if self._conf.hasRegistrantByEmail(self._getRequestParams().get("email",""), self._registrant):
-                raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%self._getRequestParams().get("email","--no email--"))
+            if self._getRequestParams().get("email","") != self._registrant.getEmail() and self._conf.hasRegistrantByEmail(self._getRequestParams().get("email","")):
+                raise FormValuesError(_("There is already a user with the email \"%s\". Please choose another one")%self._getRequestParams().get("email","--no email--"))
             self._registrant.setPersonalData(self._getRequestParams())
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 

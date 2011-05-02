@@ -18,10 +18,10 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""This file contain the definition of those classes which implement the root 
-access to the objects in the DB. The system will fetch and add objects to the 
-collections (or holders) through these classes that interact directly with the 
-persistence layer and do the necessary operations behind to ensure the 
+"""This file contain the definition of those classes which implement the root
+access to the objects in the DB. The system will fetch and add objects to the
+collections (or holders) through these classes that interact directly with the
+persistence layer and do the necessary operations behind to ensure the
 persistence.
 """
 from BTrees import OOBTree
@@ -32,22 +32,22 @@ from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 
 class ObjectHolder:
-    """This class provides a common entry point for accessing conferences and 
-       other objects of the business layer encapsulating the access to the DB 
+    """This class provides a common entry point for accessing conferences and
+       other objects of the business layer encapsulating the access to the DB
        so it's transparent for other objects to deal with it.
-       "Clients" will just instantiate this class and will retrieve the objects 
-       they are interested in through one of its methods. The object will have 
-       to manage to connect to the DB in the correct way and return the object 
+       "Clients" will just instantiate this class and will retrieve the objects
+       they are interested in through one of its methods. The object will have
+       to manage to connect to the DB in the correct way and return the object
        the client asks for.
-       This class is actually only a wrapper for the containers of objects, 
-       therefore it doesn't need to be persistent; it encapsulates the 
-       recovering and storing of those containers in the DB in a transparent 
+       This class is actually only a wrapper for the containers of objects,
+       therefore it doesn't need to be persistent; it encapsulates the
+       recovering and storing of those containers in the DB in a transparent
        way.
        Attributes:
         __allowedIdxs -- (List) Contains the names of the allowed indexes to be
             created in the DB
         idxName -- (string) Contains the name of the current index being wrapped
-        counterName -- (string) Name of the counter which will be used to 
+        counterName -- (string) Name of the counter which will be used to
             generate unique identifiers for the objects stored on the current
             index.
     """
@@ -61,7 +61,7 @@ class ObjectHolder:
     counterName = None
 
     def __init__(self):
-        """Class constructor. Gets an opened DB storage and initializes the 
+        """Class constructor. Gets an opened DB storage and initializes the
            DB connection so it's available for later requests.
         """
         self._idx = None
@@ -81,20 +81,20 @@ class ObjectHolder:
         """Returns a OOBTree object stored in the DB root under the key "name".
            If the key doesn't exist if creates a new tree and inserts it into the
            DB root.
-           BTree objects act as a dictionary but due to their data structure 
+           BTree objects act as a dictionary but due to their data structure
            properties allow to increase the concurrency (don't need to load all
            the mapping on memory) and improves performance.
             Params:
                 name -- key value of the requested tree
         """
         root = DBMgr.getInstance().getDBConnection().root()
-        name =  name.strip().lower()
+        name =  name.lower()
         if not (name in self.__allowedIdxs):
             raise Exception( _("index name not allowed %s")%name)
         if not root.has_key( name ):
             root[ name ] = OOBTree.OOBTree()
         return root[ name ]
-    
+
     def _newId( self ):
         """
         """
@@ -104,7 +104,7 @@ class ObjectHolder:
         if not idxs.has_key(self.counterName):
             idxs[self.counterName] = Counter()
         return idxs[self.counterName].newCount()
-    
+
     def getLastId(self):
         if self.counterName == None:
             raise Exception( _("counter name not set (%s)")%self.__class__.__name__)
@@ -112,7 +112,7 @@ class ObjectHolder:
         if not idxs.has_key(self.counterName):
             idxs[self.counterName] = Counter()
         return idxs[self.counterName]._getCount()
-    
+
     def add( self, newItem ):
         """adds an object to the index and assings it a new unique id.
         """
@@ -133,7 +133,7 @@ class ObjectHolder:
         if not tree.has_key( item.getId() ):
             return
         del tree[item.getId()]
-    
+
     def removeById( self, itemid ):
         """removes the specified object from the index.
         """
@@ -141,7 +141,7 @@ class ObjectHolder:
         if not tree.has_key( itemid ):
             return
         del tree[itemid]
-        
+
     def getById( self, id ):
         """returns an object from the index which id corresponds to the one
             which is specified.
@@ -155,7 +155,7 @@ class ObjectHolder:
         """returns a list of all the objects which are inserted in the index
         """
         return self._getIdx().values()
-    
+
     def getValuesToList( self ):
         l = []
         for i in self._getIdx().values():
@@ -165,7 +165,7 @@ class ObjectHolder:
 
 class IndexHolder( ObjectHolder ):
     """Specialised ObjectHolder class which provides a wrapper for collections
-        based in a Catalog for indexing the objects. It allows to index some 
+        based in a Catalog for indexing the objects. It allows to index some
         declared attributes of the stored objects and then perform SQL-like
         queries
     """
@@ -188,13 +188,13 @@ class IndexHolder( ObjectHolder ):
         #except KeyError, e:
         #    self._idx = Catalog( self.idxClass )
         #    shelf.add_catalog(self._idx)
-    
+
     def add( self, newItem):
         #XXX: this makes the perfomance decrease dramatically. Operations like
-        #   this should be avoided and the clients should now take care of 
+        #   this should be avoided and the clients should now take care of
         #   not inserting the same user twice
         #if newItem in self.getList():
-        #    return 
+        #    return
         if newItem.getId() != None and  newItem.getId() != "":
             raise MaKaCError( _("Object %s has already an id it is probably already inserted in the holder %s")%(newItem, self.__class__))
         id = self._newId()
@@ -212,10 +212,10 @@ class IndexHolder( ObjectHolder ):
 
     def getList( self ):
         return self._getIdx().dump()
-    
+
     def hasKey( self, id ):
         #XXX: verify how to implement it
         return False
-    
+
 
 

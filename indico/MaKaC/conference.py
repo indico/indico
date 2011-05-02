@@ -4569,6 +4569,21 @@ class Conference(CommonObjectBase, Locatable):
             self.notifyModification()
         return self._registrants
 
+    def getRegistrantsByEmail(self):
+        try:
+            if self._registrantsByEmail:
+                pass
+        except AttributeError, e:
+            self._registrantsByEmail = self._createRegistrantsByEmail()
+            self.notifyModification()
+        return self._registrantsByEmail
+
+    def _createRegistrantsByEmail(self):
+        dicByEmail = {}
+        for r in self.getRegistrantsList():
+            dicByEmail[r.getEmail()] = r
+        return dicByEmail
+
     def getRegistrantsList(self, sort = False):
         rl = self.getRegistrants().values()
         if sort:
@@ -4588,24 +4603,26 @@ class Conference(CommonObjectBase, Locatable):
         self.getRegistrants()[rp.getId()] = rp
         self.notifyModification()
 
+    def updateRegistrantIndexByEmail(self, rp, newEmail):
+        oldEmail = rp.getEmail()
+        if oldEmail != newEmail:
+            if self.getRegistrantsByEmail().has_key(oldEmail):
+                del self.getRegistrantsByEmail()[oldEmail]
+            self.getRegistrantsByEmail()[newEmail] = rp
+            self.notifyModification()
+
     def hasRegistrant(self,rp):
         return rp.getConference()==self and \
                 self.getRegistrants().has_key(rp.getId())
 
-    def hasRegistrantByEmail(self, email, registrant=None):
-        # Return true if there is someone with the email of the param "email" but
-        # the email has to be different to the one of the "registrant" (just in case we
-        # try to modify the data of the registrant)
-        for r in self.getRegistrantsList():
-            if r.getEmail().strip().lower() == email.strip().lower():
-                if registrant is not None and registrant.getEmail().strip().lower() == email.strip().lower():
-                    continue
-                return True
-        return False
+    def hasRegistrantByEmail(self, email):
+        # Return true if there is someone with the email of the param "email"
+        return self.getRegistrantsByEmail().has_key(email)
 
     def removeRegistrant(self, id):
         part = self.getRegistrants()[id]
         self._registrationForm.notifyRegistrantRemoval(self.getRegistrants()[id])
+        del self.getRegistrantsByEmail()[self.getRegistrantById(id).getEmail()]
         del self.getRegistrants()[id]
         if part.getAvatar() is not None:
             part.getAvatar().removeRegistrant(part)

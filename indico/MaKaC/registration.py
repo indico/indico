@@ -4146,6 +4146,9 @@ class Registrant(Persistent):
         return self.getTotal()>0 and not self.getPayed()
 
     def setPersonalData(self, data):
+
+        self.getConference().updateRegistrantIndexByEmail(self, data.get("email",""))
+
         self.setTitle(data.get("title",""))
         self.setFirstName(data.get("firstName",""))
         self.setSurName(data.get("surname",""))

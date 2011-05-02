@@ -280,6 +280,9 @@ class RHRegistrationFormPerformModify( RHRegistrationFormCreation ):
                 return p.display()
             else:
                 rp = self._getUser().getRegistrantById(self._conf.getId())
+                # check if the email is being changed by another one that already exists
+                if self._getRequestParams().get("email","") != rp.getEmail() and self._conf.hasRegistrantByEmail(self._getRequestParams().get("email","")):
+                    raise FormValuesError(_("There is already a user with the email \"%s\". Please choose another one")%self._getRequestParams().get("email","--no email--"))
                 rp.setValues(self._getRequestParams(), self._getUser())
                 # avoid multiple sending in case of db conflict
                 if not hasattr(self, "_emailSent"):
