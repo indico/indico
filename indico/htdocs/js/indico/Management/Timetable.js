@@ -65,7 +65,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                          hook.set(true);
                      } else if (state == SourceState.Error) {
                          killProgress();
-                         IndicoUtil.errorReport(source.error);
+                         IndicoUtil.errorReport(source.error.get());
                      }
                  });
              }
