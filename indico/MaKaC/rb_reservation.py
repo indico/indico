@@ -1152,7 +1152,7 @@ class ReservationBase( object ):
             raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
         if not user:
             return False
-        can = user.isAdmin() or \
+        can = user.isRBAdmin() or \
             self.isOwnedBy( user ) or \
             self.room.isOwnedBy( user )
         return can
@@ -1161,19 +1161,19 @@ class ReservationBase( object ):
         """ Owner can cancel """
         if user == None:
             return False
-        return self.isOwnedBy( user ) or user.isAdmin()
+        return self.isOwnedBy( user ) or user.isRBAdmin()
 
     def canReject( self, user ):
         """ Responsible can reject """
         if user == None:
             return False
-        return self.room.isOwnedBy( user ) or user.isAdmin()
+        return self.room.isOwnedBy( user ) or user.isRBAdmin()
 
     def canDelete( self, user ):
         """ Only admin can delete """
         if user == None:
             return False
-        return user.isAdmin()
+        return user.isRBAdmin()
 
     def isOwnedBy( self, avatar ):
         """

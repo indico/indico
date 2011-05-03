@@ -627,7 +627,7 @@ class RHRoomBookingAdminBase( RHRoomBookingBase ):
     def _checkProtection( self ):
         if self._getUser() == None:
             self._checkSessionUser()
-        elif not self._getUser().isAdmin():
+        elif not self._getUser().isRBAdmin():
             raise MaKaCError( "You are not authorized to take this action." )
 
 class RHRoomBookingWelcome( RHRoomBookingBase ):
@@ -863,7 +863,7 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
         if params.get( 'isAutoConfirmed' ) == "on": self._isAutoConfirmed = True
 
         # only admins can choose to consult non-active rooms
-        if self._getUser() and self._getUser().isAdmin() and params.get( 'isActive', None ) != "on":
+        if self._getUser() and self._getUser().isRBAdmin() and params.get( 'isActive', None ) != "on":
             self._isActive = None
 
         self._onlyMy = params.get( 'onlyMy' ) == "on"
@@ -1259,7 +1259,7 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
         # only do the remaining checks the rest if the basic ones were successful
         # (i.e. user is logged in)
         if self._doProcess:
-            if not self._candResv.room.isActive and not self._getUser().isAdmin():
+            if not self._candResv.room.isActive and not self._getUser().isRBAdmin():
                 raise FormValuesError( "You are not authorized to book this room." )
 
             if not self._candResv.room.canBook( self._getUser() ) and not self._candResv.room.canPrebook( self._getUser() ):
@@ -1400,7 +1400,7 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
             self._doProcess = False
         else:
             RHRoomBookingBase._checkProtection(self)
-            if not self._candResv.room.isActive and not self._getUser().isAdmin():
+            if not self._candResv.room.isActive and not self._getUser().isRBAdmin():
                 raise MaKaCError( "You are not authorized to book this room." )
 
             if self._formMode == FormMode.MODIF:
@@ -1740,7 +1740,7 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
         # Only owner (the one who created) and admin can CANCEL
         # (Responsible can not cancel a booking!)
         if ( not self._resv.isOwnedBy( user ) ) and \
-            ( not self._getUser().isAdmin() ):
+            ( not self._getUser().isRBAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
@@ -1779,7 +1779,7 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
         user = self._getUser()
         # Only user/admin can cancell a booking occurrence
         # (Owner can not reject his own booking, he should cancel instead)
-        if self._resv.createdBy != user.getId() and (not user.isAdmin()):
+        if self._resv.createdBy != user.getId() and (not user.isRBAdmin()):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
@@ -1818,7 +1818,7 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
         # Only responsible and admin can REJECT
         # (Owner can not reject his own booking, he should cancel instead)
         if ( not self._resv.room.isOwnedBy( user ) ) and \
-            ( not self._getUser().isAdmin() ):
+            ( not self._getUser().isRBAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
@@ -1852,7 +1852,7 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
         # Only responsible and admin can REJECT
         # (Owner can not reject his own booking, he should cancel instead)
         if ( not user.getRooms() ) and \
-            ( not self._getUser().isAdmin() ):
+            ( not self._getUser().isRBAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
@@ -1906,7 +1906,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             user = self._getUser()
             # Only responsible and admin can ACCEPT
             if ( not self._resv.room.isOwnedBy( user ) ) and \
-                ( not self._getUser().isAdmin() ):
+                ( not self._getUser().isRBAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):
@@ -2191,7 +2191,7 @@ class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
         # Only responsible and admin can REJECT
         # (Owner can not reject his own booking, he should cancel instead)
         if ( not self._resv.room.isOwnedBy( user ) ) and \
-            ( not self._getUser().isAdmin() ):
+            ( not self._getUser().isRBAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
     def _process( self ):

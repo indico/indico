@@ -523,7 +523,7 @@ class RoomBase( object ):
             return False
 
         if (self.isOwnedBy( user ) and self.isActive) \
-               or user.isAdmin():
+               or user.isRBAdmin():
             return True
         return False
 
@@ -543,7 +543,7 @@ class RoomBase( object ):
         if user == None:
             return False
         if (self.isOwnedBy( user ) and self.isActive) \
-               or user.isAdmin():
+               or user.isRBAdmin():
             return True
         return False
 
@@ -556,11 +556,11 @@ class RoomBase( object ):
             return False
         if isinstance( accessWrapper, AccessWrapper ):
             if accessWrapper.getUser():
-                return accessWrapper.getUser().isAdmin()
+                return accessWrapper.getUser().isRBAdmin()
             else:
                 return False
         elif isinstance( accessWrapper, Avatar ):
-            return accessWrapper.isAdmin()
+            return accessWrapper.isRBAdmin()
 
         raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
 

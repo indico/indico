@@ -53,6 +53,7 @@ import urllib
 import base64
 from xml.dom.minidom import parseString
 from copy import deepcopy
+from MaKaC.plugins.base import PluginsHolder
 
 """Contains the classes that implement the user management subsystem
 """
@@ -1320,6 +1321,19 @@ class Avatar(Persistent, Fossilizable):
         al = AdminList.getInstance()
         if al.isAdmin( self ):
             return True
+        return False
+
+    def isRBAdmin(self):
+        """
+        Convenience method for checking whether this user is an admin for the RB module.
+        Returns bool.
+        """
+        if self.isAdmin():
+            return True
+        for entity in PluginsHolder().getPluginType('RoomBooking').getOption('Managers').getValue():
+            if (isinstance(entity, Group) and entity.containsUser(self)) or \
+                (isinstance(entity, Avatar) and entity == self):
+                return True
         return False
 
     def getRooms( self ):

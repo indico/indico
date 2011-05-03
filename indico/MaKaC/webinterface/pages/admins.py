@@ -136,7 +136,10 @@ class WPAdminsBase( WPMainBase ):
         self._createTabCtrl()
         self._setActiveTab()
 
-        frame = WAdminFrame()
+        if self._rh._getUser().isAdmin():
+            frame = WAdminFrame()
+        else:
+            frame = WRBAdminFrame()
         p = { "body": self._getPageContent( params ),
               "sideMenu": self._sideMenu.getHTML() }
 
@@ -231,6 +234,9 @@ class WAdminFrame(wcomponents.WTemplated):
 
     def getTitleTabPixels( self ):
         return 260
+
+class WRBAdminFrame(WAdminFrame):
+    pass
 
 class WPAdmins( WPAdminsBase ):
 
@@ -2112,14 +2118,23 @@ class WPRoomsBase( WPAdminsBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
-                urlHandlers.UHRoomBookingPluginAdmin.getURL() )
-        self._subTabMain = self._subTabRoomBooking.newSubTab( "main", _("Main"), \
-                urlHandlers.UHRoomBookingPluginAdmin.getURL() )
+        if self._rh._getUser().isAdmin():
+            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
+                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
+            self._subTabMain = self._subTabRoomBooking.newSubTab( "main", _("Main"), \
+                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
+        else:
+            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
+                    urlHandlers.UHRoomBookingAdmin.getURL() )
         self._subTabConfig = self._subTabRoomBooking.newSubTab( "configuration", _("Configuration"), \
                 urlHandlers.UHRoomBookingAdmin.getURL() )
         self._subTabRoomMappers = self._tabCtrl.newTab( "mappers", _("Room Mappers"), \
                 urlHandlers.UHRoomMappers.getURL() )
+
+    def _getNavigationDrawer(self):
+        if self._rh._getUser().isAdmin():
+            return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingPluginAdmin.getURL, bgColor="white")
+        return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingAdmin.getURL, bgColor="white")
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
@@ -2452,6 +2467,9 @@ class WPRoomBookingPluginAdminBase( WPRoomsBase ):
 
     def _setActiveTab( self ):
         self._subTabRoomBooking.setActive()
+
+    def _getSiteArea(self):
+        return 'Room Booking Administration'
 
 class WPRoomBookingPluginAdmin( WPRoomBookingPluginAdminBase ):
 

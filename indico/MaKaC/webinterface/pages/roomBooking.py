@@ -143,6 +143,11 @@ class WPRoomBookingBase( WPMainBase ):
         self._usersPrebookings = wcomponents.SideMenuItem(_("PRE-bookings in my rooms"),
                                         urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, onlyPrebookings = True, autoCriteria = True ),
                                         enabled=self._showResponsible)
+        if self._rh._getUser().isRBAdmin():
+            self._adminSect = wcomponents.SideMenuSection(_("Administration"), \
+                                            urlHandlers.UHRoomBookingAdmin.getURL() )
+            self._adminOpt = wcomponents.SideMenuItem(_("Administration"), \
+                                            urlHandlers.UHRoomBookingAdmin.getURL() )
 
 
         self._leftMenu.addSection( self._roomsOpt )
@@ -158,6 +163,8 @@ class WPRoomBookingBase( WPMainBase ):
         self._bookingsOpt.addItem( self._myPreBookingListOpt )
         self._bookingsOpt.addItem( self._usersBookings )
         self._bookingsOpt.addItem( self._usersPrebookings )
+        self._leftMenu.addSection( self._adminSect )
+        self._adminSect.addItem( self._adminOpt )
         return self._leftMenu
 
     def _isRoomBooking(self):

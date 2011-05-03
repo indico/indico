@@ -72,5 +72,14 @@ globalOptions = [
         "note": _emailReplacerNote}),
     ("notificationBefore", {"description" : _("Trigger start notifications X minutes before the booking starts. Changes will not affect existing bookings"),
                            "type": int,
-                           "defaultValue": 0} )
-]
+                           "defaultValue": 0} ),
+    ( "Managers", {"description": "Users and Groups authorised to administrate/manage the roombooking module (create/delete/edit all rooms/bookings)",
+                                  "type": 'usersGroups',
+                                  "defaultValue": [],
+                                  "editable": True,
+                                  "visible": True}),
+    ( "AuthorisedUsersGroups", {"description": "Users and Groups authorised for roombooking module",
+                                "type": 'usersGroups',
+                                "defaultValue": [],
+                                "editable": True,
+                                "visible": True})]
