@@ -837,7 +837,7 @@ class PluginType (PluginBase):
             # ignore test modules
             if type(obj) == types.ModuleType and \
                    obj.__name__.startswith(module.__name__) and \
-                   obj.__name__.split('.')[-1] != 'test':
+                   obj.__name__.split('.')[-1] != 'tests':
                     accum += [obj]
                     accum += self._getAllSubmodules(obj)
 
