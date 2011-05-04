@@ -59,6 +59,7 @@ class LiveSyncUpdateTask(PeriodicTask):
             if result:
                 logger.info("Acknowledged successful operation")
                 agent.acknowledge()
+                dbi.commit()
             else:
                 logger.info("'Acknowledge' not done - no records?")
             logger.info("Agent '%s' finished" % agtName)
