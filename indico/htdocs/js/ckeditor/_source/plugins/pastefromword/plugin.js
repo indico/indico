@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 (function()
@@ -12,9 +12,10 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 			// Flag indicate this command is actually been asked instead of a generic
 			// pasting.
 			var forceFromWord = 0;
-			var resetFromWord = function()
+			var resetFromWord = function( evt )
 				{
-					setTimeout( function() { forceFromWord = 0; }, 0 );
+					evt && evt.removeListener();
+					forceFromWord && setTimeout( function() { forceFromWord = 0; }, 0 );
 				};
 
 			// Features bring by this command beside the normal process:
@@ -29,12 +30,19 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					forceFromWord = 1;
 					if ( editor.execCommand( 'paste' ) === false )
 					{
-						editor.on( 'dialogHide', function ( evt )
-							{
-								evt.removeListener();
-								resetFromWord();
-							});
+						editor.on( 'dialogShow', function ( evt )
+						{
+							evt.removeListener();
+							evt.data.on( 'cancel', resetFromWord );
+						});
+
+						editor.on( 'dialogHide', function( evt )
+						{
+							evt.data.removeListener( 'cancel', resetFromWord );
+						} );
 					}
+
+					editor.on( 'afterPaste', resetFromWord );
 				}
 			});
 
@@ -43,6 +51,11 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				{
 					label : editor.lang.pastefromword.toolbar,
 					command : 'pastefromword'
+				});
+
+			editor.on( 'pasteState', function( evt )
+				{
+					editor.getCommand( 'pastefromword' ).setState( evt.data );
 				});
 
 			editor.on( 'paste', function( evt )
@@ -87,11 +100,13 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 						|| ( this.path + 'filter/default.js' ) );
 
 				// Load with busy indicator.
-				CKEDITOR.scriptLoader.load( filterFilePath, callback, null, false, true );
+				CKEDITOR.scriptLoader.load( filterFilePath, callback, null, true );
 			}
 
 			return !isLoaded;
-		}
+		},
+
+		requires : [ 'clipboard' ]
 	});
 })();
 

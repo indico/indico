@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -56,6 +56,7 @@ CKEDITOR.lang['en'] =
 	superscript		: 'Superscript',
 	horizontalrule	: 'Insert Horizontal Line',
 	pagebreak		: 'Insert Page Break for Printing',
+	pagebreakAlt		: 'Page Break',
 	unlink			: 'Unlink',
 	undo			: 'Undo',
 	redo			: 'Redo',
@@ -105,6 +106,21 @@ CKEDITOR.lang['en'] =
 		targetTop		: 'Topmost Window (_top)',
 		targetSelf		: 'Same Window (_self)',
 		targetParent	: 'Parent Window (_parent)',
+		langDirLTR		: 'Left to Right (LTR)',
+		langDirRTL		: 'Right to Left (RTL)',
+		styles			: 'Style',
+		cssClasses		: 'Stylesheet Classes',
+		width			: 'Width',
+		height			: 'Height',
+		align			: 'Alignment',
+		alignLeft		: 'Left',
+		alignRight		: 'Right',
+		alignCenter		: 'Center',
+		alignTop		: 'Top',
+		alignMiddle		: 'Middle',
+		alignBottom		: 'Bottom',
+		invalidHeight	: 'Height must be a number.',
+		invalidWidth	: 'Width must be a number.',
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, unavailable</span>'
@@ -151,9 +167,7 @@ CKEDITOR.lang['en'] =
 		popupFullScreen	: 'Full Screen (IE)',
 		popupScrollBars	: 'Scroll Bars',
 		popupDependent	: 'Dependent (Netscape)',
-		popupWidth		: 'Width',
 		popupLeft		: 'Left Position',
-		popupHeight		: 'Height',
 		popupTop		: 'Top Position',
 		id				: 'Id',
 		langDir			: 'Language Direction',
@@ -161,18 +175,19 @@ CKEDITOR.lang['en'] =
 		langDirRTL		: 'Right to Left (RTL)',
 		acccessKey		: 'Access Key',
 		name			: 'Name',
-		langCode		: 'Language Code',
-		tabIndex		: 'Tab Index',
-		advisoryTitle	: 'Advisory Title',
+		langCode			: 'Language Code',
+		tabIndex			: 'Tab Index',
+		advisoryTitle		: 'Advisory Title',
 		advisoryContentType	: 'Advisory Content Type',
 		cssClasses		: 'Stylesheet Classes',
 		charset			: 'Linked Resource Charset',
 		styles			: 'Style',
-		selectAnchor	: 'Select an Anchor',
+		rel			: 'Relationship',
+		selectAnchor		: 'Select an Anchor',
 		anchorName		: 'By Anchor Name',
-		anchorId		: 'By Element Id',
-		emailAddress	: 'E-Mail Address',
-		emailSubject	: 'Message Subject',
+		anchorId			: 'By Element Id',
+		emailAddress		: 'E-Mail Address',
+		emailSubject		: 'Message Subject',
 		emailBody		: 'Message Body',
 		noAnchors		: '(No anchors available in the document)',
 		noUrl			: 'Please type the link URL',
@@ -187,6 +202,30 @@ CKEDITOR.lang['en'] =
 		title		: 'Anchor Properties',
 		name		: 'Anchor Name',
 		errorName	: 'Please type the anchor name'
+	},
+
+	// List style dialog
+	list:
+	{
+		numberedTitle		: 'Numbered List Properties',
+		bulletedTitle		: 'Bulleted List Properties',
+		type				: 'Type',
+		start				: 'Start',
+		validateStartNumber				:'List start number must be a whole number.',
+		circle				: 'Circle',
+		disc				: 'Disc',
+		square				: 'Square',
+		none				: 'None',
+		notset				: '<not set>',
+		armenian			: 'Armenian numbering',
+		georgian			: 'Georgian numbering (an, ban, gan, etc.)',
+		lowerRoman			: 'Lower Roman (i, ii, iii, iv, v, etc.)',
+		upperRoman			: 'Upper Roman (I, II, III, IV, V, etc.)',
+		lowerAlpha			: 'Lower Alpha (a, b, c, d, e, etc.)',
+		upperAlpha			: 'Upper Alpha (A, B, C, D, E, etc.)',
+		lowerGreek			: 'Lower Greek (alpha, beta, gamma, etc.)',
+		decimal				: 'Decimal (1, 2, 3, etc.)',
+		decimalLeadingZero	: 'Decimal leading zero (01, 02, 03, etc.)'
 	},
 
 	// Find And Replace Dialog
@@ -215,15 +254,9 @@ CKEDITOR.lang['en'] =
 		rows		: 'Rows',
 		columns		: 'Columns',
 		border		: 'Border size',
-		align		: 'Alignment',
-		alignLeft	: 'Left',
-		alignCenter	: 'Center',
-		alignRight	: 'Right',
-		width		: 'Width',
 		widthPx		: 'pixels',
 		widthPc		: 'percent',
 		widthUnit	: 'width unit',
-		height		: 'Height',
 		cellSpace	: 'Cell spacing',
 		cellPad		: 'Cell padding',
 		caption		: 'Caption',
@@ -259,9 +292,6 @@ CKEDITOR.lang['en'] =
 			wordWrap		: 'Word Wrap',
 			hAlign			: 'Horizontal Alignment',
 			vAlign			: 'Vertical Alignment',
-			alignTop		: 'Top',
-			alignMiddle		: 'Middle',
-			alignBottom		: 'Bottom',
 			alignBaseline	: 'Baseline',
 			bgColor			: 'Background Color',
 			borderColor		: 'Border Color',
@@ -382,24 +412,17 @@ CKEDITOR.lang['en'] =
 		btnUpload	: 'Send it to the Server',
 		upload		: 'Upload',
 		alt			: 'Alternative Text',
-		width		: 'Width',
-		height		: 'Height',
 		lockRatio	: 'Lock Ratio',
 		unlockRatio	: 'Unlock Ratio',
 		resetSize	: 'Reset Size',
 		border		: 'Border',
 		hSpace		: 'HSpace',
 		vSpace		: 'VSpace',
-		align		: 'Align',
-		alignLeft	: 'Left',
-		alignRight	: 'Right',
 		alertUrl	: 'Please type the image URL',
 		linkTab		: 'Link',
 		button2Img	: 'Do you want to transform the selected image button on a simple image?',
 		img2Button	: 'Do you want to transform the selected image on a image button?',
 		urlMissing	: 'Image source URL is missing.',
-		validateWidth	: 'Width must be a whole number.',
-		validateHeight	: 'Height must be a whole number.',
 		validateBorder	: 'Border must be a whole number.',
 		validateHSpace	: 'HSpace must be a whole number.',
 		validateVSpace	: 'VSpace must be a whole number.'
@@ -423,16 +446,10 @@ CKEDITOR.lang['en'] =
 		accessAlways	: 'Always',
 		accessSameDomain: 'Same domain',
 		accessNever		: 'Never',
-		align			: 'Align',
-		alignLeft		: 'Left',
 		alignAbsBottom	: 'Abs Bottom',
 		alignAbsMiddle	: 'Abs Middle',
 		alignBaseline	: 'Baseline',
-		alignBottom		: 'Bottom',
-		alignMiddle		: 'Middle',
-		alignRight		: 'Right',
 		alignTextTop	: 'Text Top',
-		alignTop		: 'Top',
 		quality			: 'Quality',
 		qualityBest		: 'Best',
 		qualityHigh		: 'High',
@@ -446,13 +463,9 @@ CKEDITOR.lang['en'] =
 		windowMode		: 'Window mode',
 		flashvars		: 'Variables for Flash',
 		bgcolor			: 'Background color',
-		width			: 'Width',
-		height			: 'Height',
 		hSpace			: 'HSpace',
 		vSpace			: 'VSpace',
 		validateSrc		: 'URL must not be empty.',
-		validateWidth	: 'Width must be a number.',
-		validateHeight	: 'Height must be a number.',
 		validateHSpace	: 'HSpace must be a number.',
 		validateVSpace	: 'VSpace must be a number.'
 	},
@@ -500,10 +513,10 @@ CKEDITOR.lang['en'] =
 
 	justify :
 	{
-		left	: 'Left Justify',
-		center	: 'Center Justify',
-		right	: 'Right Justify',
-		block	: 'Block Justify'
+		left	: 'Align Left',
+		center	: 'Center',
+		right	: 'Align Right',
+		block	: 'Justify'
 	},
 
 	blockquote : 'Block Quote',
@@ -587,6 +600,15 @@ CKEDITOR.lang['en'] =
 		remove				: 'Remove Div'
   	},
 
+	iframe :
+	{
+		title		: 'IFrame Properties',
+		toolbar		: 'IFrame',
+		noUrl		: 'Please type the iframe URL',
+		scrolling	: 'Enable scrollbars',
+		border		: 'Show frame border'
+	},
+
 	font :
 	{
 		label		: 'Font',
@@ -619,7 +641,7 @@ CKEDITOR.lang['en'] =
 		'008080' : 'Teal',
 		'000080' : 'Navy',
 		'4B0082' : 'Indigo',
-		'696969' : 'Dim Gray',
+		'696969' : 'Dark Gray',
 		'B22222' : 'Fire Brick',
 		'A52A2A' : 'Brown',
 		'DAA520' : 'Golden Rod',
@@ -635,7 +657,7 @@ CKEDITOR.lang['en'] =
 		'0FF' : 'Cyan',
 		'00F' : 'Blue',
 		'EE82EE' : 'Violet',
-		'A9A9A9' : 'Dark Gray',
+		'A9A9A9' : 'Dim Gray',
 		'FFA07A' : 'Light Salmon',
 		'FFA500' : 'Orange',
 		'FFFF00' : 'Yellow',
@@ -657,6 +679,7 @@ CKEDITOR.lang['en'] =
 	scayt :
 	{
 		title			: 'Spell Check As You Type',
+		opera_title		: 'Not supported by Opera',
 		enable			: 'Enable SCAYT',
 		disable			: 'Disable SCAYT',
 		about			: 'About SCAYT',
@@ -668,9 +691,23 @@ CKEDITOR.lang['en'] =
 		ignoreAll		: 'Ignore All',
 		addWord			: 'Add Word',
 		emptyDic		: 'Dictionary name should not be empty.',
+
 		optionsTab		: 'Options',
+		allCaps			: 'Ignore All-Caps Words',
+		ignoreDomainNames : 'Ignore Domain Names',
+		mixedCase		: 'Ignore Words with Mixed Case',
+		mixedWithDigits	: 'Ignore Words with Numbers',
+
 		languagesTab	: 'Languages',
+
 		dictionariesTab	: 'Dictionaries',
+		dic_field_name	: 'Dictionary name',
+		dic_create		: 'Create',
+		dic_restore		: 'Restore',
+		dic_delete		: 'Delete',
+		dic_rename		: 'Rename',
+		dic_info		: 'Initially the User Dictionary is stored in a Cookie. However, Cookies are limited in size. When the User Dictionary grows to a point where it cannot be stored in a Cookie, then the dictionary may be stored on our server. To store your personal dictionary on our server you should specify a name for your dictionary. If you already have a stored dictionary, please type its name and click the Restore button.',
+
 		aboutTab		: 'About'
 	},
 
@@ -687,10 +724,11 @@ CKEDITOR.lang['en'] =
 
 	fakeobjects :
 	{
-		anchor	: 'Anchor',
-		flash	: 'Flash Animation',
-		div		: 'Page Break',
-		unknown	: 'Unknown Object'
+		anchor		: 'Anchor',
+		flash		: 'Flash Animation',
+		iframe		: 'IFrame',
+		hiddenfield	: 'Hidden Field',
+		unknown		: 'Unknown Object'
 	},
 
 	resize : 'Drag to resize',
@@ -698,11 +736,18 @@ CKEDITOR.lang['en'] =
 	colordialog :
 	{
 		title		: 'Select color',
+		options	:	'Color Options',
 		highlight	: 'Highlight',
-		selected	: 'Selected',
+		selected	: 'Selected Color',
 		clear		: 'Clear'
 	},
 
 	toolbarCollapse	: 'Collapse Toolbar',
-	toolbarExpand	: 'Expand Toolbar'
+	toolbarExpand	: 'Expand Toolbar',
+
+	bidi :
+	{
+		ltr : 'Text direction from left to right',
+		rtl : 'Text direction from right to left'
+	}
 };

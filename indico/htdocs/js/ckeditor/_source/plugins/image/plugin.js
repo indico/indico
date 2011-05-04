@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -26,6 +26,14 @@ CKEDITOR.plugins.add( 'image',
 				command : pluginName
 			});
 
+		editor.on( 'doubleclick', function( evt )
+			{
+				var element = evt.data.element;
+
+				if ( element.is( 'img' ) && !element.data( 'cke-realelement' ) && !element.isReadOnly() )
+					evt.data.dialog = 'image';
+			});
+
 		// If the "menu" plugin is loaded, register the menu items.
 		if ( editor.addMenuItems )
 		{
@@ -45,7 +53,7 @@ CKEDITOR.plugins.add( 'image',
 		{
 			editor.contextMenu.addListener( function( element, selection )
 				{
-					if ( !element || !element.is( 'img' ) || element.getAttribute( '_cke_realelement' ) )
+					if ( !element || !element.is( 'img' ) || element.data( 'cke-realelement' ) || element.isReadOnly() )
 						return null;
 
 					return { image : CKEDITOR.TRISTATE_OFF };
