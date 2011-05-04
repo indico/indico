@@ -5425,11 +5425,11 @@ class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
         coming from the HTTP request
         """
 
-        sessionData["track"] = []
         sessionData["status"] = []
         sessionData["material"] = []
         sessionData.update(params)
         sessionData["type"] = utils.normalizeToList(params.get('types', []))
+        sessionData["track"] = utils.normalizeToList(params.get('tracks', []))
         sessionData['session'] = utils.normalizeToList(params.get('sessions', []))
 
         # update these elements in the session so that the parameters that are
