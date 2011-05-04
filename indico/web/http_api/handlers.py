@@ -28,7 +28,10 @@ from urlparse import parse_qs
 
 # indico imports
 from indico.web.http_api import ExportInterface
+from indico.web.http_api.cache import RequestCache
+from indico.web.http_api.util import remove_lists
 from indico.web.wsgi import webinterface_handler_config as apache
+from indico.util.metadata.serializer import Serializer
 
 # indico legacy imports
 from MaKaC.common import DBMgr
@@ -43,24 +46,42 @@ class HTTPAPIError(Exception):
 
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
+    qdata = parse_qs(query)
+    qdata_copy = dict(qdata)
 
-    m = re.match(r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)/?$', path)
+    cache = RequestCache()
+    obj = cache.loadObject(path, qdata_copy)
 
-    if m and m.group(3) in ExportInterface.getAllowedFormats():
+    resp = None
+    from_cache = False
+    if obj is not None:
+        resp = obj.getContent()
+        from_cache = True
+    else:
+        pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
 
-        dtype, idlist, dformat = m.groups()
-        idlist = idlist.split('-')
-        qdata = dict(parse_qs(query))
+        results = None
+        m = re.match(r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)/?$', path)
+        if m and m.group(3) in ExportInterface.getAllowedFormats():
+            dtype, idlist, dformat = m.groups()
+            idlist = idlist.split('-')
 
-        expInt = ExportInterface(DBMgr.getInstance())
+            expInt = ExportInterface(DBMgr.getInstance())
 
-        tzName = get_query_parameter(qdata, ['tz'], None)
+            tzName = get_query_parameter(qdata, ['tz'], None)
 
-        if dtype == 'categ':
-            mime, result =  expInt.category(dformat, idlist, tzName, **qdata)
+            if dtype == 'categ':
+                results = expInt.category(idlist, tzName, qdata)
 
+        if results:
+            serializer = Serializer.create(dformat, pretty=pretty, **remove_lists(qdata))
+            resp = serializer.getMIMEType(), serializer(results)
+
+    if resp:
+        if not from_cache:
+            cache.cacheObject(path, qdata_copy, resp)
+        mime, result = resp
         req.headers_out['Content-Type'] = mime
-
         return result
     else:
         # TODO: usage page

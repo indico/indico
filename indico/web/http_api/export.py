@@ -58,14 +58,13 @@ class ArgumentValueError(Exception):
 
 class IExport(Interface):
 
-    def category(cls, idlist, dformat, fromDT, toDT, location=None, limit=None,
-               orderBy=None, descending=False, detail="events", pretty=False):
+    def category(cls, idlist, fromDT, toDT, location=None, limit=None,
+               orderBy=None, descending=False, detail="events"):
         """
         TODO: Document this
         """
 
-    def event(cls, idlist, dformat, orderBy=None, descending=False, detail="events",
-              pretty=False):
+    def event(cls, idlist, orderBy=None, descending=False, detail="events"):
         """
         TODO: Document this
         """
@@ -144,19 +143,16 @@ class ExportInterface(object):
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
 
-    def category(self, dformat, idlist, tzName, **qdata):
+    def category(self, idlist, tzName, qdata):
 
         orderBy = get_query_parameter(qdata, ['o', 'order'])
         descending = get_query_parameter(qdata, ['c', 'descending'], False)
         detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
-        pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no')
 
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
         location = get_query_parameter(qdata, ['l', 'location'])
         limit = get_query_parameter(qdata, ['n', 'limit'], integer=True)
-
-        pretty = True if pretty == 'yes' else False
 
         self._dbi.startRequest()
 
@@ -191,13 +187,9 @@ class ExportInterface(object):
                 break
 
         self._dbi.endRequest(False)
+        return results
 
-        # pass remaining arguments to serializer!
-        serializer = Serializer.create(dformat, pretty=pretty, **remove_lists(qdata))
-
-        return serializer.getMIMEType(), serializer(results)
-
-    def event(self, idlist, dformat, orderBy=None, descending=False, detail="events"):
+    def event(self, idlist, orderBy=None, descending=False, detail="events"):
         """
         TODO: Document this
         """
