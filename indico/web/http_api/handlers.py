@@ -47,10 +47,14 @@ class HTTPAPIError(Exception):
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
     qdata = parse_qs(query)
-    qdata_copy = dict(qdata)
+    no_cache = get_query_parameter(qdata, ['nc', 'nocache'], 'no') == 'yes'
 
+    # Copy qdata for the cache key
+    qdata_copy = dict(qdata)
     cache = RequestCache()
-    obj = cache.loadObject(path, qdata_copy)
+    obj = None
+    if not no_cache:
+        obj = cache.loadObject(path, qdata_copy)
 
     resp = None
     from_cache = False
