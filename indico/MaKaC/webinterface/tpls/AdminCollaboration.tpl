@@ -30,19 +30,19 @@
             <% else: %>
                  <% checked = '' %>
             <% end %>
-            <input type="checkbox" id="pendingCB" onchange="updateFilterButton()" <%=checked %>/>
+            <input type="checkbox" id="pendingCB" name="pendingCB" onchange="updateFilterButton()" <%=checked %>/>
             <label for="pendingCB"><%= _("Show only pending")%></label>
         </div>
         <div class="CAFilterByCategoryDiv" id="CAFilterByCategoryDiv" style="display:inline;">
             <span><%= _("Restrict to category id:")%></span>
-            <input type="text" size="5" id="categoryId" onkeypress="updateFilterButton()" value="<%= InitialCategoryId %>"/>
+            <input type="text" size="5" id="categoryId" name="categoryId" onkeypress="updateFilterButton()" value="<%= InitialCategoryId %>"/>
         </div>
         <div class="CAFilterByCategoryDiv" id="CAFilterByCategoryDiv" style="display:inline;">
             <span><%= _("Restrict to conference id:")%></span>
-            <input type="text" size="5" id="conferenceId" onkeyup="confIdObs()" onkeypress="updateFilterButton()" value="<%= InitialConferenceId %>"/>
+            <input type="text" size="5" id="conferenceId" name="conferenceId" onkeyup="confIdObs()" onkeypress="updateFilterButton()" value="<%= InitialConferenceId %>"/>
         </div>
         <div class="CAResultsPerPageDiv">
-            <%= _("Results per page:")%> <input type="text" id="resultsPerPage" size="5" onkeypress="updateFilterButton()" value="<%= InitialResultsPerPage %>"/>
+            <%= _("Results per page:")%> <input type="text" id="resultsPerPage" name="resultsPerPage" size="5" onkeypress="updateFilterButton()" value="<%= InitialResultsPerPage %>"/>
         </div>
     </div>
 
@@ -63,22 +63,22 @@
         </div>
         <div style="padding-top: 5px">
             <input type="radio" name="dateFilterType" id="fromToDaysRadio" onclick="updateDateFilterType()" class="CARadio" <%= checked2 %> />
-            <%= _("From")%> <input type="text" size="3" id="fromDays" onkeypress="updateFilterButton()" value="<%= InitialFromDays %>"/>
-            <%= _("days ago to")%> <input type="text" size="3" id="toDays" onkeypress="updateFilterButton()" value="<%= InitialToDays %>"/>
+            <%= _("From")%> <input type="text" size="3" id="fromDays" name="fromDays" onkeypress="updateFilterButton()" value="<%= InitialFromDays %>"/>
+            <%= _("days ago to")%> <input type="text" size="3" id="toDays" name="toDays" onkeypress="updateFilterButton()" value="<%= InitialToDays %>"/>
             <%= _("days in the future") %>
             <span class="CAMinMaxKeySuggestion"><%= _("Please input integers") %></span>
         </div>
     </div>
     <div id="titleFilter" style="padding-top: 10px">
         <div>
-            <%= _("From")%> <input type="text" size="16" id="fromTitle" onkeypress="updateFilterButton()" value="<%= InitialFromTitle %>"/>
-            <%= _("to")%> <input type="text" size="16" id="toTitle" onkeypress="updateFilterButton()" value="<%= InitialToTitle %>"/>
+            <%= _("From")%> <input type="text" size="16" id="fromTitle" name="fromTitle" onkeypress="updateFilterButton()" value="<%= InitialFromTitle %>"/>
+            <%= _("to")%> <input type="text" size="16" id="toTitle" name="toTitle" onkeypress="updateFilterButton()" value="<%= InitialToTitle %>"/>
             <span class="CAMinMaxKeySuggestion"><%= _("Please input a conference title or the beginning of it") %></span>
         </div>
     </div>
 
     <div style="padding-top: 10px">
-        <input type="button" id="filterButton" value="<%= _("Refresh")%>" onclick="refresh()"/>
+        <input type="button" id="filterButton" name="filterButton" value="<%= _("Refresh")%>" onclick="refresh()"/>
     </div>
 </div>
 
@@ -104,7 +104,7 @@
 
         <div class="CAStaticURLDiv">
             <a class="CAStaticURLSwitch" onclick="staticURLSwitch()"><%= _("Static URL for this result")%></a> <%= _("(Use it for bookmarks)")%><br />
-            <input type="text" id="staticURL" style="width: 50%; display: none; margin-top: 5px;"/>
+            <input type="text" id="staticURL" name="staticURL" style="width: 50%; display: none; margin-top: 5px;"/>
             <a id="staticURLLink" style="display: none;  margin-left: 5px;" href="<%= BaseURL %>"><%= _("Go to URL")%></a>
         </div>
     </div>
