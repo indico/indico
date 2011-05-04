@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -31,11 +31,11 @@ CKEDITOR.lang['he'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Rich text editor, %1, press ALT 0 for help.', // MISSING
+	editorTitle : 'עורך טקסט עשיר, %1, לחץ אלט (ALT) + 0 לעזרה.',
 
 	// ARIA descriptions.
-	toolbar	: 'Toolbar', // MISSING
-	editor	: 'Rich Text Editor', // MISSING
+	toolbar	: 'סרגל הכלים',
+	editor	: 'עורך טקסט עשיר',
 
 	// Toolbar buttons without dialogs.
 	source			: 'מקור',
@@ -56,6 +56,7 @@ CKEDITOR.lang['he'] =
 	superscript		: 'כתיב עליון',
 	horizontalrule	: 'הוספת קו אופקי',
 	pagebreak		: 'הוספת שבירת דף',
+	pagebreakAlt		: 'שבירת דף',
 	unlink			: 'הסרת הקישור',
 	undo			: 'ביטול צעד אחרון',
 	redo			: 'חזרה על צעד אחרון',
@@ -92,19 +93,34 @@ CKEDITOR.lang['he'] =
 		cssStyle		: 'סגנון',
 		ok				: 'אישור',
 		cancel			: 'ביטול',
-		close			: 'Close', // MISSING
-		preview			: 'Preview', // MISSING
+		close			: 'סגירה',
+		preview			: 'תצוגה מקדימה',
 		generalTab		: 'כללי',
 		advancedTab		: 'אפשרויות מתקדמות',
 		validateNumberFailed : 'הערך חייב להיות מספרי.',
 		confirmNewPage	: 'כל השינויים שלא נשמרו יאבדו. האם להעלות דף חדש?',
 		confirmCancel	: 'חלק מהאפשרויות שונו, האם לסגור את הדיאלוג?',
-		options			: 'Options', // MISSING
-		target			: 'Target', // MISSING
-		targetNew		: 'New Window (_blank)', // MISSING
-		targetTop		: 'Topmost Window (_top)', // MISSING
-		targetSelf		: 'Same Window (_self)', // MISSING
-		targetParent	: 'Parent Window (_parent)', // MISSING
+		options			: 'אפשרויות',
+		target			: 'מטרה',
+		targetNew		: 'חלון חדש (_blank)',
+		targetTop		: 'החלון העליון ביותר (_top)',
+		targetSelf		: 'אותו חלון (_self)',
+		targetParent	: 'חלון האב (_parent)',
+		langDirLTR		: 'שמאל לימין (LTR)',
+		langDirRTL		: 'ימין לשמאל (RTL)',
+		styles			: 'סגנון',
+		cssClasses		: 'מחלקות גליונות סגנון',
+		width			: 'רוחב',
+		height			: 'גובה',
+		align			: 'יישור',
+		alignLeft		: 'לשמאל',
+		alignRight		: 'לימין',
+		alignCenter		: 'מרכז',
+		alignTop		: 'למעלה',
+		alignMiddle		: 'לאמצע',
+		alignBottom		: 'לתחתית',
+		invalidHeight	: 'הגובה חייב להיות מספר.',
+		invalidWidth	: 'הרוחב חייב להיות מספר.',
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, לא זמין</span>'
@@ -112,7 +128,7 @@ CKEDITOR.lang['he'] =
 
 	contextmenu :
 	{
-		options : 'Context Menu Options' // MISSING
+		options : 'אפשרויות תפריט ההקשר'
 	},
 
 	// Special char dialog.
@@ -120,7 +136,7 @@ CKEDITOR.lang['he'] =
 	{
 		toolbar		: 'הוספת תו מיוחד',
 		title		: 'בחירת תו מיוחד',
-		options : 'Special Character Options' // MISSING
+		options : 'אפשרויות תווים מיוחדים'
 	},
 
 	// Link dialog.
@@ -135,7 +151,7 @@ CKEDITOR.lang['he'] =
 		upload		: 'העלאה',
 		advanced	: 'אפשרויות מתקדמות',
 		type		: 'סוג קישור',
-		toUrl		: 'URL', // MISSING
+		toUrl		: 'כתובת (URL)',
 		toAnchor	: 'עוגן בעמוד זה',
 		toEmail		: 'דוא"ל',
 		targetFrame		: '<מסגרת>',
@@ -151,9 +167,7 @@ CKEDITOR.lang['he'] =
 		popupFullScreen	: 'מסך מלא (IE)',
 		popupScrollBars	: 'ניתן לגלילה',
 		popupDependent	: 'תלוי (Netscape)',
-		popupWidth		: 'רוחב',
 		popupLeft		: 'מיקום צד שמאל',
-		popupHeight		: 'גובה',
 		popupTop		: 'מיקום צד עליון',
 		id				: 'זיהוי (ID)',
 		langDir			: 'כיוון שפה',
@@ -161,18 +175,19 @@ CKEDITOR.lang['he'] =
 		langDirRTL		: 'ימין לשמאל (RTL)',
 		acccessKey		: 'מקש גישה',
 		name			: 'שם',
-		langCode		: 'קוד שפה',
-		tabIndex		: 'מספר טאב',
-		advisoryTitle	: 'כותרת מוצעת',
+		langCode			: 'קוד שפה',
+		tabIndex			: 'מספר טאב',
+		advisoryTitle		: 'כותרת מוצעת',
 		advisoryContentType	: 'Content Type מוצע',
 		cssClasses		: 'גיליונות עיצוב קבוצות',
 		charset			: 'קידוד המשאב המקושר',
 		styles			: 'סגנון',
-		selectAnchor	: 'בחירת עוגן',
+		rel			: 'קשר גומלין',
+		selectAnchor		: 'בחירת עוגן',
 		anchorName		: 'עפ"י שם העוגן',
-		anchorId		: 'עפ"י זיהוי (ID) האלמנט',
-		emailAddress	: 'כתובת הדוא"ל',
-		emailSubject	: 'נושא ההודעה',
+		anchorId			: 'עפ"י זיהוי (ID) האלמנט',
+		emailAddress		: 'כתובת הדוא"ל',
+		emailSubject		: 'נושא ההודעה',
 		emailBody		: 'גוף ההודעה',
 		noAnchors		: '(אין עוגנים זמינים בדף)',
 		noUrl			: 'יש להקליד את כתובת הקישור (URL)',
@@ -187,6 +202,30 @@ CKEDITOR.lang['he'] =
 		title		: 'מאפייני נקודת עיגון',
 		name		: 'שם לנקודת עיגון',
 		errorName	: 'יש להקליד שם לנקודת עיגון'
+	},
+
+	// List style dialog
+	list:
+	{
+		numberedTitle		: 'תכונות רשימה ממוספרת',
+		bulletedTitle		: 'תכונות רשימת תבליטים',
+		type				: 'סוג',
+		start				: 'תחילת מספור',
+		validateStartNumber				:'שדה תחילת המספור חייב להכיל מספר שלם.',
+		circle				: 'עיגול ריק',
+		disc				: 'עיגול מלא',
+		square				: 'ריבוע',
+		none				: 'ללא',
+		notset				: '<לא נקבע>',
+		armenian			: 'ספרות ארמניות',
+		georgian			: 'ספרות גיאורגיות (an, ban, gan וכו\')',
+		lowerRoman			: 'ספירה רומית באותיות קטנות (i, ii, iii, iv, v וכו\')',
+		upperRoman			: 'ספירה רומיות באותיות גדולות (I, II, III, IV, V וכו\')',
+		lowerAlpha			: 'אותיות אנגליות קטנות (a, b, c, d, e וכו\')',
+		upperAlpha			: 'אותיות אנגליות גדולות (A, B, C, D, E וכו\')',
+		lowerGreek			: 'אותיות יווניות קטנות (alpha, beta, gamma וכו\')',
+		decimal				: 'ספרות (1, 2, 3 וכו\')',
+		decimalLeadingZero	: 'ספרות עם 0 בהתחלה (01, 02, 03 וכו\')'
 	},
 
 	// Find And Replace Dialog
@@ -215,15 +254,9 @@ CKEDITOR.lang['he'] =
 		rows		: 'שורות',
 		columns		: 'עמודות',
 		border		: 'גודל מסגרת',
-		align		: 'יישור',
-		alignLeft	: 'שמאל',
-		alignCenter	: 'מרכז',
-		alignRight	: 'ימין',
-		width		: 'רוחב',
 		widthPx		: 'פיקסלים',
 		widthPc		: 'אחוז',
-		widthUnit	: 'width unit', // MISSING
-		height		: 'גובה',
+		widthUnit	: 'יחידת רוחב',
 		cellSpace	: 'מרווח תא',
 		cellPad		: 'ריפוד תא',
 		caption		: 'כיתוב',
@@ -236,7 +269,7 @@ CKEDITOR.lang['he'] =
 		invalidRows		: 'שדה מספר השורות חייב להיות מספר גדול מ 0.',
 		invalidCols		: 'שדה מספר העמודות חייב להיות מספר גדול מ 0.',
 		invalidBorder	: 'שדה גודל המסגרת חייב להיות מספר.',
-		invalidWidth	: 'שדה רוחב הטבלה חייב להיות רוחב.',
+		invalidWidth	: 'שדה רוחב הטבלה חייב להיות מספר.',
 		invalidHeight	: 'שדה גובה הטבלה חייב להיות מספר.',
 		invalidCellSpacing	: 'שדה ריווח התאים חייב להיות מספר.',
 		invalidCellPadding	: 'שדה ריפוד התאים חייב להיות מספר.',
@@ -259,9 +292,6 @@ CKEDITOR.lang['he'] =
 			wordWrap		: 'מניעת גלישת שורות',
 			hAlign			: 'יישור אופקי',
 			vAlign			: 'יישור אנכי',
-			alignTop		: 'למעלה',
-			alignMiddle		: 'מרכז',
-			alignBottom		: 'למטה',
 			alignBaseline	: 'שורת בסיס',
 			bgColor			: 'צבע רקע',
 			borderColor		: 'צבע מסגרת',
@@ -382,27 +412,20 @@ CKEDITOR.lang['he'] =
 		btnUpload	: 'שליחה לשרת',
 		upload		: 'העלאה',
 		alt			: 'טקסט חלופי',
-		width		: 'רוחב',
-		height		: 'גובה',
 		lockRatio	: 'נעילת היחס',
-		unlockRatio	: 'Unlock Ratio', // MISSING
+		unlockRatio	: 'ביטול נעילת היחס',
 		resetSize	: 'איפוס הגודל',
 		border		: 'מסגרת',
 		hSpace		: 'מרווח אופקי',
 		vSpace		: 'מרווח אנכי',
-		align		: 'יישור',
-		alignLeft	: 'לשמאל',
-		alignRight	: 'לימין',
 		alertUrl	: 'יש להקליד את כתובת התמונה',
 		linkTab		: 'קישור',
 		button2Img	: 'האם להפוך את תמונת הכפתור לתמונה פשוטה?',
 		img2Button	: 'האם להפוך את התמונה לכפתור תמונה?',
 		urlMissing	: 'כתובת התמונה חסרה.',
-		validateWidth	: 'Width must be a whole number.', // MISSING
-		validateHeight	: 'Height must be a whole number.', // MISSING
-		validateBorder	: 'Border must be a whole number.', // MISSING
-		validateHSpace	: 'HSpace must be a whole number.', // MISSING
-		validateVSpace	: 'VSpace must be a whole number.' // MISSING
+		validateBorder	: 'שדה המסגרת חייב להיות מספר שלם.',
+		validateHSpace	: 'שדה המרווח האופקי חייב להיות מספר שלם.',
+		validateVSpace	: 'שדה המרווח האנכי חייב להיות מספר שלם.'
 	},
 
 	// Flash Dialog
@@ -423,16 +446,10 @@ CKEDITOR.lang['he'] =
 		accessAlways	: 'תמיד',
 		accessSameDomain: 'דומיין זהה',
 		accessNever		: 'אף פעם',
-		align			: 'יישור',
-		alignLeft		: 'לשמאל',
 		alignAbsBottom	: 'לתחתית האבסולוטית',
 		alignAbsMiddle	: 'מרכוז אבסולוטי',
 		alignBaseline	: 'לקו התחתית',
-		alignBottom		: 'לתחתית',
-		alignMiddle		: 'לאמצע',
-		alignRight		: 'לימין',
 		alignTextTop	: 'לראש הטקסט',
-		alignTop		: 'למעלה',
 		quality			: 'איכות',
 		qualityBest		: 'מעולה',
 		qualityHigh		: 'גבוהה',
@@ -446,13 +463,9 @@ CKEDITOR.lang['he'] =
 		windowMode		: 'מצב חלון',
 		flashvars		: 'משתנים לפלאש',
 		bgcolor			: 'צבע רקע',
-		width			: 'רוחב',
-		height			: 'גובה',
 		hSpace			: 'מרווח אופקי',
 		vSpace			: 'מרווח אנכי',
 		validateSrc		: 'יש להקליד את כתובת סרטון הפלאש (URL)',
-		validateWidth	: 'הרוחב חייב להיות מספר.',
-		validateHeight	: 'הגובה חייב להיות מספר.',
 		validateHSpace	: 'המרווח האופקי חייב להיות מספר.',
 		validateVSpace	: 'המרווח האנכי חייב להיות מספר.'
 	},
@@ -484,12 +497,12 @@ CKEDITOR.lang['he'] =
 	{
 		toolbar	: 'סמיילי',
 		title	: 'הוספת סמיילי',
-		options : 'Smiley Options' // MISSING
+		options : 'אפשרויות סמיילים'
 	},
 
 	elementsPath :
 	{
-		eleLabel : 'Elements path', // MISSING
+		eleLabel : 'עץ האלמנטים',
 		eleTitle : '%1 אלמנט'
 	},
 
@@ -515,7 +528,7 @@ CKEDITOR.lang['he'] =
 		copyError	: 'הגדרות האבטחה בדפדפן שלך לא מאפשרות לעורך לבצע פעולות העתקה אוטומטיות. יש להשתמש במקלדת לשם כך (Ctrl/Cmd+C).',
 		pasteMsg	: 'נא להדביק בתוך הקופסה באמצעות (<b>Ctrl/Cmd+V</b>) וללחוץ על <b>אישור</b>.',
 		securityMsg	: 'עקב הגדרות אבטחה בדפדפן, לא ניתן לגשת אל לוח הגזירים (Clipboard) בצורה ישירה. נא להדביק שוב בחלון זה.',
-		pasteArea	: 'Paste Area' // MISSING
+		pasteArea	: 'איזור הדבקה'
 	},
 
 	pastefromword :
@@ -536,7 +549,7 @@ CKEDITOR.lang['he'] =
 	{
 		button			: 'תבניות',
 		title			: 'תביות תוכן',
-		options : 'Template Options', // MISSING
+		options : 'אפשרויות התבניות',
 		insertOption	: 'החלפת תוכן ממשי',
 		selectPromptMsg	: 'יש לבחור תבנית לפתיחה בעורך.<br />התוכן המקורי ימחק:',
 		emptyListMsg	: '(לא הוגדרו תבניות)'
@@ -547,7 +560,7 @@ CKEDITOR.lang['he'] =
 	stylesCombo :
 	{
 		label		: 'סגנון',
-		panelTitle	: 'Formatting Styles', // MISSING
+		panelTitle	: 'סגנונות פורמט',
 		panelTitle1	: 'סגנונות בלוק',
 		panelTitle2	: 'סגנונות רצף',
 		panelTitle3	: 'סגנונות אובייקט'
@@ -587,6 +600,15 @@ CKEDITOR.lang['he'] =
 		remove				: 'הסרת מיכל (Div)'
   	},
 
+	iframe :
+	{
+		title		: 'מאפייני חלון פנימי (iframe)',
+		toolbar		: 'חלון פנימי (iframe)',
+		noUrl		: 'יש להכניס כתובת לחלון.',
+		scrolling	: 'אפשר פסי גלילה',
+		border		: 'הראה מסגרת לחלון'
+	},
+
 	font :
 	{
 		label		: 'גופן',
@@ -605,7 +627,7 @@ CKEDITOR.lang['he'] =
 	{
 		textColorTitle	: 'צבע טקסט',
 		bgColorTitle	: 'צבע רקע',
-		panelTitle		: 'Colors', // MISSING
+		panelTitle		: 'צבעים',
 		auto			: 'אוטומטי',
 		more			: 'צבעים נוספים...'
 	},
@@ -657,6 +679,7 @@ CKEDITOR.lang['he'] =
 	scayt :
 	{
 		title			: 'בדיקת איות בזמן כתיבה (SCAYT)',
+		opera_title		: 'לא זמין בדפדפן אופרה',
 		enable			: 'אפשר SCAYT',
 		disable			: 'בטל SCAYT',
 		about			: 'אודות SCAYT',
@@ -668,9 +691,23 @@ CKEDITOR.lang['he'] =
 		ignoreAll		: 'התעלמות מהכל',
 		addWord			: 'הוספת מילה',
 		emptyDic		: 'יש לבחור מילון.',
+
 		optionsTab		: 'אפשרויות',
+		allCaps			: 'התעלם ממילים שכל אותיותיהן גדולות',
+		ignoreDomainNames : 'התעלם משמות מתחם',
+		mixedCase		: 'התעלם ממילים עם אותיות גדולות וקטנות ביחד',
+		mixedWithDigits	: 'התעלם ממילים עם מספרים',
+
 		languagesTab	: 'שפות',
+
 		dictionariesTab	: 'מילון',
+		dic_field_name	: 'שם המילון',
+		dic_create		: 'יצירה',
+		dic_restore		: 'שחזור',
+		dic_delete		: 'מחיקה',
+		dic_rename		: 'שינוי שם',
+		dic_info		: 'בהתחלה מילון המשתמש מאוחסן בעוגיה, אך עוגיות מוגבלות במקום. כאשר המילון מגיע לגודל בו הוא אינו יכול להתאכסן בעוגיה, המילון צריך להתאכסן בשרתנו. לשם כך עליך לתת שם למילון. אם כבר יש לך מילון מאוחסן, יש להכניס את שמו וללחוץ על כפתור השחזור.',
+
 		aboutTab		: 'אודות'
 	},
 
@@ -687,10 +724,11 @@ CKEDITOR.lang['he'] =
 
 	fakeobjects :
 	{
-		anchor	: 'עוגן',
-		flash	: 'סרטון פלאש',
-		div		: 'שבירת דף',
-		unknown	: 'אובייקט לא ידוע'
+		anchor		: 'עוגן',
+		flash		: 'סרטון פלאש',
+		iframe		: 'חלון פנימי (iframe)',
+		hiddenfield	: 'שדה חבוי',
+		unknown		: 'אובייקט לא ידוע'
 	},
 
 	resize : 'יש לגרור בכדי לשנות את הגודל',
@@ -698,11 +736,18 @@ CKEDITOR.lang['he'] =
 	colordialog :
 	{
 		title		: 'בחירת צבע',
+		options	:	'אפשרויות צבע',
 		highlight	: 'סימון',
 		selected	: 'בחירה',
 		clear		: 'ניקוי'
 	},
 
 	toolbarCollapse	: 'מזעור סרגל כלים',
-	toolbarExpand	: 'הרחבת סרגל כלים'
+	toolbarExpand	: 'הרחבת סרגל כלים',
+
+	bidi :
+	{
+		ltr : 'כיוון טקסט משמאל לימין (LTR)',
+		rtl : 'כיוון טקסט מימין לשמאל (RTL)'
+	}
 };

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -56,6 +56,7 @@ CKEDITOR.lang['bg'] =
 	superscript		: 'Индекс за степен',
 	horizontalrule	: 'Вмъкни хоризонтална линия',
 	pagebreak		: 'Вмъкни нов ред',
+	pagebreakAlt		: 'Page Break', // MISSING
 	unlink			: 'Изтрий връзка',
 	undo			: 'Отмени',
 	redo			: 'Повтори',
@@ -105,6 +106,21 @@ CKEDITOR.lang['bg'] =
 		targetTop		: 'Topmost Window (_top)', // MISSING
 		targetSelf		: 'Same Window (_self)', // MISSING
 		targetParent	: 'Parent Window (_parent)', // MISSING
+		langDirLTR		: 'Left to Right (LTR)', // MISSING
+		langDirRTL		: 'Right to Left (RTL)', // MISSING
+		styles			: 'Style', // MISSING
+		cssClasses		: 'Stylesheet Classes', // MISSING
+		width			: 'Ширина',
+		height			: 'Височина',
+		align			: 'Подравняване',
+		alignLeft		: 'Ляво',
+		alignRight		: 'Дясно',
+		alignCenter		: 'Център',
+		alignTop		: 'Отгоре',
+		alignMiddle		: 'По средата',
+		alignBottom		: 'Долу',
+		invalidHeight	: 'Height must be a number.', // MISSING
+		invalidWidth	: 'Width must be a number.', // MISSING
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, unavailable</span>' // MISSING
@@ -151,9 +167,7 @@ CKEDITOR.lang['bg'] =
 		popupFullScreen	: 'Голям екран (MS IE)',
 		popupScrollBars	: 'Плъзгач',
 		popupDependent	: 'Зависим (Netscape)',
-		popupWidth		: 'Ширина',
 		popupLeft		: 'Координати - X',
-		popupHeight		: 'Височина',
 		popupTop		: 'Координати - Y',
 		id				: 'Id', // MISSING
 		langDir			: 'посока на речта',
@@ -161,18 +175,19 @@ CKEDITOR.lang['bg'] =
 		langDirRTL		: 'От дясно на ляво',
 		acccessKey		: 'Бърз клавиш',
 		name			: 'Име',
-		langCode		: 'посока на речта',
-		tabIndex		: 'Ред на достъп',
-		advisoryTitle	: 'Препоръчително заглавие',
+		langCode			: 'посока на речта',
+		tabIndex			: 'Ред на достъп',
+		advisoryTitle		: 'Препоръчително заглавие',
 		advisoryContentType	: 'Препоръчителен тип на съдържанието',
 		cssClasses		: 'Клас от стиловите таблици',
 		charset			: 'Тип на свързания ресурс',
 		styles			: 'Стил',
-		selectAnchor	: 'Изберете котва',
+		rel			: 'Relationship', // MISSING
+		selectAnchor		: 'Изберете котва',
 		anchorName		: 'По име на котвата',
-		anchorId		: 'По идентификатор на елемент',
-		emailAddress	: 'Адрес за е-поща',
-		emailSubject	: 'Тема на писмото',
+		anchorId			: 'По идентификатор на елемент',
+		emailAddress		: 'Адрес за е-поща',
+		emailSubject		: 'Тема на писмото',
 		emailBody		: 'Текст на писмото',
 		noAnchors		: '(Няма котви в текущия документ)',
 		noUrl			: 'Моля, напишете пълния път (URL)',
@@ -187,6 +202,30 @@ CKEDITOR.lang['bg'] =
 		title		: 'Параметри на котвата',
 		name		: 'Име на котвата',
 		errorName	: 'Моля, въведете име на котвата'
+	},
+
+	// List style dialog
+	list:
+	{
+		numberedTitle		: 'Numbered List Properties', // MISSING
+		bulletedTitle		: 'Bulleted List Properties', // MISSING
+		type				: 'Type', // MISSING
+		start				: 'Start', // MISSING
+		validateStartNumber				:'List start number must be a whole number.', // MISSING
+		circle				: 'Circle', // MISSING
+		disc				: 'Disc', // MISSING
+		square				: 'Square', // MISSING
+		none				: 'None', // MISSING
+		notset				: '<not set>', // MISSING
+		armenian			: 'Armenian numbering', // MISSING
+		georgian			: 'Georgian numbering (an, ban, gan, etc.)', // MISSING
+		lowerRoman			: 'Lower Roman (i, ii, iii, iv, v, etc.)', // MISSING
+		upperRoman			: 'Upper Roman (I, II, III, IV, V, etc.)', // MISSING
+		lowerAlpha			: 'Lower Alpha (a, b, c, d, e, etc.)', // MISSING
+		upperAlpha			: 'Upper Alpha (A, B, C, D, E, etc.)', // MISSING
+		lowerGreek			: 'Lower Greek (alpha, beta, gamma, etc.)', // MISSING
+		decimal				: 'Decimal (1, 2, 3, etc.)', // MISSING
+		decimalLeadingZero	: 'Decimal leading zero (01, 02, 03, etc.)' // MISSING
 	},
 
 	// Find And Replace Dialog
@@ -215,15 +254,9 @@ CKEDITOR.lang['bg'] =
 		rows		: 'Редове',
 		columns		: 'Колони',
 		border		: 'Размер на рамката',
-		align		: 'Подравняване',
-		alignLeft	: 'Ляво',
-		alignCenter	: 'Център',
-		alignRight	: 'Дясно',
-		width		: 'Ширина',
 		widthPx		: 'пиксели',
 		widthPc		: 'проценти',
 		widthUnit	: 'width unit', // MISSING
-		height		: 'Височина',
 		cellSpace	: 'Разстояние между клетките',
 		cellPad		: 'Отстъп на съдържанието в клетките',
 		caption		: 'Заглавие',
@@ -259,9 +292,6 @@ CKEDITOR.lang['bg'] =
 			wordWrap		: 'Word Wrap', // MISSING
 			hAlign			: 'Horizontal Alignment', // MISSING
 			vAlign			: 'Vertical Alignment', // MISSING
-			alignTop		: 'Top', // MISSING
-			alignMiddle		: 'Middle', // MISSING
-			alignBottom		: 'Bottom', // MISSING
 			alignBaseline	: 'Baseline', // MISSING
 			bgColor			: 'Background Color', // MISSING
 			borderColor		: 'Border Color', // MISSING
@@ -382,24 +412,17 @@ CKEDITOR.lang['bg'] =
 		btnUpload	: 'Прати към сървъра',
 		upload		: 'Качи',
 		alt			: 'Алтернативен текст',
-		width		: 'Ширина',
-		height		: 'Височина',
 		lockRatio	: 'Запази пропорцията',
 		unlockRatio	: 'Unlock Ratio', // MISSING
 		resetSize	: 'Възстанови размера',
 		border		: 'Рамка',
 		hSpace		: 'Хоризонтален отстъп',
 		vSpace		: 'Вертикален отстъп',
-		align		: 'Подравняване',
-		alignLeft	: 'Ляво',
-		alignRight	: 'Дясно',
 		alertUrl	: 'Моля, въведете пълния път до изображението',
 		linkTab		: 'Връзка',
 		button2Img	: 'Do you want to transform the selected image button on a simple image?', // MISSING
 		img2Button	: 'Do you want to transform the selected image on a image button?', // MISSING
 		urlMissing	: 'Image source URL is missing.', // MISSING
-		validateWidth	: 'Width must be a whole number.', // MISSING
-		validateHeight	: 'Height must be a whole number.', // MISSING
 		validateBorder	: 'Border must be a whole number.', // MISSING
 		validateHSpace	: 'HSpace must be a whole number.', // MISSING
 		validateVSpace	: 'VSpace must be a whole number.' // MISSING
@@ -423,16 +446,10 @@ CKEDITOR.lang['bg'] =
 		accessAlways	: 'Always', // MISSING
 		accessSameDomain: 'Same domain', // MISSING
 		accessNever		: 'Never', // MISSING
-		align			: 'Подравняване',
-		alignLeft		: 'Ляво',
 		alignAbsBottom	: 'Най-долу',
 		alignAbsMiddle	: 'Точно по средата',
 		alignBaseline	: 'По базовата линия',
-		alignBottom		: 'Долу',
-		alignMiddle		: 'По средата',
-		alignRight		: 'Дясно',
 		alignTextTop	: 'Върху текста',
-		alignTop		: 'Отгоре',
 		quality			: 'Quality', // MISSING
 		qualityBest		: 'Best', // MISSING
 		qualityHigh		: 'High', // MISSING
@@ -446,13 +463,9 @@ CKEDITOR.lang['bg'] =
 		windowMode		: 'Window mode', // MISSING
 		flashvars		: 'Variables for Flash', // MISSING
 		bgcolor			: 'Цвят на фона',
-		width			: 'Ширина',
-		height			: 'Височина',
 		hSpace			: 'Хоризонтален отстъп',
 		vSpace			: 'Вертикален отстъп',
 		validateSrc		: 'Моля, напишете пълния път (URL)',
-		validateWidth	: 'Width must be a number.', // MISSING
-		validateHeight	: 'Height must be a number.', // MISSING
 		validateHSpace	: 'HSpace must be a number.', // MISSING
 		validateVSpace	: 'VSpace must be a number.' // MISSING
 	},
@@ -587,6 +600,15 @@ CKEDITOR.lang['bg'] =
 		remove				: 'Remove Div' // MISSING
   	},
 
+	iframe :
+	{
+		title		: 'IFrame Properties', // MISSING
+		toolbar		: 'IFrame', // MISSING
+		noUrl		: 'Please type the iframe URL', // MISSING
+		scrolling	: 'Enable scrollbars', // MISSING
+		border		: 'Show frame border' // MISSING
+	},
+
 	font :
 	{
 		label		: 'Шрифт',
@@ -619,7 +641,7 @@ CKEDITOR.lang['bg'] =
 		'008080' : 'Teal', // MISSING
 		'000080' : 'Navy', // MISSING
 		'4B0082' : 'Indigo', // MISSING
-		'696969' : 'Dim Gray', // MISSING
+		'696969' : 'Dark Gray', // MISSING
 		'B22222' : 'Fire Brick', // MISSING
 		'A52A2A' : 'Brown', // MISSING
 		'DAA520' : 'Golden Rod', // MISSING
@@ -635,7 +657,7 @@ CKEDITOR.lang['bg'] =
 		'0FF' : 'Cyan', // MISSING
 		'00F' : 'Blue', // MISSING
 		'EE82EE' : 'Violet', // MISSING
-		'A9A9A9' : 'Dark Gray', // MISSING
+		'A9A9A9' : 'Dim Gray', // MISSING
 		'FFA07A' : 'Light Salmon', // MISSING
 		'FFA500' : 'Orange', // MISSING
 		'FFFF00' : 'Yellow', // MISSING
@@ -657,6 +679,7 @@ CKEDITOR.lang['bg'] =
 	scayt :
 	{
 		title			: 'Spell Check As You Type', // MISSING
+		opera_title		: 'Not supported by Opera', // MISSING
 		enable			: 'Enable SCAYT', // MISSING
 		disable			: 'Disable SCAYT', // MISSING
 		about			: 'About SCAYT', // MISSING
@@ -668,9 +691,23 @@ CKEDITOR.lang['bg'] =
 		ignoreAll		: 'Ignore All', // MISSING
 		addWord			: 'Add Word', // MISSING
 		emptyDic		: 'Dictionary name should not be empty.', // MISSING
+
 		optionsTab		: 'Options', // MISSING
+		allCaps			: 'Ignore All-Caps Words', // MISSING
+		ignoreDomainNames : 'Ignore Domain Names', // MISSING
+		mixedCase		: 'Ignore Words with Mixed Case', // MISSING
+		mixedWithDigits	: 'Ignore Words with Numbers', // MISSING
+
 		languagesTab	: 'Languages', // MISSING
+
 		dictionariesTab	: 'Dictionaries', // MISSING
+		dic_field_name	: 'Dictionary name', // MISSING
+		dic_create		: 'Create', // MISSING
+		dic_restore		: 'Restore', // MISSING
+		dic_delete		: 'Delete', // MISSING
+		dic_rename		: 'Rename', // MISSING
+		dic_info		: 'Initially the User Dictionary is stored in a Cookie. However, Cookies are limited in size. When the User Dictionary grows to a point where it cannot be stored in a Cookie, then the dictionary may be stored on our server. To store your personal dictionary on our server you should specify a name for your dictionary. If you already have a stored dictionary, please type its name and click the Restore button.', // MISSING
+
 		aboutTab		: 'About' // MISSING
 	},
 
@@ -687,10 +724,11 @@ CKEDITOR.lang['bg'] =
 
 	fakeobjects :
 	{
-		anchor	: 'Anchor', // MISSING
-		flash	: 'Flash Animation', // MISSING
-		div		: 'Page Break', // MISSING
-		unknown	: 'Unknown Object' // MISSING
+		anchor		: 'Anchor', // MISSING
+		flash		: 'Flash Animation', // MISSING
+		iframe		: 'IFrame', // MISSING
+		hiddenfield	: 'Hidden Field', // MISSING
+		unknown		: 'Unknown Object' // MISSING
 	},
 
 	resize : 'Drag to resize', // MISSING
@@ -698,11 +736,18 @@ CKEDITOR.lang['bg'] =
 	colordialog :
 	{
 		title		: 'Select color', // MISSING
+		options	:	'Color Options', // MISSING
 		highlight	: 'Highlight', // MISSING
-		selected	: 'Selected', // MISSING
+		selected	: 'Selected Color', // MISSING
 		clear		: 'Clear' // MISSING
 	},
 
 	toolbarCollapse	: 'Collapse Toolbar', // MISSING
-	toolbarExpand	: 'Expand Toolbar' // MISSING
+	toolbarExpand	: 'Expand Toolbar', // MISSING
+
+	bidi :
+	{
+		ltr : 'Text direction from left to right', // MISSING
+		rtl : 'Text direction from right to left' // MISSING
+	}
 };

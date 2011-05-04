@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -106,12 +106,7 @@ CKEDITOR.ui.richCombo = CKEDITOR.tools.createClass(
 						return;
 					}
 
-					if ( !_.committed )
-					{
-						_.list.commit();
-						_.committed = 1;
-					}
-
+					this.commit();
 					var value = this.getValue();
 					if ( value )
 						_.list.mark( value );
@@ -136,6 +131,7 @@ CKEDITOR.ui.richCombo = CKEDITOR.tools.createClass(
 			editor.on( 'mode', function()
 				{
 					this.setState( this.modes[ editor.mode ] ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_DISABLED );
+					this.setValue( '' );
 				},
 				this );
 
@@ -201,7 +197,7 @@ CKEDITOR.ui.richCombo = CKEDITOR.tools.createClass(
 						'<span>' +
 							'<span id="' + id + '_text" class="cke_text cke_inline_label">' + this.label + '</span>' +
 						'</span>' +
-						'<span class=cke_openbutton>' + ( CKEDITOR.env.hc ? '<span>&#9660;</span>' : '' ) + '</span>' +	// BLACK DOWN-POINTING TRIANGLE
+						'<span class=cke_openbutton><span class=cke_icon>' + ( CKEDITOR.env.hc ? '&#9660;' : CKEDITOR.env.air ?  '&nbsp;' : '' ) + '</span></span>' +	// BLACK DOWN-POINTING TRIANGLE
 					'</a>' +
 				'</span>' +
 				'</span>' );
@@ -239,16 +235,16 @@ CKEDITOR.ui.richCombo = CKEDITOR.tools.createClass(
 						me.onOpen();
 				};
 
-			panel.onHide = function()
+			panel.onHide = function( preventOnClose )
 				{
 					if ( me.className )
 						this.element.getFirst().removeClass( me.className + '_panel' );
 
-					me.setState( CKEDITOR.TRISTATE_OFF );
+					me.setState( me.modes && me.modes[ editor.mode ] ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_DISABLED );
 
 					me._.on = 0;
 
-					if ( me.onClose )
+					if ( !preventOnClose && me.onClose )
 						me.onClose();
 				};
 
@@ -294,16 +290,18 @@ CKEDITOR.ui.richCombo = CKEDITOR.tools.createClass(
 			this._.value = value;
 
 			var textElement = this.document.getById( 'cke_' + this.id + '_text' );
-
-			if ( !( value || text ) )
+			if ( textElement )
 			{
-				text = this.label;
-				textElement.addClass( 'cke_inline_label' );
-			}
-			else
-				textElement.removeClass( 'cke_inline_label' );
+				if ( !( value || text ) )
+				{
+					text = this.label;
+					textElement.addClass( 'cke_inline_label' );
+				}
+				else
+					textElement.removeClass( 'cke_inline_label' );
 
-			textElement.setHtml( typeof text != 'undefined' ? text : value );
+				textElement.setHtml( typeof text != 'undefined' ? text : value );
+			}
 		},
 
 		getValue : function()
@@ -349,7 +347,13 @@ CKEDITOR.ui.richCombo = CKEDITOR.tools.createClass(
 
 		commit : function()
 		{
-			this._.list.commit();
+			if ( !this._.committed )
+			{
+				this._.list.commit();
+				this._.committed = 1;
+				CKEDITOR.ui.fire( 'ready', this );
+			}
+			this._.committed = 1;
 		},
 
 		setState : function( state )

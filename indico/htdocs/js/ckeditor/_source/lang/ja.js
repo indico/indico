@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -31,11 +31,11 @@ CKEDITOR.lang['ja'] =
 	 * Screenreader titles. Please note that screenreaders are not always capable
 	 * of reading non-English words. So be careful while translating it.
 	 */
-	editorTitle : 'Rich text editor, %1, press ALT 0 for help.', // MISSING
+	editorTitle : 'リッチテキストエディタ, %1, ヘルプは ALT 0 を押してください',
 
 	// ARIA descriptions.
-	toolbar	: 'Toolbar', // MISSING
-	editor	: 'Rich Text Editor', // MISSING
+	toolbar	: 'ツールバー',
+	editor	: 'リッチテキストエディタ',
 
 	// Toolbar buttons without dialogs.
 	source			: 'ソース',
@@ -56,6 +56,7 @@ CKEDITOR.lang['ja'] =
 	superscript		: '上付き文字',
 	horizontalrule	: '横罫線',
 	pagebreak		: '改ページ挿入',
+	pagebreakAlt		: 'Page Break', // MISSING
 	unlink			: 'リンク削除',
 	undo			: '元に戻す',
 	redo			: 'やり直し',
@@ -92,19 +93,34 @@ CKEDITOR.lang['ja'] =
 		cssStyle		: 'スタイルシート',
 		ok				: 'OK',
 		cancel			: 'キャンセル',
-		close			: 'Close', // MISSING
-		preview			: 'Preview', // MISSING
+		close			: '閉じる',
+		preview			: 'プレビュー',
 		generalTab		: '全般',
 		advancedTab		: '高度な設定',
 		validateNumberFailed : '値が数ではありません',
 		confirmNewPage	: '変更内容を保存せず、 新しいページを開いてもよろしいでしょうか？',
 		confirmCancel	: 'オプション設定を変更しました。ダイアログを閉じてもよろしいでしょうか？',
-		options			: 'Options', // MISSING
-		target			: 'Target', // MISSING
-		targetNew		: 'New Window (_blank)', // MISSING
-		targetTop		: 'Topmost Window (_top)', // MISSING
-		targetSelf		: 'Same Window (_self)', // MISSING
-		targetParent	: 'Parent Window (_parent)', // MISSING
+		options			: 'オプション',
+		target			: 'ターゲット',
+		targetNew		: '新しいウィンドウ (_空白)',
+		targetTop		: '最上部ウィンドウ (_トップ)',
+		targetSelf		: '同じウィンドウ (_同一)',
+		targetParent	: '親ウィンドウ (_親)',
+		langDirLTR		: '左から右 (LTR)',
+		langDirRTL		: '右から左 (RTL)',
+		styles			: 'スタイル',
+		cssClasses		: 'スタイルシートクラス',
+		width			: '幅',
+		height			: '高さ',
+		align			: '行揃え',
+		alignLeft		: '左',
+		alignRight		: '右',
+		alignCenter		: '中央',
+		alignTop		: '上',
+		alignMiddle		: '中央',
+		alignBottom		: '下',
+		invalidHeight	: '高さは数値で入力してください。',
+		invalidWidth	: '幅は数値で入力してください。',
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, 利用不可能</span>'
@@ -112,7 +128,7 @@ CKEDITOR.lang['ja'] =
 
 	contextmenu :
 	{
-		options : 'Context Menu Options' // MISSING
+		options : 'コンテキストメニューオプション'
 	},
 
 	// Special char dialog.
@@ -120,7 +136,7 @@ CKEDITOR.lang['ja'] =
 	{
 		toolbar		: '特殊文字挿入',
 		title		: '特殊文字選択',
-		options : 'Special Character Options' // MISSING
+		options : '特殊文字オプション'
 	},
 
 	// Link dialog.
@@ -151,9 +167,7 @@ CKEDITOR.lang['ja'] =
 		popupFullScreen	: '全画面モード(IE)',
 		popupScrollBars	: 'スクロールバー',
 		popupDependent	: '開いたウィンドウに連動して閉じる (Netscape)',
-		popupWidth		: '幅',
 		popupLeft		: '左端からの座標で指定',
-		popupHeight		: '高さ',
 		popupTop		: '上端からの座標で指定',
 		id				: 'Id',
 		langDir			: '文字表記の方向',
@@ -161,18 +175,19 @@ CKEDITOR.lang['ja'] =
 		langDirRTL		: '右から左 (RTL)',
 		acccessKey		: 'アクセスキー',
 		name			: 'Name属性',
-		langCode		: '文字表記の方向',
-		tabIndex		: 'タブインデックス',
-		advisoryTitle	: 'Title属性',
+		langCode			: '言語コード',
+		tabIndex			: 'タブインデックス',
+		advisoryTitle		: 'Title属性',
 		advisoryContentType	: 'Content Type属性',
 		cssClasses		: 'スタイルシートクラス',
 		charset			: 'リンクcharset属性',
 		styles			: 'スタイルシート',
-		selectAnchor	: 'アンカーを選択',
+		rel			: 'Relationship', // MISSING
+		selectAnchor		: 'アンカーを選択',
 		anchorName		: 'アンカー名',
-		anchorId		: 'エレメントID',
-		emailAddress	: 'E-Mail アドレス',
-		emailSubject	: '件名',
+		anchorId			: 'エレメントID',
+		emailAddress		: 'E-Mail アドレス',
+		emailSubject		: '件名',
 		emailBody		: '本文',
 		noAnchors		: '(ドキュメントにおいて利用可能なアンカーはありません。)',
 		noUrl			: 'リンクURLを入力してください。',
@@ -189,6 +204,30 @@ CKEDITOR.lang['ja'] =
 		errorName	: 'アンカー名を必ず入力してください。'
 	},
 
+	// List style dialog
+	list:
+	{
+		numberedTitle		: '段落番号 プロパティ',
+		bulletedTitle		: '箇条書き プロパティ',
+		type				: 'タイプ',
+		start				: '開始',
+		validateStartNumber				:'リスト開始番号は数値で入力してください。',
+		circle				: '白丸',
+		disc				: '黒丸',
+		square				: '四角',
+		none				: 'なし',
+		notset				: '<なし>',
+		armenian			: 'アルメニア数字',
+		georgian			: 'グルジア数字 (an, ban, gan, etc.)',
+		lowerRoman			: '小文字ローマ数字 (i, ii, iii, iv, v, etc.)',
+		upperRoman			: '大文字ローマ数字 (I, II, III, IV, V, etc.)',
+		lowerAlpha			: '小文字アルファベット (a, b, c, d, e, etc.)',
+		upperAlpha			: '大文字アルファベット (A, B, C, D, E, etc.)',
+		lowerGreek			: '小文字ギリシャ文字 (alpha, beta, gamma, etc.)',
+		decimal				: '数字 (1, 2, 3, etc.)',
+		decimalLeadingZero	: '上位桁に0をつけた数字 (01, 02, 03, etc.)'
+	},
+
 	// Find And Replace Dialog
 	findAndReplace :
 	{
@@ -198,9 +237,9 @@ CKEDITOR.lang['ja'] =
 		findWhat			: '検索する文字列:',
 		replaceWith			: '置換えする文字列:',
 		notFoundMsg			: '指定された文字列は見つかりませんでした。',
-		matchCase			: '部分一致',
-		matchWord			: '単語単位で一致',
-		matchCyclic			: '大文字/小文字区別一致',
+		matchCase			: '大文字と小文字を区別する',
+		matchWord			: '単語単位で探す',
+		matchCyclic			: '一周する',
 		replaceAll			: 'すべて置換え',
 		replaceSuccessMsg	: '%1 個置換しました。'
 	},
@@ -215,15 +254,9 @@ CKEDITOR.lang['ja'] =
 		rows		: '行',
 		columns		: '列',
 		border		: 'ボーダーサイズ',
-		align		: 'テーブルの整列',
-		alignLeft	: '左',
-		alignCenter	: '中央',
-		alignRight	: '右',
-		width		: '幅',
 		widthPx		: 'ピクセル',
 		widthPc		: 'パーセント',
-		widthUnit	: 'width unit', // MISSING
-		height		: '高さ',
+		widthUnit	: 'ユニット',
 		cellSpace	: 'セル内余白',
 		cellPad		: 'セル内間隔',
 		caption		: 'キャプション',
@@ -259,9 +292,6 @@ CKEDITOR.lang['ja'] =
 			wordWrap		: '折り返し',
 			hAlign			: 'セル横の整列',
 			vAlign			: 'セル縦の整列',
-			alignTop		: '上',
-			alignMiddle		: '中央',
-			alignBottom		: '下',
 			alignBaseline	: 'ベースライン',
 			bgColor			: '背景色',
 			borderColor		: 'ボーダーカラー',
@@ -382,27 +412,20 @@ CKEDITOR.lang['ja'] =
 		btnUpload	: 'サーバーに送信',
 		upload		: 'アップロード',
 		alt			: '代替テキスト',
-		width		: '幅',
-		height		: '高さ',
 		lockRatio	: 'ロック比率',
-		unlockRatio	: 'Unlock Ratio', // MISSING
+		unlockRatio	: 'アンロック比率',
 		resetSize	: 'サイズリセット',
 		border		: 'ボーダー',
 		hSpace		: '横間隔',
 		vSpace		: '縦間隔',
-		align		: '行揃え',
-		alignLeft	: '左',
-		alignRight	: '右',
 		alertUrl	: 'イメージのURLを入力してください。',
 		linkTab		: 'リンク',
 		button2Img	: '選択したボタンを画像に置き換えますか？',
 		img2Button	: '選択した画像をボタンに置き換えますか？',
 		urlMissing	: 'イメージのURLを入力してください。',
-		validateWidth	: 'Width must be a whole number.', // MISSING
-		validateHeight	: 'Height must be a whole number.', // MISSING
-		validateBorder	: 'Border must be a whole number.', // MISSING
-		validateHSpace	: 'HSpace must be a whole number.', // MISSING
-		validateVSpace	: 'VSpace must be a whole number.' // MISSING
+		validateBorder	: 'ボーダーは数値で入力してください。',
+		validateHSpace	: '横間隔は数値で入力してください。',
+		validateVSpace	: '縦間隔は数値で入力してください。'
 	},
 
 	// Flash Dialog
@@ -423,16 +446,10 @@ CKEDITOR.lang['ja'] =
 		accessAlways	: 'すべての場合に通信可能(Always)',
 		accessSameDomain: '同一ドメインのみに通信可能(Same domain)',
 		accessNever		: 'すべての場合に通信不可能(Never)',
-		align			: '行揃え',
-		alignLeft		: '左',
 		alignAbsBottom	: '下部(絶対的)',
 		alignAbsMiddle	: '中央(絶対的)',
 		alignBaseline	: 'ベースライン',
-		alignBottom		: '下',
-		alignMiddle		: '中央',
-		alignRight		: '右',
 		alignTextTop	: 'テキスト上部',
-		alignTop		: '上',
 		quality			: '画質',
 		qualityBest		: '品質優先',
 		qualityHigh		: '高',
@@ -446,13 +463,9 @@ CKEDITOR.lang['ja'] =
 		windowMode		: 'ウィンドウモード',
 		flashvars		: 'フラッシュに渡す変数(FlashVars)',
 		bgcolor			: '背景色',
-		width			: '幅',
-		height			: '高さ',
 		hSpace			: '横間隔',
 		vSpace			: '縦間隔',
 		validateSrc		: 'リンクURLを入力してください。',
-		validateWidth	: '幅は数値で入力してください。',
-		validateHeight	: '高さは数値で入力してください。',
 		validateHSpace	: '横間隔は数値で入力してください。',
 		validateVSpace	: '縦間隔は数値で入力してください。'
 	},
@@ -484,12 +497,12 @@ CKEDITOR.lang['ja'] =
 	{
 		toolbar	: '絵文字',
 		title	: '顔文字挿入',
-		options : 'Smiley Options' // MISSING
+		options : '絵文字オプション'
 	},
 
 	elementsPath :
 	{
-		eleLabel : 'Elements path', // MISSING
+		eleLabel : 'エレメントパス',
 		eleTitle : '%1 エレメント'
 	},
 
@@ -515,7 +528,7 @@ CKEDITOR.lang['ja'] =
 		copyError	: 'ブラウザーのセキュリティ設定によりエディタのコピー操作が自動で実行することができません。実行するには手動でキーボードの(Ctrl/Cmd+C)を使用してください。',
 		pasteMsg	: 'キーボード(<STRONG>Ctrl/Cmd+V</STRONG>)を使用して、次の入力エリア内で貼って、<STRONG>OK</STRONG>を押してください。',
 		securityMsg	: 'ブラウザのセキュリティ設定により、エディタはクリップボード・データに直接アクセスすることができません。このウィンドウは貼り付け操作を行う度に表示されます。',
-		pasteArea	: 'Paste Area' // MISSING
+		pasteArea	: '貼り付け場所'
 	},
 
 	pastefromword :
@@ -523,7 +536,7 @@ CKEDITOR.lang['ja'] =
 		confirmCleanup	: '貼り付けを行うテキストは、ワード文章からコピーされようとしています。貼り付ける前にクリーニングを行いますか？',
 		toolbar			: 'ワード文章から貼り付け',
 		title			: 'ワード文章から貼り付け',
-		error			: 'It was not possible to clean up the pasted data due to an internal error' // MISSING
+		error			: '内部エラーにより貼り付けたデータがクリアできませんでした'
 	},
 
 	pasteText :
@@ -536,7 +549,7 @@ CKEDITOR.lang['ja'] =
 	{
 		button			: 'テンプレート(雛形)',
 		title			: 'テンプレート内容',
-		options : 'Template Options', // MISSING
+		options : 'テンプレートオプション',
 		insertOption	: '現在のエディタの内容と置換えをします',
 		selectPromptMsg	: 'エディターで使用するテンプレートを選択してください。<br>(現在のエディタの内容は失われます):',
 		emptyListMsg	: '(テンプレートが定義されていません)'
@@ -547,7 +560,7 @@ CKEDITOR.lang['ja'] =
 	stylesCombo :
 	{
 		label		: 'スタイル',
-		panelTitle	: 'Formatting Styles', // MISSING
+		panelTitle	: 'スタイル',
 		panelTitle1	: 'ブロックスタイル',
 		panelTitle2	: 'インラインスタイル',
 		panelTitle3	: 'オブジェクトスタイル'
@@ -572,20 +585,29 @@ CKEDITOR.lang['ja'] =
 
 	div :
 	{
-		title				: 'Create Div Container', // MISSING
-		toolbar				: 'Create Div Container', // MISSING
-		cssClassInputLabel	: 'Stylesheet Classes', // MISSING
-		styleSelectLabel	: 'Style', // MISSING
+		title				: 'Divコンテナ',
+		toolbar				: 'Divコンテナ',
+		cssClassInputLabel	: 'スタイルシートクラス',
+		styleSelectLabel	: 'スタイル',
 		IdInputLabel		: 'Id', // MISSING
-		languageCodeInputLabel	: ' Language Code', // MISSING
-		inlineStyleInputLabel	: 'Inline Style', // MISSING
-		advisoryTitleInputLabel	: 'Advisory Title', // MISSING
-		langDirLabel		: 'Language Direction', // MISSING
-		langDirLTRLabel		: 'Left to Right (LTR)', // MISSING
-		langDirRTLLabel		: 'Right to Left (RTL)', // MISSING
-		edit				: 'Edit Div', // MISSING
-		remove				: 'Remove Div' // MISSING
+		languageCodeInputLabel	: ' 言語コード',
+		inlineStyleInputLabel	: 'インラインスタイル',
+		advisoryTitleInputLabel	: 'Title属性',
+		langDirLabel		: '文字表記の方向',
+		langDirLTRLabel		: '左から右 (LTR)',
+		langDirRTLLabel		: '右から左 (RTL)',
+		edit				: 'Divコンテナ 編集',
+		remove				: 'Divコンテナ 削除'
   	},
+
+	iframe :
+	{
+		title		: 'IFrame Properties', // MISSING
+		toolbar		: 'IFrame', // MISSING
+		noUrl		: 'Please type the iframe URL', // MISSING
+		scrolling	: 'Enable scrollbars', // MISSING
+		border		: 'Show frame border' // MISSING
+	},
 
 	font :
 	{
@@ -605,7 +627,7 @@ CKEDITOR.lang['ja'] =
 	{
 		textColorTitle	: 'テキスト色',
 		bgColorTitle	: '背景色',
-		panelTitle		: 'Colors', // MISSING
+		panelTitle		: '色',
 		auto			: '自動',
 		more			: 'その他の色...'
 	},
@@ -619,7 +641,7 @@ CKEDITOR.lang['ja'] =
 		'008080' : 'Teal', // MISSING
 		'000080' : 'Navy', // MISSING
 		'4B0082' : 'Indigo', // MISSING
-		'696969' : 'Dim Gray', // MISSING
+		'696969' : 'Dark Gray', // MISSING
 		'B22222' : 'Fire Brick', // MISSING
 		'A52A2A' : 'Brown', // MISSING
 		'DAA520' : 'Golden Rod', // MISSING
@@ -635,7 +657,7 @@ CKEDITOR.lang['ja'] =
 		'0FF' : 'Cyan', // MISSING
 		'00F' : 'Blue', // MISSING
 		'EE82EE' : 'Violet', // MISSING
-		'A9A9A9' : 'Dark Gray', // MISSING
+		'A9A9A9' : 'Dim Gray', // MISSING
 		'FFA07A' : 'Light Salmon', // MISSING
 		'FFA500' : 'Orange', // MISSING
 		'FFFF00' : 'Yellow', // MISSING
@@ -657,6 +679,7 @@ CKEDITOR.lang['ja'] =
 	scayt :
 	{
 		title			: 'スペルチェック設定(SCAYT)',
+		opera_title		: 'Operaではサポートされません',
 		enable			: 'SCAYT有効',
 		disable			: 'SCAYT無効',
 		about			: 'SCAYTﾊﾞｰｼﾞｮﾝ',
@@ -668,9 +691,23 @@ CKEDITOR.lang['ja'] =
 		ignoreAll		: 'すべて無視',
 		addWord			: '語句追加',
 		emptyDic		: '辞書名は必ず入力してください',
+
 		optionsTab		: 'オプション',
+		allCaps			: '全て大文字の単語を無視',
+		ignoreDomainNames : 'ドメイン名を無視',
+		mixedCase		: '大文字小文字混在の単語を無視',
+		mixedWithDigits	: '数字付き単語を無視',
+
 		languagesTab	: '言語',
+
 		dictionariesTab	: '辞書',
+		dic_field_name	: '辞書名',
+		dic_create		: '登録',
+		dic_restore		: '元に戻す',
+		dic_delete		: '削除',
+		dic_rename		: '名前変更',
+		dic_info		: '始めユーザーディレクトリは、Cookieに保存されます。但し Cookie はサイズに制限があります。ユーザーディレクトリがCookieに保存できないサイズに到達するとディレクトリはサーバー上に保存されます。個人のディレクトリをサーバー上に保存するには、ディレクトリ名を明示する必要があります。もし既に保存されたディレクトリがある場合、その名前を入力し、元に戻すボタンを押してください。',
+
 		aboutTab		: 'バージョン情報'
 	},
 
@@ -687,10 +724,11 @@ CKEDITOR.lang['ja'] =
 
 	fakeobjects :
 	{
-		anchor	: 'アンカー',
-		flash	: 'Flash Animation',
-		div		: 'Page Break',
-		unknown	: 'Unknown Object'
+		anchor		: 'アンカー',
+		flash		: 'Flash Animation',
+		iframe		: 'IFrame', // MISSING
+		hiddenfield	: 'Hidden Field', // MISSING
+		unknown		: 'Unknown Object'
 	},
 
 	resize : 'ドラッグしてリサイズ',
@@ -698,11 +736,18 @@ CKEDITOR.lang['ja'] =
 	colordialog :
 	{
 		title		: '色選択',
+		options	:	'カラーオプション',
 		highlight	: 'ハイライト',
 		selected	: '選択された色',
 		clear		: 'クリア'
 	},
 
 	toolbarCollapse	: 'ツールバーを閉じる',
-	toolbarExpand	: 'ツールバーを開く'
+	toolbarExpand	: 'ツールバーを開く',
+
+	bidi :
+	{
+		ltr : 'テキストの向き : 左から右へ',
+		rtl : 'テキストの向き : 右から左へ'
+	}
 };
