@@ -41,14 +41,14 @@ class RequestCache(MultiLevelCache):
         self._ttl = 600 # seconds
 
     def _generateFileName(self, entry, version):
-        return '%s' % version
+        return 'req.%s' % version
 
     def _generatePath(self, entry):
         return ['requests']
 
     def _generateKey(self, path, qdata):
         queryHash = hash(frozenset((key, frozenset(values)) for key, values in qdata.iteritems()))
-        return '.'.join(map(str, (queryHash, hash(path))))
+        return '.'.join(map(str, (hash(path), queryHash)))
 
     def cacheObject(self, path, qdata, obj):
         return super(RequestCache, self).cacheObject(self._generateKey(path, qdata), obj)
