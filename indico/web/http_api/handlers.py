@@ -29,15 +29,12 @@ from urlparse import parse_qs
 # indico imports
 from indico.web.http_api import ExportInterface
 from indico.web.http_api.cache import RequestCache
-from indico.web.http_api.util import remove_lists
+from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.metadata.serializer import Serializer
 
 # indico legacy imports
 from MaKaC.common import DBMgr
-
-
-from indico.web.http_api.util import get_query_parameter
 
 
 class HTTPAPIError(Exception):
@@ -82,9 +79,9 @@ def handler(req, **params):
             resp = serializer.getMIMEType(), serializer(results)
 
     if resp:
+        mime, result = resp
         if not from_cache:
             cache.cacheObject(path, qdata_copy, resp)
-        mime, result = resp
         req.headers_out['Content-Type'] = mime
         return result
     else:
