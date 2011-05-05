@@ -346,112 +346,12 @@ class RHUserPersBase( base.RHDisplayBaseProtected ):
         if not self._aw.getUser():
             raise errors.AccessControlError("user")
 
-class RHUserModification( RHUserBase ):
-    _uh = urlHandlers.UHUserModification
-
-    def _checkParams( self, params ):
-        self._params = params
-        self._cancel = False
-        if params.get("cancel", ""):
-            self._cancel = True
-        RHUserBase._checkParams( self, params )
-        self._save = params.get("Save", "")
-        self._addEmail = params.get("addSecEmail", "")
-        self._removeEmail = params.get("removeSecEmail", "")
+class RHUserEvents(RHUserPersBase):
+    _uh = urlHandlers.UHGetUserEventPage
 
     def _process( self ):
-        if self._cancel:
-            self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
-            return
-        save = False
-        self._params["msg"] = ""
-        if self._save:
-            save = True
-            #check submited data
-            if not self._params.get("name",""):
-                self._params["msg"] += "You must enter a name.<br>"
-                save = False
-            if not self._params.get("surName",""):
-                self._params["msg"] += "You must enter a surname.<br>"
-                save = False
-            if not self._params.get("organisation",""):
-                self._params["msg"] += "You must enter the name of your organisation.<br>"
-                save = False
-            if not self._params.get("email",""):
-                self._params["msg"] += "You must enter an email address.<br>"
-                save = False
-        if self._params.get("email","") != self._avatar.getEmail():
-                av = user.AvatarHolder().match({"email": self._params.get("email","")}, forceWithoutExtAuth=True)
-                if av:
-                    if av[0] != self._avatar:
-                        self._params["msg"] += "This email is already used"
-                        save = False
-        if save:
-            #Data are OK, save them
-            idxs = indexes.IndexesHolder()
-            org = idxs.getById( 'organisation' )
-            email = idxs.getById( 'email' )
-            name = idxs.getById( 'name' )
-            surName = idxs.getById( 'surName' )
-            org.unindexUser(self._avatar)
-            email.unindexUser(self._avatar)
-            name.unindexUser(self._avatar)
-            surName.unindexUser(self._avatar)
-            self._params["secEmails"] = self._normaliseListParam(self._params.get("secEmails",[]))
-            _UserUtils.setUserData( self._avatar, self._params )
-            self._getSession().setLang(self._avatar.getLang())
-            org.indexUser(self._avatar)
-            email.indexUser(self._avatar)
-            name.indexUser(self._avatar)
-            surName.indexUser(self._avatar)
-
-            #----Grant rights if anything
-            ph=pendingQueues.PendingQueuesHolder()
-            ph.grantRights(self._avatar)
-            #-----
-            websession = self._aw.getSession()
-            tzUtil = timezoneUtils.SessionTZ(self._aw.getUser())
-            tz = tzUtil.getSessionTZ()
-            websession.setVar("ActiveTimezone",tz)
-            self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
-
-        elif self._addEmail:
-            self._params["secEmails"] = self._normaliseListParam(self._params.get("secEmails",[]))
-            email = self._params.get("secEmailAdd", "")
-            av = user.AvatarHolder().match({"email": email}, exact=1, forceWithoutExtAuth=True)
-            add = True
-            if av:
-                if av[0] != self._avatar:
-                    self._params["msg"] += "This email is already used"
-                    add = False
-            if email and add and not email in self._params["secEmails"]:
-                self._params["secEmails"].append(email)
-            p = adminPages.WPUserModification( self, self._avatar, self._params )
-            return p.display()
-        elif self._removeEmail:
-
-            emails = self._normaliseListParam(self._params.get("secEmailRemove",[]))
-            self._params["secEmails"] = self._normaliseListParam(self._params["secEmails"])
-            for email in emails:
-                if email and email in self._params["secEmails"]:
-                    self._params["secEmails"].remove(email)
-            p = adminPages.WPUserModification( self, self._avatar, self._params )
-            websession = self._aw.getSession()
-            tzUtil = timezoneUtils.SessionTZ(self._aw.getUser())
-            tz = tzUtil.getSessionTZ()
-            websession.setVar("ActiveTimezone",tz)
-            return p.display()
-        else:
-            p = adminPages.WPUserModification( self, self._avatar, self._params )
-            websession = self._aw.getSession()
-            tzUtil = timezoneUtils.SessionTZ(self._aw.getUser())
-            tz = tzUtil.getSessionTZ()
-            websession.setVar("ActiveTimezone",tz)
-            return p.display()
-        """
-        p = adminPages.WPUserModification( self, self._avatar )
+        p = personalization.WPDisplayUserEvents( self )
         return p.display()
-        """
 
 
 class RHUserActive( RHUserBase ):

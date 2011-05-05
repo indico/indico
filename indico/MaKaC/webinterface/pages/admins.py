@@ -1434,11 +1434,19 @@ class WUserDetails(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         u = self._avatar
-        vars["fullName"] = self.htmlText("%s, %s"%(u.getSurName().upper(), u.getName()))
+        vars["userId"] = u.getId()
+        vars["surName"] = self.htmlText(u.getSurName())
+        vars["name"] = self.htmlText(u.getName())
         vars["organisation"] = self.htmlText(u.getOrganisations()[0])
+        titleDic = {}
+        for title in TitlesRegistry().getList():
+            titleDic[title] = title
+        vars["titleList"] = titleDic
         vars["title"] = self.htmlText(u.getTitle())
         vars["address"] = self.htmlText(u.getAddresses()[0])
         vars["email"] = self.getEmailsHTML(u)
+        vars["onlyEmail"] = self.htmlText(u.getEmail())
+        vars["secEmails"] = ", ".join(u.getSecondaryEmails())
         vars["lang"] = self.htmlText(u.getLang())
         vars["telephon"] = self.htmlText(u.getTelephones()[0])
         vars["fax"] = self.htmlText(u.getFaxes()[0])
@@ -1539,7 +1547,7 @@ class WPUserPreferences( WPPersonalArea ):
     def _setActiveTab( self ):
         self._tabPreferences.setActive()
 
-
+### This class is not used anymore. To remove
 class WUserModify(wcomponents.WTemplated):
 
     def __init__( self, avatar ):
@@ -1576,11 +1584,11 @@ class WUserModify(wcomponents.WTemplated):
 
         return "\n".join(html)
 
-
-class WPUserModification( WPUserBase ):
+### This class is not used anymore. To remove
+class WPUserModification( WPUserDetails ):
 
     def __init__(self, rh, avatar, params):
-        WPUserBase.__init__(self, rh)
+        WPUserDetails.__init__(self, rh)
         self._avatar = avatar
         self._params = params
 
@@ -1636,10 +1644,10 @@ class WIdentityModification(wcomponents.WTemplated):
         return vars
 
 
-class WPIdentityCreation(WPUserBase):
+class WPIdentityCreation(WPUserDetails):
 
     def __init__(self, rh, av, params):
-        WPUserBase.__init__(self, rh)
+        WPUserDetails.__init__(self, rh)
         self._avatar = av
         self._params = params
 
@@ -1650,10 +1658,10 @@ class WPIdentityCreation(WPUserBase):
         return c.getHTML( self._params )
 
 
-class WPIdentityChangePassword(WPUserBase):
+class WPIdentityChangePassword(WPUserDetails):
 
     def __init__(self, rh, av, params):
-        WPUserBase.__init__(self, rh)
+        WPUserDetails.__init__(self, rh)
         self._avatar = av
         self._params = params
 

@@ -361,11 +361,7 @@ IndicoUI.Widgets = {
 
 
         selectionField: function(elem, method, attributes, options, cachedValue, observer){
-            var cachedRpcValue = IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue);
-            IndicoUI.Widgets.Generic.sourceSelectionField(elem, cachedRpcValue, options);
-            if (observer) {
-                cachedRpcValue.observe(observer);
-            }
+            elem.set(new SelectEditWidget(method, attributes, options, cachedValue, observer).draw());
         },
 
         sourceTextField: function(elem, source){
@@ -388,15 +384,8 @@ IndicoUI.Widgets = {
             $B(elem, Html.div({}, editable(source, context), Widget.text(" "), Widget.text($B(chooser, context))));
         },
 
-        textField: function(elem, method, attributes, cachedValue){
-
-            IndicoUI.Widgets.Generic.sourceTextField(elem,
-                                                     IndicoUtil.cachedRpcValue(
-                                                         Indico.Urls.JsonRpcService,
-                                                         method,
-                                                         attributes,
-                                                         cachedValue));
-
+        textField: function(elem, method, attributes, cachedValue, observer){
+            elem.set(new InputEditWidget(method, attributes, cachedValue, true, observer).draw());
         },
 
         richTextField: function(elem, method, attributes, width, height, cachedValue){

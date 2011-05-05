@@ -23,7 +23,7 @@
         </td>
     </tr>
     <tr>
-        <td valign="top" style="min-width:290px;">
+        <td valign="top">
             <div id="inPlaceEditNumberOfAnswers" ></div>
         </td>
         <td rowspan="2" valign="top" style="padding-top:10px;">

@@ -126,7 +126,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
         },
 
         function(method, attributes, initValue) {
-            this.InlineEditWidget(method, attributes, initValue);
+            this.InlineEditWidget(method, attributes, initValue, true);
             this.__parameterManager = new IndicoUtil.parameterManager();
         });
 

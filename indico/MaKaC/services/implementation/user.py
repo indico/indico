@@ -21,7 +21,7 @@ from MaKaC.services.implementation.base import LoggedOnlyService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.user as user
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 
 from MaKaC.common import info
 
@@ -33,6 +33,11 @@ from MaKaC.rb_location import CrossLocationQueries
 
 from MaKaC.i18n import langList, languageNames
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
+from MaKaC.services.implementation.base import ParameterManager
+from MaKaC.webinterface.common.person_titles import TitlesRegistry
+import MaKaC.common.indexes as indexes
+from MaKaC.common import pendingQueues
+from MaKaC.common.utils import validMail
 
 class UserComparator(object):
 
@@ -326,6 +331,111 @@ class UserSetDisplayTimezone(LoggedOnlyService):
         return False
 
 
+class UserPersonalDataBase(LoggedOnlyService):
+
+    _dataTypes = ["title", "surName", "name", "fullName", "straightFullName", "organisation",
+                  "email", "secondaryEmails", "address", "telephone", "fax"]
+
+    def _checkParams(self):
+        self._pm = ParameterManager(self._params)
+        userId = self._pm.extract("userId", None)
+        if userId is not None:
+            ah = user.AvatarHolder()
+            self._user = self._avatar = ah.getById(userId)
+        else:
+            raise ServiceError("ERR-U5", _("User id not specified"))
+        self._dataType = self._pm.extract("dataType", pType=str, allowEmpty=False)
+        if not self._dataType in self._dataTypes:
+            raise ServiceError("ERR-U7", _("Data argument is not valid"))
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        if self._aw.getUser():
+            if not self._avatar.canModify( self._aw ):
+                raise ServiceError("ERR-U6", _("You are not allowed to perform this request"))
+
+
+class UserSetPersonalData(UserPersonalDataBase):
+
+    def _checkParams(self):
+        UserPersonalDataBase._checkParams(self)
+        if (self._dataType == "surName" or self._dataType == "name" or self._dataType == "organisation"):
+            self._value = self._pm.extract("value", pType=str, allowEmpty=False)
+        elif (self._dataType == "email"):
+            self._value = self._pm.extract("value", pType=str, allowEmpty=False)
+            if not validMail(self._value):
+                raise ServiceAccessError(_("The email address is not valid"))
+        else:
+            self._value = self._pm.extract("value", pType=str, allowEmpty=True)
+
+    def _buildEmailList(self):
+        emailList = []
+        if (self._value == ""):
+            return emailList
+        else:
+            # replace to have only one separator
+            self._value = self._value.replace(" ",",")
+            self._value = self._value.replace(";",",")
+            emailList = self._value.split(",")
+            return emailList
+
+    def _getAnswer( self):
+        if self._user:
+            idxs = indexes.IndexesHolder()
+            funcGet = "get%s%s" % (self._dataType[0].upper(), self._dataType[1:])
+            funcSet = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
+            if self._dataType == "title":
+                if self._value in TitlesRegistry().getList():
+                    self._user.setTitle(self._value)
+                else:
+                    raise ServiceError("ERR-U8", _("Invalid title value"))
+            elif self._dataType == "surName":
+                surName = idxs.getById("surName")
+                surName.unindexUser(self._avatar)
+                self._user.setSurName(self._value)
+                surName.indexUser(self._avatar)
+            elif self._dataType == "name":
+                name = idxs.getById("name")
+                name.unindexUser(self._avatar)
+                self._user.setName(self._value)
+                name.indexUser(self._avatar)
+            elif self._dataType == "organisation":
+                org = idxs.getById("organisation")
+                org.unindexUser(self._avatar)
+                self._user.setOrganisation(self._value)
+                org.indexUser(self._avatar)
+            elif self._dataType == "email":
+                # Check if there is any user with this email address
+                if self._value != self._avatar.getEmail():
+                    other = user.AvatarHolder().match({"email": self._value}, forceWithoutExtAuth=True)
+                    if other and other[0] != self._avatar:
+                        raise ServiceError("ERR-U9", _("The email address is already used by another user."))
+                email = idxs.getById("email")
+                email.unindexUser(self._avatar)
+                self._user.setEmail(self._value)
+                email.indexUser(self._avatar)
+            elif self._dataType == "secondaryEmails":
+                emailList = self._buildEmailList()
+                secondaryEmails = []
+                # check if every secondary email is valid
+                for email in emailList:
+                    if email != "":
+                        av = user.AvatarHolder().match({"email": email}, forceWithoutExtAuth=True)
+                        if av and av[0] != self._avatar:
+                            raise ServiceError("ERR-U10", _("The email address %s is already used by another user.") % email)
+                        else:
+                            secondaryEmails.append(email)
+                self._user.setSecondaryEmails(secondaryEmails)
+                return ", ".join(self._user.getSecondaryEmails())
+            else:
+                getattr(self._user, funcSet)(self._value)
+
+            return getattr(self._user, funcGet)()
+        else:
+            raise ServiceError("ERR-U5", _("User id not specified"))
+
+
+
 methodMap = {
     "event.list": UserListEvents,
     "favorites.addUsers": UserAddToBasket,
@@ -344,4 +454,6 @@ methodMap = {
     "setTimezone": UserSetTimezone,
     "getDisplayTimezones": UserGetDisplayTimezones,
     "setDisplayTimezone": UserSetDisplayTimezone,
+    "setPersonalData": UserSetPersonalData
+
 }

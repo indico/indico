@@ -8,7 +8,7 @@
     <tr>
       <td colspan="2">
         <br>
-        <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
+        <table width="60%" align="left" border="0" style="padding-left:20px;">
           <tr>
             <td colspan="3" class="groupTitle">${ WTitle }</td>
           </tr>

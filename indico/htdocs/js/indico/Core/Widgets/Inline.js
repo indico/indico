@@ -1257,10 +1257,11 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
          },
 
          _buildFrame: function(modeChooser, switchChooser) {
-             return Html.div({},
+             return Html.span({},
                              modeChooser,
-                             Html.div({style:{marginTop: '5px'}},
-                                      switchChooser));
+                              Html.div({style: this.frameAttrs},
+                                       switchChooser));
+
          },
 
          _handleError: function(error) {
@@ -1279,12 +1280,13 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
                      }
              }, 'Save'));
 
-             var editButtons = Html.div({},
-                 this.saveButton,
-                 Widget.button(command(function() {
-                     // back to the start
-                     self.setMode('display');
-                 }, 'Cancel')));
+             var editButtons = Html.span({},
+                                         this.saveButton,
+                                         Widget.button(command(function() {
+                                             // back to the start
+                                             self.setMode('display');
+                                         }, 'Cancel')));
+
 
              // there are two possible states for the "switch" area
 
@@ -1349,6 +1351,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
 
      },
      function(method, attributes, initValue) {
+         this.frameAttrs = {'display': 'inline', 'marginLeft': '5px'};
          this.value = initValue;
          this.InlineRemoteWidget(method, attributes, false);
      });
@@ -1431,7 +1434,7 @@ type("SessionRenameWidget", ["InlineWidget"],
             _buildFrame: function(modeChooser, switchChooser) {
                 return Html.div({},
                             modeChooser,
-                            Html.div({style:{marginTop: '5px', marginLeft: '5px', display: 'inline'}},
+                                Html.div({style:{marginTop: '5px', marginLeft: '5px', display: 'inline'}},
                                      switchChooser));
             },
 
@@ -1526,21 +1529,22 @@ type("SessionRenameWidget", ["InlineWidget"],
 
 
 //Textarea widget
-
 type("TextAreaEditWidget", ["InlineEditWidget"],
         {
             _handleEditMode: function(value) {
-                // call buildStructure with modification widgets
 				this.textarea = Html.textarea({rows: 7, cols: 50}, value);
+				this.__parameterManager.add(this.textarea, 'text', true);
                 return this.textarea;
             },
 
             _handleDisplayMode: function(value) {
-                // call buildStructure with spans
-            	this.comments = Html.span({}, value);
-            	this.__parameterManager.add(this.comments, 'text', true);
+                if (value) {
+                    this.comments = Html.span({}, value);
+                    return this.comments;
+                } else {
+                    return;
+                }
 
-                return this.comments;
             },
 
             _getNewValue: function() {
@@ -1548,12 +1552,123 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
             },
 
             _verifyInput: function() {
-                return true;
+                return this.__parameterManager.check();
             }
         },
         function(method, attributes, initValue) {
             this.InlineEditWidget(method, attributes, initValue);
+            this.frameAttrs = {'display': 'block', 'marginTop': '5px'};
             this.__parameterManager = new IndicoUtil.parameterManager();
+        });
+
+
+// Select widget
+type("SelectEditWidget", ["InlineEditWidget"],
+        {
+            _handleEditMode: function(value) {
+                var content = Html.span({style:{paddingBottom:'3px'}});
+                var option;
+                this.select = Html.select();
+                var self = this;
+                jQuery.each(this.options, function(key, caption) {
+                    option = Html.option({value:key}, caption);
+                    self.select.append(option);
+                    if (self.currentValue == caption) {
+                        option.dom.selected = true;
+                    }
+                });
+
+                content.append(this.select)
+                return content;
+            },
+
+            _handleDisplayMode: function(value) {
+                this.currentValue = this.options[value];
+                return Html.span({}, this.currentValue);
+            },
+
+            _getNewValue: function() {
+                return this.select.get();
+            },
+
+            _handleSuccess: function() {
+                if (this.successHandler) {
+                    return this.successHandler();
+                }
+            }
+        },
+        function(method, attributes, options, initValue, successHandler) {
+            this.options = options;
+            this.initValue = initValue;
+            this.successHandler = successHandler;
+            this.currentValue = this.options[this.initValue];
+            this.InlineEditWidget(method, attributes, initValue);
+        });
+
+
+// Input edit widget
+type("InputEditWidget", ["InlineEditWidget", "ErrorAware"],
+        {
+            _handleEditMode: function(value) {
+                var content = Html.div({style:{paddingBottom:'3px', marginLeft: '5px'}});
+                this.input = Html.input('text', {size: 30}, value);
+                content.append(this.input);
+                if (this.helpMsg) {
+                    var help = Html.div({style:{paddingTop:'3px'}}, Html.small({}, this.helpMsg));
+                    content.append(help);
+                }
+                return content;
+            },
+
+            _handleDisplayMode: function(value) {
+                var content = Html.span({}, value);
+                return content;
+            },
+
+            _getNewValue: function() {
+                return this.input.get();
+            },
+
+            _handleSuccess: function() {
+                if (this.successHandler) {
+                    return this.successHandler();
+                }
+            },
+
+            _checkErrorState: function() {
+                if (this.validation) {
+                    return !this.validation(this.input.get());
+                } else {
+                    // No validation function
+                    return false;
+                }
+            },
+
+            _setErrorState: function(text) {
+                this._stopErrorList = this._setElementErrorState(this.input, text);
+            },
+
+            _verifyInput: function() {
+                if (!this.allowEmpty && this.input.get() == '') {
+                    this._setErrorState($T('Field is mandatory'));
+                    return false;
+                }
+                if (this._checkErrorState()) {
+                    this._setErrorState(this.errorMsg);
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        },
+        function(method, attributes, initValue, allowEmpty, successHandler, validation, errorMsg, helpMsg) {
+            this.attributes = attributes;
+            this.allowEmpty = allowEmpty;
+            this.successHandler = successHandler;
+            this.validation = validation;
+            this.errorMsg = errorMsg;
+            this.helpMsg = helpMsg;
+            this.InlineEditWidget(method, attributes, initValue);
         });
 
 
