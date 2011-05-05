@@ -24,22 +24,38 @@ HTTP API - Handlers
 
 # python stdlib imports
 import re
+import time
 from urlparse import parse_qs
 
 # indico imports
 from indico.web.http_api import ExportInterface
 from indico.web.http_api.cache import RequestCache
+from indico.web.http_api.fossils import IHTTPAPIResultFossil
 from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.metadata.serializer import Serializer
 
 # indico legacy imports
 from MaKaC.common import DBMgr
-
+from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
 
 class HTTPAPIError(Exception):
     pass
 
+class HTTPAPIResult(Fossilizable):
+    fossilizes(IHTTPAPIResultFossil)
+
+    def __init__(self, results, ts=None):
+        if ts is None:
+            ts = int(time.time())
+        self._ts = ts
+        self._results = results
+
+    def getTS(self):
+        return self._ts
+
+    def getResults(self):
+        return self._results
 
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
@@ -76,7 +92,9 @@ def handler(req, **params):
 
         if results:
             serializer = Serializer.create(dformat, pretty=pretty, **remove_lists(qdata))
-            resp = serializer.getMIMEType(), serializer(results)
+            resultFossil = fossilize(HTTPAPIResult(results))
+            del resultFossil['_fossil']
+            resp = serializer.getMIMEType(), serializer(resultFossil)
 
     if resp:
         mime, result = resp

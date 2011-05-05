@@ -37,11 +37,15 @@ class XMLSerializer(Serializer):
     def _convert(self, value):
         if type(value) == datetime:
             return value.isoformat()
+        elif type(value) == int or type(value) == float:
+            return str(value)
         else:
             return value.decode('utf-8') if type(value) == str else value
 
     def _xmlForFossil(self, fossil, doc=None):
-        attribs = {'fossil': fossil['_fossil']}
+        attribs = {}
+        if '_fossil' in fossil:
+            attribs['fossil'] = fossil['_fossil']
         if 'id' in fossil:
             attribs['id'] = fossil['id']
 
@@ -53,20 +57,21 @@ class XMLSerializer(Serializer):
         for k, v in fossil.iteritems():
             if k not in ['_fossil', '_type', 'id']:
                 elem = etree.SubElement(felement, k)
-                try:
+                if type(v) == list:
+                    for subv in v:
+                        elem.append(self._xmlForFossil(subv))
+                else:
                     elem.text = self._convert(v)
-                except:
-                    raise Exception((attribs['id'], self._convert(v)))
 
-    def __call__(self, fossil):
-        xml_declaration = False
+        return felement
+
+    def __call__(self, fossil, xml_declaration=True):
         if type(fossil) == list:
             # collection of fossils
             doc = etree.ElementTree(etree.Element("collection"))
             for elem in fossil:
                 self._xmlForFossil(elem, doc)
             result = doc
-            xml_declaration = True
         else:
             result = self._xmlForFossil(fossil)
 

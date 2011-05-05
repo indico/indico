@@ -34,13 +34,13 @@ class HTML4Serializer(Serializer):
     _mime = 'text/html'
 
     def __call__(self, fossils):
-        if type(fossils) != list:
-            fossils = [fossils]
+        results = fossils['results']
+        if type(results) != list:
+            results = [results]
 
         orderedFossils = OrderedDict()
-
-        for fossil in fossils:
+        for fossil in results:
             orderedFossils.setdefault(fossil['startDate'].date(), []).append(fossil)
 
         return render(os.path.join(os.path.dirname(__file__), 'html4.tpl'),
-                      {'fossils': orderedFossils})
+                      {'fossils': orderedFossils, 'ts': fossils['ts']})

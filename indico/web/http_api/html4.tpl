@@ -1,10 +1,10 @@
-<ul class="indico_event_list">
+<ul class="indico_event_list" data-ts="${ts}">
 % for date, events in fossils.iteritems():
 <li>
   <span class="indico_event_list_day">${date.strftime("%A %B %d, %Y")}</span>
   <ul class="indico_day_content">
     % for event in events:
-    <li class="indico_event_entry">
+    <li class="indico_event_entry" data-id="${event['id']}">
       <span class="indico_event_time">${event['startDate'].time().strftime("%H:%M")}</span>
       <span class="indico_event_category">${event['owner']}</span>
       <a href="${event['url']}" title="${event['title']}">
