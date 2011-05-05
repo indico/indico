@@ -625,6 +625,7 @@ class RHRegistrantAccommodationPerformModify( RHRegistrantModifBase ):
                     ((currentAccoType is None or not currentAccoType.isBillable()) and \
                      (self._accoType is None or not self._accoType.isBillable())):
                     self._registrant.getAccommodation().setAccommodationType(self._accoType)
+        self._registrant.updateTotal()
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantSocialEventsModify( RHRegistrantModifBase ):
@@ -667,6 +668,7 @@ class RHRegistrantSocialEventsPerformModify( RHRegistrantModifBase ):
                 if not self._registrant.getPayed() or not seItem.isBillable():
                     newSE = SocialEvent(seItem, int(self._places[seItem.getId()]))
                     self._registrant.addSocialEvent(newSE)
+        self._registrant.updateTotal()
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantReasonParticipationModify( RHRegistrantModifBase ):
