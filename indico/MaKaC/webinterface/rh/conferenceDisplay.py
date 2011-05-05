@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 ##
 ##
@@ -234,7 +235,7 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
                 self._params["msg"] += _("You must define a password.")+"<br>"
                 save = False
             if self._params.get("password","") != self._params.get("passwordBis",""):
-                self._params["msg"] += _("You must enter the same password two time.")+"<br>"
+                self._params["msg"] += _("You must enter the same password twice.")+"<br>"
                 save = False
             if not ih.isLoginFree(self._params.get("login","")):
                 self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"

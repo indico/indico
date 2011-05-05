@@ -155,7 +155,7 @@ class RHUserCreation( RH ):
                 self._params["msg"] += _("You must define a password.")+"<br>"
                 save = False
             if self._params.get("password","") != self._params.get("passwordBis",""):
-                self._params["msg"] += _("You must enter the same password two time.")+"<br>"
+                self._params["msg"] += _("You must enter the same password twice.")+"<br>"
                 save = False
             if not ih.isLoginFree(self._params.get("login","")):
                 self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
@@ -534,7 +534,7 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
                 ok = False
             #then, check if password is OK
             if self._pwd != self._pwdBis:
-                msg += "You must enter the same password two time<br>"
+                msg += "You must enter the same password twice<br>"
                 ok = False
             if ok:
                 #create the indentity
@@ -569,7 +569,7 @@ class RHUserIdPerformCreation( RHUserIdentityBase ):
             return
         #then, check if password is OK
         if self._pwd != self._pwdBis:
-            self._redirect(self._fromURL + "&msg=You must enter the same password two time")
+            self._redirect(self._fromURL + "&msg=You must enter the same password twice")
             return
         #create the indentity
         li = user.LoginInfo( self._login, self._pwd )

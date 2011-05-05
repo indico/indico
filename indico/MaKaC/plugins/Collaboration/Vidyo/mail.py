@@ -205,7 +205,7 @@ class NewVidyoPublicRoomNotificationAdmin(VidyoAdminNotificationBase):
         self.setSubject("""[Vidyo] New Vidyo public room: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Vidyo Responsible,<br />
+        self.setBody("""Dear Vidyo Manager,<br />
 <br />
 There is a <strong>new Vidyo public room</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to see it in Indico.<br />
@@ -262,7 +262,7 @@ class VidyoPublicRoomModifiedNotificationAdmin(VidyoAdminNotificationBase):
         self.setSubject("""[Vidyo] Vidyo public room modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Vidyo Responsible,<br />
+        self.setBody("""Dear Vidyo Manager,<br />
 <br />
 A Vidyo public room <strong>was modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to see it in Indico.<br />
@@ -320,7 +320,7 @@ class VidyoPublicRoomRemovalNotificationAdmin(VidyoAdminNotificationBase):
         self.setSubject("""[Vidyo] Vidyo public room deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Vidyo Responsible,<br />
+        self.setBody("""Dear Vidyo Manager,<br />
 <br />
 A Vidyo public room <strong>was deleted</strong> in <a href="%s">%s</a><br />
 <br />
@@ -375,7 +375,7 @@ class VidyoCleaningNotification(VidyoAdminNotificationBase):
         self.setSubject("""[Vidyo] Too many public rooms (%s)"""
                         % str(currentCount))
 
-        self.setBody("""Dear Vidyo Responsible,<br />
+        self.setBody("""Dear Vidyo Manager,<br />
 <br />
 There are currently %s Vidyo public rooms created by Indico in <a href="%s">%s</a>.<br />
 The system was setup to send you a notification if this number was more than %s.<br />
@@ -403,7 +403,7 @@ class VidyoCleaningDoneNotification(GenericNotification):
         if error:
             self.setSubject("""[Vidyo] Old room cleaning failed: %s rooms deleted"""
                         % str(previousTotal - newTotal))
-            self.setBody("""Dear Vidyo Responsible,<br />
+            self.setBody("""Dear Vidyo Manager,<br />
 <br />
 A cleanup of old Vidyo rooms in <a href="%s">%s</a> encountered the following error:%s<br />
 "All rooms before %s (%s, server timezone) should have been deleted but only the date %s was reached.<br />
@@ -419,7 +419,7 @@ There were %s rooms before the operation and there are %s rooms left now.<br />
         else:
             self.setSubject("""[Vidyo] Old room cleaning successful: %s rooms deleted"""
                         % str(previousTotal - newTotal))
-            self.setBody("""Dear Vidyo Responsible,<br />
+            self.setBody("""Dear Vidyo Manager,<br />
 <br />
 A cleanup was successfully executed for old Vidyo rooms in <a href="%s">%s</a>.<br />
 All rooms attached to events finishing before %s (%s, server timezone) were deleted in the Vidyo server.<br />
