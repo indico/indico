@@ -1536,6 +1536,9 @@ class WPPersonalArea(WPUserBase):
         self._tabBaskets = self._tabCtrl.newTab( "baskets", _("Favorites"), \
                 urlHandlers.UHUserBaskets.getURL() )
 
+        self._tabAPI = self._tabCtrl.newTab( "api", _("HTTP API"), \
+                urlHandlers.UHUserAPI.getURL() )
+
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("User Details"))
 

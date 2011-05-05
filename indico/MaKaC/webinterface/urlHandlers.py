@@ -1976,6 +1976,12 @@ class UHUserBaskets( URLHandler ):
 class UHUserPreferences( URLHandler ):
     _relativeURL = "userPreferences.py"
 
+class UHUserAPI( URLHandler ):
+    _relativeURL = "userAPI.py"
+
+class UHUserAPICreate( URLHandler ):
+    _relativeURL = "userAPI.py/create"
+
 class UHUserRegistration( URLHandler ):
     _relativeURL = "userRegistration.py"
 

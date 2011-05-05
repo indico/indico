@@ -555,6 +555,7 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.common import utils
         self.key = utils.newKey() #key to activate the account
         self.registrants = {}
+        self.apiKey = None
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._lang = minfo.getLang()
@@ -696,6 +697,16 @@ class Avatar(Persistent, Fossilizable):
 
     def getKey( self ):
         return self.key
+
+    def getAPIKey(self):
+        try:
+            return self.apiKey
+        except:
+            self.apiKey = None
+            return self.apiKey
+
+    def setAPIKey(self, apiKey):
+        self.apiKey = apiKey
 
     def resetLinkedTo(self):
         self.linkedTo = deepcopy(self.linkedToBase)
