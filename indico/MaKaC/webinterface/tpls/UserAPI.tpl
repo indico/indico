@@ -49,7 +49,7 @@
                 </form>
             % else:
                 <form action="${urlHandlers.UHUserAPICreate.getURL()}" method="POST" onsubmit="return confirm('${_("Warning: When creating a new API key, your old key will stop working immediately!")}');">
-                    <input type="submit" value="Create a new API" />
+                    <input type="submit" value="Create a new API key" />
                 </form>
             % endif
         </td>
