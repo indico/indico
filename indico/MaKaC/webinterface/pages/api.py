@@ -38,4 +38,5 @@ class WUserAPI(WTemplated):
         vars = WTemplated.getVars(self)
         vars['avatar'] = self._avatar
         vars['apiKey'] = self._avatar.getAPIKey()
+        vars['isAdmin'] = self._rh._getUser().isAdmin()
         return vars

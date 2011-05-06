@@ -1982,6 +1982,9 @@ class UHUserAPI( URLHandler ):
 class UHUserAPICreate( URLHandler ):
     _relativeURL = "userAPI.py/create"
 
+class UHUserAPIBlock( URLHandler ):
+    _relativeURL = "userAPI.py/block"
+
 class UHUserRegistration( URLHandler ):
     _relativeURL = "userRegistration.py"
 

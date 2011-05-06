@@ -59,4 +59,22 @@
             </td>
         </tr>
     % endif
+
+    % if isAdmin:
+        <tr>
+            <td colspan="2">
+                <div class="groupTitle">${ _("Administration") }</div>
+            </td>
+        </tr>
+        % if apiKey:
+            <tr>
+                <td></td>
+                <td>
+                    <form action="${urlHandlers.UHUserAPIBlock.getURL(avatar)}" method="POST">
+                        <input type="submit" value="${_('Unblock API key') if apiKey.isBlocked() else _('Block API key')}" />
+                    </form>
+                </td>
+            </tr>
+        % endif
+    % endif
 </table>

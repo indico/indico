@@ -18,7 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from indico.web.http_api.auth import APIKey
+from indico.web.http_api.auth import APIKey, APIKeyHolder
 from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.api import WPUserAPI
@@ -43,4 +43,18 @@ class RHUserAPICreate(RHUserBase):
             ak.create()
         else:
             ak.newKey()
+        self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
+
+class RHUserAPIBlock(RHUserBase):
+    def _checkParams(self, params):
+        RHUserBase._checkParams(self, params)
+        self._ak = self._avatar.getAPIKey()
+
+    def _checkProtection(self):
+        RHUserBase._checkProtection(self)
+        if not self._getUser().isAdmin():
+            raise AccessError()
+
+    def _process(self):
+        self._ak.setBlocked(not self._ak.isBlocked())
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
