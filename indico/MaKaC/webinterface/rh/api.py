@@ -19,32 +19,28 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from indico.web.http_api.auth import APIKey
-from MaKaC.webinterface.rh.base import RHProtected
+from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.api import WPUserAPI
 from MaKaC.errors import AccessError
 
-class RHUserAPI(RHProtected):
-    _uh = urlHandlers.UHUserAPI
-
+class RHUserAPI(RHUserBase):
     def _process(self):
-        p = WPUserAPI(self, self._getUser())
+        p = WPUserAPI(self, self._avatar)
         return p.display()
 
-class RHUserAPICreate(RHProtected):
-    _uh = urlHandlers.UHUserAPI
-
+class RHUserAPICreate(RHUserBase):
     def _checkProtection(self):
-        RHProtected._checkProtection(self)
-        ak = self._getUser().getAPIKey()
+        RHUserBase._checkProtection(self)
+        ak = self._avatar.getAPIKey()
         if ak and ak.isBlocked():
             raise AccessError()
 
     def _process(self):
-        ak = self._getUser().getAPIKey()
+        ak = self._avatar.getAPIKey()
         if not ak:
-            ak = APIKey(self._getUser())
+            ak = APIKey(self._avatar)
             ak.create()
         else:
             ak.newKey()
-        self._redirect(self._uh.getURL())
+        self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))

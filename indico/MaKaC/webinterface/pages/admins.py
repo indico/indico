@@ -1537,7 +1537,7 @@ class WPPersonalArea(WPUserBase):
                 urlHandlers.UHUserBaskets.getURL() )
 
         self._tabAPI = self._tabCtrl.newTab( "api", _("HTTP API"), \
-                urlHandlers.UHUserAPI.getURL() )
+                urlHandlers.UHUserAPI.getURL(self._avatar) )
 
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("User Details"))

@@ -48,11 +48,11 @@
             <td></td>
             <td>
                 % if not apiKey:
-                    <form action="${urlHandlers.UHUserAPICreate.getURL()}" method="POST" onsubmit="return confirm('${_("Please only create an API key if you actually need one. Unused API keys might be deleted after some time.")}');">
+                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm('${_("Please only create an API key if you actually need one. Unused API keys might be deleted after some time.")}');">
                         <input type="submit" value="Create API key" />
                     </form>
                 % else:
-                    <form action="${urlHandlers.UHUserAPICreate.getURL()}" method="POST" onsubmit="return confirm('${_("Warning: When creating a new API key, your old key will stop working immediately!")}');">
+                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm('${_("Warning: When creating a new API key, your old key will stop working immediately!")}');">
                         <input type="submit" value="Create a new API key" />
                     </form>
                 % endif

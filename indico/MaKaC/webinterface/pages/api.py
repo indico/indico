@@ -36,5 +36,6 @@ class WUserAPI(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars(self)
+        vars['avatar'] = self._avatar
         vars['apiKey'] = self._avatar.getAPIKey()
         return vars
