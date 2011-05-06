@@ -75,6 +75,19 @@
                     </form>
                 </td>
             </tr>
+            <tr>
+                 <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">Old keys</span></td>
+                 <td class="blacktext">
+                    % if apiKey.getOldKeys():
+                        <ul>
+                            % for key in apiKey.getOldKeys():
+                                <li>${key}</li>
+                            % endfor
+                        </ul>
+                    % else:
+                        None
+                    % endif
+                 </td>
         % endif
     % endif
 </table>

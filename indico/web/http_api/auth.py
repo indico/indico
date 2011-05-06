@@ -20,6 +20,7 @@
 import datetime
 import uuid
 from persistent import Persistent
+from persistent.list import PersistentList
 from MaKaC.common.ObjectHolders import ObjectHolder
 
 class APIKeyHolder(ObjectHolder):
@@ -42,6 +43,7 @@ class APIKey(Persistent):
         self._useCount = 0
         self._lastPath = None
         self._lastQuery = None
+        self._oldKeys = PersistentList()
 
     def getUser(self):
         return self._user
@@ -53,6 +55,7 @@ class APIKey(Persistent):
     def setKey(self, key):
         akh = APIKeyHolder()
         akh.remove(self)
+        self._oldKeys.append(self.getKey())
         self._key = key
         akh.add(self)
 
@@ -80,6 +83,9 @@ class APIKey(Persistent):
         if self._lastQuery:
             return '%s?%s' % (self._lastPath, self._lastQuery)
         return self._lastPath
+
+    def getOldKeys(self):
+        return self._oldKeys
 
     def used(self, ip, path, query):
         self._lastUsedDT = datetime.datetime.now()
