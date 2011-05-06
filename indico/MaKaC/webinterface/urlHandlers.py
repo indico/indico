@@ -3528,6 +3528,9 @@ class UHOAIPrivateConfigAddIP( URLHandler ):
 class UHOAIPrivateConfigRemoveIP( URLHandler ):
     _relativeURL = "adminServices.py/oaiPrivateConfigRemoveIP"
 
+class UHAdminAPIKeys( URLHandler ):
+    _relativeURL = "adminServices.py/apiKeys"
+
 class UHBadgeTemplates( URLHandler ):
     _relativeURL = "badgeTemplates.py"
 

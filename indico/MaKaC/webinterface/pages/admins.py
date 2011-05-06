@@ -529,6 +529,10 @@ class WPServicesCommon( WPAdminsBase ):
                 urlHandlers.UHRecording.getURL() )
         self._subTabOAIPrivateConfig = self._tabCtrl.newTab( "oai-private", _("OAI Private Gateway"), \
                 urlHandlers.UHOAIPrivateConfig.getURL() )
+        self._subTabHTTPAPI = self._tabCtrl.newTab( "http_api", _("HTTP API"), \
+                urlHandlers.UHAdminAPIKeys.getURL() )
+        self._subTabHTTPAPI_APIKeys = self._subTabHTTPAPI.newSubTab( "api_keys", _("API Keys"), \
+                urlHandlers.UHAdminAPIKeys.getURL() )
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )

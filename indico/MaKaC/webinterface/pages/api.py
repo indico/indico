@@ -17,8 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from MaKaC.webinterface.pages.admins import WPPersonalArea
+from operator import attrgetter
+
+from MaKaC.webinterface.pages.admins import WPPersonalArea, WPServicesCommon
 from MaKaC.webinterface.wcomponents import WTemplated
+from indico.web.http_api.auth import APIKeyHolder
 
 class WPUserAPI(WPPersonalArea):
 
@@ -39,4 +42,22 @@ class WUserAPI(WTemplated):
         vars['avatar'] = self._avatar
         vars['apiKey'] = self._avatar.getAPIKey()
         vars['isAdmin'] = self._rh._getUser().isAdmin()
+        return vars
+
+
+class WPAdminAPI(WPServicesCommon):
+
+    def _getTabContent(self, params):
+        c = WAdminAPI()
+        return c.getHTML(params)
+
+    def _setActiveTab( self ):
+        self._subTabHTTPAPI.setActive()
+
+class WAdminAPI(WTemplated):
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        akh = APIKeyHolder()
+        vars['apiKeys'] = sorted(akh.getList(), key=lambda ak: ak.getUser().getFullName())
         return vars

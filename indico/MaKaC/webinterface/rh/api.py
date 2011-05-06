@@ -20,8 +20,9 @@
 
 from indico.web.http_api.auth import APIKey, APIKeyHolder
 from MaKaC.webinterface.rh.users import RHUserBase
+from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages.api import WPUserAPI
+from MaKaC.webinterface.pages.api import WPUserAPI, WPAdminAPI
 from MaKaC.errors import AccessError
 
 class RHUserAPI(RHUserBase):
@@ -72,3 +73,9 @@ class RHUserAPIDelete(RHUserBase):
     def _process(self):
         self._ak.remove()
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
+
+
+class RHAdminAPI(RHServicesBase):
+    def _process(self):
+        p = WPAdminAPI(self)
+        return p.display()

@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import MaKaC.webinterface.rh.services as services
+import MaKaC.webinterface.rh.api as api
 
 def webcast(req, **params):
     return services.RHWebcast(req).process(params)
@@ -100,3 +101,6 @@ def oaiPrivateConfigAddIP(req, **params):
 
 def oaiPrivateConfigRemoveIP(req, **params):
     return services.RHOAIPrivateConfigRemoveIP(req).process(params)
+
+def apiKeys(req, **params):
+    return api.RHAdminAPI(req).process(params)
