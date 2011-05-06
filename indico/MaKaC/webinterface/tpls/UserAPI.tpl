@@ -92,6 +92,13 @@
                         None
                     % endif
                  </td>
+             </tr>
+        % else:
+            <tr>
+                <td colspan="2" class="blacktext">
+                    ${_('No actions available')}
+                </td>
+            </tr>
         % endif
     % endif
 </table>
