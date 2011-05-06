@@ -29,6 +29,12 @@
         </td>
     </tr>
     <tr>
+        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last request")}</span></td>
+        <td class="blacktext">
+            ${apiKey.getLastRequest() or 'n/a' if apiKey else _('n/a')}
+        </td>
+    </tr>
+    <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Total uses")}</span></td>
         <td class="blacktext">
             ${apiKey.getUseCount() if apiKey else _('n/a')}

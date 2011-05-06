@@ -112,7 +112,7 @@ def handler(req, **params):
         if ak:
             for _retry in xrange(10):
                 dbi.sync()
-                ak.used(req.remote_ip)
+                ak.used(req.remote_ip, path, query)
                 try:
                     dbi.endRequest(True)
                 except ConflictError:

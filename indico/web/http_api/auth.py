@@ -39,6 +39,8 @@ class APIKey(Persistent):
         self._lastUsedDT = None
         self._lastUsedIP = None
         self._useCount = 0
+        self._lastPath = None
+        self._lastQuery = None
 
     def getUser(self):
         return self._user
@@ -65,9 +67,18 @@ class APIKey(Persistent):
     def getUseCount(self):
         return self._useCount
 
-    def used(self, ip):
+    def getLastRequest(self):
+        if not self._lastPath:
+            return None
+        if self._lastQuery:
+            return '%s?%s' % (self._lastPath, self._lastQuery)
+        return self._lastPath
+
+    def used(self, ip, path, query):
         self._lastUsedDT = datetime.datetime.now()
         self._lastUsedIP = ip
+        self._lastPath = path
+        self._lastQuery = query
         self._useCount += 1
 
     def newKey(self):
