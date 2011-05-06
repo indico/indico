@@ -24,7 +24,7 @@ which action to carry out in order to handle the request made. This means that
 each of the possible HTTP ports of the system will have a rh which will know
 what to do depending on the parameter values received, etc.
 """
-import copy, time, os, sys, random, re
+import copy, time, os, sys, random, re, socket
 import StringIO
 from datetime import datetime, timedelta
 
@@ -38,7 +38,6 @@ from ZEO.Exceptions import ClientDisconnected
 
 from MaKaC.common import fossilize
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 import MaKaC.webinterface.session as session
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -126,25 +125,14 @@ class RequestHandlerBase(OldObservable):
         i18n.install('messages', lang, unicode=True)
 
     def getHostIP(self):
-        import socket
+        hostIP = str(self._req.get_remote_ip())
 
-        host = str(self._req.get_remote_host(apache.REMOTE_NOLOOKUP))
-
-        try:
-            hostIP = socket.gethostbyname(host)
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.useProxy():
-                # if we're behind a proxy, use X-Forwarded-For
-                xff = self._req.headers_in.get("X-Forwarded-For",hostIP).split(", ")[-1]
-                return socket.gethostbyname(xff)
-            else:
-                return hostIP
-        except socket.gaierror, e:
-            # in case host resolution fails
-            raise HostnameResolveError("Error resolving host '%s' : %s" % (host, e))
-
-
-
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.useProxy():
+            # if we're behind a proxy, use X-Forwarded-For
+            return self._req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
+        else:
+            return hostIP
 
     accessWrapper = property( getAW )
 
