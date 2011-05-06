@@ -33,10 +33,8 @@ class RHPaymentModule:
         module = None
         for mod in epaymentModules:
             params2 = copy(params)
-##            mod.webinterface.rh.preprocessParams(params2)
-##            if mod.pluginName == params2.get("EPaymentName","No module name"):
             if mod.webinterface.rh.preprocessParams(params2) and \
-               pluginId(mod) == params2.get("EPaymentName","No module name"):
+                   mod.MODULE_ID == params2.get("EPaymentName","No module name"):
                 module = mod
                 break
         if module:
