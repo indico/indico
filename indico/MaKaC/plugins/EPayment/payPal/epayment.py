@@ -74,7 +74,7 @@ class PayPalMod(BaseEPayMod):
                         <input type="hidden" name="item_name" value="%s">
                         <input type="hidden" name="amount" value="%s">
                         <INPUT TYPE="hidden" NAME="currency_code" value="%s">
-                        <input type="hidden" name="charset" value="windows-1252">
+                        <input type="hidden" name="charset" value="utf-8">
                         <input type="hidden" name="return" value="%s">
                         <input type="hidden" name="cancel_return" value="%s">
                         <input type="hidden" name="notify_url" value="%s">
