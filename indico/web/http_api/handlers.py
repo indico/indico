@@ -92,8 +92,6 @@ def handler(req, **params):
             else:
                 req.status = apache.HTTP_FORBIDDEN
                 return 'Invalid API key'
-        import logging
-        logging.info('API call with user %r via key %s' % (user, ak and ak.getKey()))
 
         results = None
         m = re.match(r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)/?$', path)
