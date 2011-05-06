@@ -120,7 +120,7 @@ def handler(req, **params):
             # No need to commit stuff if we didn't use an API key - nothing was written
             dbi.endRequest(False)
 
-        if results:
+        if results is not None:
             serializer = Serializer.create(dformat, pretty=pretty, **remove_lists(qdata))
             resultFossil = fossilize(HTTPAPIResult(results))
             del resultFossil['_fossil']
