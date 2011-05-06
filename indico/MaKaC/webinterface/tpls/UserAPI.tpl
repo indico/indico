@@ -70,8 +70,12 @@
             <tr>
                 <td></td>
                 <td>
-                    <form action="${urlHandlers.UHUserAPIBlock.getURL(avatar)}" method="POST">
+                    <form action="${urlHandlers.UHUserAPIBlock.getURL(avatar)}" method="POST" style="display:inline;">
                         <input type="submit" value="${_('Unblock API key') if apiKey.isBlocked() else _('Block API key')}" />
+                    </form>
+
+                    <form action="${urlHandlers.UHUserAPIDelete.getURL(avatar)}" method="POST" style="display:inline;" onsubmit="return confirm('${_("Do you really want to DELETE the API key? The user will be able to create a new key, but all history will be lost.")}');">
+                        <input type="submit" value="${_('Delete API key')}" />
                     </form>
                 </td>
             </tr>

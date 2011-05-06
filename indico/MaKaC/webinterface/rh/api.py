@@ -58,3 +58,17 @@ class RHUserAPIBlock(RHUserBase):
     def _process(self):
         self._ak.setBlocked(not self._ak.isBlocked())
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
+
+class RHUserAPIDelete(RHUserBase):
+    def _checkParams(self, params):
+        RHUserBase._checkParams(self, params)
+        self._ak = self._avatar.getAPIKey()
+
+    def _checkProtection(self):
+        RHUserBase._checkProtection(self)
+        if not self._getUser().isAdmin():
+            raise AccessError()
+
+    def _process(self):
+        self._ak.remove()
+        self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))

@@ -9,3 +9,6 @@ def create(req, **params):
 
 def block(req, **params):
     return api.RHUserAPIBlock(req).process(params)
+
+def delete(req, **params):
+    return api.RHUserAPIDelete(req).process(params)
