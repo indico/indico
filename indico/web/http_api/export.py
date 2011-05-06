@@ -154,8 +154,6 @@ class ExportInterface(object):
         location = get_query_parameter(qdata, ['l', 'location'])
         limit = get_query_parameter(qdata, ['n', 'limit'], integer=True)
 
-        self._dbi.startRequest()
-
         if tzName == None:
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
             tzName = info.getTimezone()
@@ -186,7 +184,6 @@ class ExportInterface(object):
             if terminate:
                 break
 
-        self._dbi.endRequest(False)
         return results
 
     def event(self, idlist, orderBy=None, descending=False, detail="events"):

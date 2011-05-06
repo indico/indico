@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from ZODB.POSException import ConflictError
 
 """
 HTTP API - Handlers
@@ -29,6 +30,7 @@ from urlparse import parse_qs
 
 # indico imports
 from indico.web.http_api import ExportInterface
+from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
 from indico.web.http_api.fossils import IHTTPAPIResultFossil
 from indico.web.http_api.util import remove_lists, get_query_parameter
@@ -75,7 +77,19 @@ def handler(req, **params):
         resp = obj.getContent()
         from_cache = True
     else:
+        dbi = DBMgr.getInstance()
+        dbi.startRequest()
+
         pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
+        api_key = get_query_parameter(qdata, ['ak', 'apikey'], None)
+        user = None
+        ak = None
+        akh = APIKeyHolder()
+        if api_key and akh.hasKey(api_key):
+            ak = APIKeyHolder().getById(api_key)
+            user = ak.getUser()
+        import logging
+        logging.info('API call with user %r via key %s' % (user, ak and ak.getKey()))
 
         results = None
         m = re.match(r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)/?$', path)
@@ -83,12 +97,26 @@ def handler(req, **params):
             dtype, idlist, dformat = m.groups()
             idlist = idlist.split('-')
 
-            expInt = ExportInterface(DBMgr.getInstance())
+            expInt = ExportInterface(dbi)
 
             tzName = get_query_parameter(qdata, ['tz'], None)
 
             if dtype == 'categ':
                 results = expInt.category(idlist, tzName, qdata)
+
+        if ak:
+            for _retry in xrange(10):
+                dbi.sync()
+                ak.used(req.remote_ip)
+                try:
+                    dbi.endRequest(True)
+                except ConflictError:
+                    pass # retry
+                else:
+                    break
+        else:
+            # No need to commit stuff if we didn't use an API key - nothing was written
+            dbi.endRequest(False)
 
         if results:
             serializer = Serializer.create(dformat, pretty=pretty, **remove_lists(qdata))
