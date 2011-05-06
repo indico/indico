@@ -198,7 +198,7 @@ class WconfirmEPaymentWorldPay( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        vars["message"] = "Thank you to the payment!\n you have used WorldPay"
+        vars["message"] = "Thank you for the payment!<br/> You have used WorldPay"
         vars["trinfo"]="%s:%s"%(self._registrant.getFirstName(),self._registrant.getSurName())
         return vars
 
