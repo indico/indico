@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from ZODB.POSException import ConflictError
 
 """
 HTTP API - Handlers
@@ -27,6 +26,7 @@ HTTP API - Handlers
 import re
 import time
 from urlparse import parse_qs
+from ZODB.POSException import ConflictError
 
 # indico imports
 from indico.web.http_api import ExportInterface
@@ -85,9 +85,13 @@ def handler(req, **params):
         user = None
         ak = None
         akh = APIKeyHolder()
-        if api_key and akh.hasKey(api_key):
-            ak = APIKeyHolder().getById(api_key)
-            user = ak.getUser()
+        if api_key:
+            if akh.hasKey(api_key):
+                ak = APIKeyHolder().getById(api_key)
+                user = ak.getUser()
+            else:
+                req.status = apache.HTTP_FORBIDDEN
+                return 'Invalid API key'
         import logging
         logging.info('API call with user %r via key %s' % (user, ak and ak.getKey()))
 
