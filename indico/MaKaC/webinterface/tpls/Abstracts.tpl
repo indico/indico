@@ -192,12 +192,21 @@ document.filterOptionForm.showSubmissionDate.checked=false
                     ${ _("Apply filters")}
                   % endif
                 </a>
+                <span style="padding: 0px 6px 0px 6px">|</span>
+                <a id="index_display" onclick="showDisplay()" class="CAIndexUnselected" font-size="16">
+                    ${ _("Columns to display")}
+                </a>
             </div>
             </form>
         </td>
     </tr>
     <tr>
         <td colspan="11" align="left" width="100%">
+          <form action=${ filterPostURL } method="post" name="displayOptionForm">
+            <input type="hidden" name="operationType" value="display" />
+            ${ displayMenu }
+            ${ sortingOptions }
+          </form>
           <form action=${ filterPostURL } method="post" name="filterOptionForm">
             <input type="hidden" name="operationType" value="filter" />
             ${ filterMenu }
@@ -348,7 +357,12 @@ document.filterOptionForm.showSubmissionDate.checked=false
     }
 
     function showFilters() {
-        if ($E("filterMenu").dom.style.display == "") {
+        if ($E("displayMenu").dom.style.display == "") { // Check if the other menu (columns) is shown and hide if needed
+            $E("index_display").set('${ _("Select columns to display")}');
+            $E('index_display').dom.className = "CRLIndexUnselected";
+            $E("displayMenu").dom.style.display = "none";
+        }
+        if ($E("filterMenu").dom.style.display == "") { // the menu is shown, so hide it
 % if filterUsed:
             $E("index_filter").set('${ _("Show filters")}');
 % else:
@@ -356,10 +370,47 @@ document.filterOptionForm.showSubmissionDate.checked=false
 % endif
             $E('index_filter').dom.className = "CRLIndexUnselected";
             $E("filterMenu").dom.style.display = "none";
-        }else {
+        }else { // the menu is hiden so, show it
             $E("index_filter").set('${ _("Hide filters")}');
             $E('index_filter').dom.className = "CRLIndexSelected";
             $E("filterMenu").dom.style.display = "";
+        }
+    }
+
+    function showDisplay() {
+        if ($E("filterMenu").dom.style.display == "") { // Check if the other menu (filters) is shown and hide if needed
+% if filterUsed:
+            $E("index_filter").set('${ _("Show filters")}')
+% else:
+            $E("index_filter").set('${ _("Apply filters")}');
+% endif
+            $E('index_filter').dom.className = "CRLIndexUnselected";
+            $E("filterMenu").dom.style.display = "none";
+        }
+        if ($E("displayMenu").dom.style.display == "") { // the menu is shown, so hide it
+            $E("index_display").set('${ _("Select columns to display")}');
+            $E('index_display').dom.className = "CRLIndexUnselected";
+            $E("displayMenu").dom.style.display = "none";
+        }else { // the menu is hiden so, show it
+            $E("index_display").set('${ _("Close selection")}');
+            $E('index_display').dom.className = "CRLIndexSelected";
+            $E("displayMenu").dom.style.display = "";
+        }
+    }
+
+    function selectDisplay()
+    {
+        for (i = 0; i < document.displayOptionForm.disp.length; i++)
+        {
+            document.displayOptionForm.disp[i].checked=true
+        }
+    }
+
+    function unselectDisplay()
+    {
+        for (i = 0; i < document.displayOptionForm.disp.length; i++)
+        {
+            document.displayOptionForm.disp[i].checked=false
         }
     }
 </script>

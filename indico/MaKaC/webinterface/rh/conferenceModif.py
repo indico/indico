@@ -1738,17 +1738,6 @@ class RHAbstractList(RHConfModifCFABase):
         if sessionData.has_key("comment"):
             del sessionData["comment"]
 
-        # TODO: improve this part and do it as with the registrants
-        self._fields = {"ID": [ _("ID"), "checked"],
-                            "PrimaryAuthor": [ _("Primary Author"), "checked"],
-                            "Tracks": [ _("Tracks"), "checked"],
-                            "Type": [ _("Type"), "checked"],
-                            "Status": [ _("Status"), "checked"],
-                            "Rating": [ _("Rating"), "checked"],
-                            "AccTrack": [ _("Acc. Track"), "checked"],
-                            "AccType": [ _("Acc. Type"), "checked"],
-                            "SubmissionDate": [ _("Submission Date"), "checked"]}
-
         return sessionData
 
     def _updateFilters( self, sessionData, params ):
@@ -1789,17 +1778,6 @@ class RHAbstractList(RHConfModifCFABase):
             sessionData['comment'] = ""
         elif sessionData.has_key("comment"):
             del sessionData['comment']
-
-        # TODO: improve this part and do it as with the registrants
-        sessionData["fields"] = {"ID": [ _("ID"), params.get("showID","")],
-                                "PrimaryAuthor": [ _("Primary Author"), params.get("showPrimaryAuthor","")],
-                                "Tracks": [ _("Tracks"), params.get("showTracks","")],
-                                "Type": [ _("Type"), params.get("showType","")],
-                                "Status": [ _("Status"), params.get("showStatus","")],
-                                "Rating": [ _("Rating"), params.get("showRating","")],
-                                "AccTrack": [ _("Acc. Track"), params.get("showAccTrack","")],
-                                "AccType": [ _("Acc. Type"), params.get("showAccType","")],
-                                "SubmissionDate": [ _("Submission Date"), params.get("showSubmissionDate","")]}
         return sessionData
 
     def _buildFilteringCriteria(self, sessionData):
@@ -1825,7 +1803,6 @@ class RHAbstractList(RHConfModifCFABase):
         Decides what to do with the request parameters, depending
         on the type of operation that is requested
         """
-
         # user chose to reset the filters
         if operation ==  'resetFilters':
             self._filterUsed = False
@@ -1835,6 +1812,11 @@ class RHAbstractList(RHConfModifCFABase):
         elif operation ==  'setFilters':
             self._filterUsed = True
             sessionData = self._updateFilters(sessionData, params)
+
+        # user has changed the display options
+        elif operation == 'setDisplay':
+            self._filterUsed = filtersActive
+            sessionData['disp'] = params.get('disp',[])
 
         # session is empty (first time)
         elif not filtersActive:
@@ -1873,6 +1855,8 @@ class RHAbstractList(RHConfModifCFABase):
             operation =  'resetFilters'
         elif operationType ==  'filter':
             operation =  'setFilters'
+        elif operationType == 'display':
+            operation = 'setDisplay'
         else:
             operation = None
 
@@ -1892,14 +1876,15 @@ class RHAbstractList(RHConfModifCFABase):
 
         self._msg = sessionData.get("directAbstractMsg","")
         self._authSearch = sessionData.get("authSearch", "")
-        self._fields = sessionData.get("fields",{})
+
+        self._display = utils.normalizeToList(sessionData.get("disp",[]))
 
     def _process( self ):
         p = conferences.WPConfAbstractList(self,self._target, self._msg, self._filterUsed)
         return p.display( filterCrit = self._filterCrit,
                             sortingCrit = self._sortingCrit,
                             authSearch=self._authSearch, order=self._order,
-                            fields=self._fields)
+                            display = self._display)
 
 class RHAbstractsActions:
     """

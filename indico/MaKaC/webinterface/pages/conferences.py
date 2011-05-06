@@ -3753,12 +3753,15 @@ class WFilterCriterionOptionsAbstracts(wcomponents.WTemplated):
 
 class WAbstracts( wcomponents.WTemplated ):
 
-    def __init__( self, conference, filterCrit, sortingCrit, order, fields, filterUsed):
+    # available columns
+    COLUMNS = ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate"]
+
+    def __init__( self, conference, filterCrit, sortingCrit, order, display, filterUsed):
         self._conf = conference
         self._filterCrit = filterCrit
         self._sortingCrit = sortingCrit
         self._order = order
-        self._fields = fields
+        self._display = display
         self._filterUsed = filterUsed
 
     def _getURL( self ):
@@ -3844,43 +3847,26 @@ class WAbstracts( wcomponents.WTemplated ):
                 i18nformat("""<input type="checkbox" name="comment"%s> _("only with comments")""")%checkedShowComments]
         return l
 
-    def _getFieldToShow(self):
-        if not self._fields:
-            self._fields = {"ID": [ _("ID"), "checked"],
-                            "PrimaryAuthor": [ _("Primary Author"), "checked"],
-                            "Tracks": [ _("Tracks"), "checked"],
-                            "Type": [ _("Type"), "checked"],
-                            "Status": [ _("Status"), "checked"],
-                            "Rating": [ _("Rating"), "checked"],
-                            "AccTrack": [ _("Acc. Track"), "checked"],
-                            "AccType": [ _("Acc. Type"), "checked"],
-                            "SubmissionDate": [ _("Submission Date"), "checked"]}
-        l = []
-        for key in ["ID", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate"]:
-            l.append("""<input type="checkbox" name="show%s" %s value="checked">%s"""%(key, self._fields[key][1], self._fields[key][0]))
-        return l
-
     def _getAbstractTitleBar(self):
         l = ["<td></td>"]
-        if self._fields["ID"][1] == "checked":
+        if "ID" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href=%(numberSortingURL)s> _("ID")</a> %(numberImg)s</td>"""))
-        #if self._fields["Title"] == "checked":
         l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Title")</td>"""))
-        if self._fields["PrimaryAuthor"][1] == "checked":
+        if "PrimaryAuthor" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Primary Author(s)")</td>"""))
-        if self._fields["Tracks"][1] == "checked":
+        if "Tracks" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Tracks")</td>"""))
-        if self._fields["Type"][1] == "checked":
+        if "Type" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(typeSortingURL)s> _("Type")</a> %(typeImg)s</td>"""))
-        if self._fields["Status"][1] == "checked":
+        if "Status" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(statusSortingURL)s> _("Status")</a><b> %(statusImg)s</td>"""))
-        if self._fields["Rating"][1] == "checked":
+        if "Rating" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(ratingSortingURL)s> _("Rating")</a><b> %(ratingImg)s</td>"""))
-        if self._fields["AccTrack"][1] == "checked":
+        if "AccTrack" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Track")</td>"""))
-        if self._fields["AccType"][1] == "checked":
+        if "AccType" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Type")</td>"""))
-        if self._fields["SubmissionDate"][1] == "checked":
+        if "SubmissionDate" in self._getDisplay():
             l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(dateSortingURL)s> _("Submission date")</a> %(dateImg)s</td>"""))
 
         return "<tr><td colspan=4 style='padding: 5px 0px 10px;' nowrap>Select: <a style='color: #0B63A5;' alt='Select all' onclick='javascript:selectAll()'> All</a>, <a style='color: #0B63A5;' alt='Unselect all' onclick='javascript:deselectAll()'>None</a></td></tr><tr><td></td></tr><tr>%s</tr>"%("\n".join(l))
@@ -3900,9 +3886,7 @@ class WAbstracts( wcomponents.WTemplated ):
                        "options": self._getAccContribTypeFilterItemList()}),
             ('Others', {"title": _("others"),
                        "selectFunc": False,
-                       "options": self._getOthersFilterItemList()}),
-           ('Fields', {"title": _("columns to display"),
-                       "options": self._getFieldToShow()})
+                       "options": self._getOthersFilterItemList()})
             ]
 
         extraInfo = ""
@@ -3917,6 +3901,98 @@ class WAbstracts( wcomponents.WTemplated ):
         p = WFilterCriteriaAbstracts(options, None, extraInfo)
 
         return p.getHTML()
+
+
+    def _getColumnTitlesDict(self):
+        """
+            Dictionary with the translation from "ids" to "name to display" for each of the options you can choose for the display.
+            This method complements the method "_setDispOpts" in which we get a dictonary with "ids".
+        """
+        try:
+            if self._columns:
+                pass
+        except AttributeError:
+            self._columns = {"ID":"ID", "PrimaryAuthor":"Primary Author", "Tracks": "Tracks", "Type":"Type", "Status":"Status", \
+                      "Rating":"Rating", "AccTrack":"Acc. Track", "AccType":"Acc. Type", "SubmissionDate":"Submission Date"}
+        return self._columns
+
+    def _getDisplay(self):
+        """
+            These are the 'display' options selected by the user. In case no options were selected we add some of them by default.
+        """
+        display = self._display[:]
+
+        if display == []:
+            display = self.COLUMNS
+        return display
+
+    def _getDispHTML(self):
+        """
+        Filtering criteria: table with all the options for the columns we need to display.
+        """
+        res = ["""<table width="100%%" cellpadding="0" cellspacing="0" valign="top">"""]
+        columns = self._getColumnTitlesDict()
+        display = self._getDisplay()
+
+        for column in self.COLUMNS:
+            checked = ""
+            if column in display:
+                checked = " checked"
+            res.append("""<tr><td align="left" valign="top"><input type="checkbox" name="disp" value="%s"%s></td><td width="100%%" align="left" valign="top">%s</td></tr>"""%(column,checked,columns[column]))
+        res.append("""</table>""")
+        return "".join(res)
+
+    def _getDisplayMenu(self):
+        menu =  _("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
+        <tr>
+            <td>
+                <table width="100%%">
+                    <tr>
+                        <td>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table align="center" cellspacing="0" width="100%%">
+                                <tr>
+                                    <td style="border-bottom:1px solid lightgrey;" valign="top" align="left"><span style="color:black"><b>Columns to display:</b></span></td>
+                                </tr>
+                                <tr>
+                                    <td align="left" class="titleCellFormat" style="padding-top:5px;" nowrap> <a onclick="selectDisplay()">_("Select all")</a> | <a onclick="unselectDisplay()">_("Unselect all")</a> </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top">%(disp)s</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center"><input type="submit" class="btn" name="OK" value=  _("apply filter")></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table></div>""")
+        return menu
+
+    def _getDisplayOptionsHTML(self):
+        html = []
+        if self._display == []:
+            html.append("""<input type="hidden" name="disp" value="ID">""")
+            html.append("""<input type="hidden" name="disp" value="PrimaryAuthor">""")
+            html.append("""<input type="hidden" name="disp" value="Tracks">""")
+            html.append("""<input type="hidden" name="disp" value="Type">""")
+            html.append("""<input type="hidden" name="disp" value="Status">""")
+            html.append("""<input type="hidden" name="disp" value="Rating">""")
+            html.append("""<input type="hidden" name="disp" value="AccTrack">""")
+            html.append("""<input type="hidden" name="disp" value="AccType">""")
+            html.append("""<input type="hidden" name="disp" value="SubmissionDate">""")
+        else:
+            for d in self._display:
+                html.append("""<input type="hidden" name="disp" value="%s">"""%(d))
+        html.append("""<input type="hidden" name="sortBy" value="%s">"""%(self._sortingCrit.getField().getId()))
+        return "".join(html)
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
@@ -4024,32 +4100,31 @@ class WAbstracts( wcomponents.WTemplated ):
 
 
             m = ["""<td valign="top" align="right" width="3%%"><input onchange="javascript:isSelected('abstracts%s')" type="checkbox" name="abstracts" value="%s"></td>"""%(abstract.getId(), abstract.getId())]
-            if self._fields["ID"][1] == "checked":
+            if "ID" in self._getDisplay():
                 m.append("""<td class="CRLabstractLeftDataCell" nowrap>%s%s</td>"""%(abstract.getId(), comments))
-            #if self._fields["Title"] == "checked":
             m.append("""<td class="CRLabstractDataCell">
                         <a href=%s>%s</a></td>"""%(quoteattr(str(urlGen(abstract))), self.htmlText(abstract.getTitle())))
-            if self._fields["PrimaryAuthor"][1] == "checked":
+            if "PrimaryAuthor" in self._getDisplay():
                 authList = [ auth.getFullName() for auth in abstract.getPrimaryAuthorList() if auth.getFullName()]
                 PAuthors = "<br>".join(authList)
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%PAuthors)
-            if self._fields["Tracks"][1] == "checked":
+            if "Tracks" in self._getDisplay():
                 tracks = [ self.htmlText(track.getCode() or track.getId()) for track in abstract.getTrackListSorted()]
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%("<br>".join(tracks) or "&nbsp;"))
-            if self._fields["Type"][1] == "checked":
+            if "Type" in self._getDisplay():
                 contribType = abstract.getContribType()
                 contribTypeName = _("None")
                 if contribType:
                     contribTypeName = contribType.getName()
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%self.htmlText(contribTypeName))
-            if self._fields["Status"][1] == "checked":
+            if "Status" in self._getDisplay():
                 status=AbstractStatusList.getInstance().getCode(s.__class__ )
                 statusIconURL=AbstractStatusList.getInstance().getIconURL(s.__class__)
                 statusIconHTML = """<img src=%s border="0" alt="">"""%quoteattr(str(statusIconURL))
                 m.append("""<td class="CRLabstractDataCell" nowrap>%s %s</td>"""%(statusIconHTML,status))
-            if self._fields["Rating"][1] == "checked":
+            if "Rating" in self._getDisplay():
                 m.append("""<td class="CRLabstractDataCell">%s&nbsp;%s</td>"""%(rating,detailsImg))
-            if self._fields["AccTrack"][1] == "checked":
+            if "AccTrack" in self._getDisplay():
                 if isinstance(s,review.AbstractStatusAccepted):
                     if s.getTrack() is not None:
                         accTrack=self.htmlText(s.getTrack().getCode())
@@ -4057,7 +4132,7 @@ class WAbstracts( wcomponents.WTemplated ):
                     if s.getTrack() is not None:
                         accTrack=self.htmlText(s.getTrack().getCode())
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%accTrack)
-            if self._fields["AccType"][1] == "checked":
+            if "AccType" in self._getDisplay():
                 if isinstance(s,review.AbstractStatusAccepted):
                     if s.getType() is not None:
                         accType=self.htmlText(s.getType().getName())
@@ -4065,7 +4140,7 @@ class WAbstracts( wcomponents.WTemplated ):
                     if s.getType() is not None:
                         accType=self.htmlText(s.getType().getName())
                 m.append("""<td class="CRLabstractDataCell">%s</td>"""%accType)
-            if self._fields["SubmissionDate"][1] == "checked":
+            if "SubmissionDate" in self._getDisplay():
                 m.append("""<td class="CRLabstractDataCell" nowrap>%s</td>"""%format_date(abstract.getSubmissionDate(), format='long'))
             if len(m) == 1:
                 m = ["<td></td>"]
@@ -4089,9 +4164,9 @@ class WAbstracts( wcomponents.WTemplated ):
         vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars["pdfIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["xmlIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("xml")))
-
-
-
+        vars["disp"] = self._getDispHTML()
+        vars["displayMenu"] = self._getDisplayMenu()%vars
+        vars["displayOptions"] = self._getDisplayOptionsHTML()
 
         return vars
 
@@ -4107,7 +4182,7 @@ class WPConfAbstractList( WPConferenceModifAbstractBase ):
         wc = WAbstracts( self._conf, params.get("filterCrit", None ),
                             params.get("sortingCrit", None),
                             order,
-                            params.get("fields", None),
+                            params.get("display",None),
                             self._filterUsed )
         p = {"authSearch":params.get("authSearch","")}
         return wc.getHTML( p )
