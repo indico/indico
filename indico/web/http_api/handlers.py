@@ -40,6 +40,7 @@ from indico.util.metadata.serializer import Serializer
 # indico legacy imports
 from MaKaC.common import DBMgr
 from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
+from MaKaC.accessControl import AccessWrapper
 
 class HTTPAPIError(Exception):
     pass
@@ -83,12 +84,14 @@ def handler(req, **params):
         pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
         api_key = get_query_parameter(qdata, ['ak', 'apikey'], None)
         user = None
+        aw = AccessWrapper()
         ak = None
         akh = APIKeyHolder()
         if api_key:
             if akh.hasKey(api_key):
                 ak = APIKeyHolder().getById(api_key)
                 user = ak.getUser()
+                aw.setUser(user)
             else:
                 req.status = apache.HTTP_FORBIDDEN
                 return 'Invalid API key'
@@ -99,7 +102,7 @@ def handler(req, **params):
             dtype, idlist, dformat = m.groups()
             idlist = idlist.split('-')
 
-            expInt = ExportInterface(dbi)
+            expInt = ExportInterface(dbi, aw)
 
             tzName = get_query_parameter(qdata, ['tz'], None)
 

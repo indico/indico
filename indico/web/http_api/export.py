@@ -76,8 +76,9 @@ class ExportInterface(object):
     _deltas =  {'yesterday': timedelta(-1),
                 'tomorrow': timedelta(1)}
 
-    def __init__(self, dbi):
+    def __init__(self, dbi, aw):
         self._dbi = dbi
+        self._aw = aw
 
     @classmethod
     def getAllowedFormats(cls):
@@ -177,7 +178,7 @@ class ExportInterface(object):
                 if limit and counter >= limit:
                     terminate = True
                     break
-                if obj not in exclude:
+                if obj not in exclude and obj.canAccess(self._aw):
                     results.append(fossilize(obj, IConferenceMetadataFossil, tz=tz))
                     exclude.add(obj)
                     counter += 1
