@@ -90,6 +90,9 @@ def handler(req, **params):
         if api_key:
             if akh.hasKey(api_key):
                 ak = APIKeyHolder().getById(api_key)
+                if ak.isBlocked():
+                    req.status = apache.HTTP_FORBIDDEN
+                    return 'API key is blocked'
                 user = ak.getUser()
                 aw.setUser(user)
             else:

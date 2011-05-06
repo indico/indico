@@ -22,6 +22,7 @@ from indico.web.http_api.auth import APIKey
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.api import WPUserAPI
+from MaKaC.errors import AccessError
 
 class RHUserAPI(RHProtected):
     _uh = urlHandlers.UHUserAPI
@@ -32,6 +33,12 @@ class RHUserAPI(RHProtected):
 
 class RHUserAPICreate(RHProtected):
     _uh = urlHandlers.UHUserAPI
+
+    def _checkProtection(self):
+        RHProtected._checkProtection(self)
+        ak = self._getUser().getAPIKey()
+        if ak and ak.isBlocked():
+            raise AccessError()
 
     def _process(self):
         ak = self._getUser().getAPIKey()

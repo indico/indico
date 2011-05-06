@@ -36,6 +36,7 @@ class APIKey(Persistent):
         self._user = user
         self._key = key
         self._createdDT = datetime.datetime.now()
+        self._isBlocked = False
         self._lastUsedDT = None
         self._lastUsedIP = None
         self._useCount = 0
@@ -60,6 +61,12 @@ class APIKey(Persistent):
 
     def getLastUsedDT(self):
         return self._lastUsedDT
+
+    def isBlocked(self):
+        return self._isBlocked
+
+    def setBlocked(self, blocked):
+        self._isBlocked = blocked
 
     def getLastUsedIP(self):
         return self._lastUsedIP
