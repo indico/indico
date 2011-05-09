@@ -28,7 +28,6 @@ from zope.interface import Interface, implements
 from datetime import datetime, timedelta, date, time
 
 # external lib imports
-import pytz
 from simplejson import dumps
 
 # indico imports
@@ -45,7 +44,7 @@ from indico.web.http_api.fossils import IConferenceMetadataFossil
 # indico legacy imports
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
-
+from MaKaC.conference import ConferenceHolder
 
 from indico.web.http_api.util import get_query_parameter, remove_lists
 
@@ -146,22 +145,15 @@ class ExportInterface(object):
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
 
-    def category(self, idlist, tzName, qdata):
+    def category(self, idlist, tz, limit, detail, qdata):
+
+        detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
 
         orderBy = get_query_parameter(qdata, ['o', 'order'])
         descending = get_query_parameter(qdata, ['c', 'descending'], False)
-        detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
-
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
         location = get_query_parameter(qdata, ['l', 'location'])
-        limit = get_query_parameter(qdata, ['n', 'limit'], integer=True)
-
-        if tzName == None:
-            info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            tzName = info.getTimezone()
-
-        tz = pytz.timezone(tzName)
 
         fromDT = ExportInterface._getDateTime('from', fromDT, tz) if fromDT != None else None
         toDT = ExportInterface._getDateTime('to', toDT, tz, aux=fromDT) if toDT != None else None
@@ -177,7 +169,7 @@ class ExportInterface(object):
         for catId in idlist:
             for obj in idx.iterateObjectsIn(catId, fromDT, toDT):
                 # TODO: hard limit
-                if limit and counter >= limit:
+                if counter >= limit:
                     terminate = True
                     break
                 if obj not in exclude and obj.canAccess(self._aw):
@@ -189,10 +181,21 @@ class ExportInterface(object):
 
         return results
 
-    def event(self, idlist, orderBy=None, descending=False, detail="events"):
-        """
-        TODO: Document this
-        """
+    def event(self, idlist, tz, limit, detail, qdata):
+
+        ch = ConferenceHolder()
+        counter = 0
+        results = []
+
+        for eventId in idlist:
+            if counter >= limit:
+                break
+
+            event = ch.getById(eventId)
+            results.append(fossilize(event, IConferenceMetadataFossil, tz=tz))
+            counter += 1
+
+        return results
 
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)

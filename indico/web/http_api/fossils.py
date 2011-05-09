@@ -26,8 +26,13 @@ from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 
-class IHTTPAPIResultFossil(IFossil):
 
+class IHTTPAPIErrorFossil(IFossil):
+    def getMessage(self):
+        pass
+
+
+class IHTTPAPIResultFossil(IFossil):
     def getTS(self):
         pass
     getTS.name = 'ts'

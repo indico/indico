@@ -27,12 +27,13 @@ import re
 import time
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
+import pytz
 
 # indico imports
 from indico.web.http_api import ExportInterface
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
-from indico.web.http_api.fossils import IHTTPAPIResultFossil
+from indico.web.http_api.fossils import IHTTPAPIResultFossil, IHTTPAPIErrorFossil
 from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.metadata.serializer import Serializer
@@ -42,9 +43,17 @@ from MaKaC.common import DBMgr
 from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
 from MaKaC.accessControl import AccessWrapper
+from MaKaC.common.info import HelperMaKaCInfo
 
-class HTTPAPIError(Exception):
-    pass
+# Maximum number of records that will get exported
+MAX_RECORDS = 20000
+
+class HTTPAPIError(Exception, Fossilizable):
+    fossilizes(IHTTPAPIErrorFossil)
+
+    def getMessage(self):
+        return self.message
+
 
 class HTTPAPIResult(Fossilizable):
     fossilizes(IHTTPAPIResultFossil)
@@ -69,6 +78,29 @@ class HTTPAPIResult(Fossilizable):
     def getResults(self):
         return self._results
 
+
+def buildAW(apiKey):
+    user = None
+    aw = AccessWrapper()
+    ak = None
+    akh = APIKeyHolder()
+
+    if apiKey:
+        if akh.hasKey(apiKey):
+            ak = APIKeyHolder().getById(apiKey)
+            if ak.isBlocked():
+                req.status = apache.HTTP_FORBIDDEN
+                return 'API key is blocked'
+            user = ak.getUser()
+            aw.setUser(user)
+            return ak, aw
+        else:
+            req.status = apache.HTTP_FORBIDDEN
+            return 'Invalid API key'
+    else:
+        return None, None
+
+
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
     qdata = parse_qs(query)
@@ -83,6 +115,7 @@ def handler(req, **params):
 
     resp = None
     from_cache = False
+
     if obj is not None:
         resp = obj.getContent()
         from_cache = True
@@ -91,62 +124,77 @@ def handler(req, **params):
         dbi.startRequest()
 
         pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
-        api_key = get_query_parameter(qdata, ['ak', 'apikey'], None)
-        user = None
-        aw = AccessWrapper()
-        ak = None
-        akh = APIKeyHolder()
-        if api_key:
-            if akh.hasKey(api_key):
-                ak = APIKeyHolder().getById(api_key)
-                if ak.isBlocked():
-                    req.status = apache.HTTP_FORBIDDEN
-                    return 'API key is blocked'
-                user = ak.getUser()
-                aw.setUser(user)
-            else:
-                req.status = apache.HTTP_FORBIDDEN
-                return 'Invalid API key'
+        apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
+
+        # get an API key and an API key holder ou of the parameter
+        ak, aw = buildAW(apiKey)
 
         results = None
         m = re.match(r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)/?$', path)
+
         if m and m.group(3) in ExportInterface.getAllowedFormats():
             dtype, idlist, dformat = m.groups()
             idlist = idlist.split('-')
 
             expInt = ExportInterface(dbi, aw)
-
             tzName = get_query_parameter(qdata, ['tz'], None)
+            detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
+            limit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
+
+            if tzName == None:
+                info = HelperMaKaCInfo.getMaKaCInfoInstance()
+                tzName = info.getTimezone()
+
+            tz = pytz.timezone(tzName)
+
+            # impose a hard limit
+            limit = limit if limit > 0 else MAX_RECORDS
 
             if dtype == 'categ':
-                results = expInt.category(idlist, tzName, qdata)
+                results = expInt.category(idlist, tz, limit, detail, qdata)
+            elif dtype == 'event':
+                results = expInt.event(idlist, tz, limit, detail, qdata)
+            else:
+                results = None
 
-        if ak:
-            for _retry in xrange(10):
-                dbi.sync()
-                ak.used(req.remote_ip, path, query)
-                try:
-                    dbi.endRequest(True)
-                except ConflictError:
-                    pass # retry
-                else:
-                    break
         else:
-            # No need to commit stuff if we didn't use an API key - nothing was written
-            dbi.endRequest(False)
+            results = None
 
-        if results is not None:
-            serializer = Serializer.create(dformat, pretty=pretty, **remove_lists(qdata))
-            resultFossil = fossilize(HTTPAPIResult(results, path, query))
-            del resultFossil['_fossil']
-            resp = serializer.getMIMEType(), serializer(resultFossil)
+        if results == None:
+            # TODO: usage page
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        else:
+            serializer = Serializer.create(dformat, pretty=pretty,
+                                           **remove_lists(qdata))
 
-    if resp:
-        mime, result = resp
-        if not from_cache:
-            cache.cacheObject(path, qdata_copy, resp)
-        req.headers_out['Content-Type'] = mime
-        return result
-    else:
-        # TODO: usage page
-        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+            if ak:
+                for _retry in xrange(10):
+                    dbi.sync()
+                    ak.used(req.remote_ip, path, query)
+                    try:
+                        dbi.endRequest(True)
+                    except ConflictError:
+                        pass  # retry
+                    else:
+                        break
+
+                resultFossil = fossilize(HTTPAPIResult(results, path, query))
+                del resultFossil['_fossil']
+                result = serializer(resultFossil)
+
+            else:
+                # No need to commit stuff if we didn't use an API key
+                # (nothing was written)
+                dbi.endRequest(False)
+                error = HTTPAPIError("Access key is invalid!")
+                if serializer.schemaless:
+                    result = serializer(fossilize(error))
+                else:
+                    result = str(error)
+
+        resp = serializer.getMIMEType(), result
+
+    if not from_cache:
+        cache.cacheObject(path, qdata_copy, resp)
+    req.headers_out['Content-Type'] = resp[0]
+    return resp[1]

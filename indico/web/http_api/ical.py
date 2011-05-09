@@ -29,6 +29,7 @@ from indico.util.metadata.serializer import Serializer
 
 class ICalSerializer(Serializer):
 
+    schemaless = False
     _mime = 'text/calendar'
 
     def __call__(self, fossils):

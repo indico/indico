@@ -23,6 +23,7 @@ from MaKaC.webinterface.pages.admins import WPPersonalArea, WPServicesCommon
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.web.http_api.auth import APIKeyHolder
 
+
 class WPUserAPI(WPPersonalArea):
 
     def _getTabContent(self, params):
@@ -31,6 +32,7 @@ class WPUserAPI(WPPersonalArea):
 
     def _setActiveTab(self):
         self._tabAPI.setActive()
+
 
 class WUserAPI(WTemplated):
 
@@ -53,6 +55,7 @@ class WPAdminAPI(WPServicesCommon):
 
     def _setActiveTab( self ):
         self._subTabHTTPAPI.setActive()
+
 
 class WAdminAPI(WTemplated):
 

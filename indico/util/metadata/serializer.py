@@ -20,6 +20,7 @@
 
 class Serializer(object):
 
+    schemaless = True
     registry = {}
 
     def __init__(self, pretty=False):

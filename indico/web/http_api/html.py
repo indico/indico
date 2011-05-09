@@ -31,6 +31,7 @@ from MaKaC.common.TemplateExec import render
 
 class HTML4Serializer(Serializer):
 
+    schemaless = False
     _mime = 'text/html'
 
     def __call__(self, fossils):

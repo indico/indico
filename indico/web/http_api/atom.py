@@ -29,6 +29,7 @@ from indico.util.metadata.serializer import Serializer
 
 class AtomSerializer(Serializer):
 
+    schemaless = False
     _mime = 'application/atom+xml'
 
     def __call__(self, fossils):
