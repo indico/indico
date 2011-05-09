@@ -32,6 +32,10 @@ class IHTTPAPIResultFossil(IFossil):
         pass
     getTS.name = 'ts'
 
+    def getURL(self):
+        pass
+    getURL.name = 'url'
+
     def getResults(self):
         pass
 

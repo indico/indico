@@ -39,6 +39,7 @@ from indico.util.metadata import Serializer
 from indico.web.http_api.html import HTML4Serializer
 from indico.web.http_api.jsonp import JSONPSerializer
 from indico.web.http_api.ical import ICalSerializer
+from indico.web.http_api.atom import AtomSerializer
 from indico.web.http_api.fossils import IConferenceMetadataFossil
 
 # indico legacy imports
@@ -196,3 +197,4 @@ class ExportInterface(object):
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)
 Serializer.register('ics', ICalSerializer)
+Serializer.register('atom', AtomSerializer)

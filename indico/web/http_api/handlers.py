@@ -39,6 +39,7 @@ from indico.util.metadata.serializer import Serializer
 
 # indico legacy imports
 from MaKaC.common import DBMgr
+from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
 from MaKaC.accessControl import AccessWrapper
 
@@ -48,14 +49,22 @@ class HTTPAPIError(Exception):
 class HTTPAPIResult(Fossilizable):
     fossilizes(IHTTPAPIResultFossil)
 
-    def __init__(self, results, ts=None):
+    def __init__(self, results, path='', query='', ts=None):
         if ts is None:
             ts = int(time.time())
-        self._ts = ts
         self._results = results
+        self._path = path
+        self._query = query
+        self._ts = ts
 
     def getTS(self):
         return self._ts
+
+    def getURL(self):
+        prefix = Config.getInstance().getBaseSecureURL()
+        if self._query:
+            return prefix + self._path + '?' + self._query
+        return prefix + self._path
 
     def getResults(self):
         return self._results
@@ -128,7 +137,7 @@ def handler(req, **params):
 
         if results is not None:
             serializer = Serializer.create(dformat, pretty=pretty, **remove_lists(qdata))
-            resultFossil = fossilize(HTTPAPIResult(results))
+            resultFossil = fossilize(HTTPAPIResult(results, path, query))
             del resultFossil['_fossil']
             resp = serializer.getMIMEType(), serializer(resultFossil)
 
