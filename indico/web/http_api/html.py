@@ -20,7 +20,7 @@
 
 # python stdlib imports
 import os
-from collections import OrderedDict
+from operator import itemgetter
 
 # module imports
 from indico.util.metadata.serializer import Serializer
@@ -38,9 +38,10 @@ class HTML4Serializer(Serializer):
         if type(results) != list:
             results = [results]
 
-        orderedFossils = OrderedDict()
+        unorderedFossils = {}
         for fossil in results:
-            orderedFossils.setdefault(fossil['startDate'].date(), []).append(fossil)
+            unorderedFossils.setdefault(fossil['startDate'].date(), []).append(fossil)
 
+        orderedFossils = sorted(unorderedFossils.items(), key=itemgetter(0))
         return render(os.path.join(os.path.dirname(__file__), 'html4.tpl'),
                       {'fossils': orderedFossils, 'ts': fossils['ts']})

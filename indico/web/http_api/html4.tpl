@@ -1,5 +1,5 @@
 <ul class="indico_event_list" data-ts="${ts}">
-% for date, events in fossils.iteritems():
+% for date, events in fossils:
 <li>
   <span class="indico_event_list_day">${date.strftime("%A %B %d, %Y")}</span>
   <ul class="indico_day_content">
