@@ -346,7 +346,9 @@ var IndicoUtil = {
                               function(result, error) {
                                   if(exists(error)) {
                                       IndicoUtil.errorReport(error);
+                                      self.set(cachedValue);
                                   } else {
+                                      cachedValue = value;
                                       if (exists(result.hasWarning) && result.hasWarning === true) {
                                           var popup = new WarningPopup(result.warning.title, result.warning.content);
                                           popup.open();
