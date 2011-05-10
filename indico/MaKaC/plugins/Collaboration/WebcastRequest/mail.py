@@ -191,7 +191,7 @@ class NewRequestNotification(WebcastRequestAdminNotificationBase):
 
         self.setSubject("""[WebcastReq] New webcast request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
-        self.setBody("""Dear Webcast Responsible,<br />
+        self.setBody("""Dear Webcast Manager,<br />
 <br />
 There is a <strong>new webcast request</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
@@ -224,7 +224,7 @@ class RequestModifiedNotification(WebcastRequestAdminNotificationBase):
         self.setSubject("""[WebcastReq] Webcast request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Webcast Responsible,<br />
+        self.setBody("""Dear Webcast Manager,<br />
 <br />
 A webcast request <strong>has been modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
@@ -253,7 +253,7 @@ class RequestRescheduledNotification(WebcastRequestAdminNotificationBase):
         self.setSubject("""[WebcastReq] Webcast request rescheduled: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Webcast Responsible,<br />
+        self.setBody("""Dear Webcast Manager,<br />
 <br />
 A webcast request <strong>has been rescheduled</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
@@ -282,7 +282,7 @@ class RequestRelocatedNotification(WebcastRequestAdminNotificationBase):
         self.setSubject("""[WebcastReq] Webcast request relocated: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Webcast Responsible,<br />
+        self.setBody("""Dear Webcast Manager,<br />
 <br />
 A webcast request <strong>has been relocated</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
@@ -312,7 +312,7 @@ class RequestDeletedNotification(WebcastRequestAdminNotificationBase):
         self.setSubject("""[WebcastReq] Webcast request deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Webcast Responsible,<br />
+        self.setBody("""Dear Webcast Manager,<br />
 <br />
 A webcast request <strong>has been withdrawn</strong> in <a href="%s">%s</a><br />
 <br />
@@ -366,7 +366,7 @@ class RequestAcceptedNotificationAdmin(WebcastRequestAdminNotificationBase):
         userInfo = ""
         if user :
             userInfo = " by %s %s" %(user.getFirstName(), user.getFamilyName().upper())
-        self.setBody("""Dear Webcast Responsible,<br />
+        self.setBody("""Dear Webcast Manager,<br />
 <br />
 A webcast request for the event: "%s" has been accepted in <a href="%s">%s</a>""" %(self._conference.getTitle(),
                                                                                     MailTools.getServerName(),
@@ -416,12 +416,12 @@ class RequestRejectedNotificationAdmin(WebcastRequestAdminNotificationBase):
         self.setSubject("""[WebcastReq] Webcast request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Webcast Responsible,<br />
+        self.setBody("""Dear Webcast Manager,<br />
 <br />
 A webcast request for the event: "%s" has been rejected in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
 <br />
-The reason given by the Webcast Responsible who rejected the request was:
+The reason given by the Webcast Manager who rejected the request was:
 <br />
 %s
 <br />

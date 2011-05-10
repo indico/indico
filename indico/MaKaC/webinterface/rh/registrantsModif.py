@@ -23,7 +23,7 @@ import MaKaC.webinterface.pages.registrants as registrants
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 import MaKaC.webinterface.mail as mail
-from MaKaC.PDFinterface.conference import RegistrantsListToPDF
+from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
 from MaKaC.common import filters
 import MaKaC.webinterface.common.regFilters as regFilters
@@ -270,7 +270,8 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         self._remove = params.has_key("removeRegistrants")
         self._email = params.has_key("email.x")
         self._emailSelected = params.has_key("emailSelected")
-        self._pdf = params.has_key("pdf.x")
+        self._tablePDF = params.has_key("pdf.table")
+        self._bookPDF = params.has_key("pdf.book")
         self._info = params.has_key("info.x")
         self._excel = params.has_key("excel.x")
         self._reglist = params.get("reglist","").split(",")
@@ -295,12 +296,19 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
                 return r.email()
             else:
                 self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
-        elif self._pdf:
+        elif self._tablePDF:
             regs =[]
             for reg in self._selectedRegistrants:
                 if self._conf.getRegistrantById(reg) !=None:
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantListPDF(self,self._conf,regs, self._display)
+            return r.pdf()
+        elif self._bookPDF:
+            regs =[]
+            for reg in self._selectedRegistrants:
+                if self._conf.getRegistrantById(reg) !=None:
+                    regs.append(self._conf.getRegistrantById(reg))
+            r = RHRegistrantBookPDF(self,self._conf,regs, self._display)
             return r.pdf()
         elif self._info:
             regs =[]
@@ -359,6 +367,24 @@ class RHRegistrantsInfo:
         p=registrants.WPRegistrantsInfo(self._rh, self._conf)
         return p.display(reglist=self._list)
 
+class RHRegistrantBookPDF:
+    def __init__( self, rh,conf,reglist, disp ):
+        self._conf = conf
+        self._list = reglist
+        self._rh = rh
+        self._display = disp
+
+    def pdf( self ):
+        filename = "RegistrantsBook.pdf"
+        pdf = RegistrantsListToBookPDF(self._conf,list=self._list, display=self._display)
+        data = pdf.getPDFBin()
+        self._rh._req.set_content_length(len(data))
+        cfg = Config.getInstance()
+        mimetype = cfg.getFileTypeMimeType( "PDF" )
+        self._rh._req.content_type = """%s"""%(mimetype)
+        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        return data
+
 class RHRegistrantListPDF:
     def __init__( self, rh,conf,reglist, disp ):
         self._conf = conf
@@ -370,7 +396,10 @@ class RHRegistrantListPDF:
     def pdf( self ):
         filename = "RegistrantsList.pdf"
         pdf = RegistrantsListToPDF(self._conf,list=self._list, display=self._display)
-        data = pdf.getPDFBin()
+        try:
+            data = pdf.getPDFBin()
+        except:
+            raise FormValuesError( _("""Text too large to generate a PDF with "Table Style". Please try again generating with "Book Style"."""))
         self._rh._req.set_content_length(len(data))
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
@@ -625,6 +654,7 @@ class RHRegistrantAccommodationPerformModify( RHRegistrantModifBase ):
                     ((currentAccoType is None or not currentAccoType.isBillable()) and \
                      (self._accoType is None or not self._accoType.isBillable())):
                     self._registrant.getAccommodation().setAccommodationType(self._accoType)
+        self._registrant.updateTotal()
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantSocialEventsModify( RHRegistrantModifBase ):
@@ -667,6 +697,7 @@ class RHRegistrantSocialEventsPerformModify( RHRegistrantModifBase ):
                 if not self._registrant.getPayed() or not seItem.isBillable():
                     newSE = SocialEvent(seItem, int(self._places[seItem.getId()]))
                     self._registrant.addSocialEvent(newSE)
+        self._registrant.updateTotal()
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 class RHRegistrantReasonParticipationModify( RHRegistrantModifBase ):

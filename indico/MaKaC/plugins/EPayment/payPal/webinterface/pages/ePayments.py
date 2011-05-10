@@ -127,7 +127,7 @@ class WconfirmEPaymentPayPal( WTemplated ):
         
     def getVars( self ):
         vars = WTemplated.getVars(self)
-        vars["message"] = "Thank you to the payment!\n you have used PayPal"
+        vars["message"] = "Thank you for the payment!<br/> You have used PayPal"
         vars["trinfo"]="%s:%s"%(self._registrant.getFirstName(),self._registrant.getSurName())
         return vars
  

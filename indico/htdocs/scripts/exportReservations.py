@@ -101,6 +101,7 @@ def index(req, **params):
         rooms.append(roomEx)
 
     resvEx = Factory.newReservation()
+    resvEx.isCancelled = False
     resvEx.startDT = datetime(sd.year, sd.month, sd.day, 0, 0)
     resvEx.endDT = datetime(ed.year, ed.month, ed.day, 23, 59)
     resvs = CrossLocationQueries.getReservations(location="CERN", resvExample=resvEx, rooms=rooms)

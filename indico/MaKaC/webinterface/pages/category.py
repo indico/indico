@@ -1792,7 +1792,7 @@ class CategSelectTree:
         self._movingConference = movingConference
 
     def _getItem( self, categ, level=0 ):
-        if not categ.canView( self._aw ):
+        if not categ.canAccess( self._aw ):
             return ""
         html = ""
         for i in range(level):

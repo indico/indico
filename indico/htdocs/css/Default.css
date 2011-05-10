@@ -210,13 +210,23 @@ a.img:active {
     }
 }
 
+.iconSeparator {
+    font-size:15px;
+    vertical-align: top;
+}
+
+.iconDropDownMenu {
+    background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center right;
+    cursor: pointer;
+    padding-right: 12px;
+    padding-top: 6px;
+}
 
 .dropDownMenu, .dropDownMenuGrey, .dropUpMenu, .dropDownMenuWhite {
     padding-right: 17px;
     background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center right;
     cursor: pointer;
 }
-
 .dropDownMenuGrey {
     background-image: url(../images/menu_arrow_grey.png);
 }

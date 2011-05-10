@@ -183,7 +183,7 @@ class NewEVOMeetingNotificationAdmin(EVOAdminNotificationBase):
         self.setSubject("""[EVO] New EVO meeting: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear EVO Responsible,<br />
+        self.setBody("""Dear EVO Manager,<br />
 <br />
 There is a <strong>new EVO meeting</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to see it in Indico.<br />
@@ -240,7 +240,7 @@ class EVOMeetingModifiedNotificationAdmin(EVOAdminNotificationBase):
         self.setSubject("""[EVO] EVO meeting modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear EVO Responsible,<br />
+        self.setBody("""Dear EVO Manager,<br />
 <br />
 An EVO meeting <strong>was modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to see it in Indico.<br />
@@ -298,7 +298,7 @@ class EVOMeetingRemovalNotificationAdmin(EVOAdminNotificationBase):
         self.setSubject("""[EVO] EVO meeting deleted: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear EVO Responsible,<br />
+        self.setBody("""Dear EVO Manager,<br />
 <br />
 An EVO meeting <strong>was deleted</strong> in <a href="%s">%s</a><br />
 <br />

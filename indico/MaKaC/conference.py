@@ -3753,6 +3753,10 @@ class Conference(CommonObjectBase, Locatable):
         if PluginsHolder().hasPluginType("Collaboration"):
             if self.getCSBookingManager().isPluginManagerOfAnyPlugin(av):
                 return True
+            from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+            if RCCollaborationAdmin.hasRights(user=av) or \
+                RCCollaborationPluginAdmin.hasRights(user=av, plugins ='any'):
+                return True
 
         return False
 
@@ -8703,8 +8707,8 @@ class Contribution(CommonObjectBase, Locatable):
             return True
         ### TODO: Replace this code when plugins allow extension points+notifications ##################
         from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
-        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
-            RCCollaborationPluginAdmin.hasRights(user = aw.getUser(), plugins = "any"):
+        if RCCollaborationAdmin.hasRights(user=aw.getUser()) or \
+            RCCollaborationPluginAdmin.hasRights(user=aw.getUser(), plugins='any'):
             return True
         ################################################################################################
         for sc in self.getSubContributionList():
@@ -10723,6 +10727,11 @@ class Material(CommonObjectBase):
             return True
         #####################################################
 
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
+            RCCollaborationPluginAdmin.hasRights(user=aw.getUser(), plugins='any'):
+            return True
+
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
         canIPAccess = self.canIPAccess( aw.getIP() )
         if not self.isProtected():
@@ -11141,6 +11150,10 @@ class Resource(CommonObjectBase):
             return True
         #####################################################
 
+        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin, RCCollaborationPluginAdmin
+        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
+            RCCollaborationPluginAdmin.hasRights(user=aw.getUser(), plugins='any'):
+            return True
 
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             return False

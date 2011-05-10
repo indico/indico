@@ -349,6 +349,7 @@ class RH(RequestHandlerBase):
         """
         Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (id(self._req), e))
 
+        self._req.status = apache.HTTP_FORBIDDEN
         p=errors.WPAccessError(self)
         return p.display()
 

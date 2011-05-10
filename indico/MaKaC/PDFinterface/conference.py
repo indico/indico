@@ -2304,6 +2304,186 @@ class Int2Romans:
     int_to_roman = staticmethod(int_to_roman)
 
 
+class RegistrantToPDF(PDFBase):
+
+    def __init__(self, conf, reg, display, doc=None, story=None):
+        self._reg = reg
+        self._conf = conf
+        self._display = display
+        if not story:
+            story = [Spacer(inch, 5*cm)]
+        PDFBase.__init__(self, doc, story)
+        self._title = _("Registrant")
+        self._PAGE_HEIGHT = defaultPageSize[1]
+        self._PAGE_WIDTH = defaultPageSize[0]
+
+    def firstPage(self, c, doc):
+        c.saveState()
+        c.setFont('Times-Bold', 30)
+        if not self._drawLogo(c):
+            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+        c.setFont('Times-Bold', 25)
+        #c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT - inch - 5*cm, self._abstract.getTitle())
+        c.setLineWidth(3)
+        c.setStrokeGray(0.7)
+        #c.line(inch, self._PAGE_HEIGHT - inch - 6*cm, self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - inch - 6*cm)
+        #c.line(inch, inch , self._PAGE_WIDTH - inch, inch)
+        c.setFont('Times-Roman', 10)
+        #c.drawString(0.5*inch, 0.5*inch, Config.getInstance().getBaseURL())
+        c.restoreState()
+
+    def getBody(self, story=None, indexedFlowable={}, level=1 ):
+        if not story:
+            story = self._story
+
+        style = ParagraphStyle({})
+        style.fontSize = 12
+        text = _(""" _("Registrant ID") : %s""")%self._reg.getId()
+        p = Paragraph(text, style, part=escape(self._reg.getFullName()))
+        story.append(p)
+
+        story.append(Spacer(inch, 0.5*cm, part=escape(self._reg.getFullName())))
+
+        style = ParagraphStyle({})
+        style.alignment = TA_CENTER
+        style.fontSize = 25
+        style.leading = 30
+        text = escape(self._reg.getFullName())
+        p = Paragraph(text, style, part=escape(self._reg.getFullName()))
+        story.append(p)
+
+        indexedFlowable[p] = {"text":escape(self._reg.getFullName()), "level":1}
+        story.append(Spacer(inch, 1*cm, part=escape(self._reg.getFullName())))
+        style = ParagraphStyle({})
+        style.alignment = TA_JUSTIFY
+        for key in self._display:
+            text = ""
+            if key == "Email" and self._reg.getEmail() <> "":
+                text = _("""<b> _("Email") </b> :  %s""")%escape(self._reg.getEmail())
+            elif key == "Position" and self._reg.getPosition() <> "":
+                text = _("""<b> _("Position") </b> :  %s""")%escape(self._reg.getPosition())
+            elif key == "LastName" and self._reg.getFamilyName() <> "":
+                text = _("""<b> _("Surname") </b> :  %s""")%escape(self._reg.getFamilyName())
+            elif key == "FirstName" and self._reg.getFirstName() <> "":
+                text = _("""<b> _("First Name") </b> :  %s""")%escape(self._reg.getFirstName())
+            elif key == "Institution" and self._reg.getInstitution() <> "":
+                text = _("""<b> _("Institution") </b> :  %s""")%escape(self._reg.getInstitution())
+            elif key == "Address" and self._reg.getAddress() <> "":
+                text = _("""<b> _("Address") </b> :  %s""")%escape(self._reg.getAddress())
+            elif key == "City" and self._reg.getCity() <> "":
+                text = _("""<b> _("City") </b> :  %s""")%escape(self._reg.getCity())
+            elif key == "Country" and self._reg.getCountry() <> "":
+                text = _("""<b> _("Country") </b> :  %s""")%escape(CountryHolder().getCountryById(self._reg.getCountry()))
+            elif key == "Phone" and self._reg.getPhone() <> "":
+                text = _("""<b> _("Phone") </b> :  %s""")%escape(self._reg.getPhone())
+            elif key == "isPayed" and self._reg.isPayedText() <> "":
+                text = _("""<b> _("Paid") </b> :  %s""")%escape(self._reg.isPayedText())
+            elif key == "idpayment" and self._reg.getIdPay() <> "":
+                text = _("""<b> _("idpayment") </b> :  %s""")%escape(self._reg.getIdPay())
+            elif key == "amountToPay":
+                text = _("""<b> _("Amount") </b> : %.2f %s""")%(self._reg.getTotal(), escape(self._reg.getConference().getRegistrationForm().getCurrency()))
+            elif key == "Sessions":
+                listSession = []
+                for ses in self._reg.getSessionList():
+                    if ses is not None:
+                        listSession.append("%s"%escape(ses.getTitle()))
+                if len(listSession) > 0:
+                    text = _("""<b> _("Sessions")</b> : """)
+                    text += " ; ".join(listSession)
+            elif key == "SocialEvents":
+                listSocialEvents = []
+                for se in self._reg.getSocialEvents():
+                    if ses is not None:
+                        listSocialEvents.append("%s"%escape(se.getCaption()))
+                if len(listSocialEvents) > 0:
+                    text = _("""<b> _("Social Events")</b> : """)
+                    text += " ; ".join(listSocialEvents)
+            elif key == "Accommodation" and self._reg.getAccommodation() is not None and \
+            self._reg.getAccommodation().getAccommodationType() is not None:
+                text = _("""<b> _("Acommodation")</b> : %s""")%escape(self._reg.getAccommodation().getAccommodationType().getCaption())
+            elif key == "ArrivalDate" and self._reg.getAccommodation() is not None and \
+            self._reg.getAccommodation().getArrivalDate() is not None:
+                text = _("""<b> _("Arrival Date")</b> : %s""")%escape(self._reg.getAccommodation().getArrivalDate().strftime("%d-%B-%Y"))
+            elif key == "DepartureDate" and self._reg.getAccommodation() is not None and \
+            self._reg.getAccommodation().getDepartureDate() is not None:
+                text = _("""<b> _("Departure Date")</b> : %s""")%escape(self._reg.getAccommodation().getDepartureDate().strftime("%d-%B-%Y"))
+            elif key == "ReasonParticipation" and self._reg.getReasonParticipation() is not None and \
+            self._reg.getReasonParticipation() is not None and self._reg.getReasonParticipation() != "":
+                text = _("""<b> _("Reason Participation") </b> : %s""")%escape(self._reg.getReasonParticipation())
+            elif key == "RegistrationDate" and self._reg.getRegistrationDate() is not None:
+                text = _("""<b> _("Registration date") </b> : %s""")%escape(self._reg.getAdjustedRegistrationDate().strftime("%d-%B-%Y-%H:%M"))
+
+            elif key.startswith("s-"):
+                ids = key.split("-")
+                if len(ids) == 2:
+                    status = self._reg.getStatusById(ids[1])
+                    if status.getStatusValue() is not None:
+                        text = _("""<b> %s </b> : %s""")%(escape(status.getCaption()),escape(status.getStatusValue().getCaption()))
+            else:
+                ids = key.split("-")
+                if len(ids) == 2:
+                    group = self._reg.getMiscellaneousGroupById(ids[0])
+                    if group is not None:
+                        field = self._conf.getRegistrationForm().getSectionById(ids[0]).getFieldById(ids[1])
+                        response = group.getResponseItemById(ids[1])
+                        if response is not None and response.getValue() != "":
+                            text = _("""<b> %s </b> : %s""")%(escape(field.getCaption()),escape(str(response.getValue())))
+            if text != "":
+                p = Paragraph(text, style,  part=escape(self._reg.getFullName()))
+                story.append(p)
+                story.append(Spacer(inch, 0.2*cm, part=escape(self._reg.getFullName())))
+        return story
+
+class RegistrantsListToBookPDF(PDFWithTOC):
+    def __init__(self, conf,doc=None, story=[],list=None, display=["Institution", "Phone", "City", "Country"]):
+        self._conf = conf
+        self._regForm = conf.getRegistrationForm()
+        self._regList = list
+        self._display = display
+        self._title = _("Registrants Book")
+        PDFWithTOC.__init__(self)
+
+    def firstPage(self, c, doc):
+        c.saveState()
+        showLogo = False
+        c.setFont('Times-Bold', 30)
+        if not self._drawLogo(c):
+            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+        c.setFont('Times-Bold', 35)
+        c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
+        c.setLineWidth(3)
+        c.setStrokeGray(0.7)
+        #c.line(inch, self._PAGE_HEIGHT - inch - 6*cm, self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - inch - 6*cm)
+        #c.line(inch, inch , self._PAGE_WIDTH - inch, inch)
+        c.setFont('Times-Roman', 10)
+        c.drawString(0.5*inch, 0.5*inch, str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
+        c.restoreState()
+
+    def laterPages(self, c, doc):
+
+        c.saveState()
+        c.setFont('Times-Roman', 9)
+        c.setFillColorRGB(0.5, 0.5, 0.5)
+        confTitle = escape(self._conf.getTitle())
+        if len(self._conf.getTitle())>30:
+            confTitle = escape(self._conf.getTitle()[:30] + "...")
+        c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
+        title = doc.getCurrentPart()
+        if len(doc.getCurrentPart())>50:
+            title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
+        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
+        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
+        c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
+        c.restoreState()
+
+
+    def getBody(self):
+        for reg in self._regList:
+            temp = RegistrantToPDF(self._conf, reg, self._display)
+            temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
+            self._story.append(PageBreak())
+
+
 class RegistrantsListToPDF(PDFBase):
 
     def __init__(self, conf,doc=None, story=[],list=None, display=["Institution", "Phone", "City", "Country"]):

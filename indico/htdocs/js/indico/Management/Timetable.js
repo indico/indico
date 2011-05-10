@@ -65,7 +65,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                          hook.set(true);
                      } else if (state == SourceState.Error) {
                          killProgress();
-                         IndicoUtil.errorReport(source.error);
+                         IndicoUtil.errorReport(source.error.get());
                      }
                  });
              }
@@ -642,6 +642,7 @@ type("ChangeEditDialog", // silly name!
 
                  indicoRequest(this.timeStartMethod, this.dateArgs , function(result, error){
                      if (error) {
+                         self.killProgress();
                          IndicoUtil.errorReport(error);
                      }
                      else {
@@ -693,11 +694,11 @@ type("ChangeEditDialog", // silly name!
 
          this.successFunc = successFunc;
 
-         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
+         this.killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
          this.PreLoadHandler(
              this._preload,
              function() {
-                 killProgress();
+                 self.killProgress();
                  self.open();
              });
 

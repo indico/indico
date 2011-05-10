@@ -21,6 +21,7 @@ extend(IndicoUI.Dialogs,
                        // Get "end date" for container, so that the break be added after the rest
                        indicoRequest(timeStartMethod, dateArgs , function(result, error){
                            if (error) {
+                               killLoadProgress();
                                IndicoUtil.errorReport(error);
                            }
                            else {
@@ -263,6 +264,7 @@ extend(IndicoUI.Dialogs,
                        // Get "end date" for container, so that the break be added after the rest
                        indicoRequest(timeStartMethod, dateArgs , function(result, error){
                            if (error) {
+                               killLoadProgress();
                                IndicoUtil.errorReport(error);
                            }
                            else {

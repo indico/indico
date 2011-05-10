@@ -145,9 +145,9 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             if self._columns:
                 pass
         except AttributeError:
-            columns ={"PersonalData":"Personal Data","Id":"Id", "Email": "Email", "Position":"Position", "Institution":"Institution","Phone":"Phone","City":"City",\
-                      "Country":"Country", "Address":"Address", "ArrivalDate": "Arrival Date", "DepartureDate": "Departure Date", \
-                      "RegistrationDate": "Registration date (%s)"%self._conf.getTimezone()}
+            columns ={"PersonalData":_("Personal Data"),"Id":_("Id"), "Email": _("Email"), "Position":_("Position"), "Institution":_("Institution"),"Phone":_("Phone"),"City":_("City"),\
+                      "Country":_("Country"), "Address":_("Address"), "ArrivalDate": _("Arrival Date"), "DepartureDate": _("Departure Date"), \
+                      "RegistrationDate": _("""_("Registration date") (%s)""")%self._conf.getTimezone()}
 
             tit=self._conf.getRegistrationForm().getSessionsForm().getTitle()
             if not self._conf.getRegistrationForm().getSessionsForm().isEnabled():
@@ -165,13 +165,13 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
             if not self._conf.getRegistrationForm().getReasonParticipationForm().isEnabled():
                 tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
             columns["ReasonParticipation"]=tit
-            columns["more"]="General info"
-            columns["statuses"]="Statuses"
-            columns["isPayed"]="Paid"
-            columns["idpayment"]="Payment ID"
-            columns["amountToPay"]="Amount"
-            columns["LastName"]="Last name"
-            columns["FirstName"]="First name"
+            columns["more"]=_("General info")
+            columns["statuses"]=_("Statuses")
+            columns["isPayed"]=_("Paid")
+            columns["idpayment"]=_("Payment ID")
+            columns["amountToPay"]=_("Amount")
+            columns["LastName"]=_("Surname")
+            columns["FirstName"]=_("First name")
 
             for st in self._conf.getRegistrationForm().getStatusesList(False):
                 columns["s-%s"%st.getId()]=st.getCaption()
@@ -484,11 +484,11 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         else:
             vars ["reglist"]=",".join(regl)
         vars["emailIconURL"]="""<input type="image" name="email" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("envelope")))
-        vars["printIconURL"]="""<input type="image" name="pdf" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["infoIconURL"]="""<input type="image" name="info" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("info")))
-        vars["excelIconURL"]="""<input type="image" name="excel" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
-        vars["pdfUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
+        vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+        vars["pdfIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["excelUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+
         vars ["disp"]= self._getDispHTML()
         tit=self._conf.getRegistrationForm().getAccommodationForm().getTitle()
         if not self._conf.getRegistrationForm().getAccommodationForm().isEnabled():

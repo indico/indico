@@ -21,6 +21,7 @@
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
+from MaKaC.registration import LabelInput
 import string
 from MaKaC import registration
 from MaKaC.webinterface import wcomponents
@@ -2335,11 +2336,11 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             if v is None : v=""
             html.append("""
                     <tr>
-                       <td align="right"><b>%s:</b></td>
+                       <td align="right"><b>%s%s</b></td>
                        <td align="left">%s</td>
                        <td align="right">%s&nbsp;&nbsp;%s</td>
                     </tr>
-                    """%(f.getCaption(), self._formatValue(fieldInput, v), price, currancy) )
+                    """%(f.getCaption(), ":" if not isinstance(fieldInput, LabelInput) else '', self._formatValue(fieldInput, v), price, currancy) )
         if miscGroup is not None:
             for miscItem in miscGroup.getResponseItemList():
                     f=gsf.getFieldById(miscItem.getId())
@@ -2585,7 +2586,6 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
     def _getModPayHTML(self):
         forms=""
         html=[]
-
         regForm = self._conf.getRegistrationForm()
         for m in self.modPay.getSortedModPay():
             if m.isEnabled():

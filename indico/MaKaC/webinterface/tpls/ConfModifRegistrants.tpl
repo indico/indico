@@ -119,7 +119,7 @@
 
         <tr>
           <td colspan="40" style="border-bottom:2px solid #777777;padding-top:5px" valign="bottom" align="left">
-            <form action=${ actionPostURL } method="post" name="registrantsForm" onsubmit="return atLeastOneSelected($E('registrantsItems'), $T('No registrant selected! Please select at least one.'));">
+            <form id="registrantsForm" action=${ actionPostURL } method="post" name="registrantsForm" onsubmit="return atLeastOneSelected($E('registrantsItems'), $T('No registrant selected! Please select at least one.'));">
           <table>
                 <tr>
                   <td colspan="10">
@@ -146,14 +146,16 @@
                 <td valign="bottom" align="left">
                   <input type="submit" class="btn" name="info.x" value="${ _("Show stats")}">
                 </td>
-                <td valign="bottom" align="left">
+                <td valign="middle" align="left">
                   Export to:
                 </td>
                 <td valign="bottom" align="left">
-                  ${ printIconURL }
+                    <a href="#" id="exportPDFSelectorLink1" name="pdf" class="iconDropDownMenu"> <img src=${ pdfIconURL} border="0"></a>
+                    <input id="pdfExportInputHidden" type="hidden" name="pdf">
+                    <span class="iconSeparator"> |  </span>
                 </td>
-                <td valign="bottom" align="left">
-                  ${ excelIconURL }
+                <td valign="middle" align="left">
+                    <input type="image" style="margin-top:3px;" name="excel" src=${ excelIconURL } border="0">
                 </td>
                 </tr>
               </table>
@@ -185,16 +187,17 @@
                         <td valign="bottom" align="left">
                             <input type="submit" class="btn" name="info.x" value="${ _("Show stats")}">
                         </td>
-                        <td valign="bottom" align="left">
+                        <td valign="middle" align="left">
                             Export to:
                         </td>
-                        <td valign="bottom" align="left">
-                            ${ printIconURL }
-                        </td>
-                        <td valign="bottom" align="left">
-                            ${ excelIconURL }
-                        </td>
-
+                <td valign="bottom" align="left">
+                    <a href="#" id="exportPDFSelectorLink1" name="pdf" class="iconDropDownMenu"> <img src=${ pdfIconURL} border="0"></a>
+                    <input id="pdfExportInputHidden" type="hidden" name="pdf">
+                    <span class="iconSeparator"> |  </span>
+                </td>
+                <td valign="middle" align="left">
+                    <input type="image" style="margin-top:3px;" name="excel" src=${ excelIconURL } border="0">
+                </td>
                 </tbody>
             </table>
         </td>
@@ -244,4 +247,46 @@
             $E("displayMenu").dom.style.display = "";
         }
     }
+
+var pdfLink1 = $E('exportPDFSelectorLink1');
+var pdfLink2 = $E('exportPDFSelectorLink2');
+var pdfMenu = null;
+
+function createMenu(pdfLink) {
+    // Close the menu if clicking the link when menu is open
+    if (pdfMenu != null && pdfMenu.isOpen()) {
+        pdfMenu.close();
+        pdfMenu = null;
+        return;
+    }
+
+    // build a dictionary that represents the menu
+    var menuItems = {};
+    menuItems['Table Style'] = function () {submitForm("pdf.table");};
+    menuItems['Book Style'] = function () {submitForm("pdf.book");};
+
+    pdfMenu = new PopupMenu(menuItems, [pdfLink], null);
+    var pos = pdfLink.getAbsolutePosition();
+    pdfMenu.open(pos.x, pos.y + pdfLink.dom.offsetHeight + 3, null, null, false, true);
+    return false;
+
+}
+
+function submitForm(style) {
+    var form = $E('registrantsForm');
+    var inputHidden = $E('pdfExportInputHidden');
+    inputHidden.dom.name = style;
+    if(form.dom.onsubmit())
+        form.dom.submit(); pdfMenu.close()
+}
+
+pdfLink1.observeClick(function(e) {
+    createMenu(pdfLink1);
+    return false;
+});
+
+pdfLink2.observeClick(function(e) {
+    createMenu(pdfLink2);
+    return false;
+});
 </script>

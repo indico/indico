@@ -921,7 +921,7 @@ class ContributionReviewingNotification(GenericNotification):
     def __init__(self, user, role, contribution):
         GenericNotification.__init__(self)
         conference = contribution.getConference()
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been chosen as %s for the contribution "%s" (id: %s)"""
                         % (role, contribution.getTitle(), str(contribution.getId())))
@@ -945,7 +945,7 @@ class ContributionReviewingRemoveNotification(GenericNotification):
     def __init__(self, user, role, contribution):
         conference = contribution.getConference()
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] You have been removed as %s of the contribution "%s" (id: %s) of the conference %s (id: %s)"""
                         % (role, contribution.getTitle(), str(contribution.getId()), conference.getTitle(),str(conference.getId())))
@@ -965,7 +965,7 @@ class ContributionReviewingJudgementNotification(GenericNotification):
     def __init__(self, user, judgement, contribution):
 
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
@@ -1040,7 +1040,7 @@ class ContributionReviewingJudgementWithdrawalNotification(GenericNotification):
 
     def __init__(self, user, judgement, contribution):
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
 
         if isinstance(judgement, EditorJudgement):
@@ -1096,7 +1096,7 @@ class MaterialsSubmittedNotification(GenericNotification):
     def __init__(self, user, role, contribution):
         conference = contribution.getConference()
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] The author of the contribution %s (id: %s) of the conference %s has submitted his/her materials (id: %s)"""
                         % (contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId())))
@@ -1114,7 +1114,7 @@ class MaterialsChangedNotification(GenericNotification):
     def __init__(self, user, role, contribution):
         conference = contribution.getConference()
         GenericNotification.__init__(self)
-        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail())
+        self.setFromAddr("Indico Mailer<%s>"%HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
         self.setSubject("""[Indico] Warning: the author of the contribution %s (id: %s) of the conference %s (id: %s) has changed his/her materials """
                         % (contribution.getTitle(), str(contribution.getId()), conference.getTitle(), str(conference.getId())))

@@ -298,7 +298,7 @@ class NewRequestNotification(RecordingRequestAdminNotificationBase):
         self.setSubject("""[RecReq] New recording request: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Recording Responsible,<br />
+        self.setBody("""Dear Recording Manager,<br />
 <br />
 There is a <strong>new recording request</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
@@ -332,7 +332,7 @@ class RequestModifiedNotification(RecordingRequestAdminNotificationBase):
         self.setSubject("""[RecReq] Recording request modified: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Recording Responsible,<br />
+        self.setBody("""Dear Recording Manager,<br />
 <br />
 A recording request <strong>has been modified</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to accept or reject the request.<br />
@@ -362,7 +362,7 @@ class RequestRescheduledNotification(RecordingRequestAdminNotificationBase):
         self.setSubject("""[RecReq] Recording request rescheduled: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Recording Responsible,<br />
+        self.setBody("""Dear Recording Manager,<br />
 <br />
 A recording request <strong>has been rescheduled</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
@@ -392,7 +392,7 @@ class RequestRelocatedNotification(RecordingRequestAdminNotificationBase):
         self.setSubject("""[RecReq] Recording request relocated: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Recording Responsible,<br />
+        self.setBody("""Dear Recording Manager,<br />
 <br />
 A recording request <strong>has been relocated</strong> in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />
@@ -423,7 +423,7 @@ class RequestDeletedNotification(RecordingRequestAdminNotificationBase):
         self.setSubject("""[RecReq] Recording request withdrawn: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Recording Responsible,<br />
+        self.setBody("""Dear Recording Manager,<br />
 <br />
 A recording request <strong>has been withdrawn</strong> in <a href="%s">%s</a><br />
 <br />
@@ -457,7 +457,7 @@ Your recording request for the event: "%s" has been accepted.<br />
 Click <a href="%s">here</a> to view your request.<br />
 <br />
 Best Regards,<br />
-Recording Responsibles
+Recording Team
 
 """ % ( self._conference.getTitle(),
         self._modifLink
@@ -476,7 +476,7 @@ class RequestAcceptedNotificationAdmin(RecordingRequestAdminNotificationBase):
         userInfo = ""
         if user :
             userInfo = " by %s %s"%(user.getFirstName(), user.getFamilyName().upper())
-        self.setBody("""Dear Recording Responsible,<br />
+        self.setBody("""Dear Recording Manager,<br />
 <br />
 A recording request for the event: "%s" has been accepted in <a href="%s">%s</a>"""%(self._conference.getTitle(),
                                                                                      MailTools.getServerName(),
@@ -509,7 +509,7 @@ The reason given by the Recording responsible was:
 <br />
 <br />
 Best Regards,<br />
-Recording Responsibles
+Recording Team
 """ % ( self._conference.getTitle(),
         self._modifLink,
         self._booking.getRejectReason().strip()
@@ -525,7 +525,7 @@ class RequestRejectedNotificationAdmin(RecordingRequestAdminNotificationBase):
         self.setSubject("""[RecReq] Recording request rejected: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Recording Responsible,<br />
+        self.setBody("""Dear Recording Manager,<br />
 <br />
 A recording request for the event: "%s" has been rejected in <a href="%s">%s</a><br />
 Click <a href="%s">here</a> to view the request.<br />

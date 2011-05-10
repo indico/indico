@@ -768,7 +768,28 @@ for your conference.
 
 |image58|
 
-Clicking on the registrant's name will show you all his details
+From this list you can perform several actions on the registrants, as for example:
+
+* **Add new**: It will open the registration form `(see Registration Form) <#registration-form>`_.
+* **Remove**: It will remove the selected registrants.
+* **Email**: It will allow to send an email to the selected registrants.
+
+|image102|
+
+* **Print badges**: It will open a new page that will allow you to print the badges of the selected registrants.
+
+|image103|
+
+* **Show stats**: It will show the statistics about the registrants.
+
+|image104|
+
+* **Excel icon**: It will create a CSV file with the selected registrants and the columns displayed.
+* **PDF icon**: It will allow you to create a PDF in two styles: *Table style* and *Book style*. If you want to print a large quantity of fields it is recommended the *Book Style*.
+
+Also, beware that clicking on Select *All* or *None* will select or unselect all the registrants checkboxes.
+
+Moreover, clicking on the registrant's name will show you all his details
 and the information he provided in response to the form's
 questions.
 
@@ -1287,3 +1308,6 @@ session. You may also make a PDF of the session.
 .. |image99| image:: UserGuidePics/confrf01.png
 .. |image100| image:: UserGuidePics/confd21.png
 .. |image101| image:: UserGuidePics/confrb1.png
+.. |image102| image:: UserGuidePics/confreg14.png
+.. |image103| image:: UserGuidePics/confreg15.png
+.. |image104| image:: UserGuidePics/confreg16.png
