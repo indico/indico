@@ -23,7 +23,7 @@ class Serializer(object):
     schemaless = True
     registry = {}
 
-    def __init__(self, pretty=False):
+    def __init__(self, pretty=False, **kwargs):
         self.pretty = pretty
 
     @classmethod
