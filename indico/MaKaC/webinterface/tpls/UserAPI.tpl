@@ -14,6 +14,13 @@
         </td>
     </tr>
     <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Signature Key")}</span></td>
+        <td class="blacktext">
+            ${apiKey.getSignKey() if apiKey else _('None')}
+            ${inlineContextHelp(_('To use your API key you must sign &quot;Path?QueryString&TS&quot; (TS=int(UnixTimestamp/300)) using HMAC-SHA1 and append it to the query string, e.g. &quot;Path?QueryString&SignatureHash&quot;'))}
+        </td>
+    </tr>
+    <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Created")}</span></td>
         <td class="blacktext">
             ${formatDateTime(apiKey.getCreatedDT()) if apiKey else _('n/a')}
@@ -52,8 +59,8 @@
                         <input type="submit" value="Create API key" />
                     </form>
                 % else:
-                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm('${_("Warning: When creating a new API key, your old key will stop working immediately!")}');">
-                        <input type="submit" value="Create a new API key" />
+                    <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm('${_("Warning: When creating a new API key pair, your old key pair will stop working immediately!")}');">
+                        <input type="submit" value="Create a new API key pair" />
                     </form>
                 % endif
             </td>

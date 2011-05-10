@@ -33,9 +33,10 @@ class APIKeyHolder(ObjectHolder):
         return key
 
 class APIKey(Persistent):
-    def __init__(self, user, key=None):
+    def __init__(self, user, key=None, signKey=None):
         self._user = user
         self._key = key
+        self._signKey = signKey
         self._createdDT = datetime.datetime.now()
         self._isBlocked = False
         self._lastUsedDT = None
@@ -55,9 +56,16 @@ class APIKey(Persistent):
     def setKey(self, key):
         akh = APIKeyHolder()
         akh.remove(self)
-        self._oldKeys.append(self.getKey())
+        if self.getKey():
+            self._oldKeys.append(self.getKey())
         self._key = key
         akh.add(self)
+
+    def getSignKey(self):
+        return self._signKey
+
+    def setSignKey(self, signKey):
+        self._signKey = signKey
 
     def getCreatedDT(self):
         return self._createdDT
@@ -99,10 +107,15 @@ class APIKey(Persistent):
         self.setKey(akh.makeKey())
         return self.getKey()
 
+    def newSignKey(self):
+        self.setSignKey(str(uuid.uuid4()))
+
     def create(self):
         akh = APIKeyHolder()
         if not self.getKey():
             self.newKey()
+        if not self.getSignKey():
+            self.newSignKey()
         self._user.setAPIKey(self)
         akh.add(self)
 

@@ -23,6 +23,8 @@ HTTP API - Handlers
 """
 
 # python stdlib imports
+import hashlib
+import hmac
 import re
 import time
 from urlparse import parse_qs
@@ -86,27 +88,40 @@ class HTTPAPIResult(Fossilizable):
     def getResults(self):
         return self._results
 
+def validateSignature(req, key, signature, path, query, timestamp=None):
+    if timestamp is None:
+        timestamp = int(time.time())
+    if not signature:
+        req.status = apache.HTTP_FORBIDDEN
+        raise HTTPAPIError('Signature missing')
+    ts = timestamp / 300
+    candidates = []
+    for i in xrange(-1, 2):
+        h = hmac.new(key, '%s?%s&%d' % (path, query, ts + i), hashlib.sha1)
+        candidates.append(h.hexdigest())
+    if signature not in candidates:
+        req.status = apache.HTTP_FORBIDDEN
+        raise HTTPAPIError('Signature invalid (check system clock)')
 
-def buildAW(apiKey, req):
-    user = None
-    aw = AccessWrapper()
-    ak = None
+def getAK(apiKey, signature, path, query, req):
+    if not apiKey:
+        return None
     akh = APIKeyHolder()
+    if not akh.hasKey(apiKey):
+        req.status = apache.HTTP_FORBIDDEN
+        raise HTTPAPIError('Invalid API key')
+    ak = akh.getById(apiKey)
+    if ak.isBlocked():
+        req.status = apache.HTTP_FORBIDDEN
+        raise HTTPAPIError('API key is blocked')
+    validateSignature(req, ak.getSignKey(), signature, path, query)
+    return ak
 
-    if apiKey:
-        if akh.hasKey(apiKey):
-            ak = APIKeyHolder().getById(apiKey)
-            if ak.isBlocked():
-                req.status = apache.HTTP_FORBIDDEN
-                raise HTTPAPIError('API key is blocked')
-            user = ak.getUser()
-            aw.setUser(user)
-            return ak, aw
-        else:
-            req.status = apache.HTTP_FORBIDDEN
-            raise HTTPAPIError('Invalid API key')
-    else:
-        return None, aw
+def buildAW(ak):
+    aw = AccessWrapper()
+    if ak:
+        aw.setUser(ak.getUser())
+    return aw
 
 def getExportHandler(path):
     """Get the export handler, handler args and return type from a path"""
@@ -147,6 +162,14 @@ def handler_event_categ(dbi, aw, qdata, dtype, idlist):
 
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
+    # Extract HMAC signature
+    signature = None
+    m = re.search(r'&([0-9a-fA-F]{40})$', query)
+    if m:
+        signature = m.group(1).lower()
+        query = query[:-41]
+
+    # Parse the actual query string
     qdata = parse_qs(query)
     no_cache = get_query_parameter(qdata, ['nc', 'nocache'], 'no') == 'yes'
 
@@ -157,64 +180,64 @@ def handler(req, **params):
     if not no_cache:
         obj = cache.loadObject(path, qdata_copy)
 
-    resp = None
     add_to_cache = True
 
-    if obj is not None:
-        resp = obj.getContent()
-        add_to_cache = False
-    else:
-        dbi = DBMgr.getInstance()
-        dbi.startRequest()
+    dbi = DBMgr.getInstance()
+    dbi.startRequest()
 
-        pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
-        apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
+    pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
+    apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
 
-        # Get our handler function and its argument and response type
-        func, args, dformat = getExportHandler(path)
-        if func is None or dformat is None:
-            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+    # Get our handler function and its argument and response type
+    func, args, dformat = getExportHandler(path)
+    if func is None or dformat is None:
+        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
-        ak = error = results = None
-        try:
-            # Get an API key and an access wrapper out of the parameter
-            ak, aw = buildAW(apiKey, req)
+    ak = error = results = resp = None
+    try:
+        # Validate the API key (and its signature)
+        ak = getAK(apiKey, signature, path, query, req)
+        if obj is not None:
+            resp = obj.getContent()
+            add_to_cache = False
+        else:
+            # Create an access wrapper for the API key's user
+            aw = buildAW(ak)
             # Perform the actual exporting
             results = func(dbi, aw, qdata, *args)
-        except HTTPAPIError, e:
-            error = e
-            add_to_cache = False
+    except HTTPAPIError, e:
+        error = e
+        add_to_cache = False
 
-        if results is None and error is None:
-            # TODO: usage page
-            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+    if results is None and error is None and resp is None:
+        # TODO: usage page
+        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+    elif resp is None:
+        serializer = Serializer.create(dformat, pretty=pretty,
+                                       **remove_lists(qdata))
+
+        if error:
+            resultFossil = fossilize(error)
         else:
-            serializer = Serializer.create(dformat, pretty=pretty,
-                                           **remove_lists(qdata))
+            resultFossil = fossilize(HTTPAPIResult(results, path, query))
+        del resultFossil['_fossil']
+        result = serializer(resultFossil)
 
-            if error:
-                resultFossil = fossilize(error)
-            else:
-                resultFossil = fossilize(HTTPAPIResult(results, path, query))
-            del resultFossil['_fossil']
-            result = serializer(resultFossil)
-
-            if ak and error is None:
-                # Commit only if there was an API key and no error
-                for _retry in xrange(10):
-                    dbi.sync()
-                    ak.used(req.remote_ip, path, query)
-                    try:
-                        dbi.endRequest(True)
-                    except ConflictError:
-                        pass # retry
-                    else:
-                        break
-            else:
-                # No need to commit stuff if we didn't use an API key
-                # (nothing was written)
-                dbi.endRequest(False)
-
+        if ak and error is None:
+            # Commit only if there was an API key and no error
+            for _retry in xrange(10):
+                dbi.sync()
+                ak.used(req.remote_ip, path, query)
+                try:
+                    dbi.endRequest(True)
+                except ConflictError:
+                    pass # retry
+                else:
+                    break
+        else:
+            # No need to commit stuff if we didn't use an API key
+            # (nothing was written)
+            dbi.endRequest(False)
         resp = serializer.getMIMEType(), result
 
     if add_to_cache:

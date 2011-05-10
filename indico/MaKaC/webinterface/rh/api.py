@@ -44,6 +44,7 @@ class RHUserAPICreate(RHUserBase):
             ak.create()
         else:
             ak.newKey()
+            ak.newSignKey()
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
 
 class RHUserAPIBlock(RHUserBase):
