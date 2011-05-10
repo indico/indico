@@ -79,7 +79,7 @@ class HTTPAPIResult(Fossilizable):
         return self._results
 
 
-def buildAW(apiKey):
+def buildAW(apiKey, req):
     user = None
     aw = AccessWrapper()
     ak = None
@@ -127,7 +127,7 @@ def handler(req, **params):
         apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
 
         # get an API key and an API key holder ou of the parameter
-        ak, aw = buildAW(apiKey)
+        ak, aw = buildAW(apiKey, req)
 
         results = None
         m = re.match(r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)/?$', path)
