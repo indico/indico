@@ -39,7 +39,6 @@ class AtomSerializer(Serializer):
 
         feed = AtomFeed(
             title='Indico Feed',
-            subtitle=results and results[0]['owner'] or '', # ew
             feed_url=fossils['url']
         )
 
