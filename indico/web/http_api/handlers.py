@@ -167,6 +167,10 @@ def handler(req, **params):
             serializer = Serializer.create(dformat, pretty=pretty,
                                            **remove_lists(qdata))
 
+            resultFossil = fossilize(HTTPAPIResult(results, path, query))
+            del resultFossil['_fossil']
+            result = serializer(resultFossil)
+
             if ak:
                 for _retry in xrange(10):
                     dbi.sync()
@@ -177,20 +181,10 @@ def handler(req, **params):
                         pass  # retry
                     else:
                         break
-
-                resultFossil = fossilize(HTTPAPIResult(results, path, query))
-                del resultFossil['_fossil']
-                result = serializer(resultFossil)
-
             else:
                 # No need to commit stuff if we didn't use an API key
                 # (nothing was written)
                 dbi.endRequest(False)
-                error = HTTPAPIError("Access key is invalid!")
-                if serializer.schemaless:
-                    result = serializer(fossilize(error))
-                else:
-                    result = str(error)
 
         resp = serializer.getMIMEType(), result
 
