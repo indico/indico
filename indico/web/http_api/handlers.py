@@ -48,6 +48,14 @@ from MaKaC.common.info import HelperMaKaCInfo
 # Maximum number of records that will get exported
 MAX_RECORDS = 20000
 
+# Valid URLs for export handlers. the last group has to be the response type
+EXPORT_URL_MAP = {
+    r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)$': 'handler_event_categ'
+}
+
+# Compile regexps
+EXPORT_URL_MAP = dict((re.compile(pathRe), handlerFunc) for pathRe, handlerFunc in EXPORT_URL_MAP.iteritems())
+
 class HTTPAPIError(Exception, Fossilizable):
     fossilizes(IHTTPAPIErrorFossil)
 
@@ -90,16 +98,52 @@ def buildAW(apiKey, req):
             ak = APIKeyHolder().getById(apiKey)
             if ak.isBlocked():
                 req.status = apache.HTTP_FORBIDDEN
-                return 'API key is blocked'
+                raise HTTPAPIError('API key is blocked')
             user = ak.getUser()
             aw.setUser(user)
             return ak, aw
         else:
             req.status = apache.HTTP_FORBIDDEN
-            return 'Invalid API key'
+            raise HTTPAPIError('Invalid API key')
     else:
-        return None, None
+        return None, aw
 
+def getExportHandler(path):
+    """Get the export handler, handler args and return type from a path"""
+    func = None
+    match = None
+    for pathRe, handlerFunc in EXPORT_URL_MAP.iteritems():
+        match = pathRe.match(path)
+        if match:
+            func = handlerFunc
+            break
+
+    groups = match and match.groups()
+    if not match or groups[-1] not in ExportInterface.getAllowedFormats():
+        return None, None, None
+    return globals()[func], groups[:-1], groups[-1]
+
+def handler_event_categ(dbi, aw, qdata, dtype, idlist):
+    idlist = idlist.split('-')
+
+    expInt = ExportInterface(dbi, aw)
+    tzName = get_query_parameter(qdata, ['tz'], None)
+    detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
+    limit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
+
+    if tzName is None:
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+        tzName = info.getTimezone()
+
+    tz = pytz.timezone(tzName)
+
+    # impose a hard limit
+    limit = limit if limit > 0 else MAX_RECORDS
+
+    if dtype == 'categ':
+        return expInt.category(idlist, tz, limit, detail, qdata)
+    elif dtype == 'event':
+        return expInt.event(idlist, tz, limit, detail, qdata)
 
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
@@ -114,11 +158,11 @@ def handler(req, **params):
         obj = cache.loadObject(path, qdata_copy)
 
     resp = None
-    from_cache = False
+    add_to_cache = True
 
     if obj is not None:
         resp = obj.getContent()
-        from_cache = True
+        add_to_cache = False
     else:
         dbi = DBMgr.getInstance()
         dbi.startRequest()
@@ -126,59 +170,44 @@ def handler(req, **params):
         pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
         apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
 
-        # get an API key and an API key holder ou of the parameter
-        ak, aw = buildAW(apiKey, req)
+        # Get our handler function and its argument and response type
+        func, args, dformat = getExportHandler(path)
+        if func is None or dformat is None:
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
-        results = None
-        m = re.match(r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)/?$', path)
+        ak = error = results = None
+        try:
+            # Get an API key and an access wrapper out of the parameter
+            ak, aw = buildAW(apiKey, req)
+            # Perform the actual exporting
+            results = func(dbi, aw, qdata, *args)
+        except HTTPAPIError, e:
+            error = e
+            add_to_cache = False
 
-        if m and m.group(3) in ExportInterface.getAllowedFormats():
-            dtype, idlist, dformat = m.groups()
-            idlist = idlist.split('-')
-
-            expInt = ExportInterface(dbi, aw)
-            tzName = get_query_parameter(qdata, ['tz'], None)
-            detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
-            limit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
-
-            if tzName == None:
-                info = HelperMaKaCInfo.getMaKaCInfoInstance()
-                tzName = info.getTimezone()
-
-            tz = pytz.timezone(tzName)
-
-            # impose a hard limit
-            limit = limit if limit > 0 else MAX_RECORDS
-
-            if dtype == 'categ':
-                results = expInt.category(idlist, tz, limit, detail, qdata)
-            elif dtype == 'event':
-                results = expInt.event(idlist, tz, limit, detail, qdata)
-            else:
-                results = None
-
-        else:
-            results = None
-
-        if results == None:
+        if results is None and error is None:
             # TODO: usage page
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
         else:
             serializer = Serializer.create(dformat, pretty=pretty,
                                            **remove_lists(qdata))
 
-            resultFossil = fossilize(HTTPAPIResult(results, path, query))
+            if error:
+                resultFossil = fossilize(error)
+            else:
+                resultFossil = fossilize(HTTPAPIResult(results, path, query))
             del resultFossil['_fossil']
             result = serializer(resultFossil)
 
-            if ak:
+            if ak and error is None:
+                # Commit only if there was an API key and no error
                 for _retry in xrange(10):
                     dbi.sync()
                     ak.used(req.remote_ip, path, query)
                     try:
                         dbi.endRequest(True)
                     except ConflictError:
-                        pass  # retry
+                        pass # retry
                     else:
                         break
             else:
@@ -188,7 +217,7 @@ def handler(req, **params):
 
         resp = serializer.getMIMEType(), result
 
-    if not from_cache:
+    if add_to_cache:
         cache.cacheObject(path, qdata_copy, resp)
     req.headers_out['Content-Type'] = resp[0]
     return resp[1]
