@@ -98,9 +98,10 @@
         <tooltip name="defaultDates" target="//*[@id='defaultDatesHelp']">
             <translation language="en">
                 <text>
-                        <p>For each contribution, you can set a deadline for the judgement/opinion of
+                        <p>For each paper, you can set a deadline for the judgement/opinion of
                         Referees, Layout Reviewers, and Content Reviewers independently. The deadline will
-                        be used for new contributions.</p>
+                        be used for new papers, but if you wish, you can apply it to the existing
+                        papers.</p>
                 </text>
             </translation>
         </tooltip>

@@ -152,6 +152,40 @@ class ConferenceReviewingDeleteTemplate(ConferenceReviewingBase):
             self._confPaperReview.deleteTemplate(templateId)
             return True
 
+class ConferenceReviewingApplyDefaultDueDate(ConferenceReviewingDateTimeModificationBase):
+
+    def _checkParams(self):
+        ConferenceReviewingDateTimeModificationBase._checkParams(self)
+        self._dueDateToChange = self._params.get("dueDateToChange")
+
+    def _setParam(self):
+        for contrib in self._conf.getContributionList():
+            lastReview = contrib.getReviewManager().getLastReview()
+            if self._dueDateToChange == "Referee":
+                lastReview.setRefereeDueDate(self._pTime)
+            elif self._dueDateToChange == "Editor":
+                lastReview.setEditorDueDate(self._pTime)
+            elif self._dueDateToChange == "Reviewer":
+                lastReview.setReviewerDueDate(self._pTime)
+            else:
+                raise ServiceError("ERR-REV3c",_("Kind of deadline to change not set"))
+
+    def _handleGet(self):
+        if self._dueDateToChange == "Referee":
+            date = self._conf.getConfPaperReview().getAdjustedDefaultRefereeDueDate()
+        elif self._dueDateToChange == "Editor":
+            date = self._conf.getConfPaperReview().getAdjustedDefaultEditorDueDate()
+        elif self._dueDateToChange == "Reviewer":
+            date = self._conf.getConfPaperReview().getAdjustedDefaultReviewerDueDate()
+        else:
+            raise ServiceError("ERR-REV3b",_("Kind of deadline to change not set"))
+
+        if date:
+            return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
+        else:
+            return _("Date has not been set yet.")
+
+
 class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeModificationBase):
 
     def _checkParams(self):
@@ -180,6 +214,8 @@ class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeM
 
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
+        else:
+            return _("Date has not been set yet.")
 
 
 class ConferenceReviewingAutoEmailsModificationPRM(ConferenceReviewingSetupTextModificationBase ):
@@ -1057,6 +1093,7 @@ methodMap = {
     "conference.deleteTemplate" : ConferenceReviewingDeleteTemplate,
     "conference.changeCompetences": ConferenceReviewingCompetenceModification,
     "conference.changeDefaultDueDate" : ConferenceReviewingDefaultDueDateModification,
+    "conference.applyDefaultDueDate" : ConferenceReviewingApplyDefaultDueDate,
     "conference.attributeList" : ConferenceReviewingContributionsAttributeList,
     "conference.contributionsIdPerSelectedAttribute" : ConferenceReviewingContributionsPerSelectedAttributeList,
     "conference.userCompetencesList": ConferenceReviewingUserCompetenceList,
