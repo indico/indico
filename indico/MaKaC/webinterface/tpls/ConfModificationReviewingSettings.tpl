@@ -358,18 +358,10 @@
     <!-- here to put table for the uploaded templates info :) -->
      <thead>
         <tr>
-            <td nowrap width="20%" class="data">
-                <span style="font-weight:bold;">${ _("Name")}</span>
-            </td>
-            <td nowrap class="data">
-                <span style="font-weight:bold;">${ _("Format")}</span>
-            </td>
-            <td nowrap class="data">
-                <span style="font-weight:bold;">${ _("Description")}</span>
-            </td>
-            <td nowrap width="27%" class="data" style="text-align:center;">
-                <span style="font-weight:bold;">${ _("Actions")}</span>
-            </td>
+            <td nowrap width="20%" class="tableHeader">${ _("Name")}</td>
+            <td nowrap class="tableHeader">${ _("Format")}</td>
+            <td nowrap class="tableHeader">${ _("Description")}</td>
+            <td nowrap width="27%" class="tableHeader" style="text-align:center;">${ _("Actions")}</td>
         </tr>
         </thead>
         <tbody id="templateListTable">

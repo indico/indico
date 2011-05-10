@@ -6641,6 +6641,7 @@ table.infoTable td.tableHeader {
     color: #523D04;
     padding: 7px;
     border-bottom: 1px groove #A4A4A4;
+    font-weight: bold;
 }
 
 table.infoTable td.content {

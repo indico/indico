@@ -11,20 +11,12 @@
         <td style="padding-top:10px; padding-left:5px;">
             <table class="infoTable" cellspacing="0" width="100%">
                 <tr>
-                    <td nowrap class="data">
-                        <span style="font-weight:bold;">${ _("Id") }</span>
-                    </td>
-                    <td nowrap class="data">
-                        <span style="font-weight:bold;">${ _("Name") }</span>
-                    </td>
+                    <td nowrap class="tableHeader">${ _("Id") }</td>
+                    <td nowrap class="tableHeader">${ _("Name") }</td>
                     % if Conference.getConfPaperReview().hasReviewing():
-                    <td nowrap class="data">
-                        <span style="font-weight:bold;">${ _("Reviewing Status") }</span>
-                    </td>
+                    <td nowrap class="tableHeader">${ _("Reviewing Status") }</td>
                     % endif
-                    <td nowrap class="data" style="text-align:right;">
-                        <span style="font-weight:bold;">${ _("Actions") }</span>
-                    </td>
+                    <td nowrap class="tableHeader" style="text-align:right;">${ _("Actions") }</td>
                     </tr>
                 % for c in contributions:
                 <tr class="infoTR">
