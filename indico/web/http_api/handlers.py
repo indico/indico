@@ -106,6 +106,9 @@ def validateSignature(req, key, signature, path, query, timestamp=None):
 def getAK(apiKey, signature, path, query, req):
     if not apiKey:
         return None
+    if not req.is_https():
+        req.status = apache.HTTP_FORBIDDEN
+        raise HTTPAPIError('HTTPS is required')
     akh = APIKeyHolder()
     if not akh.hasKey(apiKey):
         req.status = apache.HTTP_FORBIDDEN
