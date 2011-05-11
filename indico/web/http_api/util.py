@@ -37,7 +37,7 @@ def get_query_parameter(qdata, keys, default=None, integer=False):
                 return val
             else:
                 raise Exception("duplicate argument' %s'!" % k)
-    return None
+    return default
 
 def remove_lists(data):
     return dict((k, v[0]) for (k, v) in data.iteritems() if v != None)
