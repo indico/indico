@@ -63,8 +63,15 @@ RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)$')
 class HTTPAPIError(Exception, Fossilizable):
     fossilizes(IHTTPAPIErrorFossil)
 
+    def __init__(self, message, code=None):
+        self.message = message
+        self.code = code
+
     def getMessage(self):
         return self.message
+
+    def getCode(self):
+        return self.code
 
 
 class HTTPAPIResult(Fossilizable):
@@ -90,7 +97,7 @@ class HTTPAPIResult(Fossilizable):
     def getResults(self):
         return self._results
 
-def validateSignature(req, key, signature, path, query, timestamp=None):
+def validateSignature(key, signature, path, query, timestamp=None):
     if timestamp is None:
         timestamp = int(time.time())
     ts = timestamp / 300
@@ -99,32 +106,27 @@ def validateSignature(req, key, signature, path, query, timestamp=None):
         h = hmac.new(key, '%s?%s&%d' % (path, query, ts + i), hashlib.sha1)
         candidates.append(h.hexdigest())
     if signature not in candidates:
-        req.status = apache.HTTP_FORBIDDEN
-        raise HTTPAPIError('Signature invalid (check system clock)')
+        raise HTTPAPIError('Signature invalid (check system clock)', apache.HTTP_FORBIDDEN)
 
-def getAK(apiKey, signature, path, query, req):
+def getAK(apiKey, signature, path, query):
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     apiMode = minfo.getAPIMode()
     if not apiKey:
         if apiMode in (API_MODE_ONLYKEY, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED):
-            req.status = apache.HTTP_FORBIDDEN
-            raise HTTPAPIError('API key is missing')
+            raise HTTPAPIError('API key is missing', apache.HTTP_FORBIDDEN)
         return None, True
     akh = APIKeyHolder()
     if not akh.hasKey(apiKey):
-        req.status = apache.HTTP_FORBIDDEN
-        raise HTTPAPIError('Invalid API key')
+        raise HTTPAPIError('Invalid API key', apache.HTTP_FORBIDDEN)
     ak = akh.getById(apiKey)
     if ak.isBlocked():
-        req.status = apache.HTTP_FORBIDDEN
-        raise HTTPAPIError('API key is blocked')
+        raise HTTPAPIError('API key is blocked', apache.HTTP_FORBIDDEN)
     # Signature validation
     onlyPublic = False
     if signature:
-        validateSignature(req, ak.getSignKey(), signature, path, query)
+        validateSignature(ak.getSignKey(), signature, path, query)
     elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
-        req.status = apache.HTTP_FORBIDDEN
-        raise HTTPAPIError('Signature missing')
+        raise HTTPAPIError('Signature missing', apache.HTTP_FORBIDDEN)
     elif apiMode == API_MODE_ONLYKEY_SIGNED:
         onlyPublic = True
     return ak, onlyPublic
@@ -135,8 +137,7 @@ def buildAW(ak, req, onlyPublic=False):
         # If we have an authenticated request, require HTTPS
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         if not req.is_https() and minfo.isAPIHTTPSRequired():
-            req.status = apache.HTTP_FORBIDDEN
-            raise HTTPAPIError('HTTPS is required')
+            raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
         aw.setUser(ak.getUser())
     return aw
 
@@ -210,7 +211,7 @@ def handler(req, **params):
     ts = int(time.time())
     try:
         # Validate the API key (and its signature)
-        ak, enforceOnlyPublic = getAK(apiKey, signature, path, query, req)
+        ak, enforceOnlyPublic = getAK(apiKey, signature, path, query)
         if enforceOnlyPublic:
             onlyPublic = True
         # Create an access wrapper for the API key's user
@@ -236,6 +237,8 @@ def handler(req, **params):
             cache.cacheObject(cache_path, qdata_copy, results)
     except HTTPAPIError, e:
         error = e
+        if e.getCode():
+            req.status = e.getCode()
 
     if results is None and error is None:
         # TODO: usage page
