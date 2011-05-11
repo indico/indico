@@ -137,21 +137,40 @@ class CSBooking(CSBookingBase):
         """
         return self._roomId
 
+    def setRoomId(self, roomId):
+        """ The Viydo internal room id for this booking
+        """
+        self._roomId = roomId
+
     def getExtension(self):
         return self._extension
 
+    def setExtension(self, extension):
+        self._extension = extension
+
     def getURL(self):
         return self._url
+
+    def setURL(self,url):
+        self._url = url
 
     def isCreated(self):
         """ Returns if the room exists in Vidyo or not
         """
         return self._created
 
+    def setCreated(self, created):
+        """ Set if the room exists in Vidyo or not
+        """
+        self._created = created
+
     def getChecksDone(self):
         if not hasattr(self, "_checksDone"):
             self._checksDone = []
         return self._checksDone
+
+    def setChecksDone(self, checksDone):
+        self._checksDone = checksDone
 
     ## overriding methods
     def _getTitle(self):
@@ -453,3 +472,29 @@ class CSBooking(CSBookingBase):
                     Logger.get('Vidyo').error(
                         """Could not send VidyoRoomDeletedOwnerNotification for booking with id %s of event with id %s, exception: %s""" %
                         (self.getId(), self.getConference().getId(), str(e)))
+
+
+    def clone ( self, conf):
+        """
+        Clones a CSBooking from an existing.
+
+        conf: the conference to put the CSBooking
+        """
+        cs = CSBooking(self.getType(),conf)
+        cs.setBookingParams(self.getBookingParams())
+        cs.setId(self.getId())
+        cs.setWarning(self.getWarning())
+        cs.setStartDate(self.getStartDate())
+        cs.setEndDate(self.getEndDate())
+        cs.setStatusMessage(self.getStatusMessage())
+        cs.setStatusClass(self.getStatusClass())
+        cs.setCanBeDeleted(self.canBeDeleted())
+        cs.setHidden(self.isHidden())
+        cs.setPin(self.getPin())
+        cs.setOwnerAccount(self.getOwnerAccount())
+        cs.setRoomId(self.getRoomId())
+        cs.setExtension(self.getExtension())
+        cs.setURL(self.getURL())
+        cs.setChecksDone(self.getChecksDone())
+        cs.setCreated(self.isCreated())
+        return cs

@@ -186,6 +186,19 @@ class CSBookingManager(Persistent, Observer):
             return len(self.getBookingList(filterByType = type)) == 0
         return True
 
+
+    def addBooking(self, booking):
+        """ Adds an existing booking to the list of bookings.
+
+            booking: The existing booking to be added.
+        """
+        self._bookings[booking.getId()] = booking
+        self._bookingsByType.setdefault(booking.getType(),[]).append(booking.getId())
+        if booking.isHidden():
+            self.getHiddenBookings().add(booking.getId())
+        self._indexBooking(booking)
+        self._notifyModification()
+
     def createBooking(self, bookingType, bookingParams = {}):
         """ Adds a new booking to the list of bookings.
             The id of the new booking is auto-generated incrementally.
@@ -808,6 +821,11 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return self._conf
 
+    def setConference(self, conf):
+        """ Sets the owner of this CSBookingBase object, which is a Conference object representing the meeting.
+        """
+        self._conf = conf
+
     def getWarning(self):
         """ Returns a warning attached to this booking.
             A warning is a plugin-defined object, with information to show to the user when
@@ -817,6 +835,14 @@ class CSBookingBase(Persistent, Fossilizable):
         if not hasattr(self, '_warning'):
             self._warning = None
         return self._warning
+
+    def setWarning(self, warning):
+        """ Sets a warning attached to this booking.
+            A warning is a plugin-defined object, with information to show to the user when
+            the operation went well but we still have to show some info to the user.
+            To be overloaded by plugins.
+        """
+        self._warning = warning
 
     def getCreationDate(self):
         """ Returns the date this booking was created, as a timezone localized datetime object
@@ -874,6 +900,11 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return self._plugin
 
+    def setPlugin(self, plugin):
+        """ Sets the Plugin object associated to this booking.
+        """
+        self._plugin = plugin
+
     def getPluginOptions(self):
         """ Utility method that returns the plugin options for this booking's type of plugin
         """
@@ -902,6 +933,9 @@ class CSBookingBase(Persistent, Fossilizable):
         if not hasattr(object, "_startDateTimestamp"): #TODO: remove when safe
             self._startDateTimestamp = int(datetimeToUnixTimeInt(self._startDate))
         return self._startDateTimestamp
+
+    def setStartDateTimestamp(self, startDateTimestamp):
+        self._startDateTimestamp = startDateTimestamp
 
     def getStartDateAsString(self):
         """ Returns the start date as a string, expressed in the meeting's timezone
@@ -947,6 +981,8 @@ class CSBookingBase(Persistent, Fossilizable):
             self._endDateTimestamp = int(datetimeToUnixTimeInt(self._endDate))
         return self._endDateTimestamp
 
+    def setEndDateTimestamp(self, endDateTimestamp):
+        self._endDateTimestamp = endDateTimestamp
     def getEndDateAsString(self):
         """ Returns the start date as a string, expressed in the meeting's timezone
         """
@@ -981,6 +1017,12 @@ class CSBookingBase(Persistent, Fossilizable):
         """
         return _(self._statusMessage)
 
+    def setStatusMessage(self, statusMessage):
+        """ Sets the status message as a string.
+            This attribute will be available in Javascript with the "statusMessage"
+        """
+        self._statusMessage = statusMessage
+
     def getStatusClass(self):
         """ Returns the status message CSS class as a string.
             This attribute will be available in Javascript with the "statusClass"
@@ -988,6 +1030,12 @@ class CSBookingBase(Persistent, Fossilizable):
         if not hasattr(self, "_statusClass"): #TODO: remove when safe
             self._statusClass = ""
         return self._statusClass
+
+    def setStatusClass(self, statusClass):
+        """ Sets the status message CSS class as a string.
+            This attribute will be available in Javascript with the "statusClass"
+        """
+        self._statusClass = statusClass
 
     def accept(self, user = None):
         """ Sets this booking as accepted
@@ -1260,6 +1308,12 @@ class CSBookingBase(Persistent, Fossilizable):
         if not hasattr(self, '_canBeDeleted'):
             self._canBeDeleted = True
         return self._canBeDeleted
+
+    def setCanBeDeleted(self, canBeDeleted):
+        """ Sets if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed.
+            This attribute will be available in Javascript with the "canBeDeleted" attribute
+        """
+        self._canBeDeleted = canBeDeleted
 
     def canBeStarted(self):
         """ Returns if this booking can be started, in the sense that the "Start" button will be active and able to be pressed.
