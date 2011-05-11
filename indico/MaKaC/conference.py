@@ -3531,6 +3531,11 @@ class Conference(CommonObjectBase, Locatable):
     def iterContributions(self):
         return self.contributions.itervalues()
 
+    def getContributionListWithoutSessions(self):
+        """Returns a list of the conference contribution objects which do not have a session
+        """
+        return [c for c in self.contributions.values() if not c.getSession()]
+
     def getContributionListSortedById(self):
         """Returns a list of the conference contribution objects, sorted by their id
         """

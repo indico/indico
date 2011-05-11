@@ -22,9 +22,10 @@
 Basic fossils for data export
 """
 
-from indico.util.fossilize import IFossil
+from indico.util.fossilize import IFossil, fossilize
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
+from MaKaC.fossils.conference import ISessionFossil
 
 
 class IHTTPAPIErrorFossil(IFossil):
@@ -46,6 +47,7 @@ class IHTTPAPIResultFossil(IFossil):
 
     def getComplete(self):
         pass
+
 
 class IConferenceMetadataFossil(IFossil):
 
@@ -88,3 +90,105 @@ class IConferenceMetadataFossil(IFossil):
     def getRoom(self):
         """ Room (inside location) """
     getRoom.convert = lambda r: r and r.getName()
+
+
+class IContributionMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getTitle(self):
+        pass
+
+    def getLocation(self):
+        pass
+    getLocation.convert = lambda l: l and l.getName()
+
+    def getRoom(self):
+        pass
+    getRoom.convert = lambda r: r and r.getName()
+
+    def getStartDate(self):
+        pass
+    getStartDate.convert = Conversion.datetime
+
+    def getEndDate(self):
+        pass
+    getEndDate.convert = Conversion.datetime
+
+    def getDuration(self):
+        pass
+    getDuration.convert = Conversion.duration
+
+    def getDescription(self):
+        pass
+
+    def getTrack( self ):
+        pass
+    getTrack.convert = lambda t: t and t.getTitle()
+
+    def getSession( self ):
+        pass
+    getSession.convert = lambda s: s and s.getTitle()
+
+    def getType(self):
+        pass
+    getType.convert = lambda t: t and t.getName()
+
+
+class ISubContributionMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getTitle(self):
+        pass
+
+    def getDuration(self):
+        pass
+    getDuration.convert = Conversion.duration
+
+
+class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
+
+    def getSubContributionList(self):
+        pass
+    getSubContributionList.convert = lambda scl: fossilize(scl, ISubContributionMetadataFossil)
+    getSubContributionList.name = 'subContributions'
+
+
+class IConferenceMetadataWithContribsFossil(IConferenceMetadataFossil):
+
+    def getContributionList(self):
+        pass
+    getContributionList.convert = lambda cl: fossilize(cl, IContributionMetadataFossil)
+    getContributionList.name = 'contributions'
+
+
+class IConferenceMetadataWithSubContribsFossil(IConferenceMetadataFossil):
+
+    def getContributionList(self):
+        pass
+    getContributionList.convert = lambda cl: fossilize(cl, IContributionMetadataWithSubContribsFossil)
+    getContributionList.name = 'contributions'
+
+
+class ISessionMetadataFossil(ISessionFossil):
+
+    def getContributionList(self):
+        pass
+    getContributionList.convert = lambda cl: fossilize(cl, IContributionMetadataWithSubContribsFossil)
+    getContributionList.name = 'contributions'
+
+
+class IConferenceMetadataWithSessionsFossil(IConferenceMetadataFossil):
+
+    def getSessionList(self):
+        pass
+    getSessionList.convert = lambda sl: fossilize(sl, ISessionMetadataFossil)
+    getSessionList.name = 'sessions'
+
+    def getContributionListWithoutSessions(self):
+        pass
+    getContributionListWithoutSessions.convert = lambda cl: fossilize(cl, IContributionMetadataWithSubContribsFossil)
+    getContributionListWithoutSessions.name = 'contributions'

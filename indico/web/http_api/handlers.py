@@ -35,7 +35,7 @@ import pytz
 from indico.web.http_api import ExportInterface, LimitExceededException
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
-from indico.web.http_api.fossils import IHTTPAPIResultFossil, IHTTPAPIErrorFossil
+from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
 from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.wsgi import webinterface_handler_config as apache
@@ -43,7 +43,6 @@ from indico.util.metadata.serializer import Serializer
 
 # indico legacy imports
 from MaKaC.common import DBMgr
-from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
@@ -59,47 +58,6 @@ EXPORT_URL_MAP = {
 # Compile regexps
 EXPORT_URL_MAP = dict((re.compile(pathRe), handlerFunc) for pathRe, handlerFunc in EXPORT_URL_MAP.iteritems())
 RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)$')
-
-class HTTPAPIError(Exception, Fossilizable):
-    fossilizes(IHTTPAPIErrorFossil)
-
-    def __init__(self, message, code=None):
-        self.message = message
-        self.code = code
-
-    def getMessage(self):
-        return self.message
-
-    def getCode(self):
-        return self.code
-
-
-class HTTPAPIResult(Fossilizable):
-    fossilizes(IHTTPAPIResultFossil)
-
-    def __init__(self, results, path='', query='', ts=None, complete=True):
-        if ts is None:
-            ts = int(time.time())
-        self._results = results
-        self._path = path
-        self._query = query
-        self._ts = ts
-        self._complete = complete
-
-    def getTS(self):
-        return self._ts
-
-    def getURL(self):
-        prefix = Config.getInstance().getBaseSecureURL()
-        if self._query:
-            return prefix + self._path + '?' + self._query
-        return prefix + self._path
-
-    def getResults(self):
-        return self._results
-
-    def getComplete(self):
-        return self._complete
 
 
 def validateSignature(key, signature, path, query, timestamp=None):

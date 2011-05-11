@@ -39,7 +39,11 @@ from indico.web.http_api.html import HTML4Serializer
 from indico.web.http_api.jsonp import JSONPSerializer
 from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.atom import AtomSerializer
-from indico.web.http_api.fossils import IConferenceMetadataFossil
+from indico.web.http_api.fossils import IConferenceMetadataFossil,\
+    IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
+    IConferenceMetadataWithSessionsFossil
+from indico.web.http_api.responses import HTTPAPIError
+from indico.web.wsgi import webinterface_handler_config as apache
 
 # indico legacy imports
 from MaKaC.common.indexes import IndexesHolder
@@ -195,6 +199,18 @@ class ExportInterface(object):
         if orderBy and exceeded:
             raise LimitExceededException()
 
+    @classmethod
+    def _getDetailInterface(cls, detail):
+        if detail == 'events':
+            return IConferenceMetadataFossil
+        elif detail == 'contributions':
+            return IConferenceMetadataWithContribsFossil
+        elif detail == 'subcontributions':
+            return IConferenceMetadataWithSubContribsFossil
+        elif detail == 'sessions':
+            return IConferenceMetadataWithSessionsFossil
+        raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
+
     def category(self, idlist, tz, limit, detail, qdata):
 
         orderBy = get_query_parameter(qdata, ['o', 'order'], 'start')
@@ -218,13 +234,14 @@ class ExportInterface(object):
 
         ch = ConferenceHolder()
         counter = 0
+        iface = ExportInterface._getDetailInterface(detail)
 
         for eventId in idlist:
             if counter >= limit:
                 break
 
             event = ch.getById(eventId)
-            yield fossilize(event, IConferenceMetadataFossil, tz=tz)
+            yield fossilize(event, iface, tz=tz)
             counter += 1
 
 
