@@ -57,6 +57,10 @@ class ArgumentValueError(Exception):
     pass
 
 
+class LimitExceededException(Exception):
+    pass
+
+
 class IExport(Interface):
 
     def category(cls, idlist, fromDT, toDT, location=None, limit=None,
@@ -76,6 +80,10 @@ class ExportInterface(object):
 
     _deltas =  {'yesterday': timedelta(-1),
                 'tomorrow': timedelta(1)}
+
+    _sortingKeys = {'id': lambda x: x.getId(),
+                    'end': lambda x: x.getEndDate(),
+                    'title': lambda x: x.getTitle()}
 
     def __init__(self, dbi, aw):
         self._dbi = dbi
@@ -145,11 +153,51 @@ class ExportInterface(object):
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
 
+    def _iterateOver(self, iterator, limit):
+        counter = 0
+        # this set acts as a checklist to know if a record has already been sent
+        exclude = set()
+        self._intermediateResults = []
+
+        for obj in iterator:
+            if counter >= limit:
+                raise LimitExceededException()
+            if obj not in exclude and obj.canAccess(self._aw):
+                self._intermediateResults.append(obj)
+                yield obj
+                exclude.add(obj)
+                counter += 1
+
+    def _sortedValues(self, iterator, limit, orderBy, descending):
+
+        if (orderBy and orderBy != 'start') or descending:
+            sortingKey = self._sortingKeys.get(orderBy)
+            try:
+                exceeded = False
+                limitedIterable = sorted(self._iterateOver(iterator, limit),
+                                         key=sortingKey)
+            except LimitExceededException:
+                exceeded = True
+                limitedIterable = sorted(self._intermediateResults,
+                                         key=sortingKey)
+
+            if descending:
+                limitedIterable.reverse()
+        else:
+            limitedIterable = self._iterateOver(iterator, limit)
+
+        # iterate over result
+        for obj in limitedIterable:
+            yield obj
+
+        # in case the limit was exceeded while sorting the results,
+        # raise the exception as if we were truly consuming an iterator
+        if orderBy and exceeded:
+            raise LimitExceededException()
+
     def category(self, idlist, tz, limit, detail, qdata):
 
-        detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
-
-        orderBy = get_query_parameter(qdata, ['o', 'order'])
+        orderBy = get_query_parameter(qdata, ['o', 'order'], 'start')
         descending = get_query_parameter(qdata, ['c', 'descending'], False)
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
@@ -160,42 +208,25 @@ class ExportInterface(object):
 
         idx = IndexesHolder().getById('categoryDate')
 
-        results = []
-        counter = 0
-        terminate = False
-        # this set acts as a checklist to know if a record has already been sent
-        exclude = set()
-
         for catId in idlist:
-            for obj in idx.iterateObjectsIn(catId, fromDT, toDT):
-                # TODO: hard limit
-                if counter >= limit:
-                    terminate = True
-                    break
-                if obj not in exclude and obj.canAccess(self._aw):
-                    results.append(fossilize(obj, IConferenceMetadataFossil, tz=tz))
-                    exclude.add(obj)
-                    counter += 1
-            if terminate:
-                break
+            for obj in self._sortedValues(idx.iterateObjectsIn(catId, fromDT, toDT),
+                                          limit, orderBy, descending):
+                yield fossilize(obj, IConferenceMetadataFossil, tz=tz)
 
-        return results
 
     def event(self, idlist, tz, limit, detail, qdata):
 
         ch = ConferenceHolder()
         counter = 0
-        results = []
 
         for eventId in idlist:
             if counter >= limit:
                 break
 
             event = ch.getById(eventId)
-            results.append(fossilize(event, IConferenceMetadataFossil, tz=tz))
+            yield fossilize(event, IConferenceMetadataFossil, tz=tz)
             counter += 1
 
-        return results
 
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)

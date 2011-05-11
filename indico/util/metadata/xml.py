@@ -37,7 +37,7 @@ class XMLSerializer(Serializer):
     def _convert(self, value):
         if type(value) == datetime:
             return value.isoformat()
-        elif type(value) == int or type(value) == float:
+        elif type(value) in [int, float, bool]:
             return str(value)
         else:
             return value.decode('utf-8') if type(value) == str else value

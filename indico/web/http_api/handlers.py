@@ -32,7 +32,7 @@ from ZODB.POSException import ConflictError
 import pytz
 
 # indico imports
-from indico.web.http_api import ExportInterface
+from indico.web.http_api import ExportInterface, LimitExceededException
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
 from indico.web.http_api.fossils import IHTTPAPIResultFossil, IHTTPAPIErrorFossil
@@ -49,7 +49,7 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 
 # Maximum number of records that will get exported
-MAX_RECORDS = 20000
+MAX_RECORDS = 10000
 
 # Valid URLs for export handlers. the last group has to be the response type
 EXPORT_URL_MAP = {
@@ -77,13 +77,14 @@ class HTTPAPIError(Exception, Fossilizable):
 class HTTPAPIResult(Fossilizable):
     fossilizes(IHTTPAPIResultFossil)
 
-    def __init__(self, results, path='', query='', ts=None):
+    def __init__(self, results, path='', query='', ts=None, complete=True):
         if ts is None:
             ts = int(time.time())
         self._results = results
         self._path = path
         self._query = query
         self._ts = ts
+        self._complete = complete
 
     def getTS(self):
         return self._ts
@@ -97,6 +98,10 @@ class HTTPAPIResult(Fossilizable):
     def getResults(self):
         return self._results
 
+    def getComplete(self):
+        return self._complete
+
+
 def validateSignature(key, signature, path, query, timestamp=None):
     if timestamp is None:
         timestamp = int(time.time())
@@ -107,6 +112,7 @@ def validateSignature(key, signature, path, query, timestamp=None):
         candidates.append(h.hexdigest())
     if signature not in candidates:
         raise HTTPAPIError('Signature invalid (check system clock)', apache.HTTP_FORBIDDEN)
+
 
 def getAK(apiKey, signature, path, query):
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -131,6 +137,7 @@ def getAK(apiKey, signature, path, query):
         onlyPublic = True
     return ak, onlyPublic
 
+
 def buildAW(ak, req, onlyPublic=False):
     aw = AccessWrapper()
     if ak and not onlyPublic:
@@ -140,6 +147,7 @@ def buildAW(ak, req, onlyPublic=False):
             raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
         aw.setUser(ak.getUser())
     return aw
+
 
 def getExportHandler(path):
     """Get the export handler, handler args and return type from a path"""
@@ -156,13 +164,14 @@ def getExportHandler(path):
         return None, None, None
     return globals()[func], groups[:-1], groups[-1]
 
+
 def handler_event_categ(dbi, aw, qdata, dtype, idlist):
     idlist = idlist.split('-')
 
     expInt = ExportInterface(dbi, aw)
     tzName = get_query_parameter(qdata, ['tz'], None)
     detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
-    limit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
+    userLimit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
 
     if tzName is None:
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -170,13 +179,27 @@ def handler_event_categ(dbi, aw, qdata, dtype, idlist):
 
     tz = pytz.timezone(tzName)
 
+    if userLimit > MAX_RECORDS:
+        raise HTTPAPIError("You can only request up to %d records per request" % MAX_RECORDS)
+
     # impose a hard limit
-    limit = limit if limit > 0 else MAX_RECORDS
+    limit = userLimit if userLimit > 0 else MAX_RECORDS
 
     if dtype == 'categ':
-        return expInt.category(idlist, tz, limit, detail, qdata)
+        iterator = expInt.category(idlist, tz, limit, detail, qdata)
     elif dtype == 'event':
-        return expInt.event(idlist, tz, limit, detail, qdata)
+        iterator = expInt.event(idlist, tz, limit, detail, qdata)
+
+    resultList = []
+    complete = True
+
+    try:
+        for obj in iterator:
+            resultList.append(obj)
+    except LimitExceededException:
+        complete = (limit == userLimit)
+
+    return resultList, complete
 
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
@@ -207,7 +230,7 @@ def handler(req, **params):
     if func is None or dformat is None:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
-    ak = error = results = None
+    ak = error = result = None
     ts = int(time.time())
     try:
         # Validate the API key (and its signature)
@@ -227,20 +250,20 @@ def handler(req, **params):
         if not no_cache:
             obj = cache.loadObject(cache_path, qdata_copy)
             if obj is not None:
-                results = obj.getContent()
+                result, complete = obj.getContent()
                 ts = obj.getTS()
                 add_to_cache = False
-        if results is None:
+        if result is None:
             # Perform the actual exporting
-            results = func(dbi, aw, qdata, *args)
-        if results is not None and add_to_cache:
-            cache.cacheObject(cache_path, qdata_copy, results)
+            result, complete = func(dbi, aw, qdata, *args)
+        if result is not None and add_to_cache:
+            cache.cacheObject(cache_path, qdata_copy, (result, complete))
     except HTTPAPIError, e:
         error = e
         if e.getCode():
             req.status = e.getCode()
 
-    if results is None and error is None:
+    if result is None and error is None:
         # TODO: usage page
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
     else:
@@ -266,7 +289,7 @@ def handler(req, **params):
         if error:
             resultFossil = fossilize(error)
         else:
-            resultFossil = fossilize(HTTPAPIResult(results, path, query, ts))
+            resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete))
         del resultFossil['_fossil']
 
         req.headers_out['Content-Type'] = serializer.getMIMEType()

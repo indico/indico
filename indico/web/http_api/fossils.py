@@ -44,6 +44,9 @@ class IHTTPAPIResultFossil(IFossil):
     def getResults(self):
         pass
 
+    def getComplete(self):
+        pass
+
 class IConferenceMetadataFossil(IFossil):
 
     def getId(self):
