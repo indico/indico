@@ -47,7 +47,7 @@ class XMLSerializer(Serializer):
         if '_fossil' in fossil:
             attribs['fossil'] = fossil['_fossil']
         if 'id' in fossil:
-            attribs['id'] = fossil['id']
+            attribs['id'] = str(fossil['id'])
 
         felement = etree.Element(fossil['_type'].lower(),
                                  attrib=attribs)
