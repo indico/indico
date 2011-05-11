@@ -180,7 +180,7 @@ def handler_event_categ(dbi, aw, qdata, dtype, idlist):
     tz = pytz.timezone(tzName)
 
     if userLimit > MAX_RECORDS:
-        raise HTTPAPIError("You can only request up to %d records per request" % MAX_RECORDS)
+        raise HTTPAPIError("You can only request up to %d records per request" % MAX_RECORDS, apache.HTTP_BAD_REQUEST)
 
     # impose a hard limit
     limit = userLimit if userLimit > 0 else MAX_RECORDS
