@@ -83,6 +83,7 @@ class MaKaCInfo(Persistent):
         # http api
         self._apiHTTPSRequired = False
         self._apiMode = False
+        self._apiCacheTTL = 600
 
         # Event display style manager
         self._styleMgr = StyleManager()
@@ -427,6 +428,16 @@ class MaKaCInfo(Persistent):
 
     def setAPIMode(self, v):
         self._apiMode = v
+
+    def getAPICacheTTL(self):
+        if hasattr(self, '_apiCacheTTL'):
+            return self._apiCacheTTL
+        else:
+            self._apiCacheTTL = 600
+            return 600
+
+    def setAPICacheTTL(self, v):
+        self._apiCacheTTL = v
 
 
 

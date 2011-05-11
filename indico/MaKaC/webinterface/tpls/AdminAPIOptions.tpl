@@ -25,6 +25,12 @@
             </td>
         </tr>
         <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">Cache TTL (seconds)</span></td>
+            <td class="blacktext">
+                <input type="text" name="apiCacheTTL" id="apiCacheTTL" value="${apiCacheTTL}" />
+            </td>
+        </tr>
+        <tr>
             <td></td>
             <td><input type="submit" value="${_('Save')}" /></td>
         </tr>

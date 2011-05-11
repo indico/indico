@@ -68,6 +68,7 @@ class WAdminAPIOptions(WTemplated):
         vars = WTemplated.getVars(self)
         vars['apiMode'] = minfo.getAPIMode()
         vars['httpsRequired'] = minfo.isAPIHTTPSRequired()
+        vars['apiCacheTTL'] = minfo.getAPICacheTTL()
         return vars
 
 

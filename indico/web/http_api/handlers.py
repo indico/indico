@@ -214,12 +214,12 @@ def handler(req, **params):
     qdata = parse_qs(query)
     no_cache = get_query_parameter(qdata, ['nc', 'nocache'], 'no') == 'yes'
 
-    # Copy qdata for the cache key
-    qdata_copy = dict(qdata)
-    cache = RequestCache()
-
     dbi = DBMgr.getInstance()
     dbi.startRequest()
+
+    # Copy qdata for the cache key
+    qdata_copy = dict(qdata)
+    cache = RequestCache(HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL())
 
     pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
     apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)

@@ -40,9 +40,9 @@ class RequestCacheEntry(MultiLevelCacheEntry):
 class RequestCache(MultiLevelCache):
     _entryFactory = RequestCacheEntry
 
-    def __init__(self):
+    def __init__(self, ttl=600):
         super(RequestCache, self).__init__('http_api')
-        self._ttl = 600 # seconds
+        self._ttl = ttl
 
     def _generateFileName(self, entry, version):
         return 'req.%s' % version
