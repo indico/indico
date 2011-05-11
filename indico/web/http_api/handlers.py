@@ -37,6 +37,7 @@ from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
 from indico.web.http_api.fossils import IHTTPAPIResultFossil, IHTTPAPIErrorFossil
 from indico.web.http_api.util import remove_lists, get_query_parameter
+from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.metadata.serializer import Serializer
 
@@ -57,6 +58,7 @@ EXPORT_URL_MAP = {
 
 # Compile regexps
 EXPORT_URL_MAP = dict((re.compile(pathRe), handlerFunc) for pathRe, handlerFunc in EXPORT_URL_MAP.iteritems())
+RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)$')
 
 class HTTPAPIError(Exception, Fossilizable):
     fossilizes(IHTTPAPIErrorFossil)
@@ -91,9 +93,6 @@ class HTTPAPIResult(Fossilizable):
 def validateSignature(req, key, signature, path, query, timestamp=None):
     if timestamp is None:
         timestamp = int(time.time())
-    if not signature:
-        req.status = apache.HTTP_FORBIDDEN
-        raise HTTPAPIError('Signature missing')
     ts = timestamp / 300
     candidates = []
     for i in xrange(-1, 2):
@@ -104,11 +103,13 @@ def validateSignature(req, key, signature, path, query, timestamp=None):
         raise HTTPAPIError('Signature invalid (check system clock)')
 
 def getAK(apiKey, signature, path, query, req):
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+    apiMode = minfo.getAPIMode()
     if not apiKey:
-        return None
-    if not req.is_https():
-        req.status = apache.HTTP_FORBIDDEN
-        raise HTTPAPIError('HTTPS is required')
+        if apiMode in (API_MODE_ONLYKEY, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED):
+            req.status = apache.HTTP_FORBIDDEN
+            raise HTTPAPIError('API key is missing')
+        return None, True
     akh = APIKeyHolder()
     if not akh.hasKey(apiKey):
         req.status = apache.HTTP_FORBIDDEN
@@ -117,12 +118,25 @@ def getAK(apiKey, signature, path, query, req):
     if ak.isBlocked():
         req.status = apache.HTTP_FORBIDDEN
         raise HTTPAPIError('API key is blocked')
-    validateSignature(req, ak.getSignKey(), signature, path, query)
-    return ak
+    # Signature validation
+    onlyPublic = False
+    if signature:
+        validateSignature(req, ak.getSignKey(), signature, path, query)
+    elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
+        req.status = apache.HTTP_FORBIDDEN
+        raise HTTPAPIError('Signature missing')
+    elif apiMode == API_MODE_ONLYKEY_SIGNED:
+        onlyPublic = True
+    return ak, onlyPublic
 
-def buildAW(ak):
+def buildAW(ak, req, onlyPublic=False):
     aw = AccessWrapper()
-    if ak:
+    if ak and not onlyPublic:
+        # If we have an authenticated request, require HTTPS
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        if not req.is_https() and minfo.isAPIHTTPSRequired():
+            req.status = apache.HTTP_FORBIDDEN
+            raise HTTPAPIError('HTTPS is required')
         aw.setUser(ak.getUser())
     return aw
 
@@ -179,58 +193,59 @@ def handler(req, **params):
     # Copy qdata for the cache key
     qdata_copy = dict(qdata)
     cache = RequestCache()
-    obj = None
-    if not no_cache:
-        obj = cache.loadObject(path, qdata_copy)
-
-    add_to_cache = True
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
 
     pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
     apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
+    onlyPublic = get_query_parameter(qdata, ['op', 'onlypublic'], 'no') == 'yes'
 
     # Get our handler function and its argument and response type
     func, args, dformat = getExportHandler(path)
     if func is None or dformat is None:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
-    ak = error = results = resp = None
+    ak = error = results = None
+    ts = int(time.time())
     try:
         # Validate the API key (and its signature)
-        ak = getAK(apiKey, signature, path, query, req)
-        if obj is not None:
-            resp = obj.getContent()
-            add_to_cache = False
-        else:
-            # Create an access wrapper for the API key's user
-            aw = buildAW(ak)
+        ak, enforceOnlyPublic = getAK(apiKey, signature, path, query, req)
+        if enforceOnlyPublic:
+            onlyPublic = True
+        # Create an access wrapper for the API key's user
+        aw = buildAW(ak, req, onlyPublic)
+        # Get rid of API key in cache key if we did not impersonate a user
+        if ak and aw.getUser() is None:
+            qdata_copy.pop('ak', None)
+            qdata_copy.pop('apikey', None)
+
+        obj = None
+        add_to_cache = True
+        cache_path = RE_REMOVE_EXTENSION.sub('', path)
+        if not no_cache:
+            obj = cache.loadObject(cache_path, qdata_copy)
+            if obj is not None:
+                results = obj.getContent()
+                ts = obj.getTS()
+                add_to_cache = False
+        if results is None:
             # Perform the actual exporting
             results = func(dbi, aw, qdata, *args)
+        if results is not None and add_to_cache:
+            cache.cacheObject(cache_path, qdata_copy, results)
     except HTTPAPIError, e:
         error = e
-        add_to_cache = False
 
-    if results is None and error is None and resp is None:
+    if results is None and error is None:
         # TODO: usage page
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
-    elif resp is None:
-        serializer = Serializer.create(dformat, pretty=pretty,
-                                       **remove_lists(qdata))
-
-        if error:
-            resultFossil = fossilize(error)
-        else:
-            resultFossil = fossilize(HTTPAPIResult(results, path, query))
-        del resultFossil['_fossil']
-        result = serializer(resultFossil)
-
+    else:
         if ak and error is None:
             # Commit only if there was an API key and no error
             for _retry in xrange(10):
                 dbi.sync()
-                ak.used(req.remote_ip, path, query)
+                ak.used(req.remote_ip, path, query, not onlyPublic)
                 try:
                     dbi.endRequest(True)
                 except ConflictError:
@@ -241,9 +256,15 @@ def handler(req, **params):
             # No need to commit stuff if we didn't use an API key
             # (nothing was written)
             dbi.endRequest(False)
-        resp = serializer.getMIMEType(), result
 
-    if add_to_cache:
-        cache.cacheObject(path, qdata_copy, resp)
-    req.headers_out['Content-Type'] = resp[0]
-    return resp[1]
+        serializer = Serializer.create(dformat, pretty=pretty,
+                                       **remove_lists(qdata))
+
+        if error:
+            resultFossil = fossilize(error)
+        else:
+            resultFossil = fossilize(HTTPAPIResult(results, path, query, ts))
+        del resultFossil['_fossil']
+
+        req.headers_out['Content-Type'] = serializer.getMIMEType()
+        return serializer(resultFossil)

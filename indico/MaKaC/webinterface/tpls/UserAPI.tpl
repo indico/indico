@@ -13,13 +13,15 @@
             % endif
         </td>
     </tr>
-    <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Signature Key")}</span></td>
-        <td class="blacktext">
-            ${apiKey.getSignKey() if apiKey else _('None')}
-            ${inlineContextHelp(_('To use your API key you must sign &quot;Path?QueryString&TS&quot; (TS=int(UnixTimestamp/300)) using HMAC-SHA1 and append it to the query string, e.g. &quot;Path?QueryString&SignatureHash&quot;'))}
-        </td>
-    </tr>
+    % if signingEnabled:
+        <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Secret Key")}</span></td>
+            <td class="blacktext">
+                ${apiKey.getSignKey() if apiKey else _('None')}
+                ${inlineContextHelp(_('To use your API key you must sign &quot;Path?QueryString&TS&quot; (TS=int(UnixTimestamp/300)) using HMAC-SHA1 and append it to the query string, e.g. &quot;Path?QueryString&SignatureHash&quot;'))}
+            </td>
+        </tr>
+    % endif
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Created")}</span></td>
         <td class="blacktext">
@@ -41,7 +43,11 @@
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last request")}</span></td>
         <td class="blacktext">
-            ${apiKey.getLastRequest() or 'n/a' if apiKey else _('n/a')}
+            % if apiKey and apiKey.getLastRequest():
+                ${apiKey.getLastRequest()} (${_('Authenticated') if apiKey.isLastUseAuthenticated() else 'Public'})
+            % else:
+                ${_('n/a')}
+            % endif
         </td>
     </tr>
     <tr>
@@ -56,11 +62,11 @@
             <td>
                 % if not apiKey:
                     <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm('${_("Please only create an API key if you actually need one. Unused API keys might be deleted after some time.")}');">
-                        <input type="submit" value="Create API key" />
+                        <input type="submit" value="${_('Create API key')}" />
                     </form>
                 % else:
                     <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" onsubmit="return confirm('${_("Warning: When creating a new API key pair, your old key pair will stop working immediately!")}');">
-                        <input type="submit" value="Create a new API key pair" />
+                        <input type="submit" value="${_('Create a new API key pair')}" />
                     </form>
                 % endif
             </td>

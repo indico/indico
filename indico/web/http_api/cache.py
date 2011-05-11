@@ -31,7 +31,11 @@ class RequestCacheEntry(MultiLevelCacheEntry):
     def create(cls, content):
         entry = cls()
         entry.setContent(content)
+        entry._ts = int(time.time())
         return entry
+
+    def getTS(self):
+        return self._ts
 
 class RequestCache(MultiLevelCache):
     _entryFactory = RequestCacheEntry

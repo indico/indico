@@ -3528,6 +3528,12 @@ class UHOAIPrivateConfigAddIP( URLHandler ):
 class UHOAIPrivateConfigRemoveIP( URLHandler ):
     _relativeURL = "adminServices.py/oaiPrivateConfigRemoveIP"
 
+class UHAdminAPIOptions( URLHandler ):
+    _relativeURL = "adminServices.py/apiOptions"
+
+class UHAdminAPIOptionsSet( URLHandler ):
+    _relativeURL = "adminServices.py/apiOptionsSet"
+
 class UHAdminAPIKeys( URLHandler ):
     _relativeURL = "adminServices.py/apiKeys"
 

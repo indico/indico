@@ -19,11 +19,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from indico.web.http_api.auth import APIKey, APIKeyHolder
+from indico.web.http_api import API_MODES
 from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages.api import WPUserAPI, WPAdminAPI
-from MaKaC.errors import AccessError
+from MaKaC.webinterface.pages.api import WPUserAPI, WPAdminAPIOptions, WPAdminAPIKeys
+from MaKaC.errors import AccessError, FormValuesError
 
 class RHUserAPI(RHUserBase):
     def _process(self):
@@ -76,7 +77,25 @@ class RHUserAPIDelete(RHUserBase):
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
 
 
-class RHAdminAPI(RHServicesBase):
+class RHAdminAPIOptions(RHServicesBase):
     def _process(self):
-        p = WPAdminAPI(self)
+        p = WPAdminAPIOptions(self)
+        return p.display()
+
+class RHAdminAPIOptionsSet(RHServicesBase):
+    def _checkParams(self, params):
+        RHServicesBase._checkParams(self, params)
+        self._httpsRequired = bool(params.get('httpsRequired'))
+        self._apiMode = int(params.get('apiMode'))
+        if self._apiMode not in API_MODES:
+            raise FormValuesError()
+
+    def _process(self):
+        self._minfo.setAPIHTTPSRequired(self._httpsRequired)
+        self._minfo.setAPIMode(self._apiMode)
+        self._redirect(urlHandlers.UHAdminAPIOptions.getURL())
+
+class RHAdminAPIKeys(RHServicesBase):
+    def _process(self):
+        p = WPAdminAPIKeys(self)
         return p.display()

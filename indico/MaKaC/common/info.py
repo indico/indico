@@ -80,8 +80,9 @@ class MaKaCInfo(Persistent):
         # list of IPs that can access the private OAI gateway
         self._oaiPrivateHarvesterList = []
 
-        # list of IPs that can access the private OAI gateway
-        self._oaiPrivateHarvesterList = []
+        # http api
+        self._apiHTTPSRequired = False
+        self._apiMode = False
 
         # Event display style manager
         self._styleMgr = StyleManager()
@@ -406,6 +407,27 @@ class MaKaCInfo(Persistent):
 
     def setOAIPrivateHarvesterList(self, harvList):
         self._oaiPrivateHarvesterList = harvList
+
+    def isAPIHTTPSRequired(self):
+        if hasattr(self, '_apiHTTPSRequired'):
+            return self._apiHTTPSRequired
+        else:
+            self._apiHTTPSRequired = False
+            return False
+
+    def setAPIHTTPSRequired(self, v):
+        self._apiHTTPSRequired = v
+
+    def getAPIMode(self):
+        if hasattr(self, '_apiMode'):
+            return self._apiMode
+        else:
+            self._apiMode = 0
+            return 0
+
+    def setAPIMode(self, v):
+        self._apiMode = v
+
 
 
 class HelperMaKaCInfo:

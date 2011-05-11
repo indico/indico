@@ -102,5 +102,12 @@ def oaiPrivateConfigAddIP(req, **params):
 def oaiPrivateConfigRemoveIP(req, **params):
     return services.RHOAIPrivateConfigRemoveIP(req).process(params)
 
+def apiOptions(req, **params):
+    return api.RHAdminAPIOptions(req).process(params)
+
+def apiOptionsSet(req, **params):
+    return api.RHAdminAPIOptionsSet(req).process(params)
+
+
 def apiKeys(req, **params):
-    return api.RHAdminAPI(req).process(params)
+    return api.RHAdminAPIKeys(req).process(params)

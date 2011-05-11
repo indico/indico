@@ -19,9 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from operator import attrgetter
 
+from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.pages.admins import WPPersonalArea, WPServicesCommon
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.web.http_api.auth import APIKeyHolder
+from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 
 
 class WPUserAPI(WPPersonalArea):
@@ -33,31 +35,53 @@ class WPUserAPI(WPPersonalArea):
     def _setActiveTab(self):
         self._tabAPI.setActive()
 
-
 class WUserAPI(WTemplated):
 
     def __init__(self, av):
         self._avatar = av
 
     def getVars(self):
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        apiMode = minfo.getAPIMode()
         vars = WTemplated.getVars(self)
         vars['avatar'] = self._avatar
         vars['apiKey'] = self._avatar.getAPIKey()
         vars['isAdmin'] = self._rh._getUser().isAdmin()
+        vars['signingEnabled'] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
         return vars
 
 
-class WPAdminAPI(WPServicesCommon):
+class WPAdminAPIOptions(WPServicesCommon):
 
     def _getTabContent(self, params):
-        c = WAdminAPI()
+        c = WAdminAPIOptions()
         return c.getHTML(params)
 
     def _setActiveTab( self ):
         self._subTabHTTPAPI.setActive()
+        self._subTabHTTPAPI_Options.setActive()
+
+class WAdminAPIOptions(WTemplated):
+
+    def getVars(self):
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        vars = WTemplated.getVars(self)
+        vars['apiMode'] = minfo.getAPIMode()
+        vars['httpsRequired'] = minfo.isAPIHTTPSRequired()
+        return vars
 
 
-class WAdminAPI(WTemplated):
+class WPAdminAPIKeys(WPServicesCommon):
+
+    def _getTabContent(self, params):
+        c = WAdminAPIKeys()
+        return c.getHTML(params)
+
+    def _setActiveTab( self ):
+        self._subTabHTTPAPI.setActive()
+        self._subTabHTTPAPI_Keys.setActive()
+
+class WAdminAPIKeys(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars(self)

@@ -44,6 +44,7 @@ class APIKey(Persistent):
         self._useCount = 0
         self._lastPath = None
         self._lastQuery = None
+        self._lastUseAuthenticated = False
         self._oldKeys = PersistentList()
 
     def getUser(self):
@@ -85,6 +86,9 @@ class APIKey(Persistent):
     def getUseCount(self):
         return self._useCount
 
+    def isLastUseAuthenticated(self):
+        return self._lastUseAuthenticated
+
     def getLastRequest(self):
         if not self._lastPath:
             return None
@@ -95,11 +99,12 @@ class APIKey(Persistent):
     def getOldKeys(self):
         return self._oldKeys
 
-    def used(self, ip, path, query):
+    def used(self, ip, path, query, authenticated):
         self._lastUsedDT = datetime.datetime.now()
         self._lastUsedIP = ip
         self._lastPath = path
         self._lastQuery = query
+        self._lastUseAuthenticated = authenticated
         self._useCount += 1
 
     def newKey(self):
