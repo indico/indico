@@ -33,6 +33,7 @@ import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.conference import Session
 from MaKaC.i18n import _
 from MaKaC.common import HelperMaKaCInfo
+from MaKaC.webinterface.common.currency import CurrencyRegistry
 # ----------------- MANAGEMENT AREA ---------------------------
 class WPConfModifEPaymentBase( registrationForm.WPConfModifRegFormBase ):
 
@@ -98,6 +99,7 @@ class WConfModifEPayment( wcomponents.WTemplated ):
             vars["conditionsEnabled"] = "DISABLED"
             if self._conf.getModPay().arePaymentConditionsEnabled():
                 vars["conditionsEnabled"] = "ENABLED"
+            vars["Currency"]=self._conf.getRegistrationForm().getCurrency() or _("not selected")
         else:
             vars["changeTo"] = "True"
             vars["status"] = _("DISABLED")
@@ -109,6 +111,7 @@ class WConfModifEPayment( wcomponents.WTemplated ):
             vars["specificConditionsPayment"] = ""
             vars["successMsgPayment"] = ""
             vars["receiptMsgPayment"] = ""
+            vars["Currency"] = ""
         vars["dataModificationURL"]=urlHandlers.UHConfModifEPaymentdetailPaymentModification.getURL(self._conf)
         vars["sections"] = self._getSectionsHTML()
         return vars
@@ -139,5 +142,6 @@ class WConfModifEPaymentDataModification( wcomponents.WTemplated ):
         regForm = self._conf.getRegistrationForm()
         vars["successMsgPaymentEnabled"] = regForm.isSendPaidEmail() and _("ENABLED") or _("DISABLED")
         vars["receiptMsgPaymentEnabled"] = regForm.isSendReceiptEmail() and _("ENABLED") or _("DISABLED")
+        vars["Currency"]=CurrencyRegistry.getSelectItemsHTML(regForm.getCurrency())
         return vars
 

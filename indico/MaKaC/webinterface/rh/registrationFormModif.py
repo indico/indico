@@ -130,7 +130,6 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
             regForm.setSendRegEmail(params.has_key("sendRegEmail"))
             regForm.setSendReceiptEmail(params.has_key("sendReceiptEmail"))
             regForm.setSendPaidEmail(params.has_key("sendPaidEmail"))
-            regForm.setCurrency(params.get("Currency",""))
         self._redirect(urlHandlers.UHConfModifRegForm.getURL(self._conf))
 
 class RHRegistrationFormModifSessions( RHRegistrationFormModifBase ):

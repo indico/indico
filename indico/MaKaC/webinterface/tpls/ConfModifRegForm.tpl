@@ -104,12 +104,6 @@
     </td>
   </tr>
   <tr>
-    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Currency")}</span></td>
-    <td class="blacktext">
-      ${ Currency }
-    </td>
-  </tr>
-  <tr>
     <td colspan="3" class="horizontalLine">&nbsp;</td>
   </tr>
   <tr>

@@ -20,7 +20,6 @@ import copy
 
 
 def lookupHandler(method):
-
     # TODO: better way to do this without the need of DB connection?
     handlers.updateMethodMapWithPlugins()
 

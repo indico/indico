@@ -134,11 +134,6 @@
       <td bgcolor="white" width="100%"><input type="checkbox" size="50" name="mandatoryAccount" ${ mandatoryAccount }> ( ${ _("Uncheck if an account is not needed")})</td>
     </tr>
 
-    <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Currency")}</span></td>
-      <td bgcolor="white" >${ Currency }</td>
-    </tr>
-
     <tr><td>&nbsp;</td></tr>
     <tr>
       <td colspan="2" align="left">

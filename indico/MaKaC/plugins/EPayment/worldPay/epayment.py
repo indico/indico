@@ -113,8 +113,7 @@ class WorldPayMod( BaseEPayMod ):
         if isinstance(self._url, urlHandlers.URLHandler):
             url = self._url.getURL()
         #raise "%s"%(str(["", registrant.getCountry(), registrant.getPhone(), registrant.getEmail()]))
-        s="""<form action="%s" method=POST>
-             <td align="center"><input type=submit value="Proceed to %s"/></td>
+        s="""<form action="%s" method=POST id="%s">
              <input type=hidden name="instId" value="%s" />
              <input type=hidden name="cartId" value="%s"/>
              <input type=hidden name="amount" value="%s" />
@@ -133,7 +132,7 @@ class WorldPayMod( BaseEPayMod ):
             <input type=hidden name="tel" value="%s" />
             <input type=hidden name="email" value="%s"/>
             </form>
-        """%(url, self.getTitle(), self._instId, registrant.getId(), "%.2f"%prix, Currency, self._description, url_confirm, self._conf.getId(), registrant.getId(), self._testMode, registrant.getFirstName(),registrant.getSurName(),\
+        """%(url, self.getId(), self._instId, registrant.getId(), "%.2f"%prix, Currency, self._description, url_confirm, self._conf.getId(), registrant.getId(), self._testMode, registrant.getFirstName(),registrant.getSurName(),\
                 registrant.getAddress(),"", registrant.getCountry(), registrant.getPhone(), registrant.getEmail())
         return s
 

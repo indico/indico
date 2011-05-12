@@ -12,7 +12,13 @@
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("detail of Payment")}</span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Currency")}</span></td>
+        <td class="blacktext" style=${"color:red;font-weight:bold;" if Currency ==_("not selected") else "" }>
+            ${ Currency }
+        </td>
+    </tr></tr>
+    <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Detail of Payment")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext">
            <TEXTAREA ROWS="6" COLS="60" disabled="true" >${ detailPayment }</TEXTAREA>
         </td>

@@ -5,7 +5,11 @@
             <td class="groupTitle" colspan="2"> ${ _("Configuration of pay later")}</td>
         </tr>
         <tr>
-            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("detail of payment")}</span></td>
+             <td nowrap class="dataCaptionTD"><span class="titleCellFormat">${ _("Currency")}</span></td>
+             <td class="blacktext"><select name="Currency">${ Currency }</select></td>
+        </tr>
+        <tr>
+            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("Detail of payment")}</span></td>
             <td align="left"><TEXTAREA name="detailPayment" ROWS="6" COLS="60">${ detailPayment }</TEXTAREA></td>
         </tr>
 <%

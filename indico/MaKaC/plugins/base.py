@@ -1133,7 +1133,9 @@ class PluginOption(Persistent):
         'ckEditor': str,
         'textarea': str,
         'list_multiline': list,
-        'links': list
+        'links': list,
+        'paymentmethods': list
+
     }
 
     def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None):

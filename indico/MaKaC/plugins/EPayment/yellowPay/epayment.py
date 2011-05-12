@@ -95,16 +95,15 @@ class YellowPayMod(BaseEPayMod):
         m.update(self.getHashSeed())
         #txtHash =  cgi.escape(m.digest(),True)
         txtHash =m.hexdigest()
-        s=""" <form action="%s" method="POST">
+        s=""" <form action="%s" method="POST" id="%s">
                       <input type="hidden" name="txtShopId" value="%s">
                       <input type="hidden" name="txtLangVersion" value="%s">
                       <input type="hidden" name="txtOrderTotal" value="%s">
                       <input type="hidden" name="txtArtCurrency" value="%s">
                       <input type="hidden" name="txtHash" value="%s">
                       <input type="hidden" name="txtShopPara" value="%s">
-                      <td align="center"><input type="submit" value="%s" ></td>
                    </form>
-                       """%(self.getUrl(),self.getMasterShopID(),"2057",prix,Currency,txtHash,param,"Proceed to %s"%self.getTitle())
+                       """%(self.getUrl(),self.getId(), self.getMasterShopID(),"2057",prix,Currency,txtHash,param)
         #s=cgi.escape(s)
         return s
 

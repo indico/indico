@@ -149,7 +149,6 @@ class PluginOptionsRemoveLink ( PluginOptionsBase ):
         self._targetOption._notifyModification()
         return {'success': True, 'table': links}
 
-
 methodMap = {
     "addUsers": PluginOptionsAddUsers,
     "removeUser": PluginOptionsRemoveUser,

@@ -68,7 +68,7 @@ class PayPalMod(BaseEPayMod):
         url_return=localUrlHandlers.UHPayConfirmPayPal.getURL(registrant)
         url_cancel_return=localUrlHandlers.UHPayCancelPayPal.getURL(registrant)
         url_notify=localUrlHandlers.UHPayParamsPayPal.getURL(registrant)
-        s=""" <form action="%s" method="POST">
+        s=""" <form action="%s" method="POST" id="%s">
                         <input type="hidden" name="cmd" value="_xclick">
                         <input type="hidden" name="business" value="%s">
                         <input type="hidden" name="item_name" value="%s">
@@ -78,10 +78,9 @@ class PayPalMod(BaseEPayMod):
                         <input type="hidden" name="return" value="%s">
                         <input type="hidden" name="cancel_return" value="%s">
                         <input type="hidden" name="notify_url" value="%s">
-                        <td align="center"><input type="submit" value="%s" ></td>
                    </form>
-                       """%(self.getUrl(),self.getBusiness(), "%s: registration for %s"%(registrant.getFullName(),strip_ml_tags(conf.getTitle())),prix,Currency,\
-                            url_return,url_cancel_return,url_notify,"Proceed to %s"%self.getTitle())
+                       """%(self.getUrl(),self.getId(),self.getBusiness(), "%s: registration for %s"%(registrant.getFullName(),strip_ml_tags(conf.getTitle())),prix,Currency,\
+                            url_return,url_cancel_return,url_notify)
         #s=cgi.escape(s)
         return s
 

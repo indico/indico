@@ -88,6 +88,7 @@ class RHEPaymentModifPerformDataModification( RHEPaymentModifBase ):
             if al.isAdmin( self._getUser() ):
                 modpay.setPaymentConditions(params.get("conditionsPayment", ""))
                 modpay.setPaymentConditionsEnabled(params.has_key("conditionsEnabled"))
+            self._conf.getRegistrationForm().setCurrency(params.get("Currency",""))
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
 ##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):

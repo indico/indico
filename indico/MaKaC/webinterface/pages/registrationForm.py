@@ -228,7 +228,6 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["sendPaidEmail"] = _("Yes")
             if not regForm.isSendPaidEmail():
                 vars["sendPaidEmail"] = _("No")
-            vars["Currency"]=regForm.getCurrency()
         else:
             vars["activated"] = False
             vars["changeTo"] = "True"
@@ -250,7 +249,6 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["sendRegEmail"] = ""
             vars["sendReceiptEmail"] = ""
             vars["sendPaidEmail"] = ""
-            vars["Currency"]=""
         vars["sections"] = self._getSectionsHTML()
         vars["actionSectionURL"]=quoteattr(str(urlHandlers.UHConfModifRegFormActionSection.getURL(self._conf)))
         vars["statuses"] = self._getStatusesHTML()
@@ -317,7 +315,6 @@ class WConfModifRegFormDataModification( wcomponents.WTemplated ):
             vars["sendReceiptEmail"] = "CHECKED"
         if regForm.isSendPaidEmail():
             vars["sendPaidEmail"] = "CHECKED"
-        vars["Currency"]="""<select name="%s">%s</select>"""%("Currency", CurrencyRegistry.getSelectItemsHTML(regForm.getCurrency()))
         vars["extraTimeAmount"] = regForm.getEndExtraTimeAmount()
         vars["extraTimeUnit"] = regForm.getEndExtraTimeUnit()
         return vars
@@ -2548,38 +2545,14 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
         self._conf = self._registrant.getConference()
         self.modPay = self._conf.getModPay()
 
-    def _getModPayHTML(self):
-        forms=""
-        html=[]
-        regForm = self._conf.getRegistrationForm()
-        for m in self.modPay.getSortedModPay():
-            if m.isEnabled():
-                forms=forms+"""
-                <tr>
-                <td></td>
-                <td><b>%s</b></td>
-                %s
-                </tr>
-                """%(m.getTitle(),m.getFormHTML(self._registrant.getTotal(),regForm.getCurrency(),self._conf,self._registrant, lang = self._rh._getSession().getLang(), secure=self._rh._req.is_https()))
-        #forms=forms+"</table>"
-
-        if forms:
-            html.append( _("""
-                    <tr>&nbsp;</tr>
-                    <tr>
-                    <td colspan="4" style="color:black"><b>Pay by credit card online with:</b></td>
-                    </tr>
-                    <tr>
-                    %s
-                    </tr>
-                    <tr><td  colspan="4" style="border-top:2px solid black">&nbsp;</td></tr>
-                """)%"".join(forms))
-        return "".join(html)
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["modPay"]=self._getModPayHTML()
         vars["modPayDetails"] = self.modPay.getPaymentDetails()
+        vars["payMods"] = self.modPay.getSortedModPay()
+        vars["registrant"] = self._registrant
+        vars["conf"] = self._conf
+        vars["lang"] = self._rh._getSession().getLang()
+        vars["secure"] = self._rh._req.is_https()
         return vars
 
 class WPRegistrationFormSignIn( conferences.WPConferenceDefaultDisplayBase ):

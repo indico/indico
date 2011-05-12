@@ -23,6 +23,9 @@ from persistent import Persistent
 from MaKaC.common.Locators import Locator
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.plugins import PluginLoader
+from MaKaC.errors import MaKaCError, FormValuesError
+import re
+
 
 class EPayment(Persistent):
 
@@ -344,6 +347,14 @@ class BaseEPayMod(Persistent):
         """
         raise Exception("This method must be overloaded")
 
+    def getOnSelectedHTML(self):
+        return "function (amount) {"\
+            "if($('#selectPaymentSystem').val()) {" \
+             "$('#paySubmit').removeAttr('disabled');"\
+             "$('#totalAmount').text(amount);"\
+             "$('#inPlaceSelectPaymentMethod').hide();"\
+             "}}"
+
     def getConfModifEPaymentURL(self, conf):
         """
         For each plugin there is just one URL for all requests. The plugin will have its own parameters to manage different URLs (have a look to urlHandler.py). This method returns that general URL.
@@ -612,7 +623,56 @@ class TransactionPayLaterMod(BaseTransaction):
                              self._Data["Currency"])
 
 
+class PaymentMethod(Persistent):
 
+    def __init__(self, conf, name="", displayName="", type="", extraFee=0.0):
+        self._name = name
+        self._displayName = displayName
+        self._type = type
+        self._extraFee = extraFee
+        self._conf = conf
+
+    def getName(self):
+        return self._name
+
+    def setName(self, name):
+        self._name = name
+
+    def getDisplayName(self):
+        return self._displayName
+
+    def setDisplayName(self, displayName):
+        self._displayName = displayName
+
+    def getType(self):
+        return self._type
+
+    def setType(self, type):
+        self._type = type
+
+    def getExtraFee(self):
+        return self._extraFee
+
+    def setExtraFee(self, extraFee):
+        match = re.compile(r'^(\d+(?:[\.]\d+)?)$').match(extraFee)
+        if match:
+            extraFee = match.group(1)
+        else:
+            raise FormValuesError( _('The extra fee format is in incorrect. The fee must be a number: 999.99'))
+        self._extraFee = extraFee
+
+    def getConference(self):
+        return self._conf
+
+    def setConference(self, conf):
+        self._conf = conf
+
+    def getLocator(self):
+        if self.getConference() == None:
+            return Locator()
+        lconf = self.getConference().getLocator()
+        lconf["paymentMethodName"] = self.getName()
+        return lconf
 
 ##class PayPalMod(BaseEPayMod):
 ##
