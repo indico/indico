@@ -201,6 +201,13 @@ class ObjectChangeListener(Component):
                 self._objectInfoChanged(obj, 'data')
             else:
                 self._objectInfoChanged(obj, 'acl')
+        elif isinstance(obj, conference.Session):
+            # TODO: Handle sessions properly, scheduling them for update
+            # (contained contributions should be sent to server instead of whole event)
+            owner = obj.getOwner()
+            if owner:
+                self._objectInfoChanged(owner, 'data')
+            # else, do nothing, as it has probably been deleted
         elif isinstance(obj, accessControl.AccessController):
             self._aclChanged(obj.getOwner(), child=False)
         else:
