@@ -1632,7 +1632,9 @@ class AvatarHolder( ObjectHolder ):
             if objType == "session":
                 for role in links[objType].keys():
                     for ses in links[objType][role]:
-                        if ses.getOwner() == None:
+                        owner = ses.getOwner()
+                        # tricky, as conference containing it may have been deleted
+                        if owner == None or owner.getOwner() == None:
                                 Logger.get('user.merge').warning(
                                     "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
                                     (ses, prin.getId(), role))
