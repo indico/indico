@@ -23,6 +23,9 @@ import datetime
 from operator import itemgetter
 import icalendar as ical
 
+# indico imports
+from indico.util.string import unicodeOrNone
+
 # module imports
 from indico.util.metadata.serializer import Serializer
 

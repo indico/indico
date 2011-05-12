@@ -19,9 +19,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # python stdlib imports
-import datetime
-from operator import itemgetter
 from pyatom import AtomFeed
+
+# indico imports
+from indico.util.string import unicodeOrNone
 
 # module imports
 from indico.util.metadata.serializer import Serializer
@@ -42,12 +43,11 @@ class AtomSerializer(Serializer):
             feed_url=fossils['url']
         )
 
-        now = datetime.datetime.utcnow()
         for fossil in results:
             feed.add(
-                title=fossil['title'],
-                summary=fossil['description'],
+                title=unicodeOrNone(fossil['title']),
+                summary=unicodeOrNone(fossil['description']),
                 url=fossil['url'],
-                updated=fossil['startDate'] # ugh, but that's better than creationDate
-            )
+                updated=fossil['startDate']  # ugh, but that's better than creationDate
+                )
         return feed.to_string()

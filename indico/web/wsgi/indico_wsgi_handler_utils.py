@@ -603,7 +603,10 @@ def _check_result(req, result):
     if result is (None or 0):
         result = ""
     else:
-        result = str(result)
+        if type(result) == unicode:
+            result = result.encode('utf-8')
+        else:
+            result = str(result)
 
     # unless content_type was manually set, we will attempt
     # to guess it

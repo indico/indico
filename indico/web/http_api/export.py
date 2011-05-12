@@ -123,8 +123,6 @@ class ExportInterface(object):
         if m:
             atoms = list(0 if a == None else int(a) for a in m.groups())
 
-
-
             if atoms[1] > 23  or atoms[2] > 59:
                 raise ArgumentParseError("Invalid time!")
             return ('ctx', timedelta(days=atoms[0], hours=atoms[1], minutes=atoms[2]))
