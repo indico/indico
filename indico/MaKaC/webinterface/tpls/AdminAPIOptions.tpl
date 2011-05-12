@@ -31,6 +31,12 @@
             </td>
         </tr>
         <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">Signature TTL (seconds)</span></td>
+            <td class="blacktext">
+                <input type="text" name="apiSignatureTTL" id="apiSignatureTTL" value="${apiSignatureTTL}" />
+            </td>
+        </tr>
+        <tr>
             <td></td>
             <td><input type="submit" value="${_('Save')}" /></td>
         </tr>

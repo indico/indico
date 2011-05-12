@@ -84,6 +84,7 @@ class MaKaCInfo(Persistent):
         self._apiHTTPSRequired = False
         self._apiMode = False
         self._apiCacheTTL = 600
+        self._apiSignatureTTL = 600
 
         # Event display style manager
         self._styleMgr = StyleManager()
@@ -438,6 +439,16 @@ class MaKaCInfo(Persistent):
 
     def setAPICacheTTL(self, v):
         self._apiCacheTTL = v
+
+    def getAPISignatureTTL(self):
+        if hasattr(self, '_apiSignatureTTL'):
+            return self._apiSignatureTTL
+        else:
+            self._apiSignatureTTL = 600
+            return 600
+
+    def setAPISignatureTTL(self, v):
+        self._apiSignatureTTL = v
 
 
 

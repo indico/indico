@@ -67,7 +67,7 @@ EXPORT_URL_MAP = dict((re.compile(pathRe), handlerFunc) for pathRe, handlerFunc 
 RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)(?:$|(?=\?))')
 
 
-def normalizeQuery(path, query, ts=None, remove=('timestamp', 'signature')):
+def normalizeQuery(path, query, remove=('signature',)):
     """Normalize request path and query so it can be used for caching and signing
 
     Returns a string consisting of path and sorted query string.
@@ -77,8 +77,6 @@ def normalizeQuery(path, query, ts=None, remove=('timestamp', 'signature')):
     if remove:
         for key in remove:
             qdata.pop(key, None)
-    if ts is not None:
-        qdata['timestamp'] = ts
     sortedQuery = sorted(qdata.items(), key=lambda x: x[0].lower())
     if sortedQuery:
         return '%s?%s' % (path, urllib.urlencode(sortedQuery))
@@ -86,19 +84,18 @@ def normalizeQuery(path, query, ts=None, remove=('timestamp', 'signature')):
         return path
 
 
-def validateSignature(key, signature, path, query, timestamp=None):
-    if timestamp is None:
-        timestamp = int(time.time())
-    ts = timestamp / 300
-    candidates = []
-    for i in xrange(-1, 2):
-        h = hmac.new(key, normalizeQuery(path, query, ts + i), hashlib.sha1)
-        candidates.append(h.hexdigest())
-    if signature not in candidates:
-        raise HTTPAPIError('Signature invalid (check system clock)', apache.HTTP_FORBIDDEN)
+def validateSignature(key, signature, timestamp, path, query):
+    ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
+    if not timestamp:
+        raise HTTPAPIError('Signature invalid (no timestamp)', apache.HTTP_FORBIDDEN)
+    elif abs(timestamp - int(time.time())) > ttl:
+        raise HTTPAPIError('Signature invalid (bad timestamp)', apache.HTTP_FORBIDDEN)
+    digest = hmac.new(key, normalizeQuery(path, query), hashlib.sha1).hexdigest()
+    if signature != digest:
+        raise HTTPAPIError('Signature invalid', apache.HTTP_FORBIDDEN)
 
 
-def getAK(apiKey, signature, path, query):
+def checkAK(apiKey, signature, timestamp, path, query):
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     apiMode = minfo.getAPIMode()
     if not apiKey:
@@ -114,7 +111,7 @@ def getAK(apiKey, signature, path, query):
     # Signature validation
     onlyPublic = False
     if signature:
-        validateSignature(ak.getSignKey(), signature, path, query)
+        validateSignature(ak.getSignKey(), signature, timestamp, path, query)
     elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
         raise HTTPAPIError('Signature missing', apache.HTTP_FORBIDDEN)
     elif apiMode == API_MODE_ONLYKEY_SIGNED:
@@ -202,6 +199,7 @@ def handler(req, **params):
 
     apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
     signature = get_query_parameter(qdata, ['signature'])
+    timestamp = get_query_parameter(qdata, ['timestamp'], 0, integer=True)
     no_cache = get_query_parameter(qdata, ['nc', 'nocache'], 'no') == 'yes'
     pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(qdata, ['op', 'onlypublic'], 'no') == 'yes'
@@ -215,7 +213,7 @@ def handler(req, **params):
     ts = int(time.time())
     try:
         # Validate the API key (and its signature)
-        ak, enforceOnlyPublic = getAK(apiKey, signature, path, query)
+        ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
         if enforceOnlyPublic:
             onlyPublic = True
         # Create an access wrapper for the API key's user

@@ -89,10 +89,11 @@ class RHAdminAPIOptionsSet(RHServicesBase):
         self._apiMode = int(params.get('apiMode'))
         try:
             self._apiCacheTTL = int(params.get('apiCacheTTL', 0))
-            if self._apiCacheTTL < 0:
+            self._apiSignatureTTL = int(params.get('apiSignatureTTL', 0))
+            if self._apiCacheTTL < 0 or self._apiSignatureTTL < 0:
                 raise ValueError
         except ValueError:
-            raise FormValuesError('Cache TTL must be a positive number')
+            raise FormValuesError('TTLs must be positive numbers')
         if self._apiMode not in API_MODES:
             raise FormValuesError()
 
@@ -100,6 +101,7 @@ class RHAdminAPIOptionsSet(RHServicesBase):
         self._minfo.setAPIHTTPSRequired(self._httpsRequired)
         self._minfo.setAPIMode(self._apiMode)
         self._minfo.setAPICacheTTL(self._apiCacheTTL)
+        self._minfo.setAPISignatureTTL(self._apiSignatureTTL)
         self._redirect(urlHandlers.UHAdminAPIOptions.getURL())
 
 class RHAdminAPIKeys(RHServicesBase):
