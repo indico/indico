@@ -23,6 +23,7 @@ Main export interface
 """
 
 # python stdlib imports
+import fnmatch
 import itertools
 import re
 from zope.interface import Interface, implements
@@ -210,13 +211,16 @@ class ExportInterface(object):
             return IConferenceMetadataWithSessionsFossil
         raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
 
-    def _iterateOver(self, iterator, offset, limit, orderBy, descending):
+    def _iterateOver(self, iterator, offset, limit, orderBy, descending, filter=None):
         """
         Iterates over a maximum of `limit` elements, starting at the
         element number `offset`. The elements will be ordered according
-        to `orderby` and `descending` (slooooow).
+        to `orderby` and `descending` (slooooow) and filtered by the
+        callable `filter`:
         """
 
+        if filter:
+            iterator = itertools.ifilter(filter, iterator)
         sortedIterator = self._sortedIterator(iterator, limit, orderBy, descending)
         # Skip offset elements - http://docs.python.org/library/itertools.html#recipes
         next(itertools.islice(sortedIterator, offset, offset), None)
@@ -227,15 +231,29 @@ class ExportInterface(object):
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
         location = get_query_parameter(qdata, ['l', 'location'])
+        room = get_query_parameter(qdata, ['r', 'room'])
 
         fromDT = ExportInterface._getDateTime('from', fromDT, tz) if fromDT != None else None
         toDT = ExportInterface._getDateTime('to', toDT, tz, aux=fromDT) if toDT != None else None
 
         idx = IndexesHolder().getById('categoryDate')
 
+        filter = None
+        if room or location:
+            def filter(obj):
+                if location:
+                    name = obj.getLocation() and obj.getLocation().getName()
+                    if not name or not fnmatch.fnmatch(name.lower(), location.lower()):
+                        return False
+                if room:
+                    name = obj.getRoom() and obj.getRoom().getName()
+                    if not name or not fnmatch.fnmatch(name.lower(), room.lower()):
+                        return False
+                return True
+
         for catId in idlist:
             for obj in self._iterateOver(idx.iterateObjectsIn(catId, fromDT, toDT),
-                                         offset, limit, orderBy, descending):
+                                         offset, limit, orderBy, descending, filter):
                 yield fossilize(obj, IConferenceMetadataFossil, tz=tz)
 
     def event(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
