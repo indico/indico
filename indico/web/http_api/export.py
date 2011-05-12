@@ -23,6 +23,7 @@ Main export interface
 """
 
 # python stdlib imports
+import itertools
 import re
 from zope.interface import Interface, implements
 from datetime import datetime, timedelta, date, time
@@ -157,12 +158,14 @@ class ExportInterface(object):
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
 
-    def _iterateOver(self, iterator, limit):
+    def _iterateOver(self, iterator, offset, limit):
         counter = 0
         # this set acts as a checklist to know if a record has already been sent
         exclude = set()
         self._intermediateResults = []
 
+        # Skip offset elements - http://docs.python.org/library/itertools.html#recipes
+        next(itertools.islice(iterator, offset, offset), None)
         for obj in iterator:
             if counter >= limit:
                 raise LimitExceededException()
@@ -172,13 +175,13 @@ class ExportInterface(object):
                 exclude.add(obj)
                 counter += 1
 
-    def _sortedValues(self, iterator, limit, orderBy, descending):
+    def _sortedValues(self, iterator, offset, limit, orderBy, descending):
 
         exceeded = False
         if (orderBy and orderBy != 'start') or descending:
             sortingKey = self._sortingKeys.get(orderBy)
             try:
-                limitedIterable = sorted(self._iterateOver(iterator, limit),
+                limitedIterable = sorted(self._iterateOver(iterator, offset, limit),
                                          key=sortingKey)
             except LimitExceededException:
                 exceeded = True
@@ -188,7 +191,7 @@ class ExportInterface(object):
             if descending:
                 limitedIterable.reverse()
         else:
-            limitedIterable = self._iterateOver(iterator, limit)
+            limitedIterable = self._iterateOver(iterator, offset, limit)
 
         # iterate over result
         for obj in limitedIterable:
@@ -211,7 +214,7 @@ class ExportInterface(object):
             return IConferenceMetadataWithSessionsFossil
         raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
 
-    def category(self, idlist, tz, limit, detail, qdata):
+    def category(self, idlist, tz, offset, limit, detail, qdata):
 
         orderBy = get_query_parameter(qdata, ['o', 'order'], 'start')
         descending = get_query_parameter(qdata, ['c', 'descending'], False)
@@ -226,17 +229,17 @@ class ExportInterface(object):
 
         for catId in idlist:
             for obj in self._sortedValues(idx.iterateObjectsIn(catId, fromDT, toDT),
-                                          limit, orderBy, descending):
+                                          offset, limit, orderBy, descending):
                 yield fossilize(obj, IConferenceMetadataFossil, tz=tz)
 
 
-    def event(self, idlist, tz, limit, detail, qdata):
+    def event(self, idlist, tz, offset, limit, detail, qdata):
 
         ch = ConferenceHolder()
         counter = 0
         iface = ExportInterface._getDetailInterface(detail)
 
-        for eventId in idlist:
+        for eventId in idlist[offset:]:
             if counter >= limit:
                 break
 
