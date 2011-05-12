@@ -47,8 +47,13 @@ from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 
-# Maximum number of records that will get exported
-MAX_RECORDS = 10000
+# Maximum number of records that will get exported for each detail level
+MAX_RECORDS = {
+    'events': 10000,
+    'contributions': 500,
+    'subcontributions': 500,
+    'sessions': 100,
+}
 
 # Valid URLs for export handlers. the last group has to be the response type
 EXPORT_URL_MAP = {
@@ -137,11 +142,13 @@ def handler_event_categ(dbi, aw, qdata, dtype, idlist):
 
     tz = pytz.timezone(tzName)
 
-    if userLimit > MAX_RECORDS:
-        raise HTTPAPIError("You can only request up to %d records per request" % MAX_RECORDS, apache.HTTP_BAD_REQUEST)
+    max = MAX_RECORDS.get(detail, 10000)
+    if userLimit > max:
+        raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s" %
+            (max, detail), apache.HTTP_BAD_REQUEST)
 
     # impose a hard limit
-    limit = userLimit if userLimit > 0 else MAX_RECORDS
+    limit = userLimit if userLimit > 0 else max
 
     if dtype == 'categ':
         iterator = expInt.category(idlist, tz, limit, detail, qdata)
