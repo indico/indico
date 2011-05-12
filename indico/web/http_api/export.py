@@ -174,10 +174,10 @@ class ExportInterface(object):
 
     def _sortedValues(self, iterator, limit, orderBy, descending):
 
+        exceeded = False
         if (orderBy and orderBy != 'start') or descending:
             sortingKey = self._sortingKeys.get(orderBy)
             try:
-                exceeded = False
                 limitedIterable = sorted(self._iterateOver(iterator, limit),
                                          key=sortingKey)
             except LimitExceededException:
