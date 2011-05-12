@@ -1631,31 +1631,35 @@ class AvatarHolder( ObjectHolder ):
 
             if objType == "session":
                 for role in links[objType].keys():
-                    if role == "manager":
-                        for ses in links[objType][role]:
+                    for ses in links[objType][role]:
+                        if ses.getOwner() == None:
+                                Logger.get('user.merge').warning(
+                                    "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
+                                    (ses, prin.getId(), role))
+                        elif role == "manager":
                             ses.revokeModification(merged)
                             ses.grantModification(prin)
-                    elif role == "access":
-                        for ses in links[objType][role]:
+                        elif role == "access":
                             ses.revokeAccess(merged)
                             ses.grantAccess(prin)
-                    elif role == "coordinator":
-                        for ses in links[objType][role]:
+                        elif role == "coordinator":
                             ses.removeCoordinator(merged)
                             ses.addCoordinator(prin)
 
             if objType == "contribution":
                 for role in links[objType].keys():
-                    if role == "manager":
-                        for contrib in links[objType][role]:
+                    for contrib in links[objType][role]:
+                        if contrib.getOwner() == None:
+                                Logger.get('user.merge').warning(
+                                    "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
+                                    (contrib, prin.getId(), role))
+                        elif role == "manager":
                             contrib.revokeModification(merged)
                             contrib.grantModification(prin)
-                    elif role == "access":
-                        for contrib in links[objType][role]:
+                        elif role == "access":
                             contrib.revokeAccess(merged)
                             contrib.grantAccess(prin)
-                    elif role == "submission":
-                        for contrib in links[objType][role]:
+                        elif role == "submission":
                             contrib.revokeSubmission(merged)
                             contrib.grantSubmission(prin)
 
