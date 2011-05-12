@@ -27,6 +27,7 @@ import hashlib
 import hmac
 import re
 import time
+import urllib
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 import pytz
@@ -60,9 +61,29 @@ EXPORT_URL_MAP = {
     r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)$': 'handler_event_categ'
 }
 
-# Compile regexps
+# Compile url regexps
 EXPORT_URL_MAP = dict((re.compile(pathRe), handlerFunc) for pathRe, handlerFunc in EXPORT_URL_MAP.iteritems())
-RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)$')
+# Remove the extension at the end or before the querystring
+RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)(?:$|(?=\?))')
+
+
+def normalizeQuery(path, query, ts=None, remove=('timestamp', 'signature')):
+    """Normalize request path and query so it can be used for caching and signing
+
+    Returns a string consisting of path and sorted query string.
+    Dynamic arguments like signature and timestamp are removed from the query string.
+    """
+    qdata = remove_lists(parse_qs(query))
+    if remove:
+        for key in remove:
+            qdata.pop(key, None)
+    if ts is not None:
+        qdata['timestamp'] = ts
+    sortedQuery = sorted(qdata.items(), key=lambda x: x[0].lower())
+    if sortedQuery:
+        return '%s?%s' % (path, urllib.urlencode(sortedQuery))
+    else:
+        return path
 
 
 def validateSignature(key, signature, path, query, timestamp=None):
@@ -71,7 +92,7 @@ def validateSignature(key, signature, path, query, timestamp=None):
     ts = timestamp / 300
     candidates = []
     for i in xrange(-1, 2):
-        h = hmac.new(key, '%s?%s&%d' % (path, query, ts + i), hashlib.sha1)
+        h = hmac.new(key, normalizeQuery(path, query, ts + i), hashlib.sha1)
         candidates.append(h.hexdigest())
     if signature not in candidates:
         raise HTTPAPIError('Signature invalid (check system clock)', apache.HTTP_FORBIDDEN)
@@ -171,26 +192,18 @@ def handler_event_categ(dbi, aw, qdata, dtype, idlist):
 
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
-    # Extract HMAC signature
-    signature = None
-    m = re.search(r'&([0-9a-fA-F]{40})$', query)
-    if m:
-        signature = m.group(1).lower()
-        query = query[:-41]
-
     # Parse the actual query string
     qdata = parse_qs(query)
-    no_cache = get_query_parameter(qdata, ['nc', 'nocache'], 'no') == 'yes'
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
 
-    # Copy qdata for the cache key
-    qdata_copy = dict(qdata)
     cache = RequestCache(HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL())
 
-    pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
     apiKey = get_query_parameter(qdata, ['ak', 'apikey'], None)
+    signature = get_query_parameter(qdata, ['signature'])
+    no_cache = get_query_parameter(qdata, ['nc', 'nocache'], 'no') == 'yes'
+    pretty = get_query_parameter(qdata, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(qdata, ['op', 'onlypublic'], 'no') == 'yes'
 
     # Get our handler function and its argument and response type
@@ -209,14 +222,15 @@ def handler(req, **params):
         aw = buildAW(ak, req, onlyPublic)
         # Get rid of API key in cache key if we did not impersonate a user
         if ak and aw.getUser() is None:
-            qdata_copy.pop('ak', None)
-            qdata_copy.pop('apikey', None)
+            cache_key = normalizeQuery(path, query, remove=('ak', 'apiKey', 'signature', 'timestamp'))
+        else:
+            cache_key = normalizeQuery(path, query, remove=('signature', 'timestamp'))
 
         obj = None
         add_to_cache = True
-        cache_path = RE_REMOVE_EXTENSION.sub('', path)
+        cache_key = RE_REMOVE_EXTENSION.sub('', cache_key)
         if not no_cache:
-            obj = cache.loadObject(cache_path, qdata_copy)
+            obj = cache.loadObject(cache_key)
             if obj is not None:
                 result, complete = obj.getContent()
                 ts = obj.getTS()
@@ -225,7 +239,7 @@ def handler(req, **params):
             # Perform the actual exporting
             result, complete = func(dbi, aw, qdata, *args)
         if result is not None and add_to_cache:
-            cache.cacheObject(cache_path, qdata_copy, (result, complete))
+            cache.cacheObject(cache_key, (result, complete))
     except HTTPAPIError, e:
         error = e
         if e.getCode():

@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 from MaKaC.common.cache import MultiLevelCacheEntry, MultiLevelCache
 import datetime
+import hashlib
 import time
 import os
 
@@ -50,15 +51,13 @@ class RequestCache(MultiLevelCache):
     def _generatePath(self, entry):
         return ['requests']
 
-    def _generateKey(self, path, qdata):
-        queryHash = hash(frozenset((key, frozenset(values)) for key, values in qdata.iteritems()))
-        return '.'.join(map(str, (hash(path), queryHash)))
+    def cacheObject(self, key, obj):
+        key = hashlib.sha256(key).hexdigest()
+        return super(RequestCache, self).cacheObject(key, obj)
 
-    def cacheObject(self, path, qdata, obj):
-        return super(RequestCache, self).cacheObject(self._generateKey(path, qdata), obj)
-
-    def loadObject(self, path, qdata):
-        return super(RequestCache, self).loadObject(self._generateKey(path, qdata))
+    def loadObject(self, key):
+        key = hashlib.sha256(key).hexdigest()
+        return super(RequestCache, self).loadObject(key)
 
     def isDirty(self, path, object):
         creationTime = datetime.datetime(*time.localtime(os.path.getmtime(path))[:6])
