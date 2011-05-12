@@ -156,14 +156,12 @@ class ExportInterface(object):
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
 
-    def _iterateOver(self, iterator, offset, limit):
+    def _limitIterator(self, iterator, limit):
         counter = 0
         # this set acts as a checklist to know if a record has already been sent
         exclude = set()
         self._intermediateResults = []
 
-        # Skip offset elements - http://docs.python.org/library/itertools.html#recipes
-        next(itertools.islice(iterator, offset, offset), None)
         for obj in iterator:
             if counter >= limit:
                 raise LimitExceededException()
@@ -173,13 +171,13 @@ class ExportInterface(object):
                 exclude.add(obj)
                 counter += 1
 
-    def _sortedValues(self, iterator, offset, limit, orderBy, descending):
+    def _sortedIterator(self, iterator, limit, orderBy, descending):
 
         exceeded = False
         if (orderBy and orderBy != 'start') or descending:
             sortingKey = self._sortingKeys.get(orderBy)
             try:
-                limitedIterable = sorted(self._iterateOver(iterator, offset, limit),
+                limitedIterable = sorted(self._limitIterator(iterator, limit),
                                          key=sortingKey)
             except LimitExceededException:
                 exceeded = True
@@ -189,7 +187,7 @@ class ExportInterface(object):
             if descending:
                 limitedIterable.reverse()
         else:
-            limitedIterable = self._iterateOver(iterator, offset, limit)
+            limitedIterable = self._limitIterator(iterator, limit)
 
         # iterate over result
         for obj in limitedIterable:
@@ -212,6 +210,18 @@ class ExportInterface(object):
             return IConferenceMetadataWithSessionsFossil
         raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
 
+    def _iterateOver(self, iterator, offset, limit, orderBy, descending):
+        """
+        Iterates over a maximum of `limit` elements, starting at the
+        element number `offset`. The elements will be ordered according
+        to `orderby` and `descending` (slooooow).
+        """
+
+        sortedIterator = self._sortedIterator(iterator, limit, orderBy, descending)
+        # Skip offset elements - http://docs.python.org/library/itertools.html#recipes
+        next(itertools.islice(sortedIterator, offset, offset), None)
+        return sortedIterator
+
     def category(self, idlist, tz, offset, limit, detail, qdata):
 
         orderBy = get_query_parameter(qdata, ['o', 'order'], 'start')
@@ -226,12 +236,12 @@ class ExportInterface(object):
         idx = IndexesHolder().getById('categoryDate')
 
         for catId in idlist:
-            for obj in self._sortedValues(idx.iterateObjectsIn(catId, fromDT, toDT),
-                                          offset, limit, orderBy, descending):
+            for obj in self._iterateOver(idx.iterateObjectsIn(catId, fromDT, toDT),
+                                         offset, limit, orderBy, descending):
                 yield fossilize(obj, IConferenceMetadataFossil, tz=tz)
 
-
     def event(self, idlist, tz, offset, limit, detail, qdata):
+        # TODO: use iterators
 
         ch = ConferenceHolder()
         counter = 0
