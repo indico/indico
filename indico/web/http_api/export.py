@@ -222,10 +222,8 @@ class ExportInterface(object):
         next(itertools.islice(sortedIterator, offset, offset), None)
         return sortedIterator
 
-    def category(self, idlist, tz, offset, limit, detail, qdata):
+    def category(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
 
-        orderBy = get_query_parameter(qdata, ['o', 'order'], 'start')
-        descending = get_query_parameter(qdata, ['c', 'descending'], False)
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
         location = get_query_parameter(qdata, ['l', 'location'])
@@ -240,20 +238,21 @@ class ExportInterface(object):
                                          offset, limit, orderBy, descending):
                 yield fossilize(obj, IConferenceMetadataFossil, tz=tz)
 
-    def event(self, idlist, tz, offset, limit, detail, qdata):
+    def event(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
         # TODO: use iterators
 
         ch = ConferenceHolder()
-        counter = 0
+
+        def _iterate_objs(objIds):
+
+            for objId in objIds:
+                obj = ch.getById(objId)
+                yield obj
+
         iface = ExportInterface._getDetailInterface(detail)
 
-        for eventId in idlist[offset:]:
-            if counter >= limit:
-                break
-
-            event = ch.getById(eventId)
+        for event in self._iterateOver(_iterate_objs(idlist), offset, limit, orderBy, descending):
             yield fossilize(event, iface, tz=tz)
-            counter += 1
 
 
 Serializer.register('html', HTML4Serializer)

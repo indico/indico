@@ -136,6 +136,8 @@ def handler_event_categ(dbi, aw, qdata, dtype, idlist):
     detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
     userLimit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
     offset = get_query_parameter(qdata, ['O', 'offset'], 0, integer=True)
+    orderBy = get_query_parameter(qdata, ['o', 'order'], 'start')
+    descending = get_query_parameter(qdata, ['c', 'descending'], False)
 
     if tzName is None:
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -152,9 +154,9 @@ def handler_event_categ(dbi, aw, qdata, dtype, idlist):
     limit = userLimit if userLimit > 0 else max
 
     if dtype == 'categ':
-        iterator = expInt.category(idlist, tz, offset, limit, detail, qdata)
+        iterator = expInt.category(idlist, tz, offset, limit, detail, orderBy, descending, qdata)
     elif dtype == 'event':
-        iterator = expInt.event(idlist, tz, offset, limit, detail, qdata)
+        iterator = expInt.event(idlist, tz, offset, limit, detail, orderBy, descending, qdata)
 
     resultList = []
     complete = True
