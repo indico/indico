@@ -146,10 +146,10 @@ def getExportHandler(path):
     return globals()[func], groups[:-1], groups[-1]
 
 
-def handler_event_categ(dbi, aw, qdata, dtype, idlist):
+def handler_event_categ(aw, qdata, dtype, idlist):
     idlist = idlist.split('-')
 
-    expInt = ExportInterface(dbi, aw)
+    expInt = ExportInterface(aw)
     tzName = get_query_parameter(qdata, ['tz'], None)
     detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
     userLimit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
@@ -235,7 +235,7 @@ def handler(req, **params):
                 add_to_cache = False
         if result is None:
             # Perform the actual exporting
-            result, complete = func(dbi, aw, qdata, *args)
+            result, complete = func(aw, qdata, *args)
         if result is not None and add_to_cache:
             cache.cacheObject(cache_key, (result, complete))
     except HTTPAPIError, e:

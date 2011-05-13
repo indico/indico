@@ -91,8 +91,7 @@ class ExportInterface(object):
                     'end': lambda x: x.getEndDate(),
                     'title': lambda x: x.getTitle()}
 
-    def __init__(self, dbi, aw):
-        self._dbi = dbi
+    def __init__(self, aw):
         self._aw = aw
 
     @classmethod
