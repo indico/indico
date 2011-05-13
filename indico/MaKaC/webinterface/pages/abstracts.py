@@ -186,7 +186,18 @@ class WUserAbstracts( wcomponents.WTemplated ):
         tzUtil = DisplayTZ(self._aw,self._conf)
         tz = tzUtil.getDisplayTZ()
 
+        asPrimaryAuthor = cfaMgr.getAbstractListForPrimaryAuthorEmail(self._aw.getUser().getEmail())
+        asCoAuthor = cfaMgr.getAbstractListForCoAuthorEmail(self._aw.getUser().getEmail())
         l = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )
+        for abs in asPrimaryAuthor:
+            if not abs in l:
+                l.append(abs)
+        for abs in asCoAuthor:
+            if not abs in l:
+                l.append(abs)
+
+        l = sorted(l, key=lambda i:int(i.getId()))
+
         if not l:
             vars["abstracts"] = _("""<tr>
                                         <td align="center" colspan="4" bgcolor="white">
@@ -203,7 +214,7 @@ class WUserAbstracts( wcomponents.WTemplated ):
                 if isinstance( status, review.AbstractStatusAccepted ):
                     statusLabel = _("ACCEPTED")
                     if status.getType() is not None and status.getType()!="":
-                        statusLabel="%s as %s"%(statusLabel,status.getType())
+                        statusLabel="%s as %s"%(statusLabel,status.getType().getName())
                 elif isinstance( status, review.AbstractStatusRejected ):
                     statusLabel = _("REJECTED")
                 elif isinstance( status, review.AbstractStatusWithdrawn ):
