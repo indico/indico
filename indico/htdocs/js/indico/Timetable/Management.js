@@ -532,7 +532,9 @@ type("TimetableManagementActions", [], {
         var days = this.timetable.getDays();
 
         each(eventData, function(value, key) {
-            params[key] = value;
+            if (key != "entries") {
+                params[key] = value;
+            }
         });
         each(params.args, function(value, key) {
             params[key] = value;
