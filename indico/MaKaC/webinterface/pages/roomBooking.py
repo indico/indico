@@ -345,7 +345,7 @@ class WPRoomBookingBookingList( WPRoomBookingBase ):
             return WPRoomBookingBase._getTitle(self) + " - " + _("Found bookings")
 
     def _setCurrentMenuItem( self ):
-        if self._rh._today:
+        if self._rh._today or self._rh._allRooms:
             self._bookingListCalendarOpt.setActive(True)
         elif self._rh._onlyMy and self._rh._onlyPrebookings:
             self._myPreBookingListOpt.setActive(True)
