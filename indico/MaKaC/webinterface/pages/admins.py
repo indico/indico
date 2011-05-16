@@ -55,6 +55,9 @@ from MaKaC.plugins import PluginLoader, PluginsHolder
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
 from indico.modules import ModuleHolder
+from MaKaC.errors import MaKaCError
+from MaKaC.conference import ConferenceHolder
+from MaKaC.webinterface.locators import CategoryWebLocator
 
 class WPAdminsBase( WPMainBase ):
 
@@ -1466,11 +1469,22 @@ class WUserDetails(wcomponents.WTemplated):
         vars["categoryManager"] = ""
         categs = u.getLinkTo("category","manager")
         for categ in categs:
-            vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
+            target = CategoryWebLocator({"categId": categ.getId()}).getObject()
+            if target == None:
+                u.unlinkTo(categ,"manager")
+            else:
+                vars["categoryManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHCategoryDisplay.getURL(categ), categ.getTitle())
+
         vars["eventManager"] = ""
+        ch = ConferenceHolder()
         events = u.getLinkTo("conference","manager")
         for event in events:
-            vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
+            try:
+                ch.getById(event.getId())
+                vars["eventManager"] += """<a href="%s">%s</a><br>""" % (urlHandlers.UHConferenceDisplay.getURL(event), event.getTitle())
+            except MaKaCError, e:
+                u.unlinkTo(event,"manager")
+
         return vars
 
     def getEmailsHTML(self, u):
