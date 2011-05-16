@@ -487,6 +487,7 @@ class PluginBase(Persistent):
         """
         self.__options = {}
         self.__actions = {}
+        self.__exporters = []
 
         self.__usable = False
 
@@ -705,6 +706,22 @@ class PluginBase(Persistent):
         return len(self.getActionList(includeOnlyNonAssociated=includeOnlyNonAssociated)) > 0
     ############## end of actions related ###############
 
+    ############## exporters related ###############
+    def updateAllExporters(self, retrievedPluginExporters):
+        self.__exporters = []
+        if retrievedPluginExporters is not None:
+            self.__exporters = retrievedPluginExporters
+        self._notifyModification()
+
+    def getExporterList(self):
+        try:
+            return self.__exporters
+        except:
+            self.__exporters = []
+            return self.__exporters
+
+    ############## end of exporters related ###############
+
     def _notifyModification(self):
         self._p_changed = 1
 
@@ -785,6 +802,10 @@ class PluginType (PluginBase):
                hasattr(pluginModule.actions, "pluginActions"):
             p.updateAllActions(pluginModule.actions.pluginActions)
 
+        if hasattr(pluginModule, "export") and \
+               hasattr(pluginModule.options, "globalExporters"):
+            p.updateAllExporters(pluginModule.export.globalExporters)
+
         self._updateComponentInfo(p, pluginModule)
         self._updateHandlerInfo(p, pluginModule)
         self._updateRHMapInfo(p, pluginModule)
@@ -822,12 +843,13 @@ class PluginType (PluginBase):
         self.__description = ptypeMetadata['description']
         self.__visible = ptypeMetadata['visible']
 
-        # components, handlers, options and actions
+        # components, handlers, options, actions and exporters
         self._updateComponentInfo(self, ptypeModule)
         self._updateRHMapInfo(self, ptypeModule)
         self._updateHandlerInfo(self, ptypeModule)
         self.updateAllOptions(self._retrievePluginTypeOptions())
         self.updateAllActions(self._retrievePluginTypeActions())
+        self.updateAllExporters(self._retrievePluginTypeExporters())
 
 
     def _getAllSubmodules(self, module):
@@ -892,6 +914,15 @@ class PluginType (PluginBase):
         hasPluginTypeActions = hasActionsModule and hasattr(self.getModule().actions, "pluginTypeActions")
         if hasActionsModule and hasPluginTypeActions:
             return self.getModule().actions.pluginTypeActions
+        else:
+            return None
+
+    def _retrievePluginTypeExporters(self):
+
+        hasExportModule = hasattr(self.getModule(), "export")
+        hasGlobalExportersVariable = hasExportModule and hasattr(self.getModule().export, "globalExporters")
+        if hasExportModule and hasGlobalExportersVariable:
+            return self.getModule().export.globalExporters
         else:
             return None
 

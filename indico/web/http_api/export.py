@@ -25,6 +25,7 @@ Main export interface
 # python stdlib imports
 import fnmatch
 import itertools
+import pytz
 import re
 from zope.interface import Interface, implements
 from datetime import datetime, timedelta, date, time
@@ -51,6 +52,7 @@ from indico.web.wsgi import webinterface_handler_config as apache
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
+from MaKaC.plugins.base import PluginsHolder
 
 from indico.web.http_api.util import get_query_parameter, remove_lists
 
@@ -67,23 +69,93 @@ class LimitExceededException(Exception):
     pass
 
 
-class IExport(Interface):
+class Exporter(object):
+    EXPORTER_LIST = []
+    TYPES = None # abstract
+    RE = None # abstract
+    DEFAULT_DETAIL = None # abstract
+    MAX_RECORDS = None # abstract
 
-    def category(cls, idlist, fromDT, toDT, location=None, limit=None,
-               orderBy=None, descending=False, detail="events"):
-        """
-        TODO: Document this
-        """
+    @classmethod
+    def parseRequest(cls, path, qdata):
+        """Parse a request path and return an exporter and the requested data type."""
+        exporters = itertools.chain(cls.EXPORTER_LIST, cls._getPluginExporters())
+        for expCls in exporters:
+            m = expCls._matchPath(path)
+            if m:
+                gd = m.groupdict()
+                g = m.groups()
+                type = g[0]
+                format = g[-1]
+                if format not in ExportInterface.getAllowedFormats():
+                    return None, None
+                return expCls(qdata, type, gd), format
+        return None, None
 
-    def event(cls, idlist, orderBy=None, descending=False, detail="events"):
-        """
-        TODO: Document this
-        """
+    @staticmethod
+    def register(cls):
+        """Register an exporter that is not part of a plugin.
+
+        To use it, simply decorate the exporter class with this method."""
+        assert cls.RE is not None
+        Exporter.EXPORTER_LIST.append(cls)
+        return cls
+
+    @classmethod
+    def _matchPath(cls, path):
+        if not hasattr(cls, '_RE'):
+            types = '|'.join(cls.TYPES)
+            cls._RE = re.compile(r'/export/(' + types + r')/' + cls.RE + r'\.(\w+)$')
+        return cls._RE.match(path)
+
+    @classmethod
+    def _getPluginExporters(cls):
+        for plugin in PluginsHolder().getPluginTypes():
+            for expClsName in plugin.getExporterList():
+                yield getattr(plugin.getModule().export, expClsName)
+
+    def __init__(self, qdata, type, urlParams):
+        self._qdata = qdata
+        self._type = type
+        self._urlParams = urlParams
+
+    def _getParams(self):
+        self._offset = get_query_parameter(self._qdata, ['O', 'offset'], 0, integer=True)
+        self._orderBy = get_query_parameter(self._qdata, ['o', 'order'], 'start')
+        self._descending = get_query_parameter(self._qdata, ['c', 'descending'], False)
+        self._detail = get_query_parameter(self._qdata, ['d', 'detail'], self.DEFAULT_DETAIL)
+        tzName = get_query_parameter(self._qdata, ['tz'], None)
+        if tzName is None:
+            info = HelperMaKaCInfo.getMaKaCInfoInstance()
+            tzName = info.getTimezone()
+        self._tz = pytz.timezone(tzName)
+        max = self.MAX_RECORDS.get(self._detail, 10000)
+        self._userLimit = get_query_parameter(self._qdata, ['n', 'limit'], 0, integer=True)
+        if self._userLimit > max:
+            raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s'" %
+                (max, self._detail), apache.HTTP_BAD_REQUEST)
+        self._limit = self._userLimit if self._userLimit > 0 else max
+
+    def __call__(self, aw):
+        """Perform the actual exporting"""
+        self._getParams()
+        resultList = []
+        complete = True
+
+        func = getattr(self, 'export_' + self._type, None)
+        if not func:
+            raise NotImplementedError('export_' + self._type)
+
+        try:
+            for obj in func(aw):
+                resultList.append(obj)
+        except LimitExceededException:
+            complete = (self._limit == self._userLimit)
+
+        return resultList, complete
 
 
 class ExportInterface(object):
-    implements(IExport)
-
     _deltas =  {'yesterday': timedelta(-1),
                 'tomorrow': timedelta(1)}
 
@@ -165,7 +237,7 @@ class ExportInterface(object):
         for obj in iterator:
             if counter >= limit:
                 raise LimitExceededException()
-            if obj not in exclude and obj.canAccess(self._aw):
+            if obj not in exclude and (not hasattr(obj, 'canAccess') or obj.canAccess(self._aw)):
                 self._intermediateResults.append(obj)
                 yield obj
                 exclude.add(obj)
@@ -200,14 +272,6 @@ class ExportInterface(object):
 
     @classmethod
     def _getDetailInterface(cls, detail):
-        if detail == 'events':
-            return IConferenceMetadataFossil
-        elif detail == 'contributions':
-            return IConferenceMetadataWithContribsFossil
-        elif detail == 'subcontributions':
-            return IConferenceMetadataWithSubContribsFossil
-        elif detail == 'sessions':
-            return IConferenceMetadataWithSessionsFossil
         raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
 
     def _iterateOver(self, iterator, offset, limit, orderBy, descending, filter=None):
@@ -225,8 +289,46 @@ class ExportInterface(object):
         next(itertools.islice(sortedIterator, offset, offset), None)
         return sortedIterator
 
-    def category(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
 
+@Exporter.register
+class CategoryEventExporter(Exporter):
+    TYPES = ('event', 'categ')
+    RE = r'(?P<idlist>\w+(?:-\w+)*)'
+    DEFAULT_DETAIL = 'events'
+    MAX_RECORDS = {
+        'events': 10000,
+        'contributions': 500,
+        'subcontributions': 500,
+        'sessions': 100,
+    }
+
+    def _getParams(self):
+        super(CategoryEventExporter, self)._getParams()
+        self._idList = self._urlParams['idlist'].split('-')
+
+    def export_categ(self, aw):
+        expInt = CategoryEventExportInterface(aw)
+        return expInt.category(self._idList, self._tz, self._offset, self._limit, self._detail, self._orderBy, self._descending, self._qdata)
+
+    def export_event(self, aw):
+        expInt = CategoryEventExportInterface(aw)
+        return expInt.event(self._idList, self._tz, self._offset, self._limit, self._detail, self._orderBy, self._descending, self._qdata)
+
+
+class CategoryEventExportInterface(ExportInterface):
+    @classmethod
+    def _getDetailInterface(cls, detail):
+        if detail == 'events':
+            return IConferenceMetadataFossil
+        elif detail == 'contributions':
+            return IConferenceMetadataWithContribsFossil
+        elif detail == 'subcontributions':
+            return IConferenceMetadataWithSubContribsFossil
+        elif detail == 'sessions':
+            return IConferenceMetadataWithSessionsFossil
+        raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
+
+    def category(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
         location = get_query_parameter(qdata, ['l', 'location'])
@@ -256,8 +358,6 @@ class ExportInterface(object):
                 yield fossilize(obj, IConferenceMetadataFossil, tz=tz)
 
     def event(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
-        # TODO: use iterators
-
         ch = ConferenceHolder()
 
         def _iterate_objs(objIds):
@@ -270,7 +370,6 @@ class ExportInterface(object):
 
         for event in self._iterateOver(_iterate_objs(idlist), offset, limit, orderBy, descending):
             yield fossilize(event, iface, tz=tz)
-
 
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)

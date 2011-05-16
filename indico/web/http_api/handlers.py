@@ -25,6 +25,7 @@ HTTP API - Handlers
 # python stdlib imports
 import hashlib
 import hmac
+import itertools
 import re
 import time
 import urllib
@@ -33,7 +34,7 @@ from ZODB.POSException import ConflictError
 import pytz
 
 # indico imports
-from indico.web.http_api import ExportInterface, LimitExceededException
+from indico.web.http_api import ExportInterface, LimitExceededException, Exporter
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
@@ -47,6 +48,7 @@ from MaKaC.common import DBMgr
 from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.plugins.base import PluginsHolder
 
 # Maximum number of records that will get exported for each detail level
 MAX_RECORDS = {
@@ -129,64 +131,6 @@ def buildAW(ak, req, onlyPublic=False):
         aw.setUser(ak.getUser())
     return aw
 
-
-def getExportHandler(path):
-    """Get the export handler, handler args and return type from a path"""
-    func = None
-    match = None
-    for pathRe, handlerFunc in EXPORT_URL_MAP.iteritems():
-        match = pathRe.match(path)
-        if match:
-            func = handlerFunc
-            break
-
-    groups = match and match.groups()
-    if not match or groups[-1] not in ExportInterface.getAllowedFormats():
-        return None, None, None
-    return globals()[func], groups[:-1], groups[-1]
-
-
-def handler_event_categ(aw, qdata, dtype, idlist):
-    idlist = idlist.split('-')
-
-    expInt = ExportInterface(aw)
-    tzName = get_query_parameter(qdata, ['tz'], None)
-    detail = get_query_parameter(qdata, ['d', 'detail'], 'events')
-    userLimit = get_query_parameter(qdata, ['n', 'limit'], 0, integer=True)
-    offset = get_query_parameter(qdata, ['O', 'offset'], 0, integer=True)
-    orderBy = get_query_parameter(qdata, ['o', 'order'], 'start')
-    descending = get_query_parameter(qdata, ['c', 'descending'], False)
-
-    if tzName is None:
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        tzName = info.getTimezone()
-
-    tz = pytz.timezone(tzName)
-
-    max = MAX_RECORDS.get(detail, 10000)
-    if userLimit > max:
-        raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s" %
-            (max, detail), apache.HTTP_BAD_REQUEST)
-
-    # impose a hard limit
-    limit = userLimit if userLimit > 0 else max
-
-    if dtype == 'categ':
-        iterator = expInt.category(idlist, tz, offset, limit, detail, orderBy, descending, qdata)
-    elif dtype == 'event':
-        iterator = expInt.event(idlist, tz, offset, limit, detail, orderBy, descending, qdata)
-
-    resultList = []
-    complete = True
-
-    try:
-        for obj in iterator:
-            resultList.append(obj)
-    except LimitExceededException:
-        complete = (limit == userLimit)
-
-    return resultList, complete
-
 def handler(req, **params):
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
     # Parse the actual query string
@@ -205,7 +149,7 @@ def handler(req, **params):
     onlyPublic = get_query_parameter(qdata, ['op', 'onlypublic'], 'no') == 'yes'
 
     # Get our handler function and its argument and response type
-    func, args, dformat = getExportHandler(path)
+    func, dformat = Exporter.parseRequest(path, qdata)
     if func is None or dformat is None:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
@@ -235,7 +179,7 @@ def handler(req, **params):
                 add_to_cache = False
         if result is None:
             # Perform the actual exporting
-            result, complete = func(aw, qdata, *args)
+            result, complete = func(aw)
         if result is not None and add_to_cache:
             cache.cacheObject(cache_key, (result, complete))
     except HTTPAPIError, e:

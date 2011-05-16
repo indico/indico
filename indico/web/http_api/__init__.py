@@ -22,7 +22,7 @@
 Indico HTTP export API
 """
 
-from indico.web.http_api.export import ExportInterface, LimitExceededException
+from indico.web.http_api.export import ExportInterface, LimitExceededException, Exporter
 
 API_MODE_KEY            = 0 # public requests without API key, authenticated requests with api key
 API_MODE_ONLYKEY        = 1 # all requests require an API key
