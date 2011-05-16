@@ -456,7 +456,7 @@ class WConferenceHeader( WHeader ):
         vars["showMoreButton"] = True
         vars["showExportToICal"] = True
         vars["showExportToPDF"] = False
-        vars["showDLMaterial"] = False
+        vars["showDLMaterial"] = True
         vars["showLayout"] = False
 
         vars["usingModifKey"]=False
