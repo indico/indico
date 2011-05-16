@@ -1213,7 +1213,6 @@ class UHMConfPerformAddContribution( URLHandler ):
 class UHContribConfSelectionAction( URLHandler ):
     _relativeURL = "confModifContribList.py/contribsActions"
 
-
 class UHContribsConfManagerDisplayPDF( URLHandler ):
     _relativeURL = "confModifContribList.py/contribsToPDF"
 

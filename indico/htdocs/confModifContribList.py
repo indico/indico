@@ -56,4 +56,3 @@ def matPkg( req, **params ):
 
 def proceedings( req, **params ):
     return conferenceModif.RHProceedings( req ).process( params )
-

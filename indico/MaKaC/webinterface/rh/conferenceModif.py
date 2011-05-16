@@ -6313,8 +6313,18 @@ class RHContribsActions:
             return RHMaterialPackage(self._req).process(params)
         elif params.has_key("PROC"):
             return RHProceedings(self._req).process(params)
+        elif params.has_key("remove"):
+            return RHContributionListRemove(self._req).process(params)
         return "no action to do"
 
+class RHContributionListRemove(RHConferenceModifBase):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams(self, params)
+        self._contribs = self._normaliseListParam(params.get("contributions",[]))
+    def _process( self ):
+        wp = conferences.WPConfModifRemoveContribsConfirmation(self, self._conf, self._contribs)
+        return wp.display()
 
 class RHContribsToPDFMenu(RHConferenceModifBase):
 

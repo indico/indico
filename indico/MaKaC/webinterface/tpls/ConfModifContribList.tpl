@@ -120,8 +120,10 @@ else:
                             <input type="button" onclick="addContribution()" class="btn" name="" value="${ _("Add new")}">
                           </form>
                         </td>
+                        <td>
+                           <input type="submit" onclick="deleteContributions()" class="btn" name="" value="${ _("Delete")}">
+                        </td>
                         <form action=${ contribSelectionAction } method="post" name="contribsForm" onsubmit="return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));">
-
                         <td valign="bottom" align="left" class="eventModifButtonBar">
                            <input type="submit" class="btn" name="move" value="${ _("Move")}">
                         </td>
@@ -256,4 +258,26 @@ var addContribution = function() {
 
     dialog.execute();
 };
+
+var deleteContributions = function() {
+    var listContribsToDelete = $('input:checked[name=contributions]').map(function(){return this.value;}).toArray();
+    if (confirm('${ _("Are you sure to delete the selected contributions?")}')){
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting the contributions..."));
+        indicoRequest('event.contributions.delete',
+                { confId: ${self_._conf.id},
+                  contributions: listContribsToDelete },
+                  function(result, error){
+                      if (!error) {
+                          $('input:checked[name=contributions]').parents('tr[id^=contributions]').remove();
+                          killProgress();
+                      } else {
+                          killProgress();
+                          IndicoUtil.errorReport(error);
+                      }
+                    }
+            );
+    }
+};
+
+
 </script>

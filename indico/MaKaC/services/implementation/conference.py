@@ -560,6 +560,20 @@ class ConferenceListContributions (ConferenceListModificationBase):
 
         return fossilize(contributions, IContributionFossil)
 
+class ConferenceDeleteContributions (ConferenceModifBase):
+    """ Deletes a list of all contributions of a conference
+    """
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        self._selectedContributions = self._params.get('contributions',[])
+
+    def _getAnswer(self):
+        for contribId in self._selectedContributions:
+            contrib = self._conf.getContributionById(contribId)
+            contrib.getParent().getSchedule().removeEntry(contrib.getSchEntry())
+            self._conf.removeContribution(contrib)
+
 #########################
 # Contribution filtering
 #########################
@@ -770,6 +784,7 @@ methodMap = {
     "main.displayBooking": ConferenceBookingModification,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributions,
+    "contributions.delete": ConferenceDeleteContributions,
     "pic.delete": ConferencePicDelete,
     "showConcurrentEvents": ShowConcurrentEvents,
 #    "getFields": ConferenceGetFields,
