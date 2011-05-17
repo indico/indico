@@ -220,7 +220,10 @@ class ExportInterface(object):
     @classmethod
     def _getDateTime(cls, ctx, dateTime, tz, aux=None):
 
-        rel, value = cls._parseDateTime(dateTime)
+        try:
+            rel, value = cls._parseDateTime(dateTime)
+        except ArgumentParseError, e:
+            raise HTTPAPIError(e.message, apache.HTTP_BAD_REQUEST)
 
         if rel == 'abs':
             return tz.localize(value)
