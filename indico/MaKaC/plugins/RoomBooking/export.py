@@ -46,17 +46,15 @@ class RoomExporter(Exporter):
         self._idList = self._urlParams['idlist'].split('-')
 
     def export_room(self, aw):
-        expInt = RoomExportInterface(aw)
-        return expInt.room(self._location, self._idList, self._tz, self._offset, self._limit, self._detail, self._orderBy, self._descending, self._qdata)
+        expInt = RoomExportInterface(aw, self)
+        return expInt.room(self._location, self._idList)
 
 class RoomExportInterface(ExportInterface):
-    @classmethod
-    def _getDetailInterface(cls, detail):
-        if detail == 'rooms':
-            return IRoomFossil
-        raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
+    DETAIL_INTERFACES = {
+        'rooms': IRoomFossil
+    }
 
-    def room(self, location, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
+    def room(self, location, idlist):
         Factory.getDALManager().connect()
 
         rooms = CrossLocationQueries.getRooms(location)
@@ -65,8 +63,6 @@ class RoomExportInterface(ExportInterface):
             objIds = map(int, objIds)
             return (room for room in rooms if room.id in objIds)
 
-        iface = RoomExportInterface._getDetailInterface(detail)
-
-        for event in self._iterateOver(_iterate_rooms(idlist), offset, limit, orderBy, descending):
-            yield fossilize(event, iface, tz=tz)
+        it = self._process(_iterate_rooms(idlist))
         Factory.getDALManager().disconnect()
+        return it

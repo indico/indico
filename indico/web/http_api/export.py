@@ -156,6 +156,8 @@ class Exporter(object):
 
 
 class ExportInterface(object):
+    DETAIL_INTERFACES = {}
+
     _deltas =  {'yesterday': timedelta(-1),
                 'tomorrow': timedelta(1)}
 
@@ -163,8 +165,14 @@ class ExportInterface(object):
                     'end': lambda x: x.getEndDate(),
                     'title': lambda x: x.getTitle()}
 
-    def __init__(self, aw):
+    def __init__(self, aw, exporter):
         self._aw = aw
+        self._tz = exporter._tz
+        self._offset = exporter._offset
+        self._limit = exporter._limit
+        self._detail = exporter._detail
+        self._orderBy = exporter._orderBy
+        self._descending = exporter._descending
 
     @classmethod
     def getAllowedFormats(cls):
@@ -270,10 +278,6 @@ class ExportInterface(object):
         if orderBy and exceeded:
             raise LimitExceededException()
 
-    @classmethod
-    def _getDetailInterface(cls, detail):
-        raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
-
     def _iterateOver(self, iterator, offset, limit, orderBy, descending, filter=None):
         """
         Iterates over a maximum of `limit` elements, starting at the
@@ -288,6 +292,14 @@ class ExportInterface(object):
         # Skip offset elements - http://docs.python.org/library/itertools.html#recipes
         next(itertools.islice(sortedIterator, offset, offset), None)
         return sortedIterator
+
+    def _process(self, iterator, filter=None, iface=None):
+        if iface is None:
+            iface = self.DETAIL_INTERFACES.get(self._detail)
+            if iface is None:
+                raise HTTPAPIError('Invalid detail level: %s' % self._detail, apache.HTTP_BAD_REQUEST)
+        for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
+            yield fossilize(obj, iface, tz=self._tz)
 
 
 @Exporter.register
@@ -307,35 +319,30 @@ class CategoryEventExporter(Exporter):
         self._idList = self._urlParams['idlist'].split('-')
 
     def export_categ(self, aw):
-        expInt = CategoryEventExportInterface(aw)
-        return expInt.category(self._idList, self._tz, self._offset, self._limit, self._detail, self._orderBy, self._descending, self._qdata)
+        expInt = CategoryEventExportInterface(aw, self)
+        return expInt.category(self._idList, self._qdata)
 
     def export_event(self, aw):
-        expInt = CategoryEventExportInterface(aw)
-        return expInt.event(self._idList, self._tz, self._offset, self._limit, self._detail, self._orderBy, self._descending, self._qdata)
+        expInt = CategoryEventExportInterface(aw, self)
+        return expInt.event(self._idList, self._qdata)
 
 
 class CategoryEventExportInterface(ExportInterface):
-    @classmethod
-    def _getDetailInterface(cls, detail):
-        if detail == 'events':
-            return IConferenceMetadataFossil
-        elif detail == 'contributions':
-            return IConferenceMetadataWithContribsFossil
-        elif detail == 'subcontributions':
-            return IConferenceMetadataWithSubContribsFossil
-        elif detail == 'sessions':
-            return IConferenceMetadataWithSessionsFossil
-        raise HTTPAPIError('Invalid detail level: %s' % detail, apache.HTTP_BAD_REQUEST)
+    DETAIL_INTERFACES = {
+        'events': IConferenceMetadataFossil,
+        'contributions': IConferenceMetadataWithContribsFossil,
+        'subcontributions': IConferenceMetadataWithSubContribsFossil,
+        'sessions': IConferenceMetadataWithSessionsFossil
+    }
 
-    def category(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
+    def category(self, idlist, qdata):
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
         location = get_query_parameter(qdata, ['l', 'location'])
         room = get_query_parameter(qdata, ['r', 'room'])
 
-        fromDT = ExportInterface._getDateTime('from', fromDT, tz) if fromDT != None else None
-        toDT = ExportInterface._getDateTime('to', toDT, tz, aux=fromDT) if toDT != None else None
+        fromDT = ExportInterface._getDateTime('from', fromDT, self._tz) if fromDT != None else None
+        toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT) if toDT != None else None
 
         idx = IndexesHolder().getById('categoryDate')
 
@@ -353,24 +360,19 @@ class CategoryEventExportInterface(ExportInterface):
                 return True
 
         for catId in idlist:
-            for obj in self._iterateOver(idx.iterateObjectsIn(catId, fromDT, toDT),
-                                         offset, limit, orderBy, descending, filter):
-                yield fossilize(obj, IConferenceMetadataFossil, tz=tz)
+            for obj in self._process(idx.iterateObjectsIn(catId, fromDT, toDT), filter, IConferenceMetadataFossil):
+                yield obj
 
-    def event(self, idlist, tz, offset, limit, detail, orderBy, descending, qdata):
+    def event(self, idlist, qdata):
         ch = ConferenceHolder()
 
         def _iterate_objs(objIds):
-
             for objId in objIds:
                 obj = ch.getById(objId, True)
                 if obj is not None:
                     yield obj
 
-        iface = CategoryEventExportInterface._getDetailInterface(detail)
-
-        for event in self._iterateOver(_iterate_objs(idlist), offset, limit, orderBy, descending):
-            yield fossilize(event, iface, tz=tz)
+        return self._process(_iterate_objs(idlist))
 
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)
