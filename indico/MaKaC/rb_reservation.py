@@ -59,6 +59,15 @@ class RepeatabilityEnum( object ):
         onceAMonth: "Once a month",
     }
 
+    rep2shortname = {
+        None: "none",
+        daily: "daily",
+        onceAWeek: "weekly",
+        onceEvery2Weeks: "everyTwoWeeks",
+        onceEvery3Weeks: "everyThreeWeeks",
+        onceAMonth: "monthly",
+    }
+
 class WeekDayEnum( object ):
     """
     Enumeration - days of the week.

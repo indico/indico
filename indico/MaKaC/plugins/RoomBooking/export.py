@@ -28,7 +28,9 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import CrossLocationQueries
-from MaKaC.fossils.roomBooking import IRoomFossil
+from MaKaC.rb_reservation import RepeatabilityEnum
+from MaKaC.fossils.roomBooking import IReservationFossil
+from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 
 globalExporters = ['RoomExporter']
 
@@ -37,7 +39,8 @@ class RoomExporter(Exporter):
     RE = r'(?P<location>\w+)/(?P<idlist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'rooms'
     MAX_RECORDS = {
-        'rooms': 1000
+        'rooms': 1000,
+        'reservations': 10
     }
 
     def _getParams(self):
@@ -68,9 +71,32 @@ class IRoomMetadataFossil(IFossil):
     def getFullName(self):
         pass
 
+class IReservationMetadataFossil(IFossil):
+    def startDT(self):
+        pass
+    def endDT(self):
+        pass
+    def repeatability(self):
+        pass # None or a nice short name
+    repeatability.convert = lambda r: RepeatabilityEnum.rep2shortname[r] if r is not None else None
+    def bookedForName(self):
+        pass
+    def getBookingUrl(self):
+        pass
+    getBookingUrl.produce = lambda s: str(UHRoomBookingBookingDetails.getURL(s))
+    def reason(self):
+        pass
+
+class IRoomMetadataWithReservationsFossil(IRoomMetadataFossil):
+
+    def getReservations(self):
+        pass
+    getReservations.convert = lambda r: fossilize(r, IReservationMetadataFossil)
+
 class RoomExportInterface(ExportInterface):
     DETAIL_INTERFACES = {
-        'rooms': IRoomMetadataFossil
+        'rooms': IRoomMetadataFossil,
+        'reservations': IRoomMetadataWithReservationsFossil
     }
 
     def room(self, location, idlist):
@@ -82,6 +108,6 @@ class RoomExportInterface(ExportInterface):
             objIds = map(int, objIds)
             return (room for room in rooms if room.id in objIds)
 
-        it = self._process(_iterate_rooms(idlist))
+        for obj in self._process(_iterate_rooms(idlist)):
+            yield obj
         Factory.getDALManager().disconnect()
-        return it
