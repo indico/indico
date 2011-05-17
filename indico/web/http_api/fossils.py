@@ -153,7 +153,7 @@ class IContributionMetadataWithSubContribsFossil(IContributionMetadataFossil):
 
     def getSubContributionList(self):
         pass
-    getSubContributionList.convert = lambda scl: fossilize(scl, ISubContributionMetadataFossil)
+    getSubContributionList.result = ISubContributionMetadataFossil
     getSubContributionList.name = 'subContributions'
 
 
@@ -161,7 +161,7 @@ class IConferenceMetadataWithContribsFossil(IConferenceMetadataFossil):
 
     def getContributionList(self):
         pass
-    getContributionList.convert = lambda cl: fossilize(cl, IContributionMetadataFossil)
+    getContributionList.result = IContributionMetadataFossil
     getContributionList.name = 'contributions'
 
 
@@ -169,7 +169,7 @@ class IConferenceMetadataWithSubContribsFossil(IConferenceMetadataFossil):
 
     def getContributionList(self):
         pass
-    getContributionList.convert = lambda cl: fossilize(cl, IContributionMetadataWithSubContribsFossil)
+    getContributionList.result = IContributionMetadataWithSubContribsFossil
     getContributionList.name = 'contributions'
 
 
@@ -177,7 +177,7 @@ class ISessionMetadataFossil(ISessionFossil):
 
     def getContributionList(self):
         pass
-    getContributionList.convert = lambda cl: fossilize(cl, IContributionMetadataWithSubContribsFossil)
+    getContributionList.result = IContributionMetadataWithSubContribsFossil
     getContributionList.name = 'contributions'
 
 
@@ -185,10 +185,10 @@ class IConferenceMetadataWithSessionsFossil(IConferenceMetadataFossil):
 
     def getSessionList(self):
         pass
-    getSessionList.convert = lambda sl: fossilize(sl, ISessionMetadataFossil)
+    getSessionList.result = ISessionMetadataFossil
     getSessionList.name = 'sessions'
 
     def getContributionListWithoutSessions(self):
         pass
-    getContributionListWithoutSessions.convert = lambda cl: fossilize(cl, IContributionMetadataWithSubContribsFossil)
+    getContributionListWithoutSessions.result = IContributionMetadataWithSubContribsFossil
     getContributionListWithoutSessions.name = 'contributions'
