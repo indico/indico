@@ -23,7 +23,7 @@ from indico.web.http_api import ExportInterface, LimitExceededException, Exporte
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
-from indico.util.fossilize import fossilize
+from indico.util.fossilize import fossilize, IFossil
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.rb_room import RoomBase
@@ -49,9 +49,28 @@ class RoomExporter(Exporter):
         expInt = RoomExportInterface(aw, self)
         return expInt.room(self._location, self._idList)
 
+class IRoomMetadataFossil(IFossil):
+
+    def id(self):
+        pass
+    def name(self):
+        pass
+    def locationName(self):
+        pass
+    def floor(self):
+        pass
+    def roomNr(self):
+        pass
+    def building(self):
+        pass
+    def getBookingUrl(self):
+        pass
+    def getFullName(self):
+        pass
+
 class RoomExportInterface(ExportInterface):
     DETAIL_INTERFACES = {
-        'rooms': IRoomFossil
+        'rooms': IRoomMetadataFossil
     }
 
     def room(self, location, idlist):
