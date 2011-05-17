@@ -25,10 +25,11 @@ from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.fossilize import fossilize, IFossil
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.timezoneUtils import utc2server
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import CrossLocationQueries
-from MaKaC.rb_reservation import RepeatabilityEnum
+from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
 from MaKaC.fossils.roomBooking import IReservationFossil
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 
@@ -50,7 +51,7 @@ class RoomExporter(Exporter):
 
     def export_room(self, aw):
         expInt = RoomExportInterface(aw, self)
-        return expInt.room(self._location, self._idList)
+        return expInt.room(self._location, self._idList, self._qdata)
 
 class IRoomMetadataFossil(IFossil):
 
@@ -71,6 +72,9 @@ class IRoomMetadataFossil(IFossil):
     def getFullName(self):
         pass
 
+class IRoomMetadataWithReservationsFossil(IRoomMetadataFossil):
+    pass
+
 class IReservationMetadataFossil(IFossil):
     def startDT(self):
         pass
@@ -86,12 +90,12 @@ class IReservationMetadataFossil(IFossil):
     getBookingUrl.produce = lambda s: str(UHRoomBookingBookingDetails.getURL(s))
     def reason(self):
         pass
-
-class IRoomMetadataWithReservationsFossil(IRoomMetadataFossil):
-
-    def getReservations(self):
+    def isCancelled(self):
         pass
-    getReservations.convert = lambda r: fossilize(r, IReservationMetadataFossil)
+    isCancelled.name = 'cancelled'
+    def isRejected(self):
+        pass
+    isRejected.name = 'rejected'
 
 class RoomExportInterface(ExportInterface):
     DETAIL_INTERFACES = {
@@ -99,9 +103,28 @@ class RoomExportInterface(ExportInterface):
         'reservations': IRoomMetadataWithReservationsFossil
     }
 
-    def room(self, location, idlist):
-        Factory.getDALManager().connect()
+    def _postprocess(self, obj, fossil, iface):
+        if iface is IRoomMetadataWithReservationsFossil:
+            if self._fromDT or self._toDT:
+                resvEx = ReservationBase()
+                resvEx.startDT = self._fromDT
+                resvEx.endDT = self._toDT
+                resvEx.room = obj
+                if self._fromDT.date() != self._toDT.date():
+                    resvEx.repeatability = RepeatabilityEnum.daily
+                resvs = list(set(c.withReservation for c in resvEx.getCollisions()))
+            else:
+                resvs = obj.getReservations()
+            fossil['reservations'] = fossilize(resvs, IReservationMetadataFossil)
+        return fossil
 
+    def room(self, location, idlist, qdata):
+        fromDT = get_query_parameter(qdata, ['f', 'from'])
+        toDT = get_query_parameter(qdata, ['t', 'to'])
+        self._fromDT = utc2server(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
+        self._toDT = utc2server(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
+
+        Factory.getDALManager().connect()
         rooms = CrossLocationQueries.getRooms(location)
 
         def _iterate_rooms(objIds):

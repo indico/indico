@@ -11,6 +11,14 @@ def server2utc( date ):
     servertz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
     return timezone(servertz).localize(date).astimezone(timezone('UTC'))
 
+def utc2server( date, naive=True ):
+    date = date.replace(tzinfo=None)
+    servertz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+    servertime = timezone('UTC').localize(date).astimezone(timezone(servertz))
+    if naive:
+        return servertime.replace(tzinfo=None)
+    return servertime
+
 def date2utctimestamp( date ):
     """ Note by DavidMC: I believe this implementation is flawed. At least in my PC
         it is not correct. I think the result depends on the local time of the PC
@@ -31,7 +39,7 @@ def isTimezoneAware(datetime):
         or False if it is naive
     """
     return hasattr(datetime, 'tzinfo') and datetime.tzinfo is not None
-    
+
 
 def naive2local( naiveDateTime, localTimezone ):
     """ Extends naive datetimes with the specified timezone info (string),
@@ -50,7 +58,7 @@ def naive2local( naiveDateTime, localTimezone ):
 
 def setAdjustedDate(date, object = None, tz=None):
     # Localizes a date to the timezone tz
-    # tz can be a string (preferred) or a pytz.timezone object 
+    # tz can be a string (preferred) or a pytz.timezone object
     # If tz is None, the timezone of the object is used
     if not tz:
         tz = object.getTimezone()
@@ -106,11 +114,11 @@ def dayDifference(date1, date2, tz):
         For example the following 2 UTC dates: 25/07 21:00 and 26/07 03:00 may be on a different day in Europe,
         but they wouldn't be in Australia, for example
         date1, date2: timezone-aware datetimes.
-    """ 
+    """
     day1 = getAdjustedDate(date1, None, tz).date()
     day2 = getAdjustedDate(date2, None, tz).date()
     return (day1 - day2).days
-    
+
 def datetimeToUnixTime(t):
     """ Gets a datetime object
         Returns a float with the number of seconds from the UNIX epoch
@@ -141,17 +149,17 @@ def minDatetime():
     return setAdjustedDate(datetime.min, tz = 'UTC')
 
 class DisplayTZ:
-    
+
     def __init__(self,aw,conf=None,useServerTZ=0):
         websession = aw.getSession()
         minfo =  info.HelperMaKaCInfo.getMaKaCInfoInstance()
         try:
             sessTimezone = websession.getVar("ActiveTimezone")
         except:
-            #sessTimezone = minfo.getTimezone() 
+            #sessTimezone = minfo.getTimezone()
             sessTimezone = "LOCAL"
         if sessTimezone == None:
-            #sessTimezone = minfo.getTimezone() 
+            #sessTimezone = minfo.getTimezone()
             sessTimezone = "LOCAL"
             websession.setVar("ActiveTimezone",sessTimezone)
         if sessTimezone == 'LOCAL':
@@ -159,17 +167,17 @@ class DisplayTZ:
                 sessTimezone = conf.getTimezone()
             else:
                 minfo =  info.HelperMaKaCInfo.getMaKaCInfoInstance()
-                sessTimezone = minfo.getTimezone() 
+                sessTimezone = minfo.getTimezone()
         self._displayTZ = sessTimezone
         if self._displayTZ in ["",None]:
             self._displayTZ = minfo.getTimezone()
- 
+
     def getDisplayTZ(self):
         return self._displayTZ
 
 
 class SessionTZ:
-    
+
     def __init__(self,user):
         try:
             displayMode = user.getDisplayTZMode()
@@ -181,9 +189,9 @@ class SessionTZ:
             except:
                 #tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
                 tz = "LOCAL"
-        else: 
+        else:
             tz = "LOCAL"
         self._displayTZ = tz
-    
+
     def getSessionTZ(self):
         return self._displayTZ

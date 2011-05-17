@@ -299,13 +299,16 @@ class ExportInterface(object):
         next(itertools.islice(sortedIterator, offset, offset), None)
         return sortedIterator
 
+    def _postprocess(self, obj, fossil, iface):
+        return fossil
+
     def _process(self, iterator, filter=None, iface=None):
         if iface is None:
             iface = self.DETAIL_INTERFACES.get(self._detail)
             if iface is None:
                 raise HTTPAPIError('Invalid detail level: %s' % self._detail, apache.HTTP_BAD_REQUEST)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
-            yield fossilize(obj, iface, tz=self._tz)
+            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz), iface)
 
 
 @Exporter.register
