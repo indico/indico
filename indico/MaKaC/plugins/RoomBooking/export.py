@@ -28,12 +28,12 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import utc2server
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.rb_room import RoomBase
-from MaKaC.rb_location import CrossLocationQueries
+from MaKaC.rb_location import CrossLocationQueries, Location
 from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
 from MaKaC.fossils.roomBooking import IReservationFossil
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 
-globalExporters = ['RoomExporter']
+globalExporters = ['RoomExporter', 'ReservationExporter']
 
 class RoomExporter(Exporter):
     TYPES = ('room', )
@@ -53,6 +53,22 @@ class RoomExporter(Exporter):
         expInt = RoomExportInterface(aw, self)
         return expInt.room(self._location, self._idList, self._qdata)
 
+class ReservationExporter(Exporter):
+    TYPES = ('reservation', )
+    RE = r'(?P<loclist>\w+(?:-\w+)*)'
+    DEFAULT_DETAIL = 'reservations'
+    MAX_RECORDS = {
+        'reservations': 10000
+    }
+
+    def _getParams(self):
+        super(ReservationExporter, self)._getParams()
+        self._locList = self._urlParams['loclist'].split('-')
+
+    def export_reservation(self, aw):
+        expInt = ReservationExportInterface(aw, self)
+        return expInt.reservation(self._locList, self._qdata)
+
 class IRoomMetadataFossil(IFossil):
 
     def id(self):
@@ -61,6 +77,7 @@ class IRoomMetadataFossil(IFossil):
         pass
     def locationName(self):
         pass
+    locationName.name = 'location'
     def floor(self):
         pass
     def roomNr(self):
@@ -72,10 +89,16 @@ class IRoomMetadataFossil(IFossil):
     def getFullName(self):
         pass
 
+class IMinimalRoomMetadataFossil(IFossil):
+    def id(self):
+        pass
+    def getFullName(self):
+        pass
+
 class IRoomMetadataWithReservationsFossil(IRoomMetadataFossil):
     pass
 
-class IReservationMetadataFossil(IFossil):
+class IReservationMetadataFossilBase(IFossil):
     def startDT(self):
         pass
     def endDT(self):
@@ -97,6 +120,17 @@ class IReservationMetadataFossil(IFossil):
         pass
     isRejected.name = 'rejected'
 
+class IRoomReservationMetadataFossil(IReservationMetadataFossilBase):
+    pass
+
+class IReservationMetadataFossil(IReservationMetadataFossilBase):
+    def locationName(self):
+        pass
+    locationName.name = 'location'
+    def room(self):
+        pass
+    room.result = IMinimalRoomMetadataFossil
+
 class RoomExportInterface(ExportInterface):
     DETAIL_INTERFACES = {
         'rooms': IRoomMetadataFossil,
@@ -115,7 +149,7 @@ class RoomExportInterface(ExportInterface):
                 resvs = list(set(c.withReservation for c in resvEx.getCollisions()))
             else:
                 resvs = obj.getReservations()
-            fossil['reservations'] = fossilize(resvs, IReservationMetadataFossil)
+            fossil['reservations'] = fossilize(resvs, IRoomReservationMetadataFossil)
         return fossil
 
     def room(self, location, idlist, qdata):
@@ -133,4 +167,27 @@ class RoomExportInterface(ExportInterface):
 
         for obj in self._process(_iterate_rooms(idlist)):
             yield obj
+        Factory.getDALManager().disconnect()
+
+class ReservationExportInterface(ExportInterface):
+    DETAIL_INTERFACES = {
+        'reservations': IReservationMetadataFossil
+    }
+
+    def reservation(self, locList, qdata):
+        fromDT = get_query_parameter(qdata, ['f', 'from'])
+        toDT = get_query_parameter(qdata, ['t', 'to'])
+        fromDT = utc2server(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
+        toDT = utc2server(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
+
+        Factory.getDALManager().connect()
+
+        resvEx = ReservationBase()
+        resvEx.startDT = fromDT
+        resvEx.endDT = toDT
+
+        for loc in sorted(locList):
+            resvs = CrossLocationQueries.getReservations(location=loc, resvExample=resvEx)
+            for obj in self._process(resvs):
+                yield obj
         Factory.getDALManager().disconnect()
