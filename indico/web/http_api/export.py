@@ -128,7 +128,10 @@ class Exporter(object):
         if tzName is None:
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
             tzName = info.getTimezone()
-        self._tz = pytz.timezone(tzName)
+        try:
+            self._tz = pytz.timezone(tzName)
+        except pytz.UnknownTimeZoneError, e:
+            raise HTTPAPIError("Bad timezone: '%s'" % e.message, apache.HTTP_BAD_REQUEST)
         max = self.MAX_RECORDS.get(self._detail, 10000)
         self._userLimit = get_query_parameter(self._qdata, ['n', 'limit'], 0, integer=True)
         if self._userLimit > max:
