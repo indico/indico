@@ -186,6 +186,8 @@ class ReservationExportInterface(ExportInterface):
         resvEx.startDT = fromDT
         resvEx.endDT = toDT
 
+        locList = filter(lambda loc: Location.parse(loc) is not None, locList)
+
         for loc in sorted(locList):
             resvs = CrossLocationQueries.getReservations(location=loc, resvExample=resvEx)
             for obj in self._process(resvs):
