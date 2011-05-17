@@ -366,7 +366,7 @@ class CategoryEventExportInterface(ExportInterface):
                 obj = ch.getById(objId)
                 yield obj
 
-        iface = ExportInterface._getDetailInterface(detail)
+        iface = CategoryEventExportInterface._getDetailInterface(detail)
 
         for event in self._iterateOver(_iterate_objs(idlist), offset, limit, orderBy, descending):
             yield fossilize(event, iface, tz=tz)
