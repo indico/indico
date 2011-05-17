@@ -1636,6 +1636,12 @@ class Abstract(Persistent):
         self._comp_CoAuthors()
         return self._coAuthors
 
+    def getCoAuthorEmailList(self):
+        emailList = []
+        for coAuthor in self.getCoAuthorList():
+            emailList.append(coAuthor.getEmail())
+        return emailList
+
     def clearCoAuthors(self):
         while len(self._coAuthors)>0:
             self._removeCoAuthor(self._coAuthors[0])
@@ -3194,6 +3200,7 @@ class NotificationTemplate(Persistent):
         self._tplSubject=""
         self._tplBody=""
         self._fromAddr = ""
+        self._CAasCCAddr = False
         self._ccAddrList=PersistentList()
         self._toAddrs = PersistentList()
         self._conditions=PersistentList()
@@ -3207,6 +3214,7 @@ class NotificationTemplate(Persistent):
         tpl.setTplSubject(self.getTplSubject())
         tpl.setTplBody(self.getTplBody())
         tpl.setFromAddr(self.getFromAddr())
+        tpl.setCAasCCAddr(self.getCAasCCAddr())
 
         for cc in self.getCCAddrList() :
             tpl.addCCAddr(cc)
@@ -3315,6 +3323,17 @@ class NotificationTemplate(Persistent):
         self.clearCCAddrList()
         for addr in l:
             self.addCCAddr(addr)
+
+    def setCAasCCAddr(self, CAasCCAddr):
+        self._CAasCCAddr = CAasCCAddr.
+
+    def getCAasCCAddr(self):
+        try:
+            if self._CAasCCAddr:
+                pass
+        except AttributeError:
+            self._CAasCCAddr = False
+        return self._CAasCCAddr
 
     def clearCCAddrList(self):
         self._ccAddrList=PersistentList()

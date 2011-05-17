@@ -1445,6 +1445,7 @@ class ConferenceRecovery:
                 ntpl.setTplBody(nt.getTplBody())
                 ntpl.setFromAddr(nt.getFromAddr())
                 ntpl.setCCAddrList(nt.getCCAddrList())
+                ntpl.setCAasCCAddr(nt.getCAasCCAddr())
                 for a in nt.getToAddrList():
                     add = TrashCanManager().getById(a._p_oid)
                     ntpl.recoverToAddr(add)

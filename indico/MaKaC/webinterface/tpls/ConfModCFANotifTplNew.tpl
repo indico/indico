@@ -55,7 +55,8 @@
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("CC addresses")}</span></td>
         <td colspan="2" bgcolor="white" width="100%">
-            <input id="notificationTplCCAddress" type="text" name="CCAddrs"  style="width: 61%;" value=${ CCAddrs } onfocus="selected('notificationTplCCAddress')">
+            <input id="notificationTplCCAddress" type="text" name="CCAddrs"  style="width: 61%;" value=${ CCAddrs } onfocus="selected('notificationTplCCAddress')"><br>
+            <input name="CAasCCAddr" type="checkbox" id="CAasCCAddr" value="coAuthors"><span>${ _("Co-Authors") }</span>
         </td>
     </tr>
     <tr>

@@ -65,7 +65,12 @@
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("CC addresses")}</span></td>
         <td colspan="2" bgcolor="white" width="100%">
-            <input id="notificationTplCCAddress" type="text" name="CCAddrs"  style="width: 61%;" value=${ CCAddrs } onfocus="selected('notificationTplCCAddress')">
+            <input id="notificationTplCCAddress" type="text" name="CCAddrs"  style="width: 61%;" value=${ CCAddrs } onfocus="selected('notificationTplCCAddress')"><br>
+            <% checked = "" %>
+            % if CAasCCAddr:
+                <% checked = "checked" %>
+            % endif
+            <input name="CAasCCAddr" type="checkbox" ${ checked } id="CAasCCAddr" value="coAuthors"><span>${ _("Co-Authors") }</span>
         </td>
     </tr>
     <tr>
@@ -117,8 +122,5 @@ notifTplManager.addToPM($E('checkBoxesCell'), 'checkBoxList', false);
 notifTplManager.addToPM($E('notificationTplCCAddress'), 'emaillist', true);
 notifTplManager.addToPM($E('notificationTplSubject'));
 notifTplManager.addToPM($E('notificationTplBody'));
-
-//Check when the page is loaded
-notifTplManager.checkSelectCondition($E('condTypeSelect'), $E('contribTypeSelect'), $E('trackSelect'));
 
 </script>

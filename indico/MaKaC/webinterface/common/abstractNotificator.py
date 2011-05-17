@@ -229,11 +229,17 @@ class EmailNotificator(Notificator):
             raise MaKaCError( _("Some of the mail notification template's tags are invalid. Note that the format of the tags should be: %(tag_name)s"))
         fa=tpl.getFromAddr()
         cc=tpl.getCCAddrList()
+        # Add Co-authors addresses if needed
+        if tpl.getCAasCCAddr():
+            ccList = cc + abstract.getCoAuthorEmailList()
+        else:
+            ccList = cc
+
         tl = []
         for user in tpl.getToAddrs(abstract):
             if not user.getEmail() in tl:
                 tl.append(user.getEmail())
-        return Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=cc)
+        return Notification(subject=subj,body=b,fromAddr=fa,toList=tl,ccList=ccList)
 
     def notify(self,abstract,tpl):
         #if no from address is specified we should put the default one

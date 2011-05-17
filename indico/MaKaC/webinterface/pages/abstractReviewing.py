@@ -234,9 +234,10 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
         vars["toAddrsList"] = NotifTplToAddrsFactory.getToAddrList()
         vars["notifTpl"] = self._notifTpl
         if not vars.has_key("ccList"):
-            vars["CCAddrs"] = quoteattr(str(",".join(self._notifTpl.getCCAddrList())))
+            vars["CCAddrs"] = quoteattr(str(", ".join(self._notifTpl.getCCAddrList())))
         else:
-            vars["CCAddrs"] = quoteattr(str(",".join(vars["ccList"])))
+            vars["CCAddrs"] = quoteattr(str(", ".join(vars["ccList"])))
+        vars["CAasCCAddr"] = self._notifTpl.getCAasCCAddr()
         return vars
 
 class WPModCFANotifTplNew(WPConfModifAbstractsReviewingNotifTplBase):
@@ -491,7 +492,13 @@ class WConfModCFANotifTplDisplay(wcomponents.WTemplated):
         vars["description"] = self._notifTpl.getDescription()
         vars["From"] = self._notifTpl.getFromAddr()
         vars["toAddrs"] = self._getToAddrsHTML()
-        vars["CCAddrs"] = ", ".join(self._notifTpl.getCCAddrList())
+        ccAddrs = ", ".join(self._notifTpl.getCCAddrList())
+        if self._notifTpl.getCAasCCAddr():
+            if ccAddrs == "":
+                ccAddrs = "Co-Authors"
+            else:
+                ccAddrs += ", Co-Authors"
+        vars["CCAddrs"] = ccAddrs
         vars["subject"] = self._notifTpl.getTplSubjectShow(EmailNotificator.getVarList())
         vars["body"] = self._notifTpl.getTplBodyShow(EmailNotificator.getVarList())
         vars["conditions"] = self._getConditionsHTML()

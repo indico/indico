@@ -60,7 +60,16 @@ class RHCFANotifTplNew(RHConfModifCFABase):
         self._body = params.get("body","")
         self._fromAddr = params.get("fromAddr","")
         self._toList = self._normaliseListParam(params.get("toAddrs",[]))
-        self._ccList = params.get("CCAddrs","").split(",")
+        auxCCList = params.get("CCAddrs","")
+        # replace to have only one separator
+        auxCCList = auxCCList.replace(" ", ",").replace(";", ",").split(",")
+        # clean the list in order to avoid empty emails, for instance, comma at the end
+        cleanList = []
+        for email in auxCCList:
+            if email != "":
+                cleanList.append(email)
+        self._ccList = cleanList
+        self._CAasCCAddr = params.has_key("CAasCCAddr")
         self._cancel = params.get("cancel", None)
         self._save = params.get("save", None)
         self._tplCondition = params.get("condType", None)
@@ -98,6 +107,8 @@ class RHCFANotifTplNew(RHConfModifCFABase):
                 tpl.setTplBody(self._body, EmailNotificator.getVarList())
                 tpl.setFromAddr(self._fromAddr)
                 tpl.setCCAddrList(self._ccList)
+                tpl.setCAasCCAddr(self._CAasCCAddr)
+
                 for toAddr in self._toList:
                     toAddrWrapper = NotifTplToAddrsFactory.getToAddrById(toAddr)
                     if toAddrWrapper:
@@ -185,7 +196,16 @@ class RHCFANotifTplEdit(RHNotificationTemplateModifBase):
             self._body=params.get("body","")
             self._fromAddr=params.get("fromAddr","")
             self._toList=self._normaliseListParam(params.get("toAddrs",[]))
-            self._ccList=params.get("CCAddrs","").split(",")
+            auxCCList = params.get("CCAddrs","")
+            # replace to have only one separator
+            auxCCList = auxCCList.replace(" ", ",").replace(";", ",").split(",")
+            # clean the list in order to avoid empty emails, for instance, comma at the end
+            cleanList = []
+            for email in auxCCList:
+                if email != "":
+                    cleanList.append(email)
+            self._ccList = cleanList
+            self._CAasCCAddr = params.get("CAasCCAddr","")
 
     def _process(self):
         error=[]
@@ -210,6 +230,7 @@ class RHCFANotifTplEdit(RHNotificationTemplateModifBase):
                 self._notifTpl.setTplBody(self._body, EmailNotificator.getVarList())
                 self._notifTpl.setFromAddr(self._fromAddr)
                 self._notifTpl.setCCAddrList(self._ccList)
+                self._notifTpl.setCAasCCAddr(self._CAasCCAddr)
                 self._notifTpl.clearToAddrs()
                 for toAddr in self._toList:
                     toAddrWrapper=NotifTplToAddrsFactory.getToAddrById(toAddr)
