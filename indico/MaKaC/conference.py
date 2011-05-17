@@ -4912,7 +4912,7 @@ class ConferenceHolder( ObjectHolder ):
                 res.append(conf)
         return conf
 
-    def getById( self, id ):
+    def getById( self, id, quiet=False ):
         """returns an object from the index which id corresponds to the one
             which is specified.
         """
@@ -4924,6 +4924,8 @@ class ConferenceHolder( ObjectHolder ):
             id = str(id)
         if self._getIdx().has_key(str(id)):
             return self._getIdx()[str(id)]
+        elif quiet:
+            return None
         else:
             raise NoReportError( _("The specified event with id \"%s\" does not exist or has been deleted.") % str(id) )
 

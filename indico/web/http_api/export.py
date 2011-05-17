@@ -363,8 +363,9 @@ class CategoryEventExportInterface(ExportInterface):
         def _iterate_objs(objIds):
 
             for objId in objIds:
-                obj = ch.getById(objId)
-                yield obj
+                obj = ch.getById(objId, True)
+                if obj is not None:
+                    yield obj
 
         iface = CategoryEventExportInterface._getDetailInterface(detail)
 
