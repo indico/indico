@@ -58,11 +58,19 @@ class XMLSerializer(Serializer):
             if k not in ['_fossil', '_type', 'id']:
                 elem = etree.SubElement(felement, k)
                 if type(v) == list:
-                    for subv in v:
-                        if type(subv) in (datetime, int, float, bool, str, unicode):
-                            elem.text = self._convert(subv)
-                        else:
+                    onlyDicts = all(type(subv) == dict for subv in v)
+                    if onlyDicts:
+                        for subv in v:
                             elem.append(self._xmlForFossil(subv))
+                    else:
+                        for subv in v:
+                            if type(subv) == dict:
+                                elem.append(self._xmlForFossil(subv))
+                            else:
+                                subelem = etree.SubElement(elem, 'item')
+                                subelem.text = self._convert(subv)
+                elif type(v) == dict:
+                    elem.append(self._xmlForFossil(v))
                 else:
                     elem.text = self._convert(v)
 
