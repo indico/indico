@@ -99,6 +99,8 @@ class IRoomMetadataWithReservationsFossil(IRoomMetadataFossil):
     pass
 
 class IReservationMetadataFossilBase(IFossil):
+    def id(self):
+        pass
     def startDT(self):
         pass
     def endDT(self):
