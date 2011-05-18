@@ -181,6 +181,7 @@ class ReservationExportInterface(ExportInterface):
         toDT = get_query_parameter(qdata, ['t', 'to'])
         fromDT = utc2server(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
         toDT = utc2server(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
+        _filter = getResvStateFilter(qdata)
 
         Factory.getDALManager().connect()
 
@@ -192,6 +193,23 @@ class ReservationExportInterface(ExportInterface):
 
         for loc in sorted(locList):
             resvs = CrossLocationQueries.getReservations(location=loc, resvExample=resvEx)
-            for obj in self._process(resvs):
+            for obj in self._process(resvs, filter=_filter):
                 yield obj
         Factory.getDALManager().disconnect()
+
+def getResvStateFilter(qdata):
+    cancelled = get_query_parameter(qdata, ['cxl', 'cancelled'])
+    rejected = get_query_parameter(qdata, ['rej', 'rejected'])
+    if cancelled is None and rejected is None:
+        return None
+    if cancelled is not None:
+        cancelled = (cancelled == 'yes')
+    if rejected is not None:
+        rejected = (rejected == 'yes')
+    def _filter(obj):
+        if cancelled is not None and obj.isCancelled != cancelled:
+            return False
+        if rejected is not None and obj.isRejected != rejected:
+            return False
+        return True
+    return _filter
