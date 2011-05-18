@@ -34,6 +34,10 @@ class XMLSerializer(Serializer):
 
     _mime = 'text/xml'
 
+    def __init__(self, pretty=False, **kwargs):
+        self._typeMap = kwargs.pop('typeMap', {})
+        super(XMLSerializer, self).__init__(pretty, **kwargs)
+
     def _convert(self, value):
         if type(value) == datetime:
             return value.isoformat()
@@ -49,7 +53,8 @@ class XMLSerializer(Serializer):
         if 'id' in fossil:
             attribs['id'] = str(fossil['id'])
 
-        felement = etree.Element(fossil['_type'].lower(),
+        typeName = self._typeMap.get(fossil['_type'], fossil['_type'])
+        felement = etree.Element(typeName.lower(),
                                  attrib=attribs)
         if doc:
             doc.getroot().append(felement)

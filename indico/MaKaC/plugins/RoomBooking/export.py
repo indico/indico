@@ -45,6 +45,10 @@ class RoomExporter(Exporter):
         'rooms': 1000,
         'reservations': 10
     }
+    SERIALIZER_TYPE_MAP = {
+        'RoomCERN': 'Room',
+        'ReservationCERN': 'Reservation'
+    }
 
     def _getParams(self):
         super(RoomExporter, self)._getParams()
@@ -61,6 +65,10 @@ class ReservationExporter(Exporter):
     DEFAULT_DETAIL = 'reservations'
     MAX_RECORDS = {
         'reservations': 10000
+    }
+    SERIALIZER_TYPE_MAP = {
+        'RoomCERN': 'Room',
+        'ReservationCERN': 'Reservation'
     }
 
     def _getParams(self):

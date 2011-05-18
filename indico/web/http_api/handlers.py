@@ -174,14 +174,14 @@ def handler(req, **params):
         if not no_cache:
             obj = cache.loadObject(cache_key)
             if obj is not None:
-                result, complete = obj.getContent()
+                result, complete, typeMap = obj.getContent()
                 ts = obj.getTS()
                 add_to_cache = False
         if result is None:
             # Perform the actual exporting
-            result, complete = func(aw)
+            result, complete, typeMap = func(aw)
         if result is not None and add_to_cache:
-            cache.cacheObject(cache_key, (result, complete))
+            cache.cacheObject(cache_key, (result, complete, typeMap))
     except HTTPAPIError, e:
         error = e
         if e.getCode():
@@ -207,7 +207,7 @@ def handler(req, **params):
             # (nothing was written)
             dbi.endRequest(False)
 
-        serializer = Serializer.create(dformat, pretty=pretty,
+        serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
                                        **remove_lists(qdata))
 
         if error:

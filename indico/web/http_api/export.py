@@ -75,6 +75,7 @@ class Exporter(object):
     RE = None # abstract
     DEFAULT_DETAIL = None # abstract
     MAX_RECORDS = None # abstract
+    SERIALIZER_TYPE_MAP = {}
 
     @classmethod
     def parseRequest(cls, path, qdata):
@@ -155,7 +156,7 @@ class Exporter(object):
         except LimitExceededException:
             complete = (self._limit == self._userLimit)
 
-        return resultList, complete
+        return resultList, complete, self.SERIALIZER_TYPE_MAP
 
 
 class ExportInterface(object):
