@@ -232,10 +232,11 @@ def getResvStateFilter(qdata):
     rejected = get_query_parameter(qdata, ['rej', 'rejected'])
     confirmed = get_query_parameter(qdata, ['confirmed'], -1)
     archival = get_query_parameter(qdata, ['arch', 'archival'])
+    repeating = get_query_parameter(qdata, ['rec', 'recurring', 'rep', 'repeating'])
     avc = get_query_parameter(qdata, ['avc'])
     avcSupport = get_query_parameter(qdata, ['avcs', 'avcsupport'])
     bookedFor = get_query_parameter(qdata, ['bf', 'bookedfor'])
-    if not any((cancelled, rejected, confirmed != -1, archival, avc, avcSupport, bookedFor)):
+    if not any((cancelled, rejected, confirmed != -1, archival, repeating, avc, avcSupport, bookedFor)):
         return None
     if cancelled is not None:
         cancelled = (cancelled == 'yes')
@@ -248,6 +249,8 @@ def getResvStateFilter(qdata):
             confirmed = (confirmed == 'yes')
     if archival is not None:
         archival = (archival == 'yes')
+    if repeating is not None:
+        repeating = (repeating == 'yes')
     if avc is not None:
         avc = (avc == 'yes')
     if avcSupport is not None:
@@ -260,6 +263,8 @@ def getResvStateFilter(qdata):
         if confirmed != -1 and obj.isConfirmed != confirmed:
             return False
         if archival is not None and obj.isArchival != archival:
+            return False
+        if repeating is not None and repeating == (obj.repeatability is None):
             return False
         if avc is not None and obj.usesAVC != avc:
             return False
