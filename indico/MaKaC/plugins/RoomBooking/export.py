@@ -18,6 +18,7 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import fnmatch
 import pytz
 from indico.web.http_api import ExportInterface, LimitExceededException, Exporter
 from indico.web.http_api.util import get_query_parameter
@@ -210,7 +211,8 @@ def getResvStateFilter(qdata):
     confirmed = get_query_parameter(qdata, ['confirmed'], -1)
     avc = get_query_parameter(qdata, ['avc'])
     avcSupport = get_query_parameter(qdata, ['avcs', 'avcsupport'])
-    if not any((cancelled, rejected, confirmed != -1, avc, avcSupport)):
+    bookedFor = get_query_parameter(qdata, ['bf', 'bookedfor'])
+    if not any((cancelled, rejected, confirmed != -1, avc, avcSupport, bookedFor)):
         return None
     if cancelled is not None:
         cancelled = (cancelled == 'yes')
@@ -235,6 +237,8 @@ def getResvStateFilter(qdata):
         if avc is not None and obj.usesAVC != avc:
             return False
         if avcSupport is not None and obj.needsAVCSupport != avcSupport:
+            return False
+        if bookedFor and not fnmatch.fnmatch(obj.bookedForName.lower(), bookedFor.lower()):
             return False
         return True
     return _filter
