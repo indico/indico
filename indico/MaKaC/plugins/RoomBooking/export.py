@@ -90,6 +90,15 @@ class IRoomMetadataFossil(IFossil):
         pass
     def getFullName(self):
         pass
+    def needsAVCSetup(self):
+        pass
+    needsAVCSetup.name = 'avc'
+    def getEquipment(self):
+        pass
+    getEquipment.convert = lambda eq: ''.join(eq) and eq or []
+    def getAvailableVC(self):
+        pass
+    getAvailableVC.name = 'vcList'
 
 class IMinimalRoomMetadataFossil(IFossil):
     def id(self):
