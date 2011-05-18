@@ -20,20 +20,71 @@
 
 # python stdlib imports
 import datetime
-from operator import itemgetter
 import icalendar as ical
 
 # indico imports
-from indico.util.string import unicodeOrNone
-
-# module imports
 from indico.util.metadata.serializer import Serializer
 
+# legacy indico imports
+from MaKaC.rb_reservation import RepeatabilityEnum
+from MaKaC.rb_tools import weekNumber
+
+WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
 
 class ICalSerializer(Serializer):
 
     schemaless = False
     _mime = 'text/calendar'
+
+    def _serialize_conference(self, fossil, now):
+        event = ical.Event()
+        event.set('uid', 'indico-event-%s@cern.ch' % fossil['id'])
+        event.set('dtstamp', now)
+        event.set('dtstart', fossil['startDate'])
+        event.set('dtend', fossil['endDate'])
+        event.set('url', fossil['url'])
+        event.set('summary', fossil['title'])
+        loc = fossil['location']
+        if fossil['room']:
+            loc += ' ' + fossil['room']
+        event.set('location', loc)
+        if fossil['description']:
+            event.set('description', fossil['description'] + '\n' + fossil['url'])
+        else:
+            event.set('description', fossil['url'])
+        return event
+
+    def _serialize_repeatability(self, startDT, endDT, repType):
+        intervals = { RepeatabilityEnum.onceAWeek: 1, RepeatabilityEnum.onceEvery2Weeks: 2, RepeatabilityEnum.onceEvery3Weeks: 3 }
+        recur = ical.vRecur()
+        recur['until'] = endDT
+        if repType == RepeatabilityEnum.daily:
+            recur['freq'] = 'daily'
+        elif repType in intervals.keys():
+            recur['freq'] = 'weekly'
+            recur['interval'] = intervals[repType]
+        elif repType == RepeatabilityEnum.onceAMonth:
+            recur['freq'] = 'monthly'
+            recur['bysetpos'] = weekNumber(startDT)
+            recur['byday'] = WEEK_DAYS[startDT.weekday()]
+        return recur
+
+    def _serialize_reservation(self, fossil, now):
+        event = ical.Event()
+        event.set('uid', 'indico-resv-%s@cern.ch' % fossil['id'])
+        event.set('dtstamp', now)
+        event.set('dtstart', fossil['startDT'])
+        event.set('dtend', datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()))
+        event.set('url', fossil['bookingUrl'])
+        event.set('summary', fossil['reason'])
+        event.set('location', fossil['location'] + ': ' + fossil['room']['fullName'])
+        event.set('description', fossil['reason'] + '\n' + fossil['bookingUrl'])
+        rrule = None
+        if fossil['repeatability'] is not None:
+            rrule = self._serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])
+        if rrule:
+            event.set('rrule', rrule)
+        return event
 
     def __call__(self, fossils):
         results = fossils['results']
@@ -47,21 +98,8 @@ class ICalSerializer(Serializer):
         now = datetime.datetime.utcnow()
         for fossil in results:
             if fossil['_fossil'] == 'conferenceMetadata':
-                event = ical.Event()
-                event.set('uid', 'indico-%s@cern.ch' % fossil['id'])
-                event.set('dtstamp', now)
-                event.set('dtstart', fossil['startDate'])
-                event.set('dtend', fossil['endDate'])
-                event.set('url', fossil['url'])
-                event.set('summary', fossil['title'])
-                loc = fossil['location']
-                if fossil['room']:
-                    loc += ' ' + fossil['room']
-                event.set('location', loc)
-                if fossil['description']:
-                    event.set('description', fossil['description'] + '\n' + fossil['url'])
-                else:
-                    event.set('description', fossil['url'])
-                cal.add_component(event)
+                cal.add_component(self._serialize_conference(fossil, now))
+            elif fossil['_fossil'] == 'reservationMetadata':
+                cal.add_component(self._serialize_reservation(fossil, now))
 
         return str(cal)

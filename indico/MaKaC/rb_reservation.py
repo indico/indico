@@ -68,6 +68,9 @@ class RepeatabilityEnum( object ):
         onceAMonth: "monthly",
     }
 
+    shortname2rep = dict((v, k) for k, v in rep2shortname.iteritems())
+    shortname2rep[None] = None # used in exporter
+
 class WeekDayEnum( object ):
     """
     Enumeration - days of the week.
