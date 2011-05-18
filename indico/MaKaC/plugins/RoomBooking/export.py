@@ -161,7 +161,7 @@ class RoomExportInterface(ExportInterface):
         self._toDT = utc2server(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
 
         Factory.getDALManager().connect()
-        rooms = CrossLocationQueries.getRooms(location)
+        rooms = CrossLocationQueries.getRooms(location=location)
 
         def _iterate_rooms(objIds):
             objIds = map(int, objIds)
