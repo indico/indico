@@ -49,6 +49,7 @@ class RoomExporter(Exporter):
         'RoomCERN': 'Room',
         'ReservationCERN': 'Reservation'
     }
+    VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
         super(RoomExporter, self)._getParams()
@@ -70,6 +71,7 @@ class ReservationExporter(Exporter):
         'RoomCERN': 'Room',
         'ReservationCERN': 'Reservation'
     }
+    VALID_FORMATS = ('json', 'jsonp', 'xml', 'ics')
 
     def _getParams(self):
         super(ReservationExporter, self)._getParams()

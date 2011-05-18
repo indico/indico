@@ -76,6 +76,7 @@ class Exporter(object):
     DEFAULT_DETAIL = None # abstract
     MAX_RECORDS = None # abstract
     SERIALIZER_TYPE_MAP = {}
+    VALID_FORMATS = None # None = all formats
 
     @classmethod
     def parseRequest(cls, path, qdata):
@@ -89,6 +90,8 @@ class Exporter(object):
                 type = g[0]
                 format = g[-1]
                 if format not in ExportInterface.getAllowedFormats():
+                    return None, None
+                elif expCls.VALID_FORMATS and format not in expCls.VALID_FORMATS:
                     return None, None
                 return expCls(qdata, type, gd), format
         return None, None
