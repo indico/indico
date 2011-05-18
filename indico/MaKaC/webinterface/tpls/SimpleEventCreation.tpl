@@ -21,28 +21,12 @@
         </tr>
         <!-- <Date and time> -->
         <tr>
-            <td rowspan="2" nowrap class="titleCellTD"><span class="titleCellFormat">Dates</span><br></td>
-            <td class="contentCellTD">
-                ${ _("The lecture will take place in")}
-                <select id="nbDates"  name="nbDates" onChange="javascript:nbDatesChanged();">
-                    <option value="1"> 1 </option>
-                    <option value="2"> 2 </option>
-                    <option value="3"> 3 </option>
-                    <option value="4"> 4 </option>
-                    <option value="5"> 5 </option>
-                    <option value="6"> 6 </option>
-                    <option value="7"> 7 </option>
-                    <option value="8"> 8 </option>
-                    <option value="9"> 9 </option>
-                </select>
-                ${ _("date(s)")}
-            </td>
-        </tr>
-        <tr>
+            <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Date(s)")}</span><br></td>
             <td class="contentCellTD">
                 <div id="datesContainer">
                     <!-- Filled through DOM manipulation   -->
                 </div>
+                <input type="hidden" id="nbDates" name="nbDates" value="1">
             </td>
         </tr>
         <!-- </Date and time> -->
@@ -158,7 +142,7 @@
     IndicoUI.executeOnLoad(function()
     {
 
-        nbDatesChanged();
+        initializeDatesContainer();
 
         showAdvancedOptions();
 
