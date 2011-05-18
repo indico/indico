@@ -72,6 +72,12 @@ class BaseTask(TimedEvent):
 
     fossilizes(ITaskFossil)
 
+    def __cmp__(self, obj):
+        if self.id == obj.id and self.id == None:
+            return cmp(self, obj)
+        else:
+            return cmp(self.id, obj.id)
+
     def __init__(self, expiryDate=None):
         self.createdOn = self._getCurrentDateTime()
         self.expiryDate = expiryDate

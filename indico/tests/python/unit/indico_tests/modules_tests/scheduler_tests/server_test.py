@@ -206,6 +206,27 @@ class _TestScheduler(unittest.TestCase):
                             'finished': 1,
                             'failed': 0})
 
+    def testSameTime(self):
+        """
+        Running several tasks at the same time
+        """
+        self._startSomeWorkers([TestTask] * 5,
+                               [base.TimeSource.get().getCurrentTime() + \
+                                timedelta(seconds=2)] * 5)
+
+        self.assertEqual(self._checkWorkersFinished(10),
+                         True)
+
+        self._shutdown()
+
+        self._assertStatus({'state': False,
+                            'waiting': 0,
+                            'running': 0,
+                            'spooled': 0,
+                            'finished': 5,
+                            'failed': 0})
+
+
     def testPriority(self):
         """
         Checking that one task is executed before another
