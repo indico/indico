@@ -209,10 +209,11 @@ def getResvStateFilter(qdata):
     cancelled = get_query_parameter(qdata, ['cxl', 'cancelled'])
     rejected = get_query_parameter(qdata, ['rej', 'rejected'])
     confirmed = get_query_parameter(qdata, ['confirmed'], -1)
+    archival = get_query_parameter(qdata, ['arch', 'archival'])
     avc = get_query_parameter(qdata, ['avc'])
     avcSupport = get_query_parameter(qdata, ['avcs', 'avcsupport'])
     bookedFor = get_query_parameter(qdata, ['bf', 'bookedfor'])
-    if not any((cancelled, rejected, confirmed != -1, avc, avcSupport, bookedFor)):
+    if not any((cancelled, rejected, confirmed != -1, archival, avc, avcSupport, bookedFor)):
         return None
     if cancelled is not None:
         cancelled = (cancelled == 'yes')
@@ -223,6 +224,8 @@ def getResvStateFilter(qdata):
             confirmed = None
         else:
             confirmed = (confirmed == 'yes')
+    if archival is not None:
+        archival = (archival == 'yes')
     if avc is not None:
         avc = (avc == 'yes')
     if avcSupport is not None:
@@ -233,6 +236,8 @@ def getResvStateFilter(qdata):
         if rejected is not None and obj.isRejected != rejected:
             return False
         if confirmed != -1 and obj.isConfirmed != confirmed:
+            return False
+        if archival is not None and obj.isArchival != archival:
             return False
         if avc is not None and obj.usesAVC != avc:
             return False
