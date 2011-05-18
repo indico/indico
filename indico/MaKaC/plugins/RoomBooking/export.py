@@ -125,6 +125,9 @@ class IReservationMetadataFossilBase(IFossil):
         pass
     def needsAVCSupport(self):
         pass
+    def useVC(self):
+        pass
+    useVC.name = 'vcList'
 
 class IRoomReservationMetadataFossil(IReservationMetadataFossilBase):
     pass
