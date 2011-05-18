@@ -19,6 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import fnmatch
+import itertools
 import pytz
 from indico.web.http_api import ExportInterface, LimitExceededException, Exporter
 from indico.web.http_api.util import get_query_parameter
@@ -159,6 +160,7 @@ class RoomExportInterface(ExportInterface):
                 resvs = list(set(c.withReservation for c in resvEx.getCollisions()))
             else:
                 resvs = obj.getReservations()
+            resvs = itertools.ifilter(self._resvFilter, resvs)
             fossil['reservations'] = fossilize(resvs, IRoomReservationMetadataFossil)
         return fossil
 
@@ -167,6 +169,7 @@ class RoomExportInterface(ExportInterface):
         toDT = get_query_parameter(qdata, ['t', 'to'])
         self._fromDT = utc2server(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
         self._toDT = utc2server(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
+        self._resvFilter = getResvStateFilter(qdata)
 
         Factory.getDALManager().connect()
         rooms = CrossLocationQueries.getRooms(location=location)
