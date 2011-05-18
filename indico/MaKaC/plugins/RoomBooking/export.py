@@ -200,16 +200,21 @@ class ReservationExportInterface(ExportInterface):
 def getResvStateFilter(qdata):
     cancelled = get_query_parameter(qdata, ['cxl', 'cancelled'])
     rejected = get_query_parameter(qdata, ['rej', 'rejected'])
-    if cancelled is None and rejected is None:
+    confirmed = get_query_parameter(qdata, ['confirmed'])
+    if cancelled is None and rejected is None and confirmed is None:
         return None
     if cancelled is not None:
         cancelled = (cancelled == 'yes')
     if rejected is not None:
         rejected = (rejected == 'yes')
+    if confirmed is not None:
+        confirmed = (confirmed == 'yes')
     def _filter(obj):
         if cancelled is not None and obj.isCancelled != cancelled:
             return False
         if rejected is not None and obj.isRejected != rejected:
+            return False
+        if obj.isConfirmed != confirmed:
             return False
         return True
     return _filter
