@@ -36,6 +36,7 @@ from MaKaC.plugins.RoomBooking.default.roomblocking import BlockedRoom
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 
+
 class RoomBooking_Feature(IndicoTestFeature):
     _requires = ['db.Database']
 
@@ -126,9 +127,6 @@ class RoomBookingTestCase(IndicoTestCase):
         resv.insert()
         return resv
 
-    def tearDown(self):
-        super(RoomBookingTestCase, self).tearDown()
-        self._closeEnvironment()
 
 class TestRoomBookingDBSetup(IndicoTestCase):
     _requires = [RoomBooking_Feature]
@@ -139,9 +137,6 @@ class TestRoomBookingDBSetup(IndicoTestCase):
         self.assertEqual(self._room3.getResponsible(), self._avatar1)
         self.assertEqual(self._room4.getResponsible(), self._avatar2)
 
-    def tearDown(self):
-        super(TestRoomBookingDBSetup, self).tearDown()
-        self._closeEnvironment()
 
 class TestRoomBlocking(RoomBookingTestCase):
 

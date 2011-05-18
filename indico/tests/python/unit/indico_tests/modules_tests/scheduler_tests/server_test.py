@@ -108,7 +108,6 @@ class Worker(threading.Thread):
         c = Client()
         c.enqueue(self._task_t(self._id, self._time, **self._extra_args))
         DBMgr.getInstance().endRequest()
-        pass
 
 
 class SchedulerThread(threading.Thread):
@@ -170,7 +169,8 @@ class _TestScheduler(IndicoTestCase):
         terminated= multiprocessing.Array('i', [0]*len(type_tasks))
 
         for i in range(0, len(type_tasks)):
-            w = Worker(i, type_tasks[i], time_tasks[i], **kwargs)
+            t = type_tasks[i]
+            w = Worker(i, t, time_tasks[i], **kwargs)
             w.start()
             self._workers[i] = w
 
@@ -192,13 +192,50 @@ class _TestScheduler(IndicoTestCase):
 
     def testSimpleFinish(self):
         """
-        Creating 1 tasks that will succeed
+        Creating 1 task that will succeed
+        """
+        self._startSomeWorkers([TestTask],
+                               [base.TimeSource.get().getCurrentTime() + \
+                                timedelta(seconds=2)])
+
+        self.assertEqual(self._checkWorkersFinished(10),
+                         True)
+
+        self._shutdown()
+
+        self._assertStatus({'state': False,
+                            'waiting': 0,
+                            'running': 0,
+                            'spooled': 0,
+                            'finished': 1,
+                            'failed': 0})
+
+    def testTaskRelocate(self):
+        """
+        Creating 1 task and relocating it
         """
 
         self._startSomeWorkers([TestTask],
                                [base.TimeSource.get().getCurrentTime() + \
                                 timedelta(seconds=2)])
-        self.assertEqual(self._checkWorkersFinished(10),
+
+        base.TimeSource.get().sleep(1)
+
+        with self._context('database', sync=True) as conn:
+
+            # wait to task to be scheduled
+            c = Client()
+            while True:
+                try:
+                    conn.sync()
+                    t = c.getTask(0)
+                    break
+                except KeyError:
+                    continue
+
+            c.moveTask(t, base.TimeSource.get().getCurrentTime() + timedelta(seconds=2))
+
+        self.assertEqual(self._checkWorkersFinished(5),
                          True)
 
         self._shutdown()
@@ -254,7 +291,7 @@ class _TestScheduler(IndicoTestCase):
                             'finished': 2,
                             'failed': 0})
 
-        with self._context('database'):
+        with self._context('database', sync=True):
             c = Client()
             t1 = c.getTask(0)
             t2 = c.getTask(1)

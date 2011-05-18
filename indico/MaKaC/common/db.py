@@ -131,13 +131,6 @@ class DBMgr:
         else:
             self.abort()
 
-        #modification vendredi 010907
-#        try:
-#            self._conn.close()
-#            self._conn=None
-#        except:
-#            pass
-
         self._getConnObject().close()
         self._delConnObject()
 
@@ -202,10 +195,12 @@ class DBMgr:
         self._storage.tpc_finish(trans)
 
     @contextmanager
-    def transaction(self):
+    def transaction(self, sync=False):
         """
         context manager (`with`)
         """
+        if sync:
+            self.sync()
         yield
         self.commit()
 

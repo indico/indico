@@ -179,7 +179,6 @@ class SchedulerModule(Module):
             self.addTaskToWaitingQueue(occurrence)
 
     def changeTaskStartDate(self, oldTS, task):
-        i = 0
 
         newTS = int_timestamp(task.getStartOn())
 
@@ -196,7 +195,6 @@ class SchedulerModule(Module):
 
         logging.getLogger('scheduler').info(
             '%s moved from bin %s to %s...' % (task, oldTS, newTS))
-
 
     def addTaskToWaitingQueue(self, task, index=False):
 
@@ -293,6 +291,3 @@ class SchedulerModule(Module):
     ##     self.removeTask(task)
 
     ##     TrashCanManager().add(task)
-
-
-

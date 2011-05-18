@@ -100,22 +100,18 @@ def initializeRoomBookingDB( location, force = False ):
     initialLocation = Location( location, FactoryCERN )
     if force or not indicoRoot.has_key( 'RoomBookingLocationList' ):
         indicoRoot['RoomBookingLocationList'] = [ initialLocation ]
-        print "Locations branch created (Indico db)"
     if force or not indicoRoot.has_key( 'DefaultRoomBookingLocation' ):
         indicoRoot['DefaultRoomBookingLocation'] = location
-        print "Default location set to " + location
 
     # 2. Rooms & Bookings ---------------------------------------------------
 
     # Create rooms branch
     if force or not root.has_key( 'Rooms' ):
         root['Rooms'] = IOBTree()
-        print "Rooms branch created"
 
     # Create reservations branch
     if force or not root.has_key( 'Reservations' ):
         root['Reservations'] = IOBTree()
-        print "Reservations branch created"
 
     # Create blocking branch
     if force or not root.has_key( 'RoomBlocking' ):
@@ -125,26 +121,20 @@ def initializeRoomBookingDB( location, force = False ):
         root['RoomBlocking']['Indexes']['OwnerBlockings'] = OOBTree()
         root['RoomBlocking']['Indexes']['DayBlockings'] = CalendarDayIndex()
         root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
-        print "RoomBlocking branch created"
 
     # Create indexes
     if force or not root.has_key( 'RoomReservationsIndex' ):
         root['RoomReservationsIndex'] = OOBTree()
-        print "Room => Reservations Index branch created"
     if force or not root.has_key( 'UserReservationsIndex' ):
         root['UserReservationsIndex'] = OOBTree()
-        print "User => Reservations Index branch created"
     if force or not root.has_key( 'DayReservationsIndex' ):
         root['DayReservationsIndex'] = OOBTree()
-        print "Day => Reservations Index branch created"
 
     # Create possible equipment branch
     if force or not root.has_key( 'EquipmentList' ):
         root['EquipmentList'] = {}
-        print "Equipment branch created"
 
     AvatarHolder().invalidateRoomManagerIdList()
-    print "Cached list of room managers invalidated"
 
     DALManagerCERN().commit()
 

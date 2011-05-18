@@ -80,7 +80,7 @@ class _Worker(object):
         # define their own actions on DB connect/disconnect/commit/abort
 
         # potentially conflict-prone (!)
-        with self._dbi.transaction():
+        with self._dbi.transaction(sync=True):
             with self._rbdbi.transaction():
                 self._task.prepare()
 

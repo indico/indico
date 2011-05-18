@@ -310,6 +310,9 @@ class Scheduler(object):
             self._sleep('Nothing to do. Sleeping for %d secs...' %
                         self._config.sleep_interval)
 
+            # read from DB again after sleeping
+            self._readFromDb()
+
     def _checkFinishedTasks(self):
         """
         Check if there are any tasks that have finished recently, and
@@ -418,7 +421,7 @@ class Scheduler(object):
                 # pass oldTS and task
                 self._db_changeTaskStartDate(*obj)
             elif op == 'del':
-                self._deleteTaskFromQueue(obj)
+                self._db_deleteTaskFromQueue(obj)
             elif op == 'shutdown':
                 raise base.SchedulerQuitException(obj)
             else:
@@ -437,7 +440,7 @@ class Scheduler(object):
         self._logger.debug('_abortDb()..')
         self._dbi.abort()
 
-    def _deleteTaskFromQueue(self, task):
+    def _db_deleteTaskFromQueue(self, task):
         """
         """
 
