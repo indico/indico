@@ -59,7 +59,10 @@ class XMLSerializer(Serializer):
                 elem = etree.SubElement(felement, k)
                 if type(v) == list:
                     for subv in v:
-                        elem.append(self._xmlForFossil(subv))
+                        if type(subv) in (datetime, int, float, bool, str, unicode):
+                            elem.text = self._convert(subv)
+                        else:
+                            elem.append(self._xmlForFossil(subv))
                 else:
                     elem.text = self._convert(v)
 
