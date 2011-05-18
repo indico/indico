@@ -206,7 +206,8 @@ def getResvStateFilter(qdata):
     rejected = get_query_parameter(qdata, ['rej', 'rejected'])
     confirmed = get_query_parameter(qdata, ['confirmed'], -1)
     avc = get_query_parameter(qdata, ['avc'])
-    if not any((cancelled, rejected, confirmed != -1, avc)):
+    avcSupport = get_query_parameter(qdata, ['avcs', 'avcsupport'])
+    if not any((cancelled, rejected, confirmed != -1, avc, avcSupport)):
         return None
     if cancelled is not None:
         cancelled = (cancelled == 'yes')
@@ -219,6 +220,8 @@ def getResvStateFilter(qdata):
             confirmed = (confirmed == 'yes')
     if avc is not None:
         avc = (avc == 'yes')
+    if avcSupport is not None:
+        avcSupport = (avcSupport == 'yes')
     def _filter(obj):
         if cancelled is not None and obj.isCancelled != cancelled:
             return False
@@ -227,6 +230,8 @@ def getResvStateFilter(qdata):
         if confirmed != -1 and obj.isConfirmed != confirmed:
             return False
         if avc is not None and obj.usesAVC != avc:
+            return False
+        if avcSupport is not None and obj.needsAVCSupport != avcSupport:
             return False
         return True
     return _filter
