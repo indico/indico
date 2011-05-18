@@ -121,6 +121,10 @@ class IReservationMetadataFossilBase(IFossil):
     def isRejected(self):
         pass
     isRejected.name = 'rejected'
+    def usesAVC(self):
+        pass
+    def needsAVCSupport(self):
+        pass
 
 class IRoomReservationMetadataFossil(IReservationMetadataFossilBase):
     pass
@@ -200,21 +204,29 @@ class ReservationExportInterface(ExportInterface):
 def getResvStateFilter(qdata):
     cancelled = get_query_parameter(qdata, ['cxl', 'cancelled'])
     rejected = get_query_parameter(qdata, ['rej', 'rejected'])
-    confirmed = get_query_parameter(qdata, ['confirmed'])
-    if cancelled is None and rejected is None and confirmed is None:
+    confirmed = get_query_parameter(qdata, ['confirmed'], -1)
+    avc = get_query_parameter(qdata, ['avc'])
+    if not any((cancelled, rejected, confirmed != -1, avc)):
         return None
     if cancelled is not None:
         cancelled = (cancelled == 'yes')
     if rejected is not None:
         rejected = (rejected == 'yes')
-    if confirmed is not None:
-        confirmed = (confirmed == 'yes')
+    if confirmed != -1:
+        if confirmed == 'pending':
+            confirmed = None
+        else:
+            confirmed = (confirmed == 'yes')
+    if avc is not None:
+        avc = (avc == 'yes')
     def _filter(obj):
         if cancelled is not None and obj.isCancelled != cancelled:
             return False
         if rejected is not None and obj.isRejected != rejected:
             return False
-        if obj.isConfirmed != confirmed:
+        if confirmed != -1 and obj.isConfirmed != confirmed:
+            return False
+        if avc is not None and obj.usesAVC != avc:
             return False
         return True
     return _filter
