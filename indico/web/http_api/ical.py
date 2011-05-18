@@ -31,6 +31,22 @@ from MaKaC.rb_tools import weekNumber
 
 WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
 
+class vRecur(ical.vRecur):
+    """Fix vRecur so the frequency comes first"""
+    def ical(self):
+        # SequenceTypes
+        result = ['FREQ=%s' % self.types['FREQ'](self['FREQ']).ical()]
+        for key, vals in self.items():
+            if key == 'FREQ':
+                continue
+            typ = self.types[key]
+            if not type(vals) in ical.prop.SequenceTypes:
+                vals = [vals]
+            vals = ','.join([typ(val).ical() for val in vals])
+            result.append('%s=%s' % (key, vals))
+        return ';'.join(result)
+ical.cal.types_factory['recur'] = vRecur
+
 class ICalSerializer(Serializer):
 
     schemaless = False
@@ -65,8 +81,7 @@ class ICalSerializer(Serializer):
             recur['interval'] = intervals[repType]
         elif repType == RepeatabilityEnum.onceAMonth:
             recur['freq'] = 'monthly'
-            recur['bysetpos'] = weekNumber(startDT)
-            recur['byday'] = WEEK_DAYS[startDT.weekday()]
+            recur['byday'] = str(weekNumber(startDT)) + WEEK_DAYS[startDT.weekday()]
         return recur
 
     def _serialize_reservation(self, fossil, now):
