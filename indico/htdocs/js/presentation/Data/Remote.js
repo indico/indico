@@ -198,6 +198,7 @@ function jsonRpcCommit(url, method, params, value, handler) {
 function jsonRpc(url, method, params, handler) {
         return jsonRequest(url, {
                 version: "1.1",
+                origin: location.href,
                 method: method,
                 params: params
         }, function(response, error) {

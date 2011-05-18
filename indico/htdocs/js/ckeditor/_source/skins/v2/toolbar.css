@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -195,6 +195,14 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	#float: none;
 }
 
+/*#7181*/
+.cke_skin_v2 .cke_browser_ie9 .cke_rtl .cke_separator,
+.cke_skin_v2 .cke_browser_ie9 .cke_rtl .cke_toolbar_start,
+.cke_skin_v2 .cke_browser_ie9 .cke_rtl .cke_toolbar_end
+{
+	vertical-align:middle;
+}
+
 .cke_skin_v2 .cke_button a,
 .cke_skin_v2 .cke_button a:hover,
 .cke_skin_v2 .cke_button a:focus,
@@ -238,11 +246,28 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	opacity: 1; /* Safari, Opera and Mozilla */
 }
 
-.cke_skin_v2 .cke_button a.cke_disabled *,
-.cke_skin_v2 .cke_browser_ie a:hover.cke_button .cke_disabled *
+.cke_skin_v2 .cke_button a.cke_disabled *
 {
 	filter: alpha(opacity=30); /* IE */
 	opacity: 0.3; /* Safari, Opera and Mozilla */
+}
+
+/* IE with zoom != 100% will distort the icons otherwise #4821 */
+.cke_skin_v2 .cke_browser_ie .cke_button a.cke_disabled *,
+.cke_skin_v2 .cke_browser_ie a:hover.cke_button .cke_disabled *
+{
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale'), alpha(opacity=30);
+}
+.cke_skin_v2 .cke_browser_ie .cke_rtl .cke_button a.cke_disabled *,
+.cke_skin_v2 .cke_browser_ie .cke_rtl a:hover.cke_button .cke_disabled *
+{
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale'), alpha(opacity=30);
+}
+.cke_skin_v2 .cke_browser_ie6 .cke_button a.cke_disabled *,
+.cke_skin_v2 .cke_browser_ie6 a:hover.cke_button .cke_disabled *,
+.cke_skin_v2 .cke_browser_ie .cke_button.cke_noalphafix a.cke_disabled *
+{
+	filter: alpha(opacity=30);
 }
 
 .cke_skin_v2 .cke_hc .cke_button a.cke_disabled *,
@@ -278,6 +303,29 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	width: 16px;
 	height: 16px;
 	display: inline-block;
+	cursor: default;
+}
+
+.cke_skin_v2 .cke_rtl .cke_button .cke_icon
+{
+	background-image: url(icons_rtl.png);
+}
+
+/* IE with zoom != 100% will distort the icons otherwise #4821 */
+.cke_skin_v2 .cke_browser_ie .cke_button .cke_icon
+{
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale');
+}
+.cke_skin_v2 .cke_browser_ie .cke_rtl .cke_button .cke_icon
+{
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale');
+}
+.cke_skin_v2 .cke_browser_ie6 .cke_button .cke_icon,
+.cke_skin_v2 .cke_browser_ie6 .cke_rtl .cke_button .cke_icon,
+.cke_skin_v2 .cke_browser_ie .cke_button.cke_noalphafix .cke_icon,
+.cke_skin_v2 .cke_browser_ie .cke_rtl .cke_button.cke_noalphafix .cke_icon
+{
+	filter: ;
 }
 
 .cke_skin_v2 .cke_button .cke_label
@@ -285,6 +333,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	cursor: default;
 	display: none;
 	padding-left: 3px;
+	vertical-align:middle;
 }
 
 .cke_skin_v2 .cke_hc .cke_button .cke_label
@@ -316,6 +365,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	background-image: url(images/sprites.png);
 	_background-image: url(images/sprites_ie6.png);
 	background-repeat: no-repeat;
+	cursor: default;
 }
 
 .cke_skin_v2 .cke_rtl .cke_button .cke_buttonarrow

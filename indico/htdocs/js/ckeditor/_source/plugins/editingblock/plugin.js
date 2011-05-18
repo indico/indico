@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -71,7 +71,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					if ( !isHandlingData && editor.mode )
 					{
 						isHandlingData = true;
-						editor.setData( getMode( editor ).getData() );
+						editor.setData( getMode( editor ).getData(), null, 1 );
 						isHandlingData = false;
 					}
 				});
@@ -95,6 +95,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					// Do that once only.
 					event.removeListener();
 
+					// Redirect the focus into editor for webkit. (#5713)
+					CKEDITOR.env.webkit && editor.container.on( 'focus', function()
+						{
+							editor.focus();
+						});
+
 					if ( editor.config.startupFocus )
 						editor.focus();
 
@@ -104,8 +110,15 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					setTimeout( function(){
 						editor.fireOnce( 'instanceReady' );
 						CKEDITOR.fire( 'instanceReady', null, editor );
-					} );
+					}, 0 );
 				});
+
+			editor.on( 'destroy', function ()
+			{
+				// ->		currentMode.unload( holderElement );
+				if ( this.mode )
+					this._.modes[ this.mode ].unload( this.getThemeSpace( 'contents' ) );
+			});
 		}
 	});
 
@@ -140,6 +153,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	 */
 	CKEDITOR.editor.prototype.setMode = function( mode )
 	{
+		this.fire( 'beforeSetMode', { newMode : mode } );
+
 		var data,
 			holderElement = this.getThemeSpace( 'contents' ),
 			isDirty = this.checkDirty();
@@ -182,6 +197,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 	 */
 	CKEDITOR.editor.prototype.focus = function()
 	{
+		this.forceNextSelectionCheck();
 		var mode = getMode( this );
 		if ( mode )
 			mode.focus();
@@ -200,12 +216,12 @@ CKEDITOR.config.startupMode = 'wysiwyg';
 
 /**
  * Sets whether the editor should have the focus when the page loads.
+ * @name CKEDITOR.config.startupFocus
  * @type Boolean
  * @default false
  * @example
  * config.startupFocus = true;
  */
-CKEDITOR.config.startupFocus = false;
 
 /**
  * Whether to render or not the editing block area in the editor interface.
@@ -221,4 +237,24 @@ CKEDITOR.config.editingBlock = true;
  * @name CKEDITOR#instanceReady
  * @event
  * @param {CKEDITOR.editor} editor The editor instance that has been created.
+ */
+
+/**
+ * Fired when the CKEDITOR instance is created, fully initialized and ready for interaction.
+ * @name CKEDITOR.editor#instanceReady
+ * @event
+ */
+
+/**
+ * Fired before changing the editing mode.
+ * @name CKEDITOR.editor#beforeModeUnload
+ * @event
+ */
+
+ /**
+ * Fired before the editor mode is set.
+ * @name CKEDITOR.editor#beforeSetMode
+ * @event
+ * @since 3.5.3
+ * @param {String} newMode The name of the mode which is about to be set.
  */

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -56,6 +56,7 @@ CKEDITOR.lang['hi'] =
 	superscript		: 'अभिलेख',
 	horizontalrule	: 'हॉरिज़ॉन्टल रेखा इन्सर्ट करें',
 	pagebreak		: 'पेज ब्रेक इन्सर्ट् करें',
+	pagebreakAlt		: 'Page Break', // MISSING
 	unlink			: 'लिंक हटायें',
 	undo			: 'अन्डू',
 	redo			: 'रीडू',
@@ -105,6 +106,21 @@ CKEDITOR.lang['hi'] =
 		targetTop		: 'Topmost Window (_top)', // MISSING
 		targetSelf		: 'Same Window (_self)', // MISSING
 		targetParent	: 'Parent Window (_parent)', // MISSING
+		langDirLTR		: 'Left to Right (LTR)', // MISSING
+		langDirRTL		: 'Right to Left (RTL)', // MISSING
+		styles			: 'Style', // MISSING
+		cssClasses		: 'Stylesheet Classes', // MISSING
+		width			: 'चौड़ाई',
+		height			: 'ऊँचाई',
+		align			: 'ऍलाइन',
+		alignLeft		: 'दायें',
+		alignRight		: 'दायें',
+		alignCenter		: 'बीच में',
+		alignTop		: 'ऊपर',
+		alignMiddle		: 'मध्य',
+		alignBottom		: 'नीचे',
+		invalidHeight	: 'Height must be a number.', // MISSING
+		invalidWidth	: 'Width must be a number.', // MISSING
 
 		// Put the voice-only part of the label in the span.
 		unavailable		: '%1<span class="cke_accessibility">, unavailable</span>' // MISSING
@@ -151,9 +167,7 @@ CKEDITOR.lang['hi'] =
 		popupFullScreen	: 'फ़ुल स्क्रीन (IE)',
 		popupScrollBars	: 'स्क्रॉल बार',
 		popupDependent	: 'डिपेन्डॅन्ट (Netscape)',
-		popupWidth		: 'चौड़ाई',
 		popupLeft		: 'बायीं तरफ',
-		popupHeight		: 'ऊँचाई',
 		popupTop		: 'दायीं तरफ',
 		id				: 'Id', // MISSING
 		langDir			: 'भाषा लिखने की दिशा',
@@ -161,18 +175,19 @@ CKEDITOR.lang['hi'] =
 		langDirRTL		: 'दायें से बायें (RTL)',
 		acccessKey		: 'ऍक्सॅस की',
 		name			: 'नाम',
-		langCode		: 'भाषा लिखने की दिशा',
-		tabIndex		: 'टैब इन्डॅक्स',
-		advisoryTitle	: 'परामर्श शीर्शक',
+		langCode			: 'भाषा लिखने की दिशा',
+		tabIndex			: 'टैब इन्डॅक्स',
+		advisoryTitle		: 'परामर्श शीर्शक',
 		advisoryContentType	: 'परामर्श कन्टॅन्ट प्रकार',
 		cssClasses		: 'स्टाइल-शीट क्लास',
 		charset			: 'लिंक रिसोर्स करॅक्टर सॅट',
 		styles			: 'स्टाइल',
-		selectAnchor	: 'ऐंकर चुनें',
+		rel			: 'Relationship', // MISSING
+		selectAnchor		: 'ऐंकर चुनें',
 		anchorName		: 'ऐंकर नाम से',
-		anchorId		: 'ऍलीमॅन्ट Id से',
-		emailAddress	: 'ई-मेल पता',
-		emailSubject	: 'संदेश विषय',
+		anchorId			: 'ऍलीमॅन्ट Id से',
+		emailAddress		: 'ई-मेल पता',
+		emailSubject		: 'संदेश विषय',
 		emailBody		: 'संदेश',
 		noAnchors		: '(डॉक्यूमॅन्ट में ऐंकर्स की संख्या)',
 		noUrl			: 'लिंक URL टाइप करें',
@@ -187,6 +202,30 @@ CKEDITOR.lang['hi'] =
 		title		: 'ऐंकर प्रॉपर्टीज़',
 		name		: 'ऐंकर का नाम',
 		errorName	: 'ऐंकर का नाम टाइप करें'
+	},
+
+	// List style dialog
+	list:
+	{
+		numberedTitle		: 'Numbered List Properties', // MISSING
+		bulletedTitle		: 'Bulleted List Properties', // MISSING
+		type				: 'Type', // MISSING
+		start				: 'Start', // MISSING
+		validateStartNumber				:'List start number must be a whole number.', // MISSING
+		circle				: 'Circle', // MISSING
+		disc				: 'Disc', // MISSING
+		square				: 'Square', // MISSING
+		none				: 'None', // MISSING
+		notset				: '<not set>', // MISSING
+		armenian			: 'Armenian numbering', // MISSING
+		georgian			: 'Georgian numbering (an, ban, gan, etc.)', // MISSING
+		lowerRoman			: 'Lower Roman (i, ii, iii, iv, v, etc.)', // MISSING
+		upperRoman			: 'Upper Roman (I, II, III, IV, V, etc.)', // MISSING
+		lowerAlpha			: 'Lower Alpha (a, b, c, d, e, etc.)', // MISSING
+		upperAlpha			: 'Upper Alpha (A, B, C, D, E, etc.)', // MISSING
+		lowerGreek			: 'Lower Greek (alpha, beta, gamma, etc.)', // MISSING
+		decimal				: 'Decimal (1, 2, 3, etc.)', // MISSING
+		decimalLeadingZero	: 'Decimal leading zero (01, 02, 03, etc.)' // MISSING
 	},
 
 	// Find And Replace Dialog
@@ -215,15 +254,9 @@ CKEDITOR.lang['hi'] =
 		rows		: 'पंक्तियाँ',
 		columns		: 'कालम',
 		border		: 'बॉर्डर साइज़',
-		align		: 'ऍलाइन्मॅन्ट',
-		alignLeft	: 'दायें',
-		alignCenter	: 'बीच में',
-		alignRight	: 'बायें',
-		width		: 'चौड़ाई',
 		widthPx		: 'पिक्सैल',
 		widthPc		: 'प्रतिशत',
 		widthUnit	: 'width unit', // MISSING
-		height		: 'ऊँचाई',
 		cellSpace	: 'सैल अंतर',
 		cellPad		: 'सैल पैडिंग',
 		caption		: 'शीर्षक',
@@ -259,9 +292,6 @@ CKEDITOR.lang['hi'] =
 			wordWrap		: 'Word Wrap', // MISSING
 			hAlign			: 'Horizontal Alignment', // MISSING
 			vAlign			: 'Vertical Alignment', // MISSING
-			alignTop		: 'Top', // MISSING
-			alignMiddle		: 'Middle', // MISSING
-			alignBottom		: 'Bottom', // MISSING
 			alignBaseline	: 'Baseline', // MISSING
 			bgColor			: 'Background Color', // MISSING
 			borderColor		: 'Border Color', // MISSING
@@ -382,24 +412,17 @@ CKEDITOR.lang['hi'] =
 		btnUpload	: 'इसे सर्वर को भेजें',
 		upload		: 'अपलोड',
 		alt			: 'वैकल्पिक टेक्स्ट',
-		width		: 'चौड़ाई',
-		height		: 'ऊँचाई',
 		lockRatio	: 'लॉक अनुपात',
 		unlockRatio	: 'Unlock Ratio', // MISSING
 		resetSize	: 'रीसॅट साइज़',
 		border		: 'बॉर्डर',
 		hSpace		: 'हॉरिज़ॉन्टल स्पेस',
 		vSpace		: 'वर्टिकल स्पेस',
-		align		: 'ऍलाइन',
-		alignLeft	: 'दायें',
-		alignRight	: 'दायें',
 		alertUrl	: 'तस्वीर का URL टाइप करें ',
 		linkTab		: 'लिंक',
 		button2Img	: 'Do you want to transform the selected image button on a simple image?', // MISSING
 		img2Button	: 'Do you want to transform the selected image on a image button?', // MISSING
 		urlMissing	: 'Image source URL is missing.', // MISSING
-		validateWidth	: 'Width must be a whole number.', // MISSING
-		validateHeight	: 'Height must be a whole number.', // MISSING
 		validateBorder	: 'Border must be a whole number.', // MISSING
 		validateHSpace	: 'HSpace must be a whole number.', // MISSING
 		validateVSpace	: 'VSpace must be a whole number.' // MISSING
@@ -423,16 +446,10 @@ CKEDITOR.lang['hi'] =
 		accessAlways	: 'Always', // MISSING
 		accessSameDomain: 'Same domain', // MISSING
 		accessNever		: 'Never', // MISSING
-		align			: 'ऍलाइन',
-		alignLeft		: 'दायें',
 		alignAbsBottom	: 'Abs नीचे',
 		alignAbsMiddle	: 'Abs ऊपर',
 		alignBaseline	: 'मूल रेखा',
-		alignBottom		: 'नीचे',
-		alignMiddle		: 'मध्य',
-		alignRight		: 'दायें',
 		alignTextTop	: 'टेक्स्ट ऊपर',
-		alignTop		: 'ऊपर',
 		quality			: 'Quality', // MISSING
 		qualityBest		: 'Best', // MISSING
 		qualityHigh		: 'High', // MISSING
@@ -446,13 +463,9 @@ CKEDITOR.lang['hi'] =
 		windowMode		: 'Window mode', // MISSING
 		flashvars		: 'Variables for Flash', // MISSING
 		bgcolor			: 'बैक्ग्राउन्ड रंग',
-		width			: 'चौड़ाई',
-		height			: 'ऊँचाई',
 		hSpace			: 'हॉरिज़ॉन्टल स्पेस',
 		vSpace			: 'वर्टिकल स्पेस',
 		validateSrc		: 'लिंक URL टाइप करें',
-		validateWidth	: 'Width must be a number.', // MISSING
-		validateHeight	: 'Height must be a number.', // MISSING
 		validateHSpace	: 'HSpace must be a number.', // MISSING
 		validateVSpace	: 'VSpace must be a number.' // MISSING
 	},
@@ -587,6 +600,15 @@ CKEDITOR.lang['hi'] =
 		remove				: 'Remove Div' // MISSING
   	},
 
+	iframe :
+	{
+		title		: 'IFrame Properties', // MISSING
+		toolbar		: 'IFrame', // MISSING
+		noUrl		: 'Please type the iframe URL', // MISSING
+		scrolling	: 'Enable scrollbars', // MISSING
+		border		: 'Show frame border' // MISSING
+	},
+
 	font :
 	{
 		label		: 'फ़ॉन्ट',
@@ -619,7 +641,7 @@ CKEDITOR.lang['hi'] =
 		'008080' : 'Teal', // MISSING
 		'000080' : 'Navy', // MISSING
 		'4B0082' : 'Indigo', // MISSING
-		'696969' : 'Dim Gray', // MISSING
+		'696969' : 'Dark Gray', // MISSING
 		'B22222' : 'Fire Brick', // MISSING
 		'A52A2A' : 'Brown', // MISSING
 		'DAA520' : 'Golden Rod', // MISSING
@@ -635,7 +657,7 @@ CKEDITOR.lang['hi'] =
 		'0FF' : 'Cyan', // MISSING
 		'00F' : 'Blue', // MISSING
 		'EE82EE' : 'Violet', // MISSING
-		'A9A9A9' : 'Dark Gray', // MISSING
+		'A9A9A9' : 'Dim Gray', // MISSING
 		'FFA07A' : 'Light Salmon', // MISSING
 		'FFA500' : 'Orange', // MISSING
 		'FFFF00' : 'Yellow', // MISSING
@@ -657,6 +679,7 @@ CKEDITOR.lang['hi'] =
 	scayt :
 	{
 		title			: 'Spell Check As You Type', // MISSING
+		opera_title		: 'Not supported by Opera', // MISSING
 		enable			: 'Enable SCAYT', // MISSING
 		disable			: 'Disable SCAYT', // MISSING
 		about			: 'About SCAYT', // MISSING
@@ -668,9 +691,23 @@ CKEDITOR.lang['hi'] =
 		ignoreAll		: 'Ignore All', // MISSING
 		addWord			: 'Add Word', // MISSING
 		emptyDic		: 'Dictionary name should not be empty.', // MISSING
+
 		optionsTab		: 'Options', // MISSING
+		allCaps			: 'Ignore All-Caps Words', // MISSING
+		ignoreDomainNames : 'Ignore Domain Names', // MISSING
+		mixedCase		: 'Ignore Words with Mixed Case', // MISSING
+		mixedWithDigits	: 'Ignore Words with Numbers', // MISSING
+
 		languagesTab	: 'Languages', // MISSING
+
 		dictionariesTab	: 'Dictionaries', // MISSING
+		dic_field_name	: 'Dictionary name', // MISSING
+		dic_create		: 'Create', // MISSING
+		dic_restore		: 'Restore', // MISSING
+		dic_delete		: 'Delete', // MISSING
+		dic_rename		: 'Rename', // MISSING
+		dic_info		: 'Initially the User Dictionary is stored in a Cookie. However, Cookies are limited in size. When the User Dictionary grows to a point where it cannot be stored in a Cookie, then the dictionary may be stored on our server. To store your personal dictionary on our server you should specify a name for your dictionary. If you already have a stored dictionary, please type its name and click the Restore button.', // MISSING
+
 		aboutTab		: 'About' // MISSING
 	},
 
@@ -687,10 +724,11 @@ CKEDITOR.lang['hi'] =
 
 	fakeobjects :
 	{
-		anchor	: 'Anchor', // MISSING
-		flash	: 'Flash Animation', // MISSING
-		div		: 'Page Break', // MISSING
-		unknown	: 'Unknown Object' // MISSING
+		anchor		: 'Anchor', // MISSING
+		flash		: 'Flash Animation', // MISSING
+		iframe		: 'IFrame', // MISSING
+		hiddenfield	: 'Hidden Field', // MISSING
+		unknown		: 'Unknown Object' // MISSING
 	},
 
 	resize : 'Drag to resize', // MISSING
@@ -698,11 +736,18 @@ CKEDITOR.lang['hi'] =
 	colordialog :
 	{
 		title		: 'Select color', // MISSING
+		options	:	'Color Options', // MISSING
 		highlight	: 'Highlight', // MISSING
-		selected	: 'Selected', // MISSING
+		selected	: 'Selected Color', // MISSING
 		clear		: 'Clear' // MISSING
 	},
 
 	toolbarCollapse	: 'Collapse Toolbar', // MISSING
-	toolbarExpand	: 'Expand Toolbar' // MISSING
+	toolbarExpand	: 'Expand Toolbar', // MISSING
+
+	bidi :
+	{
+		ltr : 'Text direction from left to right', // MISSING
+		rtl : 'Text direction from right to left' // MISSING
+	}
 };

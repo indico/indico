@@ -6732,6 +6732,7 @@ class WRoomBookingBookingForm( WTemplated ):
 
         vars["standalone"] = self._standalone
         vars["config"] = Config.getInstance()
+        vars["bookingFormURL"] = str(urlHandlers.UHRoomBookingBookingForm.getURL())
 
         if self._standalone:
             vars["conf"] = None

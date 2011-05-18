@@ -221,6 +221,30 @@ type ("RoomMap", ["IWidget"],
                 }
             }
             var book = Html.a({href:bookingUrl, target:'_parent', className:'mapBookRoomLink'}, $T("Book"));
+            book.observeClick(function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                indicoRequest('user.canBook', {
+                    roomLocation: room.locationName,
+                    roomID: room.id
+                }, function (result, error) {
+                    if (!error) {
+                        if (result) {
+                            parent.location.href = bookingUrl;
+                        } else {
+                            var popup = new ConfirmPopup('Booking Not Allowed', "You're not allowed to book this room. Do you want to view the room details to find out how to contact the room's owner?", function(result) {
+                                if(result) {
+                                    window.open(room.detailsUrl, '_blank');
+                                }
+                            }, 'Yes', 'No');
+                            popup.open();
+                        }
+                    } else {
+                        IndicoUtil.errorReport(error);
+                    }
+                });
+                return false;
+            });
 
             // "More" link - for room details
             var more = Html.a({href:"#", className:'mapRoomInfoLink'}, $T("More") + "...");

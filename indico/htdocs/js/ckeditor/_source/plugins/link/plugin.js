@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -30,6 +30,7 @@ CKEDITOR.plugins.add( 'link',
 		CKEDITOR.dialog.add( 'anchor', this.path + 'dialogs/anchor.js' );
 
 		// Add the CSS styles for anchor placeholders.
+		var side = editor.lang.dir == 'rtl' ? 'right' : 'left';
 		editor.addCss(
 			'img.cke_anchor' +
 			'{' +
@@ -37,16 +38,16 @@ CKEDITOR.plugins.add( 'link',
 				'background-position: center center;' +
 				'background-repeat: no-repeat;' +
 				'border: 1px solid #a9a9a9;' +
-				'width: 18px;' +
-				'height: 18px;' +
+				'width: 18px !important;' +
+				'height: 18px !important;' +
 			'}\n' +
 			'a.cke_anchor' +
 			'{' +
 				'background-image: url(' + CKEDITOR.getUrl( this.path + 'images/anchor.gif' ) + ');' +
-				'background-position: 0 center;' +
+				'background-position: ' + side + ' center;' +
 				'background-repeat: no-repeat;' +
 				'border: 1px solid #a9a9a9;' +
-				'padding-left: 18px;' +
+				'padding-' + side + ': 18px;' +
 			'}'
 		   	);
 
@@ -58,12 +59,25 @@ CKEDITOR.plugins.add( 'link',
 				 * for this in Firefox. So we must detect the state by element paths.
 				 */
 				var command = editor.getCommand( 'unlink' ),
-					element = evt.data.path.lastElement.getAscendant( 'a', true );
+					element = evt.data.path.lastElement && evt.data.path.lastElement.getAscendant( 'a', true );
 				if ( element && element.getName() == 'a' && element.getAttribute( 'href' ) )
 					command.setState( CKEDITOR.TRISTATE_OFF );
 				else
 					command.setState( CKEDITOR.TRISTATE_DISABLED );
 			} );
+
+		editor.on( 'doubleclick', function( evt )
+			{
+				var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;
+
+				if ( !element.isReadOnly() )
+				{
+					if ( element.is( 'a' ) )
+						evt.data.dialog =  ( element.getAttribute( 'name' ) && !element.getAttribute( 'href' ) ) ? 'anchor' : 'link';
+					else if ( element.is( 'img' ) && element.data( 'cke-real-element-type' ) == 'anchor' )
+						evt.data.dialog = 'anchor';
+				}
+			});
 
 		// If the "menu" plugin is loaded, register the menu items.
 		if ( editor.addMenuItems )
@@ -100,10 +114,10 @@ CKEDITOR.plugins.add( 'link',
 		{
 			editor.contextMenu.addListener( function( element, selection )
 				{
-					if ( !element )
+					if ( !element || element.isReadOnly() )
 						return null;
 
-					var isAnchor = ( element.is( 'img' ) && element.getAttribute( '_cke_real_element_type' ) == 'anchor' );
+					var isAnchor = ( element.is( 'img' ) && element.data( 'cke-real-element-type' ) == 'anchor' );
 
 					if ( !isAnchor )
 					{
@@ -166,13 +180,22 @@ CKEDITOR.plugins.link =
 	 */
 	getSelectedLink : function( editor )
 	{
-		var range;
-		try { range  = editor.getSelection().getRanges()[ 0 ]; }
-		catch( e ) { return null; }
+		try
+		{
+			var selection = editor.getSelection();
+			if ( selection.getType() == CKEDITOR.SELECTION_ELEMENT )
+			{
+				var selectedElement = selection.getSelectedElement();
+				if ( selectedElement.is( 'a' ) )
+					return selectedElement;
+			}
 
-		range.shrink( CKEDITOR.SHRINK_TEXT );
-		var root = range.getCommonAncestor();
-		return root.getAscendant( 'a', true );
+			var range = selection.getRanges( true )[ 0 ];
+			range.shrink( CKEDITOR.SHRINK_TEXT );
+			var root = range.getCommonAncestor();
+			return root.getAscendant( 'a', true );
+		}
+		catch( e ) { return null; }
 	}
 };
 

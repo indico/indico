@@ -5099,6 +5099,7 @@ div.exclusivePopup {
     -moz-border-radius: 10px;
     -webkit-border-radius:10px;
     behavior: url(border-radius.htc);
+    min-width: 250px;
 }
 
 div.exclusivePopupTopBg {

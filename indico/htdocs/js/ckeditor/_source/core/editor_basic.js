@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -27,15 +27,15 @@ if ( !CKEDITOR.editor )
 	CKEDITOR.ELEMENT_MODE_APPENDTO = 2;
 
 	/**
-	 * Represents an editor instance. This constructor should be rarely used,
-	 * being the {@link CKEDITOR} methods preferible.
-	 * @constructor
+	 * Creates an editor class instance. This constructor should be rarely
+	 * used, in favor of the {@link CKEDITOR} editor creation functions.
+	 * @ class Represents an editor instance.
 	 * @param {Object} instanceConfig Configuration values for this specific
 	 *		instance.
 	 * @param {CKEDITOR.dom.element} [element] The element linked to this
 	 *		instance.
 	 * @param {Number} [mode] The mode in which the element is linked to this
-	 *		instance.
+	 *		instance. See {@link #elementMode}.
 	 * @param {String} [data] Since 3.3. Initial value for the instance.
 	 * @augments CKEDITOR.event
 	 * @example
@@ -54,11 +54,11 @@ if ( !CKEDITOR.editor )
 		 * The mode in which the {@link #element} is linked to this editor
 		 * instance. It can be any of the following values:
 		 * <ul>
-		 * <li><b>CKEDITOR.ELEMENT_MODE_NONE</b>: No element is linked to the
+		 * <li>{@link CKEDITOR.ELEMENT_MODE_NONE}: No element is linked to the
 		 *		editor instance.</li>
-		 * <li><b>CKEDITOR.ELEMENT_MODE_REPLACE</b>: The element is to be
+		 * <li>{@link CKEDITOR.ELEMENT_MODE_REPLACE}: The element is to be
 		 *		replaced by the editor instance.</li>
-		 * <li><b>CKEDITOR.ELEMENT_MODE_APPENDTO</b>: The editor is to be
+		 * <li>{@link CKEDITOR.ELEMENT_MODE_APPENDTO}: The editor is to be
 		 *		created inside the element.</li>
 		 * </ul>
 		 * @name CKEDITOR.editor.prototype.elementMode
@@ -97,6 +97,10 @@ if ( !CKEDITOR.editor )
 		{
 			// Look for the element by id. We accept any kind of element here.
 			element = document.getElementById( elementOrIdOrName );
+
+			// Elements that should go into head are unacceptable (#6791).
+			if ( element && element.tagName.toLowerCase() in {style:1,script:1,base:1,link:1,meta:1,title:1} )
+				element = null;
 
 			// If not found, look for elements by name. In this case we accept only
 			// textareas.

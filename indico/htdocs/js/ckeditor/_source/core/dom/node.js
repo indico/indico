@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -107,24 +107,25 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype,
 		{
 			var $clone = this.$.cloneNode( includeChildren );
 
-			if ( !cloneId )
+			var removeIds = function( node )
 			{
-				var removeIds = function( node )
+				if ( node.nodeType != CKEDITOR.NODE_ELEMENT )
+					return;
+
+				if ( !cloneId )
+					node.removeAttribute( 'id', false );
+				node.removeAttribute( 'data-cke-expando', false );
+
+				if ( includeChildren )
 				{
-					if ( node.nodeType != CKEDITOR.NODE_ELEMENT )
-						return;
-
-					node.removeAttribute( 'id', false ) ;
-					node.removeAttribute( '_cke_expando', false ) ;
-
 					var childs = node.childNodes;
-					for ( var i=0 ; i < childs.length ; i++ )
+					for ( var i=0; i < childs.length; i++ )
 						removeIds( childs[ i ] );
-				};
+				}
+			};
 
-				// The "id" attribute should never be cloned to avoid duplication.
-				removeIds( $clone );
-			}
+			// The "id" attribute should never be cloned to avoid duplication.
+			removeIds( $clone );
 
 			return new CKEDITOR.dom.node( $clone );
 		},
@@ -203,29 +204,12 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype,
 			while ( node && node != $documentElement )
 			{
 				var parentNode = node.parentNode;
-				var currentIndex = -1;
 
 				if ( parentNode )
 				{
-					for ( var i = 0 ; i < parentNode.childNodes.length ; i++ )
-					{
-						var candidate = parentNode.childNodes[i];
-
-						if ( normalized &&
-								candidate.nodeType == 3 &&
-								candidate.previousSibling &&
-								candidate.previousSibling.nodeType == 3 )
-						{
-							continue;
-						}
-
-						currentIndex++;
-
-						if ( candidate == node )
-							break;
-					}
-
-					address.unshift( currentIndex );
+					// Get the node index. For performance, call getIndex
+					// directly, instead of creating a new node object.
+					address.unshift( this.getIndex.call( { $ : node }, normalized ) );
 				}
 
 				node = parentNode;
@@ -243,33 +227,31 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype,
 		 */
 		getDocument : function()
 		{
-			var document = new CKEDITOR.dom.document( this.$.ownerDocument || this.$.parentNode.ownerDocument );
-
-			return (
-			this.getDocument = function()
-				{
-					return document;
-				})();
+			return new CKEDITOR.dom.document( this.$.ownerDocument || this.$.parentNode.ownerDocument );
 		},
 
-		getIndex : function()
+		getIndex : function( normalized )
 		{
-			var $ = this.$;
+			// Attention: getAddress depends on this.$
 
-			var currentNode = $.parentNode && $.parentNode.firstChild;
-			var currentIndex = -1;
+			var current = this.$,
+				index = 0;
 
-			while ( currentNode )
+			while ( ( current = current.previousSibling ) )
 			{
-				currentIndex++;
+				// When normalizing, do not count it if this is an
+				// empty text node or if it's a text node following another one.
+				if ( normalized && current.nodeType == 3 &&
+					 ( !current.nodeValue.length ||
+					   ( current.previousSibling && current.previousSibling.nodeType == 3 ) ) )
+				{
+					continue;
+				}
 
-				if ( currentNode == $ )
-					return currentIndex;
-
-				currentNode = currentNode.nextSibling;
+				index++;
 			}
 
-			return -1;
+			return index;
 		},
 
 		getNextSourceNode : function( startFromSibling, nodeType, guard )
@@ -505,11 +487,18 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype,
 		},
 
 		/**
-		 * Gets the closes ancestor node of a specified node name.
-		 * @param {String} name Node name of ancestor node.
-		 * @param {Boolean} includeSelf (Optional) Whether to include the current
-		 * node in the calculation or not.
-		 * @returns {CKEDITOR.dom.node} Ancestor node.
+		 * Gets the closest ancestor node of this node, specified by its node name.
+		 * @param {String} name The node name of the ancestor node to search.
+		 * @param {Boolean} [includeSelf] Whether to include the current
+		 * node in the search.
+		 * @returns {CKEDITOR.dom.node} The located ancestor node or null if not found.
+		 * @example
+		 * // Suppose we have the following HTML:
+		 * // &lt;div id="outer"&gt;&lt;div id="inner"&gt;&lt;p&gt;&lt;b&gt;Some text&lt;/b&gt;&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
+		 * // If node == &lt;b&gt;
+		 * ascendant = node.getAscendant( 'div' );      // ascendant == &lt;div id="inner"&gt
+		 * ascendant = node.getAscendant( 'b' );        // ascendant == null
+		 * ascendant = node.getAscendant( 'b', true );  // ascendant == &lt;b&gt;
 		 */
 		getAscendant : function( name, includeSelf )
 		{
@@ -657,6 +646,45 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype,
 					child.parentNode.removeChild( child ) ;
 				}
 			}
+		},
+
+		/**
+		 * Checks is this node is read-only (should not be changed). It
+		 * additionaly returns the element, if any, which defines the read-only
+		 * state of this node. It may be the node itself or any of its parent
+		 * nodes.
+		 * @returns {CKEDITOR.dom.element|Boolean} An element containing
+		 *		read-only attributes or "false" if none is found.
+		 * @since 3.5
+		 * @example
+		 * // For the following HTML:
+		 * // &lt;div contenteditable="false"&gt;Some &lt;b&gt;text&lt;/b&gt;&lt;/div&gt;
+		 *
+		 * // If "ele" is the above &lt;div&gt;
+		 * ele.isReadOnly();  // the &lt;div&gt; element
+		 *
+		 * // If "ele" is the above &lt;b&gt;
+		 * ele.isReadOnly();  // the &lt;div&gt; element
+		 */
+		isReadOnly : function()
+		{
+			var current = this;
+			while( current )
+			{
+				if ( current.type == CKEDITOR.NODE_ELEMENT )
+				{
+					if ( current.is( 'body' ) || !!current.data( 'cke-editable' ) )
+						break;
+
+					if ( current.getAttribute( 'contentEditable' ) == 'false' )
+						return current;
+					else if ( current.getAttribute( 'contentEditable' ) == 'true' )
+						break;
+				}
+				current = current.getParent();
+			}
+
+			return false;
 		}
 	}
 );

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -43,8 +43,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 				{
 					editor.toolbox.focusCommandExecuted = true;
 
-					// Make the first button focus accessible. (#3417)
-					if ( CKEDITOR.env.ie )
+					// Make the first button focus accessible for IE. (#3417)
+					// Adobe AIR instead need while of delay.
+					if ( CKEDITOR.env.ie || CKEDITOR.env.air )
 						setTimeout( function(){ editor.toolbox.focus(); }, 100 );
 					else
 						editor.toolbox.focus();
@@ -157,9 +158,9 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					{
 						editor.toolbox = new toolbox();
 
-						var labelId = 'cke_' + CKEDITOR.tools.getNextNumber();
+						var labelId = CKEDITOR.tools.getNextId();
 
-						var output = [ '<div class="cke_toolbox" role="toolbar" aria-labelledby="', labelId, '"' ],
+						var output = [ '<div class="cke_toolbox" role="toolbar" aria-labelledby="', labelId, '" onmousedown="return false;"' ],
 							expanded =  editor.config.toolbarStartupExpanded !== false,
 							groupStarted;
 
@@ -187,7 +188,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 							if ( !row )
 								continue;
 
-							var toolbarId = 'cke_' + CKEDITOR.tools.getNextNumber(),
+							var toolbarId = CKEDITOR.tools.getNextId(),
 								toolbarObj = { id : toolbarId, items : [] };
 
 							if ( groupStarted )
@@ -283,25 +284,25 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 								function()
 								{
 									editor.execCommand( 'toolbarCollapse' );
-								} );
+								});
 
 							editor.on( 'destroy', function () {
 									CKEDITOR.tools.removeFunction( collapserFn );
-								} );
+								});
 
-							var collapserId = 'cke_' + CKEDITOR.tools.getNextNumber();
+							var collapserId = CKEDITOR.tools.getNextId();
 
 							editor.addCommand( 'toolbarCollapse',
 								{
 									exec : function( editor )
 									{
-										var collapser = CKEDITOR.document.getById( collapserId );
-										var toolbox = collapser.getPrevious();
-										var contents = editor.getThemeSpace( 'contents' );
-										var toolboxContainer = toolbox.getParent();
-										var contentHeight = parseInt( contents.$.style.height, 10 );
-										var previousHeight = toolboxContainer.$.offsetHeight;
-										var collapsed = !toolbox.isVisible();
+										var collapser = CKEDITOR.document.getById( collapserId ),
+											toolbox = collapser.getPrevious(),
+											contents = editor.getThemeSpace( 'contents' ),
+											toolboxContainer = toolbox.getParent(),
+											contentHeight = parseInt( contents.$.style.height, 10 ),
+											previousHeight = toolboxContainer.$.offsetHeight,
+											collapsed = !toolbox.isVisible();
 
 										if ( !collapsed )
 										{
@@ -344,6 +345,25 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 						event.data.html += output.join( '' );
 					}
 				});
+
+			editor.on( 'destroy', function()
+			{
+				var toolbars, index = 0, i,
+						items, instance;
+				toolbars = this.toolbox.toolbars;
+				for ( ; index < toolbars.length; index++ )
+				{
+					items = toolbars[ index ].items;
+					for ( i = 0; i < items.length; i++ )
+					{
+						instance = items[ i ];
+						if ( instance.clickFn ) CKEDITOR.tools.removeFunction( instance.clickFn );
+						if ( instance.keyDownFn ) CKEDITOR.tools.removeFunction( instance.keyDownFn );
+
+						if ( instance.index ) CKEDITOR.ui.button._.instances[ instance.index ] = null;
+					}
+				}
+			});
 
 			editor.addCommand( 'toolbarFocus', commands.toolbarFocus );
 		}
@@ -415,8 +435,9 @@ CKEDITOR.config.toolbar_Basic =
  *     ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
  *     ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
  *     ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+ *     ['BidiLtr', 'BidiRtl' ],
  *     ['Link','Unlink','Anchor'],
- *     ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
+ *     ['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe'],
  *     '/',
  *     ['Styles','Format','Font','FontSize'],
  *     ['TextColor','BGColor'],
@@ -433,8 +454,9 @@ CKEDITOR.config.toolbar_Full =
 	['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
 	['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
 	['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
+	['BidiLtr', 'BidiRtl' ],
 	['Link','Unlink','Anchor'],
-	['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
+	['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe'],
 	'/',
 	['Styles','Format','Font','FontSize'],
 	['TextColor','BGColor'],

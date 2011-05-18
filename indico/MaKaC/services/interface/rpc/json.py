@@ -136,9 +136,9 @@ def process(req):
                 params = requestBody.get("params", [])
                 Sanitization._escapeHTML(params)
                 errorInfo["requestInfo"] = {"method": str(requestBody["method"]),
-                                            "params": params}
+                                            "params": params,
+                                            "origin": str(requestBody.get("origin", "unknown"))}
                 Logger.get('rpc').debug('Arguments: %s' % errorInfo['requestInfo'])
-
 
         responseBody["error"] = errorInfo
 

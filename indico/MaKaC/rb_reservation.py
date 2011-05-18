@@ -66,20 +66,9 @@ class WeekDayEnum( object ):
 
     week2desc = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ]
 
-# This text prepends every notification - in general it should be empty
-TEST_VERSION_WARNING = "" #"[This notification considers FAKE event in TEST version of new Indico::CRBS. You can ignore it.]"
-
-# Room booking module notifications will be send to this e-mail when debug is on
-EMAIL_FOR_DEBUG_NOTIFICATIONS = ""
-EMAIL_FROM_PREFIX = "noreply-"
-
-# Room booking module notifications will be send to this e-mail when debug is on
-NOTIFICATION_SUBJECT_PREFIX = ""
-
-# Carbon copy of ALL room booking notifications will be send to this email
-EMAIL_FOR_CATCH_ALL_NOTIFICATIONS = ""
 
 class ReservationBase( Fossilizable ):
+
     """
     Generic reservation, Data Access Layer independant.
     Represents physical room reservation.
@@ -143,7 +132,6 @@ class ReservationBase( Fossilizable ):
         Called after insert().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
         # ---- Email creator and contact ----
 
@@ -154,24 +142,19 @@ class ReservationBase( Fossilizable ):
             to2 = self._getContactEmailList()
 
             if self.isConfirmed:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
+                subject = "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingInsertion' )
             else:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] PRE-Booking waiting Acceptance"
+                subject = "[" + self.room.getFullName() + "] PRE-Booking waiting Acceptance"
                 wc = WTemplated( 'RoomBookingEmail_2UserAfterPreBookingInsertion' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append( to )
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if to:
+                addrs.append( to )
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -181,25 +164,20 @@ class ReservationBase( Fossilizable ):
         toCustom = self._getNotificationEmailList()
 
         if self.isConfirmed:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
+            subject = "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
             bookingMessage = "Book"
         else:
-            subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] New PRE-Booking on " + formatDateTime(self.startDT)
+            subject = "[" + self.room.getFullName() + "] New PRE-Booking on " + formatDateTime(self.startDT)
             bookingMessage = "PRE-book"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingInsertion' )
-        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'bookingMessage': bookingMessage } )
+        text = wc.getHTML( { 'reservation':self, 'bookingMessage': bookingMessage } )
 
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom:
+            toCustom.remove( toMain )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -208,17 +186,12 @@ class ReservationBase( Fossilizable ):
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
+                subject = "[" + self.room.getFullName() + "] New Booking on " + formatDateTime(self.startDT)
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
-                text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -230,7 +203,6 @@ class ReservationBase( Fossilizable ):
         Called after cancel().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         if date:
@@ -252,21 +224,16 @@ class ReservationBase( Fossilizable ):
 
             to2 = self._getContactEmailList()
 
-            subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Cancellation Confirmation on " + startDate + " %s" % occurrenceText
+            subject = "[" + self.room.getFullName() + "] Cancellation Confirmation on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingCancellation' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            text = wc.getHTML( { 'reservation':self, 'date':date, 'firstName':firstName } )
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append( to )
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if to:
+                addrs.append( to )
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -275,20 +242,15 @@ class ReservationBase( Fossilizable ):
         toMain = self.room.getResponsible().getEmail()
         toCustom = self._getNotificationEmailList()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Cancelled Booking on " + startDate + " %s" % occurrenceText
+        subject = "[" + self.room.getFullName() + "] Cancelled Booking on " + startDate + " %s" % occurrenceText
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingCancellation' )
-        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        text = wc.getHTML( { 'reservation':self, 'date':date } )
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom:
+            toCustom.remove( toMain )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -297,17 +259,12 @@ class ReservationBase( Fossilizable ):
         if self.isCancelled and self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Booking Cancelled on " + startDate
+                subject = "[" + self.room.getFullName() + "] Booking Cancelled on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingCancellation' )
-                text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -319,7 +276,6 @@ class ReservationBase( Fossilizable ):
         Called after reject().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
         reason = self.rejectionReason or reason
 
@@ -342,21 +298,16 @@ class ReservationBase( Fossilizable ):
 
             to2 = self._getContactEmailList()
 
-            subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] REJECTED Booking on " + startDate + " %s" % occurrenceText
+            subject = "[" + self.room.getFullName() + "] REJECTED Booking on " + startDate + " %s" % occurrenceText
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingRejection' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName, 'reason':reason, 'date':date } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            text = wc.getHTML( { 'reservation':self, 'firstName':firstName, 'reason':reason, 'date':date } )
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -364,17 +315,12 @@ class ReservationBase( Fossilizable ):
 
         toCustom = self._getNotificationEmailList()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Rejected Booking on " + startDate + " %s" % occurrenceText
+        subject = "[" + self.room.getFullName() + "] Rejected Booking on " + startDate + " %s" % occurrenceText
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingRejection' )
-        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'date':date, 'reason':reason } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        text = wc.getHTML( { 'reservation':self, 'date':date, 'reason':reason } )
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.extend( toCustom )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -387,7 +333,6 @@ class ReservationBase( Fossilizable ):
         Called after reject().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
@@ -404,21 +349,16 @@ class ReservationBase( Fossilizable ):
 
             to2 = self._getContactEmailList()
 
-            subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Confirmed Booking on " + startDate
+            subject = "[" + self.room.getFullName() + "] Confirmed Booking on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingConfirmation' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -426,17 +366,12 @@ class ReservationBase( Fossilizable ):
 
         toCustom = self._getNotificationEmailList()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Confirmed Booking on " + startDate
+        subject = "[" + self.room.getFullName() + "] Confirmed Booking on " + startDate
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingConfirmation' )
-        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        text = wc.getHTML( { 'reservation':self } )
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.extend( toCustom )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -445,17 +380,12 @@ class ReservationBase( Fossilizable ):
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] New Booking on " + startDate
+                subject = "[" + self.room.getFullName() + "] New Booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingInsertion' )
-                text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
         return emails
@@ -467,7 +397,6 @@ class ReservationBase( Fossilizable ):
         Called after update().
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
@@ -484,21 +413,16 @@ class ReservationBase( Fossilizable ):
 
             to2 = self._getContactEmailList()
 
-            subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Booking Modified on " + startDate
+            subject = "[" + self.room.getFullName() + "] Booking Modified on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserAfterBookingModification' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
 
@@ -507,20 +431,15 @@ class ReservationBase( Fossilizable ):
         toMain = self.room.getResponsible().getEmail()
         toCustom = self._getNotificationEmailList()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Booking Modified on " + startDate
+        subject = "[" + self.room.getFullName() + "] Booking Modified on " + startDate
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleAfterBookingModification' )
-        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        text = wc.getHTML( { 'reservation':self } )
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom :
+            toCustom.remove( toMain )
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
 
@@ -529,17 +448,12 @@ class ReservationBase( Fossilizable ):
         if self.isConfirmed  and  self.usesAVC: # Inform only about confirmed bookings
             to = Location.parse( self.locationName ).getAVCSupportEmails()
             if to:
-                subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Modified booking on " + startDate
+                subject = "[" + self.room.getFullName() + "] Modified booking on " + startDate
                 wc = WTemplated( 'RoomBookingEmail_2AVCSupportAfterBookingModification' )
-                text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation': self } )
-                fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+                text = wc.getHTML( { 'reservation': self } )
+                fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
                 addrs = []
-                if debug:
-                    addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-                else:
-                    addrs += to
-                    if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                        addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+                addrs += to
                 maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
                 emails.append(maildata)
 
@@ -553,7 +467,6 @@ class ReservationBase( Fossilizable ):
         the reservation for the next x weeks.
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # Fix by David: include date in this mails too. I have put a try...except in case the date is not accessible in this method
@@ -570,21 +483,16 @@ class ReservationBase( Fossilizable ):
 
             to2 = self._getContactEmailList()
 
-            subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Request for Booking Prolongation on " + startDate
+            subject = "[" + self.room.getFullName() + "] Request for Booking Prolongation on " + startDate
             wc = WTemplated( 'RoomBookingEmail_2UserRequestProlongation' )
-            text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self, 'firstName':firstName } )
-            fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+            text = wc.getHTML( { 'reservation':self, 'firstName':firstName } )
+            fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
             addrs = []
-            if debug:
-                addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-            else:
-                if to :
-                    addrs.append(to)
-                    if to in to2:
-                        to2.remove(to)
-                addrs.extend(to2)
-                if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                    addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
+            if to:
+                addrs.append(to)
+                if to in to2:
+                    to2.remove(to)
+            addrs.extend(to2)
             maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
             emails.append(maildata)
         return emails
@@ -596,7 +504,6 @@ class ReservationBase( Fossilizable ):
         did not prolong his HEAVY booking.
         """
         from MaKaC.webinterface.wcomponents import WTemplated
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
         emails = []
 
         # ---- Email responsible ----
@@ -604,20 +511,15 @@ class ReservationBase( Fossilizable ):
         toMain = self.room.getResponsible().getEmail()
         toCustom = self._getNotificationEmailList()
 
-        subject = NOTIFICATION_SUBJECT_PREFIX + "[" + self.room.getFullName() + "] Consider Rejecting This Booking"
+        subject = "[" + self.room.getFullName() + "] Consider Rejecting This Booking"
         wc = WTemplated( 'RoomBookingEmail_2ResponsibleConsiderRejecting' )
-        text = TEST_VERSION_WARNING + wc.getHTML( { 'reservation':self } )
-        fromAddr = EMAIL_FROM_PREFIX+HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail()
+        text = wc.getHTML( { 'reservation':self } )
+        fromAddr = HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         addrs = []
-        if debug:
-            addrs.append( EMAIL_FOR_DEBUG_NOTIFICATIONS )
-        else:
-            addrs.append( toMain )
-            if EMAIL_FOR_CATCH_ALL_NOTIFICATIONS:
-                addrs.append( EMAIL_FOR_CATCH_ALL_NOTIFICATIONS )
-            if toMain in toCustom :
-                toCustom.remove( toMain )
-            addrs.extend( toCustom )
+        addrs.append( toMain )
+        if toMain in toCustom:
+            toCustom.remove(toMain)
+        addrs.extend( toCustom )
         maildata = { "fromAddr": fromAddr, "toList": addrs, "subject": subject, "body": text }
         emails.append(maildata)
         return emails

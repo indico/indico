@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -22,6 +22,7 @@ CKEDITOR.plugins.add( 'colorbutton',
 
 		function addButton( name, type, title )
 		{
+			var colorBoxId = CKEDITOR.tools.getNextId() + '_colorBox';
 			editor.ui.add( name, CKEDITOR.UI_PANELBUTTON,
 				{
 					label : title,
@@ -39,22 +40,52 @@ CKEDITOR.plugins.add( 'colorbutton',
 					{
 						block.autoSize = true;
 						block.element.addClass( 'cke_colorblock' );
-						block.element.setHtml( renderColors( panel, type ) );
+						block.element.setHtml( renderColors( panel, type, colorBoxId ) );
+						// The block should not have scrollbars (#5933, #6056)
+						block.element.getDocument().getBody().setStyle( 'overflow', 'hidden' );
+
+						CKEDITOR.ui.fire( 'ready', this );
 
 						var keys = block.keys;
-						keys[ 39 ]	= 'next';					// ARROW-RIGHT
+						var rtl = editor.lang.dir == 'rtl';
+						keys[ rtl ? 37 : 39 ]	= 'next';					// ARROW-RIGHT
 						keys[ 40 ]	= 'next';					// ARROW-DOWN
 						keys[ 9 ]	= 'next';					// TAB
-						keys[ 37 ]	= 'prev';					// ARROW-LEFT
+						keys[ rtl ? 39 : 37 ]	= 'prev';					// ARROW-LEFT
 						keys[ 38 ]	= 'prev';					// ARROW-UP
 						keys[ CKEDITOR.SHIFT + 9 ]	= 'prev';	// SHIFT + TAB
 						keys[ 32 ]	= 'click';					// SPACE
+					},
+
+					// The automatic colorbox should represent the real color (#6010)
+					onOpen : function()
+					{
+						var selection = editor.getSelection(),
+							block = selection && selection.getStartElement(),
+							path = new CKEDITOR.dom.elementPath( block ),
+							color;
+
+						// Find the closest block element.
+						block = path.block || path.blockLimit || editor.document.getBody();
+
+						// The background color might be transparent. In that case, look up the color in the DOM tree.
+						do
+						{
+							color = block && block.getComputedStyle( type == 'back' ? 'background-color' : 'color' ) || 'transparent';
+						}
+						while ( type == 'back' && color == 'transparent' && block && ( block = block.getParent() ) );
+
+						// The box should never be transparent.
+						if ( !color || color == 'transparent' )
+							color = '#ffffff';
+
+						this._.panel._.iframe.getFrameDocument().getById( colorBoxId ).setStyle( 'background-color', color );
 					}
 				});
 		}
 
 
-		function renderColors( panel, type )
+		function renderColors( panel, type, colorBoxId )
 		{
 			var output = [],
 				colors = config.colorButton_colors.split( ',' ),
@@ -97,10 +128,18 @@ CKEDITOR.plugins.add( 'colorbutton',
 						var colorStyle = config['colorButton_' + type + 'Style'];
 
 						colorStyle.childRule = type == 'back' ?
-							// It's better to apply background color as the innermost style. (#3599)
-							function(){ return false; } :
-							// Fore color style must be applied inside links instead of around it.
-							function( element ){ return element.getName() != 'a'; };
+							function( element )
+							{
+								// It's better to apply background color as the innermost style. (#3599)
+								// Except for "unstylable elements". (#6103)
+								return isUnstylable( element );
+							}
+							:
+							function( element )
+							{
+								// Fore color style must be applied inside links instead of around it.
+								return element.getName() != 'a' || isUnstylable( element );
+							};
 
 						new CKEDITOR.style( colorStyle, { color : color } ).apply( editor.document );
 					}
@@ -118,7 +157,7 @@ CKEDITOR.plugins.add( 'colorbutton',
 					'<table role="presentation" cellspacing=0 cellpadding=0 width="100%">' +
 						'<tr>' +
 							'<td>' +
-								'<span class="cke_colorbox" style="background-color:#000"></span>' +
+								'<span class="cke_colorbox" id="', colorBoxId, '"></span>' +
 							'</td>' +
 							'<td colspan=7 align=center>',
 								lang.auto,
@@ -140,8 +179,9 @@ CKEDITOR.plugins.add( 'colorbutton',
 
 				// The data can be only a color code (without #) or colorName + color code
 				// If only a color code is provided, then the colorName is the color with the hash
+				// Convert the color from RGB to RRGGBB for better compatibility with IE and <font>. See #5676
 				if (!parts[1])
-					colorName = '#' + colorName;
+					colorName = '#' + colorName.replace( /^(.)(.)(.)$/, '$1$1$2$2$3$3' );
 
 				var colorLabel = editor.lang.colors[ colorCode ] || colorCode;
 				output.push(
@@ -157,7 +197,7 @@ CKEDITOR.plugins.add( 'colorbutton',
 			}
 
 			// Render the "More Colors" button.
-			if ( config.colorButton_enableMore )
+			if ( config.colorButton_enableMore === undefined || config.colorButton_enableMore )
 			{
 				output.push(
 					'</tr>' +
@@ -170,24 +210,28 @@ CKEDITOR.plugins.add( 'colorbutton',
 								' role="option" aria-posinset="', total, '" aria-setsize="', total, '">',
 								lang.more,
 							'</a>' +
-						'</td>' );	// It is later in the code.
+						'</td>' );	// tr is later in the code.
 			}
 
 			output.push( '</tr></table>' );
 
 			return output.join( '' );
 		}
+
+		function isUnstylable( ele )
+		{
+			return ( ele.getAttribute( 'contentEditable' ) == 'false' ) || ele.getAttribute( 'data-nostyle' );
+		}
 	}
 });
 
 /**
  * Whether to enable the "More Colors..." button in the color selectors.
- * @default false
+ * @default true
  * @type Boolean
  * @example
  * config.colorButton_enableMore = false;
  */
-CKEDITOR.config.colorButton_enableMore = true;
 
 /**
  * Defines the colors to be displayed in the color selectors. It's a string

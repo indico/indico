@@ -82,7 +82,7 @@ class ServiceRunner(Observable):
                     try:
                         DBMgr.getInstance().sync()
 
-                        result = processRequest(method, copy.copy(params), req)
+                        result = processRequest(method, copy.deepcopy(params), req)
 
                         # notify components that the request has ended
                         self._notify('requestFinished', req)

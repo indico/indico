@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2010, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.html or http://ckeditor.com/license
 */
 
@@ -81,7 +81,7 @@ CKEDITOR.plugins.add( 'listblock',
 					add : function( value, html, title )
 					{
 						var pendingHtml = this._.pendingHtml,
-							id = 'cke_' + CKEDITOR.tools.getNextNumber();
+							id = CKEDITOR.tools.getNextId();
 
 						if ( !this._.started )
 						{
@@ -93,7 +93,7 @@ CKEDITOR.plugins.add( 'listblock',
 						this._.items[ value ] = id;
 
 						pendingHtml.push(
-							'<li id=', id, ' class=cke_panel_listItem>' +
+							'<li id=', id, ' class=cke_panel_listItem role=presentation>' +
 								'<a id="', id, '_option" _cke_focus=1 hidefocus=true' +
 									' title="', title || value, '"' +
 									' href="javascript:void(\'', value, '\')"' +
@@ -109,7 +109,7 @@ CKEDITOR.plugins.add( 'listblock',
 					{
 						this._.close();
 
-						var id = 'cke_' + CKEDITOR.tools.getNextNumber();
+						var id = CKEDITOR.tools.getNextId();
 
 						this._.groups[ title ] = id;
 

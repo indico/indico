@@ -128,7 +128,7 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form id="bookingForm" action="#conflicts" method="post" onkeypress="return submit_on_enter(event);">
+    <form id="bookingForm" action="<%= bookingFormURL %>#conflicts" method="post" onkeypress="return submit_on_enter(event);">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
         % if standalone:

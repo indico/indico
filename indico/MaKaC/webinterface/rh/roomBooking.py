@@ -1255,10 +1255,10 @@ class RHRoomBookingBookingForm( RHRoomBookingBase ):
         # (i.e. user is logged in)
         if self._doProcess:
             if not self._candResv.room.isActive and not self._getUser().isAdmin():
-                raise MaKaCError( "You are not authorized to book this room." )
+                raise FormValuesError( "You are not authorized to book this room." )
 
             if not self._candResv.room.canBook( self._getUser() ) and not self._candResv.room.canPrebook( self._getUser() ):
-                raise MaKaCError( "You are not authorized to book this room." )
+                raise FormValuesError( "You are not authorized to book this room." )
 
             if self._formMode == FormMode.MODIF:
                 if not self._candResv.canModify( self.getAW() ):

@@ -512,7 +512,7 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
                  self.handler(true);
              });
 
-             var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
+             var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T(this.cancelButtonTitle));
              cancelButton.observeClick(function(){
                  self.close();
                  self.handler(false);
@@ -524,14 +524,11 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
          }
     },
 
-    function(title, content, handler, buttonTitle) {
+    function(title, content, handler, buttonTitle, cancelButtonTitle) {
         var self = this;
 
-        if (buttonTitle) {
-            this.buttonTitle = buttonTitle;
-        } else {
-            this.buttonTitle = 'OK';
-        }
+        this.buttonTitle = buttonTitle || 'OK';
+        this.cancelButtonTitle = cancelButtonTitle || 'Cancel';
         this.content = content;
         this.handler = handler;
         this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
