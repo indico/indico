@@ -74,7 +74,7 @@ class BaseTask(TimedEvent):
 
     def __cmp__(self, obj):
         if self.id == obj.id and self.id == None:
-            return cmp(self, obj)
+            return cmp(hash(self), hash(obj))
         else:
             return cmp(self.id, obj.id)
 
