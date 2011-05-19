@@ -688,6 +688,8 @@ class ReservationBase( object ):
             retStartDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.startDT.hour, self.startDT.minute )
             retEndDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.endDT.hour, self.endDT.minute )
 
+            if retStartDT > self.endDT:
+                return None
             if self.dayIsExcluded( retStartDT.date() ):
                 return self.getNextRepeating( retStartDT )  # Recurrently ask for next
             return Period( retStartDT, retEndDT )
@@ -708,6 +710,8 @@ class ReservationBase( object ):
             retStartDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.startDT.hour, self.startDT.minute )
             retEndDT = datetime( repCandidateDT.year, repCandidateDT.month, repCandidateDT.day, self.endDT.hour, self.endDT.minute )
 
+            if retStartDT > self.endDT:
+                return None
             if self.dayIsExcluded( retStartDT.date() ):
                 return self.getNextRepeating( retStartDT )  # Recurrently ask for next
             return Period( retStartDT, retEndDT )
