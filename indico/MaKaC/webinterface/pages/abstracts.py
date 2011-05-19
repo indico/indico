@@ -186,17 +186,10 @@ class WUserAbstracts( wcomponents.WTemplated ):
         tzUtil = DisplayTZ(self._aw,self._conf)
         tz = tzUtil.getDisplayTZ()
 
-        asPrimaryAuthor = cfaMgr.getAbstractListForPrimaryAuthorEmail(self._aw.getUser().getEmail())
-        asCoAuthor = cfaMgr.getAbstractListForCoAuthorEmail(self._aw.getUser().getEmail())
         l = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )
-        for abs in asPrimaryAuthor:
-            if not abs in l:
-                l.append(abs)
-        for abs in asCoAuthor:
-            if not abs in l:
-                l.append(abs)
+        l += cfaMgr.getAbstractListForAuthorEmail(self._aw.getUser().getEmail())
 
-        l = sorted(l, key=lambda i:int(i.getId()))
+        l = sorted(set(l), key=lambda i:int(i.getId()))
 
         if not l:
             vars["abstracts"] = _("""<tr>
