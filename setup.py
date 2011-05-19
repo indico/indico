@@ -113,7 +113,7 @@ def _getInstallRequires():
     These are the ones needed for runtime.'''
 
     base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface', 'simplejson',
-             'suds', 'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil',
+             'suds', 'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
              'pypdf']
 
     #for Python older than 2.7
@@ -647,6 +647,7 @@ if __name__ == '__main__':
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
             indico_livesync = indico.ext.livesync.console:main
+            indico_shell = indico.util.shell:main
 
             [indico.ext_types]
 

@@ -224,5 +224,5 @@ class Logger:
     LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
 
     @classmethod
-    def get(cls, module=''):
-        return logging.getLogger('indico.'+module)
+    def get(cls, module=None):
+        return logging.getLogger('indico' if module == None else 'indico.' + module)
