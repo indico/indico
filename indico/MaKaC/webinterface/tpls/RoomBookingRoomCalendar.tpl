@@ -8,7 +8,7 @@
         % else:
             <span style="color: Green">
                 % if blockConflicts != 'active':
-                    ${_('No conflicts with confirmed bookings, press the "${ buttonText }" button to save your booking.')}
+                    ${_('No conflicts with confirmed bookings, press the "%s" button to save your booking.') % buttonText}
                 % else:
                     ${_('No conflicts with confirmed bookings.')}
                 % endif
