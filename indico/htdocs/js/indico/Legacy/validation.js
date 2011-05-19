@@ -220,21 +220,21 @@ function validate_period( f1, withRepeatability, allowPast, what )
             break;
         // Repeat Once a Week
         case "1":
-            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 6 )
+            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 7 )
             {
                 isRepeatabilityValid = false;
             }
             break;
         // Repeat Every Two Weeks
         case "2":
-            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 13 )
+            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 14 )
             {
                 isRepeatabilityValid = false;
             }
             break;
         // Repeat Every Three Weeks
         case "3":
-            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 20 )
+            if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 21 )
             {
                 isRepeatabilityValid = false;
             }
