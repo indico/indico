@@ -44,13 +44,13 @@ var listOfAddHandlers = {};
     trackId = 'track_'+ '${ i }';
 
     // Create the handlers
-    var addReviewerHandler = function(user, setResult) {
+    var addReviewerHandler = function(userList, setResult) {
         indicoRequest(
                 'abstractReviewing.team.addReviewer',
                 {
                     conference: '${ conf.getId() }',
                     track: '${ i }',
-                    user: user[0]['id']
+                    userList: userList
                 },
                 function(result,error) {
                     if (!error) {
