@@ -1095,13 +1095,9 @@ class WTrackModifCoordination( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        ut = wcomponents.WPrincipalTable()
-        vars["users"] = ut.getHTML( \
-            self._track.getCoordinatorList(), \
-            self._track,\
-            urlHandlers.UHTrackSelectCoordinators.getURL(),\
-            urlHandlers.UHTrackRemoveCoordinators.getURL(),
-            selectable=False)
+        vars["users"] = self._track.getCoordinatorList()
+        vars["trackId"] = self._track.getId()
+        vars["confId"] = self._track.getConference().getId()
         return vars
 
 
@@ -1113,20 +1109,6 @@ class WPTrackModifCoordination( WPTrackModifBase ):
     def _getTabContent( self, params ):
         wc = WTrackModifCoordination( self._track )
         return wc.getHTML()
-
-
-class WPTrackModifSelectCoordinators( WPTrackModifCoordination ):
-
-    def _getTabContent( self, params ):
-        url = urlHandlers.UHTrackSelectCoordinators.getURL()
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WUserSelection( url,forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHTrackAddCoordinators.getURL()
-        return wc.getHTML( params )
 
 
 class WPModAbstractIntComments(WPTrackAbstractModifBase):

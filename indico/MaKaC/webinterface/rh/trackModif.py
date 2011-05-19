@@ -95,47 +95,6 @@ class RHTrackCoordination( RHTrackModifBase ):
         return p.display()
 
 
-class RHTrackSelectCoordinators( RHTrackCoordination ):
-
-    def _process( self ):
-        p = tracks.WPTrackModifSelectCoordinators( self, self._track )
-        return p.display( **self._getRequestParams() )
-
-
-class RHTrackAddCoordinators( RHTrackCoordination ):
-
-    def _checkParams( self, params ):
-        RHTrackCoordination._checkParams( self, params )
-        selIds = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
-        ah = user.AvatarHolder()
-        self._coordinators = []
-        for id in selIds:
-            av = ah.getById( id )
-            if av is not None:
-                self._coordinators.append( av )
-
-    def _process( self ):
-        for av in self._coordinators:
-            self._track.addCoordinator( av )
-        self._redirect( urlHandlers.UHTrackModifCoordination.getURL( self._track ) )
-
-
-class RHTrackRemoveCoordinators( RHTrackCoordination ):
-
-    def _checkParams( self, params ):
-        RHTrackCoordination._checkParams( self, params )
-        selIds = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
-        ah = user.AvatarHolder()
-        self._coordinators = []
-        for id in selIds:
-            self._coordinators.append( ah.getById( id ) )
-
-    def _process( self ):
-        for av in self._coordinators:
-            self._track.removeCoordinator( av )
-        self._redirect( urlHandlers.UHTrackModifCoordination.getURL( self._track ) )
-
-
 class TrackCoordinationError( MaKaCError ):
     pass
 

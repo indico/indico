@@ -25,12 +25,3 @@ from MaKaC.webinterface.rh import trackModif
 
 def index(req, **params):
     return trackModif.RHTrackCoordination( req ).process( params )
-
-def selectCoordinators( req, **params ):
-    return trackModif.RHTrackSelectCoordinators( req ).process( params )
-
-def addCoordinators(req, **params):
-    return trackModif.RHTrackAddCoordinators( req ).process( params )
-
-def removeCoordinators(req, **params):
-    return trackModif.RHTrackRemoveCoordinators( req ).process( params )

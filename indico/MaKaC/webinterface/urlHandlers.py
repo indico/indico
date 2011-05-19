@@ -1075,18 +1075,6 @@ class UHTrackModifCoordination( URLHandler ):
     _relativeURL = "trackModifCoordination.py"
 
 
-class UHTrackSelectCoordinators( URLHandler ):
-    _relativeURL = "trackModifCoordination.py/selectCoordinators"
-
-
-class UHTrackAddCoordinators( URLHandler ):
-    _relativeURL = "trackModifCoordination.py/addCoordinators"
-
-
-class UHTrackRemoveCoordinators( URLHandler ):
-    _relativeURL = "trackModifCoordination.py/removeCoordinators"
-
-
 class UHTrackModifSubTrack( URLHandler ):
     _relativeURL = "trackModification.py/subTrack"
 
