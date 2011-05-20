@@ -937,6 +937,29 @@ class AbstractMgr(Persistent):
                     res.append( abstract )
         return res
 
+    def getAbstractListForAuthorEmail(self, email):
+        ''' Get list of abstracts where the email belongs to a primary author
+        '''
+        res = set()
+        for abs in self._abstracts.values():
+            for author in abs.getPrimaryAuthorList():
+                if email == author.getEmail():
+                    res.add(abs)
+
+            for author in abs.getCoAuthorList():
+                if email == author.getEmail():
+                    res.add(abs)
+        return list(res)
+
+    def isInAuthorizedViewList(self, user, abstract):
+        ''' Check if the user is submitter, primary author or co-author of the abstract
+        '''
+        # Check if the user is a submitter or (co-author)
+        if abstract.isSubmitter(user) or self.getAbstractListForAuthorEmail(user.getEmail()):
+            return True
+
+        return False
+
     def getNotificationTplList(self):
         try:
             if self._notifTpls:

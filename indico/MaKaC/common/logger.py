@@ -226,5 +226,5 @@ class Logger:
             logging.root.handlers.remove(handler)
 
     @classmethod
-    def get(cls, module=''):
-        return logging.getLogger('indico.'+module)
+    def get(cls, module=None):
+        return logging.getLogger('indico' if module == None else 'indico.' + module)

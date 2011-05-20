@@ -92,7 +92,7 @@ class RHContributionToXML(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 
@@ -107,7 +107,7 @@ class RHContributionToPDF(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 
@@ -121,7 +121,7 @@ class RHContributionToiCal(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 class RHContributionToMarcXML(RHContributionDisplay):
@@ -141,7 +141,7 @@ class RHContributionToMarcXML(RHContributionDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 
