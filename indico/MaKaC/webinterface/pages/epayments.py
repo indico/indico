@@ -63,48 +63,19 @@ class WConfModifEPayment( wcomponents.WTemplated ):
             urlStatus = urlHandlers.UHConfModifEPaymentEnableSection.getURL(self._conf)
             urlStatus.addParam("epayment", gs.getId())
             urlModif = gs.getConfModifEPaymentURL(self._conf)
+
             img = enabledBulb
             text = enabledText
             if not gs.isEnabled():
                 img = notEnabledBulb
                 text = disabledText
 
-            # CERN Plugin: Just admins can see and modify it
-            from MaKaC.plugins.EPayment.CERNYellowPay import  MODULE_ID
-            if gs.getId() == MODULE_ID:
-                minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-                al = minfo.getAdminList()
-                if not al.isAdmin( self._user ):
-                    from MaKaC.plugins.base import PluginsHolder
-                    endis="enable"
-                    departmentName = PluginsHolder().getPluginType("EPayment").getPlugin(MODULE_ID).getOption("FPDepartmentName").getValue()
-                    emailAddress = PluginsHolder().getPluginType("EPayment").getPlugin(MODULE_ID).getOption("FPEmaillAddress").getValue()
-                    if gs.isEnabled():
-                        endis="disable"
-                        emailAddress = minfo.getSupportEmail()
-                        departmentName = "Indico support"
-                    html.insert(0, """
-                        <tr>
-                        <td>
-                            <img src=%s alt="%s" class="imglink">&nbsp;&nbsp;<b>CERN E-Payment</b> <small>
-                            (please, contact <a href="mailto:%s?subject=Indico Epayment - Conference ID: %s">%s</a> to %s
-                            the CERN e-payment module)</small>
-                        </td>
-                        </tr>
-                        """%(img, text, emailAddress, self._conf.getId(), departmentName, endis))
-                    continue
-            #################################################
+            pluginHTML = gs.getPluginSectionHTML(self._conf, self._user, urlStatus, urlModif, img, text)
+            html.append(pluginHTML)
 
-            selbox = ""
-            html.append("""
-                        <tr>
-                        <td>
-                            <a href=%s><img src=%s alt="%s" class="imglink"></a>&nbsp;%s&nbsp;<a href=%s>%s</a>
-                        </td>
-                        </tr>
-                        """%(quoteattr(str(urlStatus)), img, text, selbox, quoteattr(str(urlModif)), gs.getTitle()) )
         html.insert(0, """<a href="" name="sections"></a><input type="hidden" name="oldpos"><table align="left">""")
         html.append("</table>")
+
         return "".join(html)
 
 

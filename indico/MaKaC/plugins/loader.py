@@ -64,12 +64,12 @@ class PluginLoader(object):
         """
 
         # get all available plugin types
-        ptypes = pkg_resources.get_entry_map('indico', group='indico.ext_types')
+        ptypes = pkg_resources.iter_entry_points('indico.ext_types')
 
-        for ptid, epoint in ptypes.iteritems():
-            if not ptid in cls._ptypesLoaded:
-                cls.loadPluginType(ptid, epoint.module_name)
-                cls._ptypesLoaded.add(ptid)
+        for epoint in ptypes:
+            if not epoint.name in cls._ptypesLoaded:
+                cls.loadPluginType(epoint.name, epoint.module_name)
+                cls._ptypesLoaded.add(epoint.name)
 
     @classmethod
     def reloadPlugins(cls):
@@ -91,9 +91,11 @@ class PluginLoader(object):
             cls._pmodules[ptypeId] = {}
             cls._ptypesLoaded.remove(ptypeId)
 
-        ptypes = pkg_resources.get_entry_map('indico', group='indico.ext_types')
+        ptypes = dict((ep.name, ep.module_name) for ep in pkg_resources.iter_entry_points('indico.ext_types'))
 
-        cls.loadPluginType(ptypeId, ptypes[ptypeId].module_name)
+        print ptypes
+
+        cls.loadPluginType(ptypeId, ptypes[ptypeId])
         cls._ptypesLoaded.add(ptypeId)
 
     @classmethod
@@ -220,17 +222,19 @@ class PluginLoader(object):
                 ptypeId)
             return
         else:
-            pluginEps = pkg_resources.get_entry_map('indico', group='indico.ext')
+            pluginEps = pkg_resources.iter_entry_points('indico.ext')
 
             # we loop through all the specified plugins
-            for itemName, epoint in pluginEps.iteritems():
+            for epoint in pluginEps:
                 mname = epoint.module_name
 
                 # ignore plugins that don't match our plugin type
                 if not epoint.name.startswith("%s." % ptypeId):
                     continue
                 else:
-                    pid = itemName[len(ptypeId) + 1:]
+                    print epoint, ptypeId
+
+                    pid = epoint.name[len(ptypeId) + 1:]
                     # load plugin files
                     cls._loadPluginFromDir(mname, ptypeId, ptypeModule, pid)
 

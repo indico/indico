@@ -634,7 +634,6 @@ if __name__ == '__main__':
             EPayment.worldPay = MaKaC.plugins.EPayment.worldPay
             EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
             EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
-            EPayment.CERNYellowPay = MaKaC.plugins.EPayment.CERNYellowPay
 
             importer.invenio = indico.ext.importer.invenio
             importer.dummy = indico.ext.importer.dummy
