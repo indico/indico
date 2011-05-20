@@ -3073,15 +3073,6 @@ class UHConfModifCFAAddSubmitter( URLHandler ):
 class UHConfModifCFARemoveSubmitter( URLHandler ):
     _relativeURL = "confModifCFA.py/removeSubmitter"
 
-class UHAbstractChangeSubmitter( URLHandler ):
-    _relativeURL = "abstractManagment.py/changeSubmitter"
-
-class UHAbstractAttachmentFileAccess(URLHandler):
-    _relativeURL = "abstractDisplay.py/getAttachedFile"
-
-class UHAbstractSetSubmitter( URLHandler ):
-    _relativeURL = "abstractManagment.py/setSubmitter"
-
 
 class UHConfModAbstractsMerge( URLHandler ):
     _relativeURL = "abstractsManagment.py/mergeAbstracts"

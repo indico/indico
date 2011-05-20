@@ -94,24 +94,6 @@ class RHAbstractManagment(RHAbstractModifBase):
         return p.display( **self._getRequestParams() )
 
 
-class RHAbstractSelectSubmitter(RHAbstractModifBase):
-
-    def _process( self ):
-        p = abstracts.WPAbstractSelectSubmitter( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHAbstractSetSubmitter(RHAbstractModifBase):
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            id  = params["selectedPrincipals"]
-            self._target.setSubmitter( ph.getById( id ) )
-        self._redirect( urlHandlers.UHAbstractManagment.getURL( self._target ) )
-
-
 class RHAbstractDirectAccess(RHAbstractModifBase, RHConferenceBase):
 
     def _checkProtection( self ):

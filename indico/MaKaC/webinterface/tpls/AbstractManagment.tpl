@@ -113,10 +113,12 @@
                 </tr>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Submitted by")}</span></td>
-                    <form action=${ changeSubmitterURL } method="POST">
-                    <td>${ submitter }</td>
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="submit" class="btn" value="${ _("change submitter")}"></td>
-                    </form>
+                    <td>
+                        <div id="submitterPlace">
+                            <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ title }">${ submitterFullName } (${ submitterAffiliation })</a>
+                        </div>
+                    </td>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" onclick="changeSubmitter();"></td>
                 </tr>
                 <tr>
                     <td colspan="4" class="horizontalLine">&nbsp;</td>
@@ -205,3 +207,36 @@
         </td>
     </tr>
 </table>
+
+<script>
+
+var changeSubmitterHandler = function(user) {
+	indicoRequest(
+            'abstracts.changeSubmitter',
+            {
+                confId: '${ confId }',
+                submitterId: user['0']['id'],
+                abstractId: '${ abstractId }'
+            },
+            function(result,error) {
+                if (!error) {
+                    // update the submitter
+                    var link = Html.a({href: 'mailto:'+result['email']+'?subject=['+'${ confTitle }'+'] '+$T("Abstract ")+'${ abstractId }'+': '+'${ title }'},
+                                      result['name']+' ('+result['affiliation']+')');
+                    $E('submitterPlace').set(link);
+                } else {
+                    IndicoUtil.errorReport(error);
+                }
+            }
+    );
+};
+
+function changeSubmitter() {
+    // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
+    //         showToggleFavouriteButtons, chooseProcess)
+    var chooseUsersPopup = new ChooseUsersPopup($T("Change submitter"), true, '${ confId }', false,
+            true, true, true, true, changeSubmitterHandler);
+    chooseUsersPopup.execute();
+}
+
+</script>

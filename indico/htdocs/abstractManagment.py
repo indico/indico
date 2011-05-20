@@ -68,14 +68,6 @@ def abstractsToXML( req, **params ):
     return abstractModif.RHAbstractsToXML( req ).process( params )
 
 
-def changeSubmitter( req, **params ):
-    return abstractModif.RHAbstractSelectSubmitter( req ).process( params )
-
-
-def setSubmitter( req, **params ):
-    return abstractModif.RHAbstractSetSubmitter( req ).process( params )
-
-
 def ac(req, **params):
     return abstractModif.RHAC(req).process(params)
 

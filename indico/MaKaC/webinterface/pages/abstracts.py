@@ -751,7 +751,6 @@ class WAbstractManagment( wcomponents.WTemplated ):
         vars["type"] = ""
         if self._abstract.getContribType() is not None:
             vars["type"] = self._abstract.getContribType().getName()
-        vars["submitter"] = self._getAuthorHTML(self._abstract.getSubmitter())
         vars["submitDate"] = self._abstract.getSubmissionDate().strftime("%d %B %Y %H:%M")
         vars["modificationDate"] = self._abstract.getModificationDate().strftime("%d %B %Y %H:%M")
         vars["disable"],vars["dupDisable"],vars["mergeDisable"] = "","",""
@@ -792,7 +791,6 @@ class WAbstractManagment( wcomponents.WTemplated ):
         vars["changeTrackURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
         vars["backToSubmittedURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentBackToSubmitted.getURL(self._abstract)))
         vars["modDataURL"]=quoteattr(str(urlHandlers.UHAbstractModEditData.getURL(self._abstract)))
-        vars["changeSubmitterURL"]=quoteattr(str(urlHandlers.UHAbstractChangeSubmitter.getURL(self._abstract)))
         vars["propToAccURL"]=quoteattr(str(urlHandlers.UHConfModAbstractPropToAcc.getURL(self._abstract)))
         vars["propToRejURL"]=quoteattr(str(urlHandlers.UHConfModAbstractPropToRej.getURL(self._abstract)))
         vars["withdrawURL"]=quoteattr(str(urlHandlers.UHConfModAbstractWithdraw.getURL(self._abstract)))
@@ -813,6 +811,11 @@ class WAbstractManagment( wcomponents.WTemplated ):
         vars["scaleLower"] = self._abstract.getConference().getConfAbstractReview().getScaleLower()
         vars["scaleHigher"] = self._abstract.getConference().getConfAbstractReview().getScaleHigher()
         vars["attachments"] = fossilize(self._abstract.getAttachments().values(), ILocalFileAbstractMaterialFossil)
+        vars["confId"] = self._conf.getId()
+        vars["confTitle"] = self._conf.getTitle()
+        vars["submitterFullName"] = self._abstract.getSubmitter().getFullName()
+        vars["submitterAffiliation"] = self._abstract.getSubmitter().getAffiliation()
+        vars["submitterEmail"] = self._abstract.getSubmitter().getEmail()
 
         return vars
 
@@ -824,22 +827,6 @@ class WPAbstractManagment(WPAbstractManagementBase):
 
     def _getTabContent( self, params ):
         wc = WAbstractManagment( self._getAW(), self._target )
-        return wc.getHTML( params )
-
-
-class WPAbstractSelectSubmitter(WPAbstractManagementBase):
-
-    def _setActiveTab( self ):
-        self._tabMain.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WUserSelection( urlHandlers.UHAbstractChangeSubmitter.getURL(), False, forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHAbstractSetSubmitter.getURL()
         return wc.getHTML( params )
 
 
