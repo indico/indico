@@ -155,6 +155,7 @@ def handler(req, **params):
 
     ak = error = result = None
     ts = int(time.time())
+    typeMap = {}
     try:
         # Validate the API key (and its signature)
         ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
