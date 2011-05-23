@@ -44,7 +44,7 @@
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last request")}</span></td>
         <td class="blacktext">
             % if apiKey and apiKey.getLastRequest():
-                ${apiKey.getLastRequest()} (${_('Authenticated') if apiKey.isLastUseAuthenticated() else 'Public'})
+                ${escape(apiKey.getLastRequest())} (${_('Authenticated') if apiKey.isLastUseAuthenticated() else 'Public'})
             % else:
                 ${_('n/a')}
             % endif
