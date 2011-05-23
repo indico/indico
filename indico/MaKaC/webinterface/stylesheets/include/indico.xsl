@@ -748,6 +748,278 @@
         </xsl:if>
 
 
+        <xsl:if test="count(./plugins/collaboration/booking) != 0">
+          <xsl:variable name="collaborationToday" select="./plugins/collaboration/todayReference"/>
+          <xsl:variable name="collaborationTomorrow" select="./plugins/collaboration/tomorrowReference"/>
+          <tr>
+            <td class="leftCol">Video Services</td>
+            <td>
+              <div>
+              <xsl:for-each select="./plugins/collaboration/booking">
+
+                <xsl:if test="position() = 3">
+                  <div id="collShowBookingsDiv">
+                    <span class="collShowHideBookingsText">
+                      <xsl:text>There are </xsl:text>
+                      <xsl:if test="./kind = 'ongoing'">
+                        <xsl:value-of select="1 + count(following-sibling::booking[kind = 'ongoing'])"/>
+                        <xsl:text> more ongoing bookings </xsl:text>
+                        <xsl:if test="count(following-sibling::booking[kind = 'scheduled']) &gt; 0">
+                          <xsl:text> and </xsl:text>
+                          <xsl:value-of select="count(following-sibling::booking[kind = 'scheduled'])"/>
+                          <xsl:text> more scheduled bookings.</xsl:text>
+                        </xsl:if>
+                      </xsl:if>
+                      <xsl:if test="./kind = 'scheduled'">
+                        <xsl:value-of select="1 + count(following-sibling::booking[kind = 'scheduled'])"/>
+                        <xsl:text> more scheduled bookings.</xsl:text>
+                      </xsl:if>
+
+                    </span>
+                    <span id="collShowBookings" class="fakeLink collShowBookingsText">
+                      Show
+                    </span>
+                  </div>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[
+              </div>
+              <div id="collHiddenBookings" style="visibility: hidden; overflow: hidden;">
+                  ]]></xsl:text>
+                </xsl:if>
+
+                <!-- Start of a booking line -->
+                <div class="collaborationDisplayBookingLine">
+
+                  <span class="collaborationDisplayBookingType">
+                    <xsl:value-of select="./typeDisplayName"/>
+                  </span>
+
+                  <xsl:if test="count(./startDate) != 0">
+
+                  <xsl:choose>
+                    <xsl:when test="./kind = 'scheduled' and substring(./startDate,0,11) = substring(./endDate,0,11)">
+                      <!-- Starting and ending day is same, no need to print day twice -->
+                      <xsl:choose>
+                        <xsl:when test="$collaborationToday = substring(./startDate,0,11)">
+                          <xsl:text> today </xsl:text>
+                        </xsl:when>
+                        <xsl:when test="$collaborationTomorrow = substring(./startDate,0,11)">
+                          <xsl:text> tomorrow </xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:text> on </xsl:text>
+                          <xsl:call-template name="shortDate">
+                            <xsl:with-param name="dat" select="substring(./startDate,0,21)"/>
+                          </xsl:call-template>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                      <xsl:text> from </xsl:text>
+                      <xsl:value-of select="substring(./startDate,12,5)"/>
+                      <xsl:text> to </xsl:text>
+                      <xsl:value-of select="substring(./endDate,12,5)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <!-- Starting and ending day are different -->
+                      <xsl:if test="./kind = 'scheduled'">
+                        <xsl:text> from </xsl:text>
+                        <xsl:choose>
+                          <xsl:when test="$collaborationToday = substring(./startDate,0,11)">
+                            <xsl:text> today at </xsl:text>
+                          </xsl:when>
+                          <xsl:when test="$collaborationTomorrow = substring(./startDate,0,11)">
+                            <xsl:text> tomorrow at </xsl:text>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:call-template name="shortDate">
+                              <xsl:with-param name="dat" select="substring(./startDate,0,21)"/>
+                            </xsl:call-template>
+                            <xsl:text> at </xsl:text>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:value-of select="substring(./startDate,12,5)"/>
+                        <xsl:text> until </xsl:text>
+                      </xsl:if>
+                      <xsl:if test="./kind = 'ongoing'">
+                        <xsl:text> ongoing until </xsl:text>
+                      </xsl:if>
+
+
+                      <xsl:choose>
+                        <xsl:when test="$collaborationToday = substring(./endDate,0,11)">
+                          <xsl:text> today at </xsl:text>
+                        </xsl:when>
+                        <xsl:when test="$collaborationTomorrow = substring(./endDate,0,11)">
+                          <xsl:text> tomorrow at </xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:call-template name="shortDate">
+                            <xsl:with-param name="dat" select="substring(./endDate,0,21)"/>
+                          </xsl:call-template>
+                          <xsl:text> at </xsl:text>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                      <xsl:value-of select="substring(./endDate,12,5)"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  </xsl:if>
+
+                  <xsl:choose>
+                    <xsl:when test="count(child::firstLineInfo) = 1">
+                      <xsl:text>: </xsl:text>
+                      <xsl:value-of select="./firstLineInfo"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>.</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
+
+                  <span style="margin-left:20px;"></span>
+
+                  <xsl:if test="count(child::information) = 1">
+                    <span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo{./id}">More Info</span>
+                  </xsl:if>
+
+                  <xsl:if test="count(child::information) = 1 and count(child::launchInfo) = 1">
+                    <span style="margin-left:8px;margin-right:8px;">|</span>
+                  </xsl:if>
+
+                  <xsl:if test="count(child::launchInfo) = 1">
+                    <span style="font-weight: bold;">
+                       <a target="_blank" href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
+                         <xsl:value-of select="./launchInfo/launchText"/>
+                       </a>
+                    </span>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[
+                      <script type="text/javascript">
+                        $E('bookingLaunchLink]]></xsl:text>
+                          <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                          <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
+                            IndicoUI.Widgets.Generic.tooltip($E('bookingLaunchLink]]></xsl:text>
+                              <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                              <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
+                                <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
+                                <xsl:value-of select="./launchInfo/launchTooltip" disable-output-escaping="yes"/>
+                                <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
+                                <xsl:text disable-output-escaping="yes"><![CDATA[
+                                );
+                          }
+                      </script>
+                    ]]></xsl:text>
+                  </xsl:if>
+
+                  <xsl:if test="count(child::information) = 1">
+
+                  <!-- Start of a booking info line -->
+                  <div id="collaborationInfoLine{./id}" style="visibility: hidden; overflow: hidden;">
+                    <div class="collaborationDisplayInfoLine">
+                    <table>
+                      <tbody>
+                        <xsl:for-each select="./information/section">
+                          <tr>
+                            <td class="collaborationDisplayInfoLeftCol">
+                              <span><xsl:value-of select="./title"/></span>
+                            </td>
+                            <td class="collaborationDisplayInfoRightCol">
+                              <xsl:for-each select="./line">
+                                <div>
+                                  <xsl:value-of select="."/>
+                                </div>
+                              </xsl:for-each>
+                              <xsl:for-each select="./linkLine">
+                                <div>
+                                  <a href="{./href}">
+                                    <xsl:value-of select="./caption"/>
+                                  </a>
+                                </div>
+                              </xsl:for-each>
+                            </td>
+                          </tr>
+                        </xsl:for-each>
+                      </tbody>
+                    </table>
+                    </div>
+                  </div>
+
+                  <xsl:text disable-output-escaping="yes"><![CDATA[
+                    <script type="text/javascript">
+
+                      $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
+                          IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo]]></xsl:text>
+                            <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                            <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
+                              <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
+                              <xsl:text>Click here to show / hide detailed information.</xsl:text>
+                              <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
+                              <xsl:text disable-output-escaping="yes"><![CDATA[
+                              );
+                        }
+
+                      var bookingInfoState]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
+
+                      var height]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[ = IndicoUI.Effect.prepareForSlide('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[', true);
+
+                      $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
+                        if (bookingInfoState]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[) {
+                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[);
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('More info');
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayMoreInfo";
+                      } else {
+                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                      <xsl:text disable-output-escaping="yes"><![CDATA[);
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('Hide info');
+                        $E('collaborationBookingMoreInfo]]></xsl:text>
+                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayHideInfo";
+                      }
+                      bookingInfoState]]></xsl:text>
+                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[ = !bookingInfoState]]></xsl:text>
+                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[
+                    });
+                  </script>
+                  ]]></xsl:text>
+
+                  </xsl:if>
+                <!-- End of a booking info line -->
+                </div>
+                <!-- End of a booking line -->
+              </xsl:for-each>
+              <xsl:if test="count(./plugins/collaboration/booking) > 2">
+                <div class="collHideBookingsDiv">
+                  <span class="fakeLink collHideBookingsText" id="collHideBookings">Hide additional bookings</span>
+                </div>
+              </xsl:if>
+              </div>
+            </td>
+          </tr>
+
+        </xsl:if>
+
         <xsl:if test="count(./plugins/chatrooms) != 0">
           <tr>
             <td class="leftCol">Chat rooms</td>
@@ -927,278 +1199,7 @@
           </tr>
 
 
-
         </xsl:if>
-        <xsl:if test="count(./plugins/collaboration/booking) != 0">
-          <xsl:variable name="collaborationToday" select="./plugins/collaboration/todayReference"/>
-          <xsl:variable name="collaborationTomorrow" select="./plugins/collaboration/tomorrowReference"/>
-          <tr>
-            <td class="leftCol">Video Services</td>
-            <td>
-              <div>
-              <xsl:for-each select="./plugins/collaboration/booking">
-
-                <xsl:if test="position() = 3">
-                  <div id="collShowBookingsDiv">
-                    <span class="collShowHideBookingsText">
-                      <xsl:text>There are </xsl:text>
-                      <xsl:if test="./kind = 'ongoing'">
-                        <xsl:value-of select="1 + count(following-sibling::booking[kind = 'ongoing'])"/>
-                        <xsl:text> more ongoing bookings </xsl:text>
-                        <xsl:if test="count(following-sibling::booking[kind = 'scheduled']) &gt; 0">
-                          <xsl:text> and </xsl:text>
-                          <xsl:value-of select="count(following-sibling::booking[kind = 'scheduled'])"/>
-                          <xsl:text> more scheduled bookings.</xsl:text>
-                        </xsl:if>
-                      </xsl:if>
-                      <xsl:if test="./kind = 'scheduled'">
-                        <xsl:value-of select="1 + count(following-sibling::booking[kind = 'scheduled'])"/>
-                        <xsl:text> more scheduled bookings.</xsl:text>
-                      </xsl:if>
-
-                    </span>
-                    <span id="collShowBookings" class="fakeLink collShowBookingsText">
-                      Show
-                    </span>
-                  </div>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[
-              </div>
-              <div id="collHiddenBookings" style="visibility: hidden; overflow: hidden;">
-                  ]]></xsl:text>
-                </xsl:if>
-
-                <!-- Start of a booking line -->
-                <div class="collaborationDisplayBookingLine">
-
-                  <span class="collaborationDisplayBookingType">
-                    <xsl:value-of select="./typeDisplayName"/>
-                  </span>
-
-                  <xsl:if test="count(./startDate) != 0">
-
-                  <xsl:choose>
-                    <xsl:when test="./kind = 'scheduled' and substring(./startDate,0,11) = substring(./endDate,0,11)">
-                      <!-- Starting and ending day is same, no need to print day twice -->
-                      <xsl:choose>
-                        <xsl:when test="$collaborationToday = substring(./startDate,0,11)">
-                          <xsl:text> today </xsl:text>
-                        </xsl:when>
-                        <xsl:when test="$collaborationTomorrow = substring(./startDate,0,11)">
-                          <xsl:text> tomorrow </xsl:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:text> on </xsl:text>
-                          <xsl:call-template name="shortDate">
-                            <xsl:with-param name="dat" select="substring(./startDate,0,21)"/>
-                          </xsl:call-template>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                      <xsl:text> from </xsl:text>
-                      <xsl:value-of select="substring(./startDate,12,5)"/>
-                      <xsl:text> to </xsl:text>
-                      <xsl:value-of select="substring(./endDate,12,5)"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <!-- Starting and ending day are different -->
-                      <xsl:if test="./kind = 'scheduled'">
-                        <xsl:text> from </xsl:text>
-                        <xsl:choose>
-                          <xsl:when test="$collaborationToday = substring(./startDate,0,11)">
-                            <xsl:text> today at </xsl:text>
-                          </xsl:when>
-                          <xsl:when test="$collaborationTomorrow = substring(./startDate,0,11)">
-                            <xsl:text> tomorrow at </xsl:text>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:call-template name="shortDate">
-                              <xsl:with-param name="dat" select="substring(./startDate,0,21)"/>
-                            </xsl:call-template>
-                            <xsl:text> at </xsl:text>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                        <xsl:value-of select="substring(./startDate,12,5)"/>
-                        <xsl:text> until </xsl:text>
-                      </xsl:if>
-                      <xsl:if test="./kind = 'ongoing'">
-                        <xsl:text> ongoing until </xsl:text>
-                      </xsl:if>
-
-
-                      <xsl:choose>
-                        <xsl:when test="$collaborationToday = substring(./endDate,0,11)">
-                          <xsl:text> today at </xsl:text>
-                        </xsl:when>
-                        <xsl:when test="$collaborationTomorrow = substring(./endDate,0,11)">
-                          <xsl:text> tomorrow at </xsl:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:call-template name="shortDate">
-                            <xsl:with-param name="dat" select="substring(./endDate,0,21)"/>
-                          </xsl:call-template>
-                          <xsl:text> at </xsl:text>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                      <xsl:value-of select="substring(./endDate,12,5)"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                  </xsl:if>
-
-                  <xsl:choose>
-                    <xsl:when test="count(child::firstLineInfo) = 1">
-                      <xsl:text>: </xsl:text>
-                      <xsl:value-of select="./firstLineInfo"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text>.</xsl:text>
-                    </xsl:otherwise>
-                  </xsl:choose>
-
-                  <span style="margin-left:20px;"></span>
-
-                  <xsl:if test="count(child::information) = 1">
-                    <span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo{./id}">More Info</span>
-                  </xsl:if>
-
-                  <xsl:if test="count(child::information) = 1 and count(child::launchInfo) = 1">
-                    <span style="margin-left:8px;margin-right:8px;">|</span>
-                  </xsl:if>
-
-                  <xsl:if test="count(child::launchInfo) = 1">
-                    <a target="_blank" href="{./launchInfo/launchLink}" id="bookingLaunchLink{./id}">
-                      <xsl:value-of select="./launchInfo/launchText"/>
-                    </a>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[
-                      <script type="text/javascript">
-                        $E('bookingLaunchLink]]></xsl:text>
-                          <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                          <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
-                            IndicoUI.Widgets.Generic.tooltip($E('bookingLaunchLink]]></xsl:text>
-                              <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                              <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
-                                <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
-                                <xsl:value-of select="./launchInfo/launchTooltip" disable-output-escaping="yes"/>
-                                <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
-                                <xsl:text disable-output-escaping="yes"><![CDATA[
-                                );
-                          }
-                      </script>
-                    ]]></xsl:text>
-                  </xsl:if>
-
-                  <xsl:if test="count(child::information) = 1">
-
-                  <!-- Start of a booking info line -->
-                  <div id="collaborationInfoLine{./id}" style="visibility: hidden; overflow: hidden;">
-                    <div class="collaborationDisplayInfoLine">
-                    <table>
-                      <tbody>
-                        <xsl:for-each select="./information/section">
-                          <tr>
-                            <td class="collaborationDisplayInfoLeftCol">
-                              <span><xsl:value-of select="./title"/></span>
-                            </td>
-                            <td class="collaborationDisplayInfoRightCol">
-                              <xsl:for-each select="./line">
-                                <div>
-                                  <xsl:value-of select="."/>
-                                </div>
-                              </xsl:for-each>
-                              <xsl:for-each select="./linkLine">
-                                <div>
-                                  <a href="{./href}">
-                                    <xsl:value-of select="./caption"/>
-                                  </a>
-                                </div>
-                              </xsl:for-each>
-                            </td>
-                          </tr>
-                        </xsl:for-each>
-                      </tbody>
-                    </table>
-                    </div>
-                  </div>
-
-                  <xsl:text disable-output-escaping="yes"><![CDATA[
-                    <script type="text/javascript">
-
-                      $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.onmouseover = function (event) {
-                          IndicoUI.Widgets.Generic.tooltip($E('collaborationBookingMoreInfo]]></xsl:text>
-                            <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                            <xsl:text disable-output-escaping="yes"><![CDATA[').dom, event, ]]></xsl:text>
-                              <xsl:text disable-output-escaping="yes">'&lt;div class=&quot;collaborationLinkTooltipMeetingLecture&quot;&gt;</xsl:text>
-                              <xsl:text>Click here to show / hide detailed information.</xsl:text>
-                              <xsl:text disable-output-escaping="yes">&lt;/div&gt;'</xsl:text>
-                              <xsl:text disable-output-escaping="yes"><![CDATA[
-                              );
-                        }
-
-                      var bookingInfoState]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[ = false;
-
-                      var height]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[ = IndicoUI.Effect.prepareForSlide('collaborationInfoLine]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[', true);
-
-                      $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[').observeClick(function() {
-                        if (bookingInfoState]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[) {
-                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[);
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('More info');
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayMoreInfo";
-                      } else {
-                        IndicoUI.Effect.slide('collaborationInfoLine]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[', height]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                      <xsl:text disable-output-escaping="yes"><![CDATA[);
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').set('Hide info');
-                        $E('collaborationBookingMoreInfo]]></xsl:text>
-                        <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                        <xsl:text disable-output-escaping="yes"><![CDATA[').dom.className = "collaborationDisplayHideInfo";
-                      }
-                      bookingInfoState]]></xsl:text>
-                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[ = !bookingInfoState]]></xsl:text>
-                      <xsl:value-of select="./id" disable-output-escaping="yes"/>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[
-                    });
-                  </script>
-                  ]]></xsl:text>
-
-                  </xsl:if>
-                <!-- End of a booking info line -->
-                </div>
-                <!-- End of a booking line -->
-              </xsl:for-each>
-              <xsl:if test="count(./plugins/collaboration/booking) > 2">
-                <div class="collHideBookingsDiv">
-                  <span class="fakeLink collHideBookingsText" id="collHideBookings">Hide additional bookings</span>
-                </div>
-              </xsl:if>
-              </div>
-            </td>
-          </tr>
-
-        </xsl:if>
-
 
         <xsl:if test="./supportEmail != ''">
           <tr>
