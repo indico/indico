@@ -69,7 +69,7 @@ EXPORT_URL_MAP = dict((re.compile(pathRe), handlerFunc) for pathRe, handlerFunc 
 RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)(?:$|(?=\?))')
 
 
-def normalizeQuery(path, query, remove=('signature',)):
+def normalizeQuery(path, query, remove=('signature',), separate=False):
     """Normalize request path and query so it can be used for caching and signing
 
     Returns a string consisting of path and sorted query string.
@@ -80,7 +80,9 @@ def normalizeQuery(path, query, remove=('signature',)):
         for key in remove:
             qdata.pop(key, None)
     sortedQuery = sorted(qdata.items(), key=lambda x: x[0].lower())
-    if sortedQuery:
+    if separate:
+        return path, sortedQuery and urllib.urlencode(sortedQuery)
+    elif sortedQuery:
         return '%s?%s' % (path, urllib.urlencode(sortedQuery))
     else:
         return path
@@ -196,7 +198,8 @@ def handler(req, **params):
             # Commit only if there was an API key and no error
             for _retry in xrange(10):
                 dbi.sync()
-                ak.used(req.remote_ip, path, query, not onlyPublic)
+                normPath, normQuery = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
+                ak.used(req.remote_ip, normPath, normQuery, not onlyPublic)
                 try:
                     dbi.endRequest(True)
                 except ConflictError:
