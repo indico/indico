@@ -24,9 +24,11 @@ Conversion functions for fossils
 
 import pytz
 
-class Conversion:
+
+class Conversion(object):
+
     @classmethod
-    def datetime(cls, dt, tz = None):
+    def datetime(cls, dt, tz=None):
         if dt:
             if tz:
                 if isinstance(tz, basestring):
@@ -39,7 +41,24 @@ class Conversion:
             return None
 
     @classmethod
-    def duration(cls, duration, units = 'minutes', truncate = True):
+    def naive(cls, dt, tz=None, naiveTZ=None):
+        if dt:
+            if tz:
+                if isinstance(tz, basestring):
+                    tz = pytz.timezone(tz)
+
+                if isinstance(naiveTZ, basestring):
+                    naiveTZ = pytz.timezone(naiveTZ)
+
+                date = naiveTZ.localize(dt).astimezone(tz)
+            else:
+                date = dt
+            return date
+        else:
+            return None
+
+    @classmethod
+    def duration(cls, duration, units='minutes', truncate=True):
         if duration:
             from MaKaC.common.utils import formatDuration
             return formatDuration(duration, units, truncate)

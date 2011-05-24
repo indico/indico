@@ -23,7 +23,7 @@
 
 
 from MaKaC.common.fossilize import IFossil, Fossilizable, fossilizes, fossilize, \
-    NonFossilizableException, WrongFossilTypeException, addFossil,\
+    NonFossilizableException, addFossil,\
     InvalidFossilException
 import unittest
 
@@ -119,8 +119,10 @@ class SimpleClass(Fossilizable):
     def getC(self):
         return self.c
 
+
 class DerivedClass(SimpleClass):
     pass
+
 
 class ComplexClass(Fossilizable):
 
@@ -132,14 +134,17 @@ class ComplexClass(Fossilizable):
     def getSimpleInstance(self):
         return self.simpleInstance
 
+
 class IterableWrapper(object):
     def __init__(self, *content):
         self.onlyAttribute = list(content)
+
 
 class ConversionClass(object):
     @classmethod
     def multiply(cls, number, factor):
         return number * factor
+
 
 def mysum(number, numberToBeAdded):
     return number + numberToBeAdded
@@ -150,6 +155,7 @@ class IWithConversion2Fossil(IFossil):
         pass
     getA.convert = mysum
 
+
 class IWithConversionFossil(IFossil):
     def getA(self):
         pass
@@ -157,6 +163,7 @@ class IWithConversionFossil(IFossil):
     def getList(self):
         pass
     getList.result = IWithConversion2Fossil
+
 
 class AnotherClass(Fossilizable):
     fossilizes(IWithConversionFossil)
@@ -175,6 +182,7 @@ class AnotherChildrenClass(Fossilizable):
     def getA(self):
         return self.a
 
+
 class ClassWithDifferentMethodNames(Fossilizable):
     fossilizes(IClassWithDifferentMethodNamesFossil, IClassWithDifferentMethodNamesBadFossil, IClassWithDifferentMethodNamesBad2Fossil)
     def __init__(self):
@@ -189,7 +197,6 @@ class ClassWithDifferentMethodNames(Fossilizable):
         return 4
     def get_type(self):
         pass
-
 
 
 class TestFossilize(unittest.TestCase):
@@ -229,14 +236,14 @@ class TestFossilize(unittest.TestCase):
         self.assertRaises(InvalidFossilException, fossilize, o1, IClassWithDifferentMethodNamesBad2Fossil)
 
     def testFossilizingNonFossilizable(self):
-        "Non-fossilizable objects should thrown an exception"
+        "Non-Fossilizable objects should be OK to fossilize"
 
-        self.assertRaises(NonFossilizableException, fossilize, 1+4j, ISomeFossil)
+        self.assertEqual(fossilize(1+4j, ISomeFossil), {'_fossil': 'some', '_type': 'complex'})
 
     def testFossilizingWrongType(self):
-        "Fossilizing using the wrong type should thrown an exception"
+        "Fossilizing Fossilizables using non-standard types should be OK"
 
-        self.assertRaises(WrongFossilTypeException, self.s.fossilize, ISomeFossil)
+        self.assertEqual(self.s.fossilize(ISomeFossil), {'_fossil': 'some', '_type': 'SimpleClass'})
 
     def testFossilizingSimpleClass(self):
         "Simple fossilization example"
@@ -318,18 +325,26 @@ class TestFossilize(unittest.TestCase):
         self.assertEquals(fossilize([s1, d1]), [fossilize(s1), d1.fossilize()])
 
     def testFossilizeDict(self):
-        "Fossilize a dictionary of objects"
+        "Fossilize using a dictionary of interfaces"
 
         s1 = SimpleClass(10, 20, 'foo')
         d1 = DerivedClass(10, 50, 'bar')
         self.assertEquals(fossilize([s1, d1], {"indico.tests.python.unit.MaKaC_tests.common_tests.fossilize_test.SimpleClass": ISimpleFossil2Fossil, "indico.tests.python.unit.MaKaC_tests.common_tests.fossilize_test.DerivedClass": ISimpleFossil1Fossil}),
                           [s1.fossilize(ISimpleFossil2Fossil), d1.fossilize(ISimpleFossil1Fossil)])
 
+    def testFossilizeWrongDict(self):
+        "Fossilize using a wrong dictionary of interfaces"
+
+        s1 = SimpleClass(10, 20, 'foo')
+        d1 = DerivedClass(10, 50, 'bar')
+        self.assertRaises(NonFossilizableException, fossilize, [s1, d1],
+                          {"indico.tests.python.unit.MaKaC_tests.common_tests.fossilize_test.DerivedClass": ISimpleFossil1Fossil})
+
     def testFossilizeWithAttributes(self):
+        """
+        Using attributes instead of getters
+        """
         s1 = SimpleClass(10, 20, 'foo')
         d1 = DerivedClass(10, 50, 'bar')
         self.assertEquals(s1.fossilize(IAttributeFossil), {'_type':'SimpleClass', '_fossil':'attribute', "a": 10, "b": 20, "c":"foo"})
         self.assertEquals(fossilize(d1, IAttributeFossil), {'_type':'DerivedClass', '_fossil':'attribute', "a": 10, "b": 50, "c":"bar"})
-
-if __name__ == '__main__':
-    unittest.main()

@@ -67,11 +67,6 @@ class NonFossilizableException(Exception):
     Object is not fossilizable (doesn't implement Fossilizable)
     """
 
-class WrongFossilTypeException(Exception):
-    """
-    Fossil type doesn't apply to target object
-    """
-
 class InvalidFossilException(Exception):
     """
     The fossil name doesn't follow the convention I(\w+)Fossil
@@ -139,8 +134,8 @@ class Fossilizable(object):
                 cls.__fossilNameCache[name] = fossilName
         return fossilName
 
-
-    def __obtainInterface(self, interfaceArg):
+    @classmethod
+    def __obtainInterface(cls, obj, interfaceArg):
         """
         Obtains the appropriate interface for this object.
 
@@ -160,30 +155,32 @@ class Fossilizable(object):
         if interfaceArg is None:
             # we try to take the 1st interface declared with fossilizes
             implementedInterfaces = list(
-                i for i in zope.interface.implementedBy(self.__class__) \
+                i for i in zope.interface.implementedBy(obj.__class__) \
                 if i.extends(IFossil) )
 
             if not implementedInterfaces:
                 raise NonFossilizableException(
                     "Object %s of class %s cannot be fossilized,"
                     "no fossils were declared for it" %
-                    (str(self), self.__class__.__name__))
+                    (str(obj), obj.__class__.__name__))
             else:
                 interface = implementedInterfaces[0]
 
         elif type(interfaceArg) is dict:
 
-            className = self.__class__.__module__ + '.' + \
-                        self.__class__.__name__
+            className = obj.__class__.__module__ + '.' + \
+                        obj.__class__.__name__
 
             # interfaceArg is a dictionary of class:Fossil pairs
             if className in interfaceArg:
                 interface = interfaceArg[className]
+            elif obj.__class__ in interfaceArg:
+                interface = interfaceArg[obj.__class__]
             else:
                 raise NonFossilizableException(
                     "Object %s of class %s cannot be fossilized; "
                     "its class was not a key in the provided fossils dictionary" %
-                    (str(self), self.__class__.__name__))
+                    (str(obj), obj.__class__.__name__))
         else:
             interface = interfaceArg
 
@@ -224,20 +221,28 @@ class Fossilizable(object):
                                       **kwargs) for elem in target)
             # If the object is a wrapper for an iterable, by default we fossilize
             # the iterable the object is wrapping. This behaviour is included in
-            # order to let objects like PersistentList to be fossilized
+            # order to let objects like legacy PersistentLists to be fossilized
             elif hasattr(target, '__dict__') and len(target.__dict__) == 1 and \
                      hasattr(target.__dict__.values()[0], '__iter__'):
                 return list(fossilize(elem,
                                       interface,
                                       useAttrCache,
                                       **kwargs) for elem in target.__dict__.values()[0])
+            elif cls.__obtainInterface(target, interface):
+                return cls.fossilize_obj(target, interface, useAttrCache, **kwargs)
+
             else:
                 raise NonFossilizableException("Type %s is not fossilizable!" %
                                                ttype)
 
-            return fossilize(target, interface, useAttrCache)
+            return fossilize(target, interface, useAttrCache, **kwargs)
 
-    def fossilize(self, interfaceArg = None, useAttrCache = False, **kwargs):
+    def fossilize(self, interfaceArg=None, useAttrCache=False, **kwargs):
+        return self.fossilize_obj(self, interfaceArg=interfaceArg, useAttrCache=useAttrCache,
+                           **kwargs)
+
+    @classmethod
+    def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, **kwargs):
         """
         Fossilizes the object, using the fossil provided by `interface`.
 
@@ -248,10 +253,10 @@ class Fossilizable(object):
         :type useAttrCache: boolean
         """
 
-        interface = self.__obtainInterface(interfaceArg)
+        interface = cls.__obtainInterface(obj, interfaceArg)
 
         name = interface.getName()
-        fossilName = self.__extractFossilName(name)
+        fossilName = cls.__extractFossilName(name)
 
         result = {}
 
@@ -265,7 +270,7 @@ class Fossilizable(object):
             cacheUsed = False
             if useAttrCache:
                 try:
-                    methodResult = self.__fossilAttrsCache[self._p_oid][method]
+                    methodResult = cls.__fossilAttrsCache[obj._p_oid][method]
                     cacheUsed = True
                 except KeyError:
                     pass
@@ -273,21 +278,21 @@ class Fossilizable(object):
                 # Please use 'produce' as little as possible;
                 # there is almost always a more elegant and modular solution!
                 if 'produce' in tags:
-                    methodResult = interface[method].getTaggedValue('produce')(self)
+                    methodResult = interface[method].getTaggedValue('produce')(obj)
                 else:
-                    attr = getattr(self, method)
+                    attr = getattr(obj, method)
                     if callable(attr):
                         methodResult = attr()
                     else:
                         methodResult = attr
                         isAttribute = True
 
-                if hasattr(self, "_p_oid"):
+                if hasattr(obj, "_p_oid"):
                     try:
-                        self.__fossilAttrsCache[self._p_oid]
+                        cls.__fossilAttrsCache[obj._p_oid]
                     except KeyError:
-                        self.__fossilAttrsCache[self._p_oid] = {}
-                    self.__fossilAttrsCache[self._p_oid][method] = methodResult
+                        cls.__fossilAttrsCache[obj._p_oid] = {}
+                    cls.__fossilAttrsCache[obj._p_oid][method] = methodResult
 
             # Result conversion
             if 'result' in tags:
@@ -312,7 +317,7 @@ class Fossilizable(object):
             elif isAttribute:
                 attrName = method
             else:
-                attrName = self.__extractName(method)
+                attrName = cls.__extractName(method)
 
             # In case the name contains dots, each of the 'domains' but the
             # last one are translated into nested dictionnaries. For example,
@@ -340,8 +345,8 @@ class Fossilizable(object):
             raise InvalidFossilException('"_type" or "_fossil"'
                                          ' cannot be a fossil attribute  name')
         else:
-            result["_type"] = self.__class__.__name__
-            if fossilName: #we check that it's not an empty string
+            result["_type"] = obj.__class__.__name__
+            if fossilName:  #we check that it's not an empty string
                 result["_fossil"] = fossilName
             else:
                 result["_fossil"] = ""
@@ -349,7 +354,7 @@ class Fossilizable(object):
         return result
 
 
-def fossilize(target, interfaceArg = None, useAttrCache = False, **kwargs):
+def fossilize(target, interfaceArg=None, useAttrCache=False, **kwargs):
     """
     Method that allows the "fossilization" process to
     be called on data structures (lists, dictionaries
