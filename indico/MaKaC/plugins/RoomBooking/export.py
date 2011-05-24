@@ -18,26 +18,36 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from pytz import timezone
 import fnmatch
 import itertools
-import pytz
-from indico.web.http_api import ExportInterface, LimitExceededException, Exporter
+from datetime import datetime
+from indico.web.http_api import ExportInterface, Exporter
 from indico.web.http_api.util import get_query_parameter
-from indico.web.http_api.responses import HTTPAPIError
-from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.fossilize import fossilize, IFossil
-from MaKaC.common.info import HelperMaKaCInfo
+from indico.util.fossilize.conversion import Conversion
 from MaKaC.common.timezoneUtils import utc2server
 from MaKaC.plugins.RoomBooking.default.factory import Factory
-from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import CrossLocationQueries, Location
+from MaKaC.rb_tools import Period
 from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
-from MaKaC.fossils.roomBooking import IReservationFossil
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 
+
 globalExporters = ['RoomExporter', 'ReservationExporter']
+MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
+MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
+
+
+def utcdate(datet):
+    d = datet.astimezone(timezone('UTC'))
+    return utc2server(d)
+
 
 class RoomExporter(Exporter):
+    """
+    Example: /room/CERN/23.xml
+    """
     TYPES = ('room', )
     RE = r'(?P<location>\w+)/(?P<idlist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'rooms'
@@ -60,6 +70,7 @@ class RoomExporter(Exporter):
         expInt = RoomExportInterface(aw, self)
         return expInt.room(self._location, self._idList, self._qdata)
 
+
 class ReservationExporter(Exporter):
     TYPES = ('reservation', )
     RE = r'(?P<loclist>\w+(?:-\w+)*)'
@@ -80,6 +91,7 @@ class ReservationExporter(Exporter):
     def export_reservation(self, aw):
         expInt = ReservationExportInterface(aw, self)
         return expInt.reservation(self._locList, self._qdata)
+
 
 class IRoomMetadataFossil(IFossil):
 
@@ -110,84 +122,149 @@ class IRoomMetadataFossil(IFossil):
         pass
     getAvailableVC.name = 'vcList'
 
+
 class IMinimalRoomMetadataFossil(IFossil):
     def id(self):
         pass
     def getFullName(self):
         pass
 
+
 class IRoomMetadataWithReservationsFossil(IRoomMetadataFossil):
     pass
+
 
 class IReservationMetadataFossilBase(IFossil):
     def id(self):
         pass
+
     def startDT(self):
         pass
+    startDT.convert = Conversion.naive
+
     def endDT(self):
         pass
+    endDT.convert = Conversion.naive
+
     def repeatability(self):
         pass # None or a nice short name
     repeatability.convert = lambda r: RepeatabilityEnum.rep2shortname[r] if r is not None else None
+
     def bookedForName(self):
         pass
+
     def getBookingUrl(self):
         pass
     getBookingUrl.produce = lambda s: str(UHRoomBookingBookingDetails.getURL(s))
+
     def reason(self):
         pass
-    def isCancelled(self):
-        pass
-    isCancelled.name = 'cancelled'
-    def isRejected(self):
-        pass
-    isRejected.name = 'rejected'
+
     def usesAVC(self):
         pass
+
     def needsAVCSupport(self):
         pass
+
     def useVC(self):
         pass
+
+    def isConfirmed(self):
+        pass
+
+    def isValid(self):
+        pass
+
     useVC.name = 'vcList'
+    useVC.produce = lambda x: x.useVC if hasattr(x, 'useVC') else None
+
 
 class IRoomReservationMetadataFossil(IReservationMetadataFossilBase):
     pass
+
+
+class IPeriodFossil(IFossil):
+    def startDT(self):
+        pass
+    startDT.convert = Conversion.naive
+
+    def endDT(self):
+        pass
+    endDT.convert = Conversion.naive
+
 
 class IReservationMetadataFossil(IReservationMetadataFossilBase):
     def locationName(self):
         pass
     locationName.name = 'location'
+
     def room(self):
         pass
     room.result = IMinimalRoomMetadataFossil
 
+
 class RoomExportInterface(ExportInterface):
     DETAIL_INTERFACES = {
         'rooms': IRoomMetadataFossil,
-        'reservations': IRoomMetadataWithReservationsFossil
+        'reservations': IRoomMetadataWithReservationsFossil,
+        'occurrences': IRoomMetadataWithReservationsFossil
     }
 
-    def _postprocess(self, obj, fossil, iface):
+    def _postprocess(self, obj, fossil, iface, detail):
+
+        def _repeating_iterator(resv):
+            last = resv.startDT
+            while True:
+                rep = resv.getNextRepeating(last)
+                if rep == None:
+                    break
+                else:
+                    yield rep
+                    last = rep.startDT
+
         if iface is IRoomMetadataWithReservationsFossil:
+            (startDT, endDT) = (self._fromDT or MIN_DATETIME,
+                                self._toDT or MAX_DATETIME)
+
             if self._fromDT or self._toDT:
+                toDate = self._toDT.date() if self._toDT else None
+                fromDate = self._fromDT.date() if self._fromDT else None
+
                 resvEx = ReservationBase()
-                resvEx.startDT = self._fromDT
-                resvEx.endDT = self._toDT
+                resvEx.startDT = startDT
+                resvEx.endDT = endDT
                 resvEx.room = obj
-                if self._fromDT.date() != self._toDT.date():
+                resvEx.isRejected = False
+                resvEx.isCancelled = False
+
+                if fromDate != toDate:
                     resvEx.repeatability = RepeatabilityEnum.daily
-                resvs = list(set(c.withReservation for c in resvEx.getCollisions()))
+
+                resvs = set(c.withReservation for c in resvEx.getCollisions())
             else:
                 resvs = obj.getReservations()
-            resvs = itertools.ifilter(self._resvFilter, resvs)
-            fossil['reservations'] = fossilize(resvs, IRoomReservationMetadataFossil)
+
+            iresvs1, iresvs2 = itertools.tee(itertools.ifilter(self._resvFilter, resvs), 2)
+            fresvs = fossilize(iresvs1, IRoomReservationMetadataFossil, tz=self._tz,
+                               naiveTZ=self._serverTZ)
+
+            if detail == 'occurrences':
+                for fresv, resv in itertools.izip(iter(fresvs), iresvs2):
+                    # get occurrences in the date interval
+                    fresv['occurrences'] = fossilize(itertools.ifilter(
+                        lambda x: x.startDT >= startDT and x.endDT <= endDT, _repeating_iterator(resv)),
+                                                     {Period: IPeriodFossil}, tz=self._tz,
+                                                     naiveTZ=self._serverTZ)
+
+            fossil['reservations'] = fresvs
+
         return fossil
 
     def room(self, location, idlist, qdata):
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
-        self._fromDT = utc2server(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
-        self._toDT = utc2server(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
+        self._fromDT = utcdate(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
+        self._toDT = utcdate(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
         self._resvFilter = getResvStateFilter(qdata)
 
         Factory.getDALManager().connect()
@@ -201,6 +278,7 @@ class RoomExportInterface(ExportInterface):
             yield obj
         Factory.getDALManager().disconnect()
 
+
 class ReservationExportInterface(ExportInterface):
     DETAIL_INTERFACES = {
         'reservations': IReservationMetadataFossil
@@ -209,8 +287,8 @@ class ReservationExportInterface(ExportInterface):
     def reservation(self, locList, qdata):
         fromDT = get_query_parameter(qdata, ['f', 'from'])
         toDT = get_query_parameter(qdata, ['t', 'to'])
-        fromDT = utc2server(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
-        toDT = utc2server(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
+        fromDT = utcdate(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
+        toDT = utcdate(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
         _filter = getResvStateFilter(qdata)
 
         Factory.getDALManager().connect()
@@ -226,6 +304,7 @@ class ReservationExportInterface(ExportInterface):
             for obj in self._process(resvs, filter=_filter):
                 yield obj
         Factory.getDALManager().disconnect()
+
 
 def getResvStateFilter(qdata):
     cancelled = get_query_parameter(qdata, ['cxl', 'cancelled'])

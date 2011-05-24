@@ -129,9 +129,12 @@ class Exporter(object):
         self._descending = get_query_parameter(self._qdata, ['c', 'descending'], False)
         self._detail = get_query_parameter(self._qdata, ['d', 'detail'], self.DEFAULT_DETAIL)
         tzName = get_query_parameter(self._qdata, ['tz'], None)
+
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+        self._serverTZ = info.getTimezone()
+
         if tzName is None:
-            info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            tzName = info.getTimezone()
+            tzName = self._serverTZ
         try:
             self._tz = pytz.timezone(tzName)
         except pytz.UnknownTimeZoneError, e:
@@ -175,6 +178,7 @@ class ExportInterface(object):
     def __init__(self, aw, exporter):
         self._aw = aw
         self._tz = exporter._tz
+        self._serverTZ = exporter._serverTZ
         self._offset = exporter._offset
         self._limit = exporter._limit
         self._detail = exporter._detail
@@ -304,7 +308,7 @@ class ExportInterface(object):
         next(itertools.islice(sortedIterator, offset, offset), None)
         return sortedIterator
 
-    def _postprocess(self, obj, fossil, iface):
+    def _postprocess(self, obj, fossil, iface, detail):
         return fossil
 
     def _process(self, iterator, filter=None, iface=None):
@@ -313,7 +317,7 @@ class ExportInterface(object):
             if iface is None:
                 raise HTTPAPIError('Invalid detail level: %s' % self._detail, apache.HTTP_BAD_REQUEST)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
-            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz), iface)
+            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz), iface, self._detail)
 
 
 @Exporter.register
