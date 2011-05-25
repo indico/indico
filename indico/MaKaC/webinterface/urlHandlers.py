@@ -3399,15 +3399,6 @@ class UHWebcastArchive( URLHandler ):
 class UHWebcastSetup( URLHandler ):
     _relativeURL = "adminServices.py/webcastSetup"
 
-class UHWebcastSelectManager( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSelectManager"
-
-class UHWebcastAddManager( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddManager"
-
-class UHWebcastRemoveManager( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveManager"
-
 class UHWebcastAddWebcast( URLHandler ):
     _relativeURL = "adminServices.py/webcastAddWebcast"
 

@@ -33,15 +33,6 @@ def webcastArchive(req, **params):
 def webcastSetup(req, **params):
     return services.RHWebcastSetup(req).process(params)
 
-def webcastSelectManager(req, **params):
-    return services.RHWebcastSelectManager(req).process(params)
-
-def webcastAddManager(req, **params):
-    return services.RHWebcastAddManager(req).process(params)
-
-def webcastRemoveManager(req, **params):
-    return services.RHWebcastRemoveManager(req).process(params)
-
 def webcastAddWebcast(req, **params):
     return services.RHWebcastAddWebcast(req).process(params)
 

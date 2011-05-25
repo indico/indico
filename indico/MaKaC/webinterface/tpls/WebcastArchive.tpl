@@ -2,9 +2,9 @@
 <tr>
   <td>
     <br>
-    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="80%" align="left" border="0">
     <tr>
-      <td class="groupTitle">Archived Webcasts</td>
+      <td class="groupTitle">${ _("Archived Webcasts")}</td>
     </tr>
     <tr>
       <td>

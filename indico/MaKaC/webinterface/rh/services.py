@@ -115,37 +115,6 @@ class RHWebcastSetup( RHWebcastBase ):
         p = adminPages.WPWebcastSetup(self)
         return p.display()
 
-class RHWebcastSelectManager( RHWebcastBase ):
-    _uh = urlHandlers.UHWebcastSelectManager
-
-    def _process( self ):
-        p = adminPages.WPWebcastSelectManager(self)
-        return p.display(**self._getRequestParams())
-
-class RHWebcastAddManager( RHWebcastBase ):
-    _uh = urlHandlers.UHWebcastAddManager
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            al = self._wm.getManagers()
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if ph.getById( id ) != None:
-                    self._wm.addManager( ph.getById( id ) )
-        self._redirect( urlHandlers.UHWebcastSetup.getURL() )
-
-class RHWebcastRemoveManager( RHWebcastBase ):
-    _uh = urlHandlers.UHWebcastRemoveManager
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if ph.getById( id ) != None:
-                    self._wm.removeManager( ph.getById( id ) )
-        self._redirect( urlHandlers.UHWebcastSetup.getURL() )
 
 class RHWebcastAddWebcast( RHWebcastBase ):
     _uh = urlHandlers.UHWebcastAddWebcast

@@ -656,10 +656,7 @@ class WWebcastSetup( wcomponents.WTemplated ):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        managers = wm.getManagers()
-        urlselectmanager = urlHandlers.UHWebcastSelectManager.getURL()
-        urlremovemanager = urlHandlers.UHWebcastRemoveManager.getURL()
-        vars["adminList"] = wcomponents.WPrincipalTable().getHTML( managers,  None, urlselectmanager, urlremovemanager, selectable=False )
+        vars["adminList"] = wm.getManagers()
         channels = wm.getChannels()
         iconremove = Config.getInstance().getSystemIconURL( "remove" )
         iconadd = Config.getInstance().getSystemIconURL( "add" )
@@ -736,13 +733,6 @@ class WWebcastSetup( wcomponents.WTemplated ):
 
         return vars
 
-class WPWebcastSelectManager( WPWebcastSetup ):
-
-    def _getTabContent( self, params ):
-        wc = wcomponents.WUserSelection( urlHandlers.UHWebcastSelectManager.getURL(), forceWithoutExtAuth=True )
-        wc.setTitle("Select webcast administrator")
-        params["addURL"] =  urlHandlers.UHWebcastAddManager.getURL()
-        return wc.getHTML( params )
 
 class WPTemplatesCommon( WPAdminsBase ):
 
