@@ -56,16 +56,19 @@ def addFossil(klazz, fossils):
     for fossil in fossils:
         zope.interface.classImplements(klazz, fossil)
 
+
 def clearCache():
     """
     Shortcut for Fossilizable.clearCache()
     """
     Fossilizable.clearCache()
 
+
 class NonFossilizableException(Exception):
     """
     Object is not fossilizable (doesn't implement Fossilizable)
     """
+
 
 class InvalidFossilException(Exception):
     """
@@ -73,10 +76,12 @@ class InvalidFossilException(Exception):
     or has an invalid method name and did not declare a .name tag for it
     """
 
+
 class IFossil(zope.interface.Interface):
     """
     Fossil base interface. All fossil classes should derive from this one.
     """
+
 
 class Fossilizable(object):
     """
@@ -186,12 +191,14 @@ class Fossilizable(object):
 
         return interface
 
+
     @classmethod
     def clearCache(cls):
         """
         Clears the fossil attribute cache
         """
         cls.__fossilAttrsCache = {}
+
 
     @classmethod
     def fossilizeIterable(cls, target, interface, useAttrCache = False, **kwargs):

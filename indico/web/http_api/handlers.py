@@ -25,46 +25,30 @@ HTTP API - Handlers
 # python stdlib imports
 import hashlib
 import hmac
-import itertools
 import re
 import time
 import urllib
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
-import pytz
 
 # indico imports
-from indico.web.http_api import ExportInterface, LimitExceededException, Exporter
+from indico.web.http_api import Exporter
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.cache import RequestCache
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
 from indico.web.http_api.util import remove_lists, get_query_parameter
-from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.util.metadata.serializer import Serializer
 
 # indico legacy imports
 from MaKaC.common import DBMgr
-from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
+from MaKaC.common.logger import Logger
+from MaKaC.common.fossilize import fossilize
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.plugins.base import PluginsHolder
 
-# Maximum number of records that will get exported for each detail level
-MAX_RECORDS = {
-    'events': 10000,
-    'contributions': 500,
-    'subcontributions': 500,
-    'sessions': 100,
-}
 
-# Valid URLs for export handlers. the last group has to be the response type
-EXPORT_URL_MAP = {
-    r'/export/(event|categ)/(\w+(?:-\w+)*)\.(\w+)$': 'handler_event_categ'
-}
-
-# Compile url regexps
-EXPORT_URL_MAP = dict((re.compile(pathRe), handlerFunc) for pathRe, handlerFunc in EXPORT_URL_MAP.iteritems())
 # Remove the extension at the end or before the querystring
 RE_REMOVE_EXTENSION = re.compile(r'\.(\w+)(?:$|(?=\?))')
 
@@ -134,6 +118,7 @@ def buildAW(ak, req, onlyPublic=False):
     return aw
 
 def handler(req, **params):
+    logger = Logger.get('httpapi')
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
     # Parse the actual query string
     qdata = parse_qs(query)
@@ -172,18 +157,18 @@ def handler(req, **params):
             cache_key = normalizeQuery(path, query, remove=('signature', 'timestamp'))
 
         obj = None
-        add_to_cache = True
+        addToCache = True
         cache_key = RE_REMOVE_EXTENSION.sub('', cache_key)
         if not no_cache:
             obj = cache.loadObject(cache_key)
             if obj is not None:
                 result, complete, typeMap = obj.getContent()
                 ts = obj.getTS()
-                add_to_cache = False
+                addToCache = False
         if result is None:
             # Perform the actual exporting
             result, complete, typeMap = func(aw)
-        if result is not None and add_to_cache:
+        if result is not None and addToCache:
             cache.cacheObject(cache_key, (result, complete, typeMap))
     except HTTPAPIError, e:
         error = e
@@ -221,4 +206,9 @@ def handler(req, **params):
         del resultFossil['_fossil']
 
         req.headers_out['Content-Type'] = serializer.getMIMEType()
-        return serializer(resultFossil)
+
+        try:
+            return serializer(resultFossil)
+        except:
+            logger.exception('Serialization error in request %s?%s' % (path, query))
+            raise
