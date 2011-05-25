@@ -164,7 +164,7 @@
             serializeRooms();
             $E('roomList').set(blockedRoomList.draw());
 
-            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, function() {
+            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {onlyActive: true}, function() {
                 $E('roomChooser').set(roomChooser.draw(), addRoomButton);
                 // sort by room name. we cannot do it serverside since objects are not ordered
                 $j('#roomChooser select > option').detach().sort(function(a, b) {

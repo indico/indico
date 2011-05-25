@@ -127,13 +127,18 @@ class RoomBookingListLocationsAndRooms( ServiceBase ):
 
 class RoomBookingListLocationsAndRoomsWithGuids( ServiceBase ):
 
+    def _checkParams(self):
+        self._onlyActive = self._params.get('onlyActive', False)
+
     def _getAnswer( self ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         result = {}
         if minfo.getRoomBookingModuleActive():
             locationNames = map(lambda l: l.friendlyName, Location.allLocations)
             for loc in locationNames:
-                for room in CrossLocationQueries.getRooms( location = loc ):
+                for room in CrossLocationQueries.getRooms(location = loc):
+                    if self._onlyActive and not room.isActive:
+                        continue
                     result[str(room.guid)] = "%s: %s" % (loc, room.getFullName())
         return result
 
