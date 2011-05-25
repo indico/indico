@@ -1880,7 +1880,7 @@ div.UISimpleDialogMainPanel {
     font-size: 13px;
 }
 
-label {
+label, .label {
     font-weight: bold;
 }
 
