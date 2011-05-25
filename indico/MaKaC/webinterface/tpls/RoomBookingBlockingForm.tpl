@@ -166,6 +166,10 @@
 
             var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, function() {
                 $E('roomChooser').set(roomChooser.draw(), addRoomButton);
+                // sort by room name. we cannot do it serverside since objects are not ordered
+                $j('#roomChooser select > option').detach().sort(function(a, b) {
+                    return strnatcmp($j(a).text().toLowerCase(), $j(b).text().toLowerCase());
+                }).appendTo($j('#roomChooser select'));
             })
             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
             addRoomButton.observeClick(function(setResult){
