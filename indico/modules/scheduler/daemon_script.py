@@ -31,7 +31,8 @@ from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 # legacy import
 from MaKaC.common.Configuration import Config
 from MaKaC.common import DBMgr
-
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 
 class SchedulerApp(object):
 
@@ -190,14 +191,23 @@ def _run(args):
     _setup(args)
 
     dbi = DBMgr.getInstance()
-
     dbi.startRequest()
+
+    info = HelperMaKaCInfo.getMaKaCInfoInstance()
+    useRBDB = info.getRoomBookingModuleActive()
+
+    if useRBDB:
+        DALManager.connect()
 
     sm = SchedulerModule.getDBInstance()
     t = sm.getTaskById(args.taskid)
 
+    t.plugLogger(logging.getLogger('console.run/%s' % args.taskid))
     t.run()
 
+    if useRBDB:
+        DALManager.commit()
+        DALManager.disconnect()
     dbi.endRequest()
 
 def main():
