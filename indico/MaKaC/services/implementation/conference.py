@@ -32,9 +32,8 @@ from MaKaC.common import filters
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common import indexes, info
-from MaKaC.common.fossilize import fossilize
 
-from MaKaC.conference import ConferenceHolder
+from MaKaC.conference import ConferenceHolder, ConferenceChair
 import MaKaC.conference as conference
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import HTMLModificationBase
@@ -45,7 +44,7 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.user import PrincipalHolder, Avatar, Group
+from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 
 import datetime
 from pytz import timezone
@@ -841,6 +840,7 @@ class ConferenceContactInfoModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getAccessController().getContactInfo()
 
+
 class ConferenceAlarmSendTestNow(ConferenceModifBase):
 
     def _checkParams(self):
@@ -871,6 +871,164 @@ class ConferenceSocialBookmarksToggle(ConferenceModifBase):
         val = self._conf.getDisplayMgr().getShowSocialApps()
         self._conf.getDisplayMgr().setShowSocialApps(not val)
 
+class ConferenceAddExistingChairPerson(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        # Check if there is already a user with the same email
+        for person in self._userList:
+            if self._isEmailAlreadyUsed(person["email"]):
+                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another chairperson or the user is already added to the list. Chairperson(s) not added.") % person["email"])
+
+    def _isEmailAlreadyUsed(self, email):
+        for chair in self._conf.getChairList():
+            if email == chair.getEmail():
+                return True
+        return False
+
+    def _newChair(self, av):
+        chair = ConferenceChair()
+        chair.setTitle(av.getTitle())
+        chair.setFirstName(av.getFirstName())
+        chair.setFamilyName(av.getSurName())
+        chair.setAffiliation(av.getAffiliation())
+        chair.setEmail(av.getEmail())
+        chair.setAddress(av.getAddress())
+        chair.setPhone(av.getTelephone())
+        chair.setFax(av.getFax())
+        self._conf.addChair(chair)
+
+    def _getAnswer(self):
+        for person in self._userList:
+            ah = AvatarHolder()
+            av = ah.getById(person["id"])
+            self._newChair(av)
+
+        return fossilize(self._conf.getChairList())
+
+
+class ConferenceAddNewChairPerson(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
+        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
+            raise ServiceAccessError(_("The email address is already used by another chairperson. Chairperson not added."))
+
+    def _isEmailAlreadyUsed(self):
+        for chair in self._conf.getChairList():
+            if self._userData.get("email", "") == chair.getEmail():
+                return True
+        return False
+
+    def _newChair(self):
+        chair = ConferenceChair()
+        chair.setTitle(self._userData.get("title", ""))
+        chair.setFirstName(self._userData.get("firstName", ""))
+        chair.setFamilyName(self._userData.get("familyName", ""))
+        chair.setAffiliation(self._userData.get("affiliation", ""))
+        chair.setEmail(self._userData.get("email", ""))
+        chair.setAddress(self._userData.get("address", ""))
+        chair.setPhone(self._userData.get("phone", ""))
+        chair.setFax(self._userData.get("fax", ""))
+        self._conf.addChair(chair)
+        #If the chairperson needs to be given management rights
+        if self._userData.get("manager", None):
+            avl = AvatarHolder().match({"email": self._userData.get("email", "")})
+            if avl:
+                av = avl[0]
+                self._conf.grantModification(av)
+            else:
+                #Apart from granting the chairman, we add it as an Indico user
+                self._conf.grantModification(chair)
+
+    def _getAnswer(self):
+        self._newChair()
+        return fossilize(self._conf.getChairList())
+
+
+class ConferenceRemoveChairPerson(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._chairId = pm.extract("chairId", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        chair = self._conf.getChairById(self._chairId)
+        self._conf.removeChair(chair)
+
+        return fossilize(self._conf.getChairList())
+
+
+class ConferenceEditChairPerson(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
+        self._chairId = pm.extract("chairId", pType=str, allowEmpty=False)
+        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
+            raise ServiceAccessError(_("The email address is already used by another chairperson. Chairperson not modified."))
+
+    def _isEmailAlreadyUsed(self):
+        for chair in self._conf.getChairList():
+            # check if the email is already used by other different chairperson
+            if self._userData.get("email", "") == chair.getEmail() and self._chairId != str(chair.getId()):
+                return True
+        return False
+
+    def _editChair(self, chair):
+        chair.setTitle(self._userData.get("title", ""))
+        chair.setFirstName(self._userData.get("firstName", ""))
+        chair.setFamilyName(self._userData.get("familyName", ""))
+        chair.setAffiliation(self._userData.get("affiliation", ""))
+        chair.setEmail(self._userData.get("email", ""))
+        chair.setAddress(self._userData.get("address", ""))
+        chair.setPhone(self._userData.get("phone", ""))
+        chair.setFax(self._userData.get("fax", ""))
+        #If the chairperson needs to be given management rights
+        if self._userData.get("manager", None):
+            avl = AvatarHolder().match({"email": self._userData.get("email", "")})
+            if avl:
+                av = avl[0]
+                self._conf.grantModification(av)
+            else:
+                #Apart from granting the chairman, we add it as an Indico user
+                self._conf.grantModification(chair)
+
+    def _getAnswer(self):
+        chair = self._conf.getChairById(self._chairId)
+        self._editChair(chair)
+        return fossilize(self._conf.getChairList())
+
+
+class ConferenceGetChairPersonData(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._chairId = pm.extract("chairId", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        chair = self._conf.getChairById(self._chairId)
+        # var to control if we have to show the checkbox to allow add to modification control list
+        canModify = True
+        av = AvatarHolder().match({"email": chair.getEmail()})
+        if (not av or not av[0] in self._conf.getManagerList()) and not chair.getEmail() in self._conf.getAccessController().getModificationEmail():
+            canModify = False
+        result = fossilize(chair)
+        result["canModify"] = canModify
+        return result
+
+
+class ConferenceGetChairPersonList(ConferenceModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._conf.getChairList())
 
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
@@ -889,6 +1047,12 @@ methodMap = {
     "main.changeShortURL": ConferenceShortURLModification,
     "main.changeKeywords": ConferenceKeywordsModification,
     "main.changeTimezone": ConferenceTimezoneModification,
+    "main.addExistingChairPerson": ConferenceAddExistingChairPerson,
+    "main.addNewChairPerson": ConferenceAddNewChairPerson,
+    "main.removeChairPerson": ConferenceRemoveChairPerson,
+    "main.editChairPerson": ConferenceEditChairPerson,
+    "main.getChairPersonData": ConferenceGetChairPersonData,
+    "main.getChairPersonList": ConferenceGetChairPersonList,
     "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributionsReview,
     "contributions.listAll" : ConferenceListContributions,

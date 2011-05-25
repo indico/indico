@@ -17,6 +17,7 @@ include(ScriptRoot + "indico/Core/Widgets/DateTime.js");
 include(ScriptRoot + "indico/Core/Widgets/Menu.js");
 include(ScriptRoot + "indico/Core/Widgets/Navigation.js");
 include(ScriptRoot + "indico/Core/Widgets/RichText.js");
+include(ScriptRoot + "indico/Core/Widgets/UserList.js");
 
 include(ScriptRoot + "indico/Core/Dialogs/Popup.js");
 include(ScriptRoot + "indico/Core/Dialogs/Base.js");

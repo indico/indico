@@ -136,3 +136,71 @@ type("PicItem", ["IWidget"], {
          //this.ServiceWidget(Indico.Urls.JsonRpcService, 'pics.add', {});
      }
     );
+
+
+/*
+ * Manager of the chairpersons list in the General Settings page
+ */
+type("ChairPersonsManager", ["ListOfUsersManager"], {
+
+    _getAddNewParams: function(userData) {
+        var params = {confId: this.confId, userData: userData};
+        return params;
+    },
+
+    _getAddExistingParams: function(userList) {
+        var params = {confId: this.confId, userList: userList};
+        return params;
+    },
+
+    _getEditParams: function(userData) {
+        var params = {confId: this.confId, chairId: userData.get("id"), userData: userData};
+        return params;
+    },
+
+    _getRemoveParams: function(chairId) {
+        var params = {confId: this.confId, chairId: chairId};
+        return params;
+    },
+
+    _getGetUserParams: function(chairId) {
+        var params = {confId: this.confId, chairId: chairId};
+        return params;
+    },
+
+    addManagementMenu: function(){
+        var self = this;
+        this.inPlaceMenu.observeClick(function(e) {
+            var menuItems = {};
+
+            menuItems[$T('Add existing')] = function(){ self.searchChairperson($T("Add chairperson"), true, this.confId, false,
+                                                                               true, true, false, true); };
+            menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
+
+            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
+            var pos = self.inPlaceMenu.getAbsolutePosition();
+            menu.open(pos.x, pos.y + 20);
+            return false;
+        });
+    }
+
+},
+
+    function(confId, inPlaceListElem, inPlaceMenu) {
+        var self = this;
+        this.confId = confId;
+        this.methods = {'addNew': 'event.main.addNewChairPerson',
+                        'addExisting': 'event.main.addExistingChairPerson',
+                        'remove': 'event.main.removeChairPerson',
+                        'edit': 'event.main.editChairPerson',
+                        'getUserData': 'event.main.getChairPersonData',
+                        'getUserList': 'event.main.getChairPersonList'};
+
+        this.inPlaceListElem = inPlaceListElem;
+        this.inPlaceMenu = inPlaceMenu;
+
+
+        this.ListOfUsersManager(this.confId, this.methods, {confId: this.confId}, this.inPlaceListElem, true, true,
+                                false, false, "chairperson", true);
+    }
+);

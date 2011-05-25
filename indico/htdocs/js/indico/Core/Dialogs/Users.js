@@ -1281,9 +1281,18 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             var self = this;
             self.parameterManager = new IndicoUtil.parameterManager();
 
-            grant = [];
+            var grant = [];
+            var grantManagement = [];
+            var warning = [];
             if (this.grantSubmission) {
-                grant = ['Grant submission rights', $B(Html.checkbox({}), userData.accessor('submission'))];
+                grant = [$T('Grant submission rights'), $B(Html.checkbox({}), userData.accessor('submission'))];
+            }
+            if (this.grantManagement) {
+                grantManagement = [$T('Give management rights.'), $B(Html.checkbox({}), userData.accessor('manager'))];
+                warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
+                           $T('he or she will be sent an email asking to create an account.'), Html.br(),
+                           $T(' After the account creation the user will automatically be'), Html.br(),
+                           $T(' given management rights.'))];
             }
 
             var form = IndicoUtil.createFormFromMap([
@@ -1295,7 +1304,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Address'), $B(Html.textarea(), userData.accessor('address'))],
                [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))],
                [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
-               grant]);
+               grant, grantManagement, warning]);
 
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
          },
@@ -1315,11 +1324,12 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
          }
 
      },
-     function(title, userData, action, grantSubmission) {
+     function(title, userData, action, grantSubmission, grantManagement) {
          this.userData = userData;
          this.action = action;
          this.grantSubmission = exists(grantSubmission)?grantSubmission:false;
-         this.ExclusivePopupWithButtons(title);
+         this.grantManagement = exists(grantManagement)?grantManagement:false;
+         this.ExclusivePopup(title,  function(){return true;});
      }
     );
 

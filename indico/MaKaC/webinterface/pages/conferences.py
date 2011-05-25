@@ -2213,10 +2213,6 @@ class WConfModifMainData(wcomponents.WTemplated):
             vars["contactInfo"]=self._conf.getContactInfo()
         else:
             vars["contactInfo"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._conf.getContactInfo()
-        vars["newChairURL"]=quoteattr(str(urlHandlers.UHConfModChairNew.getURL(self._conf)))
-        vars["remChairsURL"]=quoteattr(str(urlHandlers.UHConferenceRemoveChairs.getURL(self._conf)))
-        vars["searchChairURL"]=quoteattr(str(urlHandlers.UHConfModifSelectChairs.getURL(self._conf)))
-        vars["chairs"] = self._conf.getChairList()
         vars["supportEmailCaption"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption()
         vars["supportEmail"] = i18nformat("""--_("not set")--""")
         if self._conf.hasSupportEmail():
@@ -2460,53 +2456,6 @@ class WPConfDataModif( WPConferenceModification ):
         "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL(),
         "type": params.get("type") }
         return p.getHTML( pars )
-
-
-class WPModChairNew( WPConferenceModification ):
-
-    def _getPageContent(self,params):
-        caption= _("Adding a new chair")
-        wc=wcomponents.WConfModParticipEdit(title=caption)
-        params["postURL"]=urlHandlers.UHConfModChairNew.getURL(self._conf)
-        params["addToManagersList"] = i18nformat("""<tr>
-            <td nowrap class="titleCellTD">
-                <span class="titleCellFormat"> _("Manager")</span>
-            </td>
-            <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                <input type="checkbox" name="manager"> _("Give management rights to the chairperson").</td>
-        </tr>
-        <tr>
-            <td class="titleCellTD" nowrap="nowrap"></td>
-            <td class="blacktext" bgcolor="white" valign="top" width="100%"><i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have an Indico account, he or she will be sent an email asking to create an account. After the account creation the user will automatically be given management rights.")</i></td>
-        </tr>
-            </td>
-        </tr>""")
-        return wc.getHTML( params )
-
-
-class WPModChairEdit( WPConferenceModification ):
-
-    def _getPageContent(self,params):
-        caption= _("Edit chairperson data")
-        chair=part=params["chair"]
-        wc=wcomponents.WConfModParticipEdit(part=chair,title=caption)
-        params["postURL"]=urlHandlers.UHConfModChairEdit.getURL(chair)
-        av = user.AvatarHolder().match({"email":chair.getEmail()})
-        if (not av or not av[0] in self._conf.getManagerList()) and not chair.getEmail() in self._conf.getAccessController().getModificationEmail():
-            params["addToManagersList"] = i18nformat("""<tr>
-                <td nowrap class="titleCellTD">
-                    <span class="titleCellFormat">Manager</span>
-                </td>
-                <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                    <input type="checkbox" name="manager"> _("Give management rights to the chairperson").</td>
-            </tr>
-            <tr>
-                <td class="titleCellTD" nowrap="nowrap"></td>
-                <td class="blacktext" bgcolor="white" valign="top" width="100%"><i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have an Indico account, he or she will be sent an email asking to create an account. After the account creation the user will automatically be given management rights.")</i></td>
-            </tr>
-                </td>
-            </tr>""")
-        return wc.getHTML(params)
 
 
 class WPConfAddMaterial( WPConferenceModification ):
@@ -4762,20 +4711,6 @@ class WPConfModifCFASelectSubmitters(WPConferenceModifAbstractBase):
         params["addURL"] = urlHandlers.UHConfModifCFAAddSubmitter.getURL()
         return wc.getHTML( params )
 
-class WPConfModifSelectChairs(WPConferenceModifBase):
-
-    def _setActiveSideMenuItem(self):
-        self._generalSettingsMenuItem.setActive(True)
-
-    def _getPageContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WUserSelection( urlHandlers.UHConfModifSelectChairs.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfModifAddChairs.getURL()
-        return wc.getHTML( params )
 
 class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):
 

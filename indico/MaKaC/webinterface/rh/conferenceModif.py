@@ -350,116 +350,74 @@ class RHConfPerformDataModif( RHConferenceModifBase ):
         self._redirect( urlHandlers.UHConferenceModification.getURL( self._conf) )
 
 
-#class RHConfSelectChairs( RHConferenceModifBase ):
-#    _uh = urlHandlers.UHConferenceSelectChairs
-#
-#    def _process( self ):
-#        p = conferences.WPConfSelectChairs( self, self._conf )
-#        return p.display( **self._getRequestParams() )
-#
-
-class RHChairNew(RHConferenceModifBase):
-    _uh=urlHandlers.UHConfModChairNew
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self,params)
-        self._action=""
-        if params.has_key("ok"):
-            self._action = "perform"
-        elif params.has_key("cancel"):
-            self._action = "cancel"
-
-    def _newChair(self):
-        chair=conference.ConferenceChair()
-        p=self._getRequestParams()
-        chair.setTitle(p.get("title",""))
-        chair.setFirstName(p.get("name",""))
-        chair.setFamilyName(p.get("surName",""))
-        chair.setAffiliation(p.get("affiliation",""))
-        chair.setEmail(p.get("email",""))
-        chair.setAddress(p.get("address",""))
-        chair.setPhone(p.get("phone",""))
-        chair.setFax(p.get("fax",""))
-        self._target.addChair(chair)
-        #If the chairperson needs to be given management rights
-        if p.get("manager", None):
-            avl = user.AvatarHolder().match({"email":p.get("email","")})
-            if avl:
-                av = avl[0]
-                self._target.grantModification(av)
-            else:
-                #Apart from granting the chairman, we add it as an Indico user
-                self._target.grantModification(chair)
-
-    def _process(self):
-        if self._action!="":
-            if self._action=="perform":
-                self._newChair()
-            url=urlHandlers.UHConferenceModification.getURL(self._target)
-            self._redirect(url)
-        else:
-            p=conferences.WPModChairNew(self,self._conf)
-            return p.display(**self._getRequestParams())
-
-
-class RHConfRemoveChairs( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConferenceRemoveChairs
+class RHConfAddMaterial( RHConferenceModifBase ):
+    _uh = urlHandlers.UHConferenceAddMaterial
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        selChairId=self._normaliseListParam(params.get("selChair",[]))
-        self._chairs=[]
+        typeMat = params.get( "typeMaterial", "notype" )
+        if typeMat=="notype" or typeMat.strip()=="":
+            raise FormValuesError("Please choose a material type")
+        self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
 
-        for id in selChairId:
-            self._chairs.append(self._target.getChairById(id))
+    def _process( self ):
+        if self._mf:
+            if not self._mf.needsCreationPage():
+                m = RHConfPerformAddMaterial.create( self._conf, self._mf, self._getRequestParams() )
+                self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
+                return
+        p = conferences.WPConfAddMaterial( self, self._target, self._mf )
+        return p.display()
 
-    def _process(self):
-        for av in self._chairs:
-            self._target.removeChair(av)
-        self._redirect(urlHandlers.UHConferenceModification.getURL(self._target))
 
+class RHConfPerformAddMaterial( RHConferenceModifBase ):
+    _uh = urlHandlers.UHConferencePerformAddMaterial
 
-class RHChairEdit( RHConferenceModifBase ):
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        typeMat = params.get( "typeMaterial", "" )
+        self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
 
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self._chairId=params["chairId"]
-        self._action=""
-        if params.has_key("ok"):
-            self._action = "perform"
-        elif params.has_key("cancel"):
-            self._action = "cancel"
-
-    def _setChairData(self):
-        c=self._target.getChairById(self._chairId)
-        p = self._getRequestParams()
-        c.setTitle(p.get("title",""))
-        c.setFirstName(p.get("name",""))
-        c.setFamilyName(p.get("surName",""))
-        c.setAffiliation(p.get("affiliation",""))
-        c.setEmail(p.get("email",""))
-        c.setAddress(p.get("address",""))
-        c.setPhone(p.get("phone",""))
-        c.setFax(p.get("fax",""))
-        if p.get("manager", None):
-            avl = user.AvatarHolder().match({"email":p.get("email","")}, exact = 1)
-            if avl:
-                av = avl[0]
-                self._target.grantModification(av)
-            else:
-                self._target.grantModification(c)
-
-    def _process(self):
-        if self._action != "":
-            if self._action == "perform":
-                self._setChairData()
-            url=urlHandlers.UHConferenceModification.getURL(self._target)
-            self._redirect(url)
+    @staticmethod
+    def create( conf, matFactory, matData ):
+        if matFactory:
+            m = matFactory.create( conf )
         else:
-            c=self._target.getChairById(self._chairId)
-            p = conferences.WPModChairEdit(self,self._target)
-            return p.display(chair=c)
+            m = conference.Material()
+            conf.addMaterial( m )
+            m.setValues( matData )
+        return m
 
+    def _process( self ):
+        m = self.create( self._conf, self._mf, self._getRequestParams() )
+        self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
+
+
+class RHConfRemoveMaterials( RHConferenceModifBase ):
+    _uh = urlHandlers.UHConferenceRemoveMaterials
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        typeMat = params.get( "typeMaterial", "" )
+        #self._mf = materialFactories.ConfMFRegistry.getById( typeMat )
+        self._materialIds = self._normaliseListParam( params.get("materialId", []) )
+        self._returnURL = params.get("returnURL","")
+
+    def _process( self ):
+        for id in self._materialIds:
+            #Performing the deletion of special material types
+            f = materialFactories.ConfMFRegistry().getById( id )
+            if f:
+                f.remove( self._target )
+            else:
+                #Performs the deletion of additional material types
+                mat = self._target.getMaterialById( id )
+                self._target.removeMaterial( mat )
+        if self._returnURL != "":
+            url = self._returnURL
+        else:
+            url = urlHandlers.UHConfModifMaterials.getURL( self._target )
+        self._redirect( url )
 
 #----------------------------------------------------------------
 
@@ -6774,37 +6732,6 @@ class RHConfMoveAbsFieldDown( RHConfModifCFABase ):
             self._conf.getAbstractMgr().moveAbsFieldDown(self._fieldId)
         self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
 
-
-
-class RHConfModifSelectChairs(RHConferenceModifBase):
-
-    def _process( self ):
-        p = conferences.WPConfModifSelectChairs( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHConfModifAddChairs(RHConferenceModifBase):
-
-    def _newChair(self, av):
-        chair=conference.ConferenceChair()
-        chair.setTitle(av.getTitle())
-        chair.setFirstName(av.getFirstName())
-        chair.setFamilyName(av.getSurName())
-        chair.setAffiliation(av.getAffiliation())
-        chair.setEmail(av.getEmail())
-        chair.setAddress(av.getAddress())
-        chair.setPhone(av.getTelephone())
-        chair.setFax(av.getFax())
-        self._target.addChair(chair)
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ah = user.AvatarHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                av=ah.getById( id )
-                self._newChair(av)
-        self._redirect( urlHandlers.UHConferenceModification.getURL( self._target ) )
 
 class RHScheduleMoveEntryUp(RHConferenceModifBase):
 

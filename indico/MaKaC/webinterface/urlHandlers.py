@@ -592,25 +592,6 @@ class UHRoomPhotoSmall( URLHandler ):
 #        url.addParam( "small", small )
 #        return url
 
-
-class UHConfModChairNew( URLHandler ):
-    _relativeURL = "conferenceModification.py/newChair"
-
-
-class UHConferenceRemoveChairs( URLHandler ):
-    _relativeURL = "conferenceModification.py/removeChairs"
-
-
-class UHConfModChairEdit( URLHandler ):
-    _relativeURL = "conferenceModification.py/editChair"
-
-class UHConfModifSelectChairs( URLHandler ):
-    _relativeURL = "conferenceModification.py/selectChairs"
-
-
-class UHConfModifAddChairs( URLHandler ):
-    _relativeURL = "conferenceModification.py/addChairs"
-
 class UHConferenceAddMaterial( URLHandler ):
     _relativeURL = "conferenceModification.py/addMaterial"
 

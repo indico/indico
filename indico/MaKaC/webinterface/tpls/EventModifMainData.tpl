@@ -183,35 +183,12 @@ additionalInfo = confObj.getContactInfo()
         <table width="100%">
             <tr>
                 <td class="blacktext" style="width: 100%">
-                    <form action=${ remChairsURL } method="post">
-                        <input type="hidden" name="selChair" value="" />
-                        <ul class="UIPeopleList">
-                            % for chair in chairs:
-                                <li class="UIPerson">
-                                    <a href="${ urlHandlers.UHConfModChairEdit.getURL(chair) }" class="nameLink">
-                                        ${ escape (chair.getFullName()) }
-                                    </a>
-                                    <input type="image" class="UIRowButton2" onclick="removeItem(${chair.getId()}, this.form);return false;"  title="${ _("Remove this person from the list")}" src="${ systemIcon("remove") }" />
-                                </li>
-                            % endfor
-                        </ul>
-                    </form>
+                    <ul id="chairPersonsList" class="UIPeopleList"></ul>
                 </td>
-                <td>
-                    <table>
-                        <tr>
-                            <td>
-                                <form action=${ newChairURL } method="POST">
-                                    <input type="submit" class="btn" value="new">
-                                </form>
-                            </td>
-                            <td>
-                                <form action=${ searchChairURL } method="POST">
-                                    <input type="submit" class="btn" value="search">
-                                </form>
-                            </td>
-                        </tr>
-                    </table>
+                <td nowrap valign="top">
+                    <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
+                        <a id="addNewChairLink" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="chairPersonsManager.addManagementMenu();">${ _("Add chairperson")}</a>
+                    </span>
                 </td>
             </tr>
         </table>
@@ -310,5 +287,7 @@ $E('inPlaceEditLocation').set([
   )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '${ conferenceId }'}, $O(${ offlineRequest(self_._rh,'event.main.changeBooking',dict(conference="%s"%conferenceId))})), context),
     IndicoUI.Aux.defaultEditMenu(context)]);
 
+// Search chairpersons
+var chairPersonsManager = new ChairPersonsManager(confFossile["id"], $E('chairPersonsList'), $E('addNewChairSpan'));
 
 </script>

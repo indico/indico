@@ -1779,7 +1779,9 @@ class ConferenceParticipation(Persistent, Fossilizable, Observable):
     _cmpFamilyName=staticmethod(_cmpFamilyName)
 
 
-class ConferenceChair(ConferenceParticipation):
+class ConferenceChair(ConferenceParticipation, Fossilizable):
+
+    fossilizes(IConferenceParticipationFossil)
 
     def __init__(self):
         self._conf=None
@@ -3229,8 +3231,9 @@ class Conference(CommonObjectBase, Locatable):
         return self._chairs
 
     def _addChair(self,newChair):
-        if newChair in self._chairs:
-            return
+        for chair in self._chairs:
+            if newChair.getEmail() != "" and newChair.getEmail() == chair.getEmail():
+                return
         try:
             if self._chairGen:
                 pass
