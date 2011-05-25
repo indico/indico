@@ -604,7 +604,7 @@ class RHConferenceProgramPDF( RHConferenceBaseDisplay ):
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         #self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 class RHConferenceTimeTable( RoomBookingDBMixin, RHConferenceBaseDisplay ):
@@ -975,7 +975,7 @@ class RHAbstractBookPerform(RHConferenceBaseDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 
@@ -1136,7 +1136,7 @@ class RHConferenceToiCal(RHConferenceBaseDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "ICAL" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 class RHConferenceToXML(RHConferenceBaseDisplay):
@@ -1170,7 +1170,7 @@ class RHConferenceToXML(RHConferenceBaseDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 
@@ -1191,7 +1191,7 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 class RHWriteMinutes( RHConferenceBaseDisplay ):
@@ -1365,7 +1365,7 @@ class RHConferenceLatexPackage(RHConferenceBaseDisplay):
         mimetype = cfg.getFileTypeMimeType( "ZIP" )
         #self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 
