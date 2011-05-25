@@ -41,7 +41,7 @@ from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHSubmitMaterialBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
-from MaKaC.errors import MaKaCError, ModificationError, NoReportError, AccessError
+from MaKaC.errors import MaKaCError, ModificationError, NoReportError, AccessError, NotFoundError
 from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF,TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, ProgrammeToPDF, TimetablePDFFormat
 from xml.sax.saxutils import escape
 from MaKaC.participant import Participant
@@ -543,7 +543,10 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
             self._emailto =self._conf.getChairById(chairid).getEmail()
         if self._auth:
             authid=params.get("authId","")
-            self._emailto =contrib.getAuthorById(authid).getEmail()
+            author = contrib.getAuthorById(authid)
+            if author == None:
+                raise NotFoundError(_("The author you try to email does not exist."))
+            self._emailto = author.getEmail()
 
     def _process(self):
         p=conferences.WPEMail(self, self._target)
