@@ -50,7 +50,7 @@ def main():
 
     args, remainingArgs = parser.parse_known_args()
 
-    if 'logging' in args:
+    if args.logging:
         logger = Logger.get()
         handler = logging.StreamHandler()
         handler.setLevel(getattr(logging, args.logging))
