@@ -59,7 +59,7 @@
                               <tr><td>&nbsp;</td></tr>
                               <!-- ACL -->
                               <tr>
-                                <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")} ${inlineContextHelp(_("These users/groups are allowed to block the selected rooms during the blocking. Note that you as the creator of the blocking are always allowed to book them."))}</span></td>
+                                <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")} ${inlineContextHelp(_("These users/groups are allowed to book the selected rooms during the blocking. Note that you as the creator of the blocking are always allowed to book them."))}</span></td>
                                 <td bgcolor="white" width="100%">
                                   <div id="allowedPrincipals"></div>
                                 </td>
