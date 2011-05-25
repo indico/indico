@@ -203,11 +203,20 @@ def handler(req, **params):
             resultFossil = fossilize(error)
         else:
             resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete))
+
         del resultFossil['_fossil']
 
-        req.headers_out['Content-Type'] = serializer.getMIMEType()
-
         try:
+
+            if error and not serializer.schemaless:
+                # if our serializer has a specific schema (HTML, ICAL, etc...)
+                # use JSON, since it is universal
+                serializer = Serializer.create('json')
+                # set text/plain, so that it is visible in all browsers
+                req.headers_out['Content-Type'] = 'text/plain'
+            else:
+                req.headers_out['Content-Type'] = serializer.getMIMEType()
+
             return serializer(resultFossil)
         except:
             logger.exception('Serialization error in request %s?%s' % (path, query))

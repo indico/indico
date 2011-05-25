@@ -210,14 +210,13 @@ class ExportInterface(object):
         elif dateTime == 'today':
             return ('ctx', now)
 
-        m = re.match(r'^([-+])?(?:(\d{1,3})d)?(?:(\d{1,2})h)?(?:(\d{1,2})m)?$', dateTime)
+        m = re.match(r'^([+])?(?:(\d{1,3})d)?(?:(\d{1,2})h)?(?:(\d{1,2})m)?$', dateTime)
         if m:
             atoms = list(0 if a == None else int(a) for a in m.groups()[1:])
 
-            mod = -1 if m.group(0) == '-' else 1
             if atoms[1] > 23  or atoms[2] > 59:
                 raise ArgumentParseError("Invalid time!")
-            return ('ctx', timedelta(days=mod*atoms[0], hours=mod*atoms[1], minutes=mod*atoms[2]))
+            return ('ctx', timedelta(days=atoms[0], hours=atoms[1], minutes=atoms[2]))
         else:
             # iso 8601 subset
             try:
@@ -303,7 +302,8 @@ class ExportInterface(object):
 
         if filter:
             iterator = itertools.ifilter(filter, iterator)
-        sortedIterator = self._sortedIterator(iterator, limit, orderBy, descending)
+        # offset + limit because offset records are skipped and do not count
+        sortedIterator = self._sortedIterator(iterator, offset + limit, orderBy, descending)
         # Skip offset elements - http://docs.python.org/library/itertools.html#recipes
         next(itertools.islice(sortedIterator, offset, offset), None)
         return sortedIterator

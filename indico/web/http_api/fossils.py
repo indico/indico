@@ -74,6 +74,7 @@ class IConferenceMetadataFossil(IFossil):
     def getOwner(self):
         pass
     getOwner.convert = lambda x: x.getTitle()
+    getOwner.name = 'category'
 
     def getTimezone(self):
         pass
