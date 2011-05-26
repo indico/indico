@@ -327,7 +327,7 @@ class PluginLoader(object):
                 # we store the submodule in the foundSubModules dictionary
                 foundSubModules[itemName] = subModule
 
-                if subModule.__name__.split('.')[-1] != 'test':
+                if not subModule.__name__.split('.')[-1].startswith('test'):
                     # we make a recursive call
                     cls._loadSubModules(subModule)
 
