@@ -21,6 +21,7 @@
 from pytz import timezone
 import fnmatch
 import itertools
+from dateutil import rrule
 from datetime import datetime, timedelta
 from indico.web.http_api import ExportInterface, Exporter
 from indico.web.http_api.util import get_query_parameter
@@ -209,12 +210,11 @@ class RoomBookingExportInterface(ExportInterface):
     """
 
     def _getQueryParams(self, qdata):
-        fromDT = get_query_parameter(qdata, ['f', 'from'])
-        toDT = get_query_parameter(qdata, ['t', 'to'])
-        self._fromDT = utcdate(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
-        self._toDT = utcdate(ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT)) if toDT != None else None
-        self._resvFilter = getResvStateFilter(qdata)
+        super(RoomBookingExportInterface, self)._getQueryParams(qdata)
 
+        self._fromDT = utcdate(self._fromDT) if self._fromDT else None
+        self._toDT = utcdate(self._toDT) if self._toDT else None
+        self._resvFilter = getResvStateFilter(qdata)
 
     @staticmethod
     def _repeatingIterator(resv):
@@ -320,8 +320,14 @@ class ReservationExportInterface(RoomBookingExportInterface):
 
         locList = filter(lambda loc: Location.parse(loc) is not None, locList)
 
+        if self._fromDT or self._toDT:
+            daysParam = (day.date() for day in rrule.rrule(rrule.DAILY, dtstart=self._fromDT, until=self._toDT))
+        else:
+            # slow!
+            daysParam = None
+
         for loc in sorted(locList):
-            resvs = CrossLocationQueries.getReservations(location=loc, resvExample=resvEx)
+            resvs = CrossLocationQueries.getReservations(location=loc, resvExample=resvEx, days=daysParam)
             for obj in self._process(resvs, filter=self._resvFilter):
                 yield obj
 

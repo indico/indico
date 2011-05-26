@@ -252,6 +252,7 @@ class Reservation( Persistent, ReservationBase, Observable ):
             resvsInDays = {}
             for day in days:
                 dayResvs = Reservation.getDayReservationsIndexRoot().get( day )
+
                 if dayResvs:
                     for resv in dayResvs:
                         resvsInDays[resv] = None

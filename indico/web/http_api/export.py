@@ -250,6 +250,19 @@ class ExportInterface(object):
         else:
             return tz.localize(value.combine(value.date(), time(23, 59, 59)))
 
+    def _getQueryParams(self, qdata):
+        fromDT = get_query_parameter(qdata, ['f', 'from'])
+        toDT = get_query_parameter(qdata, ['t', 'to'])
+        dayDT = get_query_parameter(qdata, ['day'])
+
+        if (fromDT or toDT) and dayDT:
+            raise HTTPAPIError("'day' can only be used without 'from' and 'to'", apache.HTTP_BAD_REQUEST)
+        elif dayDT:
+            fromDT = toDT = dayDT
+
+        self._fromDT = ExportInterface._getDateTime('from', fromDT, self._tz)
+        self._toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT)
+
     def _limitIterator(self, iterator, limit):
         counter = 0
         # this set acts as a checklist to know if a record has already been sent
@@ -354,13 +367,9 @@ class CategoryEventExportInterface(ExportInterface):
     }
 
     def category(self, idlist, qdata):
-        fromDT = get_query_parameter(qdata, ['f', 'from'])
-        toDT = get_query_parameter(qdata, ['t', 'to'])
+        super(CategoryEventExporter, self)._getQueryParams()
         location = get_query_parameter(qdata, ['l', 'location'])
         room = get_query_parameter(qdata, ['r', 'room'])
-
-        fromDT = ExportInterface._getDateTime('from', fromDT, self._tz) if fromDT != None else None
-        toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT) if toDT != None else None
 
         idx = IndexesHolder().getById('categoryDate')
 
@@ -378,7 +387,7 @@ class CategoryEventExportInterface(ExportInterface):
                 return True
 
         for catId in idlist:
-            for obj in self._process(idx.iterateObjectsIn(catId, fromDT, toDT), filter, IConferenceMetadataFossil):
+            for obj in self._process(idx.iterateObjectsIn(catId, self._fromDT, self._toDT), filter, IConferenceMetadataFossil):
                 yield obj
 
     def event(self, idlist, qdata):
