@@ -190,7 +190,7 @@ class ExportInterface(object):
         return Serializer.getAllFormats()
 
     @classmethod
-    def _parseDateTime(cls, dateTime):
+    def _parseDateTime(cls, dateTime, allowNegativeOffset):
         """
         Accepted formats:
          * ISO 8601 subset - YYYY-MM-DD[THH:MM]
@@ -210,10 +210,13 @@ class ExportInterface(object):
         elif dateTime == 'today':
             return ('ctx', now)
 
-        m = re.match(r'^([+])?(?:(\d{1,3})d)?(?:(\d{1,2})h)?(?:(\d{1,2})m)?$', dateTime)
+        m = re.match(r'^([+-])?(?:(\d{1,3})d)?(?:(\d{1,2})h)?(?:(\d{1,2})m)?$', dateTime)
         if m:
-            atoms = list(0 if a == None else int(a) for a in m.groups()[1:])
+            mod = -1 if m.group(1) == '-' else 1
+            if not allowNegativeOffset and mod == -1:
+                raise ArgumentParseError('End date cannot be a negative offset')
 
+            atoms = list(0 if a == None else int(a) * mod for a in m.groups()[1:])
             if atoms[1] > 23  or atoms[2] > 59:
                 raise ArgumentParseError("Invalid time!")
             return ('ctx', timedelta(days=atoms[0], hours=atoms[1], minutes=atoms[2]))
@@ -232,15 +235,15 @@ class ExportInterface(object):
     def _getDateTime(cls, ctx, dateTime, tz, aux=None):
 
         try:
-            rel, value = cls._parseDateTime(dateTime)
+            rel, value = cls._parseDateTime(dateTime, ctx=='from')
         except ArgumentParseError, e:
             raise HTTPAPIError(e.message, apache.HTTP_BAD_REQUEST)
 
         if rel == 'abs':
-            return tz.localize(value)
+            return tz.localize(value) if not value.tzinfo else value
         elif rel == 'ctx' and type(value) == timedelta:
             if ctx == 'from':
-                raise ArgumentValueError("Only 'to' accepts relative times")
+                value = nowutc() + value
             else:
                 value = aux + value
 
