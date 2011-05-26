@@ -260,8 +260,8 @@ class ExportInterface(object):
         elif dayDT:
             fromDT = toDT = dayDT
 
-        self._fromDT = ExportInterface._getDateTime('from', fromDT, self._tz) if toDT else None
-        self._toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT) if fromDT else None
+        self._fromDT = ExportInterface._getDateTime('from', fromDT, self._tz) if fromDT else None
+        self._toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT) if toDT else None
 
     def _limitIterator(self, iterator, limit):
         counter = 0
@@ -321,7 +321,7 @@ class ExportInterface(object):
         next(itertools.islice(sortedIterator, offset, offset), None)
         return sortedIterator
 
-    def _postprocess(self, obj, fossil, iface, detail):
+    def _postprocess(self, obj, fossil, iface):
         return fossil
 
     def _process(self, iterator, filter=None, iface=None):
@@ -367,7 +367,7 @@ class CategoryEventExportInterface(ExportInterface):
     }
 
     def category(self, idlist, qdata):
-        super(CategoryEventExporter, self)._getQueryParams()
+        super(CategoryEventExportInterface, self)._getQueryParams(qdata)
         location = get_query_parameter(qdata, ['l', 'location'])
         room = get_query_parameter(qdata, ['r', 'room'])
 
