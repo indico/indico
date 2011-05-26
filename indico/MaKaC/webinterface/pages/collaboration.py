@@ -57,8 +57,7 @@ class WPAdminCollaboration(WPMainBase):
         return wc.getHTML({ "subArea": _("Video Services Administration"), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())), \
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())), \
-                             "tabControl": self._getTabControl(), \
-                             "loginAsURL": self.getLoginAsURL() })
+                             "tabControl": self._getTabControl() })
 
     def _getBody(self, params):
         return WAdminCollaboration(self._queryParams, self._pluginsWithIndexing, self._user).getHTML()

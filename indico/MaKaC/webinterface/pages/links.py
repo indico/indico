@@ -60,8 +60,7 @@ class WPLinkModifBase( WPLinkBase ):
         """
         wc = wcomponents.WManagementHeader( self._getAW() )
         return wc.getHTML( { "loginURL": urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL()),\
-                             "logoutURL": urlHandlers.UHSignOut.getURL(),\
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "logoutURL": urlHandlers.UHSignOut.getURL() } )
 
 ##        wc = wcomponents.WManagementHeader( self._getAW(), self._getNavigationDrawer() )
 ##        return wc.getHTML( { "loginURL": self.getLoginURL(),\

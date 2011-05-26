@@ -24,13 +24,11 @@
       </td>
     </tr>
     </form>
-    <form action="${ logMeAsURL }" method="POST">
     <tr>
       <td>
-        <input type="submit" value="${ _("Log me as ...")}" class="btn">
+        <input type="button" value="${ _("Log me as ...")}" onclick="loginAsManager.drawUsersPopup();">
       </td>
     </tr>
-    </form>
     </table>
   </td>
 </tr>
@@ -89,3 +87,9 @@
 </form>
 
 </table>
+
+<script>
+
+var loginAsManager = new LoginAsManager();
+
+</script>

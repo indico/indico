@@ -77,8 +77,7 @@ class WPAdminsBase( WPMainBase ):
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())), \
-                             "tabControl": self._getTabControl(), \
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "tabControl": self._getTabControl() } )
 
     def _createSideMenu(self):
         self._sideMenu = wcomponents.ManagementSideMenu()
@@ -1275,7 +1274,6 @@ class WUserList(wcomponents.WTemplated):
         vars["nbUsers"] = indexes.IndexesHolder().getById("email").getLength()
         vars["createUserURL"] = urlHandlers.UHUserCreation.getURL()
         vars["mergeUsersURL"] = urlHandlers.UHUserMerge.getURL()
-        vars["logMeAsURL"] = urlHandlers.UHLogMeAs.getURL()
         vars["searchUsersURL"] = urlHandlers.UHUsers.getURL()
         vars["browseUsersURL"] = urlHandlers.UHUsers.getURL()
         vars["browseOptions"] = ""
@@ -1961,25 +1959,6 @@ class WPGroupSelectMembers( WPGroupModificationBase ):
         comp = wcomponents.WPrincipalSelection( urlHandlers.UHGroupSelectMembers.getURL(),forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHGroupAddMembers.getURL()
         return comp.getHTML( params )
-
-
-class WPSelectUserToLogAs(WPUserCommon ):
-
-#    def _getTabContent( self, params ):
-#        wc = WSelectUserToLogAs()
-#        pars = {"submitURL":urlHandlers.UHLogMeAs.getURL()}
-#        return wc.getHTML( pars )
-
-    def _getTabContent( self, params ):
-        searchURL = urlHandlers.UHLogMeAs.getURL()
-        #cancelURL = urlHandlers.UHUsers.getURL()
-        wc = wcomponents.WUserSelection( searchURL, multi=False, forceWithoutExtAuth=True )
-        wc.setTitle(_("Select user to log in as"))
-        params["addURL"] =  urlHandlers.UHLogMeAs.getURL()
-
-        return wc.getHTML( params )
-
-
 
 
 class WPUserMerge( WPUserCommon ):

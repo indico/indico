@@ -1213,8 +1213,7 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
                              "currentView": currentView,\
                              "type": WebFactory.getId(),\
                              "filterActive": False,\
-                             "dark": True,\
-                             "loginAsURL": self.getLoginAsURL()} )
+                             "dark": True } )
 
     def _getBody( self, params ):
 

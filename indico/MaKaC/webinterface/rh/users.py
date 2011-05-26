@@ -80,36 +80,6 @@ class RHUsers( admins.RHAdminBase ):
         p = adminPages.WPUserList( self, self._params )
         return p.display()
 
-class RHUserManagementLogMeAs( admins.RHAdminBase ):
-
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
-        self._params = params
-        self._userId = None
-        self._av = None
-
-        self._returnURL = urlHandlers.UHWelcome.getURL()
-        if "returnURL" in params.keys():
-            self._returnURL = params["returnURL"]
-
-        if "selectedPrincipals" in params.keys() and not "cancel" in params:
-            self._userId = params["selectedPrincipals"]
-            try:
-                self._av = user.AvatarHolder().getById(self._userId)
-            except:
-                raise MaKaCError("can't found user with id %s"%self._userId)
-
-    def _process( self ):
-        if self._av:
-            tzUtil = timezoneUtils.SessionTZ(self._av)
-            tz = tzUtil.getSessionTZ()
-            self._getSession().setVar("ActiveTimezone",tz)
-            self._getSession().setUser(self._av)
-            self._redirect(self._returnURL)
-        else:
-            p = adminPages.WPSelectUserToLogAs( self )
-            return p.display(**self._getRequestParams())
-
 
 class RHUserCreation( RH ):
     _uh = urlHandlers.UHUserCreation

@@ -33,6 +33,3 @@ def switchNotifyAccountCreation( req, **params ):
 
 def switchModerateAccountCreation( req, **params ):
     return users.RHUserManagementSwitchModerateAccountCreation( req ).process( params )
-
-def LogMeAs(req, **params ):
-    return users.RHUserManagementLogMeAs( req ).process( params )

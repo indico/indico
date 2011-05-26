@@ -211,8 +211,6 @@ class WPDecorated( WPBase ):
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL("%s"%self._rh.getCurrentURL())
 
-    def getLoginAsURL( self ):
-        return urlHandlers.UHLogMeAs.getURL("%s"%self._rh.getCurrentURL())
 
     def _getHeader( self ):
         """
@@ -221,8 +219,7 @@ class WPDecorated( WPBase ):
 
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())),\
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
 
     def _getTabControl(self):
         return None

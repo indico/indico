@@ -162,7 +162,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         wc = wcomponents.WConferenceHeader( self._getAW(), self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
-                             "loginAsURL": self.getLoginAsURL(), \
                              "confId": self._conf.getId(), \
                              "dark": True} )
 
@@ -1264,7 +1263,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                              "selectedSession": self._params.get("showSession",""),\
                              "detailLevel": self._params.get("detailLevel",""),\
                              "filterActive": self._params.get("filterActive",""),\
-                             "loginAsURL": self.getLoginAsURL(),
                             "dark": True } )
 
     def getCSSFiles(self):
@@ -1536,8 +1534,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         wc = wcomponents.WHeader( self._getAW() )
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())),\
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
 
     def _getNavigationDrawer(self):
         pars = {"target": self._conf, "isModif": True }

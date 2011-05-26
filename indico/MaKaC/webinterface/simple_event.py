@@ -403,8 +403,7 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
                              "confId": self._conf.getId(),\
                              "currentView": "static",\
                              "type": WebFactory.getId(),\
-                             "dark": True,\
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "dark": True } )
 
     def _getBody( self, params ):
         wc = WSimpleEventDisplay( self._getAW(), self._conf )

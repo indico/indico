@@ -305,14 +305,11 @@ class WHeader(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         #urlHandlers.UHUserDetails.getURL(self._currentuser)
-        vars["logMeAs"] = ""
         # TODO: Remove this after CRBS headers are fixed!
         if self._currentuser:
             vars["userInfo"] = """<font size="-1"><a class="topbar" href="%s" target="_blank">%s</a> - <a href="%s">logout</a></font>"""%(urlHandlers.UHUserDetails.getURL(self._currentuser), self._currentuser.getFullName(), vars["logoutURL"])
             vars["userDetails"] = 'class="topbar" href="%s" target="_blank"'%urlHandlers.UHUserDetails.getURL(self._currentuser)
 
-            if self._currentuser.isAdmin():
-                vars["logMeAs"] = vars["loginAsURL"]
         else:
             vars["userInfo"] = """<a href="%s">login</a>"""%(vars["loginURL"])
             vars["userDetails"] = ""

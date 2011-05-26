@@ -1820,16 +1820,6 @@ class UHUserPerformCreation( URLHandler ):
 class UHUserMerge( URLHandler ):
     _relativeURL = "userMerge.py"
 
-class UHLogMeAs( URLHandler ):
-    _relativeURL = "userManagement.py/LogMeAs"
-
-    def getURL( cls, returnURL="" ):
-        url = cls._getURL()
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
-        return url
-    getURL = classmethod( getURL )
-
 
 class UHConfSignIn( SecureURLHandler ):
     _relativeURL = "confLogin.py"

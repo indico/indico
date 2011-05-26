@@ -1259,8 +1259,7 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
         wc = wcomponents.WHeader( self._getAW() )
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())),\
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
 
     def _getNavigationDrawer(self):
         if self._target and self._target.isRoot():
@@ -1294,8 +1293,7 @@ class WPCategoryModifBase( WPCategoryBase ):
         wc = wcomponents.WHeader( self._getAW() )
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())),\
-                             "loginAsURL": self.getLoginAsURL() } )
+                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
 
     def _getNavigationDrawer(self):
         pars = {"target": self._target , "isModif" : True}
