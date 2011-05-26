@@ -21,7 +21,7 @@
 from pytz import timezone
 import fnmatch
 import itertools
-from datetime import datetime
+from datetime import datetime, timedelta
 from indico.web.http_api import ExportInterface, Exporter
 from indico.web.http_api.util import get_query_parameter
 from indico.util.fossilize import fossilize, IFossil
@@ -203,24 +203,52 @@ class IReservationMetadataFossil(IReservationMetadataFossilBase):
     room.result = IMinimalRoomMetadataFossil
 
 
-class RoomExportInterface(ExportInterface):
+class RoomBookingExportInterface(ExportInterface):
+    """
+    Base export interface for RB related stuff
+    """
+
+    def _getQueryParams(self, qdata):
+        fromDT = get_query_parameter(qdata, ['f', 'from'])
+        toDT = get_query_parameter(qdata, ['t', 'to'])
+        self._fromDT = utcdate(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
+        self._toDT = utcdate(ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT)) if toDT != None else None
+        self._resvFilter = getResvStateFilter(qdata)
+
+
+    @staticmethod
+    def _repeatingIterator(resv):
+        """
+        Iterates over all repeatings of a booking
+        """
+        last = resv.startDT - timedelta(days=1)
+        while True:
+            rep = resv.getNextRepeating(last)
+            if rep == None:
+                break
+            else:
+                yield rep
+                last = rep.startDT
+
+    def _addOccurrences(self, fossil, obj, startDT, endDT):
+        if self._detail == 'occurrences':
+            # get occurrences in the date interval
+            fossil['occurrences'] = fossilize(itertools.ifilter(
+                lambda x: x.startDT >= startDT and x.endDT <= endDT, self._repeatingIterator(obj)),
+                                             {Period: IPeriodFossil}, tz=self._tz,
+                                             naiveTZ=self._serverTZ)
+
+        return fossil
+
+
+class RoomExportInterface(RoomBookingExportInterface):
     DETAIL_INTERFACES = {
         'rooms': IRoomMetadataFossil,
         'reservations': IRoomMetadataWithReservationsFossil,
         'occurrences': IRoomMetadataWithReservationsFossil
     }
 
-    def _postprocess(self, obj, fossil, iface, detail):
-
-        def _repeating_iterator(resv):
-            last = resv.startDT
-            while True:
-                rep = resv.getNextRepeating(last)
-                if rep == None:
-                    break
-                else:
-                    yield rep
-                    last = rep.startDT
+    def _postprocess(self, obj, fossil, iface):
 
         if iface is IRoomMetadataWithReservationsFossil:
             (startDT, endDT) = (self._fromDT or MIN_DATETIME,
@@ -245,27 +273,18 @@ class RoomExportInterface(ExportInterface):
                 resvs = obj.getReservations()
 
             iresvs1, iresvs2 = itertools.tee(itertools.ifilter(self._resvFilter, resvs), 2)
-            fresvs = fossilize(iresvs1, IRoomReservationMetadataFossil, tz=self._tz,
-                               naiveTZ=self._serverTZ)
+            fresvs = fossilize(iresvs1, IRoomReservationMetadataFossil, tz=self._tz, naiveTZ=self._serverTZ)
 
-            if detail == 'occurrences':
-                for fresv, resv in itertools.izip(iter(fresvs), iresvs2):
-                    # get occurrences in the date interval
-                    fresv['occurrences'] = fossilize(itertools.ifilter(
-                        lambda x: x.startDT >= startDT and x.endDT <= endDT, _repeating_iterator(resv)),
-                                                     {Period: IPeriodFossil}, tz=self._tz,
-                                                     naiveTZ=self._serverTZ)
+            for fresv, resv in itertools.izip(iter(fresvs), iresvs2):
+                self._addOccurrences(fresv, resv, startDT, endDT)
 
             fossil['reservations'] = fresvs
 
         return fossil
 
     def room(self, location, idlist, qdata):
-        fromDT = get_query_parameter(qdata, ['f', 'from'])
-        toDT = get_query_parameter(qdata, ['t', 'to'])
-        self._fromDT = utcdate(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
-        self._toDT = utcdate(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
-        self._resvFilter = getResvStateFilter(qdata)
+
+        self._getQueryParams(qdata)
 
         Factory.getDALManager().connect()
         rooms = CrossLocationQueries.getRooms(location=location)
@@ -279,30 +298,33 @@ class RoomExportInterface(ExportInterface):
         Factory.getDALManager().disconnect()
 
 
-class ReservationExportInterface(ExportInterface):
+class ReservationExportInterface(RoomBookingExportInterface):
     DETAIL_INTERFACES = {
-        'reservations': IReservationMetadataFossil
+        'reservations': IReservationMetadataFossil,
+        'occurrences': IReservationMetadataFossil
     }
 
+    def _postprocess(self, obj, fossil, iface):
+        return self._addOccurrences(fossil, obj, self._fromDT, self._toDT)
+
+
     def reservation(self, locList, qdata):
-        fromDT = get_query_parameter(qdata, ['f', 'from'])
-        toDT = get_query_parameter(qdata, ['t', 'to'])
-        fromDT = utcdate(ExportInterface._getDateTime('from', fromDT, self._tz)) if fromDT != None else None
-        toDT = utcdate(ExportInterface._getDateTime('to', toDT, self._tz, aux=fromDT)) if toDT != None else None
-        _filter = getResvStateFilter(qdata)
+
+        self._getQueryParams(qdata)
 
         Factory.getDALManager().connect()
 
         resvEx = ReservationBase()
-        resvEx.startDT = fromDT
-        resvEx.endDT = toDT
+        resvEx.startDT = self._fromDT
+        resvEx.endDT = self._toDT
 
         locList = filter(lambda loc: Location.parse(loc) is not None, locList)
 
         for loc in sorted(locList):
             resvs = CrossLocationQueries.getReservations(location=loc, resvExample=resvEx)
-            for obj in self._process(resvs, filter=_filter):
+            for obj in self._process(resvs, filter=self._resvFilter):
                 yield obj
+
         Factory.getDALManager().disconnect()
 
 

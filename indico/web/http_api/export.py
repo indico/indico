@@ -317,7 +317,7 @@ class ExportInterface(object):
             if iface is None:
                 raise HTTPAPIError('Invalid detail level: %s' % self._detail, apache.HTTP_BAD_REQUEST)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
-            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz), iface, self._detail)
+            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ), iface)
 
 
 @Exporter.register
