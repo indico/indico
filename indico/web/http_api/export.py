@@ -260,8 +260,8 @@ class ExportInterface(object):
         elif dayDT:
             fromDT = toDT = dayDT
 
-        self._fromDT = ExportInterface._getDateTime('from', fromDT, self._tz)
-        self._toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT)
+        self._fromDT = ExportInterface._getDateTime('from', fromDT, self._tz) if toDT else None
+        self._toDT = ExportInterface._getDateTime('to', toDT, self._tz, aux=self._fromDT) if fromDT else None
 
     def _limitIterator(self, iterator, limit):
         counter = 0
