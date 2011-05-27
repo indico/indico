@@ -80,6 +80,7 @@ class Exporter(object):
     MAX_RECORDS = None # abstract
     SERIALIZER_TYPE_MAP = {}
     VALID_FORMATS = None # None = all formats
+    GUEST_ALLOWED = True
 
     @classmethod
     def parseRequest(cls, path, qdata):
@@ -149,9 +150,16 @@ class Exporter(object):
                 (max, self._detail), apache.HTTP_BAD_REQUEST)
         self._limit = self._userLimit if self._userLimit > 0 else max
 
+    def _hasAccess(self, aw):
+        return True
+
     def __call__(self, aw):
         """Perform the actual exporting"""
         self._getParams()
+        if not self.GUEST_ALLOWED and not aw.getUser():
+            raise HTTPAPIError('Guest access to this exporter is forbidden.', apache.HTTP_FORBIDDEN)
+        if not self._hasAccess(aw):
+            raise HTTPAPIError('Access to this exporter is restricted.', apache.HTTP_FORBIDDEN)
         resultList = []
         complete = True
 

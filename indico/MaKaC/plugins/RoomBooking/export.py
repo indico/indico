@@ -29,9 +29,11 @@ from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.common.timezoneUtils import utc2server
 from MaKaC.plugins.RoomBooking.default.factory import Factory
+from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_location import CrossLocationQueries, Location
 from MaKaC.rb_tools import Period
 from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
+from MaKaC.user import Group, Avatar
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 
 
@@ -44,8 +46,28 @@ def utcdate(datet):
     d = datet.astimezone(timezone('UTC'))
     return utc2server(d)
 
+class RoomBookingExporter(Exporter):
+    GUEST_ALLOWED = False
 
-class RoomExporter(Exporter):
+    def _hasAccess(self, aw):
+        """Check if the impersonated user may access the RB module
+
+        Admins can always access it; otherwise the authorized list must be empty or
+        the user must be present in that list (or member of a group in that list).
+        """
+        user = aw.getUser()
+        if user.isAdmin():
+            return True
+        authorizedList = PluginsHolder().getPluginType("RoomBooking").getOption("AuthorisedUsersGroups").getValue()
+        if not authorizedList:
+            return True
+        for entity in authorizedList:
+            if ((isinstance(entity, Group) and entity.containsUser(user)) or
+               (isinstance(entity, Avatar) and entity == user)):
+                return True
+        return False
+
+class RoomExporter(RoomBookingExporter):
     """
     Example: /room/CERN/23.xml
     """
@@ -72,7 +94,7 @@ class RoomExporter(Exporter):
         return expInt.room(self._location, self._idList, self._qdata)
 
 
-class ReservationExporter(Exporter):
+class ReservationExporter(RoomBookingExporter):
     TYPES = ('reservation', )
     RE = r'(?P<loclist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'reservations'
