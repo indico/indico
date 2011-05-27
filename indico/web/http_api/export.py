@@ -44,7 +44,7 @@ from indico.web.http_api.ical import ICalSerializer
 from indico.web.http_api.atom import AtomSerializer
 from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
-    IConferenceMetadataWithSessionsFossil
+    IConferenceMetadataWithSessionsFossil, IPeriodFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.wsgi import webinterface_handler_config as apache
 
@@ -53,9 +53,12 @@ from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.rb_tools import Period, datespan
 
 from indico.web.http_api.util import get_query_parameter, remove_lists
 
+MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
+MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
 
 class ArgumentParseError(Exception):
     pass
@@ -369,8 +372,38 @@ class CategoryEventExportInterface(ExportInterface):
         'sessions': IConferenceMetadataWithSessionsFossil
     }
 
-    def category(self, idlist, qdata):
+    def _getQueryParams(self, qdata):
         super(CategoryEventExportInterface, self)._getQueryParams(qdata)
+        self._occurrences = get_query_parameter(qdata, ['occ', 'occurrences'], 'no') == 'yes'
+
+    def _postprocess(self, obj, fossil, iface):
+        return self._addOccurrences(fossil, obj, self._fromDT, self._toDT)
+
+    @staticmethod
+    def _eventDaysIterator(conf):
+        """
+        Iterates over the daily times of an event
+        """
+        sched = conf.getSchedule()
+        for day in datespan(conf.getStartDate(), conf.getEndDate()):
+            startDT = sched.calculateDayStartDate(day)
+            endDT = sched.calculateDayEndDate(day)
+            if startDT != endDT:
+                yield Period(startDT, endDT)
+
+    def _addOccurrences(self, fossil, obj, startDT, endDT):
+        if self._occurrences:
+            (startDT, endDT) = (startDT or MIN_DATETIME,
+                                endDT or MAX_DATETIME)
+            # get occurrences in the date interval
+            fossil['occurrences'] = fossilize(itertools.ifilter(
+                lambda x: x.startDT >= startDT and x.endDT <= endDT, self._eventDaysIterator(obj)),
+                                             {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
+
+        return fossil
+
+    def category(self, idlist, qdata):
+        self._getQueryParams(qdata)
         location = get_query_parameter(qdata, ['l', 'location'])
         room = get_query_parameter(qdata, ['r', 'room'])
 
@@ -394,6 +427,7 @@ class CategoryEventExportInterface(ExportInterface):
                 yield obj
 
     def event(self, idlist, qdata):
+        self._getQueryParams(qdata)
         ch = ConferenceHolder()
 
         def _iterate_objs(objIds):

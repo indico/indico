@@ -49,6 +49,16 @@ class IHTTPAPIResultFossil(IFossil):
         pass
 
 
+class IPeriodFossil(IFossil):
+    def startDT(self):
+        pass
+    startDT.convert = Conversion.datetime
+
+    def endDT(self):
+        pass
+    endDT.convert = Conversion.datetime
+
+
 class IConferenceMetadataFossil(IFossil):
 
     def getId(self):

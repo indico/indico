@@ -184,7 +184,7 @@ class IRoomReservationMetadataFossil(IReservationMetadataFossilBase):
     pass
 
 
-class IPeriodFossil(IFossil):
+class INaivePeriodFossil(IFossil):
     def startDT(self):
         pass
     startDT.convert = Conversion.naive
@@ -238,7 +238,7 @@ class RoomBookingExportInterface(ExportInterface):
             # get occurrences in the date interval
             fossil['occurrences'] = fossilize(itertools.ifilter(
                 lambda x: x.startDT >= startDT and x.endDT <= endDT, self._repeatingIterator(obj)),
-                                             {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
+                                             {Period: INaivePeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
 
         return fossil
 
