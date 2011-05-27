@@ -59,15 +59,15 @@ class ICalSerializer(Serializer):
         event.set('dtstart', fossil['startDate'])
         event.set('dtend', fossil['endDate'])
         event.set('url', fossil['url'])
-        event.set('summary', fossil['title'])
-        loc = fossil['location']
+        event['summary'] = fossil['title']
+        loc = fossil['location'] or ''
         if fossil['room']:
             loc += ' ' + fossil['room']
-        event.set('location', loc)
+        event['location'] = loc
         if fossil['description']:
-            event.set('description', fossil['description'] + '\n' + fossil['url'])
+            event['description'] = fossil['description'] + '\n' + fossil['url']
         else:
-            event.set('description', fossil['url'])
+            event['description'] = fossil['url']
         return event
 
     def _serialize_repeatability(self, startDT, endDT, repType):
@@ -92,8 +92,8 @@ class ICalSerializer(Serializer):
         event.set('dtend', datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].time()))
         event.set('url', fossil['bookingUrl'])
         event.set('summary', fossil['reason'])
-        event.set('location', fossil['location'] + ': ' + fossil['room']['fullName'])
-        event.set('description', fossil['reason'] + '\n' + fossil['bookingUrl'])
+        event['location'] = fossil['location'] + ': ' + fossil['room']['fullName']
+        event['description'] = fossil['reason'] + '\n' + fossil['bookingUrl']
         rrule = None
         if fossil['repeatability'] is not None:
             rrule = self._serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])
