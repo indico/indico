@@ -72,6 +72,9 @@ class BaseTask(TimedEvent):
 
     fossilizes(ITaskFossil)
 
+    # seconds to consider a task AWOL
+    _AWOLThresold = 6000
+
     def __cmp__(self, obj):
         if self.id == obj.id and self.id == None:
             return cmp(hash(self), hash(obj))
@@ -328,6 +331,10 @@ class TaskOccurrence(TimedEvent):
 class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
     '''Updates statistics associated with categories
     '''
+
+    # seconds to consider a task AWOL
+    _AWOLThresold = 15000
+
     def __init__(self, cat, frequency, **kwargs):
         super(CategoryStatisticsUpdaterTask, self).__init__(frequency,
                                                             **kwargs)
