@@ -214,6 +214,7 @@ class RoomBookingExportInterface(ExportInterface):
 
         self._fromDT = utcdate(self._fromDT) if self._fromDT else None
         self._toDT = utcdate(self._toDT) if self._toDT else None
+        self._occurrences = get_query_parameter(qdata, ['occ', 'occurrences'], 'no') == 'yes'
         self._resvFilter = getResvStateFilter(qdata)
 
     @staticmethod
@@ -231,7 +232,9 @@ class RoomBookingExportInterface(ExportInterface):
                 last = rep.startDT
 
     def _addOccurrences(self, fossil, obj, startDT, endDT):
-        if self._detail == 'occurrences':
+        if self._occurrences:
+            (startDT, endDT) = (startDT or MIN_DATETIME,
+                                endDT or MAX_DATETIME)
             # get occurrences in the date interval
             fossil['occurrences'] = fossilize(itertools.ifilter(
                 lambda x: x.startDT >= startDT and x.endDT <= endDT, self._repeatingIterator(obj)),
@@ -243,8 +246,7 @@ class RoomBookingExportInterface(ExportInterface):
 class RoomExportInterface(RoomBookingExportInterface):
     DETAIL_INTERFACES = {
         'rooms': IRoomMetadataFossil,
-        'reservations': IRoomMetadataWithReservationsFossil,
-        'occurrences': IRoomMetadataWithReservationsFossil
+        'reservations': IRoomMetadataWithReservationsFossil
     }
 
     def _postprocess(self, obj, fossil, iface):
@@ -299,8 +301,7 @@ class RoomExportInterface(RoomBookingExportInterface):
 
 class ReservationExportInterface(RoomBookingExportInterface):
     DETAIL_INTERFACES = {
-        'reservations': IReservationMetadataFossil,
-        'occurrences': IReservationMetadataFossil
+        'reservations': IReservationMetadataFossil
     }
 
     def _postprocess(self, obj, fossil, iface):
