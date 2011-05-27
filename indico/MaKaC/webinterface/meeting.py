@@ -171,17 +171,9 @@ class WebFactory(WebFactory):
         return WPMContribEditData(rh, contrib)
     getContributionEditData = staticmethod (getContributionEditData)
 
-    def getContributionNewspeaker(rh, contrib):
-        return WPMModNewSpeaker (rh,contrib)
-    getContributionNewspeaker = staticmethod(getContributionNewspeaker)
-
     def getContribAddMaterial(rh,contrib, mf):
         return WPMContribAddMaterial (rh,contrib,mf)
     getContribAddMaterial = staticmethod(getContribAddMaterial)
-
-    def getModSpeaker (rh, contrib):
-        return WPMModSpeaker(rh, contrib)
-    getModSpeaker = staticmethod(getModSpeaker)
 
     def getContribAddSC(rh, contrib):
         return WPMContribAddSC(rh,contrib)
@@ -547,20 +539,12 @@ class WPMContributionModification(contributions.WPContributionModification):
         wc = WContribModifMain( self._contrib, ContribMFRegistry(), eventType = "meeting" )
         return wc.getHTML()
 
-class WPMModSpeaker(contributions.WPModSpeaker):
-    pass
-    #def _getBody( self, params ):
-    #    return ContribModifTabsFrame._getBody(self, params)
 
 class WPMContribAddMaterial(contributions.WPContribAddMaterial):
     pass
 #    def _getBody( self, params ):
 #        return ContribModifTabsFrame._getBody(self, params)
 
-class WPMModNewSpeaker(contributions.WPModNewSpeaker):
-    pass
-#    def _getBody( self, params ):
-#        return ContribModifTabsFrame._getBody(self, params)
 
 class WPMContribEditData(contributions.WPEditData):
     pass

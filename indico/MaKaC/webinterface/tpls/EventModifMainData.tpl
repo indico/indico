@@ -187,7 +187,7 @@ additionalInfo = confObj.getContactInfo()
                 </td>
                 <td nowrap valign="top">
                     <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                        <a id="addNewChairLink" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="chairPersonsManager.addManagementMenu();">${ _("Add chairperson")}</a>
+                        <a id="addNewChairLink" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px" onclick="chairPersonsManager.addManagementMenu();">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
                     </span>
                 </td>
             </tr>
@@ -240,8 +240,11 @@ $E('inPlaceEditStartEndDate').set(new StartEndDateWidget('event.main.changeDates
 
 $E('inPlaceEditDescription').set(new ParsedRichTextInlineEditWidget('event.main.changeDescription', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, confFossile.description, null, null, "${_('No description')}").draw());
 
+var userCaption = "speaker";
+
 % if evtType == 'conference':
     $E('inPlaceEditAdditionalInfo').set(new RichTextInlineEditWidget('event.main.changeAdditionalInfo', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(additionalInfo) }, 600, 45, "${_('No additional info')}").draw());
+    userCaption = "chairperson";
 % endif
 
 $E('inPlaceEditShortURL').set(new URLPathEditWidget('event.main.changeShortURL',
@@ -287,7 +290,8 @@ $E('inPlaceEditLocation').set([
   )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '${ conferenceId }'}, $O(${ offlineRequest(self_._rh,'event.main.changeBooking',dict(conference="%s"%conferenceId))})), context),
     IndicoUI.Aux.defaultEditMenu(context)]);
 
-// Search chairpersons
-var chairPersonsManager = new ChairPersonsManager(confFossile["id"], $E('chairPersonsList'), $E('addNewChairSpan'));
+// Search chairpersons/speakers
+
+var chairPersonsManager = new ChairPersonsManager(confFossile["id"], $E('chairPersonsList'), $E('addNewChairSpan'), userCaption);
 
 </script>

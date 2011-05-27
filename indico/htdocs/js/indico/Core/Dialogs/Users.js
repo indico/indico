@@ -750,7 +750,8 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             this.suggestedUsersPanel.suggestedUserListDiv.setStyle('height', pixels(this.cellSuggested.dom.offsetHeight - this.suggestedUsersPanel.titleDiv.dom.offsetHeight - 10));
         }
         this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
-        $E('userSearchFocusField').dom.focus();
+        if (this.allowSearch)
+            $E('userSearchFocusField').dom.focus();
     }
 },
     /**
@@ -1286,6 +1287,10 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             var warning = [];
             if (this.grantSubmission) {
                 grant = [$T('Grant submission rights'), $B(Html.checkbox({}), userData.accessor('submission'))];
+                warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
+                        $T('he or she will be sent an email asking to register as a user.'), Html.br(),
+                        $T(' After the registration the user will automatically be given'), Html.br(),
+                        $T(' submission rights.'))];
             }
             if (this.grantManagement) {
                 grantManagement = [$T('Give management rights.'), $B(Html.checkbox({}), userData.accessor('manager'))];

@@ -510,47 +510,6 @@ class WPContributionModifMaterials( WPContributionModifBase ):
         wc=wcomponents.WShowExistingMaterial(self._target, mode='management', showTitle=True)
         return wc.getHTML( pars )
 
-class WPModSearchPrimAuthor ( WPContribModifMain ):
-
-    def _getTabContent(self,params):
-        url = urlHandlers.UHContribModPrimAuthSearch.getURL()
-        self._conf = self._target.getConference()
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc=wcomponents.WAuthorSearch(self._conf,url, addTo=2,forceWithoutExtAuth=searchLocal)
-        params["addURL"]=urlHandlers.UHContribModPrimAuthSearchAdd.getURL()
-        return wc.getHTML( params )
-
-class WPModSearchCoAuthor ( WPContribModifMain ):
-
-    def _getTabContent(self,params):
-        url = urlHandlers.UHContribModCoAuthSearch.getURL()
-        self._conf = self._target.getConference()
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc=wcomponents.WAuthorSearch(self._conf,url, addTo=2,forceWithoutExtAuth=searchLocal)
-        params["addURL"]=urlHandlers.UHContribModCoAuthSearchAdd.getURL()
-        return wc.getHTML( params )
-
-class WPModSearchSpeaker ( WPContribModifMain ):
-
-    def _getTabContent(self,params):
-        url = urlHandlers.UHContribModSpeakerSearch.getURL()
-        self._conf = self._target.getConference()
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc=wcomponents.WAuthorSearch(self._conf,url, addTo=2,forceWithoutExtAuth=searchLocal)
-        params["addURL"]=urlHandlers.UHContribModSpeakerSearchAdd.getURL()
-        return wc.getHTML( params )
 
 class WAuthorTable(wcomponents.WTemplated):
 
@@ -634,36 +593,6 @@ class WContribModifMain(wcomponents.WTemplated):
                 """)
         return html
 
-    def _getSpeakersHTML(self):
-        res=[]
-        for spk in self._contrib.getSpeakerList():
-            fullName = self.htmlText(spk.getFullName())
-            submitter = ""
-            if spk.getEmail() in self._contrib.getSubmitterEmailList():
-                submitter = i18nformat(""" <small>(_("Submitter"))</small>""")
-            for emails in [av.getEmails() for av in self._contrib.getSubmitterList() if av != None and hasattr(av,"getEmails")]:
-                if spk.getEmail() in emails:
-                    submitter = i18nformat(""" <small>( _("Submitter"))</small>""")
-                    break
-
-            #if not self._contrib.isAuthor(spk):
-            fullName = """<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHContribModSpeaker.getURL(spk))), \
-                                                self.htmlText(spk.getFullName()))
-            res.append("""<input type="checkbox" name="selSpeaker" value=%s><i>%s</i>%s"""%(quoteattr(str(spk.getId())),fullName, submitter))
-        return "<br>".join(res)
-
-    def _getAuthorsForSpeakers(self):
-        res=["""<option value=""></option>"""]
-        for auth in self._contrib.getPrimaryAuthorList():
-            if self._contrib.isSpeaker(auth):
-                continue
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(auth.getId()),self.htmlText(auth.getFullName())))
-        for auth in self._contrib.getCoAuthorList():
-            if self._contrib.isSpeaker(auth):
-                continue
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(auth.getId()),self.htmlText(auth.getFullName())))
-        return "".join(res)
-
     def _getChangeTracksHTML(self):
         res=[]
         if not self._contrib.getTrack() is None:
@@ -745,24 +674,6 @@ class WContribModifMain(wcomponents.WTemplated):
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._contrib.getDescription()
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
         vars["rowspan"]="6"
-        tmp = WAuthorTable( self._contrib.getPrimaryAuthorList(), self._contrib )
-        p = {"addAuthorsURL":quoteattr(str(urlHandlers.UHContribModNewPrimAuthor.getURL(self._contrib))), \
-            "authorActionURL":quoteattr(str(urlHandlers.UHContribModPrimaryAuthorAction.getURL(self._contrib))), \
-            "modAuthorURLGen":urlHandlers.UHContribModPrimAuthor.getURL,\
-            "upAuthorURLGen":urlHandlers.UHContribModPrimAuthUp.getURL, \
-            "downAuthorURLGen":urlHandlers.UHContribModPrimAuthDown.getURL, \
-            "searchAuthorURL":quoteattr(str(urlHandlers.UHContribModPrimAuthSearch.getURL(self._contrib))), \
-            "moveValue": _("to co-author")}
-        vars["primAuthTable"] = tmp.getHTML(p)
-        tmp = WAuthorTable( self._contrib.getCoAuthorList(), self._contrib)
-        p = {"addAuthorsURL":quoteattr(str(urlHandlers.UHContribModNewCoAuthor.getURL(self._contrib))), \
-            "authorActionURL":quoteattr(str(urlHandlers.UHContribModCoAuthorAction.getURL(self._contrib))), \
-            "modAuthorURLGen":urlHandlers.UHContribModCoAuthor.getURL,\
-            "upAuthorURLGen":urlHandlers.UHContribModCoAuthUp.getURL, \
-            "downAuthorURLGen":urlHandlers.UHContribModCoAuthDown.getURL, \
-            "searchAuthorURL":quoteattr(str(urlHandlers.UHContribModCoAuthSearch.getURL(self._contrib))), \
-            "moveValue": _("to primary")}
-        vars["coAuthTable"] = tmp.getHTML(p)
         vars["place"] = ""
         if self._contrib.getLocation():
             vars["place"]=self.htmlText(self._contrib.getLocation().getName())
@@ -788,13 +699,7 @@ class WContribModifMain(wcomponents.WTemplated):
         vars["abstract"] = ""
         if isinstance(self._contrib, conference.AcceptedContribution):
             vars["abstract"] = self._getAbstractHTML()
-        vars["speakers"]=self._getSpeakersHTML()
         vars["contrib"] = self._contrib
-        vars["authorsForSpeakers"]=self._getAuthorsForSpeakers()
-        vars["addSpeakersURL"]=quoteattr(str(urlHandlers.UHContribModAddSpeakers.getURL(self._contrib)))
-        vars["newSpeakerURL"]=quoteattr(str(urlHandlers.UHContribModNewSpeaker.getURL(self._contrib)))
-        vars["remSpeakersURL"]=quoteattr(str(urlHandlers.UHContribModRemSpeakers.getURL(self._contrib)))
-        vars["searchSpeakersURL"]=quoteattr(str(urlHandlers.UHContribModSpeakerSearch.getURL(self._contrib)))
         vars["selTracks"]=self._getChangeTracksHTML()
         vars["setTrackURL"]=quoteattr(str(urlHandlers.UHContribModSetTrack.getURL(self._contrib)))
         vars["selSessions"]=self._getChangeSessionsHTML()
@@ -833,168 +738,6 @@ class WPContributionModificationClosed( WPContribModifMain ):
         wc = WContribModifClosed()
         return wc.getHTML()
 
-
-class WContribModNewPrimAuthor(wcomponents.WTemplated):
-
-    def __init__(self,contrib):
-        self._contrib = contrib
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHContribModNewPrimAuthor.getURL(self._contrib)))
-        vars["titles"]=TitlesRegistry().getSelectItemsHTML()
-        return vars
-
-
-
-class WPModNewPrimAuthor( WPContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WContribModNewPrimAuthor(self._contrib)
-        return wc.getHTML()
-
-
-class WContribModPrimAuthor(wcomponents.WTemplated):
-
-    def __init__(self,auth):
-        self._auth=auth
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHContribModPrimAuthor.getURL(self._auth)))
-        vars["titles"]=TitlesRegistry.getSelectItemsHTML(self._auth.getTitle())
-        vars["surName"]=quoteattr(self._auth.getFamilyName())
-        vars["name"]=quoteattr(self._auth.getFirstName())
-        vars["affiliation"]=quoteattr(self._auth.getAffiliation())
-        vars["email"]=quoteattr(self._auth.getEmail())
-        vars["address"]=self._auth.getAddress()
-        vars["phone"]=quoteattr(self._auth.getPhone())
-        vars["fax"]=quoteattr(self._auth.getFax())
-        return vars
-
-
-class WPModPrimAuthor( WPContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WContribModPrimAuthor(params["author"])
-        return wc.getHTML()
-
-class WContribModNewCoAuthor(wcomponents.WTemplated):
-
-    def __init__(self,contrib):
-        self._contrib = contrib
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHContribModNewCoAuthor.getURL(self._contrib)))
-        vars["titles"]=TitlesRegistry().getSelectItemsHTML()
-        return vars
-
-
-class WPModNewCoAuthor( WPContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WContribModNewCoAuthor(self._contrib)
-        return wc.getHTML()
-
-class WContribModNewSpeaker(wcomponents.WTemplated):
-
-    def __init__(self,contrib):
-        self._contrib = contrib
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHContribModNewSpeaker.getURL(self._contrib)))
-        vars["titles"]=TitlesRegistry().getSelectItemsHTML()
-        return vars
-
-
-class WPModNewSpeaker( WPContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WContribModNewSpeaker(self._contrib)
-        return wc.getHTML()
-
-
-class WContribModCoAuthor(wcomponents.WTemplated):
-
-    def __init__(self,auth):
-        self._auth=auth
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHContribModCoAuthor.getURL(self._auth)))
-        vars["titles"]=TitlesRegistry.getSelectItemsHTML(self._auth.getTitle())
-        vars["surName"]=quoteattr(self._auth.getFamilyName())
-        vars["name"]=quoteattr(self._auth.getFirstName())
-        vars["affiliation"]=quoteattr(self._auth.getAffiliation())
-        vars["email"]=quoteattr(self._auth.getEmail())
-        vars["address"]=self._auth.getAddress()
-        vars["phone"]=quoteattr(self._auth.getPhone())
-        vars["fax"]=quoteattr(self._auth.getFax())
-        return vars
-
-
-class WPModCoAuthor( WPContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WContribModCoAuthor(params["author"])
-        return wc.getHTML()
-
-class WContribModSpeaker(wcomponents.WTemplated):
-
-    def __init__(self,auth):
-        self._auth=auth
-
-    def _getAddAsSubmitterHTML(self):
-        html= i18nformat("""
-                    <tr>
-                        <td nowrap class="titleCellTD">
-                            <span class="titleCellFormat"> _("Submission control")</span>
-                        </td>
-                        <td bgcolor="white" width="100%%" valign="top" class="blacktext" style="padding-left:5px">
-                            %s
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">&nbsp;</td>
-                    </tr>
-                    """)
-        from MaKaC.user import AvatarHolder
-        ah = AvatarHolder()
-        results=ah.match({"email":self._auth.getEmail()}, exact=1)
-        if results is not None and results!=[]:
-            av=results[0]
-            if self._auth.getContribution().canUserSubmit(av):
-                html=html%( _("""This speaker Already have submission rights."""))
-            else:
-                html=html% i18nformat("""<input type="checkbox" name="submissionControl"> _("Give submission rights to the speaker").""")
-        elif self._auth.getEmail() in self._auth.getContribution().getSubmitterEmailList():
-            html=html%( _("""This speaker Already have submission rights."""))
-        else:
-            html=html% i18nformat("""<input type="checkbox" name="submissionControl"> _("Give submission rights to the speaker.")<br><br><i><font color="black"><b> _("Note"): </b></font> _("This person does NOT already have an Indico account, he or she will be sent an email asking to create an account. After the account creation, the user will automatically be given submission rights.")</i>""")
-        return html
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHContribModSpeaker.getURL(self._auth)))
-        vars["titles"]=TitlesRegistry.getSelectItemsHTML(self._auth.getTitle())
-        vars["surName"]=quoteattr(self._auth.getFamilyName())
-        vars["name"]=quoteattr(self._auth.getFirstName())
-        vars["affiliation"]=quoteattr(self._auth.getAffiliation())
-        vars["email"]=quoteattr(self._auth.getEmail())
-        vars["address"]=self._auth.getAddress()
-        vars["phone"]=quoteattr(self._auth.getPhone())
-        vars["fax"]=quoteattr(self._auth.getFax())
-        vars["addAsSubmitter"]=self._getAddAsSubmitterHTML()
-        return vars
-
-
-class WPModSpeaker( WPContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WContribModSpeaker(params["author"])
-        return wc.getHTML()
 
 class WContribModWithdraw(wcomponents.WTemplated):
 

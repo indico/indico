@@ -173,7 +173,7 @@ type("ChairPersonsManager", ["ListOfUsersManager"], {
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
 
-            menuItems[$T('Add existing')] = function(){ self.searchChairperson($T("Add chairperson"), true, this.confId, false,
+            menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
                                                                                true, true, false, true); };
             menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
 
@@ -186,7 +186,7 @@ type("ChairPersonsManager", ["ListOfUsersManager"], {
 
 },
 
-    function(confId, inPlaceListElem, inPlaceMenu) {
+    function(confId, inPlaceListElem, inPlaceMenu, userCaption) {
         var self = this;
         this.confId = confId;
         this.methods = {'addNew': 'event.main.addNewChairPerson',
@@ -196,11 +196,10 @@ type("ChairPersonsManager", ["ListOfUsersManager"], {
                         'getUserData': 'event.main.getChairPersonData',
                         'getUserList': 'event.main.getChairPersonList'};
 
-        this.inPlaceListElem = inPlaceListElem;
         this.inPlaceMenu = inPlaceMenu;
 
 
-        this.ListOfUsersManager(this.confId, this.methods, {confId: this.confId}, this.inPlaceListElem, true, true,
-                                false, false, "chairperson", true);
+        this.ListOfUsersManager(this.confId, this.methods, {confId: this.confId}, inPlaceListElem, true, true, false,
+                                false, null, userCaption, "UIPerson", false, true);
     }
 );

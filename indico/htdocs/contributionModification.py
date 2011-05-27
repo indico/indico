@@ -26,36 +26,6 @@ def index(req, **params):
 def browseMaterial(req, **params):
     return contribMod.RHContribModifMaterialBrowse( req ).process( params )
 
-def newPrimAuthor(req, **params):
-    return contribMod.RHNewPrimaryAuthor( req ).process( params )
-
-def searchPrimAuthor(req, **params):
-    return contribMod.RHSearchPrimaryAuthor( req ).process( params )
-
-def searchAddPrimAuthor(req, **params):
-    return contribMod.RHSearchAddPrimaryAuthor( req ).process( params )
-
-def searchCoAuthor(req, **params):
-    return contribMod.RHSearchCoAuthor( req ).process( params )
-
-def searchAddCoAuthor(req, **params):
-    return contribMod.RHSearchAddCoAuthor( req ).process( params )
-
-def remPrimAuthors(req, **params):
-    return contribMod.RHRemPrimaryAuthors( req ).process( params )
-
-def modPrimAuthor(req, **params):
-    return contribMod.RHEditPrimaryAuthor( req ).process( params )
-
-def newCoAuthor(req, **params):
-    return contribMod.RHNewCoAuthor( req ).process( params )
-
-def remCoAuthors(req, **params):
-    return contribMod.RHRemCoAuthors( req ).process( params )
-
-def modCoAuthor(req, **params):
-    return contribMod.RHEditCoAuthor( req ).process( params )
-
 def addMaterial(req, **params):
     return contribMod.RHContributionAddMaterial( req ).process( params )
 
@@ -93,19 +63,6 @@ def modifData( req, **params ):
     return contribMod.RHContributionModifData( req ).process( params )
 
 
-def addSpk( req, **params ):
-    return contribMod.RHAddSpeakers( req ).process( params )
-
-
-def remSpk( req, **params ):
-    return contribMod.RHRemSpeakers( req ).process( params )
-
-def searchSpk( req, **params ):
-    return contribMod.RHSearchSpeakers( req ).process( params )
-
-def searchAddSpk(req, **params):
-    return contribMod.RHSearchAddSpeakers( req ).process( params )
-
 def setTrack( req, **params ):
     return contribMod.RHSetTrack( req ).process( params )
 
@@ -115,30 +72,6 @@ def setSession( req, **params ):
 
 def withdraw(req, **params):
     return contribMod.RHWithdraw( req ).process( params )
-
-def primAuthUp(req, **params):
-    return contribMod.RHPrimAuthUp( req ).process( params )
-
-def primAuthDown(req, **params):
-    return contribMod.RHPrimAuthDown( req ).process( params )
-
-def coAuthUp(req, **params):
-    return contribMod.RHCoAuthUp( req ).process( params )
-
-def coAuthDown(req, **params):
-    return contribMod.RHCoAuthDown( req ).process( params )
-
-def primaryAuthorAction(req, **params):
-    return contribMod.RHPrimaryAuthorsActions( req ).process( params )
-
-def coAuthorAction(req, **params):
-    return contribMod.RHCoAuthorsActions( req ).process( params )
-
-def newSpeaker(req, **params):
-    return contribMod.RHNewSpeaker( req ).process( params )
-
-def modSpeaker(req, **params):
-    return contribMod.RHEditSpeaker( req ).process( params )
 
 def materials(req, **params):
     return contribMod.RHMaterials( req ).process( params )

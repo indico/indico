@@ -2743,72 +2743,6 @@ class UHContribModifMaterials( URLHandler ):
 class UHContribModifSchedule( URLHandler ):
     _relativeURL = "contributionModification.py/schedule"
 
-class UHContribModNewPrimAuthor( URLHandler ):
-    _relativeURL = "contributionModification.py/newPrimAuthor"
-
-class UHContribModPrimAuthSearch(URLHandler):
-    _relativeURL = "contributionModification.py/searchPrimAuthor"
-
-class UHContribModPrimAuthSearchAdd(URLHandler):
-    _relativeURL = "contributionModification.py/searchAddPrimAuthor"
-
-class UHContribModCoAuthSearch(URLHandler):
-    _relativeURL = "contributionModification.py/searchCoAuthor"
-
-class UHContribModCoAuthSearchAdd(URLHandler):
-    _relativeURL = "contributionModification.py/searchAddCoAuthor"
-
-class UHContribModPrimaryAuthorAction( URLHandler ):
-    _relativeURL = "contributionModification.py/primaryAuthorAction"
-
-class UHContribModRemPrimAuthors( URLHandler ):
-    _relativeURL = "contributionModification.py/remPrimAuthors"
-
-
-class UHContribModPrimAuthor( URLHandler ):
-    _relativeURL = "contributionModification.py/modPrimAuthor"
-
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-        url.setParams(target.getContribution().getLocator())
-        url.addParam("authorId",target.getId())
-        return url
-    getURL = classmethod( getURL )
-
-
-class UHContribModNewCoAuthor( URLHandler ):
-    _relativeURL = "contributionModification.py/newCoAuthor"
-
-class UHContribModCoAuthorAction( URLHandler ):
-    _relativeURL = "contributionModification.py/coAuthorAction"
-
-class UHContribModRemCoAuthors( URLHandler ):
-    _relativeURL = "contributionModification.py/remCoAuthors"
-
-
-class UHContribModCoAuthor( URLHandler ):
-    _relativeURL = "contributionModification.py/modCoAuthor"
-
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-        url.setParams(target.getContribution().getLocator())
-        url.addParam("authorId",target.getId())
-        return url
-    getURL = classmethod( getURL )
-
-class UHContribModNewSpeaker( URLHandler ):
-    _relativeURL = "contributionModification.py/newSpeaker"
-
-class UHContribModSpeaker( URLHandler ):
-    _relativeURL = "contributionModification.py/modSpeaker"
-
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-        url.setParams(target.getContribution().getLocator())
-        url.addParam("authorId",target.getId())
-        return url
-    getURL = classmethod( getURL )
-
 
 class UHContributionMove( URLHandler ):
     _relativeURL = "contributionModification.py/move"
@@ -2899,18 +2833,6 @@ class UHConfModifContribListCloseMenu( URLHandler ):
 class UHContribModifMaterialBrowse( URLHandler ):
     _relativeURL = "contributionModification.py/browseMaterial"
 
-class UHContribModAddSpeakers( URLHandler ):
-    _relativeURL = "contributionModification.py/addSpk"
-
-
-class UHContribModRemSpeakers( URLHandler ):
-    _relativeURL = "contributionModification.py/remSpk"
-
-class UHContribModSpeakerSearch( URLHandler ):
-    _relativeURL = "contributionModification.py/searchSpk"
-
-class UHContribModSpeakerSearchAdd(URLHandler):
-    _relativeURL = "contributionModification.py/searchAddSpk"
 
 class UHContribModSetTrack( URLHandler ):
     _relativeURL = "contributionModification.py/setTrack"
@@ -3159,22 +3081,6 @@ class UHConfSpeakerIndex(URLHandler):
 
 class UHContribModWithdraw( URLHandler ):
     _relativeURL = "contributionModification.py/withdraw"
-
-class UHContribModPrimAuthUp( URLHandler ):
-    _relativeURL = "contributionModification.py/primAuthUp"
-
-
-class UHContribModPrimAuthDown( URLHandler ):
-    _relativeURL = "contributionModification.py/primAuthDown"
-
-
-class UHContribModCoAuthUp( URLHandler ):
-    _relativeURL = "contributionModification.py/coAuthUp"
-
-
-class UHContribModCoAuthDown( URLHandler ):
-    _relativeURL = "contributionModification.py/coAuthDown"
-
 
 class UHTrackModContribList(URLHandler):
     _relativeURL="trackModContribList.py"
