@@ -122,6 +122,7 @@ def _fixEmptyURLs(obj):
         if type(l) == SystemLink and not hasattr(l, '_URL'):
             menu._listLink.remove(l)
 
+
 def runCategoryACMigration(dbi, withRBDB):
     """
     Fixing AccessController for categories
