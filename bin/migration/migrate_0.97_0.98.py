@@ -33,6 +33,7 @@ from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
+from MaKaC.webinterface.displayMgr import ConfDisplayMgrRegistery, SystemLink
 
 from indico.ext import livesync
 from indico.util import console
@@ -115,6 +116,12 @@ def _convertAlarms(obj):
     obj.alarmList = alarms
 
 
+def _fixEmptyURLs(obj):
+    menu = ConfDisplayMgrRegistery().getDisplayMgr(obj).getMenu()
+    for l in menu.getLinkList():
+        if type(l) == SystemLink and not hasattr(l, '_URL'):
+            menu._listLink.remove(l)
+
 def runCategoryACMigration(dbi, withRBDB):
     """
     Fixing AccessController for categories
@@ -149,20 +156,14 @@ def runConferenceMigration(dbi, withRBDB):
             nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
             obj._Conference__alarmCounter = Counter(nstart)
 
-            # TODO: For each conference, take the existing tasks and
+            # For each conference, take the existing tasks and
             # convert them to the new object classes.
-            # It is important to save the state of the alarm (sent or not)
             _convertAlarms(obj)
+
+            _fixEmptyURLs(obj)
 
         _fixAccessController(obj,
                              fixSelf=(level != 'subcontrib'))
-
-        if i % 1000 == 999:
-            dbi.commit()
-            if withRBDB:
-                DALManager.commit()
-
-        i += 1
 
         # Convert RegistrationSessions to RegistrantSessions
         if isinstance(obj, Conference):
@@ -171,6 +172,13 @@ def runConferenceMigration(dbi, withRBDB):
                        isinstance(reg._sessions[0], RegistrationSession):
                     reg._sessions = [RegistrantSession(ses, reg) \
                                      for ses in reg._sessions]
+
+        if i % 1000 == 999:
+            dbi.commit()
+            if withRBDB:
+                DALManager.commit()
+
+        i += 1
 
     dbi.commit()
     if withRBDB:
