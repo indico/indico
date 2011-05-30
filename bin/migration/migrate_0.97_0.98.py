@@ -119,7 +119,8 @@ def _convertAlarms(obj):
 def _fixEmptyURLs(obj):
     menu = ConfDisplayMgrRegistery().getDisplayMgr(obj).getMenu()
     for l in menu.getLinkList():
-        if type(l) == SystemLink and not hasattr(l, '_URL'):
+        if type(l) == SystemLink and not hasattr(l, '_URL') and l.getCaption() == '' \
+               and l.getName() == 'manageabstractreviewing':
             menu._listLink.remove(l)
 
 
