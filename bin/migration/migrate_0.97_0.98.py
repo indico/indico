@@ -33,7 +33,6 @@ from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
 from MaKaC.registration import RegistrantSession, RegistrationSession
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
-from MaKaC.webinterface.displayMgr import ConfDisplayMgrRegistery, SystemLink
 
 from indico.ext import livesync
 from indico.util import console
@@ -116,14 +115,6 @@ def _convertAlarms(obj):
     obj.alarmList = alarms
 
 
-def _fixEmptyURLs(obj):
-    menu = ConfDisplayMgrRegistery().getDisplayMgr(obj).getMenu()
-    for l in menu.getLinkList():
-        if type(l) == SystemLink and not hasattr(l, '_URL') and l.getCaption() == '' \
-               and l.getName() == 'manageabstractreviewing':
-            menu._listLink.remove(l)
-
-
 def runCategoryACMigration(dbi, withRBDB):
     """
     Fixing AccessController for categories
@@ -161,8 +152,6 @@ def runConferenceMigration(dbi, withRBDB):
             # For each conference, take the existing tasks and
             # convert them to the new object classes.
             _convertAlarms(obj)
-
-            _fixEmptyURLs(obj)
 
         _fixAccessController(obj,
                              fixSelf=(level != 'subcontrib'))
