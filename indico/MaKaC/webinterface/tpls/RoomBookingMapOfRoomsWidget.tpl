@@ -223,7 +223,7 @@ function availabilityFilterFunction(filtersCallback) {
                 filtersCallback([], [roomIdFilter]);
             } else {
                 IndicoUtil.errorReport(error);
-                setResult(false);
+                filtersCallback([], []);
             }
         }
 
