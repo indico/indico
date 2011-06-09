@@ -65,9 +65,6 @@ class Scheduler(object):
         # tasks in the runningList the lower the number the lower the number of checks
         'awol_tasks_check_probability': 0.3,
 
-        # seconds to consider a task AWOL
-        'awol_tasks_thresold': 6000,
-
         # Number of times to try to run a task before aborting (min 1)
         'task_max_tries': 5
         }
@@ -144,7 +141,7 @@ class Scheduler(object):
     def _db_notifyTaskStatus(self, task, status):
         """
         Called by a task when it's done. If a task doesn't notify us
-        after AWOL_TASKS_THRESHOLD seconds we assume it went AWOL and
+        after AWOLThresold seconds we assume it went AWOL and
         we notify the admins
         """
 
@@ -480,7 +477,7 @@ class Scheduler(object):
                 runForSecs = int_timestamp(self._getCurrentDateTime()) - \
                              int_timestamp(task.getOnRunningListSince())
 
-                if runForSecs > self._config.awol_tasks_thresold:
+                if runForSecs > task._AWOLThresold:
                     self._logger.warning("Task %s has been running for %d secs. "
                                    "Assuming it has died abnormally and forcibly "
                                    "calling its tearDown()..." % (task.id, runForSecs))

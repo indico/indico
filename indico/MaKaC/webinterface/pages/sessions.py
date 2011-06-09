@@ -463,7 +463,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
         loc=self._session.getLocation()
         if loc is not None and loc.getName().strip()!="":
             vars["location"]="""<i>%s</i>"""%self.htmlText(loc.getName())
-            if loc.getAddress().strip()!="":
+            if loc.getAddress() is not None and loc.getAddress().strip()!="":
                 vars["location"]="""%s<pre>%s</pre>"""%(vars["location"],
                                                         loc.getAddress())
         room = self._session.getRoom()

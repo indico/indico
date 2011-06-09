@@ -1195,7 +1195,7 @@ class Category(CommonObjectBase):
         self._numConferences=0
         if len(self.getSubCategoryList())>0:
             for sc in self.getSubCategoryList():
-                sc.getNumConferences()
+                self._incNumConfs(sc.getNumConferences())
         else:
             self._incNumConfs(len(self.getConferenceList()))
 

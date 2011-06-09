@@ -200,7 +200,7 @@ def createCSV(resvs, req):
     req.headers_out["Content-Length"] = "%s"%int(os.stat(tempFileName)[stat.ST_SIZE])
     mimetype = cfg.getFileTypeMimeType( cfg.getFileType("CSV") )
     req.content_type = """%s"""%(mimetype)
-    req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%os.path.basename(tempFileName)
+    req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%os.path.basename(tempFileName).replace("\r\n"," ")
 
     fr = open(tempFileName, "rb")
     data = fr.read()

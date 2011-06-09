@@ -72,7 +72,7 @@ class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "XML" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 class RHWriteMinutes( RHSubContributionDisplayBase ):

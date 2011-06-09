@@ -243,11 +243,11 @@ class RHSearchBase:
 
     @classmethod
     def create(self, req, params):
-        
+
         l = locators.WebLocator()
 
-        try:            
-            l.setCategory(params)                    
+        try:
+            l.setCategory(params)
             return RHSearchCategory(req)
         except:
             try:
@@ -255,7 +255,7 @@ class RHSearchBase:
                 return RHSearchConference(req)
             except:
                 # fallback - root category search page
-                params['categId'] = [0]
+                params['categId'] = 0
                 return RHSearchCategory(req)
 
 class RHSearchConference(RHConferenceBase, RHSearchBase):

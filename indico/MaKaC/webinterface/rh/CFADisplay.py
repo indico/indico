@@ -537,10 +537,13 @@ class RHAbstractDisplay( RHAbstractDisplayBase ):
     _uh = urlHandlers.UHAbstractDisplay
 
     def _checkProtection(self):
-        if self._abstract is None:
-            raise MaKaCError( _("The abstract you are trying to access does not exist"))
-        if not self._conf.getAbstractMgr().isInAuthorizedViewList(self._getUser(), self._abstract):
-            RHAbstractSubmissionBase._checkProtection(self)
+        if self._getUser() == None:
+            self._checkSessionUser()
+        else:
+            if self._abstract is None:
+                raise MaKaCError( _("The abstract you are trying to access does not exist"))
+            if not self._conf.getAbstractMgr().isInAuthorizedViewList(self._getUser(), self._abstract):
+                RHAbstractSubmissionBase._checkProtection(self)
 
     def _processIfActive( self ):
         p = abstracts.WPAbstractDisplay( self, self._target )
@@ -564,7 +567,7 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         cfg = Config.getInstance()
         mimetype = cfg.getFileTypeMimeType( "PDF" )
         self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
         return data
 
 

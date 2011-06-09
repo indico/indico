@@ -58,14 +58,27 @@ class NiceAuthenticator(Authenthicator):
         if  req.subprocess_env.has_key("ADFS_EMAIL"):
             email = req.subprocess_env["ADFS_EMAIL"]
             login = req.subprocess_env["ADFS_LOGIN"]
-#            phone = req.subprocess_env.get("ADFS_PHONENUMBER","")
-#            lastname = req.subprocess_env.get("ADFS_LASTNAME","")
-#            firstname = req.subprocess_env.get("ADFS_FIRSTNAME","")
             from MaKaC.user import AvatarHolder
             ah = AvatarHolder()
             av = ah.match({"email":email},exact=1, forceWithoutExtAuth=True)
             if av:
-                return av[0]
+                av = av[0]
+                phone = req.subprocess_env.get("ADFS_PHONENUMBER","")
+                fax = req.subprocess_env.get("ADFS_FAXNUMBER","")
+                lastname = req.subprocess_env.get("ADFS_LASTNAME","")
+                firstname = req.subprocess_env.get("ADFS_FIRSTNAME","")
+                institute = req.subprocess_env.get("ADFS_HOMEINSTITUTE","")
+                if phone != '' and phone != av.getPhone():
+                    av.setTelephone(phone)
+                if fax != '' and fax != av.getFax():
+                    av.setFax(fax)
+                if lastname != '' and lastname != av.getFamilyName():
+                    av.setSurName(lastname)
+                if firstname != '' and firstname != av.getFirstName():
+                    av.setName(firstname)
+                if institute != '' and institute != av.getAffiliation():
+                    av.setAffiliation(institute)
+                return av
             else:
                 avDict = NiceUser().getByLoginOrUPN(login)
                 if avDict:

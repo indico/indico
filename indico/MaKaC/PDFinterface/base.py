@@ -481,9 +481,11 @@ class PDFBase:
                     width = self._PAGE_WIDTH
                     height = self._PAGE_WIDTH * ratio
                     img = img.resize((width, height))
-                c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, self._PAGE_HEIGHT - 1.5 * inch - height)
+                startHeight = self._PAGE_HEIGHT
                 if drawTitle:
-                    c.drawCentredString( self._PAGE_WIDTH*0.75, self._PAGE_HEIGHT - inch , escape(self._conf.getTitle()))
+                    startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+                    height = 0
+                c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight - 1.5 * inch - height)
                 return True
         return False
 

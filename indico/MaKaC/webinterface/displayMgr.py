@@ -289,6 +289,9 @@ class Menu(Persistent):
                         link.getParent().removeLink(link)
                     elif link.getParent().getName() != linksData[link.getName()]["parent"]:
                         link.getParent().removeLink(link)
+                elif link.getName() not in linksData:
+                    # link was removed from the list
+                    self.removeLink(link)
 
         #Now, update the system links
         for name in linksDataOrderedKeys:
