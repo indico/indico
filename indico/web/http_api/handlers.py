@@ -152,9 +152,9 @@ def handler(req, **params):
         aw = buildAW(ak, req, onlyPublic)
         # Get rid of API key in cache key if we did not impersonate a user
         if ak and aw.getUser() is None:
-            cache_key = normalizeQuery(path, query, remove=('ak', 'apiKey', 'signature', 'timestamp'))
+            cache_key = normalizeQuery(path, query, remove=('ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache'))
         else:
-            cache_key = normalizeQuery(path, query, remove=('signature', 'timestamp'))
+            cache_key = normalizeQuery(path, query, remove=('signature', 'timestamp', 'nc', 'nocache'))
 
         obj = None
         addToCache = True
