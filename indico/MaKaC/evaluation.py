@@ -27,10 +27,12 @@ from MaKaC.common.Configuration import Config
 from MaKaC.user   import Avatar
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter       import Counter
-from MaKaC.common.timerExec     import Alarm
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc
+
+from indico.modules.scheduler import Client
+from indico.modules.scheduler.tasks import AlarmTask
 
 
 class Evaluation(Persistent):
@@ -85,11 +87,11 @@ class Evaluation(Persistent):
 
     def removeReferences(self):
         """remove all pointers to other objects."""
-        self._conf = None
         self.removeAllAlarms()
         self.removeAllNotifications()
         self.removeAllQuestions()
         self.removeAllSubmissions()
+        self._conf = None
 
     def clone(self, conference):
         """returns a new Evaluation which is a copy of the current one (self)."""
@@ -223,6 +225,11 @@ class Evaluation(Persistent):
 
     def setStartDate( self, sd ):
         self.startDate = datetime(sd.year,sd.month,sd.day,0,0,0)
+        for nid, notif in self.getNotifications().iteritems():
+            if isinstance(notif, EvaluationAlarm):
+                if notif.getStartOn() != sd:
+                    notif.move(sd)
+
     def getStartDate( self ):
         if not hasattr(self, "startDate") or self.startDate==datetime(1,1,1,0,0,0):
             self.setStartDate(self._conf.getEndDate().date() + timedelta(days=1))
@@ -411,17 +418,20 @@ class Evaluation(Persistent):
             pass #no need of an alarm for this kind of notification
         elif notificationKey == self._EVALUATION_START :
             notification = self.getNotification(notificationKey)
-            if notification != None :
+            if notification != None:
                 from MaKaC.webinterface import urlHandlers
                 alarm = self.getAlarm(notificationKey)
                 if alarm == None :
                     alarm = EvaluationAlarm(self, notificationKey)
                     self.getConference().addAlarm(alarm)
                     self.getAlarms()[notificationKey] = alarm
+
                     self.notifyModification()
-                    alarm.initialiseToAddr()
+                else:
+                    if self.getStartDate() != alarm.getStartOn():
+                        alarm.move(self.getStartDate())
+
                 alarm.setFromAddr( HelperMaKaCInfo.getMaKaCInfoInstance().getSupportEmail() )
-                alarm.setStartDate(self.getStartDate())
                 alarm.setToAddrList(notification.getToList())
                 alarm.setCcAddrList(notification.getCCList())
                 alarm.setSubject( self.getTitle() )
@@ -431,7 +441,7 @@ class Evaluation(Persistent):
     def removeAlarm(self, alarm):
         """Remove given Alarm."""
         if alarm != None :
-            if self.getConference().getAlarmById(alarm.getId())!=None :
+            if self.getConference().getAlarmById(alarm.getConfRelativeId()) != None :
                 self.getConference().removeAlarm(alarm)
             else :
                 self.getAlarms().pop(alarm.getNotificationKey(), None)
@@ -440,6 +450,7 @@ class Evaluation(Persistent):
     def removeAllAlarms(self):
         """remove all alarms."""
         alarms = self.getAlarms()
+
         for alarm in alarms.values() :
             self.getConference().removeAlarm(alarm)
         self.alarms = {}
@@ -461,13 +472,15 @@ class Evaluation(Persistent):
         return alarm
 
 
-class EvaluationAlarm(Alarm):
+class EvaluationAlarm(AlarmTask):
     """Suited alarm for an evaluation."""
 
     def __init__(self, evaluation, notificationKey):
         self._evaluation = evaluation
-        self.notificationKey = notificationKey #cf Evaluation._ALL_NOTIFICATIONS
-        Alarm.__init__(self, evaluation.getConference())
+        self.notificationKey = notificationKey  #cf Evaluation._ALL_NOTIFICATIONS
+        super(EvaluationAlarm, self).__init__(evaluation.getConference(),
+                                              'Eval_%s' % notificationKey,
+                                              evaluation.getStartDate())
 
     def setEvaluation(self, evaluation):
         self._evaluation = evaluation
@@ -477,36 +490,42 @@ class EvaluationAlarm(Alarm):
             self._evaluation = None
         return self._evaluation
 
-    def setNotificationKey(self, notificationKey): #cf Evaluation._ALL_NOTIFICATIONS
+    def setNotificationKey(self, notificationKey):
         self.notificationKey = notificationKey
 
-    def getNotificationKey(self): #cf Evaluation._ALL_NOTIFICATIONS
+    def getNotificationKey(self):
         if not hasattr(self, "notificationKey"):
             self.notificationKey = None
         return self.notificationKey
 
+    def move(self, newDate):
+        c = Client()
+        c.moveTask(self, newDate)
+
     def delete(self):
         evaluation = self.getEvaluation()
-        if evaluation != None :
+        if evaluation != None:
             evaluation.removeAlarm(self)
         self.setEvaluation(None)
         Alarm.delete(self)
 
-    def prerun(self):
-        """returns True if aborted, False otherwise."""
-        #date checking...
+    def _prepare(self, check=True):
+
+        # date checking...
         from MaKaC.conference import ConferenceHolder
         evaluation = self.getEvaluation()
         notificationKey = self.getNotificationKey()
         evalEndDate = evaluation.getEndDate().date()
         today = nowutc().date()
         if not ConferenceHolder().hasKey(self.conf.getId()) or \
-                evaluation.getNbOfQuestions()<1 or \
+                evaluation.getNbOfQuestions() < 1 or \
                 not evaluation.isVisible() or \
-                notificationKey==Evaluation._EVALUATION_START and evalEndDate<today :
+                (notificationKey == Evaluation._EVALUATION_START and \
+                evalEndDate < today and check):
             self.conf.removeAlarm(self)
-            return True #email aborted
-        return False #email ok
+            self.suicide()
+            return False  # email aborted
+        return True  # email ok
 
 
 class Question(Persistent):

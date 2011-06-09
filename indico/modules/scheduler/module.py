@@ -146,7 +146,7 @@ class SchedulerModule(Module):
             self._runningList.remove(task)
             self._p_changed = True
         except ValueError:
-            logging.getLogger('scheduler').exception()
+            logging.getLogger('scheduler').exception("Problem removing running task: %s" % self._runningList)
 
     def moveTask(self, task, moveFrom, status, occurrence=None, nocheck=False):
         """

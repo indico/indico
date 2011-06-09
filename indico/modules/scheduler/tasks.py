@@ -76,7 +76,10 @@ class BaseTask(TimedEvent):
     _AWOLThresold = 6000
 
     def __cmp__(self, obj):
-        if self.id == obj.id and self.id == None:
+        if obj == None:
+            return 1
+        elif (not isinstance(obj, BaseTask) or \
+              self.id == obj.id and self.id == None):
             return cmp(hash(self), hash(obj))
         else:
             return cmp(self.id, obj.id)
