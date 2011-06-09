@@ -445,6 +445,8 @@ class Config:
         'UploadedFilesTempDir'      : "/opt/indico/tmp",
         'UploadedFilesSharedTempDir': "",
         'XMLCacheDir'               : "/opt/indico/cache",
+        'CacheBackend'              : 'files',
+        'MemcachedServers'          : [],
         'SmtpServer'                : ('localhost', 25),
         'SmtpLogin'                 : '',
         'SmtpPassword'              : '',

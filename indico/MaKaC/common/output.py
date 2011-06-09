@@ -1966,12 +1966,12 @@ class XMLCache(MultiLevelCache):
         MultiLevelCache.__init__(self, 'xml')
 
 
-    def isDirty(self, file, object):
+    def isDirty(self, mtime, object):
 
         # get event OAI date
         modDate = resolveHierarchicalId(object.getId())._modificationDS
         fileModDate = timezone("UTC").localize(
-            datetime.utcfromtimestamp(os.path.getmtime(file)))
+            datetime.utcfromtimestamp(mtime))
 
         # check file system date vs. event date
         return (modDate > fileModDate)

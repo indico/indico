@@ -26,7 +26,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 
-import os, shutil, pickle, datetime
+import hashlib, os, shutil, pickle, datetime, time
 
 
 class IndicoCache:
@@ -109,6 +109,106 @@ class EventCache( IndicoCache ):
     def getFileName( self ):
         return "eve-%s-%s" % (self._eventId, self._type)
 
+class CacheStorage(object):
+    __CACHE_STORAGE_LIST = {}
+    __CACHE_STORAGE_DEFAULT = None
+
+    @classmethod
+    def new(cls, *args, **kwargs):
+        backend = Config.getInstance().getCacheBackend()
+        storageCls = cls.__CACHE_STORAGE_LIST.get(backend, cls.__CACHE_STORAGE_DEFAULT)
+        return storageCls(*args, **kwargs)
+
+    @classmethod
+    def register(cls, default=False):
+        def decorate(klass):
+            cls.__CACHE_STORAGE_LIST[klass.STORAGE_NAME] = klass
+            if default:
+                cls.__CACHE_STORAGE_DEFAULT = klass
+            return klass
+        return decorate
+
+    def __init__(self, cache):
+        self._cache = cache
+        self._name = cache.cacheName
+        Logger.get('cache/%s' % self._name).debug('Using %s for storage' % self.STORAGE_NAME)
+
+    def getTTL(self):
+        return self._cache.getTTL()
+
+    def save(self, path, name, data):
+        raise NotImplementedError
+
+    def load(self, path, name, default=None):
+        raise NotImplementedError
+
+    def remove(self, path, name):
+        raise NotImplementedError
+
+@CacheStorage.register(True)
+class FileCacheStorage(CacheStorage):
+    STORAGE_NAME = 'files'
+
+    def __init__(self, cache):
+        super(FileCacheStorage, self).__init__(cache)
+        self._dir = os.path.join(Config.getInstance().getXMLCacheDir(), self._name)
+        if not os.path.exists(self._dir):
+            os.makedirs(self._dir)
+
+    def save(self, path, name, data):
+        fsPath = os.path.join(self._dir, path)
+        if not os.path.exists(fsPath):
+            os.makedirs(fsPath)
+        filePath = os.path.join(fsPath, name)
+        f = open(filePath, 'wb')
+        OSSpecific.lockFile(f, 'LOCK_EX')
+        pickle.dump(data, f)
+        OSSpecific.lockFile(f, 'LOCK_UN')
+        f.close()
+
+    def load(self, path, name, default=None):
+        filePath = os.path.join(self._dir, path, name)
+        if not os.path.exists(filePath):
+            return default, None
+        f = open(filePath, 'rb')
+        OSSpecific.lockFile(f, 'LOCK_SH')
+        obj = pickle.load(f)
+        mtime = os.path.getmtime(filePath)
+        OSSpecific.lockFile(f, 'LOCK_UN')
+        f.close()
+        return obj, mtime
+
+    def remove(self, path, name):
+        filePath = os.path.join(self._dir, path, name)
+        if os.path.exists(filePath):
+            os.remove(filePath)
+
+
+@CacheStorage.register()
+class MemcachedCacheStorage(CacheStorage):
+    STORAGE_NAME = 'memcached'
+
+    def __init__(self, cache):
+        super(MemcachedCacheStorage, self).__init__(cache)
+
+    def _connect(self):
+        import memcache
+        return memcache.Client(Config.getInstance().getMemcachedServers())
+
+    def _makeKey(self, path, name):
+        return hashlib.sha256(os.path.join(self._name, path, name)).hexdigest()
+
+    def save(self, path, name, data):
+        self._connect().set(self._makeKey(path, name), data, self.getTTL())
+
+    def load(self, path, name, default=None):
+        obj = self._connect().get(self._makeKey(path, name))
+        return obj, None
+
+    def remove(self, path, name):
+        self._connect().delete(self._makeKey(path, name))
+
+
 class MultiLevelCacheEntry(object):
     """
     An entry(line) for a multilevel cache
@@ -123,19 +223,11 @@ class MultiLevelCacheEntry(object):
         """
         pass
 
-    def pickle(self):
-        return pickle.dumps(self)
-
     def setContent(self, content):
         self.content = content
 
     def getContent(self):
         return self.content
-
-    @classmethod
-    def unpickle(self, data):
-        return pickle.loads(data)
-
 
 
 class MultiLevelCache(object):
@@ -143,56 +235,34 @@ class MultiLevelCache(object):
     A multilevel cache
     """
 
-    __entryFactory = None
+    _entryFactory = None
+    _entryTTL = 86400
 
     def __init__(self, cacheName):
-
         self.cacheName = cacheName
-        cacheDir = self.getCacheDir()
+        self._v_storage = CacheStorage.new(self)
 
-        if not os.path.exists(cacheDir):
-            os.makedirs(cacheDir)
+    def getStorage(self):
+        if not hasattr(self, '_v_storage') or self._v_storage is None:
+            self._v_storage = CacheStorage.new(self)
+        return self._v_storage
 
-    def _saveObject(self, fsPath, path, fileName, data):
-        """
-        Performs the actual save operation
-        """
+    def setTTL(self, ttl):
+        self._entryTTL = ttl
 
-        if len(path) == 0:
-            filePath = os.path.join(fsPath, fileName)
-            f = open(filePath, 'wb')
-            OSSpecific.lockFile(f, 'LOCK_EX')
-            f.write(data)
-            OSSpecific.lockFile(f, 'LOCK_UN')
-            f.close()
-        else:
-            dirPath = os.path.join(fsPath, path[0])
-
-            if not os.path.exists(dirPath):
-                os.makedirs(dirPath)
-
-            self._saveObject(dirPath, path[1:], fileName, data)
-
-
-    def getCacheDir(self):
-        """
-        Returns the directory where the cache is located
-        Can be overriden by subclasses
-        """
-        return os.path.join(Config().getInstance().getXMLCacheDir(), self.cacheName)
+    def getTTL(self):
+        return self._entryTTL
 
     def cacheObject(self, version, content, *args):
         """
-        Actually puts an object into the cache
+        Puts an object into the cache
         """
 
         entry = self._entryFactory.create(content, *args)
-
         path = self._generatePath(entry)
-
         fileName = self._generateFileName(entry, version)
 
-        self._saveObject(self.getCacheDir(), path, fileName, entry.pickle())
+        self.getStorage().save(os.path.join(*path), fileName, entry)
 
         Logger.get('cache/%s' % self.cacheName).debug(
             "Saved %s" % (os.path.join(*(path + [fileName]))))
@@ -204,40 +274,35 @@ class MultiLevelCache(object):
         """
 
         dummyEntry = self._entryFactory.create(None, *args)
+        path = os.path.join(*self._generatePath(dummyEntry))
+        fileName = self._generateFileName(dummyEntry, version)
 
-        filePath = os.path.join(*([self.getCacheDir()] +
-                                  self._generatePath(dummyEntry) +
-                                  [self._generateFileName(dummyEntry, version)]))
+        Logger.get('cache/%s' % self.cacheName).debug(
+            "Checking %s..." % os.path.join(path, fileName))
+        obj, mtime = self.getStorage().load(path, fileName)
 
-        Logger.get('cache/%s'%self.cacheName).debug("Checking %s...", filePath)
-        if os.path.isfile(filePath):
-            # (Possible) Cache hit!
+        if obj is not None:
+            # (Possible) Cache hit
             # check dirty state first
-
-            f = open(filePath, 'rb')
-
-            # Lock file
-            OSSpecific.lockFile(f, 'LOCK_SH')
-            data = f.read()
-            OSSpecific.lockFile(f, 'LOCK_UN')
-            f.close()
-
-            obj = MultiLevelCacheEntry.unpickle(data)
-
-            if self.isDirty(filePath, obj):
-                Logger.get('cache/%s'%self.cacheName).debug("DIRTY")
+            if mtime is not None and self.isDirty(mtime, obj):
+                Logger.get('cache/%s' % self.cacheName).debug("DIRTY")
                 # if the file is older, report a miss
-                # os.remove(filePath)
+                # self.getStorage().remove(path, fileName)
                 return None
             else:
-                Logger.get('cache/%s'%self.cacheName).debug("HIT")
+                Logger.get('cache/%s' % self.cacheName).debug("HIT")
                 return obj
 
         else:
-            Logger.get('cache/%s'%self.cacheName).debug("MISS")
-            # Cache miss!
+            Logger.get('cache/%s' % self.cacheName).debug("MISS")
+            # Cache miss
             return None
 
+    def isDirty(self, mtime, object):
+        if self._entryTTL == -1:
+            return True
+        creationTime = datetime.datetime(*time.localtime(mtime)[:6])
+        return datetime.datetime.now() - creationTime > datetime.timedelta(seconds=self._entryTTL)
 
     def _generatePath(self, entry):
         """
@@ -254,10 +319,3 @@ class MultiLevelCache(object):
         """
 
         return '%s_%s' % (entry.getId(), version)
-
-    def isDirty(self, path, object):
-        """
-        Overload it, in order to define whether
-        the entry has expired or not
-        """
-        raise Exception("this method should be overloaded")

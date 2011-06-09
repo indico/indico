@@ -48,7 +48,7 @@ class SECache(MultiLevelCache):
 
         return [entry.getWebSession()]
 
-    def isDirty(self, path, object):
+    def isDirty(self, mtime, object):
         """ TODO: implement this one (websession date?) """
         return False
 
@@ -74,17 +74,13 @@ class MapOfRoomsCache(MultiLevelCache):
     """
 
     _entryFactory = MapOfRoomsCacheEntry
+    _entryTTL = 300
 
     def __init__(self):
         super(MapOfRoomsCache, self).__init__('mapOfRooms')
-        self._ttl = 5
 
     def _generateFileName(self, entry, version):
         return '%s_%s' % (entry.getQuery(), version)
 
     def _generatePath(self, entry):
         return ['maps']
-
-    def isDirty(self, path, object):
-        creationTime = datetime.datetime(*time.localtime(os.path.getmtime(path))[:6])
-        return datetime.datetime.now() - creationTime > datetime.timedelta(minutes=self._ttl)

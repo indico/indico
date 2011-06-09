@@ -61,30 +61,23 @@ class UpcomingEventsCache(MultiLevelCache, Persistent):
     _entryFactory = UECacheEntry
 
     def __init__(self, ttl=datetime.timedelta(minutes=5), dirty=False):
-        self._ttl = ttl
-        self._dirty = dirty
         MultiLevelCache.__init__(self, 'upcoming_events')
+        self._dirty = dirty
+        self.setTTL(ttl)
 
     def _generateFileName(self, entry, version):
         return entry.getId()
 
-    def isDirty(self, path, object):
-
-        creationTime = datetime.datetime(*time.localtime(os.path.getmtime(path))[:6])
-
-        if self._dirty or (datetime.datetime.now() - creationTime) > self._ttl:
-            return True
-        else:
-            return False
+    def isDirty(self, mtime, object):
+        return self._dirty or super(UpcomingEventsCache, self).isDirty(mtime, object)
 
     def invalidate(self):
         self._dirty = True;
 
     def setTTL(self, ttl):
-        self._ttl = ttl
-
-    def getTTL(self):
-        return self._ttl
+        if isinstance(ttl, datetime.timedelta):
+            ttl = (86400 * ttl.days + ttl.seconds)
+        super(UpcomingEventsCache, self).setTTL(ttl)
 
     def loadObject(self):
         # TODO: Use user IDs, private events
@@ -141,7 +134,7 @@ class UpcomingEventsModule(Module):
         self._cache.invalidate()
 
     def getCacheTTL(self):
-        return self._cache.getTTL()
+        return datetime.timedelta(seconds=self._cache.getTTL())
 
     def setNumberItems(self, number):
         self._maxEvents = number

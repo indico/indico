@@ -43,7 +43,7 @@ class RequestCache(MultiLevelCache):
 
     def __init__(self, ttl=600):
         super(RequestCache, self).__init__('http_api')
-        self._ttl = ttl
+        self.setTTL(ttl)
 
     def _generateFileName(self, entry, version):
         return 'req.%s' % version
@@ -58,7 +58,3 @@ class RequestCache(MultiLevelCache):
     def loadObject(self, key):
         key = hashlib.sha256(key).hexdigest()
         return super(RequestCache, self).loadObject(key)
-
-    def isDirty(self, path, object):
-        creationTime = datetime.datetime(*time.localtime(os.path.getmtime(path))[:6])
-        return datetime.datetime.now() - creationTime > datetime.timedelta(seconds=self._ttl)
