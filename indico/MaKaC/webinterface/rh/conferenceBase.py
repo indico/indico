@@ -38,6 +38,11 @@ from MaKaC.user import AvatarHolder, GroupHolder
 
 from MaKaC.common.logger import Logger
 
+from indico.util import json
+
+BYTES_1MB = 1024 * 1024
+
+
 class RHCustomizable( RH ):
 
     def __init__( self, req ):
@@ -199,6 +204,7 @@ class RHAbstractBase( RHConferenceSite ):
         self._conf = self._abstract.getOwner().getOwner()
         self._setMenuStatus(params)
 
+
 class RHSubmitMaterialBase:
 
     _allowedMatsConference=["paper", "slides", "poster", "minutes"]
@@ -210,12 +216,15 @@ class RHSubmitMaterialBase:
     def __init__(self, target, rh = None):
         self._target=target
         self._callerRH = rh
+        self._req = rh._req
         self._repositoryIds = None
+        self._errorList = []
+        self._cfg = Config.getInstance()
 
     def _getNewTempFile( self ):
         cfg = Config.getInstance()
         tempPath = cfg.getUploadedFilesTempDir()
-        tempFileName = tempfile.mkstemp( suffix="Indico.tmp", dir = tempPath )[1]
+        tempFileName = tempfile.mkstemp(suffix="Indico.tmp", dir=tempPath)[1]
         return tempFileName
 
     #XXX: improve routine to avoid saving in temporary file
@@ -245,8 +254,8 @@ class RHSubmitMaterialBase:
         self._visibility = int(params.get("visibility", 0))
         self._password = params.get("password","")
 
-        from MaKaC.services.interface.rpc import json
-        self._userList = json.decode(params.get("userList", "[]"))
+        self._userList = json.loads(params.get("userList", "[]"))
+        maxUploadFileSize = self._cfg.getMaxUploadFileSize()
 
         if self._uploadType == "file":
             if isinstance(params["file"], list):
@@ -259,13 +268,21 @@ class RHSubmitMaterialBase:
             for fileUpload in files:
                 if type(fileUpload) != str and fileUpload.filename.strip() != "":
                     fDict = {}
-                    fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
-
-                    if self._callerRH != None:
-                        self._callerRH._tempFilesToDelete.append(fDict["filePath"])
 
                     fDict["fileName"] = fileUpload.filename
-                    fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
+                    estimSize = int(self._req.headers_in["content-length"])
+
+                    if maxUploadFileSize and estimSize > (maxUploadFileSize * BYTES_1MB):
+                        # if file is too big, do not save it in disk
+                        fDict["filePath"] = ''
+                        fDict["size"] = estimSize
+                    else:
+                        fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
+                        fDict["size"] = int(os.stat(fDict["filePath"])[stat.ST_SIZE])
+                        if self._callerRH != None:
+                            self._callerRH._tempFilesToDelete.append(fDict["filePath"])
+
+                    self._setErrorList(fDict)
                     self._files.append(fDict)
 
         elif self._uploadType == "link":
@@ -284,23 +301,25 @@ class RHSubmitMaterialBase:
                 self._links.append(link)
 
 
-    def _getErrorList(self):
+    def _setErrorList(self, fileEntry):
         res=[]
 
+        maxUploadFileSize = self._cfg.getMaxUploadFileSize()
+
         if self._uploadType == "file":
-            if not self._files:
-                res.append(_("""A file must be submitted."""))
-            for fileEntry in self._files:
-                if hasattr(fileEntry, "filePath") and not fileEntry["filePath"].strip():
-                    res.append(_("""A valid file to be submitted must be specified."""))
-                if hasattr(fileEntry, "size") and fileEntry["size"] < 10:
-                    res.append(_("""The file %s seems to be empty""") % fileEntry["fileName"])
+            if "filePath" in fileEntry and not fileEntry["filePath"].strip():
+                self._errorList.append(_("""A valid file to be submitted must be specified. """))
+            if "size" in fileEntry:
+                if fileEntry["size"] < 10:
+                    self._errorList.append(_("""The file %s seems to be empty """) % fileEntry["fileName"])
+                elif maxUploadFileSize and fileEntry["size"] > (maxUploadFileSize*1024*1024):
+                    self._errorList.append(_("The file size of %s exceeds the upload limit (%s Mb)") % (fileEntry["fileName"], maxUploadFileSize))
         elif self._uploadType == "link":
             if not self._links[0]["url"].strip():
-                res.append(_("""A valid URL must be specified."""))
+                self._errorList.append(_("""A valid URL must be specified."""))
 
         if self._materialId=="":
-            res.append(_("""A material ID must be selected."""))
+            self._errorList.append(_("""A material ID must be selected."""))
         return res
 
     def _getMaterial(self, forceCreate = True):
@@ -453,25 +472,21 @@ class RHSubmitMaterialBase:
             owner = None
             text = ""
 
-        errorList=self._getErrorList()
-
         try:
-            if len(errorList) > 0:
-                status = "ERROR"
-                info = errorList
+            if len(self._errorList) > 0:
+                status = "NOREPORT"
+                info = self._errorList
             else:
                 mat, status, info = self._addMaterialType(text, user)
 
                 if status == "OK":
                     for entry in info:
-                        entry['material'] = mat.getId();
+                        entry['material'] = mat.getId()
         except Exception, e:
             status = "ERROR"
-            info = errorList + ["%s: %s" % (e.__class__.__name__, str(e))]
+            info = self._errorList + ["%s: %s" % (e.__class__.__name__, str(e))]
             Logger.get('requestHandler').exception('Error uploading file')
-
         # hackish, because of mime types. Konqueror, for instance, would assume text if there were no tags,
         # and would try to open it
-        from MaKaC.services.interface.rpc import json
-        return "<html><head></head><body>"+json.encode({'status': status, 'info': info})+"</body></html>"
-
+        return "<html><head></head><body>%s</body></html>" %\
+               json.dumps({'status': status, 'info': info})

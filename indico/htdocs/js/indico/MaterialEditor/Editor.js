@@ -67,7 +67,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
         return buttonDiv;
     },
 
-
     /*
      * Draws a pane that switches between a URL input and a file upload dialog.
      *
@@ -478,6 +477,12 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
             success: function(resp){
                 if (resp.status == "ERROR") {
                     IndicoUtil.errorReport({
+                        code: '0',
+                        requestInfo: {},
+                        message: resp.info });
+                } else if (resp.status == "NOREPORT") {
+                    IndicoUtil.errorReport({
+                        type: "noReport",
                         code: '0',
                         requestInfo: {},
                         message: resp.info });

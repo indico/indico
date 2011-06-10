@@ -149,6 +149,13 @@ ApacheGroup = "nogroup"
 # IndicoSearchServer   = ""
 # IndicoSearchClass    = "MaKaC.search.invenioSEA.InvenioSEA"
 
+#------------------------------------------------------------------------------
+# FILE UPLOAD
+#------------------------------------------------------------------------------
+# Here you can limit the maximum size of uploaded files (in MB)
+# default: 0 (unlimited)
+
+MaxUploadFileSize = 0
 
 #------------------------------------------------------------------------------
 # FILE CONVERSION

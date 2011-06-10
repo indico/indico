@@ -465,7 +465,7 @@ class Config:
         'UseXSendFile'              : 'no',
         'AuthenticatedEnforceSecure': 'yes',
         'ExportACL'           : {},
-        
+        'MaxUploadFileSize' : '1024',
         # Authentication
         'LDAPConfig': {'host': 'myldapserver.example.com',
                        'useTLS': True,
