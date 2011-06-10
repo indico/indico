@@ -68,7 +68,10 @@ class IRoomMapFossil(IFossil):
         """ Room description for the map marker """
 
     def needsAVCSetup(self):
-        """ Setup for for audio and video conference """
+        """ Setup for audio and video conference """
+
+    def hasWebcastRecording(self):
+        """ Setup for webcast/recording """
 
     def getAvailableVC(self):
         """ Available equipment for audio and video conference """

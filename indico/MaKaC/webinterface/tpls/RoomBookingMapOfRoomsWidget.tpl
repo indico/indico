@@ -169,6 +169,7 @@ var filters = [
     {label: "<%= _("Min. capacity") %>", filterType: "room", inputType: "text", filterFunction: capacityFilter, optional: true, defaultValue: ""},
 <% if not forVideoConference: %>
     {label: "<%= _("Video conference") %>", filterType: "room", inputType: "boolean", defaultValue: false, property: "needsAVCSetup", optional: true, defaultValue: false},
+    {label: "<%= _("Webcast/Recording") %>", filterType: "room", inputType: "boolean", defaultValue: false, property: "hasWebcastRecording", optional: true, defaultValue: false},
 <% end %>
     {label: "<%= _("Only public rooms") %>", filterType: "room", inputType: "boolean", property: "isReservable", optional: true, defaultValue:false},
     {label: "<%= _("Auto confirm") %>", filterType: "room", inputType: "boolean", property: "isAutoConfirm", optional: true, defaultValue:false},
