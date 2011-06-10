@@ -590,10 +590,9 @@ Calendar.cellClick = function(el, ev) {
 		if (cal.currentDateEl) {
 			Calendar.removeClass(cal.currentDateEl, "selected");
 			Calendar.addClass(el, "selected");
-			closing = (cal.currentDateEl == el);
-			if (!closing) {
-				cal.currentDateEl = el;
-			}
+			// close on select unless we also have a time picker
+			closing = !cal.showsTime || (cal.currentDateEl == el);
+			cal.currentDateEl = el;
 		}
 		cal.date.setDateOnly(el.caldate);
 		date = cal.date;
