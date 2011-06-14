@@ -11974,9 +11974,18 @@ class BOAConfig(Persistent):
     def __init__(self,conf):
         self._conf=conf
         self._text=""
+        self._showIds=False
 
     def getText(self):
         return self._text
 
     def setText(self,newText):
         self._text=newText.strip()
+
+    def getShowIds(self):
+        if not hasattr(self, "_showIds"):
+            self._showIds=False
+        return self._showIds
+
+    def setShowIds(self,showIds):
+        self._showIds=showIds

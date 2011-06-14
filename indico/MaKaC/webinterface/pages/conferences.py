@@ -9093,6 +9093,8 @@ class WConfModAbstractBook(wcomponents.WTemplated):
         boaConfig=self._conf.getBOAConfig()
         vars["modURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
         vars["text"]=boaConfig.getText()
+        vars["showIds"]=boaConfig.getShowIds()
+        vars["urlToogleShowIds"]=str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
         return vars
 
 

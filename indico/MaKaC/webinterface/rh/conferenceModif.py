@@ -6817,6 +6817,13 @@ class RHAbstractBookEdit( RHConfModifCFABase ):
         p=conferences.WPModAbstractBookEdit(self,self._target)
         return p.display()
 
+class RHAbstractBookToogleShowIds( RHConfModifCFABase ):
+    _uh = urlHandlers.UHConfModAbstractBookToogleShowIds
+
+    def _process( self ):
+        self._conf.getBOAConfig().setShowIds(not self._conf.getBOAConfig().getShowIds())
+        self._redirect( urlHandlers.UHConfModAbstractBook.getURL( self._conf ) )
+
 class RHFullMaterialPackage(RHConferenceModifBase):
     _uh=urlHandlers.UHConfModFullMaterialPackage
 

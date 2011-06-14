@@ -197,7 +197,10 @@ class AbstractToPDF(PDFBase):
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
-        indexedFlowable[p] = {"text":escape(self._abstract.getTitle()), "level":1}
+        flowableText = escape(self._abstract.getTitle())
+        if self._conf.getBOAConfig().getShowIds():
+            flowableText += """ (%s)"""%self._abstract.getId()
+        indexedFlowable[p] = {"text":escape(flowableText), "level":1}
 
         style = ParagraphStyle({})
         style.fontName = "LinuxLibertine"

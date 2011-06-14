@@ -3290,6 +3290,9 @@ class UHConfModAbstractBook( URLHandler ):
 class UHConfModAbstractBookEdit( URLHandler ):
     _relativeURL = "confModBOA.py/edit"
 
+class UHConfModAbstractBookToogleShowIds( URLHandler ):
+    _relativeURL = "confModBOA.py/toogleShowIds"
+
 class UHAbstractReviewingSetup(URLHandler):
     _relativeURL = "confModifCFA.py/reviewingSetup"
 
