@@ -915,6 +915,8 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._roomGUIDs = []
         self._allRooms = False
         roomGUIDs = params.get( "roomGUID" )
+        if isinstance( roomGUIDs, list ) and 'allRooms' in roomGUIDs:
+            roomGUIDs = 'allRooms'
         if isinstance( roomGUIDs, str ):
             if roomGUIDs == "allRooms":
                 self._allRooms = True

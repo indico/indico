@@ -31,6 +31,7 @@ global ids of objects, and cross-location queries.
 from persistent import Persistent
 from MaKaC.common.Locators import Locator
 import MaKaC
+from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.plugins import PluginLoader
 
@@ -420,7 +421,7 @@ class RoomGUID( Persistent, object ):
             if not location: raise 'Cannot parse location'
             return RoomGUID( location, id )
         except:
-            raise guidString + ' - invalid RoomGUID string'
+            raise MaKaCError(guidString + ' - invalid RoomGUID string')
 
     def getRoom( self ):
         """
