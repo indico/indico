@@ -1,112 +1,100 @@
 <script type="text/javascript">
-
-    // Function for checking and submitting the form when the user presses Enter.
-    // The JavaScript doesn't behave as expected in this case, since the checking is
-    // skipped.
-    function submit_on_enter(ev) {
-
-        var kc, e;
-        if (window.event) {
-            e = window.event;
-            kc = window.event.keyCode;
-        }
-        else if (ev) {
-            e = ev;
-            kc = ev.which;
-        }
-        else {
-            return true;
-        }
-
-        if (kc == 13) {
-            // If Enter was pressed in the "Reason" textarea, we don't want
-            // to submit the form
-            if (e.target == $('reason')) {
-                 return true;
-            }
-            if (forms_are_valid( true )) {
-                submit_booking();
-            }
-            else {
-                alert( ${ _("'There are errors in the form. Please correct fields with red background.'")} );
-            }
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
-    function forms_are_valid( onSubmit )
-    {
-        if ( onSubmit != true )
+    function forms_are_valid(onSubmit) {
+        if (onSubmit != true) {
             onSubmit = false;
+        }
 
         // Init, clean up (make all textboxes white again)
-        var f1 = $('bookingForm')
-        period_clean_redouts( f1 )
-        f1.bookedForName.className = f1.contactEmail.className = f1.contactPhone.className = f1.reason.className = ''
+        var bookingForm = $j('#bookingForm');
+        $j(':input', bookingForm).removeClass('invalid');
 
-        var isValid = true
-        isValid = validate_period( f1, true, ${ allowPast }  ) && isValid
-        isValid = required_fields( ['bookedForName', 'contactEmail', 'reason'] ) && isValid
+        var isValid = true;
+        isValid = validate_period(bookingForm[0], true, ${allowPast}) && isValid;
+        isValid = required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
 
-        if ( !Util.Validation.isEmailList( $F( 'contactEmail' ) ) )
-        {
-            isValid = false
-            $('contactEmail').className = 'invalid'
+        if (!Util.Validation.isEmailList($F('contactEmail'))) {
+            isValid = false;
+            $j('#contactEmail').addClass('invalid');
         }
 
         // Holidays warning
-        if ( isValid && !onSubmit )
-        {
-            var holidaysWarning = indicoSource('roomBooking.getDateWarning', $(f1).serialize(true));
+        if (isValid && !onSubmit) {
+            var lastDateInfo = bookingForm.data('lastDateInfo');
+            var dateInfo = $j('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
+            if (dateInfo != lastDateInfo) {
+                bookingForm.data('lastDateInfo', dateInfo);
+                var holidaysWarning = indicoSource('roomBooking.getDateWarning', bookingForm.serializeObject());
 
-            holidaysWarning.state.observe(function(state) {
-                if (state == SourceState.Loaded) {
-                    $E('holidays-warning').set(holidaysWarning.get());
-                }
-            });
+                holidaysWarning.state.observe(function(state) {
+                    if (state == SourceState.Loaded) {
+                        $E('holidays-warning').set(holidaysWarning.get());
+                    }
+                });
+            }
         }
 
-    % if candResv.room.needsAVCSetup:
-
-    $('vcSystemList').className=''
-
-    if ($('usesAVC').checked) {
-
-        var oneChecked = false;
-
-      $$('input.videoConferenceOption').each(function(elem){
-        if (elem.checked)
-        {
-          oneChecked = true;
-        }
-      });
-
-      if (!oneChecked) {
-        $( 'vcSystemList' ).className = 'invalid';
-        isValid = false;
-      }
-
-    }
-    % endif
-
+        % if candResv.room.needsAVCSetup:
+            var vcIsValid = true;
+            if ($j('#usesAVC').is(':checked')) {
+                vcIsValid = $j('input.videoConferenceOption').is(':checked');
+            }
+            $j('#vcSystemList').toggleClass('invalid', !vcIsValid);
+            isValid = isValid && vcIsValid;
+        % endif
 
         return isValid;
     }
 
-    function submit_booking()
-    {
-        $('bookingForm').action = "${ saveBookingUH.getURL( conf ) }"
-        $('bookingForm').submit()
-    }
 
+    $j(window).load(function() {
+        % if candResv.room.needsAVCSetup:
+            $j('.videoConferenceOption, #needsAVCSupport').change(function() {
+                if(this.checked) {
+                    $j('#usesAVC').prop('checked', true);
+                }
+            });
+            $j('#usesAVC').change(function() {
+                if(!this.checked) {
+                    $j('.videoConferenceOption, #needsAVCSupport').prop('checked', false);
+                }
+            });
+        % endif
 
+        if (forms_are_valid()) {
+            set_repeatition_comment();
+        }
 
+        $j('#bookingForm').delegate(':input', 'keyup change', function() {
+            forms_are_valid();
+        }).submit(function(e) {
+            if (!forms_are_valid(true)) {
+                e.preventDefault();
+                alert(${_("'There are errors in the form. Please correct the fields with red background.'")});
+            };
+        }).keydown(function(e) {
+            if(e.which == 13 && !$j(e.target).is('textarea, :submit')) {
+                e.preventDefault();
+                $j('#saveBooking').click();
+            }
+        });
 
+        $j('#saveBooking').click(function(e) {
+            $j('#bookingForm').attr('action', '${saveBookingUH.getURL(conf)}');
+        });
+        $j('#checkBooking').click(function(e) {
+            $j('#bookingForm').attr('action', '${bookingFormURL}#conflicts');
+            if (!validate_period($j('#bookingForm')[0], true, ${ allowPast })) {
+                alert(${_("'There are errors in the form. Please correct fields with red background.'")});
+                e.preventDefault();
+            }
+        });
+
+        % if candResv.room.needsAVCSetup:
+            alert("The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\n                    Thank you for your understanding.")
+        % endif
+    });
 </script>
 
     <!-- CONTEXT HELP DIVS -->
@@ -128,7 +116,7 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form id="bookingForm" action="${bookingFormURL}#conflicts" method="post" onkeypress="return submit_on_enter(event);">
+    <form id="bookingForm" action="${bookingFormURL}#conflicts" method="post">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
         % if standalone:
@@ -220,7 +208,7 @@
                                                         % if vc in candResv.getUseVC():
                                                             <% checked = """checked="checked" """ %>
                                                         % endif
-                                                        <% htmlCheckbox = """<br>\n<input id="vc_%s" name="vc_%s" class="videoConferenceOption" type="checkbox" onclick="if(this.checked){$(usesAVC).checked=true;}" %s /> %s""" %>
+                                                        <% htmlCheckbox = """<br>\n<input id="vc_%s" name="vc_%s" class="videoConferenceOption" type="checkbox" %s /> %s""" %>
                                                         ${ htmlCheckbox % (vc[:3], vc[:3], checked, vc) }
                                                     % endfor
                                                     <br><br>
@@ -229,7 +217,7 @@
                                             <tr>
                                                 <td align="right" class="subFieldWidth" valign="top"><small><span style="color: Red;"> ${ _("I need assistance")}</span>&nbsp;&nbsp;</small></td>
                                                 <td align="left" class="blacktext">
-                                                    <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} onclick="if ( this.checked ) { $( 'usesAVC' ).checked = true; }" />
+                                                    <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} />
                                                     ${contextHelp('iNeedAVCSupport' )}
                                                 </td>
                                             </tr>
@@ -244,8 +232,8 @@
                                 <td>
                                        <input type="hidden" name="conf" value="${ conf.getId()  if conf else ""}" />
                                     <input type="hidden" name="standalone" value="${ standalone }" />
-                                       <input type="submit" class="btn" value="${ _("Re-check for conflicts")}" onclick="if (!validate_period(document.forms[0], true, ${ allowPast })) { alert( ${ _("'There are errors in the form. Please correct fields with red background.'")} ); return false; }"/>
-                                       <input type="submit" class="btn"  ${' value="Save" ' if formMode==FormMode.MODIF else ""} value="${ bookingMessage }" onclick="if (forms_are_valid( true )) { submit_booking(); } else { alert( ${ _("'There are errors in the form. Please correct fields with red background.'")} ); }; return false;" />
+                                       <input type="submit" id="checkBooking" class="btn" value="${ _("Re-check for conflicts")}" />
+                                       <input type="submit" id="saveBooking" class="btn"  ${' value="Save" ' if formMode==FormMode.MODIF else ""} value="${ bookingMessage }" />
                                     (
                                     <input type="checkbox" name="skipConflicting" id="skipConflicting" ${' checked="checked" ' if skipConflicting else ""} />
                                      ${ _("skip conflicting dates")}
@@ -269,18 +257,3 @@
     </table>
     </form>
     <br />
-    <!-- Just to initialize -->
-    <script type="text/javascript">
-        Event.observe( window, 'load',
-            function ()
-            {
-                if ( forms_are_valid() )
-                    set_repeatition_comment();
-                new Form.Observer( 'bookingForm', 0.4, forms_are_valid );
-            }
-        );
-        % if candResv.room.needsAVCSetup:
-            alert("The conference room you have chosen is equiped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\n                    Thank you for your understanding.")
-        % endif
-
-    </script>

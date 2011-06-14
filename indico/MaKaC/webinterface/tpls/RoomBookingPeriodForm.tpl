@@ -1,46 +1,22 @@
 <%page args="repeatability=None, form=None, unavailableDates=None"/>
 <script type="text/javascript">
 
-    // Removes red background from form fields.
-    // Often calleed in the beginning of validation.
-    function period_clean_redouts( f1 )
-    {
-        f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = '';
-        f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = '';
-        f1.sTime.className = f1.eTime.className = '';
-        f1.repeatability.className = '';
-    }
-
     // Comments the repeatition for user, to make it clear
-    function set_repeatition_comment()
-    {
-        var repTypeSel = $('repeatability')
-        var repCom = $('repComment')
-        var s = ''
-        var repType = parseInt( repTypeSel.value, 10 )
-        if ( repType > 0 )
-        {
-            date = new Date( parseInt( $F('sYear'), 10 ), parseInt( $F('sMonth')-1, 10 ), parseInt( $F('sDay'), 10 ) )
-            weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-            s = 'on ' + weekDays[date.getDay()]
-            if ( repType == 4 )
-            {
-                weekNr = Math.floor( date.getDate() / 7 ) + 1
-                postfix = ['st', 'nd', 'rd', 'th', 'th']
-                weekNrStr = 'the ' + weekNr + postfix[weekNr-1] + ' '
-                s = 'on ' + weekNrStr + weekDays[date.getDay()] + ' of a month'
+    function set_repeatition_comment() {
+        var s = '';
+        var repType = parseInt($j('#repeatability').val(), 10);
+        if(repType > 0) {
+            date = new Date(parseInt($F('sYear'), 10), parseInt($F('sMonth')-1, 10), parseInt($F('sDay'), 10));
+            weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            s = 'on ' + weekDays[date.getDay()];
+            if(repType == 4) {
+                weekNr = Math.floor( date.getDate() / 7 ) + 1;
+                postfix = ['st', 'nd', 'rd', 'th', 'th'];
+                weekNrStr = 'the ' + weekNr + postfix[weekNr-1] + ' ';
+                s = 'on ' + weekNrStr + weekDays[date.getDay()] + ' of a month';
             }
         }
-        repCom.innerHTML = s
-
-/*
-        skipConflicts = $( '' );
-        if ( skipConflicts )
-        {
-            if ( repType == 0 ) skipConflicts.hide();
-            else skipConflicts.show();
-        }
-*/
+        $j('#repComment').html(s);
     }
 
     IndicoUI.executeOnLoad(function()

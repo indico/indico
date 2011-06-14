@@ -2,71 +2,64 @@
 <script type="text/javascript">
 
     // Displays div with dates and hours
-    function display_availability( bool)
-    {
-        trs = $( 'sdatesTR', 'edatesTR', 'hoursTR', 'repTypeTR', 'includePrebookingsTR', 'includePendingBlockingsTR' )
-        for ( i = 0; i < trs.length; i++ )
-        {
-            if ( bool ) trs[i].style.display = ''      // Show
-            if ( !bool ) trs[i].style.display = 'none' // Hide
-        }
+    function display_availability(bool) {
+        $j('#sdatesTR, #edatesTR, #hoursTR, #repTypeTR, #includePrebookingsTR, #includePendingBlockingsTR').toggle(bool);
     }
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
-    function forms_are_valid( onSubmit )
-    {
-        if ( onSubmit != true )
+    function forms_are_valid(onSubmit) {
+        if (onSubmit != true) {
             onSubmit = false;
+        }
 
         // Clean up - make all textboxes white again
-        f1 = $('searchForm')
-        period_clean_redouts( f1 )
-        f1.capacity.className = ''
-
+        var searchForm = $j('#searchForm');
+        $j(':input', searchForm).removeClass('invalid');
         // Init
-        isValid = true
+        var isValid = true;
 
         // Simple search -------------------------------------
         // Availability
-        if ( !$('searchForm').availability[2].checked ) // only if NOT "Don't care"
-        {
-            isValid = validate_period( f1 )
+        if (!$j('input[name="availability"]', searchForm).is(':checked')) { // only if NOT "Don't care"
+            isValid = validate_period(searchForm[0]);
         }
         // capacity
-        if ( $F( 'capacity' ).length > 0 && parseInt( $F( 'capacity' ), 10 ).toString() == 'NaN' )
-        {
-            f1.capacity.className = 'invalid'
-            isValid = false
+        if ($F('capacity').length > 0 && parseInt($F('capacity'), 10).toString() == 'NaN') {
+            $j('#capacity').addClass('invalid');
+            isValid = false;
         }
 
         // Holidays warning
-        if ( isValid && !onSubmit )
-        {
-            var holidaysWarning = indicoSource('roomBooking.getDateWarning', $(f1).serialize(true));
+        if (isValid && !onSubmit) {
+            var lastDateInfo = searchForm.data('lastDateInfo');
+            var dateInfo = $j('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
+            if (dateInfo != lastDateInfo) {
+                searchForm.data('lastDateInfo', dateInfo);
+                var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
 
-            holidaysWarning.state.observe(function(state) {
-                if (state == SourceState.Loaded) {
-                    $E('holidays-warning').set(holidaysWarning.get());
-                }
-            });
+                holidaysWarning.state.observe(function(state) {
+                    if (state == SourceState.Loaded) {
+                        $E('holidays-warning').set(holidaysWarning.get());
+                    }
+                });
+            }
         }
 
-        if (f1.sdate.value == '' ){
-              f1.sdate.className = 'invalid'
-              isValid = false;
-           }
+        if (!$j('#sdate').val()) {
+            $j('#sdate').addClass('invalid');
+            isValid = false;
+        }
 
-        if (f1.edate.value == ''){
-              f1.edate.className = 'invalid'
-              isValid = false;
-           }
+        if (!$j('#edate').val()) {
+            $j('#edate').addClass('invalid');
+            isValid = false;
+        }
 
-        return isValid
+        return isValid;
     }
     // Check whether a room can be booked (or pre-booked) by the user
     // If not, pop up a dialog
-    function isBookable()
-    {
+    function isBookable() {
         // Get the selected option in the SELECT
         var selectedURL = $F('roomName');
         var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-]*)(?:&|$)/;
@@ -101,6 +94,29 @@
                 }
             });
     }
+
+    $j(window).load(function() {
+        $j('#searchForm').delegate(':input', 'keyup change', function() {
+            forms_are_valid();
+        }).submit(function(e) {
+            if (!forms_are_valid(true)) {
+                e.preventDefault();
+                alert(${_("'There are errors in the form. Please correct the fields with red background.'")});
+            };
+        });
+
+        if (forms_are_valid()) {
+            set_repeatition_comment();
+        }
+        if ($j('#searchForm input[name="availability"]').is(':checked')) { // if "Don't care" about availability
+            display_availability(false);
+        }
+        $j('#searchForm input[name="availability"]').change(function() {
+            display_availability($j(this).data('showAvailability'));
+        });
+        $j('#freeSearch').focus();
+    });
+
 
 </script>
 
@@ -208,10 +224,10 @@
                                                 </select>
 
                                                 % if forNewBooking:
-                                                    <span id="bookButtonWrapper"><input id="bookButton" class="btn" type="button" value="${ _("Book")}" onclick="isBookable();" /></span>
+                                                    <span id="bookButtonWrapper"><input id="bookButton" class="btn" type="button" value="${_("Book")}" onclick="isBookable();" /></span>
                                                 % endif
                                                 % if not forNewBooking:
-                                                    <input class="btn" type="button" value="${ _("Room details")}" onclick="document.location = $F( 'roomName' ); return false;" />
+                                                    <input class="btn" type="button" value="${ _("Room details")}" onclick="document.location = $F('roomName'); return false;" />
                                                 % endif
 
                                                 <!-- Help -->
@@ -242,8 +258,6 @@
                                                                     % endif
                                                                 % endfor
                                                             </select>
-                                                            <!-- HACK to make form submitable with ENTER. This is just submit button copied and hidden. -->
-                                                            <input style="width: 0px; position:absolute; left: -50px;" type="submit" class="btn" onclick="if (!forms_are_valid( true )) { alert(  ${ _("'There are errors in the form. Please correct fields with red background.'")} ); return false; };" value="" />
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -272,9 +286,9 @@
                                                     <tr>
                                                         <td class="subFieldWidth" align="right" ><small> ${ _("Must be")}&nbsp;&nbsp;</small></td>
                                                         <td align="left" class="blacktext">
-                                                            <input name="availability" type="radio" value="Available" onclick="display_availability( true ); " ${'checked="checked"' if forNewBooking else ""} /> ${ _("Available")}
-                                                            <input name="availability" type="radio" value="Booked" onclick="display_availability( true ); "/> ${ _("Booked")}
-                                                            <input name="availability" type="radio" value="Don't care" onclick="display_availability( false )" ${'checked="checked"' if not forNewBooking else ""}/> ${ _("Don't care")}
+                                                            <input name="availability" type="radio" value="Available" data-show-availability="true" ${'checked="checked"' if forNewBooking else ""} /> ${ _("Available")}
+                                                            <input name="availability" type="radio" value="Booked" data-show-availability="true" /> ${ _("Booked")}
+                                                            <input name="availability" type="radio" value="Don't care" data-show-availability="false" ${'checked="checked"' if not forNewBooking else ""}/> ${ _("Don't care")}
                                                             ${contextHelp('availabilityHelp' )}
                                                         </td>
                                                     </tr>
@@ -330,7 +344,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> ${ _("Special attributes")}</td>                                    <td align="right">
+                                            <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> ${ _("Special attributes")}</td>
+                                            <td align="right">
                                                 <table width="100%" cellspacing="4px">
                                                     <tr>
                                                         <td width="80px" align="right" valign="top"><small> ${ _("Is public")}&nbsp;&nbsp;</small></td>
@@ -371,7 +386,7 @@
                                                 </table>
                                             </td>
                                         </tr>
-                                        <tr><td colspan="2" style="padding-left:20px"><input type="submit" class="btn" onclick="if (!forms_are_valid( true )) {alert(  ${ _("'There are errors in the form. Please correct fields with red background.'")} ); return false; };" value="${ _('Search') }" /></td></tr>
+                                        <tr><td colspan="2" style="padding-left:20px"><input type="submit" class="btn" value="${ _('Search') }" /></td></tr>
                                     </table>
                                     </form>
                                     <br />
@@ -384,16 +399,3 @@
             </td>
         </tr>
         </table>
-        <!-- Just to initialize -->
-        <script type="text/javascript">
-            Event.observe( window, 'load',
-                function () {
-                    if ( forms_are_valid() )
-                        set_repeatition_comment();
-                    if ( $('searchForm').availability[2].checked ) // if "Don't care" about availability
-                        display_availability( false );
-                    $( 'freeSearch' ).focus();
-                    new Form.Observer( 'searchForm', 0.4, forms_are_valid );
-                }
-            );
-        </script>

@@ -930,8 +930,7 @@ IndicoUI.Widgets = {
                 var update = (cal.dateClicked || exists(cal.activeDiv._range)); // if there is _range we are updating the time
                 if (update && p.inputField) {
                     p.inputField.value = cal.date.print(p.ifFormat);
-                    if (typeof p.inputField.onchange == "function")
-                        p.inputField.onchange();
+                    $j(p.inputField).trigger('change');
                 }
                 if (update && p.displayArea)
                     p.displayArea.innerHTML = cal.date.print(p.daFormat);
