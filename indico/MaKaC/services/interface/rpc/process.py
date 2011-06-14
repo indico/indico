@@ -8,11 +8,12 @@ from MaKaC.webinterface import session
 from MaKaC.services.interface import rpc
 from MaKaC.services.interface.rpc import handlers
 from MaKaC.plugins.base import Observable
+import MaKaC.errors
 
 from MaKaC.common import DBMgr, Config
 from MaKaC.common.contextManager import ContextManager
 
-from MaKaC.services.interface.rpc.common import CausedError
+from MaKaC.services.interface.rpc.common import CausedError, NoReportError
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 import copy
@@ -82,7 +83,10 @@ class ServiceRunner(Observable):
                     try:
                         DBMgr.getInstance().sync()
 
-                        result = processRequest(method, copy.deepcopy(params), req)
+                        try:
+                            result = processRequest(method, copy.deepcopy(params), req)
+                        except MaKaC.errors.NoReportError, e:
+                            raise NoReportError(e.getMsg())
 
                         # notify components that the request has ended
                         self._notify('requestFinished', req)

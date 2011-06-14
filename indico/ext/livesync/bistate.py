@@ -182,6 +182,10 @@ class BistateBatchUploaderAgent(PushSyncAgent):
             deleted = operation & STATUS_DELETED
             try:
                 if record.getOwner() or recId:
+                    # caching is disabled because ACL changes do not triggered
+                    # notifyModification, and consequently can be classified as a hit
+                    # even if they were changed
+                    # TODO: change overrideCache to False when this problem is solved
                     di.toMarc(recId if deleted else record, overrideCache=True, deleted=deleted)
                 else:
                     logger.warning('%s (%s) seems to have been deleted meanwhile!' % \
