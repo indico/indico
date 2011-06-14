@@ -42,17 +42,17 @@ from MaKaC.user import AvatarHolder
 def deleteRoomBookingBranches( force = False ):
     """
     !!! REMOVES DATA !!!
-    
+
     Deletes all branches related to room booking,
     from both main and room booking databases.
     """
     if not force:
-        raise 'nothing done'
-    
+        raise Exception('nothing done')
+
     indicoRoot = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
     root = DALManagerCERN().getRoot()
     minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    
+
     # 1. INDICO -----------------------------------------
 
     minfo.setRoomBookingModuleActive( False )
@@ -60,14 +60,14 @@ def deleteRoomBookingBranches( force = False ):
         del indicoRoot['RoomBookingLocationList']
     if indicoRoot.get( 'DefaultRoomBookingLocation' ):
         del indicoRoot['DefaultRoomBookingLocation']
-    
+
     # 2. ROOM BOKING ------------------------------------
 
     if root.get( 'Rooms' ):
         del root['Rooms']
     if root.get( 'Reservations' ):
         del root['Reservations']
-    
+
     # Create indexes
     if root.get( 'RoomReservationsIndex' ):
         del root['RoomReservationsIndex']
@@ -92,9 +92,9 @@ def initializeRoomBookingDB( location, force = False ):
     """
     indicoRoot = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
     root = DALManagerCERN().getRoot()
-    
+
     # 1. Location -----------------------------------------------------------
-    
+
     initialLocation = Location( location, FactoryCERN )
     if force or not indicoRoot.has_key( 'RoomBookingLocationList' ):
         indicoRoot['RoomBookingLocationList'] = [ initialLocation ]
@@ -102,7 +102,7 @@ def initializeRoomBookingDB( location, force = False ):
     if force or not indicoRoot.has_key( 'DefaultRoomBookingLocation' ):
         indicoRoot['DefaultRoomBookingLocation'] = location
         print "Default location set to " + location
-    
+
     # 2. Rooms & Bookings ---------------------------------------------------
 
     # Create rooms branch
@@ -114,7 +114,7 @@ def initializeRoomBookingDB( location, force = False ):
     if force or not root.has_key( 'Reservations' ):
         root['Reservations'] = IOBTree()
         print "Reservations branch created"
-    
+
     # Create indexes
     if force or not root.has_key( 'RoomReservationsIndex' ):
         root['RoomReservationsIndex'] = OOBTree()
@@ -139,7 +139,7 @@ def initializeRoomBookingDB( location, force = False ):
 
 def main( **kwargs ):
     location = kwargs.get( 'location', 'Universe' )
-    
+
     from MaKaC.rb_factory import Factory
     from MaKaC.common.db import DBMgr
     DBMgr.getInstance().startRequest()

@@ -514,7 +514,7 @@ class Config:
         self.__tplFiles = {}
 
         if self.getSanitizationLevel() not in range(4):
-            raise "Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel'])
+            raise MaKaCError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
 
 
     def __getattr__(self, attr):
@@ -575,7 +575,7 @@ class Config:
         """gives back the path of the directory where the current database
            files are kept
         """
-        raise "Deprecated Method"
+        raise NotImplementedError("Deprecated Method")
         # return raw_input("\n\nPlease enter the path to the directory that contains the database files")
 
 
@@ -583,7 +583,7 @@ class Config:
         """gives back the path of the directory where the backups of the
            database files are kept
         """
-        raise "Deprecated Method"
+        raise NotImplementedError("Deprecated Method")
         # return raw_input("\n\nPlease enter the path to the directory that will contain the database backups [OPTIONAL]\n\n")
 
 

@@ -42,4 +42,4 @@ def preprocessParams(params):
     #raise("preprocessParams ... " + str(params))
     return True
   except Exception,e:
-     raise "%s"%params
+     raise Exception(str(params))

@@ -24,33 +24,33 @@ Responsible: Piotr Wlodarek
 """
 
 class CustomAttributesManagerBase:
-    """ 
+    """
     Generic manager for room attributes that are plugin-specific.
-    
+
     It manages the list of rooms' possible attributes.
     The list does NOT include core attributes (like id,
-    room number etc.) This is only to manage plugin-specific 
+    room number etc.) This is only to manage plugin-specific
     attributes, called _Custom_Attributes_.
 
     All attributes are strings.
-    
-    The list of possible equipment is defined either 
+
+    The list of possible equipment is defined either
     programmatically in CustomAttributesManagerLOCATION
-    implementation or by the Room Booking admin 
-    (if plugin permits). 
-    
+    implementation or by the Room Booking admin
+    (if plugin permits).
+
     This list is used mainly for generating user web interface.
     """
 
     @staticmethod
     def supportsAttributeManagement( *args, **kwargs ):
         """
-        Returns True if plugin supports adding and 
+        Returns True if plugin supports adding and
         removing room attributes (modyfing 'room shema').
         Otherwise returns False.
         """
         return False
-    
+
     @staticmethod
     def getAttributes( *args, **kwargs ):
         """ Returns the List of rooms' possible equipment. """
@@ -59,28 +59,28 @@ class CustomAttributesManagerBase:
     @staticmethod
     def setAttributes( customAttributeList, *args, **kwargs ):
         """ Sets the List of rooms' custom attributes. """
-        raise 'This plugin does not support modyfing the list of room attributes'
-    
+        raise NotImplementedError('This plugin does not support modyfing the list of room attributes')
+
     @staticmethod
     def insertAttribute( customAttribute, *args, **kwargs ):
         """ Adds new attribute to the list of custom attributes."""
-        raise 'This plugin does not support modyfing the list of room attributes'
-    
+        raise NotImplementedError('This plugin does not support modyfing the list of room attributes')
+
     @staticmethod
     def removeAttribute( customAttributeName, *args, **kwargs ):
         """ Deletes attribute from the list of custom attributes. """
-        raise 'This plugin does not support modyfing the list of room attributes'
-    
+        raise NotImplementedError('This plugin does not support modyfing the list of room attributes')
+
     @staticmethod
     def setRequired( customAttributeName, isRequired, *args, **kwargs ):
         """ Sets the 'required' attribute of the custom attribute. """
-        raise 'This plugin does not support modyfing the list of room attributes'
-    
+        raise NotImplementedError('This plugin does not support modyfing the list of room attributes')
+
     @staticmethod
     def setHidden( customAttributeName, isHidden, *args, **kwargs ):
         """ Sets the 'hidden' attribute of the custom attribute. """
-        raise 'This plugin does not support modyfing the list of room attributes'
-    
+        raise NotImplementedError('This plugin does not support modyfing the list of room attributes')
+
     @staticmethod
     def checkAttribute( at ):
         """

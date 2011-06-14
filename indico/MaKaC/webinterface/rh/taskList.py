@@ -45,8 +45,8 @@ class RHTaskModifBase(RHCategDisplayBase):
 
 class RHTaskList( RHCategDisplayBase ):
     _uh = urlHandlers.UHTaskList
-    
-    def _process( self ):        
+
+    def _process( self ):
         params = self._getRequestParams()
         order = params.get("order","1")
         p = tasks.WPTaskList( self, self._target,"", order)
@@ -57,10 +57,10 @@ class RHTaskList( RHCategDisplayBase ):
 
 class RHTaskListAction( RHCategDisplayBase ):
     _uh = urlHandlers.UHTaskListAction
-    
-    def _process( self ):        
+
+    def _process( self ):
         params = self._getRequestParams()
-        
+
         if params.get("actionPerformed",None) is None :
             p = tasks.WPTaskList( self, self._target)
             return p.display()
@@ -68,8 +68,8 @@ class RHTaskListAction( RHCategDisplayBase ):
             url = urlHandlers.UHTaskNew.getURL(self._target)
             url.addParam("clear","true")
             self._redirect(url)
-            return     
-        if params["actionPerformed"] == _("Apply filter") :            
+            return
+        if params["actionPerformed"] == _("Apply filter") :
             filter = params.get("filter","")
             p = tasks.WPTaskList( self, self._target, filter)
             return p.display()
@@ -81,27 +81,27 @@ class RHTaskListAction( RHCategDisplayBase ):
 
 class RHTaskNew( RHTaskModifBase ):
     _uh = urlHandlers.UHTaskNew
-    
-    
+
+
     def _checkParams( self, params):
         RHTaskModifBase._checkParams(self,params)
         if params.get("clear",None) is not None :
             self._removeDefinedList("responsible")
             self._removePreservedParams()
             del params["clear"]
-    
-    def _process( self ):        
+
+    def _process( self ):
         preservedParams = self._getPreservedParams()
         params = self._getRequestParams()
         params.update(preservedParams)
         params["createdBy"] = self._getUser().getFullName()
         params["creatorId"] = self._getUser().getId()
-        
+
         params = copy(params)
-        
+
         params["responsibleOptions"] = self._getResponsibleOptions()
         params["responsibleDefined"] = self._getDefinedList("responsible",False)
-        
+
         p = tasks.WPTaskNew( self, self._target, params)
         return p.display()
 
@@ -111,8 +111,8 @@ class RHTaskNew( RHTaskModifBase ):
             return {}
         return params
 
-    def _getResponsibleOptions(self): 
-        html = []        
+    def _getResponsibleOptions(self):
+        html = []
         for t in self._target.getTaskList() :
             index = 0
             for resp in t.getResponsibleList() :
@@ -120,19 +120,19 @@ class RHTaskNew( RHTaskModifBase ):
                 html.append(text)
         return """
                 """.join(html)
-    
+
     def _getDefinedList(self, typeName, submission):
         lis = self._websession.getVar("%sList"%typeName)
         if lis is None :
             return ""
-        
+
         html = []
         counter = 0
         for person in lis :
             subm = ""
             if submission and person[1] :
                 subm = _("""<td> _("submiter")</td>""")
-                
+
             text = """
                 <tr>
                     <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
@@ -143,14 +143,14 @@ class RHTaskNew( RHTaskModifBase ):
             counter = counter + 1
         return """
             """.join(html)
-    
+
     def _removeDefinedList(self, typeName):
         self._websession.setVar("%sList"%typeName,None)
-        
+
     def _removePreservedParams(self):
         self._websession.setVar("preservedParams",None)
-    
-    def _personInDefinedList(self, typeName, person):    
+
+    def _personInDefinedList(self, typeName, person):
         lis = self._websession.getVar("%sList"%typeName)
         if lis is None :
             return False
@@ -158,14 +158,14 @@ class RHTaskNew( RHTaskModifBase ):
             if person.getFullName()+" "+person.getEmail() == p[0].getFullName()+" "+p[0].getEmail() :
                 return True
         return False
-    
+
 #---------------------------------------------------------------
 
 class RHTaskNewAdd( RHTaskModifBase ):
     _uh = urlHandlers.UHTaskNewAdd
-    
-    
-    def _process( self ):        
+
+
+    def _process( self ):
         params = self._getRequestParams()
 
         #raise  "%s"%params
@@ -174,7 +174,7 @@ class RHTaskNewAdd( RHTaskModifBase ):
             url = urlHandlers.UHTaskNewPersonAdd.getURL(self._target)
             url.addParam("orgin","added")
             url.addParam("typeName","responsible")
-            self._redirect(url)   
+            self._redirect(url)
             return
         if params.get("performedAction","") == "New responsible" :
             self._preserveParams()
@@ -190,12 +190,12 @@ class RHTaskNewAdd( RHTaskModifBase ):
             return
         if params.get("performedAction","") == "Remove responsibles" :
             self._removePersons(params, "responsible")
-            
+
             self._redirect(urlHandlers.UHTaskNew.getURL(self._target))
             return
         if params.has_key("cancel") :
             self._removePreservedParams()
-            self._removeDefinedList("responsible")            
+            self._removeDefinedList("responsible")
         if params.get("performedAction","") == _("ok") :
             task = self._target.newTask(self._getUser())
             task.setTitle(params.get("title",""))
@@ -204,19 +204,19 @@ class RHTaskNewAdd( RHTaskModifBase ):
             responsibleList = self._getDefinedList("responsible")
             for responsible in responsibleList :
                 task.addResponsible(responsible[0])
-            
+
             self._removePreservedParams()
-            self._removeDefinedList("responsible")            
-            
+            self._removeDefinedList("responsible")
+
         self._redirect(urlHandlers.UHTaskList.getURL(self._target))
 
 
     def _preserveParams(self):
         preservedParams = self._getRequestParams().copy()
         self._websession.setVar("preservedParams",preservedParams)
-    
+
     def _removePersons(self, params, typeName):
-        
+
         persons = self._normaliseListParam(params.get("%ss"%typeName,[]))
         definedList = self._getDefinedList(typeName)
         personsToRemove = []
@@ -226,22 +226,22 @@ class RHTaskNewAdd( RHTaskModifBase ):
         for person in personsToRemove :
             definedList.remove(person)
         self._setDefinedList(definedList,typeName)
-        
+
     def _removePreservedParams(self):
         self._websession.setVar("preservedParams",None)
-    
+
     def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList"%typeName,None) 
-        
+        self._websession.setVar("%sList"%typeName,None)
+
     def _getDefinedList(self, typeName):
         definedList = self._websession.getVar("%sList"%typeName)
         if definedList is None :
             return []
         return definedList
-        
+
     def _setDefinedList(self, definedList, typeName):
         self._websession.setVar("%sList"%typeName,definedList)
-   
+
 #--------------------------------------------------------------------------
 
 class RHTaskNewResponsibleSearch( RHTaskModifBase ):
@@ -249,10 +249,10 @@ class RHTaskNewResponsibleSearch( RHTaskModifBase ):
 
     def _checkParams( self, params):
         RHTaskModifBase._checkParams(self,params)
-        
+
     def _process( self ):
         params = self._getRequestParams()
-        
+
         params["newButtonAction"] = str(urlHandlers.UHTaskNewResponsibleNew.getURL())
         addURL = urlHandlers.UHTaskNewPersonAdd.getURL()
         addURL.addParam("orgin","selected")
@@ -260,7 +260,7 @@ class RHTaskNewResponsibleSearch( RHTaskModifBase ):
         params["addURL"] = addURL
         p = tasks.WPTaskNewResponsibleSelect( self, self._target)
         return p.display(**params)
-   
+
 #-------------------------------------------------------------------------------------
 
 class RHTaskNewPersonAdd( RHTaskModifBase ):
@@ -271,23 +271,23 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
         self._typeName = params.get("typeName",None)
         if self._typeName  is None :
             raise MaKaCError( _("Type name of the person to add is not set."))
-        
+
     def _process( self ):
         params = self._getRequestParams()
         self._errorList = []
-        
+
         #raise "%s"%params
         definedList = self._getDefinedList(self._typeName)
         if definedList is None :
             definedList = []
-        
+
         if params.get("orgin","") == "new" :
             #raise "new"
             if params.get("ok",None) is None :
-                raise "not ok"
+                raise MaKaCError("not ok")
                 self._redirect(urlHandlers.UHTaskNew.getURL(self._target))
                 return
-            else :                
+            else:
                 person = ContributionParticipation()
                 person.setFirstName(params["name"])
                 person.setFamilyName(params["surName"])
@@ -296,12 +296,12 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
                 person.setAddress(params["address"])
                 person.setPhone(params["phone"])
                 person.setTitle(params["title"])
-                person.setFax(params["fax"])                
-                if not self._alreadyDefined(person, definedList) :                    
-                    definedList.append([person,params.has_key("submissionControl")])    
+                person.setFax(params["fax"])
+                if not self._alreadyDefined(person, definedList) :
+                    definedList.append([person,params.has_key("submissionControl")])
                 else :
                     self._errorList.append( _("%s has been already defined as %s of this contribution")%(person.getFullName(),self._typeName))
-        
+
         elif params.get("orgin","") == "selected" :
             selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals",[]))
             for s in selectedList :
@@ -310,7 +310,7 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
                     selected = auths.getById(s[9:])[0]
                 else :
                     ph = user.PrincipalHolder()
-                    selected = ph.getById(s)                            
+                    selected = ph.getById(s)
                 if isinstance(selected, user.Avatar) :
                     person = ContributionParticipation()
                     person.setDataFromAvatar(selected)
@@ -318,17 +318,17 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
                         definedList.append([person,params.has_key("submissionControl")])
                     else :
                         self._errorList.append( _("%s has been already defined as %s of this contribution")%(person.getFullName(),self._typeName))
-                        
-                elif isinstance(selected, user.Group) : 
+
+                elif isinstance(selected, user.Group) :
                     for member in selected.getMemberList() :
                         person = ContributionParticipation()
                         person.setDataFromAvatar(member)
                         if not self._alreadyDefined(person, definedList) :
-                            definedList.append([person,params.has_key("submissionControl")])            
+                            definedList.append([person,params.has_key("submissionControl")])
                         else :
                             self._errorList.append( _("%s has been already defined as %s of this contribution")%(presenter.getFullName(),self._typeName))
-                else : 
-                    person = ContributionParticipation()                                            
+                else :
+                    person = ContributionParticipation()
                     person.setTitle(selected.getTitle())
                     person.setFirstName(selected.getFirstName())
                     person.setFamilyName(selected.getFamilyName())
@@ -341,13 +341,13 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
                         definedList.append([person,params.has_key("submissionControl")])
                     else :
                         self._errorList.append( _("%s has been already defined as %s of this contribution")%(person.getFullName(),self._typeName))
-                
+
         elif params.get("orgin","") == "added" :
             preservedParams = self._getPreservedParams()
             chosen = preservedParams.get("%sChosen"%self._typeName,None)
-            if chosen is None or chosen == "" : 
+            if chosen is None or chosen == "" :
                 self._redirect(urlHandlers.UHConfModScheduleNewContrib.getURL(self._target))
-                return            
+                return
             index = chosen.find("-")
             taskId = chosen[0:index]
             resId = chosen[index+1:len(chosen)]
@@ -356,7 +356,7 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
             if chosenPerson is None :
                 self._redirect(urlHandlers.UHConfModScheduleNewContrib.getURL(self._target))
                 return
-            person = ContributionParticipation()                                            
+            person = ContributionParticipation()
             person.setTitle(chosenPerson.getTitle())
             person.setFirstName(chosenPerson.getFirstName())
             person.setFamilyName(chosenPerson.getFamilyName())
@@ -366,7 +366,7 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
             person.setPhone(chosenPerson.getPhone())
             person.setFax(chosenPerson.getFax())
             if not self._alreadyDefined(person, definedList) :
-                definedList.append([person,params.has_key("submissionControl")])    
+                definedList.append([person,params.has_key("submissionControl")])
             else :
                 self._errorList.append( _("%s has been already defined as %s of this contribution")%(person.getFullName(),self._typeName))
         else :
@@ -376,7 +376,7 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
         preservedParams["errorMsg"] = self._errorList
         self._preserveParams(preservedParams)
         self._websession.setVar("%sList"%self._typeName,definedList)
-        
+
         self._redirect(urlHandlers.UHTaskNew.getURL(self._target))
 
 
@@ -385,7 +385,7 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
         if definedList is None :
             return []
         return definedList
-        
+
     def _alreadyDefined(self, person, definedList):
         if person is None :
             return True
@@ -402,7 +402,7 @@ class RHTaskNewPersonAdd( RHTaskModifBase ):
         if params is None :
             return {}
         return params
-    
+
     def _preserveParams(self, params):
         self._websession.setVar("preservedParams",params)
     def _removePreservedParams(self):
@@ -416,7 +416,7 @@ class RHTaskNewResponsibleNew( RHTaskModifBase ):
 
     def _checkParams( self, params):
         RHTaskModifBase._checkParams(self,params)
-        
+
     def _process( self ):
         p = tasks.WPTaskNewResponsibleNew( self, self._target)
         return p.display()
@@ -426,8 +426,8 @@ class RHTaskNewResponsibleNew( RHTaskModifBase ):
 
 class RHTaskDetails( RHCategDisplayBase ):
     _uh = urlHandlers.UHTaskDetails
-    
-    def _process( self ):        
+
+    def _process( self ):
         params = self._getRequestParams()
         if params.get("taskId",None) is None :
             raise MaKaCError( _("Task id is not set - cannot display task details"))
@@ -442,19 +442,19 @@ class RHTaskDetails( RHCategDisplayBase ):
             params["editRights"] = "True"
         elif user in task.getResponsibleList() or user.getEmail() in emails :
             params["editRights"] = "True"
-        else :             
+        else :
             params["editRights"] = "False"
-        
+
         p = tasks.WPTaskDetails( self, task, params)
         return p.display()
 
-        
+
 class RHTaskDetailsAction( RHCategDisplayBase ):
     _uh = urlHandlers.UHTaskDetailsAction
-    
-    def _process( self ):        
+
+    def _process( self ):
         params = self._getRequestParams()
-        
+
         #raise "%s"%params
         if params.get("taskId",None) is None :
             raise MaKaCError( _("Task id is not set - cannot preform task details action"))
@@ -468,17 +468,17 @@ class RHTaskDetailsAction( RHCategDisplayBase ):
             params["showComments"] = "true"
         if params.get("performedAction","") == _("Hide comments list") :
             del params["showComments"]
-        
+
         if params.get("performedAction","") == _("Show status history") :
             params["showStatus"] = "true"
         if params.get("performedAction","") == _("Hide status history") :
             del params["showStatus"]
-        
+
         if params.get("performedAction","") == _("Change status") :
             status = TaskStatus(params["changedStatus"],self._getUser())
             task.changeStatus(status)
             params["showStatus"] = "true"
-        
+
         if params.get("performedAction","") == "Add as responsible" :
             resId = params.get("responsibleChosen",None)
             if resId is not None :
@@ -487,7 +487,7 @@ class RHTaskDetailsAction( RHCategDisplayBase ):
                 resId = resId[index+1:]
                 responsible = self._target.getTask(taskId).getResponsibleList()[int(resId)]
                 task.addResponsible(responsible)
-                
+
         if params.get("performedAction","") == "Remove responsibles" :
             toRemove = self._normaliseListParam(params.get("responsibles",[]))
             if len(toRemove) > 0 :
@@ -497,18 +497,18 @@ class RHTaskDetailsAction( RHCategDisplayBase ):
                 for r in lis :
                     task.removeResponsible(r)
         if params.get("performedAction","") == "New responsible" :
-            url = urlHandlers.UHTaskDetailsResponsibleSearch.getURL(task)  
+            url = urlHandlers.UHTaskDetailsResponsibleSearch.getURL(task)
             url.addParam("taskId",params["taskId"])
             self._redirect(url)
             return
-                    
+
         if params.get("performedAction","") == "New comment" :
             url = urlHandlers.UHTaskCommentNew.getURL(task)
             url.addParam("taskId",params["taskId"])
             self._redirect(url)
             return
-                    
-        
+
+
         p = tasks.WPTaskDetails( self, task, params)
         return p.display()
 
@@ -519,20 +519,20 @@ class RHTaskDetailsResponsibleSearch( RHCategDisplayBase ):
 
     def _checkParams( self, params):
         RHCategDisplayBase._checkParams(self,params)
-        
+
     def _process( self ):
         params = self._getRequestParams()
-        
+
         params["newButtonAction"] = str(urlHandlers.UHTaskDetailsResponsibleNew.getURL())
         addURL = urlHandlers.UHTaskDetailsPersonAdd.getURL()
         addURL.addParam("orgin","selected")
         addURL.addParam("typeName","responsible")
         #addURL.addParam("taskId",params["taskId"])
         params["addURL"] = addURL
-        
+
         p = tasks.WPTaskDetailsResponsibleSelect( self, self._target)
         return p.display(**params)
-   
+
 #-------------------------------------------------------------------------------------
 
 class RHTaskDetailsPersonAdd( RHTaskModifBase ):
@@ -543,23 +543,23 @@ class RHTaskDetailsPersonAdd( RHTaskModifBase ):
         self._typeName = params.get("typeName",None)
         if self._typeName  is None :
             raise MaKaCError( _("Type name of the person to add is not set."))
-        
+
     def _process( self ):
         params = self._getRequestParams()
         self._errorList = []
-        
+
         #raise "%s"%params
         taskId = params["taskId"]
 
         taskObject = self._target.getTask(taskId)
-        if params.get("orgin","") == "new" :            
+        if params.get("orgin","") == "new" :
             if params.get("ok",None) is None :
-                raise "not ok"
+                raise MaKaCError("not ok")
                 url = urlHandlers.UHTaskDetails.getURL(self._target)
                 url.addParam("taskId",params["taskId"])
                 self._redirect(url)
                 return
-            else :                
+            else :
                 person = ContributionParticipation()
                 person.setFirstName(params["name"])
                 person.setFamilyName(params["surName"])
@@ -568,12 +568,12 @@ class RHTaskDetailsPersonAdd( RHTaskModifBase ):
                 person.setAddress(params["address"])
                 person.setPhone(params["phone"])
                 person.setTitle(params["title"])
-                person.setFax(params["fax"])                
-                if not self._alreadyDefined(person, taskObject.getResponsibleList()) :                    
+                person.setFax(params["fax"])
+                if not self._alreadyDefined(person, taskObject.getResponsibleList()) :
                     taskObject.addResponsible(person)
                 else :
                     self._errorList.append("%s has been already defined as %s of this task"%(person.getFullName(),self._typeName))
-        
+
         elif params.get("orgin","") == "selected" :
             selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals",[]))
             for s in selectedList :
@@ -582,26 +582,26 @@ class RHTaskDetailsPersonAdd( RHTaskModifBase ):
                     selected = auths.getById(s[9:])[0]
                 else :
                     ph = user.PrincipalHolder()
-                    selected = ph.getById(s)                            
+                    selected = ph.getById(s)
                 if isinstance(selected, user.Avatar) :
                     person = ContributionParticipation()
                     person.setDataFromAvatar(selected)
-                    if not self._alreadyDefined(person, taskObject.getResponsibleList()) :                    
+                    if not self._alreadyDefined(person, taskObject.getResponsibleList()) :
                         taskObject.addResponsible(person)
                     else :
                         self._errorList.append("%s has been already defined as %s of this task"%(person.getFullName(),self._typeName))
-                        
-                elif isinstance(selected, user.Group) : 
+
+                elif isinstance(selected, user.Group) :
                     for member in selected.getMemberList() :
                         person = ContributionParticipation()
                         person.setDataFromAvatar(member)
-                        if not self._alreadyDefined(person, taskObject.getResponsibleList()) :                    
+                        if not self._alreadyDefined(person, taskObject.getResponsibleList()) :
                             taskObject.addResponsible(person)
                         else :
                             self._errorList.append("%s has been already defined as %s of this task"%(person.getFullName(),self._typeName))
-                        
-                else : 
-                    person = ContributionParticipation()                                            
+
+                else :
+                    person = ContributionParticipation()
                     person.setTitle(selected.getTitle())
                     person.setFirstName(selected.getFirstName())
                     person.setFamilyName(selected.getFamilyName())
@@ -610,7 +610,7 @@ class RHTaskDetailsPersonAdd( RHTaskModifBase ):
                     person.setAffiliation(selected.getAffiliation())
                     person.setPhone(selected.getPhone())
                     person.setFax(selected.getFax())
-                    if not self._alreadyDefined(person, taskObject.getResponsibleList()) :                    
+                    if not self._alreadyDefined(person, taskObject.getResponsibleList()) :
                         taskObject.addResponsible(person)
                     else :
                         self._errorList.append("%s has been already defined as %s of this task"%(person.getFullName(),self._typeName))
@@ -619,7 +619,7 @@ class RHTaskDetailsPersonAdd( RHTaskModifBase ):
                 url.addParam("taskId",params["taskId"])
                 self._redirect(url)
                 return
-        
+
         url = urlHandlers.UHTaskDetails.getURL(self._target)
         url.addParam("taskId",params["taskId"])
         self._redirect(url)
@@ -642,43 +642,43 @@ class RHTaskDetailsResponsibleNew( RHTaskModifBase ):
 
     def _checkParams( self, params):
         RHTaskModifBase._checkParams(self,params)
-        
+
     def _process( self ):
         params = self._getRequestParams()
         p = tasks.WPTaskDetailsResponsibleNew( self, self._target, params)
         return p.display()
-        
-        
+
+
 #--------------------------------------------------------------------------
 
 class RHTaskCommentNew( RHTaskModifBase ):
     _uh = urlHandlers.UHTaskCommentNew
-    
-    def _process( self ):        
+
+    def _process( self ):
         params = self._getRequestParams()
         if params.get("taskId",None) is None :
             raise MaKaCError( _("Task id is not set - cannot add a comment"))
-            
+
         params["commentedBy"] = self._getUser().getFullName()
-        
+
         p = tasks.WPTaskCommentNew( self, self._target, params)
         return p.display()
 
 
 class RHTaskCommentNewAction( RHTaskModifBase ):
     _uh = urlHandlers.UHTaskCommentNewAction
-    
-    def _process( self ):        
+
+    def _process( self ):
         params = self._getRequestParams()
         if params.get("taskId",None) is None :
             raise MaKaCError( _("Task id is not set - cannot add a comment"))
-                    
-        task = self._target.getTask(params["taskId"])            
+
+        task = self._target.getTask(params["taskId"])
         if params.get("performedAction","") == "ok" :
             task.addComment(self._getUser(),params["commentText"])
-        
+
         url = urlHandlers.UHTaskDetails().getURL(task)
         url.addParam("showComments", "true")
         self._redirect(url)
 
-        
+

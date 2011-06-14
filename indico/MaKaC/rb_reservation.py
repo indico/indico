@@ -27,6 +27,7 @@ from datetime import datetime, timedelta, date
 from MaKaC.rb_tools import iterdays, weekNumber, doesPeriodsOverlap, overlap, Period, Impersistant, checkPresence, fromUTC, toUTC, formatDateTime, formatDate
 from MaKaC.rb_location import ReservationGUID, Location, CrossLocationQueries
 from MaKaC.accessControl import AccessWrapper
+from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder, Avatar
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
@@ -585,7 +586,7 @@ class ReservationBase( object ):
         # 4) Remember and return collisions.
 
         if ( rooms == None and self.room == None ) or self.startDT == None or self.endDT == None:
-            raise 'room, startDT, endDT fields must not be None'
+            raise MaKaCError('room, startDT, endDT fields must not be None')
 
         if rooms == None:
             rooms = [ self.room ]
@@ -711,7 +712,7 @@ class ReservationBase( object ):
                 return self.getNextRepeating( retStartDT )  # Recurrently ask for next
             return Period( retStartDT, retEndDT )
 
-        raise 'Unknown repeatability type.'
+        raise MaKaCError('Unknown repeatability type.')
 
     def overlapsOn( self, startDT, endDT ):
         """
@@ -786,7 +787,7 @@ class ReservationBase( object ):
                     return True
             return False
 
-        raise "Unknown repeatability type"
+        raise MaKaCError("Unknown repeatability type")
 
     # Excluded days management ----------------------------------------------
 
@@ -819,7 +820,7 @@ class ReservationBase( object ):
             return 'Not applicable to non-repeating reservations.'
         for d in excludedDays:
             if not isinstance( d, date ):
-                raise 'excludedDays must contain only objects of date type (NOT datetime)'
+                raise MaKaCError('excludedDays must contain only objects of date type (NOT datetime)')
 
     def excludeDay( self, dayD ):
         """
@@ -829,7 +830,7 @@ class ReservationBase( object ):
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
-            raise 'dayD must be of date type (NOT datetime)'
+            raise MaKaCError('dayD must be of date type (NOT datetime)')
 
     def includeDay( self, dayD ):
         """
@@ -839,7 +840,7 @@ class ReservationBase( object ):
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
-            raise 'dayD must be of date type (NOT datetime)'
+            raise MaKaCError('dayD must be of date type (NOT datetime)')
 
     def dayIsExcluded( self, dayD ):
         """
@@ -848,7 +849,7 @@ class ReservationBase( object ):
         if self.repeatability == None:
             return 'Not applicable to non-repeating reservations.'
         if not isinstance( dayD, date ):
-            raise 'dayD must be of date type (NOT datetime)'
+            raise MaKaCError('dayD must be of date type (NOT datetime)')
 
 
     # Statistical ------------------------------------------------------------
@@ -1144,7 +1145,7 @@ class ReservationBase( object ):
         elif isinstance( accessWrapper, Avatar ):
             user = accessWrapper
         else:
-            raise 'canModify requires either AccessWrapper or Avatar object'
+            raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
         if not user:
             return False
         can = user.isAdmin() or \

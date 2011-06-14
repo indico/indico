@@ -27,6 +27,7 @@ from MaKaC.rb_tools import Impersistant, checkPresence, iterdays
 from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
 from MaKaC.user import Avatar, AvatarHolder
 from MaKaC.accessControl import AccessWrapper
+from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
 
 
@@ -355,7 +356,7 @@ class RoomBase( object ):
         elif isinstance( eq, str ):
             self._equipment = eq
             return
-        raise 'Invalid equipment list'
+        raise MaKaCError('Invalid equipment list')
 
     def getEquipment( self ):
         """
@@ -380,11 +381,11 @@ class RoomBase( object ):
 
     def isCloseToBuilding( self, buildingNr ):
         """ Returns true if room is close to the specified building """
-        raise 'Not implemented'
+        raise NotImplementedError('Not implemented')
 
     def belongsTo( self, user ):
         """ Returns true if current CrbsUser is responsible for this room """
-        raise 'Not implemented'
+        raise NotImplementedError('Not implemented')
 
     # "System" ---------------------------------------------------------------
 
@@ -561,7 +562,7 @@ class RoomBase( object ):
         elif isinstance( accessWrapper, Avatar ):
             return accessWrapper.isAdmin()
 
-        raise 'canModify requires either AccessWrapper or Avatar object'
+        raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
 
     def canDelete( self, user ):
         return self.canModify( user )
@@ -596,7 +597,7 @@ class RoomBase( object ):
 
     def setLocationName( self, locationName ):
         if self.__class__.__name__ == 'RoomBase':
-            raise 'This method is purely virtual. Call it only on derived objects.'
+            raise MaKaCError('This method is purely virtual. Call it only on derived objects.')
         return self.setLocationName( locationName ) # Subclass
 
     def getAccessKey( self ): return ""

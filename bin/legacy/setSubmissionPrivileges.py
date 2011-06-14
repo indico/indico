@@ -30,5 +30,5 @@ for conf in ConferenceHolder().getList():
             try:
                 assert (len(contrib.getSubmitterList())>=1)
             except AssertionError:
-                raise "conf %s - contrib %s"%(conf.getId(),contrib.getId())
+                raise Exception("conf %s - contrib %s"%(conf.getId(),contrib.getId()))
 DBMgr.getInstance().endRequest()
