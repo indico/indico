@@ -28,7 +28,3 @@ if DEVELOPMENT:
 
 def index(req, **params):
     return users.RHUserDetails( req ).process( params )
-
-def getEvents(req, **params):
-    return users.RHUserEvents( req ).process( params )
-

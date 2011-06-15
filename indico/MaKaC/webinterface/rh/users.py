@@ -20,7 +20,6 @@
 
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.admins as admins
-import MaKaC.webinterface.pages.personalization as personalization
 import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.user as user
 import MaKaC.common.info as info
@@ -346,13 +345,6 @@ class RHUserPersBase( base.RHDisplayBaseProtected ):
         RHProtected._checkSessionUser( self )
         if not self._aw.getUser():
             raise errors.AccessControlError("user")
-
-class RHUserEvents(RHUserPersBase):
-    _uh = urlHandlers.UHGetUserEventPage
-
-    def _process( self ):
-        p = personalization.WPDisplayUserEvents( self )
-        return p.display()
 
 class RHUserModification( RHUserBase ):
     _uh = urlHandlers.UHUserModification
