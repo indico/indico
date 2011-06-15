@@ -122,7 +122,7 @@
             });
 
             var serializeACL = function() {
-                $('allowedUsers').setValue(Json.write(principalField.getUsers()));
+                $j('#allowedUsers').val(Json.write(principalField.getUsers()));
             }
 
             var serializeRooms = function() {
@@ -131,7 +131,7 @@
                     roomGuids.push(key);
                 });
                 hasRooms = (roomGuids.length > 0);
-                $('blockedRooms').setValue(Json.write(roomGuids));
+                $j('#blockedRooms').val(Json.write(roomGuids));
             }
 
             var principalField = new UserListField(

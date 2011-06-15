@@ -78,17 +78,15 @@ function isBefore( sTime, eTime )
 
 function required_fields( fieldNames )
 {
-    var isValid = true
-    for ( i = 0; i < fieldNames.length; ++i )
-    {
-        fieldName = fieldNames[i]
-        if ( trim($F( fieldName )).length == 0 )
-        {
-            $( fieldName ).className = 'invalid'
-            isValid = false
+    var isValid = true;
+    for (var i = 0; i < fieldNames.length; ++i) {
+        fieldName = fieldNames[i];
+        if (trim($F(fieldName)).length == 0) {
+            $j('#' + fieldName).addClass('invalid');
+            isValid = false;
         }
     }
-    return isValid
+    return isValid;
 }
 
 function valid_email( emailString )
