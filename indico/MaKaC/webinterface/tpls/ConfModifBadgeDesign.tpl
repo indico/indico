@@ -190,26 +190,6 @@
       }
     }
 
-    /*
-    The following method does not work in IE because of $('font selector').options[i].value .
-    As well, it seems the function is not needed and it was just used once in the method markSelected, like this:
-
-        $('font selector').selectedIndex = getSelectedFontIndex(newSelectedItem);
-
-    we replaced it with:
-
-        $('font selector').selectedIndex = newSelectedItem.fontFamilyIndex;
-
-    function getSelectedFontIndex(newSelectedItem) {
-        index = 0;
-        for (i = 0; i < $E('font selector').dom.options.length; i++) {
-            if ($E('font selector').dom.options[i].value == newSelectedItem.fontFamily) {
-                index = newSelectedItem.fontFamilyIndex;
-            }
-        }
-        return index;
-    }*/
-
     function markSelected(newSelectedDiv) {
 
       // Change the text that says which item is selected
