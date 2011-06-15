@@ -62,9 +62,6 @@ endpointMap = {
     "scheduler": importModule('MaKaC.services.implementation.scheduler'),
     "abstractReviewing": importModule('MaKaC.services.implementation.abstractReviewing'),
 
-    # Hermes integration
-    #"hermes": importPlugin('Collaboration', 'Hermes', 'ServiceEndpoint'),
-
     # Tests - just for remote testing of JSON-RPC
     "test": importModule('MaKaC.services.implementation.test')
 }

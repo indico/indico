@@ -35,16 +35,6 @@ def performBookingAction(req, **args):
 def BookingDetail(req, **args):
     return conferenceModif.RHBookingDetail(req).process(args)
 
-#
-def createBookingHERMES(req, **args ):
-    return conferenceModif.RHBookingsHERMES( req ).process( args )
-#
-def performBookingHERMES(req, **args ):
-    return conferenceModif.RHBookingsHERMESPerform( req ).process( args )
-#
-def addHERMESParticipant(req, **args):
-    return conferenceModif.RHHERMESParticipantCreation(req).process(args)
-
 def performBookingDeletion(req, **args):
     return conferenceModif.RHBookingListDelete(req).process (args)
 

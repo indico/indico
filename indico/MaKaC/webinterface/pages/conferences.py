@@ -2422,11 +2422,6 @@ class WPConfModifBookings( WPConferenceModifBase ):
         elif self._bs.strip()=="VRVS":
             wc = WBookingsWarning(self._conf)
             return wc.getHTML(p)
-#        elif self._bs.strip()=="MCU":
-#            wc = importPlugin("Collaboration", "Hermes", "CreateComponent")(self._conf)
-#            if (wc == None):
-#                wc= WBookingsNotYetAvailable(self._conf)
-#            return wc.getHTML(p)
 
 class WConfModifBookings( wcomponents.WTemplated ):
 
@@ -2470,34 +2465,6 @@ class WBookings (wcomponents.WTemplated):
         vars["calendarSelectURL"] = urlHandlers.UHSimpleCalendar.getURL()
         vars["comments"]=""
         return vars
-
-class WHERMESParticipantList (wcomponents.WTemplated):
-
-      pass
-
-class WHERMESParticipantCreation (wcomponents.WTemplated):
-
-    def __init__( self, conference ):
-        self._conf = conference
-
-    def getVars (self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["participantName"] = ""
-        vars["participantIpAddress"] = ""
-        return vars
-
-class WPBookingsHERMES (WPConfModifBookings):
-
-    def __init__( self, rh, conf ):
-        WPConferenceModifBase.__init__(self, rh, conf)
-
-    def _setActiveTab( self ):
-        self._tabVideoServices.setActive()
-
-    def _getTabContent( self, params ):
-        p={"UserEmail": self._getAW().getUser().getEmail()}
-        wc = WBookingsHERMES (self._conf)
-        return wc.getHTML(p)
 
 class WPBookingsVRVS(WPConfModifBookings):
 
@@ -2622,11 +2589,6 @@ class WPBookingsDetail(WPConferenceModifBase):
 "listOfBookings": quoteattr(str(urlHandlers.UHConfModifBookings.getURL(self._conf)))}
             wc = WBookingsVRVSDetail(self._booking)
             return wc.getHTML(p)
-#        elif self._booking.getSystem()=="HERMES":
-#            wc = importPlugin("Collaboration", "Hermes", "ShowComponent")(self._conf, self._booking)
-#            if (wc == None):
-#                wc= WBookingsNotYetAvailable(self._conf)
-#            return wc.getHTML()
 
 class WBookingsVRVSPerformed(WBookingsVRVS):
 

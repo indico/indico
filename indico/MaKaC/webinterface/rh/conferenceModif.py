@@ -2112,21 +2112,6 @@ class RHBookingDetail(RHBookingListModifBase):
         return conferences.WPBookingsDetail(self,self._conf,self._booking).display()
 
 
-class RHHERMESParticipantCreation (RHConfModifBookings):
-    _uh = urlHandlers.UHHERMESParticipantCreation
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._cancel = params.has_key("cancel")
-
-    def _process(self):
-
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        else:
-            self._redirect(urlHandlers.UHBookingsHERMES.getURL(self._conf))
-
 ################################
 # !End of videoconference related
 ######################################################################################

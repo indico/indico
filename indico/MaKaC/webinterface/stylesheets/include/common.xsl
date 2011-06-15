@@ -181,10 +181,6 @@
   VRVS <xsl:value-of select="./description"/>
 </xsl:template>
 
-<xsl:template match="HERMES">
-  HERMES <xsl:value-of select="./description"/>
-</xsl:template>
-
 <xsl:template match="EDIAL">
   eDial <xsl:value-of select="./description"/>
 </xsl:template>

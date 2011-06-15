@@ -1495,18 +1495,6 @@ class UHBookingDetail(URLHandler):
     _relativeURL = "confModifBookings.py/BookingDetail"
 
 
-class UHBookingsHERMES( URLHandler ):
-    _relativeURL = "confModifBookings.py/createBookingHERMES"
-
-
-class UHHERMESParticipantCreation( URLHandler ):
-    _relativeURL = "ConferenceModifBookings.py/addHERMESParticipant"
-
-
-class UHPerformBookingsHERMES( URLHandler ):
-    _relativeURL = "confModifBookings.py/performBookingHERMES"
-
-
 class UHConfModifBookings( URLHandler ):
     _relativeURL = "confModifBookings.py"
 
