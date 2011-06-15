@@ -7,7 +7,7 @@
 <% conf = item.getConference() %>
 
 
-% if len(conf.getSessionList()) > 1:
+% if len(conf.getSessionList()) != 1:
     <tr>
         <td>
             <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
@@ -22,17 +22,20 @@
                 (${common.renderLocationAdministrative(item)})
             % endif
             <br/>
-
         </td>
         <td class="itemRightAlign" >
             % if len(session.getAllMaterialList()) > 0 and allMaterial:
                 % for material in session.getAllMaterialList():
-                    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
+                    % if material.canView(accessWrapper):
+                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
+                    % endif
                 % endfor
             % elif materialSession and len(session.getAllMaterialList()) > 0:
                 % for material in session.getAllMaterialList():
-                    % if material.getTitle()!='document' or not conf.getReportNumberHolder().listReportNumbers():
-                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
+                    % if material.canView(accessWrapper):
+                        % if material.getTitle()!='document' or not conf.getReportNumberHolder().listReportNumbers():
+                            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
+                        % endif
                     % endif
                 % endfor
             % endif

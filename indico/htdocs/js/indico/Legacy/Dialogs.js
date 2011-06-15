@@ -592,6 +592,29 @@ extend(IndicoUI.Dialogs,
                }).run();
            },
 
+           deleteMinutes: function(confId, sessId, contId, subContId, compile){
+               indicoRequest(
+                       'minutes.delete',
+                       {
+                           confId: intToStr(confId),
+                           sessionId: intToStr(sessId),
+                           contribId: intToStr(contId),
+                           subContId: intToStr(subContId),
+                           compile: false
+                       },
+                       function(result,error) {
+                           if (!error) {
+                               if (result) {
+                                   window.location.reload(true);
+                               } else {
+                                   IndicoUtil.errorReport(error);
+                               }
+                           }
+                       }
+                   );
+
+           },
+
            writeMinutes: function(confId, sessId, contId, subContId, compile) {
 
                var changedText = new WatchValue(false);

@@ -96,6 +96,15 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
 
         return text
 
+class MinutesDelete(MinutesEdit):
+    def _getAnswer(self):
+        self._target.removeMinutes()
+        if self._target.getMinutes() is None:
+            return True
+        else:
+            return False
+
 methodMap = {
-    "edit": MinutesEdit
+    "edit": MinutesEdit,
+    "delete": MinutesDelete
     }

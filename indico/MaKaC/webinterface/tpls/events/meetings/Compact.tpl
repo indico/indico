@@ -31,7 +31,7 @@
         _daysPerRow = int(daysPerRow)
 %>
 
-<%def name="printSession(item,contContrib)" >
+<%def name="printSession(item)" >
 
 <% session = item.getSession()%>
     <tr>
@@ -39,7 +39,7 @@
     <span style="font-weight:bold;">${getTime(item.getAdjustedStartDate(timezone))}</span>
     </td>
     <td colspan="1" bgcolor="#90c0f0">
-    <div style="float:left">
+    <div style="float:right">
         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </div>
     <span style="font-weight:bold;">${session.getTitle()}</span>
@@ -72,34 +72,36 @@
             % if getItemType(subitem) == "Break":
                 ${printBreak(subitem)}
             % elif getItemType(subitem) == "Contribution":
-                ${printContribution(subitem,contContrib)}
-                <% contContrib += 1 %>
+                ${printContribution(subitem)}
             % endif
         % endfor
     % endif
 </%def>
 
 
-<%def name="printContribution(item,contContrib)" >
-    <tr bgcolor=${"silver" if contContrib % 2 != 1 else "#D2D2D2"}>
-        <td bgcolor=${"#D0D0D0" if contContrib % 2 != 1 else "#E2E2E2"}  valign="top" width="5%">
+<%def name="printContribution(item)" >
+
+    <tr bgcolor=${"silver" if item.getConference().getContribOrderSchedule(item) % 2 != 0 else "#D2D2D2"}>
+        <td bgcolor=${"#D0D0D0" if item.getConference().getContribOrderSchedule(item) % 2 != 0 else "#E2E2E2"}  valign="top" width="5%">
             ${getTime(item.getAdjustedStartDate(timezone))}
         </td>
         <td valign="top">
-                  <div style="float:left">
-                    <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False"/>
-                  </div>
                        &nbsp;${item.getTitle()}
                       % if item.getSpeakerList() or item.getSpeakerText():
                             - ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), title=False, spanClass='speakerList',italicAffilation=False, separator=' ')}
                       % endif
                   &nbsp;
                   <div style="float:right">
-                      % for material in item.getAllMaterialList():
-                                % if material.canView(accessWrapper):
-                                <%include file="${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
-                                % endif
-                      % endfor
+                      <div style="float:left">
+                          % for material in item.getAllMaterialList():
+                                    % if material.canView(accessWrapper):
+                                    <%include file="${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
+                                    % endif
+                          % endfor
+                      </div>
+                      <div style="float:right">
+                        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=False"/>
+                      </div>
                   </div>
         </td>
    </tr>
@@ -158,7 +160,6 @@
 
 <table class="dayList" cellpadding="0">
 
-<% contContrib = 0 %>
 % for i in range (0,numRows):
     <% contDays = 0 %>
     <tr>
@@ -192,11 +193,9 @@
 
                     % for item in daysDict[day]['AM']:
                                  % if getItemType(item) == "Session":
-                                     ${printSession(item, contContrib)}
-                                     <% contContrib += item.getSession().getNumberOfContributions() %>
+                                     ${printSession(item)}
                                  % elif getItemType(item) == "Contribution":
-                                     ${printContribution(item, contContrib)}
-                                     <% contContrib += 1 %>
+                                     ${printContribution(item)}
                                  % elif getItemType(item) == "Break":
                                      ${printBreak(item)}
                                  % endif
@@ -228,11 +227,9 @@
                 <table width="100%" cellspacing="1" cellpadding="3" border="0">
                     % for item in daysDict[day]['PM']:
                                  % if getItemType(item) == "Session":
-                                     ${printSession(item, contContrib)}
-                                     <% contContrib += item.getSession().getNumberOfContributions() %>
+                                     ${printSession(item)}
                                  % elif getItemType(item) == "Contribution":
-                                     ${printContribution(item,contContrib)}
-                                     <% contContrib += 1 %>
+                                     ${printContribution(item)}
                                  % elif getItemType(item) == "Break":
                                      ${printBreak(item)}
                                  % endif

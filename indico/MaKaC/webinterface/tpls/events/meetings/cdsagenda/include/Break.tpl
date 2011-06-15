@@ -1,10 +1,12 @@
-<%page args="item, parent, minutes=False"/>
+<%page args="item, parent"/>
 
 <tr class="header">
-    <td align="center" valign="top" width="1%">
-        <span style="font-weight:bold;">&nbsp;${getTime(item.getAdjustedStartDate(timezone))}</span>
+    <td align="center" valign="top" width="2%" style="font-weight:bold;">
+        ${getTime(item.getAdjustedStartDate(timezone))}&nbsp;
     </td>
-    <td colspan="3">
+    <td width="1%">
+    </td>
+    <td colspan="2">
         ${item.getTitle()}
         % if formatDuration(item.getDuration()) != '00:00':
              <span class="itemDuration"> (${prettyDuration(formatDuration(item.getDuration()))}) </span>

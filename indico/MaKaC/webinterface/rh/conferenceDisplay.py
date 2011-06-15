@@ -471,10 +471,10 @@ class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
                 view =styleMgr.getDefaultStyleForEventType( type )
                 displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
         # create the html factory
-        #if view in styleMgr.getXSLStyles():
-        #    p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
-        if view != "static":
+        if view in styleMgr.getXSLStyles():
             p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
+        elif view != "static" and isLibxml:
+            p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
         else:
             p = conferences.WPMeetingTimeTable( self, self._target,"parallel","meeting",self._reqParams )
         # generate the html

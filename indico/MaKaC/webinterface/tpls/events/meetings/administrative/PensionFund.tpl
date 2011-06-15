@@ -32,7 +32,9 @@
 <%block name="eventMaterial">
     % if len(conf.getAllMaterialList()) > 0:
         % for material in conf.getAllMaterialList():
-            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
+            % if material.canView(accessWrapper):
+               <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
+            % endif
         % endfor
     % endif
 </%block>

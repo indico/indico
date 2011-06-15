@@ -3,7 +3,7 @@
 <%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
 
 <tr>
-  <td valign="top" width="3%" style="font-weight:bold;">
+  <td valign="top" width="2%" style="font-weight:bold;">
     &nbsp;${getTime(item.getAdjustedStartDate(timezone))}
     % if olist:
       &nbsp;${order}.
@@ -42,12 +42,13 @@
         % endif
       </td>
       <td align="right">
-        % if item.getSpeakerList() or item.getSpeakerText():
-           ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), title=False, italicAffilation=false, separator=' ')}
-        % endif
-      </td>
-      <td>
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+          % if item.getSpeakerList() or item.getSpeakerText():
+             ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), title=False, italicAffilation=false, separator=' ')}
+          % endif
+          &nbsp;
+          <div style="float:right;">
+             <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+          </div>
       </td>
     </tr>
 

@@ -48,9 +48,10 @@
         % if item.getSpeakerList() or item.getSpeakerText():
            ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText(), title=False, italicAffilation=false, separator=' ')}
         % endif
-    </td>
-    <td>
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        &nbsp;
+        <div style="float:right">
+            <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        </div>
     </td>
 
 </tr>

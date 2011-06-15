@@ -99,9 +99,9 @@
 </tr>
 % endif
 
-<%include file="Chatrooms.tpl"/>
-
 <%include file="VideoServices.tpl"/>
+
+<%include file="Chatrooms.tpl"/>
 
 % if conf.getSupportEmail():
 <tr>

@@ -3537,6 +3537,18 @@ class Conference(CommonObjectBase, Locatable):
         contributions.sort(key = lambda c: c.getId())
         return contributions
 
+    def getContributionListScheduledSorted(self):
+        contributions = []
+        for contrib in self.contributions.values():
+            if contrib.isScheduled():
+                contributions.append(contrib)
+        contributions.sort(key = lambda c: c.getStartDate())
+        return contributions
+
+    def getContribOrderSchedule(self,contrib):
+        contributions = self.getContributionListScheduledSorted()
+        return contributions.index(contrib)
+
     def getNumberOfContributions(self):
         return len(self.contributions)
 

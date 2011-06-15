@@ -114,7 +114,7 @@
           <td>
             % for material in conf.getAllMaterialList():
                 % if material.canView(accessWrapper):
-                <%include file="${INCLUDE}/Material.tpl" args="material=material"/>
+                    <%include file="${INCLUDE}/Material.tpl" args="material=material"/>
                 % endif
             % endfor
           </td>
@@ -132,39 +132,43 @@
                 <td>
                     <table bgcolor="white" cellpadding="2" cellspacing="0" border="0" width="100%">
                         <% contSessions = 0 %>
-                        % for session in conf.getSessionListSorted():
-                            <tr>
-                                <td valign="top" class="headerselected" bgcolor="#000060">
-                                    <span style="font-size:x-small;color:white;">
-                                        % if getDate(session.getAdjustedStartDate(timezone)) == getDate(session.getAdjustedEndDate(timezone)):
-                                            ${prettyDate(session.getAdjustedStartDate(timezone))}&nbsp;${getTime(session.getAdjustedStartDate(timezone))}
-                                            % if getTime(session.getAdjustedEndDate(timezone)) != '00:00':
-                                                ->${getTime(session.getAdjustedEndDate(timezone))}
+                        % for item in entries:
+                            % if getItemType(item)=="Session":
+                            <% session = item.getSession() %>
+                                <tr>
+                                    <td valign="top" class="headerselected" bgcolor="#000060">
+                                        <span style="font-size:x-small;color:white;">
+                                            % if getDate(session.getAdjustedStartDate(timezone)) == getDate(session.getAdjustedEndDate(timezone)):
+                                                ${prettyDate(session.getAdjustedStartDate(timezone))}&nbsp;${getTime(session.getAdjustedStartDate(timezone))}
+                                                % if getTime(session.getAdjustedEndDate(timezone)) != '00:00':
+                                                    ->${getTime(session.getAdjustedEndDate(timezone))}
+                                                % endif
+                                            % else:
+                                                ${prettyDate(session.getAdjustedStartDate(timezone))}&nbsp;${getTime(session.getAdjustedStartDate(timezone))}->${prettyDate(session.getAdjustedEndDate(timezone))}&nbsp;${getTime(session.getAdjustedEndDate(timezone))}
                                             % endif
-                                        % else:
-                                            ${prettyDate(session.getAdjustedStartDate(timezone))}&nbsp;${getTime(session.getAdjustedStartDate(timezone))}->${prettyDate(session.getAdjustedEndDate(timezone))}&nbsp;${getTime(session.getAdjustedEndDate(timezone))}
+                                        </span>
+                                    </td>
+                                    <% bgcolor="#E4E4E4" if contSessions % 2 == 1 else "#F6F6F6" %>
+                                    <td valign="top" bgcolor=${bgcolor}>
+                                    <a href="#session.getId()">
+                                        <span style="font-size:x-small">
+                                            ${session.getTitle() if session.getTitle!='' else "no title"}
+                                        </span>
+                                    </a>
+                                    <span style="font-size:x-small">
+                                        % if getLocationInfo(item)!= getLocationInfo(conf):
+                                           (${getLocationInfo(item)[1]})
+
                                         % endif
                                     </span>
-                                </td>
-                                <% bgcolor="#E4E4E4" if contSessions % 2 == 1 else "#F6F6F6" %>
-                                <td valign="top" bgcolor=${bgcolor}>
-                                <a href="#session.getId()">
-                                    <span style="font-size:x-small">
-                                        ${session.getTitle() if session.getTitle!='' else "no title"}
-                                    </span>
-                                </a>
-                                <span style="font-size:x-small">
-                                    % if getLocationInfo(session)!= getLocationInfo(conf):
-                                       (${getLocationInfo(session.getSession())[1]})
-                                    % endif
-                                </span>
-                                &nbsp;
-                                </td>
+                                    &nbsp;
+                                    </td>
 
-                                <td valign="top" align="right" bgcolor=${bgcolor}>&nbsp;</td>
-    </tr>
-    <% contSessions +=1 %>
-    % endfor
+                                    <td valign="top" align="right" bgcolor=${bgcolor}>&nbsp;</td>
+                                </tr>
+                            <% contSessions +=1 %>
+                            % endif
+                            % endfor
     </table>
     </td></tr>
     % endif

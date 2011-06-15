@@ -4,9 +4,6 @@
 
 <tr>
 
-    <td class="itemTopAlign">
-         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
-    </td>
     <td class="itemTopAlign" colspan="2">
         <table class="subItemOrder">
             <tr>
@@ -32,14 +29,16 @@
         % if not allMaterial:
             <% materialDocuments = False %>
             % for material in item.getAllMaterialList():
-                 % if material.getTitle()=='document' and item.getReportNumberHolder().listReportNumbers():
-                 <% materialDocuments = True %>
-                 <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">
-                 % for rn in item.getReportNumberHolder().listReportNumbers():
-                    ${rn[1]}
-                 % endfor
-                 </a><br/>
-                 % endif
+                % if material.canView(accessWrapper):
+                     % if material.getTitle()=='document' and item.getReportNumberHolder().listReportNumbers():
+                     <% materialDocuments = True %>
+                     <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">
+                     % for rn in item.getReportNumberHolder().listReportNumbers():
+                        ${rn[1]}
+                     % endfor
+                     </a><br/>
+                     % endif
+                % endif
             % endfor
             % if not materialDocuments and item.getReportNumberHolder().listReportNumbers():
                 % for rn in item.getReportNumberHolder().listReportNumbers():
@@ -48,17 +47,25 @@
             % endif
             % if len(item.getAllMaterialList()) > 0:
                 % for material in item.getAllMaterialList():
-                    % if material.getTitle()!='document' or not item.getReportNumberHolder().listReportNumbers():
-                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>
+                    % if material.canView(accessWrapper):
+                        % if material.getTitle()!='document' or not item.getReportNumberHolder().listReportNumbers():
+                            <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a><br/>
+                        % endif
                     % endif
                 % endfor
             % endif
         % else:
             % if len(item.getAllMaterialList()) > 0:
                 % for material in item.getAllMaterialList():
-                    <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a>&nbsp;
+                    % if material.canView(accessWrapper):
+                        <a href="${urlHandlers.UHMaterialDisplay.getURL(material)}">${material.getTitle()}</a><br/>
+                    % endif
                 % endfor
             % endif
         % endif
+    </td>
+
+    <td class="itemTopAlign">
+         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </td>
 </tr>

@@ -72,13 +72,14 @@
                     % if (not previousItem or date != getDate(previousItem.getAdjustedStartDate(timezone))):
                         <tr></tr>
                         <tr>
-                            <td class="itemHeaderDate" colspan="3">
+                            <td class="itemHeaderDate" colspan="2">
                                 ${prettyDate(item.getAdjustedStartDate(timezone))}<br />
                                 <br />
                             </td>
-                            <td class="itemHeaderDocuments" colspan="1">
+                            <td class="itemHeaderDocuments" colspan="2">
                                 Documents<br /><br />
                             </td>
+                            <td></td>
                         </tr>
                     % endif
                     <%include file="${INCLUDEADM}/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order"/>

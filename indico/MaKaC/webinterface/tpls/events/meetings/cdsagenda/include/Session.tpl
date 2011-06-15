@@ -72,7 +72,7 @@
       <td class="headerInfo" >
         % for material in session.getAllMaterialList():
             % if material.canView(accessWrapper):
-            <%include file="${INCLUDE}/Material.tpl" args="material=material"/>
+                <%include file="${INCLUDE}/Material.tpl" args="material=material"/>
             % endif
         % endfor
       </td>

@@ -24,7 +24,7 @@
         <hr/>
     % endif
     % if getItemType(item) in ['Contribution','Break']:
-        <table class="dayList" cellpadding="4">
+        <table class="dayList" cellspacing="0" cellpadding="4">
     % endif
     <%include file="${INCLUDECDS}/${getItemType(item)}.tpl" args="item=item, parent=conf,minutes=self.attr.minutes, olist=self.attr.olist, checkEndTime=self.attr.checkEndTime, order=order, showDescriptionTitle = self.attr.showDescriptionTitle, checkOwnerLocation=self.attr.checkOwnerLocation"/>
     % if getItemType(item) in ['Contribution','Break']:

@@ -50,6 +50,13 @@
                 return false;},
         % endif
 
+        % if extractMinutes(item.getAllMaterialList()):
+            'Delete minutes': function(m) {
+                IndicoUI.Dialogs.deleteMinutes('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}');
+                m.close();
+                return false;},
+        % endif
+
         % if getItemType(item) == 'Conference':
             'Compile minutes': function(m) {
                 if (confirm('Are you sure you want to compile minutes from all talks in the agenda? This will replace any existing text here.')) {

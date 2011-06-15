@@ -42,16 +42,16 @@
                                 </td>
                             </tr>
                             <!-- ACTIONS -->
-                            % if canModify or canDelete: 
+                            % if canModify or canDelete:
                             <tr>
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
                                 <td>
-                                    % if canModify: 
+                                    % if canModify:
                                         <form style="display:inline;" action="${ urlHandlers.UHRoomBookingBlockingForm.getURL(block) }" method="post">
                                             <input type="submit" class="btn" value="${ _("Modify")}" />
                                         </form>
                                     % endif
-                                    % if canDelete: 
+                                    % if canDelete:
                                         <form style="display:inline;" action="${ urlHandlers.UHRoomBookingDeleteBlocking.getURL(block) }" method="post" onsubmit="return confirm($T('Do you really want to DELETE this blocking?'));">
                                             <input type="submit" class="btn" value="${ _("Delete")}" />
                                         </form>
@@ -65,7 +65,7 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")}</span></td>
                                 <td>
                                     <table class="blockingTable">
-                                        % for principal in block.allowed: 
+                                        % for principal in block.allowed:
                                             <tr class="blockingHover blockingPadding">
                                                 <td>${ principal.getTypeString() }</td>
                                                 <td>${ principal.getPrincipal().getFullName() }</td>
@@ -87,14 +87,14 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        % for rb in block.blockedRooms: 
+                                        % for rb in block.blockedRooms:
                                             <tr class="blockingHover blockingPadding">
                                                 <td><a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(rb.room) }">${ rb.room.getFullName() }</a></td>
                                                 <td>
                                                     ${ rb.getActiveString() }
-                                                    % if rb.active is False: 
+                                                    % if rb.active is False:
                                                       by <b>${ rb.rejectedBy }</b>: ${ rb.rejectionReason }
-                                                    % elif rb.active is None: 
+                                                    % elif rb.active is None:
                                                       ${inlineContextHelp(_("This blocking has to be approved by the room owner first."))}
                                                     % endif
                                                 </td>
