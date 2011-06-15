@@ -650,7 +650,7 @@ class RHRoomBookingWelcome( RHRoomBookingBase ):
         #    self._redirect( urlHandlers.UHRoomBookingBookingList.getURL( ofMyRooms = True, autoCriteria = True ) )
         #    return
         #self._redirect( urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True, autoCriteria = True ) )
-        self._redirect( urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True ))
+        self._redirect( urlHandlers.UHRoomBookingMapOfRooms.getURL())
 
 # 1. Searching
 
