@@ -584,12 +584,6 @@ class WMenuConferenceHeader( WConferenceHeader ):
         vars["matPackURL"]=quoteattr(str(urlMatPack))
         vars["zipIMG"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "smallzip" )))
 
-        if Config.getInstance().getIndicoSearchServer() != '' :
-            vars["searchBox"] = WMicroSearchBox(self._conf.getId()).getHTML()
-            vars["searchURL"] = quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "search" )))
-        else:
-            vars["searchBox"] = ""
-
         return vars
 
 class WMenuMeetingHeader( WConferenceHeader ):
@@ -7086,18 +7080,6 @@ class WMiniSearchBox(WBaseSearchBox):
 
     def getVars(self):
         vars = WBaseSearchBox.getVars( self )
-        return vars
-
-class WMicroSearchBox(WBaseSearchBox):
-
-    def __init__(self, confId):
-        WBaseSearchBox.__init__(self, template='MicroSearchBox',targetId = confId)
-        self._confId = confId
-
-    def getVars(self):
-        vars = WBaseSearchBox.getVars( self )
-        vars["innerBox"] = WMiniSearchBox(self._confId).getHTML().replace('"', '\\"').replace("'", "\\'").replace("\n"," ")
-        vars["closeIcon"] = quoteattr(str(Configuration.Config.getInstance().getSystemIconURL("remove")));
         return vars
 
 class WCategorySearchBox(WBaseSearchBox):
