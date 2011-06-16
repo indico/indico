@@ -26,6 +26,7 @@ import datetime
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
+from MaKaC.services.implementation.base import TextModificationBase
 import MaKaC.conference as conference
 from MaKaC.common.logger import Logger
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
@@ -33,8 +34,8 @@ import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group
-
 from indico.core.index import Catalog
+
 
 class CategoryBase(object):
     """
@@ -61,6 +62,10 @@ class CategoryDisplayBase(ProtectedDisplayService, CategoryBase):
     def _checkParams(self):
         CategoryBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
+
+class CategoryTextModificationBase(TextModificationBase, CategoryModifBase):
+    #Note: don't change the order of the inheritance here!
+    pass
 
 class GetCategoryList(CategoryDisplayBase):
 
@@ -214,6 +219,15 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._categ.revokeAccess(userToRemove)
 
+class CategoryContactEmailModification( CategoryTextModificationBase ):
+    """
+    Category contact email modification
+    """
+    def _handleSet(self):
+        self._categ.setContactEmail(self._value)
+    def _handleGet(self):
+        return self._categ.getContactEmail()
+
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -221,5 +235,6 @@ methodMap = {
     "canCreateEvent": CanCreateEvent,
     "protection.getAllowedUsersList": CategoryProtectionUserList,
     "protection.addAllowedUsers": CategoryProtectionAddUsers,
-    "protection.removeAllowedUser": CategoryProtectionRemoveUser
+    "protection.removeAllowedUser": CategoryProtectionRemoveUser,
+    "protection.changeContactEmail": CategoryContactEmailModification
     }

@@ -60,6 +60,7 @@ class AccessController( Persistent, Observable ):
         self.requiredDomains = []
         self.accessKey = ""
         self.owner = owner
+        self.contactEmail = ""
 
     def getOwner(self):
         return self.owner
@@ -329,6 +330,17 @@ class AccessController( Persistent, Observable ):
             return 1
         return 0
 
+    def getContactEmail(self):
+        try:
+            if self.contactEmail:
+                pass
+        except AttributeError, e:
+            self.contactEmail = ""
+        return self.contactEmail
+
+    def setContactEmail(self, contactEmail):
+        self.contactEmail = contactEmail
+        self._p_changed = 1
 
 class CategoryAC(AccessController):
 

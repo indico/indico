@@ -26,6 +26,9 @@
                             <li> ${ _("""You can go back to the precedent page by using the "Back" button of your browser.""")}
                             <li> ${ _("""You can try to refresh this page by using the "Refresh" button of your browser.""")}
                             <li> ${ _("You can contact the owner of this event.")}
+                            % if contactEmail:
+                                <li>${ _("You can also contact : %s.")%contactEmail}
+                            % endif
 
                         </font></ul>
                     </td>

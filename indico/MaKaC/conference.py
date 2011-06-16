@@ -1470,6 +1470,12 @@ class Category(CommonObjectBase):
         self.cleanCache()
         self._p_changed=1
 
+    def getContactEmail(self):
+        return self.__ac.getContactEmail()
+
+    def setContactEmail(self, contactEmail):
+        self.__ac.setContactEmail(contactEmail)
+
 
 class CustomLocation(Persistent):
 
@@ -3908,6 +3914,12 @@ class Conference(CommonObjectBase, Locatable):
 
     def getAllowedToAccessList( self ):
         return self.__ac.getAccessList()
+
+    def getContactEmail(self):
+        return self.__ac.getContactEmail()
+
+    def setContactEmail(self, contactEmail):
+        self.__ac.setContactEmail(contactEmail)
 
     def addMaterial( self, newMat ):
         newMat.setId( str(self.__materialGenerator.newCount()) )

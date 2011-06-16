@@ -1870,7 +1870,7 @@ class WAccessControlFrame(WTemplated):
                 vars["parentStatusColor"] = "#128F33"
 
         vars["locator"] = self.__target.getLocator().getWebForm()
-
+        vars["contactEmail"] = self.__target.getContactEmail()
         return vars
 
 
@@ -1909,7 +1909,7 @@ class WConfAccessControlFrame(WTemplated):
 
         vars["locator"] = self.__target.getLocator().getWebForm()
         vars["accessKey"] = self.__target.getAccessKey()
-
+        vars["contactEmail"] = self.__target.getContactEmail()
         return vars
 
 
