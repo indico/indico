@@ -11662,7 +11662,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             case.append(itemKey)
             case.append('");')
             case.append('\n')
-            case.append('newDiv.innerHTML = items[itemId].toHTML();')
+            case.append('newDiv.html(items[itemId].toHTML());')
             case.append('\n')
             case.append('break;')
             cases.append("".join(case))
@@ -11744,11 +11744,6 @@ class WPConfModifBadgeDesign( WPConfModifToolsBase ):
             # now, let's pretend nothing happened, and let the code
             # handle the template as if it existed before
             self.__new = False
-
-    def getJSFiles(self):
-        return [ 'js/prototype/prototype.js',
-                 'js/scriptaculous/scriptaculous.js' ] + \
-                WPConfModifToolsBase.getJSFiles(self)
 
     def _setActiveTab( self ):
         self._tabBadges.setActive()
