@@ -189,6 +189,7 @@ class LDAPConnector(object):
                                ldapConfig.get('groupDNQuery')
         self.ldapAccessCredentials = ldapConfig.get('accessCredentials')
         self.ldapMembershipQuery = ldapConfig.get('membershipQuery')
+        self.ldapUseTLS = ldapConfig.get('useTLS')
 
     def login(self):
         try:
@@ -219,6 +220,15 @@ class LDAPConnector(object):
         """
         self.l = ldap.open(self.ldapHost)
         self.l.protocol_version = ldap.VERSION3
+
+        if self.ldapUseTLS:
+            self.l.set_option(ldap.OPT_X_TLS, ldap.OPT_X_TLS_DEMAND)
+        else:
+            self.l.set_option(ldap.OPT_X_TLS, ldap.OPT_X_TLS_NEVER)
+
+        if self.ldapUseTLS:
+            self.l.start_tls_s()
+
         return self.l
 
     def openAsUser(self, userName, password):

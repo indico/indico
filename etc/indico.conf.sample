@@ -203,6 +203,9 @@ AuthenticatorList    = ['Local']
 #
 # LDAPConfig = {'host': 'myldapserver.example.com',
 #
+#               # use TLS (do so, if your server allows)
+#               'useTLS': True,
+#
 #               # filter parameters for users, base DN to use
 #               'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
 #

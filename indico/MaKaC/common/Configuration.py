@@ -441,6 +441,7 @@ class Config:
 
             # Authentication
             'LDAPConfig': {'host': 'myldapserver.example.com',
+                           'useTLS': True,
                            'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
                            'groupDNQuery': ('cn={0}',
                                             'OU=Groups,DC=example,DC=com'),
