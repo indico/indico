@@ -11962,7 +11962,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             case.append(itemKey)
             case.append('");')
             case.append('\n')
-            case.append('newDiv.innerHTML = items[itemId].toHTML();')
+            case.append('newDiv.html(items[itemId].toHTML());')
             case.append('\n')
             case.append('break;')
             cases.append("".join(case))
@@ -12037,11 +12037,6 @@ class WPConfModifPosterDesign( WPConfModifToolsBase ):
         self.__templateId = templateId
         self.__new = new
         self.__baseTemplate = baseTemplateId
-
-    def getJSFiles(self):
-        return [ 'js/prototype/prototype.js',
-                 'js/scriptaculous/scriptaculous.js' ] + \
-                WPConfModifToolsBase.getJSFiles(self)
 
     def _setActiveTab( self ):
         self._tabPosters.setActive()

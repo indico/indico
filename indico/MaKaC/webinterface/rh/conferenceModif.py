@@ -8125,13 +8125,13 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
 
                 return "".join(['<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">',
                                 '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>',
-                                '<span id="background id">',
+                                '<span id="background_id">',
                                   str(backgroundId),
                                   '</span>',
-                                  '<span id="background url">',
+                                  '<span id="background_url">',
                                   str(urlHandlers.UHConfModifPosterGetBackground.getURL(self._conf, self.__templateId, backgroundId)),
                                   '</span>',
-                                  '<span id="background pos">',
+                                  '<span id="background_pos">',
                                   str(self._bgPosition),
                                   '</span>',
 

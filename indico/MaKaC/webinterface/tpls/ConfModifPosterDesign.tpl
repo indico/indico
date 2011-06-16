@@ -1,13 +1,8 @@
-  <script type="text/javascript">
+<script type="text/javascript">
+    var snapToGrid = false;
 
     // "Zoom factor" - the size of the document, related to reality
-
     var zoom_factor = 0.5
-
-    // These variables are initialised by a script at the end of the document
-    // They represent the top left corner of the blank space where poster template design takes place
-    var xBlankSpace = 0;
-    var yBlankSpace = 0;
 
     // Dimensions of the template space, in pixels
     var templateDimensions;
@@ -18,8 +13,9 @@
     // Number of pixels per cm
     var pixelsPerCm = 50 * zoom_factor;
 
-    // Id of the background used
+    // Id and position of the background used
     var backgroundId = -1
+    var backgroundPos;
 
     // Number of pixels, both horizontal and vertical, that are between the top left corner
     // and the position where items are inserted
@@ -29,11 +25,11 @@
     var itemId = -1;
 
     // Common parts of many elements
-    var elementCommon1 = '<table border="2" cellpadding="0" cellspacing="0" style="cursor:move;" onClick=clicked(event) width="200"><tbody><tr><td align="center">';
+    var elementCommon1 = '<table border="2" cellpadding="0" cellspacing="0" style="cursor:move;" width="200"><tbody><tr><td align="center">';
     var elementCommon2 = '</td></tr></tbody></table>';
 
     // Last selected item (holds the div for that item)
-    var lastSelectedDiv;
+    var lastSelectedDiv = null;
 
     // Translation dictionary from key to name in current language.
     var translate = ${translateName};
@@ -41,599 +37,545 @@
     // List of poster template items
     var items = [];
 
+    var firstLoad = true;
+
     // Item class
     function Item(itemId, key) {
-      this.id = itemId;
-      this.key = key;
-      this.x = initialOffset;
-      this.y = initialOffset;
-      this.fontFamily = "Times New Roman";
-      this.bold = false;
-      this.italic = false;
-      this.textAlign = "Center";
-      this.color = "black";
-      this.fontSize = "25pt";
-      this.width = 400;
-      this.text = "(Type your text)" // Only for fixed text items
+        this.id = itemId;
+        this.key = key;
+        this.x = initialOffset;
+        this.y = initialOffset;
+        this.fontFamily = "Times New Roman";
+        this.bold = false;
+        this.italic = false;
+        this.textAlign = "Center";
+        this.color = "black";
+        this.fontSize = "25pt";
+        this.width = 400;
+        this.text = "(Type your text)" // Only for fixed text items
 
-      // The following attributes have no meaning to the server
-      this.selected = false;
-      this.fontFamilyIndex = 0;
-      this.styleIndex = 0;
-      this.textAlignIndex = 2; //Center
-      this.colorIndex = 0;
-      this.fontSizeIndex = 11; //Medium
+        // The following attributes have no meaning to the server
+        this.selected = false;
+        this.fontFamilyIndex = 0;
+        this.styleIndex = 0;
+        this.textAlignIndex = 2; //Center
+        this.colorIndex = 0;
+        this.fontSizeIndex = 11; //Medium
     }
 
     Item.prototype.toHTML = function () {
-        return '<table border="2" cellpadding="0" cellspacing="0" onClick=clicked(event)' +
-              ' width="' + this.width + '" bgColor="' + (this.selected? "#CCCCFF" : "white") +
-              '" style="cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
-              '; text-align: ' + this.textAlign + ';"' +
-              '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' +
-              (this.key == "Fixed Text" ? this.text : translate[this.key]) +
-              '</span></td></tr></tbody></table>';
-      }
+        return '<table border="2" cellpadding="0" cellspacing="0"' +
+               ' width="' + this.width + '" bgcolor="' + (this.selected ? "#CCCCFF" : "white") +
+               '" style="cursor:move; font-weight:' + (this.bold ? 'bold' : 'normal') + '; font-style:' + (this.italic ? 'italic' : 'normal') +
+               '; text-align: ' + this.textAlign.replace('Justified', 'justify') + ';"' +
+               '><tbody><tr><td><span style="color:' + this.color + '; font-family: ' + this.fontFamily + '; font-size:' + this.fontSize + ';">' +
+               (this.key == "Fixed Text" ? this.text : translate[this.key]) +
+               '</span></td></tr></tbody></table>';
+    }
 
     // Dimensions class
     function Dimensions(width, height) {
-      this.width = width
-      this.height = height
-    }
-
-    // Returns the first div encountered when exploring the PARENT nodes of the element
-    function getDiv (element) {
-      if (element.tagName == "DIV") {
-        return element;
-      }
-      if (element.tagName == "BODY") {
-        return false;
-      }
-      return getDiv(element.parentNode);
-    }
-
-    // Function object that will be passed to draggables when we want them to snap to a grid
-    var mySnap = function(x,y) {
-
-        var xResolution = 10;
-        var yResolution = 10;
-
-        xResult = Math.floor(x / xResolution) * xResolution;
-        yResult = Math.floor(y / yResolution) * yResolution;
-
-        return [xResult,yResult];
+        this.width = width
+        this.height = height
     }
 
     // This function creates a new draggable div
     function createDiv() {
-    //       Each div has:
-    //       -an unique id, which is a natural number (0, 1, 2, ...)
-    //       -a type (stored in the name attribute)
-    //       -absolute x,y position
-    //       -an inner HTML with its content
-      itemId++;
+        // Each div has:
+        // -an unique id, which is a natural number (0, 1, 2, ...)
+        // -a type (stored in the name attribute)
+        // -absolute x,y position
+        // -an inner HTML with its content
+        itemId++;
 
-      var newDiv = document.createElement('div');
+        var newDiv = $j('<div/>', {
+            id: itemId
+        }).css({
+            position: 'absolute',
+            left: initialOffset + 'px',
+            top: initialOffset + 'px',
+            zIndex: itemId + 10
+        }).appendTo('#templateDiv');
 
-      newDiv.id = itemId;
-      newDiv.style.position="absolute";
-      newDiv.style.left=initialOffset+"px";
-      newDiv.style.top=initialOffset+"px";
-      newDiv.style.zIndex = itemId + 10
+        newDiv.draggable({
+            containment: '#templateDiv',
+            stack: '#templateDiv > div',
+            opacity: 0.5,
+            drag: function(e, ui) {
+                if (snapToGrid) {
+                    ui.position.left = Math.floor(ui.position.left / 10) * 10;
+                    ui.position.top = Math.floor(ui.position.top / 10) * 10;
+                }
+            },
+            stop: function(e, ui) {
+                items[this.id].x = ui.position.left;
+                items[this.id].y = ui.position.top;
+            }
+        });
 
-      // We insert the div in the HTML document
-      $("templateDiv").appendChild(newDiv);
-
-      // We create a Draggable from the div
-      var newDrag = new Draggable(newDiv.id , { // Scriptaculous class
-
-        revert:false,
-
-        endeffect: function(element) { // We overload this function, writing the original code + our code. Element is a div
-
-          // Begining of original code
-          var toOpacity = typeof element._opacity == 'number' ? element._opacity : 1.0
-          new Effect.Opacity(element, {duration:0.2, from:0.7, to:toOpacity});
-          // End of original code
-
-          // The following code returns the dragged item inside the template area if it's dragged outside
-          var offset = Position.cumulativeOffset(element); // Prototype function
-          var dimensions = Element.getDimensions(element); // Prototype function
-
-          if (!Position.within($('templateDiv'), offset[0], offset[1]) || // Prototype function
-              !Position.within($('templateDiv'), offset[0] + dimensions.width - 1, offset[1] + dimensions.height - 1)) {
-            // Element is OUTSIDE the template design space, we restore the previous position
-            element.style.left = element.lastGoodPositionLeft;
-            element.style.top = element.lastGoodPositionTop;
-          } else {
-            // Element is INSIDE the template design space, we save the position
-            element.lastGoodPositionLeft = element.style.left;
-            element.lastGoodPositionTop = element.style.top;
-          }
-
-          // The following code saves the position of the div
-          items[element.id].x = element.lastGoodPositionLeft;
-          items[element.id].y = element.lastGoodPositionTop;
-
-        },
-
-        snap: ($F('snap checkbox') == "on") ? mySnap : false
-      });
-
-      // We store the initial position as a good position which to return to
-      newDiv.lastGoodPositionLeft = 0;
-      newDiv.lastGoodPositionTop = 0;
-
-      return newDiv;
+        return newDiv;
     }
 
     // This function inserts the selected element in the blank space where poster template designing takes place
     function insertElement() {
+        var newDiv = createDiv();
+        // We set the inner html of the div depending on the type of item inserted
+        switch($j('#elementList').val()) {
+            ${ switchCases }
+        }
 
-      newDiv = createDiv()
+        if (!lastSelectedDiv) {
+            markSelected(newDiv);
+        }
 
-      // We set the inner html of the div depending on the type of item inserted
-      switch($F('elementList')) {
-        ${ switchCases }
-      }
-
-      if (!lastSelectedDiv) {
-        markSelected(newDiv);
-      }
-
-      initialOffset += 10
-
+        initialOffset += 10;
     }
 
     function removeElement() {
-      if(lastSelectedDiv) {
-        items[lastSelectedDiv.id] = false;
-        Element.remove(lastSelectedDiv); // Prototype function
-        $('selection text').innerHTML = "";
-        lastSelectedDiv = false;
-      }
-    }
-
-    /*
-    The following method does not work in IE because of $('font selector').options[i].value .
-    As well, it seems the function is not needed and it was just used once in the method markSelected, like this:
-
-        $('font selector').selectedIndex = getSelectedFontIndex(newSelectedItem);
-
-    we replaced it with:
-
-        $('font selector').selectedIndex = newSelectedItem.fontFamilyIndex;
-
-    function getSelectedFontIndex(newSelectedItem) {
-        index = 0;
-        for (i = 0; i < $('font selector').options.length; i++) {
-            if ($('font selector').options[i].value == newSelectedItem.fontFamily) {
-                index = newSelectedItem.fontFamilyIndex;
-            }
+        if (lastSelectedDiv) {
+            items[lastSelectedDiv.attr('id')] = false;
+            lastSelectedDiv.remove();
+            $j('#selection_text').html('');
+            lastSelectedDiv = null;
+            $j('#removeButton').prop('disabled', true);
         }
-        return index;
-    }*/
+    }
 
     function markSelected(newSelectedDiv) {
+        // Change the text that says which item is selected
+        var id = newSelectedDiv.attr('id');
+        $j('#selection_text').html(translate[items[id].key]);
 
-      // Change the text that says which item is selected
-      $('selection text').innerHTML = translate[items[newSelectedDiv.id].key];
+        // TODO: add check to see if there's a table inside and not an image
 
-      // TODO: add check to see if there's a table inside and not an image
+        // Change the background color of the old selected item and the new selected item
+        if (lastSelectedDiv) {
+            var lastId = lastSelectedDiv.attr('id');
+            items[lastId].selected = false;
+            lastSelectedDiv.html(items[lastId].toHTML());
+        }
 
-      // Change the background color of the old selected item and the new selected item
-      if (lastSelectedDiv) {
-        items[lastSelectedDiv.id].selected = false;
-        lastSelectedDiv.innerHTML = items[lastSelectedDiv.id].toHTML();
-      }
+        var newSelectedItem = items[id];
+        newSelectedItem.selected = true;
+        newSelectedDiv.html(newSelectedItem.toHTML());
+        lastSelectedDiv = newSelectedDiv;
+        $j('#removeButton').prop('disabled', false);
 
-      var newSelectedItem = items[newSelectedDiv.id];
-      newSelectedItem.selected = true;
-      newSelectedDiv.innerHTML = newSelectedItem.toHTML();
-      lastSelectedDiv = newSelectedDiv;
-
-      // Change the selectors so that they match the properties of the item
-      $('alignment selector').selectedIndex = newSelectedItem.textAlignIndex;
-      $('font selector').selectedIndex = newSelectedItem.fontFamilyIndex;
-      $('size selector').selectedIndex = newSelectedItem.fontSizeIndex;
-      $('style selector').selectedIndex = newSelectedItem.styleIndex;
-      $('color selector').selectedIndex = newSelectedItem.colorIndex;
-      $('width field').value = newSelectedItem.width / pixelsPerCm;
-      if (newSelectedItem.key == "Fixed Text") {
-        $('fixed text field').value = newSelectedItem.text
-      } else {
-          $('fixed text field').value = "--"
-      }
-    }
-
-    function clicked(event) {
-      markSelected(getDiv(Event.element(event))); // Prototype function
+        // Change the selectors so that they match the properties of the item
+        $j('#alignment_selector').prop('selectedIndex', newSelectedItem.textAlignIndex);
+        $j('#font_selector').prop('selectedIndex', newSelectedItem.fontFamilyIndex);
+        $j('#size_selector').prop('selectedIndex', newSelectedItem.fontSizeIndex);
+        $j('#style_selector').prop('selectedIndex', newSelectedItem.styleIndex);
+        $j('#color_selector').prop('selectedIndex', newSelectedItem.colorIndex);
+        $j('#width_field').val(newSelectedItem.width / pixelsPerCm);
+        if (newSelectedItem.key == "Fixed Text") {
+            $j('#fixed_text_field').val(newSelectedItem.text).prop('disabled', false);
+            $j('#changeText').prop('disabled', false);
+        } else {
+            $j('#fixed_text_field').val("").prop('disabled', true);
+            $j('#changeText').prop('disabled', true);
+        }
     }
 
     function updateRulers() {
-      var horizontalRuler = $('horizontal ruler');
-      var horizontalRuler = $('vertical ruler');
-
-      if (templateDimensions.width > previousTemplateDimensions.width) {
-           var hRuler = $('horizontal ruler');
-
-        for (i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i < Math.ceil(templateDimensions.width / pixelsPerCm); i++) {
-          var newImg = document.createElement('div');
-          newImg.id = "rulerh" + i;
-          newImg.style.width = pixelsPerCm-1 + 'px';
-          newImg.style.height = '10px';
-          newImg.style.position = 'absolute';
-          newImg.style.border = '1px solid black';
-          newImg.style.borderTop = 'none';
-          newImg.style.background = '#EEEEEE';
-          newImg.style.textAlign = 'right';
-          newImg.style.fontSize = '6pt';
-          newImg.style.left =  i*pixelsPerCm-1 + 'px';
-          newImg.style.top =  0;
-          newImg.innerHTML =i+1;
-          hRuler.appendChild(newImg);
+        if (templateDimensions.width > previousTemplateDimensions.width) {
+            var hRuler = $j('#horizontal_ruler');
+            for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i < Math.ceil(templateDimensions.width / pixelsPerCm); i++) {
+                $j('<div/>', {
+                    id: 'rulerh' + i
+                }).css({
+                    width: pixelsPerCm - 1 + 'px',
+                    height: '10px',
+                    position: 'absolute',
+                    border: '1px solid black',
+                    borderTop: 'none',
+                    background: '#eee',
+                    textAlign: 'right',
+                    fontSize: '6pt',
+                    left: (i * pixelsPerCm - 1) + 'px',
+                    top: 0
+                }).html(i + 1).appendTo(hRuler);
+            }
         }
-      } else if (templateDimensions.width < previousTemplateDimensions.width) {
-        for (i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i > Math.ceil(templateDimensions.width / pixelsPerCm); i = i - 1) {
-          $('horizontal ruler').removeChild($('rulerh' + (i - 1)));
+        else if (templateDimensions.width < previousTemplateDimensions.width) {
+            for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i > Math.ceil(templateDimensions.width / pixelsPerCm); i--) {
+                $j('#horizontal_ruler > #rulerh' + (i - 1)).remove();
+            }
         }
-      }
 
-      if (templateDimensions.height > previousTemplateDimensions.height) {
-           var vRuler = $('vertical ruler');
-
-        for (i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i < Math.ceil(templateDimensions.height / pixelsPerCm); i++) {
-          var newImg = document.createElement('div');
-          newImg.id = "rulerv" + i;
-          newImg.style.height = pixelsPerCm-1 + 'px';
-          newImg.style.width = '10px';
-          newImg.style.position = 'absolute';
-          newImg.style.border = '1px solid black';
-          newImg.style.borderLeft = 'none';
-          newImg.style.background = '#EEEEEE';
-          newImg.style.verticalAlign = 'bottom';
-          newImg.style.fontSize = '6pt';
-          newImg.style.top = i*pixelsPerCm-1 + 'px';
-          newImg.style.left =  0;
-          newImg.innerHTML ='<p style="font-size: 6pt; margin-bottom: 0px;">'+(i+1)+'</p>';
-          vRuler.appendChild(newImg);
+        if (templateDimensions.height > previousTemplateDimensions.height) {
+            var vRuler = $j('#vertical_ruler');
+            for (var i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i < Math.ceil(templateDimensions.height / pixelsPerCm); i++) {
+                $j('<div/>', {
+                    id: 'rulerv' + i
+                }).css({
+                    width: '10px',
+                    height: pixelsPerCm - 1 + 'px',
+                    position: 'absolute',
+                    border: '1px solid black',
+                    borderLeft: 'none',
+                    background: '#eee',
+                    verticalAlign: 'bottom',
+                    fontSize: '6pt',
+                    left: 0,
+                    top: (i * pixelsPerCm - 1) + 'px'
+                }).html('<p style="font-size: 6pt; margin-bottom: 0px;">' + (i + 1) + '</p>').appendTo(vRuler);
+            }
         }
-      } else if (templateDimensions.height < previousTemplateDimensions.height) {
-        for (i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i > Math.ceil(templateDimensions.height / pixelsPerCm); i = i - 1) {
-          $('vertical ruler').removeChild($('rulerv' + (i - 1)));
+        else if (templateDimensions.height < previousTemplateDimensions.height) {
+            for (i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i > Math.ceil(templateDimensions.height / pixelsPerCm); i--) {
+                $j('#vertical_ruler > #rulerv' + (i - 1)).remove();
+            }
         }
-      }
-
     }
 
     // This function displays all the items in the 'items' array on the screen
     // If there are already some items being displayed, it does not erase them
     function displayItems() {
-      items.each( function (item) { //Prototype-like loop
-        newDiv = createDiv();
-        newDiv.style.left = item.x + "px";
-        newDiv.style.top = item.y + "px";
-        item.fontSize = zoom_font(zoom_factor,item.fontSize);
-        newDiv.innerHTML = item.toHTML();
-        if (item.selected) {
-          markSelected(newDiv)
-          lastSelectedDiv = newDiv
-        }
-      });
+        $j.each(items, function(i, item) {
+            var newDiv = createDiv();
+            newDiv.css({
+                left: item.x + 'px',
+                top: item.y + 'px'
+            });
+            item.fontSize = zoom_font(zoom_factor, item.fontSize);
+            newDiv.html(item.toHTML());
+            if (item.selected) {
+                markSelected(newDiv);
+            }
+        });
     }
 
 
     function changeTemplateSize() {
-      $('templateDiv').style.width = $F('poster width') * pixelsPerCm  + "px";
-      $('templateDiv').style.height = $F('poster height') * pixelsPerCm  + "px";
-      previousTemplateDimensions.width = templateDimensions.width;
-      previousTemplateDimensions.height = templateDimensions.height;
-      templateDimensions = new Dimensions($F('poster width') * pixelsPerCm, $F('poster height') * pixelsPerCm);
-      updateRulers();
-      if (backgroundId != -1) {
-        var url = $('background').src
-        Element.remove('background')
-        displayBackground(url)
-      }
-    }
-
-    function moveLeft() {
-      if(lastSelectedDiv) {
-        lastSelectedDiv.style.left = 0  + "px";
-        items[lastSelectedDiv.id].x = 0  + "px";
-      }
-    }
-
-    function moveRight() {
-      if(lastSelectedDiv) {
-        var itemDimensions = Element.getDimensions(lastSelectedDiv); //Prototype function
-        lastSelectedDiv.style.left = templateDimensions.width - itemDimensions.width - 1  + "px"; // -1 because of the table border
-        items[lastSelectedDiv.id].x = templateDimensions.width - itemDimensions.width - 1  + "px";
-      }
-    }
-
-    function moveCenter() {
-      if(lastSelectedDiv) {
-        var itemDimensions = Element.getDimensions(lastSelectedDiv); //Prototype function
-        lastSelectedDiv.style.left = (templateDimensions.width - itemDimensions.width - 1) / 2  + "px";
-        lastSelectedDiv.style.top = (templateDimensions.height - itemDimensions.height - 1) / 2  + "px";
-        items[lastSelectedDiv.id].x = (templateDimensions.width - itemDimensions.width - 1) / 2  + "px";
-        items[lastSelectedDiv.id].y = (templateDimensions.height - itemDimensions.height - 1) / 2  + "px";
-      }
-    }
-
-    function moveTop() {
-      if(lastSelectedDiv) {
-        lastSelectedDiv.style.top = 0  + "px";
-        items[lastSelectedDiv.id].y = 0  + "px";
-      }
-    }
-
-    function moveBottom() {
-      if(lastSelectedDiv) {
-        var itemDimensions = Element.getDimensions(lastSelectedDiv); //Prototype function
-        lastSelectedDiv.style.top = templateDimensions.height - itemDimensions.height - 1 + "px";
-        items[lastSelectedDiv.id].y = templateDimensions.height - itemDimensions.height - 1  + "px";
-      }
-    }
-
-    function snapToGrid() {
-      if ($F('snap checkbox') == "on") {
-        for (i = 0; i < Draggables.drags.length; i++) { //Draggables is the object where scriptaculous stores draggable objects
-          Draggables.drags[i].options.snap = mySnap; // TODO; snap from the top left corner; define function(x,y) {} instead of [10,10]
+        var tpl = $j('#templateDiv');
+        tpl.width($j('#poster_width').val() * pixelsPerCm);
+        tpl.height($j('#poster_height').val() * pixelsPerCm);
+        previousTemplateDimensions.width = templateDimensions.width;
+        previousTemplateDimensions.height = templateDimensions.height;
+        templateDimensions = new Dimensions($j('#poster_width').val() * pixelsPerCm, $j('#poster_height').val() * pixelsPerCm);
+        updateRulers();
+        if (backgroundId != -1) {
+            var url = $j('#background').attr('src');
+            $j('#background').remove();
+            displayBackground(url);
         }
-      } else {
-        for (i = 0; i < Draggables.drags.length; i++) {
-          Draggables.drags[i].options.snap = false;
+    }
+
+    var moveFuncs = {
+        left: function() {
+            if (lastSelectedDiv) {
+                lastSelectedDiv.css('left', 0);
+                items[lastSelectedDiv.attr('id')].x = 0 + "px";
+            }
+        },
+        right: function() {
+            if (lastSelectedDiv) {
+                lastSelectedDiv.css('left', (templateDimensions.width - lastSelectedDiv.width() - 1) + "px"); // -1 because of the table border
+                items[lastSelectedDiv.attr('id')].x = (templateDimensions.width - lastSelectedDiv.width() - 1) + "px";
+            }
+        },
+        center: function() {
+            if (lastSelectedDiv) {
+                lastSelectedDiv.css('left', ((templateDimensions.width - lastSelectedDiv.width() - 1) / 2) + "px");
+                lastSelectedDiv.css('top', ((templateDimensions.height - lastSelectedDiv.height() - 1) / 2) + "px");
+                items[lastSelectedDiv.attr('id')].x = ((templateDimensions.width - lastSelectedDiv.width() - 1) / 2) + "px";
+                items[lastSelectedDiv.attr('id')].y = ((templateDimensions.height - lastSelectedDiv.height() - 1) / 2) + "px";
+            }
+        },
+        top: function() {
+            if (lastSelectedDiv) {
+                lastSelectedDiv.css('top', 0);
+                items[lastSelectedDiv.attr('id')].y = 0 + "px";
+            }
+        },
+        bottom: function() {
+            if (lastSelectedDiv) {
+                lastSelectedDiv.css('top', (templateDimensions.height - lastSelectedDiv.height() - 1) + "px");
+                items[lastSelectedDiv.attr('id')].y = (templateDimensions.height - lastSelectedDiv.height() - 1) + "px";
+            }
         }
-      }
-    }
+    };
 
-    function changeAlignment() {
-      if(lastSelectedDiv) {
-        var item = items[lastSelectedDiv.id];
-        item.textAlign = $F('alignment selector');
-        item.textAlignIndex = $('alignment selector').selectedIndex;
-        lastSelectedDiv.innerHTML = item.toHTML();
-      }
-    }
+    var attrFuncs = {
+        font: function() {
+            if (lastSelectedDiv) {
+                var item = items[lastSelectedDiv.attr('id')];
+                item.fontFamily = $j('#font_selector').val();
+                item.fontFamilyIndex = $j('#font_selector').prop('selectedIndex');
+                lastSelectedDiv.html(item.toHTML());
+            }
+        },
+        color: function() {
+            if (lastSelectedDiv) {
+                var item = items[lastSelectedDiv.attr('id')];
+                item.color = $j('#color_selector').val();
+                item.colorIndex = $j('#color_selector').prop('selectedIndex');
+                lastSelectedDiv.html(item.toHTML());
+            }
+        },
+        alignment: function() {
+            if (lastSelectedDiv) {
+                var item = items[lastSelectedDiv.attr('id')];
+                item.textAlign = $j('#alignment_selector').val();
+                item.textAlignIndex = $j('#alignment_selector').prop('selectedIndex');
+                lastSelectedDiv.html(item.toHTML());
+            }
+        },
+        size: function() {
+            if (lastSelectedDiv) {
+                var item = items[lastSelectedDiv.attr('id')];
+                item.fontSize = zoom_font(zoom_factor, $j('#size_selector').val());
+                item.fontSizeIndex = $j('#size_selector').prop('selectedIndex');
+                lastSelectedDiv.html(item.toHTML());
+            }
+        },
+        style: function() {
+            if (lastSelectedDiv) {
+                var item = items[lastSelectedDiv.attr('id')];
+                switch($j('#style_selector').val()) {
+                    case "normal":
+                        item.bold = false;
+                        item.italic = false;
+                        break;
+                    case "bold":
+                        item.bold = true;
+                        item.italic = false;
+                        break;
 
-    function changeFont() {
-      if(lastSelectedDiv) {
-        var item = items[lastSelectedDiv.id];
-        item.fontFamily = $F('font selector');
-        item.fontFamilyIndex = $('font selector').selectedIndex;
-        lastSelectedDiv.innerHTML = item.toHTML();
-      }
-    }
+                    case "italic":
+                        item.bold = false;
+                        item.italic = true;
+                        break;
 
-    function zoom_font(zfact,fontSize)
-    {
-        var pattern = new RegExp ("([0-9.]+)pt", "g");
+                    case "bold_italic":
+                        item.bold = true;
+                        item.italic = true;
+                        break;
+                }
 
+                item.styleIndex = $j('#style_selector').prop('selectedIndex');
+                lastSelectedDiv.html(item.toHTML());
+            }
+        },
+        text: function() {
+            if (lastSelectedDiv) {
+                var item = items[lastSelectedDiv.attr('id')];
+                item.text = unescapeHTML($j('#fixed_text_field').val());
+                $j('#fixed_text_field').val(item.text);
+                lastSelectedDiv.html(item.toHTML());
+            }
+        },
+        width: function() {
+            if (lastSelectedDiv) {
+                var item = items[lastSelectedDiv.attr('id')];
+                item.width = $j('#width_field').val() * pixelsPerCm;
+                lastSelectedDiv.html(item.toHTML());
+            }
+        }
+    };
+
+    function zoom_font(zfact, fontSize) {
+        var pattern = /([0-9.]+)pt/g
         var ftsize = pattern.exec(fontSize)[1];
-
-        return (ftsize*zfact)+"pt";
-    }
-
-    function changeSize() {
-      if(lastSelectedDiv) {
-        var item = items[lastSelectedDiv.id];
-        item.fontSize = zoom_font(zoom_factor,$F('size selector'));
-        item.fontSizeIndex = $('size selector').selectedIndex;
-        lastSelectedDiv.innerHTML = item.toHTML();
-      }
-    }
-
-    function changeStyle() {
-      if(lastSelectedDiv) {
-        var item = items[lastSelectedDiv.id];
-        switch($F('style selector')) {
-          case "Normal":
-            item.bold = false;
-            item.italic = false10;
-            break;
-          case "Bold":
-            item.bold = true;
-            item.italic = false;
-            break;
-
-          case "Italic":
-            item.bold = false;
-            item.italic = true;
-            break;
-
-          case "Bold & Italic":
-            item.bold = true;
-            item.italic = true;
-            break;
-        }
-
-        item.styleIndex = $('style selector').selectedIndex;
-        lastSelectedDiv.innerHTML = item.toHTML();
-      }
-    }
-
-    function changeColor() {
-      if(lastSelectedDiv) {
-        var item = items[lastSelectedDiv.id];
-        item.color = $F('color selector');
-        item.colorIndex = $('color selector').selectedIndex;
-        lastSelectedDiv.innerHTML = item.toHTML();
-      }
-    }
-
-    function changeWidth() {
-      if(lastSelectedDiv) {
-        var item = items[lastSelectedDiv.id];
-        item.width = $F('width field') * pixelsPerCm;
-        lastSelectedDiv.innerHTML = item.toHTML();
-      }
-    }
-
-    function changeText() {
-      if(lastSelectedDiv) {
-        var item = items[lastSelectedDiv.id]
-        item.text = $F('fixed text field').unescapeHTML()
-        lastSelectedDiv.innerHTML = item.toHTML()
-      }
+        return (ftsize * zfact) + 'pt';
     }
 
     function save() {
-      if ($F('template name') == '') {
-        alert("Please choose a name for the template")
-        return
-      }
-      template = [];
-      template.push($F('template name'));
-      template.push(templateDimensions, pixelsPerCm);
-      template.push(backgroundId);
+        if ($j('#template_name').val() == '') {
+            alert("Please choose a name for the template");
+            return;
+        }
+        var template = [];
+        template.push($j('#template_name').val());
+        template.push(templateDimensions, pixelsPerCm);
+        template.push(backgroundId);
 
-      for (var i=0;i<items.length;++i)
-      {
-          if (items[i] != false)
-              items[i].fontSize = zoom_font(1/zoom_factor,items[i].fontSize);
-      }
+        $j.each(items, function(i, item) {
+            if (item != false) {
+                item.fontSize = zoom_font(1/zoom_factor, item.fontSize);
+            }
+        });
 
-      template.push(items);
-      $('templateData').value = template.toJSON();
-      document.hiddenform.submit()
+        template.push(items);
+        $j('#templateData').val(Json.write(template));
+        $j('#saveForm').submit();
     }
-
-    function sending() {
-      Element.show('loadingIcon')
-    }
-
-    firstLoad = true
 
     function sent() {
-      if (firstLoad) {
-        firstLoad = false
-      } else {
-        var iframeDocument = $('uploadTarget').contentDocument || $('uploadTarget').contentWindow
-        if (iframeDocument.document) {
-          iframeDocument = iframeDocument.document
+        if (firstLoad) {
+            firstLoad = false;
         }
-
-        try {
-          if (backgroundId != -1) {
-            Element.remove('background')
-          }
-          backgroundId = iframeDocument.getElementById('background id').innerHTML
-          var backgroundURL = iframeDocument.getElementById('background url').innerHTML
-
-          backgroundPos = iframeDocument.getElementById('background pos').innerHTML
-
-          displayBackground(backgroundURL);
-
-
-
-        } catch (err) {
-          Element.hide('loadingIcon')
-        }
-      }
-    }
-
-
-    function setBackgroundPos(mode)
-    {
-        var background = document.getElementById('background');
-        var hiddenField = document.getElementById('bgPosition');
-
-        var bgPosStretch = document.getElementById('bgPosStretch');
-        var bgPosCenter = document.getElementById('bgPosCenter');
-
-
-        if (mode == 'Stretch')
-        {
-            background.style.left = 0;
-            background.style.top = 0;
-            background.height = templateDimensions.height;
-            background.width = templateDimensions.width;
-
-
-            bgPosStretch.checked = true;
-            bgPosCenter.checked = false;
-        }
-        else if (mode == 'Center')
-        {
-            background.height = background.naturalHeight;
-            background.width = background.naturalWidth;
-
-            if (background.width > templateDimensions.width ||
-                background.height > templateDimensions.height)
-            {
-                if (background.width > templateDimensions.width)
-                {
-                    var ratio = templateDimensions.width/background.width;
-
-                    background.width = templateDimensions.width;
-                    background.height = background.height * ratio;
-                    background.style.top = templateDimensions.height/2.0 - background.height/2.0;
-                    background.style.left = 0;
-
-                }
-
-                if (background.height > templateDimensions.height)
-                {
-                    var ratio = templateDimensions.height/background.height;
-
-                    background.height = templateDimensions.height;
-                    background.height = background.height * ratio;
-
-                    background.style.left = templateDimensions.width/2.0 - background.width/2.0;
-                    baclground.style.top = 0;
-                }
-            }
-            else
-            {
-                background.style.left = templateDimensions.width/2 - background.naturalWidth/2;
-                background.style.top = templateDimensions.height/2 - background.naturalHeight/2;
+        else {
+            var iframeDocument = $j('#uploadTarget')[0].contentDocument || $j('#uploadTarget')[0].contentWindow;
+            if (iframeDocument.document) {
+                iframeDocument = iframeDocument.document;
             }
 
-
-            bgPosStretch.checked = false;
-            bgPosCenter.checked = true;
-
+            try {
+                if (backgroundId != -1) {
+                    $j('#background').remove();
+                }
+                backgroundId = $j('#background_id', iframeDocument).html();
+                var backgroundURL = $j('#background_url', iframeDocument).html();
+                backgroundPos = $j('#background_pos', iframeDocument).html();
+                displayBackground(backgroundURL);
+            }
+            catch (err) {
+                $j('#loadingIcon').hide();
+            }
         }
-
-
     }
 
-    function backgroundReceived() {
-      Element.hide('loadingIcon')
+    function setBackgroundPos(mode) {
+        var background = $j('#background');
+        var hiddenField = $j('#bgPosition');
+        var bgPosStretch = $j('#bgPosStretch');
+        var bgPosCenter = $j('#bgPosCenter');
 
-      setBackgroundPos(backgroundPos);
+        if (mode == 'Stretch') {
+            background.css({
+                left: 0,
+                top: 0
+            });
+            background.height(templateDimensions.height);
+            background.width(templateDimensions.width);
+            bgPosStretch.prop('checked', true);
+            bgPosCenter.prop('checked', false);
+        }
+        else if (mode == 'Center') {
+            background.height(background.prop('naturalHeight'));
+            background.width(background.prop('naturalWidth'));
+
+            if (background.width() > templateDimensions.width || background.height() > templateDimensions.height) {
+                if (background.width() > templateDimensions.width) {
+                    var ratio = templateDimensions.width / background.width();
+
+                    background.width(templateDimensions.width);
+                    background.height(background.height() * ratio);
+                    background.css({
+                        left: 0,
+                        top: (templateDimensions.height/2.0 - background.height()/2.0) + 'px'
+                    });
+                }
+
+                if (background.height() > templateDimensions.height) {
+                    var ratio = templateDimensions.height / background.height();
+
+                    background.width(background.width() * ratio);
+                    background.height(templateDimensions.height);
+
+                    background.css({
+                        left: (templateDimensions.width/2.0 - background.width()/2.0) + 'px',
+                        top: 0
+                    });
+                }
+            }
+            else {
+                background.css({
+                    left: (templateDimensions.width/2 - background.prop('naturalWidth')/2) + 'px',
+                    top: (templateDimensions.height/2 - background.prop('naturalHeight')/2) + 'px'
+                });
+            }
+
+            bgPosStretch.prop('checked', false);
+            bgPosCenter.prop('checked', true);
+        }
     }
 
     function displayBackground(backgroundURL) {
-        var newBackground = document.createElement('img');
-        newBackground.id = 'background'
-        newBackground.src = backgroundURL
-        newBackground.style.position="absolute";
-        newBackground.style.left = 0
-        newBackground.style.top = 0
-        newBackground.height = templateDimensions.height
-        newBackground.width = templateDimensions.width
-        newBackground.style.zIndex = 5
-        newBackground.onload = backgroundReceived
-        var template = $("templateDiv");
-        template.appendChild(newBackground);
+        $j('<img/>', {
+            id: 'background',
+            src: backgroundURL
+        }).css({
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            height: templateDimensions.height + 'px',
+            width: templateDimensions.width + 'px',
+            zIndex: 5
+        }).load(function() {
+            $j('#loadingIcon').hide();
+            setBackgroundPos(backgroundPos);
+        }).appendTo('#templateDiv');
     }
 
     function removeBackground() {
-      if (backgroundId != -1) {
-        backgroundId = -1;
-        Element.remove('background');
-      }
+        if (backgroundId != -1) {
+            backgroundId = -1;
+            $j('#background').remove();
+        }
     }
 
-  </script>
+    function unescapeHTML(str) {
+        // taken from Prototype
+        return str.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+    }
+
+    $j(document).ready(function() {
+        // select items on mousedown
+        $j('#templateDiv > div').live('mousedown', function() {
+            markSelected($j(this));
+        });
+
+        // toggle grid/snap mode
+        $j('#snap_checkbox').change(function() {
+            snapToGrid = this.checked;
+        }).change();
+
+        // show a throbber when uploading a background
+        $j('#bgForm').submit(function() {
+            $j('#loadingIcon').show();
+        });
+
+        $j('#removeBackground').click(function(e) {
+            e.preventDefault();
+            removeBackground();
+        });
+
+        $j('.moveButton').click(function(e) {
+            e.preventDefault();
+            var dir = $j(this).data('direction');
+            moveFuncs[dir]();
+        });
+
+        $j('.attrButton').click(function(e) {
+            e.preventDefault();
+            var attr = $j(this).data('attr');
+            attrFuncs[attr]();
+        });
+
+        $j('.attrSelect').change(function() {
+            var attr = $j(this).data('attr');
+            attrFuncs[attr]();
+        });
+
+        $j('#changeTemplateSize').click(function(e) {
+            e.preventDefault();
+            changeTemplateSize();
+        });
+
+        $j('#insertButton').click(function(e) {
+            e.preventDefault();
+            insertElement();
+        });
+
+        $j('#removeButton').click(function(e) {
+            e.preventDefault();
+            removeElement();
+        });
+
+        $j('#saveButton').click(function(e) {
+            e.preventDefault();
+            save();
+        });
+
+        $j('#uploadTarget').load(sent);
+    });
+</script>
 
 
-
-
-<iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0" onload="sent()"></iframe>
+<iframe id="uploadTarget" name="uploadTarget" src="" style="width:0px;height:0px;border:0"></iframe>
 
 <div style="width:100%">
   <br/>
@@ -648,18 +590,18 @@
           <span class="titleCellFormat">Name</span>
         </td>
         <td colspan="5">
-          <input id="template name" size="50" name="Template Name">
+          <input id="template_name" size="50" name="Template Name">
         </td>
       </tr>
       <tr>
         <td class="titleCellTD">
           <span class="titleCellFormat">Background</span>
         </td>
-        <form action="${ saveBackgroundURL }" method="POST" ENCTYPE="multipart/form-data" onsubmit="sending()" target="uploadTarget">
+        <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" target="uploadTarget">
         <td height="20px" NOWRAP align="left" colspan="3">
           <input name="file" size="58" type="file">
           <input class="btn" value="Send File" type="submit">
-          <input class="btn" type="button" value="Remove background" onclick="removeBackground()">
+          <input class="btn" type="button" value="Remove background" id="removeBackground">
         </td>
         <td width="100%" align="left" colspan="4">
           <img id="loadingIcon" src=${ loadingIconURL } width="20px" height="20px" style="display:none;">
@@ -689,14 +631,14 @@
           <span class="titleCellFormat">Poster Width (cm)&nbsp;</span>
         </td>
         <td>
-           <input id="poster width" name="Poster Width" size="5">
+           <input id="poster_width" name="Poster Width" size="5">
         </td>
         <td class="titleCellTD" NOWRAP>
           <span class="titleCellFormat">Poster Height (cm)&nbsp;</span>
         </td>
         <td>
-          <input id="poster height" name="Poster Height" size="5">
-          <input class="btn" value="Change" type="button" onclick="changeTemplateSize()">
+          <input id="poster_height" name="Poster Height" size="5">
+          <input class="btn" value="Change" type="button" id="changeTemplateSize">
         </td>
       </tr>
     </tbody>
@@ -715,8 +657,8 @@
 
           <br/><br/>
 
-          <input name="Insert Template Element Button" class="btn" value="Insert" type="button" onclick="insertElement()">
-          <input name="Delete Template Element Button" class="btn" value="Remove" type="button" onclick="removeElement()">
+          <input name="insertButton" id="insertButton" class="btn" value="Insert" type="button">
+          <input name="removeButton" id="removeButton" class="btn" value="Remove" type="button" disabled="disabled">
 
           <br/><br/>
 
@@ -727,7 +669,7 @@
           <br/>
           <br/>
 
-          Selection: <span id="selection text"></span>
+          Selection: <span id="selection_text"></span>
           <br/><br/>
 
           Position:
@@ -738,25 +680,25 @@
               <tr>
                 <td></td>
                 <td align="center">
-                  <input name="Move Template Element Top Button" class="btn" value="Top" type="button" onclick="moveTop()">
+                  <input name="Move Template Element Top Button" class="btn moveButton" value="Top" type="button" data-direction="top">
                 </td>
                 <td></td>
               </tr>
               <tr>
                 <td align="center">
-                  <input name="Move Template Element Left Button" class="btn" value="Left" type="button" onclick="moveLeft()">
+                  <input name="Move Template Element Left Button" class="btn moveButton" value="Left" type="button" data-direction="left">
                 </td>
                 <td align="center">
-                  <input name="Move Template Element Center Button" class="btn" value="Center" type="button" onclick="moveCenter()">
+                  <input name="Move Template Element Center Button" class="btn moveButton" value="Center" type="button" data-direction="center">
                 </td>
                 <td align="center">
-                  <input name="Move Template Element Right Button" class="btn" value="Right" type="button" onclick="moveRight()">
+                  <input name="Move Template Element Right Button" class="btn moveButton" value="Right" type="button" data-direction="right">
                 </td>
               </tr>
               <tr>
                 <td></td>
                 <td align="center">
-                  <input name="Move Template Element Bottom Button" class="btn" value="Bottom" type="button" onclick="moveBottom()">
+                  <input name="Move Template Element Bottom Button" class="btn moveButton" value="Bottom" type="button" data-direction="bottom">
                 </td>
                 <td></td>
               </tr>
@@ -764,21 +706,21 @@
             </tbody>
           </table>
 
-          <input id="snap checkbox" type="checkbox" onclick="snapToGrid()"><label for="snap checkbox">Snap to grid</label>
+          <input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">Snap to grid</label>
 
         </td>
 
         <td></td>
 
         <td align="left" valign="bottom" height="22"> <!-- height of the horizontal ruler images -->
-          <div id="horizontal ruler" style="position: relative; height: 5px; top: -6px;">
+          <div id="horizontal_ruler" style="position: relative; height: 5px; top: -6px;">
           </div>
         </td>
       </tr>
 
       <tr>
         <td valign="top" align="right" width="22"> <!-- width of the vertical ruler image -->
-          <div id="vertical ruler" style="position: relative; width: 5px; left: -6px;">
+          <div id="vertical_ruler" style="position: relative; width: 5px; left: -6px;">
           </div>
         </td>
 
@@ -814,7 +756,7 @@
        </td>
 
         <td colspan="2">
-          <select id='font selector' onChange="changeFont()" name="Template Element Font">
+          <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
             <optgroup label="Normal Fonts">
               <option>Times New Roman</option>
               <option>Courier</option>
@@ -835,7 +777,7 @@
         </td>
 
         <td width="100%">
-          <select id='color selector' name="Template Element Color" onchange="changeColor()">
+          <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
             <option>black</option>
             <option>red</option>
             <option>blue</option>
@@ -858,11 +800,11 @@
         </td>
 
         <td colspan="2">
-          <select id='style selector' name="Template Element Style" onchange="changeStyle()">
-            <option>Normal</option>
-            <option>Bold</option>
-            <option>Italic</option>
-            <option>Bold &amp; Italic</option>
+          <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
+            <option value="normal">Normal</option>
+            <option value="bold">Bold</option>
+            <option value="italic">Italic</option>
+            <option value="bold_italic">Bold &amp; Italic</option>
           </select>
         </td>
 
@@ -871,7 +813,7 @@
         </td>
 
         <td width="100%">
-          <select id='size selector' name="Template Element Size" onchange="changeSize()">
+          <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
             <option>160pt</option>
             <option>150pt</option>
             <option>140pt</option>
@@ -900,7 +842,7 @@
           <span class="titleCellFormat">Alignment&nbsp;</span>
         </td>
         <td colspan="2">
-          <select id='alignment selector' name="Template Element Alignment" onChange="changeAlignment()">
+          <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
             <!-- Note: the text of the options is used directly in the style attribute of the items -->
             <option>Left</option>
             <option>Right</option>
@@ -912,8 +854,8 @@
           <span class="titleCellFormat">Width (cm)&nbsp;</span>
         </td>
         <td width="100%">
-          <input id="width field" size="5" name="Element Size">
-          <input class="btn" value="Change" type="button" onclick="changeWidth()">
+          <input id="width_field" size="5" name="Element Size">
+          <input class="btn attrButton" value="Change" type="button" data-attr="width">
         </td>
       </tr>
       <tr>
@@ -921,10 +863,10 @@
           <span class="titleCellFormat">Text (for Fixed Text)&nbsp;</span>
         </td>
         <td>
-          <input id="fixed text field" size="30" name="Element Size">
+          <input id="fixed_text_field" size="30" name="Element Size">
         </td>
         <td>
-          <input class="btn" value="Change" type="button" onclick="changeText()">
+          <input class="btn attrButton" id="changeText" value="Change" type="button" data-attr="text" />
         </td>
         <td></td>
         <td></td>
@@ -936,57 +878,50 @@
     <tbody>
       <tr>
         <td colspan="4" align="center" width="100%">
-          <input class="btn" name="Save Template Button" value="Save" type="button" onclick="save()">
+          <input class="btn" name="Save Template Button" value="Save" type="button" id="saveButton">
           <input class="btn" name="Cancel Button" value="Cancel" type="button" onclick="location.href='${ cancelURL }'">
         </td>
       </tr>
     </tbody>
   </table>
 
-  <form name="hiddenform" action="${ saveTemplateURL }" method="POST">
+  <form id="saveForm" action="${ saveTemplateURL }" method="POST">
       <input name="templateId" value="${ templateId }" type="hidden">
       <input id="templateData" name="templateData" type="hidden">
   </form>
-
-<!--
-  <table id='test' width="200" height="200" border="1" onclick="alert(Element.getDimensions(this).width);this.width = parseInt(this.width) + 10; return false">
-    <tr><td></tr></td>
-  </table>
--->
 
   <script type="text/javascript">
 
     // We load the template if we are editing a template
     if (${ editingTemplate }) {
-       var template = eval(${ templateData }.unescapeHTML());
-       $('template name').value = template[0];
-       $('templateDiv').style.width = template[1].width;
-       $('templateDiv').style.height = template[1].height;
-       items = template[4];
-       // We give the toHTML() method to each of the items
-       items.each (function (item) {
-         item.toHTML = Item.prototype.toHTML
-       });
-       templateDimensions = new Dimensions(template[1].width, template[1].height);
+        var template = eval(unescapeHTML(${ templateData }));
+        $j('#template_name').val(template[0]);
+        $j('#templateDiv').width(template[1].width).height(template[1].height);
+        items = template[4];
+        // We give the toHTML() method to each of the items
+        $j.each(items, function(i, item) {
+            item.toHTML = Item.prototype.toHTML;
+        });
+        templateDimensions = new Dimensions(template[1].width, template[1].height);
     } else {
-       templateDimensions = new Dimensions(525,742); //put here the initial dimensions of templateDiv
+        templateDimensions = new Dimensions(525, 742); //put here the initial dimensions of templateDiv
     }
 
-    previousTemplateDimensions = new Dimensions(0,0)
+    previousTemplateDimensions = new Dimensions(0,0);
 
-    $('poster width').value = templateDimensions.width / pixelsPerCm;
-    $('poster height').value = templateDimensions.height / pixelsPerCm;
+    $j('#poster_width').val(templateDimensions.width / pixelsPerCm);
+    $j('#poster_height').val(templateDimensions.height / pixelsPerCm);
 
-    // This function initialises the rulers
-    updateRulers();
+    updateRulers(); // creates the initial rulers
+    changeTemplateSize();
 
     // This function displays the items, if any have been loaded, on the screen
-    displayItems()
+    displayItems();
 
     if (${ editingTemplate } && ${ hasBackground }) {
-       backgroundId = ${ backgroundId }
-       backgroundPos = '${ backgroundPos }'
-       displayBackground("${ backgroundURL }")
+        backgroundId = ${ backgroundId };
+        backgroundPos = '${ backgroundPos }';
+        displayBackground("${ backgroundURL }");
     }
 
   </script>
