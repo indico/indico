@@ -14,7 +14,7 @@
     var pixelsPerCm = 50 * zoom_factor;
 
     // Id and position of the background used
-    var backgroundId = -1
+    var backgroundId = -1;
     var backgroundPos;
 
     // Number of pixels, both horizontal and vertical, that are between the top left corner
@@ -82,7 +82,7 @@
     // This function creates a new draggable div
     function createDiv() {
         // Each div has:
-        // -an unique id, which is a natural number (0, 1, 2, ...)
+        // -a unique id, which is a natural number (0, 1, 2, ...)
         // -a type (stored in the name attribute)
         // -absolute x,y position
         // -an inner HTML with its content
@@ -894,7 +894,7 @@
 
     // We load the template if we are editing a template
     if (${ editingTemplate }) {
-        var template = eval(unescapeHTML(${ templateData }));
+        var template = ${ templateData };
         $j('#template_name').val(template[0]);
         $j('#templateDiv').width(template[1].width).height(template[1].height);
         items = template[4];

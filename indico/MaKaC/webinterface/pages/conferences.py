@@ -11691,7 +11691,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, new=True)
             vars["titleMessage"]= _("Creating new badge template")
             vars["editingTemplate"]="false"
-            vars["templateData"]="''"
+            vars["templateData"]="[]"
             vars["hasBackground"]="false"
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
@@ -11700,7 +11700,7 @@ class WConfModifBadgeDesign( wcomponents.WTemplated ):
             vars["saveTemplateURL"]=urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)
             vars["titleMessage"]= _("No template id given")
             vars["editingTemplate"]="false"
-            vars["templateData"]="''"
+            vars["templateData"]="[]"
             vars["hasBackground"]="false"
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
@@ -11988,7 +11988,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
             vars["backgroundPos"]="Stretch"
-            vars["templateData"]="''"
+            vars["templateData"]="[]"
             vars["editingTemplate"]="false"
 
 
@@ -11999,7 +11999,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["backgroundURL"]="false"
             vars["backgroundId"]=-1
             vars["backgroundPos"]="Stretch"
-            vars["templateData"] = "''"
+            vars["templateData"] = "[]"
             vars["editingTemplate"]="false"
 
 
@@ -12008,7 +12008,7 @@ class WConfModifPosterDesign( wcomponents.WTemplated ):
             vars["titleMessage"]= _("Editing poster template")
             vars["editingTemplate"]="true"
             templateDataString = jsonEncode(self.__conf.getPosterTemplateManager().getTemplateData(self.__templateId))
-            vars["templateData"]=quoteattr(templateDataString)
+            vars["templateData"]= templateDataString
 
             usedBackgroundId = self.__conf.getPosterTemplateManager().getTemplateById(self.__templateId).getUsedBackgroundId()
             vars["backgroundId"] = usedBackgroundId
