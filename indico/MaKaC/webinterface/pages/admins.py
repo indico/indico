@@ -787,11 +787,6 @@ class WPWebcastSelectManager( WPWebcastSetup ):
 
 class WPTemplatesCommon( WPAdminsBase ):
 
-    def getJSFiles(self):
-        return [ 'js/prototype/prototype.js',
-                 'js/scriptaculous/scriptaculous.js' ] + \
-                WPAdminsBase.getJSFiles(self)
-
     def _setActiveSideMenuItem(self):
         self._templatesMenuItem.setActive()
 
