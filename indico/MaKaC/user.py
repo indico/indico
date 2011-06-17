@@ -1001,7 +1001,8 @@ class Avatar(Persistent, Fossilizable):
     def getFullName(self):
         surName = ""
         if self.getSurName() != "":
-            surName = "%s, "%self.getSurName().upper()
+            # accented letter capitalization requires all these encodes/decodes
+            surName = "%s, " % self.getSurName().decode('utf-8').upper().encode('utf-8')
         return "%s%s"%(surName, self.getName())
 
     def getStraightFullName(self):

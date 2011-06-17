@@ -1441,7 +1441,7 @@ class WUserDetails(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         u = self._avatar
-        vars["fullName"] = self.htmlText("%s, %s"%(u.getSurName().upper(), u.getName()))
+        vars["fullName"] = self.htmlText(u.getFullName())
         vars["organisation"] = self.htmlText(u.getOrganisations()[0])
         vars["title"] = self.htmlText(u.getTitle())
         vars["address"] = self.htmlText(u.getAddresses()[0])

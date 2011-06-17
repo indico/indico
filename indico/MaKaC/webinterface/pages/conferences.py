@@ -8648,13 +8648,7 @@ class WConfAuthorIndex(wcomponents.WTemplated):
         if len(pl)<=0:
             return ""
         auth=pl[0]
-        authCaption="%s"%auth.getFamilyName().upper()
-        #if authCaption.strip()=="":
-        #    return ""
-        #if self._selLetter!='[all]' and authCaption[0].lower()!=self._selLetter:
-        #    return ""
-        if auth.getFirstName()!="":
-            authCaption="%s, %s"%(authCaption,auth.getFirstName())
+        authCaption = auth.getFullNameNoTitle()
         itemFormatFunc=self._getContribMinView
         if self._view=="full":
             itemFormatFunc=self._getContribFullView

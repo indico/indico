@@ -7356,18 +7356,13 @@ class ContributionParticipation(Persistent, Fossilizable):
         return res
 
     def getFullName( self ):
-        res = self.getFamilyName().upper()
-        if self.getFirstName() != "":
-            if res.strip() != "":
-                res = "%s, %s"%( res, self.getFirstName() )
-            else:
-                res = self.getFirstName()
+        res = self.getFullNameNoTitle()
         if self.getTitle() != "":
             res = "%s %s"%( self.getTitle(), res )
         return res
 
     def getFullNameNoTitle( self ):
-        res = self.getFamilyName().upper()
+        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
         if self.getFirstName() != "":
             if res.strip() != "":
                 res = "%s, %s"%( res, self.getFirstName() )

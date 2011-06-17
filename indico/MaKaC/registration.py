@@ -4368,7 +4368,8 @@ class Registrant(Persistent):
             res = "%s %s"%( self.getFirstName(), self.getFamilyName())
             res = res.strip()
         else:
-            res = self.getFamilyName().upper()
+            # accented letter capitalization requires all these encodes/decodes
+            res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
             if self.getFirstName() != "":
                 res = "%s, %s"%( res, self.getFirstName() )
         if title and self.getTitle() != "":
