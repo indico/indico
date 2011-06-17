@@ -89,7 +89,7 @@
     </form>
 
     <script type="text/javascript">
-        jQuery(document).ready(function($) {
+        $(document).ready(function() {
             $('#dateRange').daterange({
                 % if not rh._createNew:
                 labels: ['', ''],
@@ -122,7 +122,7 @@
             });
 
             var serializeACL = function() {
-                $j('#allowedUsers').val(Json.write(principalField.getUsers()));
+                $('#allowedUsers').val(Json.write(principalField.getUsers()));
             }
 
             var serializeRooms = function() {
@@ -131,7 +131,7 @@
                     roomGuids.push(key);
                 });
                 hasRooms = (roomGuids.length > 0);
-                $j('#blockedRooms').val(Json.write(roomGuids));
+                $('#blockedRooms').val(Json.write(roomGuids));
             }
 
             var principalField = new UserListField(
@@ -167,9 +167,9 @@
             var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {isActive: true}, function() {
                 $E('roomChooser').set(roomChooser.draw(), addRoomButton);
                 // sort by room name. we cannot do it serverside since objects are not ordered
-                $j('#roomChooser select > option').detach().sort(function(a, b) {
-                    return strnatcmp($j(a).text().toLowerCase(), $j(b).text().toLowerCase());
-                }).appendTo($j('#roomChooser select'));
+                $('#roomChooser select > option').detach().sort(function(a, b) {
+                    return strnatcmp($(a).text().toLowerCase(), $(b).text().toLowerCase());
+                }).appendTo($('#roomChooser select'));
             })
             var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
             addRoomButton.observeClick(function(setResult){

@@ -3,7 +3,7 @@
 
     // Displays div with dates and hours
     function display_availability(bool) {
-        $j('#sdatesTR, #edatesTR, #hoursTR, #repTypeTR, #includePrebookingsTR, #includePendingBlockingsTR').toggle(bool);
+        $('#sdatesTR, #edatesTR, #hoursTR, #repTypeTR, #includePrebookingsTR, #includePendingBlockingsTR').toggle(bool);
     }
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
@@ -13,26 +13,26 @@
         }
 
         // Clean up - make all textboxes white again
-        var searchForm = $j('#searchForm');
-        $j(':input', searchForm).removeClass('invalid');
+        var searchForm = $('#searchForm');
+        $(':input', searchForm).removeClass('invalid');
         // Init
         var isValid = true;
 
         // Simple search -------------------------------------
         // Availability
-        if (!$j('input[name="availability"]', searchForm).is(':checked')) { // only if NOT "Don't care"
+        if (!$('input[name="availability"]', searchForm).is(':checked')) { // only if NOT "Don't care"
             isValid = validate_period(searchForm[0]);
         }
         // capacity
-        if ($j('#capacity').val().length > 0 && parseInt($j('#capacity').val(), 10).toString() == 'NaN') {
-            $j('#capacity').addClass('invalid');
+        if ($('#capacity').val().length > 0 && parseInt($('#capacity').val(), 10).toString() == 'NaN') {
+            $('#capacity').addClass('invalid');
             isValid = false;
         }
 
         // Holidays warning
         if (isValid && !onSubmit) {
             var lastDateInfo = searchForm.data('lastDateInfo');
-            var dateInfo = $j('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
+            var dateInfo = $('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
             if (dateInfo != lastDateInfo) {
                 searchForm.data('lastDateInfo', dateInfo);
                 var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
@@ -45,13 +45,13 @@
             }
         }
 
-        if (!$j('#sdate').val()) {
-            $j('#sdate').addClass('invalid');
+        if (!$('#sdate').val()) {
+            $('#sdate').addClass('invalid');
             isValid = false;
         }
 
-        if (!$j('#edate').val()) {
-            $j('#edate').addClass('invalid');
+        if (!$('#edate').val()) {
+            $('#edate').addClass('invalid');
             isValid = false;
         }
 
@@ -61,7 +61,7 @@
     // If not, pop up a dialog
     function isBookable() {
         // Get the selected option in the SELECT
-        var selectedURL = $j('#roomName').val();
+        var selectedURL = $('#roomName').val();
         var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-]*)(?:&|$)/;
         var roomIDPattern = /roomID=([a-zA-Z0-9\-]*)(?:&|$)/;
 
@@ -95,8 +95,8 @@
             });
     }
 
-    $j(window).load(function() {
-        $j('#searchForm').delegate(':input', 'keyup change', function() {
+    $(window).load(function() {
+        $('#searchForm').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
@@ -108,13 +108,13 @@
         if (forms_are_valid()) {
             set_repeatition_comment();
         }
-        if ($j('#searchForm input[name="availability"]').is(':checked')) { // if "Don't care" about availability
+        if ($('#searchForm input[name="availability"]').is(':checked')) { // if "Don't care" about availability
             display_availability(false);
         }
-        $j('#searchForm input[name="availability"]').change(function() {
-            display_availability($j(this).data('showAvailability'));
+        $('#searchForm input[name="availability"]').change(function() {
+            display_availability($(this).data('showAvailability'));
         });
-        $j('#freeSearch').focus();
+        $('#freeSearch').focus();
     });
 
 
@@ -227,7 +227,7 @@
                                                     <span id="bookButtonWrapper"><input id="bookButton" class="btn" type="button" value="${_("Book")}" onclick="isBookable();" /></span>
                                                 % endif
                                                 % if not forNewBooking:
-                                                    <input class="btn" type="button" value="${ _("Room details")}" onclick="document.location = $j('#roomName').val(); return false;" />
+                                                    <input class="btn" type="button" value="${ _("Room details")}" onclick="document.location = $('#roomName').val(); return false;" />
                                                 % endif
 
                                                 <!-- Help -->

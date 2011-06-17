@@ -40,7 +40,6 @@
     </table>
 
     <script type="text/javascript">
-    (function($) {
         $('.blockingShowRooms').toggle(function(e) {
             e.preventDefault();
             var $this = $(this);
@@ -52,7 +51,6 @@
             $this.text('Show rooms').closest('tr').next('.blockingRoomList').hide();
             $this.closest('tbody').removeClass('hasRoomList');
         });
-    })(jQuery);
     </script>
 % else:
     <br />

@@ -88,7 +88,7 @@
         // -an inner HTML with its content
         itemId++;
 
-        var newDiv = $j('<div/>', {
+        var newDiv = $('<div/>', {
             id: itemId
         }).css({
             position: 'absolute',
@@ -120,7 +120,7 @@
     function insertElement() {
         var newDiv = createDiv();
         // We set the inner html of the div depending on the type of item inserted
-        switch($j('#elementList').val()) {
+        switch($('#elementList').val()) {
             ${ switchCases }
         }
 
@@ -135,16 +135,16 @@
         if (lastSelectedDiv) {
             items[lastSelectedDiv.attr('id')] = false;
             lastSelectedDiv.remove();
-            $j('#selection_text').html('');
+            $('#selection_text').html('');
             lastSelectedDiv = null;
-            $j('#removeButton').prop('disabled', true);
+            $('#removeButton').prop('disabled', true);
         }
     }
 
     function markSelected(newSelectedDiv) {
         // Change the text that says which item is selected
         var id = newSelectedDiv.attr('id');
-        $j('#selection_text').html(translate[items[id].key]);
+        $('#selection_text').html(translate[items[id].key]);
 
         // TODO: add check to see if there's a table inside and not an image
 
@@ -159,29 +159,29 @@
         newSelectedItem.selected = true;
         newSelectedDiv.html(newSelectedItem.toHTML());
         lastSelectedDiv = newSelectedDiv;
-        $j('#removeButton').prop('disabled', false);
+        $('#removeButton').prop('disabled', false);
 
         // Change the selectors so that they match the properties of the item
-        $j('#alignment_selector').prop('selectedIndex', newSelectedItem.textAlignIndex);
-        $j('#font_selector').prop('selectedIndex', newSelectedItem.fontFamilyIndex);
-        $j('#size_selector').prop('selectedIndex', newSelectedItem.fontSizeIndex);
-        $j('#style_selector').prop('selectedIndex', newSelectedItem.styleIndex);
-        $j('#color_selector').prop('selectedIndex', newSelectedItem.colorIndex);
-        $j('#width_field').val(newSelectedItem.width / pixelsPerCm);
+        $('#alignment_selector').prop('selectedIndex', newSelectedItem.textAlignIndex);
+        $('#font_selector').prop('selectedIndex', newSelectedItem.fontFamilyIndex);
+        $('#size_selector').prop('selectedIndex', newSelectedItem.fontSizeIndex);
+        $('#style_selector').prop('selectedIndex', newSelectedItem.styleIndex);
+        $('#color_selector').prop('selectedIndex', newSelectedItem.colorIndex);
+        $('#width_field').val(newSelectedItem.width / pixelsPerCm);
         if (newSelectedItem.key == "Fixed Text") {
-            $j('#fixed_text_field').val(newSelectedItem.text).prop('disabled', false);
-            $j('#changeText').prop('disabled', false);
+            $('#fixed_text_field').val(newSelectedItem.text).prop('disabled', false);
+            $('#changeText').prop('disabled', false);
         } else {
-            $j('#fixed_text_field').val("").prop('disabled', true);
-            $j('#changeText').prop('disabled', true);
+            $('#fixed_text_field').val("").prop('disabled', true);
+            $('#changeText').prop('disabled', true);
         }
     }
 
     function updateRulers() {
         if (templateDimensions.width > previousTemplateDimensions.width) {
-            var hRuler = $j('#horizontal_ruler');
+            var hRuler = $('#horizontal_ruler');
             for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i < Math.ceil(templateDimensions.width / pixelsPerCm); i++) {
-                $j('<div/>', {
+                $('<div/>', {
                     id: 'rulerh' + i
                 }).css({
                     width: pixelsPerCm - 1 + 'px',
@@ -199,14 +199,14 @@
         }
         else if (templateDimensions.width < previousTemplateDimensions.width) {
             for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i > Math.ceil(templateDimensions.width / pixelsPerCm); i--) {
-                $j('#horizontal_ruler > #rulerh' + (i - 1)).remove();
+                $('#horizontal_ruler > #rulerh' + (i - 1)).remove();
             }
         }
 
         if (templateDimensions.height > previousTemplateDimensions.height) {
-            var vRuler = $j('#vertical_ruler');
+            var vRuler = $('#vertical_ruler');
             for (var i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i < Math.ceil(templateDimensions.height / pixelsPerCm); i++) {
-                $j('<div/>', {
+                $('<div/>', {
                     id: 'rulerv' + i
                 }).css({
                     width: '10px',
@@ -224,7 +224,7 @@
         }
         else if (templateDimensions.height < previousTemplateDimensions.height) {
             for (i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i > Math.ceil(templateDimensions.height / pixelsPerCm); i--) {
-                $j('#vertical_ruler > #rulerv' + (i - 1)).remove();
+                $('#vertical_ruler > #rulerv' + (i - 1)).remove();
             }
         }
     }
@@ -232,7 +232,7 @@
     // This function displays all the items in the 'items' array on the screen
     // If there are already some items being displayed, it does not erase them
     function displayItems() {
-        $j.each(items, function(i, item) {
+        $.each(items, function(i, item) {
             var newDiv = createDiv();
             newDiv.css({
                 left: item.x + 'px',
@@ -248,16 +248,16 @@
 
 
     function changeTemplateSize() {
-        var tpl = $j('#templateDiv');
-        tpl.width($j('#poster_width').val() * pixelsPerCm);
-        tpl.height($j('#poster_height').val() * pixelsPerCm);
+        var tpl = $('#templateDiv');
+        tpl.width($('#poster_width').val() * pixelsPerCm);
+        tpl.height($('#poster_height').val() * pixelsPerCm);
         previousTemplateDimensions.width = templateDimensions.width;
         previousTemplateDimensions.height = templateDimensions.height;
-        templateDimensions = new Dimensions($j('#poster_width').val() * pixelsPerCm, $j('#poster_height').val() * pixelsPerCm);
+        templateDimensions = new Dimensions($('#poster_width').val() * pixelsPerCm, $('#poster_height').val() * pixelsPerCm);
         updateRulers();
         if (backgroundId != -1) {
-            var url = $j('#background').attr('src');
-            $j('#background').remove();
+            var url = $('#background').attr('src');
+            $('#background').remove();
             displayBackground(url);
         }
     }
@@ -301,39 +301,39 @@
         font: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.fontFamily = $j('#font_selector').val();
-                item.fontFamilyIndex = $j('#font_selector').prop('selectedIndex');
+                item.fontFamily = $('#font_selector').val();
+                item.fontFamilyIndex = $('#font_selector').prop('selectedIndex');
                 lastSelectedDiv.html(item.toHTML());
             }
         },
         color: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.color = $j('#color_selector').val();
-                item.colorIndex = $j('#color_selector').prop('selectedIndex');
+                item.color = $('#color_selector').val();
+                item.colorIndex = $('#color_selector').prop('selectedIndex');
                 lastSelectedDiv.html(item.toHTML());
             }
         },
         alignment: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.textAlign = $j('#alignment_selector').val();
-                item.textAlignIndex = $j('#alignment_selector').prop('selectedIndex');
+                item.textAlign = $('#alignment_selector').val();
+                item.textAlignIndex = $('#alignment_selector').prop('selectedIndex');
                 lastSelectedDiv.html(item.toHTML());
             }
         },
         size: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.fontSize = zoom_font(zoom_factor, $j('#size_selector').val());
-                item.fontSizeIndex = $j('#size_selector').prop('selectedIndex');
+                item.fontSize = zoom_font(zoom_factor, $('#size_selector').val());
+                item.fontSizeIndex = $('#size_selector').prop('selectedIndex');
                 lastSelectedDiv.html(item.toHTML());
             }
         },
         style: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                switch($j('#style_selector').val()) {
+                switch($('#style_selector').val()) {
                     case "normal":
                         item.bold = false;
                         item.italic = false;
@@ -354,22 +354,22 @@
                         break;
                 }
 
-                item.styleIndex = $j('#style_selector').prop('selectedIndex');
+                item.styleIndex = $('#style_selector').prop('selectedIndex');
                 lastSelectedDiv.html(item.toHTML());
             }
         },
         text: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.text = unescapeHTML($j('#fixed_text_field').val());
-                $j('#fixed_text_field').val(item.text);
+                item.text = unescapeHTML($('#fixed_text_field').val());
+                $('#fixed_text_field').val(item.text);
                 lastSelectedDiv.html(item.toHTML());
             }
         },
         width: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.width = $j('#width_field').val() * pixelsPerCm;
+                item.width = $('#width_field').val() * pixelsPerCm;
                 lastSelectedDiv.html(item.toHTML());
             }
         }
@@ -382,24 +382,24 @@
     }
 
     function save() {
-        if ($j('#template_name').val() == '') {
+        if ($('#template_name').val() == '') {
             alert("Please choose a name for the template");
             return;
         }
         var template = [];
-        template.push($j('#template_name').val());
+        template.push($('#template_name').val());
         template.push(templateDimensions, pixelsPerCm);
         template.push(backgroundId);
 
-        $j.each(items, function(i, item) {
+        $.each(items, function(i, item) {
             if (item != false) {
                 item.fontSize = zoom_font(1/zoom_factor, item.fontSize);
             }
         });
 
         template.push(items);
-        $j('#templateData').val(Json.write(template));
-        $j('#saveForm').submit();
+        $('#templateData').val(Json.write(template));
+        $('#saveForm').submit();
     }
 
     function sent() {
@@ -407,31 +407,31 @@
             firstLoad = false;
         }
         else {
-            var iframeDocument = $j('#uploadTarget')[0].contentDocument || $j('#uploadTarget')[0].contentWindow;
+            var iframeDocument = $('#uploadTarget')[0].contentDocument || $('#uploadTarget')[0].contentWindow;
             if (iframeDocument.document) {
                 iframeDocument = iframeDocument.document;
             }
 
             try {
                 if (backgroundId != -1) {
-                    $j('#background').remove();
+                    $('#background').remove();
                 }
-                backgroundId = $j('#background_id', iframeDocument).html();
-                var backgroundURL = $j('#background_url', iframeDocument).html();
-                backgroundPos = $j('#background_pos', iframeDocument).html();
+                backgroundId = $('#background_id', iframeDocument).html();
+                var backgroundURL = $('#background_url', iframeDocument).html();
+                backgroundPos = $('#background_pos', iframeDocument).html();
                 displayBackground(backgroundURL);
             }
             catch (err) {
-                $j('#loadingIcon').hide();
+                $('#loadingIcon').hide();
             }
         }
     }
 
     function setBackgroundPos(mode) {
-        var background = $j('#background');
-        var hiddenField = $j('#bgPosition');
-        var bgPosStretch = $j('#bgPosStretch');
-        var bgPosCenter = $j('#bgPosCenter');
+        var background = $('#background');
+        var hiddenField = $('#bgPosition');
+        var bgPosStretch = $('#bgPosStretch');
+        var bgPosCenter = $('#bgPosCenter');
 
         if (mode == 'Stretch') {
             background.css({
@@ -484,7 +484,7 @@
     }
 
     function displayBackground(backgroundURL) {
-        $j('<img/>', {
+        $('<img/>', {
             id: 'background',
             src: backgroundURL
         }).css({
@@ -495,7 +495,7 @@
             width: templateDimensions.width + 'px',
             zIndex: 5
         }).load(function() {
-            $j('#loadingIcon').hide();
+            $('#loadingIcon').hide();
             setBackgroundPos(backgroundPos);
         }).appendTo('#templateDiv');
     }
@@ -503,7 +503,7 @@
     function removeBackground() {
         if (backgroundId != -1) {
             backgroundId = -1;
-            $j('#background').remove();
+            $('#background').remove();
         }
     }
 
@@ -512,65 +512,65 @@
         return str.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi, '').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
     }
 
-    $j(document).ready(function() {
+    $(document).ready(function() {
         // select items on mousedown
-        $j('#templateDiv > div').live('mousedown', function() {
-            markSelected($j(this));
+        $('#templateDiv > div').live('mousedown', function() {
+            markSelected($(this));
         });
 
         // toggle grid/snap mode
-        $j('#snap_checkbox').change(function() {
+        $('#snap_checkbox').change(function() {
             snapToGrid = this.checked;
         }).change();
 
         // show a throbber when uploading a background
-        $j('#bgForm').submit(function() {
-            $j('#loadingIcon').show();
+        $('#bgForm').submit(function() {
+            $('#loadingIcon').show();
         });
 
-        $j('#removeBackground').click(function(e) {
+        $('#removeBackground').click(function(e) {
             e.preventDefault();
             removeBackground();
         });
 
-        $j('.moveButton').click(function(e) {
+        $('.moveButton').click(function(e) {
             e.preventDefault();
-            var dir = $j(this).data('direction');
+            var dir = $(this).data('direction');
             moveFuncs[dir]();
         });
 
-        $j('.attrButton').click(function(e) {
+        $('.attrButton').click(function(e) {
             e.preventDefault();
-            var attr = $j(this).data('attr');
+            var attr = $(this).data('attr');
             attrFuncs[attr]();
         });
 
-        $j('.attrSelect').change(function() {
-            var attr = $j(this).data('attr');
+        $('.attrSelect').change(function() {
+            var attr = $(this).data('attr');
             attrFuncs[attr]();
         });
 
-        $j('#changeTemplateSize').click(function(e) {
+        $('#changeTemplateSize').click(function(e) {
             e.preventDefault();
             changeTemplateSize();
         });
 
-        $j('#insertButton').click(function(e) {
+        $('#insertButton').click(function(e) {
             e.preventDefault();
             insertElement();
         });
 
-        $j('#removeButton').click(function(e) {
+        $('#removeButton').click(function(e) {
             e.preventDefault();
             removeElement();
         });
 
-        $j('#saveButton').click(function(e) {
+        $('#saveButton').click(function(e) {
             e.preventDefault();
             save();
         });
 
-        $j('#uploadTarget').load(sent);
+        $('#uploadTarget').load(sent);
     });
 </script>
 
@@ -895,11 +895,11 @@
     // We load the template if we are editing a template
     if (${ editingTemplate }) {
         var template = ${ templateData };
-        $j('#template_name').val(template[0]);
-        $j('#templateDiv').width(template[1].width).height(template[1].height);
+        $('#template_name').val(template[0]);
+        $('#templateDiv').width(template[1].width).height(template[1].height);
         items = template[4];
         // We give the toHTML() method to each of the items
-        $j.each(items, function(i, item) {
+        $.each(items, function(i, item) {
             item.toHTML = Item.prototype.toHTML;
         });
         templateDimensions = new Dimensions(template[1].width, template[1].height);
@@ -909,8 +909,8 @@
 
     previousTemplateDimensions = new Dimensions(0,0);
 
-    $j('#poster_width').val(templateDimensions.width / pixelsPerCm);
-    $j('#poster_height').val(templateDimensions.height / pixelsPerCm);
+    $('#poster_width').val(templateDimensions.width / pixelsPerCm);
+    $('#poster_height').val(templateDimensions.height / pixelsPerCm);
 
     updateRulers(); // creates the initial rulers
     changeTemplateSize();

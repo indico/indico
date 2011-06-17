@@ -4,9 +4,9 @@
     // Comments the repeatition for user, to make it clear
     function set_repeatition_comment() {
         var s = '';
-        var repType = parseInt($j('#repeatability').val(), 10);
+        var repType = parseInt($('#repeatability').val(), 10);
         if(repType > 0) {
-            var date = new Date(parseInt($j('#sYear').val(), 10), parseInt($j('#sMonth').val()-1, 10), parseInt($j('#sDay').val(), 10));
+            var date = new Date(parseInt($('#sYear').val(), 10), parseInt($('#sMonth').val()-1, 10), parseInt($('#sDay').val(), 10));
             var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             s = 'on ' + weekDays[date.getDay()];
             if(repType == 4) {
@@ -16,7 +16,7 @@
                 s = 'on ' + weekNrStr + weekDays[date.getDay()] + ' of a month';
             }
         }
-        $j('#repComment').html(s);
+        $('#repComment').html(s);
     }
 
     IndicoUI.executeOnLoad(function()

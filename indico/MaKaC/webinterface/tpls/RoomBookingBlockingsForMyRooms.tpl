@@ -60,7 +60,6 @@
     </table>
 
     <script type="text/javascript">
-    (function($) {
         $('.processRoomBlocking').click(function(e) {
             e.preventDefault();
             var $this = $(this);
@@ -87,7 +86,6 @@
                 }
             });
         });
-    })(jQuery);
     </script>
 % else:
     <br />

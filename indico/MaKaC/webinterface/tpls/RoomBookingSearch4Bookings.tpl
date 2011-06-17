@@ -4,11 +4,11 @@
 
     // Displays div with dates and hours
     function all_date_fields_are_blank() {
-        return ($j('#sDay').val()=='' && $j('#sMonth').val()=='' && $j('#sYear').val()=='' && $j('#sdate').val()=='' &&
-                 $j('#eDay').val()=='' && $j('#eMonth').val()=='' && $j('#eYear').val()=='' && $j('#edate').val()=='');
+        return ($('#sDay').val()=='' && $('#sMonth').val()=='' && $('#sYear').val()=='' && $('#sdate').val()=='' &&
+                 $('#eDay').val()=='' && $('#eMonth').val()=='' && $('#eYear').val()=='' && $('#edate').val()=='');
     }
     function all_time_fields_are_blank() {
-        return $j('#sTime').val() == '' && $j('#eTime').val() == '';
+        return $('#sTime').val() == '' && $('#eTime').val() == '';
     }
 
     // Reds out the invalid textboxes and returns false if something is invalid.
@@ -19,8 +19,8 @@
         }
 
         // Clean up - make all textboxes white again
-        var searchForm = $j('#searchForm');
-        $j(':input', searchForm).removeClass('invalid');
+        var searchForm = $('#searchForm');
+        $(':input', searchForm).removeClass('invalid');
 
         // Init
         var isValid = true;
@@ -36,7 +36,7 @@
         // Holidays warning
         if (isValid && !onSubmit) {
             var lastDateInfo = searchForm.data('lastDateInfo');
-            var dateInfo = $j('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
+            var dateInfo = $('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
             if (dateInfo != lastDateInfo) {
                 searchForm.data('lastDateInfo', dateInfo);
                 var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
@@ -53,18 +53,18 @@
     }
 
     function confirm_search() {
-        if ($j('#onlyMy').is(':checked')) {
+        if ($('#onlyMy').is(':checked')) {
             return true;
         }
-        if ($j('#roomGUID').val() !== null) {
+        if ($('#roomGUID').val() !== null) {
             return true;
         }
-        try { if ($j('#ofMyRooms').is(':checked')) { return true; } } catch (err) {}
+        try { if ($('#ofMyRooms').is(':checked')) { return true; } } catch (err) {}
         alert('Please select a room (or several rooms).');
         return false;
     }
 
-    $j(window).load(function() {
+    $(window).load(function() {
         var startDate = IndicoUI.Widgets.Generic.dateField_sdate(false, null, ['sDay', 'sMonth', 'sYear']);
         $E('sDatePlace').set(startDate);
 
@@ -96,19 +96,19 @@
             endDate.set('${ weekLater.day }/${ weekLater.month }/${ weekLater.year }');
         % endif
 
-        $j('#onlyBookings').change(function() {
+        $('#onlyBookings').change(function() {
             if(this.checked) {
-                $j('#onlyPrebookings').prop('checked', false);
+                $('#onlyPrebookings').prop('checked', false);
             }
         });
 
-        $j('#onlyPrebookings').change(function() {
+        $('#onlyPrebookings').change(function() {
             if(this.checked) {
-                $j('#onlyBookings').prop('checked', false);
+                $('#onlyBookings').prop('checked', false);
             }
         });
 
-        $j('#searchForm').delegate(':input', 'keyup change', function() {
+        $('#searchForm').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {

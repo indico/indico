@@ -7,22 +7,22 @@
         }
 
         // Init, clean up (make all textboxes white again)
-        var bookingForm = $j('#bookingForm');
-        $j(':input', bookingForm).removeClass('invalid');
+        var bookingForm = $('#bookingForm');
+        $(':input', bookingForm).removeClass('invalid');
 
         var isValid = true;
         isValid = validate_period(bookingForm[0], true, ${allowPast}) && isValid;
         isValid = required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
 
-        if (!Util.Validation.isEmailList($j('#contactEmail').val())) {
+        if (!Util.Validation.isEmailList($('#contactEmail').val())) {
             isValid = false;
-            $j('#contactEmail').addClass('invalid');
+            $('#contactEmail').addClass('invalid');
         }
 
         // Holidays warning
         if (isValid && !onSubmit) {
             var lastDateInfo = bookingForm.data('lastDateInfo');
-            var dateInfo = $j('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
+            var dateInfo = $('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
             if (dateInfo != lastDateInfo) {
                 bookingForm.data('lastDateInfo', dateInfo);
                 var holidaysWarning = indicoSource('roomBooking.getDateWarning', bookingForm.serializeObject());
@@ -37,10 +37,10 @@
 
         % if candResv.room.needsAVCSetup:
             var vcIsValid = true;
-            if ($j('#usesAVC').is(':checked')) {
-                vcIsValid = $j('input.videoConferenceOption').is(':checked');
+            if ($('#usesAVC').is(':checked')) {
+                vcIsValid = $('input.videoConferenceOption').is(':checked');
             }
-            $j('#vcSystemList').toggleClass('invalid', !vcIsValid);
+            $('#vcSystemList').toggleClass('invalid', !vcIsValid);
             isValid = isValid && vcIsValid;
         % endif
 
@@ -48,16 +48,16 @@
     }
 
 
-    $j(window).load(function() {
+    $(window).load(function() {
         % if candResv.room.needsAVCSetup:
-            $j('.videoConferenceOption, #needsAVCSupport').change(function() {
+            $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {
-                    $j('#usesAVC').prop('checked', true);
+                    $('#usesAVC').prop('checked', true);
                 }
             });
-            $j('#usesAVC').change(function() {
+            $('#usesAVC').change(function() {
                 if(!this.checked) {
-                    $j('.videoConferenceOption, #needsAVCSupport').prop('checked', false);
+                    $('.videoConferenceOption, #needsAVCSupport').prop('checked', false);
                 }
             });
         % endif
@@ -66,7 +66,7 @@
             set_repeatition_comment();
         }
 
-        $j('#bookingForm').delegate(':input', 'keyup change', function() {
+        $('#bookingForm').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
@@ -74,18 +74,18 @@
                 alert(${_("'There are errors in the form. Please correct the fields with red background.'")});
             };
         }).keydown(function(e) {
-            if(e.which == 13 && !$j(e.target).is('textarea, :submit')) {
+            if(e.which == 13 && !$(e.target).is('textarea, :submit')) {
                 e.preventDefault();
-                $j('#saveBooking').click();
+                $('#saveBooking').click();
             }
         });
 
-        $j('#saveBooking').click(function(e) {
-            $j('#bookingForm').attr('action', '${saveBookingUH.getURL(conf)}');
+        $('#saveBooking').click(function(e) {
+            $('#bookingForm').attr('action', '${saveBookingUH.getURL(conf)}');
         });
-        $j('#checkBooking').click(function(e) {
-            $j('#bookingForm').attr('action', '${bookingFormURL}#conflicts');
-            if (!validate_period($j('#bookingForm')[0], true, ${ allowPast })) {
+        $('#checkBooking').click(function(e) {
+            $('#bookingForm').attr('action', '${bookingFormURL}#conflicts');
+            if (!validate_period($('#bookingForm')[0], true, ${ allowPast })) {
                 alert(${_("'There are errors in the form. Please correct fields with red background.'")});
                 e.preventDefault();
             }
