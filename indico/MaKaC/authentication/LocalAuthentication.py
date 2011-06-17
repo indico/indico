@@ -34,12 +34,6 @@ class LocalAuthenticator(Authenthicator):
         return LocalIdentity(li.getLogin(), li.getPassword(), avatar)
 
 
-
-
-
-
-
-
 class LocalIdentity(PIdentity):
 
     def __init__(self, login, password, user):
@@ -57,4 +51,3 @@ class LocalIdentity(PIdentity):
 
     def getAuthenticatorTag(self):
         return LocalAuthenticator.getId()
-
