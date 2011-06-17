@@ -4,11 +4,11 @@
 
     // Displays div with dates and hours
     function all_date_fields_are_blank() {
-        return ($F('sDay')=='' && $F('sMonth')=='' && $F('sYear')=='' && $F('sdate')=='' &&
-                 $F('eDay')=='' && $F('eMonth')=='' && $F('eYear')=='' && $F('edate')=='');
+        return ($j('#sDay').val()=='' && $j('#sMonth').val()=='' && $j('#sYear').val()=='' && $j('#sdate').val()=='' &&
+                 $j('#eDay').val()=='' && $j('#eMonth').val()=='' && $j('#eYear').val()=='' && $j('#edate').val()=='');
     }
     function all_time_fields_are_blank() {
-        return $F('sTime') == '' && $F('eTime') == '';
+        return $j('#sTime').val() == '' && $j('#eTime').val() == '';
     }
 
     // Reds out the invalid textboxes and returns false if something is invalid.
@@ -53,13 +53,13 @@
     }
 
     function confirm_search() {
-        if ($F('onlyMy')) {
+        if ($j('#onlyMy').is(':checked')) {
             return true;
         }
-        if ($F('roomGUID')[0] !== undefined && $F('roomGUID')[0].length > 0) {
+        if ($j('#roomGUID').val() !== null) {
             return true;
         }
-        try { if ($F('ofMyRooms')) { return true; } } catch (err) {}
+        try { if ($j('#ofMyRooms').is(':checked')) { return true; } } catch (err) {}
         alert('Please select a room (or several rooms).');
         return false;
     }

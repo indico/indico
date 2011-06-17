@@ -167,7 +167,7 @@ type ("RoomBookingCalendarData", [],
              */
             getBars: function(){
                 var bars = [];
-                for( var day = 0; day < this.days.size(); ++day )
+                for( var day = 0; day < _.size(this.days); ++day )
                     bars = bars.concat(this.days[day].getBars());
                 return bars;
             },
@@ -327,7 +327,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                         if(roomDiv)
                             rooms.push(roomDiv);
                 })
-                if(rooms.size() > 0)
+                if(_.size(rooms) > 0)
                     return Html.div({style:{width:pixels(840), marginTop:pixels(40)}}, Html.div({style:{width:pixels(120), height:pixels(20)}}, Html.div({style:{cssFloat:'left', fontWeight:'bold'}}, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d")), this.drawHours()), rooms);
             },
 
@@ -617,7 +617,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
              * Main drawing method. Draws a summary if there are any reservations.
              */
             draw: function(){
-                if( this.bars.size() > 0 ){
+                if( _.size(this.bars) > 0 ){
                     var self = this;
                     contentLoaded = false;
                     showContent = false;

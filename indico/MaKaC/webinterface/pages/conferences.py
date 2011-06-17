@@ -11329,10 +11329,8 @@ class WPDisplayFullMaterialPackage( WPConferenceDefaultDisplayBase ):
 class WPConfModifRoomBookingBase( WPConferenceModifBase ):
 
     def getJSFiles(self):
-        return [ 'js/prototype/prototype.js',
-                 'js/scriptaculous/scriptaculous.js' ] + \
-                WPConferenceModifBase.getJSFiles(self) + \
-                self._includeJSPackage('RoomBooking')
+        return WPConferenceModifBase.getJSFiles(self) + \
+               self._includeJSPackage('RoomBooking')
 
     def _getHeadContent( self ):
         """

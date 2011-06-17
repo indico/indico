@@ -70,9 +70,7 @@ class WPRoomBookingBase( WPMainBase ):
         return WPMainBase._getTitle(self) + " - " + _("Room Booking")
 
     def getJSFiles(self):
-        return [ 'js/prototype/prototype.js',
-                 'js/scriptaculous/scriptaculous.js' ] + \
-                WPMainBase.getJSFiles(self) + \
+        return WPMainBase.getJSFiles(self) + \
                 self._includeJSPackage('Management')
 
     def _getHeadContent( self ):

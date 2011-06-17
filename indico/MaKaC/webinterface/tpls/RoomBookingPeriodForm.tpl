@@ -6,8 +6,8 @@
         var s = '';
         var repType = parseInt($j('#repeatability').val(), 10);
         if(repType > 0) {
-            date = new Date(parseInt($F('sYear'), 10), parseInt($F('sMonth')-1, 10), parseInt($F('sDay'), 10));
-            weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            var date = new Date(parseInt($j('#sYear').val(), 10), parseInt($j('#sMonth').val()-1, 10), parseInt($j('#sDay').val(), 10));
+            var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             s = 'on ' + weekDays[date.getDay()];
             if(repType == 4) {
                 weekNr = Math.floor( date.getDate() / 7 ) + 1;

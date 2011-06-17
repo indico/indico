@@ -24,7 +24,7 @@
             isValid = validate_period(searchForm[0]);
         }
         // capacity
-        if ($F('capacity').length > 0 && parseInt($F('capacity'), 10).toString() == 'NaN') {
+        if ($j('#capacity').val().length > 0 && parseInt($j('#capacity').val(), 10).toString() == 'NaN') {
             $j('#capacity').addClass('invalid');
             isValid = false;
         }
@@ -61,7 +61,7 @@
     // If not, pop up a dialog
     function isBookable() {
         // Get the selected option in the SELECT
-        var selectedURL = $F('roomName');
+        var selectedURL = $j('#roomName').val();
         var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-]*)(?:&|$)/;
         var roomIDPattern = /roomID=([a-zA-Z0-9\-]*)(?:&|$)/;
 
@@ -227,7 +227,7 @@
                                                     <span id="bookButtonWrapper"><input id="bookButton" class="btn" type="button" value="${_("Book")}" onclick="isBookable();" /></span>
                                                 % endif
                                                 % if not forNewBooking:
-                                                    <input class="btn" type="button" value="${ _("Room details")}" onclick="document.location = $F('roomName'); return false;" />
+                                                    <input class="btn" type="button" value="${ _("Room details")}" onclick="document.location = $j('#roomName').val(); return false;" />
                                                 % endif
 
                                                 <!-- Help -->

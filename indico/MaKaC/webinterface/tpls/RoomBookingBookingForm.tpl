@@ -14,7 +14,7 @@
         isValid = validate_period(bookingForm[0], true, ${allowPast}) && isValid;
         isValid = required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
 
-        if (!Util.Validation.isEmailList($F('contactEmail'))) {
+        if (!Util.Validation.isEmailList($j('#contactEmail').val())) {
             isValid = false;
             $j('#contactEmail').addClass('invalid');
         }

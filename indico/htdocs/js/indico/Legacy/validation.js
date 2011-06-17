@@ -81,7 +81,7 @@ function required_fields( fieldNames )
     var isValid = true;
     for (var i = 0; i < fieldNames.length; ++i) {
         fieldName = fieldNames[i];
-        if (trim($F(fieldName)).length == 0) {
+        if (trim($j('#' + fieldName).val()).length == 0) {
             $j('#' + fieldName).addClass('invalid');
             isValid = false;
         }
@@ -150,21 +150,21 @@ function validate_period( f1, withRepeatability, allowPast, what )
     if ( what != ONLY_TIMES )
     {
         // sDate
-        if ( !is_valid_date( $F('sDay'), $F('sMonth'), $F('sYear') ) )
+        if ( !is_valid_date( $j('#sDay').val(), $j('#sMonth').val(), $j('#sYear').val() ) )
         {
             f1.sDay.className = f1.sMonth.className = f1.sYear.className = f1.sdate.className = 'invalid';
             isValid = false;
         }
         // eDate
-        if ( !is_valid_date( $F('eDay'), $F('eMonth'), $F('eYear') ) )
+        if ( !is_valid_date( $j('#eDay').val(), $j('#eMonth').val(), $j('#eYear').val() ) )
         {
             f1.eDay.className = f1.eMonth.className = f1.eYear.className = f1.edate.className = 'invalid';
             isValid = false;
         }
 
         // sDate < eDate
-        var sDate = new Date( parseInt( $F('sYear'), 10 ), parseInt( $F('sMonth'), 10 ) - 1, parseInt( $F('sDay'), 10 ) );
-        var eDate = new Date( parseInt( $F('eYear'), 10 ), parseInt( $F('eMonth'), 10 ) - 1, parseInt( $F('eDay'), 10 ) );
+        var sDate = new Date( parseInt( $j('#sYear').val(), 10 ), parseInt( $j('#sMonth').val(), 10 ) - 1, parseInt( $j('#sDay').val(), 10 ) );
+        var eDate = new Date( parseInt( $j('#eYear').val(), 10 ), parseInt( $j('#eMonth').val(), 10 ) - 1, parseInt( $j('#eDay').val(), 10 ) );
         if ( isValid )
         {
             todayDate = new Date();
@@ -180,18 +180,18 @@ function validate_period( f1, withRepeatability, allowPast, what )
     if ( what != ONLY_DATES )
     {
         // sTime
-        if ( !is_valid_time( $F( 'sTime' ) ) )
+        if ( !is_valid_time( $j('#sTime').val() ) )
         {
             f1.sTime.className = 'invalid';
             isValid = false
         }
         // eTime
-        if ( !is_valid_time( $F( 'eTime' ) ) )
+        if ( !is_valid_time( $j('#eTime').val() ) )
         {
             f1.eTime.className = 'invalid';  isValid = false;
         }
         // sTime < eTime
-        if ( !isBefore( $F( 'sTime' ), $F( 'eTime' ) ) )
+        if ( !isBefore( $j('#sTime').val(), $j('#eTime').val() ) )
         {
             f1.sTime.className = f1.eTime.className = 'invalid';  isValid = false;
         }
@@ -202,7 +202,7 @@ function validate_period( f1, withRepeatability, allowPast, what )
         var ms_in_one_day = 1000*60*60*24;
         var isRepeatabilityValid = true;
 
-        switch($F('repeatability')) {
+        switch($j('#repeatability').val()) {
         // Single Day
         case "None":
             if( sDate.valueOf() != eDate.valueOf() ) {
