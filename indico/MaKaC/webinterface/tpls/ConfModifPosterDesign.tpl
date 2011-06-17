@@ -587,7 +587,7 @@
       </tr>
       <tr>
         <td class="titleCellTD">
-          <span class="titleCellFormat">Name</span>
+          <span class="titleCellFormat">${_("Name")}</span>
         </td>
         <td colspan="5">
           <input id="template_name" size="50" name="Template Name">
@@ -595,13 +595,13 @@
       </tr>
       <tr>
         <td class="titleCellTD">
-          <span class="titleCellFormat">Background</span>
+          <span class="titleCellFormat">${_("Background")}</span>
         </td>
         <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" target="uploadTarget">
         <td height="20px" NOWRAP align="left" colspan="3">
           <input name="file" size="58" type="file">
-          <input class="btn" value="Send File" type="submit">
-          <input class="btn" type="button" value="Remove background" id="removeBackground">
+          <input class="btn" value="${_("Send File")}" type="submit">
+          <input class="btn" type="button" value="${_("Remove background")}" id="removeBackground">
         </td>
         <td width="100%" align="left" colspan="4">
           <img id="loadingIcon" src=${ loadingIconURL } width="20px" height="20px" style="display:none;">
@@ -614,11 +614,11 @@
               <tbody>
                 <tr><td>
                           <input checked type="radio" id="bgPosStretch" name ='bgPosition' value="Stretch">
-                          <label>Stretch</label>
+                          <label>${_("Stretch")}</label>
                     </td>
                     <td>
                         <input type='radio' id="bgPosCenter" name ='bgPosition' value="Center">
-                        <label>Center</label>
+                        <label>${_("Center")}</label>
                 </td></tr>
               </tbody>
             </table>
@@ -628,17 +628,17 @@
       </tr>
       <tr>
         <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">Poster Width (cm)&nbsp;</span>
+          <span class="titleCellFormat">${_("Poster Width (cm)")}&nbsp;</span>
         </td>
         <td>
            <input id="poster_width" name="Poster Width" size="5">
         </td>
         <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">Poster Height (cm)&nbsp;</span>
+          <span class="titleCellFormat">${_("Poster Height (cm)")}&nbsp;</span>
         </td>
         <td>
           <input id="poster_height" name="Poster Height" size="5">
-          <input class="btn" value="Change" type="button" id="changeTemplateSize">
+          <input class="btn" value="${ _("Change")}" type="button" id="changeTemplateSize">
         </td>
       </tr>
     </tbody>
@@ -653,12 +653,12 @@
       <tr>
 
         <td width="200" rowspan="2" valign="top"> <!-- Width attribute necessary so that the template design space doesn't move depending on selection text-->
-          <span class="titleCellFormat">Elements</span>
+          <span class="titleCellFormat">${_("Elements")}</span>
 
           <br/><br/>
 
-          <input name="insertButton" id="insertButton" class="btn" value="Insert" type="button">
-          <input name="removeButton" id="removeButton" class="btn" value="Remove" type="button" disabled="disabled">
+          <input name="insertButton" id="insertButton" class="btn" value="${ _("Insert")}" type="button">
+          <input name="removeButton" id="removeButton" class="btn" value="${ _("Remove")}" type="button" disabled="disabled">
 
           <br/><br/>
 
@@ -669,10 +669,10 @@
           <br/>
           <br/>
 
-          Selection: <span id="selection_text"></span>
+          ${ _("Selection")}: <span id="selection_text"></span>
           <br/><br/>
 
-          Position:
+          ${ _("Position")}:
           <br/>
 
           <table>
@@ -680,25 +680,25 @@
               <tr>
                 <td></td>
                 <td align="center">
-                  <input name="Move Template Element Top Button" class="btn moveButton" value="Top" type="button" data-direction="top">
+                  <input name="Move Template Element Top Button" class="btn moveButton" value="${ _("Top")}" type="button" data-direction="top">
                 </td>
                 <td></td>
               </tr>
               <tr>
                 <td align="center">
-                  <input name="Move Template Element Left Button" class="btn moveButton" value="Left" type="button" data-direction="left">
+                  <input name="Move Template Element Left Button" class="btn moveButton" value="${ _("Left")}" type="button" data-direction="left">
                 </td>
                 <td align="center">
-                  <input name="Move Template Element Center Button" class="btn moveButton" value="Center" type="button" data-direction="center">
+                  <input name="Move Template Element Center Button" class="btn moveButton" value="${ _("Center")}" type="button" data-direction="center">
                 </td>
                 <td align="center">
-                  <input name="Move Template Element Right Button" class="btn moveButton" value="Right" type="button" data-direction="right">
+                  <input name="Move Template Element Right Button" class="btn moveButton" value="${ _("Right")}" type="button" data-direction="right">
                 </td>
               </tr>
               <tr>
                 <td></td>
                 <td align="center">
-                  <input name="Move Template Element Bottom Button" class="btn moveButton" value="Bottom" type="button" data-direction="bottom">
+                  <input name="Move Template Element Bottom Button" class="btn moveButton" value="${ _("Bottom")}" type="button" data-direction="bottom">
                 </td>
                 <td></td>
               </tr>
@@ -706,7 +706,7 @@
             </tbody>
           </table>
 
-          <input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">Snap to grid</label>
+          <input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">${ _("Snap to grid")}</label>
 
         </td>
 
@@ -744,7 +744,7 @@
     <tbody>
 
       <tr>
-        <td colspan="3" rowspan="1" class="titleCellFormat">Attributes</td>
+        <td colspan="3" rowspan="1" class="titleCellFormat">${ _("Attributes")}</td>
         <td></td>
         <td></td>
       </tr>
@@ -752,17 +752,17 @@
       <tr>
 
        <td class="titleCellTD">
-          <span class="titleCellFormat">Font&nbsp;</span>
+          <span class="titleCellFormat">${ _("Font")}&nbsp;</span>
        </td>
 
         <td colspan="2">
           <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
-            <optgroup label="Normal Fonts">
+            <optgroup label="${ _('Normal Fonts') }">
               <option>Times New Roman</option>
               <option>Courier</option>
               <option>Sans</option>
             </optgroup>
-            <optgroup label="Special Character Fonts">
+            <optgroup label="${ _('Special Character Fonts') }">
               <option>LinuxLibertine</option>
               <option>Kochi-Mincho</option>
               <option>Kochi-Gothic</option>
@@ -773,21 +773,21 @@
         </td>
 
         <td class="titleCellTD">
-          <span class="titleCellFormat">Color&nbsp;</span>
+          <span class="titleCellFormat">${ _("Color")}&nbsp;</span>
         </td>
 
         <td width="100%">
           <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
-            <option>black</option>
-            <option>red</option>
-            <option>blue</option>
-            <option>green</option>
-            <option>yellow</option>
-            <option>brown</option>
-            <option>gold</option>
-            <option>pink</option>
-            <option>gray</option>
-            <option>white</option>
+            <option value="black"> ${ _("black")}</option>
+            <option value="red"> ${ _("red")}</option>
+            <option value="blue"> ${ _("blue")}</option>
+            <option value="green"> ${ _("green")}</option>
+            <option value="yellow"> ${ _("yellow")}</option>
+            <option value="brown"> ${ _("brown")}</option>
+            <option value="gold"> ${ _("gold")}</option>
+            <option value="pink"> ${ _("pink")}</option>
+            <option value="gray"> ${ _("gray")}</option>
+            <option value="white"> ${ _("white")}</option>
           </select>
         </td>
 
@@ -796,20 +796,20 @@
       <tr>
 
         <td class="titleCellTD">
-          <span class="titleCellFormat">Style&nbsp;</span>
+          <span class="titleCellFormat">${ _("Style")}&nbsp;</span>
         </td>
 
         <td colspan="2">
           <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
-            <option value="normal">Normal</option>
-            <option value="bold">Bold</option>
-            <option value="italic">Italic</option>
-            <option value="bold_italic">Bold &amp; Italic</option>
+            <option value="normal"> ${ _("Normal")}</option>
+            <option value="bold"> ${ _("Bold")}</option>
+            <option value="italic"> ${ _("Italic")}</option>
+            <option value="bold_italic"> ${ _("Bold &amp; Italic")}</option>
           </select>
         </td>
 
         <td class="titleCellTD">
-          <span class="titleCellFormat">Size&nbsp;</span>
+          <span class="titleCellFormat"> ${ _("Size")}&nbsp;</span>
         </td>
 
         <td width="100%">
@@ -839,19 +839,19 @@
 
       <tr>
         <td class="titleCellTD">
-          <span class="titleCellFormat">Alignment&nbsp;</span>
+          <span class="titleCellFormat">${ _("Alignment")}&nbsp;</span>
         </td>
         <td colspan="2">
           <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
-            <!-- Note: the text of the options is used directly in the style attribute of the items -->
-            <option>Left</option>
-            <option>Right</option>
-            <option>Center</option><br>
-            <option>Justified</option>
+            <!-- Note: the value of the options is used directly in the style attribute of the items -->
+            <option value="Left"> ${ _("Left")}</option>
+            <option value="Right"> ${ _("Right")}</option>
+            <option value="Center"> ${ _("Center")}</option>
+            <option value="Justified"> ${ _("Justified")}</option>
           </select>
         </td>
         <td class="titleCellTD">
-          <span class="titleCellFormat">Width (cm)&nbsp;</span>
+          <span class="titleCellFormat">${ _("Width (cm)")}&nbsp;</span>
         </td>
         <td width="100%">
           <input id="width_field" size="5" name="Element Size">
@@ -860,13 +860,13 @@
       </tr>
       <tr>
         <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">Text (for Fixed Text)&nbsp;</span>
+          <span class="titleCellFormat">${ _("Text (for Fixed Text)")}&nbsp;</span>
         </td>
         <td>
-          <input id="fixed_text_field" size="30" name="Element Size">
+          <input id="fixed_text_field" size="30" name="Element Size" disabled="disabled">
         </td>
         <td>
-          <input class="btn attrButton" id="changeText" value="Change" type="button" data-attr="text" />
+          <input class="btn attrButton" id="changeText" value="${ _("Change")}" type="button" data-attr="text" disabled="disabled" />
         </td>
         <td></td>
         <td></td>
@@ -878,8 +878,8 @@
     <tbody>
       <tr>
         <td colspan="4" align="center" width="100%">
-          <input class="btn" name="Save Template Button" value="Save" type="button" id="saveButton">
-          <input class="btn" name="Cancel Button" value="Cancel" type="button" onclick="location.href='${ cancelURL }'">
+          <input class="btn" name="Save Template Button" value="${ _("Save")}" type="button" id="saveButton">
+          <input class="btn" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'">
         </td>
       </tr>
     </tbody>

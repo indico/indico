@@ -513,7 +513,7 @@
       </tr>
       <tr>
         <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Background")}<br><small>( ${ _("picture file in jpeg, png or gif")})</small></span>
+          <span class="titleCellFormat"> ${ _("Background")}<br><small>(${ _("picture file in jpeg, png or gif")})</small></span>
         </td>
         <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" target="uploadTarget">
         <td height="20px" NOWRAP align="left" colspan="3">
@@ -606,7 +606,7 @@
             </tbody>
           </table>
 
-          <input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">Snap to grid</label>
+          <input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">${ _("Snap to grid")}</label>
 
         </td>
 
@@ -743,7 +743,7 @@
             <!-- Note: the value of the options is used directly in the style attribute of the items -->
             <option value="Left"> ${ _("Left")}</option>
             <option value="Right"> ${ _("Right")}</option>
-            <option value="Center"> ${ _("Center")}</option><br>
+            <option value="Center"> ${ _("Center")}</option>
             <option value="Justified"> ${ _("Justified")}</option>
           </select>
         </td>
@@ -760,10 +760,10 @@
           <span class="titleCellFormat"> ${ _("Text (for Fixed Text)")}&nbsp;</span>
         </td>
         <td>
-          <input id="fixed_text_field" size="30" name="Element Size">
+          <input id="fixed_text_field" size="30" name="Element Size" disabled="disabled">
         </td>
         <td>
-          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="text" id="changeText">
+          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="text" id="changeText" disabled="disabled">
         </td>
         <td></td>
         <td></td>
