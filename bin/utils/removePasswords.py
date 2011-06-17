@@ -12,11 +12,14 @@ if raw_input('Do you want to continue? [yes|NO]: ').lower() != 'yes':
     print 'Cancelled.'
     sys.exit(0)
 
-DBMgr.getInstance().startRequest()
+i = 0
+
+dbi = DBMgr.getInstance()
+dbi.startRequest()
 
 ah = AvatarHolder()
 am = AuthenticatorMgr()
-for avatar in ah.getValuesToList():
+for aid, avatar in ah._getIdx().iteritems():
     for identity in avatar.getIdentityList():
         if isinstance(identity, LocalIdentity):
             print('Removing LocalIdentity(%s, %s) from %s' %
@@ -24,5 +27,7 @@ for avatar in ah.getValuesToList():
                     avatar.getFullName()))
             am.removeIdentity(identity)
             avatar.removeIdentity(identity)
-
+    if i % 100 == 99:
+        dbi.commit()
+    i += 1
 DBMgr.getInstance().endRequest()
