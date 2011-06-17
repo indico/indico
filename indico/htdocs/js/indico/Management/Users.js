@@ -135,10 +135,10 @@ type ("SimpleSearchPanel", ["IWidget"], {
            return null;
        } else {
            var authenticatorList = [];
-           each(Indico.Settings.ExtAuthenticators, function(authenticatorName) {
+           each(Indico.Settings.ExtAuthenticators, function(auth) {
                var searchExternalCB = Html.checkbox({});
-               $B(searchExternalCB, self.criteria.accessor('searchExternal-' + authenticatorName));
-               authenticatorList.push(["Search " + authenticatorName, searchExternalCB]);
+               $B(searchExternalCB, self.criteria.accessor('searchExternal-' + auth[0]));
+               authenticatorList.push(["Search " + auth[1], searchExternalCB]);
            });
            return authenticatorList;
        }

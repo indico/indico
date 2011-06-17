@@ -1,16 +1,14 @@
 <% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 <% from MaKaC.common import Config %>
+<% from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr %>
 <% import MaKaC.common.info as info %>
 <% from MaKaC.rb_location import Location %>
 <% import simplejson %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
 <%
 config = Config.getInstance()
-authenticators = config.getAuthenticatorList()
-extAuths = []
-for auth in authenticators:
-    if auth.lower() != "local":
-        extAuths.append(auth)
+authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
+extAuths = list((auth.id, auth.name) for auth in authenticators)
 
 rbActive = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
 if rbActive:
@@ -156,7 +154,7 @@ var Indico = {
     },
 
     Settings: {
-        ExtAuthenticators: ${ extAuths },
+        ExtAuthenticators: ${ jsonEncode(extAuths) },
         RoomBookingModuleActive: ${ jsBoolean(rbActive) }
     }
 };

@@ -36,7 +36,7 @@ from MaKaC.i18n import _
 class NiceAuthenticator(Authenthicator):
     idxName = "NiceIdentities"
     id = 'Nice'
-    name = 'NICE'
+    name = 'CERN user database'
     description = "NICE Login"
 
     def __init__(self):
