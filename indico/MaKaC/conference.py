@@ -3788,19 +3788,19 @@ class Conference(CommonObjectBase, Locatable):
             chair or is granted to access the conference, when the client ip is
             not restricted.
         """
-
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
         if self.__ac.isHarvesterIP(aw.getIP()):
             return True
         #####################################################
-
-        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
+        if self.getAccessKey()!= "":
+            if self.canKeyAccess( aw ) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
+                return False
+        elif not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
             return False
         if not self.isProtected():
             return True
-        flag = self.isAllowedToAccess( aw.getUser() )
-        return flag or self.canKeyAccess( aw )
+        return self.isAllowedToAccess( aw.getUser() )
 
     def canKeyAccess( self, aw, key=None ):
         sess = aw.getSession()
