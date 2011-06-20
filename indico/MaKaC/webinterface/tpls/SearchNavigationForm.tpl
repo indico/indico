@@ -1,4 +1,5 @@
 <%page args="target=None, direction=None"/>
+<% import MaKaC %>
 % if direction == 'Next':
   <% inc = 1 %>
 % else:
