@@ -4,6 +4,7 @@
         options: {
             disabled: false,
             allowPast: false,
+            useFields: true,
             fieldNames: ['startDate', 'endDate'],
             labels: ['', ''],
             labelAttrs: {},
@@ -26,16 +27,21 @@
             var self = this;
 
             // Create the hidden fields containing the dates
-            self.startDateField = $('<input/>', {
-                type: 'hidden',
-                name: self.options.fieldNames[0],
-                value: self.startDate || ''
-            }).appendTo(self.element);
-            self.endDateField = $('<input/>', {
-                type: 'hidden',
-                name: self.options.fieldNames[1],
-                value: self.endDate || ''
-            }).appendTo(self.element);
+            if(self.options.useFields) {
+                self.startDateField = $('<input/>', {
+                    type: 'hidden',
+                    name: self.options.fieldNames[0],
+                    value: self.startDate || ''
+                }).appendTo(self.element);
+                self.endDateField = $('<input/>', {
+                    type: 'hidden',
+                    name: self.options.fieldNames[1],
+                    value: self.endDate || ''
+                }).appendTo(self.element);
+            }
+            else {
+                self.startDateField = self.endDateField = null;
+            }
 
             // Create the markup for the inline widget
             self.container = $('<div/>', { style: 'display: table; width: 100%;' });
@@ -54,13 +60,13 @@
             self.startPicker.datepicker($.extend({
                 minDate: self.options.allowPast ? null : 0
             }, self.options.pickerOptions, self.options.startPickerOptions, {
-                altField: self.startDateField,
+                altField: self.startDateField || '',
                 defaultDate: self.options.startDate
             }));
             self.endPicker.datepicker($.extend({
                 minDate: self.options.allowPast ? null : 0
             }, self.options.pickerOptions, self.options.endPickerOptions, {
-                altField: self.endDateField,
+                altField: self.endDateField || '',
                 defaultDate: self.options.endDate
             }));
             self.pickers = self.startPicker.add(self.endPicker);
@@ -89,8 +95,12 @@
 
         destroy: function() {
             this.element.removeClass('ui-daterange')
-            this.startDateField.remove();
-            this.endDateField.remove();
+            if(this.startDateField) {
+                this.startDateField.remove();
+            }
+            if(this.endDateField) {
+                this.endDateField.remove();
+            }
             this.pickers.datepicker('destroy');
             this.container.remove();
             $.Widget.prototype.destroy.apply(this, arguments);
