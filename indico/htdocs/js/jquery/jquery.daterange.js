@@ -81,11 +81,11 @@
                         self.startPicker.datepicker('setDate', self.endPicker.datepicker('getDate'));
                     }
                 }
-                self.options.startDate = self.endPicker.datepicker('getDate');
+                self.options.startDate = self.startPicker.datepicker('getDate');
                 self.options.endDate = self.endPicker.datepicker('getDate');
             });
             // Copy current date in case it was not set before
-            self.options.startDate = self.endPicker.datepicker('getDate');
+            self.options.startDate = self.startPicker.datepicker('getDate');
             self.options.endDate = self.endPicker.datepicker('getDate');
             // Disable the date picker if necessary
             if(self.options.disabled) {
