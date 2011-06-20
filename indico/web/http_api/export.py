@@ -143,7 +143,7 @@ class Exporter(object):
             self._tz = pytz.timezone(tzName)
         except pytz.UnknownTimeZoneError, e:
             raise HTTPAPIError("Bad timezone: '%s'" % e.message, apache.HTTP_BAD_REQUEST)
-        max = self.MAX_RECORDS.get(self._detail, 10000)
+        max = self.MAX_RECORDS.get(self._detail, 1000)
         self._userLimit = get_query_parameter(self._qdata, ['n', 'limit'], 0, integer=True)
         if self._userLimit > max:
             raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s'" %
@@ -353,7 +353,7 @@ class CategoryEventExporter(Exporter):
     RE = r'(?P<idlist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'events'
     MAX_RECORDS = {
-        'events': 10000,
+        'events': 1000,
         'contributions': 500,
         'subcontributions': 500,
         'sessions': 100,
