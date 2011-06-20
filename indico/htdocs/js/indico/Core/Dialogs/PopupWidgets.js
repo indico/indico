@@ -14,7 +14,8 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     },
 
     _submit: function() {
-        if(!this.valid) {
+        if(!this._verifyDates()) {
+            new AlertPopup($T('Invalid date range'), $T('The selected date range is invalid.')).open();
             return;
         }
 
@@ -27,47 +28,32 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     },
 
     _verifyDates: function() {
-        var valid = true;
+        var dates = this.dateRangeWidget.daterange('getDates');
+        var sDate = dates[0];
+        var eDate = dates[1];
 
-        this.startDateSel.askForErrorCheck();
-        this.endDateSel.askForErrorCheck();
-
-        if (this.startDateSel.inError() || this.endDateSel.inError()) {
-            valid = false;
-        }
-        else {
-            var sDate = Util.parseJSDateTime(this.startDateSel.get(), IndicoDateTimeFormats.ServerHourless);
-            var eDate = Util.parseJSDateTime(this.endDateSel.get(), IndicoDateTimeFormats.ServerHourless);
-
-            if (sDate > eDate || (!this.allowEqual && sDate == eDate)) {
-                valid = false;
-                this.startDateSel.setError($T('Start date should be before end date'));
-                this.endDateSel.setError($T('End date should be after start date'));
-            }
-            else {
-                valid = true;
-                this.startDateSel.setError(null);
-                this.endDateSel.setError(null);
-                this.startDate = sDate;
-                this.endDate = eDate;
-            }
+        if (sDate > eDate || (!this.allowEqual && (sDate - eDate) == 0)) {
+            return false;
         }
 
-        this.valid = valid;
+        this.startDate = sDate;
+        this.endDate = eDate;
+        return true;
     },
 
     _drawWidget: function() {
-        var self = this;
+        var structure = Html.div({style:{height: pixels(245)}});
+        this.dateRangeWidget = jQuery(structure.dom).daterange({
+            allowPast: true,
+            useFields: false,
+            startDate: this.startDate,
+            endDate: this.endDate,
+            pickerOptions: {
+                yearRange: 'c-2:c+2'
+            }
+        });
 
-        var structure = Html.table({}, Html.tbody({},
-                Html.tr("startEndDate",
-                        Html.td("startEndDateEntry", "Start date:"),
-                        Html.td({}, this.startDateSel.draw())),
-                Html.tr("startEndDate",
-                        Html.td("startEndDateEntry", "End date:"),
-                        Html.td({}, this.endDateSel.draw()))));
-
-        return Html.div({style: {width: pixels(220), height: pixels(50)}}, structure);
+        return structure;
     },
 
     draw: function() {
@@ -77,38 +63,12 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
 }, function(startDate, endDate, callback, title, allowEqual) {
     var self = this;
 
-    this.valid = true;
     this.callback = callback;
     this.allowEqual = allowEqual || false;
+    this.dateRangeWidget = null;
 
-    if(startDate) {
-        this.startDate = this._dateFromString(startDate);
-    }
-    else {
-        this.startDate = new Date();
-    }
-
-    if(endDate) {
-        this.endDate = this._dateFromString(endDate);
-    }
-    else {
-        this.endDate = new Date();
-    }
-
-    this.startDateSel = new DateSelector();
-    this.endDateSel = new DateSelector();
-
-    this.startDateSel.set(Util.formatDateTime(this.startDate, IndicoDateTimeFormats.ServerHourless));
-    this.endDateSel.set(Util.formatDateTime(this.endDate, IndicoDateTimeFormats.ServerHourless));
-
-    this.startDateSel.observe(function() {
-        self._verifyDates();
-        return true;
-    });
-    this.endDateSel.observe(function() {
-        self._verifyDates();
-        return true;
-    });
+    this.startDate = startDate ? this._dateFromString(startDate) : new Date();
+    this.endDate = endDate ? this._dateFromString(endDate) : new Date();
 
     this.ExclusivePopupWithButtons(title || 'Choose date range', function() {
         self.close();
