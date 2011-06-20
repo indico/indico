@@ -42,6 +42,9 @@ class IHTTPAPIResultFossil(IFossil):
         pass
     getURL.name = 'url'
 
+    def getCount(self):
+        pass
+
     def getResults(self):
         pass
 

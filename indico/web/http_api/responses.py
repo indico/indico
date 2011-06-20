@@ -67,6 +67,9 @@ class HTTPAPIResult(Fossilizable):
             return prefix + self._path + '?' + self._query
         return prefix + self._path
 
+    def getCount(self):
+        return len(self._results)
+
     def getResults(self):
         return self._results
 
