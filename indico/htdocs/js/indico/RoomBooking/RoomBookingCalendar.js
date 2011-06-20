@@ -690,7 +690,7 @@ type("RoomBookingPrevNext", [],
 
                         window.location = redirectUrl;
 
-                    }, $T("Choose Period"));
+                    }, $T("Choose Period"), true);
                     dlg.open();
                 });
 
