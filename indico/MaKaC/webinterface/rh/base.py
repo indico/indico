@@ -547,13 +547,13 @@ class RH(RequestHandlerBase):
                         res = self._processError(e)
                 except (ConflictError, POSKeyError):
                     import traceback
-                    Logger.get('requestHandler').debug('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
+                    Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
                     continue
                 except ClientDisconnected:
-                    Logger.get('requestHandler').debug('Client Disconnected! (Request %s)' % id(self._req) )
+                    Logger.get('requestHandler').warning('Client Disconnected! (Request %s)' % id(self._req) )
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
