@@ -75,7 +75,7 @@ class RoomExporter(RoomBookingExporter):
     RE = r'(?P<location>\w+)/(?P<idlist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'rooms'
     MAX_RECORDS = {
-        'rooms': 1000,
+        'rooms': 500,
         'reservations': 10
     }
     SERIALIZER_TYPE_MAP = {
@@ -99,7 +99,7 @@ class ReservationExporter(RoomBookingExporter):
     RE = r'(?P<loclist>\w+(?:-\w+)*)'
     DEFAULT_DETAIL = 'reservations'
     MAX_RECORDS = {
-        'reservations': 10000
+        'reservations': 100
     }
     SERIALIZER_TYPE_MAP = {
         'RoomCERN': 'Room',
