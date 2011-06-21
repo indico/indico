@@ -318,6 +318,7 @@ class RoomExportInterface(RoomBookingExportInterface):
 
         for obj in self._process(_iterate_rooms(idlist)):
             yield obj
+        Factory.getDALManager().rollback()
         Factory.getDALManager().disconnect()
 
 
