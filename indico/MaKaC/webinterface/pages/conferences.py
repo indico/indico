@@ -4215,7 +4215,6 @@ class WPConfModifToolsBase( WPConferenceModifBase ):
         self._tabOfflineSite = self._tabCtrl.newTab( "offlineSite", _("Offline Site"), \
                 urlHandlers.UHConfDVDCreation.getURL(self._conf) )
 
-        self._tabAlarms.setEnabled(False)
         self._tabOfflineSite.setHidden(True)
 
         self._setActiveTab()
@@ -5257,83 +5256,11 @@ class WPContribParticipationSentEmail( WPConfModifListings ):
 
 #---------------------------------------------------------------------------------------
 
-class WSetAlarm(wcomponents.WTemplated):
-
-    def __init__(self, conference, aw):
-            self.__conf = conference
-            self._aw=aw
-
-    def _getFromOptionsHTML(self, selected=""):
-        emails=[]
-        foundEmail=False
-        selHTML=""
-        if selected=="":
-            foundEmail=True
-            selHTML="selected=\"selected\""
-        html=[ i18nformat("""<option value=\"\" %s>--_("select a from address")--</option>""")%selHTML]
-        for ch in self.__conf.getChairList():
-            if ch.getEmail().strip()!="" and ch.getEmail().strip() not in emails:
-                selHTML=""
-                if selected.strip()==ch.getEmail().strip():
-                    foundEmail=True
-                    selHTML="selected=\"selected\""
-                html.append("<option value=%s %s>%s &#60;%s&#62;</option>"%(quoteattr(ch.getEmail().strip()),selHTML,ch.getFullName(),ch.getEmail().strip()))
-                emails.append(ch.getEmail().strip())
-        if self.__conf.getSupportEmail().strip()!="" and self.__conf.getSupportEmail().strip() not in emails:
-            selHTML=""
-            if selected.strip()==self.__conf.getSupportEmail().strip():
-                foundEmail=True
-                selHTML="selected=\"selected\""
-            html.append("<option value=%s %s>%s</option>"%(quoteattr(self.__conf.getSupportEmail().strip()),selHTML,self.__conf.getSupportEmail().strip()))
-            emails.append(self.__conf.getSupportEmail().strip())
-        if self._aw.getUser() is not None and self._aw.getUser().getEmail().strip() not in emails:
-            selHTML=""
-            if selected.strip()==self._aw.getUser().getEmail().strip():
-                foundEmail=True
-                selHTML="selected=\"selected\""
-            html.append("<option value=%s %s>%s</option>"%(quoteattr(self._aw.getUser().getEmail().strip()),selHTML,self._aw.getUser().getEmail().strip()))
-            emails.append(self._aw.getUser().getEmail().strip())
-        if self.__conf.getCreator() is not None and self.__conf.getCreator().getEmail().strip() not in emails:
-            selHTML=""
-            if selected.strip()==self.__conf.getCreator().getEmail().strip():
-                foundEmail=True
-                selHTML="selected=\"selected\""
-            html.append("<option value=%s %s>%s &#60;%s&#62;</option>"%(quoteattr(self.__conf.getCreator().getEmail().strip()),selHTML,self.__conf.getCreator().getFullName(), self.__conf.getCreator().getEmail().strip()))
-        #selHTML=""
-        #if selected.strip()==self.__conf.getTitle().strip():
-        #    foundEmail=True
-        #    selHTML="selected=\"selected\""
-        #html.append("<option value=%s %s>%s</option>"%(quoteattr(self.__conf.getTitle().strip()),selHTML,self.__conf.getTitle().strip()))
-        if not foundEmail:
-            selHTML="selected=\"selected\""
-            html.append("<option value=%s %s>%s</option>"%(quoteattr(selected.strip()),selHTML,selected.strip()))
-        return "".join(html)
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["alarmId"] = vars.get("alarmId","")
-        vars["confTitle"] = self.__conf.getTitle()
-        vars["formTitle"] = vars.get("formTitle", _("Create a new alarm email"))
-        vars["fromOptions"] = self._getFromOptionsHTML(vars.get("fromEmail",""))
-        vars["toEmails"] = vars.get("toEmails","")
-        if vars["toEmails"] != "" :
-            vars["definedRecipients"] = "checked"
-            vars["recipientsDisabled"] = ""
-        else :
-            vars["definedRecipients"] = ""
-            vars["recipientsDisabled"] = """disabled="disabled" """
-        vars["includeConf"] = vars.get("includeConf","")
-        vars["note"] = vars.get("note","")
-        vars["timezone"] = self.__conf.getTimezone()
-        return vars
-
-#---------------------------------------------------------------------------------------
-
 class WConfDisplayAlarm( wcomponents.WTemplated ):
 
     def __init__(self, conference, aw):
-            self.__conf = self.__target = conference
-            self._aw=aw
+        self.__conf = self.__target = conference
+        self._aw=aw
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -5342,73 +5269,76 @@ class WConfDisplayAlarm( wcomponents.WTemplated ):
         vars["confTZ"]= timezone(self.__target.getTimezone())
         vars["alarmList"] = self.__target.getAlarmList()
         vars["timezone"] = self.__target.getTimezone()
-        vars["notScheduledMsg"] = _("The alarm is being scheduled, please wait some seconds and refresh the page.")
-        vars["alarmSentMsg"] = _("The alarm can no longer be edited as it has already been sent.")
+        vars["addAlarmURL"] = urlHandlers.UHConfAddAlarm.getURL( self.__conf )
+        vars["deleteAlarmURL"] = urlHandlers.UHConfDeleteAlarm.getURL()
+        vars["modifyAlarmURL"] = urlHandlers.UHConfModifyAlarm.getURL()
         return vars
 
 class WPConfDisplayAlarm( WPConfModifToolsBase ):
 
     def _getTabContent( self, params ):
         wc = WConfDisplayAlarm( self._conf, self._rh._getUser() )
-        p = {
-"addAlarmURL": urlHandlers.UHConfAddAlarm.getURL( self._conf ), \
-"deleteAlarmURL": urlHandlers.UHConfDeleteAlarm.getURL(), \
-"modifyAlarmURL": urlHandlers.UHConfModifyAlarm.getURL(), \
-    }
-        return wc.getHTML( p )
+        return wc.getHTML()
+
+#---------------------------------------------------------------------------------------
+
+class WSetAlarm(wcomponents.WTemplated):
+
+    def __init__(self, conference, aw):
+        self.__conf = conference
+        self._aw=aw
+
+    def _getFromList(self):
+        fromList = {}
+        for ch in self.__conf.getChairList():
+            if not fromList.has_key(ch.getEmail().strip()):
+                fromList[ch.getEmail().strip()] = ch.getFullName()
+        if self.__conf.getSupportEmail().strip()!="" and not fromList.has_key(self.__conf.getSupportEmail().strip()):
+            fromList[self.__conf.getSupportEmail().strip()] = self.__conf.getSupportEmail().strip()
+        if self._aw.getUser() is not None and not fromList.has_key(self._aw.getUser().getEmail().strip()):
+            fromList[self._aw.getUser().getEmail().strip()] = self._aw.getUser().getFullName()
+        if self.__conf.getCreator() is not None and not fromList.has_key(self.__conf.getCreator().getEmail().strip()):
+            fromList[self.__conf.getCreator().getEmail().strip()] = self.__conf.getCreator().getFullName()
+        return fromList
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        if vars.has_key("alarmId"):
+            vars["formTitle"] =  _("Create a new alarm email")
+        else:
+            vars["formTitle"] =  _("Modify alarm data")
+        vars["timezone"] = self.__conf.getTimezone()
+        vars["conference"] = self.__conf
+        vars["today"] = datetime.today()
+        vars["fromList"] = self._getFromList()
+        return vars
 
 class WPConfAddAlarm( WPConfModifToolsBase ):
 
     def _setActiveTab( self ):
         self._tabAlarms.setActive()
 
-
     def _getTabContent( self, params ):
-        p = WSetAlarm( self._conf, self._getAW() )
-        testSendAlarm = i18nformat("""<input type="submit" class="btn" value="_("send this alarm email now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
-        if self._rh._getUser():
-            testSendAlarm += i18nformat(""" <input type="submit" class="btn" value="_("send me this alarm email as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
-        thisyear=datetime.today().year
-        thismonth=datetime.today().month
-        thisday=datetime.today().day
-        yearoptions=""
-        for i in range(thisyear,thisyear+10):
-            yearoptions+="<OPTION VALUE='%s'>%s" % (i,i)
-        monthoptions=""
-        for i in range(1,13):
-            if i==thismonth:
-                selecttext=" selected"
-            else:
-                selecttext=""
-            monthoptions+="<OPTION VALUE='%02d'%s>%s" % (i,selecttext,datetime(1900,i,1).strftime("%B"))
-        dayoptions=""
-        for i in range(1,32):
-            if i==thisday:
-                selecttext=" selected"
-            else:
-                selecttext=""
-            dayoptions+="<OPTION VALUE='%02d'%s>%02d" %(i,selecttext,i)
-        pars = { \
-"cancelURL": urlHandlers.UHConfDisplayAlarm.getURL( self._conf ), \
-"saveAlarm": urlHandlers.UHSaveAlarm.getURL( self._conf ), \
-"confId": self._conf.getId(), \
-"yearOptions": yearoptions, \
-"monthOptions": monthoptions, \
-"dayOptions": dayoptions, \
-"testSendAlarm": testSendAlarm }
-        pars["toAllParticipants"] = params.get("toAllParticipants","")
-        pars["selec1"] = " checked"
-        pars["selec2"] = pars["selec3"] = ""
-        pars["hour"] = ""
-        for i in range(0,24):
-            pars["hour"] += "<OPTION VALUE=\"%s\">%sH\n"%(string.zfill(i,2),string.zfill(i,2))
-        pars["hourBefore"] = ""
-        for i in range(1,24):
-            pars["hourBefore"] += "<OPTION VALUE=\"%s\">H-%s\n"%(string.zfill(i,2),i)
-        pars["dayBefore"] = ""
-        for i in range(1,8):
-            pars["dayBefore"] += "<OPTION VALUE=\"%s\">D-%s\n"%(string.zfill(i,2),i)
-        return p.getHTML( pars )
+        wc = WSetAlarm( self._conf, self._getAW() )
+        pars = {}
+        pars["alarmId"] = self._rh._reqParams.get("alarmId","")
+        pars["user"] = self._rh._getUser()
+        pars["fromAddr"] = self._rh._reqParams.get("fromAddr","")
+        pars["Emails"] = self._rh._reqParams.get("Emails","")
+        pars["note"] = self._rh._reqParams.get("note","")
+        pars["includeConf"] = (self._rh._reqParams.get("includeConf","")=="1")
+        pars["toAllParticipants"] =  (self._rh._reqParams.get("toAllParticipants",False) == "on")
+        pars["dateType"] = int(self._rh._reqParams.get("dateType",-1))
+        tz=self._conf.getTimezone()
+        now = nowutc().astimezone(timezone(tz))
+        pars["year"]=self._rh._reqParams.get("year",now.year)
+        pars["month"] = self._rh._reqParams.get("month",now.month)
+        pars["day"] = self._rh._reqParams.get("day",now.day)
+        pars["hour"] = self._rh._reqParams.get("hour","08")
+        pars["minute"] = self._rh._reqParams.get("minute","00")
+        pars["timeBefore"] = int(self._rh._reqParams.get("_timeBefore",0))
+        pars["timeTypeBefore"] = self._rh._reqParams.get("dayBefore","")
+        return wc.getHTML( pars )
 
 #--------------------------------------------------------------------
 
@@ -5418,113 +5348,47 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
         WPConfModifToolsBase.__init__(self, caller, conf)
         self._alarm = alarm
 
-
     def _getTabContent( self, params ):
-
-        confTZ = timezone(self._conf.getTimezone())
-
-        p = WSetAlarm(self._conf, self._getAW())
-
-        vars = { \
-            "cancelURL": urlHandlers.UHConfDisplayAlarm.getURL( self._conf ), \
-            "saveAlarm": urlHandlers.UHConfSaveAlarm.getURL(), \
-            "confId": self._conf.getId(), \
-            "alarmId": self._alarm.getConfRelativeId(), \
-            "confTitle": self._conf.getTitle() }
-        vars["selec1"] = vars["selec2"] = vars["selec3"] = ""
-        year = month = day = hour = dayBefore = hourBefore = -1
+        wc = WSetAlarm(self._conf, self._getAW())
+        pars ={}
+        pars["alarmId"] = self._alarm.getConfRelativeId()
+        pars["timeBeforeType"] = ""
+        timeBefore=0
+        year = month = day = hour = minute = -1
         if self._alarm.getTimeBefore():
+            pars["dateType"] = 2
             #the date is calculated from the conference startdate
             if self._alarm.getTimeBefore() < timedelta(days=1):
-                vars["selec3"] = "checked"
-                hourBefore = int(self._alarm.getTimeBefore().seconds/3600)
+                pars["timeBeforeType"] = "hours"
+                timeBefore = int(self._alarm.getTimeBefore().seconds/3600)
             else:
                 #time before upper to 1 day
-                vars["selec2"] = "checked"
-                dayBefore = int(self._alarm.getTimeBefore().days)
-            startyear=datetime.today().year
+                pars["timeBeforeType"] = "days"
+                timeBefore = int(self._alarm.getTimeBefore().days)
         else:
             #the date is global
-            vars["selec1"] = "checked"
-            startOn = self._alarm.getStartOn().astimezone(confTZ)
+            pars["dateType"] = 1
+            startOn = self._alarm.getStartOn().astimezone(timezone(self._conf.getTimezone()))
             if startOn != None:
-                startyear = year = int(startOn.year)
-                month = int(startOn.month)
-                day = int(startOn.day)
-                hour = int(startOn.hour)
-        vars["dayOptions"] = ""
-        for i in range(1,32):
-            sel = ""
-            if i == day:
-                sel = "selected"
-            vars["dayOptions"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(string.zfill(i,2),sel,string.zfill(i,2))
-
-        vars["monthOptions"] = ""
-        for i in range(1,13):
-            sel = ""
-            if i == month:
-                sel = "selected"
-            vars["monthOptions"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(string.zfill(i,2),sel,datetime(1900,i,1).strftime("%B"))
-
-        vars["yearOptions"] = ""
-        for i in range(startyear,startyear+10):
-            sel = ""
-            if i == year:
-                sel = "selected"
-            vars["yearOptions"] += "<OPTION VALUE=\"%s\"%s>%s\n"%(string.zfill(i,4),sel,string.zfill(i,4))
-
-        vars["hour"] = ""
-        for i in range(0,24):
-            sel = ""
-            if i == hour:
-                sel = "selected"
-            vars["hour"] += "<OPTION VALUE=\"%s\"%s>%sH\n"%(string.zfill(i,2),sel,string.zfill(i,2))
-
-        vars["hourBefore"] = ""
-        for i in range(1,24):
-            sel = ""
-            if i == hourBefore:
-                sel = "selected"
-            vars["hourBefore"] += "<OPTION VALUE=\"%s\"%s>H-%s\n"%(string.zfill(i,2),sel,i)
-
-        vars["dayBefore"] = ""
-        for i in range(1,8):
-            sel = ""
-            if i == dayBefore:
-                sel = "selected"
-            vars["dayBefore"] += "<OPTION VALUE=\"%s\"%s>D-%s\n"%(string.zfill(i,2),sel,i)
-
-        vars["subject"] = self._alarm.getSubject()
-        vars["toEmails"] = ", ".join(self._alarm.getToAddrList())
-        vars["fromEmail"] = self._alarm.getFromAddr()
-        vars["text"] = self._alarm.getText()
-        vars["note"] = self._alarm.getNote()
-        vars["formTitle"] = _("Modify alarm data")
-
-        if self._alarm.getToAllParticipants() :
-            vars["toAllParticipants"] = i18nformat("""
-        <tr>
-            <td>&nbsp;<input type="checkbox" name="toAllParticipants" checked="checked"></td>
-            <td> _("Send alarm to all participants of the event.")</td>
-        </tr>
-        """)
-        else :
-            vars["toAllParticipants"] = i18nformat("""
-        <tr>
-            <td>&nbsp;<input type="checkbox" name="toAllParticipants" ></td>
-            <td> _("Send alarm to all participants of the event.")</td>
-        </tr>
-        """)
-
-        testSendAlarm = i18nformat("""<input type="submit" class="btn" value="_("send this alarm now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
-        if self._rh._getUser():
-            testSendAlarm += i18nformat(""" <input type="submit" class="btn" value="_("send me this alarm as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
-
-        vars["testSendAlarm"] = testSendAlarm
-        if self._alarm.getConfSummary():
-            vars["includeConf"] = "checked"
-
-        return p.getHTML( vars )
+                month = startOn.month
+                day = startOn.day
+                hour = startOn.hour
+                minute = startOn.minute
+                year = startOn.year
+        pars["day"] = day
+        pars["month"] = month
+        pars["year"] = year
+        pars["hour"] = hour
+        pars["minute"] = minute
+        pars["timeBefore"] = timeBefore
+        pars["subject"] = self._alarm.getSubject()
+        pars["Emails"] = ", ".join(self._alarm.getToAddrList())
+        pars["fromAddr"] = self._alarm.getFromAddr()
+        pars["text"] = self._alarm.getText()
+        pars["note"] = self._alarm.getNote()
+        pars["toAllParticipants"] =  self._alarm.getToAllParticipants()
+        pars["includeConf"] = self._alarm.getConfSummary()
+        return wc.getHTML( pars )
 
 #----------------------------------------------------------------------------------
 

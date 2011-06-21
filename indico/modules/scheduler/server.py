@@ -453,7 +453,7 @@ class Scheduler(object):
         # get rid of it
         self._db_moveTask(task,
                           oldStatus,
-                          base.TASK_STATUS_FAILED)
+                          base.TASK_STATUS_NONE)
 
         self._logger.info("%s dequeued from status %s" % \
                           (task, base.status(oldStatus)))

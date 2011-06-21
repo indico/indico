@@ -1,19 +1,4 @@
-<script type="text/javascript">
-<!--
-function setEmailsState()
-{
-    if (document.getElementById("email").disabled){
-        document.getElementById("email").disabled = false
-    } else {
-        document.getElementById("email").disabled = true
-    }
-}
-//-->
-</script>
-
-
-<center>
-<table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
+<table width="60%" border="0">
   <tr>
     <td colspan="5" class="groupTitle">${ formTitle }</td>
   </tr>
@@ -21,8 +6,7 @@ function setEmailsState()
     <td>
 <br>
 <TABLE border="0" align="center" width="100%">
-<form action="${ saveAlarm }" methode="POST" name="alarmForm">
-<input type="hidden" name="confId" value="${ confId }">
+<form method="POST" name="alarmForm">
 <input type="hidden" name="alarmId" value="${ alarmId }">
     <tr>
       <td align="right">
@@ -36,43 +20,29 @@ function setEmailsState()
 </tr>
 <tr>
     <td>
-        <input name="dateType" type="radio" value="1" ${ selec1 }>  ${ _("At this date")}:
+        <input name="dateType" type="radio" value="1" ${ "checked" if dateType == 1 else "" }>  ${ _("At this date")}:
     </td>
-    <td nowrap>
-        <SMALL>
-        <SELECT name=day >
-            ${ dayOptions }
-        </SELECT>
-        <SELECT name=month >
-            ${ monthOptions }
-        </SELECT>
-        <SELECT name=year >
-            ${ yearOptions }
-        </SELECT>&nbsp;&nbsp;&nbsp;
-        <SELECT name=hour >
-            ${ hour }
-        </SELECT>
+    <td nowrap class="contentCellTD">
+                <span id="datePlace"></span>
+                <input type="hidden" id="day" name="day" value="${ day }">
+                <input type="hidden" id="month"  name="month" value="${ month }">
+                <input type="hidden" id="year" name="year" value="${ year }">
+                <input type="hidden" id="hour" name="hour" value="${ hour }">
+                <input type="hidden" id="minute" name="minute" value="${ minute }">
         (${ timezone })
     </td>
 </tr>
 <tr>
    <td>
-        <input name="dateType" type="radio" value="2" ${ selec2 }> ${ _("Day before the beginning of the event")}:
+        <input name="dateType" type="radio" value="2" ${ "checked" if dateType == 2 else "" }> ${ _("Time before the beginning of the event")}:
     </td>
     <td>
-        <SELECT name=dayBefore >
-          ${ dayBefore }
-        </SELECT>
-  </td>
-</tr>
-<tr>
-  <td>
-        <input name="dateType" type="radio" value="3" ${ selec3 }> ${ _("Hours before the beginning of the event")}:
-    </td>
-    <td>
-        <SELECT name=hourBefore >
-          ${ hourBefore }
-        </SELECT>
+        <input size="3" name="timeBefore" value="${timeBefore}">
+
+        <select name=timeTypeBefore >
+                <option value="hours" ${"selected" if dateType == 2 else ""}>${_("Hours")}
+                <option value="days" ${"selected" if dateType == 3 else ""}>${_("Days")}
+        </select>
   </td>
 </tr>
 </table>
@@ -88,8 +58,17 @@ function setEmailsState()
     <tr>
         <td>&nbsp;</td>
         <td>
-            <select name="fromAddr" style="width:425px">
-                ${ fromOptions }
+            <select name="fromAddr" id="fromAddr" style="width:425px">
+                <option value="">--${_("select a from address")}--</option>
+                % for contact in fromList:
+                    <option value="${contact}" ${"selected" if fromAddr.strip() == contact else ""}>
+                    % if contact == fromList[contact]:
+                        ${contact}
+                    % else:
+                        ${fromList[contact]} &#60;${contact}&#62;
+                    % endif
+                    </option>
+                % endfor
             </select>
         </td>
     </tr>
@@ -97,14 +76,17 @@ function setEmailsState()
     <tr>
         <td colspan="2"><b>&nbsp; ${ _("Send alarm to")}:</b></td>
     </tr>
-        ${ toAllParticipants }
     <tr>
-        <td>&nbsp;<input type="checkbox" name="defineRecipients" onClick="setEmailsState()" ${ definedRecipients }></td>
+        <td>&nbsp;<input type="checkbox" name="toAllParticipants" ${"checked" if toAllParticipants else ""}></td>
+        <td> ${_("Send alarm to all participants of the event.")}</td>
+    </tr>
+    <tr>
+        <td>&nbsp;<input type="checkbox" name="defineRecipients" onClick="setEmailsState()" ${ "checked" if Emails!="" else "" }></td>
         <td> ${ _("Define recipients (comma-separated list of email addresses)")} :</td>
     </tr>
     <tr>
         <td>&nbsp;</td>
-        <td><input type="text" name="Emails" id="email" size="90%" ${ recipientsDisabled } value="${ toEmails }"></td>
+        <td><input type="text" name="Emails" id="email" size="90%" ${ "disabled='disabled'" if Emails=="" else "" }value="${ Emails }"></td>
     </tr>
     <tr><td>&nbsp;</td></tr>
     <tr>
@@ -112,21 +94,24 @@ function setEmailsState()
     <tr>
     </tr>
         <td>&nbsp;</td>
-        <td align="right"><textarea name="note" rows="5" style="width:100%;" >${ note }</textarea></td>
+        <td align="right"><textarea id="note" name="note" rows="5" style="width:100%;" >${ note }</textarea></td>
     </tr>
     <tr>
         <td colspan="2" align="left">
         <br>
-        &nbsp;<input name="includeConf" type="checkbox" value="1" ${ includeConf }> ${ _("Include a text version of the agenda in the email")}
+        &nbsp;<input name="includeConf" id="includeConf" type="checkbox" value="1" ${ "checked" if includeConf else ""}> ${ _("Include a text version of the agenda in the email")}
         </td>
     </tr>
-    </SMALL>
 </table>
       </TD></tr>
-    <tr><td align="center" colspan="2">
-        <br>
-        <input type="submit" class="btn" value="${ _("save the alarm")}"> ${ testSendAlarm }
-      </td>
+    <tr>
+        <td align="center" colspan="2">
+            <br>
+            <input type="submit" class="btn" value="${ _("Save")}" onClick="this.form.action='${ urlHandlers.UHSaveAlarm.getURL( conference ) }'">
+            <input type="submit" class="btn" value="${_("Send now")}" onClick="this.form.action='${urlHandlers.UHSendAlarmNow.getURL(conference)}';">
+            <input type="submit" class="btn" value="${_("Send me as a test")}" onClick="return sendTestAlarm(this.form); return false;">
+             <input type="submit" class="btn" value="${ _("Cancel")}" onClick="this.form.action='${urlHandlers.UHConfDisplayAlarm.getURL( conference )}';">
+        </td>
     </tr>
 </form>
 </table>
@@ -134,7 +119,44 @@ function setEmailsState()
 </td></tr>
 
 </table>
-<form action="${ cancelURL }" method="POST">
-    <input type="submit" class="btn" value="${ _("cancel")}">
-</form>
-</center>
+
+<script type="text/javascript">
+var setEmailsState = function ()
+{
+    if ($("#email").is(":disabled")){
+        $("#email").removeAttr("disabled");
+    } else {
+        $("#email").attr("disabled",true);
+    }
+};
+
+var sendTestAlarm = function (form)
+{
+    var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending the test alarm..."));
+    indicoRequest('event.alarm.sendTestNow', {
+        confId: ${conference.getId()},
+        fromAddr: $("#fromAddr").val(),
+        note: $("#note").val(),
+        includeConf: $("#includeConf").val(),
+    },
+    function(result, error) {
+        if(error) {
+            IndicoUtil.errorReport(error);
+            killProgress();
+        } else{
+            killProgress();
+            (new AlertPopup($T('Success'),$T("The test alarm has been succesfully sent."))).open();
+        }
+    });
+    return false;
+};
+
+IndicoUI.executeOnLoad(function()
+{
+    var dateAlarm = IndicoUI.Widgets.Generic.dateField(true,null,['day', 'month', 'year','hour', 'minute']);
+    $('#datePlace').append($(dateAlarm.dom));
+    % if day != '':
+        dateAlarm.set('${ day }/${ month }/${ year } ${ hour }:${ minute }');
+    % endif
+});
+</script>

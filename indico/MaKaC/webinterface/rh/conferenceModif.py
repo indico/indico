@@ -1921,11 +1921,7 @@ class RHConfModifTools( RHConferenceModifBase ):
     _allowClosed = True
 
     def _process( self ):
-        wf = self.getWebFactory()
-        if wf is not None and not self._conf.isClosed():
-            p = wf.getConfModifTools(self, self._conf)
-        else:
-            p = conferences.WPConfClone(self, self._target)
+        p = conferences.WPConfDisplayAlarm(self, self._target)
         return p.display()
 
 class RHConfModifListings( RHConferenceModifBase ):
@@ -3126,12 +3122,7 @@ class RHConfDisplayAlarm( RHConferenceModifBase ):
 class RHConfAddAlarm( RHConferenceModifBase ):
 
     def _process( self ):
-
-        wf=self.getWebFactory()
-        if wf is not None:
-            p = wf.getConfAddAlarm(self, self._conf)
-        else :
-            p = conferences.WPConfAddAlarm( self, self._conf )
+        p = conferences.WPConfAddAlarm( self, self._conf )
         return p.display()
 
 class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
@@ -3145,50 +3136,59 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
         if not params.has_key("toAllParticipants") and (not params.has_key("defineRecipients")
                                                         or (params.has_key("defineRecipients") and params.get("Emails","")=="")):
             raise FormValuesError( _("""Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."""))
+        self._toAllParticipants = params.get("toAllParticipants", False)
+        self._defineRecipients = params.get("defineRecipients", False)
+        self._emails = params.get("Emails","")
 
-        params = self._getRequestParams()
+        if not params.has_key("dateType") or params.get("dateType","")=="":
+            raise FormValuesError(_("Please choose when to send this alarm"))
 
         self._dateType = params["dateType"]
         self._year = int(params["year"])
         self._month = int(params["month"])
         self._day = int(params["day"])
         self._hour = int(params["hour"])
-        self._dayBefore = params["dayBefore"]
-        self._hourBefore = params["hourBefore"]
-        self._emails = params.get("Emails","")
+        self._minute = int(params["minute"])
+        self._timeBefore = params["timeBefore"]
+        self._timeTypeBefore = params["timeTypeBefore"]
+        self._note = params.get("note","")
+        self._includeConf = params.get("includeConf",None)
+        self._alarmId = params.get("alarmId",None)
+        self._testAlarm = False
 
     def _initializeAlarm(self, dryRun = False):
-
         if self._dateType == "1":
             dtStart = timezone(self._conf.getTimezone()).localize(
                 datetime(self._year,
                          self._month,
                          self._day,
-                         self._hour)).astimezone(timezone('UTC'))
+                         self._hour,
+                         self._minute)).astimezone(timezone('UTC'))
             relative = None
         else:
-            if self._dateType == "2":
-                delta = timedelta(days=int(self._dayBefore))
-            elif self._dateType == "3":
-                delta = timedelta(0, int(self._hourBefore) * 3600)
+            if self._timeTypeBefore=="days":
+                delta = timedelta(days=int(self._timeBefore))
+            elif self._timeTypeBefore=="hours":
+                delta = timedelta(0, int(self._timeBefore) * 3600)
             dtStart = self._target.getStartDate() - delta
             relative = delta
 
         if self._alarmId:
-            # Alarm modification
             al = self._conf.getAlarmById(self._alarmId)
             c = Client()
-            c.moveTask(al, dtStart)
+            if dryRun:
+                al.setStartOn(dtStart)
+                c.dequeue(al)
+            else:
+                c.moveTask(al, dtStart)
             al.setRelative(relative)
         else:
-            # Alarm creation
-            if dryRun:
-                al = tasks.AlarmTask(self._conf, 0, dtStart, relative=relative)
-            else:
-                al = self._conf.newAlarm(relative or dtStart)
+            al = self._conf.newAlarm(relative or dtStart, enqueue=not dryRun)
 
-        for addr in self._emails.split(","):
-            al.addToAddr(addr.strip())
+        al.setToAddrList([])
+        if(self._defineRecipients or self._testAlarm):
+            for addr in self._emails.split(","):
+                al.addToAddr(addr.strip())
 
         al.setFromAddr(self._fromAddr)
         al.setSubject("Event reminder: %s" % self._target.getTitle())
@@ -3241,184 +3241,49 @@ Best Regards%s
         else:
             al.setConfSummary(False)
 
+        al.setToAllParticipants(self._toAllParticipants)
         self._al = al
 
-
-class RHConfSendAlarm( RHCreateAlarm ):
-
-    def _checkParams( self, params ):
-        RHCreateAlarm._checkParams( self, params )
-        self._note = params["note"]
-        if "includeConf" in params.keys():
-            self._includeConf = params["includeConf"]
-        else:
-            self._includeConf = None
-        if "alarmId" in params.keys():
-            self._alarmId = params["alarmId"]
-        else:
-            self._alarmId = None
-        if self._aw.getUser():
-            self._emails = self._aw.getUser().getEmail()
-        else:
-            self._emails = None
-
-    def _process( self ):
-        RHCreateAlarm._process(self)
-        params = self._getRequestParams()
-
-        if self._al:
-            self._al.run(check = False)
-            # if not self._alarmId:
-            #    self._conf.removeAlarm(self._al)
-
-            if params.get("toAllParticipants", False):
-                self._al.setToAllParticipants(True)
-            else :
-                self._al.setToAllParticipants(False)
-
-        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
-
-class RHConfSendAlarmNow( RHConfSendAlarm ):
+class RHConfSendAlarmNow( RHCreateAlarm ):
 
     def _checkParams( self, params ):
         RHCreateAlarm._checkParams( self, params )
-        self._note = params["note"]
-        if "includeConf" in params.keys():
-            self._includeConf = params["includeConf"]
-        else:
-            self._includeConf = None
-        if "alarmId" in params.keys():
-            self._alarmId = params["alarmId"]
-        else:
-            self._alarmId = None
-
-        self._emails = params.get("Emails","")
-
         emails = []
         if self._emails != "" :
             emails.append(self._emails)
-        if params.get("toAllParticipants",None) is not None :
-            for p in self._conf.getParticipation().getParticipantList() :
-                emails.append(p.getEmail())
+        if self._toAllParticipants:
+            if self._conf.getType()=="conference":
+                for r in self._conf.getRegistrantsList():
+                    emails.append(r.getEmail())
+            else:
+                for p in self._conf.getParticipation().getParticipantList() :
+                    emails.append(p.getEmail())
             self._emails = ", ".join(emails)
 
         self._initializeAlarm(dryRun = True)
 
-
-class ConfSendTestAlarm(RHConfSendAlarm):
-
-    def _checkParams( self, params ):
-        RHConfSendAlarm._checkParams( self, params )
-        if not params.has_key("fromAddr") or params.get("fromAddr","")=="":
-            raise FormValuesError( _("""Please choose a "FROM" address for this alarm"""))
-        self._fromAddr=params.get("fromAddr")
-
-        self._note = params["note"]
-        if "includeConf" in params.keys():
-            self._includeConf = params["includeConf"]
-        else:
-            self._includeConf = None
-        self._alarmId = None
-        if self._aw.getUser():
-            self._emails = self._aw.getUser().getEmail()
-        else:
-            self._emails = None
-
-        self._initializeAlarm(dryRun = True)
-
+    def _process( self ):
+        RHCreateAlarm._process(self)
+        if self._al:
+            self._al.run(check = False)
+            self._al.setStartedOn(timezoneUtils.nowutc())
+            self._al.setEndedOn(timezoneUtils.nowutc())
+        self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
 
 class RHConfSaveAlarm( RHCreateAlarm ):
 
-    def _createAlarm(self, dtStart):
-
-        if self._alarmId:
-            al = self._conf.getAlarmById(self._alarmId)
-        else:
-            al = self._conf.newAlarm(dtStart)
-
-        for addr in self._emails.split(","):
-            al.addToAddr(addr.strip())
-        al.setFromAddr(self._fromAddr)
-        al.setSubject("Event reminder: %s"%self._target.getTitle())
-        try:
-            locationText = self._target.getLocation().getName()
-            if self._target.getLocation().getAddress() != "":
-                locationText += ", %s" % self._target.getLocation().getAddress()
-            if self._target.getRoom().getName() != "":
-                locationText += " (%s)" % self._target.getRoom().getName()
-        except:
-            locationText = ""
-        if locationText != "":
-            locationText = i18nformat(""" _("Location"): %s""") % locationText
-        fullName="%s"%self._conf.getTitle()
-        if self._getUser() is not None:
-            fullName = ",\n%s" % self._getUser().getStraightFullName()
-        else:
-            fullName = ""
-        if Config.getInstance().getShortEventURL() != "":
-            url = "%s%s" % (Config.getInstance().getShortEventURL(),self._target.getId())
-        else:
-            url = urlHandlers.UHConferenceDisplay.getURL( self._target )
-        al.setText( _("""Hello,
-    Please note that the event "%s" will begin on %s (%s).
-    %s
-
-    You can access the full event here:
-    %s
-
-Best Regards%s
-
-    """)%(self._target.getTitle(),\
-                self._target.getAdjustedStartDate().strftime("%A %d %b %Y at %H:%M"),\
-                self._target.getTimezone(),\
-                locationText,\
-                url,\
-                fullName,\
-                ))
-        al.setNote(self._note)
-        if self._includeConf:
-            if self._includeConf == "1":
-                al.setConfSumary(True)
-            else:
-                al.setConfSumary(False)
-        else:
-            al.setConfSumary(False)
-        self._al = al
-
     def _checkParams( self, params ):
         RHCreateAlarm._checkParams( self, params )
-
-        emails = []
-        if self._emails != "" :
-            emails.append(self._emails)
-        self._note = params["note"]
-        if "includeConf" in params.keys():
-            self._includeConf = params["includeConf"]
-        else:
-            self._includeConf = None
-        if "alarmId" in params.keys():
-            self._alarmId = params["alarmId"]
-        else:
-            self._alarmId = None
-
         self._initializeAlarm()
 
-        if params.get("toAllParticipants", False):
-            self._al.setToAllParticipants(True)
-        else :
-            self._al.setToAllParticipants(False)
-
-
     def _process(self):
-        RHCreateAlarm._process(self)
-        params = self._getRequestParams()
-
         self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._target ) )
 
-
-class RHConfdeleteAlarm( RHAlarmBase ):
+class RHConfDeleteAlarm( RHAlarmBase ):
 
     def _process(self):
+        if self._alarm.getEndedOn():
+            raise MaKaCError(_("The alarm can not be deleted"))
         self._conf.removeAlarm(self._alarm)
         self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._conf ) )
 

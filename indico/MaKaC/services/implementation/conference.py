@@ -54,10 +54,11 @@ from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 
 from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
-        ResultWithWarning, TimingNoReportError
+        ResultWithWarning, TimingNoReportError, ServiceAccessError, NoReportError
 from MaKaC.fossils.contribution import IContributionFossil
-
-
+from indico.modules.scheduler import tasks
+from indico.util.i18n import i18nformat
+from MaKaC.common.Configuration import Config
 class ConferenceBase:
     """
     Base class for conference modification
@@ -766,6 +767,65 @@ class ConferenceContactInfoModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getAccessController().getContactInfo()
 
+class ConferenceAlarmSendTestNow(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._fromAddr = pm.extract("fromAddr", pType=str, allowEmpty=False)
+        self._note = pm.extract("note", pType=str, allowEmpty=True)
+        self._includeConf = pm.extract("includeConf", pType=str, allowEmpty=True, defaultValue="")
+
+    def _getAnswer(self):
+        al = tasks.AlarmTask(self._conf, 0, datetime.timedelta(), relative=datetime.timedelta())
+        al.setFromAddr(self._fromAddr)
+        al.setNote(self._note)
+        al.setConfSummary(self._includeConf == "1")
+
+        if self._getUser():
+            fullName = self._getUser().getStraightFullName()
+            al.addToAddr(self._aw.getUser().getEmail())
+        else:
+            raise NoReportError(_("You must be logged in to use this feature"))
+
+        try:
+            locationText = self._target.getLocation().getName()
+            if self._target.getLocation().getAddress() != "":
+                locationText += ", %s" % self._target.getLocation().getAddress()
+            if self._target.getRoom().getName() != "":
+                locationText += " (%s)" % self._target.getRoom().getName()
+        except:
+            locationText = ""
+        if locationText != "":
+            locationText = i18nformat(""" _("Location"): %s""") % locationText
+
+        if Config.getInstance().getShortEventURL() != "":
+            url = "%s%s" % (Config.getInstance().getShortEventURL(),
+                            self._target.getId())
+        else:
+            url = urlHandlers.UHConferenceDisplay.getURL( self._target )
+
+        al.setText( _("""Hello,
+    Please note that the event "%s" will begin on %s (%s).
+    %s
+
+    You can access the full event here:
+    %s
+
+Best Regards,
+
+%s
+
+    """)%(self._target.getTitle(),\
+                self._conf.getAdjustedStartDate().strftime("%A %d %b %Y at %H:%M"),\
+                self._conf.getTimezone(),\
+                locationText,\
+                url,\
+                fullName,\
+                ))
+        al.run(check = False)
+        return True;
+
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupportEmail": ConferenceSupportEmailModification,
@@ -793,5 +853,6 @@ methodMap = {
     "protection.removeAllowedUser": ConferenceProtectionRemoveUser,
     "protection.setAccessKey": ConferenceProtectionSetAccessKey,
     "protection.setModifKey": ConferenceProtectionSetModifKey,
-    "protection.changeContactInfo": ConferenceContactInfoModification
+    "protection.changeContactInfo": ConferenceContactInfoModification,
+    "alarm.sendTestNow": ConferenceAlarmSendTestNow
     }

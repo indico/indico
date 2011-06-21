@@ -120,6 +120,9 @@ class BaseTask(TimedEvent):
     def getStartedOn(self):
         return self.startedOn
 
+    def setStartedOn(self, dateTime):
+        self.startedOn = dateTime
+
     def setOnRunningListSince(self, sometime):
         self.onRunningListSince = sometime
         self._p_changed = 1
@@ -649,9 +652,12 @@ class AlarmTask(SendMailTask):
             locationText = " %s: %s" % (_("Location"), locationText)
 
         if self.getToAllParticipants() :
-            for p in self.conf.getParticipation().getParticipantList():
-                self.addToUser(p)
-
+            if self.conf.getType()=="conference":
+                for r in self.conf.getRegistrantsList():
+                    self.addToUser(r)
+            else:
+                for p in self.conf.getParticipation().getParticipantList() :
+                    self.addToUser(p)
         from MaKaC.webinterface import urlHandlers
         if Config.getInstance().getShortEventURL() != "":
             url = "%s%s" % (Config.getInstance().getShortEventURL(),self.conf.getId())

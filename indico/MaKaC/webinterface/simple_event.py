@@ -87,10 +87,6 @@ class WebFactory(WebFactory):
         return WPSEConfModifAC(rh, conf)
     getConfModifAC = staticmethod(getConfModifAC)
 
-    def getConfModifTools(rh, conf):
-        return WPSEConfDisplayAlarm(rh, conf)
-    getConfModifTools = staticmethod(getConfModifTools)
-
     def getConfModifBookings(rh, conf, bs):
         return WPSEConfModifBookings(rh, conf, bs)
     getConfModifBookings = staticmethod(getConfModifBookings)
@@ -627,30 +623,6 @@ class WPSEEvaluationInactive (WPSEEvaluationBase, evaluations.WPEvaluationInacti
     def _getBody(self, params):
         return evaluations.WPEvaluationInactive._getBody(self, params)
 
-#################### Alarms #####################################
-
-class WPSEConfDisplayAlarm(WPSEConfModifToolsBase, conferences.WPConfDisplayAlarm):
-
-    def _getTabContent(self, params):
-        return conferences.WPConfDisplayAlarm._getTabContent(self, params)
-
-    def _setActiveTab( self ):
-        self._tabAlarms.setActive()
-
-
-class WPSEConfAddAlarm(WPSEConfModifToolsBase, conferences.WPConfAddAlarm ):
-
-    def __init__(self, rh, conf):
-        WPSEConfModifToolsBase.__init__(self, rh, conf)
-
-    def _getTabContent(self, params):
-        params["toAllParticipants"] = """
-        <tr>
-            <td>&nbsp;<input type="checkbox" name="toAllParticipants"></td>
-            <td>Send alarm to all participants of the event.</td>
-        </tr>
-        """
-        return conferences.WPConfAddAlarm._getTabContent(self, params)
 
 ################# Minutes #########################################
 

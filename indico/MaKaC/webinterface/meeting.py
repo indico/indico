@@ -101,10 +101,6 @@ class WebFactory(WebFactory):
         return WPMConfModifAC(rh, conf)
 
     @staticmethod
-    def getConfModifTools(rh, conf):
-        return conferences.WPConfDisplayAlarm(rh, conf)
-
-    @staticmethod
     def getConfModifBookings(rh, conf, bs):
         return WPMConfModifBookings(rh, conf, bs)
 
@@ -1755,25 +1751,6 @@ class WPMEvaluationInactive (WPMEvaluationBase, evaluations.WPEvaluationInactive
 
     def _getBody(self, params):
         return evaluations.WPEvaluationInactive._getBody(self, params)
-
-#################### Alarms #####################################
-
-class WPMConfAddAlarm(WPMConfModifTools, conferences.WPConfAddAlarm):
-
-    def __init__(self, rh, conf):
-        WPMConfModifTools.__init__(self, rh, conf)
-
-    def _setActiveTab( self ):
-        self._tabAlarms.setActive()
-
-    def _getTabContent(self, params):
-        params["toAllParticipants"] =  i18nformat("""
-        <tr>
-            <td>&nbsp;<input type="checkbox" name="toAllParticipants"></td>
-            <td> _("Send alarm to all participants of the event.")</td>
-        </tr>
-        """)
-        return conferences.WPConfAddAlarm._getTabContent(self, params)
 
 class WPMTimeTableCustomizePDF(WPMeetingDisplay):
 

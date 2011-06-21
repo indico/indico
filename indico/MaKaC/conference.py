@@ -2721,7 +2721,8 @@ class Conference(CommonObjectBase, Locatable):
             owner.removeConference( self, notify=False )
 
         for alarm in self.getAlarmList():
-            self.removeAlarm(alarm)
+            if not alarm.getEndedOn():
+                self.removeAlarm(alarm)
 
         self.removeAllEvaluations()
 
@@ -4311,7 +4312,7 @@ class Conference(CommonObjectBase, Locatable):
         self._notify('cloneEvent', {'conf': conf, 'user': userPerformingClone, 'options': options})
         return conf
 
-    def newAlarm(self, when):
+    def newAlarm(self, when, enqueue=True):
 
         if type(when) == timedelta:
             relative = when
@@ -4325,7 +4326,7 @@ class Conference(CommonObjectBase, Locatable):
                              startDateTime=dtStart,
                              relative=relative)
 
-        self.addAlarm(al)
+        self.addAlarm(al, enqueue)
         return al
 
     def removeAlarm(self, alarm):
@@ -4343,10 +4344,10 @@ class Conference(CommonObjectBase, Locatable):
     def _getNextAlarmId(self):
         return self.__alarmCounter.newCount()
 
-    def addAlarm(self, alarm):
-        tl = Client()
-
-        tl.enqueue(alarm)
+    def addAlarm(self, alarm, enqueue = True):
+        if enqueue:
+            tl = Client()
+            tl.enqueue(alarm)
 
         self.alarmList[alarm.getConfRelativeId()] = alarm
         self._p_changed = 1

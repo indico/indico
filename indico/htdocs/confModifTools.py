@@ -49,13 +49,13 @@ def saveAlarm( req, **params ):
     return conferenceModif.RHConfSaveAlarm( req ).process( params )
 
 def testSendAlarm( req, **params ):
-    return conferenceModif.ConfSendTestAlarm( req ).process( params )
+    return conferenceModif.RHConfSendTestAlarm( req ).process( params )
 
 def sendAlarmNow( req, **params ):
     return conferenceModif.RHConfSendAlarmNow( req ).process( params )
 
 def deleteAlarm( req, **params ):
-    return conferenceModif.RHConfdeleteAlarm( req ).process( params )
+    return conferenceModif.RHConfDeleteAlarm( req ).process( params )
 
 def modifyAlarm( req, **params ):
     return conferenceModif.RHConfModifyAlarm( req ).process( params )
