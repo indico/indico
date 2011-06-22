@@ -453,12 +453,15 @@ class AbstractStatusTrackViewFactory:
 
 class WTrackModifAbstracts( wcomponents.WTemplated ):
 
-    def __init__( self, track, filterCrit, sortingCrit ):
+    def __init__( self, track, filterCrit, sortingCrit, order, filterUsed=False, canModify=False ):
         self._track = track
 
         self._conf = self._track.getConference()
         self._filterCrit = filterCrit
         self._sortingCrit = sortingCrit
+        self._order = order
+        self._filterUsed = filterUsed
+        self._canModify = canModify
 
     def _getAbstractHTML( self, abstract ):
         aStatus = AbstractStatusTrackViewFactory().getStatus( self._track, abstract )
@@ -484,17 +487,19 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         if abstract.getComments():
             comments = i18nformat(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
         html = """
-        <tr>
-            <td nowrap class="abstractLeftDataCell">%s%s</td>
-            <td width="100%%" align="left" valign="top" class="abstractDataCell">
-                <input type="checkbox" name="abstracts" value=%s%s> <a href=%s>%s</a></td>
-            <td valign="top" class="abstractDataCell">%s</td>
-            <td nowrap valign="top" class="abstractDataCell">%s %s</td>
-            <td valign="top" class="abstractDataCell">%s</td>
-            <td nowrap valign="top" class="abstractDataCell">%s</td>
+        <tr id="abstracts%s" style="background-color: transparent;" onmouseout="onMouseOut('abstracts%s')" onmouseover="onMouseOver('abstracts%s')">
+            <td align="right" width="3%%" valign="top"><input type="checkbox" onchange="isSelected('abstracts%s')" name="abstracts" value=%s%s></td>
+            <td nowrap class="CRLabstractDataCell">%s%s</td>
+            <td width="100%%" align="left" valign="top" class="CRLabstractDataCell">
+                <a href=%s>%s</a></td>
+            <td valign="top" class="CRLabstractDataCell">%s</td>
+            <td nowrap valign="top" class="CRLabstractDataCell">%s %s</td>
+            <td valign="top" class="CRLabstractDataCell">%s</td>
+            <td nowrap valign="top" class="CRLabstractDataCell">%s</td>
         </tr>
-                """%(self.htmlText(abstract.getId()),comments,\
-                    quoteattr(str(abstract.getId())),self._checked, \
+                """%(abstract.getId(), abstract.getId(), abstract.getId(), abstract.getId(), \
+                     quoteattr(str(abstract.getId())),self._checked, \
+                     self.htmlText(abstract.getId()),comments,\
                     quoteattr(str(url)),self.htmlText(abstract.getTitle()),\
                     self.htmlText(contribTypeName),icon, \
                     label,self.htmlText(accType),\
@@ -504,6 +509,7 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
     def _getURL( self ):
         #builds the URL to the track management abstract list page
         #   preserving the current filter and sorting status
+
         url = urlHandlers.UHTrackModifAbstracts.getURL( self._track )
         if self._filterCrit.getField( "type" ):
             l=[]
@@ -529,7 +535,6 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
             url.addParam( "selOnlyComment", "1" )
         if self._sortingCrit.getField():
             url.addParam( "sortBy", self._sortingCrit.getField().getId() )
-        url.addParam("OK", "1")
         url.setSegment("abstracts")
         return url
 
@@ -596,46 +601,76 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         for abstract in abstractList:
             al.append( self._getAbstractHTML( abstract ) )
             abstractsToPrint.append("""<input type="hidden" name="abstracts" value="%s">"""%abstract.getId())
-        vars["number"] = str(len(abstractList))
+        vars["filteredNumberAbstracts"] = str(len(abstractList))
+        vars["totalNumberAbstracts"] = str(len(self._track.getAbstractList()))
+        if self._order == "up":
+            al.reverse()
         vars["abstracts"] = "".join( al )
         vars["abstractsToPrint"] = "\n".join(abstractsToPrint)
 
         sortingField = self._sortingCrit.getField()
         vars["currentSorting"] = ""
+
+
         url = self._getURL()
         url.addParam("sortBy", "type")
-        vars["typeSortingURL"] = quoteattr( str( url ) )
         vars["typeImg"] = ""
         if sortingField and sortingField.getId() == "type":
-            vars["typeImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="type">"""
+            if self._order == "down":
+                vars["typeImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order","up")
+            elif self._order == "up":
+                vars["typeImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order","down")
+        vars["typeSortingURL"] = quoteattr( str( url ) )
+
+        vars["statusImg"] = ""
         url = self._getURL()
         url.addParam("sortBy", "status")
-        vars["statusSortingURL"] = quoteattr( str( url ) )
-        vars["statusImg"] = ""
         if sortingField and sortingField.getId() == "status":
-            vars["statusImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="status">"""
+            if self._order == "down":
+                vars["statusImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order","up")
+            elif self._order == "up":
+                vars["statusImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order","down")
+        vars["statusSortingURL"] = quoteattr( str( url ) )
+
+        vars["numberImg"] = ""
         url = self._getURL()
         url.addParam("sortBy", "number")
-        vars["numberSortingURL"] = quoteattr( str( url ) )
-        vars["numberImg"] = ""
         if sortingField and sortingField.getId() == "number":
-            vars["numberImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="number">"""
+            if self._order == "down":
+                vars["numberImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order","up")
+            elif self._order == "up":
+                vars["numberImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order","down")
+        vars["numberSortingURL"] = quoteattr(str(url))
 
         url = self._getURL()
         url.addParam("sortBy", "date")
-        vars["dateSortingURL"] = quoteattr( str( url ) )
         vars["dateImg"] = ""
         if sortingField and sortingField.getId() == "date":
-            vars["dateImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
             vars["currentSorting"] = """<input type="hidden" name="sortBy" value="date">"""
+            if self._order == "down":
+                vars["dateImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order","up")
+            elif self._order == "up":
+                vars["dateImg"] = """<img src=%s alt="">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order","down")
+        vars["dateSortingURL"] = quoteattr( str( url ) )
+
         url = urlHandlers.UHTrackModifAbstracts.getURL( self._track )
+        url.addParam("order", self._order)
+        url.addParam("OK", "1")
         url.setSegment( "abstracts" )
         vars["filterPostURL"]=quoteattr(str(url))
         vars["accessAbstract"] = quoteattr(str(urlHandlers.UHTrackAbstractDirectAccess.getURL(self._track)))
-        vars["allAbstractsURL"] = quoteattr( str( urlHandlers.UHConfAbstractManagment.getURL( self._conf ) ) )
+        vars["allAbstractsURL"] = str(urlHandlers.UHConfAbstractManagment.getURL(self._conf))
         l = []
         for tpl in self._conf.getAbstractMgr().getNotificationTplList():
             l.append("""<option value="%s">%s</option>"""%(tpl.getId(), tpl.getName()))
@@ -644,13 +679,19 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         vars["abstractsPDFURL"]=quoteattr(str(urlHandlers.UHAbstractsTrackManagerDisplayPDF.getURL(self._track)))
         vars["actionURL"]=quoteattr(str(urlHandlers.UHAbstractsTrackManagerAction.getURL(self._track)))
         vars["selectURL"]=quoteattr(str(urlHandlers.UHTrackModifAbstracts.getURL(self._track)))
+        vars["filterUsed"] = self._filterUsed
+        vars["resetFiltersURL"] = str(urlHandlers.UHTrackModifAbstracts.getURL(self._track))
+        vars["pdfIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
+        vars["canModify"] = self._canModify
         return vars
 
 
 class WPTrackModifAbstracts( WPTrackModifBase ):
 
-    def __init__(self, rh, track, msg):
+    def __init__(self, rh, track, msg, filterUsed, order):
         self._msg = msg
+        self._filterUsed = filterUsed
+        self._order = order
         WPTrackModifBase.__init__(self, rh, track)
 
     def _setActiveTab( self ):
@@ -661,10 +702,12 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
         self._tabAbstracts.setActive()
 
     def _getTabContent( self, params ):
-
+        canModify = self._track.getConference().canModify(self._getAW())
         wc = WTrackModifAbstracts( self._track, \
                                     params["filterCrit"], \
-                                    params["sortingCrit"]  )
+                                    params["sortingCrit"], \
+                                    self._order, \
+                                    self._filterUsed, canModify )
         pars = { "selectAll": params.get("selectAll", None), \
                 "directAbstractMsg": escape(self._msg) }
         return wc.getHTML(pars)

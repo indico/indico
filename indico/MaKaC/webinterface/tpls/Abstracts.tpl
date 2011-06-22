@@ -248,7 +248,7 @@ document.filterOptionForm.showSubmissionDate.checked=false
                     <td valign="bottom" align="left"><input type="submit" class="btn" name="rejectMultiple" value="${ _("Reject") }">
                     <td valign="bottom" align="left"><input type="submit" class="btn" name="merge" value="${ _("Merge")}"></td>
                     <td valign="bottom" align="left"><input type="submit" class="btn" name="auth" value="${ _("Author list")}"></td>
-                    <td valign="bottom" align="left">Export to:</td>
+                    <td valign="bottom" align="left">${ _("Export to:") }</td>
                     <td valign="bottom" align="left"><input type="image" name="excel" src=${ excelIconURL} border="0"></td>
                     <td valign="bottom" align="left"><input type="image" name="pdf" src=${ pdfIconURL} border="0"></td>
                     <td valign="bottom" align="left"><input type="image" name="xml" src=${ xmlIconURL} border="0"></td>

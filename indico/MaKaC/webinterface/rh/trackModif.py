@@ -319,11 +319,11 @@ class RHTrackAbstractList( RHTrackAbstractsBase ):
 
     def _checkParams( self, params ):
         RHTrackAbstractsBase._checkParams( self, params )
-        filterUsed = params.has_key( "OK" ) #this variable is true when the
+        self._filterUsed = params.has_key( "OK" ) #this variable is true when the
                                             #   filter has been used
         filter = {}
         ltypes = []
-        if not filterUsed:
+        if not self._filterUsed:
             for type in self._conf.getContribTypeList():
                 ltypes.append(type)
         else:
@@ -331,14 +331,14 @@ class RHTrackAbstractList( RHTrackAbstractsBase ):
                 ltypes.append(self._conf.getContribTypeById(id))
         filter["type"]=ltypes
         lstatus=[]
-        if not filterUsed:
+        if not self._filterUsed:
             sl = tracks.AbstractStatusTrackViewFactory().getStatusList()
             for statusKlass in sl:
                 lstatus.append( statusKlass.getId() )
             pass
         filter["status"] = self._normaliseListParam( params.get("selStatus", lstatus) )
         ltypes = []
-        if not filterUsed:
+        if not self._filterUsed:
             for type in self._conf.getContribTypeList():
                 ltypes.append( type )
         else:
@@ -351,7 +351,7 @@ class RHTrackAbstractList( RHTrackAbstractsBase ):
             filter["comment"] = ""
         self._criteria = TrackAbstractsFilterCrit( self._track, filter )
         typeShowNoValue,accTypeShowNoValue=True,True
-        if filterUsed:
+        if self._filterUsed:
             typeShowNoValue =  params.has_key("typeShowNoValue")
             accTypeShowNoValue= params.has_key("accTypeShowNoValue")
         self._criteria.getField("type").setShowNoValue( typeShowNoValue )
@@ -359,10 +359,11 @@ class RHTrackAbstractList( RHTrackAbstractsBase ):
         self._sortingCrit = TrackAbstractsSortingCrit( self._track, [params.get( "sortBy", "number").strip()] )
         self._selectAll = params.get("selectAll", None)
         self._msg = params.get("directAbstractMsg","")
+        self._order = params.get("order","down")
 
 
     def _process( self ):
-        p = tracks.WPTrackModifAbstracts( self, self._track, self._msg )
+        p = tracks.WPTrackModifAbstracts( self, self._track, self._msg, self._filterUsed, self._order )
         return p.display( filterCrit= self._criteria, \
                             sortingCrit = self._sortingCrit, \
                             selectAll = self._selectAll )

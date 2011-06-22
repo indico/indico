@@ -4001,7 +4001,7 @@ class RHAbstractList(RHConfModifCFABase):
         sessionData = self._checkAction(params, filtersActive, sessionData, operation)
 
         # Maintain the state abotu filter usage
-        sessionData['filtersActive'] = self._filterUsed;
+        sessionData['filtersActive'] = self._filterUsed
 
         # Save the web session
         websession.setVar("abstractFilterAndSortingConf%s"%self._conf.getId(), sessionData)
