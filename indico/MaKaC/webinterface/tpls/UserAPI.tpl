@@ -18,7 +18,6 @@
             <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Secret Key")}</span></td>
             <td class="blacktext">
                 ${apiKey.getSignKey() if apiKey else _('None')}
-                ${inlineContextHelp(_('To use your API key you must sign &quot;Path?QueryString&TS&quot; (TS=int(UnixTimestamp/300)) using HMAC-SHA1 and append it to the query string, e.g. &quot;Path?QueryString&SignatureHash&quot;'))}
             </td>
         </tr>
     % endif
