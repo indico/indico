@@ -57,8 +57,9 @@ from MaKaC.rb_tools import Period, datespan
 
 from indico.web.http_api.util import get_query_parameter, remove_lists
 
-MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
-MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
+utc = pytz.timezone('UTC')
+MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
+MIN_DATETIME = utc.localize(datetime(2000, 1, 1))
 
 class ArgumentParseError(Exception):
     pass
