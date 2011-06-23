@@ -27,11 +27,16 @@ You can use the following placeholders:<br />{roomName}, {roomAtts[ATTNAME]}, {b
 """.strip()
 
 globalOptions = [
-    ("AuthorisedUsersGroups", {"description": "Users and Groups authorised for roombooking module",
-                          "type": 'usersGroups',
-                          "defaultValue": [],
-                          "editable": True,
-                          "visible": True}),
+    ( "Managers", {"description": "Users and Groups authorised to administrate/manage the roombooking module (create/delete/edit all rooms/bookings)",
+                                  "type": 'usersGroups',
+                                  "defaultValue": [],
+                                  "editable": True,
+                                  "visible": True}),
+    ( "AuthorisedUsersGroups", {"description": "Users and Groups authorised to access roombooking interface",
+                                "type": 'usersGroups',
+                                "defaultValue": [],
+                                "editable": True,
+                                "visible": True}),
     ("bookingsForRealUsers", {
         "description": _("Should bookings require an existing user in the 'booked for' field"),
         "type" : bool,
@@ -72,14 +77,4 @@ globalOptions = [
         "note": _emailReplacerNote}),
     ("notificationBefore", {"description" : _("Trigger start notifications X minutes before the booking starts. Changes will not affect existing bookings"),
                            "type": int,
-                           "defaultValue": 0} ),
-    ( "Managers", {"description": "Users and Groups authorised to administrate/manage the roombooking module (create/delete/edit all rooms/bookings)",
-                                  "type": 'usersGroups',
-                                  "defaultValue": [],
-                                  "editable": True,
-                                  "visible": True}),
-    ( "AuthorisedUsersGroups", {"description": "Users and Groups authorised for roombooking module",
-                                "type": 'usersGroups',
-                                "defaultValue": [],
-                                "editable": True,
-                                "visible": True})]
+                           "defaultValue": 0} )]

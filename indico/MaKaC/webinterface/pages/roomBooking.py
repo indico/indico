@@ -149,7 +149,6 @@ class WPRoomBookingBase( WPMainBase ):
             self._adminOpt = wcomponents.SideMenuItem(_("Administration"), \
                                             urlHandlers.UHRoomBookingAdmin.getURL() )
 
-
         self._leftMenu.addSection( self._roomsOpt )
         self._roomsOpt.addItem( self._roomSearchOpt )
         if Location.getDefaultLocation().isMapAvailable():
@@ -163,8 +162,9 @@ class WPRoomBookingBase( WPMainBase ):
         self._bookingsOpt.addItem( self._myPreBookingListOpt )
         self._bookingsOpt.addItem( self._usersBookings )
         self._bookingsOpt.addItem( self._usersPrebookings )
-        self._leftMenu.addSection( self._adminSect )
-        self._adminSect.addItem( self._adminOpt )
+        if self._rh._getUser().isRBAdmin():
+            self._leftMenu.addSection( self._adminSect )
+            self._adminSect.addItem( self._adminOpt )
         return self._leftMenu
 
     def _isRoomBooking(self):

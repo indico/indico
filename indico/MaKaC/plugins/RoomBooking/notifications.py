@@ -22,8 +22,8 @@ from indico.core.api.base import Component
 from zope.interface import implements
 from datetime import datetime, timedelta
 from persistent import Persistent
-from modules.scheduler.client import Client
-from modules.scheduler import tasks
+from indico.modules.scheduler.client import Client
+from indico.modules.scheduler import tasks
 from MaKaC.plugins.base import Observable, PluginsHolder
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.utils import getEmailList, formatDateTime
