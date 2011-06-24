@@ -11,11 +11,11 @@ The ID can be either a single event ID or a *-* separated list.
 Parameters
 ----------
 
-==========  =====  =======================================================
-Param       Short  Description
-==========  =====  =======================================================
-occurences  occ    Include the daily event times in the exported data.
-==========  =====  =======================================================
+===========  =====  =======================================================
+Param        Short  Description
+===========  =====  =======================================================
+occurrences  occ    Include the daily event times in the exported data.
+===========  =====  =======================================================
 
 
 Detail Levels
@@ -23,7 +23,7 @@ Detail Levels
 
 events
 ~~~~~~
-Returns basic data about the event. In this example occurences are
+Returns basic data about the event. In this example occurrences are
 included, too. ::
 
     {
