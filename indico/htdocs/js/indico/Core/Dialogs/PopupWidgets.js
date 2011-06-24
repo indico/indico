@@ -48,8 +48,8 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
             self.dateRangeWidget = $(structure.dom).daterange({
                 allowPast: true,
                 useFields: false,
-                startDate: this.startDate,
-                endDate: this.endDate,
+                startDate: self.startDate,
+                endDate: self.endDate,
                 pickerOptions: {
                     yearRange: 'c-2:c+2'
                 }
