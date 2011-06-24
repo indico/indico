@@ -10,7 +10,15 @@ The ID can be either a single category ID or a *-* separated list.
 
 Parameters
 ----------
-None
+
+========  =====  ==========================================================
+Param     Short  Description
+========  =====  ==========================================================
+location  l      Only include events taking place at the specified location.
+                 The `*` and `?` wildcards may be used.
+room      r      Only include events taking place in the specified room.
+                 The `*` and `?` wildcards may be used.
+========  =====  ==========================================================
 
 
 Detail Levels
