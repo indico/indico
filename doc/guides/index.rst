@@ -18,6 +18,7 @@ Contents:
    ./PaperReviewingGuides/index.rst
    ./Importer/Importer.rst
    ./AdminGuide/index.rst
+   ./ExportAPI/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
 

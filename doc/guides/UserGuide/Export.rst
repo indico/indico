@@ -81,7 +81,15 @@ where:
 * *date* is the starting date of the event (format: *yyyy-mm-dd* or *today*)
 * *days* is the number of days to export the events (starting on *date*)
 * *of* is the output format (one of *xml*, *html*, *ical*, *rss*)
-        
+
+
+Using the HTTP Export API
+-------------------------
+
+Basides the export.py script Indico has an export API which allows you to
+export categories, events, rooms and room bookings in various formats such
+as JSON, XML, iCal and Atom. For details no how to use this API, see
+:doc:`/ExportAPI/index`.
 
 --------------
 
