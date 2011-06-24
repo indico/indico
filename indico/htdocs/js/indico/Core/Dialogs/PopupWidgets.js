@@ -42,15 +42,18 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     },
 
     _drawWidget: function() {
+        var self = this;
         var structure = Html.div({style:{height: pixels(245)}});
-        this.dateRangeWidget = jQuery(structure.dom).daterange({
-            allowPast: true,
-            useFields: false,
-            startDate: this.startDate,
-            endDate: this.endDate,
-            pickerOptions: {
-                yearRange: 'c-2:c+2'
-            }
+        _.defer(function() {
+            self.dateRangeWidget = $(structure.dom).daterange({
+                allowPast: true,
+                useFields: false,
+                startDate: this.startDate,
+                endDate: this.endDate,
+                pickerOptions: {
+                    yearRange: 'c-2:c+2'
+                }
+            });
         });
 
         return structure;
