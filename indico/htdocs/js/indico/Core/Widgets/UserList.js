@@ -1,7 +1,4 @@
 
-
-
-
 /*
  * List of users: This component manage a listo of users, you can search and add users to the list, remove and edit them.
  * You can also add your own options
@@ -18,8 +15,9 @@
  * @param: kindOfUser -> String, kind of user identifier
  * @param: userCaption -> String to show in the texts
  * @param: elementClass -> String, css class of the elements in the list
- * @param: showGrantManagementCB -> show the checkbox to grant management rights in the AddNew/Edit popup
- * @param: showGrantSubmissionCB -> show the checkbox to grant submission rights in the AddNew/Edit popup
+ * @param: showGrantManagementCB -> Bool, show the checkbox to grant management rights in the AddNew/Edit popup
+ * @param: showGrantSubmissionCB -> Bool, show the checkbox to grant submission rights in the AddNew/Edit popup
+ * @param: showAffiliation -> Bool, show the affiliation of the user
  */
 type("ListOfUsersManager", [], {
 
@@ -104,8 +102,13 @@ type("ListOfUsersManager", [], {
         for (var i=0; i<result.length; i++) {
             var userRowElements = [];
 
-            var userFullName = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['fullName']);
-            userRowElements.push(userFullName);
+            if (this.showAffiliation && result[i]['affiliation'] != '') {
+                // Show submitter
+                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['fullName'] + ' ('+ result[i]['affiliation'] + ')');
+            } else {
+                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['fullName']);
+            }
+            userRowElements.push(userText);
 
             if (this.showEditIcon) {
                 // edit icon
@@ -246,7 +249,7 @@ type("ListOfUsersManager", [], {
 },
 
     function(confId, methods, userListParams, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
-             kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB) {
+             kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation) {
         this.conferenceId = confId;
         this.methods = methods;
         this.userListParams = userListParams;
@@ -260,6 +263,7 @@ type("ListOfUsersManager", [], {
         this.elementClass = elementClass;
         this.showGrantSubmissionCB = showGrantSubmissionCB;
         this.showGrantManagementCB = showGrantManagementCB;
+        this.showAffiliation = showAffiliation;
         var self = this;
         indicoRequest(
                 self.methods["getUserList"], self.userListParams,

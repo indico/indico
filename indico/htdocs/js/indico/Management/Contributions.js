@@ -372,6 +372,120 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         this.ListOfUsersManager(this.confId, this.methods,
                                 {confId: this.confId, contribId: this.contribId, kindOfList: kindOfUser},
                                 inPlaceListElem, false, false,
-                                false, true, kindOfUser, userCaption, elementClass, true, false);
+                                false, true, kindOfUser, userCaption, elementClass, true, false, false);
+    }
+);
+
+
+
+/*
+ * Manager of participant list in the contribution main tab
+ */
+type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
+
+    _getAddNewParams: function(userData) {
+        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userData: userData};
+        return params;
+    },
+
+    _getAddExistingParams: function(userList) {
+        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userList: userList};
+        return params;
+    },
+
+    _getEditParams: function(userData) {
+        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userData: userData};
+        return params;
+    },
+
+    _getRemoveParams: function(userId) {
+        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userId: userId};
+        return params;
+    },
+
+    _getGetUserParams: function(userId) {
+        var params = {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId, userId: userId};
+        return params;
+    },
+
+    addManagementMenu: function(){
+        var self = this;
+        this.inPlaceMenu.observeClick(function(e) {
+            var menuItems = {};
+
+            menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+
+            menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
+                                                                               true, true, false, true); };
+            menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
+
+            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
+            var pos = self.inPlaceMenu.getAbsolutePosition();
+            menu.open(pos.x, pos.y + 20);
+            return false;
+        });
+    },
+
+    _showEditUserPopup: function(userData) {
+        var self = this;
+        // get the user data
+        var user = $O(userData);
+        var editUserPopup = new UserDataPopup(
+                $T('Edit ') + self.userCaption + $T(' data'),
+                user,
+                function(newData) {
+                    if (editUserPopup.parameterManager.check()) {
+                        self._manageUserList(self.methods["edit"], self._getEditParams(newData));
+                        editUserPopup.close();
+                    }
+                }, false, false);
+        editUserPopup.open();
+    },
+
+    _addFromAuthorsList: function() {
+        var self = this;
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+        // Get the suggestedUsers
+        indicoRequest(this.methods["getAllAuthors"], {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId},
+                function(result, error) {
+                    if (!error) {
+                        killProgress();
+                        // Create the popup to add suggested users
+                        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
+                        //          showToggleFavouriteButtons, chooseProcess)
+                        var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
+                                result, false, false,
+                                function(userList) {self._manageUserList(self.methods["addAuthorAsPresenter"], self._getAddExistingParams(userList));}
+                        );
+                        chooseUsersPopup.execute();
+                    } else {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+        );
+    }
+
+},
+
+    function(confId, contribId, subContribId, inPlaceListElem, inPlaceMenu, userCaption) {
+        var self = this;
+        this.confId = confId;
+        this.contribId = contribId;
+        this.subContribId = subContribId;
+        this.methods = {'addNew': 'contribution.participants.subContribution.addNewParticipant',
+                        'addExisting': 'contribution.participants.subContribution.addExistingParticipant',
+                        'remove': 'contribution.participants.subContribution.removeParticipant',
+                        'edit': 'contribution.participants.subContribution.editParticipantData',
+                        'getUserData': 'contribution.participants.subContribution.getParticipantData',
+                        'getUserList': 'contribution.participants.subContribution.getParticipantsList',
+                        'getAllAuthors': 'contribution.participants.subContribution.getAllAuthors',
+                        'addAuthorAsPresenter': 'contribution.participants.subContribution.addAuthorAsPresenter'};
+
+        this.inPlaceMenu = inPlaceMenu;
+
+
+        this.ListOfUsersManager(confId, this.methods, {confId: confId, contribId: this.contribId, subContribId: this.subContribId},
+                                inPlaceListElem, true, true, false, false, null, userCaption, "UIPerson", false, false, true);
     }
 );

@@ -22,7 +22,7 @@
 from MaKaC.plugins import PluginsHolder, Observable
 from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
-    ISubContributionFossil, ISubContributionWithSpeakersFossil
+    ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
 from MaKaC.fossils.contribution import IContributionParticipationFossil,\
     IContributionFossil, IContributionWithSpeakersFossil, IContributionParticipationMinimalFossil, \
     IContributionWithSubContribsFossil,\
@@ -9565,7 +9565,7 @@ class ContribStatusNone(ContribStatus):
 
 class SubContribParticipation(Persistent, Fossilizable):
 
-    fossilizes(ISubContribParticipationFossil)
+    fossilizes(ISubContribParticipationFossil, ISubContribParticipationFullFossil)
 
     def __init__( self ):
         self._subContrib = None

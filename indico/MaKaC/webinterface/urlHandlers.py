@@ -1291,9 +1291,6 @@ class UHContribModSubmittersSel(URLHandler):
 class UHContribModSubmittersAdd(URLHandler):
     _relativeURL = "contributionAC.py/addSubmitters"
 
-class UHContributionAddSpeakers( URLHandler ):
-    _relativeURL = "contributionModification.py/addSpeakers"
-
 class UHContribModifMaterialMgmt( URLHandler ):
     _relativeURL = "contributionModification.py/materials"
 
@@ -1310,14 +1307,6 @@ class UHContributionAddMaterial( URLHandler ):
 class UHContributionPerformAddMaterial( URLHandler ):
     _relativeURL = "contributionModification.py/performAddMaterial"
 # </Deprecated>
-
-class UHContributionSelectSpeakers( URLHandler ):
-    _relativeURL = "contributionModification.py/selectSpeakers"
-
-
-class UHContributionRemoveSpeakers( URLHandler ):
-    _relativeURL = "contributionModification.py/removeSpeakers"
-
 
 class UHContributionAddDomain( URLHandler ):
     _relativeURL = "contributionAC.py/addDomains"
@@ -2522,33 +2511,8 @@ class UHSubContributionRemoveMaterials( URLHandler ):
 class UHSubContribModifAddMaterials( URLHandler ):
     _relativeURL = "subContributionModification.py/materialsAdd"
 
-class UHSubContributionSelectSpeakers( URLHandler ):
-    _relativeURL = "subContributionModification.py/selectSpeakers"
-
-
-class UHSubContributionAddSpeakers( URLHandler ):
-    _relativeURL = "subContributionModification.py/addSpeakers"
-
-class UHSubContributionNewSpeaker( URLHandler ):
-    _relativeURL = "subContributionModification.py/newSpeaker"
-
-class UHSubContributionRemoveSpeakers( URLHandler ):
-    _relativeURL = "subContributionModification.py/removeSpeakers"
-
-
 class UHSubContribModifTools( URLHandler ):
     _relativeURL = "subContributionTools.py"
-
-class UHSubContribModPresenter( URLHandler ):
-    _relativeURL = "subContributionModification.py/modPresenter"
-
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-        url.setParams(target.getSubContrib().getLocator())
-        url.addParam("authorId",target.getId())
-        return url
-    getURL = classmethod( getURL )
-
 
 class UHSessionModification( URLHandler ):
     _relativeURL = "sessionModification.py"

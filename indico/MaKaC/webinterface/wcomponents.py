@@ -4010,30 +4010,6 @@ class WUserSelection(WTemplated):
         vars["searchOptions"]+= i18nformat("""<input type="checkbox" name="exact" value="1" %s>  _("exact match")<br>""") % selected
         return vars
 
-class WAuthorSearch(WUserSelection):
-
-    def __init__(self, conf, searchURL, multi=True, addTo=0, forceWithoutExtAuth=False):
-        _title =  _("Search Users and Authors")
-        WUserSelection.__init__(self, searchURL, multi, addTo, forceWithoutExtAuth=forceWithoutExtAuth)
-        self._conf = conf
-
-
-    def _performSearch( self, criteria, exact=0  ):
-        #this should go in the PrincipalHolder match method
-        ah = user.AvatarHolder()
-        resUsers = ah.match(criteria, exact=exact, forceWithoutExtAuth=self._forceWithoutExtAuth)
-        auths = self._conf.getAuthorIndex()
-        resAuths = auths.match(criteria, exact=exact)
-        #crear una lista y devolver el resultado
-        l = []
-        emails = []
-        for usr in resUsers:
-            l.append(usr)
-            emails.append(usr.getEmail())
-        for author in resAuths :
-            if author.getEmail() not in emails:
-                l.append(author)
-        return l
 
 class WPrincipalSelection(WUserSelection):
 

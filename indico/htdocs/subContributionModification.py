@@ -25,30 +25,13 @@ def index(req, **params):
     return subContribMod.RHSubContributionModification( req ).process( params )
 
 def data( req, **params ):
-    return subContribMod.RHSubContributionData( req ).process( params )    
-
+    return subContribMod.RHSubContributionData( req ).process( params )
 
 def modifData( req, **params ):
     return subContribMod.RHSubContributionModifData( req ).process( params )
 
-
-def selectSpeakers(req, **params):
-    return subContribMod.RHSubContributionSelectSpeakers( req ).process( params )
-    
-
-def addSpeakers(req, **params):
-    return subContribMod.RHSubContributionAddSpeakers( req ).process( params )
-
-def newSpeaker  (req, **params):
-    return subContribMod.RHSubContribNewSpeaker( req ).process( params )
-
-def removeSpeakers(req, **params):
-    return subContribMod.RHSubContributionRemoveSpeakers( req ).process( params )
-    
-    
 def addMaterial(req, **params):
     return subContribMod.RHSubContributionAddMaterial( req ).process( params )
-
 
 def performAddMaterial(req, **params):
     return subContribMod.RHSubContributionPerformAddMaterial( req ).process( params )
@@ -59,9 +42,6 @@ def removeMaterials( req, **params ):
 
 def materialsAdd(req, **params):
     return subContribMod.RHMaterialsAdd(req).process(params)
-
-def modPresenter(req, **params):
-    return subContribMod.RHEditPresenter( req ).process( params )
 
 def materials(req, **params):
     return subContribMod.RHMaterials( req ).process( params )

@@ -200,6 +200,6 @@ type("ChairPersonsManager", ["ListOfUsersManager"], {
 
 
         this.ListOfUsersManager(this.confId, this.methods, {confId: this.confId}, inPlaceListElem, true, true, false,
-                                false, null, userCaption, "UIPerson", false, true);
+                                false, null, userCaption, "UIPerson", false, true, false);
     }
 );

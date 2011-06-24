@@ -12,6 +12,7 @@ from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import HTMLModificationBase
 from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.common.fossilize import fossilize
+from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 
 class ContributionBase(object):
@@ -584,6 +585,170 @@ class ContributionAddAuthorAsPresenter(ContributionParticipantsBase):
         return self._getParticipantsList(self._contribution.getSpeakerList())
 
 
+class SubContributionParticipantsBase(ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        self._pm = ParameterManager(self._params)
+        subContribId = self._pm.extract("subContribId", pType=str, allowEmpty=False)
+        self._subContrib = None
+        for subContrib in self._contribution.getSubContributionList():
+            if subContribId == subContrib.getId():
+                self._subContrib = subContrib
+        if self._subContrib == None:
+            raise ServiceError("ERR-SC0", _("Invalid subcontribution id."))
+
+    def _isEmailAlreadyUsed(self, email):
+        for part in self._subContrib.getSpeakerList():
+            if email == part.getEmail():
+                return True
+        return False
+
+
+class SubContributionGetParticipantsList(SubContributionParticipantsBase):
+
+    def _getAnswer(self):
+        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
+
+
+class SubContributionAddNewParticipant(SubContributionParticipantsBase):
+
+    def _checkParams(self):
+        SubContributionParticipantsBase._checkParams(self)
+        self._userData = self._pm.extract("userData", pType=dict, allowEmpty=False)
+        email = self._userData.get("email", "")
+        if email != "" and self._isEmailAlreadyUsed(email):
+            raise ServiceAccessError(_("The email address is already used by another participant or the user is already added to the list. Participant not added."))
+
+    def _newParticipant(self):
+        spk = conference.SubContribParticipation()
+        spk.setTitle(self._userData.get("title", ""))
+        spk.setFirstName(self._userData.get("firstName", ""))
+        spk.setFamilyName(self._userData.get("familyName", ""))
+        spk.setAffiliation(self._userData.get("affiliation", ""))
+        spk.setEmail(self._userData.get("email", ""))
+        spk.setAddress(self._userData.get("address", ""))
+        spk.setPhone(self._userData.get("phone", ""))
+        spk.setFax(self._userData.get("fax", ""))
+        self._subContrib.newSpeaker(spk)
+
+
+    def _getAnswer(self):
+        self._newParticipant()
+        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
+
+
+class SubContributionAddExistingParticipant(SubContributionParticipantsBase):
+
+    def _checkParams(self):
+        SubContributionParticipantsBase._checkParams(self)
+        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+        # Check if there is already a user with the same email
+        for user in self._userList:
+            if user["email"] != "" and self._isEmailAlreadyUsed(user["email"]):
+                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another participant or the user is already added to the list. Participant(s) not added.") % user["email"])
+
+    def _getAnswer(self):
+        ah = AvatarHolder()
+        for user in self._userList:
+            spk = conference.SubContribParticipation()
+            spk.setDataFromAvatar(ah.getById(user["id"]))
+            self._subContrib.newSpeaker(spk)
+        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
+
+
+class SubContributionGetAllAuthors(SubContributionParticipantsBase):
+
+    def _getAnswer(self):
+        result = []
+        for author in self._contribution.getPrimaryAuthorList():
+            result.append(author)
+        for author in self._contribution.getCoAuthorList():
+            result.append(author)
+        if result == []:
+            raise ServiceAccessError(_("There are no authors available to add as presenters."))
+        return fossilize(result)
+
+
+class SubContributionRemoveParticipant(SubContributionParticipantsBase):
+
+    def _checkParams(self):
+        SubContributionParticipantsBase._checkParams(self)
+        self._participant = self._subContrib.getSpeakerById(self._pm.extract("userId", pType=str, allowEmpty=False))
+        if self._participant == None:
+            raise ServiceError("ERR-U0", _("User does not exist."))
+
+    def _getAnswer(self):
+        self._subContrib.removeSpeaker(self._participant)
+        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
+
+
+class SubContributionAddAuthorAsPresenter(SubContributionAddExistingParticipant):
+
+    def _newSpeaker(self, author):
+        spk = conference.SubContribParticipation()
+        spk.setTitle(author.getTitle())
+        spk.setFirstName(author.getFirstName())
+        spk.setFamilyName(author.getFamilyName())
+        spk.setAffiliation(author.getAffiliation())
+        spk.setEmail(author.getEmail())
+        spk.setAddress(author.getAddress())
+        spk.setPhone(author.getPhone())
+        spk.setFax(author.getFax())
+        self._subContrib.newSpeaker(spk)
+
+    def _getAnswer(self):
+        for author in self._userList:
+            self._newSpeaker(self._contribution.getAuthorById(author["id"]))
+        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
+
+
+class SubContributionGetParticipantData(SubContributionParticipantsBase):
+
+    def _checkParams(self):
+        SubContributionParticipantsBase._checkParams(self)
+        self._participant = self._subContrib.getSpeakerById(self._pm.extract("userId", pType=str, allowEmpty=False))
+        if self._participant == None:
+            raise ServiceError("ERR-U0", _("User does not exist."))
+
+    def _getAnswer(self):
+        return fossilize(self._participant, ISubContribParticipationFullFossil)
+
+
+class SubContributionEditParticipantData(SubContributionParticipantsBase):
+
+    def _checkParams(self):
+        SubContributionParticipantsBase._checkParams(self)
+        self._userData = self._pm.extract("userData", pType=dict, allowEmpty=False)
+        self._userId = self._userData.get("id")
+        self._participant = self._subContrib.getSpeakerById(self._userId)
+        if self._participant == None:
+            raise ServiceError("ERR-U0", _("User does not exist."))
+        if self._userData.get("email", "") != "" and self._isEmailAlreadyUsed():
+            raise ServiceAccessError(_("The email address is already used by another participant. Participant not modified."))
+
+    def _isEmailAlreadyUsed(self):
+        for auth in self._subContrib.getSpeakerList():
+            # check if the email is already used by other different speaker
+            if self._userData.get("email", "") == auth.getEmail() and self._userId != str(auth.getId()):
+                return True
+        return False
+
+    def _editParticipant(self):
+        self._participant.setTitle(self._userData.get("title", ""))
+        self._participant.setFirstName(self._userData.get("firstName", ""))
+        self._participant.setFamilyName(self._userData.get("familyName", ""))
+        self._participant.setEmail(self._userData.get("email", ""))
+        self._participant.setAffiliation(self._userData.get("affiliation", ""))
+        self._participant.setAddress(self._userData.get("address", ""))
+        self._participant.setPhone(self._userData.get("phone", ""))
+        self._participant.setFax(self._userData.get("fax", ""))
+
+    def _getAnswer(self):
+        self._editParticipant()
+        return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
+
+
 
 methodMap = {
     "addSubContribution": ContributionAddSubContribution,
@@ -605,6 +770,14 @@ methodMap = {
     "participants.sendEmailData": ContributionSendEmailData,
     "participants.changeSubmissionRights": ContributionChangeSubmissionRights,
     "participants.getAllAuthors": ContributionGetAllAuthors,
-    "participants.addAuthorAsPresenter": ContributionAddAuthorAsPresenter
+    "participants.addAuthorAsPresenter": ContributionAddAuthorAsPresenter,
 
+    "participants.subContribution.addNewParticipant": SubContributionAddNewParticipant,
+    "participants.subContribution.addExistingParticipant": SubContributionAddExistingParticipant,
+    "participants.subContribution.editParticipantData": SubContributionEditParticipantData,
+    "participants.subContribution.removeParticipant": SubContributionRemoveParticipant,
+    "participants.subContribution.getParticipantsList": SubContributionGetParticipantsList,
+    "participants.subContribution.getParticipantData": SubContributionGetParticipantData,
+    "participants.subContribution.getAllAuthors": SubContributionGetAllAuthors,
+    'participants.subContribution.addAuthorAsPresenter': SubContributionAddAuthorAsPresenter
 }

@@ -23,34 +23,61 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 
 class ISubContributionFossil(IFossil):
-    
+
     def getId(self):
         pass
-    
+
     def getParent(self):
         pass
     getParent.convert = lambda p: p.getId()
     getParent.name = 'parentId'
-    
+
     def getTitle(self):
         pass
-    
+
     def getDuration(self):
         pass
     getDuration.convert = Conversion.duration
-    
-    
+
+
 class ISubContribParticipationFossil(IFossil):
-    
+
     def getId(self):
         pass
-    
+
     def getFullName(self):
         pass
-    
-    
+
+
+class ISubContribParticipationFullFossil(ISubContribParticipationFossil):
+
+    def getTitle(self):
+        pass
+
+    def getFirstName(self):
+        pass
+
+    def getFamilyName(self):
+        pass
+
+    def getAffiliation(self):
+        pass
+
+    def getEmail(self):
+        pass
+
+    def getAddress(self):
+        pass
+
+    def getPhone(self):
+        pass
+
+    def getFax(self):
+        pass
+
+
 class ISubContributionWithSpeakersFossil(ISubContributionFossil):
-    
+
     def getSpeakerList(self):
         pass
     getSpeakerList.result = ISubContribParticipationFossil

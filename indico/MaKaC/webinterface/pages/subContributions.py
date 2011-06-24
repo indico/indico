@@ -273,25 +273,6 @@ class WPSubContributionModifMaterials( WPSubContributionModifBase ):
         return wc.getHTML()
 
 
-class WSubContribModNewSpeaker(wcomponents.WTemplated):
-
-    def __init__(self,subcontrib):
-        self._subcontrib = subcontrib
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHSubContributionNewSpeaker.getURL(self._subcontrib)))
-        vars["titles"]=TitlesRegistry().getSelectItemsHTML()
-        return vars
-
-class WPSubModNewSpeaker( WPSubContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WSubContribModNewSpeaker(self._subContrib)
-        return wc.getHTML( params )
-
-
-
 class WPSubContributionModification( WPSubContribModifMain ):
     def _getTabContent( self, params ):
         wc = WSubContribModifMain( self._target, materialFactories.ContribMFRegistry() )
@@ -308,11 +289,7 @@ class WPSubContributionModification( WPSubContribModifMain ):
                 "subContribId": self._target.getId(), \
                 "addMaterialURL": str(urlHandlers.UHSubContributionAddMaterial.getURL( self._target )), \
                 "removeMaterialsURL": str(urlHandlers.UHSubContributionRemoveMaterials.getURL()), \
-                "modifyMaterialURLGen": urlHandlers.UHMaterialModification.getURL, \
-                "searchSpeakersURL": quoteattr(str(urlHandlers.UHSubContributionSelectSpeakers.getURL(self._target))), \
-                "removeSpeakersURL": quoteattr(str(urlHandlers.UHSubContributionRemoveSpeakers.getURL(self._target))),\
-                "modSpeakerURLGen":urlHandlers.UHSubContribModPresenter.getURL,\
-                "newSpeakerURL": quoteattr(str(urlHandlers.UHSubContributionNewSpeaker.getURL(self._target)))}
+                "modifyMaterialURLGen": urlHandlers.UHMaterialModification.getURL}
         return wc.getHTML( pars )
 
 class WSubContributionDataModification(wcomponents.WTemplated):
@@ -338,18 +315,6 @@ class WPSubContribData( WPSubContribModifMain ):
     def _getTabContent( self, params ):
         wc = WSubContributionDataModification(self._target)
         params["postURL"] = urlHandlers.UHSubContributionDataModif.getURL()
-        return wc.getHTML( params )
-
-
-class WPSubContribSelectSpeakers( WPSubContribModifMain ):
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WAuthorSearch( self._conf, urlHandlers.UHSubContributionSelectSpeakers.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHSubContributionAddSpeakers.getURL()
         return wc.getHTML( params )
 
 
@@ -394,56 +359,6 @@ class WPSubContributionDeletion( WPSubContributionModifTools ):
         wc = WSubContributionDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHSubContributionDelete.getURL( self._target ) )
 
-class WSubContribModPresenter(wcomponents.WTemplated):
-
-    def __init__(self,auth):
-        self._auth=auth
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHSubContribModPresenter.getURL(self._auth)))
-        vars["titles"]=TitlesRegistry.getSelectItemsHTML(self._auth.getTitle())
-        vars["surName"]=quoteattr(self._auth.getFamilyName())
-        vars["name"]=quoteattr(self._auth.getFirstName())
-        vars["affiliation"]=quoteattr(self._auth.getAffiliation())
-        vars["email"]=quoteattr(self._auth.getEmail())
-        vars["address"]=self._auth.getAddress()
-        vars["phone"]=quoteattr(self._auth.getPhone())
-        vars["fax"]=quoteattr(self._auth.getFax())
-        return vars
-
-class WPModPresenter( WPSubContribModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WSubContribModPresenter(params["author"])
-        return wc.getHTML()
-
-class WSubContribSpeakerTable(wcomponents.WTemplated):
-
-    def __init__(self, authList, subContrib):
-        self._list = authList
-        self._conf = subContrib.getConference()
-        self._subContrib = subContrib
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        urlGen=vars.get("modSpeakerURLGen",None)
-        l = []
-        for author in self._list:
-            authCaption=author.getFullName()
-            if author.getAffiliation()!="":
-                authCaption="%s (%s)"%(authCaption,author.getAffiliation())
-            if urlGen:
-                authCaption="""<a href=%s>%s</a>"""%(urlGen(author),self.htmlText(authCaption))
-            href ="\"\""
-            if author.getEmail() != "":
-                mailtoSubject =  i18nformat("""[%s]  _("Sub-Contribution") %s: %s""")%( self._conf.getTitle(), self._subContrib.getId(), self._subContrib.getTitle() )
-                mailtoURL = "mailto:%s?subject=%s"%( author.getEmail(), urllib.quote( mailtoSubject ) )
-                href = quoteattr( mailtoURL )
-            emailHtml = """ <a href=%s><img src="%s" style="border:0px" alt="email"></a> """%(href, Config.getInstance().getSystemIconURL("smallEmail"))
-            l.append("""<input type="checkbox" name="selAuthor" value=%s>%s %s"""%(quoteattr(author.getId()),emailHtml,authCaption))
-        vars["authors"] = "<br>".join(l)
-        return vars
 
 class WSubContribModifMain(wcomponents.WTemplated):
 
@@ -460,18 +375,12 @@ class WSubContribModifMain(wcomponents.WTemplated):
         else:
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._subContrib.getDescription()
         vars["dataModifButton"] = ""
-        vars["dataModifButton"] =  i18nformat("""<input type="submit" class="btn" value="_("modify")">""")
-        speakerText = self._subContrib.getSpeakerText()
-        if speakerText != "":
-            speakerText = "%s<br>"%speakerText
-        p = {"newSpeakerURL":vars["newSpeakerURL"],\
-            "searchSpeakersURL":vars["searchSpeakersURL"], \
-            "removeSpeakersURL":vars["removeSpeakersURL"], \
-            "modSpeakerURLGen":vars['modSpeakerURLGen']}
-        pt = WSubContribSpeakerTable(self._subContrib.getSpeakerList(), self._subContrib).getHTML(p)
-        vars["speakersTable"] = "%s%s"%(speakerText, pt)
+        vars["dataModifButton"] =  _("""<input type="submit" class="btn" value="_("modify")">""")
         vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._subContrib,"subcontribution").getHTML()
         vars["keywords"] = self._subContrib.getKeywords()
+        vars["confId"] = self._subContrib.getConference().getId()
+        vars["contribId"] = self._subContrib.getContribution().getId()
+        vars["subContribId"] = self._subContrib.getId()
         return vars
 
 class WPSubContributionReportNumberEdit(WPSubContributionModifBase):
