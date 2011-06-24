@@ -6,3 +6,5 @@ Exportable Elements
 
    ./categ.rst
    ./event.rst
+   ./room.rst
+   ./reservation.rst
