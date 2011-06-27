@@ -14,6 +14,10 @@
         <input type="submit" class="btn" value="${ _("modify")}">
         </form>
       </td>
+    <tr>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Archiving Volume")}</span></td>
+      <td bgcolor="white" width="100%" valign="top" class="blacktext">${ minfo.getArchivingVolume() }</td>
+    </tr>
     </tr>
     </table>
   </td>

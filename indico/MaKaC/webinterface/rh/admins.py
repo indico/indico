@@ -634,6 +634,7 @@ class RHSystemModify(RHAdminBase):
     def _checkParams( self, params ):
         RHAdminBase._checkParams( self, params )
         self._action = params.get("action", None)
+        self._volume = params.get("volume", None)
         self._proxy = False
         if params.get("proxy", False):
             self._proxy = True
@@ -641,6 +642,7 @@ class RHSystemModify(RHAdminBase):
     def _process( self ):
         if self._action == "ok":
             self._minfo.setProxy(self._proxy)
+            self._minfo.setArchivingVolume(self._volume)
             self._redirect(urlHandlers.UHAdminsSystem.getURL())
         elif self._action == "cancel":
             self._redirect(urlHandlers.UHAdminsSystem.getURL())

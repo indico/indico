@@ -18,6 +18,12 @@
       </td>
     </tr>
     <tr>
+      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Archiving Volume")}</span></td>
+      <td bgcolor="white" width="100%">&nbsp;
+        <input type="text" size="50" name="volume" value="${ minfo.getArchivingVolume() }">
+      </td>
+    </tr>
+    <tr>
       <td colspan="2" align="center">
         <table align="center">
         <tr>
