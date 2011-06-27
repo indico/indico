@@ -576,6 +576,7 @@ class Avatar(Persistent, Fossilizable):
         self.resetTimedLinkedEvents()
 
         self.personalInfo = PersonalInfo()
+        self.unlockedFields = [] # fields that are not synchronized with auth backends
 
         if userData != None:
             if userData.has_key( "name" ):
@@ -1414,6 +1415,22 @@ class Avatar(Persistent, Fossilizable):
         except:
             self.personalInfo = PersonalInfo()
             return self.personalInfo
+
+    def isFieldSynced(self, field):
+        if not hasattr(self, 'unlockedFields'):
+            self.unlockedFields = []
+        return field not in self.unlockedFields
+
+    def setFieldSynced(self, field, synced):
+        # check if the sync state is the same. also creates the list if it's missing
+        if synced == self.isFieldSynced(field):
+            pass
+        elif synced:
+            self.unlockedFields.remove(field)
+            self._p_changed = 1
+        else:
+            self.unlockedFields.append(field)
+            self._p_changed = 1
 
     def getLang(self):
         try:

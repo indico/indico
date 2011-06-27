@@ -111,12 +111,12 @@ class LDAPIdentity(PIdentity):
                     if av.getAddress() != postalAddress:
                         av.setAddress(postalAddress)
 
-                if 'sn' in data:
+                if 'sn' in data and av.isFieldSynced('surName'):
                     surname = data['sn']
                     if av.getSurName() != surname:
                         av.setSurName(surname, reindex=True)
 
-                if 'givenName' in data:
+                if 'givenName' in data and av.isFieldSynced('firstName'):
                     firstName = data['givenName']
                     if av.getName() != firstName:
                         av.setName(firstName, reindex=True)

@@ -71,15 +71,15 @@ class NiceAuthenticator(Authenthicator):
                 lastname = req.subprocess_env.get("ADFS_LASTNAME","")
                 firstname = req.subprocess_env.get("ADFS_FIRSTNAME","")
                 institute = req.subprocess_env.get("ADFS_HOMEINSTITUTE","")
-                if phone != '' and phone != av.getPhone():
+                if phone != '' and phone != av.getPhone() and av.isFieldSynced('phone'):
                     av.setTelephone(phone)
-                if fax != '' and fax != av.getFax():
+                if fax != '' and fax != av.getFax() and av.isFieldSynced('fax'):
                     av.setFax(fax)
-                if lastname != '' and lastname != av.getFamilyName():
+                if lastname != '' and lastname != av.getFamilyName() and av.isFieldSynced('surName'):
                     av.setSurName(lastname, reindex=True)
-                if firstname != '' and firstname != av.getFirstName():
+                if firstname != '' and firstname != av.getFirstName() and av.isFieldSynced('firstName'):
                     av.setName(firstname, reindex=True)
-                if institute != '' and institute != av.getAffiliation():
+                if institute != '' and institute != av.getAffiliation() and av.isFieldSynced('affiliation'):
                     av.setAffiliation(institute, reindex=True)
                 if personId != None and personId != av.getPersonId():
                     av.setPersonId(personId)
