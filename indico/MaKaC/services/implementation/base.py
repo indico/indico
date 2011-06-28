@@ -40,6 +40,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.i18n import _
+from MaKaC.common.contextManager import ContextManager
 
 """
 base module for asynchronous server requests
@@ -224,6 +225,8 @@ class ServiceBase(RequestHandlerBase):
         Processes the request, analyzing the parameters, and feeding them to the
         _getAnswer() method (implemented by derived classes)
         """
+
+        ContextManager.set('currentRH', self)
 
         self._setLang()
         self._checkParams()

@@ -65,13 +65,8 @@ from MaKaC.plugins.base import OldObservable
 class RequestHandlerBase(OldObservable):
 
     _uh = None
-    _currentRH = None
 
     def __init__(self, req):
-
-        # attention: not thread-safe
-        RequestHandlerBase._currentRH = self
-
         if req == None:
             raise Exception("Request object not initialised")
         self._req = req
@@ -453,6 +448,7 @@ class RH(RequestHandlerBase):
 
         # clear the context
         ContextManager.destroy()
+        ContextManager.set('currentRH', self)
 
         #redirect to https if necessary
         if self._checkHttpsRedirect():

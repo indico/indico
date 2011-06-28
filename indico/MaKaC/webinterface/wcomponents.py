@@ -93,8 +93,7 @@ class WTemplated(OldObservable):
             self.tplId = tpl_name
 
         #if ( '_rh' in ','.join( dir( self ) ) ):
-        from MaKaC.webinterface.rh.base import RequestHandlerBase
-        self._rh = RequestHandlerBase._currentRH
+        self._rh = ContextManager.getdefault('currentRH', None)
 
         cfg = Configuration.Config.getInstance()
         self._dir = cfg.getTPLDir()
@@ -153,8 +152,7 @@ class WTemplated(OldObservable):
            Classes inheriting from this one will have to take care of adding
             their variables to the ones returned by this method.
         """
-        from MaKaC.webinterface.rh.base import RequestHandlerBase
-        self._rh = RequestHandlerBase._currentRH
+        self._rh = ContextManager.getdefault('currentRH', None)
 
         cfg = Configuration.Config.getInstance()
         vars = cfg.getTPLVars()
@@ -180,8 +178,7 @@ class WTemplated(OldObservable):
             Params:
                 params -- additional paramters received from the caller
         """
-        from MaKaC.webinterface.rh.base import RequestHandlerBase
-        self._rh = RequestHandlerBase._currentRH
+        self._rh = ContextManager.getdefault('currentRH', None)
         if self.tplId == None:
             self.tplId = self.__class__.__name__[1:]
         self._setTPLFile()
