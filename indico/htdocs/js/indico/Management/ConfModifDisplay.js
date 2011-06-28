@@ -45,15 +45,15 @@ type("PicItem", ["IWidget"], {
 
     _iFrameLoaded : function(iframeId) {
         var doc;
-        
+
         if (Browser.IE) {
             // *sigh*
             doc = document.frames[iframeId].document;
         } else {
             doc = $E(iframeId).dom.contentDocument;
         }
-    
-        var res = Json.read(doc.body.innerHTML);
+
+        var res = Json.read($('textarea', doc.body).val());
 
         if (res.status == "ERROR") {
             IndicoUtil.errorReport(res.info);
@@ -75,7 +75,7 @@ type("PicItem", ["IWidget"], {
                     var form = Html.form({target: frameId, method: 'post', id: Html.generateId(),
                         action: self.parentList.uploadAction,
                         enctype: 'multipart/form-data'});
-                    
+
                     form.append(inputField);
 
                     form.append(Widget.button(

@@ -4982,7 +4982,7 @@ class RHConfSavePic( RHConferenceModifBase ):
         info={"name": f.getFileName(),
                 "id": f.getId(),
                 "picURL": str(urlHandlers.UHConferencePic.getURL(pic))}
-        return "<html><head></head><body>"+json.encode({'status': "OK", 'info': info})+"</body></html>"
+        return "<html><head></head><body><textarea>"+json.encode({'status': "OK", 'info': info})+"</textarea></body></html>"
 
 class RHConfModifTickerTapeAction( RHConferenceModifBase ):
 
