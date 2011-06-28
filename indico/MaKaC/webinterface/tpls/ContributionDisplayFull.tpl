@@ -80,7 +80,7 @@
                     ${ primaryAuthors }
                     ${ coAuthors }
                     ${ speakers }
-                    % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw):
+                    % if (Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw)) and not isWithdrawn:
                         <td class="displayField" nowrap="" align="right" valign="top">
                             <b>${_("Material")}:</b>
                             % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() :
@@ -96,7 +96,7 @@
                     ${ inSession }
                     ${ inTrack }
                     ${ subConts }
-                    % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() :
+                    % if Contribution.getConference() and Contribution.getConference().hasEnabledSection('paperReviewing') and Contribution.getConference().getConfPaperReview().hasReviewing() and not isWithdrawn:
                         % if Contribution.canUserSubmit(self_._aw.getUser()) or Contribution.canModify(self_._aw):
                         </table>
                         </div>
