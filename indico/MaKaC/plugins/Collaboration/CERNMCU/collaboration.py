@@ -862,7 +862,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, booking:%s, calling participants.enumerate. Got error: %s""" % (self._conf.getId(), self.getId(), str(e)))
-            raise e
+            raise
         except socket.error, e:
             handleSocketError(e)
 
@@ -920,7 +920,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
 
         except Fault, e:
             Logger.get('CERNMCU').warning("""Evt:%s, booking:%s, calling participants.enumerate. Got error: %s""" % (self._conf.getId(), self.getId(), str(e)))
-            raise e
+            raise
         except socket.error, e:
             handleSocketError(e)
 

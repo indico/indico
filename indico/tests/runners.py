@@ -251,8 +251,6 @@ class FunctionalTestRunner(NoseTestRunner):
                 self._info("Test #%d: %s\n" % \
                            (i + 1, testResult and 'OK' or 'Error'))
 
-        except Exception:
-            raise
         finally:
             self._stopSeleniumServer()
 

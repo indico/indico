@@ -37,7 +37,7 @@ class ApiBase(object):
         elif type(e) == URLError:
             raise VidyoConnectionException(e)
         else:
-            raise e
+            raise
 
 
 
@@ -67,7 +67,7 @@ class AdminApi(ApiBase):
         except WebFault, e:
             Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's addRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
-            raise e
+            raise
 
         except Exception, e:
             cls._handleServiceCallException(e)
@@ -93,7 +93,7 @@ class AdminApi(ApiBase):
         except WebFault, e:
             Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
-            raise e
+            raise
 
         except Exception, e:
             cls._handleServiceCallException(e)
@@ -149,7 +149,7 @@ class AdminApi(ApiBase):
         except WebFault, e:
             Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
-            raise e
+            raise
 
         except Exception, e:
             cls._handleServiceCallException(e)
@@ -174,7 +174,7 @@ class AdminApi(ApiBase):
         except WebFault, e:
             Logger.get('Vidyo').info("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
-            raise e
+            raise
 
         except Exception, e:
             cls._handleServiceCallException(e)
@@ -208,7 +208,7 @@ class UserApi(ApiBase):
         except WebFault, e:
             Logger.get('Vidyo').info("""Evt:%s, booking:%s, User API's search operation operation got WebFault: %s""" %
                                     (confId, bookingId, e.fault.faultstring))
-            raise e
+            raise
 
         except Exception, e:
             cls._handleServiceCallException(e)

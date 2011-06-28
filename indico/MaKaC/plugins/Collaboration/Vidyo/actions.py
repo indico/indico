@@ -111,9 +111,9 @@ class DeleteOldRoomsAction(ActionBase):
 
             return page
 
-        except Exception, e:
+        except Exception:
             Logger.get("Vidyo").exception("Exception during Vidyo's DeleteOldRoomsAction call")
-            raise e
+            raise
 
 
 class ShowOldRoomIndexAction(ActionBase):

@@ -111,7 +111,7 @@ class SessionSlotBase(SessionBase):
 #            if self._target == None:
 #                raise ServiceError("ERR-S3", "Invalid slot id.")
 #        except ServiceError, e:
-#            raise e
+#            raise
 #        except Exception, e:
 #           raise ServiceError("ERR-S3", "Invalid slot id.",inner=str(e))
         except Exception, e:

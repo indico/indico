@@ -1537,7 +1537,7 @@ class CSBookingBase(Persistent, Fossilizable):
                 Logger.get('VideoServ').error(
                     """Could not send NewBookingNotification for booking with id %s of event with id %s, exception: %s""" %
                     (self.getId(), self._conf.getId(), str(e)))
-                raise e
+                raise
 
         elif operation == 'modify':
             try:
@@ -1549,7 +1549,7 @@ class CSBookingBase(Persistent, Fossilizable):
                 Logger.get('VideoServ').error(
                     """Could not send BookingModifiedNotification for booking with id %s of event with id %s, exception: %s""" %
                     (self.getId(), self._conf.getId(), str(e)))
-                raise e
+                raise
 
         elif operation == 'remove':
             try:
@@ -1561,7 +1561,7 @@ class CSBookingBase(Persistent, Fossilizable):
                 Logger.get('VideoServ').error(
                     """Could not send BookingDeletedNotification for booking with id %s of event with id %s, exception: %s""" %
                     (self.getId(), self._conf.getId(), str(e)))
-                raise e
+                raise
 
 
 class WCSTemplateBase(wcomponents.WTemplated):

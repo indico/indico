@@ -357,7 +357,7 @@ class WebcastManager(Persistent):
             except Exception, e:
                 Logger.get('webcast').error("""Calling the webcast synchronization URL: [%s] triggered Exception: %s""" % (str(url), str(e)))
                 if raiseExceptionOnSyncFail:
-                    raise e
+                    raise
 
 
         else:

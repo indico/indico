@@ -66,9 +66,9 @@ class AdminClient(ClientBase):
             try:
                 cls._instance = suds.client.Client(adminAPIUrl,
                                                    transport = ClientBase.getTransport(adminAPIUrl, username , password))
-            except Exception, e:
+            except Exception:
                 Logger.get("Vidyo").exception("Problem building AdminClient")
-                raise e
+                raise
 
         return cls._instance
 
@@ -94,8 +94,8 @@ class UserClient(ClientBase):
             try:
                 cls._instance = suds.client.Client(userAPIUrl,
                                                    transport = ClientBase.getTransport(userAPIUrl, username , password))
-            except Exception, e:
+            except Exception:
                 Logger.get("Vidyo").exception("Problem building UserClient")
-                raise e
+                raise
 
         return cls._instance

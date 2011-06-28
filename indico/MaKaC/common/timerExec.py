@@ -65,7 +65,7 @@ class toExec:
                         time.sleep(i)
                     else:
                         self._printOutput(e)
-                        raise e
+                        raise
 
     def _closeLog(self):
         if self._file:

@@ -408,7 +408,7 @@ class RHPropBase(RHAbstractModifBase):
         except ModificationError,e:
             if self._target.isAllowedToCoordinate(self._getUser()):
                 return
-            raise e
+            raise
 
     def _checkParams( self, params ):
         RHAbstractModifBase._checkParams(self, params)

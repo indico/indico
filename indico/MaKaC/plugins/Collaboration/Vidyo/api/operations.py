@@ -93,7 +93,7 @@ class VidyoOperations(object):
                     extension = baseExtension + str(extensionSuffix)
                     extensionSuffix = extensionSuffix + 1
                 else:
-                    raise e
+                    raise
 
         #if we could not create the room, the owner did not have any Vidyo accounts
         if not roomCreated and loginToUse == len(possibleLogins):
@@ -178,7 +178,7 @@ class VidyoOperations(object):
                         loginToUse = loginToUse + 1
 
                 else:
-                    raise e
+                    raise
 
         #if we could not create the room, the owner did not have any Vidyo accounts
         if not roomModified and loginToUse == len(possibleLogins):
@@ -218,7 +218,7 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "checkStatus")
             else:
-                raise e
+                raise
 
         extension = str(adminApiRoom.extension)
 
@@ -246,5 +246,5 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "delete")
             else:
-                raise e
+                raise
 

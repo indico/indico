@@ -122,9 +122,6 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
         except ModificationError:
             raise ServiceAccessError(_("you are not authorised to manage material "
                                        "for this contribution"))
-        except Exception, e:
-            raise e
-
 class ResourceBase:
     """
     Base class for material resource access
