@@ -8,10 +8,6 @@
             <td>To: </td>
               <td>${ toField }</td>
         </tr>
-           <tr>
-            <td>Cc: </td>
-              <td><input type="text" name="cc" size="50" value="${ cc }"></text></td>
-        </tr>
         <tr>
             <td>From: </td>
           <td>${ fromField }</td>

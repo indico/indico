@@ -882,34 +882,19 @@ class WPSentEmail( WPConferenceDefaultDisplayBase ):
 
 class WEmail(wcomponents.WTemplated):
 
-    def __init__(self,conf,user,toEmail):
+    def __init__(self,conf,user,toUser):
         self._conf = conf
-        try:
-            self._fromEmail = user.getEmail()
-        except:
-            self._fromEmail = ""
-        self._toEmail = toEmail
+        self._from = user
+        self._to = toUser
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         if vars.get("from", None) is None :
-            vars["From"] = self._fromEmail
-        if vars.get("fromDisabled", None) is None or not vars.get("fromDisabled", None):
-            vars["fromField"] = """<input type="text" name="from" size="50" value="%s"></text>"""%vars["From"]
-        else :
-            vars["fromField"] = """<input type="hidden" name="from" value="%s"></input>%s"""%(vars["From"],vars["From"])
-
-        if vars.get("to", None) is None :
-            vars["to"] = self._toEmail
-        if vars.get("toDisabled",None) is None or not vars.get("toDisabled",None):
-            vars["toField"] = """<textarea name="to" cols="50" rows="4">%s</textarea>"""%vars["to"]
-        else :
-            vars["toField"] = """<input type="hidden" name="to" value="%s"></input>%s"""%(vars["to"],vars["to"])
-
-        if vars.get("cc", None) is None :
-            vars["cc"]= ""
+            vars["FromName"] = self._from
+        vars["fromField"] = """<input type="hidden" name="from" value="%s"></input>%s"""%(self._from.getId(),self._from.getFirstName() + " " +  self._from.getFamilyName())
+        vars["toField"] = """<input type="hidden" name="to" value="%s"></input>%s"""%(self._to.getId(),self._to.getFirstName() + " " +  self._to.getFamilyName())
         if vars.get("postURL",None) is None :
-            vars["postURL"]=urlHandlers.UHConferenceSendEmail.getURL(self._conf)
+            vars["postURL"]=urlHandlers.UHConferenceSendEmail.getURL(self._to)
         if vars.get("subject", None) is None :
             vars["subject"]=""
         if vars.get("body", None) is None :

@@ -27,7 +27,7 @@ from MaKaC.common import Config
 from MaKaC.i18n import _
 
 class WAuthorDisplay(wcomponents.WTemplated):
-    
+
     def __init__(self,conf, authId):
         self._conf = conf
         self._authorId = authId
@@ -78,11 +78,9 @@ class WAuthorDisplay(wcomponents.WTemplated):
                 material = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;( %s )"%material
             contribList.append("""<p style="text-indent: -3em;margin-left:3em"><a href=%s">%s-%s</a>%s</p>"""%(quoteattr(str(url)),self.htmlText(contrib.getId()),self.htmlText(contrib.getTitle()), material ))
         vars["contributions"] = "".join(contribList)
-        vars["title"] = author.getTitle() 
         vars["fullName"] = author.getFullName()
-        email = author.getEmail()
-        vars["mailURL"]=urlHandlers.UHConferenceEmail.getURL(author)   
-        vars["email"] = email
+        vars["mailURL"]=urlHandlers.UHConferenceEmail.getURL(author)
+        vars["mailIcon"]=Config.getInstance().getSystemIconURL("mail_big")
         vars["address"] = author.getAddress()
         vars["telephone"] = author.getPhone()
         vars["fax"] = author.getFax()
@@ -102,6 +100,6 @@ class WPAuthorDisplay(WPConferenceDefaultDisplayBase):
         wc=WAuthorDisplay(self._conf, self._authorId)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)

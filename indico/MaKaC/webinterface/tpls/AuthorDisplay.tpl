@@ -5,7 +5,10 @@
             <br>
             <table width="100%" align="center" border="0" style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
               <tr>
-                <td colspan="3" class="groupTitle" style="background:#E5E5E5; color:gray"> ${ _("Details for") } ${ title } ${ fullName }</td>
+                <td colspan="3" class="groupTitle" style="background:#E5E5E5; color:gray">
+                    ${ _("Details for") } ${ fullName }
+                    <div style="float:right"><a href="${ mailURL }"><img alt="${ _("Email")}" src="${mailIcon}"/></a></div>
+                </td>
               </tr>
               <tr>
                 <td bgcolor="white">
@@ -16,10 +19,6 @@
                           <tr>
                             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Affiliation")}</span></td>
                             <td bgcolor="white" width="100%" valign="top" class="blacktext">&nbsp;&nbsp;&nbsp;${ organisation }</td>
-                          </tr>
-                          <tr>
-                            <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Email")}</span></td>
-                            <td bgcolor="white" width="100%" valign="top" class="blacktext"><a href="${ mailURL }">${ email }</a></a></td>
                           </tr>
                           <tr>
                             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Address")}</span></td>

@@ -540,13 +540,13 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
             contrib = self._conf.getContributionById(params.get("contribId",""))
         if self._chair:
             chairid=params.get("chairId","")
-            self._emailto =self._conf.getChairById(chairid).getEmail()
+            self._emailto = self._conf.getChairById(chairid)
         if self._auth:
             authid=params.get("authId","")
             author = contrib.getAuthorById(authid)
             if author == None:
                 raise NotFoundError(_("The author you try to email does not exist."))
-            self._emailto = author.getEmail()
+            self._emailto = author
 
     def _process(self):
         p=conferences.WPEMail(self, self._target)
@@ -560,9 +560,17 @@ class RHConferenceSendEmail (RHConferenceBaseDisplay, base.RHProtected):
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams( self, params )
-        self._to = params.get("to","")
-        self._cc = params.get("cc","")
-        self._from=params.get("from","")
+        if params.has_key("contribId"):
+            contrib = self._conf.getContributionById(params.get("contribId",""))
+        if params.has_key("chairId"):
+            chairid=params.get("chairId","")
+            self._to = self._conf.getChairById(chairid).getEmail()
+        if params.has_key("authId"):
+            authid=params.get("authId","")
+            self._to = contrib.getAuthorById(authid).getEmail()
+        fromId = params.get("from","")
+        self._from = (user.AvatarHolder()).getById(fromId).getEmail()
+        self._cc = self._from
         self._subject=params.get("subject","")
         self._body = params.get("body","")
         self._send = params.has_key("OK")
