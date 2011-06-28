@@ -88,6 +88,20 @@ class RequestListener(Component):
         ContextManager.set('indico.ext.livesync:ids', {})
 
 
+class RequestListenerContext(object):
+    """
+    This class is mainly useful for testing or CLI scripting
+    """
+    def __init__(self):
+        self._reqListener = RequestListener()
+
+    def __enter__(self):
+        self._reqListener.requestStarted(None, None)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._reqListener.requestFinished(None, None)
+
+
 class ObjectChangeListener(Component):
     """
     This component listens for events and directs them to the MPT.
