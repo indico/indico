@@ -46,16 +46,6 @@ def create(req, **params):
     return "done"
     """
 
-def presenterSearch(req, **params):
-    return contribMod.RHNewSubcontributionPresenterSearch(req).process(params)
-
-def presenterNew(req, **params):
-    return contribMod.RHNewSubcontributionPresenterNew(req).process(params)
-
-def personAdd(req, **params):
-    return contribMod.RHNewSubcontributionPersonAdd(req).process(params)
-
-
 def actionSubContribs(req, **params):
     return contribMod.RHSubContribActions(req).process(params)
 
@@ -69,7 +59,7 @@ def up(req, **params):
 
 def Down(req, **params):
     return contribMod.RHContributionDownSC( req ).process( params )
-    
+
 
 def selectManagers( req, **params ):
     return contribMod.RHContributionSelectManagers( req ).process( params )
@@ -82,7 +72,7 @@ def removeManagers( req, **params ):
 
 def setVisibility( req, **params ):
     return contribMod.RHContributionSetVisibility( req ).process( params )
-    
+
 def selectAllowedToAccess( req, **params ):
     return contribMod.RHContributionSelectAllowed( req ).process( params )
 

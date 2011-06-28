@@ -1332,16 +1332,6 @@ class UHContribCreateSubCont( URLHandler ):
     _relativeURL = "contributionModifSubCont.py/create"
 
 
-class UHContribCreateSubContPresenterSearch(URLHandler):
-    _relativeURL = "contributionModifSubCont.py/presenterSearch"
-
-class UHContribCreateSubContPresenterNew(URLHandler):
-    _relativeURL = "contributionModifSubCont.py/presenterNew"
-
-class UHContribCreateSubContPersonAdd(URLHandler):
-    _relativeURL = "contributionModifSubCont.py/personAdd"
-
-
 class UHContribUpSubCont( URLHandler ):
     _relativeURL = "contributionModifSubCont.py/up"
 

@@ -657,7 +657,7 @@ class SubContributionAddExistingParticipant(SubContributionParticipantsBase):
         return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
 
 
-class SubContributionGetAllAuthors(SubContributionParticipantsBase):
+class SubContributionGetAllAuthors(ContributionModifBase):
 
     def _getAnswer(self):
         result = []

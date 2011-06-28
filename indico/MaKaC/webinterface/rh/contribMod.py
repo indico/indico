@@ -39,6 +39,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
+from MaKaC.user import AvatarHolder
 
 class RHContribModifBase(RHModificationBaseProtected):
     """ Base RH for contribution modification.
@@ -290,72 +291,16 @@ class RHContributionAddSC(RHContribModifBaseSpecialSesCoordRights):
     def _process(self):
         p = contributions.WPContribAddSC(self, self._target)
         params = self._getRequestParams()
-        if params.get("recalled", None) is None :
-            self._removePreservedParams()
-            self._removeDefinedList("presenter")
-        params.update(self._getPreservedParams())
+
         wf = self.getWebFactory()
         if wf != None:
             p = wf.getContribAddSC(self, self._target)
-
-        params["presenterDefined"] = self._getDefinedDisplayList("presenter")
-        params["presenterOptions"] = self._getPersonOptions("presenter")
 
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]
 
         return p.display(**params)
-
-    def _getDefinedDisplayList(self, typeName):
-        return self._websession.getVar("%sList"%typeName)
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("preservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _removePreservedParams(self):
-        self._websession.setVar("preservedParams", None)
-
-    def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList"%typeName, None)
-
-    def _personInDefinedList(self, typeName, person):
-        list = self._websession.getVar("%sList"%typeName)
-        if list is None :
-            return False
-        for p in list :
-            if person.getFullName()+" "+person.getEmail() == p[0].getFullName()+" "+p[0].getEmail() :
-                return True
-        return False
-
-    def _getPersonOptions(self, typeName):
-        html = []
-        names = []
-        text = {}
-        html.append("""<option value=""> </option>""")
-        for contribution in self._target.getConference().getContributionList() :
-            for speaker in contribution.getSpeakerList() :
-                name = speaker.getFullNameNoTitle()
-                if not name in names and not self._personInDefinedList(typeName, speaker):
-                    text[name] = """<option value="s%s-%s">%s</option>"""%(contribution.getId(),speaker.getId(),name)
-                    names.append(name)
-            for author in contribution.getAuthorList() :
-                name = author.getFullNameNoTitle()
-                if not name in names and not self._personInDefinedList(typeName, author):
-                    text[name] = """<option value="a%s-%s">%s</option>"""%(contribution.getId(),author.getId(),name)
-                    names.append(name)
-            for coauthor in contribution.getCoAuthorList() :
-                name = coauthor.getFullNameNoTitle()
-                if not name in names and not self._personInDefinedList(typeName, coauthor):
-                    text[name] = """<option value="c%s-%s">%s</option>"""%(contribution.getId(),coauthor.getId(),name)
-                    names.append(name)
-        names.sort()
-        for name in names:
-            html.append(text[name])
-        return "".join(html)
 
 
 #-------------------------------------------------------------------------------------
@@ -366,7 +311,10 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
     def _process(self):
 
         params = self._getRequestParams()
-        #params.update(self._getPreservedParams())
+
+        from MaKaC.services.interface.rpc import json
+        presenters = json.decode(params.get("presenters", "[]"))
+
         sc = self._target
         """self._target - contribution owning new subcontribution"""
 
@@ -387,270 +335,37 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
             sc.setDuration( durationHours, durationMinutes )
             sc.setSpeakerText( params.get("speakers", "") )
             sc.setParent(self._target)
-            for presenter in self._getDefinedList("presenter") :
-                sc.newSpeaker(presenter[0])
+
+            for presenter in presenters:
+                try:
+                    if presenter["existing"]:
+                        # the avatar should exists
+                        ah = AvatarHolder()
+                        spk = conference.SubContribParticipation()
+                        spk.setDataFromAvatar(ah.getById(presenter["id"]))
+                except KeyError:
+                    # create new speaker
+                    spk = self._newSpeaker(presenter)
+                sc.newSpeaker(spk)
 
             logInfo = sc.getLogInfo()
             logInfo["subject"] = "Create new subcontribution: %s"%sc.getTitle()
             self._target.getConference().getLogHandler().logAction(logInfo, "Timetable/SubContribution", self._getUser())
-
-            self._removePreservedParams()
-            self._removeDefinedList("presenter")
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
-        elif params.get("performedAction", "") == "New presenter" :
-            self._preserveParams(params)
-            self._redirect(urlHandlers.UHContribCreateSubContPresenterNew.getURL(self._target))
-        elif params.get("performedAction","") == "Search presenter" :
-            self._preserveParams(params)
-            self._redirect(urlHandlers.UHContribCreateSubContPresenterSearch.getURL(self._target))
-        elif params.get("performedAction", "") == "Add as presenter" :
-            self._preserveParams(params)
-            url = urlHandlers.UHContribCreateSubContPersonAdd.getURL(self._target)
-            url.addParam("typeName", "presenter")
-            url.addParam("orgin", "added")
-            self._redirect(url)
-        elif params.get("performedAction", "") == "Remove presenters" :
-            self._preserveParams(params)
-            self._removePersons(params, "presenter")
-            url = urlHandlers.UHContribAddSubCont.getURL(self._target)
-            url.addParam("recalled", "true")
-            self._redirect(url)
         else:
-            self._removePreservedParams()
-            self._removeDefinedList("presenter")
             self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
 
-    def _getPreservedParams(self):
-        params = self._websession.getVar("preservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _preserveParams(self, params):
-        self._websession.setVar("preservedParams", params)
-
-    def _removePreservedParams(self):
-        self._websession.setVar("preservedParams", None)
-
-    def _getDefinedList(self, typeName):
-        definedList = self._websession.getVar("%sList"%typeName)
-        if definedList is None :
-            return []
-        return definedList
-
-    def _setDefinedList(self, definedList, typeName):
-        self._websession.setVar("%sList"%typeName, definedList)
-
-    def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList"%typeName, None)
-
-    def _removePersons(self, params, typeName):
-        persons = self._normaliseListParam(params.get("%ss"%typeName, []))
-        definedList = self._getDefinedList(typeName)
-        personsToRemove = []
-        for p in persons :
-            if int(p) < len(definedList) or int(p) >= 0 :
-                personsToRemove.append(definedList[int(p)])
-        for person in personsToRemove :
-            definedList.remove(person)
-        self._setDefinedList(definedList, typeName)
-
-#-------------------------------------------------------------------------------------
-
-class RHNewSubcontributionPresenterSearch(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribCreateSubContPresenterSearch
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-
-    def _process(self):
-        params = self._getRequestParams()
-
-        params["newButtonAction"] = str(urlHandlers.UHContribCreateSubContPresenterNew.getURL())
-        addURL = urlHandlers.UHContribCreateSubContPersonAdd.getURL()
-        addURL.addParam("orgin", "selected")
-        addURL.addParam("typeName", "presenter")
-        params["addURL"] = addURL
-        p = contributions.WSubContributionCreationPresenterSelect(self, self._target)
-        return p.display(**params)
-
-#-------------------------------------------------------------------------------------
-
-class RHNewSubcontributionPresenterNew(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribCreateSubContPresenterNew
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-
-    def _process(self):
-        p = contributions.WSubContributionCreationPresenterNew(self, self._target)
-        return p.display()
-
-#-------------------------------------------------------------------------------------
-
-class RHNewSubcontributionPersonAdd(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribCreateSubContPersonAdd
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._typeName = params.get("typeName", None)
-        if self._typeName  is None :
-            raise MaKaCError( _("Type name of the person to add is not set."))
-
-    def _process(self):
-        params = self._getRequestParams()
-        self._errorList = []
-
-        definedList = self._getDefinedList(self._typeName)
-        if definedList is None :
-            definedList = []
-
-        if params.get("orgin", "") == "new" :
-            if params.get("ok", None) is None :
-                url = urlHandlers.UHContribAddSubCont.getURL(self._target)
-                url.addParam("recalled", "true")
-                self._redirect(url)
-                return
-            else :
-                person = SubContribParticipation()
-                person.setFirstName(params["name"])
-                person.setFamilyName(params["surName"])
-                person.setEmail(params["email"])
-                person.setAffiliation(params["affiliation"])
-                person.setAddress(params["address"])
-                person.setPhone(params["phone"])
-                person.setTitle(params["title"])
-                person.setFax(params["fax"])
-                if not self._alreadyDefined(person, definedList) :
-                    definedList.append([person, params.has_key("submissionControl")])
-                else :
-                    self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-
-        elif params.get("orgin", "") == "selected":
-            selectedList = self._normaliseListParam(self._getRequestParams().get("selectedPrincipals", []))
-
-            for s in selectedList :
-                if s[0:8] == "*author*" :
-                    auths = self._target.getConference().getAuthorIndex()
-                    selected = auths.getById(s[9:])[0]
-                else :
-                    ph = user.PrincipalHolder()
-                    selected = ph.getById(s)
-                if isinstance(selected, user.Avatar) :
-                    person = SubContribParticipation()
-                    person.setDataFromAvatar(selected)
-                    if not self._alreadyDefined(person, definedList) :
-                        definedList.append([person, params.has_key("submissionControl")])
-                    else :
-                        self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-
-                elif isinstance(selected, user.Group) :
-                    for member in selected.getMemberList() :
-                        person = SubContribParticipation()
-                        person.setDataFromAvatar(member)
-                        if not self._alreadyDefined(person, definedList) :
-                            definedList.append([person, params.has_key("submissionControl")])
-                        else :
-                            self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-                else :
-                    person = SubContribParticipation()
-                    person.setTitle(selected.getTitle())
-                    person.setFirstName(selected.getFirstName())
-                    person.setFamilyName(selected.getFamilyName())
-                    person.setEmail(selected.getEmail())
-                    person.setAddress(selected.getAddress())
-                    person.setAffiliation(selected.getAffiliation())
-                    person.setPhone(selected.getPhone())
-                    person.setFax(selected.getFax())
-                    if not self._alreadyDefined(person, definedList) :
-                        definedList.append([person, params.has_key("submissionControl")])
-                    else :
-                        self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-
-        elif params.get("orgin", "") == "added" :
-            preservedParams = self._getPreservedParams()
-            chosen = preservedParams.get("%sChosen"%self._typeName, None)
-            if chosen is None or chosen == "" :
-                url = urlHandlers.UHContribAddSubCont.getURL(self._target)
-                url.addParam("recalled", "true")
-                self._redirect(url)
-                return
-            index = chosen.find("-")
-            objectId = chosen[1:index]
-            chosenId = chosen[index+1:len(chosen)]
-            if chosen[0:1] == "d" :
-                object = self._target.getConference().getSessionById(objectId)
-            else :
-                object = self._target.getConference().getContributionById(objectId)
-            chosenPerson = None
-            if chosen[0:1] == "s" :
-                chosenPerson = object.getSpeakerById(chosenId)
-            elif chosen[0:1] == "a" :
-                chosenPerson = object.getAuthorById(chosenId)
-            elif chosen[0:1] == "c" :
-                chosenPerson = object.getCoAuthorById(chosenId)
-            elif chosen[0:1] == "d" :
-                chosenPerson = object.getConvenerById(chosenId)
-            elif index ==  -1 : #person data doesn't contain proper id
-                if self._getUser() and chosenId in self._getUser().getPersonalInfo().getBasket().getUsers() :   #checking if such person is listed on favourites
-                    chosenPerson = self._getUser().getPersonalInfo().getBasket().getUsers()[chosenId]
-            if chosenPerson is None :
-                self._redirect(urlHandlers.UHConfModScheduleNewContrib.getURL(self._target))
-                return
-            person = SubContribParticipation()
-            person.setTitle(chosenPerson.getTitle())
-            person.setFirstName(chosenPerson.getFirstName())
-            person.setFamilyName(chosenPerson.getFamilyName())
-            person.setEmail(chosenPerson.getEmail())
-            person.setAddress(chosenPerson.getAddress())
-            person.setAffiliation(chosenPerson.getAffiliation())
-            person.setPhone(chosenPerson.getPhone())
-            person.setFax(chosenPerson.getFax())
-            if not self._alreadyDefined(person, definedList) :
-                definedList.append([person, params.has_key("submissionControl")])
-            else :
-                self._errorList.append("%s has been already defined as %s of this session"%(person.getFullName(), self._typeName))
-        else :
-            self._redirect(urlHandlers.UHConfModifSchedule.getURL(self._target))
-            return
-        preservedParams = self._getPreservedParams()
-        preservedParams["errorMsg"] = self._errorList
-        self._preserveParams(preservedParams)
-        self._websession.setVar("%sList"%self._typeName, definedList)
-
-        url = urlHandlers.UHContribAddSubCont.getURL(self._target)
-        url.addParam("recalled", "true")
-        self._redirect(url)
-
-
-    def _getDefinedList(self, typeName):
-        definedList = self._websession.getVar("%sList"%typeName)
-        if definedList is None :
-            return []
-        return definedList
-
-    def _alreadyDefined(self, person, definedList):
-        if person is None :
-            return True
-        if definedList is None :
-            return False
-        fullName = person.getFullName()
-        for p in definedList :
-            if p[0].getFullName() == fullName :
-                return True
-        return False
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("preservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _preserveParams(self, params):
-        self._websession.setVar("preservedParams", params)
-
-    def _removePreservedParams(self):
-        self._websession.setVar("preservedParams", None)
+    def _newSpeaker(self, presenter):
+        spk = conference.SubContribParticipation()
+        spk.setTitle(presenter["title"])
+        spk.setFirstName(presenter["firstName"])
+        spk.setFamilyName(presenter["familyName"])
+        spk.setAffiliation(presenter["affiliation"])
+        spk.setEmail(presenter["email"])
+        spk.setAddress(presenter["address"])
+        spk.setPhone(presenter["phone"])
+        spk.setFax(presenter["fax"])
+        return spk
 
 #-------------------------------------------------------------------------------------
 

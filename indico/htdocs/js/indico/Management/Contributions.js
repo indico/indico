@@ -379,7 +379,7 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
 
 
 /*
- * Manager of participant list in the contribution main tab
+ * Manager of participant list in the subcontribution main tab
  */
 type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
 
@@ -446,7 +446,7 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress();
         // Get the suggestedUsers
-        indicoRequest(this.methods["getAllAuthors"], {confId: this.confId, contribId: this.contribId, subContribId: this.subContribId},
+        indicoRequest(this.methods["getAllAuthors"], {confId: this.confId, contribId: this.contribId},
                 function(result, error) {
                     if (!error) {
                         killProgress();
@@ -487,5 +487,93 @@ type("SubContributionPresenterListManager", ["ListOfUsersManager"], {
 
         this.ListOfUsersManager(confId, this.methods, {confId: confId, contribId: this.contribId, subContribId: this.subContribId},
                                 inPlaceListElem, true, true, false, false, null, userCaption, "UIPerson", false, false, true);
+    }
+);
+
+
+
+/*
+ * Manager of participant list in creating a new sub contribution
+ * The difference between this class and SubContributionPresenterListManager is that this object does not have
+ * to send ajax request when a new participant is added/removed or edited.
+ */
+type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
+
+	addManagementMenu: function() {
+        var self = this;
+        this.inPlaceMenu.observeClick(function(e) {
+            var menuItems = {};
+
+            menuItems[$T('Add from authors')] = function(){ self._addFromAuthorsList(); };
+
+            menuItems[$T('Add existing')] = function(){ self._addExistingUser($T("Add ") + self.userCaption, true, this.confId, false,
+                                                                               true, true, false, true); };
+            menuItems[$T('Add new')] = function(){ self._addNonExistingUser(); };
+
+            var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList");
+            var pos = self.inPlaceMenu.getAbsolutePosition();
+            menu.open(pos.x, pos.y + 20);
+            return false;
+        });
+    },
+
+    _addFromAuthorsList: function() {
+        var self = this;
+        var killProgress = IndicoUI.Dialogs.Util.progress();
+        // Get the suggestedUsers
+        indicoRequest(this.methods["getAllAuthors"], {confId: this.confId, contribId: this.contribId},
+                function(result, error) {
+                    if (!error) {
+                        killProgress();
+                        // Create the popup to add suggested users
+                        // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
+                        //          showToggleFavouriteButtons, chooseProcess)
+                        var chooseUsersPopup = new ChooseUsersPopup($T('Select presenter(s)'), false, this.confId, false, false,
+                                result, false, false,
+                                function(userList) {
+                                    for (var i=0; i<userList.length; i++) {
+                                        if (!self._isAlreadyInList(userList[i]['email'])) {
+                                            self.usersList.append(userList[i]);
+                                        } else {
+                                            var popup = new AlertPopup($T('Add ')+self.userCaption,
+                                                            $T('The email address (') + userList[i]['email'] +
+                                                            $T(') of a user you are trying to add is already used by another participant or the user is already added to the list.'));
+                                            popup.open();
+                                        }
+                                    }
+                                    self._updateUserList();
+                                }
+                        );
+                        chooseUsersPopup.execute();
+                    } else {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+        );
+    },
+
+    _checkEmptyList: function() {
+        if (this.usersList.length.get() == 0) {
+            this.parentElement.dom.style.display = 'none';
+            this.inPlaceMenu.dom.style.marginLeft = '0px';
+        } else {
+            this.parentElement.dom.style.display = '';
+            this.inPlaceMenu.dom.style.marginLeft = '15px';
+        }
+    }
+
+},
+
+    function(confId, contribId, inPlaceListElem, inPlaceMenu, parentElement, userCaption) {
+        this.contribId = contribId;
+        this.inPlaceMenu = inPlaceMenu;
+        this.parentElement = parentElement;
+        this.userCaption = userCaption;
+        this.usersList = $L();
+        this.methods = {'getAllAuthors': 'contribution.participants.subContribution.getAllAuthors'};
+
+        this.ListOfUsersManagerForForm(confId, inPlaceListElem, true, true, false, false, userCaption, userCaption,
+                                       "UIPerson", false, false, true);
     }
 );

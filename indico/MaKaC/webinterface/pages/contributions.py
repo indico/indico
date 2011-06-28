@@ -832,6 +832,7 @@ class WSubContributionCreation(wcomponents.WTemplated):
 
     def __init__( self, target ):
         self.__owner = target
+        self._contribution = target
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -841,36 +842,11 @@ class WSubContributionCreation(wcomponents.WTemplated):
         vars["durationMinutes"] = vars.get("durationMinutes","15")
         vars["keywords"] = vars.get("keywords","")
         vars["locator"] = self.__owner.getLocator().getWebForm()
-        vars["speakers"] = ""
 
-        vars["presenterDefined"] = vars.get("presenterDefined","")
+        vars["confId"] = self._contribution.getConference().getId()
+        vars["contribId"] = self._contribution.getId()
         return vars
 
-    def _getPersonOptions(self):
-        html = []
-        names = []
-        text = {}
-        html.append("""<option value=""> </option>""")
-        for contribution in self.__owner.getConference().getContributionList() :
-            for speaker in contribution.getSpeakerList() :
-                name = speaker.getFullNameNoTitle()
-                if not(name in names) :
-                    text[name] = """<option value="s%s-%s">%s</option>"""%(contribution.getId(),speaker.getId(),name)
-                    names.append(name)
-            for author in contribution.getAuthorList() :
-                name = author.getFullNameNoTitle()
-                if not name in names:
-                    text[name] = """<option value="a%s-%s">%s</option>"""%(contribution.getId(),author.getId(),name)
-                    names.append(name)
-            for coauthor in contribution.getCoAuthorList() :
-                name = coauthor.getFullNameNoTitle()
-                if not name in names:
-                    text[name] = """<option value="c%s-%s">%s</option>"""%(contribution.getId(),coauthor.getId(),name)
-                    names.append(name)
-        names.sort()
-        for name in names:
-            html.append(text[name])
-        return "".join(html)
 
 class WPContribAddSC( WPContributionModifBase ):
 
@@ -884,90 +860,8 @@ class WPContribAddSC( WPContributionModifBase ):
             "postURL": urlHandlers.UHContribCreateSubCont.getURL()}
         params.update(pars)
 
-        wpresenter = wcomponents.WAddPersonModule("presenter")
-        params["presenterOptions"] = params.get("presenterOptions",self._getPersonOptions())
-        params["presenter"] = wpresenter.getHTML(params)
-
         return wc.getHTML( params )
 
-    def _getPersonOptions(self):
-        html = []
-        names = []
-        text = {}
-        html.append("""<option value=""> </option>""")
-        for contribution in self._contrib.getConference().getContributionList() :
-            for speaker in contribution.getSpeakerList() :
-                name = speaker.getFullNameNoTitle()
-                if not(name in names) :
-                    text[name] = """<option value="s%s-%s">%s</option>"""%(contribution.getId(),speaker.getId(),name)
-                    names.append(name)
-            for author in contribution.getAuthorList() :
-                name = author.getFullNameNoTitle()
-                if not name in names:
-                    text[name] = """<option value="a%s-%s">%s</option>"""%(contribution.getId(),author.getId(),name)
-                    names.append(name)
-            for coauthor in contribution.getCoAuthorList() :
-                name = coauthor.getFullNameNoTitle()
-                if not name in names:
-                    text[name] = """<option value="c%s-%s">%s</option>"""%(contribution.getId(),coauthor.getId(),name)
-                    names.append(name)
-        names.sort()
-        for name in names:
-            html.append(text[name])
-        return "".join(html)
-
-#---------------------------------------------------------------------------
-
-class WSubContributionCreationPresenterSelect(WPContributionModifBase ):
-
-    def _setActiveTab( self ):
-        self._tabSubCont.setActive()
-
-    def _getTabContent( self, params ):
-        searchAction = str(self._rh.getCurrentURL())
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        p = wcomponents.WComplexSelection(self._conf,searchAction,forceWithoutExtAuth=searchLocal)
-        return p.getHTML(params)
-
-#---------------------------------------------------------------------------
-
-class WSubContributionCreationPresenterNew(WPContributionModifBase):
-
-    def _setActiveTab( self ):
-        self._tabSubCont.setActive()
-
-    def _getTabContent( self, params ):
-        p = wcomponents.WNewPerson()
-
-        if params.get("formTitle",None) is None :
-            params["formTitle"] = _("Define new presenter")
-        if params.get("titleValue",None) is None :
-            params["titleValue"] = ""
-        if params.get("surNameValue",None) is None :
-            params["surNameValue"] = ""
-        if params.get("nameValue",None) is None :
-            params["nameValue"] = ""
-        if params.get("emailValue",None) is None :
-            params["emailValue"] = ""
-        if params.get("addressValue",None) is None :
-            params["addressValue"] = ""
-        if params.get("affiliationValue",None) is None :
-            params["affiliationValue"] = ""
-        if params.get("phoneValue",None) is None :
-            params["phoneValue"] = ""
-        if params.get("faxValue",None) is None :
-            params["faxValue"] = ""
-
-        formAction = urlHandlers.UHContribCreateSubContPersonAdd.getURL(self._contrib)
-        formAction.addParam("orgin","new")
-        formAction.addParam("typeName","presenter")
-        params["formAction"] = formAction
-
-        return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 
