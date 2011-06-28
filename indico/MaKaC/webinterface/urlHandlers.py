@@ -24,6 +24,7 @@ import MaKaC.user as user
 from new import classobj
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.common.contextManager import ContextManager
 
 """
 This file contains classes representing url handlers which are objects which
@@ -64,7 +65,12 @@ class URLHandler(object):
             Parameters:
                 params - (Dict) parameters to be added to the URL.
         """
-        return URL( "%s/%s"%(Config.getInstance().getBaseURL(),cls.getRelativeURL()) , **params )
+        rh = ContextManager.getdefault('currentRH', None)
+        if rh and rh._req.is_https():
+            baseURL = Config.getInstance().getBaseSecureURL()
+        else:
+            baseURL = Config.getInstance().getSecureURL()
+        return URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
 
     @classmethod
     def getURL( cls, target=None, **params ):
