@@ -4982,7 +4982,7 @@ class RHConfSavePic( RHConferenceModifBase ):
         info={"name": f.getFileName(),
                 "id": f.getId(),
                 "picURL": str(urlHandlers.UHConferencePic.getURL(pic))}
-        return "<html><head></head><body><textarea>"+json.encode({'status': "OK", 'info': info})+"</textarea></body></html>"
+        return json.encode_iframe({'status': "OK", 'info': info})
 
 class RHConfModifTickerTapeAction( RHConferenceModifBase ):
 

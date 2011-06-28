@@ -35,12 +35,23 @@ from MaKaC.services.interface.rpc.process import ServiceRunner
 
 from MaKaC.common.logger import Logger
 
+# Test if simplejson escapes forward slashes. It changed its behaviour im some version.
+if '\\/' in simplejson.dumps('/'):
+    dumps = simplejson.dumps
+else:
+    def dumps(*args, **kwargs):
+        return simplejson.dumps(*args, **kwargs).replace('/', '\\/')
+
 class Json:
     def __init__(self, content):
         self.json = encode(content)
 
 def encode(obj):
-    return simplejson.dumps(obj, ensure_ascii=True)
+    return dumps(obj, ensure_ascii=True)
+
+def encode_iframe(obj):
+    s = encode(obj)
+    return "<html><head></head><body><textarea>%s</textarea></body></html>" % s
 
 def decode(str):
     return unicodeToUtf8(simplejson.loads(str))
