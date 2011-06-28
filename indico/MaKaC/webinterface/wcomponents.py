@@ -3764,7 +3764,7 @@ class WTabControl( WTemplated ):
         for i in range(0, len(tabCtrl.getTabList())):
             tab = tabCtrl.getTabList()[i]
 
-            if not tab.isEnabled():
+            if not tab.isEnabled() or tab.isHidden():
                 continue
             cls=self.__class__._unSelTabCls
 
