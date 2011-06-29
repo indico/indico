@@ -168,16 +168,11 @@ class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
         self._params = params
         self._event_type = params.get("event_type", "").strip()
         RHConferenceCreationBase._checkParams( self, params, mustExist=0 )
-        self._askForType = (params.get("event_type", "").strip() == "")
-
-    def _getSelectTypePage( self ):
-        p = category.WPConferenceCreationSelectType( self, self._target )
-        return p.display( wfs=self._wfReg.getFactoryList() )
 
     def _process( self ):
 
-        if self._askForType:
-            return self._getSelectTypePage()
+        if self._event_type == "":
+            raise MaKaCError("No event type specified")
         else:
             p = category.WPConferenceCreationMainData( self, self._target )
             if self._wf != None:
