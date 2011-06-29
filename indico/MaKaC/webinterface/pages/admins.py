@@ -39,8 +39,6 @@ from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.common.timerExec import HelperTaskList, Alarm
-from MaKaC.common.timerExec import task as Task
 from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerReminder, PendingCoordinatorReminder
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC import roomMapping
@@ -2690,15 +2688,14 @@ class WPTaskManagerBase(WPAdminsSystemBase):
 class WPTaskManager( WPTaskManagerBase ):
 
     def _getTabContent( self, params ):
-        wc = WTaskManager(HelperTaskList.getTaskListInstance())
+        wc = WTaskManager()
 
         pars = {}
-        return wc.getHTML( pars )
+        return wc.getHTML(pars)
+
 
 class WTaskManager(wcomponents.WTemplated):
-
-    def  __init__(self, taskList):
-        self.taskList = taskList
+    pass
 
 
 class WPConfirmDelete(WPTaskManagerBase):

@@ -18,8 +18,6 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-'''TODO TASKDAEMON: remove this file once the migration to the new taskDaemon is complete'''
-
 import time, signal, copy, sys, traceback
 from threading import Thread
 import smtplib
@@ -536,6 +534,60 @@ class sendMail(obj):
         TrashCanManager().remove(self)
 
 
+class FoundationSync( obj ):
+    """
+    Synchronizes room data (along with associated room managers
+    and equipment) with Foundation database.
+
+    Also, updates list of CERN Official Holidays
+
+    (This is object for a task class)
+    """
+    def __init__(self):
+        obj.__init__(self)
+
+    def run(self):
+        from MaKaC.common.FoundationSync.foundationSync import FoundationSync
+        FoundationSync().doAll()
+
+    def delete(self):
+        TrashCanManager().add( self )
+
+    def recover(self):
+        TrashCanManager().remove( self )
+
+    @staticmethod
+    def register():
+        """
+        Run ONCE to add FoundationSync task
+        """
+        # Connect to Indico DB
+        db.DBMgr.getInstance().startRequest()
+        db.DBMgr.getInstance().sync()
+        TASK_ID = 'FoundationSyncTask'
+
+        t = task()
+        t.setId( TASK_ID )
+        d = nowutc() + timedelta( days = 1 )
+        t.setStartDate( d.replace( hour=0, minute=0, second=0, microsecond=0 )) # This midnight
+        t.setInterval( timedelta( days = 1 ) )
+        t.addObj( FoundationSync() )
+
+        # Check if tasks existis
+        taskList = HelperTaskList.getTaskListInstance()
+        for existing in taskList.getTasks():
+            if existing.getId() == t.getId():
+                print TASK_ID + " is already registered"
+                return
+
+        # Task does not exist: add it
+        taskList.addTask( t )
+
+        # Disconnect from Indico DB
+        db.DBMgr.getInstance().endRequest()
+        print "Successfully registered " + TASK_ID
+
+
 class timer(Thread):
     """
     When thread started, call the function 'func' each 'interval' using the worker class
@@ -822,6 +874,25 @@ Best Regards
             # implemented.
             obj.delete()
         #self.conf = None
+        TrashCanManager().add(self)
+
+    def recover(self):
+        TrashCanManager().remove(self)
+
+class StatisticsUpdater(obj):
+    def __init__(self, cat):
+        self._cat = cat
+
+    def run( self ):
+        CategoryStatistics.updateStatistics(self._cat)
+
+    def delete(self):
+        for obj in self.getObjList():
+            self.removeObj(obj)
+            # Id the delete method doesn't exist for obj it has to be
+            # implemented.
+            obj.delete()
+        self.conf = None
         TrashCanManager().add(self)
 
     def recover(self):

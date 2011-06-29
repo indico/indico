@@ -21,15 +21,13 @@
 from datetime     import datetime, timedelta
 from persistent   import Persistent
 from registration import Notification
-from datetime     import datetime
 from MaKaC.common import utils, Counter
-from MaKaC.common.Configuration import Config
 from MaKaC.user   import Avatar
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.Counter       import Counter
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.modules.scheduler import Client
 from indico.modules.scheduler.tasks import AlarmTask
@@ -1479,17 +1477,16 @@ class Submission(Persistent):
                 ccList = newSubmissionNotify.getCCList()
                 if len(toList+ccList) > 0 :
                     subject = "Notification for evaluation '%s'"%evaluation.getTitle()
-                    from MaKaC.common.timerExec import sendMail
-                    sm = sendMail()
-                    supportEmail = evaluation.getConference().getSupportEmail(returnNoReply=True)
-                    sm.setFromAddr(supportEmail)
-                    for to in toList:
-                        sm.addToAddr(to)
-                    for cc in ccList:
-                        sm.addCcAddr(cc)
-                    sm.setSubject(subject)
-                    sm.setText(message)
-                    sm.run()
+                    conf = evaluation.getConference()
+                    supportEmail = conf.getSupportEmail(returnNoReply=True, caption=True)
+
+                    notification = GenericNotification({'fromAddr': supportEmail,
+                                                        'toList': toList,
+                                                        'ccList': ccList,
+                                                        'subject': subject,
+                                                        'body': message})
+
+                    GenericMailer.send(notification)
         except Exception, e:
             if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
                 raise Exception(e)

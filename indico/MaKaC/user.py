@@ -816,14 +816,6 @@ class Avatar(Persistent, Fossilizable):
 
                     self._p_changed = 1
 
-        elif isinstance(obj, MaKaC.common.timerExec.Alarm):
-            if not role in self.linkedTo["alarm"].keys():
-                    raise  _("""role "%s" not allowed for alarms""")%role
-            else:
-                if not obj in self.linkedTo["alarm"][role]:
-                    self.linkedTo["alarm"][role].append(obj)
-                    self._p_changed = 1
-
         elif isinstance(obj, MaKaC.user.Group):
             if not role in self.linkedTo["group"].keys():
                     raise  _("""role "%s" not allowed for groups""")%role
@@ -919,14 +911,6 @@ class Avatar(Persistent, Fossilizable):
                     # remove from the time-ordered list
                     self.getTimedLinkedEvents().delete(obj.getConference(), role)
 
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.common.timerExec.Alarm):
-            if not role in self.linkedTo["alarm"].keys():
-                    raise  _("""role "%s" not allowed for alarms""")%role
-            else:
-                if obj in self.linkedTo["alarm"][role]:
-                    self.linkedTo["alarm"][role].remove(obj)
                     self._p_changed = 1
 
         elif isinstance(obj, MaKaC.user.Group):

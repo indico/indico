@@ -70,7 +70,6 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AdminList
-from MaKaC.common.timerExec import HelperTaskList, Alarm
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError
 from MaKaC import registration,epayment
 from MaKaC.evaluation import Evaluation
@@ -3123,7 +3122,7 @@ class Conference(CommonObjectBase, Locatable):
         self.description = desc
         self.notifyModification()
 
-    def getSupportEmail( self, returnNoReply=False ):
+    def getSupportEmail( self, returnNoReply=False, caption=False ):
         """
         Returns the support email address associated with the conference
         :param returnNoReply: Return no-reply address in case there's no support e-mail (default True)
@@ -3140,7 +3139,12 @@ class Conference(CommonObjectBase, Locatable):
             # address, and the 'global' support e-mail if there isn't one
             return HelperMaKaCInfo.getMaKaCInfoInstance().getNoReplyEmail(returnSupport=True)
         else:
-            return self._supportEmail
+            supportCaption = self.getDisplayMgr().getSupportEmailCaption()
+
+            if caption and supportCaption:
+                return '"%s" <%s>' % (supportCaption, self._supportEmail)
+            else:
+                return self._supportEmail
 
     def setSupportEmail( self, newSupportEmail ):
         self._supportEmail = newSupportEmail.strip()
@@ -4139,9 +4143,15 @@ class Conference(CommonObjectBase, Locatable):
             if isinstance(entry.getOwner(), SessionSlot) :
                 entry.getOwner().fit()
 
-    def getDefaultStyle( self ):
+    def getDisplayMgr(self):
+        """
+        Return the display manager for the conference
+        """
         from MaKaC.webinterface import displayMgr
-        return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self).getDefaultStyle()
+        return displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self)
+
+    def getDefaultStyle( self ):
+        return self.getDisplayMgr(self).getDefaultStyle()
 
     def clone( self, startDate, options, eventManager=None, userPerformingClone = None ):
         # startDate must be in the timezone of the event (to avoid problems with daylight-saving times)

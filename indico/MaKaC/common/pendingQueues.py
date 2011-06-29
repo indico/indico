@@ -23,7 +23,6 @@ import MaKaC.common.indexes as indexes
 from MaKaC.common import DBMgr
 from MaKaC.webinterface import mail, urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.timerExec import task, obj
 from indico.modules.scheduler import Scheduler
 from indico.modules.scheduler.tasks import OneShotTask
 from persistent import Persistent
