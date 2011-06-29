@@ -42,7 +42,7 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
 
         # Account for possible retries (due to conflicts)
         # If 'minutesFileId' is defined, there was a previous try
-        fileId = ContextManager.getdefault('minutesFileId', None)
+        fileId = ContextManager.setdefault('minutesFileId', None)
 
         minutes = self._target.getMinutes()
         if not minutes:

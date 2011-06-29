@@ -138,7 +138,7 @@ class ChatSMContributor(Component, Observable):
         conf = params['conf']
         user = params['user']
         options = params['options']
-        ContextManager.getdefault('mailHelper', MailHelper())
+        ContextManager.setdefault('mailHelper', MailHelper())
 
         if options.get("chatrooms", True):
             crList = DBHelpers().getChatroomList(confToClone)

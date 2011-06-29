@@ -112,7 +112,7 @@ class ContextManager(object):
         return cls.get(elem)
 
     @classmethod
-    def getdefault(cls, name, default):
+    def setdefault(cls, name, default):
         """
         If no set has been done over the variable before,
         a default value is *set* and *returned*

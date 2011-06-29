@@ -76,7 +76,7 @@ class ExternalOperationsManager(object):
         """ Returns the dictionary where the results are stored.
             The dictionary is stored inside the ContentManager
         """
-        return ContextManager.getdefault("collaborationRemoteOperations", {})
+        return ContextManager.setdefault("collaborationRemoteOperations", {})
 
     @classmethod
     def _objectToKey(cls, obj):

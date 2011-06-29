@@ -172,7 +172,7 @@ class CreateChatroom( XMPPChatroomService ):
         if self._room.getCreatedInLocalServer():
             self.roomExistsXMPP(self._botJID, self._botPass, self._room)
         try:
-            ContextManager.getdefault('mailHelper', MailHelper())
+            ContextManager.setdefault('mailHelper', MailHelper())
             self._notify('createChatroom', {'room': self._room,
                                             'conference': conference})
         except ServiceError, e:
@@ -243,7 +243,7 @@ class EditChatroom( XMPPChatroomService ):
                 self.roomExistsXMPP(self._botJID, self._botPass, self._room)
 
             #edit the chat room in indico
-            ContextManager.getdefault('mailHelper', MailHelper())
+            ContextManager.setdefault('mailHelper', MailHelper())
             self._notify('editChatroom', {'oldTitle': oldRoom.getTitle(), 'newRoom':self._room})
         except ServiceError, e:
             Logger.get('ext.im').error("Exception while editing: %s" %e)
@@ -298,7 +298,7 @@ class DeleteChatroom( XMPPChatroomService ):
         message = _("%s has requested to delete this room. Please address this person for further information" %self._user.getName())
         #delete room from Indico
         try:
-            ContextManager.getdefault('mailHelper', MailHelper())
+            ContextManager.setdefault('mailHelper', MailHelper())
             self._notify('deleteChatroom', {'room': self._room})
         except ServiceError, e:
             Logger.get('ext.im').exception(_('Problem deleting indexes in the database for chat room %s' % self._room.getTitle()))
@@ -367,7 +367,7 @@ class AddConference2Room( ServiceBase, Observable ):
 
     def _getAnswer( self ):
         rooms=[]
-        ContextManager.getdefault('mailHelper', MailHelper())
+        ContextManager.setdefault('mailHelper', MailHelper())
         try:
             for roomID in self._rooms:
                 try:
