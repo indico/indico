@@ -529,7 +529,7 @@ Event details:
 
     @classmethod
     def currentUserDetails(cls, caption):
-        if not ContextManager.has('currentUser'):
+        if not 'currentUser' in ContextManager.get():
             return ""
         user = ContextManager.get('currentUser')
         return cls.userDetails(caption, user)

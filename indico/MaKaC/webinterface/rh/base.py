@@ -451,8 +451,8 @@ class RH(RequestHandlerBase):
         textLog = []
         self._startTime = datetime.now()
 
-        # create the context
-        ContextManager.create()
+        # clear the context
+        ContextManager.destroy()
 
         #redirect to https if necessary
         if self._checkHttpsRedirect():
@@ -620,10 +620,6 @@ class RH(RequestHandlerBase):
                 self._req.status=apache.HTTP_INTERNAL_SERVER_ERROR
             except NameError:
                 pass
-
-
-        # destroy the context
-        ContextManager.destroy()
 
         totalTime = (datetime.now() - self._startTime)
         textLog.append("%s : Request ended"%totalTime)

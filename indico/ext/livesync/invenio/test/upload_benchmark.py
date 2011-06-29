@@ -93,7 +93,7 @@ def runTests(host='localhost', port=FAKE_SERVICE_PORT,
 
     dummy = avatar
 
-    ContextManager.create()
+    ContextManager.destroy()
 
     HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
 

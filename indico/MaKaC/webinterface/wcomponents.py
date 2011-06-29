@@ -2065,7 +2065,7 @@ class WPrincipalTable(WTemplated):
 
     def __init__(self):
         WTemplated.__init__(self)
-        if not ContextManager.has("principalTableCounter"):
+        if not "principalTableCounter" in ContextManager.get():
             ContextManager.set("principalTableCounter", 0)
         self._principalTableId = ContextManager.get("principalTableCounter")
         ContextManager.set("principalTableCounter", self._principalTableId + 1)

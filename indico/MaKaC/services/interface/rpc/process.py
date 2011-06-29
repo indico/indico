@@ -61,8 +61,9 @@ def processRequest(method, params, req):
 class ServiceRunner(Observable):
 
     def invokeMethod(self, method, params, req):
-        # create the context
-        ContextManager.create()
+
+        # clear the context
+        ContextManager.destroy()
 
         DBMgr.getInstance().startRequest()
 
@@ -73,48 +74,42 @@ class ServiceRunner(Observable):
         self._notify('requestStarted', req)
 
         try:
-            try:
-                retry = 10
-                while retry > 0:
-                    if 10 - retry > 0:
-                        # notify components that the request is being retried
-                        self._notify('requestRetry', req, 10 - retry)
+            retry = 10
+            while retry > 0:
+                if 10 - retry > 0:
+                    # notify components that the request is being retried
+                    self._notify('requestRetry', req, 10 - retry)
+
+                try:
+                    DBMgr.getInstance().sync()
 
                     try:
-                        DBMgr.getInstance().sync()
+                        result = processRequest(method, copy.deepcopy(params), req)
+                    except MaKaC.errors.NoReportError, e:
+                        raise NoReportError(e.getMsg())
 
-                        try:
-                            result = processRequest(method, copy.deepcopy(params), req)
-                        except MaKaC.errors.NoReportError, e:
-                            raise NoReportError(e.getMsg())
+                    # notify components that the request has ended
+                    self._notify('requestFinished', req)
 
-                        # notify components that the request has ended
-                        self._notify('requestFinished', req)
+                    _endRequestSpecific2RH( True )
 
-                        _endRequestSpecific2RH( True )
-
-                        DBMgr.getInstance().endRequest(True)
-                        break
-                    except ConflictError:
-                        _abortSpecific2RH()
-                        DBMgr.getInstance().abort()
-                        retry -= 1
-                        continue
-                    except ClientDisconnected:
-                        _abortSpecific2RH()
-                        DBMgr.getInstance().abort()
-                        retry -= 1
-                        time.sleep(10 - retry)
-                        continue
-            except CausedError:
-                raise
-            except Exception, e:
-                raise ProcessError("ERR-P0", "Error processing method.")
-        finally:
-            # destroy the context
-            ContextManager.destroy()
-
-    #    _endRequestSpecific2RH( False )
+                    DBMgr.getInstance().endRequest(True)
+                    break
+                except ConflictError:
+                    _abortSpecific2RH()
+                    DBMgr.getInstance().abort()
+                    retry -= 1
+                    continue
+                except ClientDisconnected:
+                    _abortSpecific2RH()
+                    DBMgr.getInstance().abort()
+                    retry -= 1
+                    time.sleep(10 - retry)
+                    continue
+        except CausedError:
+            raise
+        except Exception, e:
+            raise ProcessError("ERR-P0", "Error processing method.")
 
         return result
 

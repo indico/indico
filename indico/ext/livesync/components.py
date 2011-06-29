@@ -39,7 +39,7 @@ from indico.ext.livesync.base import ActionWrapper
 from indico.ext.livesync.agent import SyncManager
 
 # legacy indico imports
-from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.contextManager import ContextManager, DummyDict
 from MaKaC.common.logger import Logger
 from MaKaC import conference, accessControl
 
@@ -63,7 +63,7 @@ class RequestListener(Component):
         timestamp = int_timestamp(nowutc())
 
         # if the returned context is a dummy one, there's nothing to do
-        if cm.__class__ == ContextManager.DummyContext:
+        if cm.__class__ == DummyDict:
             return
 
         # Insert the elements from the temporary index

@@ -139,7 +139,7 @@ class ContextManager_Feature(IndicoTestFeature):
         super(ContextManager_Feature, self).start(obj)
 
         # create the context
-        ContextManager.create()
+        ContextManager.destroy()
 
     def destroy(self, obj):
         super(ContextManager_Feature, self).destroy(obj)
