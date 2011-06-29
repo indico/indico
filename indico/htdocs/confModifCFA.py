@@ -44,15 +44,6 @@ def modifyData( req, **params ):
 def performModifyData( req, **params ):
     return conferenceModif.RHCFAPerformDataModification( req ).process( params )
 
-def addSubmitter( req, **params ):
-    return conferenceModif.RHConfModifCFAAddSubmitter( req ).process( params )
-
-def selectSubmitter( req, **params ):
-    return conferenceModif.RHConfModifCFASelectSubmitter( req ).process( params )
-
-def removeSubmitter( req, **params ):
-    return conferenceModif.RHConfModifCFARemoveSubmitter( req ).process( params )
-
 def abstractFields(req, **params):
     return conferenceModif.RHConfAbstractFields(req).process(params)
 

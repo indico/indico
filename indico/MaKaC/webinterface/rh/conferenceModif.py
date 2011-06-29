@@ -3275,37 +3275,6 @@ class RHConfModifCFAPreview(RHConfModifCFABase):
         return p.display()
 
 
-class RHConfModifCFASelectSubmitter(RHConfModifCFABase):
-
-    def _process( self ):
-        p = conferences.WPConfModifCFASelectSubmitters( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHConfModifCFAAddSubmitter(RHConfModifCFABase):
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                if id:
-                    self._target.getAbstractMgr().addAuthorizedSubmitter( ph.getById( id ) )
-        self._redirect( urlHandlers.UHConfModifCFA.getURL( self._target ) )
-
-
-class RHConfModifCFARemoveSubmitter(RHConfModifCFABase):
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                self._target.getAbstractMgr().removeAuthorizedSubmitter( ph.getById( id ) )
-        self._redirect( urlHandlers.UHConfModifCFA.getURL( self._target ) )
-
-
 class RHConfModifCFAStatus( RHConfModifCFABase ):
 
     def _checkParams( self, params ):

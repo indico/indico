@@ -59,7 +59,17 @@
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Late submission authorised users")}</span></td>
         <td bgcolor="white" width="100%" class="blacktext" colspan="2">
-            ${ submitters }
+            <table width="100%">
+                <tr>
+                    <td><ul id="inPlaceUsers" class="UIPeopleList"></ul></td>
+                </tr>
+                <tr>
+                    <td nowrap style="width:80%">
+                        <input type="button" id="inPlaceAddUserButton" onclick="lateSubmissionAuthUsers.addExistingUser();" value='${ _("Add user") }'></input>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
         </td>
     </tr>
     <tr>
@@ -98,3 +108,8 @@
 </table>
 <br>
 
+<script>
+
+var lateSubmissionAuthUsers = new LateSubmissionUsersManager('${ confId }', $E('inPlaceUsers'), "user");
+
+</script>

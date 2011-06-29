@@ -21,6 +21,9 @@
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.implementation.conference import ConferenceModifBase
 import MaKaC.user as user
+from MaKaC.common.fossilize import fossilize
+from MaKaC.user import AvatarHolder
+from MaKaC.services.interface.rpc.common import ServiceError
 
 class ChangeAbstractSubmitter(ConferenceModifBase):
 
@@ -41,7 +44,50 @@ class ChangeAbstractSubmitter(ConferenceModifBase):
                 "email": newSubmitter.getEmail()}
 
 
+class GetLateSumissionAuthUserList(ConferenceModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
+
+
+class AddLateSumissionAuthUser(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ah = AvatarHolder()
+        for user in self._userList:
+            if user["id"] != None:
+                self._conf.getAbstractMgr().addAuthorizedSubmitter(ah.getById(user["id"]))
+            else:
+                raise ServiceError("ERR-U0", _("User does not exist."))
+        return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
+
+
+class RemoveLateSumissionAuthUser(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        ah = AvatarHolder()
+        self._user = ah.getById(pm.extract("userId", pType=str, allowEmpty=False))
+        if self._user == None:
+            raise ServiceError("ERR-U0", _("User does not exist."))
+
+    def _getAnswer(self):
+        self._conf.getAbstractMgr().removeAuthorizedSubmitter(self._user)
+        return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
+
+
+
+
 
 methodMap = {
-    "changeSubmitter": ChangeAbstractSubmitter
+    "changeSubmitter": ChangeAbstractSubmitter,
+    "lateSubmission.addExistingLateAuthUser": AddLateSumissionAuthUser,
+    "lateSubmission.removeLateAuthUser": RemoveLateSumissionAuthUser,
+    "lateSubmission.getLateAuthUser": GetLateSumissionAuthUserList
     }

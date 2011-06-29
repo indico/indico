@@ -2909,18 +2909,6 @@ class UHConfModNotifTplConditionRem(URLHandler):
     _relativeURL = "abstractReviewing.py/notifTplCondRem"
 
 
-class UHConfModifCFASelectSubmitter( URLHandler ):
-    _relativeURL = "confModifCFA.py/selectSubmitter"
-
-
-class UHConfModifCFAAddSubmitter( URLHandler ):
-    _relativeURL = "confModifCFA.py/addSubmitter"
-
-
-class UHConfModifCFARemoveSubmitter( URLHandler ):
-    _relativeURL = "confModifCFA.py/removeSubmitter"
-
-
 class UHConfModAbstractsMerge( URLHandler ):
     _relativeURL = "abstractsManagment.py/mergeAbstracts"
 

@@ -4653,11 +4653,6 @@ class WConfModifCFA( wcomponents.WTemplated ):
             vars["modifDL"] = i18nformat("""--_("not specified")--""")
             if modifDL:
                 vars["modifDL"] = modifDL.strftime("%A %d %B %Y")
-            vars["submitters"] = wcomponents.WPrincipalTable().getHTML(\
-                            abMgr.getAuthorizedSubmitterList(), \
-                            self._conf, \
-                            urlHandlers.UHConfModifCFASelectSubmitter.getURL(),\
-                            urlHandlers.UHConfModifCFARemoveSubmitter.getURL(), selectable=False)
             vars["notification"] = i18nformat("""
                         <table align="left">
                             <tr>
@@ -4688,25 +4683,8 @@ class WConfModifCFA( wcomponents.WTemplated ):
         vars["abstractFields"]=self._getAbstractFieldsHTML(vars)
         vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
         vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
+        vars["confId"] = self._conf.getId()
         return vars
-
-
-
-
-class WPConfModifCFASelectSubmitters(WPConferenceModifAbstractBase):
-
-    def _setActiveTab( self ):
-        self._tabCFA.setActive()
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfModifCFASelectSubmitter.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfModifCFAAddSubmitter.getURL()
-        return wc.getHTML( params )
 
 
 class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):

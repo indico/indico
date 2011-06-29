@@ -1440,8 +1440,8 @@ type("UserListWidget", ["ListWidget"],
 
                  var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}});
 
-                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
-                     var favouritizeButton = new ToggleFavouriteButton(userData.getAll()).draw();
+                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
+                     var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
                      buttonDiv.append(favouritizeButton);
                  }
                  if (this.allowEdit) {

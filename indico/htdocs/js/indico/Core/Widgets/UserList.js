@@ -109,6 +109,14 @@ type("ListOfUsersManager", [], {
             }
             userRowElements.push(userText);
 
+            // favourites star
+            if (this.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
+                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && result[i]['_type'] === "Avatar") {
+                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
+                spanStar.set(new ToggleFavouriteButton(result[i], {}, IndicoGlobalVars['userData']['favorite-user-ids'][result[i]['id']]).draw());
+                userRowElements.push(spanStar);
+            }
+
             if (this.showEditIcon) {
                 // edit icon
                 var imageEdit = Html.img({
@@ -151,11 +159,6 @@ type("ListOfUsersManager", [], {
                     self._manageUserList(self.methods["remove"], self._getRemoveParams(userId));
                 });
                 userRowElements.push(imageRemove);
-            }
-
-            if (this.showFavouritesIcon) {
-                // TODO include the star and functionality in the user row
-                //userRowElements.push(imageStar);
             }
 
             if (this.showOrderArrows) {
@@ -378,12 +381,20 @@ type("ListOfUsersManagerForForm", [], {
 
 
             if (this.showAffiliation && this.usersList.item(i)['affiliation']) {
-                // Show submitter
+                // Show affiliation
                 var userText = Html.span({className:'nameLink', cssFloat:'left'}, fullName + ' ('+ this.usersList.item(i)['affiliation'] + ')');
             } else {
                 var userText = Html.span({className:'nameLink', cssFloat:'left'}, fullName);
             }
             userRowElements.push(userText);
+
+            // favourites star
+            if (this.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
+                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.usersList.item(i)['_type'] === "Avatar") {
+                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
+                spanStar.set(new ToggleFavouriteButton(this.usersList.item(i), {}, IndicoGlobalVars['userData']['favorite-user-ids'][this.usersList.item(i)['id']]).draw());
+                userRowElements.push(spanStar);
+            }
 
             if (this.showEditIcon) {
                 // edit icon
@@ -427,11 +438,6 @@ type("ListOfUsersManagerForForm", [], {
                     self._removeUser(userId);
                 });
                 userRowElements.push(imageRemove);
-            }
-
-            if (this.showFavouritesIcon) {
-                // TODO include the star and functionality in the user row
-                //userRowElements.push(imageStar);
             }
 
             if (this.showOrderArrows) {
