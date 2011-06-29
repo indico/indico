@@ -21,9 +21,8 @@
 from persistent import Persistent
 from MaKaC.common.db import DBMgr
 from MaKaC.common.logger import Logger
-from MaKaC.common.httpTimeout import urlOpenWithTimeout
 from MaKaC.errors import MaKaCError
-from urllib2 import HTTPError, URLError
+from urllib2 import HTTPError, URLError, urlopen
 from BaseHTTPServer import BaseHTTPRequestHandler
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
@@ -322,7 +321,7 @@ class WebcastManager(Persistent):
                 DBMgr.getInstance().commit()
                 Logger.get('webcast').info("Commit done.")
                 Logger.get('webcast').info("Calling the webcast synchronization URL: " + url)
-                answer = urlOpenWithTimeout(url , 10).read(100000).strip()
+                answer = urlopen(url , 10).read(100000).strip()
                 Logger.get('webcast').info("Got answer: " + answer)
                 return answer
 

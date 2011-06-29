@@ -20,10 +20,9 @@
 
 
 from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
-from urllib2 import HTTPError, URLError
+from urllib2 import HTTPError, URLError, urlopen
 from datetime import timedelta
 from BaseHTTPServer import BaseHTTPRequestHandler
-from MaKaC.common.httpTimeout import urlOpenWithTimeout
 from MaKaC.common.url import URL
 from array import array
 from MaKaC.common.timezoneUtils import nowutc, datetimeToUnixTime
@@ -72,7 +71,7 @@ def getEVOAnswer(action, arguments = {}, eventId = '', bookingId = ''):
     Logger.get('EVO').info("""Evt:%s, booking:%s, sending request to EVO: [%s]""" % (eventId, bookingId, str(url)))
 
     try:
-        answer = urlOpenWithTimeout(str(url) , secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
+        answer = urlopen(str(url), secondsToWait).read(readLimit).strip() #we remove any whitespaces, etc. We won't read more than 100k characters
         Logger.get('EVO').info("""Evt:%s, booking:%s, got answer (unprocessed): [%s]""" % (eventId, bookingId, str(answer)))
 
     except HTTPError, e:
