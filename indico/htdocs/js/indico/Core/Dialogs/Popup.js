@@ -132,15 +132,13 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
 
     postDraw: function() {
 
-        this.winDim = getWindowDimensions();
-
         this._adjustContentWrapper();
         this._postDrawPositionDialog();
         this._postDrawAdjustTitle();
     },
 
     _calculateContentHeight: function(){
-        var winHeight = this.winDim.height - 100;
+        var winHeight = $(window).height() - 100;
         var contentHeight = this.contentWrapper.dom.offsetHeight;
 
         // If content is to big for the window
@@ -169,13 +167,17 @@ type("ExclusivePopup", ["PopupWidget", "Printable"], {
     },
 
     _postDrawPositionDialog: function(){
-        var left = Math.floor((this.winDim.width - this.container.dom.offsetWidth) / 2);
-        var top = Math.floor((this.winDim.height - this.container.dom.offsetHeight) / 2);
-        var scrollOffset = getScrollOffset();
-        left += scrollOffset.x;
-        top += scrollOffset.y;
-        this.canvas.dom.style.left = pixels(Math.max(0, left));
-        this.canvas.dom.style.top = pixels(Math.max(0, top));
+        var canvas = $(this.canvas.dom);
+        var container = $(this.container.dom);
+        var left = Math.floor(($(window).width() - container.outerWidth()) / 2);
+        var top = Math.floor(($(window).height() - container.outerHeight()) / 2);
+        left += $(window).scrollLeft();
+        top += $(window).scrollTop();
+        var width = canvas.width() - left;
+        canvas.css({
+            left: pixels(Math.max(0, left)),
+            top: pixels(Math.max(0, top))
+        }).width(width);
     },
 
     _postDrawAdjustTitle: function() {
@@ -382,8 +384,8 @@ type("BalloonPopup", ["PopupDialog"], {
             return;
         }
 
-        if ((this.y - height) < getScrollOffset().y )  {
-            if ((getWindowDimensions().height + getScrollOffset().y) > (this.y + height)) {
+        if ((this.y - height) < $(window).scrollTop())  {
+            if (($(window).height() + $(window).scrollTop()) > (this.y + height)) {
                 this.switchOrientation();
                 return;
             }
@@ -396,8 +398,8 @@ type("BalloonPopup", ["PopupDialog"], {
         var leftPos = this.x - Math.floor(balloonWidth/2);
 
         // Check if the balloon is outside left side of browser window
-        if (leftPos - getScrollOffset().x < 0) {
-            leftPos = getScrollOffset().x + 5; // 5 pixel margin
+        if (leftPos - $(window).scrollLeft() < 0) {
+            leftPos = $(window).scrollLeft() + 5; // 5 pixel margin
 
             // Check if the arrow is outside the balloon, then move the balloon to
             // a correct position based on the arrow
@@ -408,9 +410,9 @@ type("BalloonPopup", ["PopupDialog"], {
         }
         // Check if the balloon is outside the right side of browser windows
         // Counts width 25px margin because of the scrollbar.
-        else if (leftPos + balloonWidth > getScrollOffset().x + getWindowDimensions().width - 25) {
+        else if (leftPos + balloonWidth > $(window).scrollLeft() + $(window).width() - 25) {
 
-            leftPos = getScrollOffset().x + getWindowDimensions().width - balloonWidth - 25;
+            leftPos = $(window).scrollLeft() + $(window).width() - balloonWidth - 25;
 
             // Check if the arrow is outside the balloon, then move the balloon to
             // a correct position based on the arrow

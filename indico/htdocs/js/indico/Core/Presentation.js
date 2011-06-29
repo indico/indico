@@ -83,46 +83,6 @@ function getMousePointerCoordinates(e) {
     return cursor;
 }
 
-// Returns the (inner) size of the browser window
-function getWindowDimensions() {
-    var dim = {width: 0, height: 0};
-
-    if( typeof( window.innerWidth ) == 'number' ) {
-        // Non-IE
-        dim.width = window.innerWidth;
-        dim.height = window.innerHeight;
-    } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-        // IE 6+ in 'standards compliant mode'
-        dim.width = document.documentElement.clientWidth;
-        dim.height = document.documentElement.clientHeight;
-    } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-        // IE 4 compatible
-        dim.width = document.body.clientWidth;
-        dim.height = document.body.clientHeight;
-    }
-    return dim;
-}
-
-// Returns the X and Y scroll offsets
-function getScrollOffset() {
-    var scroll = {x: 0, y: 0};
-
-    if( typeof( window.pageYOffset ) == 'number' ) {
-        // Netscape compliant
-        scroll.y = window.pageYOffset;
-        scroll.x = window.pageXOffset;
-    } else if( document.body && ( document.body.scrollLeft || document.body.scrollTop ) ) {
-        // DOM compliant
-        scroll.y = document.body.scrollTop;
-        scroll.x = document.body.scrollLeft;
-    } else if( document.documentElement && ( document.documentElement.scrollLeft || document.documentElement.scrollTop ) ) {
-        // IE6 standards compliant mode
-        scroll.y = document.documentElement.scrollTop;
-        scroll.x = document.documentElement.scrollLeft;
-    }
-    return scroll;
-}
-
 function eventTarget(event) {
     return any(event.srcElement, event.target);
 }

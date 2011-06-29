@@ -900,12 +900,7 @@ type("PopupWidget", [], {
         });
 
         if(setWidth) {
-            // taken from jQuery width() function. TODO: replace with less-ugly code as soon as we have jquery embedded globally
-            var width = ('scrollTo' in document && document) ?
-                    document.compatMode === "CSS1Compat" && document.documentElement.clientWidth || document.body.clientWidth :
-                    Math.max(document.documentElement.clientWidth, document.body.scrollWidth, document.documentElement.scrollWidth,
-                             document.body.offsetWidth, document.documentElement.offsetWidth);
-            width -= x;
+            var width = $('body').width() - x;
             styles.width = pixels(width);
         }
 
