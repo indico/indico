@@ -1,7 +1,7 @@
 
   <table class="noticeMain" style="text-align: center;">
     <tr>
-      <td class="title"> ${ _("Evaluation well")}&nbsp;${status}</td>
+      <td class="title"> ${ _("Evaluation")}&nbsp;${status}</td>
     </tr>
     <tr>
       <td class="td">
@@ -9,7 +9,7 @@
         <br><br>
         <table class="noticeInside" style="text-align: center; margin: auto;">
           <tr>
-            <td> ${ _("Your information have been well recorded.<br/><br/>Thank you for your contribution!")}</td>
+            <td> ${ _("Your information has been saved.<br/><br/>Thank you for your participation!")}</td>
           </tr>
         </table>
 
