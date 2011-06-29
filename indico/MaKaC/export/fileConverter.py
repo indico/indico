@@ -20,9 +20,11 @@
 
 import tempfile, os, base64, socket
 import mimetypes, urlparse, simplejson
+import httplib
+
+from MaKaC.common.logger import Logger
 from MaKaC.common.Configuration import Config
 from MaKaC import conference
-from MaKaC.common.httpTimeout import HTTPWithTimeout
 
 #URL_RESPONSE = "http://pcdh20.cern.ch/indico/getConvertedFile.py"
 #SERVER = 'http://pcdh20.cern.ch/getSegFile.py'#'http://pcuds01.cern.ch/getSegFile.py'
@@ -78,15 +80,10 @@ class CDSConvFileConverter(FileConverter):
         if not os.access(localFile, os.F_OK):
             #writeLog("Local file to upload invalid")
             return False
-        fic=open(localFile, "rb")
-        segnum=0
+        fic = open(localFile, "rb")
+        segnum = 0
         segsize = SEGMENT_SIZE
         filekey = 'segfile'
-        try :
-            h = HTTPWithTimeout(host, timeout = 5)
-        except Exception, e:
-            #writeLog("Error : Can't connect to host:%s"%host)
-            return False
 
         while 1:
 
@@ -147,21 +144,15 @@ class CDSConvFileConverter(FileConverter):
             content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
 
             try:
-                h.putrequest('POST', selector)
-                h.putheader('content-type', content_type)
-                h.putheader('content-length', str(len(body)))
-                h.endheaders()
-                h.send(body)
-            except:
-                #writeLog("Exception while sending file to the CDSconv server")
-                pass
-            try:
-                h.getreply()
+                Logger.get('cdsconv').info("Uploading %s to %s" % (localFile, host))
+                h = httplib.HTTPConnection(host, timeout=5)
+                h.request('POST', selector, body, {'content-type': content_type})
+                h.getresponse()
             except socket.timeout:
+                Logger.get('cdsconv').exception("Timeout connecting to %s" % host)
                 break
             except Exception:
-                #writeLog(e)
-                pass
+                Logger.get('cdsconv').exception("Error connecting to %s" % host)
             if lastseg == 1 :
                 #print "\n%s\n"%(h.getfile().read())
                 break
