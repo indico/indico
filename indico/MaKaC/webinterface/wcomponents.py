@@ -92,8 +92,7 @@ class WTemplated(OldObservable):
         if tpl_name != None:
             self.tplId = tpl_name
 
-        #if ( '_rh' in ','.join( dir( self ) ) ):
-        self._rh = ContextManager.getdefault('currentRH', None)
+        self._rh = ContextManager.get('currentRH', None)
 
         cfg = Configuration.Config.getInstance()
         self._dir = cfg.getTPLDir()
@@ -152,7 +151,7 @@ class WTemplated(OldObservable):
            Classes inheriting from this one will have to take care of adding
             their variables to the ones returned by this method.
         """
-        self._rh = ContextManager.getdefault('currentRH', None)
+        self._rh = ContextManager.get('currentRH', None)
 
         cfg = Configuration.Config.getInstance()
         vars = cfg.getTPLVars()
@@ -178,7 +177,7 @@ class WTemplated(OldObservable):
             Params:
                 params -- additional paramters received from the caller
         """
-        self._rh = ContextManager.getdefault('currentRH', None)
+        self._rh = ContextManager.get('currentRH', None)
         if self.tplId == None:
             self.tplId = self.__class__.__name__[1:]
         self._setTPLFile()
