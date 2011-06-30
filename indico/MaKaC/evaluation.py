@@ -22,7 +22,7 @@ from datetime     import datetime, timedelta
 from persistent   import Persistent
 from registration import Notification
 from MaKaC.common import utils
-from MaKaC.common.utils import Counter
+from MaKaC.common.Counter import Counter
 from MaKaC.user   import Avatar
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
