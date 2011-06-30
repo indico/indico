@@ -3239,7 +3239,7 @@ class ReasonParticipationForm(BaseForm):
     def __init__(self, data=None):
         BaseForm.__init__(self)
         self._title = _("Reason for participation")
-        self._description = _("Please, let us know why you are interested on participate in our event:")
+        self._description = _("Please, let us know why you are interested to participate in our event:")
         if data is not None:
             self._title = data.get("title", self._title)
             self._description = data.get("description",self._description)
