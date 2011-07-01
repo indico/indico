@@ -242,8 +242,8 @@ class FunctionalTestRunner(NoseTestRunner):
                 self._info("Test #%d: %s\n" % \
                            (i + 1, testResult and 'OK' or 'Error'))
 
-        except Exception, e:
-            raise e
+        except Exception:
+            raise
         finally:
             self._stopSeleniumServer()
 
@@ -326,7 +326,8 @@ class FunctionalTestRunner(NoseTestRunner):
         """
         stops the selenium server
         """
-        self.child.kill()
+        if self.child:
+            self.child.kill()
 
     def _runParallel(self, args, numThreads):
         self._info("Starting %s threads" % numThreads)
