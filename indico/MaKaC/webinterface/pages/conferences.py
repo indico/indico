@@ -3412,16 +3412,19 @@ class WConferenceParticipants(wcomponents.WTemplated):
         vars["selectAll"] = Config.getInstance().getSystemIconURL("checkAll")
         vars["deselectAll"] = Config.getInstance().getSystemIconURL("uncheckAll")
 
-        vars["participants"] = self.getParticipantsList()
+        vars["participantsList"] = self._conf.getParticipation().getParticipantList()
+        vars["participantDetailsURL"] = urlHandlers.UHConfModifParticipantsDetails.getURL(self._conf)
+        vars["participantEditURL"] = urlHandlers.UHConfModifParticipantsDetails.getURL(self._conf)
+        vars["nowutc"] = nowutc()
+        vars["confStartDate"] = self._conf.getStartDate()
+
+
         vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
         vars["sendButton"] = i18nformat("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
         vars["excelButton"] = i18nformat("""<input type="submit" class="btn" value="_("Export to Excel")" name="participantsAction"/>""")
         vars["participantsAction"] = str(urlHandlers.UHConfModifParticipantsAction.getURL(self._conf))
         if nowutc() < self._conf.getStartDate() :
-            vars["inviteButton"] = i18nformat("""<input type="submit" class="btn" value="_("Invite participant")" />""")
-            vars["inviteAction"] = str(urlHandlers.UHConfModifParticipantsSelectToInvite.getURL(self._conf))
-            vars["addButton"] = i18nformat("""<input type="submit" class="btn" value="_("Add existing particitant")" />""")
-            vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
+            vars["inviteAction"] = True
             vars["sendAddedInfoButton"] = i18nformat("""<input type="submit" class="btn" value="_("Inform about adding")" name="participantsAction" />""")
 
             vars["presenceButton"] = vars["absenceButton"] = vars["askButton"] = vars["excuseButton"] = ""
@@ -3432,40 +3435,13 @@ class WConferenceParticipants(wcomponents.WTemplated):
             vars["askButton"] = i18nformat("""<input type="submit" class="btn" value="_("Ask for excuse")" name="participantsAction" />""")
             vars["excuseButton"] = i18nformat("""<input type="submit" class="btn" value="_("Excuse absence")" name="participantsAction" />""")
 
-            vars["inviteButton"] = vars["inviteAction"] = ""
-            vars["addButton"] = vars["addAction"] = ""
+            vars["inviteAction"] = False
             vars["removeButton"] = vars["sendAddedInfoButton"] = ""
 
-        vars["addButton"] = i18nformat("""<input type="submit" class="btn" value="_("Search database")" />""")
-        vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
         vars["removeButton"] = i18nformat("""<input type="submit" class="btn" value="_("Remove participant")" name="participantsAction" />""")
-
-        vars["newParticipantURL"] = urlHandlers.UHConfModifParticipantsNewToAdd.getURL(self._conf)
 
         return vars
 
-    def getParticipantsList(self):
-        html = []
-        for p in self._conf.getParticipation().getParticipantList():#.values().list().sort(sortByName):
-            presence = "n/a"
-            if nowutc() > self._conf.getStartDate() :
-                if p.isPresent() :
-                    presence = "present"
-                else :
-                    presence = "absent"
-            url = urlHandlers.UHConfModifParticipantsDetails.getURL(self._conf)
-            url.addParam("participantId",p.getId())
-            text = """
-            <tr><td class="abstractDataCell">
-                <input type="checkbox" name="participants" value="%s" />&nbsp;
-                <a href="%s">%s %s %s</a>
-                </td>
-                <td class="abstractDataCell">&nbsp;&nbsp;%s</td>
-                <td class="abstractDataCell">&nbsp;&nbsp;%s</td>
-                </tr>
-            """%(p.getId(),str(url),p.getTitle(), p.getFirstName(), p.getFamilyName(), p.getStatus(), presence)
-            html.append(text)
-        return "".join(html)
 
 class WPConfModifParticipants( WPConferenceModifBase ):
 
@@ -3576,19 +3552,6 @@ class WPConfModifParticipantsStatistics( WPConfModifParticipants ):
         p = WConferenceParticipantsStatistics( self._conf )
         return banner+p.getHTML(params)
 
-#---------------------------------------------------------------------------
-
-class WPConfModifParticipantsSelect( WPConfModifParticipants ):
-
-    def _getPageContent( self, params ):
-        searchAction = str(self._rh.getCurrentURL())
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        p = wcomponents.WComplexSelection(self._conf,searchAction,forceWithoutExtAuth=searchLocal)
-        return p.getHTML(params)
 
 #---------------------------------------------------------------------------
 

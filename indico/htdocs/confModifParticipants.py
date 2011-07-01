@@ -49,24 +49,6 @@ def action( req, **params ):
 def statistics( req, **params ):
     return conferenceModif.RHConfModifParticipantsStatistics( req ).process( params )
 
-def selectToAdd( req, **params ):
-    return conferenceModif.RHConfModifParticipantsSelectToAdd( req ).process( params )
-
-def addSelected( req, **params ):
-    return conferenceModif.RHConfModifParticipantsAddSelected( req ).process( params )
-
-def newToAdd( req, **params ):
-    return conferenceModif.RHConfModifParticipantsNewToAdd( req ).process( params )
-
-def addNew( req, **params ):
-    return conferenceModif.RHConfModifParticipantsAddNew( req ).process( params )
-
-def selectToInvite( req, **params ):
-    return conferenceModif.RHConfModifParticipantsSelectToInvite( req ).process( params )
-
-def inviteSelected( req, **params ):
-    return conferenceModif.RHConfModifParticipantsInviteSelected( req ).process( params )
-
 def newToInvite( req, **params ):
     return conferenceModif.RHConfModifParticipantsNewToInvite( req ).process( params )
 

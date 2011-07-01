@@ -8,3 +8,4 @@ include(ScriptRoot + "indico/Management/NotificationTPL.js");
 include(ScriptRoot + "indico/Management/AbstractReviewing.js");
 include(ScriptRoot + "indico/Management/CFA.js");
 include(ScriptRoot + "indico/Management/Registration.js");
+include(ScriptRoot + "indico/Management/Participants.js");

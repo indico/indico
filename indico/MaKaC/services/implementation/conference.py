@@ -58,6 +58,7 @@ from MaKaC.services.interface.rpc.common import ServiceError, Warning, \
 from MaKaC.fossils.contribution import IContributionFossil
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
+from MaKaC.participant import Participant
 
 class ConferenceBase:
     """
@@ -1030,6 +1031,79 @@ class ConferenceGetChairPersonList(ConferenceModifBase):
     def _getAnswer(self):
         return fossilize(self._conf.getChairList())
 
+
+class ConferenceAddParticipantBase(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        self._pm = ParameterManager(self._params)
+
+
+    def _isEmailAlreadyUsed(self, email):
+        for part in self._conf.getParticipation().getParticipantList():
+            if email == part.getEmail():
+                return True
+        return False
+
+
+class ConferenceParticipantAddExisting(ConferenceAddParticipantBase):
+
+    def _checkParams(self):
+        ConferenceAddParticipantBase._checkParams(self)
+        self._action = self._pm.extract("action", pType=str, allowEmpty=False)
+        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+        # Check if there is already a participant with the same email
+        for part in self._userList:
+            if self._isEmailAlreadyUsed(part["email"]):
+                raise ServiceAccessError(_("The email address (%s) of a participant you are trying to add is already used by another participant. Participant(s) not added.") % part["email"])
+
+    def _getAnswer(self):
+        eventManager = self._getUser()
+        for part in self._userList:
+            ah = AvatarHolder()
+            av = ah.getById(part["id"])
+            participant = Participant(self._conf, av)
+            if self._action == "add":
+                self._conf.getParticipation().addParticipant(participant, eventManager)
+            elif self._action == "invite":
+                self._conf.getParticipation().inviteParticipant(participant, eventManager)
+        return fossilize(self._conf.getParticipation().getParticipantList())
+
+
+class ConferenceParticipantAddNew(ConferenceAddParticipantBase):
+
+    def _checkParams(self):
+        ConferenceAddParticipantBase._checkParams(self)
+        self._userData = self._pm.extract("userData", pType=dict, allowEmpty=False)
+        # check the email, used already or empty
+        email = self._userData.get("email", "")
+        if email == "":
+            raise ServiceAccessError(_("Participant has not been added because the email address was missing."))
+        elif self._isEmailAlreadyUsed(email):
+            raise ServiceAccessError(_("The participant identified by email '%s' is already in the participants' list.") % email)
+        if self._userData.get("familyName", "") == "":
+            raise ServiceAccessError(_("Participant has not been added because family name was missing."))
+
+    def _getAnswer(self):
+        eventManager = self._getUser()
+        av = AvatarHolder().match({"email": self._userData["email"].strip()}, exact=1, forceWithoutExtAuth=False)
+        if av != []:
+            participant = Participant(self._conf, av[0])
+        else:
+            participant = Participant(self._conf)
+            participant.setTitle(self._userData.get("title", ""))
+            participant.setFamilyName(self._userData.get("familyName", ""))
+            participant.setFirstName(self._userData.get("firstName", ""))
+            participant.setEmail(self._userData.get("email", ""))
+            participant.setAffiliation(self._userData.get("affiliation", ""))
+            participant.setAddress(self._userData.get("address",""))
+            participant.setTelephone(self._userData.get("phone",""))
+            participant.setFax(self._userData.get("fax",""))
+        self._conf.getParticipation().addParticipant(participant, eventManager)
+        return fossilize(self._conf.getParticipation().getParticipantList())
+
+
+
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupportEmail": ConferenceSupportEmailModification,
@@ -1070,5 +1144,7 @@ methodMap = {
     "protection.setAccessKey": ConferenceProtectionSetAccessKey,
     "protection.setModifKey": ConferenceProtectionSetModifKey,
     "protection.changeContactInfo": ConferenceContactInfoModification,
-    "alarm.sendTestNow": ConferenceAlarmSendTestNow
+    "alarm.sendTestNow": ConferenceAlarmSendTestNow,
+    "participant.addExistingParticipant": ConferenceParticipantAddExisting,
+    "participant.addNewParticipant": ConferenceParticipantAddNew
     }

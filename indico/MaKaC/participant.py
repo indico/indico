@@ -30,6 +30,8 @@ from MaKaC.common import utils
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.common.Configuration import Config
+from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.fossils.participant import IParticipantMinimalFossil
 
 class Participation(Persistent):
 
@@ -775,10 +777,11 @@ on behalf of %s %s
 
 #---------------------------------------------------------------------------------
 
-class Participant (Persistent, Negotiator):
+class Participant (Persistent, Negotiator, Fossilizable):
     """
         Class collecting data about person taking part in meeting / lecture
     """
+    fossilizes(IParticipantMinimalFossil)
 
     def __init__(self, conference, avatar=None):
         Negotiator(avatar)
@@ -925,6 +928,15 @@ class Participant (Persistent, Negotiator):
 
     def isPresent(self):
         return self._present
+
+    def getPresenceText(self):
+        presence = "n/a"
+        if nowutc() > self.getConference().getStartDate():
+            if self.isPresent():
+                presence = "present"
+            else:
+                presence = "absent"
+        return presence
 
     def setPresent(self):
         self._present = True

@@ -1305,7 +1305,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
-               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', true), userData.accessor('email'))],
+               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
                [$T('Address'), $B(Html.textarea(), userData.accessor('address'))],
                [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))],
                [$T('Fax'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('fax'))],
@@ -1329,11 +1329,12 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
          }
 
      },
-     function(title, userData, action, grantSubmission, grantManagement) {
+     function(title, userData, action, grantSubmission, grantManagement, allowEmptyEmail) {
          this.userData = userData;
          this.action = action;
          this.grantSubmission = exists(grantSubmission)?grantSubmission:false;
          this.grantManagement = exists(grantManagement)?grantManagement:false;
+         this.allowEmptyEmail = exists(allowEmptyEmail)?allowEmptyEmail:true;
          this.ExclusivePopup(title,  function(){return true;});
      }
     );

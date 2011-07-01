@@ -1,33 +1,4 @@
 <% from MaKaC.common.timezoneUtils import nowutc %>
-<script type="text/javascript">
-<!--
-function selectAll()
-{
-    //document.participantsForm.trackShowNoValue.checked=true
-    if (!document.participantsForm.participants.length){
-        document.participantsForm.participants.checked=true
-    } else {
-        for (i = 0; i < document.participantsForm.participants.length; i++) {
-            document.participantsForm.participants[i].checked=true
-        }
-    }
-}
-
-function deselectAll()
-{
-    //document.participantsForm.trackShowNoValue.checked=false
-    if (!document.participantsForm.participants.length)    {
-        document.participantsForm.participants.checked=false
-    } else {
-       for (i = 0; i < document.participantsForm.participants.length; i++) {
-           document.participantsForm.participants[i].checked=false
-       }
-    }
-}
-//-->
-</script>
-
-
         <table>
             <!-- <tr>
                 <td>
@@ -150,26 +121,18 @@ function deselectAll()
 
         <table style="margin-top: 20px;">
                 <tr>
-                    <td>Add participant: </td>
+                    <td>${ _("Add participant: ")}</td>
 
                     <td>
-                        <form action="${ addAction }" method="post">
-                            <div>${ addButton }</div>
-                        </form>
+                        <div><input type="button" value="${ _("Search database")}" onclick="meetingParticipantsListManager.searchUser('add');"/></div>
                     </td>
-
                     <td>
-                        <form action="${ newParticipantURL }" method="post">
-                                <div><input type="submit" value="${ _("Define new")}" class="btn"  /></div>
-                        </form>
+                        <div><input type="button" value="${ _("Define new")}" onclick="meetingParticipantsListManager.defineNew();"  /></div>
                     </td>
 
                     % if inviteAction:
                     <td>
-
-                        <form action="${ inviteAction }" method="post">
-                            <div>${ inviteButton }</div>
-                        </form>
+                        <div><input type="button" value="${ _("Invite participant")}" onclick="meetingParticipantsListManager.searchUser('invite');"/></div>
                     </td>
                     % endif
 
@@ -183,19 +146,27 @@ function deselectAll()
             <form action="${ participantsAction }" method="post" name="participantsForm">
 
                 <div style="float: left; padding-right: 30px; min-width: 400px; min-height: 270px;">
-                            <table>
+                            <table id="participantsTable">
                                 <tr>
                                     <th class="titleCellFormat">
-                                        <img src="${ selectAll }" alt="${ _("Select all")}" title="${ _("Select all")}" onclick="javascript:selectAll()">
-                                        <img src="${ deselectAll }" alt="${ _("Deselect all")}" title="${ _("Deselect all")}" onclick="javascript:deselectAll()">
+                                        <img src="${ selectAll }" alt="${ _("Select all")}" title="${ _("Select all")}" onclick="meetingParticipantsListManager.selectAll()">
+                                        <img src="${ deselectAll }" alt="${ _("Deselect all")}" title="${ _("Deselect all")}" onclick="meetingParticipantsListManager.deselectAll()">
                                         ${ _("Name")}
                                     </th>
                                     <th class="titleCellFormat">&nbsp;${ _("Status")}</th>
                                     <th class="titleCellFormat">&nbsp;${ _("Presence")}</th>
                                 </tr>
-                                    ${ participants }
-
-
+                            % for p in participantsList:
+                                <% participantDetailsURL.addParam("participantId",p.getId()) %>
+                                <tr>
+                                    <td class="abstractDataCell">
+                                        <input type="checkbox" name="participants" value="${ p.getId() }" />
+                                        <a href="${ participantDetailsURL }">${ p.getTitle()} ${ p.getFirstName() } ${ p.getFamilyName() }</a>
+                                    </td>
+                                    <td class="abstractDataCell">${ p.getStatus() }</td>
+                                    <td class="abstractDataCell">${ p.getPresenceText() }</td>
+                                </tr>
+                            % endfor
                             </table>
                 </div>
 
@@ -235,3 +206,9 @@ function deselectAll()
             </form>
         </div>
 
+<script>
+
+var meetingParticipantsListManager = new MeetingParticipantsListManager('${ confId }', $E('participantsTable'),
+                                               '${ participantEditURL }', '${ selectAll }', '${ deselectAll }');
+
+</script>

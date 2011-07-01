@@ -1686,30 +1686,6 @@ class UHConfModifParticipantsStatistics( URLHandler ):
     _relativeURL = "confModifParticipants.py/statistics"
 
 
-class UHConfModifParticipantsSelectToAdd( URLHandler ):
-    _relativeURL = "confModifParticipants.py/selectToAdd"
-
-
-class UHConfModifParticipantsAddSelected( URLHandler ):
-    _relativeURL = "confModifParticipants.py/addSelected"
-
-
-class UHConfModifParticipantsNewToAdd( URLHandler ):
-    _relativeURL = "confModifParticipants.py/newToAdd"
-
-
-class UHConfModifParticipantsAddNew( URLHandler ):
-    _relativeURL = "confModifParticipants.py/addNew"
-
-
-class UHConfModifParticipantsSelectToInvite( URLHandler ):
-    _relativeURL = "confModifParticipants.py/selectToInvite"
-
-
-class UHConfModifParticipantsInviteSelected( URLHandler ):
-    _relativeURL = "confModifParticipants.py/inviteSelected"
-
-
 class UHConfModifParticipantsNewToInvite( URLHandler ):
     _relativeURL = "confModifParticipants.py/newToInvite"
 
