@@ -1314,9 +1314,11 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
             url = urlHandlers.UHConfModifRegFormGeneralSectionFieldModif.getURL(f)
             spec = " <b>(%s"%f.getInput().getName()
             if f.isMandatory():
-                spec =  i18nformat(""" %s, _("mandatory") """)%spec
+                spec =  i18nformat(""" %s, _("mandatory")""")%spec
             if f.isBillable():
-                spec =  i18nformat(""" %s , _("Billable") = %s """)%(spec,self.htmlText(f.getPrice()))
+                spec =  i18nformat(""" %s, _("Billable") = %s""")%(spec,self.htmlText(f.getPrice()))
+            if f.getPlacesLimit():
+                spec =  i18nformat(""" %s, _("Places") = %s/%s""")%(spec,f.getNoPlacesLeft(),f.getPlacesLimit())
 
             spec = " %s)</b>"%spec
 

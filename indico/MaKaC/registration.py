@@ -528,6 +528,10 @@ class RegistrationForm(Persistent):
                 accoType.decreaseNoPlaces()
         for se in reg.getSocialEvents():
             se.delete() # It'll decrease the no of places
+        for mg in reg.getMiscellaneousGroupList():
+            for item in mg.getResponseItemList():
+                if item.getQuantity():
+                    item.getGeneralField().decreaseNoPlaces()
 
     def delete(self):
         self.getSessionsForm().clearSessionList()
@@ -1089,7 +1093,11 @@ class FieldInputType(Persistent):
         if item is None:
             item=MiscellaneousInfoSimpleItem(mg, self.getParent())
             mg.addResponseItem(item)
+        if item.getQuantity(): # if we had a quantity before, make the place available again
+            self.getParent().decreaseNoPlaces();
         self._setResponseValue(item, params, registrant)
+        if item.getQuantity(): # and make it unavailable if there's still a quantity
+            self.getParent().increaseNoPlaces();
 
     def _setResponseValue(self, item, registrant, params):
         """
@@ -1673,6 +1681,7 @@ class CheckboxInput(FieldInputType):
         currency = self._parent.getParent().getRegistrationForm().getCurrency()
         htmlName = self.getHTMLName()
         v = ""
+        quantity = 0
         if item is not None:
             v = item.getValue()
             caption = self._parent.getCaption()
@@ -1680,8 +1689,9 @@ class CheckboxInput(FieldInputType):
             billable = item.isBillable()
             currency = item.getCurrency()
             htmlName = item.getHTMLName()
-        if ( registrant is not None and billable and registrant.getPayed()):
-            disable="disabled=\"true\""
+            quantity = item.getQuantity()
+        if ( registrant is not None and billable and registrant.getPayed()) or (not self.getParent().hasAvailablePlaces() and not quantity):
+            disable="disabled=\"disabled\""
             #pass
         if v=="yes":
             checked="checked=\"checked\""
@@ -1689,9 +1699,10 @@ class CheckboxInput(FieldInputType):
         tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s""" % (htmlName, htmlName, checked, disable, caption)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
-            tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp, price, currency)
-        else:
-            tmp= """%s </td> """%tmp
+            tmp= """%s&nbsp;&nbsp;%s&nbsp;%s """%(tmp, price, currency)
+        if self.getParent().getPlacesLimit():
+            tmp += """&nbsp;(%s left)""" % (self.getParent().getNoPlacesLeft())
+        tmp += """</td>"""
         if description:
             tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
@@ -1713,6 +1724,16 @@ class CheckboxInput(FieldInputType):
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
         item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
+
+    def _getSpecialOptionsHTML(self):
+        html = FieldInputType._getSpecialOptionsHTML(self)
+        html += _("""<tr>
+                  <td class="titleCellTD"><span class="titleCellFormat"> _("Places (0 for unlimited)")</span></td>
+                  <td bgcolor="white" class="blacktext" width="100%%">
+                    <input type="text" name="placesLimit" size="60" value=%s>
+                  </td>
+                </tr>""")%(self._parent.getPlacesLimit())
+        return html
 
 class YesNoInput(FieldInputType):
     _id="yes/no"
@@ -2026,9 +2047,8 @@ class RadioGroupInput(FieldInputType):
                 checked = "checked"
             tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" id="%s" name="%s" value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
             if val.isBillable():
-                tmp.append("""&nbsp;&nbsp;%s&nbsp;%s</td></tr> """ % (val.getPrice(), currency))
-            else:
-                 tmp.append(""" </td></tr> """)
+                tmp.append("""&nbsp;&nbsp;%s&nbsp;%s""" % (val.getPrice(), currency))
+            tmp.append(""" </td></tr> """)
 
         if description:
             tmp.append("""<tr><td></td><td colspan="2">%s</td></tr>""" % (self._getDescriptionHTML(description)))
@@ -2181,7 +2201,7 @@ class RadioGroupInput(FieldInputType):
                             </table>
                             </td>
                             <td rowspan="2" valign="top" align="left">
-                                <input type="submit" class="btn" name="addradioitem" value="_("add")" onFocus="javascript: addIsFocused = true;" onBlur="javascript: addIsFocused = false;"><br>
+                                <input type="submit" class="btn" name="addradioitem" value="_("add")" onfocus="addIsFocused = true;" onblur="addIsFocused = false;"><br>
                                 <input type="submit" class="btn" name="removeradioitem" value="_("remove")"><br>
                                 <input type="submit" class="btn" name="disableradioitem" value="_("enable/disable")"><br>
                                 <input type="submit" class="btn" name="defaultradioitem" value="_("set as default")"><br>
@@ -2424,6 +2444,8 @@ class GeneralField(Persistent):
             self._description = ""
             self._billable =False
             self._price = "0"
+            self._placesLimit = 0
+            self._currentNoPlaces = 0
         else:
             self.setValues(data)
 
@@ -2444,6 +2466,7 @@ class GeneralField(Persistent):
         self.setMandatory(data.has_key("mandatory") and data["mandatory"])
         self.setBillable(data.has_key("billable") and data["billable"])
         self.setPrice(data.get("price",""))
+        self.setPlacesLimit(data.get("placesLimit", "0"))
         self.setDescription(data.get("description",""))
 
     def getValues(self):
@@ -2454,6 +2477,7 @@ class GeneralField(Persistent):
         values["mandatory"] = self.isMandatory()
         values["billable"]=self.isBillable()
         values["price"]=self.getPrice()
+        values["placesLimit"] = self.getPlacesLimit()
         values["description"]=self.getDescription()
         return values
 
@@ -2482,6 +2506,55 @@ class GeneralField(Persistent):
             else:
                 raise MaKaCError(_('The price is in incorrect format!'))
         self._price = price
+
+    def getPlacesLimit(self):
+        try:
+            if self._placesLimit:
+                pass
+        except AttributeError, e:
+            self._placesLimit = 0
+        return self._placesLimit
+
+    def setPlacesLimit(self, limit):
+        if limit == "":
+            limit = "0"
+        try:
+            l = int(limit)
+        except ValueError:
+            raise FormValuesError( _("Please enter a number for the limit of places"))
+        self._placesLimit = l
+        self.updateCurrentNoPlaces()
+
+    def getCurrentNoPlaces(self):
+        try:
+            if self._currentNoPlaces:
+                pass
+        except AttributeError:
+            self._currentNoPlaces = 0
+        return self._currentNoPlaces
+
+    def hasAvailablePlaces(self):
+        return (self.getCurrentNoPlaces() < self.getPlacesLimit())
+
+    def getNoPlacesLeft(self):
+        return self.getPlacesLimit() - self.getCurrentNoPlaces()
+
+    def increaseNoPlaces(self):
+        if self.getPlacesLimit() > 0 :
+            if self.getCurrentNoPlaces() >= self.getPlacesLimit():
+                raise FormValuesError( _("""The limit for the number of places is smaller than the current amount registered for this item. Please, set a higher limit."""))
+            self._currentNoPlaces += 1
+
+    def decreaseNoPlaces(self):
+        if self.getPlacesLimit() > 0 and self.getCurrentNoPlaces() > 0:
+            self._currentNoPlaces -= 1
+
+    def updateCurrentNoPlaces(self):
+        self._currentNoPlaces = 0
+        for reg in self._parent.getRegistrationForm().getConference().getRegistrantsList():
+            item = reg.getMiscellaneousGroupById(self._parent.getId()).getResponseItemById(self.getId())
+            if item is not None and item.getQuantity():
+                self.increaseNoPlaces()
 
     def getId(self):
         return self._id

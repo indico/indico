@@ -663,6 +663,7 @@ class _TmpSectionField:
         self._input=None
         self._billable =""
         self._price = ""
+        self._placesLimit = 0
         if generalField is not None:
             self._caption=generalField.getCaption()
             self._mandatory=generalField.isMandatory()
@@ -670,6 +671,7 @@ class _TmpSectionField:
             self._input=generalField.getInput().clone(self)
             self._billable =generalField.isBillable()
             self._price = generalField.getPrice()
+            self._placesLimit = generalField.getPlacesLimit()
         else:
             self.map(params)
 
@@ -677,7 +679,9 @@ class _TmpSectionField:
         d={}
         d['caption']=self.getCaption()
         d['description']=self.getDescription()
-        d['price']=self.getPrice();
+        d['price']=self.getPrice()
+        d['placesLimit']=self.getPlacesLimit()
+
         if self.isMandatory():
             d['mandatory']='True'
         if self.isBillable():
@@ -692,6 +696,7 @@ class _TmpSectionField:
         self._mandatory=params.has_key("mandatory")
         self._billable=params.has_key("billable")
         self._price=params.get("price","")
+        self._placesLimit=params.get("placesLimit","")
 
         if params.get("inputtype"):
             self._input.setInputType(params.get("inputtype"))
@@ -760,6 +765,12 @@ class _TmpSectionField:
 
     def setPrice(self,price):
         self._price=price
+
+    def getPlacesLimit(self):
+        return self._placesLimit
+
+    def setPlacesLimit(self, limit):
+        self._placesLimit = limit
 
     def getCaption(self):
         return self._caption
