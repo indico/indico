@@ -170,10 +170,8 @@ class NoseTestRunner(BaseTestRunner):
         if specific:
             args.append(specific)
         else:
-            args.append(os.path.join(self.setupDir, 'python', 'unit'))
+            args.append(os.path.join(self.setupDir, self._defaultPath))
 
-            # add plugins
-            args += BaseTestRunner.findPlugins()
         return args
 
 
@@ -184,11 +182,21 @@ class UnitTestRunner(NoseTestRunner):
     Using nosetest
     """
 
+    _defaultPath = os.path.join('python', 'unit')
     _runnerOptions = {'silent': Option,
                       'coverage': CoveragePythonTestOption,
                       'specify': Option,
                       'log': LogToConsoleTestOption,
                       'xml': XMLOutputOption }
+
+    def _buildArgs(self):
+        args = NoseTestRunner._buildArgs(self)
+
+        if not self.options.valueOf('specify'):
+            #TODO: Make more general for functional test.
+            # add plugins
+            args += BaseTestRunner.findPlugins()
+        return args
 
     def _run(self):
         args = self._buildArgs()
@@ -202,6 +210,7 @@ class FunctionalTestRunner(NoseTestRunner):
     Using selenium
     """
 
+    _defaultPath = os.path.join('python', 'functional')
     _runnerOptions = {'silent': Option,
                       'record': Option,
                       'specify': Option,
@@ -242,8 +251,8 @@ class FunctionalTestRunner(NoseTestRunner):
                 self._info("Test #%d: %s\n" % \
                            (i + 1, testResult and 'OK' or 'Error'))
 
-        except Exception, e:
-            raise e
+        except Exception:
+            raise
         finally:
             self._stopSeleniumServer()
 
@@ -282,6 +291,7 @@ class FunctionalTestRunner(NoseTestRunner):
         self._info("Starting Selenium Server")
 
         try:
+            #TODO: refactor this. Moving to config file?
             fout = open('build/selenium.stdout.log','w')
             ferr = open('build/selenium.stderr.log', 'w')
 
