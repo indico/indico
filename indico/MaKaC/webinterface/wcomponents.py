@@ -204,12 +204,8 @@ class WTemplated(OldObservable):
         if self._rh and self._rh._req.is_https():
             imagesBaseURL = Config.getInstance().getImagesBaseURL()
             imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
-            baseURL = Config.getInstance().getBaseURL()
-            baseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getBaseSecureURL())
             tempHTML = tempHTML.replace(imagesBaseURL, imagesBaseSecureURL)
             tempHTML = tempHTML.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
-            tempHTML = tempHTML.replace(baseURL, baseSecureURL)
-            tempHTML = tempHTML.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
 
         if helpText == None:
             return tempHTML
@@ -2644,7 +2640,7 @@ class WSignIn(WTemplated):
         vars["login"] = quoteattr( vars.get( "login", "" ) )
         vars["msg"] = self.htmlText( vars.get( "msg" ) )
         imgIcon=Configuration.Config.getInstance().getSystemIconURL("currentMenuItem")
-        if Configuration.Config.getInstance().getLoginURL().startswith("https"):
+        if Configuration.Config.getInstance().getAuthenticatedEnforceSecure():
            imgIcon=imgIcon.replace("http://", "https://")
            imgIcon = urlHandlers.setSSLPort( imgIcon )
         vars["itemIcon"] = imgIcon

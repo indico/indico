@@ -136,8 +136,8 @@ class WPBase(OldObservable):
 
         baseurl = self._getBaseURL()
         if ((isinstance(self, WPSignIn) or isinstance(self, WPConfSignIn) or isinstance(self, WPRegistrationFormSignIn)) and \
-                Config.getInstance().getLoginURL().startswith("https")) or \
-                self._rh._req.is_https() and self._rh._tohttps:
+            Config.getInstance().getLoginURL().startswith("https")) or \
+            self._rh._req.is_https() and self._rh._tohttps:
             baseurl = baseurl.replace("http://","https://")
             baseurl = urlHandlers.setSSLPort( baseurl )
 
@@ -218,6 +218,7 @@ class WPDecorated( WPBase ):
         """
         """
         wc = wcomponents.WHeader( self._getAW(), isFrontPage=self._isFrontPage(), currentCategory=self._currentCategory(), locTZ=self._locTZ )
+
         return wc.getHTML( { "subArea": self._getSiteArea(), \
                              "loginURL": self._escapeChars(str(self.getLoginURL())),\
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())),\

@@ -66,10 +66,14 @@ class URLHandler(object):
                 params - (Dict) parameters to be added to the URL.
         """
         rh = ContextManager.get('currentRH', None)
-        if rh and rh._req.is_https():
+
+        if (cls in [UHSignIn, UHSignOut, UHConfSignIn, UHConfRegistrationFormSignIn] and \
+            Config.getInstance().getAuthenticatedEnforceSecure()) or \
+            (rh._req.is_https() and rh._tohttps):
             baseURL = Config.getInstance().getBaseSecureURL()
         else:
-            baseURL = Config.getInstance().getSecureURL()
+            baseURL = Config.getInstance().getBaseURL()
+
         return URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
 
     @classmethod
@@ -150,7 +154,7 @@ class UHWelcome( URLHandler ):
     _relativeURL = "index.py"
 
 
-class UHSignIn( SecureURLHandler ):
+class UHSignIn( URLHandler ):
     _relativeURL = "signIn.py"
 
     def getURL( cls, returnURL="" ):
