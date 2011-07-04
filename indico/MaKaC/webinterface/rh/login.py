@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
-import MaKaC.common.Configuration as Configuration
+from MaKaC.common import Configuration, Config
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -106,7 +106,12 @@ class RHSignOut( base.RH ):
         if autoLogoutRedirect:
             self._redirect(autoLogoutRedirect)
         else:
-            self._redirect( self._returnURL )
+            # if not all the site is HTTPS, try moving user to plain HTTP
+            if not Config.getInstance().getBaseURL().startswith('https'):
+                self._redirect(self._returnURL.replace('https', 'http'))
+            else:
+                self._redirect(self._returnURL)
+
 
 class RHLogoutSSOHook( base.RH):
 

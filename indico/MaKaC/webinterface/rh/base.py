@@ -102,6 +102,29 @@ class RequestHandlerBase(OldObservable):
             return ""
         return self._uh.getURL( self._target )
 
+    def getRequestParams( self ):
+        return self._params
+
+    def getRequestURL( self ):
+        """
+        Reconstructs the request URL
+        """
+        proc = "http://"
+        try:
+            if self._req.is_https():
+                proc = "https://"
+        except:
+            pass
+
+        port = ""
+        if self._req.parsed_uri[apache.URI_PORT]:
+            port = ":" + str( self._req.parsed_uri[apache.URI_PORT] )
+        return "%s%s%s%s"%(proc, self._req.hostname, port, self._req.unparsed_uri)
+    requestURL = property( getRequestURL )
+
+    def getRequestHTTPHeaders( self ):
+        return self._req.headers_in
+
     def _setLang(self, params=None):
 
         # allow to choose the lang from params
@@ -231,9 +254,6 @@ class RH(RequestHandlerBase):
 
     def getRequestParams( self ):
         return self._getRequestParams()
-
-    def getRequestHTTPHeaders( self ):
-        return self._req.headers_in
 
     def _disableCaching(self):
         """
@@ -666,19 +686,6 @@ class RH(RequestHandlerBase):
             for file in self._tempFilesToDelete:
                 os.remove(file)
 
-    def getRequestURL( self ):
-        proc = "http://"
-        try:
-            if self._req.is_https():
-                proc = "https://"
-        except:
-            pass
-
-        port = ""
-        if self._req.parsed_uri[apache.URI_PORT]:
-            port = ":" + str( self._req.parsed_uri[apache.URI_PORT] )
-        return "%s%s%s%s"%(proc, self._req.hostname, port, self._req.unparsed_uri)
-
     def _startRequestSpecific2RH( self ):
         """
         Works like DBMgr.getInstance().startRequest() but is specific to
@@ -724,7 +731,6 @@ class RH(RequestHandlerBase):
 
     # Properties =============================================================
 
-    requestURL = property( getRequestURL )
     relativeURL = None
 
 
