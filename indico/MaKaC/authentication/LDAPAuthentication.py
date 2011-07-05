@@ -114,12 +114,12 @@ class LDAPIdentity(PIdentity):
                 if 'sn' in data:
                     surname = data['sn']
                     if av.getSurName() != surname:
-                        av.setSurName(surname)
+                        av.setSurName(surname, reindex=True)
 
                 if 'givenName' in data:
                     firstName = data['givenName']
                     if av.getName() != firstName:
-                        av.setName(firstName)
+                        av.setName(firstName, reindex=True)
 
                 if 'o' in data:
                     org = data.get('o', '')
@@ -127,12 +127,12 @@ class LDAPIdentity(PIdentity):
                     org = data.get('company', '')
 
                 if org.strip() != '' and org != av.getOrganisation():
-                    av.setOrganisation(org)
+                    av.setOrganisation(org, reindex=True)
 
                 mail = data.get('mail', '')
 
                 if mail.strip() != '' and mail != av.getEmail():
-                    av.setEmail(mail)
+                    av.setEmail(mail, reindex=True)
 
                 return self.user
             else:

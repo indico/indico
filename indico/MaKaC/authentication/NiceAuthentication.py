@@ -76,11 +76,11 @@ class NiceAuthenticator(Authenthicator):
                 if fax != '' and fax != av.getFax():
                     av.setFax(fax)
                 if lastname != '' and lastname != av.getFamilyName():
-                    av.setSurName(lastname)
+                    av.setSurName(lastname, reindex=True)
                 if firstname != '' and firstname != av.getFirstName():
-                    av.setName(firstname)
+                    av.setName(firstname, reindex=True)
                 if institute != '' and institute != av.getAffiliation():
-                    av.setAffiliation(institute)
+                    av.setAffiliation(institute, reindex=True)
                 if personId != None and personId != av.getPersonId():
                     av.setPersonId(personId)
                 return av

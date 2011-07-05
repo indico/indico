@@ -27,7 +27,6 @@ import MaKaC.common.info as info
 import MaKaC.errors as errors
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
-import MaKaC.common.indexes as indexes
 from MaKaC.common.general import *
 from MaKaC.errors import MaKaCError, ModificationError
 from MaKaC.accessControl import AdminList
@@ -263,15 +262,15 @@ class RHUserExistWithIdentity( RH ):
 
 class _UserUtils:
 
-    def setUserData( self, a, userData):
-        a.setName( userData["name"] )
-        a.setSurName( userData["surName"] )
+    def setUserData(self, a, userData, reindex=False):
+        a.setName( userData["name"], reindex=reindex )
+        a.setSurName( userData["surName"], reindex=reindex )
         a.setTitle( userData["title"] )
-        a.setOrganisation( userData["organisation"] )
+        a.setOrganisation( userData["organisation"], reindex=reindex )
         if userData.has_key("lang"):
             a.setLang( userData["lang"] )
         a.setAddress( userData["address"] )
-        a.setEmail( userData["email"] )
+        a.setEmail( userData["email"], reindex )
         a.setSecondaryEmails( userData.get("secEmails", [] ))
         a.setTelephone( userData["telephone"] )
         a.setFax( userData["fax"] )
@@ -396,22 +395,9 @@ class RHUserModification( RHUserBase ):
                         save = False
         if save:
             #Data are OK, save them
-            idxs = indexes.IndexesHolder()
-            org = idxs.getById( 'organisation' )
-            email = idxs.getById( 'email' )
-            name = idxs.getById( 'name' )
-            surName = idxs.getById( 'surName' )
-            org.unindexUser(self._avatar)
-            email.unindexUser(self._avatar)
-            name.unindexUser(self._avatar)
-            surName.unindexUser(self._avatar)
             self._params["secEmails"] = self._normaliseListParam(self._params.get("secEmails",[]))
-            _UserUtils.setUserData( self._avatar, self._params )
+            _UserUtils.setUserData( self._avatar, self._params, True )
             self._getSession().setLang(self._avatar.getLang())
-            org.indexUser(self._avatar)
-            email.indexUser(self._avatar)
-            name.indexUser(self._avatar)
-            surName.indexUser(self._avatar)
 
             #----Grant rights if anything
             ph=pendingQueues.PendingQueuesHolder()
