@@ -749,6 +749,172 @@ class SubContributionEditParticipantData(SubContributionParticipantsBase):
         return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
 
 
+class ContributionSubmittersBase(ContributionModifBase):
+
+    def _checkParams(self):
+        ContributionModifBase._checkParams(self)
+        self._pm = ParameterManager(self._params)
+
+    def _isPrimaryAuthor(self, email):
+        for prAuthor in self._contribution.getPrimaryAuthorList():
+            if prAuthor.getEmail() == email:
+                return True
+        return False
+
+    def _isCoAuthor(self, email):
+        for coAuthor in self._contribution.getCoAuthorList():
+            if coAuthor.getEmail() == email:
+                return True
+        return False
+
+    def _isSpeaker(self, email):
+        for speaker in self._contribution.getSpeakerList():
+            if speaker.getEmail() == email:
+                return True
+        return False
+
+    def _getSubmittersList(self):
+        result = []
+        for submitter in self._contribution.getSubmitterList():
+            submitterFossil = fossilize(submitter)
+            if isinstance(submitter, Avatar):
+                isSpeaker = False
+                if self._conf.getType() == "conference":
+                    isPrAuthor = False
+                    isCoAuthor = False
+                    if self._isPrimaryAuthor(submitter.getEmail()):
+                        isPrAuthor = True
+                    if self._isCoAuthor(submitter.getEmail()):
+                        isCoAuthor = True
+                    submitterFossil["isPrAuthor"] = isPrAuthor
+                    submitterFossil["isCoAuthor"] = isCoAuthor
+                if self._isSpeaker(submitter.getEmail()):
+                    isSpeaker = True
+                submitterFossil["isSpeaker"] = isSpeaker
+            result.append(submitterFossil)
+        # get pending users
+        for email in self._contribution.getSubmitterEmailList():
+            pendingUser = {}
+            pendingUser["name"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
+
+
+
+class ContributionGetSubmittersList(ContributionSubmittersBase):
+
+    def _getAnswer(self):
+        return self._getSubmittersList()
+
+
+class ContributionAddExistingSubmitter(ContributionSubmittersBase):
+
+    def _checkParams(self):
+        ContributionSubmittersBase._checkParams(self)
+        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ah = PrincipalHolder()
+        for user in self._userList:
+            av = ah.getById(user["id"])
+            self._contribution.grantSubmission(av)
+        return self._getSubmittersList()
+
+
+class ContributionRemoveSubmitter(ContributionSubmittersBase):
+
+    def _checkParams(self):
+        ContributionSubmittersBase._checkParams(self)
+        self._submitterId = self._pm.extract("userId", pType=str, allowEmpty=False)
+        self._kindOfUser = self._pm.extract("kindOfUser", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        if self._kindOfUser == "pending":
+            # remove pending email, self._submitterId is an email address
+            self._contribution.revokeSubmissionEmail(self._submitterId)
+        elif self._kindOfUser == "avatar":
+            ah = PrincipalHolder()
+            av = ah.getById(self._submitterId)
+            if av is not None:
+                # remove submitter
+                self._contribution.revokeSubmission(av)
+            else:
+                raise ServiceError("ERR-U0", _("User does not exist."))
+        return self._getSubmittersList()
+
+
+class ContributionSumissionControlModifyUserRol(ContributionSubmittersBase):
+
+    def _checkParams(self):
+        ContributionSubmittersBase._checkParams(self)
+        self._submitterId = self._pm.extract("userId", pType=str, allowEmpty=False)
+        self._kindOfList = self._pm.extract("kindOfList", pType=str, allowEmpty=False)
+
+
+class ContributionSumissionControlAddAsAuthor(ContributionSumissionControlModifyUserRol):
+
+    def _newParticipant(self, a):
+        part = conference.ContributionParticipation()
+        part.setTitle(a.getTitle())
+        part.setFirstName(a.getName())
+        part.setFamilyName(a.getSurName())
+        part.setAffiliation(a.getOrganisation())
+        part.setEmail(a.getEmail())
+        part.setAddress(a.getAddress())
+        part.setPhone(a.getTelephone())
+        part.setFax(a.getFax())
+        if self._kindOfList == "prAuthor":
+            self._contribution.addPrimaryAuthor(part)
+        elif self._kindOfList == "coAuthor":
+            self._contribution.addCoAuthor(part)
+        elif self._kindOfList == "speaker":
+            self._contribution.newSpeaker(part)
+
+    def _getAnswer(self):
+        ah = AvatarHolder()
+        av = ah.getById(self._submitterId)
+        self._newParticipant(av)
+        return self._getSubmittersList()
+
+
+class ContributionSumissionControlRemoveAsAuthor(ContributionSumissionControlModifyUserRol):
+
+    def _getParticipantByEmail(self, email):
+        if self._kindOfList == "prAuthor":
+            for prAuthor in self._contribution.getPrimaryAuthorList():
+                if prAuthor.getEmail() == email:
+                    return prAuthor
+        elif self._kindOfList == "coAuthor":
+            for coAuthor in self._contribution.getCoAuthorList():
+                if coAuthor.getEmail() == email:
+                    return coAuthor
+        elif self._kindOfList == "speaker":
+            for speaker in self._contribution.getSpeakerList():
+                if speaker.getEmail() == email:
+                    return speaker
+        else:
+            raise ServiceError("ERR-UK0", _("Invalid kind of list of users."))
+        # user not found
+        raise ServiceError("ERR-USC", _("User not found in the list."))
+
+
+    def _getAnswer(self):
+        ah = AvatarHolder()
+        av = ah.getById(self._submitterId)
+        participant = self._getParticipantByEmail(av.getEmail())
+
+        if self._kindOfList == "prAuthor":
+            self._contribution.removePrimaryAuthor(participant)
+        elif self._kindOfList == "coAuthor":
+            self._contribution.removeCoAuthor(participant)
+        elif self._kindOfList == "speaker":
+            self._contribution.removeSpeaker(participant)
+        return self._getSubmittersList()
+
+
+
 
 methodMap = {
     "addSubContribution": ContributionAddSubContribution,
@@ -779,5 +945,11 @@ methodMap = {
     "participants.subContribution.getParticipantsList": SubContributionGetParticipantsList,
     "participants.subContribution.getParticipantData": SubContributionGetParticipantData,
     "participants.subContribution.getAllAuthors": SubContributionGetAllAuthors,
-    'participants.subContribution.addAuthorAsPresenter': SubContributionAddAuthorAsPresenter
+    "participants.subContribution.addAuthorAsPresenter": SubContributionAddAuthorAsPresenter,
+
+    "submissionControl.addExistingSubmitter": ContributionAddExistingSubmitter,
+    "submissionControl.removeSubmitter": ContributionRemoveSubmitter,
+    "submissionControl.getSubmittersList": ContributionGetSubmittersList,
+    "submissionControl.addAsAuthor": ContributionSumissionControlAddAsAuthor,
+    "submissionControl.removeAsAuthor": ContributionSumissionControlRemoveAsAuthor
 }

@@ -10,16 +10,27 @@ ${ accessControlFrame }
     </tr>
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat">${ _("Submitters")}<br><font size="-2">(${ _("users allowed to submit material for this contribution")})</font></span></td>
-        <form action=${ remSubmittersURL } method="POST">
-        <td bgcolor="white" width="80%" valign="top" class="blacktext">${ submitters }</td>
-        <td align="right">
-            <input type="submit" class="btn" value="${ _("remove")}">
-        </form>
-        <form action=${ addSubmittersURL } method="POST">
-            <input type="submit" class="btn" value="${ _("add")}">
-        </form>
+        <td width="100%" style="padding-bottom:20px;">
+            <table width="100%" style="padding-top:6px;">
+                <tr>
+                    <td id="parentTDSubmitters" style="width:79%; display:none"><ul id="inPlaceSubmitters" class="UIPeopleList"></ul></td>
+                </tr>
+                <tr>
+                    <td nowrap valign="top" style="width: 21%; text-align:left;">
+                        <input type="button" value='${ _("Add submitter") }' onclick="submitterManager.addExistingUser();">
+                    </td>
+                </tr>
+            </table>
         </td>
     </tr>
 </table>
 <br>
 </tr></td></table>
+
+
+<script>
+
+var submitterManager = new SubmissionControlListManager('${ confId }', '${ contribId }', $E('inPlaceSubmitters'),
+        $E('parentTDSubmitters'),  "submitter", '${ eventType }');
+
+</script>

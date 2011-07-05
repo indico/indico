@@ -35,7 +35,7 @@ def removeManagers( req, **params ):
 
 def setVisibility( req, **params ):
     return contribMod.RHContributionSetVisibility( req ).process( params )
-    
+
 def selectAllowedToAccess( req, **params ):
     return contribMod.RHContributionSelectAllowed( req ).process( params )
 
@@ -50,13 +50,3 @@ def addDomains( req, **params ):
 
 def removeDomains( req, **params ):
     return contribMod.RHContributionRemoveDomains( req ).process( params )
-
-def removeSubmitters( req, **params ):
-    return contribMod.RHSubmittersRem( req ).process( params )
-
-def selectSubmitters( req, **params ):
-    return contribMod.RHSubmittersSel( req ).process( params )
-
-def addSubmitters( req, **params ):
-    return contribMod.RHSubmittersAdd( req ).process( params )
-

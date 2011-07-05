@@ -32,17 +32,21 @@ type("ListOfUsersManager", [], {
         chooseUsersPopup.execute();
     },
 
-    _manageUserList: function(method, params) {
+    _manageUserList: function(method, params, progress) {
         var self = this;
-        var killProgress = IndicoUI.Dialogs.Util.progress();
+        var progress = any(progress, true);
+        if (progress)
+            var killProgress = IndicoUI.Dialogs.Util.progress();
         indicoRequest(
                 method, params,
                 function(result, error) {
                     if (!error) {
                         self._updateUserList(result);
-                        killProgress();
+                        if (progress)
+                            killProgress();
                     } else {
-                        killProgress();
+                        if (progress)
+                            killProgress();
                         IndicoUtil.errorReport(error);
                     }
                 }
@@ -202,7 +206,11 @@ type("ListOfUsersManager", [], {
 
             }
 
-            var row = Html.li({className: this.elementClass, onmouseover: "this.style.backgroundColor = '#ECECEC';",
+            var elemStyle = this.elementClass;
+            if (result[i]['_type'] == 'Group')
+                elemStyle = "UIGroup";
+
+            var row = Html.li({className: elemStyle, onmouseover: "this.style.backgroundColor = '#ECECEC';",
                                 onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
 
             for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7

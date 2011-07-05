@@ -577,3 +577,221 @@ type("AddSubContributionPresenterListManager", ["ListOfUsersManagerForForm"], {
                                        "UIPerson", false, false, true);
     }
 );
+
+
+/*
+ * Manager of submission control list
+ */
+type("SubmissionControlListManager", ["ListOfUsersManager"], {
+
+    addExistingUser: function() {
+        this._addExistingUser($T('Add submitter'), true, this.confId, true, true, null, false, true);
+    },
+
+    _getAddExistingParams: function(userList) {
+        var params = {confId: this.confId, userList: userList, contribId: this.contribId};
+        return params;
+    },
+
+    _getRemoveParams: function(userId, kindOfUser) {
+        var params = {confId: this.confId, contribId: this.contribId, userId: userId, kindOfUser: kindOfUser};
+        return params;
+    },
+
+    _getModifyAsAuthorParams: function(userId, kindOfList) {
+        var params = {confId: this.confId, contribId: this.contribId, userId: userId, kindOfList: kindOfList};
+        return params;
+    },
+
+    _getRolesText: function(user) {
+        if (user['_type'] == 'Avatar') {
+            var text = '(';
+            var counter = 0;
+            if (user['isPrAuthor']) {
+                text += $T('Primary author');
+                counter += 1;
+            }
+            if (user['isCoAuthor']) {
+                if (counter > 0)
+                    text += $T(', Co-author');
+                else
+                    text += $T('Co-author');
+                counter += 1;
+            }
+            if (user['isSpeaker']) {
+                if (counter > 0)
+                    text += $T(', ') + this.speakerCaptionCapital;
+                else
+                    text += this.speakerCaptionCapital;
+                counter += 1;
+            }
+            if (counter == 0)
+                return null;
+            else
+                return Html.small({style:{paddingLeft:'5px'}}, text + ')');
+        } else {
+            return null;
+        }
+    },
+
+    _updateUserList: function(result) {
+        var self = this;
+        // update the user list
+        this.inPlaceListElem.set('');
+        for (var i=0; i<result.length; i++) {
+            var userRowElements = [];
+
+            if (result[i]["pending"]) {
+                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['name'], Html.small({style:{paddingLeft:'5px'}}, $T('(Pending)')), this._getRolesText(result[i]));
+                var kindOfUser = "pending";
+                var userIdentifier = result[i]['name'];
+            } else {
+                var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['name'], this._getRolesText(result[i]));
+                var kindOfUser = "avatar";
+                var userIdentifier = result[i]['id'];
+            }
+            userRowElements.push(userText);
+
+            if (result[i]['_type'] == 'Avatar') {
+                // Options menu for each user
+                var optionsMenuSpan = Html.span({onmouseover:"this.className = 'mouseover'",
+                                            onmouseout:"this.className = ''", style:{cssFloat:'right'}});
+
+                var optionsMenuLink = Html.a({id:'userMenu_' + result[i]['id'], className:'dropDownMenu fakeLink',
+                                         style:{marginLeft:'15px', marginRight:'15px'}}, $T('More'));
+                this._addParticipantMenu(optionsMenuLink, result[i]);
+                optionsMenuSpan.append(optionsMenuLink);
+                userRowElements.push(optionsMenuSpan);
+            }
+
+            // favourites star
+            if (IndicoGlobalVars.isUserAuthenticated &&
+                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && result[i]['_type'] === "Avatar") {
+                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
+                spanStar.set(new ToggleFavouriteButton(result[i], {}, IndicoGlobalVars['userData']['favorite-user-ids'][result[i]['id']]).draw());
+                userRowElements.push(spanStar);
+            }
+
+            // remove icon
+            var imageRemove = Html.img({
+                src: imageSrc("remove"),
+                alt: $T('Remove ') + this.userCaption,
+                title: $T('Remove this ') + this.userCaption + $T(' from the list'),
+                className: 'UIRowButton2',
+                id: 'r_' + kindOfUser + '_' + userIdentifier,
+                style:{cssFloat:'right', cursor:'pointer', marginLeft:'4px', marginRight:'10px'}
+            });
+
+            imageRemove.observeClick(function(event) {
+                if (event.target) { // Firefox
+                    var kindOfUser = event.target.id.split('_')[1];
+                    var userId = event.target.id.split('r_'+kindOfUser+'_')[1];
+                } else { // IE
+                    var kindOfUser = event.srcElement.id.split('_')[1];
+                    var userId = event.srcElement.id.split('r_'+kindOfUser+'_')[1];
+                }
+                self._manageUserList(self.methods["remove"], self._getRemoveParams(userId, kindOfUser), false);
+            });
+            userRowElements.push(imageRemove);
+
+            var elemStyle = this.elementClass;
+            if (result[i]['_type'] == 'Group')
+                elemStyle = "UIGroup";
+
+            var row = Html.li({className: elemStyle, onmouseover: "this.style.backgroundColor = '#ECECEC';",
+                                onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
+
+            for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7
+                row.append(userRowElements[j]);
+            }
+
+            this.inPlaceListElem.append(row);
+        }
+        this._checkEmptyList(result);
+    },
+
+    _addParticipantMenu : function(element, user) {
+        var self = this;
+
+        element.observeClick(function(e) {
+            var menuItems = {};
+
+            if (self.eventType == "conference") {
+                if (!user['isPrAuthor']) {
+                    menuItems[$T('Add as primary author')] = function() {
+                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false);
+                        menu.close();
+                    };
+                } else {
+                    menuItems[$T('Remove as primary author')] = function() {
+                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "prAuthor"), false);
+                        menu.close();
+                    };
+                }
+
+                if (!user['isCoAuthor']) {
+                    menuItems[$T('Add as co-author')] = function() {
+                        self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false);
+                        menu.close();
+                    };
+                } else {
+                    menuItems[$T('Remove as co-author')] = function() {
+                        self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "coAuthor"), false);
+                        menu.close();
+                    };
+                }
+            }
+
+            if (!user['isSpeaker']) {
+                menuItems[$T('Add as ') + self.speakerCaption] = function() {
+                    self._manageUserList(self.methods["addAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false);
+                    menu.close();
+                };
+            } else {
+                menuItems[$T('Remove as ') + self.speakerCaption] = function() {
+                    self._manageUserList(self.methods["removeAsAuthor"], self._getModifyAsAuthorParams(user['id'], "speaker"), false);
+                    menu.close();
+                };
+            }
+
+            var menu = new PopupMenu(menuItems, [element], "popupList");
+            var pos = element.getAbsolutePosition();
+            menu.open(pos.x-25, pos.y + 20);
+            return false;
+        });
+    },
+
+    _checkEmptyList: function(result) {
+        if (result.length == 0)
+            this.parentElement.dom.style.display = 'none';
+        else
+            this.parentElement.dom.style.display = '';
+    }
+
+},
+
+    function(confId, contribId, inPlaceListElem, parentElement, userCaption, eventType) {
+        this.confId = confId;
+	    this.contribId = contribId;
+        this.parentElement = parentElement;
+        this.userCaption = userCaption;
+        this.eventType = eventType;
+        if (this.eventType == 'conference') {
+            this.speakerCaption = $T('presenter');
+            this.speakerCaptionCapital = $T('Presenter');
+        }
+        else if (this.eventType == 'meeting') {
+            this.speakerCaption = $T('speaker');
+            this.speakerCaptionCapital = $T('Speaker');
+        }
+
+        this.methods = {'addExisting': 'contribution.submissionControl.addExistingSubmitter',
+                        'remove': 'contribution.submissionControl.removeSubmitter',
+                        'getUserList': 'contribution.submissionControl.getSubmittersList',
+                        'addAsAuthor': 'contribution.submissionControl.addAsAuthor',
+                        'removeAsAuthor':'contribution.submissionControl.removeAsAuthor'};
+
+        this.ListOfUsersManager(confId, this.methods, {confId: confId, contribId: this.contribId},
+                inPlaceListElem, true, true, false, false, null, userCaption, "UIPerson", false, false, true);
+    }
+);

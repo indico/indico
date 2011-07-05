@@ -761,24 +761,8 @@ class WContribModifAC(wcomponents.WTemplated):
     def __init__( self, contrib ):
         self._contrib = contrib
 
-    def _getSubmittersHTML(self):
-        #return wcomponents.WPrincipalTable().getHTML( self._contrib.getSubmitterList(), self._contrib, "", "" )
-        res=[]
-        for sub in self._contrib.getSubmitterList():
-            if sub != None:
-                if type(sub) == user.Avatar:
-                    res.append("""<input type="checkbox" name="selUsers" value=%s>%s"""%(quoteattr(str(sub.getId())),self.htmlText(sub.getFullName())))
-                else:
-                    res.append("""<input type="checkbox" name="selUsers" value=%s>%s"""%(quoteattr(str(sub.getId())),self.htmlText(sub.getName())))
-        for email in self._contrib.getSubmitterEmailList():
-            res.append( i18nformat("""<input type="checkbox" name="selUsers" value=%s>%s <small>( _("Pending"))</small>""")%(quoteattr(email),email))
-        return "<br>".join(res)
-
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars( self )
-        vars["submitters"]=self._getSubmittersHTML()
-        vars["addSubmittersURL"]=quoteattr(str(urlHandlers.UHContribModSubmittersSel.getURL(self._contrib)))
-        vars["remSubmittersURL"]=quoteattr(str(urlHandlers.UHContribModSubmittersRem.getURL(self._contrib)))
         mcf=wcomponents.WModificationControlFrame()
         addMgrURL=urlHandlers.UHContributionSelectManagers.getURL()
         remMgrURL=urlHandlers.UHContributionRemoveManagers.getURL()
@@ -796,6 +780,9 @@ class WContribModifAC(wcomponents.WTemplated):
             addDomURL=urlHandlers.UHContributionAddDomain.getURL()
             remDomURL=urlHandlers.UHContributionRemoveDomain.getURL()
             vars["accessControlFrame"] += "<br>%s"%df.getHTML(addDomURL,remDomURL)
+        vars["confId"] = self._contrib.getConference().getId()
+        vars["contribId"] = self._contrib.getId()
+        vars["eventType"] = self._contrib.getConference().getType()
         return vars
 
 
@@ -1118,23 +1105,6 @@ class WPcontribMove( WPContributionModifTools ):
         params["moveURL"] = urlHandlers.UHContributionPerformMove.getURL()
         return wc.getHTML( params )
 
-
-class WPModSubmittersSel(WPContribModifAC):
-
-    def _getTabContent(self,params):
-        wf=self._rh.getWebFactory()
-        addTo=1
-        if wf is not None:
-            addTo=4
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc=wcomponents.WPrincipalSelection(urlHandlers.UHContribModSubmittersSel.getURL(), addTo=addTo, forceWithoutExtAuth=searchLocal)
-        wc.setTitle( _("Selecting users allowed to submit material"))
-        params["addURL"]=urlHandlers.UHContribModSubmittersAdd.getURL()
-        return wc.getHTML( params )
 
 class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayBase ):
 

@@ -1279,18 +1279,6 @@ class UHContributionAddAllowed( URLHandler ):
 class UHContributionRemoveAllowed( URLHandler ):
     _relativeURL = "contributionAC.py/removeAllowedToAccess"
 
-
-class UHContribModSubmittersRem(URLHandler):
-    _relativeURL = "contributionAC.py/removeSubmitters"
-
-
-class UHContribModSubmittersSel(URLHandler):
-    _relativeURL = "contributionAC.py/selectSubmitters"
-
-
-class UHContribModSubmittersAdd(URLHandler):
-    _relativeURL = "contributionAC.py/addSubmitters"
-
 class UHContribModifMaterialMgmt( URLHandler ):
     _relativeURL = "contributionModification.py/materials"
 

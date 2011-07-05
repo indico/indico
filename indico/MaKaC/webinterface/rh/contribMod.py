@@ -878,65 +878,6 @@ class RHContributionToPDF(RHContributionModification):
         return data
 
 
-class RHSubmittersRem(RHContribModifBaseSpecialSesCoordRights):
-    _uh=urlHandlers.UHContribModSubmittersRem
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._submitters=[]
-        self._pendings=[]
-        ah=user.PrincipalHolder()
-        for id in self._normaliseListParam(params.get("selUsers", [])):
-            av=ah.getById(id)
-            if av is None:
-                self._pendings.append(id)
-            else:
-                self._submitters.append(av)
-
-    def _process(self):
-        for sub in self._submitters:
-            self._target.revokeSubmission(sub)
-        for email in self._pendings:
-            self._target.revokeSubmissionEmail(email)
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHSubmittersSel(RHContribModifBaseSpecialSesCoordRights):
-    _uh=urlHandlers.UHContribModSubmittersSel
-
-    def _process(self):
-        p=contributions.WPModSubmittersSel(self, self._target)
-        return p.display(**self._getRequestParams())
-
-
-class RHSubmittersAdd(RHContribModifBaseSpecialSesCoordRights):
-    _uh=urlHandlers.UHContribModSubmittersAdd
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._submitterRole=self._normaliseListParam(params.get("submitterRole", []))
-
-    def _process(self):
-        params=self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ah=user.PrincipalHolder()
-            for id in self._normaliseListParam(params["selectedPrincipals"]):
-                av=ah.getById(id)
-                self._target.grantSubmission(av)
-                if self._submitterRole!=[] and not isinstance(av, user.Group):
-                    cp=conference.ContributionParticipation()
-                    cp.setDataFromAvatar(av)
-                    if "primaryAuthor" in self._submitterRole:
-                        self._target.addPrimaryAuthor(cp)
-                    elif "coAuthor" in self._submitterRole:
-                        self._target.addCoAuthor(cp)
-                    if "speaker" in self._submitterRole:
-                        if self._submitterRole in ["primaryAuthor", "coAuthor"]:
-                            self._target.addSpeaker(cp)
-                        else:
-                            self._target.newSpeaker(cp)
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
 class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
     _uh = urlHandlers.UHContribModifMaterials
 
