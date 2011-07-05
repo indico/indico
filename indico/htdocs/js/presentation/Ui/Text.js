@@ -3,8 +3,6 @@
  * @author Tom
  */
 
-var dictionaries = {};
-
 /**
  * Loads dictionary for given language
  * @param {String} language
@@ -15,34 +13,7 @@ function loadDictionary(language) {
 
 var defaultLanguage = "en_US";
 var languageDictionaryPath = isDefined("TextRoot") ? TextRoot : "texts";;
-
-loadDictionary(defaultLanguage);
-
-/**
- * Returns template for given key and language
- * @param {String} key
- * @param {String} language
- * @return {Function} template
- */
-function getTemplate(key, language) {
-        if (exists(language)) {
-                var dictionary = dictionaries[language];
-                if (exists(dictionary)) {
-                        var template = dictionary[key];
-                        if (exists(template)) {
-                                if (!isFunction(template)) {
-                                        template = textTemplate(template);
-                                        dictionary[key] = template;
-                                }
-                        }
-                        return template;
-                } else {
-                        return null;
-                }
-        } else {
-                return getTemplate(key, defaultLanguage);
-        }
-}
+var json_locale_data = {}
 
 var currentLanguage = null;
 
@@ -52,13 +23,12 @@ var currentLanguage = null;
  * @param {String} ... params
  * @return {String} text
  */
-function $T(key) {
-        var template = getTemplate(key, currentLanguage);
-        if (exists(template)) {
-                return template($A(arguments, 1));
-        } else {
-                return key;
-        }
+function $T(key){
+    if (json_locale_data['messages-js'] && json_locale_data['messages-js'][key]) {
+        return json_locale_data['messages-js'][key][1];
+    } else {
+        return key;
+    }
 }
 
 

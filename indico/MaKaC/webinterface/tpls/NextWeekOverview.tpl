@@ -6,7 +6,6 @@
     """
 %>
 
-%>
 <table width="100%" align="center">
     <tr>
         <td align="center"><b>${ startDate } -&gt; ${ endDate }</b></td>

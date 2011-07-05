@@ -30,6 +30,7 @@ from MaKaC.common import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 from MaKaC.common import Configuration
 
@@ -85,8 +86,8 @@ class WConfCFA(wcomponents.WTemplated):
             else:
                 submitOpt = ""
                 if cfa.inSubmissionPeriod():
-                    submitOpt = _("""<li><a href="%s"> _("Submit a new abstract")</a></li>""")%(urlHandlers.UHAbstractSubmission.getURL( self._conf ))
-                html = _("""
+                    submitOpt = i18nformat("""<li><a href="%s"> _("Submit a new abstract")</a></li>""")%(urlHandlers.UHAbstractSubmission.getURL( self._conf ))
+                html = i18nformat("""
                 <b> _("Possible actions you can carry out"):</b>
                 <ul>
                     %s
@@ -192,7 +193,7 @@ class WUserAbstracts( wcomponents.WTemplated ):
         l = sorted(set(l), key=lambda i:int(i.getId()))
 
         if not l:
-            vars["abstracts"] = _("""<tr>
+            vars["abstracts"] = i18nformat("""<tr>
                                         <td align="center" colspan="4" bgcolor="white">
                                             <br>
                                             --_("No submitted abstract found within this conference")--
@@ -334,8 +335,8 @@ class WAbstractDisplay( wcomponents.WTemplated ):
 
         vars["title"] = self.htmlText( self._abstract.getTitle() )
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
-        vars["primary_authors"] = _("""--_("none")--""")
-        vars["authors"] = _("""--_("none")--""")
+        vars["primary_authors"] = i18nformat("""--_("none")--""")
+        vars["authors"] = i18nformat("""--_("none")--""")
         primary = []
         for author in self._abstract.getPrimaryAuthorList():
             primary.append( self._getAuthorHTML( author ) )
@@ -346,17 +347,17 @@ class WAbstractDisplay( wcomponents.WTemplated ):
             vars["primary_authors"] = "<br>".join( primary )
         if authors:
             vars["authors"] = "<br>".join( authors )
-        vars["speakers"] = _("""--_("none")--""")
+        vars["speakers"] = i18nformat("""--_("none")--""")
         speakers = []
         for spk in self._abstract.getSpeakerList():
             speakers.append( "%s"%self.htmlText( spk.getFullName() ) )
         if speakers:
             vars["speakers"] = "<br>".join( speakers )
-        vars["tracks"] = _("""--_("none")--""")
-        vars["contribType"] = _("""--_("none")--""")
+        vars["tracks"] = i18nformat("""--_("none")--""")
+        vars["contribType"] = i18nformat("""--_("none")--""")
         status=self._abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
-            vars["contribType"]= _("""--_("none")--""")
+            vars["contribType"]= i18nformat("""--_("none")--""")
             if status.getType() is not None:
                 vars["contribType"]=self.htmlText(status.getType().getName())
             vars["tracks"]=""
@@ -372,7 +373,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
                     self._abstract.getContribType()!="":
                 vars["contribType"]=self.htmlText(self._abstract.getContribType().getName())
         if self._abstract.getConference().getContribTypeList() != []:
-            vars["contribType"]= _("""
+            vars["contribType"]= i18nformat("""
                                 <tr>
                                     <td>
                                         <table width="100%%" cellspacing="0">
@@ -408,11 +409,11 @@ class WAbstractDisplay( wcomponents.WTemplated ):
             vars["btnModifyDisabled"] = "disabled"
             vars["btnWithdrawDisabled"] = "disabled"
         elif isinstance( status, review.AbstractStatusWithdrawn ):
-            vars["status"] = _(""" _("WITHDRAWN") <font size="-1">by %s _("on") %s</font>""")%(self.htmlText(status.getResponsible().getFullName()),getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M"))
+            vars["status"] = i18nformat(""" _("WITHDRAWN") <font size="-1">by %s _("on") %s</font>""")%(self.htmlText(status.getResponsible().getFullName()),getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M"))
             if status.getComments().strip() != "":
                 vars["status"] = """%s<br><i>%s</i>"""%(vars["status"],self.htmlText(status.getComments()))
             vars["btnWithdrawDisabled"] = "disabled"
-            vars["btnRecover"] = _("""<form action=%s method="POST">
+            vars["btnRecover"] = i18nformat("""<form action=%s method="POST">
                                         <td>
                                             <input type="submit" class="btn" value="_("recover")">
                                         </td>
@@ -425,7 +426,7 @@ class WAbstractDisplay( wcomponents.WTemplated ):
             vars["btnManageMaterialDisabled"] = "disabled"
         elif isinstance(status,review.AbstractStatusMerged):
             target=status.getTargetAbstract()
-            vars["status"] = _(""" _("MERGED") into %s-%s""")%(self.htmlText(target.getId()),self.htmlText(target.getTitle()))
+            vars["status"] = i18nformat(""" _("MERGED") into %s-%s""")%(self.htmlText(target.getId()),self.htmlText(target.getTitle()))
             vars["btnModifyDisabled"]="disabled"
             vars["btnWithdrawDisabled"]="disabled"
             vars["btnManageMaterialDisabled"] = "disabled"
@@ -538,7 +539,7 @@ class WAbstractDataModification( wcomponents.WTemplated ):
                 nbRows = 10
                 if maxLength > 0:
                     nbRows = int(int(maxLength)/85) + 1
-                    maxLengthJS = _("""<small><input name="maxchars%s" size="4" value="%s" disabled> _("char. left")</small>""") % (id.replace(" ", "_"),maxLength)
+                    maxLengthJS = i18nformat("""<small><input name="maxchars%s" size="4" value="%s" disabled> _("char. left")</small>""") % (id.replace(" ", "_"),maxLength)
                     maxLengthText = """ onkeyup="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}; this.form.maxchars%s.value = %s - this.value.length;" onchange="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}" """ % (maxLength,maxLength,id.replace(" ", "_"),maxLength,maxLength,maxLength)
                 else:
                     maxLengthJS = maxLengthText = ""
@@ -601,8 +602,8 @@ class WAbstractDataModification( wcomponents.WTemplated ):
             selected = ""
             if vars.get( "type", "" ) == "":
                 selected = "selected"
-            types.insert( 0 , _("""<option value=""%s>--_("not specified")--</option>""")%selected )
-            vars["types"] = _("""
+            types.insert( 0 , i18nformat("""<option value=""%s>--_("not specified")--</option>""")%selected )
+            vars["types"] = i18nformat("""
                             <tr><td>&nbsp;</td></tr>
                             <tr>
                                 <td align="right" valign="top" style="white-space:nowrap;">
@@ -766,7 +767,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
         tmp = "%s (%s)"%(auth.getFullName(), auth.getAffiliation())
         tmp = self.htmlText( tmp )
         if auth.getEmail() != "":
-            mailtoSubject = _("""[%s] _("Abstract") %s: %s""")%( self._conf.getTitle(), self._abstract.getId(), self._abstract.getTitle() )
+            mailtoSubject = i18nformat("""[%s] _("Abstract") %s: %s""")%( self._conf.getTitle(), self._abstract.getId(), self._abstract.getTitle() )
             mailtoURL = "mailto:%s?subject=%s"%( auth.getEmail(), urllib.quote( mailtoSubject ) )
             href = quoteattr( mailtoURL )
             tmp = """<a href=%s>%s</a>"""%(href, tmp)
@@ -784,7 +785,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 trackTitle = " for %s"%self.htmlText(status.getTrack().getTitle())
             if status.getType():
                 contribTitle = " as %s"%self.htmlText(status.getType().getName())
-            html = _("""%s%s%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
+            html = i18nformat("""%s%s%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
                             html, trackTitle, contribTitle,\
                             self._getAuthorHTML(status.getResponsible()), \
                             getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
@@ -792,7 +793,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
         elif status.__class__ == review.AbstractStatusRejected:
-            html = _("""%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
+            html = i18nformat("""%s<br><font size="-1"> _("by") %s _("on") %s</font>""")%( \
                             html, \
                             self._getAuthorHTML( status.getResponsible() ), \
                             getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
@@ -800,7 +801,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
                                                     html, status.getComments() )
         elif status.__class__ == review.AbstractStatusWithdrawn:
-            html = _("""%s <font size="-1"> _("by") %s _("on") %s</font>""")%( \
+            html = i18nformat("""%s <font size="-1"> _("by") %s _("on") %s</font>""")%( \
                             html,self._getAuthorHTML(status.getResponsible()),\
                             getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
             if status.getComments() != "":
@@ -809,7 +810,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
         elif status.__class__ == review.AbstractStatusDuplicated:
             original=status.getOriginal()
             url=urlHandlers.UHAbstractManagment.getURL(original)
-            html = _("""%s (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(original.getId()),\
+            html = i18nformat("""%s (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(original.getId()),\
                 self.htmlText(original.getTitle()),\
                 self._getAuthorHTML(status.getResponsible()), \
                 getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
@@ -819,7 +820,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
         elif status.__class__ == review.AbstractStatusMerged:
             target=status.getTargetAbstract()
             url=urlHandlers.UHAbstractManagment.getURL(target)
-            html = _("""<font color="black"><b>%s</b></font> (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(target.getId()),\
+            html = i18nformat("""<font color="black"><b>%s</b></font> (<a href=%s>%s-<i>%s</i></a>) <font size="-1"> _("by") %s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(target.getId()),\
                 self.htmlText(target.getTitle()),\
                 self._getAuthorHTML(status.getResponsible()), \
                 getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
@@ -836,13 +837,13 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 cTypeCaption=""
                 if jud.getContribType() is not None:
                     cTypeCaption=jud.getContribType().getName()
-                st = _(""" - _("Proposed to accept") (%s)""")%(self.htmlText(cTypeCaption))
+                st = i18nformat(""" - _("Proposed to accept") (%s)""")%(self.htmlText(cTypeCaption))
                 color = """ color="#009933" """
             elif jud.__class__ == review.AbstractRejection:
-                st = _("""- _("Proposed to reject")""")
+                st = i18nformat("""- _("Proposed to reject")""")
                 color = """ color="red" """
             elif jud.__class__ == review.AbstractReallocation:
-                st = _("""- _("Proposed for other tracks")""")
+                st = i18nformat("""- _("Proposed for other tracks")""")
                 color = """ color="black" """
             else:
                 st = ""
@@ -874,7 +875,7 @@ class WAbstractManagment( wcomponents.WTemplated ):
             else:
                 l.append("""%s : %s [DELETED]<br>\n"""%(abstract.getId(), abstract.getTitle()))
 
-        return _("""<tr>
+        return i18nformat("""<tr>
                     <td class="dataCaptionTD" nowrap><span class="dataCaptionFormat"> _("Merged from")</span></td>
                     <td bgcolor="white" valign="top" colspan="3">%s</td>
                 </tr>""")%"".join(l)
@@ -1021,7 +1022,7 @@ class WPModEditData(WPAbstractManagment):
     def _getTabContent(self,params):
         wc=wcomponents.WConfModAbstractEditData(self._target.getConference(),self._abstractData)
         p={"postURL": urlHandlers.UHAbstractModEditData.getURL(self._abstract)}
-        return _("""
+        return i18nformat("""
             <table width="95%%" cellpadding="0" cellspacing="0" align="center" border="0">
             <tr>
             <td class="groupTitle">
@@ -1041,7 +1042,7 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
         self._conf = abstract.getOwner().getOwner()
 
     def _getTypeItemsHTML( self ):
-        items = [ _("""<option value="not_defined">--_("not defined")--</option>""")]
+        items = [ i18nformat("""<option value="not_defined">--_("not defined")--</option>""")]
         status = self._abstract.getCurrentStatus()
         isPropToAcc = isinstance(status, review.AbstractStatusProposedToAccept)
         for type in self._conf.getContribTypeList():
@@ -1054,7 +1055,7 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
         return items
 
     def _getTrackItemsHTML( self ):
-        items = [ _("""<option value="conf">--_("no track")--</option>""")]
+        items = [ i18nformat("""<option value="conf">--_("no track")--</option>""")]
         for track in self._conf.getTrackList():
             #the indicator legend:
             #   [*] -> suggested for that track
@@ -1074,7 +1075,7 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
         return items
 
     def _getSessionItemsHTML( self ):
-        items = [ _("""<option value="conf">--_("no session")--</option>""")]
+        items = [ i18nformat("""<option value="conf">--_("no session")--</option>""")]
         for session in self._conf.getSessionList():
             items.append("""<option value="%s">%s</option>"""%(session.getId(), session.getTitle()))
         return items
@@ -1509,7 +1510,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                     l = []
                     for propTrack in status.getProposedTrackList():
                         l.append( self.htmlText( propTrack.getTitle() ) )
-                    st = _(""" _("Proposed for other tracks"):<font size="-1"><table style="padding-left:10px"><tr><td>%s</td></tr></table></font>""")%"<br>".join(l)
+                    st = i18nformat(""" _("Proposed for other tracks"):<font size="-1"><table style="padding-left:10px"><tr><td>%s</td></tr></table></font>""")%"<br>".join(l)
                     color = "#F6F6F6"
                     modifDate = getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M")
                     modifier = self._getResponsibleHTML( track, status.getResponsible() )
@@ -1711,13 +1712,13 @@ class WAbstractModNotifLog(wcomponents.WTemplated):
             d=entry.getDate().strftime("%Y-%m-%d %H:%M")
             resp=entry.getResponsible()
             tplCaption=entry.getTpl().getName()
-            tplLink= _("""
+            tplLink= i18nformat("""
                     <b>%s</b> <font color="red"> _("(This template doesn't exist anymore)")</font>
                     """)%tplCaption
             if entry.getTpl().getOwner() is not None:
                 url=urlHandlers.UHAbstractModNotifTplDisplay.getURL(entry.getTpl())
                 tplLink="<a href=%s>%s</a>"%(quoteattr(str(url)),self.htmlText(tplCaption))
-            res.append( _("""
+            res.append( i18nformat("""
                         <tr>
                             <td bgcolor="white">
                                 %s _("by") %s

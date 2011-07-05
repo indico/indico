@@ -78,6 +78,7 @@ from MaKaC import booking
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.plugins.base import Observable
 
 from MaKaC.rb_location import CrossLocationDB, Location, CrossLocationQueries
@@ -3204,7 +3205,7 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
             locationText = ""
 
         if locationText != "":
-            locationText = _(""" _("Location"): %s""") % locationText
+            locationText = i18nformat(""" _("Location"): %s""") % locationText
         fullName="%s" % self._conf.getTitle()
 
         if self._getUser() is not None:
@@ -3350,7 +3351,7 @@ class RHConfSaveAlarm( RHCreateAlarm ):
         except:
             locationText = ""
         if locationText != "":
-            locationText = _(""" _("Location"): %s""") % locationText
+            locationText = i18nformat(""" _("Location"): %s""") % locationText
         fullName="%s"%self._conf.getTitle()
         if self._getUser() is not None:
             fullName = ",\n%s" % self._getUser().getStraightFullName()
@@ -6436,7 +6437,7 @@ class RHContribsParticipantList(RHConferenceModifBase):
 
     def _process( self ):
         if not self._contribIds:
-            return  _("""<table align=\"center\" width=\"100%%\"><tr><td> _("There are no contributions") </td></tr></table>""")
+            return  i18nformat("""<table align=\"center\" width=\"100%%\"><tr><td> _("There are no contributions") </td></tr></table>""")
 
         speakers = OOBTree()
         primaryAuthors = OOBTree()

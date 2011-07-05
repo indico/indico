@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-##
 ## This file is part of CDS Indico.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -17,11 +16,3 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from indico.util.i18n import _
-
-__metadata__ = {
-    'name': "Importers",
-    'description': _("Imports data from external sources.")
-    }
-

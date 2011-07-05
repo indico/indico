@@ -29,7 +29,6 @@ from BTrees import OOBTree
 from db import DBMgr
 from Counter import Counter
 from MaKaC.errors import MaKaCError
-from MaKaC.i18n import _
 
 class ObjectHolder:
     """This class provides a common entry point for accessing conferences and

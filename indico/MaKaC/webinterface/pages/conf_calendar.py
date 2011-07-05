@@ -24,6 +24,7 @@ import time
 import random
 import MaKaC.webinterface.pages.main as main
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat, currentLocale
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -173,26 +174,23 @@ class WCalendarMonthItem:
                 res.append("""
                     </tr>
                     <tr>\n""")
-        str = _("""
+        str = i18nformat("""
                 <table cellspacing="1" cellpadding="5">
                     <tr>
                         <td colspan="7" align="center" style="font-size: 1.2em;">%s %s</b></td>
                     </tr>
                     <tr>
-                        <td align="right" bgcolor="#CCCCCC"> _("Mo")</td>
-                        <td align="right" bgcolor="#CCCCCC">_("Tu")</td>
-                        <td align="right" bgcolor="#CCCCCC">_("We")</td>
-                        <td align="right" bgcolor="#CCCCCC">_("Th")</td>
-                        <td align="right" bgcolor="#CCCCCC">_("Fr")</td>
-                        <td align="right" bgcolor="#CCCCCC">_("Sa")</td>
-                        <td align="right" bgcolor="#CCCCCC">_("Su")</td>
+                      %s
                     </tr>
                     <tr>
                         %s
                     </tr>
                 </table>
                 %s
-              """)%(self._month.getName(), self._month.getYear(), "\n".join(res),"\n".join(divs))
+                """) % (self._month.getName(), self._month.getYear(),
+                        ''.join(list('<td align="right" bgcolor="#CCCCCC">%s</td>' % currentLocale().weekday(wd)[:2] for wd in xrange(0, 7))),
+                        "\n".join(res),"\n".join(divs))
+
         return str
 
 class WCalendar(wcomponents.WTemplated):
@@ -403,7 +401,7 @@ class WSimpleCalendar(wcomponents.WTemplated):
             res.append( """<td align="right" bgcolor="%s"><a href="" onClick="SetDate(%s,%s,%s);">%s</a></td>"""%(bgcolor,day,month,year,day ))
             if calendar.weekday(year,month,day) == 6:
                 res.append("</tr><tr>")
-        str = _("""
+        str = """
                 <table>
                     <tr>
                         <td colspan="7" align="center"><b>
@@ -429,7 +427,7 @@ class WSimpleCalendar(wcomponents.WTemplated):
                         %s
                     </tr>
                 </table>
-              """) %(datetime(1900,month,1).strftime("%B"), year, "\n".join(res))
+              """ %(datetime(1900,month,1).strftime("%B"), year, "\n".join(res))
         return str
 
     def getVars( self ):
@@ -564,7 +562,7 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
         strpm = "%s"%previousMonth
         strny = "%s"%nextYear
         strpy = "%s"%previousYear
-        html = _("""
+        html = i18nformat("""
                 <table cellspacing="1" cellpadding="5">
                     <tr>
                         <td colspan="7" align="center" style="font-size: 1.1em;">

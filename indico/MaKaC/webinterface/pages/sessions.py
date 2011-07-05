@@ -40,6 +40,7 @@ from MaKaC.webinterface.pages import main
 from MaKaC.common.utils import isStringHTML
 from MaKaC import user
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ
@@ -339,7 +340,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
             speakerList.append(spkcapt)
         speakers =""
         if speakerList != []:
-            speakers = _("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
+            speakers = i18nformat("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
         linkColor=""
         if contrib.getSession().isTextColorToLinks():
             linkColor="color:%s"%contrib.getSession().getTextColor()
@@ -456,7 +457,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
         if sDate.strftime("%d%b%Y")==eDate.strftime("%d%b%Y"):
             vars["dateInterval"]=sDate.strftime("%A %d %B %Y %H:%M")
         else:
-            vars["dateInterval"]= _(""" _("from") %s  _("to") %s""")%(
+            vars["dateInterval"]= i18nformat(""" _("from") %s  _("to") %s""")%(
                 sDate.strftime("%A %d %B %Y %H:%M"),
                 eDate.strftime("%A %d %B %Y %H:%M"))
         vars["location"]=""
@@ -469,7 +470,7 @@ class WSessionDisplayBase(wcomponents.WTemplated):
         room = self._session.getRoom()
         if room is not None:
             roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= _("""%s<br><small> _("Room"):</small> %s""")%(vars["location"],
+            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(vars["location"],
                                                             roomLink)
         vars["location"]=self._getHTMLRow( _("Place"), vars["location"])
         sessionConvs=[]
@@ -861,15 +862,15 @@ class WPSessionDataModificationConvenerNew(WPSessionModifBase):
 
 
         params["disabledRole"] = False
-        params["roleDescription"] = _(""" _("Coordinator")<br> _("Manager")""")
+        params["roleDescription"] = i18nformat(""" _("Coordinator")<br> _("Manager")""")
         if params.has_key("submissionControlValue") :
-            params["roleValue"] = _(""" <input type="checkbox" name="coordinatorControl" checked> _("Give coordinator rights to the convener").<br>
+            params["roleValue"] = i18nformat(""" <input type="checkbox" name="coordinatorControl" checked> _("Give coordinator rights to the convener").<br>
                                       <input type="checkbox" name="managerControl" checked> _("Give management rights to the convener").""")
         else:
-            params["roleValue"] = _(""" <input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").<br>
+            params["roleValue"] = i18nformat(""" <input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").<br>
                                       <input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
         params["disabledNotice"] = True
-        params["noticeValue"] = _("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
+        params["noticeValue"] = i18nformat("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given coordinator rights").</i>""")
 
@@ -900,7 +901,7 @@ class WPModConvenerNew(WPSessionModification):
         caption= _("Adding a new convener")
         wc=wcomponents.WConfModParticipEdit(title=caption)
         params["postURL"]=urlHandlers.UHSessionModConvenerNew.getURL(self._session)
-        params["addToManagersList"]= _("""
+        params["addToManagersList"]= i18nformat("""
                                     <tr>
                                         <td nowrap class="titleCellTD">
                                             <span class="titleCellFormat"> _("Specific rights")</span>
@@ -940,17 +941,17 @@ class WPModConvenerEdit(WPSessionModification):
         params["faxValue"] = conv.getFax()
 
         params["disabledRole"] = False
-        params["roleDescription"] =  _(""" _("Coordinator")<br> _("Manager")""")
+        params["roleDescription"] =  i18nformat(""" _("Coordinator")<br> _("Manager")""")
         session = conv.getSession()
         av = user.AvatarHolder().match({"email":conv.getEmail()})
         params["disabledNotice"] = True
-        coordValue =  _("""<input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").""")
+        coordValue =  i18nformat("""<input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").""")
         if (av and av[0] in session.getCoordinatorList()) or conv.getEmail() in session.getCoordinatorEmailList():
             coordValue = _("""The convener is already a coordinator""")
         else:
             params["disabledNotice"] = False
 
-        managerValue =  _("""<input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
+        managerValue =  i18nformat("""<input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
         if (av and av[0] in session.getManagerList() ) or conv.getEmail() in session.getAccessController().getModificationEmail():
             managerValue = _("""The convener is already a manager""")
         else:
@@ -959,7 +960,7 @@ class WPModConvenerEdit(WPSessionModification):
         params["roleValue"] = """ %s<br>
                                   %s"""%(coordValue, managerValue)
 
-        params["noticeValue"] =  _("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
+        params["noticeValue"] =  i18nformat("""<i><font color="black"><b> _("Note"): </b></font> _("If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given coordinator/manager rights").</i>""")
 
@@ -1121,7 +1122,7 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
                 l.append("""%s"""%(self.htmlText(conv.getFullName())))
         if len(l)>0:
             convs="Conveners: %s"%"; ".join(l)
-        return  _("""
+        return  i18nformat("""
             <a name="slot%s"/>
             <table width="90%%" align="center" border="0"
                                         style="border-left: 1px solid #777777">
@@ -1211,10 +1212,10 @@ class WSessionModPlainTTDay(wcomponents.WTemplated):
         vars["newSlotBtn"]="&nbsp;"
         if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
             if self._session.getConference().getEnableSessionSlots() :
-                vars["newSlotBtn"]= _("""<input type="submit" class="btn" value="_("new slot")">""")
+                vars["newSlotBtn"]= i18nformat("""<input type="submit" class="btn" value="_("new slot")">""")
         vars["fitToInnerSlots"] = "&nbsp;"
         if self._session.getConference().getEnableSessionSlots() :
-            vars["fitToInnerSlots"] = _("""<input type="submit" class="btn" value="_("fit to inner slots")">""")
+            vars["fitToInnerSlots"] = i18nformat("""<input type="submit" class="btn" value="_("fit to inner slots")">""")
         vars["start_date"] = self._session.getAdjustedStartDate().strftime("%a %d %b %Y %H:%M")
         vars["end_date"] = self._session.getAdjustedEndDate().strftime("%a %d %b %Y %H:%M")
         vars["editURL"] = quoteattr(str(urlHandlers.UHSessionModFit.getURL(self._session)))
@@ -1314,7 +1315,7 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
                 l.append("""%s"""%(self.htmlText(conv.getFullName())))
         if len(l)>0:
             convs="""<span style="letter-spacing: 0px">Conveners: %s</span>"""%"; ".join(l)
-        return  _("""
+        return  i18nformat("""
             <a name="slot%s"/>
             <table width="90%%" align="center" border="0"
                                         style="border-left: 1px solid #777777">
@@ -1390,7 +1391,7 @@ class WSessionModPosterTTDay(wcomponents.WTemplated):
         vars["newSlotURL"]=quoteattr(str(urlNewSlot))
         vars["newSlotBtn"]=""
         if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-            vars["newSlotBtn"]= _("""<input type="submit" class="btn" value="_("new slot")">""")
+            vars["newSlotBtn"]= i18nformat("""<input type="submit" class="btn" value="_("new slot")">""")
         return vars
 
 
@@ -1598,7 +1599,7 @@ class WSessionAddSlot(wcomponents.WTemplated):
     def _getConvenersHTML(self):
         res=[]
         for conv in self._slotData.getConvenerList():
-            tmp= _("""
+            tmp= i18nformat("""
                     <tr>
                         <td style="border-top:1px solid #777777;border-left:1px solid #777777;" width="100%%">
                             <input type="checkbox" name="sel_conv" value=%s>
@@ -1750,7 +1751,7 @@ class WSlotModifMainData(wcomponents.WTemplated):
     def _getConvenersHTML(self):
         res=[]
         for conv in self._slotData.getConvenerList():
-            tmp= _("""
+            tmp= i18nformat("""
                     <tr>
                         <td style="border-top:1px solid #777777;border-left:1px solid #777777;" width="100%%">
                             <input type="checkbox" name="sel_conv" value=%s>
@@ -1909,7 +1910,7 @@ class WSchModifRecalculate(wcomponents.WTemplated):
         vars["entryType"]="slot"
         vars["title"]=""
         if self._entry.getTitle().strip() != "":
-            vars["title"]= _("""
+            vars["title"]= i18nformat("""
                             <tr>
                                 <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Title")</span></td>
                                 <td bgcolor="white" width="100%%">&nbsp;%s</td>
@@ -2147,7 +2148,7 @@ class WPSessionModifTools( WPSessionModifBase ):
 class WPSessionDeletion( WPSessionModifTools ):
 
     def _getTabContent( self, params ):
-        msg = _("""
+        msg = i18nformat("""
         <font size="+2">_("Are you sure that you want to DELETE the session '%s'")?</font><br>(_("Note that if you delete the
 session, all the items below it will also be deleted"))
               """)%(self._session.getTitle())
@@ -2306,7 +2307,7 @@ class WSessionModContribList(wcomponents.WTemplated):
         checked=""
         if self._filterCrit.getField("type").getShowNoValue():
             checked=" checked"
-        res=[ _("""<input type="checkbox" name="typeShowNoValue" value="--none--"%s>--_("not specified")--""")%checked]
+        res=[ i18nformat("""<input type="checkbox" name="typeShowNoValue" value="--none--"%s>--_("not specified")--""")%checked]
         for t in self._conf.getContribTypeList():
             checked=""
             if t.getId() in self._filterCrit.getField("type").getValues():
@@ -2318,7 +2319,7 @@ class WSessionModContribList(wcomponents.WTemplated):
         checked=""
         if self._filterCrit.getField("track").getShowNoValue():
             checked=" checked"
-        res=[ _("""<input type="checkbox" name="trackShowNoValue" value="--none--"%s>--_("not specified")--""")%checked]
+        res=[ i18nformat("""<input type="checkbox" name="trackShowNoValue" value="--none--"%s>--_("not specified")--""")%checked]
         for t in self._conf.getTrackList():
             checked=""
             if t.getId() in self._filterCrit.getField("track").getValues():
@@ -2343,7 +2344,7 @@ class WSessionModContribList(wcomponents.WTemplated):
         pf,sf=materialFactories.PaperFactory(),materialFactories.SlidesFactory()
         for (id,caption) in [(pf.getId(),pf.getTitle()),\
                         (sf.getId(),sf.getTitle()),\
-                        ("--other--", _("other")),("--none--", _("""--_("no material")--"""))]:
+                        ("--other--", _("other")),("--none--", i18nformat("""--_("no material")--"""))]:
             checked=""
             if id in self._filterCrit.getField("material").getValues():
                 checked=" checked"
@@ -2607,7 +2608,7 @@ class WSessionModContribListEditContrib(wcomponents.WTemplated):
             vars["sDay"]=quoteattr(str(""))
             vars["sHour"]=quoteattr(str(""))
             vars["sMinute"]=quoteattr(str(""))
-            vars["startDate"]= _("""--_("not scheduled")--""")
+            vars["startDate"]= i18nformat("""--_("not scheduled")--""")
         vars["durHours"]=quoteattr(str((datetime(1900,1,1)+self._contrib.getDuration()).hour))
         vars["durMins"]=quoteattr(str((datetime(1900,1,1)+self._contrib.getDuration()).minute))
         if confLocation:
@@ -2650,7 +2651,7 @@ class WSessionModAddContribs(wcomponents.WTemplated):
         self._session=session
 
     def _getTrackItems(self):
-        res=[ _("""<option value="--none--">--_("none")--</option>""")]
+        res=[ i18nformat("""<option value="--none--">--_("none")--</option>""")]
         for track in self._session.getConference().getTrackList():
             res.append("""<option value=%s>(%s) %s</option>"""%(quoteattr(str(track.getId())),self.htmlText(track.getCode()),self.htmlText(track.getTitle())))
         return "".join(res)

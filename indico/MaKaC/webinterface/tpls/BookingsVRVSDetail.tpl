@@ -16,7 +16,7 @@
         </tr>
     <tr><td>&nbsp;</td></tr>
         <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _(}: </span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ }: </span></td>
         <td bgcolor="white" width="100%">&nbsp;  <b>${ starting }</td>
         </tr>
     <tr><td>&nbsp;</td></tr>

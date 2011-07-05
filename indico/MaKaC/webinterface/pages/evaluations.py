@@ -30,6 +30,7 @@ from MaKaC.errors                   import FormValuesError
 from MaKaC.common                   import utils
 from MaKaC.user                     import Avatar
 from MaKaC.i18n                     import _
+from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.info import HelperMaKaCInfo
 
@@ -346,7 +347,7 @@ class WConfModifEvaluationSetup( wcomponents.WTemplated ):
         vars["dataModificationURL"]=urlHandlers.UHConfModifEvaluationDataModif.getURL(self._conf)
         vars["specialActionURL"] = urlHandlers.UHConfModifEvaluationSetupSpecialAction.getURL(self._conf)
         vars["evaluation"] = evaluation
-        vars["submissionsLimit"] = _("""--_("No limit")--""")
+        vars["submissionsLimit"] = i18nformat("""--_("No limit")--""")
         if evaluation.getSubmissionsLimit() > 0:
             vars["submissionsLimit"] = evaluation.getSubmissionsLimit()
         vars["title"] = evaluation.getTitle()
@@ -381,13 +382,13 @@ class WConfModifEvaluationSetup( wcomponents.WTemplated ):
             vars["changeTo"] = "False"
             vars["status"] = _("VISIBLE")
             if evaluation.getNbOfQuestions()<1 :
-                vars["statusMoreInfo"] = _("""<span style="color: #E25300">(_("not ready"))</span>""")
+                vars["statusMoreInfo"] = i18nformat("""<span style="color: #E25300">(_("not ready"))</span>""")
             elif nowutc() < evaluation.getStartDate() :
-                vars["statusMoreInfo"] = _("""<span style="color: #E25300">(_("not open yet"))</span>""")
+                vars["statusMoreInfo"] = i18nformat("""<span style="color: #E25300">(_("not open yet"))</span>""")
             elif nowutc() > evaluation.getEndDate() :
-                vars["statusMoreInfo"] = _("""<span style="color: #E25300">(_("closed"))</span>""")
+                vars["statusMoreInfo"] = i18nformat("""<span style="color: #E25300">(_("closed"))</span>""")
             else:
-                vars["statusMoreInfo"] = _("""<span style="color: green">(_("running"))</span>""")
+                vars["statusMoreInfo"] = i18nformat("""<span style="color: green">(_("running"))</span>""")
             vars["changeStatus"] = _("HIDE")
             if evaluation.getStartDate() is None:
                 vars["startDate"] = ""
@@ -631,7 +632,7 @@ class WConfModifEvaluationEditQuestionView( wcomponents.WTemplated ):
         #remove question
         url = urlHandlers.UHConfModifEvaluationEditPerformChanges.getURL(conf, mode=Question._REMOVE, questionPos=questionPos)
         vars["removeQuestionUrl"] = url
-        vars["removeQuestionConfirm"] = _("""javascript:return confirm( _("Are you sure you want to remove this question?"));""")
+        vars["removeQuestionConfirm"] = i18nformat("""javascript:return confirm( _("Are you sure you want to remove this question?"));""")
         vars["removeQuestionInput"] = WUtils.createInput(type="image",
                                                          name="remove",
                                                          alt="remove",
@@ -714,7 +715,7 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
         #######
         #defaultAnswer
         if self._questionType in Question._BOX_SUBTYPES:
-            vars["defaultAnswer"] = _("""<tr>
+            vars["defaultAnswer"] = i18nformat("""<tr>
                     <td class="titleCellTD"><span class="titleCellFormat">  _("Default answer")</span></td>
                     <td class="inputCelTD"><input type="text" name="defaultAnswer" value="%s"/></td>
                 </tr>""")%(defaultAnswer)

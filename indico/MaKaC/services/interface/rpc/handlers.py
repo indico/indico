@@ -36,7 +36,6 @@ methodMap = {
     "roombooking.blocking.reject": roomBooking.RoomBookingBlockingReject,
 
     "resources.timezones.getAll": resources.GetTimezones,
-    "resources.languages.getAll": resources.GetLanguages,
 
     "system.describe": description.describe,
     "system.error.report": error.SendErrorReport

@@ -26,6 +26,7 @@ from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.common.baseNotificator import TplVar, Notification
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.common.info import HelperMaKaCInfo
 
 class ConfTitleTplVar(TplVar):
@@ -80,7 +81,7 @@ class AbsTrackTplVar(TplVar):
         if isinstance(status,review.AbstractStatusAccepted):
             if status.getTrack() is not None:
                 return status.getTrack().getTitle()
-        return _("""--_("not specified")--""")
+        return i18nformat("""--_("not specified")--""")
     getValue=classmethod(getValue)
 
 
@@ -93,7 +94,7 @@ class AbsContribTypeTplVar(TplVar):
         if isinstance(status,review.AbstractStatusAccepted):
             if status.getType() is not None:
                 return status.getType().getName()
-        return _("""--_("not specified")--""")
+        return i18nformat("""--_("not specified")--""")
     getValue=classmethod(getValue)
 
 

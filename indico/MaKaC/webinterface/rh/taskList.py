@@ -34,6 +34,7 @@ from MaKaC.task import TaskStatus
 from MaKaC.task import TaskComment
 from MaKaC.conference import ContributionParticipation
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 class RHTaskModifBase(RHCategDisplayBase):
 
@@ -131,7 +132,7 @@ class RHTaskNew( RHTaskModifBase ):
         for person in lis :
             subm = ""
             if submission and person[1] :
-                subm = _("""<td> _("submiter")</td>""")
+                subm = i18nformat("""<td> _("submiter")</td>""")
                 
             text = """
                 <tr>

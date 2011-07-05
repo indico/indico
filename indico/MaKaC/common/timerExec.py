@@ -838,7 +838,7 @@ class Alarm(task):
         except:
             locationText = ""
         if locationText != "":
-            locationText = _(""" _("Location"): %s""") % locationText
+            locationText = i18nformat(""" _("Location"): %s""") % locationText
 
         if self.getToAllParticipants() :
             for p in self.conf.getParticipation().getParticipantList():

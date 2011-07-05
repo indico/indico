@@ -89,7 +89,7 @@
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Action")}:</span></td>
             <td style="padding-left:10px">
                 ${ updateParentDates }
-                <input type="checkbox" name="moveEntries" value="1"> ${ _(reschedule entries after this session slot}
+                <input type="checkbox" name="moveEntries" value="1"> ${ _('reschedule entries after this session slot')}
             </td>
         </tr>
 <!--

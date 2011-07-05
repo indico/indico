@@ -23,6 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 from MaKaC.plugins.base import OldObservable
 
@@ -49,7 +50,7 @@ class WPBase(OldObservable):
         if info.isDebugActive():
             return ['js/%s/%s/Loader.js' % (module, packageName)]
         else:
-            return ['js/%s/pack/%s.pack.js' % (module, packageName)]
+            return ['js/%s/pack/%s.js.pack' % (module, packageName)]
 
     def _includeJQuery(self):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
@@ -58,7 +59,7 @@ class WPBase(OldObservable):
             # We can't use Loader.js as jQuery is included before any indico js
             return ['js/jquery/%s.js' % f for f in files] + ['js/indico/jquery/defaults.js']
         else:
-            return ['js/jquery/jquery.pack.js'] + ['js/indico/jquery/defaults.js']
+            return ['js/jquery/jquery.js.pack'] + ['js/indico/jquery/defaults.js']
 
     def _includeJSFile(self, path, filename):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
@@ -66,7 +67,7 @@ class WPBase(OldObservable):
         if info.isDebugActive():
             return ['%s/%s.js' % (path, filename)]
         else:
-            return ['%s/%s.pack.js' % (path, filename)]
+            return ['%s/%s.js.pack' % (path, filename)]
 
     def _includePresentationFiles(self):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
@@ -74,7 +75,7 @@ class WPBase(OldObservable):
         if info.isDebugActive():
             return ['js/presentation/Loader.js']
         else:
-            return ['js/presentation/pack/Presentation.pack.js']
+            return ['js/presentation/pack/Presentation.js.pack']
 
     def _getBaseURL( self ):
         return Config.getInstance().getBaseURL()
@@ -143,9 +144,9 @@ class WPBase(OldObservable):
 
         area=""
         if isinstance(self._rh, RHModificationBaseProtected):
-            area=_(""" - _("Management area")""")
+            area=i18nformat(""" - _("Management area")""")
         elif isinstance(self._rh, RHAdminBase):
-            area=_(""" - _("Administrator area")""")
+            area=i18nformat(""" - _("Administrator area")""")
 
         websession = self._getAW().getSession()
         if websession:

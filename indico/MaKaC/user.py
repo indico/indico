@@ -481,7 +481,7 @@ class GroupHolder(ObjectHolder):
                 gr = CERNGroup()
                 gr.setId(name)
                 gr.setName(name)
-                gr.setDescription( _("""_("Mapping of the Nice group") %s""")%name+"<br><br>\nMembers list: https://websvc02.cern.ch/WinServices/Services/GroupManager/GroupManager.aspx")
+                gr.setDescription( i18nformat("""_("Mapping of the Nice group") %s""")%name+"<br><br>\nMembers list: https://websvc02.cern.ch/WinServices/Services/GroupManager/GroupManager.aspx")
                 self.add(gr)
 
 

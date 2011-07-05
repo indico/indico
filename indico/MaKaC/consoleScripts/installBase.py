@@ -18,20 +18,18 @@
 ## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-'''This file contains functions used by both 'python setup.py install' and after-easy_install
+"""
+This file contains functions used by both 'python setup.py install' and after-easy_install
 based installations.
-'''
+"""
 
 import commands
-import getopt
 import os
 import re
 import shutil
-import string
 import sys
 import pkg_resources
 import copy
-
 
 
 if sys.platform == 'linux2':
@@ -169,17 +167,13 @@ def _updateMaKaCEggCache(file, path):
     open(file, 'w').write(fdata)
 
 
-def compileAllLanguages():
+def compileAllLanguages(cmd):
     '''Generates .mo files from .po files'''
-    pwd = os.getcwd()
-    os.chdir(os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'po'))
-    retVal = os.system('%s compile-all-lang.py --quiet' % sys.executable)
-
-    if (retVal>>8) != 0:
-        print "Generation of .mo files failed - maybe you don't have gettext installed?"
-        sys.exit(-1)
-
-    os.chdir(pwd)
+    # call commands directly
+    cc = cmd.distribution.get_command_obj('compile_catalog')
+    cc.run()
+    gjs = cmd.distribution.get_command_obj('generate_messages_js')
+    gjs.run()
 
 
 def copytreeSilently(source, target):

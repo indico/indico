@@ -37,6 +37,7 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.webinterface.common.countries import CountryHolder
 import re
 
@@ -580,13 +581,13 @@ class Notification(Persistent):
         text = ""
         if sessionForm.isEnabled():
             if sessionForm.getType() == "2priorities":
-                session1 = _("""--_("not selected")--""")
+                session1 = i18nformat("""--_("not selected")--""")
                 if len(sessionList)>0:
                     session1 = sessionList[0].getTitle()
-                session2 = _("""--_("not selected")--""")
+                session2 = i18nformat("""--_("not selected")--""")
                 if len(sessionList)>1:
                     session2 = sessionList[1].getTitle()
-                text =  _("""%s
+                text =  i18nformat("""%s
 - _("First priority"): %s
 - _("Other option"): %s
 """)%(self._printTitle(sessionForm.getTitle()), session1, session2)
@@ -601,10 +602,10 @@ class Notification(Persistent):
     def _printAccommodation(self, accommodationForm, accommodation):
         text = ""
         if accommodationForm.isEnabled():
-            accoType = _("""--_("not selected")--""")
+            accoType = i18nformat("""--_("not selected")--""")
             if accommodation.getAccommodationType() is not None:
                 accoType = accommodation.getAccommodationType().getCaption()
-            text = _("""%s- _("Arrival date"): %s
+            text = i18nformat("""%s- _("Arrival date"): %s
 - _("Departure date"): %s
 - _("Accommodation type"): %s""")%(self._printTitle(accommodationForm.getTitle()), \
                             accommodation.getArrivalDate().strftime("%d %B %Y"), \
@@ -622,7 +623,7 @@ class Notification(Persistent):
             if se != []:
                 text = """%s
 %s
-"""%(self._printTitle(socialEventForm.getTitle()), "\n".join(se) or _("""--_("No social events selected")--"""))
+"""%(self._printTitle(socialEventForm.getTitle()), "\n".join(se) or i18nformat("""--_("No social events selected")--"""))
         return text
 
     def _printReasonParticipation(self, reasonParticipationForm, reasonParticipation):
@@ -754,7 +755,7 @@ class Notification(Persistent):
             paymentWarning = "."
 
         subject= _("""New registrant in '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
-        body = _("""
+        body = i18nformat("""
 _("Event"): %s
 _("Registrant Id"): %s%s
 %s
@@ -945,7 +946,7 @@ Please use this information for your payment (except for e-payment):\n
     def sendEmailModificationRegistrant(self, regForm, rp):
         fromAddr = regForm.getNotificationSender()
         subject= _("""Registration modified for '%s': %s""")%(strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
-        body= _("""
+        body= i18nformat("""
 _("Registrant Id"): %s
 _("Title"): %s
 _("Family Name"): %s
@@ -1102,7 +1103,7 @@ class FieldInputType(Persistent):
         if billable:
             checked="checked=\"checked\""
 
-        html= _(""" <tr>
+        html= i18nformat(""" <tr>
                   <td class="titleCellTD"><span class="titleCellFormat">Is Billable</span></td>
                   <td bgcolor="white" class="blacktext" width="100%%">
                     <input type="checkbox" name="billable" size="60" %s> _("(uncheck if it is not billable)")
@@ -1191,7 +1192,7 @@ class TextInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
-        return _("""
+        return i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Size in chars")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
@@ -1286,7 +1287,7 @@ class TelephoneInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
-        return _("""
+        return i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Size in chars")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
@@ -1390,7 +1391,7 @@ class TextareaInput(FieldInputType):
         item.setHTMLName(self.getHTMLName())
 
     def _getSpecialOptionsHTML(self):
-        html = [_("""
+        html = [i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Number of rows")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
@@ -1398,7 +1399,7 @@ class TextareaInput(FieldInputType):
           </td>
         </tr>""") % self.getNumberOfRows()]
 
-        html.append(_("""
+        html.append(i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Row length")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
@@ -1534,7 +1535,7 @@ class NumberInput(FieldInputType):
         if billable:
             checked="checked=\"checked\""
 
-        return _("""
+        return i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Min. value")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
@@ -2141,7 +2142,7 @@ class RadioGroupInput(FieldInputType):
         else:
             radioSelected = ''
             dropdownSelected = ' selected="selected"'
-        html=[_("""
+        html=[i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Type of input")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
@@ -2155,7 +2156,7 @@ class RadioGroupInput(FieldInputType):
           <td class="titleCellTD"><span class="titleCellFormat">Items</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
                 <table>""") % dict(radioSelected=radioSelected, dropdownSelected=dropdownSelected)]
-        html.append( _("""<tr>
+        html.append( i18nformat("""<tr>
                             <td valign="top" align="left">
                             <table>
                             <tr>
@@ -2198,7 +2199,7 @@ class RadioGroupInput(FieldInputType):
                         """%(v.getId(), v.getCaption()))
             if v.isBillable():
                 billable = True
-                html.append( _("""<span class="titleCellFormat">&nbsp;&nbsp; _("Price"):%s</span>""")%(v.getPrice()))
+                html.append( i18nformat("""<span class="titleCellFormat">&nbsp;&nbsp; _("Price"):%s</span>""")%(v.getPrice()))
             if not v.isEnabled():
                 html.append("""<span><font color="red">&nbsp;&nbsp;(""" + _("disabled") + """)</font></span>""")
             if v.getCaption()==self.getDefaultItem():
@@ -2239,7 +2240,7 @@ class CountryInput(FieldInputType):
         else:
             param = ''
 
-        inputHTML = _("""<option value="">--  _("Select a country") --</option>""")
+        inputHTML = i18nformat("""<option value="">--  _("Select a country") --</option>""")
         for countryKey in CountryHolder().getCountrySortedKeys():
             selected = ""
             if value == countryKey:
@@ -2365,7 +2366,7 @@ class DateInput(FieldInputType):
                    ('%m.%Y', 'MM.YYYY'),
                    ('%Y', 'YYYY')]
 
-        html = [_("""
+        html = [i18nformat("""
         <tr>
           <td class="titleCellTD"><span class="titleCellFormat">_("Date format")</span></td>
           <td bgcolor="white" class="blacktext" width="100%%">
@@ -3817,7 +3818,7 @@ class SocialEventForm(BaseForm):
         return None
 
     def _getDefaultIntroValue(self):
-        return _("""<b> _("Select the social events you would like to attend and how many places you will need"):</b>""")
+        return i18nformat("""<b> _("Select the social events you would like to attend and how many places you will need"):</b>""")
 
     def getIntroSentence(self):
         try:
@@ -5085,7 +5086,7 @@ class RegistrantMapping(object):
         if self._registrant.getRegistrationDate() is not None:
             return self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
         else:
-            return _("""--  _("date unknown")--""")
+            return i18nformat("""--  _("date unknown")--""")
 
     def _getSessions(self):
         sessions = self._registrant.getSessionList()
@@ -5096,7 +5097,7 @@ class RegistrantMapping(object):
         if st.getStatusValue() is not None:
             return st.getStatusValue().getCaption()
         else:
-            return  _("""<span style="white-space:nowrap">--  _("not set") --</span>""")
+            return  i18nformat("""<span style="white-space:nowrap">--  _("not set") --</span>""")
 
     def _getGroup(self, groupId):
         if self._registrant.getMiscellaneousGroupById(groupId):

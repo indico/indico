@@ -29,6 +29,7 @@ import MaKaC
 import MaKaC.common.info as info
 import xml.sax.saxutils
 
+
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
 
@@ -39,6 +40,7 @@ mako = TemplateLookup(directories=["/"],
                       module_directory=COMPILED_MODULES,
                       disable_unicode=True,
                       filesystem_checks=True)
+
 
 def render(tplPath, params):
     """Render the template."""
@@ -53,15 +55,17 @@ def render(tplPath, params):
 
     return template.render(**params)
 
+
 def inlineContextHelp(helpContent):
     """
     Allows you to put [?], the context help marker.
     Help content passed as argument helpContent.
     """
     from MaKaC.webinterface.wcomponents import WTemplated
-    params = { "helpContent" : helpContent,
-               "imgSrc" : Config.getInstance().getSystemIconURL("help") }
+    params = {"helpContent" : helpContent,
+              "imgSrc" : Config.getInstance().getSystemIconURL("help")}
     return WTemplated('InlineContextHelp').getHTML(params)
+
 
 def contextHelp(helpId):
     """
@@ -69,9 +73,10 @@ def contextHelp(helpId):
     Help content is defined in <div id="helpId"></div>.
     """
     from MaKaC.webinterface.wcomponents import WTemplated
-    params = { "helpId" : helpId,
-               "imgSrc" : Config.getInstance().getSystemIconURL("help") }
+    params = {"helpId" : helpId,
+              "imgSrc" : Config.getInstance().getSystemIconURL("help")}
     return WTemplated('ContextHelp').getHTML(params)
+
 
 def escapeAttrVal(s):
     """Just escapes the apostrophes, new lines, etc."""
@@ -88,6 +93,7 @@ def escapeAttrVal(s):
     s = s.replace("&#10;", " ")
     return s
 
+
 def verbose(s, default=""):
     """
     Purpose: avoid showing "None" to user; show default value instead.
@@ -99,6 +105,7 @@ def verbose(s, default=""):
             return "no"
     return s or default
 
+
 def verbose_dt(dt, default=""):
     """Return verbose date representation."""
     if dt == None:
@@ -107,15 +114,18 @@ def verbose_dt(dt, default=""):
                             dt.hour,
                             dt.minute)).replace(' ', '0').replace('_', ' ')
 
+
 def verbose_t(t, default=""):
     """Return verbose time representation."""
     if t == None:
         return default
     return ("%2d:%2d" % (t.hour, t.minute)).replace(' ', '0')
 
+
 def escape(s):
     """HTML escape"""
     return xml.sax.saxutils.escape(s)
+
 
 def jsBoolean(b):
     """Return Javascript version of a boolean value."""
@@ -124,9 +134,11 @@ def jsBoolean(b):
     else:
         return 'false'
 
+
 def quoteattr(s):
     """quotes escape"""
     return xml.sax.saxutils.quoteattr(s)
+
 
 def roomClass(room):
     if room.isReservable:
@@ -137,12 +149,14 @@ def roomClass(room):
         roomCls = "moderatedRoom"
     return roomCls
 
+
 def dequote(s):
     """Remove surrounding quotes from a string (if there are any)."""
     if ((s.startswith('"') or s.startswith("'"))
             and (s.endswith('"') or s.endswith("'"))):
         return s[1:-1]
     return s
+
 
 def linkify(s):
     urlIxStart = s.find('http://')
@@ -152,6 +166,7 @@ def linkify(s):
     s = (s[0:urlIxStart] + '<a href="' + s[urlIxStart:urlIxEnd] + '">'
             + s[urlIxStart:urlIxEnd] + "</a> " + s[urlIxEnd:])
     return s
+
 
 def deepstr(obj):
     """ obj is any kind of object

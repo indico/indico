@@ -37,6 +37,7 @@ from MaKaC.webinterface.materialFactories import ConfMFRegistry
 from MaKaC.webinterface import meeting
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 import MaKaC.common.timezoneUtils as timezoneUtils
 from pytz import timezone
 
@@ -193,7 +194,7 @@ class WPMMaterialDisplayBase( conferences.WPConferenceDefaultDisplayBase):
         padding=""
         padding=""" style="padding:0px" """
 
-        body =  _("""
+        body =  i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
                     <table border="0" cellpadding="0" cellspacing="0"
@@ -247,7 +248,7 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
             vars["supportEmail"] = ""
         if self._conf.hasSupportEmail():
             mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] =  _("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email">  _("support")</a>""")%(mailto, Config.getInstance().getSystemIconURL("mail") )
+            vars["supportEmail"] =  i18nformat("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email">  _("support")</a>""")%(mailto, Config.getInstance().getSystemIconURL("mail") )
         format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
@@ -315,7 +316,7 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
 "cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
 "cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
 "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-"cloneOptions": _("""
+"cloneOptions": i18nformat("""
     <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" >
         _("Participants")</li>
     <li><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" >

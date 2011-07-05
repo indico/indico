@@ -42,6 +42,7 @@ from xmlGen import XMLGen
 import os, time
 from math import ceil
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
@@ -156,7 +157,7 @@ class outputGenerator(Observable):
             html = html.replace(baseURL, baseSecureURL)
             html = html.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
         if DEVELOPMENT:
-            stat_text = _("""<br><br><font size="-2">_("XML creation"): %s<br>_("HTML creation"): %s</font>""") % (self.time_XML,self.time_HTML)
+            stat_text = i18nformat("""<br><br><font size="-2">_("XML creation"): %s<br>_("HTML creation"): %s</font>""") % (self.time_XML,self.time_HTML)
         else:
             stat_text = ""
         if (re.search("xml.xsl$",stylesheet) or re.search("text.xsl$",stylesheet) or re.search("jacow.xsl$",stylesheet)) and vars.get("frame","") != "no":

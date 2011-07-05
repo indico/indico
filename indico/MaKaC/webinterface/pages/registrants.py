@@ -33,6 +33,7 @@ from MaKaC.webinterface.common.registrantNotificator import EmailNotificator
 from MaKaC import registration
 from conferences import WConfModifBadgePDFOptions
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from xml.sax.saxutils import escape
 import string
 
@@ -147,7 +148,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         except AttributeError:
             columns ={"PersonalData":_("Personal Data"),"Id":_("Id"), "Email": _("Email"), "Position":_("Position"), "Institution":_("Institution"),"Phone":_("Phone"),"City":_("City"),\
                       "Country":_("Country"), "Address":_("Address"), "ArrivalDate": _("Arrival Date"), "DepartureDate": _("Departure Date"), \
-                      "RegistrationDate": _("""_("Registration date") (%s)""")%self._conf.getTimezone()}
+                      "RegistrationDate": i18nformat("""_("Registration date") (%s)""")%self._conf.getTimezone()}
 
             tit=self._conf.getRegistrationForm().getSessionsForm().getTitle()
             if not self._conf.getRegistrationForm().getSessionsForm().isEnabled():
@@ -290,7 +291,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                     idImg = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
             idSortingURL=quoteattr("%s#results"%str(url))
-            resgroups["PersonalData"]=[ _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Id")</a></td>""")%(idImg, idSortingURL)]
+            resgroups["PersonalData"]=[ i18nformat("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Id")</a></td>""")%(idImg, idSortingURL)]
 
         url=self._getURL()
         url.addParam("sortBy","Name")
@@ -305,7 +306,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
                 url.addParam("order","down")
         nameSortingURL=quoteattr("%s#results"%str(url))
 
-        resgroups["PersonalData"].append( _("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Name")</a></td>""")%(nameImg, nameSortingURL))
+        resgroups["PersonalData"].append( i18nformat("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Name")</a></td>""")%(nameImg, nameSortingURL))
         if "Id" in display:
             pdil=["Id", "Name"]
         else:
@@ -408,7 +409,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
 
         extraInfo = ""
         if self._conf.getRegistrationForm().getStatusesList(False):
-            extraInfo = _("""<table align="center" cellspacing="0" width="100%%">
+            extraInfo = i18nformat("""<table align="center" cellspacing="0" width="100%%">
                                 <tr>
                                     <td align="left" class="titleCellFormat" style="border-bottom: 1px solid #888; padding-right:10px">  _("Statuses") <img src=%s border="0" alt="Select all" onclick="javascript:selectStatuses()"><img src=%s border="0" alt="Unselect all" onclick="javascript:unselectStatuses()"></td>
                                 </tr>
@@ -423,7 +424,7 @@ class WConfModifRegistrants( wcomponents.WTemplated ):
         return p.getHTML()
 
     def _getDisplayMenu(self):
-        menu =  _("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
+        menu =  i18nformat("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
         <tr>
             <td>
                 <table width="100%%">
@@ -629,11 +630,11 @@ class WRegPreviewMail(wcomponents.WTemplated):
         registrant=None
         if len(regsIds)>0:
             registrant=self._conf.getRegistrantById(regsIds[0])
-        vars["From"]=  _("""<center>  _("No preview avaible") </center>""")
-        vars["subject"]=  _("""<center>  _("No preview avaible") </center>""")
-        vars["body"]=  _("""<center> _("No preview avaible") </center>""")
-        vars["to"]=  _("""<center> _("No preview avaible") </center>""")
-        vars["cc"]=  _("""<center> _("No preview avaible") </center>""")
+        vars["From"]=  i18nformat("""<center>  _("No preview avaible") </center>""")
+        vars["subject"]=  i18nformat("""<center>  _("No preview avaible") </center>""")
+        vars["body"]=  i18nformat("""<center> _("No preview avaible") </center>""")
+        vars["to"]=  i18nformat("""<center> _("No preview avaible") </center>""")
+        vars["cc"]=  i18nformat("""<center> _("No preview avaible") </center>""")
         if registrant != None:
             notif=EmailNotificator().apply(registrant,{"subject":subject, "body":body, "from":fromAddr, "to":[registrant.getEmail()], "cc": [cc]})
             vars["From"]=notif.getFromAddr()
@@ -721,7 +722,7 @@ class WPRegistrantModifRemoveConfirmation(WPConfModifRegistrantListBase):
         regs=[]
         for reg in self._regList:
             regs.append("<li><i>%s</i></li>"%self._conf.getRegistrantById(reg).getFullName())
-        msg=  _("""  _("Are you sure you want to delete the following registrants")?:<br><ul>%s</ul>
+        msg=  i18nformat("""  _("Are you sure you want to delete the following registrants")?:<br><ul>%s</ul>
         <font color="red"> _("(note you will permanently lose all the information about the registrants)")</font><br>""")%("".join(regs))
         url=urlHandlers.UHConfModifRegistrantPerformRemove.getURL(self._conf)
         return wc.getHTML(msg,url,{"registrants":self._regList})
@@ -910,7 +911,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             total=0
             html=[]
             currency = ""
-            html.append( _("""
+            html.append( i18nformat("""
                         <tr>
                         <tr><td colspan="4" class="title"><b> _("details") </b></td></tr>
                         <tr>
@@ -932,7 +933,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                         quantity=0
                         caption=miscItem.getCaption()
                         currency=miscItem.getCurrency()
-                        v= _("""--  _("no value selected") --""")
+                        v= i18nformat("""--  _("no value selected") --""")
                         if miscItem is not None:
                             v=miscItem.getValue()
                             if miscItem.isBillable():
@@ -973,7 +974,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                                    <td></td>
                                 </tr>
                                 """%(quantity, caption, price, price*quantity, currency))
-            html.append( _("""
+            html.append( i18nformat("""
                         <tr>&nbsp;</tr>
                         <tr>
                            <td ><b> _("TOTAL") </b></td>
@@ -985,7 +986,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             transHTML = ""
             if self._registrant.getTransactionInfo():
                 transHTML = self._registrant.getTransactionInfo().getTransactionHTML()
-            return  _("""<form action=%s method="POST">
+            return  i18nformat("""<form action=%s method="POST">
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat">  _("Amount")</span></td>
                               <td bgcolor="white" class="blacktext">%s</td>
@@ -1009,7 +1010,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             urlEpayment=""
             if self._registrant.getConference().getModPay().isActivated() and self._registrant.doPay():
                 urlEpayment = """<br/><br/><i>Direct access link for epayment:</i><br/><small>%s</small>"""%escape(str(urlHandlers.UHConfRegistrationFormCreationDone.getURL(self._registrant)))
-            return _(""" <form action=%s method="POST">
+            return i18nformat(""" <form action=%s method="POST">
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat">_("Amount")</span></td>
                               <td bgcolor="white" class="blacktext">%s</td>
@@ -1025,7 +1026,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                             </form>
                             """)%(quoteattr(str(urlHandlers.UHConfModifRegistrantTransactionModify.getURL(self._registrant))), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()),"unpaid",urlEpayment)
         else :
-            return  _(""" <form action="" method="POST">
+            return  i18nformat(""" <form action="" method="POST">
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Payment")</span></td>
                               <td bgcolor="white" class="blacktext">%s</td>
@@ -1043,17 +1044,17 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         sessions = self._registrant.getSessionList()
         if regForm.getSessionsForm().isEnabled():
             if regForm.getSessionsForm().getType() == "2priorities":
-                session1 =  _("""<font color=\"red\">--  _("not selected") --</font>""")
-                session2 =  _("""--  _("not selected") --""")
+                session1 =  i18nformat("""<font color=\"red\">--  _("not selected") --</font>""")
+                session2 =  i18nformat("""--  _("not selected") --""")
                 if len(sessions) > 0:
                     session1 = sessions[0].getTitle()
                     if sessions[0].isCancelled():
-                        session1 =  _("""%s <font color=\"red\">( _("cancelled") )""")%session1
+                        session1 =  i18nformat("""%s <font color=\"red\">( _("cancelled") )""")%session1
                 if len(sessions) > 1:
                     session2 = sessions[1].getTitle()
                     if sessions[1].isCancelled():
-                        session2 =  _("""%s <font color=\"red\"> ( _("cancelled") )""")%session2
-                text=  _("""
+                        session2 =  i18nformat("""%s <font color=\"red\"> ( _("cancelled") )""")%session2
+                text=  i18nformat("""
                         <table>
                           <tr>
                             <td align="right"><b> _("First Priority"):</b></td>
@@ -1065,7 +1066,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                           </tr>
                         </table>
                         """)%(session1, session2)
-                return  _("""
+                return  i18nformat("""
                         <form action=%s method="POST">
                         <tr>
                           <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Sessions")</span></td>
@@ -1078,13 +1079,13 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                         </form>
                         """)%(quoteattr(str(urlHandlers.UHConfModifRegistrantSessionModify.getURL(self._registrant))), text)
             if regForm.getSessionsForm().getType() == "all":
-                sessionList =  _("""<font color=\"red\">--_("not selected")--</font>""")
+                sessionList =  i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
                 if len(sessions) > 0:
                     sessionList=["<ul>"]
                     for ses in sessions:
                         sesText = "<li>%s</li>"%ses.getTitle()
                         if ses.isCancelled():
-                            sesText =  _("""<li>%s <font color=\"red\"> ( _("cancelled") )</font></li>""")%ses.getTitle()
+                            sesText =  i18nformat("""<li>%s <font color=\"red\"> ( _("cancelled") )</font></li>""")%ses.getTitle()
                         sessionList.append(sesText)
                     sessionList.append("</ul>")
                     sessionList="".join(sessionList)
@@ -1095,7 +1096,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                           </tr>
                         </table>
                         """%(sessionList)
-                return  _("""
+                return  i18nformat("""
                         <form action=%s method="POST">
                         <tr>
                           <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Sessions")</span></td>
@@ -1113,19 +1114,19 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         regForm = self._conf.getRegistrationForm()
         if regForm.getAccommodationForm().isEnabled():
             accommodation = self._registrant.getAccommodation()
-            accoType =   _("""<font color=\"red\">--_("not selected")--</font>""")
+            accoType =   i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
             cancelled = ""
             if accommodation is not None and accommodation.getAccommodationType() is not None:
                 accoType = accommodation.getAccommodationType().getCaption()
                 if accommodation.getAccommodationType().isCancelled():
-                    cancelled =  _("""<font color=\"red\"> _("(disabled)")</font>""")
-            arrivalDate =  _("""<font color=\"red\">--_("not selected")--</font>""")
+                    cancelled =  i18nformat("""<font color=\"red\"> _("(disabled)")</font>""")
+            arrivalDate =  i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
             if accommodation is not None and accommodation.getArrivalDate() is not None:
                 arrivalDate = accommodation.getArrivalDate().strftime("%d-%B-%Y")
-            departureDate =  _("""<font color=\"red\">--_("not selected")--</font>""")
+            departureDate =  i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
             if accommodation is not None and accommodation.getDepartureDate() is not None:
                 departureDate = accommodation.getDepartureDate().strftime("%d-%B-%Y")
-            text =  _("""
+            text =  i18nformat("""
                         <table>
                           <tr>
                             <td align="right"><b> _("Arrival date"):</b></td>
@@ -1142,7 +1143,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                         </table>
                         """)%(arrivalDate, departureDate, \
                                 accoType, cancelled)
-            return  _("""
+            return  i18nformat("""
                     <form action=%s method="POST">
                     <tr>
                       <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Accommodation")</span></td>
@@ -1165,23 +1166,23 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             for se in socialEvents:
                 cancelled = ""
                 if se.isCancelled():
-                    cancelled =  _("""<font color=\"red\"> ( _("cancelled") )</font>""")
+                    cancelled =  i18nformat("""<font color=\"red\"> ( _("cancelled") )</font>""")
                     if se.getCancelledReason().strip():
-                        cancelled =  _("""<font color=\"red\">( _("cancelled"): %s)</font>""")%se.getCancelledReason().strip()
-                r.append( _("""
+                        cancelled =  i18nformat("""<font color=\"red\">( _("cancelled"): %s)</font>""")%se.getCancelledReason().strip()
+                r.append( i18nformat("""
                             <tr>
                               <td align="left">%s <b>[%s _("place(s) needed")]</b> %s</td>
                             </tr>
                          """)%(se.getCaption(), se.getNoPlaces(), cancelled))
             if r == []:
-                text = _("""--_("no social events selected")--""")
+                text = i18nformat("""--_("no social events selected")--""")
             else:
                 text = """
                         <table>
                           %s
                         </table>
                         """%("".join(r))
-            text = _("""
+            text = i18nformat("""
                     <form action=%s method="POST">
                     <tr>
                       <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Social events")</span></td>
@@ -1198,7 +1199,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
     def _getReasonParticipationHTML(self):
         regForm = self._conf.getRegistrationForm()
         if regForm.getReasonParticipationForm().isEnabled():
-            return _("""
+            return i18nformat("""
                     <form action=%s method="POST">
                     <tr>
                       <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Reason for participation") </span></td>
@@ -1231,7 +1232,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             miscItem=None
             if miscGroup is not None:
                 miscItem=miscGroup.getResponseItemById(f.getId())
-            v= _("""--_("no value selected")--""")
+            v= i18nformat("""--_("no value selected")--""")
             if miscItem is not None:
                 v = self._getItemValueDisplay(miscItem)
             html.append("""
@@ -1253,7 +1254,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                                     <tr><td>&nbsp;</td></tr>
                                     """) %(miscItem.getCaption(), self._getItemValueDisplay(miscItem)) )
         if len(html)==1:
-            html.append( _("""
+            html.append( i18nformat("""
                         <tr><td><font color="black"><i> --_("No fields")--</i></font></td></tr>
                         """))
         html.append("</table>")
@@ -1264,7 +1265,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         html=[]
         url=urlHandlers.UHConfModifRegistrantMiscInfoModify.getURL(self._registrant)
         url.addParam("miscInfoId", gsf.getId())
-        html.append( _("""
+        html.append( i18nformat("""
             <form action=%s method="POST">
             <tr>
               <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
@@ -1313,7 +1314,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                         </tr>
                         """%(rst.getCaption(), vcap))
         html.append("""</table>""")
-        html=[ _("""
+        html=[ i18nformat("""
                     <form action=%s method="POST">
                     <tr>
                       <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Statuses")</span></td>
@@ -1342,7 +1343,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         vars["fax"] = self.htmlText( self._registrant.getFax() )
         vars["email"] = self.htmlText( self._registrant.getEmail() )
         vars["personalHomepage"] = self.htmlText( self._registrant.getPersonalHomepage() )
-        vars["registrationDate"] = _("""--_("date unknown")--""")
+        vars["registrationDate"] = i18nformat("""--_("date unknown")--""")
         if self._registrant.getRegistrationDate() is not None:
             vars["registrationDate"] = "%s (%s)"%(self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M"), self._conf.getTimezone())
         vars["dataModificationURL"] = quoteattr(str(urlHandlers.UHRegistrantDataModification.getURL(self._registrant)))
@@ -1428,7 +1429,7 @@ class WConfModifRegistrantSessions2PrioritiesModify(WConfModifRegistrantSessions
         selected = ""
         if sessionValue is None:
             selected = "selected"
-        html = [ _("""<select name="%s">
+        html = [ i18nformat("""<select name="%s">
                         <option value="nosession" %s>--_("None selected")--</option>""")%(selectName, selected)]
         for ses in self._sessionForm.getSessionList(True):
             selected = ""
@@ -1472,7 +1473,7 @@ class WConfModifRegistrantTransactionModify(WConfModifRegistrantSessionsBase):
             checkedNo="selected"
         elif (transaction is None or transaction.isChangeable()):
             checkedYes="selected"
-        tmp=  _("""<select name="isPayed"><option value="yes" %s> _("yes")</option><option value="no" %s> _("no")</option></select>""")%(checkedYes, checkedNo)
+        tmp=  i18nformat("""<select name="isPayed"><option value="yes" %s> _("yes")</option><option value="no" %s> _("no")</option></select>""")%(checkedYes, checkedNo)
         return tmp
 
     def getVars(self):
@@ -1573,7 +1574,7 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
                                 </tr>
                             """%(type.getId(), selected, disabled, type.getCaption(), priceCol ) )
             else:
-                html.append( _("""<tr>
+                html.append( i18nformat("""<tr>
                                  <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>
                                </tr>
                             """)%(type.getCaption() ) )
@@ -1779,7 +1780,7 @@ class WConfModifRegistrantStatusesModify(wcomponents.WTemplated):
         checked=""
         if not somechecked:
             checked=" checked"
-        html.insert(1, _("""
+        html.insert(1, i18nformat("""
                         <tr><td><input type="radio" name="statuses-%s" value="novalue"%s>--_("no value")--</td></tr>
                         """)%(st.getId(), checked))
         html.append("""</table>""")
@@ -1906,7 +1907,7 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
         checked=""
         if self._filterCrit.getField(self._sessionFilterName).getShowNoValue():
             checked=" checked"
-        res=[ _("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
+        res=[ i18nformat("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
         for sess in sesstypes:
             checked=""
             if sess.getId() in self._filterCrit.getField(self._sessionFilterName).getValues():
@@ -1916,12 +1917,12 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
             checked=""
             if self._sessionFilterName == "sessionfirstpriority":
                 checked=" checked"
-            res.append( _("""<b>------</b><br><input type="checkbox" name="firstChoice" value="firstChoice"%s><i> _("Only by first choice") </i>""")%checked)
+            res.append( i18nformat("""<b>------</b><br><input type="checkbox" name="firstChoice" value="firstChoice"%s><i> _("Only by first choice") </i>""")%checked)
         return "<br>".join(res)
 
     def _getFilterOptionsHTML(self, currentSortingHTML):
         filterPostURL=quoteattr("%s#results"%str(urlHandlers.UHConfRegistrantsList.getURL(self._conf)))
-        return _("""<tr>
+        return i18nformat("""<tr>
         <td width="100%%">
                     <br>
                     <form action=%s method="POST">

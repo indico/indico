@@ -32,6 +32,7 @@ from MaKaC.webinterface.pages.category import WPCategoryBase,WPCategoryDisplayBa
 import MaKaC.webinterface.pages.category
 import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 class WPMaterialBase( WPConferenceModifBase, WPCategoryBase ):
     
@@ -128,7 +129,7 @@ class WMaterialDisplay(wcomponents.WTemplated):
             status=contrib.getCurrentStatus()
             if not isinstance(status,conference.ContribStatusWithdrawn) and \
                                 contrib.canUserSubmit(self._aw.getUser()):
-                res= _("""<input type="submit" class="btn" value='_("submit resource")'>""")
+                res= i18nformat("""<input type="submit" class="btn" value='_("submit resource")'>""")
         return res
 
     def getVars( self ):
@@ -192,7 +193,7 @@ class WMaterialDisplay(wcomponents.WTemplated):
                         """%(iconHTML,vars["fileAccessURLGen"](res),
                                     res.getFileName(),strfFileSize(res.getSize()), res.getCreationDate().strftime("%d.%m.%Y %H:%M:%S"),protection))
            
-            vars["resources"] = _("""<td align="right" valign="top" class="displayField" nowrap><b> _("Resources"):</b></td>
+            vars["resources"] = i18nformat("""<td align="right" valign="top" class="displayField" nowrap><b> _("Resources"):</b></td>
                         <td>%s</td>""")%"".join(rl)
         vars["submitURL"]=quoteattr(str(urlHandlers.UHMaterialDisplaySubmitResource.getURL(self._material)))
         vars["submitBtn"]=self._getSubmitButtonHTML()
@@ -264,7 +265,7 @@ class WMaterialModifMain( wcomponents.WTemplated ):
         vars["resources"] = "<ol>%s</ol>"%"".join( l )
         mr = self._material.getMainResource()
         if mr == None:
-            vars["mainResource"] = _("""--_("no main resource")--""")
+            vars["mainResource"] = i18nformat("""--_("no main resource")--""")
         else:
             if mr.__class__ is conference.LocalFile:
                 vars["mainResource"] =  """<small>[%s]</small> <b>%s</b> (%s) - <small>%s</small></li>"""%(mr.getFileType(), mr.getName(), mr.getFileName(), strfFileSize( mr.getSize() ) )
@@ -363,7 +364,7 @@ class WFileSubmission(wcomponents.WTemplated):
         vars=wcomponents.WTemplated.getVars(self)
         vars["conversion"]=""
         if Config.getInstance().hasFileConverter():
-            vars["conversion"]= _("""
+            vars["conversion"]= i18nformat("""
                                 <tr>
                                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("To PDF")</span></td>
                                     <td align="left"><input type="checkbox" name="topdf" checked="checked"> _("Automatic conversion to pdf (when applicable)? (PPT, DOC)")</td>
@@ -410,7 +411,7 @@ class WMaterialModifAC( wcomponents.WTemplated ):
             oppVisibility = _("VISIBLE")
         #Privacy of the current target can only be changed if the target 
         #   owner is not protected
-        vars["changeVisibility"] = _("""( _("make it") <input type="submit" class="btn" name="visibility" value="%s">)""")%oppVisibility
+        vars["changeVisibility"] = i18nformat("""( _("make it") <input type="submit" class="btn" name="visibility" value="%s">)""")%oppVisibility
         vars["locator"] = self.__material.getLocator().getWebForm()
         vars["userTable"] = wcomponents.WPrincipalTable().getHTML( self.__material.getAllowedToAccessList(), self.__material, vars["addAllowedURL"], vars["removeAllowedURL"] )
         vars["accessKey"] = self.__material.getAccessKey()
@@ -590,7 +591,7 @@ class WMaterialMainResourceSelect(wcomponents.WTemplated):
         checked = ""
         if mr == None:
             checked = """ checked="checked" """
-        l = [ _("""<li><input type="radio" %s name="mainResource" value="none"><b> --_("no main resource")--</b></li>""")%checked]
+        l = [ i18nformat("""<li><input type="radio" %s name="mainResource" value="none"><b> --_("no main resource")--</b></li>""")%checked]
         for res in self._material.getResourceList():
             checked = ""
             if mr != None and res.getId() == mr.getId():
@@ -614,7 +615,7 @@ class WPMaterialDisplayRemoveResourceConfirm( WPMaterialDisplayBase ):
     
     def _getBody(self,params):
         wc=wcomponents.WDisplayConfirmation()
-        msg= _(""" _("Are you sure you want to delete the following resource?")<br>
+        msg= i18nformat(""" _("Are you sure you want to delete the following resource?")<br>
             <b><i>%s</i></b>
         <br>""")%self._res.getFileName()
         url=urlHandlers.UHMaterialDisplayRemoveResource.getURL(self._res)

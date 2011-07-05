@@ -31,7 +31,7 @@ from MaKaC.common.fossilize import fossilize
 
 from MaKaC.rb_location import CrossLocationQueries
 
-from MaKaC.i18n import langList, languageNames
+from indico.util.i18n import getLocaleDisplayNames, availableLocales
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
@@ -262,10 +262,8 @@ class UserHidePastEvents(LoggedOnlyService):
 class UserGetLanguages(LoggedOnlyService):
 
     def _getAnswer( self):
-        userLang = self.getAW().getUser().getLang()
-        languages = [v for k,v in langList() if k != userLang]
-        languages.insert(0, languageNames[userLang])
-        return languages
+        userLoc = self.getAW().getUser().getLang()
+        return getLocaleDisplayNames(using=userLoc)
 
 
 class UserSetLanguage(LoggedOnlyService):
@@ -276,12 +274,11 @@ class UserSetLanguage(LoggedOnlyService):
         self._lang = self._params.get("lang",None)
 
     def _getAnswer( self):
-        if self._lang:
-            for k,v in langList():
-                if v == self._lang:
-                    self._user.setLang(k)
-                    return True
-        return False
+        if self._lang and self._lang in availableLocales:
+            self._user.setLang(self._lang)
+            return True
+        else:
+            return False
 
 
 class UserGetTimezones(LoggedOnlyService):

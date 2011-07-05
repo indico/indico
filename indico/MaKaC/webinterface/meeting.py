@@ -44,6 +44,7 @@ from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 from MaKaC.webinterface.materialFactories import ConfMFRegistry, ContribMFRegistry
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 import MaKaC.common.timezoneUtils as timezoneUtils
 
 class WebFactory(WebFactory):
@@ -349,7 +350,7 @@ class WPMConferenceDisplayWriteMinutes(conferences.WPConferenceDefaultDisplayBas
         padding=""
         padding=""" style="padding:0px" """
 
-        body = _("""
+        body = i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
                     <table border="0" cellpadding="0" cellspacing="0"
@@ -392,7 +393,7 @@ class WPMSubContributionDisplay(subContributions.WPSubContributionDisplay):
         padding=""
         padding=""" style="padding:0px" """
 
-        body = _("""
+        body = i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
                     <table border="0" cellpadding="0" cellspacing="0"
@@ -467,7 +468,7 @@ class WPMContributionDisplay(contributions.WPContributionDisplay):
         padding=""
         padding=""" style="padding:0px" """
 
-        body =  _("""
+        body =  i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
                     <table border="0" cellpadding="0" cellspacing="0"
@@ -539,7 +540,7 @@ class WPMSessionDisplay(sessions.WPSessionDisplay):
         padding=""
         padding=""" style="padding:0px" """
 
-        body =  _("""
+        body =  i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
                     <table border="0" cellpadding="0" cellspacing="0"
@@ -692,7 +693,7 @@ class WPMMaterialDisplayBase( material.WPMaterialDisplayBase):
         padding=""
         padding=""" style="padding:0px" """
 
-        body =  _("""
+        body =  i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
                     <table border="0" cellpadding="0" cellspacing="0"
@@ -872,7 +873,7 @@ class WPMConfClone(conferences.WPConfClone):
 "cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
 "cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
 "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-"cloneOptions": _("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
+"cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                      <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" checked="checked" />_("Participants")</li>
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" />_("send email to the participants of the created event")</li></ul></li>
@@ -992,7 +993,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         entries = container.getSessionSlot().getSchedule().getEntries()
         if len(entries) > 0:
             if container.getStartDate()<entries[0].getStartDate() or container.getEndDate()>entries[-1].getEndDate():
-                fitSlotLink =  _("""<input type="submit" value="_("fit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionFitSlot.getURL(container.getSessionSlot()))
+                fitSlotLink =  i18nformat("""<input type="submit" value="_("fit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionFitSlot.getURL(container.getSessionSlot()))
         return fitSlotLink
 
     def _getCompactSlotLink( self, container, linkColor ):
@@ -1003,7 +1004,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         compactSlotLink = ""
         sch = container.getSessionSlot().getSchedule()
         if sch.hasGap():
-            compactSlotLink =  _("""<input type="submit" value="_("compact slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionModSlotCompact.getURL(container.getSessionSlot()))
+            compactSlotLink =  i18nformat("""<input type="submit" value="_("compact slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionModSlotCompact.getURL(container.getSessionSlot()))
         return compactSlotLink
 
     def _getAddContribLink( self, container, linkColor ):
@@ -1018,7 +1019,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
                 continue
             l.append(contrib)
         if len(l)>0:
-            addContrib =  _("""<input type="submit" value="_("add contribution")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionAddContribution.getURL(container.getSessionSlot()))
+            addContrib =  i18nformat("""<input type="submit" value="_("add contribution")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionAddContribution.getURL(container.getSessionSlot()))
         else:
             addContrib = ""
         return addContrib
@@ -1055,9 +1056,9 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         editSlotLink,delSlotLink="",""
         if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
             if self._session.getConference().getEnableSessionSlots() :
-                editSlotLink= _("""<input type="submit" value="_("edit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlEditSlot)
+                editSlotLink= i18nformat("""<input type="submit" value="_("edit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlEditSlot)
                 if len(self._session.getSlotList()) > 1:
-                    delSlotLink= _("""<input type="submit" value="_("delete slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlDelSlot)
+                    delSlotLink= i18nformat("""<input type="submit" value="_("delete slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlDelSlot)
         title = self.htmlText(container.getTitle())
         duration = container.getDuration()
         conveners=""
@@ -1069,12 +1070,12 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
             for conv in container.getSessionSlot().getSession().getConvenerList():
                 convenerList.append(conv.getFullName())
         if convenerList != []:
-            conveners = _("""
+            conveners = i18nformat("""
                         <tr>
                             <td width="100%%" align="center" style="color:%s"><small> _("Conveners"): %s</small></td>
                         </tr>
                     """)%(self._session.getTextColor(), "; ".join(convenerList))
-        return  _("""
+        return  i18nformat("""
         <td colspan="%s" bgcolor="%s" align="center" valign="middle" width="%s%%" style="color: black; border-top: 2px solid #E6E6E6; margin-left:1px;">
                         <table width="100%%">
                             <tr>
@@ -1131,11 +1132,11 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
         compactSlotLink = self._getCompactSlotLink(container, linkColor)
         if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
             if self._session.getConference().getEnableSessionSlots() :
-                editSlotLink= _("""<input type="submit" value="_("edit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlEditSlot)
+                editSlotLink= i18nformat("""<input type="submit" value="_("edit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlEditSlot)
                 if len(self._session.getSlotList()) > 1:
-                    delSlotLink= _("""<input type="submit" value="_("delete slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlDelSlot)
+                    delSlotLink= i18nformat("""<input type="submit" value="_("delete slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlDelSlot)
 
-        return  _("""
+        return  i18nformat("""
         <td colspan="%s" bgcolor="%s" align="center" valign="middle" width="%s%%" style="color: black;">
         <table width="100%%">
                             <tr>
@@ -1211,7 +1212,7 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
             reducedScheduleActionURL = urlHandlers.UHReducedSessionScheduleAction.getURL(self._session)
             reducedScheduleActionURL.addParam("slotId",0)
             reducedScheduleActionURL.addParam("orginURL",orginURL)
-            res= _("""
+            res= i18nformat("""
         <a href="" name="%s"></a>
         <table align="center" width="100%%">
             <tr>
@@ -1271,10 +1272,10 @@ class WMSessionModifSchedule(sessions.WSessionModifSchedule):
     def getVars( self ):
         vars = sessions.WSessionModifSchedule.getVars(self)
         if self._session.getConference().getEnableSessionSlots() :
-            vars["fitToInnerSlots"] =  _("""<input type="submit" class="btn" value="_("fit inner timetable")">""")
+            vars["fitToInnerSlots"] =  i18nformat("""<input type="submit" class="btn" value="_("fit inner timetable")">""")
         else :
             editURL = urlHandlers.UHSessionDatesModification.getURL(self._session)
-            vars["fitToInnerSlots"] =  _("""<input type="submit" class="btn" value="_("fit inner timetable")"><input type="submit" class="btn" value="_("modify dates")" onClick="this.form.action='%s';">""") % editURL
+            vars["fitToInnerSlots"] =  i18nformat("""<input type="submit" class="btn" value="_("fit inner timetable")"><input type="submit" class="btn" value="_("modify dates")" onClick="this.form.action='%s';">""") % editURL
         return vars
 
 ######################################################################
@@ -1766,7 +1767,7 @@ class WPMConfAddAlarm(WPMConfModifTools, conferences.WPConfAddAlarm):
         self._tabAlarms.setActive()
 
     def _getTabContent(self, params):
-        params["toAllParticipants"] =  _("""
+        params["toAllParticipants"] =  i18nformat("""
         <tr>
             <td>&nbsp;<input type="checkbox" name="toAllParticipants"></td>
             <td> _("Send alarm to all participants of the event.")</td>

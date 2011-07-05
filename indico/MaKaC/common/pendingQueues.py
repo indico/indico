@@ -29,6 +29,7 @@ from persistent import Persistent
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 ###---------------------------- General Pending Queues ---------------------------------
 
 #---GENERAL----
@@ -252,7 +253,7 @@ class _PendingSubmitterNotification(_PendingNotification):
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=_("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
             for ps in self._participationsByConf[conf]:
                 contrib=ps.getContribution()
                 typeAuthor=""
@@ -262,7 +263,7 @@ class _PendingSubmitterNotification(_PendingNotification):
                     typeAuthor=_("Co-author")
                 elif contrib.isSpeaker(ps):
                     typeAuthor=_("Speaker")
-                participations+=_("""\t\t\t\t - _("Contribution") \"%s\" (%s)\n""")%(contrib.getTitle(), typeAuthor)
+                participations+=i18nformat("""\t\t\t\t - _("Contribution") \"%s\" (%s)\n""")%(contrib.getTitle(), typeAuthor)
                 accessURL = urlHandlers.UHContributionDisplay.getURL(contrib)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
@@ -360,10 +361,10 @@ class _PendingManagerNotification(_PendingNotification):
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=_("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
             for ps in self._participationsByConf[conf]:
                 session=ps.getSession()
-                participations+=_("""\t\t\t\t - _("Session") \"%s\"\n""")%(session.getTitle())
+                participations+=i18nformat("""\t\t\t\t - _("Session") \"%s\"\n""")%(session.getTitle())
                 accessURL = urlHandlers.UHSessionDisplay.getURL(session)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
@@ -458,7 +459,7 @@ class _PendingConfManagerNotification(_PendingNotification):
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=_("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
             accessURL = urlHandlers.UHConferenceDisplay.getURL(conf)
             participations+="\t\t\t- Access: %s\n" % accessURL
         return participations
@@ -552,10 +553,10 @@ class _PendingCoordinatorNotification(_PendingNotification):
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=_("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
             for ps in self._participationsByConf[conf]:
                 session=ps.getSession()
-                participations+=_("""\t\t\t\t - _("Session") \"%s\"\n""")%(session.getTitle())
+                participations+=i18nformat("""\t\t\t\t - _("Session") \"%s\"\n""")%(session.getTitle())
                 accessURL = urlHandlers.UHSessionDisplay.getURL(session)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations

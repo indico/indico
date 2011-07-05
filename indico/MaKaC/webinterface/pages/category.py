@@ -37,6 +37,7 @@ from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.common.cache import CategoryCache
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
 from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
@@ -119,7 +120,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
             l.append( temp.getHTML( self._aw, mat, url ) )
         res = ""
         if l:
-            res =   _("""
+            res =   i18nformat("""
                         <span style="color:#444"> _("Material"): %s</span>
                     """)%", ".join( l )
         return res
@@ -160,7 +161,7 @@ class WCategoryDisplay(wcomponents.WTemplated):
 
         # TODO: Should be added to submenu
         if self._target.tasksAllowed() :
-            vars["taskList"] = _("""<a href="%s"> _("Task List")</a>""")%urlHandlers.UHTaskList.getURL(self._target)
+            vars["taskList"] = i18nformat("""<a href="%s"> _("Task List")</a>""")%urlHandlers.UHTaskList.getURL(self._target)
         else :
             vars["taskList"] = ""
 
@@ -181,7 +182,7 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         url = urlHandlers.UHCategoryToRSS.getURL(self._target)
 
         return WPCategoryDisplayBase._getHeadContent( self ) + \
-        _("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
+        i18nformat("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
 
     def _getBody( self, params ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -999,7 +1000,7 @@ class WPCategOverview( WPCategoryDisplayBase ):
         # add RSS feed
         if self._ow.getDate().date() == nowutc().astimezone(timezone(self._locTZ)).date():
             url = urlHandlers.UHCategOverviewToRSS.getURL(self._categ)
-            return _("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
+            return i18nformat("""<link rel="alternate" type="application/rss+xml" title= _("Indico RSS Feed") href="%s">""") % url
         return ""
 
     def _getBody( self, params ):
@@ -1104,13 +1105,13 @@ class WCategoryStatistics(wcomponents.WTemplated):
                     wcsl=wcomponents.WCategoryStatisticsList( _("Number of contributions"), self._stats["contributions"] )
                     stats.append(wcsl.getHTML( self._aw ))
                 else:
-                    stats.append( _("""<b> _("Number of contributions"): 0</b>"""))
-                stats.append( _("""<b> _("Number of resources"): %s</b>""")%self._stats["resources"])
+                    stats.append( i18nformat("""<b> _("Number of contributions"): 0</b>"""))
+                stats.append( i18nformat("""<b> _("Number of resources"): %s</b>""")%self._stats["resources"])
                 vars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
             else:
-                stats.append(_("""<b> _("No statistics for the events").</b>"""))
-                stats.append(_("""<b> _("No statistics for the contributions").</b>"""))
-                stats.append(_("""<b> _("No statistics for the resources").</b>"""))
+                stats.append(i18nformat("""<b> _("No statistics for the events").</b>"""))
+                stats.append(i18nformat("""<b> _("No statistics for the contributions").</b>"""))
+                stats.append(i18nformat("""<b> _("No statistics for the resources").</b>"""))
                 vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
             vars["contents"] = "<br><br>".join( stats )
         else:
@@ -1410,7 +1411,7 @@ class WCategModifMain(wcomponents.WTemplated):
                         <a href="%s">%s</a>
                     </td>
                 </tr>"""%(id, selbox,modifURLGen( categ ), categ.getName().strip() or "[no title]"))
-        html = _("""
+        html = i18nformat("""
                 <input type="hidden" name="oldpos">
                 <table align="left" width="100%%">
                 <tr>
@@ -1426,7 +1427,7 @@ class WCategModifMain(wcomponents.WTemplated):
         temp = []
         for conf in cl:
             if conf.isClosed():
-                textopen = _(""" <b>[ <a href="%s"> _("re-open event")</a> ]</b>""") %  modifURLOpen(conf)
+                textopen = i18nformat(""" <b>[ <a href="%s"> _("re-open event")</a> ]</b>""") %  modifURLOpen(conf)
             else:
                 textopen = ""
             temp.append("""
@@ -1438,7 +1439,7 @@ class WCategModifMain(wcomponents.WTemplated):
                     <td align="center" width="17%%">%s</td>
                     <td width="100%%"><a href="%s">%s</a>%s</td>
                 </tr>"""%(conf.getId(), conf.getAdjustedStartDate().date(), conf.getAdjustedEndDate().date(),modifURLGen(conf), conf.getTitle(), textopen))
-        html = _("""<table align="left" width="100%%">
+        html = i18nformat("""<table align="left" width="100%%">
                 <tr>
                     <td width="3%%" nowrap><img src="%s" border="0" alt="Select all" onclick="javascript:selectAll(document.contentForm.selectedConf)"><img src="%s" border="0" alt="Deselect all" onclick="javascript:deselectAll(document.contentForm.selectedConf)"></td>
                     <td align="center" width="17%%" class="titleCellFormat" style="border-right:5px solid #FFFFFF; border-bottom: 1px solid #FFFFFF;"> _("Start date")</td>
@@ -1462,7 +1463,7 @@ class WCategModifMain(wcomponents.WTemplated):
             vars["icon"] = "None"
         vars["dataModifButton"] = ""
         if not self._categ.isRoot():
-            vars["dataModifButton"] = _("""<input type="submit" class="btn" value="_("modify")">""")
+            vars["dataModifButton"] = i18nformat("""<input type="submit" class="btn" value="_("modify")">""")
         vars["removeItemsURL"] = vars["actionSubCategsURL"]
         if not self._categ.getSubCategoryList():
             vars['containsEvents'] = True
@@ -1502,13 +1503,13 @@ class WCategModifMain(wcomponents.WTemplated):
         if (self._categ.hasSubcategories()):
             icon=vars["disablePic"]
             textIcon = disabledText
-            comment = _("""<b>&nbsp;&nbsp;[ _("Category contains subcategories - this module cannot be enabled")]</b>""")
+            comment = i18nformat("""<b>&nbsp;&nbsp;[ _("Category contains subcategories - this module cannot be enabled")]</b>""")
             url = ""
         elif self._categ.tasksAllowed():
             icon=vars["enablePic"]
             textIcon=enabledText
             if len(self._categ.getTaskList()) > 0 :
-                comment = _("""<b>&nbsp;&nbsp;[_("Task list is not empty - this module cannot be disabled")]</b>""")
+                comment = i18nformat("""<b>&nbsp;&nbsp;[_("Task list is not empty - this module cannot be disabled")]</b>""")
                 url = ""
         else:
             icon=vars["disablePic"]
@@ -1552,7 +1553,7 @@ class WCategoryDataModification(wcomponents.WTemplated):
         selected = ""
         if visibility == 0:
             selected = "selected"
-        vis = [ _("""<option value="0" %s> _("Nowhere")</option>""") % selected]
+        vis = [ i18nformat("""<option value="0" %s> _("Nowhere")</option>""") % selected]
         while topcat:
             level += 1
             selected = ""
@@ -1564,7 +1565,7 @@ class WCategoryDataModification(wcomponents.WTemplated):
         selected = ""
         if visibility > level:
             selected = "selected"
-        vis.append( _("""<option value="999" %s> _("Everywhere")</option>""") % selected)
+        vis.append( i18nformat("""<option value="999" %s> _("Everywhere")</option>""") % selected)
         vis.reverse()
         return "".join(vis)
 
@@ -1661,7 +1662,7 @@ class WCategoryDeletion(object):
         l = []
         for categ in self._categList:
             l.append("""<li><i>%s</i></li>"""%categ.getName())
-        msg = _("""
+        msg = i18nformat("""
         <font size="+2"> _("Are you sure that you want to DELETE the following categories"):<ul>%s</ul>?</font><br>( _("Note that ALL the existing sub-categories below will also be deleted"))
               """)%("".join(l))
         wc = wcomponents.WConfirmation()
@@ -1980,12 +1981,12 @@ class WCategModifTools(wcomponents.WTemplated):
         vars["deleteButton"] = ""
         vars["id"] = self._categ.getId()
         if not self._categ.isRoot():
-            vars["deleteButton"] = _("""<input type="submit" class="btn" value="_("delete this category")">""")
+            vars["deleteButton"] = i18nformat("""<input type="submit" class="btn" value="_("delete this category")">""")
         vars["clearCache"] = ""
         if info.HelperMaKaCInfo.getMaKaCInfoInstance().isCacheActive():
-            vars["clearCache"] = _("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear category cache")"></form>""") % urlHandlers.UHCategoryClearCache.getURL(self._categ)
+            vars["clearCache"] = i18nformat("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear category cache")"></form>""") % urlHandlers.UHCategoryClearCache.getURL(self._categ)
             if len(self._categ.getConferenceList()):
-                vars["clearCache"] += _("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear conference caches")"></form>""") % urlHandlers.UHCategoryClearConferenceCaches.getURL(self._categ)
+                vars["clearCache"] += i18nformat("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear conference caches")"></form>""") % urlHandlers.UHCategoryClearConferenceCaches.getURL(self._categ)
         return vars
 
 
@@ -2030,7 +2031,7 @@ class WCategModifTasks(wcomponents.WTemplated):
         else :
             vars["accessVisibility"] = _("PRIVATE")
             oppVisibility = _("PUBLIC")
-        vars["changeAccessVisibility"] = _("""( _("make it") <input type="submit" class="btn" name="accessVisibility" value="%s">)""")%oppVisibility
+        vars["changeAccessVisibility"] = i18nformat("""( _("make it") <input type="submit" class="btn" name="accessVisibility" value="%s">)""")%oppVisibility
 
         if not self._categ.tasksPublic() :
             vars["commentVisibility"] = _("PRIVATE")
@@ -2042,7 +2043,7 @@ class WCategModifTasks(wcomponents.WTemplated):
             else :
                 vars["commentVisibility"] = _("PRIVATE")
                 oppVisibility = _("PUBLIC")
-            vars["changeCommentVisibility"] = _("""( _("make it") <input type="submit" class="btn" name="commentVisibility" value="%s">)""")%oppVisibility
+            vars["changeCommentVisibility"] = i18nformat("""( _("make it") <input type="submit" class="btn" name="commentVisibility" value="%s">)""")%oppVisibility
 
 
         vars["managerList"] = self._getPersonList("manager")

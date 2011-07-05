@@ -5,7 +5,6 @@
                 <input id="languageInputHidden" type="hidden" name="lang" value="${ SelectedLanguage.lower() }">
             </form>
 
-
 <a id="languageSelectorLink" href="#" class="dropDownMenu" id="selectLanguageLink">${ SelectedLanguageName }</a>
 
 
@@ -25,7 +24,7 @@ languageLink.observeClick(function(e) {
     var inputHidden = $E('languageInputHidden');
 
     // build a dictionary that represents the menu
-    % for k,v in Languages.items():
+    % for k,v in Languages:
         menuItems['${ v }'] = function() {inputHidden.dom.value = '${ k }'; form.dom.submit()};
     % endfor
 

@@ -35,6 +35,7 @@ from MaKaC.common import Config
 from MaKaC.common.utils import isStringHTML, formatDateTime
 from MaKaC.common import info
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC import user
 from pytz import timezone
 import MaKaC.common.timezoneUtils as timezoneUtils
@@ -90,7 +91,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         modifyItem = ""
         url = urlHandlers.UHSubContributionDisplay.getURL(sc)
         if sc.canModify( self._aw ):
-            modifyItem = _("""
+            modifyItem = i18nformat("""
                           <a href="%s"><img src="%s" border="0" alt='_("Jump to the modification interface")'></a>
                          """)%(modifURL, Config.getInstance().getSystemIconURL( "modify" ) )
         return """
@@ -104,7 +105,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
     def _getWithdrawnNoticeHTML(self):
         res=""
         if isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn):
-            res= _("""
+            res= i18nformat("""
                 <tr>
                     <td colspan="2" align="center"><b>--_("WITHDRAWN")--</b></td>
                 </tr>
@@ -116,7 +117,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         status=self._contrib.getCurrentStatus()
         if not isinstance(status,conference.ContribStatusWithdrawn) and \
                             self._contrib.canUserSubmit(self._aw.getUser()):
-            res= _("""<input type="submit" class="btn" value="_("manage material")">""")
+            res= i18nformat("""<input type="submit" class="btn" value="_("manage material")">""")
         return res
 
     def _getModifIconHTML(self):
@@ -197,7 +198,7 @@ class WContributionDisplayBase(wcomponents.WTemplated):
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._contrib.getDescription()
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
         vars["id"]=self.htmlText(self._contrib.getId())
-        vars["startDate"] = _("""--_("not yet scheduled")--""")
+        vars["startDate"] = i18nformat("""--_("not yet scheduled")--""")
         vars["startTime"] = ""
         if self._contrib.isScheduled():
             tzUtil = timezoneUtils.DisplayTZ(self._aw,self._contrib.getOwner())
@@ -214,13 +215,13 @@ class WContributionDisplayBase(wcomponents.WTemplated):
         room=self._contrib.getRoom()
         if room is not None:
             roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= _("""%s<br><small> _("Room"):</small> %s""")%(\
+            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(\
                 vars["location"],roomLink)
             if self._contrib.getBoardNumber()!="":
-                vars["location"]= _("""%s - _("board #"): %s""")%(vars["location"],self._contrib.getBoardNumber())
+                vars["location"]= i18nformat("""%s - _("board #"): %s""")%(vars["location"],self._contrib.getBoardNumber())
         else:
             if self._contrib.getBoardNumber()!="":
-                vars["location"]= _("""%s <br> _("board #"): %s""")%(vars["location"],self._contrib.getBoardNumber())
+                vars["location"]= i18nformat("""%s <br> _("board #"): %s""")%(vars["location"],self._contrib.getBoardNumber())
 
         vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
 
@@ -617,7 +618,7 @@ class WContribModifMain(wcomponents.WTemplated):
             return ""
         abs = self._contrib.getAbstract()
         if abs is not None:
-            html = _("""
+            html = i18nformat("""
              <tr>
                 <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Abstract")</span></td>
                 <td bgcolor="white" class="blacktext"><a href=%s>%s - %s</a></td>
@@ -628,7 +629,7 @@ class WContribModifMain(wcomponents.WTemplated):
                 """)%( quoteattr(str(urlHandlers.UHAbstractManagment.getURL(abs))),\
                     self.htmlText(abs.getId()), abs.getTitle() )
         else:
-            html = _("""
+            html = i18nformat("""
              <tr>
                 <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Abstract")</span></td>
                 <td bgcolor="white" class="blacktext">&nbsp;&nbsp;&nbsp;<font color="red"> _("The abstract associated with this contribution has been removed")</font></td>
@@ -645,10 +646,10 @@ class WContribModifMain(wcomponents.WTemplated):
             fullName = self.htmlText(spk.getFullName())
             submitter = ""
             if spk.getEmail() in self._contrib.getSubmitterEmailList():
-                submitter = _(""" <small>(_("Submitter"))</small>""")
+                submitter = i18nformat(""" <small>(_("Submitter"))</small>""")
             for emails in [av.getEmails() for av in self._contrib.getSubmitterList() if av != None and hasattr(av,"getEmails")]:
                 if spk.getEmail() in emails:
-                    submitter = _(""" <small>( _("Submitter"))</small>""")
+                    submitter = i18nformat(""" <small>( _("Submitter"))</small>""")
                     break
 
             #if not self._contrib.isAuthor(spk):
@@ -672,7 +673,7 @@ class WContribModifMain(wcomponents.WTemplated):
     def _getChangeTracksHTML(self):
         res=[]
         if not self._contrib.getTrack() is None:
-            res=[ _("""<option value="">--_("none")--</option>""")]
+            res=[ i18nformat("""<option value="">--_("none")--</option>""")]
         for track in self._contrib.getConference().getTrackList():
             if self._contrib.getTrack()==track:
                 continue
@@ -682,7 +683,7 @@ class WContribModifMain(wcomponents.WTemplated):
     def _getChangeSessionsHTML(self):
         res=[]
         if not self._contrib.getSession() is None:
-            res=[ _("""<option value="">--_("none")--</option>""")]
+            res=[ i18nformat("""<option value="">--_("none")--</option>""")]
         for session in self._contrib.getConference().getSessionListSorted():
             if self._contrib.getSession()==session:
                 continue
@@ -694,7 +695,7 @@ class WContribModifMain(wcomponents.WTemplated):
         res=""
         status=self._contrib.getCurrentStatus()
         if isinstance(status,conference.ContribStatusWithdrawn):
-            res= _("""
+            res= i18nformat("""
                 <tr>
                     <td align="center"><b>--_("WITHDRAWN")--</b></td>
                 </tr>
@@ -712,7 +713,7 @@ class WContribModifMain(wcomponents.WTemplated):
         resp=""
         if status.getResponsible() is not None:
             resp="by %s"%self.htmlText(status.getResponsible().getFullName())
-        html = _("""
+        html = i18nformat("""
      <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Withdrawal information")</span></td>
         <td bgcolor="white" class="blacktext"><b> _("WITHDRAWN")</b> _("on") %s %s%s</td>
@@ -773,9 +774,9 @@ class WContribModifMain(wcomponents.WTemplated):
             vars["place"]=self.htmlText(self._contrib.getLocation().getName())
         room=self._contrib.getRoom()
         if room is not None and room.getName().strip()!="":
-            vars["place"]= _("""%s <br> _("Room"): %s""")%(vars["place"],self.htmlText(room.getName()))
+            vars["place"]= i18nformat("""%s <br> _("Room"): %s""")%(vars["place"],self.htmlText(room.getName()))
         if self._eventType == "conference" and self._contrib.getBoardNumber()!="" and self._contrib.getBoardNumber() is not None:
-            vars["place"]= _("""%s<br> _("Board #")%s""")%(vars["place"],self.htmlText(self._contrib.getBoardNumber()))
+            vars["place"]= i18nformat("""%s<br> _("Board #")%s""")%(vars["place"],self.htmlText(self._contrib.getBoardNumber()))
         vars["id"] = self.htmlText( self._contrib.getId() )
         vars["dataModificationURL"] = str( urlHandlers.UHContributionDataModification.getURL( self._contrib ) )
         vars["duration"]=""
@@ -784,7 +785,7 @@ class WContribModifMain(wcomponents.WTemplated):
         vars["type"] = ""
         if self._contrib.getType():
             vars["type"] = self.htmlText( self._contrib.getType().getName() )
-        vars["track"] = _("""--_("none")--""")
+        vars["track"] = i18nformat("""--_("none")--""")
         if self._contrib.getTrack():
             vars["track"] = """<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHTrackModification.getURL(self._contrib.getTrack()))),self.htmlText(self._contrib.getTrack().getTitle()))
         vars["session"] = ""
@@ -952,7 +953,7 @@ class WContribModSpeaker(wcomponents.WTemplated):
         self._auth=auth
 
     def _getAddAsSubmitterHTML(self):
-        html= _("""
+        html= i18nformat("""
                     <tr>
                         <td nowrap class="titleCellTD">
                             <span class="titleCellFormat"> _("Submission control")</span>
@@ -973,11 +974,11 @@ class WContribModSpeaker(wcomponents.WTemplated):
             if self._auth.getContribution().canUserSubmit(av):
                 html=html%( _("""This speaker Already have submission rights."""))
             else:
-                html=html% _("""<input type="checkbox" name="submissionControl"> _("Give submission rights to the speaker").""")
+                html=html% i18nformat("""<input type="checkbox" name="submissionControl"> _("Give submission rights to the speaker").""")
         elif self._auth.getEmail() in self._auth.getContribution().getSubmitterEmailList():
             html=html%( _("""This speaker Already have submission rights."""))
         else:
-            html=html% _("""<input type="checkbox" name="submissionControl"> _("Give submission rights to the speaker.")<br><br><i><font color="black"><b> _("Note"): </b></font> _("This person does NOT already have an Indico account, he or she will be sent an email asking to create an account. After the account creation, the user will automatically be given submission rights.")</i>""")
+            html=html% i18nformat("""<input type="checkbox" name="submissionControl"> _("Give submission rights to the speaker.")<br><br><i><font color="black"><b> _("Note"): </b></font> _("This person does NOT already have an Indico account, he or she will be sent an email asking to create an account. After the account creation, the user will automatically be given submission rights.")</i>""")
         return html
 
     def getVars( self ):
@@ -1033,7 +1034,7 @@ class WContribModifAC(wcomponents.WTemplated):
                 else:
                     res.append("""<input type="checkbox" name="selUsers" value=%s>%s"""%(quoteattr(str(sub.getId())),self.htmlText(sub.getName())))
         for email in self._contrib.getSubmitterEmailList():
-            res.append( _("""<input type="checkbox" name="selUsers" value=%s>%s <small>( _("Pending"))</small>""")%(quoteattr(email),email))
+            res.append( i18nformat("""<input type="checkbox" name="selUsers" value=%s>%s <small>( _("Pending"))</small>""")%(quoteattr(email),email))
         return "<br>".join(res)
 
     def getVars( self ):
@@ -1468,10 +1469,10 @@ class WContributionMove(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         sesList = ""
         if self._contrib.getOwner() != self._conf:
-            sesList = _("""<option value=\"CONF\" > _("Conference") : %s</option>\n""")%self._conf.getTitle()
+            sesList = i18nformat("""<option value=\"CONF\" > _("Conference") : %s</option>\n""")%self._conf.getTitle()
         for ses in self._conf.getSessionListSorted():
             if self._contrib.getOwner() != ses:
-                sesList = sesList + _("""<option value=\"%s\" > _("Session") : %s</option>\n""")%(ses.getId(), ses.getTitle())
+                sesList = sesList + i18nformat("""<option value=\"%s\" > _("Session") : %s</option>\n""")%(ses.getId(), ses.getTitle())
         vars["sessionList"] = sesList
         vars["confId"] = self._conf.getId()
         vars["contribId"] = self._contrib.getId()
@@ -1519,7 +1520,7 @@ class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayB
 
     def _getBody(self,params):
         wc=wcomponents.WDisplayConfirmation()
-        msg= _(""" _("Are you sure you want to delete the following material")?<br>
+        msg= i18nformat(""" _("Are you sure you want to delete the following material")?<br>
         <b><i>%s</i></b>
         <br>""")%self._mat.getTitle()
         url=urlHandlers.UHContributionDisplayRemoveMaterial.getURL(self._mat.getOwner())

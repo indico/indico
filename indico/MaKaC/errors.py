@@ -22,8 +22,6 @@
 Module containing the MaKaC exception class hierarchy
 """
 
-from MaKaC.i18n import _
-
 class MaKaCError(Exception):
 
     def __init__( self, msg="",area="", explanation = None):
@@ -107,7 +105,7 @@ class WebcastAdminError(AccessControlError):
     """
     """
     def __str__(self):
-        return "only webcast administrators can access this %s"%self.objType
+        return _("only webcast administrators can access this %s")%self.objType
 
 
 class TimingError(MaKaCError):

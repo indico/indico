@@ -32,6 +32,7 @@ from MaKaC.common.Configuration import Config
 from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):
 
@@ -134,7 +135,7 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
         room=self._subContrib.getRoom()
         if room is not None:
             roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= _("""%s<br><small> _("Room"):</small> %s""")%(\
+            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(\
                 vars["location"],roomLink)
         vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
         vars["material"]=self._getMaterialHTML()
@@ -438,7 +439,7 @@ class WSubContribSpeakerTable(wcomponents.WTemplated):
                 authCaption="""<a href=%s>%s</a>"""%(urlGen(author),self.htmlText(authCaption))
             href ="\"\""
             if author.getEmail() != "":
-                mailtoSubject =  _("""[%s]  _("Sub-Contribution") %s: %s""")%( self._conf.getTitle(), self._subContrib.getId(), self._subContrib.getTitle() )
+                mailtoSubject =  i18nformat("""[%s]  _("Sub-Contribution") %s: %s""")%( self._conf.getTitle(), self._subContrib.getId(), self._subContrib.getTitle() )
                 mailtoURL = "mailto:%s?subject=%s"%( author.getEmail(), urllib.quote( mailtoSubject ) )
                 href = quoteattr( mailtoURL )
             emailHtml = """ <a href=%s><img src="%s" style="border:0px" alt="email"></a> """%(href, Config.getInstance().getSystemIconURL("smallEmail"))
@@ -461,7 +462,7 @@ class WSubContribModifMain(wcomponents.WTemplated):
         else:
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._subContrib.getDescription()
         vars["dataModifButton"] = ""
-        vars["dataModifButton"] =  _("""<input type="submit" class="btn" value="_("modify")">""")
+        vars["dataModifButton"] =  i18nformat("""<input type="submit" class="btn" value="_("modify")">""")
         speakerText = self._subContrib.getSpeakerText()
         if speakerText != "":
             speakerText = "%s<br>"%speakerText

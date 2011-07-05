@@ -1,0 +1,2212 @@
+# Translations template for indico.
+# Copyright (C) 2011 ORGANIZATION
+# This file is distributed under the same license as the indico project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indico 0.98-dev\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2011-07-05 11:26+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: MaKaC/webinterface/tpls/Abstracts.tpl:297
+#: MaKaC/webinterface/tpls/ListJSHelpers.tpl:83
+#: indico/MaKaC/webinterface/tpls/Abstracts.tpl:297
+#: indico/MaKaC/webinterface/tpls/ListJSHelpers.tpl:83
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:159
+msgid "Warning"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/Abstracts.tpl:297
+#: indico/MaKaC/webinterface/tpls/Abstracts.tpl:297
+msgid "No abstract selected! Please select at least one."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/AccessControlStatusFrame.tpl:56
+#: MaKaC/webinterface/tpls/AccessControlStatusFrame.tpl:83
+#: indico/MaKaC/webinterface/tpls/AccessControlStatusFrame.tpl:56
+#: indico/MaKaC/webinterface/tpls/AccessControlStatusFrame.tpl:83
+msgid "This operation may take a few minutes..."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:167
+#: indico/MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:167
+msgid ""
+"Select a <strong>booking type</strong> from the drop-down list and press the "
+"\"Create\" button."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:178
+#: indico/MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:178
+msgid "Create"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:183
+#: indico/MaKaC/webinterface/tpls/ConfModifCollaborationMultipleBookings.tpl:183
+msgid "Please select a booking type from the list."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModifRegistrantMiscInfoModify.tpl:18
+#: MaKaC/webinterface/tpls/ConfRegistrationFormDisplay.tpl:18
+#: MaKaC/webinterface/tpls/ConfRegistrationFormModify.tpl:18
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrantMiscInfoModify.tpl:18
+#: indico/MaKaC/webinterface/tpls/ConfRegistrationFormDisplay.tpl:18
+#: indico/MaKaC/webinterface/tpls/ConfRegistrationFormModify.tpl:18
+msgid "The form contains some errors. Please, correct them and submit again."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModificationReviewingFrame.tpl:78
+#: indico/MaKaC/webinterface/tpls/ConfModificationReviewingFrame.tpl:78
+msgid "This referee has been assigned "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfModificationReviewingFrame.tpl:78
+#: indico/MaKaC/webinterface/tpls/ConfModificationReviewingFrame.tpl:78
+msgid " contributions. Do you want to remove the referee anyway?"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:302
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:302
+msgid "Track"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:303
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:303
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:471
+#: indico/htdocs/js/indico/Timetable/Base.js:35
+#: indico/htdocs/js/indico/Timetable/Management.js:299
+#: indico/htdocs/js/indico/Timetable/Management.js:316
+msgid "Session"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:304
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:304
+#: indico/htdocs/js/indico/Management/Timetable.js:434
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:673
+msgid "Type"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:378
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:378
+msgid "Show Filters"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:382
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:382
+msgid "Hide Filters"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:510
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:510
+msgid "Judged"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:521
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:521
+msgid "Not judged yet:"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:546
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:546
+msgid "Referee: "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:549
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:549
+msgid "No referee"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:556
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:556
+msgid "Layout reviewer: "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:559
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:559
+msgid "No layout reviewer"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:566
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:566
+msgid "Content reviewers: "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:579
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:579
+msgid "No content reviewers"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:723
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:723
+msgid "None of the contributions you checked have a Referee."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:724
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:733
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:724
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:733
+msgid ""
+"You can only add a layout reviewer or a content reviewer if the contribution "
+"has a referee."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:732
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:732
+msgid "Some of the contributions you checked have a Referee."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:736
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:736
+msgid "Contributions without referee"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:742
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:742
+msgid "Some of the contributions you checked do not have a Referee."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:743
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:743
+msgid "You can only add an editor or a reviewer if the contribution has a referee."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:744
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:744
+msgid "Do you want to add that  only to the contributions with a referee?"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:745
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:745
+msgid "Yes"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:752
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:752
+msgid "No"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:788
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:788
+msgid "There is no assigned Content Reviewer to remove."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:809
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:809
+msgid "Contributions without reviewer"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:815
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:815
+msgid ""
+"The Content Reviewers will be removed only from the contributions that have "
+"one."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:816
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:816
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:480
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:550
+msgid "OK"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:847
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:847
+msgid "There is no assigned Layout Reviewer to remove."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:868
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:868
+msgid "There is no assigned Referee to remove."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:911
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:911
+msgid "You have to assign new referee."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:914
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:914
+msgid ""
+"Please note that layout and content have already been assigned for this/these"
+" contributions."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:918
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:918
+msgid ""
+"Please note that a content reviewer has already been assigned for this/these "
+"contributions."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:922
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:922
+msgid ""
+"Please note that a layout reviewer has already been assigned for this/these "
+"contributions."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1130
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1130
+msgid "paper"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1132
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1132
+msgid "papers"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1150
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1459
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1150
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1459
+msgid "Please select at least 1 contribution"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1180
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1183
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1186
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1180
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1183
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1186
+msgid "Click on a user name to "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1180
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1276
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1180
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1276
+msgid " a layout reviewer:"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1183
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1183
+msgid "content reviewer:"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1189
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1189
+msgid "Click on a user name to assign new "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1209
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1377
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1209
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1377
+msgid "(no competences defined)"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1209
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1377
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1209
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1377
+msgid "(competences: "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1223
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1424
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1223
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1424
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1000
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1560
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:100
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:558
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:609
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:662
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:86
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:334
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:551
+#: indico/htdocs/js/indico/Legacy/Widgets.js:357
+#: indico/htdocs/js/indico/Legacy/Widgets.js:385
+#: indico/htdocs/js/indico/Legacy/Widgets.js:418
+#: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:50
+#: indico/htdocs/js/indico/Management/Timetable.js:497
+#: indico/htdocs/js/indico/Management/Timetable.js:726
+#: indico/htdocs/js/indico/Management/Timetable.js:1475
+#: indico/htdocs/js/indico/Management/Users.js:1306
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:910
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1042
+msgid "Cancel"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1237
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1237
+msgid ""
+"The Reviewer you choose will be removed only from the contribution that is "
+"assigned to him/her."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1239
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1239
+msgid ""
+"The Reviewer you choose will be removed only from the contributions that are "
+"assigned to him/her."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1244
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1432
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1244
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1432
+msgid "No "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1244
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1432
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1244
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1432
+msgid "in the reviewing team yet. Please, assign them from the 'Team' tab."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1276
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1279
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1282
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1276
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1279
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1282
+msgid "Follow the steps to "
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1279
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1279
+msgid " a content reviewer:"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1341
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1341
+msgid "Assign"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1396
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1396
+msgid "You must select at least one attribute."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1409
+#: indico/MaKaC/webinterface/tpls/ConfReviewingAssignContributions.tpl:1409
+msgid "You must select at least one user."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConferenceDataModification.tpl:167
+#: indico/MaKaC/webinterface/tpls/ConferenceDataModification.tpl:167
+msgid "ok"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ConferenceDataModification.tpl:168
+#: indico/MaKaC/webinterface/tpls/ConferenceDataModification.tpl:168
+msgid "cancel"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:187
+#: indico/MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:187
+msgid "Show History"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:191
+#: indico/MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:191
+msgid "Hide History"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:210
+#: indico/MaKaC/webinterface/tpls/ContributionDisplayFull.tpl:210
+msgid "Hide general info"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/RoomBookingBlockingsForMyRooms.tpl:77
+#: indico/MaKaC/webinterface/tpls/RoomBookingBlockingsForMyRooms.tpl:77
+msgid "Processing..."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:323
+#: indico/MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:323
+msgid "Select a responsible"
+msgstr ""
+
+#: indico/ext/livesync/tpls/PluginAgentManagement.tpl:54
+msgid "Agent activation"
+msgstr ""
+
+#: indico/ext/livesync/tpls/PluginAgentManagement.tpl:64
+msgid "Activate "
+msgstr ""
+
+#: indico/ext/livesync/tpls/PluginAgentManagement.tpl:66
+msgid ""
+"Are you sure you want to activate this agent? Please make sure that the "
+"export process finished successfully"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:5
+msgid "Executing Operation..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:81
+msgid "sec. left"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:89
+msgid "Stop monitoring"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:96
+msgid "Resume monitoring"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:112
+msgid "Refresh now"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:245
+msgid "State"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:247
+msgid "Enabled"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:248
+msgid "Disabled"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:250
+msgid "Spooled commands"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:252
+msgid "Queued tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:254
+msgid "Running tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:256
+msgid "Failed tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:258
+msgid "Finished tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:340
+msgid "Summary"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:341
+msgid "Running Tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:342
+msgid "Waiting queue"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:343
+msgid "Failed Tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:344
+msgid "History"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:902
+msgid ""
+"This option ensures that if a manager changes the event's dates, this "
+"booking's dates change accordingly. "
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:915
+msgid ""
+"This option ensures that if a manager changes the event's dates, this "
+"booking's dates change accordingly. The event already took place, so you "
+"cannot activate this option."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:929
+msgid "This option hides the booking in the event page."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:937
+msgid ""
+"Tags in the <tag> form are not allowed. Please remove any '<' and '>' "
+"characters."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:994
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:650
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:333
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:713
+#: indico/htdocs/js/indico/Legacy/Widgets.js:357
+#: indico/htdocs/js/indico/Legacy/Widgets.js:385
+#: indico/htdocs/js/indico/Legacy/Widgets.js:418
+#: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:49
+#: indico/htdocs/js/indico/Management/Timetable.js:725
+#: indico/htdocs/js/indico/Management/Users.js:1305
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:909
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1041
+msgid "Save"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1013
+#: indico/htdocs/js/indico/Management/Timetable.js:516
+#: indico/htdocs/js/indico/Management/Timetable.js:518
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:552
+msgid "Basic"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1013
+#: indico/htdocs/js/indico/Management/Timetable.js:542
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:554
+msgid "Advanced"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1077
+msgid "Saving your booking..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1274
+msgid "Removing your booking..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1309
+msgid "Remove booking"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1310
+msgid "Are you sure you want to remove that "
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1310
+msgid " booking?"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1430
+msgid "Sending your request..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1502
+msgid "Errors detected"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1502
+msgid "The corresponding fields have been marked in red."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1510
+msgid "Withdraw request"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1515
+msgid "Are you sure you want to withdraw the request?"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1520
+msgid "Withdrawing your request..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1576
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1000
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1061
+msgid "Show"
+msgstr ""
+
+#: indico/htdocs/js/indico/Collaboration/Collaboration.js:1577
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:994
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1058
+msgid "Hide"
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/IntelligentSearchBox.js:65
+msgid "Some category suggestions..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/IntelligentSearchBox.js:75
+msgid "other results - please write more..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:37
+msgid "Change timezone"
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:49
+msgid " Use the events' local timezone "
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:51
+msgid " Your saved timezone"
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:53
+msgid " Specify a timezone"
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:56
+msgid "Loading list of timezones..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:94
+msgid " Remember these settings next time I log in"
+msgstr ""
+
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:99
+msgid "Apply"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Data.js:228
+msgid "(currently <strong>restricted</strong> to some users, but can change)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Data.js:229
+msgid "(currently <strong>open</strong> to everyone, but can change)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:102
+msgid "Unable to send your error report: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:106
+msgid "Your report has been sent. Thank you!"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:108
+msgid "Your report could not be sent to the support address."
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:124
+msgid ""
+"An error has occurred while processing your request. We advise you to submit "
+"an error report, by clicking \"Send report\"."
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:136
+msgid "Send report"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:141
+msgid "Do not send report"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:170
+msgid "Go to login page"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:194
+msgid "Loading..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:656
+msgid "Don't Save"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/PopupWidgets.js:11
+#: indico/htdocs/js/indico/Management/Users.js:703
+#: indico/htdocs/js/indico/Management/Users.js:914
+msgid "Choose"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/PopupWidgets.js:18
+msgid "Invalid date range"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/PopupWidgets.js:18
+msgid "The selected date range is invalid."
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/DateTime.js:79
+msgid "Date is invalid"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/DateTime.js:169
+msgid "Start date should be before end date"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/DateTime.js:170
+msgid "End date should be after start date"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/DateTime.js:211
+msgid "Move session/contribution times in the timetable accordingly"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/DateTime.js:285
+msgid "Date/Time:"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/DateTime.js:286
+msgid "Duration(min):"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:176
+#: indico/htdocs/js/indico/Management/Users.js:1645
+msgid "Communicating with server"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:687
+msgid "Add a different one"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1132
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1148
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:708
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:721
+msgid "or"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1137
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:712
+msgid "other"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1153
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:725
+msgid "select from list"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1240
+msgid "Please select a material type"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1443
+msgid "This slot belongs to the session "
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Inline.js:1492
+msgid "(rename Session)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/Menu.js:577
+msgid "Color"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:210
+msgid "switch to plain text"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:213
+msgid "switch to rich text"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:398
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:678
+msgid "Saving..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:423
+msgid "here"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:434
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:468
+msgid "Warning!"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:435
+msgid ""
+"Your data contains some potentially harmful , which cannot be stored in the "
+"database. Use the automatic Indico cleaner or clean the text manually (see "
+"the list of forbidden elements that you are using "
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:441
+msgid "Clean automatically"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:447
+msgid "Clean manually"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:468
+msgid "Format of your data is invalid. Please check the syntax."
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:17
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:247
+#: indico/htdocs/js/indico/Management/Timetable.js:55
+#: indico/htdocs/js/indico/Management/Timetable.js:595
+#: indico/htdocs/js/indico/Management/Timetable.js:697
+#: indico/htdocs/js/indico/Management/Users.js:587
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:760
+msgid "Loading dialog..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:74
+msgid "Add Session"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:85
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:333
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:550
+#: indico/htdocs/js/indico/Legacy/Widgets.js:58
+#: indico/htdocs/js/indico/Legacy/Widgets.js:81
+#: indico/htdocs/js/indico/Management/Timetable.js:496
+#: indico/htdocs/js/indico/Management/Timetable.js:725
+#: indico/htdocs/js/indico/Management/Users.js:703
+msgid "Add"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:112
+msgid "Standard"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:112
+msgid "Poster"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:187
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:470
+msgid "Time"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:202
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:579
+#: indico/htdocs/js/indico/Management/Timetable.js:384
+#: indico/htdocs/js/indico/Management/Timetable.js:873
+#: indico/htdocs/js/indico/Management/Users.js:1294
+msgid "Title"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:203
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:580
+#: indico/htdocs/js/indico/Management/Timetable.js:406
+#: indico/htdocs/js/indico/Management/Timetable.js:874
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:393
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:675
+msgid "Description"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:204
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:478
+#: indico/htdocs/js/indico/Management/Timetable.js:318
+#: indico/htdocs/js/indico/Management/Timetable.js:876
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:422
+msgid "Date"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:206
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:480
+#: indico/htdocs/js/indico/Management/Timetable.js:388
+#: indico/htdocs/js/indico/Management/Timetable.js:875
+msgid "Place"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:208
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:481
+msgid "Convener(s)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:209
+msgid "Session type"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:319
+msgid "Edit session block"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:319
+msgid "Add session block"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:451
+msgid "Timezone"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:477
+msgid "Sub-Title"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:542
+msgid "Add Subcontribution"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:581
+#: indico/htdocs/js/indico/Management/Timetable.js:417
+msgid "Keywords"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:582
+msgid "Duration (min) "
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:583
+#: indico/htdocs/js/indico/Management/Timetable.js:391
+msgid "Presenter(s)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:615
+msgid "My minutes"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:704
+msgid "Confirm"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:705
+msgid "You have modified your text since you last saved."
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:706
+msgid "Do you want to save your changes?"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:721
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1596
+msgid "Close"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:26
+msgid "Location: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:27
+msgid "Room: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:28
+msgid "Address: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:50
+msgid "Remove this status from the list"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:101
+msgid "Keywords:"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:104
+msgid "No items"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:207
+msgid "Inherit from Parent"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:356
+#: indico/htdocs/js/indico/Legacy/Widgets.js:384
+#: indico/htdocs/js/indico/Legacy/Widgets.js:417
+msgid "(edit)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:381
+#: indico/htdocs/js/indico/Legacy/Widgets.js:414
+msgid "None"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:547
+msgid "Updating..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:643
+msgid ""
+"developer error: kind of radioButtonField is not correct, should be "
+"'vertical', 'horizontal1', 'horizontal2'"
+msgstr ""
+
+#: indico/htdocs/js/indico/Legacy/Widgets.js:679
+msgid "Error loading initial values"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/AbstractReviewing.js:471
+msgid "Add "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/AbstractReviewing.js:539
+msgid "Please answer all questions."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:45
+#: indico/htdocs/js/indico/Management/RoomBooking.js:392
+msgid "Inherit from parent: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:54
+#: indico/htdocs/js/indico/Management/RoomBooking.js:405
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:363
+msgid "Location"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:57
+#: indico/htdocs/js/indico/Management/RoomBooking.js:399
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:194
+#: indico/htdocs/js/indico/Timetable/Base.js:37
+msgid "Room"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBooking.js:65
+#: indico/htdocs/js/indico/Management/Users.js:1299
+msgid "Address"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:45
+msgid "Default on start-up"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:121
+msgid "Default"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:159
+msgid "Add Map Aspect"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:167
+msgid "New map aspect"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:92
+#: indico/htdocs/js/indico/Management/Timetable.js:605
+msgid "Add Contribution"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:139
+msgid "You may choose to:"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:146
+msgid "Create a new one"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:148
+msgid "Choose one (or more) unscheduled"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:152
+msgid "Add selected"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:156
+msgid "To add an unscheduled contribution, please select at least one"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:337
+#: indico/htdocs/js/indico/Management/Timetable.js:449
+#: indico/htdocs/js/indico/Management/Timetable.js:456
+msgid "submission rights"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:365
+#: indico/htdocs/js/indico/Management/Timetable.js:877
+msgid "Start time"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:366
+#: indico/htdocs/js/indico/Management/Timetable.js:377
+#: indico/htdocs/js/indico/Management/Timetable.js:878
+msgid " Duration "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:366
+#: indico/htdocs/js/indico/Management/Timetable.js:377
+#: indico/htdocs/js/indico/Management/Timetable.js:878
+msgid "min"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:421
+msgid "Board #"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:465
+msgid "Author(s)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:466
+msgid "Co-author(s)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:539
+msgid "Authors"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:947
+msgid "Edit Break"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:968
+msgid "Add Break"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1040
+msgid "Top level timetable"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1125
+msgid "Top-level timetable"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1130
+msgid "This contribution currently located at: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1131
+msgid "This break is currently located at: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1141
+msgid "Please select the place where you want to move it to."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1144
+msgid "Move Entry"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1224
+msgid "Move Timetable Entry"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1258
+msgid "Step 1: Choose type of rescheduling"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1262
+msgid "Adjust starting time of all entries"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1265
+msgid "Move the entries of "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1265
+#: indico/htdocs/js/indico/Management/Timetable.js:1266
+msgid " by changing their"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1266
+msgid "Move the entries of the interval "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1267
+msgid " starting times. "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1269
+msgid "The first entry will start when the event starts ("
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1270
+msgid "The first entry will start when the interval starts ("
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1271
+msgid ""
+"and the other entries will follow consecutively after it. The durations of "
+"the entries will not change. "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1272
+#: indico/htdocs/js/indico/Management/Timetable.js:1287
+msgid "See an example"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1278
+msgid "Adjust duration of all entries"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1280
+msgid "Adjust the "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1280
+msgid " duration "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1280
+msgid "of the entries of "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1283
+msgid "the interval "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1284
+msgid ""
+" to fill the gaps between them, so that their starting time don't change. If "
+"a time gap is specified, the duration will be extended up to the value of "
+"this time gap before the starting time of the next entry. "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1349
+msgid "Step 2: Choose time gap between entries"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1371
+msgid "Step 3: Choose to fit sessions to their content"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1381
+msgid ""
+"This changes the start and end times of the session blocks occuring on  in "
+"order to fit their respective content "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1382
+msgid "before"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1382
+msgid " performing the rescheduling."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1407
+msgid "There will be no gaps between consecutive entries."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1412
+msgid "Entries will be separated by gaps of "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1414
+msgid "1 hour "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1416
+msgid " hours "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1420
+msgid "and "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1424
+msgid "1 minute."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1426
+msgid " minutes."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1460
+#: indico/htdocs/js/indico/Timetable/Base.js:742
+msgid "Reschedule"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1464
+msgid "Please select type of rescheduling"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1506
+msgid "Rescheduling day "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1525
+msgid "Rescheduling interval... "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1552
+msgid "Are you sure you want to reschedule entries ?"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1553
+msgid "The entries that are part of a session will"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1554
+msgid " first"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1555
+msgid " be fitted to their content."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1556
+msgid "Then, all entries "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1556
+msgid "All entries "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1557
+msgid " will have their "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1558
+msgid "starting times"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1558
+msgid "duration"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1559
+msgid " changed."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1564
+msgid "Please review your choice"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1600
+msgid "Reschedule Entries"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1634
+msgid "This will change the starting and ending times of the Session "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1636
+msgid " so that it encompasses all entries defined in its timetable."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1638
+msgid "Are you sure you want to proceed?"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1651
+msgid "Fitting session to content"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Timetable.js:1689
+msgid "Fit timetable to content"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:169
+msgid "Search"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:247
+msgid "Family name"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:248
+msgid "First name"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:249
+msgid "E-mail"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:250
+msgid "Organisation"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:251
+msgid "Exact Match"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:277
+#: indico/htdocs/js/indico/Management/Users.js:364
+msgid "No results for this search..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:338
+msgid "Group name"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:453
+msgid "Users"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:453
+msgid "Groups"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:504
+msgid "Suggested users"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:507
+msgid "There are no suggested users for you at the moment. Why not add some "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:508
+msgid "favourites"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:707
+msgid "Please select at least one item"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1294
+msgid "Mr."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1294
+msgid "Mrs."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1294
+msgid "Ms."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1294
+msgid "Dr."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1294
+msgid "Prof."
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1295
+msgid "Family Name"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1296
+msgid "First Name"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1297
+msgid "Affiliation"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1298
+msgid "Email"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1300
+msgid "Telephone"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1301
+msgid "Fax"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1451
+msgid "Add Existing"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1455
+msgid "Add Users and Groups"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1455
+msgid "Add Users"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1457
+msgid "Search Users and Groups"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1457
+msgid "Search Users"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1501
+msgid "Add New"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1509
+msgid "New user"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1533
+msgid "Grant all these users with privileges: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1631
+msgid "Remove from your list of favorite users"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/Users.js:1638
+msgid "Add to your list of favorite users"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:32
+msgid "Category"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:36
+msgid "Events"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:48
+msgid "from"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:48
+msgid "to"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:48
+msgid "tz"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:91
+msgid "Concurrent Events sorted by category:"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:112
+msgid "Access forbidden"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:112
+msgid "You do not have sufficient permissions to access that category"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:136
+msgid " subcategories)"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:169
+msgid "Creation forbidden"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:169
+msgid "You do not have permissions to create events in that category"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:238
+msgid "Go to parent category"
+msgstr ""
+
+#: indico/htdocs/js/indico/Management/eventCreation.js:295
+msgid "Category chooser:"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:40
+msgid "Unexpected exception"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:94
+msgid "more"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:115
+msgid "Convert to PDF (when applicable)"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:130
+msgid "URL"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:138
+msgid "Example: http://www.example.com/YourPDFFile.pdf"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:203
+msgid "Same as for the parent Subcontribution"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:205
+msgid "Same as for the parent Contribution"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:207
+msgid "Same as for the parent Session"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:209
+msgid "Same as for the parent Conference"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:211
+msgid "Same as for the parent Category"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:238
+msgid ""
+"Please enter a name for the material type and then select who will be able to"
+" access this material type."
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:246
+msgid "You're adding a resource to the existing material type"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:246
+msgid "Please specify who will be able to access it:"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:259
+msgid "Same as for the parent material type "
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:260
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:273
+msgid ""
+"Private: Can only be viewed by you and users/groups chosen by you from the "
+"list of users"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:261
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:274
+msgid "Public: Can be viewed by everyone"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:269
+msgid "This will be the first resource of type"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:269
+msgid "Please select who will be able to access this material type:"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:308
+msgid "You can specify users using this tab"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:346
+msgid "Local file"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:346
+msgid "External resource (hyperlink)"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:372
+msgid "Material type"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:397
+msgid "Display Name"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:399
+msgid "'Display name' will be used instead of the original file name"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:507
+msgid ""
+"The link for this material will <strong>visible</strong> from the event page,"
+" to everyone"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:508
+msgid ""
+"The link will be <strong>invisible</strong> by default - only people who can "
+"access the material will be able to see it"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:529
+msgid "Allowed users and groups"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:533
+msgid "Visibility"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:537
+msgid "Access key"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:553
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:907
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1035
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1036
+msgid "Protection"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:579
+msgid "Upload Paper"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:579
+msgid "Upload Material"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:672
+msgid "Name"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:674
+msgid "File"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:686
+msgid "Uploading..."
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:690
+msgid "Upload"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:840
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1000
+msgid "Private"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:840
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1000
+msgid "Public"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:840
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1000
+msgid "(from parent)"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:841
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1001
+msgid "Private (by itself)"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:842
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1002
+msgid "Public (by itself)"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:857
+msgid "Visible for unauth. users"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:858
+msgid "Hidden from unauth. users"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:871
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1019
+msgid "Allowed users"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:874
+msgid "Visibility: "
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:878
+msgid "Access Key: "
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:889
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1029
+msgid "Status: "
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:898
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:972
+msgid "Description: "
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:906
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1034
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1036
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1037
+msgid "Information"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:968
+msgid "Name: "
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:970
+msgid "URL: "
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1123
+msgid ""
+"Modifying this material is currently not possible because it has been already"
+" submitted."
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1128
+msgid "Mark as main resource."
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1133
+msgid "Unmark main resource."
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1149
+msgid "Are you sure you want to delete"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1150
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1336
+msgid "Removing..."
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1170
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1191
+msgid "Setting main resource..."
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1400
+msgid "This material is protected"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1510
+msgid "Add Material"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1561
+msgid "Upload paper"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1657
+msgid "Edit Material"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1662
+msgid "Edit Resource"
+msgstr ""
+
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1667
+msgid "Edit Materials"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:224
+msgid "Book"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:251
+msgid "More"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:254
+msgid "Details"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:514
+msgid "Search criteria"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:525
+#: indico/htdocs/js/indico/Timetable/Base.js:145
+#: indico/htdocs/js/indico/Timetable/Base.js:306
+msgid "Filter"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:530
+msgid "Reset"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:818
+msgid "Total"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:819
+msgid "room(s)"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:820
+msgid "building(s)"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:242
+msgid "Booking"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:243
+msgid "PRE-Booking"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:244
+msgid "New Booking"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:245
+msgid "Conflict"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:246
+msgid "Conflict with PRE-Booking"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:247
+msgid "Concurrent PRE-Bookings"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:273
+msgid "Too large time span. Please issue a more specific query."
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:277
+msgid "Too many results. Searching period was shortened."
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:375
+msgid "This room cannot be booked for this date due to maintenance reasons"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:402
+msgid "Availability for "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:403
+msgid "  ( show 3 months preview)"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:406
+msgid "No bookings were made "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:503
+msgid "Reject"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:506
+msgid "Rejecting a booking"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:508
+msgid "Are you sure you want to REJECT the booking for ?"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:509
+msgid "If so, please give a reason:"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:557
+msgid "Room "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:564
+msgid "For whom "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:571
+msgid "Reason "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:578
+msgid "Date "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:585
+msgid "Hours "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:603
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:605
+msgid "Reject ALL Conflicting PRE-Bookings"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:606
+msgid "Are you sure you want to REJECT ALL conflicting PRE-bookings?"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:626
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:635
+msgid "Display room booking summary "
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:641
+msgid "Hide room booking summary"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:678
+msgid "previous"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:679
+msgid "next"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:680
+msgid "change period"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:693
+msgid "Choose Period"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:107
+msgid "Updating the timetable..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:162
+msgid "Printable version"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:182
+#: indico/htdocs/js/indico/Timetable/Base.js:221
+msgid "Go back"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:183
+#: indico/htdocs/js/indico/Timetable/Base.js:282
+msgid "Print"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:219
+msgid "Switching to full screen mode..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:228
+msgid "Switching to normal mode..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:288
+msgid "PDF"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:294
+msgid "Full screen"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:301
+msgid "Link"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:303
+msgid "Detailed view"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:358
+msgid "All days"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:525
+msgid "You are viewing the contents of the interval:"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:602
+msgid "Your changes triggered the automatic modification of some settings:"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:612
+#: indico/htdocs/js/indico/Timetable/Base.js:613
+msgid "The <strong>starting time</strong> of the session interval <strong>"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:612
+#: indico/htdocs/js/indico/Timetable/Base.js:613
+#: indico/htdocs/js/indico/Timetable/Base.js:617
+#: indico/htdocs/js/indico/Timetable/Base.js:618
+msgid "</strong> was moved from "
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:614
+msgid ""
+"The <strong>starting time</strong> of the <strong>Conference</strong> was "
+"moved from "
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:617
+#: indico/htdocs/js/indico/Timetable/Base.js:618
+msgid "The <strong>ending time</strong> of the session interval <strong>"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:619
+msgid ""
+"The <strong>ending time</strong> of the <strong>Conference</strong> was moved"
+" from "
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:622
+msgid "The contents of the interval <strong>"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:622
+msgid "</strong> were moved from "
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:628
+msgid " to "
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:748
+msgid "Add new block"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Base.js:750
+msgid "Fit to content"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:173
+msgid " et al."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:252
+msgid "This poster session has "
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:252
+msgid " contribution(s)."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:253
+msgid "Please click for more information."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:537
+msgid "Move up"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:538
+msgid "Move down"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:644
+msgid "inside"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:699
+msgid "Conveners"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:700
+msgid "Convener"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1009
+msgid "Shift later entries"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1031
+#: indico/htdocs/js/indico/Timetable/Draw.js:1065
+#: indico/htdocs/js/indico/Timetable/Draw.js:1073
+msgid "Edit"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1034
+msgid "Block timetable"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1038
+msgid "Block properties"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1043
+msgid "Session properties"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1052
+msgid "Add block"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1087
+msgid "Move"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Draw.js:1125
+msgid "This session is empty..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Filter.js:181
+msgid "Sessions"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Filter.js:182
+msgid "No sessions in the timetable"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Filter.js:185
+msgid "Rooms"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Filter.js:186
+msgid "No rooms found in the timetable"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Filter.js:190
+msgid "Filter options"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Filter.js:192
+msgid "Reset filter"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Management.js:88
+msgid "Deleting entry..."
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Management.js:322
+msgid "Contribution"
+msgstr ""
+
+#: indico/htdocs/js/indico/Timetable/Management.js:326
+msgid "Break"
+msgstr ""
+
+#: indico/htdocs/js/indico/jquery/defaults.js:6
+msgid "Choose the start date"
+msgstr ""
+
+#: indico/htdocs/js/indico/jquery/defaults.js:6
+msgid "Choose the end date"
+msgstr ""
+

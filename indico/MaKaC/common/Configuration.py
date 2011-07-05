@@ -30,7 +30,6 @@ import sys
 import MaKaCConfig
 
 from MaKaC.errors import MaKaCError
-from MaKaC.i18n import _
 import MaKaC
 
 class Config:

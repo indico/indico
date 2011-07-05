@@ -37,6 +37,15 @@ import pkg_resources
 from setuptools.command import develop, install, sdist, bdist_egg, easy_install
 from setuptools import setup, find_packages, findall
 
+from indico.util import i18n
+
+try:
+    from babel.messages import frontend as babel
+    BABEL_PRESENT = True
+except ImportError:
+    BABEL_PRESENT = False
+
+
 EXTRA_RESOURCES_URL = "http://cdswaredev.cern.ch/indico/wiki/Admin/Installation/IndicoExtras"
 
 if sys.platform == 'linux2':
@@ -148,29 +157,34 @@ class jsdist_indico:
     def jsCompress(self):
         from MaKaC.consoleScripts.installBase import jsCompress
         jsCompress()
-        self.dataFiles += _generateDataPaths([('htdocs/js/presentation/pack', findall('indico/htdocs/js/presentation/pack'), 35),
-                                             ('htdocs/js/indico/pack', findall('indico/htdocs/js/indico/pack'), 29)])
+        self.dataFiles += _generateDataPaths([
+            ('htdocs/js/presentation/pack', findall('indico/htdocs/js/presentation/pack'), 35),
+            ('htdocs/js/indico/pack', findall('indico/htdocs/js/indico/pack'), 29),
+            ('htdocs/js/livesync/pack', findall('indico/htdocs/js/indico/pack'), 31),
+            ('htdocs/js/jquery/pack', findall('indico/htdocs/js/indico/pack'), 29)])
 
 
 def _bdist_indico(dataFiles):
     class bdist_indico(bdist.bdist, jsdist_indico):
         def run(self):
             self.jsCompress()
-            compileAllLanguages()
+            compileAllLanguages(self)
             bdist.bdist.run(self)
 
     bdist_indico.dataFiles = dataFiles
     return bdist_indico
 
+
 def _bdist_egg_indico(dataFiles):
     class bdist_egg_indico(bdist_egg.bdist_egg, jsdist_indico):
         def run(self):
             self.jsCompress()
-            compileAllLanguages()
+            compileAllLanguages(self)
             bdist_egg.bdist_egg.run(self)
 
     bdist_egg_indico.dataFiles = dataFiles
     return bdist_egg_indico
+
 
 class jsbuild(Command):
     description = "minifies and packs javascript files"
@@ -287,7 +301,7 @@ Please specify the directory where you'd like it to be placed.
         _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'), directories['tmp'])
 
         updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
-        compileAllLanguages()
+        compileAllLanguages(self)
         print '''
 %s
         ''' % _databaseText('etc')
@@ -577,17 +591,23 @@ if __name__ == '__main__':
 
     foundPackages.append('indico')
 
-    setup(name = "indico",
-          cmdclass = {'sdist': sdist_indico,
-                    'bdist': _bdist_indico(dataFiles),
-                    'bdist_egg': _bdist_egg_indico(dataFiles),
-                    'jsbuild': jsbuild,
-                    'fetchdeps': fetchdeps_indico,
-                    'develop_config': develop_indico,
-                    'test': test_indico,
-                    'egg_filename': egg_filename
-                    },
+    cmdclass = {'sdist': sdist_indico,
+                'bdist': _bdist_indico(dataFiles),
+                'bdist_egg': _bdist_egg_indico(dataFiles),
+                'jsbuild': jsbuild,
+                'fetchdeps': fetchdeps_indico,
+                'develop_config': develop_indico,
+                'test': test_indico,
+                'egg_filename': egg_filename
+                }
 
+    if BABEL_PRESENT:
+        for cmdname in ['init_catalog', 'extract_messages', 'compile_catalog', 'update_catalog']:
+            cmdclass['%s_js' % cmdname] = getattr(babel, cmdname)
+        cmdclass['generate_messages_js'] = i18n.generate_messages_js
+
+    setup(name = "indico",
+          cmdclass = cmdclass,
           version = _versionInit(),
           description = "Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool",
           author = "Indico Team",

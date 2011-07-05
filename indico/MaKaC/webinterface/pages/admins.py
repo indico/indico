@@ -48,6 +48,7 @@ import MaKaC.webinterface.personalization as personalization
 from cgi import escape
 import re
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.plugins import PluginLoader, PluginsHolder
 
 from MaKaC.common.fossilize import fossilize
@@ -191,21 +192,21 @@ class WAdmins(wcomponents.WTemplated):
             icon = iconEnabled
         else:
             icon = iconDisabled
-        vars["features"] += _("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" alt="Toggle on/off" style="float:left; padding-right: 5px"> _("Cache Indico Pages")</a></div>""") % (str(url), icon)
+        vars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" alt="Toggle on/off" style="float:left; padding-right: 5px"> _("Cache Indico Pages")</a></div>""") % (str(url), icon)
         url = urlHandlers.UHAdminSwitchNewsActive.getURL()
         if minfo.isNewsActive():
             icon = iconEnabled
         else:
             icon = iconDisabled
-        #vars["features"] += _("""<br><a href="%s"><img src="%s" border="0" alt="Toggle on/off"> _("News Pages") </a>""") % (str(url), icon)
+        #vars["features"] += i18nformat("""<br><a href="%s"><img src="%s" border="0" alt="Toggle on/off"> _("News Pages") </a>""") % (str(url), icon)
         #vars["announcement"] = WAnnouncementModif().getHTML( vars )
-        vars["features"] += _("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a></div>""") % (str(url), icon)
+        vars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a></div>""") % (str(url), icon)
         url = urlHandlers.UHAdminSwitchDebugActive.getURL()
         if minfo.isDebugActive():
             icon = iconEnabled
         else:
             icon = iconDisabled
-        vars["features"] += _("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("Debug")</a></div>""") % (str(url), icon)
+        vars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("Debug")</a></div>""") % (str(url), icon)
         return vars
 
 
@@ -245,7 +246,7 @@ class WPAdminSelectUsers( WPAdmins ):
         wc = wcomponents.WPrincipalSelection( urlHandlers.UHAdminsSelectUsers.getURL(), forceWithoutExtAuth=False )
         wc.setTitle( _("Select administrator"))
         params["addURL"] =  urlHandlers.UHAdminsAddUsers.getURL()
-        html = _("""<table align="center" width="95%%">
+        html = i18nformat("""<table align="center" width="95%%">
     <tr>
        <td class="formTitle"> _("General admin data")</td>
     </tr>
@@ -843,7 +844,7 @@ class WAdminsStyles(wcomponents.WTemplated):
         vars["styleMgr"] = styleMgr
         baseXSLPath = styleMgr.getBaseXSLPath()
         baseCSSPath = styleMgr.getBaseCSSPath()
-        vars["contextHelpText"] = _("""- <b>_("XSL files")</b> _("are mandatory and located in"):<br/>%s<br/>- <b>_("CSS files")</b> _("are optional and located in"):<br/>%s<br/>- <b>_("Lines in red")</b> _("indicate a missing .xsl file (these styles will not be presented to the users"))<br/>- <b>_("XSL and CSS files")</b> _("should be named after the ID of the style (+extension: .xsl or .css)")""") % (baseXSLPath,baseCSSPath)
+        vars["contextHelpText"] = i18nformat("""- <b>_("XSL files")</b> _("are mandatory and located in"):<br/>%s<br/>- <b>_("CSS files")</b> _("are optional and located in"):<br/>%s<br/>- <b>_("Lines in red")</b> _("indicate a missing .xsl file (these styles will not be presented to the users"))<br/>- <b>_("XSL and CSS files")</b> _("should be named after the ID of the style (+extension: .xsl or .css)")""") % (baseXSLPath,baseCSSPath)
         vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("remove")
         return vars
 
@@ -1118,19 +1119,19 @@ class WUserManagement( wcomponents.WTemplated ):
             icon = iconEnabled
         else:
             icon = iconDisabled
-        vars["accountCreationData"] += _("""<a href="%s"><img src="%s" border="0"> _("Public Account Creation")</a>""") % (str(url), icon)
+        vars["accountCreationData"] += i18nformat("""<a href="%s"><img src="%s" border="0"> _("Public Account Creation")</a>""") % (str(url), icon)
         url = urlHandlers.UHUserManagementSwitchNotifyAccountCreation.getURL()
         if minfo.getNotifyAccountCreation():
             icon = iconEnabled
         else:
             icon = iconDisabled
-        vars["accountCreationData"] += _("""<br><a href="%s"><img src="%s" border="0"> _("Notify Account Creation by Email")</a>""") % (str(url), icon)
+        vars["accountCreationData"] += i18nformat("""<br><a href="%s"><img src="%s" border="0"> _("Notify Account Creation by Email")</a>""") % (str(url), icon)
         url = urlHandlers.UHUserManagementSwitchModerateAccountCreation.getURL()
         if minfo.getModerateAccountCreation():
             icon = iconEnabled
         else:
             icon = iconDisabled
-        vars["accountCreationData"] += _("""<br><a href="%s"><img src="%s" border="0"> _("Moderate Account Creation")</a>""") % (str(url), icon)
+        vars["accountCreationData"] += i18nformat("""<br><a href="%s"><img src="%s" border="0"> _("Moderate Account Creation")</a>""") % (str(url), icon)
         vars["moderators"] = ""
         vars["moderatorsURL"] = ""
         return vars
@@ -1208,7 +1209,7 @@ class WHTMLUserList(wcomponents.WTemplated):
         color="white"
         ul = []
         vars["userList"] = ""
-        ul.append( _("""
+        ul.append( i18nformat("""
                         <tr>
                             <td bgcolor="white" style="color:black" align="center"><b>%s  _("users")</b></td>
                         </tr>
@@ -1234,7 +1235,7 @@ class WHTMLUserList(wcomponents.WTemplated):
         if ul:
             vars["userList"] += "".join( ul )
         else:
-            vars["userList"] += _("""<tr>
+            vars["userList"] += i18nformat("""<tr>
                             <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No users returned")</span></td></tr>""")
         return vars
 
@@ -1461,7 +1462,7 @@ class WUserDetails(wcomponents.WTemplated):
             vars["identities"] = WUserIdentitiesTable( self._avatar ).getHTML( { "addIdentityURL": vars["addIdentityURL"], "removeIdentityURL": vars["removeIdentityURL"] })
         vars["activeButton"] = ""
         if self._currentUser in al.getList() and not self._avatar.isActivated():
-            vars["activeButton"] = _("""<form action="%s" method="POST"><td bgcolor="white" width="100%%"\
+            vars["activeButton"] = i18nformat("""<form action="%s" method="POST"><td bgcolor="white" width="100%%"\
                     valign="top" align="left">&nbsp;&nbsp;&nbsp;<input type="submit" class="btn" \
                     value=" _("activate the account") "></td></form>""")%vars["activeURL"]
         vars["categoryManager"] = ""
@@ -1573,14 +1574,14 @@ class WUserModify(wcomponents.WTemplated):
         return vars
 
     def _getSecEmailHTML(self, secEmails):
-        html = [ _("""<input type="text" name="secEmailAdd" value="" size="25"><input type="submit" name="addSecEmail" value="_("Add")"><br>""")]
+        html = [ i18nformat("""<input type="text" name="secEmailAdd" value="" size="25"><input type="submit" name="addSecEmail" value="_("Add")"><br>""")]
         emails = []
         for email in secEmails:
             emails.append("""<input type="hidden" name="secEmails" value="%s">
                             <input type="checkbox" name="secEmailRemove" value="%s"> %s"""%(email, email, email))
         html.append("<br>".join(emails))
         if secEmails:
-            html.append( _("""<input type="submit" name="removeSecEmail" value="_("Remove")">"""))
+            html.append( i18nformat("""<input type="submit" name="removeSecEmail" value="_("Remove")">"""))
 
         return "\n".join(html)
 
@@ -1697,7 +1698,7 @@ class WHTMLGroupList(wcomponents.WTemplated):
         color="white"
         ul = []
         vars["groupList"] = ""
-        ul.append( _("""
+        ul.append( i18nformat("""
                         <tr>
                             <td bgcolor="white" style="color:black" align="center"><b>%s _("groups")</b></td>
                         </tr>
@@ -1719,7 +1720,7 @@ class WHTMLGroupList(wcomponents.WTemplated):
         if ul:
             vars["groupList"] += "".join( ul )
         else:
-            vars["groupList"] += _("""<tr>
+            vars["groupList"] += i18nformat("""<tr>
                             <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No group returned")</span></td></tr>""")
         return vars
 
@@ -2059,7 +2060,7 @@ class WPUserMergeSelectPrin(WPUserMerge):
         wc = wcomponents.WUserSelection( searchURL, multi=False, forceWithoutExtAuth=True )
         wc.setTitle("Select user")
         params["addURL"] =  addURL
-        html = _("""<table align="center" width="95%%">
+        html = i18nformat("""<table align="center" width="95%%">
     <tr>
        <td class="formTitle"> _("General admin data")</td>
     </tr>
@@ -2081,7 +2082,7 @@ class WPUserMergeSelectToMerge(WPUserMerge):
         wc = wcomponents.WUserSelection( searchURL, multi=False, forceWithoutExtAuth=True )
         wc.setTitle("Select user")
         params["addURL"] =  addURL
-        html = _("""<table align="center" width="95%%">
+        html = i18nformat("""<table align="center" width="95%%">
     <tr>
        <td class="formTitle"> _("General admin data")</td>
     </tr>
@@ -2155,7 +2156,7 @@ class WRoomMapperList(wcomponents.WTemplated):
             if ul:
                 vars["roomMappers"] += "".join( ul )
             else:
-                vars["roomMappers"] += _("""<tr>
+                vars["roomMappers"] += i18nformat("""<tr>
                             <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No room mappers for this search")</span></td></tr>""")
             vars["roomMappers"] += """    </table>
                       </td>
@@ -2266,13 +2267,13 @@ class WBrowseDomains( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars( self )
         dh = domain.DomainHolder()
         letters = dh.getBrowseIndex()
-        vars["browseIndex"] = _("""
+        vars["browseIndex"] = i18nformat("""
         <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.disable=1;document.browseForm.submit();return false;">_("clear")</a></span>""")
         if self._letter == "all":
             vars["browseIndex"] += """
         [all] """
         else:
-            vars["browseIndex"] += _("""
+            vars["browseIndex"] += i18nformat("""
         <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='all';document.browseForm.submit();return false;">_("all")</a></span> """)
         for letter in letters:
             if self._letter == letter:

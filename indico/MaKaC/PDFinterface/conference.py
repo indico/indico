@@ -58,6 +58,7 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.common.tools import strip_ml_tags
 import re
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 
 styles = getSampleStyleSheet()
@@ -156,7 +157,7 @@ class AbstractToPDF(PDFBase):
         c.restoreState()
 
     def _getTrackText(self):
-        text = _("""_("Track classification") : """)
+        text = i18nformat("""_("Track classification") : """)
         status=self._abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
             if status.getTrack() is not None:
@@ -171,9 +172,9 @@ class AbstractToPDF(PDFBase):
     def _getContribTypeText(self):
         status=self._abstract.getCurrentStatus()
         if isinstance(status,review.AbstractStatusAccepted):
-            text= _(""" _("Contribution type") : %s""")%(escape(str(status.getType())))
+            text= i18nformat(""" _("Contribution type") : %s""")%(escape(str(status.getType())))
         else:
-            text= _(""" _("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
+            text= i18nformat(""" _("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
         return text
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
@@ -182,7 +183,7 @@ class AbstractToPDF(PDFBase):
 
         #style = ParagraphStyle({})
         #style.fontSize = 12
-        text = _(""" _("Abstract ID") : %s""")%self._abstract.getId()
+        text = i18nformat(""" _("Abstract ID") : %s""")%self._abstract.getId()
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text, 12)
         story.append(p)
@@ -240,7 +241,7 @@ class AbstractToPDF(PDFBase):
         style.firstLineIndent = -80
         style.leftIndent = 80
         style.alignment = TA_JUSTIFY
-        text = _("""<b> _("Primary authors")</b> : """)
+        text = i18nformat("""<b> _("Primary authors")</b> : """)
         listAuthor = []
         for author in self._abstract.getPrimaryAuthorsList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()))  )
@@ -254,7 +255,7 @@ class AbstractToPDF(PDFBase):
         style.firstLineIndent = -35
         style.leftIndent = 35
         style.alignment = TA_JUSTIFY
-        text = _("""<b> _("Co-authors")</b> : """)
+        text = i18nformat("""<b> _("Co-authors")</b> : """)
         listAuthor = []
         for author in self._abstract.getCoAuthorList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()) )  )
@@ -268,7 +269,7 @@ class AbstractToPDF(PDFBase):
         #style = ParagraphStyle({})
         #style.firstLineIndent = -45
         #style.leftIndent = 45
-        text = _("""_("Presenter") : """)
+        text = i18nformat("""_("Presenter") : """)
         listSpeaker= []
         for speaker in self._abstract.getSpeakerList():
             listSpeaker.append( "%s (%s)"%(escape(speaker.getFullName()), escape(speaker.getAffiliation()) )  )
@@ -286,38 +287,38 @@ class AbstractToPDF(PDFBase):
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        tmp= _("""--_("not specified")--""")
+        tmp= i18nformat("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
             tmp=self._abstract.getContribType().getName()
-        text = _("""_("Contribution type") : %s""")%escape(tmp)
+        text = i18nformat("""_("Contribution type") : %s""")%escape(tmp)
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""_("Submitted by") : %s""")%escape(self._abstract.getSubmitter().getFullName())
+        text = i18nformat("""_("Submitted by") : %s""")%escape(self._abstract.getSubmitter().getFullName())
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""_("Submitted on") %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
+        text = i18nformat("""_("Submitted on") %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""_("Last modified on") : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
+        text = i18nformat("""_("Last modified on") : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = _("""_("Comments") : """)
+        text = i18nformat("""_("Comments") : """)
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         #p = SimpleParagraph(text)
         story.append(p)
@@ -372,7 +373,7 @@ class AbstractsToPDF(PDFWithTOC):
         if len(doc.getCurrentPart())>50:
             title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
+        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, i18nformat(""" _("Page") %d """)%doc.page)
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
 
@@ -388,7 +389,7 @@ class AbstractsToPDF(PDFWithTOC):
 class ConfManagerAbstractToPDF(AbstractToPDF):
 
     def _getTrackText(self):
-        text = _("""_("Track classification") : """)
+        text = i18nformat("""_("Track classification") : """)
         listTrack= []
         for track in self._abstract.getTrackListSorted():
             listTrack.append( escape(track.getTitle()))
@@ -397,7 +398,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
     def _getContribTypeText(self):
         status=self._abstract.getCurrentStatus()
-        text= _("""_("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
+        text= i18nformat("""_("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
         return text
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
@@ -413,13 +414,13 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         #style.leftIndent = 90
         if status.__class__ == review.AbstractStatusDuplicated:
             original=status.getOriginal()
-            st = _(""" _("DUPLICATED") (%s : %s)""")%(original.getId(), original.getTitle())
+            st = i18nformat(""" _("DUPLICATED") (%s : %s)""")%(original.getId(), original.getTitle())
         elif status.__class__ == review.AbstractStatusMerged:
             target=status.getTargetAbstract()
-            st = _(""" _("MERGED") (%s : %s)""")%(target.getId(), target.getTitle())
+            st = i18nformat(""" _("MERGED") (%s : %s)""")%(target.getId(), target.getTitle())
         else:
             st = AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
-        text = _("""_("Status") : %s""")%escape(st)
+        text = i18nformat("""_("Status") : %s""")%escape(st)
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -427,7 +428,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         #style = ParagraphStyle({})
         #style.firstLineIndent = -90
         #style.leftIndent = 90
-        text = _("""_("Track judgments") :""")
+        text = i18nformat("""_("Track judgments") :""")
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -438,7 +439,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 contribType = ""
                 if status.getContribType() is not None:
                     contribType = "(%s)"%status.getContribType().getName()
-                st = _(""" _("Proposed to accept") %s""")%(contribType)
+                st = i18nformat(""" _("Proposed to accept") %s""")%(contribType)
                 modifDate = status.getDate().strftime("%d %B %Y %H:%M")
                 modifier = status.getResponsible().getFullName()
                 comments = escape(status.getComment())
@@ -451,7 +452,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
                 l = []
                 for track in status.getProposedTrackList():
                     l.append( track.getTitle() )
-                st = _(""" _("Proposed for other tracks") (%s)""")%", ".join(l)
+                st = i18nformat(""" _("Proposed for other tracks") (%s)""")%", ".join(l)
                 modifDate = status.getDate().strftime("%d %B %Y %H:%M")
                 modifier = status.getResponsible().getFullName()
                 comments = escape(status.getComment())
@@ -467,7 +468,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             #style = ParagraphStyle({})
             #style.firstLineIndent = -90
             #style.leftIndent = 130
-            text = _("""_("Track") : %s""")%escape(track.getTitle())
+            text = i18nformat("""_("Track") : %s""")%escape(track.getTitle())
             #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             p = SimpleParagraph(text, indent = 40)
             story.append(p)
@@ -478,7 +479,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             #style = ParagraphStyle({})
             #style.firstLineIndent = -90
             #style.leftIndent = 170
-            text = _("""_("Judgment") : %s""")%st
+            text = i18nformat("""_("Judgment") : %s""")%st
             #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             p = SimpleParagraph(text, indent = 80)
             story.append(p)
@@ -489,7 +490,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             #style = ParagraphStyle({})
             #style.firstLineIndent = -90
             #style.leftIndent = 170
-            text = _("""_("Judged by") : %s""")%modifier
+            text = i18nformat("""_("Judged by") : %s""")%modifier
             #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             p = SimpleParagraph(text, indent = 80)
             story.append(p)
@@ -500,7 +501,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             #style = ParagraphStyle({})
             #style.firstLineIndent = -90
             #style.leftIndent = 170
-            text = _("""_("Date") : %s""")%modifDate
+            text = i18nformat("""_("Date") : %s""")%modifDate
             #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             p = SimpleParagraph(text, indent = 80)
             story.append(p)
@@ -512,7 +513,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             style.firstLineIndent = -55
             style.leftIndent = 135
             style.alignment = TA_JUSTIFY
-            text = _("""_("Comments") : \"<i>%s</i>\"""")%comments
+            text = i18nformat("""_("Comments") : \"<i>%s</i>\"""")%comments
             p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             #p = SimpleParagraph(text)
             story.append(p)
@@ -536,7 +537,7 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
 #        self._tz = tz
 
     def _getTrackText(self):
-        text = _("""<b> _("Track classification")</b> : """)
+        text = i18nformat("""<b> _("Track classification")</b> : """)
         listTrack= []
         for track in self._abstract.getTrackListSorted():
             listTrack.append( escape(track.getTitle()))
@@ -545,7 +546,7 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
 
     def _getContribTypeText(self):
         status=self._abstract.getCurrentStatus()
-        text= _("""<b> _("Contribution type")</b> : %s""")%escape(str(self._abstract.getContribType()))
+        text= i18nformat("""<b> _("Contribution type")</b> : %s""")%escape(str(self._abstract.getContribType()))
         return text
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
@@ -603,12 +604,12 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
         #style.firstLineIndent = -90
         #style.leftIndent = 90
         if st:
-            text = _("""_("Status") : %s""")%st
+            text = i18nformat("""_("Status") : %s""")%st
             if modifier or modifDate:
                 text += " (%s)"%" - ".join( [modifier, modifDate])
 
         else:
-            text = _("""_("Status") : _("SUBMITTED")""")
+            text = i18nformat("""_("Status") : _("SUBMITTED")""")
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -639,7 +640,7 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
         if conflictText:
             style = ParagraphStyle({})
             style.leftIndent = 40
-            p = Paragraph( _(""" _("In conflict with"): """), style, part=escape(self._abstract.getTitle()))
+            p = Paragraph( i18nformat(""" _("In conflict with"): """), style, part=escape(self._abstract.getTitle()))
             story.append(p)
 
             style = ParagraphStyle({})
@@ -699,7 +700,7 @@ class ContribToPDF(PDFBase):
 
         style = ParagraphStyle({})
         style.fontSize = 12
-        text = _(""" _("Contribution ID") : %s""")%self._contrib.getId()
+        text = i18nformat(""" _("Contribution ID") : %s""")%self._contrib.getId()
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
 
@@ -759,7 +760,7 @@ class ContribToPDF(PDFBase):
         style = ParagraphStyle({})
         style.firstLineIndent = -80
         style.leftIndent = 80
-        text = _("""<b> _("Primary authors")</b> : """)
+        text = i18nformat("""<b> _("Primary authors")</b> : """)
         listAuthor = []
         for author in self._contrib.getPrimaryAuthorsList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()))  )
@@ -772,7 +773,7 @@ class ContribToPDF(PDFBase):
         style = ParagraphStyle({})
         style.firstLineIndent = -35
         style.leftIndent = 35
-        text = _("""<b> _("Co-authors")</b> : """)
+        text = i18nformat("""<b> _("Co-authors")</b> : """)
         listAuthor = []
         for author in self._contrib.getCoAuthorList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()) )  )
@@ -786,7 +787,7 @@ class ContribToPDF(PDFBase):
         style = ParagraphStyle({})
         style.firstLineIndent = -45
         style.leftIndent = 45
-        text = _("""<b> _("Presenter")</b> : """)
+        text = i18nformat("""<b> _("Presenter")</b> : """)
         listSpeaker= []
         for speaker in self._contrib.getSpeakerList():
             listSpeaker.append( "%s (%s)"%(escape(speaker.getFullName()), escape(speaker.getAffiliation()) )  )
@@ -802,8 +803,8 @@ class ContribToPDF(PDFBase):
         if session!=None:
             sessiontitle = session.getTitle()
         else:
-            sessiontitle = _("""--_("not yet classified")--""")
-        text = _("""<b> _("Session classification") </b> :  %s""")%escape(sessiontitle)
+            sessiontitle = i18nformat("""--_("not yet classified")--""")
+        text = i18nformat("""<b> _("Session classification") </b> :  %s""")%escape(sessiontitle)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
 
@@ -816,17 +817,17 @@ class ContribToPDF(PDFBase):
         if track!=None:
             tracktitle = track.getTitle()
         else:
-            tracktitle = _("""--_("not yet classified")--""")
-        text = _("""<b> _("Track classification")</b> :  %s""")%escape(tracktitle)
+            tracktitle = i18nformat("""--_("not yet classified")--""")
+        text = i18nformat("""<b> _("Track classification")</b> :  %s""")%escape(tracktitle)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
 
-        tmp=_("""--_("not specified")--""")
+        tmp=i18nformat("""--_("not specified")--""")
         if self._contrib.getType():
             tmp=self._contrib.getType().getName()
-        text = _("""<b> _("Type")</b> : %s""")%escape(tmp)
+        text = i18nformat("""<b> _("Type")</b> : %s""")%escape(tmp)
         p = Paragraph(text, style, part=escape(self._contrib.getTitle()))
         story.append(p)
 
@@ -965,7 +966,7 @@ class ContributionBook(PDFBase):
                 if instit!="":
                     fullName="%s (%s)"%(fullName, instit)
                 lspk.append("%s"%escape(fullName))
-            speakers= _("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
+            speakers= i18nformat("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
             p2=Paragraph(speakers,self._styles["speakers"])
             abstract=contrib.getDescription()
             p3=Paragraph(escape(abstract),self._styles["abstract"])
@@ -1029,7 +1030,7 @@ class ContribsToPDF(PDFWithTOC):
         if len(doc.getCurrentPart())>50:
             title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
+        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, i18nformat(""" _("Page") %d """)%doc.page)
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
 
@@ -1259,7 +1260,7 @@ class TimeTablePlain(PDFWithTOC):
         if doc.getCurrentPart().strip() != "":
             maxi=self._PAGE_WIDTH-6*cm
         self._drawWrappedString(c, "%s / %s"%(self._conf.getTitle(),self._title), width=1*cm, height=self._PAGE_HEIGHT-1*cm, font='Times-Roman', size=modifiedFontSize(9, self._fontsize), color=(0.5,0.5,0.5), align="left", lineSpacing=0.3, maximumWidth=maxi)
-        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,_(""" _("Page") %d """)%(doc.page + self._firstPageNumber - 1))
+        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,i18nformat(""" _("Page") %d """)%(doc.page + self._firstPageNumber - 1))
         c.drawRightString(self._PAGE_WIDTH-1*cm,self._PAGE_HEIGHT-1*cm,doc.getCurrentPart())
         c.restoreState()
 
@@ -1338,9 +1339,9 @@ class TimeTablePlain(PDFWithTOC):
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
-                    speakerWord = _(""" _("Presenter"): """)
+                    speakerWord = i18nformat(""" _("Presenter"): """)
                 else:
-                    speakerWord = _(""" _("Presenters"): """)
+                    speakerWord = i18nformat(""" _("Presenters"): """)
                 speakerText = speakerWord + ", ".join(spkList)
                 speakerText = "<font name=\"Times-Italic\"><i>%s</i></font>"%speakerText
                 lt.append([self._fontify(speakerText,9)])
@@ -1431,9 +1432,9 @@ class TimeTablePlain(PDFWithTOC):
                 spkList.append(spkName)
             if len(spkList) > 0:
                 if len(spkList) == 1:
-                    speakerWord = _(""" _("Presenter"): """)
+                    speakerWord = i18nformat(""" _("Presenter"): """)
                 else:
-                    speakerWord = _(""" _("Presenters"): """)
+                    speakerWord = i18nformat(""" _("Presenters"): """)
                 speakerText = speakerWord + ", ".join(spkList)
                 speakerText = "<font name=\"Times-Italic\"><i>%s</i></font>"%speakerText
                 lt.append([self._fontify(speakerText, 10)])
@@ -1548,7 +1549,7 @@ class TimeTablePlain(PDFWithTOC):
                         conv.append(escape(c.getFullName()))
                 conv="; ".join(conv)
                 if conv!="":
-                    conv=_("""<font name=\"Times-Bold\"><b>- _("Conveners"): %s</b></font>""")%conv
+                    conv=i18nformat("""<font name=\"Times-Bold\"><b>- _("Conveners"): %s</b></font>""")%conv
                 res.append(Paragraph("",self._styles["session_title"]))
                 startDateStr = escape(sessionSlot.getAdjustedStartDate(self._tz).strftime("%H:%M"))
                 if self._ttPDFFormat.showDateCloseToSessions():
@@ -1694,7 +1695,7 @@ class TimeTablePlain(PDFWithTOC):
                         spks.append(escape(c.getFullName()))
                 spks="; ".join(spks)
                 if spks.strip()!="":
-                    spks=_("""<font name=\"Times-Bold\"><b>- _("Presenters"): %s</b></font>""")%spks
+                    spks=i18nformat("""<font name=\"Times-Bold\"><b>- _("Presenters"): %s</b></font>""")%spks
                 text="""<u>%s</u>%s (%s-%s)"""%(
                         escape(caption),room,
                         escape(contrib.getAdjustedStartDate(self._tz).strftime("%H:%M")),
@@ -1852,18 +1853,18 @@ class SimplifiedTimeTablePlain(PDFBase):
                 title=e.getTitle()
                 if title.strip()=="":
                     title=e.getOwner().getTitle()
-                res.append(Paragraph( _("""<font name=\"Times-Bold\"><b> _("Session"):</b></font> %s""")%escape(title),self._styles["normal"]))
+                res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Session"):</b></font> %s""")%escape(title),self._styles["normal"]))
                 roomTime=""
                 if e.getRoom() is not None:
                     roomTime="%s "%(escape(e.getRoom().getName()))
-                roomTime= _("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, e.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
+                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, e.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
                         e.getAdjustedEndDate(self._tz).strftime("%H:%M"))
                 res.append(Paragraph(roomTime,self._styles["normal"]))
                 chairs=[]
                 for c in e.getConvenerList():
                     chairs.append("%s"%c.getFullName())
                 if chairs != []:
-                    res.append(Paragraph( _("""<font name=\"Times-Bold\"><b> _("Chair/s"):</b></font> %s""")%("; ".join(chairs)),self._styles["normal"]))
+                    res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Chair/s"):</b></font> %s""")%("; ".join(chairs)),self._styles["normal"]))
                 res.append(Spacer(1,0.2*inch))
             elif self._ttPDFFormat.showContribsAtConfLevel() and isinstance(entry,schedule.LinkedTimeSchEntry) and \
                     isinstance(entry.getOwner(),conference.Contribution):
@@ -1873,28 +1874,28 @@ class SimplifiedTimeTablePlain(PDFBase):
                 title=contrib.getTitle()
                 if title.strip()=="":
                     title=e.getOwner().getTitle()
-                res.append(Paragraph( _("""<font name=\"Times-Bold\"><b> _("Contribution"):</b></font> %s""")%escape(title),self._styles["normal"]))
+                res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Contribution"):</b></font> %s""")%escape(title),self._styles["normal"]))
                 roomTime=""
                 if contrib.getRoom() is not None:
                     roomTime="%s "%(escape(contrib.getRoom().getName()))
-                roomTime= _("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, contrib.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
+                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, contrib.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
                         contrib.getAdjustedEndDate(self._tz).strftime("%H:%M"))
                 res.append(Paragraph(roomTime,self._styles["normal"]))
                 spks=[]
                 for c in contrib.getSpeakerList():
                     spks.append("%s"%c.getFullName())
                 if spks != []:
-                    res.append(Paragraph( _("""<font name=\"Times-Bold\"><b> _("Presenter/s"):</b></font> %s""")%("; ".join(spks)),self._styles["normal"]))
+                    res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Presenter/s"):</b></font> %s""")%("; ".join(spks)),self._styles["normal"]))
                 res.append(Spacer(1,0.2*inch))
             elif self._ttPDFFormat.showBreaksAtConfLevel() and isinstance(entry,schedule.BreakTimeSchEntry):
                 title=entry.getTitle()
                 if title.strip()=="":
                     title=e.getOwner().getTitle()
-                res.append(Paragraph( _("""<font name=\"Times-Bold\"><b> _("Break"):</b></font> %s""")%escape(title),self._styles["normal"]))
+                res.append(Paragraph( i18nformat("""<font name=\"Times-Bold\"><b> _("Break"):</b></font> %s""")%escape(title),self._styles["normal"]))
                 roomTime=""
                 if entry.getRoom() is not None:
                     roomTime="%s "%(escape(entry.getRoom().getName()))
-                roomTime= _("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, entry.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
+                roomTime= i18nformat("""<font name=\"Times-Bold\"><b> _("Time and Place"):</b></font> %s(%s-%s)""")%(roomTime, entry.getAdjustedStartDate(self._tz).strftime("%H:%M"), \
                         entry.getAdjustedEndDate(self._tz).strftime("%H:%M"))
                 res.append(Paragraph(roomTime,self._styles["normal"]))
                 res.append(Spacer(1,0.2*inch))
@@ -1926,7 +1927,7 @@ class SimplifiedTimeTablePlain(PDFBase):
             text="%s"%text
             p=Paragraph(text, self._styles["title"])
             story.append(p)
-            text2= _(""" _("Daily Programme"): %s""")%escape(currentDay.strftime("%A %d %B %Y"))
+            text2= i18nformat(""" _("Daily Programme"): %s""")%escape(currentDay.strftime("%A %d %B %Y"))
             p2=Paragraph(text2,self._styles["day"])
             story.append(p2)
             story.append(Spacer(1,0.4*inch))
@@ -2029,7 +2030,7 @@ class AbstractBook(PDFBase):
             if instit!="":
                 fullName="%s (%s)"%(fullName, instit)
             lspk.append("%s"%escape(fullName))
-        speakers= _("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
+        speakers= i18nformat("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
         p2=Paragraph(speakers,self._styles["speakers"])
         abstract=contrib.getDescription()
         p3=Paragraph(escape(abstract),self._styles["abstract"])
@@ -2338,7 +2339,7 @@ class RegistrantToPDF(PDFBase):
 
         style = ParagraphStyle({})
         style.fontSize = 12
-        text = _(""" _("Registrant ID") : %s""")%self._reg.getId()
+        text = i18nformat(""" _("Registrant ID") : %s""")%self._reg.getId()
         p = Paragraph(text, style, part=escape(self._reg.getFullName()))
         story.append(p)
 
@@ -2359,36 +2360,36 @@ class RegistrantToPDF(PDFBase):
         for key in self._display:
             text = ""
             if key == "Email" and self._reg.getEmail() <> "":
-                text = _("""<b> _("Email") </b> :  %s""")%escape(self._reg.getEmail())
+                text = i18nformat("""<b> _("Email") </b> :  %s""")%escape(self._reg.getEmail())
             elif key == "Position" and self._reg.getPosition() <> "":
-                text = _("""<b> _("Position") </b> :  %s""")%escape(self._reg.getPosition())
+                text = i18nformat("""<b> _("Position") </b> :  %s""")%escape(self._reg.getPosition())
             elif key == "LastName" and self._reg.getFamilyName() <> "":
-                text = _("""<b> _("Surname") </b> :  %s""")%escape(self._reg.getFamilyName())
+                text = i18nformat("""<b> _("Surname") </b> :  %s""")%escape(self._reg.getFamilyName())
             elif key == "FirstName" and self._reg.getFirstName() <> "":
-                text = _("""<b> _("First Name") </b> :  %s""")%escape(self._reg.getFirstName())
+                text = i18nformat("""<b> _("First Name") </b> :  %s""")%escape(self._reg.getFirstName())
             elif key == "Institution" and self._reg.getInstitution() <> "":
-                text = _("""<b> _("Institution") </b> :  %s""")%escape(self._reg.getInstitution())
+                text = i18nformat("""<b> _("Institution") </b> :  %s""")%escape(self._reg.getInstitution())
             elif key == "Address" and self._reg.getAddress() <> "":
-                text = _("""<b> _("Address") </b> :  %s""")%escape(self._reg.getAddress())
+                text = i18nformat("""<b> _("Address") </b> :  %s""")%escape(self._reg.getAddress())
             elif key == "City" and self._reg.getCity() <> "":
-                text = _("""<b> _("City") </b> :  %s""")%escape(self._reg.getCity())
+                text = i18nformat("""<b> _("City") </b> :  %s""")%escape(self._reg.getCity())
             elif key == "Country" and self._reg.getCountry() <> "":
-                text = _("""<b> _("Country") </b> :  %s""")%escape(CountryHolder().getCountryById(self._reg.getCountry()))
+                text = i18nformat("""<b> _("Country") </b> :  %s""")%escape(CountryHolder().getCountryById(self._reg.getCountry()))
             elif key == "Phone" and self._reg.getPhone() <> "":
-                text = _("""<b> _("Phone") </b> :  %s""")%escape(self._reg.getPhone())
+                text = i18nformat("""<b> _("Phone") </b> :  %s""")%escape(self._reg.getPhone())
             elif key == "isPayed" and self._reg.isPayedText() <> "":
-                text = _("""<b> _("Paid") </b> :  %s""")%escape(self._reg.isPayedText())
+                text = i18nformat("""<b> _("Paid") </b> :  %s""")%escape(self._reg.isPayedText())
             elif key == "idpayment" and self._reg.getIdPay() <> "":
-                text = _("""<b> _("idpayment") </b> :  %s""")%escape(self._reg.getIdPay())
+                text = i18nformat("""<b> _("idpayment") </b> :  %s""")%escape(self._reg.getIdPay())
             elif key == "amountToPay":
-                text = _("""<b> _("Amount") </b> : %.2f %s""")%(self._reg.getTotal(), escape(self._reg.getConference().getRegistrationForm().getCurrency()))
+                text = i18nformat("""<b> _("Amount") </b> : %.2f %s""")%(self._reg.getTotal(), escape(self._reg.getConference().getRegistrationForm().getCurrency()))
             elif key == "Sessions":
                 listSession = []
                 for ses in self._reg.getSessionList():
                     if ses is not None:
                         listSession.append("%s"%escape(ses.getTitle()))
                 if len(listSession) > 0:
-                    text = _("""<b> _("Sessions")</b> : """)
+                    text = i18nformat("""<b> _("Sessions")</b> : """)
                     text += " ; ".join(listSession)
             elif key == "SocialEvents":
                 listSocialEvents = []
@@ -2396,22 +2397,22 @@ class RegistrantToPDF(PDFBase):
                     if ses is not None:
                         listSocialEvents.append("%s"%escape(se.getCaption()))
                 if len(listSocialEvents) > 0:
-                    text = _("""<b> _("Social Events")</b> : """)
+                    text = i18nformat("""<b> _("Social Events")</b> : """)
                     text += " ; ".join(listSocialEvents)
             elif key == "Accommodation" and self._reg.getAccommodation() is not None and \
             self._reg.getAccommodation().getAccommodationType() is not None:
-                text = _("""<b> _("Acommodation")</b> : %s""")%escape(self._reg.getAccommodation().getAccommodationType().getCaption())
+                text = i18nformat("""<b> _("Acommodation")</b> : %s""")%escape(self._reg.getAccommodation().getAccommodationType().getCaption())
             elif key == "ArrivalDate" and self._reg.getAccommodation() is not None and \
             self._reg.getAccommodation().getArrivalDate() is not None:
-                text = _("""<b> _("Arrival Date")</b> : %s""")%escape(self._reg.getAccommodation().getArrivalDate().strftime("%d-%B-%Y"))
+                text = i18nformat("""<b> _("Arrival Date")</b> : %s""")%escape(self._reg.getAccommodation().getArrivalDate().strftime("%d-%B-%Y"))
             elif key == "DepartureDate" and self._reg.getAccommodation() is not None and \
             self._reg.getAccommodation().getDepartureDate() is not None:
-                text = _("""<b> _("Departure Date")</b> : %s""")%escape(self._reg.getAccommodation().getDepartureDate().strftime("%d-%B-%Y"))
+                text = i18nformat("""<b> _("Departure Date")</b> : %s""")%escape(self._reg.getAccommodation().getDepartureDate().strftime("%d-%B-%Y"))
             elif key == "ReasonParticipation" and self._reg.getReasonParticipation() is not None and \
             self._reg.getReasonParticipation() is not None and self._reg.getReasonParticipation() != "":
-                text = _("""<b> _("Reason Participation") </b> : %s""")%escape(self._reg.getReasonParticipation())
+                text = i18nformat("""<b> _("Reason Participation") </b> : %s""")%escape(self._reg.getReasonParticipation())
             elif key == "RegistrationDate" and self._reg.getRegistrationDate() is not None:
-                text = _("""<b> _("Registration date") </b> : %s""")%escape(self._reg.getAdjustedRegistrationDate().strftime("%d-%B-%Y-%H:%M"))
+                text = i18nformat("""<b> _("Registration date") </b> : %s""")%escape(self._reg.getAdjustedRegistrationDate().strftime("%d-%B-%Y-%H:%M"))
 
             elif key.startswith("s-"):
                 ids = key.split("-")
@@ -2472,7 +2473,7 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         if len(doc.getCurrentPart())>50:
             title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, _(""" _("Page") %d """)%doc.page)
+        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, i18nformat(""" _("Page") %d """)%doc.page)
         c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
 
@@ -2516,7 +2517,7 @@ class RegistrantsListToPDF(PDFBase):
         style = ParagraphStyle({})
         style.fontSize = 12
         style.alignment = TA_CENTER
-        text = _("""<b>_("List of registrants")</b>""")
+        text = i18nformat("""<b>_("List of registrants")</b>""")
         p = Paragraph(text, style, part=escape(self._conf.getTitle()))
         p.spaceAfter = 30
         story.append(p)
@@ -2537,7 +2538,7 @@ class RegistrantsListToPDF(PDFBase):
                         ('ALIGN',(0,1),(-1,-1),"LEFT") ] )
         l = []
         lp = []
-        lp.append(Paragraph( _("""<b> _("Name")</b>"""), styleRegistrant))
+        lp.append(Paragraph( i18nformat("""<b> _("Name")</b>"""), styleRegistrant))
 
         for key in self._display:
             if key in ["Email", "Position", "LastName", "FirstName", "Institution", "Phone", "City", "Country", "Address", "RegistrationDate"]:
@@ -2549,9 +2550,9 @@ class RegistrantsListToPDF(PDFBase):
             elif key == "Sessions":
                 p=Paragraph("""<b>%s</b>"""%escape(self._regForm.getSessionsForm().getTitle()), styleRegistrant)
             elif key=="ArrivalDate":
-                p=Paragraph( _("""<b> _("Arrival Date")</b>"""), styleRegistrant)
+                p=Paragraph( i18nformat("""<b> _("Arrival Date")</b>"""), styleRegistrant)
             elif key=="DepartureDate":
-                p=Paragraph( _("""<b> _("Departure Date")</b>"""), styleRegistrant)
+                p=Paragraph( i18nformat("""<b> _("Departure Date")</b>"""), styleRegistrant)
             elif key == "ReasonParticipation":
                 p=Paragraph("""<b>%s</b>"""%escape(self._regForm.getReasonParticipationForm().getTitle()), styleRegistrant)
             elif key == "isPayed":

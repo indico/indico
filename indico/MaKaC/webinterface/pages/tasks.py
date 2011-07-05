@@ -30,6 +30,7 @@ from MaKaC.conference import CategoryManager
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import DisplayTZ
 
 
@@ -81,7 +82,7 @@ class WTaskList(wcomponents.WTemplated):
                mgrs.append(mgr.getAbrName())
         vars["managers"]=""
         if mgrs != []:
-            vars["managers"]= _("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
+            vars["managers"]= i18nformat("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
         return vars
 
     def _getTaskList(self):
@@ -105,7 +106,7 @@ class WTaskList(wcomponents.WTemplated):
                 urlComment.addParam("taskId",t.getId())
                 tz = DisplayTZ(self._aw,None,useServerTZ=1).getDisplayTZ()
                 creationDate = "%s"%t.getCreationDate().astimezone(timezone(tz))
-                text = _("""
+                text = i18nformat("""
                 <tr>
                     <td>&nbsp;&nbsp;%s</td>
                     <td>&nbsp;&nbsp;<a href="%s">%s</a></td>
@@ -162,7 +163,7 @@ class WTaskNew(wcomponents.WTemplated):
         vars["title"] = vars.get("title","")
         vars["taskDescription"] = vars.get("taskDescription","")
         if vars.get("id", None) is not None :
-            vars["id"] = _("""
+            vars["id"] = i18nformat("""
             <tr>
                 <td nowrap class="titleCellTD"><span class="titleCellFormat">
                     _("Id")
@@ -179,7 +180,7 @@ class WTaskNew(wcomponents.WTemplated):
                mgrs.append(mgr.getAbrName())
         vars["managers"]=""
         if mgrs != []:
-            vars["managers"]= _("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
+            vars["managers"]= i18nformat("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
         
         vars["responsibleDefined"] = vars.get("responsibleDefined","")
         vars["responsibleOptions"] = vars.get("responsibleOptions","")
@@ -250,9 +251,9 @@ class WPTaskNewResponsibleNew( WPCategoryDisplayBase ):
             params["faxValue"] = ""
         
         params["disabledSubmission"] = False
-        params["submissionValue"] = _(""" <input type="checkbox" name="submissionControl"> _("Give submission rights to the presenter").""")
+        params["submissionValue"] = i18nformat(""" <input type="checkbox" name="submissionControl"> _("Give submission rights to the presenter").""")
         params["disabledNotice"] = False
-        params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
+        params["noticeValue"] = i18nformat("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
          user will automatically be given submission rights.")</i>""")
         
@@ -296,7 +297,7 @@ class WTaskDetails(wcomponents.WTemplated):
                mgrs.append(mgr.getAbrName())
         vars["managers"]=""
         if mgrs != []:
-            vars["managers"]= _("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
+            vars["managers"]= i18nformat("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
         
         vars["taskTitle"] = self._task.getTitle()
         vars["taskStatus"] = self._task.getCurrentStatus().getStatusName()
@@ -312,7 +313,7 @@ class WTaskDetails(wcomponents.WTemplated):
             vars["responsible"] = wresponsible.getHTML(vars)    
         else : 
             vars["statusDisabled"] = "disabled"
-            vars["responsible"] = _("""
+            vars["responsible"] = i18nformat("""
             <tr>
                 <td nowrap class="titleCellTD"><span class="titleCellFormat">
                     _("Responsible")
@@ -330,22 +331,22 @@ class WTaskDetails(wcomponents.WTemplated):
                                 """.join(taskStatusOptions)
     
         if vars.get("showComments",None) is None:
-            vars["showCommentsButton"] = _("""<input type="submit" class="btn" name="performedAction" value="_("Show comments list")">""")
-            vars["newCommentButton"] = _("""<input type="submit" class="btn" name="performedAction" value="_("New comment")">""")
+            vars["showCommentsButton"] = i18nformat("""<input type="submit" class="btn" name="performedAction" value="_("Show comments list")">""")
+            vars["newCommentButton"] = i18nformat("""<input type="submit" class="btn" name="performedAction" value="_("New comment")">""")
             vars["commentsList"] = ""
             vars["showComments"] = ""
         else : 
-            vars["showCommentsButton"] = _("""<input type="submit" class="btn" name="performedAction" value="_("Hide comments list")">""")
-            vars["newCommentButton"] = _("""<input type="submit" class="btn" name="performedAction" value="_("New comment")">""")
+            vars["showCommentsButton"] = i18nformat("""<input type="submit" class="btn" name="performedAction" value="_("Hide comments list")">""")
+            vars["newCommentButton"] = i18nformat("""<input type="submit" class="btn" name="performedAction" value="_("New comment")">""")
             vars["commentsList"] = self._getCommentsList(self._task)            
             vars["showComments"] = """<input type="hidden" name="showComments" value="true">"""
         #raise "comments : >>%s<<"%vars["commentsList"]
         if vars.get("showStatus",None) is None :
-            vars["showStatusButton"] = _("""<input type="submit" class="btn" name="performedAction" value="_("Show status history")">""")
+            vars["showStatusButton"] = i18nformat("""<input type="submit" class="btn" name="performedAction" value="_("Show status history")">""")
             vars["statusList"] = ""
             vars["showStatus"] = ""
         else :
-            vars["showStatusButton"] = _("""<input type="submit" class="btn" name="performedAction" value="_("Hide status history")">""")
+            vars["showStatusButton"] = i18nformat("""<input type="submit" class="btn" name="performedAction" value="_("Hide status history")">""")
             vars["statusList"] = self._getStatusList(self._task)
             vars["showStatus"] = """<input type="hidden" name="showStatus" value="true">"""
                 
@@ -357,7 +358,7 @@ class WTaskDetails(wcomponents.WTemplated):
         keys = task.getCommentHistory().keys()
         keys.sort()
         #raise "%s"%keys
-        out = _("""
+        out = i18nformat("""
         <table width="100%">
             <tr>
                 <td width="22%"><span class="titleCellFormat">&nbsp; _("Date")</span></td>
@@ -383,7 +384,7 @@ class WTaskDetails(wcomponents.WTemplated):
         </table>"""
 
     def _getStatusList(self, task):
-        out = _("""
+        out = i18nformat("""
         <table width="100%">
             <tr>
                 <td width="22%"><span class="titleCellFormat">&nbsp; _("Date")</span></td>
@@ -522,9 +523,9 @@ class WPTaskDetailsResponsibleNew( WPCategoryDisplayBase ):
             params["faxValue"] = ""
         
         params["disabledSubmission"] = False
-        params["submissionValue"] = _(""" <input type="checkbox" name="submissionControl"> _("Give submission rights to the presenter").""")
+        params["submissionValue"] = i18nformat(""" <input type="checkbox" name="submissionControl"> _("Give submission rights to the presenter").""")
         params["disabledNotice"] = False
-        params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
+        params["noticeValue"] = i18nformat("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the 
          user will automatically be given submission rights.")</i>""")
         
@@ -566,7 +567,7 @@ class WTaskComment(wcomponents.WTemplated):
                mgrs.append(mgr.getAbrName())
         vars["managers"]=""
         if mgrs != []:
-            vars["managers"]= _("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
+            vars["managers"]= i18nformat("""(<b> _("Managers")</b>: %s)""")%"; ".join(mgrs)
         
         taskObject = self._target.getTask(vars["taskId"])
         vars["taskTitle"] = taskObject.getTitle()

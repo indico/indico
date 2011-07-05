@@ -283,7 +283,7 @@ class Month:
         return self._cal
 
     def getName( self ):
-        return _(self.getNames()[self._month-1])
+        return self.getNames()[self._month-1]
 
     def getDayList( self ):
         inc = timedelta(1)

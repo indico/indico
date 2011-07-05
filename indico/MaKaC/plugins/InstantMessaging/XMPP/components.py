@@ -26,6 +26,7 @@ from MaKaC.plugins.helpers import DBHelpers, MailHelper
 from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
 from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat, i18nformat
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
@@ -124,7 +125,7 @@ class ChatSMContributor(Component, Observable):
         #list of creators of the chat rooms
         ownersList = [cr.getOwner() for cr in DBHelpers().getChatroomList(obj._conf)]
         if PluginsWrapper('InstantMessaging', 'XMPP').isActive() and obj._rh._aw._currentUser in ownersList:
-            list['cloneOptions'] += _("""<li><input type="checkbox" name="cloneChatrooms" id="cloneChatrooms" value="1" />_("Chat Rooms")</li>""")
+            list['cloneOptions'] += i18nformat("""<li><input type="checkbox" name="cloneChatrooms" id="cloneChatrooms" value="1" />_("Chat Rooms")</li>""")
 
     @classmethod
     def fillCloneDict(self, obj, params):

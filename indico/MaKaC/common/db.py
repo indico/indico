@@ -37,7 +37,6 @@ skip_imports = getIndicoInstallMode()
 
 if not skip_imports:
     from MaKaC.common.logger import Logger
-    from MaKaC.i18n import _
 
 
 class MaKaCDB(DB):

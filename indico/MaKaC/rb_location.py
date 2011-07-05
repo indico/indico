@@ -65,8 +65,8 @@ class MapAspect(Persistent, object):
     """
 
     def __str__(self):
-        s = _(""" _("Id"): """) + self.id + "\n"
-        s += _(""" _("Name"): """) + self.name + "\n"
+        s = i18nformat(""" _("Id"): """) + self.id + "\n"
+        s += i18nformat(""" _("Name"): """) + self.name + "\n"
         return s
 
     def __cmp__(self, second):
@@ -131,8 +131,8 @@ class Location( Persistent, object ):
         self._aspects = {}
 
     def __str__( self ):
-        s = _(""" _("Location"): """) + self.friendlyName + "\n"
-        s += _(""" _("Plugin"): """) + self.factory.__class__.__name__ + "\n"
+        s = i18nformat(""" _("Location"): """) + self.friendlyName + "\n"
+        s += i18nformat(""" _("Plugin"): """) + self.factory.__class__.__name__ + "\n"
         return s
 
     def __cmp__( self, second ):

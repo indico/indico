@@ -58,8 +58,7 @@ from MaKaC.rb_tools import FormMode, overlap
 
 from lxml import etree
 
-from MaKaC.i18n import _
-from MaKaC.i18n import langList
+from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
 
 from MaKaC.common.TemplateExec import truncateTitle
 from MaKaC.fossils.user import IAvatarFossil
@@ -323,17 +322,6 @@ class WHeader(WTemplated):
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             selLang = minfo.getLang()
 
-        #language list related
-        languages = {}
-        vars["SelectedLanguageName"] = "Unknown Language";
-        for lang in langList():
-            if selLang.lower() == lang[0].lower():
-                vars["SelectedLanguageName"] = lang[1];
-            languages[lang[0]] = lang[1]
-        vars["Languages"] = languages
-
-        vars["SelectedLanguage"] = selLang;
-
         vars["ActiveTimezone"] = self._getActiveTimezone();
         """
             Get the timezone for displaying on top of the page.
@@ -343,6 +331,10 @@ class WHeader(WTemplated):
             2. If the user has a custom timezone display that one.
         """
         vars["ActiveTimezoneDisplay"] = self._getTimezoneDisplay(vars["ActiveTimezone"])
+
+        vars["SelectedLanguage"] = selLang
+        vars["SelectedLanguageName"] = parseLocale(selLang).get_display_name().encode('utf-8')
+        vars["Languages"] = getLocaleDisplayNames()
 
         if DBMgr.getInstance().isConnected():
             vars["title"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTitle()
@@ -479,11 +471,11 @@ class WMenuConferenceHeader( WConferenceHeader ):
         vars["categurl"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         url = urlHandlers.UHConfEnterModifKey.getURL(self._conf)
         url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-        vars["confModif"] =  _("""<a href=%s> _("manage")</a>""")%quoteattr(str(url))
+        vars["confModif"] =  i18nformat("""<a href=%s> _("manage")</a>""")%quoteattr(str(url))
         if self._conf.canKeyModify(self._aw):
             url = urlHandlers.UHConfCloseModifKey.getURL(self._conf)
             url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
-            vars["confModif"] = _("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
+            vars["confModif"] = i18nformat("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         stylesheets = styleMgr.getStylesheetListForEventType(vars["type"])
 
@@ -507,7 +499,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
                     selected = "selected"
             else:
                 selectedDate = "all"
-            dates = [ _(""" <select name="showDate" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all days") - -</option> """)%selected]
+            dates = [ i18nformat(""" <select name="showDate" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all days") - -</option> """)%selected]
             while sdate.strftime("%Y-%m-%d") <= edate.strftime("%Y-%m-%d"):
                 selected = ""
                 if selectedDate == sdate.strftime("%d-%B-%Y"):
@@ -528,7 +520,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
                     selected = "selected"
             else:
                 selectedSession = "all"
-            sessions = [ _(""" <select name="showSession" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
+            sessions = [ i18nformat(""" <select name="showSession" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
             for session in self._conf.getSessionList():
                 selected = ""
                 id = session.getId()
@@ -550,12 +542,12 @@ class WMenuConferenceHeader( WConferenceHeader ):
         vars["hideContributions"] = hideContributions;
 
         if self._conf.getType() == "meeting" and self._conf.getParticipation().isAllowedForApplying() and self._conf.getStartDate() > nowutc():
-            vars["applyForParticipation"] = _("""<a href="%s">_("Apply for participation")</a>""")%urlHandlers.UHConfParticipantsNewPending.getURL(self._conf)
+            vars["applyForParticipation"] = i18nformat("""<a href="%s">_("Apply for participation")</a>""")%urlHandlers.UHConfParticipantsNewPending.getURL(self._conf)
         else :
             vars["applyForParticipation"] = ""
         evaluation = self._conf.getEvaluation()
         if self._conf.hasEnabledSection("evaluation") and evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions()>0 :
-            vars["evaluation"] =  _("""<a href="%s"> _("Evaluation")</a>""")%urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
+            vars["evaluation"] =  i18nformat("""<a href="%s"> _("Evaluation")</a>""")%urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
         else :
             vars["evaluation"] = ""
 
@@ -595,12 +587,12 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars = WConferenceHeader.getVars( self )
 
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
-        #vars["confModif"] =  _("""<a href=%s> _("manage")</a>""")%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
+        #vars["confModif"] =  i18nformat("""<a href=%s> _("manage")</a>""")%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
         #if self._conf.canKeyModify(self._aw):
-        #    vars["confModif"] =  _("""<a href=%s> _("exit manage")</a>""")%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
+        #    vars["confModif"] =  i18nformat("""<a href=%s> _("exit manage")</a>""")%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
         #vars["confModif"] += "&nbsp;|&nbsp;"
         #if not self._conf.canAccess(self._aw) and self._conf.getAccessKey() != "":
-        #    vars["confModif"] += _("""<a href=%s>_("full agenda")</a>&nbsp;|&nbsp;""")%(quoteattr(str(urlHandlers.UHConfForceEnterAccessKey.getURL(self._conf))))
+        #    vars["confModif"] += i18nformat("""<a href=%s>_("full agenda")</a>&nbsp;|&nbsp;""")%(quoteattr(str(urlHandlers.UHConfForceEnterAccessKey.getURL(self._conf))))
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         stylesheets = styleMgr.getStylesheetListForEventType(vars["type"])
 
@@ -632,7 +624,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 selected = "selected"
         else:
             selectedDate = "all"
-        dates = [ _(""" <option value="all" %s>- -  _("all days") - -</option> """)%selected]
+        dates = [ i18nformat(""" <option value="all" %s>- -  _("all days") - -</option> """)%selected]
         while sdate.strftime("%Y-%m-%d") <= edate.strftime("%Y-%m-%d"):
             selected = ""
             if selectedDate == sdate.strftime("%d-%B-%Y"):
@@ -651,7 +643,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 selected = "selected"
         else:
             selectedSession = "all"
-        sessions = [ _(""" <option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
+        sessions = [ i18nformat(""" <option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
         for session in self._conf.getSessionList():
             selected = ""
             id = session.getId()
@@ -977,7 +969,7 @@ class WCategModifHeader(WTemplated):
         for categ in self._conf.getOwnerList():
             l.append("""<option value="%s">%s</option>"""%(categ.getId(),\
                                                           categ.getName()))
-        return  _("""<form action="%s" method="GET">
+        return  i18nformat("""<form action="%s" method="GET">
                         <select name="categId">%s</select>
                         <input type="submit" class="btn" value="_("go")">
                     </form>""")%(URLGen(), "".join(l))
@@ -1148,7 +1140,7 @@ class WContributionDeletion(object):
         l = []
         for contrib in self._contribList:
             l.append("""<li><i>%s</i></li>"""%contrib.getTitle())
-        msg =  _("""
+        msg =  i18nformat("""
         <font size="+2"> _("Are you sure that you want to DELETE the following contributions"):<ul>%s</ul>?</font><br>
             <table>
                 <tr><td>
@@ -1670,7 +1662,7 @@ class WBreakDataModification(WTemplated):
             textcolortolinks=""
             if self._break.isTextColorToLinks():
                 textcolortolinks="checked=\"checked\""
-            schOptions= _("""&nbsp;<input type="checkbox" name="moveEntries" value="1">  _("reschedule entries after this time")""")
+            schOptions= i18nformat("""&nbsp;<input type="checkbox" name="moveEntries" value="1">  _("reschedule entries after this time")""")
         else:
             wpTitle = "Create new break"
             title, description = "break", ""
@@ -2624,7 +2616,7 @@ class WUserSearchResultsTable( WTemplated ):
         if l:
             vars["usersFound"] = "".join( l )
         else:
-            vars["usersFound"] =  _(""""<br><span class=\"blacktext\">&nbsp;&nbsp;&nbsp; _("No results for this search")</span>""")
+            vars["usersFound"] =  i18nformat(""""<br><span class=\"blacktext\">&nbsp;&nbsp;&nbsp; _("No results for this search")</span>""")
         vars["nbResults"] = len(self.__resultList)
         return vars
 
@@ -2646,7 +2638,7 @@ class WSignIn(WTemplated):
         vars["itemIcon"] = imgIcon
         vars["createAccount"] = ""
         if minfo.getAuthorisedAccountCreation():
-            vars["createAccount"] =  _("""_("If you don't have an account, you can create one")<a href="%s"> _("here")</a>
+            vars["createAccount"] =  i18nformat("""_("If you don't have an account, you can create one")<a href="%s"> _("here")</a>
         """) % (vars["createAccountURL"])
         vars["NiceMsg"]=""
         if "Nice" in Configuration.Config.getInstance().getAuthenticatorList():
@@ -3459,10 +3451,10 @@ class WConfCreationControlFrame(WTemplated):
         vars = WTemplated.getVars( self )
         vars["locator"] = self._categ.getLocator().getWebForm()
         vars["status"] =  _("OPENED")
-        vars["changeStatus"] =  _("""( <input type="submit" class="btn" name="RESTRICT" value="_("RESTRICT it")"> )""")
+        vars["changeStatus"] =  i18nformat("""( <input type="submit" class="btn" name="RESTRICT" value="_("RESTRICT it")"> )""")
         if self._categ.isConferenceCreationRestricted():
             vars["status"] =  _("RESTRICTED")
-            vars["changeStatus"] = _("""( <input type="submit" class="btn" name="OPEN" value="_("OPEN it")"> )""")
+            vars["changeStatus"] = i18nformat("""( <input type="submit" class="btn" name="OPEN" value="_("OPEN it")"> )""")
         vars["principalTable"] = WPrincipalTable().getHTML( self._categ.getConferenceCreatorList(), self._categ , vars["addCreatorsURL"], vars["removeCreatorsURL"], selectable=False )
         vars["notifyCreationList"] = quoteattr(self._categ.getNotifyCreationList())
         vars["setNotifyCreationURL"] = urlHandlers.UHCategorySetNotifyCreation.getURL(self._categ)
@@ -3967,7 +3959,7 @@ class WSelectionBoxAuthors:
         wc=WSelectionBox()
         p={
             "description":  _("Please make your selection if you want to add the submitter/s directly to any of the following roles:"),\
-            "options":  _("""<input type="radio" name="submitterRole" value="primaryAuthor"> _("Primary author")<br>
+            "options":  i18nformat("""<input type="radio" name="submitterRole" value="primaryAuthor"> _("Primary author")<br>
                         <input type="radio" name="submitterRole" value="coAuthor"> _("Co-author")<br><hr>
                         <input type="checkbox" name="submitterRole" value="speaker"> _("Speaker")
                             """)
@@ -3980,7 +3972,7 @@ class WMSelectionBoxAuthors:
         wc=WSelectionBox()
         p={
             "description":  _("Please make your selection if you want to add the submitter/s directly to:"),\
-            "options":  _("""<input type="checkbox" name="submitterRole" value="speaker"> _("Speaker")
+            "options":  i18nformat("""<input type="checkbox" name="submitterRole" value="speaker"> _("Speaker")
                             """), \
             "table_width": "180px" \
           }
@@ -3991,8 +3983,8 @@ class WSelectionBoxSubmitter:
     def getHTML(self):
         wc=WSelectionBox()
         p={
-            "description":  _(""" _("Please check the box if you want to add them as submitters"):<br><br><i><font color=\"black\"><b> _("Note"): </b></font> _("If this person is not already a user they will be sent an email asking them to create an account. After their registration the user will automatically be given submission rights").</i><br>"""),\
-            "options":  _("""<input type="checkbox" name="submissionControl" value="speaker" checked> _("Add as submitter")
+            "description":  i18nformat(""" _("Please check the box if you want to add them as submitters"):<br><br><i><font color=\"black\"><b> _("Note"): </b></font> _("If this person is not already a user they will be sent an email asking them to create an account. After their registration the user will automatically be given submission rights").</i><br>"""),\
+            "options":  i18nformat("""<input type="checkbox" name="submissionControl" value="speaker" checked> _("Add as submitter")
                         """)
           }
         return wc.getHTML(p)
@@ -4003,7 +3995,7 @@ class WSelectionBoxConveners:
         wc=WSelectionBox()
         p={
             "description": _("Please make your selection if you want to add the result/s directly to the role of session Convener:"),\
-            "options":  _("""<input type="checkbox" name="userRole" value="convener"> _("Add as convener")
+            "options":  i18nformat("""<input type="checkbox" name="userRole" value="convener"> _("Add as convener")
                         """)
           }
         return wc.getHTML(p)
@@ -4013,8 +4005,8 @@ class WSelectionBoxConvToManagerCoordinator:
     def getHTML(self):
         wc=WSelectionBox()
         p={
-            "description":  _(""" _("Please check the box if you want to add them as managers/coordinators"):"""),\
-            "options":  _("""<input type="checkbox" name="managerControl"> _("Add as session manager")<br>
+            "description":  i18nformat(""" _("Please check the box if you want to add them as managers/coordinators"):"""),\
+            "options":  i18nformat("""<input type="checkbox" name="managerControl"> _("Add as session manager")<br>
                              <input type="checkbox" name="coordinatorControl"> _("Add as session coordinator")
                         """)
           }
@@ -4027,7 +4019,7 @@ class WSelectionBoxCloneLecture :
         wc=WSelectionBox()
         p={
             "description":  _("Please check the boxes indicating which elements of the lecture you want to clone"),\
-            "options":  _("""<input type="checkbox" name="cloneDetails" id="cloneDetails" checked="1" disabled="1" value="1">  _("Event details")
+            "options":  i18nformat("""<input type="checkbox" name="cloneDetails" id="cloneDetails" checked="1" disabled="1" value="1">  _("Event details")
                           <input type="checkbox" name="cloneMaterials" id="cloneMaterials" value="1" >  _("Attached materials")
                           <input type="checkbox" name="cloneAccess" id="cloneAccess" value="1" >  _("Access and management privileges")
                         """)
@@ -4161,11 +4153,11 @@ class WUserSelection(WTemplated):
                 selected = ""
                 if auth in searchList:
                     selected = "checked"
-                vars["searchOptions"]+= _("""<input type="checkbox" name="searchExt" value="%s" %s> _("search %s database")<br>""") % (auth, selected, auth.upper())
+                vars["searchOptions"]+= i18nformat("""<input type="checkbox" name="searchExt" value="%s" %s> _("search %s database")<br>""") % (auth, selected, auth.upper())
         selected = ""
         if vars.get("exact","") != "":
             selected = "checked"
-        vars["searchOptions"]+= _("""<input type="checkbox" name="exact" value="1" %s>  _("exact match")<br>""") % selected
+        vars["searchOptions"]+= i18nformat("""<input type="checkbox" name="exact" value="1" %s>  _("exact match")<br>""") % selected
         return vars
 
 class WAuthorSearch(WUserSelection):
@@ -4355,7 +4347,7 @@ class WNewPerson(WTemplated):
         </tr>"""%vars["noticeValue"]
 
         if vars.get("msg","")!="":
-            vars["msg"]=  _("""<table bgcolor="gray"><tr><td bgcolor="white">
+            vars["msg"]=  i18nformat("""<table bgcolor="gray"><tr><td bgcolor="white">
                       <font size="+1" color="red"><b> _("You must enter a valid email address.")</b></font>
 
                        </td></tr></table>""")
@@ -4416,7 +4408,7 @@ class WAddPersonModule(WTemplated):
         vars["personType"] = self._personType
 
         if vars.get("submission",None) is not None :
-            vars["submissionButtons"] =  _("""
+            vars["submissionButtons"] =  i18nformat("""
             <tr>
                 <td colspan="4"><input type="submit" class="btn" value="_("Grant submission")" onClick="setAction(this.form,'Grant submission');"></td>
             </tr>
@@ -4510,13 +4502,13 @@ class WSessionModifComm(WTemplated):
         modifButton=""
         if self._conf.canModify(self._aw):
 
-            modifButton =  _("""<form action=%s method="POST">
+            modifButton =  i18nformat("""<form action=%s method="POST">
                     <td align="center">
                         <input type="submit" class="btn" value="_("modify")">
                     </td>
                     </form>
                         """)%quoteattr(str(editCommentsURLGen(self._session)))
-        return ( _("""
+        return ( i18nformat("""
         <table width="50%%" align="center" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle"> _("Session comment")</td>
@@ -4565,14 +4557,14 @@ class WAbstractModIntComments(WTemplated):
             date=self.htmlText(c.getCreationDate().strftime("%Y-%m-%d %H:%M"))
             buttonMod,buttonRem="",""
             if self._aw.getUser()==c.getResponsible():
-                buttonMod= _("""
+                buttonMod= i18nformat("""
                     <form action=%s method="POST">
                     <td valign="bottom">
                         <input type="submit" class="btn" value="_("modify")">
                     </td>
                     </form>
                         """)%quoteattr(str(commentEditURLGen(c)))
-                buttonRem= _("""
+                buttonRem= i18nformat("""
                     <form action=%s method="POST">
                     <td valign="bottom">
                         <input type="submit" class="btn" value="_("remove")">
@@ -4595,7 +4587,7 @@ class WAbstractModIntComments(WTemplated):
                     </td>
                 </tr>"""%(responsible,date,c.getContent(),buttonMod,buttonRem))
         if res == []:
-            res.append( _("""<tr><td align=\"center\" style=\"color:black\"><br>--_("no internal comments")--<br><br></td></tr>"""))
+            res.append( i18nformat("""<tr><td align=\"center\" style=\"color:black\"><br>--_("no internal comments")--<br><br></td></tr>"""))
         return "".join(res)
 
     def getVars(self):
@@ -4667,7 +4659,7 @@ class WConfModAbstractEditData(WTemplated):
     #    return "".join(res)
 
     def _getContribTypeItemsHTML(self):
-        res=[ _("""<option value="">--_("not specified")--</option>""")]
+        res=[ i18nformat("""<option value="">--_("not specified")--</option>""")]
         for cType in self._conf.getContribTypeList():
             selected=""
             if cType.getId()==self._ad.getContribTypeId():
@@ -4681,7 +4673,7 @@ class WConfModAbstractEditData(WTemplated):
             spk_checked=""
             if author.isSpeaker():
                 spk_checked=" checked"
-            tmp= _("""
+            tmp= i18nformat("""
                     <tr>
                         <td style="border-top:1px solid #777777; border-left:1px solid #777777">
                             <table align="center">
@@ -4754,7 +4746,7 @@ class WConfModAbstractEditData(WTemplated):
             spk_checked=""
             if author.isSpeaker():
                 spk_checked=" checked"
-            tmp= _("""
+            tmp= i18nformat("""
                     <tr>
                         <td style="border-top:1px solid #777777; border-left:1px solid #777777">
                             <table align="center">
@@ -4844,7 +4836,7 @@ class WConfModAbstractEditData(WTemplated):
                     maxLengthText = """ onkeyup="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}; this.form.maxchars%s.value = %s - this.value.length;" onchange="if (this.value.length > %s) {this.value = this.value.slice(0, %s);}" """ % (maxLength,maxLength,id.replace(" ", "_"),maxLength,maxLength,maxLength)
                 else:
                     maxLengthJS = maxLengthText = ""
-                html+= _("""
+                html += """
                     <tr>
                         <td align="right" valign="top" class="titleCellTD">
                             <span class="titleCellFormat">
@@ -4855,7 +4847,7 @@ class WConfModAbstractEditData(WTemplated):
                             <textarea name="%s" cols="85" rows="%s" %s>%s</textarea>
                         </td>
                     </tr>
-                """) % ( mandatoryText, caption, maxLengthJS, id, nbRows, maxLengthText, value )
+                """ % ( mandatoryText, _(caption), maxLengthJS, id, nbRows, maxLengthText, value )
         return html
 
     def getVars(self):
@@ -5167,7 +5159,7 @@ class WSessionModEditData(WTemplated):
         else:
             vars["disabled"] = ""
         if self._title.find("Ed") != -1 and self._conf.getEnableSessionSlots():
-            vars["adjustSlots"]= _("""<input type="checkbox" name="slmove" value="1">  _("Also move timetable entries")""")
+            vars["adjustSlots"]= i18nformat("""<input type="checkbox" name="slmove" value="1">  _("Also move timetable entries")""")
         else:
             vars["adjustSlots"]="""<input type="hidden" name="slmove" value="1">"""
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
@@ -5212,8 +5204,8 @@ class WConfModMoveContribsToSessionConfirmation(WTemplated):
                             contrib.getSession()!=self._targetSession):
                 scheduled=""
                 if contrib.isScheduled():
-                    scheduled= _("""  _("and scheduled") (%s)""")%self.htmlText(contrib.getStartDate().strftime("%Y-%b-%d %H:%M"))
-                wl.append( _("""
+                    scheduled= i18nformat("""  _("and scheduled") (%s)""")%self.htmlText(contrib.getStartDate().strftime("%Y-%b-%d %H:%M"))
+                wl.append( i18nformat("""
                         <li>%s-<i>%s</i>%s: is <font color="red"> _("already in session") <b>%s</b>%s</font></li>
                 """)%(self.htmlText(contrib.getId()),
                         self.htmlText(contrib.getTitle()),
@@ -5223,7 +5215,7 @@ class WConfModMoveContribsToSessionConfirmation(WTemplated):
             if (contrib.getSession() is None and \
                             self._targetSession is not None and \
                             contrib.isScheduled()):
-                wl.append( _("""
+                wl.append( i18nformat("""
                         <li>%s-<i>%s</i>%s: is <font color="red"> _("scheduled") (%s)</font></li>
                 """)%(self.htmlText(contrib.getId()),
                         self.htmlText(contrib.getTitle()),
@@ -5418,7 +5410,7 @@ class WSubmitMaterialLink(WTemplated):
         vars["materialTypeSelectFieldName"]="LinkType%s"%self._filenb
         vars["materialTypeInputFieldName"]="LinkTypeFT%s"%self._filenb
         vars["urlFieldName"]="link%s"%self._filenb
-        l=[ _("""<option value="notype">--_("Select a type")--</option>""")]
+        l=[ i18nformat("""<option value="notype">--_("Select a type")--</option>""")]
         selMatType=vars.get("LinkType%s" % self._filenb,"")
         for mf in self._availMF:
             try:
@@ -5456,7 +5448,7 @@ class WSubmitMaterialFile(WTemplated):
         vars["materialTypeSelectFieldName"]="FileType%s"%self._filenb
         vars["materialTypeInputFieldName"]="FileTypeFT%s"%self._filenb
         vars["fileFieldName"]="file%s"%self._filenb
-        l=[ _("""<option value="notype">--_("Select a type")--</option>""")]
+        l=[ i18nformat("""<option value="notype">--_("Select a type")--</option>""")]
         selMatType=vars.get("FileType%s" % self._filenb,"")
         for mf in self._availMF:
             try:
@@ -5765,9 +5757,9 @@ class WSubmitMaterial(WTemplated):
         vars["iconDelete"] = Config.getInstance().getSystemIconURL("smallDelete")
         vars["iconKey"] = ""
         if vars["materialModifHandler"] or vars["resourcesFileModifHandler"] or vars["resourcesLinkModifHandler"]:
-            vars["iconKey"] += _("""&nbsp;<img src=%s style="vertical-align:middle; margin: 1px;"> _("edit")""") % Config.getInstance().getSystemIconURL("file_edit")
+            vars["iconKey"] += i18nformat("""&nbsp;<img src=%s style="vertical-align:middle; margin: 1px;"> _("edit")""") % Config.getInstance().getSystemIconURL("file_edit")
         if vars["materialProtectHandler"] or vars["resourcesFileProtectHandler"] or vars["resourcesLinkProtectHandler"]:
-            vars["iconKey"] += _("""&nbsp;<img src=%s style="vertical-align:middle; margin: 1px;"> _("protect")""") % Config.getInstance().getSystemIconURL("file_protect")
+            vars["iconKey"] += i18nformat("""&nbsp;<img src=%s style="vertical-align:middle; margin: 1px;"> _("protect")""") % Config.getInstance().getSystemIconURL("file_protect")
         vars["materialList"] = "<table>"
         materialList = self._target.getAllMaterialList()
         for material in materialList:
@@ -5793,7 +5785,7 @@ class WSubmitMaterial(WTemplated):
             vars["linkSubmitForms"] += WSubmitMaterialLink(i,self._availMF).getHTML(vars)
         vars["conversion"]=""
         if Configuration.Config.getInstance().hasFileConverter():
-            vars["conversion"]= _("""
+            vars["conversion"]= i18nformat("""
                                 <tr>
                                     <td nowrap class="titleCellTD"><span class="titleCellFormat">To PDF</span></td>
                                     <td align="left"><input type="checkbox" name="topdf" checked="checked"> _("Automatic conversion to pdf (when applicable)? (PPT, DOC)")</td>
@@ -5801,7 +5793,7 @@ class WSubmitMaterial(WTemplated):
                                 """)
         vars["errors"]=self._getErrorHTML(vars.get("errorList",[]))
         if vars["cancel"]:
-            vars["CancelButton"] =  _("""<input type="submit" name="CANCEL" value="_("cancel")" class="btn">""")
+            vars["CancelButton"] =  i18nformat("""<input type="submit" name="CANCEL" value="_("cancel")" class="btn">""")
         else:
             vars["CancelButton"] = ""
         return vars
@@ -5826,7 +5818,7 @@ class WSchRelocate(WTemplated):
 
     def _getTargetPlaceHTML(self):
         html=[]
-        html.append( _("""
+        html.append( i18nformat("""
                         <tr><td><input type="radio" name="targetId" value="conf"></td><td colspan="3" width="100%%"><b> _("Top timetable (within no session)")</b></td></tr>
                         <tr><td colspan="4"><hr></td></tr>
                     """))

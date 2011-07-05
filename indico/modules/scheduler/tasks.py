@@ -25,7 +25,6 @@ import zope.interface
 
 # Required by specific tasks
 from MaKaC.user import Avatar
-from MaKaC.i18n import _
 from MaKaC.common import Config
 # end required
 
@@ -34,6 +33,7 @@ from BTrees.IOBTree import IOBTree
 
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.date_time import int_timestamp
+from indico.util.i18n import _, i18nformat
 from indico.modules.scheduler.fossils import ITaskFossil, ITaskOccurrenceFossil
 from indico.modules.scheduler import base
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
@@ -636,7 +636,7 @@ class AlarmTask(SendMailTask):
         except:
             locationText = ""
         if locationText != "":
-            locationText = _(""" _("Location"): %s""") % locationText
+            locationText = i18nformat(""" _("Location"): %s""") % locationText
 
         if self.getToAllParticipants() :
             for p in self.conf.getParticipation().getParticipantList():

@@ -2848,7 +2848,7 @@ class AbstractStatusAccepted( AbstractStatus ):
         from MaKaC.conference import ContribStatusWithdrawn
         if contrib is not None and \
                 not isinstance(contrib.getCurrentStatus(),ContribStatusWithdrawn):
-            contrib.withdraw(resp, _(""" _("abstract withdrawn"): %s""")%comments)
+            contrib.withdraw(resp, i18nformat(""" _("abstract withdrawn"): %s""")%comments)
         AbstractStatus.withdraw(self,resp,comments)
 
 

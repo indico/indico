@@ -32,6 +32,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 class WGenericError( WTemplated ):
 
@@ -168,7 +169,7 @@ class WAccessError( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["area"]= _(""" _("Authorisation") - """)
+        vars["area"]= i18nformat(""" _("Authorisation") - """)
         vars["msg"] = _("The access to this page has been restricted by its owner and you are not authorised to view it")
         return vars
 
@@ -212,7 +213,7 @@ class WPAccessError( WPDecorated ):
             keys = sess.getVar("accessKeys")
             id = self._rh._target.getUniqueId()
             if keys != None and keys.has_key(id):
-                msg = _("""<font color=red> _("Bad access key")!</font>""")
+                msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
             else:
                 msg = ""
             wc = WAccessKeyError( self._rh, msg )
@@ -321,7 +322,7 @@ class WPModificationError( WPDecorated ):
             keys = sess.getVar("modifKeys")
             id = self._rh._target.getId()
             if keys != None and keys.has_key(id) and keys[id].strip()!="":
-                msg = _("""<font color=red> _("Wrong modification key!")</font>""")
+                msg = i18nformat("""<font color=red> _("Wrong modification key!")</font>""")
             else:
                 msg = ""
             wc = WModificationKeyError( self._rh, msg )

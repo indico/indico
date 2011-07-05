@@ -53,7 +53,7 @@ from xml.sax.saxutils import escape
 from MaKaC.common.utils import truncate
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.i18n import _, langList
+from indico.util.i18n import _, availableLocales
 
 from MaKaC.plugins import PluginsHolder
 from MaKaC.user import Group, Avatar
@@ -130,17 +130,17 @@ class RequestHandlerBase(OldObservable):
         # allow to choose the lang from params
         if params and 'lang' in params:
             newLang = params.get('lang', '')
-            for lang in langList():
-                if newLang.lower() == lang[0].lower():
-                    self._websession.setLang(lang[0])
+            for lang in availableLocales:
+                if newLang.lower() == lang.lower():
+                    self._websession.setLang(lang)
                     break
 
         lang=self._websession.getLang()
         Logger.get('i18n').debug("lang:%s"%lang)
         if lang is None:
             lang = "en_US"
-        from MaKaC import i18n
-        i18n.install('messages', lang, unicode=True)
+        from indico.util.i18n import setLocale
+        setLocale(lang)
 
     def getHostIP(self):
         hostIP = str(self._req.get_remote_ip())

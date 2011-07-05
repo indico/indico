@@ -63,6 +63,7 @@ from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
 from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 import MaKaC.webcast as webcast
 
 from MaKaC.common.fossilize import fossilize
@@ -354,7 +355,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             else:
                 itemList.insert(0, """<a href=%s>%s</a>"""%( quoteattr(str(item.getURL(self._navigationTarget))), wcomponents.WTemplated.htmlText(item.getTitle()) ) )
             item = item.getParent(self._navigationTarget)
-        itemList.insert(0, _("""<a href=%s> _("Home")</a>""")%quoteattr(str(urlHandlers.UHConferenceDisplay.getURL(self._conf))) )
+        itemList.insert(0, i18nformat("""<a href=%s> _("Home")</a>""")%quoteattr(str(urlHandlers.UHConferenceDisplay.getURL(self._conf))) )
         return " &gt; ".join(itemList)
 
     def _getToolBarHTML(self):
@@ -557,10 +558,10 @@ class ConfDisplayMenu:
             #    menuicon=Config.getInstance().getSystemIconURL("arrowRightMenuConf")
             if self._menu.isCurrentItem(link):
                 html = ["""<li id="menuLink_%s" class="menuConfSelected" nowrap><a href="%s"%s>%s</a>\n"""%
-                            (link.getName(), link.getURL(), target, link.getCaption())]
+                            (link.getName(), link.getURL(), target, _(link.getCaption()))]
             else:
                 html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a>\n"""%
-                            (link.getName(), link.getURL(), target, link.getCaption())]
+                            (link.getName(), link.getURL(), target, _(link.getCaption()))]
 
             if len(sublinkList) > 0:
                 html += """<ul class="inner">"""
@@ -572,11 +573,11 @@ class ConfDisplayMenu:
                 if self._menu.isCurrentItem(sublink):
                     html.append("""<li id="menuLink_%s" class="subMenuConfSelected" nowrap><a href="%s"%s>\
                             %s</a></li>\n"""\
-                            %(sublink.getName(), sublink.getURL(), target, sublink.getCaption()))
+                            %(sublink.getName(), sublink.getURL(), target, _(sublink.getCaption())))
                 else:
                     html.append( """<li id="menuLink_%s" class="menuConfMiddleCell" nowrap><a class="confSubSection" href="%s"%s>\
                             %s</a></li>"""%(sublink.getName(), sublink.getURL(), target,\
-                             sublink.getCaption()) )
+                             _(sublink.getCaption())) )
 
             if len(sublinkList) > 0:
                 html += "</ul>"
@@ -711,7 +712,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
                 l.append(self.htmlText(chair.getFullName()))
         res = ""
         if len(l) > 0:
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Chairs"):</b></td>
         <td>%s</td>
@@ -728,7 +729,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
                 l.append( temp.getHTML( self._aw, mat, url ) )
         res = ""
         if l:
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Material"):</b></td>
         <td align="left" width="100%%">%s</td>
@@ -742,7 +743,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         else:
             text = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._conf.getContactInfo()
         if self._conf.getContactInfo() != "":
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Additional info"):</b>
         </td>
@@ -753,7 +754,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
     def _getActionsHTML( self, showActions = False):
         html=[]
         if showActions:
-            html=[ _("""
+            html=[ i18nformat("""
                 <table style="padding-top:40px; padding-left:20px">
                 <tr>
                     <td nowrap>
@@ -802,7 +803,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
             room = self._conf.getRoom()
             if room:
                 roomLink = linking.RoomLinker().getHTMLLink( room, location )
-                vars["location"] += _("""<small> _("Room"):</small> %s""")%roomLink
+                vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
         vars["chairs"] = self._getChairsHTML()
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
@@ -1140,7 +1141,7 @@ class WConfProgramTrack(wcomponents.WTemplated):
             subtracks.append( "%s"%subtrack.getTitle() )
         vars["subtracks"] = ""
         if subtracks:
-            vars["subtracks"] = _("""<i> _("Sub-tracks")</i>: %s""")%", ".join( subtracks )
+            vars["subtracks"] = i18nformat("""<i> _("Sub-tracks")</i>: %s""")%", ".join( subtracks )
         return vars
 
 
@@ -1361,7 +1362,7 @@ class WConferenceRoomTimeTable(WConferenceTimeTable):
             legend=""
             roomhtml =[]
             if roomList !=[]:
-                roomhtml.append( _("""<td width="10" bgcolor="white"><font color="gray"> _("Room")</font></td>"""))
+                roomhtml.append( i18nformat("""<td width="10" bgcolor="white"><font color="gray"> _("Room")</font></td>"""))
                 for room in roomList:
                     if room != "":
                         roomhtml.append("""<td bgcolor="white" align="center">%s</td>"""%room)
@@ -1536,7 +1537,7 @@ class WConferenceSessionTimeTable(WConferenceTimeTable):
             legend=""
             sessionhtml =[]
             if sessionList !=[]:
-                sessionhtml.append( _("""<td width="10" bgcolor="white"><font color="gray"> _("session")</font></td>"""))
+                sessionhtml.append( i18nformat("""<td width="10" bgcolor="white"><font color="gray"> _("session")</font></td>"""))
                 for session in sessionList:
                     if session != "":
                         sessionhtml.append("""<td bgcolor="white" align="center">%s</td>"""%session)
@@ -1627,7 +1628,7 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
                 convenerList.append(convcapt)
         conveners = ""
         if len(convenerList) != 0:
-            conveners = _("""<tr>
+            conveners = i18nformat("""<tr>
                                 <td valign="top" align="left" style="color:%s"><b> _("Conveners"): </b></td>
                                 <td nowrap align="left" style="color:%s">
                                     %s
@@ -1638,7 +1639,7 @@ class WConferencePlainTimeTable(WConferenceTimeTable):
             materialList.append(material.getTitle())
         materials = ""
         if len(materialList) != 0:
-            materials = _("""<tr>
+            materials = i18nformat("""<tr>
                                 <td align="left" valign="top" style="color:%s"><b> _("Material"): </b></td>
                                 <td align="left" nowrap style="color:%s">
                                     %s
@@ -2707,7 +2708,7 @@ class WPBookingsModifDeleteConfirmation(WPConfModifBookingListBase):
         bks=[]
         for bk in self._bookingList:
             bks.append("<li><i>%s</i></li>"%self._conf.getBookingById(bk).getTitle())
-        msg= _(""" _("Are you sure you want to delete the following booking(s)")?<br><ul>%s</ul>
+        msg= i18nformat(""" _("Are you sure you want to delete the following booking(s)")?<br><ul>%s</ul>
         <font color="red">( _("note you will permanently remove the booking(s) and all its related information") )</font><br>""")%("".join(bks))
         url=urlHandlers.UHConfModifBookingPerformDeletion.getURL(self._conf)
         return wc.getHTML(msg,url,{"bookings":self._bookingList})
@@ -2744,7 +2745,7 @@ class WConfModifMainData(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         type = vars["type"]
-        defaultStyle = _("""--_("not set")--""")
+        defaultStyle = i18nformat("""--_("not set")--""")
         defStyle = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getDefaultStyle()
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         defaultStyle = styleMgr.getStylesheetName(defStyle)
@@ -2801,7 +2802,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["searchChairURL"]=quoteattr(str(urlHandlers.UHConfModifSelectChairs.getURL(self._conf)))
         vars["chairs"] = self._conf.getChairList()
         vars["supportEmailCaption"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption()
-        vars["supportEmail"] = _("""--_("not set")--""")
+        vars["supportEmail"] = i18nformat("""--_("not set")--""")
         if self._conf.hasSupportEmail():
             vars["supportEmail"] = self.htmlText(self._conf.getSupportEmail())
         typeList = []
@@ -2825,14 +2826,14 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["screenDatesURL"] = urlHandlers.UHConfScreenDatesEdit.getURL(self._conf)
         ssdate = self._conf.getAdjustedScreenStartDate().strftime("%A %d %B %Y %H:%M")
         if self._conf.getScreenStartDate() == self._conf.getStartDate():
-            ssdate += _(""" <i> _("(normal)")</i>""")
+            ssdate += i18nformat(""" <i> _("(normal)")</i>""")
         else:
-            ssdate += _(""" <font color='red'>_("(modified)")</font>""")
+            ssdate += i18nformat(""" <font color='red'>_("(modified)")</font>""")
         sedate = self._conf.getAdjustedScreenEndDate().strftime("%A %d %B %Y %H:%M")
         if self._conf.getScreenEndDate() == self._conf.getEndDate():
-            sedate += _(""" <i> _("(normal)")</i>""")
+            sedate += i18nformat(""" <i> _("(normal)")</i>""")
         else:
-            sedate += _(""" <font color='red'> _("(modified)")</font>""")
+            sedate += i18nformat(""" <font color='red'> _("(modified)")</font>""")
         vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
 
@@ -2940,7 +2941,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         selected = ""
         if visibility == 0:
             selected = "selected"
-        vis = [ _("""<option value="0" %s> _("Nowhere")</option>""") % selected]
+        vis = [ i18nformat("""<option value="0" %s> _("Nowhere")</option>""") % selected]
         while topcat:
             level += 1
             selected = ""
@@ -2953,7 +2954,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         selected = ""
         if visibility > level:
             selected = "selected"
-        vis.append( _("""<option value="999" %s> _("Everywhere")</option>""") % selected)
+        vis.append( i18nformat("""<option value="999" %s> _("Everywhere")</option>""") % selected)
         vis.reverse()
         return "".join(vis)
 
@@ -3054,7 +3055,7 @@ class WPModChairNew( WPConferenceModification ):
         caption= _("Adding a new chair")
         wc=wcomponents.WConfModParticipEdit(title=caption)
         params["postURL"]=urlHandlers.UHConfModChairNew.getURL(self._conf)
-        params["addToManagersList"] = _("""<tr>
+        params["addToManagersList"] = i18nformat("""<tr>
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat"> _("Manager")</span>
             </td>
@@ -3079,7 +3080,7 @@ class WPModChairEdit( WPConferenceModification ):
         params["postURL"]=urlHandlers.UHConfModChairEdit.getURL(chair)
         av = user.AvatarHolder().match({"email":chair.getEmail()})
         if (not av or not av[0] in self._conf.getManagerList()) and not chair.getEmail() in self._conf.getAccessController().getModificationEmail():
-            params["addToManagersList"] = _("""<tr>
+            params["addToManagersList"] = i18nformat("""<tr>
                 <td nowrap class="titleCellTD">
                     <span class="titleCellFormat">Manager</span>
                 </td>
@@ -3247,7 +3248,7 @@ class WPPConfModifScheduleRemoveEtries(WPConfModifSchedule):
 
     def _getTabContent(self,params):
         wc = wcomponents.WConfirmation()
-        msg = _(""" _("Are you sure you want to remove these entries from the time schedule")?<br/>
+        msg = i18nformat(""" _("Are you sure you want to remove these entries from the time schedule")?<br/>
         <br />
         <br />
         <table width="100%%" align="center">
@@ -3472,11 +3473,11 @@ class WPNewSessionConvenerNew( WPConferenceModifBase ):
             self._params["faxValue"] = ""
 
         self._params["disabledRole"] = False
-        self._params["roleDescription"] = _(""" _("Coordinator")<br> _("Manager")""")
-        self._params["roleValue"] = _(""" <input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").<br>
+        self._params["roleDescription"] = i18nformat(""" _("Coordinator")<br> _("Manager")""")
+        self._params["roleValue"] = i18nformat(""" <input type="checkbox" name="coordinatorControl"> _("Give coordinator rights to the convener").<br>
                                         <input type="checkbox" name="managerControl"> _("Give management rights to the convener").""")
         self._params["disabledNotice"] = True
-        self._params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
+        self._params["noticeValue"] = i18nformat("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given coordinator/management rights.")</i>""")
 
@@ -3546,7 +3547,7 @@ class WSchEditSlot(wcomponents.WTemplated):
     def _getConvenersHTML(self):
         res=[]
         for conv in self._slotData.getConvenerList():
-            tmp= _("""
+            tmp= i18nformat("""
                     <tr>
                         <td style="border-top:1px solid #777777;border-left:1px solid #777777;" width="100%%">
                             <input type="checkbox" name="sel_conv" value=%s>
@@ -3621,7 +3622,7 @@ class WSchEditSlot(wcomponents.WTemplated):
         else :
             vars["formTitle"] = _("Modify session slot schedule data")
             vars["updateParentDates"] = ""
-            vars["slotTitle"] = _("""
+            vars["slotTitle"] = i18nformat("""
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Slot Title")</span></td>
             <td bgcolor="white" width="100%%">&nbsp;%s</td>
@@ -3722,7 +3723,7 @@ class WSessionMoveConfirmation(wcomponents.WTemplated):
             vars["sHour"] = sd.hour
             vars["sMinute"] = sd.minute
         else:
-            vars["currentDate"]= _("""--_("no start date")--""")
+            vars["currentDate"]= i18nformat("""--_("no start date")--""")
             vars["sDay"] = "dd"
             vars["sMonth"] = "mm"
             vars["sYear"] = "yyyy"
@@ -3997,7 +3998,7 @@ class WPConfClosing(WPConfModifToolsBase):
         self._tabClose.setActive()
 
     def _getTabContent( self, params ):
-        msg = _("""
+        msg = i18nformat("""
         <font size="+2"> _("Are you sure that you want to LOCK the event") <i>"%s"</i>?</font><br>
         (_("Note that if you lock the event, you will not be able to change its details any more <br>Only the creator of the event or an administrator of the system/category can unlock an event"))
               """)%(self._conf.getTitle())
@@ -4012,7 +4013,7 @@ class WPConfDeletion( WPConfModifToolsBase ):
         self._tabDelete.setActive()
 
     def _getTabContent( self, params ):
-        msg = _("""
+        msg = i18nformat("""
         <font size="+2"> _("Are you sure that you want to DELETE the conference") <i>"%s"</i>?</font><br>( _("Note that if you delete the conference, all the items below it will also be deleted"))
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
@@ -4030,7 +4031,7 @@ class WPConfCloneConfirm( WPConfModifToolsBase ):
         self._tabCloneEvent.setActive()
 
     def _getTabContent( self, params ):
-        msg = _("""
+        msg = i18nformat("""
         <font size="+1"> _("This action will create %s new events. Are you sure you want to proceed")?</font>
               """)%self._nbClones
         wc = wcomponents.WConfirmation()
@@ -4060,31 +4061,31 @@ class WConferenceParticipants(wcomponents.WTemplated):
 
         vars["participants"] = self.getParticipantsList()
         vars["statisticAction"] = str(urlHandlers.UHConfModifParticipantsStatistics.getURL(self._conf))
-        vars["sendButton"] = _("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
-        vars["excelButton"] = _("""<input type="submit" class="btn" value="_("Export to Excel")" name="participantsAction"/>""")
+        vars["sendButton"] = i18nformat("""<input type="submit" class="btn" value="_("Send email to")" name="participantsAction" />""")
+        vars["excelButton"] = i18nformat("""<input type="submit" class="btn" value="_("Export to Excel")" name="participantsAction"/>""")
         vars["participantsAction"] = str(urlHandlers.UHConfModifParticipantsAction.getURL(self._conf))
         if nowutc() < self._conf.getStartDate() :
-            vars["inviteButton"] = _("""<input type="submit" class="btn" value="_("Invite participant")" />""")
+            vars["inviteButton"] = i18nformat("""<input type="submit" class="btn" value="_("Invite participant")" />""")
             vars["inviteAction"] = str(urlHandlers.UHConfModifParticipantsSelectToInvite.getURL(self._conf))
-            vars["addButton"] = _("""<input type="submit" class="btn" value="_("Add existing particitant")" />""")
+            vars["addButton"] = i18nformat("""<input type="submit" class="btn" value="_("Add existing particitant")" />""")
             vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
-            vars["sendAddedInfoButton"] = _("""<input type="submit" class="btn" value="_("Inform about adding")" name="participantsAction" />""")
+            vars["sendAddedInfoButton"] = i18nformat("""<input type="submit" class="btn" value="_("Inform about adding")" name="participantsAction" />""")
 
             vars["presenceButton"] = vars["absenceButton"] = vars["askButton"] = vars["excuseButton"] = ""
 
         else :
-            vars["absenceButton"] = _("""<input type="submit" class="btn" value="_("Mark absence")" name="participantsAction" />""")
-            vars["presenceButton"] = _("""<input type="submit" class="btn" value="_("Mark present")" name="participantsAction" />""")
-            vars["askButton"] = _("""<input type="submit" class="btn" value="_("Ask for excuse")" name="participantsAction" />""")
-            vars["excuseButton"] = _("""<input type="submit" class="btn" value="_("Excuse absence")" name="participantsAction" />""")
+            vars["absenceButton"] = i18nformat("""<input type="submit" class="btn" value="_("Mark absence")" name="participantsAction" />""")
+            vars["presenceButton"] = i18nformat("""<input type="submit" class="btn" value="_("Mark present")" name="participantsAction" />""")
+            vars["askButton"] = i18nformat("""<input type="submit" class="btn" value="_("Ask for excuse")" name="participantsAction" />""")
+            vars["excuseButton"] = i18nformat("""<input type="submit" class="btn" value="_("Excuse absence")" name="participantsAction" />""")
 
             vars["inviteButton"] = vars["inviteAction"] = ""
             vars["addButton"] = vars["addAction"] = ""
             vars["removeButton"] = vars["sendAddedInfoButton"] = ""
 
-        vars["addButton"] = _("""<input type="submit" class="btn" value="_("Search database")" />""")
+        vars["addButton"] = i18nformat("""<input type="submit" class="btn" value="_("Search database")" />""")
         vars["addAction"] = str(urlHandlers.UHConfModifParticipantsSelectToAdd.getURL(self._conf))
-        vars["removeButton"] = _("""<input type="submit" class="btn" value="_("Remove participant")" name="participantsAction" />""")
+        vars["removeButton"] = i18nformat("""<input type="submit" class="btn" value="_("Remove participant")" name="participantsAction" />""")
 
         vars["newParticipantURL"] = urlHandlers.UHConfModifParticipantsNewToAdd.getURL(self._conf)
 
@@ -4190,21 +4191,21 @@ class WConferenceParticipantsStatistics(wcomponents.WTemplated):
         if nowutc() < self.__conf.getStartDate() :
             vars["present"] = vars["absent"] = vars["excused"] = ""
         else :
-            vars["present"] = _("""
+            vars["present"] = i18nformat("""
             <tr>
                 <td class="titleCellFormat"> _("Present participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getPresentNumber()
 
-            vars["absent"] = _("""
+            vars["absent"] = i18nformat("""
             <tr>
                 <td class="titleCellFormat"> _("Absent participants") </td>
                 <td><b>%s</b></td>
             </tr>
             """)%self.__conf.getParticipation().getAbsentNumber()
 
-            vars["excused"] = _("""
+            vars["excused"] = i18nformat("""
             <tr>
                 <td class="titleCellFormat"> _("Excused participants") </td>
                 <td><b>%s</b></td>
@@ -4310,7 +4311,7 @@ class WPConfModifParticipantsInvite(WPConferenceDefaultDisplayBase):
         self._sectionMenu = None
 
     def _getBody( self, params ):
-        msg = _("""
+        msg = i18nformat("""
         _("Please indicate whether you want to accept or reject the invitation to the") <i>"%s"</i>?<br>
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
@@ -4327,7 +4328,7 @@ class WPConfModifParticipantsRefuse(WPConferenceDefaultDisplayBase):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
 
     def _getBody( self, params ):
-        msg = _("""
+        msg = i18nformat("""
         <font size="+2"> _("Are you sure you want to refuse to attend the "%s"")?</font>
               """)%(self._conf.getTitle())
         wc = wcomponents.WConfirmation()
@@ -4600,7 +4601,7 @@ class WPConfClone( WPConfModifToolsBase, OldObservable ):
                 "cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
                 "cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
                 "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-                "cloneOptions": _("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>
+                "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>
                                      <li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" />_("Full timetable")</li>
                                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                                      <li><input type="checkbox" name="cloneRegistration" id="cloneRegistration" value="1" >_("Registration")</li>
@@ -4680,7 +4681,7 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
             html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%sessionlist
             html = html + """<td valign="top"  class="abstractDataCell">%s</td>"""%actionsList
             html = html + """</tr>"""
-        html += _("""
+        html += i18nformat("""
                     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
                     <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
                     </form>
@@ -4815,7 +4816,7 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
                         contribtitle = self.htmlText(contribPart.getContribution().getTitle()) or "&nbsp;"
                         contribs.append("<b>- </b><a href=%s>%s</a>"%(url,contribtitle))
                 html.append("""<td valign="top"  class="abstractDataCell">%s</td></tr>"""%("<br>".join(contribs)))
-        html.append( _("""
+        html.append( i18nformat("""
                     <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
                     <tr><td colspan="3" align="left">&nbsp;<input type="submit" class="btn" value="_("Send an E-mail")" name="sendEmails"></td></tr>
                     </form>
@@ -5019,7 +5020,7 @@ class WSetAlarm(wcomponents.WTemplated):
         if selected=="":
             foundEmail=True
             selHTML="selected=\"selected\""
-        html=[ _("""<option value=\"\" %s>--_("select a from address")--</option>""")%selHTML]
+        html=[ i18nformat("""<option value=\"\" %s>--_("select a from address")--</option>""")%selHTML]
         for ch in self.__conf.getChairList():
             if ch.getEmail().strip()!="" and ch.getEmail().strip() not in emails:
                 selHTML=""
@@ -5112,9 +5113,9 @@ class WPConfAddAlarm( WPConfModifToolsBase ):
 
     def _getTabContent( self, params ):
         p = WSetAlarm( self._conf, self._getAW() )
-        testSendAlarm = _("""<input type="submit" class="btn" value="_("send this alarm email now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
+        testSendAlarm = i18nformat("""<input type="submit" class="btn" value="_("send this alarm email now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
         if self._rh._getUser():
-            testSendAlarm += _(""" <input type="submit" class="btn" value="_("send me this alarm email as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
+            testSendAlarm += i18nformat(""" <input type="submit" class="btn" value="_("send me this alarm email as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
         thisyear=datetime.today().year
         thismonth=datetime.today().month
         thisday=datetime.today().day
@@ -5249,23 +5250,23 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
         vars["formTitle"] = _("Modify alarm data")
 
         if self._alarm.getToAllParticipants() :
-            vars["toAllParticipants"] = _("""
+            vars["toAllParticipants"] = i18nformat("""
         <tr>
             <td>&nbsp;<input type="checkbox" name="toAllParticipants" checked="checked"></td>
             <td> _("Send alarm to all participants of the event.")</td>
         </tr>
         """)
         else :
-            vars["toAllParticipants"] = _("""
+            vars["toAllParticipants"] = i18nformat("""
         <tr>
             <td>&nbsp;<input type="checkbox" name="toAllParticipants" ></td>
             <td> _("Send alarm to all participants of the event.")</td>
         </tr>
         """)
 
-        testSendAlarm = _("""<input type="submit" class="btn" value="_("send this alarm now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
+        testSendAlarm = i18nformat("""<input type="submit" class="btn" value="_("send this alarm now")" onClick="this.form.action='%s';">""") % urlHandlers.UHSendAlarmNow.getURL( self._conf  )
         if self._rh._getUser():
-            testSendAlarm += _(""" <input type="submit" class="btn" value="_("send me this alarm as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
+            testSendAlarm += i18nformat(""" <input type="submit" class="btn" value="_("send me this alarm as a test")" onClick="this.form.action='%s';">""") % urlHandlers.UHTestSendAlarm.getURL( self._conf  )
 
         vars["testSendAlarm"] = testSendAlarm
         if self._alarm.getConfSummary():
@@ -5383,7 +5384,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                 urledit, \
                                 af.getName(), \
                                 addInfo))
-        laf.append( _("""
+        laf.append( i18nformat("""
     <tr>
       <td align="right" colspan="3">
         <input type="submit" value="_("remove")" onClick="this.form.action='%s';" class="btn">
@@ -5427,7 +5428,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
             icon = iconEnabled
         else:
             icon = iconDisabled
-        vars["miscOptions"] = _("""<a href="%s"><img src="%s" border="0"> _("Allow multiple tracks selection")</a>""") % (str(url), icon)
+        vars["miscOptions"] = i18nformat("""<a href="%s"><img src="%s" border="0"> _("Allow multiple tracks selection")</a>""") % (str(url), icon)
         url = urlHandlers.UHConfCFAMakeTracksMandatory.getURL(self._conf)
         if abMgr.areTracksMandatory():
             icon = iconEnabled
@@ -5447,7 +5448,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
             vars["announcement"] = abMgr.getAnnouncement()
             vars["disabled"] = ""
             modifDL = abMgr.getModificationDeadline()
-            vars["modifDL"] = _("""--_("not specified")--""")
+            vars["modifDL"] = i18nformat("""--_("not specified")--""")
             if modifDL:
                 vars["modifDL"] = modifDL.strftime("%A %d %B %Y")
             vars["submitters"] = wcomponents.WPrincipalTable().getHTML(\
@@ -5455,7 +5456,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
                             self._conf, \
                             urlHandlers.UHConfModifCFASelectSubmitter.getURL(),\
                             urlHandlers.UHConfModifCFARemoveSubmitter.getURL(), selectable=False)
-            vars["notification"] = _("""
+            vars["notification"] = i18nformat("""
                         <table align="left">
                             <tr>
                                 <td align="right"><b> _("To List"):</b></td>
@@ -5466,7 +5467,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                 <td align="left">%s</td>
                             </tr>
                         </table>
-                        """)%(", ".join(abMgr.getSubmissionNotification().getToList()) or _("""--_("no TO list")--"""), ", ".join(abMgr.getSubmissionNotification().getCCList()) or _("""--_("no CC list")--"""))
+                        """)%(", ".join(abMgr.getSubmissionNotification().getToList()) or i18nformat("""--_("no TO list")--"""), ", ".join(abMgr.getSubmissionNotification().getCCList()) or i18nformat("""--_("no CC list")--"""))
         else:
             vars["changeTo"] = "True"
             vars["status"] = _("DISABLED")
@@ -5762,7 +5763,7 @@ class WAbstracts( wcomponents.WTemplated ):
         field=self._filterCrit.getField("track")
         if field is not None and field.getShowNoValue():
             checked = " checked"
-        l = [ _("""<input type="checkbox" name="trackShowNoValue"%s> --_("not specified")--""")%checked]
+        l = [ i18nformat("""<input type="checkbox" name="trackShowNoValue"%s> --_("not specified")--""")%checked]
         for t in self._conf.getTrackList():
             checked = ""
             if field is not None and t.getId() in field.getValues():
@@ -5775,7 +5776,7 @@ class WAbstracts( wcomponents.WTemplated ):
         field=self._filterCrit.getField("type")
         if field is not None and field.getShowNoValue():
             checked = " checked"
-        l = [ _("""<input type="checkbox" name="typeShowNoValue"%s> --_("not specified")--""")%checked]
+        l = [ i18nformat("""<input type="checkbox" name="typeShowNoValue"%s> --_("not specified")--""")%checked]
         for contribType in self._conf.getContribTypeList():
             checked = ""
             if field is not None and contribType in field.getValues():
@@ -5788,7 +5789,7 @@ class WAbstracts( wcomponents.WTemplated ):
         field=self._filterCrit.getField("acc_track")
         if field is not None and field.getShowNoValue():
             checked = " checked"
-        l = [ _("""<input type="checkbox" name="accTrackShowNoValue"%s> --_("not specified")--""")%checked]
+        l = [ i18nformat("""<input type="checkbox" name="accTrackShowNoValue"%s> --_("not specified")--""")%checked]
         for t in self._conf.getTrackList():
             checked = ""
             if field is not None and t.getId() in field.getValues():
@@ -5801,7 +5802,7 @@ class WAbstracts( wcomponents.WTemplated ):
         field=self._filterCrit.getField("acc_type")
         if field is not None and field.getShowNoValue():
             checked = " checked"
-        l = [ _("""<input type="checkbox" name="accTypeShowNoValue"%s> --_("not specified")--""")%checked]
+        l = [ i18nformat("""<input type="checkbox" name="accTypeShowNoValue"%s> --_("not specified")--""")%checked]
         for contribType in self._conf.getContribTypeList():
             checked = ""
             if field is not None and contribType in field.getValues():
@@ -5831,8 +5832,8 @@ class WAbstracts( wcomponents.WTemplated ):
             checkedShowMultiple = " checked"
         if self._filterCrit.getField("comment") is not None:
             checkedShowComments = " checked"
-        l = [ _("""<input type="checkbox" name="trackShowMultiple"%s> _("only multiple tracks")""")%checkedShowMultiple,
-                _("""<input type="checkbox" name="comment"%s> _("only with comments")""")%checkedShowComments]
+        l = [ i18nformat("""<input type="checkbox" name="trackShowMultiple"%s> _("only multiple tracks")""")%checkedShowMultiple,
+                i18nformat("""<input type="checkbox" name="comment"%s> _("only with comments")""")%checkedShowComments]
         return l
 
     def _getFieldToShow(self):
@@ -5854,25 +5855,25 @@ class WAbstracts( wcomponents.WTemplated ):
     def _getAbstractTitleBar(self):
         l = ["<td></td>"]
         if self._fields["ID"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href=%(numberSortingURL)s> _("ID")</a> %(numberImg)s</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;"><a href=%(numberSortingURL)s> _("ID")</a> %(numberImg)s</td>"""))
         #if self._fields["Title"] == "checked":
-        l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Title")</td>"""))
+        l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Title")</td>"""))
         if self._fields["PrimaryAuthor"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Primary Author(s)")</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Primary Author(s)")</td>"""))
         if self._fields["Tracks"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Tracks")</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Tracks")</td>"""))
         if self._fields["Type"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(typeSortingURL)s> _("Type")</a> %(typeImg)s</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(typeSortingURL)s> _("Type")</a> %(typeImg)s</td>"""))
         if self._fields["Status"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(statusSortingURL)s> _("Status")</a><b> %(statusImg)s</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(statusSortingURL)s> _("Status")</a><b> %(statusImg)s</td>"""))
         if self._fields["Rating"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(ratingSortingURL)s> _("Rating")</a><b> %(ratingImg)s</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(ratingSortingURL)s> _("Rating")</a><b> %(ratingImg)s</td>"""))
         if self._fields["AccTrack"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Track")</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Track")</td>"""))
         if self._fields["AccType"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Type")</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"> _("Acc. Type")</td>"""))
         if self._fields["SubmissionDate"][1] == "checked":
-            l.append( _("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(dateSortingURL)s> _("Submission date")</a> %(dateImg)s</td>"""))
+            l.append( i18nformat("""<td nowrap class="titleCellFormat" style="border-bottom: 1px solid #888;border-right:5px solid #FFFFFF"><a href=%(dateSortingURL)s> _("Submission date")</a> %(dateImg)s</td>"""))
 
         return "<tr><td colspan=4 style='padding: 5px 0px 10px;' nowrap>Select: <a style='color: #0B63A5;' alt='Select all' onclick='javascript:selectAll()'> All</a>, <a style='color: #0B63A5;' alt='Unselect all' onclick='javascript:deselectAll()'>None</a></td></tr><tr><td></td></tr><tr>%s</tr>"%("\n".join(l))
 
@@ -5908,7 +5909,7 @@ class WAbstracts( wcomponents.WTemplated ):
 
         extraInfo = ""
         if self._conf.getRegistrationForm().getStatusesList():
-            extraInfo = _("""<table align="center" cellspacing="10" width="100%%">
+            extraInfo = i18nformat("""<table align="center" cellspacing="10" width="100%%">
                                 <tr>
                                     <td colspan="5" class="titleCellFormat"> _("Author search") <input type="text" name="authSearch" value=%s></td>
                                 </tr>
@@ -6007,7 +6008,7 @@ class WAbstracts( wcomponents.WTemplated ):
             s=abstract.getCurrentStatus()
             comments = ""
             if abstract.getComments():
-                comments = _(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
+                comments = i18nformat(""" <img src=%s alt="_("The submitter filled some comments")">""")%(quoteattr(Config.getInstance().getSystemIconURL("comments")))
             accTrack,accType="&nbsp;","&nbsp;"
             urlGen=urlHandlers.UHCFAAbstractManagment.getURL
 
@@ -6126,7 +6127,7 @@ class WPModNewAbstract(WPConfAbstractList):
     def _getTabContent( self, params ):
         wc=wcomponents.WConfModAbstractEditData(self._conf,self._abstractData)
         p={"postURL": urlHandlers.UHConfModNewAbstract.getURL(self._conf)}
-        return _("""
+        return i18nformat("""
             <table width="95%%" cellpadding="0" cellspacing="0" align="center" border="0" style="border-left: 1px solid #777777">
             <tr>
             <td class="groupTitle">
@@ -6294,7 +6295,7 @@ class WConfModifDisplayCustom(wcomponents.WTemplated):
         vars["logoIconURL"] = Config.getInstance().getSystemIconURL("logo")
         if vars["logoURL"]:
             vars["logo"] = """<img heigth=\"95\" width=\"150\" src="%s" alt="%s" border="0">"""%(vars["logoURL"], self._conf.getTitle())
-            vars["removeLogo"] = _("""<form action=%s method="POST"><input type="submit" class="btn" value="_("remove")"></form>""")%quoteattr(str(urlHandlers.UHRemoveLogo.getURL(self._conf)))
+            vars["removeLogo"] = i18nformat("""<form action=%s method="POST"><input type="submit" class="btn" value="_("remove")"></form>""")%quoteattr(str(urlHandlers.UHRemoveLogo.getURL(self._conf)))
         else:
             vars["logo"] = "<em>No logo has been saved for this conference</em>"
             vars["removeLogo"] = ""
@@ -6389,7 +6390,7 @@ class WConfModifDisplayMenu(wcomponents.WTemplated):
                         "imageDownURL": quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))) }
                 vars["linkEdition"] = WPageLinkModif(self._link).getHTML(p)
         else:
-            vars["linkEdition"] = _("""<center><b> _("Click on an item of the menu to edit it")</b></center>""")
+            vars["linkEdition"] = i18nformat("""<center><b> _("Click on an item of the menu to edit it")</b></center>""")
 
         return vars
 
@@ -6482,7 +6483,7 @@ class WConfModifDisplayConfHeader(wcomponents.WTemplated):
         if not vars.has_key("modifiedText"):
             vars["modifiedText"]=""
         else:
-            vars["modifiedText"]= _("""<font color="green"> _("(text saved)")</font>""")
+            vars["modifiedText"]= i18nformat("""<font color="green"> _("(text saved)")</font>""")
 
         #enable or disable the contribution search feature
         urlSB=urlHandlers.UHConfModifToggleSearch.getURL(self._conf)
@@ -6552,7 +6553,7 @@ class ConfEditMenu:
 
     def _getLinkHTML(self, link, indent=""):
         if self._menu.linkHasToBeDisplayed(link):
-            disabled = _("""<font size="-1" color="red"> _("(disabled)")</font>""")
+            disabled = i18nformat("""<font size="-1" color="red"> _("(disabled)")</font>""")
             if link.isEnabled():
                 disabled = ""
             if link.getType() == "spacer":
@@ -6851,7 +6852,7 @@ class WPConfModifDisplayRemoveLink( WPConfModifDisplayBase ):
         self._tabDisplayMenu.setActive()
 
     def _getTabContent( self, params ):
-        msg = _("""<font size=\"+2\"> _("Are you sure that you want to DELETE the link") \"%s\"</font><br>( _("Note that if you delete the link, all the links below it will also be deleted"))""")%self._link.getName()
+        msg = i18nformat("""<font size=\"+2\"> _("Are you sure that you want to DELETE the link") \"%s\"</font><br>( _("Note that if you delete the link, all the links below it will also be deleted"))""")%self._link.getName()
         postURL = quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link)))
         return wcomponents.WConfirmation().getHTML( msg, postURL, {})
         #wc = WConfModifDisplayRemoveLink( self._conf, link )
@@ -7029,7 +7030,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         checked=""
         if self._filterCrit.getField("type").getShowNoValue():
             checked=" checked"
-        res=[ _("""<input type="checkbox" name="typeShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
+        res=[ i18nformat("""<input type="checkbox" name="typeShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
         for t in self._conf.getContribTypeList():
             checked=""
             if t.getId() in self._filterCrit.getField("type").getValues():
@@ -7041,7 +7042,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         checked=""
         if self._filterCrit.getField("session").getShowNoValue():
             checked=" checked"
-        res=[ _("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
+        res=[ i18nformat("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
         for s in self._conf.getSessionListSorted():
             checked=""
             l = self._filterCrit.getField("session").getValues()
@@ -7056,7 +7057,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         checked=""
         if self._filterCrit.getField("track").getShowNoValue():
             checked=" checked"
-        res=[ _("""<input type="checkbox" name="trackShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
+        res=[ i18nformat("""<input type="checkbox" name="trackShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
         for t in self._conf.getTrackList():
             checked=""
             if t.getId() in self._filterCrit.getField("track").getValues():
@@ -7080,7 +7081,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         res=[]
         for (id,caption) in [(PaperFactory().getId(),PaperFactory().getTitle()),\
                         (SlidesFactory().getId(),SlidesFactory().getTitle()),\
-                        ("--other--", _("other")),("--none--", _("""--_("no material")--"""))]:
+                        ("--other--", _("other")),("--none--", i18nformat("""--_("no material")--"""))]:
             checked=""
             if id in self._filterCrit.getField("material").getValues():
                 checked=" checked"
@@ -7102,7 +7103,7 @@ class WConfModifContribList(wcomponents.WTemplated):
                         "options": self._getMaterialItemsHTML()})
         ]
 
-        extraInfo = _("""<table align="center" cellspacing="10" width="100%%">
+        extraInfo = i18nformat("""<table align="center" cellspacing="10" width="100%%">
                             <tr>
                                 <td colspan="5" class="titleCellFormat"> _("Author search") <input type="text" name="authSearch" value=%s></td>
                             </tr>
@@ -7132,7 +7133,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url.addParam("sortBy","number")
         vars["numberImg"]=""
         if self._currentSorting == "number":
-                vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("number")">""")
+                vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("number")">""")
                 if self._order == "down":
                     vars["numberImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                     url.addParam("order","up")
@@ -7145,7 +7146,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url.addParam("sortBy", "date")
         vars["dateImg"] = ""
         if self._currentSorting == "date":
-            vars["currentSorting"]= _("""<input type="hidden" name="sortBy" value="_("date")">""")
+            vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("date")">""")
             if self._order == "down":
                 vars["dateImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -7159,7 +7160,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url.addParam("sortBy", "name")
         vars["titleImg"] = ""
         if self._currentSorting == "name":
-            vars["currentSorting"]= _("""<input type="hidden" name="sortBy" value="_("name")">""")
+            vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("name")">""")
             if self._order == "down":
                 vars["titleImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -7173,7 +7174,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url.addParam("sortBy", "type")
         vars["typeImg"] = ""
         if self._currentSorting == "type":
-            vars["currentSorting"]= _("""<input type="hidden" name="sortBy" value="_("type")">""")
+            vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("type")">""")
             if self._order == "down":
                 vars["typeImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -7185,7 +7186,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url.addParam("sortBy", "session")
         vars["sessionImg"] = ""
         if self._currentSorting == "session":
-            vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value='_("session")'>""")
+            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value='_("session")'>""")
             if self._order == "down":
                 vars["sessionImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -7197,7 +7198,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url.addParam("sortBy", "speaker")
         vars["speakerImg"]=""
         if self._currentSorting=="speaker":
-            vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("speaker")">""")
+            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("speaker")">""")
             if self._order == "down":
                 vars["speakerImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -7210,7 +7211,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url.addParam("sortBy","track")
         vars["trackImg"] = ""
         if self._currentSorting == "track":
-            vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("track")">""")
+            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("track")">""")
             if self._order == "down":
                 vars["trackImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -7565,7 +7566,7 @@ class WContributionSchCreation(WContributionCreation):
         vars["presenterFreeText"] = ""
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
         if vars.get("eventType","conference") != "conference":
-            vars["presenterFreeText"] = _("""
+            vars["presenterFreeText"] = i18nformat("""
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Presenter (free text)")</span></td>
             <td bgcolor="white" width="100%%">&nbsp;
@@ -7573,14 +7574,14 @@ class WContributionSchCreation(WContributionCreation):
             </td>
         </tr>""")
         if vars.get("eventType","conference") == "conference" :
-            vars["typeModule"] = _("""
+            vars["typeModule"] = i18nformat("""
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Type")</span></td>
             <td bgcolor="white" width="100%%">&nbsp;
                 <select name="type">%s</select></td>
         </tr>
         """)%vars["type"]
-            vars["boardModule"] = _("""
+            vars["boardModule"] = i18nformat("""
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Board #")</span></td>
             <td bgcolor="white" width="100%%">&nbsp;
@@ -7733,12 +7734,12 @@ class WPNewContributionAuthorNew( WPConferenceModifBase ):
         self._params["disabledRole"] = False
         self._params["roleDescription"] = _("""Submitter""")
         #if self._params.has_key("submissionControlValue"):
-        #    self._params["submissionValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED> _("Give submission rights to the presenter").""")
+        #    self._params["submissionValue"] = i18nformat(""" <input type="checkbox" name="submissionControl" CHECKED> _("Give submission rights to the presenter").""")
         #else:
         #    self._params["submissionValue"] = """ <input type="checkbox" name="submissionControl"> Give submission rights to the presenter."""
-        self._params["roleValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
+        self._params["roleValue"] = i18nformat(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
         self._params["disabledNotice"] = False
-        self._params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
+        self._params["noticeValue"] = i18nformat("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given submission rights.")</i>""")
 
@@ -7811,7 +7812,7 @@ class WPNewContributionCoauthorNew( WPConferenceModifBase ):
         #    self._params["submissionValue"] = """ <input type="checkbox" name="submissionControl" CHECKED> Give submission rights to the presenter."""
         #else:
         #    self._params["submissionValue"] = """ <input type="checkbox" name="submissionControl"> Give submission rights to the presenter."""
-        self._params["roleValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
+        self._params["roleValue"] = i18nformat(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
         self._params["disabledNotice"] = False
         self._params["noticeValue"] = """<i><font color="black"><b>Note: </b></font>If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the
@@ -7884,11 +7885,11 @@ class WPNewContributionPresenterNew( WPConferenceModifBase ):
         self._params["disabledRole"] = False
         self._params["roleDescription"] = """Submitter"""
         #if self._params.has_key("submissionControlValue"):
-        self._params["roleValue"] = _(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
+        self._params["roleValue"] = i18nformat(""" <input type="checkbox" name="submissionControl" CHECKED onchange="if (!this.checked){this.form.warning_email.type='hidden';}  else {if(this.form.email.value.length==0){this.form.warning_email.type='text'}else{this.form.warning_email.type='hidden';}}"> _("Give submission rights to the presenter").""")
         #else:
         #    self._params["roleValue"] = """ <input type="checkbox" name="submissionControl"> Give submission rights to the presenter."""
         self._params["disabledNotice"] = False
-        self._params["noticeValue"] = _("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
+        self._params["noticeValue"] = i18nformat("""<i><font color="black"><b>_("Note"): </b></font>_("If this person does not already have
          an Indico account, he or she will be sent an email asking to create an account. After the account creation the
          user will automatically be given submission rights.")</i>""")
 
@@ -8189,7 +8190,7 @@ class WPAbstractSendNotificationMail(WPConferenceBase):
         self._count = count
 
     def _getBody( self, params ):
-        return _("""
+        return i18nformat("""
 <table align="center"><tr><td align="center">
 <b> _("The submitters of the selected abstracts will nearly recieve the notification mail").<br>
 <br>
@@ -8356,7 +8357,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         checked = ""
         if self._filterCrit.getField("type").getShowNoValue():
             checked = " checked"
-        l = [ _("""<input type="checkbox" name="typeShowNoValue"%s> --_("not specified")--""")%checked]
+        l = [ i18nformat("""<input type="checkbox" name="typeShowNoValue"%s> --_("not specified")--""")%checked]
         for type in self._conf.getContribTypeList():
             checked = ""
             if type.getId() in self._filterCrit.getField("type").getValues():
@@ -8368,7 +8369,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         checked = ""
         if self._filterCrit.getField("track").getShowNoValue():
             checked = " checked"
-        l = [ _("""<input type="checkbox" name="trackShowNoValue"%s> --_("not specified")--""")%checked]
+        l = [ i18nformat("""<input type="checkbox" name="trackShowNoValue"%s> --_("not specified")--""")%checked]
         for t in self._conf.getTrackList():
             checked = ""
             if t.getId() in self._filterCrit.getField("track").getValues():
@@ -8380,7 +8381,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         checked = ""
         if self._filterCrit.getField("session").getShowNoValue():
             checked = " checked"
-        l = [ _("""<input type="checkbox" name="sessionShowNoValue"%s> --_("not specified")--""")%checked]
+        l = [ i18nformat("""<input type="checkbox" name="sessionShowNoValue"%s> --_("not specified")--""")%checked]
         for s in self._conf.getSessionListSorted():
             checked = ""
             if s.getCode() != "no code":
@@ -8397,10 +8398,10 @@ class WConfContributionList ( wcomponents.WTemplated ):
         vars["types"] = vars["tracks"] = ""
         vars["typeFilterHeader"] = vars["trackFilterHeader"] = ""
         if self._displayTypeFilter:
-            vars["typeFilterHeader"] = _("""<td align="center" class="titleCellFormat" style="padding-right:10px"> _("show contribution types")</td>""")
+            vars["typeFilterHeader"] = i18nformat("""<td align="center" class="titleCellFormat" style="padding-right:10px"> _("show contribution types")</td>""")
             vars["types"] = """<td valign="top" style="border-right:1px solid #777777;">%s</td>""" % "<br>".join( self._getTypeFilterItemList() )
         if self._displayTrackFilter:
-            vars["trackFilterHeader"] = _("""<td align="center" class="titleCellFormat"> _("show tracks")</td>""")
+            vars["trackFilterHeader"] = i18nformat("""<td align="center" class="titleCellFormat"> _("show tracks")</td>""")
             vars["tracks"] = """<td valign="top">%s</td>""" % "<br>".join( self._getTrackFilterItemList() )
         vars["sessions"] = "<br>".join( self._getSessionFilterItemList() )
         l = []
@@ -8459,7 +8460,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         url.addParam("sc",(num-self._displayContribs))
         if sortingField and sortingField.getId() == "number":
 
-            vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("number")">""")
+            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("number")">""")
             if self._order == "down":
                 vars["numberImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -8474,7 +8475,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         url.addParam("sc",(num-self._displayContribs))
         if sortingField and sortingField.getId() == "date":
 
-            vars["currentSorting"]= _("""<input type="hidden" name="sortBy" value="_("date")">""")
+            vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("date")">""")
             if self._order == "down":
                 vars["dateImg"]="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -8489,7 +8490,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
             typeImg = ""
             url.addParam("sc",(num-self._displayContribs))
             if sortingField and sortingField.getId() == "type":
-                vars["currentSorting"]= _("""<input type="hidden" name="sortBy" value="_("type")">""")
+                vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("type")">""")
                 if self._order == "down":
                     typeImg="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                     url.addParam("order","up")
@@ -8520,7 +8521,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         vars["speakerImg"] = ""
         url.addParam("sc",(num-self._displayContribs))
         if sortingField and sortingField.getId() == "speaker":
-            vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("speaker")">""")
+            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("speaker")">""")
             if self._order == "down":
                 vars["speakerImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -8534,7 +8535,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
         vars["sessionImg"] = ""
         url.addParam("sc",(num-self._displayContribs))
         if sortingField and sortingField.getId() == "session":
-            vars["currentSorting"] = _("""<input type="hidden" name="sortBy" value="_("session")">""")
+            vars["currentSorting"] = i18nformat("""<input type="hidden" name="sortBy" value="_("session")">""")
             if self._order == "down":
                 vars["sessionImg"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
@@ -8549,7 +8550,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
             trackImg = ""
             url.addParam("sc",(num-self._displayContribs))
             if sortingField and sortingField.getId() == "track":
-                vars["currentSorting"]= _("""<input type="hidden" name="sortBy" value="_("track")">""")
+                vars["currentSorting"]= i18nformat("""<input type="hidden" name="sortBy" value="_("track")">""")
                 if self._order == "down":
                     trackImg="""<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                     url.addParam("order","up")
@@ -8557,7 +8558,7 @@ class WConfContributionList ( wcomponents.WTemplated ):
                     trackImg="""<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
             trackSortingURL = quoteattr( str( url ) )
-            vars["trackHeader"] = _("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> %s<a href=%s> _("Track")</a></td>""") % (trackImg,trackSortingURL)
+            vars["trackHeader"] = i18nformat("""<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;"> %s<a href=%s> _("Track")</a></td>""") % (trackImg,trackSortingURL)
         else:
             vars["trackHeader"] = ""
 
@@ -9149,9 +9150,9 @@ class WFullMaterialPackage(wcomponents.WTemplated):
         if len(self._conf.getSessionList()) == 0:
             vars["sessionList"] = "No session in this event"
         for session in self._conf.getSessionList():
-            vars["sessionList"] += _("""
+            vars["sessionList"] += i18nformat("""
                  <input name="sessionList" type="checkbox" value="%s" checked="checked">%s _("(last modified: %s)")<br>""") % (session.getId(),session.getTitle(),session.getModificationDate().strftime("%d %B %Y %H:%M"))
-        vars["materialType"] = _("""
+        vars["materialType"] = i18nformat("""
                                 <tr>
             <td>
                 <input name="materialType" type="checkbox" value="paper" checked="checked"> _("Papers")
@@ -9228,7 +9229,7 @@ class WConfStaticDetails( wcomponents.WTemplated ):
             l.append( """<a href=%s>%s</a>"""%(quoteattr(mailToURL),self.htmlText(chair.getFullName())))
         res = ""
         if len(l) > 0:
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Chairs"):</b></td>
         <td>%s</td>
@@ -9244,7 +9245,7 @@ class WConfStaticDetails( wcomponents.WTemplated ):
             l.append( temp.getHTML( self._aw, mat, url, self._staticPars["material"] ) )
         res = ""
         if l:
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Material"):</b></td>
         <td align="left" width="100%%">%s</td>
@@ -9254,7 +9255,7 @@ class WConfStaticDetails( wcomponents.WTemplated ):
     def _getMoreInfoHTML( self ):
         res = ""
         if self._conf.getContactInfo() != "":
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Additional info"):</b>
         </td>
@@ -9265,7 +9266,7 @@ class WConfStaticDetails( wcomponents.WTemplated ):
     def _getActionsHTML( self, showActions = False):
         html=[]
         if showActions:
-            html=[ _("""
+            html=[ i18nformat("""
                 <table style="padding-top:40px; padding-left:20px">
                 <tr>
                     <td nowrap>
@@ -9305,7 +9306,7 @@ class WConfStaticDetails( wcomponents.WTemplated ):
             room = self._conf.getRoom()
             if room:
                 roomLink = linking.RoomLinker().getHTMLLink( room, location )
-                vars["location"] += _("""<small> _("Room"):</small> %s""")%roomLink
+                vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
         vars["chairs"] = self._getChairsHTML()
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
@@ -9365,10 +9366,10 @@ class ConfStaticDisplayMenu:
             if self._menu.isCurrentItem(link):
                 url="%s%s"%(parentDir, link.getStaticURL())
                 html = ["""<li id="menuLink_%s" class="menuConfSelected" nowrap><a href="%s"%s>%s</a></li>\n"""%(sublink.getName(), url, target, \
-                         link.getCaption())]
+                         _(link.getCaption()))]
             else:
                 url="%s%s"%(parentDir, link.getStaticURL())
-                html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a></li>\n"""%(sublink.getName(), url, target, link.getCaption())]
+                html = ["""<li id="menuLink_%s" class="menuConfTitle" nowrap><a class="confSection" href="%s"%s>%s</a></li>\n"""%(sublink.getName(), url, target, _(link.getCaption()+'aa'))]
 
             for sublink in sublinkList:
                 target = ""
@@ -9378,12 +9379,12 @@ class ConfStaticDisplayMenu:
                     url="%s%s"%(parentDir, sublink.getStaticURL())
                     html.append("""<li id="menuLink_%s" class="menuConfSelected" nowrap><a href="%s"%s>\
                             %s</a></li>\n"""\
-                            %(sublink.getName(), url, target,  sublink.getCaption()))
+                            %(sublink.getName(), url, target,  _(sublink.getCaption())))
                 else:
                     url="%s%s"%(parentDir, sublink.getStaticURL())
                     html.append( """<li id="menuLink_%s" class="menuConfMiddleCell" nowrap><a class="confSubSection" href="%s"%s>\
                             <img border="0" src="%s" alt="">&nbsp;%s</a></li>"""%(sublink.getName(), url, target,\
-                            params["bulletMenuConf"], sublink.getCaption()) )
+                            params["bulletMenuConf"], _(sublink.getCaption()) ))
         return "".join(html)
 
 class WConfStaticDisplayFrame(wcomponents.WTemplated):
@@ -9428,7 +9429,7 @@ class WConfStaticDisplayFrame(wcomponents.WTemplated):
         vars["supportEmail"] = ""
         if self._conf.hasSupportEmail():
             mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
-            vars["supportEmail"] = _("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> _("support")</a>""")%(mailto, self._staticPars["smallEmail"] )
+            vars["supportEmail"] = i18nformat("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> _("support")</a>""")%(mailto, self._staticPars["smallEmail"] )
         p=self._staticPars
         p["supportEmail"] = vars["supportEmail"]
         menuList = self._getMenuList(["overview", "programme", "timetable", "contributionList", "authorIndex", "abstractsBook"])
@@ -9469,7 +9470,7 @@ class WConfStaticProgramTrack(wcomponents.WTemplated):
             subtracks.append( "%s"%subtrack.getTitle() )
         vars["subtracks"] = ""
         if subtracks:
-            vars["subtracks"] = _("""<i> _("Sub-tracks") </i>: %s""")%", ".join( subtracks )
+            vars["subtracks"] = i18nformat("""<i> _("Sub-tracks") </i>: %s""")%", ".join( subtracks )
         return vars
 
 class WConfStaticProgram(wcomponents.WTemplated):
@@ -9767,7 +9768,7 @@ class WContributionStaticDisplay(wcomponents.WTemplated):
         vars["title"] = self.htmlText(self._contrib.getTitle())
         vars["description"] = self._contrib.getDescription()
         vars["id"]=self.htmlText(self._contrib.getId())
-        vars["startDate"] = _("""--_("not yet scheduled")--""")
+        vars["startDate"] = i18nformat("""--_("not yet scheduled")--""")
         vars["startTime"] = ""
         if self._contrib.isScheduled():
             vars["startDate"]=self.htmlText(self._contrib.getAdjustedStartDate().strftime("%d-%b-%Y"))
@@ -9781,7 +9782,7 @@ class WContributionStaticDisplay(wcomponents.WTemplated):
         room=self._contrib.getRoom()
         if room is not None:
             roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= _("""%s <small> _("Room"):</small> %s""")%(\
+            vars["location"]= i18nformat("""%s <small> _("Room"):</small> %s""")%(\
                 vars["location"],roomLink)
         vars["location"]=self._getHTMLRow( _("Place"),vars["location"])
         l=[]
@@ -10084,7 +10085,7 @@ class WPMMaterialStaticDisplay( WPStaticMeetingBase ):
         padding=""" style="padding:0px" """
         urlIndex=str(urlHandlers.UHStaticConferenceDisplay.getRelativeURL())
         urlIndex="%s/%s"%(self.getRootDir(self._material), urlIndex)
-        body = _("""
+        body = i18nformat("""
                 <div class="confBodyBox clearfix" %s %s>
                     %s
                     <table border="0" cellpadding="0" cellspacing="0"
@@ -10236,11 +10237,11 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
                                         refDay.getDate().strftime("%d%B%Y") :
                 timeInterval = ""
             else:
-                timeInterval = _("""<br>(%s_("until") %s)""")%(room, eDate.strftime("%H:%M"))
+                timeInterval = i18nformat("""<br>(%s_("until") %s)""")%(room, eDate.strftime("%H:%M"))
         else:
             if session.getAdjustedEndDate().strftime("%d%B%Y") != \
                                         refDay.getDate().strftime("%d%B%Y") :
-                timeInterval = _("""<br>(%s_("from") %s)""")%(room, sDate.strftime("%H:%M"))
+                timeInterval = i18nformat("""<br>(%s_("from") %s)""")%(room, sDate.strftime("%H:%M"))
 
         #################################
         # Fermi timezone awareness(end)   #
@@ -10250,7 +10251,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
         for conv in session.getConvenerList():
             l.append("""%s"""%(self.htmlText(conv.getDirectFullName())))
         if len(l)>0:
-            conveners= _("""<br><small> _("Conveners"): %s</small>""")%"; ".join(l)
+            conveners= i18nformat("""<br><small> _("Conveners"): %s</small>""")%"; ".join(l)
         title = self.htmlText(session.getSession().getTitle())
         if session.getTitle().strip() != "":
             title = "%s: %s"%(title, session.getTitle())
@@ -10311,7 +10312,7 @@ class WConferenceStaticTimeTable(wcomponents.WTemplated):
             session = self._conf.getSessionById( sessionId )
             str = self._getColorLegendItemHTML(\
                                     self._sessionColorMap[ sessionId ],\
-                                    _(""" _("Session"): <i>%s </i>""")%session.getTitle())
+                                    i18nformat(""" _("Session"): <i>%s </i>""")%session.getTitle())
             l.append( str )
         return html%" - ".join( l )
 
@@ -10506,7 +10507,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
             speakerList.append(spk.getDirectFullName())
         speakers =""
         if speakerList != []:
-            speakers = _("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
+            speakers = i18nformat("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
         linkColor=""
         if contrib.getSession().isTextColorToLinks():
             linkColor="color:%s"%contrib.getSession().getTextColor()
@@ -10667,7 +10668,7 @@ class WSessionStaticDisplay(wcomponents.WTemplated):
         room = self._session.getRoom()
         if room is not None:
             roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= _("""%s<br><small> _("Room"):</small> %s""")%(vars["location"],
+            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(vars["location"],
                                                             roomLink)
         vars["location"]=self._getHTMLRow("Place", vars["location"])
 
@@ -10939,7 +10940,7 @@ class WPConfModifPendingQueuesRemoveSubmConfirm( WPConfModifPendingQueuesBase ):
         pss=[]
         for i in self._pendingSubms:
            pss.append("""<li>%s</li>"""%i)
-        msg= _(""" _("Are you sure you want to delete the following participants pending to become submitters")?<br>
+        msg= i18nformat(""" _("Are you sure you want to delete the following participants pending to become submitters")?<br>
         <ul>
         %s
         </ul>
@@ -10958,7 +10959,7 @@ class WPConfModifPendingQueuesReminderSubmConfirm( WPConfModifPendingQueuesBase 
         pss=[]
         for i in self._pendingSubms:
            pss.append("""<li>%s</li>"""%i)
-        msg= _(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
+        msg= i18nformat(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
         <ul>
         %s
         </ul>
@@ -10977,7 +10978,7 @@ class WPConfModifPendingQueuesRemoveMgrConfirm( WPConfModifPendingQueuesBase ):
         pss=[]
         for i in self._pendingMgrs:
            pss.append("""<li>%s</li>"""%i)
-        msg= _(""" _("Are you sure you want to delete the following conveners pending to become managers")?<br>
+        msg= i18nformat(""" _("Are you sure you want to delete the following conveners pending to become managers")?<br>
         <ul>
         %s
         </ul>
@@ -10996,7 +10997,7 @@ class WPConfModifPendingQueuesReminderMgrConfirm( WPConfModifPendingQueuesBase )
         pss=[]
         for i in self._pendingMgrs:
            pss.append("""<li>%s</li>"""%i)
-        msg= _(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
+        msg= i18nformat(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
         <ul>
         %s
         </ul>
@@ -11015,7 +11016,7 @@ class WPConfModifPendingQueuesRemoveCoordConfirm( WPConfModifPendingQueuesBase )
         pss=[]
         for i in self._pendingCoords:
            pss.append("""<li>%s</li>"""%i)
-        msg= _(""" _("Are you sure you want to delete the following conveners pending to become coordinators")?<br>
+        msg= i18nformat(""" _("Are you sure you want to delete the following conveners pending to become coordinators")?<br>
         <ul>
         %s
         </ul>
@@ -11034,7 +11035,7 @@ class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase
         pss=[]
         for i in self._pendingCoords:
            pss.append("""<li>%s</li>"""%i)
-        msg= _(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
+        msg= i18nformat(""" _("Please confirm that you want to send an email with the reminder to create an account in Indico")?<br><br> _("The email will be sent to"):<br>
         <ul>
         %s
         </ul>
@@ -11111,7 +11112,7 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
             l.append( """<a href=%s>%s</a>"""%(quoteattr(mailToURL),self.htmlText(chair.getFullName())))
         res = ""
         if len(l) > 0:
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Chairs"):</b></td>
         <td>%s</td>
@@ -11127,7 +11128,7 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
             l.append( temp.getHTML( self._aw, mat, url, self._staticPars["material"] ) )
         res = ""
         if l:
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Material"):</b></td>
         <td align="left" width="100%%">%s</td>
@@ -11137,7 +11138,7 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
     def _getMoreInfoHTML( self ):
         res = ""
         if self._conf.getContactInfo() != "":
-            res = _("""
+            res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Additional info"):</b>
         </td>
@@ -11148,7 +11149,7 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
     def _getActionsHTML( self, showActions = False):
         html=[]
         if showActions:
-            html=[ _("""
+            html=[ i18nformat("""
                 <table style="padding-top:40px; padding-left:20px">
                 <tr>
                     <td nowrap>
@@ -11188,7 +11189,7 @@ class WMConfStaticDetails( wcomponents.WTemplated ):
             room = self._conf.getRoom()
             if room:
                 roomLink = linking.RoomLinker().getHTMLLink( room, location )
-                vars["location"] += _("""<small> _("Room"):</small> %s""")%roomLink
+                vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
         vars["chairs"] = self._getChairsHTML()
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
@@ -11304,7 +11305,7 @@ class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
         if mat != None:
             existingFiles = mat.getResourceList()
         if len(existingFiles) == 0:
-            vars["body"] = _("""<br><br>&nbsp;&nbsp;&nbsp; _("no image found")...""")
+            vars["body"] = i18nformat("""<br><br>&nbsp;&nbsp;&nbsp; _("no image found")...""")
         else:
             vars["body"] += "<table><tr>"
             for file in existingFiles:
@@ -11516,7 +11517,7 @@ class WConfModifBadgePrinting( wcomponents.WTemplated ):
         dconf = conference.CategoryManager().getDefaultConference()
         templates = dconf.getBadgeTemplateManager().getTemplates()
 
-        html = _("""<option value="blank">&lt; _("Blank Page")&gt;</option>""")
+        html = i18nformat("""<option value="blank">&lt; _("Blank Page")&gt;</option>""")
 
         for id,template in templates.iteritems():
             html += '<option value="'+id+'">'+template.getName()+'</option>'
@@ -11567,7 +11568,7 @@ class WConfModifBadgePrinting( wcomponents.WTemplated ):
             delete = []
             delete.append("""                  <a href='""")
             delete.append(str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf, deleteTemplateId=templateId)))
-            delete.append( _("""' onClick="return confirm('""" + _("Are you sure you want to delete this template?") + """');"><img src='"""))
+            delete.append( i18nformat("""' onClick="return confirm('""" + _("Are you sure you want to delete this template?") + """');"><img src='"""))
             delete.append(str(Config.getInstance().getSystemIconURL("smallDelete")))
             delete.append("""' border='0'></a>&nbsp;""")
             templateListHTML.append("".join(delete))

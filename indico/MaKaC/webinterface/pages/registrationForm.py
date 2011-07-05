@@ -35,6 +35,7 @@ from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.common import Config
 from MaKaC.i18n import _
+from indico.util.i18n import i18nformat
 
 ####
 # ----------------- MANAGEMENT AREA ---------------------------
@@ -199,9 +200,9 @@ class WConfModifRegForm( wcomponents.WTemplated ):
                             &nbsp;<input type="checkbox" name="statusesIds" value="%s">&nbsp;<a href=%s>%s</a>
                         </td>
                         </tr>
-                        """%(st.getId(), quoteattr(str(urlStatus)), st.getCaption().strip() or  _("""-- [%s]  _("status with no name") --""")%st.getId()) )
+                        """%(st.getId(), quoteattr(str(urlStatus)), st.getCaption().strip() or  i18nformat("""-- [%s]  _("status with no name") --""")%st.getId()) )
         if html == []:
-            html.append( _("""<tr><td style="padding-left:20px"><ul><li> _("No statuses defined yet").</li></ul><br>  _("You can use this option in order to create general statuses you will be able to use afterwards in the list of registrants. For instance, you can create a status "paid" in order to check if someone has paid or not").</td></tr>"""))
+            html.append( i18nformat("""<tr><td style="padding-left:20px"><ul><li> _("No statuses defined yet").</li></ul><br>  _("You can use this option in order to create general statuses you will be able to use afterwards in the list of registrants. For instance, you can create a status "paid" in order to check if someone has paid or not").</td></tr>"""))
         html.insert(0, """<a href="" name="statuses"></a><table style="padding-top:20px">""")
         html.append("</table>")
         return "".join(html)
@@ -235,11 +236,11 @@ class WConfModifRegForm( wcomponents.WTemplated ):
             vars["announcement"] = regForm.getAnnouncement()
             vars["disabled"] = ""
             vars["contactInfo"] = regForm.getContactInfo()
-            vars["usersLimit"] = _("""--_("No limit")--""")
+            vars["usersLimit"] = i18nformat("""--_("No limit")--""")
             if regForm.getUsersLimit() > 0:
                 vars["usersLimit"] = regForm.getUsersLimit()
             vars["title"] = regForm.getTitle()
-            vars["notification"] = _("""
+            vars["notification"] = i18nformat("""
                                     <table>
                                         <tr>
                                             <td align="right"><b> _("To List"):</b></td>
@@ -250,7 +251,7 @@ class WConfModifRegForm( wcomponents.WTemplated ):
                                             <td align="left">%s</td>
                                         </tr>
                                     </table>
-                                    """)%(", ".join(regForm.getNotification().getToList()) or _("""--_("no TO list")--"""), ", ".join(regForm.getNotification().getCCList()) or _("""--_("no CC list")--"""))
+                                    """)%(", ".join(regForm.getNotification().getToList()) or i18nformat("""--_("no TO list")--"""), ", ".join(regForm.getNotification().getCCList()) or i18nformat("""--_("no CC list")--"""))
             vars["mandatoryAccount"] =  _("Yes")
             if not regForm.isMandatoryAccount():
                 vars["mandatoryAccount"] =  _("No")
@@ -451,7 +452,7 @@ class WConfModifRegFormSessions( wcomponents.WTemplated ):
 
     def _getSessionsHTML(self, sessions):
         if sessions.getSessionList() == []:
-            html =  _("""--_("None selected")--""")
+            html =  i18nformat("""--_("None selected")--""")
         else:
             html = []
             for ses in sessions.getSessionList(True):
@@ -501,11 +502,11 @@ class WConfModifRegFormSessionsDataModif( wcomponents.WTemplated ):
         selected=""
         if sessions.getType()=="2priorities":
             selected=" selected"
-        html.append( _("""<option value="2priorities"%s> _("2 choices")</option>""")%selected)
+        html.append( i18nformat("""<option value="2priorities"%s> _("2 choices")</option>""")%selected)
         selected=""
         if sessions.getType()=="all":
             selected=" selected"
-        html.append( _("""<option value="all"%s> _("multiple")</option>""")%selected)
+        html.append( i18nformat("""<option value="all"%s> _("multiple")</option>""")%selected)
         html.append("""</select>""")
         return "".join(html)
 
@@ -539,7 +540,7 @@ class WConfModifRegFormSessionsAdd( wcomponents.WTemplated ):
                     <input type="checkbox" name="sessionIds" value="%s" >%s
                     """%(ses.getId(), ses.getTitle()) )
         if html == []:
-            html =  _("""--  _("No sessions to add") --""")
+            html =  i18nformat("""--  _("No sessions to add") --""")
         else:
             html = "<br>".join(html)
         return html
@@ -656,9 +657,9 @@ class WConfModifRegFormAccommodation( wcomponents.WTemplated ):
         for atype in accommodation.getAccommodationTypesList():
             cancelled = ""
             if atype.isCancelled():
-                cancelled =  _(""" <font color=\"red\">( _("disabled") )</font>""")
+                cancelled =  i18nformat(""" <font color=\"red\">( _("disabled") )</font>""")
             url = urlHandlers.UHConfModifRegFormAccommodationTypeModify.getURL(atype)
-            limit =  _(""" <i>[ _("unlimited places") ]</i>""")
+            limit =  i18nformat(""" <i>[ _("unlimited places") ]</i>""")
             if atype.getPlacesLimit() > 0:
                 limit = " <i>[%s/%s place(s)]</i>"%(atype.getCurrentNoPlaces(), atype.getPlacesLimit())
             billable = ""
@@ -767,7 +768,7 @@ class WPConfRemoveAccommodationType(WPConfModifRegFormAccommodationBase):
         self._tabMain.setActive()
 
     def _getTabContent( self, params ):
-        msg =  _("""
+        msg =  i18nformat("""
         <font size="+2"> _("Are you sure that you want to DELETE this accomodation")? <br><table><tr><td align="left"><ul>%s</ul></td></tr></table></font><br>
         ( _("Note that if you delete this accomodation, registrants who applied for it
         will lose their accomodation info") )
@@ -1056,9 +1057,9 @@ class WConfModifRegFormSocialEvent( wcomponents.WTemplated ):
         for se in socialEvent.getSocialEventList(True):
             cancelled = ""
             if se.isCancelled():
-                cancelled =  _("""<font color=\"red\">( _("cancelled") )</font>""")
+                cancelled =  i18nformat("""<font color=\"red\">( _("cancelled") )</font>""")
                 if se.getCancelledReason().strip():
-                    cancelled =  _("""<font color=\"red\">( _("disabled"): %s)</font>""")%se.getCancelledReason().strip()
+                    cancelled =  i18nformat("""<font color=\"red\">( _("disabled"): %s)</font>""")%se.getCancelledReason().strip()
             limit = " <i>[unlimited places]</i>"
             if se.getPlacesLimit() > 0:
                 limit = " <i>[%s/%s place(s)]</i>"%(se.getCurrentNoPlaces(), se.getPlacesLimit())
@@ -1173,7 +1174,7 @@ class WPConfRemoveSocialEvent(WPConfModifRegFormSocialEventBase):
         self._tabMain.setActive()
 
     def _getTabContent( self, params ):
-        msg =  _("""
+        msg =  i18nformat("""
         <font size="+2"> _("Are you sure that you want to DELETE this social event")? <br><table><tr><td align="left"><ul>%s</ul></td></tr></table></font><br>
         ( _("Note that if you delete this social event, registrants who applied for it
         will lose their social event info") )
@@ -1197,9 +1198,9 @@ class WPConfModifRegFormStatusesRemConfirm(WPConfModifRegFormBase):
             s=self._conf.getRegistrationForm().getStatusById(id)
             ssHTML.append("""
                                 <li>%s</li>
-                                """%(s.getCaption().strip() or  _("""-- [%s]  _("status with no name") --""")%s.getId()))
+                                """%(s.getCaption().strip() or  i18nformat("""-- [%s]  _("status with no name") --""")%s.getId()))
         ssHTML.append("</ul>")
-        msg= _(""" _("Are you sure you want to delete the following statuses
+        msg= i18nformat(""" _("Are you sure you want to delete the following statuses
         linked to the registration form module")?
         %s
         <font color="red">( _("note that current registrants will lose this info") )</font>""")%("".join(ssHTML))
@@ -1221,7 +1222,7 @@ class WPConfModifRegFormGeneralSectionRemConfirm(WPConfModifRegFormBase):
                                 <li>%s</li>
                                 """%(s.getTitle()))
         ssHTML.append("</ul>")
-        msg= _("""  _("Are you sure you want to delete the following sections
+        msg= i18nformat("""  _("Are you sure you want to delete the following sections
         of the registration form")?
         %s
         <font color="red">( _("note that current registrants will lose this info"))</font>""")%("".join(ssHTML))
@@ -1313,9 +1314,9 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
             url = urlHandlers.UHConfModifRegFormGeneralSectionFieldModif.getURL(f)
             spec = " <b>(%s"%f.getInput().getName()
             if f.isMandatory():
-                spec =  _(""" %s, _("mandatory") """)%spec
+                spec =  i18nformat(""" %s, _("mandatory") """)%spec
             if f.isBillable():
-                spec =  _(""" %s , _("Billable") = %s """)%(spec,self.htmlText(f.getPrice()))
+                spec =  i18nformat(""" %s , _("Billable") = %s """)%(spec,self.htmlText(f.getPrice()))
 
             spec = " %s)</b>"%spec
 
@@ -1448,7 +1449,7 @@ class WPConfModifRegFormGeneralSectionFieldRemConfirm(WPConfModifRegFormGeneralS
                                 <li>%s</li>
                                 """%(f.getCaption()))
         fieldsHTML.append("</ul>")
-        msg= _(""" _("Are you sure you want to delete the following fields
+        msg= i18nformat(""" _("Are you sure you want to delete the following fields
         of the section '%s'")?
         %s
         <font color="red">( _("note that current registrants will lose this info"))</font>""")%(self._generalSectionForm.getTitle(),
@@ -1531,10 +1532,10 @@ class WConfRegistrationForm(wcomponents.WTemplated):
                 if self._avatar is not None:
                     registered = self._avatar.isRegisteredInConf(self._conf)
                 if regForm.inRegistrationPeriod() and not registered:
-                   submitOpt =  _("""<li><a href=%s> _("Show registration form")</a></li>""")%(quoteattr(str(urlHandlers.UHConfRegistrationFormDisplay.getURL( self._conf ))))
+                   submitOpt =  i18nformat("""<li><a href=%s> _("Show registration form")</a></li>""")%(quoteattr(str(urlHandlers.UHConfRegistrationFormDisplay.getURL( self._conf ))))
                 if registered:
-                    submitOpt =  _("""%s<li><a href=%s> _("View or modify your already registration")</a></li>""")%(submitOpt, quoteattr(str("")))
-                html =  _("""
+                    submitOpt =  i18nformat("""%s<li><a href=%s> _("View or modify your already registration")</a></li>""")%(submitOpt, quoteattr(str("")))
+                html =  i18nformat("""
                 <b> _("Possible actions you can carry out"):</b>
                 <ul>
                     %s
@@ -1552,7 +1553,7 @@ class WConfRegistrationForm(wcomponents.WTemplated):
         vars["title"] = regForm.getTitle()
         vars["usersLimit"] = ""
         if regForm.getUsersLimit() > 0:
-            vars["usersLimit"] =  _("""
+            vars["usersLimit"] =  i18nformat("""
                                 <tr>
                                     <td nowrap class="displayField"><b> _("Max No. of registrants"):</b></td>
                                     <td width="100%%" align="left">%s</td>
@@ -1560,7 +1561,7 @@ class WConfRegistrationForm(wcomponents.WTemplated):
                                 """)%regForm.getUsersLimit()
         vars["contactInfo"] = ""
         if regForm.getContactInfo().strip()!="":
-            vars["contactInfo"] =  _("""
+            vars["contactInfo"] =  i18nformat("""
                                 <tr>
                                     <td nowrap class="displayField"><b> _("Contact info"):</b></td>
                                     <td width="100%%" align="left">%s</td>
@@ -1698,7 +1699,7 @@ class WConfRegFormPersonalDataDisplay(wcomponents.WTemplated):
                     inputHTML += """<option value="%s" %s>%s</option>"""%(title, selected, title)
                 inputHTML = """<select id="%s" name="%s">%s</select>"""%(item.getId(), item.getId(), inputHTML)
             elif item.getId() == "country":
-                inputHTML= _("""<option value="">--  _("Select a country") --</option>""")
+                inputHTML= i18nformat("""<option value="">--  _("Select a country") --</option>""")
                 for ck in CountryHolder().getCountrySortedKeys():
                     selected = ""
                     if value == ck:
@@ -1777,7 +1778,7 @@ class WConfRegFormSessionsDisplay(WConfRegFormSessionsBase):
 
     def _getSessionsHTML(self, sessions):
         if sessions.getSessionList() == []:
-            html =  _("""--_("None selected")--""")
+            html =  i18nformat("""--_("None selected")--""")
         else:
             html = []
             for ses in sessions.getSessionList(True):
@@ -1814,7 +1815,7 @@ class WConfRegFormSessions2PrioritiesDisplay(WConfRegFormSessionsBase):
                                                                     });</script>""" % selectName
         else:
             addParam = ''
-        html = [ _("""<select id="%s" name="%s">
+        html = [ i18nformat("""<select id="%s" name="%s">
                         <option value="nosession" %s>--_("Select a session")--</option>""")%(selectName, selectName, selected)]
         for ses in sessions.getSessionList(True):
             selected = ""
@@ -1898,7 +1899,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
         disabled = ""
         if alreadyPaid:
             disabled = " disabled"
-        html = [ _("""
+        html = [ i18nformat("""
                 <select id="%s" name="%s"%s>
                 <option value="nodate" %s>--_("select a date")--</option>
                 """)%(name, name, disabled, selected)]
@@ -1950,14 +1951,14 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                                    </tr>
                         """%(atype.getCaption() ) )
             else:
-                html.append( _("""<tr>
+                html.append( i18nformat("""<tr>
                                  <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>
                                </tr>
                             """)%(atype.getCaption() ) )
 
         html.append("""<script>addParam($E('accommodationType'), 'radio', false);</script>""")
         if currentAccoType is not None and currentAccoType.isCancelled() and currentAccoType not in self._accommodation.getAccommodationTypesList():
-            html.append( _("""<tr>
+            html.append( i18nformat("""<tr>
                                 <td align="left" style="padding-left:10px">&nbsp;&nbsp;&nbsp;<b>-</b> %s <font color="red">( _("not available at present") )</font></td>
                             </tr>
                         """)%(currentAccoType.getCaption() ) )
@@ -2146,17 +2147,17 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         sessions = self._registrant.getSessionList()
         if regForm.getSessionsForm().isEnabled():
             if regForm.getSessionsForm().getType() == "2priorities":
-                session1 = _("""<font color=\"red\">--_("not selected")--</font>""")
+                session1 = i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
                 session2 = "-- not selected --"
                 if len(sessions) > 0:
                     session1 = sessions[0].getTitle()
                     if sessions[0].isCancelled():
-                        session1 = _("""%s <font color=\"red\">( _("cancelled") )""")%session1
+                        session1 = i18nformat("""%s <font color=\"red\">( _("cancelled") )""")%session1
                 if len(sessions) > 1:
                     session2 = sessions[1].getTitle()
                     if sessions[1].isCancelled():
-                        session2 =  _("""%s <font color=\"red\">( _("cancelled") )""")%session2
-                text=  _("""
+                        session2 =  i18nformat("""%s <font color=\"red\">( _("cancelled") )""")%session2
+                text=  i18nformat("""
                         <table>
                           <tr>
                             <td align="right"><b> _("First Priority"):</b></td>
@@ -2178,13 +2179,13 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                         </tr>
                         """)%(regForm.getSessionsForm().getTitle(),text)
             if regForm.getSessionsForm().getType() == "all":
-                sessionList =  _("""<font color=\"red\">--_("not selected")--</font>""")
+                sessionList =  i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
                 if len(sessions) > 0:
                     sessionList=["<ul>"]
                     for ses in sessions:
                         sesText = "<li>%s</li>"%ses.getTitle()
                         if ses.isCancelled():
-                            sesText =  _("""<li>%s <font color=\"red\">( _("cancelled") )</font></li>""")%ses.getTitle()
+                            sesText =  i18nformat("""<li>%s <font color=\"red\">( _("cancelled") )</font></li>""")%ses.getTitle()
                         sessionList.append(sesText)
                     sessionList.append("</ul>")
                     sessionList="".join(sessionList)
@@ -2210,7 +2211,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         regForm = self._conf.getRegistrationForm()
         if regForm.getAccommodationForm().isEnabled():
             accommodation = self._registrant.getAccommodation()
-            accoType = _("""<font color=\"red\">--_("not selected")--</font>""")
+            accoType = i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
             cancelled = ""
             if accommodation is not None and accommodation.getAccommodationType() is not None:
                 accoType = accommodation.getAccommodationType().getCaption()
@@ -2230,7 +2231,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                             <td align="left">%s %s</td>
                           </tr>"""%(accoType, cancelled)
 
-            text = _("""
+            text = i18nformat("""
                         <table>
                           <tr>
                             <td align="right"><b> _("Arrival date"):</b></td>
@@ -2243,7 +2244,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                           %s
                         </table>
                         """)%(arrivalDate, departureDate, accoTypeHTML)
-            return _("""
+            return i18nformat("""
                     <tr>
                       <td style="color:black"><b> _("Accommodation")</b></td>
                       <td bgcolor="white" class="blacktext">%s</td>
@@ -2263,16 +2264,16 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             for se in socialEvents:
                 cancelled = ""
                 if se.isCancelled():
-                    cancelled =  _("""<font color=\"red\">( _("cancelled") )</font>""")
+                    cancelled =  i18nformat("""<font color=\"red\">( _("cancelled") )</font>""")
                     if se.getCancelledReason().strip():
-                        cancelled =  _("""<font color=\"red\">( _("cancelled"): %s)</font>""")%se.getCancelledReason().strip()
-                r.append( _("""
+                        cancelled =  i18nformat("""<font color=\"red\">( _("cancelled"): %s)</font>""")%se.getCancelledReason().strip()
+                r.append( i18nformat("""
                             <tr>
                               <td align="left">%s <b>[%s  _("place(s) needed")]</b> %s</td>
                             </tr>
                          """)%(se.getCaption(), se.getNoPlaces(), cancelled))
             if r == []:
-                text =  _("""--  _("no social events selected") --""")
+                text =  i18nformat("""--  _("no social events selected") --""")
             else:
                 text = """
                         <table>
@@ -2293,7 +2294,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
     def _getReasonParticipationHTML(self):
         regForm = self._conf.getRegistrationForm()
         if regForm.getReasonParticipationForm().isEnabled():
-            return  _("""
+            return  i18nformat("""
                     <tr>
                       <td style="color:black"><b> _("Reason for participation")</b></td>
                       <td bgcolor="white" class="blacktext">%s</td>
@@ -2324,7 +2325,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                 miscItem=miscGroup.getResponseItemById(f.getId())
                 if miscItem is None: continue # for fields created after the registration of the user, we skip it.
                 fieldInput = miscItem.getGeneralField().getInput()
-            v= _("""--_("no value selected")--""")
+            v= i18nformat("""--_("no value selected")--""")
             if f.isBillable():
                 price=f.getPrice()
                 currancy=regForm.getCurrency()
@@ -2345,14 +2346,14 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
             for miscItem in miscGroup.getResponseItemList():
                     f=gsf.getFieldById(miscItem.getId())
                     if f is None:
-                        html.append( _("""
+                        html.append( i18nformat("""
                                     <tr>
                                        <td align="right" nowrap><b>%s:</b></td>
                                        <td align="left">%s <font color="red">( _("cancelled") )</font></td>
                                     </tr>
                                     """)%(miscItem.getCaption(), self._formatValue(fieldInput, miscItem.getValue())) )
         if len(html)==1:
-            html.append( _("""
+            html.append( i18nformat("""
                         <tr><td><font color="black"><i>--_("No fields")--</i></font></td></tr>
                         """))
         html.append("</table>")
@@ -2435,7 +2436,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         if modPay.isActivated() and self._registrant.doPay():
             total={}
             total["value"]=0
-            html.append( _(""" <tr><td colspan="2"><table width="100%%">
+            html.append( i18nformat(""" <tr><td colspan="2"><table width="100%%">
                             <tr>
                             <tr><td colspan="4" class="title"><b>_("Payment summary")</b></td></tr>
                             <tr>
@@ -2465,7 +2466,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                                     <td><br></td>
                                 </tr>"""%str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf))
 
-            html.append( _("""
+            html.append( i18nformat("""
                             <tr>&nbsp;</tr>
                             <tr>
                                <td ><b> _("TOTAL")</b></td>
@@ -2551,7 +2552,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars( self )
         vars["id"] = self._registrant.getId()
         vars["pdfields"] = self._getPDInfoHTML()
-        vars["registrationDate"] = _("""--_("date unknown")--""")
+        vars["registrationDate"] = i18nformat("""--_("date unknown")--""")
         if self._registrant.getRegistrationDate() is not None:
             vars["registrationDate"] = self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
         vars["dataModificationURL"] = quoteattr(str(urlHandlers.UHRegistrantDataModification.getURL(self._registrant)))
