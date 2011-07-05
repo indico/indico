@@ -6,8 +6,54 @@ function updateMaterialList(oldList, newList) {
     }
 }
 
+type("AddEditMaterialDialog", [],{
+    _parentText: function(args) {
+        var self = this;
+        var text = null;
 
-type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
+        //If we are editing a resource
+        if (args.resourceId) {
+            var isFatherProtected;
+            if(self.material.materialProtection == -1){
+                isFatherProtected = false;
+            }
+            else if(self.material.materialProtection == 1){
+                isFatherProtected = true;
+            }
+            //then its value is 0
+            else{
+                //check the value of the material's parent
+                isFatherProtected = self.material.parentProtected;
+            }
+
+            text = $T("Same as for the parent") + " " + self.materialName;
+
+            text = Html.span({}, text, " ",
+                    Html.unescaped.span({className: isFatherProtected ? 'strongProtPrivate' : 'strongProtPublic', style: {fontStyle: 'italic'}}," ",
+                              Protection.ParentRestrictionMessages[isFatherProtected?1:-1]));
+        } else {
+            //if we are editing a material type
+            if (args.subContId) {
+                text = $T("Same as for the parent Subcontribution");
+            } else if (args.contribId) {
+                text = $T("Same as for the parent Contribution");
+            } else if (args.sessionId) {
+                text = $T("Same as for the parent Session");
+            } else if (args.confId) {
+                text = $T("Same as for the parent Conference");
+            } else if (args.categId) {
+                text = $T("Same as for the parent Category");
+            }
+
+            text = Html.span({}, text, " ",
+                         Html.unescaped.span({className: args.parentProtected ? 'strongProtPrivate' : 'strongProtPublic', style: {fontStyle: 'italic'}}," ",
+                                   Protection.ParentRestrictionMessages[args.parentProtected?1:-1]));
+        }
+        return text;
+    }
+});
+
+type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGrowing"], {
 
     _drawButtons: function() {
 
@@ -21,43 +67,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
         return buttonDiv;
     },
 
-
-
-    _iFrameLoaded : function(iframeId) {
-        var doc;
-
-        if (Browser.IE) {
-            // *sigh*
-            doc = document.frames[iframeId].document;
-        } else {
-            doc = $E(iframeId).dom.contentDocument;
-        }
-
-        // textContent would be more appropriate, but IE...
-        try {
-            var res = Json.read(doc.body.innerHTML);
-        } catch(e) {
-            IndicoUtil.errorReport({'code':'0', 'message':$T('Unexpected exception')});
-            return;
-        }
-
-        var self = this;
-
-        if (res.status == "ERROR") {
-            IndicoUtil.errorReport({
-                code: '0',
-                requestInfo: {},
-                message: res.info });
-        } else {
-            this.onUpload(res.info);
-            // Firefox will keep "loading" if the iframe is destroyed
-            // right now. Let's wait a bit.
-            setTimeout(
-                function() {
-                    self.close();
-                }, 100);
-        }
-    },
 
     /*
      * Draws a pane that switches between a URL input and a file upload dialog.
@@ -194,28 +203,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
 
         return resourcePathPane;
 
-    },
-
-    _parentText: function(args) {
-        var text = null;
-
-        if (args.subContId) {
-            text = $T("Same as for the parent Subcontribution");
-        } else if (args.contribId) {
-            text = $T("Same as for the parent Contribution");
-        } else if (args.sessionId) {
-            text = $T("Same as for the parent Session");
-        } else if (args.confId) {
-            text = $T("Same as for the parent Conference");
-        } else if (args.categId) {
-            text = $T("Same as for the parent Category");
-        }
-
-        text = Html.span({}, text, " ",
-                         Html.unescaped.span({className: args.parentProtected ? 'strongProtPrivate' : 'strongProtPublic', style: {fontStyle: 'italic'}}," ",
-                                   Protection.ParentRestrictionMessages[args.parentProtected?1:-1]));
-
-        return text;
     },
 
     _findTypeName: function(id) {
@@ -429,27 +416,22 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
             }
             this.formDict.materialId.set(type);
 
-            this.form.dom.submit();
+            $(this.form.dom).submit();
 
         }
     },
-
 
     _drawWidget: function() {
         var self = this;
 
         this.formDict = {};
-        this.frameId = Html.generateId();
-
-        var iframe = Html.iframe({id: this.frameId, name: this.frameId, style: {display: 'none'}});
 
         this.form = Html.form(
             {
-                target: this.frameId, method: 'post',
+                method: 'post',
                 id: Html.generateId(),
                 action: this.uploadAction,
-                enctype: 'multipart/form-data',
-                encoding: 'multipart/form-data'
+                enctype: 'multipart/form-data'
             },
             this.tabWidget.draw());
 
@@ -460,29 +442,36 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
                  self.form.append(elem);
              });
 
-        var loadFunc = function() {
-            if (self.uploading) {
-                self.killProgress();
-                self.uploading = false;
-                // need to pass the ID, due to IE
-                self._iFrameLoaded(self.frameId);
-            }
-        };
-
-        if (Browser.IE) {
-            iframe.dom.onreadystatechange = loadFunc;
-        } else {
-            // for normal browsers
-            iframe.observeEvent("load", loadFunc);
-        }
-
         each(this.args, function (value, key) {
             self.form.append(Html.input('hidden',{name: key}, value));
         });
 
+        $(this.form.dom).ajaxForm({
+            dataType: 'json',
+            iframe: true,
+            complete: function(){
+                self.killProgress();
+            },
+            success: function(resp){
+                if (resp.status == "ERROR") {
+                    IndicoUtil.errorReport({
+                        code: '0',
+                        requestInfo: {},
+                        message: resp.info });
+                } else {
+                    self.onUpload(resp.info);
+                    // Firefox will keep "loading" if the iframe is destroyed
+                    // right now. Let's wait a bit.
+                    setTimeout(
+                        function() {
+                            self.close();
+                        }, 100);
+                }
+            }
+        });
+
         return Html.div({},
-                        this.form,
-                        iframe);
+                        this.form);
 
     },
 
@@ -561,7 +550,7 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
 
 
 }, function(args, list, types, uploadAction, onUpload, forReviewing) {
-
+    this.AddEditMaterialDialog();
     var self = this;
     this.list = list;
     this.types = types;
@@ -575,7 +564,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
 
     this.protectionStatus = $O();
     this.uploadType = new WatchValue();
-
     this.ExclusivePopupWithButtons(this.forReviewing?[$T("Upload Paper")]:[$T("Upload Material")],
                         function() {
                             self.close();
@@ -595,49 +583,6 @@ type("AddMaterialDialog", ["ExclusivePopupWithButtonsGrowing"], {
 
 type("UploadTemplateDialog", ["ExclusivePopup"], {
 
-    _iFrameLoaded : function(iframeId) {
-        var doc;
-
-        if (Browser.IE) {
-            // *sigh*
-            doc = document.frames[iframeId].document;
-        } else {
-            doc = $E(iframeId).dom.contentDocument;
-        }
-
-        // textContent would be more appropriate, but IE...
-        var res = Json.read(doc.body.innerHTML);
-
-        if (res.status == "ERROR") {
-            IndicoUtil.errorReport(res.info);
-        } else {
-            this.close();
-            this.onUpload(res.info);
-        }
-    },
-
-    _setupIframe: function(iframe) {
-        var self = this;
-
-        var loadFunc = function() {
-            if (self.uploading) {
-                self.killProgress();
-                self.uploading = false;
-                // need to pass the ID, due to IE
-                self._iFrameLoaded(self.frameId);
-            }
-        };
-
-        if (Browser.IE) {
-            // cof! cof!
-            iframe.dom.onreadystatechange = loadFunc;
-        } else {
-            // for normal browsers
-            iframe.observeEvent("load", loadFunc);
-        }
-
-    },
-
      _fileUpload: function() {
         var self = this
         var pm = new IndicoUtil.parameterManager();
@@ -654,13 +599,8 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
         pm.add(description, 'text', true);
         pm.add(name, 'text', true);
 
-        this.frameId = Html.generateId();
-        var iframe = Html.iframe({id: this.frameId, name: this.frameId, style: {display: 'none'}});
-
-        this._setupIframe(iframe);
-
         this.form = Html.form({
-                            target: this.frameId, method: 'post',
+                            method: 'post',
                             id: Html.generateId(),
                             action: this.uploadAction,
                             enctype: 'multipart/form-data',
@@ -676,8 +616,23 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
                             ]),
                         uploadType);
 
+        $(this.form.dom).ajaxForm({
+            dataType: 'json',
+            iframe: true,
+            complete: function(){
+                self.killProgress();
+            },
+            success: function(resp){
+                if (resp.status == "ERROR") {
+                    IndicoUtil.errorReport(resp.info);
+                } else {
+                    this.close();
+                    this.onUpload(resp.info);
+                }
+            }
+        });
+
         return Html.div({},
-                        iframe,
                         this.form,
                         Html.div({style: {'textAlign': 'center', width: self.width, height: self.height}},
                                  Widget.button(command(
@@ -685,7 +640,7 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
                                          if (pm.check()) {
                                              self.killProgress = IndicoUI.Dialogs.Util.progress($T('Uploading...'));
                                              self.uploading = true;
-                                             self.form.dom.submit();
+                                             $(self.form.dom).submit();
                                          }
                                      }, $T("Upload")))));
 },
@@ -752,8 +707,12 @@ type("UploadTemplateDialog", ["ExclusivePopup"], {
                         });
 });
 
-type("EditMaterialResourceBase", ["ServiceDialogWithButtons"], {
-
+type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithButtons", "PreLoadHandler"], {
+    _preload: [
+               function(hook){
+                   this._preloadAllowedUsers(hook, this.action);
+               }
+           ],
     _preloadAllowedUsers: function(hook, method) {
         var self = this;
 
@@ -781,7 +740,113 @@ type("EditMaterialResourceBase", ["ServiceDialogWithButtons"], {
                 IndicoUtil.errorReport(users.error.get());
             }
         });
+    },
+
+    _drawUserList: function(){
+
+        return new UserListField(
+                'ShortPeopleListDiv', 'PeopleList',
+                this.allowedUsers, true, null,
+                true, true, null, null,
+                false, false, true,
+                userListNothing, userListNothing, userListNothing);
+
+
+    },
+
+    _drawProtectionDiv: function() {
+        var self = this;
+
+        self.privateInfoDiv = self._drawPrivateInfoDiv();
+
+        return Html.div(
+                {style: {marginTop: pixels(5)}},
+                self.privateInfoDiv);
+
+    },
+
+    _drawProtectionPane: function() {
+        var self = this;
+
+        var inheritanceText = Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}},
+                Protection.ParentRestrictionMessages[self.protection]);
+
+        text = Html.span({}, $T("Please select who will be able to access "), " ",Html.span({style:{fontWeight: 'bold'}}, self.protectionName), " :");
+
+        self.protectionSelector  = new RadioFieldWidget([
+            [0, self._parentText(this.args)],
+            [1, Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+            [-1, Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
+            ], 'nobulletsListWrapping');
+
+        self.protectionSelector.observe(function(value) {
+
+            // if 'private' is chosen or 'inherit' was chosen
+            // and the parent resource is protected
+            if (value == 0 && self.item.get('protectedOwner') ||
+                    value == 1) {
+                self.tabWidget.enableTab(1);
+                // draw a little notification saying that
+                // the added tab can be used
+                self.notification  = new NotificationBalloonPopup(
+                    self.protectionSelector.radioDict[value],
+                    Html.div({style:{width: '120px'}}, $T("You can specify users using this tab")));
+
+                var pos = self.tabWidget.tabs[1].getAbsolutePosition();
+
+                // open it, pointing to tab
+                self.notification.open(pos.x + self.tabWidget.tabs[1].dom.offsetWidth/2, pos.y);
+
+            } else {
+                self.tabWidget.disableTab(1);
+            }
+        });
+
+        return Html.div({style:{marginTop: '10px',height: '150px'}},
+                        Html.div({style: {textAlign: 'left', fontStyle: 'italic', color: '#881122'}}, $T(text)),
+                        Html.div({style: {marginTop: '10px'}}, self.protectionSelector.draw()));
+
+    },
+    _drawButtons: function(){
+        var self = this;
+
+        var saveButton = Html.input('button', {style: {marginRight: pixels(3)}}, $T('Save'));
+        var cancelButton = Html.input('button', {style: {marginLeft: pixels(3)}}, $T('Cancel'));
+        saveButton.observeClick(function(){
+            self._save();
+        });
+        cancelButton.observeClick(function(){
+            self.close();
+        });
+       return Html.div({}, saveButton, cancelButton);
+    },
+
+    _drawWidget: function(){
+        var self = this;
+
+        var protectionDiv = self._drawProtectionDiv();
+
+        var infoDiv = Html.div({},
+                self._drawInfoPane(),
+                this.forReviewing?[]:self._drawProtectionPane() );
+        var widget = [[$T("Information"), infoDiv]];
+        if(!this.forReviewing) {
+            widget.push([$T("Protection") , protectionDiv]);
+        }
+        return new TabWidget(widget, 400,350);
+    },
+
+    draw: function() {
+        this.tabWidget =  this._drawWidget();
+        return this.ServiceDialogWithButtons.prototype.draw.call(this, this.tabWidget.draw(), this._drawButtons());
+    },
+
+    postDraw: function(){
+        var self = this;
+        this.ServiceDialogWithButtons.prototype.postDraw.call(this);
+        self._bindData();
     }
+
 },
 
     function(endPoint, method, args, title, closeHandler) {
@@ -789,14 +854,10 @@ type("EditMaterialResourceBase", ["ServiceDialogWithButtons"], {
     }
 );
 
-type("EditMaterialDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
-    _preload: [
-        function(hook){
-            this._preloadAllowedUsers(hook, 'material.listAllowedUsers');
-        }
-    ],
 
-    _saveCategory: function() {
+type("EditMaterialDialog", ["EditMaterialResourceBase"], {
+
+    _save: function() {
         var params = clone(this.args);
         params.materialInfo = this.newMaterial;
         this.newMaterial.set('userList', this.userList.getUsers());
@@ -830,94 +891,65 @@ type("EditMaterialDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
 
     },
 
-    draw: function() {
+    _drawPrivateInfoDiv: function(){
+
         var self = this;
 
-        self.newMaterial = $O(self.material.getAll());
+        self.userList = self._drawUserList();
 
-        var statusSelection = Widget.select(
-            $L({
-                0: (self.material.get('hasProtectedOwner')?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
-                1: $T('Private (by itself)'),
-                '-1': $T('Public (by itself)')
-            })
-        );
+        this.visibility = new RadioFieldWidget([
+            [0, Html.unescaped.span('strongRed', $T("The link for this material will <strong>visible</strong> from the event page, to everyone"))],
+            [1, Html.unescaped.span('strongRed', $T("The link will be <strong>invisible</strong> by default - only people who can access the material will be able to see it"))]]);
 
-        statusSelection.observe(function(value) {
-            if (value == 0 && self.material.get('protectedOwner') ||
-                value == 1) {
-                self.privateInfoDiv.show();
-            } else {
-                self.privateInfoDiv.hide();
-            }
-        });
+        this.password = Html.input('password',{});
 
-        var visibility = Html.select(
-            {},
-            Html.option({value: 0},$T('Visible for unauth. users')),
-            Html.option({value: 1},$T('Hidden from unauth. users'))
-        );
+        return IndicoUtil.createFormFromMap(
+                            [
+                                [
+                                    $T('Allowed users and groups'),
+                                    self.userList.draw()
+                                ],
+                                [
+                                    $T('Visibility'),
+                                    self.visibility.draw()
+                                ],
+                                [
+                                    $T('Access key'),
+                                    self.password
+                                ]
+                            ]);
 
-        this.userList = new UserListField(
-                'ShortPeopleListDiv', 'PeopleList',
-                this.allowedUsers, true, null,
-                true, true, null, null,
-                false, false, true,
-                userListNothing, userListNothing, userListNothing);
+    },
+    _drawInfoPane: function() {
+        var self = this;
 
-        self.privateInfoDiv = Html.div(
-            {style:{padding:pixels(2)}},
-            Html.div({},
-                     Html.label({}, $T('Allowed users')),
-                     self.userList.draw()),
-            Html.div({style:{marginTop: pixels(15)}},
-                     Html.label({}, $T('Visibility: ')),
-                     $B(visibility,
-                        self.newMaterial.accessor('hidden'))),
-            Html.div({style:{marginTop: pixels(10)}},
-                     Html.label({}, $T('Access Key: ')),
-                     $B(Html.input('password',{}),
-                        self.newMaterial.accessor('accessKey')))
-        );
-        if ( !self.material.get('protectedOwner')) {
-            self.privateInfoDiv.hide();
-        }
+        self.materialTitle = Html.input("text",{'name':'title', style:{width:'220px'}});
+        self.description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
 
-        var protectionDiv = Html.div(
-            {style: {marginTop: pixels(5)}},
-            Html.div({style:{paddingBottom:pixels(10)}},
-                     Html.label({},$T("Status: ")),
-                     $B(statusSelection,
-                        self.newMaterial.accessor('protection'))
-                    ),
-            self.privateInfoDiv);
+        return IndicoUtil.createFormFromMap(
+                [
+                 [
+                  $T('Description'),
+                  self.description
+                 ],
+                 [
+                     $T('Title'),
+                     Html.div({}, self.materialTitle,
+                                  Html.div("smallGrey", $T("'Title' will be used instead of the original name")))
+                 ]
+             ]);
+    },
 
-        var title = Html.input('text',{});
-        var titleDiv = Html.div({style:{paddingBottom:pixels(20)}}, Html.label({},"Title: "), title);
-        var description = Html.textarea({name:'description', style: {width: '100%'}});
-        var descDiv = Html.div({style:{paddingRight:pixels(10)}}, Html.label({}, $T("Description: ")), description);
+    _bindData: function(){
+        var self = this;
 
-        $B(title, self.newMaterial.accessor('title'));
-        $B(description, self.newMaterial.accessor('description'));
-
-        statusSelection.notifyObservers();
-
-        var tabControl = new TabWidget([
-            [$T("Information"), Widget.block([titleDiv,descDiv])],
-            [$T("Protection") , protectionDiv]], 300,325);
-
-        var saveButton = Html.input('button', {style: {marginRight: pixels(3)}}, $T('Save'));
-        var cancelButton = Html.input('button', {style: {marginLeft: pixels(3)}}, $T('Cancel'));
-        saveButton.observeClick(function(){
-            self._saveCategory();
-        });
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-        var buttonDiv = Html.div({}, saveButton, cancelButton);
-
-        return this.EditMaterialResourceBase.prototype.draw.call(this, tabControl.draw(), buttonDiv);
+        $B(self.visibility, self.newMaterial.accessor('hidden'));
+        $B(self.password, self.newMaterial.accessor('accessKey'));
+        $B(self.protectionSelector, self.newMaterial.accessor('protection'));
+        $B(self.materialTitle, self.newMaterial.accessor('title'));
+        $B(self.description, self.newMaterial.accessor('description'));
     }
+
 },
 
      function(args, material, types, list, title) {
@@ -925,7 +957,14 @@ type("EditMaterialDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
          this.materialId = this.material.get('id');
          this.types = types;
          this.list = list;
-
+         this.item = material;
+         this.protectionStatus = this.material.get('protection');
+         this.newMaterial = $O(this.material.getAll());
+         this.action = 'material.listAllowedUsers';
+         this.protectionName = this.newMaterial.get('title');
+         this.protection = Protection.resolveProtection(
+                 this.newMaterial.get('protection'),
+                 this.newMaterial.get('hasProtectedOwner')?1:-1);
          args = clone(args);
          args.materialId = this.materialId;
 
@@ -941,15 +980,10 @@ type("EditMaterialDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
 
     );
 
-type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
-    _preload:
-    [
-        function(hook){
-            this._preloadAllowedUsers(hook, 'material.resources.listAllowedUsers');
-        }
-    ],
 
-    _saveResource: function() {
+type("EditResourceDialog", ["EditMaterialResourceBase"], {
+
+    _save: function() {
         var params = clone(this.args);
         params.resourceInfo = this.newResource;
         this.newResource.set('userList', this.userList.getUsers());
@@ -960,100 +994,55 @@ type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
         this.appender(watchize(response));
     },
 
-    draw: function() {
+    _drawPrivateInfoDiv: function(){
+
         var self = this;
 
-        self.newResource = clone(this.resource);
-        var name = Html.input('text',{});
-        var nameDiv = Html.div({style:{paddingBottom:pixels(10)}}, Html.label({},$T("Name: ")),name);
-        var url = Html.input('text',{name:'url'});
-        var urlDiv = Html.div({style:{paddingBottom:pixels(10)}}, Html.label({},$T("URL: ")), url);
-        var description = Html.textarea({name:'description',style: {width: '100%'}});
-        var descDiv = Html.div({style:{paddingRight:pixels(5)}}, Html.label({},$T("Description: ")), description);
+        self.userList = self._drawUserList();
 
+        return IndicoUtil.createFormFromMap(
+                            [
+                                [
+                                    $T('Allowed users and groups'),
+                                    self.userList.draw()
+                                ]
+                            ]);
+    },
 
-        $B(name, self.newResource.accessor('name'));
-        $B(description, self.newResource.accessor('description'));
-        $B(url, self.newResource.accessor('url'));
+    _drawInfoPane: function() {
+        var self = this;
 
-        this.userList = new UserListField(
-                'VeryShortPeopleListDiv', 'PeopleList',
-                this.allowedUsers, true, null,
-                true, true, null, null,
-                false, false, true,
-                userListNothing, userListNothing, userListNothing);
+        self.name = Html.input("text",{'name':'name', style:{width:'220px'}});
+        self.url = Html.input("text",{'name':'url', style:{width:'220px'}});
+        self.description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
 
-        var isFatherProtected;
-        if(self.material.materialProtection == -1){
-            isFatherProtected = false;
-        }
-        else if(self.material.materialProtection == 1){
-            isFatherProtected = true;
-        }
-        //then its value is 0
-        else{
-            //check the value of the material's parent
-            isFatherProtected = self.material.parentProtected;
-        }
-        var statusSelection = Widget.select(
-                $L({
-                    0:(isFatherProtected?$T('Private'):$T('Public'))+' '+$T('(from parent)'),
-                    1:$T('Private (by itself)'),
-                    '-1':$T('Public (by itself)')
-                })
-            );
-
-        statusSelection.observe(function(value) {
-
-            if (value == 0 && isFatherProtected || value == 1) {
-                self.privateInfoDiv.show();
-            }
-            else {
-                self.privateInfoDiv.hide();
-            }
-        });
-
-        self.privateInfoDiv = Html.div(
-            {style:{padding:pixels(2)}},
-            Html.div({},
-                     Html.label({}, $T('Allowed users')),
-                     self.userList.draw()));
-
-        if ( !isFatherProtected) {
-            self.privateInfoDiv.hide();
-        }
-
-        var protectionDiv = Html.div(
-            {style: {marginTop: pixels(5)}},
-            Html.div({style:{paddingBottom:pixels(10)}},
-                     Html.label({},$T("Status: ")),
-                     $B(statusSelection,
-                        self.newResource.accessor('protection'))), self.privateInfoDiv);
-
-        var tabControl = new TabWidget([
-            [$T("Information"), Widget.block([nameDiv,this.resource.type=='stored'?[]:urlDiv,descDiv])],
-            [$T("Protection")   , protectionDiv]], 300,200);
-        tabControl.options = $L(this.forReviewing?[$T("Information")]:[$T("Information"), $T("Protection")]);
-        tabControl.selected.set($T("Information"));
-
-        statusSelection.notifyObservers();
-
-        var saveButton = Html.input('button', {style: {marginRight: pixels(3)}}, $T('Save'));
-        var cancelButton = Html.input('button', {style: {marginLeft: pixels(3)}}, $T('Cancel'));
-        saveButton.observeClick(function(){
-            self._saveResource();
-        });
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-        var buttonDiv = Html.div({}, saveButton, cancelButton);
-
-        return this.EditMaterialResourceBase.prototype.draw.call(this, tabControl.draw(), buttonDiv);
-
-    }
+        return IndicoUtil.createFormFromMap(
+                [
+                 [
+                     $T('Name'),
+                     Html.div({}, self.name,
+                                  Html.div("smallGrey", $T("'Name' will be used instead of the url")))
+                 ],
+                 [
+                  $T('URL'),
+                  self.url
+                 ],
+                 [
+                  $T('Description'),
+                  self.description
+                 ],
+             ]);
+    },
+    _bindData: function(){
+        var self = this;
+        $B(self.name, self.newResource.accessor('name'));
+        $B(self.description, self.newResource.accessor('description'));
+        $B(self.url, self.newResource.accessor('url'));
+        $B(self.protectionSelector, self.newResource.accessor('protection'));
+    },
 },
 
-     function(args, material, resource, domItem, appender, title, forReviewing) {
+     function(args, material, materialName, resource, domItem, appender, title, forReviewing) {
          args = clone(args);
 
          this.material = material;
@@ -1063,7 +1052,15 @@ type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
          this.domItem = domItem;
          this.appender = appender;
          this.forReviewing = forReviewing;
-
+         this.item = resource;
+         this.materialName = materialName;
+         this.protectionStatus = this.resource.get('protection');
+         this.newResource = $O(this.resource.getAll());
+         this.action = 'material.resources.listAllowedUsers';
+         this.protectionName = this.newResource.get('name');
+         this.protection = Protection.resolveProtection(
+                 this.newResource.get('protection'),
+                 this.newResource.get('hasProtectedOwner')?1:-1);
          var self = this;
          this.PreLoadHandler(
              self._preload,
@@ -1076,7 +1073,8 @@ type("EditResourceDialog", ["EditMaterialResourceBase", "PreLoadHandler"], {
 
          this.EditMaterialResourceBase(Indico.Urls.JsonRpcService, 'material.resources.edit', args, title);
      }
-    );
+ );
+
 
 /**
  * Mouseover help popup to inform the user about the meaning
@@ -1236,7 +1234,7 @@ type("ResourceListWidget", ["ListWidget"], {
             } else { flag = false;}
             removeButton = Widget.link(command(deleteResource,IndicoUI.Buttons.removeButton()));
             editButton = Widget.link(command(function() {
-                IndicoUI.Dialogs.Material.editResource(resParams, self.matParams, resource, resourceNode, function(resource) {
+                IndicoUI.Dialogs.Material.editResource(resParams, self.matParams, self.materialName, resource, resourceNode, function(resource) {
                     self.set(resource.get('id'), null);
                     self.set(resource.get('id'), resource);
                 }, flag);
@@ -1658,8 +1656,8 @@ IndicoUI.Dialogs.Material = {
         dialog.execute();
     },
 
-    editResource: function(args, material, resource, domItem, appender, forReviewing) {
-        var dialog = new EditResourceDialog(args, material, resource, domItem, appender, $T("Edit Resource"), forReviewing);
+    editResource: function(args, material, materialName , resource, domItem, appender, forReviewing) {
+        var dialog = new EditResourceDialog(args, material, materialName, resource, domItem, appender, $T("Edit Resource"), forReviewing);
         dialog.execute();
     },
 
