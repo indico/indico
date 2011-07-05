@@ -32,6 +32,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.errors import FormValuesError,MaKaCError
 from MaKaC.common.Locators import Locator
 from MaKaC.common import Config
+from MaKaC.common.TemplateExec import inlineContextHelp
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.common.tools import strip_ml_tags
@@ -530,8 +531,7 @@ class RegistrationForm(Persistent):
             se.delete() # It'll decrease the no of places
         for mg in reg.getMiscellaneousGroupList():
             for item in mg.getResponseItemList():
-                if item.getQuantity():
-                    item.getGeneralField().decreaseNoPlaces()
+                item.getGeneralField()._beforeValueChange(item, False)
 
     def delete(self):
         self.getSessionsForm().clearSessionList()
@@ -1093,11 +1093,22 @@ class FieldInputType(Persistent):
         if item is None:
             item=MiscellaneousInfoSimpleItem(mg, self.getParent())
             mg.addResponseItem(item)
-        if item.getQuantity(): # if we had a quantity before, make the place available again
-            self.getParent().decreaseNoPlaces();
+            self._beforeValueChange(item, True)
+        else:
+            self._beforeValueChange(item, False)
+
         self._setResponseValue(item, params, registrant)
-        if item.getQuantity(): # and make it unavailable if there's still a quantity
-            self.getParent().increaseNoPlaces();
+        self._afterValueChange(item)
+
+    def _beforeValueChange(self, item, newItem):
+        # if the item had a quantity, make the place available again
+        if not newItem and item.getQuantity():
+            self.getParent().decreaseNoPlaces()
+
+    def _afterValueChange(self, item):
+        # if the item has a quantity now, make the place unavailable
+        if item.getQuantity():
+            self.getParent().increaseNoPlaces()
 
     def _setResponseValue(self, item, registrant, params):
         """
@@ -1819,6 +1830,8 @@ class RadioItem(Persistent):
         self._billable=False
         self._price=""
         self._enabled=True
+        self._placesLimit = 0
+        self._currentNoPlaces = 0
 
     #def getQuantity(self):return 1
     def getId(self):
@@ -1869,12 +1882,74 @@ class RadioItem(Persistent):
                 raise MaKaCError(_('The price is in incorrect format!'))
         self._price = price
 
+    def getPlacesLimit(self):
+        try:
+            if self._placesLimit:
+                pass
+        except AttributeError, e:
+            self._placesLimit = 0
+        return self._placesLimit
+
+    def setPlacesLimit(self, limit):
+        if limit == "":
+            limit = "0"
+        try:
+            l = int(limit)
+        except ValueError:
+            raise FormValuesError(_("Please enter a number for the limit of places"))
+        self._placesLimit = l
+        self.updateCurrentNoPlaces()
+
+    def getCurrentNoPlaces(self):
+        try:
+            if self._currentNoPlaces:
+                pass
+        except AttributeError:
+            self._currentNoPlaces = 0
+        return self._currentNoPlaces
+
+    def hasAvailablePlaces(self):
+        if not self.getPlacesLimit():
+            return True
+        return (self.getCurrentNoPlaces() < self.getPlacesLimit())
+
+    def getNoPlacesLeft(self):
+        return self.getPlacesLimit() - self.getCurrentNoPlaces()
+
+    def increaseNoPlaces(self):
+        if self.getPlacesLimit() > 0 :
+            if self.getCurrentNoPlaces() >= self.getPlacesLimit():
+                raise FormValuesError( _("""The place limit has been exceeded."""))
+            self._currentNoPlaces += 1
+
+    def decreaseNoPlaces(self):
+        if self.getPlacesLimit() > 0 and self.getCurrentNoPlaces() > 0:
+            self._currentNoPlaces -= 1
+
+    def updateCurrentNoPlaces(self):
+        # self -> RadioGroupInput -> GeneralField -> GeneralSectionForm
+        gf = self._parent._parent
+        if gf.isTemporary():
+            return
+        self._currentNoPlaces = 0
+        gsf = gf._parent
+        regform = gsf.getRegistrationForm()
+        for reg in regform.getConference().getRegistrantsList():
+            mg = reg.getMiscellaneousGroupById(gsf.getId())
+            if not mg:
+                continue
+            gf.getId() # for some reason it's empty when calling it for the first time
+            item = mg.getResponseItemById(gf.getId())
+            if item is not None and item.getQuantity():
+                self.increaseNoPlaces()
+
     def clone(self, parent):
         ri=RadioItem(parent)
         ri.setCaption(self.getCaption())
         ri.setBillable(self.isBillable())
         ri.setPrice(self.getPrice())
         ri.setEnabled(self.isEnabled())
+        ri.setPlacesLimit(self.getPlacesLimit())
         return ri
 
     def _cmpCaption(r1, r2):
@@ -1904,6 +1979,7 @@ class RadioGroupInput(FieldInputType):
             tmp["billable"]=i.isBillable()
             tmp["price"]=i.getPrice()
             tmp["isEnabled"]=i.isEnabled()
+            tmp["placesLimit"]=i.getPlacesLimit()
             d["radioitems"].append(tmp)
         d["defaultItem"]=self.getDefaultItem()
         d["inputType"] = self.getInputType()
@@ -1920,11 +1996,30 @@ class RadioGroupInput(FieldInputType):
                 ri.setBillable(c["billable"])
                 ri.setPrice(c["price"])
                 ri.setEnabled(c["isEnabled"])
+                ri.setPlacesLimit(c.get("placesLimit"))
                 self.addItem(ri)
         if data.has_key("defaultItem"):
             self.setDefaultItem(data.get("defaultItem",None))
         if data.has_key("inputType"):
             self._inputType = data.get("inputType")
+
+    def _beforeValueChange(self, item, newItem):
+        # if the item had a quantity, make the place available again
+        selected = self.getSelectedItem(item)
+        if not newItem and selected:
+            selected.decreaseNoPlaces()
+
+    def _afterValueChange(self, item):
+        # if the item has a quantity now, make the place unavailable
+        selected = self.getSelectedItem(item)
+        if selected:
+            selected.increaseNoPlaces()
+
+    def getSelectedItem(self, item):
+        for val in self.getItemsList(False):
+            if val.getCaption() == item.getValue():
+                return val
+        return None
 
     def getDefaultItem(self):
         try:
@@ -1944,7 +2039,7 @@ class RadioGroupInput(FieldInputType):
         if self._items.has_key(id):
             self.setDefaultItem(self._items[id].getCaption())
 
-    def changeItemById(self, id, caption=None, billable=None, price=None):
+    def changeItemById(self, id, caption=None, billable=None, price=None, places=None):
         if self._items.has_key(id):
             item = self._items[id]
             if caption:
@@ -1952,6 +2047,8 @@ class RadioGroupInput(FieldInputType):
             if billable and price:
                 item.setBillable(billable)
                 item.setPrice(price)
+            if places or places == 0: # empty string doesn't change it, 0 does
+                item.setPlacesLimit(places)
 
     def removePriceById(self, id):
         if self._items.has_key(id):
@@ -2036,16 +2133,20 @@ class RadioGroupInput(FieldInputType):
             itemId = "%s_%s" % (self.getHTMLName(), counter)
             disable = ""
             if not val.isEnabled():
-                disable = "disabled=\"true\""
+                disable = "disabled=\"disabled\""
             if (registrant is not None and (val.isBillable() or billable) and registrant.getPayed()):
-                disable = "disabled=\"true\""
-                #pass
+                disable = "disabled=\"disabled\""
+            elif (not val.hasAvailablePlaces() and val.getCaption() != value):
+                disable = "disabled=\"disabled\""
             checked = ""
             if val.getCaption() == value:
                 checked = "checked"
             elif not value and val.getCaption() == self.getDefaultItem():
                 checked = "checked"
-            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" id="%s" name="%s" value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
+            placesInfo = ""
+            if val.getPlacesLimit():
+                placesInfo = """&nbsp;(%s/%s left)""" % (val.getNoPlacesLeft(),val.getPlacesLimit())
+            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" id="%s" name="%s" value="%s" %s %s> %s%s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption(), placesInfo))
             if val.isBillable():
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;%s""" % (val.getPrice(), currency))
             tmp.append(""" </td></tr> """)
@@ -2100,9 +2201,17 @@ class RadioGroupInput(FieldInputType):
         for radioItem in self.getItemsList():
             if radioItem.isEnabled() and not (registrant is not None and (radioItem.isBillable() or billable) and registrant.getPayed()):
 
+                placesInfo = ""
+                if radioItem.getPlacesLimit():
+                    placesInfo = """&nbsp;(%s left)""" % (radioItem.getNoPlacesLeft())
+
+                disabled = ""
+                if (not radioItem.hasAvailablePlaces() and radioItem.getCaption() != value):
+                    disabled = " disabled='disabled'"
+
                 selected = ""
                 if radioItem.getCaption() == value:
-                    selected = ' selected="selected"'
+                    selected = " selected='selected'"
                 else:
                     selected = ''
 
@@ -2111,7 +2220,7 @@ class RadioGroupInput(FieldInputType):
                 else:
                     price = ''
 
-                tmp.append("""<option value="%s"%s>%s%s</option>""" % (radioItem.getId(), selected, radioItem.getCaption(), price))
+                tmp.append("""<option value="%s"%s%s>%s%s%s</option>""" % (radioItem.getId(), selected, disabled, radioItem.getCaption(), price, placesInfo))
 
         tmp.append("""</select>%s</td>""" % param)
 
@@ -2197,7 +2306,13 @@ class RadioGroupInput(FieldInputType):
                                 <td bgcolor="white" class="blacktext" width="100%%">
                                     <input type="text" name="newprice">
                                 </td>
-                           </tr>
+                            </tr>
+                            <tr>
+                                <td class="blacktext"><span class="titleCellFormat"> _("Places")</span></td>
+                                <td bgcolor="white" class="blacktext" width="100%%">
+                                    <input type="text" name="newplaces">%s
+                                </td>
+                            </tr>
                             </table>
                             </td>
                             <td rowspan="2" valign="top" align="left">
@@ -2209,15 +2324,18 @@ class RadioGroupInput(FieldInputType):
                                 <input type="submit" class="btn" name="removeradioitemprice" value="_("remove price")"><br>
                             </td>
                         </tr>
-                """))
+                """) % inlineContextHelp(_('Use 0 for unlimited places')))
         html.append("""<tr><td valign="top" align="left"><table>""")
         billable = False
         for v in self.getItemsList(True):
+            placesInfo = ""
+            if v.getPlacesLimit():
+                placesInfo = " (%s places)" % (v.getPlacesLimit())
             html.append("""
                         <tr>
-                            <td bgcolor="white" class="blacktext" ><input type="checkbox" name="radioitems" value="%s">%s</td>
+                            <td bgcolor="white" class="blacktext" ><input type="checkbox" name="radioitems" value="%s">%s%s</td>
                             <td bgcolor="white" class="blacktext" >
-                        """%(v.getId(), v.getCaption()))
+                        """%(v.getId(), v.getCaption(), placesInfo))
             if v.isBillable():
                 billable = True
                 html.append( i18nformat("""<span class="titleCellFormat">&nbsp;&nbsp; _("Price"):%s</span>""")%(v.getPrice()))
@@ -2481,6 +2599,9 @@ class GeneralField(Persistent):
         values["description"]=self.getDescription()
         return values
 
+    def isTemporary(self):
+        return False
+
     def isBillable(self):
         try:
             return self._billable
@@ -2534,6 +2655,8 @@ class GeneralField(Persistent):
         return self._currentNoPlaces
 
     def hasAvailablePlaces(self):
+        if not self.getPlacesLimit():
+            return True
         return (self.getCurrentNoPlaces() < self.getPlacesLimit())
 
     def getNoPlacesLeft(self):

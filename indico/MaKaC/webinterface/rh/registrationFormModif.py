@@ -717,6 +717,7 @@ class _TmpSectionField:
                 ri.setCaption(params.get("newradioitem"))
                 ri.setBillable(params.get("newbillable"))
                 ri.setPrice(params.get("newprice"))
+                ri.setPlacesLimit(params.get("newplaces"))
                 self._input.addItem(ri)
         elif params.get("removeradioitem","").strip()!="":
             rs=params.get("radioitems",[])
@@ -744,7 +745,8 @@ class _TmpSectionField:
                 caption = params.get("newradioitem")
                 billable = params.get("newbillable")
                 price = params.get("newprice")
-                self._input.changeItemById(id, caption=caption, billable=billable, price=price)
+                places = params.get("newplaces")
+                self._input.changeItemById(id, caption=caption, billable=billable, price=price, places=places)
         elif params.get("removeradioitemprice","").strip()!="":
             rs=params.get("radioitems",[])
             if type(rs)!=list:
@@ -753,6 +755,9 @@ class _TmpSectionField:
                 self._input.removePriceById(id)
         elif not params.has_key("save") or self._input is None:
             self._input=FieldInputs.getAvailableInputKlassById(params.get("input","text"))(self)
+
+    def isTemporary(self):
+        return True
 
     def isBillable(self):
         return self._billable
@@ -795,6 +800,9 @@ class _TmpSectionField:
 
     def setMandatory(self, v):
         self._mandatory = v
+
+    def getRegistrationForm(self):
+        return None
 
 class RHRegistrationFormModifGeneralSectionFieldAdd( RHRegistrationFormModifGeneralSectionBase ):
 
