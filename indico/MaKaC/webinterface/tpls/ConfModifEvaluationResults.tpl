@@ -83,11 +83,11 @@
                       <table class="statsGraph">
                         <tr>
                           <% if percent>=10: %>
-                            <td class="<% print colors[color%len(colors)]; color+=1 %>" width="<%=percent%>%" align="right"><%=percent%>&#37;</td>
+                            <td class="<%= colors[color%len(colors)] %><% color+=1 %>" width="<%=percent%>%" align="right"><%=percent%>&#37;</td>
                             <td width="<%=100-percent%>%"/>
                           <% end %>
                           <% if percent<10: %>
-                            <td class="<% print colors[color%len(colors)]; color+=1 %>" width="<%=percent%>%" />
+                            <td class="<%= colors[color%len(colors)] %><% color+=1 %>" width="<%=percent%>%" />
                             <td width="<%=100-percent%>%">&nbsp;<%=percent%>&#37;</td>
                           <% end %>
                         </tr>
