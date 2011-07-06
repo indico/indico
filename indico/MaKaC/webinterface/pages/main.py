@@ -174,11 +174,11 @@ class WUpcomingEvents(wcomponents.WTemplated):
         elif dateTime.date() == (now + datetime.timedelta(days=1)).date():
             return _("tomorrow") + " " + formatTime(dateTime.time())
         elif dateTime < (now + datetime.timedelta(days=6)):
-            return formatDateTime(dateTime, format="%A %H:%M")
+            return formatDateTime(dateTime, format="EEEE H:mm")
         elif dateTime.date().year == now.date().year:
-            return formatDateTime(dateTime, format="%d %b")
+            return formatDateTime(dateTime, format="d MMM")
         else:
-            return formatDateTime(dateTime, format="%d %b %Y")
+            return formatDateTime(dateTime, format="d MMM YYYY")
 
     def _getUpcomingEvents(self):
         upcomingMod = ModuleHolder().getById('upcoming_events')

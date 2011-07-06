@@ -24,7 +24,8 @@ from datetime import datetime, date, timedelta
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC import user, errors
-from MaKaC.i18n import _
+from indico.util.i18n import currentLocale
+from babel.dates import format_datetime
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
@@ -411,14 +412,17 @@ def daysBetween(dtStart, dtEnd):
 
     return days
 
+
 def formatDateTime(dateTime, showWeek=False, format=None):
     week = ""
+    locale = str(currentLocale())
     if showWeek:
-        week = "%a "
+        week = "EEEE "
     if not format:
-        return datetime.strftime(dateTime, week+'%d/%m/%Y %H:%M')
+        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale).encode('utf-8')
     else:
-        return datetime.strftime(dateTime, format)
+        return format_datetime(dateTime, format, locale=locale).encode('utf-8')
+
 
 def formatDate(date, showWeek=False, format=None):
     week = ""
@@ -429,8 +433,10 @@ def formatDate(date, showWeek=False, format=None):
     else:
         return datetime.strftime(date, format)
 
+
 def formatTime(time):
     return time.strftime('%H:%M')
+
 
 def parseDate(dateStr, format='%d/%m/%Y'):
     t=time.strptime(dateStr, format)
@@ -442,7 +448,6 @@ def formatDuration(duration, units = 'minutes', truncate = True):
     """
 
     seconds = duration.days * 86400 + duration.seconds
-
 
     if units == 'seconds':
         result = seconds
@@ -475,10 +480,6 @@ def formatDuration(duration, units = 'minutes', truncate = True):
         return int(result)
     else:
         return result
-
-
-
-
 
 
 def formatTwoDates(date1, date2, tz = None, useToday = False, useTomorrow = False, dayFormat = None, capitalize = True, showWeek = False):

@@ -333,7 +333,8 @@ class WHeader(WTemplated):
         vars["ActiveTimezoneDisplay"] = self._getTimezoneDisplay(vars["ActiveTimezone"])
 
         vars["SelectedLanguage"] = selLang
-        vars["SelectedLanguageName"] = parseLocale(selLang).get_display_name().encode('utf-8')
+        locale = parseLocale(selLang)
+        vars["SelectedLanguageName"] = locale.languages[locale.language].encode('utf-8')
         vars["Languages"] = getLocaleDisplayNames()
 
         if DBMgr.getInstance().isConnected():
@@ -1286,8 +1287,8 @@ class WConferenceModifFrame(WTemplated):
         vars = WTemplated.getVars( self )
 
         vars["conf"] = self.__conf
-        vars["startDate"] = utils.formatDateTime(self.__conf.getAdjustedStartDate(), format="%d %B")
-        vars["endDate"] = utils.formatDateTime(self.__conf.getAdjustedEndDate(), format="%d %B")
+        vars["startDate"] = utils.formatDateTime(self.__conf.getAdjustedStartDate(), format="d MMM")
+        vars["endDate"] = utils.formatDateTime(self.__conf.getAdjustedEndDate(), format="d MMM")
 
         return vars
 

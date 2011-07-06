@@ -85,8 +85,8 @@ class WExtra (WJSBase):
 
         vars["AllowedStartMinutes"] = self._EVOOptions["allowedPastMinutes"].getValue()
         if self._conf:
-            vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf), format = "%a %d/%m %H:%M")
-            vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf), format = "%a %d/%m %H:%M")
+            vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf), format = "EEE d/M H:mm")
+            vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf), format = "EEE d/M H:mm")
         else:
             vars["MinStartDate"] = ''
             vars["MaxEndDate"] = ''
