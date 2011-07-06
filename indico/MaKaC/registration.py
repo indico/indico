@@ -2203,7 +2203,7 @@ class RadioGroupInput(FieldInputType):
 
                 placesInfo = ""
                 if radioItem.getPlacesLimit():
-                    placesInfo = """&nbsp;(%s left)""" % (radioItem.getNoPlacesLeft())
+                    placesInfo = """&nbsp;(%s/%s left)""" % (radioItem.getNoPlacesLeft(),radioItem.getPlacesLimit())
 
                 disabled = ""
                 if (not radioItem.hasAvailablePlaces() and radioItem.getCaption() != value):
