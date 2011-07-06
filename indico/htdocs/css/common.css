@@ -463,6 +463,11 @@ div.meetingEventHeader {
     min-height: 125px;
     margin: 0px;
     padding: 10px 30px 10px;
+    border-radius: 10px 10px 0px 0px;
+}
+
+div.meetingEventHeader h1 {
+    text-shadow: 1px 1px 5px #000;
 }
 
 div.meetingEventHeader a {
@@ -483,6 +488,7 @@ div.meetingEventHeader .iCal {
 div.meetingEventHeader .details {
     padding-top: 10px;
     margin: 0;
+    text-shadow: 1px 1px 1px #555;
 }
 
 div.meetingEventSubHeader {
@@ -501,6 +507,7 @@ div.meetingEventBody {
     margin: 0px;
     padding: 10px 50px;
     position: relative;
+    min-height: 200px;
 }
 
 div.partList {

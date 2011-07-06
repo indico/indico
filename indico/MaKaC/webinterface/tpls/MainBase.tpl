@@ -10,20 +10,16 @@
         % if sideMenu:
             <div class="emptyVerticalGap"></div>
         % endif
-        <table border="0" cellSpacing="0" cellPadding="0">
-            <tr>
                 % if sideMenu:
-                <td style="vertical-align: top;">
+                <div>
                     ${ sideMenu }
-                </td>
+                </div>
                 % endif
-                <td style="vertical-align: top; width: 100%;">
-                    <div class="body clearfix${" bodyWithSideMenu" if sideMenu else ""}${" bodyWithSideBar" if isFrontPage else ""}" style="margin-left:0px;">
+                <div class="body clearfix${" bodyWithSideMenu" if sideMenu else ""}${" bodyWithSideBar" if isFrontPage else ""}" style="margin-left:0px;">
                         ${ body }
-                    </div>
-                </td>
-            </tr>
-        </table>
+                </div>
+           </div>
+</div>
 
     % else:
 
@@ -37,14 +33,14 @@
         % if isFrontPage:
             <div class="frontPageSideBarContainer">
                 <div class="sideBar">
-                    <div class="leftCorner"></div>
-                    <div class="rightCorner"></div>
-                    <div class="content">
+                  <div class="smallSideBox" style="margin-bottom: 20px;">
                     <h1>${ _("News") }</h1>
                         <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
+                  </div>
+                  <div class="smallSideBox">
                     <h1>${ _("Upcoming events") }</h1>
                         ${ upcomingEvents }
-                    </div>
+                  </div>
                 </div>
             </div>
         % endif

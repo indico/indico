@@ -40,6 +40,7 @@ div.lectureEventHeader {
     margin: 0px;
     padding: 20px 30px;
     position: relative;
+    border-radius: 10px 10px 0px 0px;
 }
 
 div.lectureEventHeader > h1 {
@@ -94,6 +95,7 @@ div.lectureEventBody {
 	color: black;
 	margin: 0;
 	padding: 20px;
+        min-height: 500px;
 }
 
 div.partList {
