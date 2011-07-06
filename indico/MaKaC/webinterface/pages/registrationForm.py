@@ -1936,7 +1936,7 @@ class WConfRegFormAccommodationDisplay(wcomponents.WTemplated):
                         disabled = ' disabled="disabled"'
                     placesLeft = ""
                     if atype.getNoPlacesLeft() > 0:
-                        placesLeft = " <font color='green'><i>[%s place(s) left]</i></font>"%atype.getNoPlacesLeft()
+                        placesLeft = " <span style='color:green; font-style:italic;'>[%s place(s) left]</span>"%atype.getNoPlacesLeft()
                     priceCol = ""
                     if atype.isBillable():
                         priceCol = """<td align="right">%s %s per night</td>""" % (atype.getPrice(), self._conf.getRegistrationForm().getCurrency())
@@ -2027,7 +2027,7 @@ class WConfRegFormSocialEventDisplay(wcomponents.WTemplated):
                     seItem = se.getSocialEventItem()
                 placesLeft = ""
                 if seItem.getPlacesLimit() > 0:
-                    placesLeft = " <font color='green'><i>[%s place(s) left]</i></font>"%seItem.getNoPlacesLeft()
+                    placesLeft = "<span style='color:green; font-style:italic;'>[%s place(s) left]</span>"%seItem.getNoPlacesLeft()
                 priceCol = ""
                 if seItem.isBillable():
                     perPlace = ""

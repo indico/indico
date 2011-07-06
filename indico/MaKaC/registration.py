@@ -1712,7 +1712,7 @@ class CheckboxInput(FieldInputType):
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s """%(tmp, price, currency)
         if self.getParent().getPlacesLimit():
-            tmp += """&nbsp;(%s left)""" % (self.getParent().getNoPlacesLeft())
+            tmp += """&nbsp;<span style='color:green; font-style:italic;'>[%s place(s) left]</span>""" % (self.getParent().getNoPlacesLeft())
         tmp += """</td>"""
         if description:
             tmp = """%s</tr><tr><td></td><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
@@ -1738,7 +1738,7 @@ class CheckboxInput(FieldInputType):
 
     def _getSpecialOptionsHTML(self):
         html = FieldInputType._getSpecialOptionsHTML(self)
-        html += _("""<tr>
+        html += i18nformat("""<tr>
                   <td class="titleCellTD"><span class="titleCellFormat"> _("Places (0 for unlimited)")</span></td>
                   <td bgcolor="white" class="blacktext" width="100%%">
                     <input type="text" name="placesLimit" size="60" value=%s>
@@ -1786,7 +1786,12 @@ class YesNoInput(FieldInputType):
             checkedYes="selected"
         elif v=="no":
             checkedNo="selected"
-        tmp = """%s <select id="%s" name="%s" %s><option value="">-- Choose a value --</option><option value="yes" %s>yes</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, checkedNo, param)
+        placesInfo = ""
+        if self.getParent().getPlacesLimit():
+            placesInfo = """&nbsp;[%s place(s) left]""" % (self.getParent().getNoPlacesLeft())
+            if v != "yes" and not self.getParent().hasAvailablePlaces():
+                checkedYes += " disabled"
+        tmp = """%s <select id="%s" name="%s" %s><option value="">-- Choose a value --</option><option value="yes" %s>yes%s</option><option value="no" %s>no</option></select>%s""" % (caption, htmlName, htmlName, disable, checkedYes, placesInfo, checkedNo, param)
         tmp= """ <td>%s</td><td align="right" align="bottom">"""%tmp
         if billable:
             tmp= """%s&nbsp;&nbsp;%s&nbsp;%s</td> """%(tmp,price,currency)
@@ -1820,6 +1825,16 @@ class YesNoInput(FieldInputType):
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
         item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
+
+    def _getSpecialOptionsHTML(self):
+        html = FieldInputType._getSpecialOptionsHTML(self)
+        html += i18nformat("""<tr>
+                  <td class="titleCellTD"><span class="titleCellFormat"> _("Places (0 for unlimited)")</span></td>
+                  <td bgcolor="white" class="blacktext" width="100%%">
+                    <input type="text" name="placesLimit" size="60" value=%s>
+                  </td>
+                </tr>""")%(self._parent.getPlacesLimit())
+        return html
 
 class RadioItem(Persistent):
 
@@ -2124,8 +2139,7 @@ class RadioGroupInput(FieldInputType):
             value = item.getValue()
 
         tmp = """%s""" % (caption)
-        tmp = [""" <td>%s</td><td align="right" align="bottom">""" % tmp]
-        tmp.append(""" </td> """)
+        tmp = [""" <td>%s</td><td align="right" align="bottom" colspan="2"></td>""" % tmp]
 
         counter = 0
         for val in self.getItemsList():
@@ -2143,12 +2157,12 @@ class RadioGroupInput(FieldInputType):
                 checked = "checked"
             elif not value and val.getCaption() == self.getDefaultItem():
                 checked = "checked"
-            placesInfo = ""
-            if val.getPlacesLimit():
-                placesInfo = """&nbsp;(%s/%s left)""" % (val.getNoPlacesLeft(),val.getPlacesLimit())
-            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" id="%s" name="%s" value="%s" %s %s> %s%s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption(), placesInfo))
+            tmp.append("""<tr><td></td><td><input type="radio" style="vertical-align:sub;" id="%s" name="%s" value="%s" %s %s> %s</td><td align="right" style="vertical-align: bottom;" >""" % (itemId, self.getHTMLName(), val.getId(), checked, disable, val.getCaption()))
             if val.isBillable():
                 tmp.append("""&nbsp;&nbsp;%s&nbsp;%s""" % (val.getPrice(), currency))
+            tmp.append("""</td><td align="right" style="vertical-align: bottom;" >""")
+            if val.getPlacesLimit():
+                tmp.append("""&nbsp;<span style='color:green; font-style:italic;'>[%s place(s) left]</span>""" % (val.getNoPlacesLeft()))
             tmp.append(""" </td></tr> """)
 
         if description:
@@ -2203,7 +2217,7 @@ class RadioGroupInput(FieldInputType):
 
                 placesInfo = ""
                 if radioItem.getPlacesLimit():
-                    placesInfo = """&nbsp;(%s/%s left)""" % (radioItem.getNoPlacesLeft(),radioItem.getPlacesLimit())
+                    placesInfo = """&nbsp;[%s place(s) left]""" % (radioItem.getNoPlacesLeft())
 
                 disabled = ""
                 if (not radioItem.hasAvailablePlaces() and radioItem.getCaption() != value):
@@ -2665,7 +2679,7 @@ class GeneralField(Persistent):
     def increaseNoPlaces(self):
         if self.getPlacesLimit() > 0 :
             if self.getCurrentNoPlaces() >= self.getPlacesLimit():
-                raise FormValuesError( _("""The limit for the number of places is smaller than the current amount registered for this item. Please, set a higher limit."""))
+                raise FormValuesError( _("""The limit for the number of places is smaller than the current amount registered for this item."""))
             self._currentNoPlaces += 1
 
     def decreaseNoPlaces(self):
