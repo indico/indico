@@ -94,8 +94,8 @@ class WPBase(OldObservable):
         return []
 
     def getJSFiles(self):
-        return self._includePresentationFiles() + \
-               self._includeJQuery() + \
+        return self._includeJQuery() + \
+               self._includePresentationFiles() + \
                self._includeJSPackage('Core') + \
                self._includeJSPackage('Legacy') + \
                self._includeJSPackage('Common')
