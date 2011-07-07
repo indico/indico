@@ -5,48 +5,48 @@
 this.global = this;
 
 function isDefined(name) {
-	return name in global;
+    return name in global;
 }
 
 if (typeof(global.include) !== "function") {
-	var include = function(script) {
-		document.write("<script type=\"text/javascript\" src=\"" + script + "\"></script>");
-	}
+    var include = function(script) {
+        document.write("<script type=\"text/javascript\" src=\"" + script + "\"></script>");
+    }
 }
 
 function load(code) {
-	if (window.execScript) {
-		return window.execScript(code);
-	}
-	global.eval(code);
+    if (window.execScript) {
+        return window.execScript(code);
+    }
+    global.eval(code);
 }
 
 function extract(text, start, stop) {
-	var startIndex;
-	if (!empty(start)) {
-		startIndex = text.indexOf(start);
-		if (startIndex < 0) {
-			return null;
-		}
-		startIndex += start.length;
-	}
-	var stopIndex = text.indexOf(stop, startIndex);
-	if (stopIndex < startIndex) {
-		return null;
-	}
-	return text.substring(startIndex, stopIndex);
+    var startIndex;
+    if (!empty(start)) {
+        startIndex = text.indexOf(start);
+        if (startIndex < 0) {
+            return null;
+        }
+        startIndex += start.length;
+    }
+    var stopIndex = text.indexOf(stop, startIndex);
+    if (stopIndex < startIndex) {
+        return null;
+    }
+    return text.substring(startIndex, stopIndex);
 }
 
 function equals(a, b) {
-	if (!exists(a))
-		return !exists(b);
-	if (!exists(b))
-		return !exists(a);
-	if (a.Equatable)
-		return a.equals(b);
-	if (b.Equatable)
-		return b.equals(a);
-	return a == b;
+    if (!exists(a))
+        return !exists(b);
+    if (!exists(b))
+        return !exists(a);
+    if (a.Equatable)
+        return a.equals(b);
+    if (b.Equatable)
+        return b.equals(a);
+    return a == b;
 }
 
 /**
@@ -54,7 +54,7 @@ function equals(a, b) {
  * @param {Function} block
  */
 function internal(block) {
-	block();
+    block();
 }
 
 /**
@@ -63,7 +63,7 @@ function internal(block) {
  * @return {Object}
  */
 function pass(value) {
-	return value;
+    return value;
 }
 pass.toTarget = pass;
 pass.toSource = pass;
@@ -74,7 +74,7 @@ pass.toSource = pass;
  * @return {Boolean}
  */
 function invert(value) {
-	return !value;
+    return !value;
 }
 invert.toTarget = invert;
 invert.toSource = invert;
@@ -85,7 +85,7 @@ invert.toSource = invert;
  * @return {Boolean}
  */
 function exists(value) {
-	return value !== undefined && value !== null;
+    return value !== undefined && value !== null;
 }
 
 /**
@@ -94,9 +94,9 @@ function exists(value) {
  * @return {Boolean}
  */
 function empty(value) {
-	return !exists(value) || value === ""
-		|| (isArray(value) && value.length === 0)
-		|| (isObject(value) && (value.Enumerable ? value.isEmpty() : !hasProperties(value)));
+    return !exists(value) || value === ""
+        || (isArray(value) && value.length === 0)
+        || (isObject(value) && (value.Enumerable ? value.isEmpty() : !hasProperties(value)));
 }
 
 /**
@@ -105,10 +105,10 @@ function empty(value) {
  * @return {Boolean}
  */
 function hasProperties(object) {
-	for (var key in object) {
-		return true;
-	}
-	return false;
+    for (var key in object) {
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -117,12 +117,12 @@ function hasProperties(object) {
  * @return {Object}
  */
 function any() {
-	for (var i = 0, length = arguments.length; i < length; i++) {
-		var arg = arguments[i];
-		if (exists(arg)) {
-			return arg;
-		}
-	}
+    for (var i = 0, length = arguments.length; i < length; i++) {
+        var arg = arguments[i];
+        if (exists(arg)) {
+            return arg;
+        }
+    }
 }
 
 /**
@@ -131,22 +131,22 @@ function any() {
  * @return {Object}
  */
 function tryAny() {
-	for (var i = 0; i < arguments.length; i++) {
-		var method = arguments[i];
-		try {
-			return method();
-		} catch (e) {
+    for (var i = 0; i < arguments.length; i++) {
+        var method = arguments[i];
+        try {
+            return method();
+        } catch (e) {
 
-		}
-	}
+        }
+    }
 }
 
 function get(value, builder) {
-	return exists(value) ? value : builder();
+    return exists(value) ? value : builder();
 }
 
 function getByKey(object, property, value) {
-	return property in object ? object[property] : value;
+    return property in object ? object[property] : value;
 }
 
 /**
@@ -155,7 +155,7 @@ function getByKey(object, property, value) {
  * @return {Boolean}
  */
 function isObject(value) {
-	return typeof(value) == "object" && value !== null;
+    return typeof(value) == "object" && value !== null;
 }
 
 /**
@@ -164,7 +164,7 @@ function isObject(value) {
  * @return {Boolean}
  */
 function isNumber(value) {
-	return typeof(value) == "number";
+    return typeof(value) == "number";
 }
 
 /**
@@ -173,7 +173,7 @@ function isNumber(value) {
  * @return {Boolean}
  */
 function isString(value) {
-	return typeof(value) == "string";
+    return typeof(value) == "string";
 }
 
 /**
@@ -182,7 +182,7 @@ function isString(value) {
  * @return {Boolean}
  */
 function isFunction(value) {
-	return typeof(value) == "function";
+    return typeof(value) == "function";
 }
 
 /**
@@ -191,7 +191,7 @@ function isFunction(value) {
  * @return {Boolean}
  */
 function isArray(value) {
-	return value instanceof Array;
+    return value instanceof Array;
 }
 
 /**
@@ -200,7 +200,7 @@ function isArray(value) {
  * @return {Boolean}
  */
 function isDom(value) {
-	return exists(value) && isNumber(value.nodeType);
+    return exists(value) && isNumber(value.nodeType);
 }
 
 /**
@@ -214,8 +214,8 @@ function isDom(value) {
  * @return {Object} result
  */
 function init(object, property, value) {
-	var result = object[property];
-	return exists(result) ? result : object[property] = value;
+    var result = object[property];
+    return exists(result) ? result : object[property] = value;
 }
 
 /**
@@ -229,25 +229,25 @@ function init(object, property, value) {
  * @return {Object} result
  */
 function obtain(object, property, initializer) {
-	var result = object[property];
-	return exists(result) ? result : object[property] = initializer();
+    var result = object[property];
+    return exists(result) ? result : object[property] = initializer();
 }
 
 function obtainGet(object, property, initializer) {
-	var result = object.get(property);
-	if (!exists(result)) {
-		result = initializer();
-		object.set(property, result);
-	}
-	return result;
+    var result = object.get(property);
+    if (!exists(result)) {
+        result = initializer();
+        object.set(property, result);
+    }
+    return result;
 }
 
 function obtainSet(object, property, key, value) {
-	obtain(object, property, newObject)[key] = value;
+    obtain(object, property, newObject)[key] = value;
 }
 
 function obtainAdd(object, property, value) {
-	obtain(object, property, newArray).push(value);
+    obtain(object, property, newArray).push(value);
 }
 
 
@@ -257,11 +257,11 @@ function obtainAdd(object, property, value) {
  * @return {Object} result
  */
 function clone(object) {
-	var result = new object.constructor();
-	for (var key in object) {
-		result[key] = object[key];
-	}
-	return result;
+    var result = new object.constructor();
+    for (var key in object) {
+        result[key] = object[key];
+    }
+    return result;
 }
 
 /**
@@ -271,10 +271,10 @@ function clone(object) {
  * @return {Object} target
  */
 function extend(target, source) {
-	for (var key in source) {
-		target[key] = source[key];
-	}
-	return target;
+    for (var key in source) {
+        target[key] = source[key];
+    }
+    return target;
 }
 
 /**
@@ -289,19 +289,19 @@ function nothing() {
  * @return {String}
  */
 function str(value) {
-	switch (typeof(value)) {
-		case "boolean":
-			return value ? "true" : "false";
-		case "number":
-		case "object":
-			if (value === null) {
-				return "";
-			}
-		case "string":
-			return String(value);
-		default:
-			return "";
-	}
+    switch (typeof(value)) {
+        case "boolean":
+            return value ? "true" : "false";
+        case "number":
+        case "object":
+            if (value === null) {
+                return "";
+            }
+        case "string":
+            return String(value);
+        default:
+            return "";
+    }
 }
 
 /**
@@ -310,15 +310,15 @@ function str(value) {
  * @return {Function}
  */
 function construct(type) {
-	return function() {
-		return new type();
-	};
+    return function() {
+        return new type();
+    };
 }
 
 function provide(type) {
-	return function(value) {
-		return exists(value) ? value : new type();
-	};
+    return function(value) {
+        return exists(value) ? value : new type();
+    };
 }
 
 
@@ -329,26 +329,26 @@ var getArray = provide(newArray);
 
 
 function objectize(key, value) {
-	var obj = {};
-	obj[key] = value;
-	return obj;
+    var obj = {};
+    obj[key] = value;
+    return obj;
 }
 
 function setExisting(object, key, value) {
-	if (exists(value)) {
-		object[key] = value;
-	}
+    if (exists(value)) {
+        object[key] = value;
+    }
 }
 
 /**
  * Browser detection from Prototype JavaScript Framework.
  */
 var Browser = {
-	IE: (window.attachEvent && !window.opera) ? extract(navigator.appVersion, "MSIE ", ";") : false,
-	Opera: window.opera ? extract(navigator.appVersion, "", " ") : false,
-	WebKit: navigator.appVersion.indexOf('AppleWebKit/') > -1 ? extract(navigator.appVersion, "AppleWebKit/", " ") : false,
-	Gecko: navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('KHTML') == -1 ? extract(navigator.userAgent, "rv:", ")") : false,
-	KHTML: navigator.appVersion.indexOf('KHTML') > -1 && navigator.appVersion.indexOf('AppleWebKit') == -1 ? extract(navigator.appVersion, "KHTML/", " ") : false,
-	MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/)
+    IE: (window.attachEvent && !window.opera) ? extract(navigator.appVersion, "MSIE ", ";") : false,
+    Opera: window.opera ? extract(navigator.appVersion, "", " ") : false,
+    WebKit: navigator.appVersion.indexOf('AppleWebKit/') > -1 ? extract(navigator.appVersion, "AppleWebKit/", " ") : false,
+    Gecko: navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('KHTML') == -1 ? extract(navigator.userAgent, "rv:", ")") : false,
+    KHTML: navigator.appVersion.indexOf('KHTML') > -1 && navigator.appVersion.indexOf('AppleWebKit') == -1 ? extract(navigator.appVersion, "KHTML/", " ") : false,
+    MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/)
 };
 
