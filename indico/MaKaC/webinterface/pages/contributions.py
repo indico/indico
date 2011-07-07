@@ -764,9 +764,7 @@ class WContribModifAC(wcomponents.WTemplated):
     def getVars( self ):
         vars=wcomponents.WTemplated.getVars( self )
         mcf=wcomponents.WModificationControlFrame()
-        addMgrURL=urlHandlers.UHContributionSelectManagers.getURL()
-        remMgrURL=urlHandlers.UHContributionRemoveManagers.getURL()
-        vars["modifyControlFrame"]=mcf.getHTML(self._contrib,addMgrURL,remMgrURL)
+        vars["modifyControlFrame"] = mcf.getHTML(self._contrib)
         acf=wcomponents.WAccessControlFrame()
         visURL=urlHandlers.UHContributionSetVisibility.getURL()
 
@@ -851,19 +849,6 @@ class WPContribAddSC( WPContributionModifBase ):
 
 
 #---------------------------------------------------------------------------
-
-class WPContributionSelectManagers( WPContribModifAC ):
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHContributionSelectManagers.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHContributionAddManagers.getURL()
-        return wc.getHTML( params )
-
 
 class WPContributionSelectAllowed( WPContribModifAC ):
 

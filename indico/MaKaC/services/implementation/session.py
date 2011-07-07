@@ -10,9 +10,9 @@ import MaKaC.conference as conference
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
-from MaKaC.conference import SessionSlot
+from MaKaC.conference import SessionSlot, SessionChair
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group
+from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 
 class SessionBase(conferenceServices.ConferenceBase):
 
@@ -197,9 +197,110 @@ class SessionProtectionRemoveUser(SessionModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._session.revokeAccess(userToRemove)
 
+
+class SessionManagerListBase(SessionModifBase):
+
+    def _isConvener(self, email):
+        for convener in self._session.getConvenerList():
+            if email == convener.getEmail():
+                return True
+        return False
+
+    def _getManagersList(self):
+        result = []
+        for manager in self._session.getManagerList():
+            managerFossil = fossilize(manager)
+            if isinstance(manager, Avatar):
+                isConvener = False
+                if self._isConvener(manager.getEmail()):
+                    isConvener = True
+                managerFossil['isConvener'] = isConvener
+            result.append(managerFossil)
+        # get pending users
+        for email in self._session.getAccessController().getModificationEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
+
+class SessionGetManagerList(SessionManagerListBase):
+
+    def _getAnswer(self):
+        return self._getManagersList()
+
+
+class SessionAddExistingManager(SessionManagerListBase):
+
+    def _checkParams(self):
+        SessionManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        for user in self._userList:
+            self._session.grantModification(ph.getById(user["id"]))
+        return self._getManagersList()
+
+
+class SessionRemoveManager(SessionManagerListBase):
+
+    def _checkParams(self):
+        SessionManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._managerId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        if self._kindOfUser == "pending":
+            # remove pending email, self._submitterId is an email address
+            self._session.getAccessController().revokeModificationEmail(self._managerId)
+        elif self._kindOfUser == "principal":
+            ph = PrincipalHolder()
+            self._session.revokeModification(ph.getById(self._managerId))
+        return self._getManagersList()
+
+
+class SessionModifyAsConvener(SessionManagerListBase):
+
+    def _checkParams(self):
+        SessionManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._managerId = pm.extract("userId", pType=str, allowEmpty=False)
+
+
+class SessionAddAsConvener(SessionModifyAsConvener):
+
+    def _getAnswer(self):
+        ah = AvatarHolder()
+        convener = SessionChair()
+        convener.setDataFromAvatar(ah.getById(self._managerId))
+        self._session.addConvener(convener)
+        return self._getManagersList()
+
+
+class SessionRemoveAsConvener(SessionModifyAsConvener):
+
+    def _getAnswer(self):
+        ah = AvatarHolder()
+        convEmail = ah.getById(self._managerId).getEmail()
+        for convener in self._session.getConvenerList():
+            if convEmail == convener.getEmail():
+                self._session.removeConvener(convener)
+        return self._getManagersList()
+
+
+
 methodMap = {
     "getBooking": SessionGetBooking,
     "protection.getAllowedUsersList": SessionProtectionUserList,
     "protection.addAllowedUsers": SessionProtectionAddUsers,
-    "protection.removeAllowedUser": SessionProtectionRemoveUser
+    "protection.removeAllowedUser": SessionProtectionRemoveUser,
+    "protection.addExistingManager": SessionAddExistingManager,
+    "protection.removeManager": SessionRemoveManager,
+    "protection.getManagerList": SessionGetManagerList,
+    "protection.addAsConvener": SessionAddAsConvener,
+    "protection.removeAsConvener": SessionRemoveAsConvener
 }

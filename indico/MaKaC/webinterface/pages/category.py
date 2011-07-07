@@ -1888,10 +1888,7 @@ class WCategModifAC(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
 
-        vars["modifyControlFrame"] = wcomponents.WModificationControlFrame().getHTML(\
-                                                    self._categ,\
-                                                    vars["addManagersURL"],\
-                                                    vars["removeManagersURL"] )
+        vars["modifyControlFrame"] = wcomponents.WModificationControlFrame().getHTML(self._categ)
         if self._categ.isRoot() :
             type = 'Home'
         else :
@@ -1907,6 +1904,7 @@ class WCategModifAC(wcomponents.WTemplated):
                                                     vars["addDomainURL"], \
                                                     vars["removeDomainURL"] )
         vars["confCreationControlFrame"] = ""
+        vars["categoryId"] = self._categ.getId()
         if not self._categ.getSubCategoryList():
             frame = wcomponents.WConfCreationControlFrame( self._categ )
             p = { "setStatusURL": vars["setConferenceCreationControlURL"], \
@@ -1923,8 +1921,6 @@ class WPCategModifAC( WPCategoryModifBase ):
     def _getPageContent( self, params ):
         wc = WCategModifAC( self._target )
         pars = { \
-"addManagersURL": urlHandlers.UHCategorySelectManagers.getURL(), \
-"removeManagersURL": urlHandlers.UHCategoryRemoveManagers.getURL(), \
 "setVisibilityURL": urlHandlers.UHCategorySetVisibility.getURL(), \
 "addAllowedURL": urlHandlers.UHCategorySelectAllowed.getURL(), \
 "removeAllowedURL": urlHandlers.UHCategoryRemoveAllowed.getURL(), \
@@ -1935,18 +1931,6 @@ class WPCategModifAC( WPCategoryModifBase ):
 "removeConfenceCreatorsURL": urlHandlers.UHCategoryRemoveConfCreators.getURL() }
         return wc.getHTML( pars )
 
-
-class WPCategorySelectManagers( WPCategModifAC ):
-
-    def _getPageContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHCategorySelectManagers.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHCategoryAddManagers.getURL()
-        return wc.getHTML( params )
 
 
 class WPCategorySelectAllowed( WPCategModifAC ):

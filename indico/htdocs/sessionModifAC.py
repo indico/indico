@@ -42,15 +42,6 @@ def addDomains( req, **params ):
 def removeDomains( req, **params ):
     return sessionModif.RHSessionRemoveDomains( req ).process( params )
 
-def selectManagers( req, **params ):
-    return sessionModif.RHSessionSelectManagers( req ).process( params )
-
-def addManagers( req, **params ):
-    return sessionModif.RHSessionAddManagers( req ).process( params )
-
-def removeManagers( req, **params ):
-    return sessionModif.RHSessionRemoveManagers( req ).process( params )
-
 def selectCoordinators( req, **params ):
     return sessionModif.RHCoordinatorsSel( req ).process( params )
 

@@ -647,7 +647,7 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
                 var userIdentifier = result[i]['name'];
             } else {
                 var userText = Html.span({className:'nameLink', cssFloat:'left'}, result[i]['name'], this._getRolesText(result[i]));
-                var kindOfUser = "avatar";
+                var kindOfUser = "principal";
                 var userIdentifier = result[i]['id'];
             }
             userRowElements.push(userText);
@@ -785,11 +785,11 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
             this.speakerCaptionCapital = $T('Speaker');
         }
 
-        this.methods = {'addExisting': 'contribution.submissionControl.addExistingSubmitter',
-                        'remove': 'contribution.submissionControl.removeSubmitter',
-                        'getUserList': 'contribution.submissionControl.getSubmittersList',
-                        'addAsAuthor': 'contribution.submissionControl.addAsAuthor',
-                        'removeAsAuthor':'contribution.submissionControl.removeAsAuthor'};
+        this.methods = {'addExisting': 'contribution.protection.submissionControl.addExistingSubmitter',
+                        'remove': 'contribution.protection.submissionControl.removeSubmitter',
+                        'getUserList': 'contribution.protection.submissionControl.getSubmittersList',
+                        'addAsAuthor': 'contribution.protection.submissionControl.addAsAuthor',
+                        'removeAsAuthor':'contribution.protection.submissionControl.removeAsAuthor'};
 
         this.ListOfUsersManager(confId, this.methods, {confId: confId, contribId: this.contribId},
                 inPlaceListElem, true, true, false, false, null, userCaption, "UIPerson", false, false, true);

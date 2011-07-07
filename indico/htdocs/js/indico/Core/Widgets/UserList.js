@@ -615,3 +615,106 @@ type("ListOfUsersManagerForForm", [], {
         this.usersList = $L();
     }
 );
+
+
+/*
+ * Manager for the list of users/groups with modification rights
+ *
+ * @param: confId -> Id of the conference (if needed),
+ * @param: methods -> Supported methods,
+ * @param: params -> Common params for all the methods,
+ * @param: inPlaceListElem -> Element of the webpage where the list will be.
+ * @param: userCaption -> String to show in the texts
+ */
+type("ModificationControlManager", ["ListOfUsersManager"], {
+
+    _getAddExistingParams: function(userList) {
+        var params = this.params;
+        params['userList'] = userList;
+        return params;
+    },
+
+    _getRemoveParams: function(userId) {
+        var params = this.params;
+        params['userId'] = userId;
+        return params;
+    },
+
+    addExistingUser: function(){
+        this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, true, true, true, false, true);
+    },
+
+    _updateUserList: function(result) {
+        var self = this;
+        // update the user list
+        this.inPlaceListElem.set('');
+        for (var i=0; i<result.length; i++) {
+            var userRowElements = [];
+
+            if (result[i]['_type'] == "Avatar") {
+                if (!result[i]['firstName']) {
+                    var fullName = result[i]['familyName'].toUpperCase();
+                } else {
+                    var fullName = result[i]['familyName'].toUpperCase() + ', ' + result[i]['firstName'];
+                }
+                var elementStyle = "UIPerson";
+            } else if (result[i]['_type'] == "Group") {
+                var fullName = result[i]['name'];
+                var elementStyle = "UIGroup";
+            } else if (result[i]['pending']) {
+                var fullName = $T('Non-registered-user');
+                var elementStyle = "UIPerson";
+            }
+            var userText = Html.span({className:'nameLink', cssFloat:'left'}, fullName, Html.small({},' ('+ result[i]['email'] + ')'));
+            userRowElements.push(userText);
+
+            // favourites star
+            if (this.showFavouritesIcon && IndicoGlobalVars.isUserAuthenticated &&
+                    exists(IndicoGlobalVars['userData']['favorite-user-ids']) && result[i]['_type'] === "Avatar") {
+                spanStar = Html.span({style:{padding:'3px', cssFloat:'right'}});
+                spanStar.set(new ToggleFavouriteButton(result[i], {}, IndicoGlobalVars['userData']['favorite-user-ids'][result[i]['id']]).draw());
+                userRowElements.push(spanStar);
+            }
+
+            // remove icon
+            var imageRemove = Html.img({
+                src: imageSrc("remove"),
+                alt: $T('Remove ') + this.userCaption,
+                title: $T('Remove this ') + this.userCaption + $T(' from the list'),
+                className: 'UIRowButton2',
+                id: 'remove_'+result[i]['id'],
+                style:{marginRight:'10px', cssFloat:'right', cursor:'pointer'}
+            });
+
+            imageRemove.observeClick(function(event) {
+                if (event.target) { // Firefox
+                    var userId = event.target.id.split('_')[1];
+                } else { // IE
+                    var userId = event.srcElement.id.split('_')[1];
+                }
+                    self._manageUserList(self.methods["remove"], self._getRemoveParams(userId), false);
+                });
+            userRowElements.push(imageRemove);
+
+            var row = Html.li({className: elementStyle, onmouseover: "this.style.backgroundColor = '#ECECEC';",
+                                onmouseout : "this.style.backgroundColor='#ffffff';", style:{cursor:'auto'}});
+
+            for (var j=userRowElements.length-1; j>=0; j--) { // Done the 'for' like this because of IE7
+                row.append(userRowElements[j]);
+            }
+            this.inPlaceListElem.append(row);
+        }
+    }
+
+},
+
+    function(confId, methods, params, inPlaceListElem, userCaption) {
+        this.confId = confId;
+        this.methods = methods;
+        this.params = params;
+        // params: confId, methods, userListParams, inPlaceListElem, showRemoveIcon, showEditIcon, showFavouritesIcon, showOrderArrows,
+        // kindOfUser, userCaption, elementClass, showGrantSubmissionCB, showGrantManagementCB, showAffiliation
+        this.ListOfUsersManager(this.confId, this.methods, params, inPlaceListElem, true,
+                                false, true, false, userCaption, userCaption, null, false, false, false);
+    }
+);

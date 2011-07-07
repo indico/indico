@@ -834,7 +834,7 @@ class ContributionRemoveSubmitter(ContributionSubmittersBase):
         if self._kindOfUser == "pending":
             # remove pending email, self._submitterId is an email address
             self._contribution.revokeSubmissionEmail(self._submitterId)
-        elif self._kindOfUser == "avatar":
+        elif self._kindOfUser == "principal":
             ah = PrincipalHolder()
             av = ah.getById(self._submitterId)
             if av is not None:
@@ -914,6 +914,49 @@ class ContributionSumissionControlRemoveAsAuthor(ContributionSumissionControlMod
         return self._getSubmittersList()
 
 
+class ContributionManagerListBase(ContributionModifBase):
+
+    def _getManagersList(self):
+        result = fossilize(self._contribution.getManagerList())
+        # get pending users
+        for email in self._contribution.getAccessController().getModificationEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
+
+class ContributionGetManagerList(ContributionManagerListBase):
+
+    def _getAnswer(self):
+        return self._getManagersList()
+
+
+class ContributionAddExistingManager(ContributionManagerListBase):
+
+    def _checkParams(self):
+        ContributionManagerListBase._checkParams(self)
+        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        for user in self._userList:
+            self._contribution.grantModification(ph.getById(user["id"]))
+        return self._getManagersList()
+
+
+class ContributionRemoveManager(ContributionManagerListBase):
+
+    def _checkParams(self):
+        ContributionManagerListBase._checkParams(self)
+        self._managerId = self._pm.extract("userId", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        self._contribution.revokeModification(ph.getById(self._managerId))
+        return self._getManagersList()
+
 
 
 methodMap = {
@@ -947,9 +990,13 @@ methodMap = {
     "participants.subContribution.getAllAuthors": SubContributionGetAllAuthors,
     "participants.subContribution.addAuthorAsPresenter": SubContributionAddAuthorAsPresenter,
 
-    "submissionControl.addExistingSubmitter": ContributionAddExistingSubmitter,
-    "submissionControl.removeSubmitter": ContributionRemoveSubmitter,
-    "submissionControl.getSubmittersList": ContributionGetSubmittersList,
-    "submissionControl.addAsAuthor": ContributionSumissionControlAddAsAuthor,
-    "submissionControl.removeAsAuthor": ContributionSumissionControlRemoveAsAuthor
+    "protection.submissionControl.addExistingSubmitter": ContributionAddExistingSubmitter,
+    "protection.submissionControl.removeSubmitter": ContributionRemoveSubmitter,
+    "protection.submissionControl.getSubmittersList": ContributionGetSubmittersList,
+    "protection.submissionControl.addAsAuthor": ContributionSumissionControlAddAsAuthor,
+    "protection.submissionControl.removeAsAuthor": ContributionSumissionControlRemoveAsAuthor,
+
+    "protection.addExistingManager": ContributionAddExistingManager,
+    "protection.removeManager": ContributionRemoveManager,
+    "protection.getManagerList": ContributionGetManagerList
 }

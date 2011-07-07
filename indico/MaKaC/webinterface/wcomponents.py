@@ -2125,21 +2125,13 @@ class WPrincipalTable(WTemplated):
 
 class WModificationControlFrame(WTemplated):
 
-    def getHTML( self, target, addManagersURL, removeManagersURL ):
+    def getHTML( self, target ):
         self.__target = target
-        params = { "addManagersURL": addManagersURL, \
-                   "removeManagersURL": removeManagersURL }
-        return  WTemplated.getHTML( self, params )
+        return  WTemplated.getHTML( self )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["principalTable"] = WPrincipalTable().getHTML( self.__target.getManagerList(),
-                                                            self.__target,vars["addManagersURL"],
-                                                            vars["removeManagersURL"],
-                                                            pendings=self.__target.getAccessController().getModificationEmail(),
-                                                            selectable=False)
-
         return vars
 
 

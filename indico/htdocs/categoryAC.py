@@ -24,18 +24,9 @@ import MaKaC.webinterface.rh.categoryMod as categoryMod
 def index(req, **params):
     return categoryMod.RHCategoryAC( req ).process( params )
 
-def selectManagers( req, **params ):
-    return categoryMod.RHCategorySelectManagers( req ).process( params )
-
-def addManagers( req, **params ):
-    return categoryMod.RHCategoryAddManagers( req ).process( params )
-
-def removeManagers( req, **params ):
-    return categoryMod.RHCategoryRemoveManagers( req ).process( params )
-
 def setVisibility( req, **params ):
     return categoryMod.RHCategorySetVisibility( req ).process( params )
-    
+
 def selectAllowedToAccess( req, **params ):
     return categoryMod.RHCategorySelectAllowed( req ).process( params )
 

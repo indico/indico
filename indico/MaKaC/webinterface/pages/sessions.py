@@ -2024,10 +2024,10 @@ class WSessionModifAC(wcomponents.WTemplated):
                                     urlHandlers.UHSessionAddDomains.getURL(),\
                                     urlHandlers.UHSessionRemoveDomains.getURL())
         wc=wcomponents.WModificationControlFrame()
-        vars["modifyControlFrame"]=wc.getHTML(self._session,\
-                                urlHandlers.UHSessionSelectManagers.getURL(),\
-                                urlHandlers.UHSessionRemoveManagers.getURL() )
+        vars["modifyControlFrame"] = wc.getHTML(self._session)
         vars["coordinators"]=self._getCoordinatorsHTML()
+        vars["confId"] = self._session.getConference().getId()
+        vars["sessionId"] = self._session.getId()
         return vars
 
 
@@ -2051,19 +2051,6 @@ class WPSessionSelectAllowed( WPSessionModifAC ):
             searchLocal = True
         wc = wcomponents.WPrincipalSelection( urlHandlers.UHSessionSelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHSessionAddAllowed.getURL()
-        return wc.getHTML( params )
-
-
-class WPSessionSelectManagers( WPSessionModifAC ):
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHSessionSelectManagers.getURL(), addTo=3,forceWithoutExtAuth=searchLocal)
-        params["addURL"] = urlHandlers.UHSessionAddManagers.getURL()
         return wc.getHTML( params )
 
 

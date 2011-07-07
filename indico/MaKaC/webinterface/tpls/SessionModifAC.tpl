@@ -14,3 +14,17 @@ ${ accessControlFrame }
 </tr>
 </table>
 </tr></td></table>
+
+<script>
+
+var methods = {'addExisting': 'session.protection.addExistingManager',
+                    'remove': 'session.protection.removeManager',
+               'getUserList': 'session.protection.getManagerList',
+             'addAsConvener': 'session.protection.addAsConvener',
+          'removeAsConvener': 'session.protection.removeAsConvener'};
+
+var params = {confId: '${ confId }', sessionId: '${ sessionId }'};
+
+var modificationControlManager = new SessionModificationControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+
+</script>

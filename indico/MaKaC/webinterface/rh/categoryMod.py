@@ -568,40 +568,6 @@ class RHCategoryActionConferences( RHCategModifBase ):
             return self._action.askConfirmation( self._getRequestParams() )
 
 
-class RHCategorySelectManagers( RHCategModifBase ):
-    _uh = urlHandlers.UHCategorySelectManagers
-
-    def _process( self ):
-        p = category.WPCategorySelectManagers( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHCategoryAddManagers( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryAddManagers
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                av = ph.getById( id )
-                self._target.grantModification( av )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
-
-class RHCategoryRemoveManagers( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryRemoveManagers
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                self._target.revokeModification( ph.getById( id ) )
-        self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
-
-
 class RHCategorySetVisibility( RHCategModifBase ):
     _uh = urlHandlers.UHCategorySetVisibility
 

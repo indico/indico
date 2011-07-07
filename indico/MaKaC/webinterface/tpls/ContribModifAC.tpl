@@ -11,7 +11,7 @@ ${ accessControlFrame }
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat">${ _("Submitters")}<br><font size="-2">(${ _("users allowed to submit material for this contribution")})</font></span></td>
         <td width="100%" style="padding-bottom:20px;">
-            <table width="100%" style="padding-top:6px;">
+            <table width="80%">
                 <tr>
                     <td id="parentTDSubmitters" style="width:79%; display:none"><ul id="inPlaceSubmitters" class="UIPeopleList"></ul></td>
                 </tr>
@@ -32,5 +32,13 @@ ${ accessControlFrame }
 
 var submitterManager = new SubmissionControlListManager('${ confId }', '${ contribId }', $E('inPlaceSubmitters'),
         $E('parentTDSubmitters'),  "submitter", '${ eventType }');
+
+var methods = {'addExisting': 'contribution.protection.addExistingManager',
+                    'remove': 'contribution.protection.removeManager',
+               'getUserList': 'contribution.protection.getManagerList'};
+
+var params = {confId: '${ confId }', contribId: '${ contribId }'};
+
+var modificationControlManager = new ModificationControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
 
 </script>

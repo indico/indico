@@ -60,16 +60,6 @@ def up(req, **params):
 def Down(req, **params):
     return contribMod.RHContributionDownSC( req ).process( params )
 
-
-def selectManagers( req, **params ):
-    return contribMod.RHContributionSelectManagers( req ).process( params )
-
-def addManagers( req, **params ):
-    return contribMod.RHContributionAddManagers( req ).process( params )
-
-def removeManagers( req, **params ):
-    return contribMod.RHContributionRemoveManagers( req ).process( params )
-
 def setVisibility( req, **params ):
     return contribMod.RHContributionSetVisibility( req ).process( params )
 
@@ -87,4 +77,3 @@ def addDomains( req, **params ):
 
 def removeDomains( req, **params ):
     return contribMod.RHContributionRemoveDomains( req ).process( params )
-

@@ -1252,18 +1252,6 @@ class UHContribModifAC( URLHandler ):
     _relativeURL = "contributionAC.py"
 
 
-class UHContributionSelectManagers( URLHandler ):
-    _relativeURL = "contributionAC.py/selectManagers"
-
-
-class UHContributionAddManagers( URLHandler ):
-    _relativeURL = "contributionAC.py/addManagers"
-
-
-class UHContributionRemoveManagers( URLHandler ):
-    _relativeURL = "contributionAC.py/removeManagers"
-
-
 class UHContributionSetVisibility( URLHandler ):
     _relativeURL = "contributionAC.py/setVisibility"
 
@@ -2287,18 +2275,6 @@ class UHCategoryTasksOption( URLHandler ):
     _relativeURL = "categoryDataModification.py/tasksOption"
 
 
-class UHCategorySelectManagers( URLHandler ):
-    _relativeURL = "categoryAC.py/selectManagers"
-
-
-class UHCategoryAddManagers( URLHandler ):
-    _relativeURL = "categoryAC.py/addManagers"
-
-
-class UHCategoryRemoveManagers( URLHandler ):
-    _relativeURL = "categoryAC.py/removeManagers"
-
-
 class UHCategorySetVisibility( URLHandler ):
     _relativeURL = "categoryAC.py/setVisibility"
 
@@ -2624,19 +2600,6 @@ class UHSessionAddDomains( URLHandler ):
 
 class UHSessionRemoveDomains( URLHandler ):
     _relativeURL = "sessionModifAC.py/removeDomains"
-
-
-class UHSessionSelectManagers( URLHandler ):
-    _relativeURL = "sessionModifAC.py/selectManagers"
-
-
-class UHSessionAddManagers( URLHandler ):
-    _relativeURL = "sessionModifAC.py/addManagers"
-
-
-class UHSessionRemoveManagers( URLHandler ):
-    _relativeURL = "sessionModifAC.py/removeManagers"
-
 
 class UHSessionModifTools( URLHandler ):
     _relativeURL = "sessionModifTools.py"

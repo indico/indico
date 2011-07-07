@@ -622,38 +622,6 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRigh
         else:
             self._loggedIn = True
 
-class RHContributionSelectManagers(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionSelectManagers
-
-    def _process(self):
-        p = contributions.WPContributionSelectManagers(self, self._target)
-        return p.display(**self._getRequestParams())
-
-
-class RHContributionAddManagers(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionAddManagers
-
-    def _process(self):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam(params["selectedPrincipals"]):
-                self._target.grantModification(ph.getById(id))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionRemoveManagers(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionRemoveManagers
-
-    def _process(self):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam(params["selectedPrincipals"]):
-                self._target.revokeModification(ph.getById(id))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
 
 class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionSetVisibility

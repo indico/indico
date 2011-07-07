@@ -24,15 +24,6 @@ from MaKaC.webinterface.rh import contribMod
 def index(req, **params):
     return contribMod.RHContributionAC( req ).process( params )
 
-def selectManagers( req, **params ):
-    return contribMod.RHContributionSelectManagers( req ).process( params )
-
-def addManagers( req, **params ):
-    return contribMod.RHContributionAddManagers( req ).process( params )
-
-def removeManagers( req, **params ):
-    return contribMod.RHContributionRemoveManagers( req ).process( params )
-
 def setVisibility( req, **params ):
     return contribMod.RHContributionSetVisibility( req ).process( params )
 

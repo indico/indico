@@ -9,3 +9,4 @@ include(ScriptRoot + "indico/Management/AbstractReviewing.js");
 include(ScriptRoot + "indico/Management/CFA.js");
 include(ScriptRoot + "indico/Management/Registration.js");
 include(ScriptRoot + "indico/Management/Participants.js");
+include(ScriptRoot + "indico/Management/Sessions.js");

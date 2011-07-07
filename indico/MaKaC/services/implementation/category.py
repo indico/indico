@@ -243,6 +243,7 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._categ.revokeAccess(userToRemove)
 
+
 class CategoryContactInfoModification( CategoryTextModificationBase ):
     """
     Category contact email modification
@@ -252,6 +253,53 @@ class CategoryContactInfoModification( CategoryTextModificationBase ):
     def _handleGet(self):
         return self._categ.getAccessController().getContactInfo()
 
+
+class CategoryManagerListBase(CategoryModifBase):
+
+    def _getManagersList(self):
+        result = fossilize(self._categ.getManagerList())
+        # get pending users
+        for email in self._categ.getAccessController().getModificationEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
+
+class CategoryGetManagerList(CategoryManagerListBase):
+
+    def _getAnswer(self):
+        return self._getManagersList()
+
+
+class CategoryAddExistingManager(CategoryManagerListBase):
+
+    def _checkParams(self):
+        CategoryManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        for user in self._userList:
+            self._categ.grantModification(ph.getById(user["id"]))
+        return self._getManagersList()
+
+
+class CategoryRemoveManager(CategoryManagerListBase):
+
+    def _checkParams(self):
+        CategoryManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._managerId = pm.extract("userId", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        self._categ.revokeModification(ph.getById(self._managerId))
+        return self._getManagersList()
+
+
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -260,5 +308,8 @@ methodMap = {
     "protection.getAllowedUsersList": CategoryProtectionUserList,
     "protection.addAllowedUsers": CategoryProtectionAddUsers,
     "protection.removeAllowedUser": CategoryProtectionRemoveUser,
-    "protection.changeContactInfo": CategoryContactInfoModification
+    "protection.changeContactInfo": CategoryContactInfoModification,
+    "protection.addExistingManager": CategoryAddExistingManager,
+    "protection.removeManager": CategoryRemoveManager,
+    "protection.getManagerList": CategoryGetManagerList
     }

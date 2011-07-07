@@ -1175,53 +1175,6 @@ class RHSessionRemoveDomains( RHSessionModifBase ):
         self._redirect( urlHandlers.UHSessionModifAC.getURL( self._target ) )
 
 
-class RHSessionSelectManagers( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionSelectManagers
-
-    def _process( self ):
-        p = sessions.WPSessionSelectManagers( self, self._target )
-        return p.display( **self._getRequestParams() )
-
-
-class RHSessionAddManagers( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionAddManagers
-
-    def _checkParams(self, params):
-        RHSessionModifBase._checkParams(self, params)
-        self._managerRole=self._normaliseListParam(params.get("userRole", []))
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                av=ph.getById( id )
-                self._target.grantModification( av )
-                if self._managerRole!=[]:
-                    conv=conference.SessionChair()
-                    conv.setDataFromAvatar(av)
-                    if "convener" in self._managerRole:
-                        self._target.addConvener(conv)
-        self._redirect( urlHandlers.UHSessionModifAC.getURL( self._target ) )
-
-
-class RHSessionRemoveManagers( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionRemoveManagers
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                av = ph.getById(id)
-                if av:
-                    self._target.revokeModification(av)
-                else:
-                    self._target.getAccessController().revokeModificationEmail(id)
-        self._redirect( urlHandlers.UHSessionModifAC.getURL( self._target ) )
-
-
 class RHCoordinatorsSel(RHSessionModifBase):
     _uh=urlHandlers.UHSessionModCoordinatorsSel
 
