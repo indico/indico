@@ -29,6 +29,18 @@ from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.common.info as info
 
 
+def blackListed(iter):
+    blIds = Config.getInstance().getExportBlacklist()
+
+    for conf in iter:
+        owners = list(categ.getId() for categ in conf.getOwnerPath()) + ['0']
+        for blId in blIds:
+            if blId in owners:
+                break
+        else:
+            yield conf
+
+
 class CategoryToRSS:
 
     def __init__(self, categ, date=None, tz=None):
@@ -48,7 +60,10 @@ class CategoryToRSS:
         else:
             confs = calIdx.getObjectsInDay(self._categ.getId(), self._date)
 
-        res = list(confs)
+        sconfs = set()
+
+        sconfs = set(blackListed(confs))
+        res = list(sconfs)
         res.sort(sortByStartDate)
         rss = xmlGen.XMLGen()
         rss.openTag('rss version="2.0"')

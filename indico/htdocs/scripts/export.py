@@ -22,7 +22,7 @@ import sys,re
 import datetime,sets
 
 from MaKaC.common.general import *
-from MaKaC.common import db
+from MaKaC.common import db, Config
 from MaKaC.conference import ConferenceHolder,CategoryManager
 from MaKaC.common import indexes
 from MaKaC.common import xmlGen
@@ -317,8 +317,21 @@ def getConfList(startdate,enddate,ids):
   im = indexes.IndexesHolder()
   calIdx = im.getIndex('categoryDate')
   for cid in ids:
-      confs = calIdx.getObjectsInDays(cid, startdate, enddate)
-      res.union_update(confs)
+      confs = blackListed(calIdx.iterateObjectsIn(cid, startdate, enddate))
+      for conf in confs:
+          res.add(conf)
   res = list(res)
   res.sort(sortByStartDate)
   return res
+
+
+def blackListed(iter):
+  blIds = Config.getInstance().getExportBlacklist()
+
+  for conf in iter:
+      owners = list(categ.getId() for categ in conf.getOwnerPath()) + ['0']
+      for blId in blIds:
+          if blId in owners:
+              break
+      else:
+          yield conf

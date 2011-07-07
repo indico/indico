@@ -21,6 +21,7 @@
 from xml.sax.saxutils import quoteattr, escape
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.ICALinterface.base import ICALBase
+from MaKaC.RSSinterface.conference import blackListed
 from MaKaC.common.utils import encodeUnicode
 from MaKaC.common.indexes import IndexesHolder
 
@@ -59,7 +60,8 @@ class CategoryToiCal(ICALBase):
 
         text = self._printHeader()
         # get all visible events in category
-        confs = calIdx.getObjectsInDays(self._categ.getId(), None, None)
+        confs = set(blackListed(calIdx.iterateObjectsIn(self._categ.getId(), None, None)))
+
         for conf in confs:
             text += ConferenceToiCal(conf).getCore()
         text += self._printFooter()

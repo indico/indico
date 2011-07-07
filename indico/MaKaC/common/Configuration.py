@@ -438,6 +438,7 @@ class Config:
             'Profile'                   : 'no',
             'UseXSendFile'              : 'no',
             'AuthenticatedEnforceSecure': 'yes',
+            'ExportBlacklist'           : [],
 
             # Authentication
             'LDAPConfig': {'host': 'myldapserver.example.com',

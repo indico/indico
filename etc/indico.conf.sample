@@ -253,6 +253,13 @@ CssStylesheetName    = "Default"
 
 
 #------------------------------------------------------------------------------
+# DATA EXPORT PARAMETERS
+#------------------------------------------------------------------------------
+
+# Categories that you do not wish to be exported using our metadata export services
+ExportBlacklist = []
+
+#------------------------------------------------------------------------------
 # OAI PARAMETERS
 #------------------------------------------------------------------------------
 # The Open Archives Initiative develops and promotes interoperability standards
