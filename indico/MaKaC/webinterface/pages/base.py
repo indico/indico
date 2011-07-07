@@ -57,9 +57,9 @@ class WPBase(OldObservable):
         files = ['underscore', 'jquery', 'jquery-ui', 'jquery.form', 'jquery.custom', 'jquery.daterange', 'jquery.qtip']
         if info.isDebugActive():
             # We can't use Loader.js as jQuery is included before any indico js
-            return ['js/jquery/%s.js' % f for f in files] + ['js/indico/jquery/defaults.js']
+            return ['js/jquery/%s.js' % f for f in files]
         else:
-            return ['js/jquery/pack/jquery.js.pack'] + ['js/indico/jquery/defaults.js']
+            return ['js/jquery/pack/jquery.js.pack']
 
     def _includeJSFile(self, path, filename):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
@@ -73,9 +73,9 @@ class WPBase(OldObservable):
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
         if info.isDebugActive():
-            return ['js/presentation/Loader.js']
+            return ['js/presentation/Loader.js', 'js/indico/jquery/defaults.js']
         else:
-            return ['js/presentation/pack/Presentation.js.pack']
+            return ['js/presentation/pack/Presentation.js.pack', 'js/indico/jquery/defaults.js']
 
     def _getBaseURL( self ):
         if self._rh._req.is_https() and Config.getInstance().getBaseSecureURL():
