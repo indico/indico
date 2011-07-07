@@ -169,6 +169,16 @@ def _updateMaKaCEggCache(file, path):
 
 def compileAllLanguages(cmd):
     '''Generates .mo files from .po files'''
+
+    try:
+        pkg_resources.require('babel')
+    except pkg_resources.DistributionNotFound:
+        print """
+Babel not found! JSTools is needed for internationalization, if you're building Indico from source. Please install it.
+i.e. try 'easy_install babel'"""
+        sys.exit(-1)
+
+
     # call commands directly
     cc = cmd.distribution.get_command_obj('compile_catalog')
     cc.run()
@@ -434,9 +444,6 @@ def fresh_install(defaultPrefix):
     # create the directory that will contain the configuration files
     if not os.path.exists(configDir):
             os.makedirs(configDir)
-
-    # compile po -> mo
-    compileAllLanguages()
 
     indicoconfpath = os.path.join(configDir, 'indico.conf')
 
