@@ -155,6 +155,8 @@ function getByKey(object, property, value) {
  * @return {Boolean}
  */
 function isObject(value) {
+    // We do not use _.isObject here since it has another idea of what
+    // an "object" is.
     return typeof(value) == "object" && value !== null;
 }
 
@@ -163,36 +165,28 @@ function isObject(value) {
  * @param {Object} value
  * @return {Boolean}
  */
-function isNumber(value) {
-    return typeof(value) == "number";
-}
+var isNumber = _.isNumber;
 
 /**
  * Returns true if the value is a string.
  * @param {Object} value
  * @return {Boolean}
  */
-function isString(value) {
-    return typeof(value) == "string";
-}
+var isString = _.isString;
 
 /**
  * Returns true if the value is a function.
  * @param {Object} value
  * @return {Boolean}
  */
-function isFunction(value) {
-    return typeof(value) == "function";
-}
+var isFunction = _.isFunction;
 
 /**
  * Returns true if the value is an array.
  * @param {Object} value
  * @return {Boolean}
  */
-function isArray(value) {
-    return value instanceof Array;
-}
+var isArray = _.isArray;
 
 /**
  * Returns true if the value is a DOM node.
