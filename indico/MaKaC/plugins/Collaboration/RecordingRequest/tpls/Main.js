@@ -61,6 +61,9 @@
 
     onLoad : function() {
         RRUpdateContributionList();
+
+        IndicoUtil.enableDisableForm($E("RRForm"), RRRecordingCapable);
+
         if (!isLecture) {
             if (singleBookings['RecordingRequest'] && singleBookings['RecordingRequest'].bookingParams.talks == 'choose') {
                 IndicoUI.Effect.appear($E('contributionsDiv'));

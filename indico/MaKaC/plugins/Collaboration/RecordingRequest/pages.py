@@ -29,6 +29,8 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
 from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
+from MaKaC.plugins.Collaboration.RecordingRequest.common import getCommonTalkInformation
+
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -41,45 +43,46 @@ class WNewBookingForm(WCSPageTemplateBase):
         isLecture = self._conf.getType() == 'simple_event'
         vars["IsLecture"] = isLecture
 
-        location = self._conf.getLocation()
-        room = self._conf.getRoom()
-        if location and location.getName() and location.getName().strip() and \
-           room and room.getName() and room.getName().strip():
-            vars["HasRoom"] = True
-        else:
-            vars["HasRoom"] = False
-
+        underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
         booking = self._conf.getCSBookingManager().getSingleBooking('RecordingRequest')
-
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
+        initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
+
         vars["InitialChoose"] = initialChoose
+        vars["DisplayTalks"] = initialDisplay
 
-        contributions = []
+        talks, recordingCapableRooms, recordingAbleTalks = getCommonTalkInformation(self._conf)
+        nTalks = len(talks)
+        nRecordingCapable = len(recordingAbleTalks)
 
-        if not isLecture and self._conf.getNumberOfContributions() > 0:
-            underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
+        vars["HasRecordingCapableTalks"] = nRecordingCapable > 0
+        vars["NTalks"] = nTalks
 
-            initialDisplay = underTheLimit or (booking is not None and initialChoose)
-            vars["DisplayTalks"] = initialDisplay
+        #list of "locationName:roomName" strings
+        vars["RecordingCapableRooms"] = recordingCapableRooms
 
-            #a talk is defined as a non-poster contribution
-            talks = getTalks(self._conf, oneIsEnough = not initialDisplay)
-            nTalks = len(talks)
-            vars["HasTalks"] = nTalks > 0
+        vars["NRecordingCapableContributions"] = nRecordingCapable
 
-            if initialDisplay:
-                talks.sort(key = Contribution.contributionStartDateForSort)
+        #we see if the event itself is webcast capable (depends on event's room)
+        confLocation = self._conf.getLocation()
+        confRoom = self._conf.getRoom()
+        if confLocation and confRoom and (confLocation.getName() + ":" + confRoom.getName() in recordingCapableRooms):
+            topLevelRecordingCapable = True
+        else:
+            topLevelRecordingCapable = False
 
-                contributions = fossilize(talks, IContributionWithSpeakersFossil,
+        #Finally, this event is webcast capable if the event itself or one of its talks are
+        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0
+
+        if initialDisplay:
+            recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
+
+            vars["Contributions"] = fossilize(recordingAbleTalks, IContributionWithSpeakersFossil,
                                           tz = self._conf.getTimezone(),
                                           units = '(hours)_minutes',
                                           truncate = True)
-
         else:
-            vars["DisplayTalks"] = booking is not None and initialChoose
-            vars["HasTalks"] = False
-
-        vars["Contributions"] = contributions
+            vars["Contributions"] = []
 
         vars["LectureOptions"] = lectureOptions
         vars["TypesOfEvents"] = typeOfEvents

@@ -208,13 +208,8 @@
                             };
                     </script>
                 % elif option.getType() =="rooms":
-                    <div id="roomList" class="PeopleListDiv"></div>
-                    <div id="roomChooser"></div>
-                    <div id="roomAddButton"></div>
+                    <div id="roomList${name}"></div>
                     <script type="text/javascript">
-                        var callback = function(){
-                            $E('roomChooser').set(roomChooser.draw(),addRoomButton);
-                        }
 
                         var removeRoomHandler = function (roomToRemove,setResult){
                             indicoRequest(
@@ -225,71 +220,36 @@
                                      },function(result,error) {
                                          if (!error) {
                                              setResult(true);
-                                             roomList.set(roomToRemove,null);
                                          } else {
                                                 IndicoUtil.errorReport(error);
                                                 setResult(false);
                                          }
                                     }
                                 );
-                            }
-                        var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {})
-                        var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
-                        addRoomButton.observeClick(
-                            function(setResult){
-                                var selectedValue = roomChooser.select.get();
-                                var roomName = roomChooser.select.dom.options[roomChooser.select.dom.selectedIndex].innerHTML; // horrible..
-                                indicoRequest(
-                                    'plugins.addRooms',
-                                    {
-                                     optionName: "${ name }",
-                                     room: selectedValue
-                                     },function(result,error) {
-                                         if (!error) {
-                                             roomList.set(selectedValue, roomName);
-                                         } else {
-                                             IndicoUtil.errorReport(error);
-                                         }
-                                    }
-                                );
-                        });
-                        var roomList = new RoomListWidget('PeopleList', removeRoomHandler, true);
-                        <%
-                            rooms = {}
-                            for room in option.getRooms():
-                                rooms[str(room.guid)] = '%s: %s' % (room.locationName, room.getFullName())
-                        %>
 
-                        var roomSelectedBefore = ${ fossilize(rooms) };
-                        each (roomSelectedBefore,function(room, guid){
-                            roomList.set(guid, room);
-                        });
-                        $E('roomList').set(roomList.draw());
-
-                        % if rbActive:
-
-                            var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, callback);
-                            var addRoomButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Room') );
-                            addRoomButton.observeClick(
-                                function(setResult){
-                                    var selectedValue = roomChooser.select.get();
-                                    var roomName = roomChooser.select.dom.options[roomChooser.select.dom.selectedIndex].innerHTML; // horrible..
+                            };
+                        var addRoomHandler = function(roomToAdd, setResult){
                                     indicoRequest(
                                         'plugins.addRooms',
                                         {
                                          optionName: "${ name }",
-                                         room: selectedValue
+                                         room: roomToAdd
                                          },function(result,error) {
-                                             if (!error) {
-                                                 roomList.set(selectedValue, roomName);
+                                                 setResult(true);
                                              } else {
                                                  IndicoUtil.errorReport(error);
                                              }
                                         }
                                     );
-                            });
-                            $E('roomAddButton').set();
+                            };
+                        var addNew = false;
+                        % if rbActive:
+                            addNew = true;
                         % endif
+                        var rlf = new RoomListField('PeopleListDiv', 'PeopleList', ${ option.getValue() },
+                               addNew, addRoomHandler, removeRoomHandler);
+
+                        $E('roomList${name}').set(rlf.draw());
                     </script>
                % elif option.getType() == "usersGroups":
                     <div id="userGroupList${name}" style="margin-bottom: 10px">

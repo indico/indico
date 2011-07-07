@@ -1,10 +1,16 @@
 <% declareTemplate(newTemplateStyle=True) %>
 
+span.RRWarningMessage {
+    color: #D01F3C;
+    font-weight: bold;
+}
+
 span.RRNoteTitle {
     font-weight: bold;
     font-style: italic;
     text-decoration: underline;
 }
+
 span.RRNoteText {
     font-style: italic;
 }

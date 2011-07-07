@@ -65,5 +65,11 @@ globalOptions = [
                "type": str,
                "defaultValue": "",
                "editable": True,
-               "visible": True})
+               "visible": True}),
+
+    ("recordingCapableRooms", {"description": _("Rooms capable of recording"),
+                      "type": "rooms",
+                      "defaultValue": [],
+                      "editable": True,
+                      "visible": True} ),
 ]

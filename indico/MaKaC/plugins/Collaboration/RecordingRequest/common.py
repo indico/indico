@@ -24,6 +24,7 @@ from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.conference import Contribution
 from MaKaC.common.fossilize import fossilizes
 from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IRecordingRequestErrorFossil
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 
 from indico.util.i18n import L_
 
@@ -118,3 +119,27 @@ class RecordingRequestError(CSErrorBase): #already Fossilizable
 
 class RecordingRequestException(CollaborationServiceException):
     pass
+
+def getCommonTalkInformation(conference):
+    """ Returns a tuple of 3 lists:
+        -List of talks (Contribution objects which are not in a Poster session)
+        -List of record capable rooms, as a list of "locationName:roomName" strings
+        -List of record-able talks (list of Contribution objects who take place in a record capable room)
+    """
+
+    #a talk is defined as a non-poster contribution
+    filter = PosterFilterField(conference, False, False)
+    talks = [cont for cont in conference.getContributionList() if filter.satisfies(cont)]
+
+    #list of "locationName:roomName" strings
+    recordingCapableRooms = CollaborationTools.getOptionValue('RecordingRequest', "recordingCapableRooms")
+
+    #a webcast-able talk is defined as a talk talking place in a webcast-able room
+    recordingAbleTalks = []
+    for t in talks:
+        location = t.getLocation()
+        room = t.getRoom()
+        if location and room and (location.getName() + ":" + room.getName() in recordingCapableRooms):
+            recordingAbleTalks.append(t)
+
+    return (talks, recordingCapableRooms, recordingAbleTalks)

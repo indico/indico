@@ -96,7 +96,7 @@ var RRUpdateContributionList = function () {
         }
     } else {
         if (exists($E('contributionList'))) { // we are not in a lecture
-            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks.")));
+            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of recording.")));
         }
     }
 }
@@ -141,7 +141,7 @@ var RR_loadTalks = function () {
         indicoRequest('collaboration.pluginService',
                 {
                     plugin: 'RecordingRequest',
-                    service: 'RRTalks',
+                    service: 'RecordingAbleTalks',
                     conference: '${ ConferenceId }'
                 },
             function(result, error){
