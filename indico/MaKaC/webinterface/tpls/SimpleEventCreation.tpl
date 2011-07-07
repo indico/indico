@@ -131,7 +131,7 @@
 
     var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
             null, true, null,
-            true, false, false, {"grant-manager": ['${ _("event modification")}', false]},
+            true, false, false, {"grant-manager": [${ jsonEncode(_("event modification"))}, false]},
             true, false, true,
             userListNothing, userListNothing, userListNothing);
 

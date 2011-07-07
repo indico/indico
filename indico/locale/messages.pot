@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 0.98-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-07-05 11:24+0200\n"
+"POT-Creation-Date: 2011-07-11 16:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,6 +127,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:85
 #: MaKaC/webinterface/tpls/TrackModifMain.tpl:13
 #: MaKaC/webinterface/tpls/UserAbstracts.tpl:18
+#: MaKaC/webinterface/tpls/UserDetails.tpl:20
 #: MaKaC/webinterface/tpls/UserMerge.tpl:27
 #: MaKaC/webinterface/tpls/UserMerge.tpl:77
 #: MaKaC/webinterface/tpls/UserModify.tpl:24
@@ -244,6 +245,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:85
 #: indico/MaKaC/webinterface/tpls/TrackModifMain.tpl:13
 #: indico/MaKaC/webinterface/tpls/UserAbstracts.tpl:18
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:20
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:27
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:77
 #: indico/MaKaC/webinterface/tpls/UserModify.tpl:24
@@ -277,8 +279,9 @@ msgid "Full Name C (w/o title)"
 msgstr ""
 
 #: MaKaC/badgeDesignConf.py:141 MaKaC/webinterface/tpls/RegistrantModifMain.tpl:21
-#: indico/MaKaC/badgeDesignConf.py:141
+#: MaKaC/webinterface/tpls/UserDetails.tpl:32 indico/MaKaC/badgeDesignConf.py:141
 #: indico/MaKaC/webinterface/tpls/RegistrantModifMain.tpl:21
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:32
 msgid "First Name"
 msgstr ""
 
@@ -360,7 +363,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/SessionModifSchContribCreation.tpl:40
 #: MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:48
 #: MaKaC/webinterface/tpls/SubContribModPresenter.tpl:49
-#: MaKaC/webinterface/tpls/UserDetails.tpl:25
+#: MaKaC/webinterface/tpls/UserDetails.tpl:56
 #: MaKaC/webinterface/tpls/UserMerge.tpl:52
 #: MaKaC/webinterface/tpls/UserMerge.tpl:102
 #: MaKaC/webinterface/tpls/UserModify.tpl:52
@@ -389,7 +392,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/SessionModifSchContribCreation.tpl:40
 #: indico/MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:48
 #: indico/MaKaC/webinterface/tpls/SubContribModPresenter.tpl:49
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:25
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:56
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:52
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:102
 #: indico/MaKaC/webinterface/tpls/UserModify.tpl:52
@@ -423,7 +426,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/RegistrantModifMain.tpl:49
 #: MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:64
 #: MaKaC/webinterface/tpls/SubContribModPresenter.tpl:65
-#: MaKaC/webinterface/tpls/UserDetails.tpl:33
+#: MaKaC/webinterface/tpls/UserDetails.tpl:68
 #: MaKaC/webinterface/tpls/UserMerge.tpl:62
 #: MaKaC/webinterface/tpls/UserMerge.tpl:112 indico/MaKaC/badgeDesignConf.py:149
 #: indico/MaKaC/webinterface/tpls/AuthorDisplay.tpl:33
@@ -438,7 +441,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/RegistrantModifMain.tpl:49
 #: indico/MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:64
 #: indico/MaKaC/webinterface/tpls/SubContribModPresenter.tpl:65
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:33
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:68
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:62
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:112
 msgid "Fax"
@@ -468,7 +471,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/RegistrantModifMain.tpl:53
 #: MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:40
 #: MaKaC/webinterface/tpls/SubContribModPresenter.tpl:41
-#: MaKaC/webinterface/tpls/UserDetails.tpl:21
+#: MaKaC/webinterface/tpls/UserDetails.tpl:44
 #: MaKaC/webinterface/tpls/UserList.tpl:67 MaKaC/webinterface/tpls/UserMerge.tpl:47
 #: MaKaC/webinterface/tpls/UserMerge.tpl:97
 #: MaKaC/webinterface/tpls/UserRegistration.tpl:56
@@ -499,7 +502,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/RegistrantModifMain.tpl:53
 #: indico/MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:40
 #: indico/MaKaC/webinterface/tpls/SubContribModPresenter.tpl:41
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:21
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:44
 #: indico/MaKaC/webinterface/tpls/UserList.tpl:67
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:47
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:97
@@ -5248,12 +5251,12 @@ msgid " are not in a room capable of webcasting and thus cannot be webcasted."
 msgstr ""
 
 #: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:126
-#: MaKaC/webinterface/displayMgr.py:839 MaKaC/webinterface/wcomponents.py:815
+#: MaKaC/webinterface/displayMgr.py:839 MaKaC/webinterface/wcomponents.py:816
 #: MaKaC/webinterface/pages/conferences.py:2125
 #: MaKaC/webinterface/tpls/ConfModifScheduleGraphic.tpl:1
 #: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:126
 #: indico/MaKaC/webinterface/displayMgr.py:839
-#: indico/MaKaC/webinterface/wcomponents.py:815
+#: indico/MaKaC/webinterface/wcomponents.py:816
 #: indico/MaKaC/webinterface/pages/conferences.py:2125
 #: indico/MaKaC/webinterface/tpls/ConfModifScheduleGraphic.tpl:1
 msgid "Timetable"
@@ -5307,7 +5310,7 @@ msgstr ""
 #: MaKaC/plugins/EPayment/payPal/webinterface/pages/ePayments.py:41
 #: MaKaC/webinterface/pages/abstractReviewing.py:261
 #: MaKaC/webinterface/pages/abstracts.py:721 MaKaC/webinterface/pages/admins.py:427
-#: MaKaC/webinterface/pages/admins.py:1087 MaKaC/webinterface/pages/admins.py:2097
+#: MaKaC/webinterface/pages/admins.py:1087 MaKaC/webinterface/pages/admins.py:2105
 #: MaKaC/webinterface/pages/contributions.py:381
 #: MaKaC/webinterface/pages/contributions.py:836
 #: MaKaC/webinterface/pages/files.py:105 MaKaC/webinterface/pages/links.py:82
@@ -5325,7 +5328,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/pages/abstracts.py:721
 #: indico/MaKaC/webinterface/pages/admins.py:427
 #: indico/MaKaC/webinterface/pages/admins.py:1087
-#: indico/MaKaC/webinterface/pages/admins.py:2097
+#: indico/MaKaC/webinterface/pages/admins.py:2105
 #: indico/MaKaC/webinterface/pages/contributions.py:381
 #: indico/MaKaC/webinterface/pages/contributions.py:836
 #: indico/MaKaC/webinterface/pages/files.py:105
@@ -6077,6 +6080,44 @@ msgstr ""
 msgid "It is not possible to move a break inside a poster session"
 msgstr ""
 
+#: MaKaC/services/implementation/user.py:343
+#: MaKaC/services/implementation/user.py:432
+#: indico/MaKaC/services/implementation/user.py:343
+#: indico/MaKaC/services/implementation/user.py:432
+msgid "User id not specified"
+msgstr ""
+
+#: MaKaC/services/implementation/user.py:346
+#: indico/MaKaC/services/implementation/user.py:346
+msgid "Data argument is not valid"
+msgstr ""
+
+#: MaKaC/services/implementation/user.py:352
+#: indico/MaKaC/services/implementation/user.py:352
+msgid "You are not allowed to perform this request"
+msgstr ""
+
+#: MaKaC/services/implementation/user.py:364
+#: indico/MaKaC/services/implementation/user.py:364
+msgid "The email address is not valid"
+msgstr ""
+
+#: MaKaC/services/implementation/user.py:388
+#: indico/MaKaC/services/implementation/user.py:388
+msgid "Invalid title value"
+msgstr ""
+
+#: MaKaC/services/implementation/user.py:409
+#: indico/MaKaC/services/implementation/user.py:409
+msgid "The email address is already used by another user."
+msgstr ""
+
+#: MaKaC/services/implementation/user.py:422
+#: indico/MaKaC/services/implementation/user.py:422
+#, python-format
+msgid "The email address %s is already used by another user."
+msgstr ""
+
 #: MaKaC/services/interface/rpc/offline.py:53
 #: indico/MaKaC/services/interface/rpc/offline.py:53
 msgid "Inherit from parent slot"
@@ -6548,85 +6589,85 @@ msgstr ""
 msgid "Template  produced empty output, and it has a .wohl file. Error: "
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:365
-#: indico/MaKaC/webinterface/wcomponents.py:365
+#: MaKaC/webinterface/wcomponents.py:366
+#: indico/MaKaC/webinterface/wcomponents.py:366
 msgid "Server admin"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:370
+#: MaKaC/webinterface/wcomponents.py:371
 #: MaKaC/webinterface/tpls/AdminCollaboration.tpl:3
-#: indico/MaKaC/webinterface/wcomponents.py:370
+#: indico/MaKaC/webinterface/wcomponents.py:371
 #: indico/MaKaC/webinterface/tpls/AdminCollaboration.tpl:3
 msgid "Video Services Overview"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:372
-#: indico/MaKaC/webinterface/wcomponents.py:372
+#: MaKaC/webinterface/wcomponents.py:373
+#: indico/MaKaC/webinterface/wcomponents.py:373
 msgid "Webcast Admin"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:841 MaKaC/webinterface/wcomponents.py:843
-#: MaKaC/webinterface/wcomponents.py:845 MaKaC/webinterface/wcomponents.py:859
-#: indico/MaKaC/webinterface/wcomponents.py:841
-#: indico/MaKaC/webinterface/wcomponents.py:843
-#: indico/MaKaC/webinterface/wcomponents.py:845
-#: indico/MaKaC/webinterface/wcomponents.py:859
+#: MaKaC/webinterface/wcomponents.py:842 MaKaC/webinterface/wcomponents.py:844
+#: MaKaC/webinterface/wcomponents.py:846 MaKaC/webinterface/wcomponents.py:860
+#: indico/MaKaC/webinterface/wcomponents.py:842
+#: indico/MaKaC/webinterface/wcomponents.py:844
+#: indico/MaKaC/webinterface/wcomponents.py:846
+#: indico/MaKaC/webinterface/wcomponents.py:860
 msgid "Contributions list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:870
-#: indico/MaKaC/webinterface/wcomponents.py:870
+#: MaKaC/webinterface/wcomponents.py:871
+#: indico/MaKaC/webinterface/wcomponents.py:871
 msgid "Notification template list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:878
-#: indico/MaKaC/webinterface/wcomponents.py:878
+#: MaKaC/webinterface/wcomponents.py:879
+#: indico/MaKaC/webinterface/wcomponents.py:879
 msgid "Abstracts list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:889
-#: indico/MaKaC/webinterface/wcomponents.py:889
+#: MaKaC/webinterface/wcomponents.py:890
+#: indico/MaKaC/webinterface/wcomponents.py:890
 msgid "Abstract list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:891
-#: indico/MaKaC/webinterface/wcomponents.py:891
+#: MaKaC/webinterface/wcomponents.py:892
+#: indico/MaKaC/webinterface/wcomponents.py:892
 msgid "Track list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:906
-#: indico/MaKaC/webinterface/wcomponents.py:906
+#: MaKaC/webinterface/wcomponents.py:907
+#: indico/MaKaC/webinterface/wcomponents.py:907
 msgid "Registrants list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:915
-#: indico/MaKaC/webinterface/wcomponents.py:915
+#: MaKaC/webinterface/wcomponents.py:916
+#: indico/MaKaC/webinterface/wcomponents.py:916
 msgid "Registration form setup"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:924
-#: indico/MaKaC/webinterface/wcomponents.py:924
+#: MaKaC/webinterface/wcomponents.py:925
+#: indico/MaKaC/webinterface/wcomponents.py:925
 msgid "Epayment setup"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:933
-#: indico/MaKaC/webinterface/wcomponents.py:933
+#: MaKaC/webinterface/wcomponents.py:934
+#: indico/MaKaC/webinterface/wcomponents.py:934
 msgid "All listings"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:942
-#: indico/MaKaC/webinterface/wcomponents.py:942
+#: MaKaC/webinterface/wcomponents.py:943
+#: indico/MaKaC/webinterface/wcomponents.py:943
 msgid "Participants list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:952
+#: MaKaC/webinterface/wcomponents.py:953
 #: MaKaC/webinterface/pages/conferences.py:2204
-#: indico/MaKaC/webinterface/wcomponents.py:952
+#: indico/MaKaC/webinterface/wcomponents.py:953
 #: indico/MaKaC/webinterface/pages/conferences.py:2204
 msgid "Logs"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1593
+#: MaKaC/webinterface/wcomponents.py:1594
 #: MaKaC/webinterface/pages/conferences.py:9791
 #: MaKaC/webinterface/pages/contributions.py:233
 #: MaKaC/webinterface/pages/subContributions.py:152
@@ -6638,7 +6679,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/SubContribModifMain.tpl:36
 #: MaKaC/webinterface/tpls/SubContributionDataModification.tpl:28
 #: MaKaC/webinterface/tpls/TrackAbstractModification.tpl:33
-#: indico/MaKaC/webinterface/wcomponents.py:1593
+#: indico/MaKaC/webinterface/wcomponents.py:1594
 #: indico/MaKaC/webinterface/pages/conferences.py:9791
 #: indico/MaKaC/webinterface/pages/contributions.py:233
 #: indico/MaKaC/webinterface/pages/subContributions.py:152
@@ -6653,17 +6694,17 @@ msgstr ""
 msgid "Presenters"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1639
-#: indico/MaKaC/webinterface/wcomponents.py:1639
+#: MaKaC/webinterface/wcomponents.py:1640
+#: indico/MaKaC/webinterface/wcomponents.py:1640
 msgid "Break entry data modification"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2206
+#: MaKaC/webinterface/wcomponents.py:2207
 #: MaKaC/webinterface/pages/conferences.py:3961
 #: MaKaC/webinterface/tpls/RoomBookingBlockingDetails.tpl:56
 #: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:260
 #: MaKaC/webinterface/tpls/RoomBookingRoomDetails.tpl:257
-#: indico/MaKaC/webinterface/wcomponents.py:2206
+#: indico/MaKaC/webinterface/wcomponents.py:2207
 #: indico/MaKaC/webinterface/pages/conferences.py:3961
 #: indico/MaKaC/webinterface/tpls/RoomBookingBlockingDetails.tpl:56
 #: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:260
@@ -6671,65 +6712,65 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2210
-#: indico/MaKaC/webinterface/wcomponents.py:2210
+#: MaKaC/webinterface/wcomponents.py:2211
+#: indico/MaKaC/webinterface/wcomponents.py:2211
 #, python-format
 msgid ""
 "<tr> <td nowrap>%s</td> <td width=\"60%%\">%s%s</td> <td nowrap>%s</td>  <td "
 "align=\"center\">%s</td>   </tr>"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2497
-#: indico/MaKaC/webinterface/wcomponents.py:2497
+#: MaKaC/webinterface/wcomponents.py:2498
+#: indico/MaKaC/webinterface/wcomponents.py:2498
 msgid "Creating a new Indico user"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2510
-#: indico/MaKaC/webinterface/wcomponents.py:2510
+#: MaKaC/webinterface/wcomponents.py:2511
+#: indico/MaKaC/webinterface/wcomponents.py:2511
 msgid "Modifying an Indico user"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2524
-#: indico/MaKaC/webinterface/wcomponents.py:2524
+#: MaKaC/webinterface/wcomponents.py:2525
+#: indico/MaKaC/webinterface/wcomponents.py:2525
 msgid "After the submission of your personal data, an email will be sent to you"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2524
-#: indico/MaKaC/webinterface/wcomponents.py:2524
+#: MaKaC/webinterface/wcomponents.py:2525
+#: indico/MaKaC/webinterface/wcomponents.py:2525
 msgid ""
 "You will able to use your account only after you activate it by clicking on "
 "the link inside the email."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2526
-#: indico/MaKaC/webinterface/wcomponents.py:2526
+#: MaKaC/webinterface/wcomponents.py:2527
+#: indico/MaKaC/webinterface/wcomponents.py:2527
 msgid ""
 "The site manager has to accept your account creation request. You will be "
 "informed of the decision by email."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2561
-#: indico/MaKaC/webinterface/wcomponents.py:2561
+#: MaKaC/webinterface/wcomponents.py:2562
+#: indico/MaKaC/webinterface/wcomponents.py:2562
 msgid ""
 "However, you will not be able to log into the system until you have activated"
 " your new account. To do this please follow the instructions in the mail that"
 " we have already sent you"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2563
-#: indico/MaKaC/webinterface/wcomponents.py:2563
+#: MaKaC/webinterface/wcomponents.py:2564
+#: indico/MaKaC/webinterface/wcomponents.py:2564
 msgid ""
 "However, you will not be able to log into the system until the site "
 "administrator has accepted your account creation request. You will be "
 "notified of the decision by email"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2645
-#: indico/MaKaC/webinterface/wcomponents.py:2645
+#: MaKaC/webinterface/wcomponents.py:2646
+#: indico/MaKaC/webinterface/wcomponents.py:2646
 msgid "Please note you can use your NICE (CERN) account"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2661 MaKaC/webinterface/wcomponents.py:2679
+#: MaKaC/webinterface/wcomponents.py:2662 MaKaC/webinterface/wcomponents.py:2680
 #: MaKaC/webinterface/tpls/ConfModifRegFormAccommodationDataModif.tpl:30
 #: MaKaC/webinterface/tpls/ConfModifRegFormFurtherInformationDataModif.tpl:16
 #: MaKaC/webinterface/tpls/ConfModifRegFormGeneralSectionDataModif.tpl:16
@@ -6739,8 +6780,8 @@ msgstr ""
 #: MaKaC/webinterface/tpls/ConfModifReschedule.tpl:27
 #: MaKaC/webinterface/tpls/MaterialDataModification.tpl:21
 #: MaKaC/webinterface/tpls/MaterialDisplayDataModification.tpl:35
-#: indico/MaKaC/webinterface/wcomponents.py:2661
-#: indico/MaKaC/webinterface/wcomponents.py:2679
+#: indico/MaKaC/webinterface/wcomponents.py:2662
+#: indico/MaKaC/webinterface/wcomponents.py:2680
 #: indico/MaKaC/webinterface/tpls/ConfModifRegFormAccommodationDataModif.tpl:30
 #: indico/MaKaC/webinterface/tpls/ConfModifRegFormFurtherInformationDataModif.tpl:16
 #: indico/MaKaC/webinterface/tpls/ConfModifRegFormGeneralSectionDataModif.tpl:16
@@ -6753,7 +6794,7 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2662 MaKaC/webinterface/wcomponents.py:2680
+#: MaKaC/webinterface/wcomponents.py:2663 MaKaC/webinterface/wcomponents.py:2681
 #: MaKaC/webinterface/pages/conferences.py:4338
 #: MaKaC/webinterface/tpls/AbsModAcceptConfirmation.tpl:31
 #: MaKaC/webinterface/tpls/AbsModRejectConfirmation.tpl:28
@@ -6768,8 +6809,8 @@ msgstr ""
 #: MaKaC/webinterface/tpls/IdentityModification.tpl:43
 #: MaKaC/webinterface/tpls/ModifReportNumberEdit.tpl:13
 #: MaKaC/webinterface/tpls/UserModify.tpl:71
-#: indico/MaKaC/webinterface/wcomponents.py:2662
-#: indico/MaKaC/webinterface/wcomponents.py:2680
+#: indico/MaKaC/webinterface/wcomponents.py:2663
+#: indico/MaKaC/webinterface/wcomponents.py:2681
 #: indico/MaKaC/webinterface/pages/conferences.py:4338
 #: indico/MaKaC/webinterface/tpls/AbsModAcceptConfirmation.tpl:31
 #: indico/MaKaC/webinterface/tpls/AbsModRejectConfirmation.tpl:28
@@ -6787,61 +6828,61 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3453 MaKaC/webinterface/pages/abstracts.py:104
-#: indico/MaKaC/webinterface/wcomponents.py:3453
+#: MaKaC/webinterface/wcomponents.py:3454 MaKaC/webinterface/pages/abstracts.py:104
+#: indico/MaKaC/webinterface/wcomponents.py:3454
 #: indico/MaKaC/webinterface/pages/abstracts.py:104
 msgid "OPENED"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3456
-#: indico/MaKaC/webinterface/wcomponents.py:3456
+#: MaKaC/webinterface/wcomponents.py:3457
+#: indico/MaKaC/webinterface/wcomponents.py:3457
 msgid "RESTRICTED"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3961
-#: indico/MaKaC/webinterface/wcomponents.py:3961
+#: MaKaC/webinterface/wcomponents.py:3962
+#: indico/MaKaC/webinterface/wcomponents.py:3962
 msgid ""
 "Please make your selection if you want to add the submitter/s directly to any"
 " of the following roles:"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3974
-#: indico/MaKaC/webinterface/wcomponents.py:3974
+#: MaKaC/webinterface/wcomponents.py:3975
+#: indico/MaKaC/webinterface/wcomponents.py:3975
 msgid "Please make your selection if you want to add the submitter/s directly to:"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3997
-#: indico/MaKaC/webinterface/wcomponents.py:3997
+#: MaKaC/webinterface/wcomponents.py:3998
+#: indico/MaKaC/webinterface/wcomponents.py:3998
 msgid ""
 "Please make your selection if you want to add the result/s directly to the "
 "role of session Convener:"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4021
-#: indico/MaKaC/webinterface/wcomponents.py:4021
+#: MaKaC/webinterface/wcomponents.py:4022
+#: indico/MaKaC/webinterface/wcomponents.py:4022
 msgid ""
 "Please check the boxes indicating which elements of the lecture you want to "
 "clone"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4034 MaKaC/webinterface/wcomponents.py:4217
-#: indico/MaKaC/webinterface/wcomponents.py:4034
-#: indico/MaKaC/webinterface/wcomponents.py:4217
+#: MaKaC/webinterface/wcomponents.py:4035 MaKaC/webinterface/wcomponents.py:4218
+#: indico/MaKaC/webinterface/wcomponents.py:4035
+#: indico/MaKaC/webinterface/wcomponents.py:4218
 msgid "Search for users"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4090
+#: MaKaC/webinterface/wcomponents.py:4091
 #: MaKaC/webinterface/tpls/ConfAddContribType.tpl:17
 #: MaKaC/webinterface/tpls/ConfModifRegFormAccommodationTypeAdd.tpl:17
 #: MaKaC/webinterface/tpls/ConfModifRegFormSocialEventAdd.tpl:17
-#: indico/MaKaC/webinterface/wcomponents.py:4090
+#: indico/MaKaC/webinterface/wcomponents.py:4091
 #: indico/MaKaC/webinterface/tpls/ConfAddContribType.tpl:17
 #: indico/MaKaC/webinterface/tpls/ConfModifRegFormAccommodationTypeAdd.tpl:17
 #: indico/MaKaC/webinterface/tpls/ConfModifRegFormSocialEventAdd.tpl:17
 msgid "create"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4095 MaKaC/webinterface/wcomponents.py:4115
+#: MaKaC/webinterface/wcomponents.py:4096 MaKaC/webinterface/wcomponents.py:4116
 #: MaKaC/webinterface/tpls/AuthorSearch.tpl:15
 #: MaKaC/webinterface/tpls/AuthorTable.tpl:31
 #: MaKaC/webinterface/tpls/CategoryComplexSelection.tpl:35
@@ -6852,8 +6893,8 @@ msgstr ""
 #: MaKaC/webinterface/tpls/SessionModifMain.tpl:65
 #: MaKaC/webinterface/tpls/SubContribSpeakerTable.tpl:27
 #: MaKaC/webinterface/tpls/UserSelection.tpl:39
-#: indico/MaKaC/webinterface/wcomponents.py:4095
-#: indico/MaKaC/webinterface/wcomponents.py:4115
+#: indico/MaKaC/webinterface/wcomponents.py:4096
+#: indico/MaKaC/webinterface/wcomponents.py:4116
 #: indico/MaKaC/webinterface/tpls/AuthorSearch.tpl:15
 #: indico/MaKaC/webinterface/tpls/AuthorTable.tpl:31
 #: indico/MaKaC/webinterface/tpls/CategoryComplexSelection.tpl:35
@@ -6867,60 +6908,60 @@ msgstr ""
 msgid "search"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4166
-#: indico/MaKaC/webinterface/wcomponents.py:4166
+#: MaKaC/webinterface/wcomponents.py:4167
+#: indico/MaKaC/webinterface/wcomponents.py:4167
 msgid "Search Users and Authors"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4193
-#: indico/MaKaC/webinterface/wcomponents.py:4193
+#: MaKaC/webinterface/wcomponents.py:4194
+#: indico/MaKaC/webinterface/wcomponents.py:4194
 msgid "Search for users and groups"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4267
-#: indico/MaKaC/webinterface/wcomponents.py:4267
+#: MaKaC/webinterface/wcomponents.py:4268
+#: indico/MaKaC/webinterface/wcomponents.py:4268
 msgid "Mr."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4267
-#: indico/MaKaC/webinterface/wcomponents.py:4267
+#: MaKaC/webinterface/wcomponents.py:4268
+#: indico/MaKaC/webinterface/wcomponents.py:4268
 msgid "Ms."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4267
-#: indico/MaKaC/webinterface/wcomponents.py:4267
+#: MaKaC/webinterface/wcomponents.py:4268
+#: indico/MaKaC/webinterface/wcomponents.py:4268
 msgid "Dr."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4267
-#: indico/MaKaC/webinterface/wcomponents.py:4267
+#: MaKaC/webinterface/wcomponents.py:4268
+#: indico/MaKaC/webinterface/wcomponents.py:4268
 msgid "Prof."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4386
-#: indico/MaKaC/webinterface/wcomponents.py:4386
+#: MaKaC/webinterface/wcomponents.py:4387
+#: indico/MaKaC/webinterface/wcomponents.py:4387
 msgid "'personType' must be set to use the Add Person Module"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4497 MaKaC/webinterface/wcomponents.py:4499
-#: indico/MaKaC/webinterface/wcomponents.py:4497
-#: indico/MaKaC/webinterface/wcomponents.py:4499
+#: MaKaC/webinterface/wcomponents.py:4498 MaKaC/webinterface/wcomponents.py:4500
+#: indico/MaKaC/webinterface/wcomponents.py:4498
+#: indico/MaKaC/webinterface/wcomponents.py:4500
 msgid "No Session Comment Entered"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:5585
-#: indico/MaKaC/webinterface/wcomponents.py:5585
+#: MaKaC/webinterface/wcomponents.py:5586
+#: indico/MaKaC/webinterface/wcomponents.py:5586
 msgid "Existing material"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:5610
-#: indico/MaKaC/webinterface/wcomponents.py:5610
+#: MaKaC/webinterface/wcomponents.py:5611
+#: indico/MaKaC/webinterface/wcomponents.py:5611
 msgid "Existing Reviewing material"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:6536
+#: MaKaC/webinterface/wcomponents.py:6537
 #: MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:10
-#: indico/MaKaC/webinterface/wcomponents.py:6536
+#: indico/MaKaC/webinterface/wcomponents.py:6537
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:10
 #, python-format
 msgid ""
@@ -6930,9 +6971,9 @@ msgid ""
 "<b>You are permitted to override the blocking.</b>"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:6540
+#: MaKaC/webinterface/wcomponents.py:6541
 #: MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:14
-#: indico/MaKaC/webinterface/wcomponents.py:6540
+#: indico/MaKaC/webinterface/wcomponents.py:6541
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:14
 #, python-format
 msgid ""
@@ -6943,9 +6984,9 @@ msgid ""
 "override the blocking. Please use this privilege with care!</b>"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:6543
+#: MaKaC/webinterface/wcomponents.py:6544
 #: MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:17
-#: indico/MaKaC/webinterface/wcomponents.py:6543
+#: indico/MaKaC/webinterface/wcomponents.py:6544
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:17
 #, python-format
 msgid ""
@@ -6953,9 +6994,9 @@ msgid ""
 "%s"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:6546
+#: MaKaC/webinterface/wcomponents.py:6547
 #: MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:20
-#: indico/MaKaC/webinterface/wcomponents.py:6546
+#: indico/MaKaC/webinterface/wcomponents.py:6547
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomCalendarDayRow.tpl:20
 #, python-format
 msgid ""
@@ -7504,109 +7545,109 @@ msgstr ""
 msgid "by status"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1491
-#: indico/MaKaC/webinterface/pages/admins.py:1491
+#: MaKaC/webinterface/pages/admins.py:1499
+#: indico/MaKaC/webinterface/pages/admins.py:1499
 msgid "Account Details"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1499
-#: indico/MaKaC/webinterface/pages/admins.py:1499
+#: MaKaC/webinterface/pages/admins.py:1507
+#: indico/MaKaC/webinterface/pages/admins.py:1507
 msgid "Preferences"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1502
-#: indico/MaKaC/webinterface/pages/admins.py:1502
+#: MaKaC/webinterface/pages/admins.py:1510
+#: indico/MaKaC/webinterface/pages/admins.py:1510
 msgid "Favorites"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1506
-#: indico/MaKaC/webinterface/pages/admins.py:1506
+#: MaKaC/webinterface/pages/admins.py:1514
+#: indico/MaKaC/webinterface/pages/admins.py:1514
 msgid "User Details"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1555
-#: indico/MaKaC/webinterface/pages/admins.py:1555
+#: MaKaC/webinterface/pages/admins.py:1563
+#: indico/MaKaC/webinterface/pages/admins.py:1563
 msgid "Modifying an existing user"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1607
-#: indico/MaKaC/webinterface/pages/admins.py:1607
+#: MaKaC/webinterface/pages/admins.py:1615
+#: indico/MaKaC/webinterface/pages/admins.py:1615
 msgid "New Identity for user"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1667
-#: indico/MaKaC/webinterface/pages/admins.py:1667
+#: MaKaC/webinterface/pages/admins.py:1675
+#: indico/MaKaC/webinterface/pages/admins.py:1675
 msgid "Change password for user"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1797
-#: indico/MaKaC/webinterface/pages/admins.py:1797
+#: MaKaC/webinterface/pages/admins.py:1805
+#: indico/MaKaC/webinterface/pages/admins.py:1805
 msgid "Creating a new group"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1804
-#: indico/MaKaC/webinterface/pages/admins.py:1804
+#: MaKaC/webinterface/pages/admins.py:1812
+#: indico/MaKaC/webinterface/pages/admins.py:1812
 msgid "Modifying group basic data"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1887
-#: indico/MaKaC/webinterface/pages/admins.py:1887
+#: MaKaC/webinterface/pages/admins.py:1895
+#: indico/MaKaC/webinterface/pages/admins.py:1895
 msgid "Creating a new LDAP group"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1892
-#: indico/MaKaC/webinterface/pages/admins.py:1892
+#: MaKaC/webinterface/pages/admins.py:1900
+#: indico/MaKaC/webinterface/pages/admins.py:1900
 msgid "Modifying LDAP group basic data"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1941
-#: indico/MaKaC/webinterface/pages/admins.py:1941
+#: MaKaC/webinterface/pages/admins.py:1949
+#: indico/MaKaC/webinterface/pages/admins.py:1949
 msgid "Select user to log in as"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2095
+#: MaKaC/webinterface/pages/admins.py:2103
 #: MaKaC/webinterface/pages/roomBooking.py:70
 #: MaKaC/webinterface/tpls/RoomBookingWelcome.tpl:3
-#: indico/MaKaC/webinterface/pages/admins.py:2095
+#: indico/MaKaC/webinterface/pages/admins.py:2103
 #: indico/MaKaC/webinterface/pages/roomBooking.py:70
 #: indico/MaKaC/webinterface/tpls/RoomBookingWelcome.tpl:3
 msgid "Room Booking"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2099 MaKaC/webinterface/pages/admins.py:2533
-#: indico/MaKaC/webinterface/pages/admins.py:2099
-#: indico/MaKaC/webinterface/pages/admins.py:2533
+#: MaKaC/webinterface/pages/admins.py:2107 MaKaC/webinterface/pages/admins.py:2541
+#: indico/MaKaC/webinterface/pages/admins.py:2107
+#: indico/MaKaC/webinterface/pages/admins.py:2541
 msgid "Configuration"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2101
+#: MaKaC/webinterface/pages/admins.py:2109
 #: MaKaC/webinterface/tpls/RoomMapperDetails.tpl:3
 #: MaKaC/webinterface/tpls/RoomMapperEdit.tpl:5
 #: MaKaC/webinterface/tpls/RoomMapperList.tpl:13
-#: indico/MaKaC/webinterface/pages/admins.py:2101
+#: indico/MaKaC/webinterface/pages/admins.py:2109
 #: indico/MaKaC/webinterface/tpls/RoomMapperDetails.tpl:3
 #: indico/MaKaC/webinterface/tpls/RoomMapperEdit.tpl:5
 #: indico/MaKaC/webinterface/tpls/RoomMapperList.tpl:13
 msgid "Room Mappers"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2463
-#: indico/MaKaC/webinterface/pages/admins.py:2463
+#: MaKaC/webinterface/pages/admins.py:2471
+#: indico/MaKaC/webinterface/pages/admins.py:2471
 msgid "Click to DEACTIVATE Room Booking Module"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2466
-#: indico/MaKaC/webinterface/pages/admins.py:2466
+#: MaKaC/webinterface/pages/admins.py:2474
+#: indico/MaKaC/webinterface/pages/admins.py:2474
 msgid "Click to ACTIVATE Room Booking Module"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2535
-#: indico/MaKaC/webinterface/pages/admins.py:2535
+#: MaKaC/webinterface/pages/admins.py:2543
+#: indico/MaKaC/webinterface/pages/admins.py:2543
 msgid "Task Manager"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2537
-#: indico/MaKaC/webinterface/pages/admins.py:2537
+#: MaKaC/webinterface/pages/admins.py:2545
+#: indico/MaKaC/webinterface/pages/admins.py:2545
 msgid "Maintenance"
 msgstr ""
 
@@ -10020,16 +10061,12 @@ msgid "you are not allowed to recover this abstract"
 msgstr ""
 
 #: MaKaC/webinterface/rh/abstractModif.py:310
-#: MaKaC/webinterface/rh/abstractModif_flymake.py:310
 #: indico/MaKaC/webinterface/rh/abstractModif.py:310
-#: indico/MaKaC/webinterface/rh/abstractModif_flymake.py:310
 msgid "invalid original abstract id"
 msgstr ""
 
 #: MaKaC/webinterface/rh/abstractModif.py:422
-#: MaKaC/webinterface/rh/abstractModif_flymake.py:422
 #: indico/MaKaC/webinterface/rh/abstractModif.py:422
-#: indico/MaKaC/webinterface/rh/abstractModif_flymake.py:422
 msgid ""
 "You have to choose a track in order to do the proposal. If there are not "
 "tracks to select, please change the track assignment of the abstract from its"
@@ -10037,10 +10074,8 @@ msgid ""
 msgstr ""
 
 #: MaKaC/webinterface/rh/abstractModif.py:432
-#: MaKaC/webinterface/rh/abstractModif_flymake.py:432
 #: MaKaC/webinterface/rh/trackModif.py:431
 #: indico/MaKaC/webinterface/rh/abstractModif.py:432
-#: indico/MaKaC/webinterface/rh/abstractModif_flymake.py:432
 #: indico/MaKaC/webinterface/rh/trackModif.py:431
 #, python-format
 msgid ""
@@ -10049,10 +10084,8 @@ msgid ""
 msgstr ""
 
 #: MaKaC/webinterface/rh/abstractModif.py:669
-#: MaKaC/webinterface/rh/abstractModif_flymake.py:669
 #: MaKaC/webinterface/rh/trackModif.py:735
 #: indico/MaKaC/webinterface/rh/abstractModif.py:669
-#: indico/MaKaC/webinterface/rh/abstractModif_flymake.py:669
 #: indico/MaKaC/webinterface/rh/trackModif.py:735
 msgid "the internal comment identifier hasn't been specified"
 msgstr ""
@@ -11139,11 +11172,11 @@ msgstr ""
 msgid "user id not specified"
 msgstr ""
 
-#: MaKaC/webinterface/rh/users.py:587 indico/MaKaC/webinterface/rh/users.py:587
+#: MaKaC/webinterface/rh/users.py:487 indico/MaKaC/webinterface/rh/users.py:487
 msgid "Both password and password confirmation fields must be filled up"
 msgstr ""
 
-#: MaKaC/webinterface/rh/users.py:592 indico/MaKaC/webinterface/rh/users.py:592
+#: MaKaC/webinterface/rh/users.py:492 indico/MaKaC/webinterface/rh/users.py:492
 msgid "Password and password confirmation are not equal"
 msgstr ""
 
@@ -11934,7 +11967,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/SearchBox.tpl:25
 #: MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:32
 #: MaKaC/webinterface/tpls/SubContribModPresenter.tpl:33
-#: MaKaC/webinterface/tpls/UserDetails.tpl:17
+#: MaKaC/webinterface/tpls/UserDetails.tpl:38
 #: MaKaC/webinterface/tpls/UserMerge.tpl:42
 #: MaKaC/webinterface/tpls/UserMerge.tpl:92
 #: MaKaC/webinterface/tpls/UserRegistration.tpl:52
@@ -11955,7 +11988,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/SearchBox.tpl:25
 #: indico/MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:32
 #: indico/MaKaC/webinterface/tpls/SubContribModPresenter.tpl:33
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:17
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:38
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:42
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:92
 #: indico/MaKaC/webinterface/tpls/UserRegistration.tpl:52
@@ -12026,7 +12059,6 @@ msgstr ""
 #: MaKaC/webinterface/tpls/SubContribModifMain.tpl:8
 #: MaKaC/webinterface/tpls/SystemLinkModif.tpl:9
 #: MaKaC/webinterface/tpls/TrackModifMain.tpl:8
-#: MaKaC/webinterface/tpls/UserDetails.tpl:40
 #: indico/MaKaC/webinterface/tpls/AbstractDisplay.tpl:9
 #: indico/MaKaC/webinterface/tpls/AbstractDisplay.tpl:159
 #: indico/MaKaC/webinterface/tpls/AbstractManagment.tpl:50
@@ -12076,7 +12108,6 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/SubContribModifMain.tpl:8
 #: indico/MaKaC/webinterface/tpls/SystemLinkModif.tpl:9
 #: indico/MaKaC/webinterface/tpls/TrackModifMain.tpl:8
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:40
 msgid "modify"
 msgstr ""
 
@@ -14239,7 +14270,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:177
 #: MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:56
 #: MaKaC/webinterface/tpls/SubContribModPresenter.tpl:57
-#: MaKaC/webinterface/tpls/UserDetails.tpl:29
+#: MaKaC/webinterface/tpls/UserDetails.tpl:62
 #: MaKaC/webinterface/tpls/UserMerge.tpl:57
 #: MaKaC/webinterface/tpls/UserMerge.tpl:107
 #: indico/MaKaC/webinterface/tpls/AuthorDisplay.tpl:29
@@ -14256,7 +14287,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:177
 #: indico/MaKaC/webinterface/tpls/SubContribModNewSpeaker.tpl:56
 #: indico/MaKaC/webinterface/tpls/SubContribModPresenter.tpl:57
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:29
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:62
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:57
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:107
 msgid "Telephone"
@@ -22473,7 +22504,9 @@ msgid "Modifying registrant data"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/RegistrantModifMain.tpl:17
+#: MaKaC/webinterface/tpls/UserDetails.tpl:26
 #: indico/MaKaC/webinterface/tpls/RegistrantModifMain.tpl:17
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:26
 msgid "Family Name"
 msgstr ""
 
@@ -24956,28 +24989,35 @@ msgid ""
 "                but you must have at least one account."
 msgstr ""
 
-#: MaKaC/webinterface/tpls/UserDetails.tpl:45
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:45
+#: MaKaC/webinterface/tpls/UserDetails.tpl:50
+#: MaKaC/webinterface/tpls/UserModify.tpl:48
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:50
+#: indico/MaKaC/webinterface/tpls/UserModify.tpl:48
+msgid "Secondary emails"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/UserDetails.tpl:74
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:74
 msgid "Your account(s)"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/UserDetails.tpl:48
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:48
+#: MaKaC/webinterface/tpls/UserDetails.tpl:77
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:77
 msgid "Account status"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/UserDetails.tpl:63
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:63
+#: MaKaC/webinterface/tpls/UserDetails.tpl:92
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:92
 msgid "Special Rights"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/UserDetails.tpl:68
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:68
+#: MaKaC/webinterface/tpls/UserDetails.tpl:97
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:97
 msgid "Category Manager"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/UserDetails.tpl:76
-#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:76
+#: MaKaC/webinterface/tpls/UserDetails.tpl:105
+#: indico/MaKaC/webinterface/tpls/UserDetails.tpl:105
 msgid "Event Manager"
 msgstr ""
 
@@ -25067,11 +25107,6 @@ msgstr ""
 #: MaKaC/webinterface/tpls/UserModify.tpl:44
 #: indico/MaKaC/webinterface/tpls/UserModify.tpl:44
 msgid "Primary email"
-msgstr ""
-
-#: MaKaC/webinterface/tpls/UserModify.tpl:48
-#: indico/MaKaC/webinterface/tpls/UserModify.tpl:48
-msgid "Secondary emails"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/UserModify.tpl:56

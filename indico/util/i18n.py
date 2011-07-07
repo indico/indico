@@ -143,7 +143,7 @@ class generate_messages_js(Command):
                 self.input_dir, locale, "LC_MESSAGES", 'messages-js.po'), js=True, pretty_print=True)
             fname = os.path.join(self.output_dir, '%s.js' % locale)
             with open(fname, 'w') as f:
-                f.write(result)
+                f.write(result.encode('utf-8'))
             print 'wrote %s' % fname
 
 
