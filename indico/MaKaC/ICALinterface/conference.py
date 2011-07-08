@@ -21,7 +21,7 @@
 from xml.sax.saxutils import quoteattr, escape
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.ICALinterface.base import ICALBase
-from MaKaC.RSSinterface.conference import blackListed
+from MaKaC.RSSinterface.conference import ACLfiltered
 from MaKaC.common.utils import encodeUnicode
 from MaKaC.common.indexes import IndexesHolder
 
@@ -51,8 +51,9 @@ class WebcastToiCal(ICALBase):
 
 class CategoryToiCal(ICALBase):
 
-    def __init__(self, categ):
+    def __init__(self, categ, req):
         self._categ = categ
+        self._req = req
 
     def getBody(self):
         im = IndexesHolder()
@@ -60,7 +61,7 @@ class CategoryToiCal(ICALBase):
 
         text = self._printHeader()
         # get all visible events in category
-        confs = set(blackListed(calIdx.iterateObjectsIn(self._categ.getId(), None, None)))
+        confs = set(ACLfiltered(calIdx.iterateObjectsIn(self._categ.getId(), None, None), self._req.get_remote_ip()))
 
         for conf in confs:
             text += ConferenceToiCal(conf).getCore()

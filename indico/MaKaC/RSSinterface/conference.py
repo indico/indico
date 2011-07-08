@@ -29,8 +29,10 @@ from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.common.info as info
 
 
-def blackListed(iter):
-    blIds = Config.getInstance().getExportBlacklist()
+def ACLfiltered(iter, requestIP):
+
+    acl = Config.getInstance().getExportACL().iteritems()
+    blIds = list(categ for (categ, iplist) in acl if (requestIP not in iplist))
 
     for conf in iter:
         owners = list(categ.getId() for categ in conf.getOwnerPath()) + ['0']
@@ -43,13 +45,14 @@ def blackListed(iter):
 
 class CategoryToRSS:
 
-    def __init__(self, categ, date=None, tz=None):
+    def __init__(self, categ, req, date=None, tz=None):
         self._categ = categ
         self._date = date
         if not tz:
             self._tz = 'UTC'
         else:
             self._tz = tz
+        self._req = req
 
     def getBody(self):
         im = indexes.IndexesHolder()
@@ -62,7 +65,7 @@ class CategoryToRSS:
 
         sconfs = set()
 
-        sconfs = set(blackListed(confs))
+        sconfs = set(ACLfiltered(confs, self._req.get_remote_ip()))
         res = list(sconfs)
         res.sort(sortByStartDate)
         rss = xmlGen.XMLGen()

@@ -29,6 +29,7 @@ from MaKaC.common import xmlGen
 from MaKaC.webinterface.urlHandlers import UHMaterialDisplay
 from MaKaC.ICALinterface.conference import ConferenceToiCal
 from MaKaC.ICALinterface.base import ICALBase
+from MaKaC.RSSinterface.conference import ACLfiltered
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface import urlHandlers
@@ -77,7 +78,7 @@ def index(req, **params):
   [year, month, day] = re.split('-',date)
   startdate = tz.localize(datetime.datetime(int(year),int(month),int(day),0,0,0))
   enddate   = startdate + datetime.timedelta(days=days,hours=23,minutes=59,seconds=59)
-  res = getConfList(startdate,enddate,ids)
+  res = getConfList(startdate, enddate, ids, req.get_remote_ip())
   # filter with event type
   if event_types != ['']:
     finalres = []
@@ -310,14 +311,14 @@ def displayRSSConf(conf,rss,tz):
 def sortByStartDate(conf1,conf2):
   return cmp(conf1.getStartDate(),conf2.getStartDate())
 
-def getConfList(startdate,enddate,ids):
+def getConfList(startdate,enddate,ids, requestIP):
   #create result set
   res = sets.Set()
   #instanciate indexes
   im = indexes.IndexesHolder()
   calIdx = im.getIndex('categoryDate')
   for cid in ids:
-      confs = blackListed(calIdx.iterateObjectsIn(cid, startdate, enddate))
+      confs = ACLfiltered(calIdx.iterateObjectsIn(cid, startdate, enddate), requestIP)
       for conf in confs:
           res.add(conf)
   res = list(res)
@@ -325,13 +326,3 @@ def getConfList(startdate,enddate,ids):
   return res
 
 
-def blackListed(iter):
-  blIds = Config.getInstance().getExportBlacklist()
-
-  for conf in iter:
-      owners = list(categ.getId() for categ in conf.getOwnerPath()) + ['0']
-      for blId in blIds:
-          if blId in owners:
-              break
-      else:
-          yield conf

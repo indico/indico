@@ -256,8 +256,8 @@ CssStylesheetName    = "Default"
 # DATA EXPORT PARAMETERS
 #------------------------------------------------------------------------------
 
-# Categories that you do not wish to be exported using our metadata export services
-ExportBlacklist = []
+# Categories that you want to limit to certain IPs (RSS, iCal, export.py)
+ExportACL = {}
 
 #------------------------------------------------------------------------------
 # OAI PARAMETERS
