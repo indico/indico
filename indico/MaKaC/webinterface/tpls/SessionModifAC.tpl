@@ -10,21 +10,45 @@ ${ accessControlFrame }
 </tr>
 <tr>
   <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Coordinators")}</span></td>
-  <td bgcolor="white" width="100%" valign="top" class="blacktext">${ coordinators }</td>
+  <td bgcolor="white" width="80%">
+        <table width="100%">
+            <tr>
+                <td><ul id="inPlaceCoordinators" class="UIPeopleList"></ul></td>
+            </tr>
+            <tr>
+                <td nowrap style="width:80%">
+                    <input type="button" id="inPlaceAddCoordinatorButton" onclick="coordinationControlManager.addExistingUser();" value='${ _("Add coordinator") }'></input>
+                </td>
+                <td></td>
+            </tr>
+        </table>
+    </td>
 </tr>
 </table>
 </tr></td></table>
 
 <script>
 
+// Modificaton control
 var methods = {'addExisting': 'session.protection.addExistingManager',
                     'remove': 'session.protection.removeManager',
                'getUserList': 'session.protection.getManagerList',
              'addAsConvener': 'session.protection.addAsConvener',
           'removeAsConvener': 'session.protection.removeAsConvener'};
 
-var params = {confId: '${ confId }', sessionId: '${ sessionId }'};
+var params = {confId: '${ confId }', sessionId: '${ sessionId }', kindOfList: 'manager'};
 
-var modificationControlManager = new SessionModificationControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+var modificationControlManager = new SessionControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+
+// Coordination control
+var coordMethods = {'addExisting': 'session.protection.addExistingCoordinator',
+                         'remove': 'session.protection.removeCoordinator',
+                    'getUserList': 'session.protection.getCoordinatorList',
+                  'addAsConvener': 'session.protection.addAsConvener',
+               'removeAsConvener': 'session.protection.removeAsConvener'};
+
+var coordParams = {confId: '${ confId }', sessionId: '${ sessionId }', kindOfList: 'coordinator'};
+
+var coordinationControlManager = new SessionControlManager('${ confId }', coordMethods, coordParams, $E('inPlaceCoordinators'), "coordinator");
 
 </script>

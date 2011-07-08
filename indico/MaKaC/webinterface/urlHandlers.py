@@ -2965,18 +2965,6 @@ class UHTrackModContribQuickAccess(URLHandler):
     _relativeURL="trackModContribList.py/contribQuickAccess"
 
 
-class UHSessionModCoordinatorsRem(URLHandler):
-    _relativeURL="sessionModifAC.py/remCoordinators"
-
-
-class UHSessionModCoordinatorsSel(URLHandler):
-    _relativeURL="sessionModifAC.py/selectCoordinators"
-
-
-class UHSessionModCoordinatorsAdd(URLHandler):
-    _relativeURL="sessionModifAC.py/addCoordinators"
-
-
 class UHConfMyStuff(URLHandler):
     _relativeURL="myconference.py"
 

@@ -1175,52 +1175,6 @@ class RHSessionRemoveDomains( RHSessionModifBase ):
         self._redirect( urlHandlers.UHSessionModifAC.getURL( self._target ) )
 
 
-class RHCoordinatorsSel(RHSessionModifBase):
-    _uh=urlHandlers.UHSessionModCoordinatorsSel
-
-    def _process( self ):
-        p=sessions.WPModCoordinatorsSel(self,self._target)
-        return p.display(**self._getRequestParams())
-
-
-class RHCoordinatorsAdd(RHSessionModifBase):
-    _uh = urlHandlers.UHSessionModCoordinatorsAdd
-
-    def _checkParams(self, params):
-        RHSessionModifBase._checkParams(self, params)
-        self._coordRole=self._normaliseListParam(params.get("userRole", []))
-
-    def _process( self ):
-        params=self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph=user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                av=ph.getById( id )
-                self._target.addCoordinator( av )
-                if self._coordRole!=[]:
-                    conv=conference.SessionChair()
-                    conv.setDataFromAvatar(av)
-                    if "convener" in self._coordRole:
-                        self._target.addConvener(conv)
-        self._redirect(urlHandlers.UHSessionModifAC.getURL(self._target))
-
-
-class RHCoordinatorsRem(RHSessionModifBase):
-    _uh=urlHandlers.UHSessionModCoordinatorsRem
-
-    def _process( self ):
-        params=self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph=user.PrincipalHolder()
-            for id in self._normaliseListParam( params["selectedPrincipals"] ):
-                av = ph.getById(id)
-                if av:
-                    self._target.removeCoordinator(av)
-                else:
-                    self._target.removeCoordinatorEmail(id)
-        self._redirect(urlHandlers.UHSessionModifAC.getURL(self._target))
-
 class RHSessionModifComm( RHSessionModCoordinationBase ):
     _uh = urlHandlers.UHSessionModifComm
 

@@ -41,12 +41,3 @@ def addDomains( req, **params ):
 
 def removeDomains( req, **params ):
     return sessionModif.RHSessionRemoveDomains( req ).process( params )
-
-def selectCoordinators( req, **params ):
-    return sessionModif.RHCoordinatorsSel( req ).process( params )
-
-def addCoordinators( req, **params ):
-    return sessionModif.RHCoordinatorsAdd( req ).process( params )
-
-def remCoordinators( req, **params ):
-    return sessionModif.RHCoordinatorsRem( req ).process( params )

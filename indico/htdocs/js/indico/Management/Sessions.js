@@ -2,7 +2,23 @@
  * Manager for the modification control list of users/groups in session management
  *
  */
-type("SessionModificationControlManager", ["ModificationControlManager"], {
+type("SessionControlManager", ["ModificationControlManager"], {
+
+    _manageBothUserList: function(method, params) {
+        var self = this;
+        indicoRequest(
+                method, params,
+                function(result, error) {
+                    if (!error) {
+                        // Update both lists of the page
+                        modificationControlManager.updateUserList(result[0]);
+                        coordinationControlManager.updateUserList(result[1]);
+                    } else {
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+        );
+    },
 
 	_getModifyAsConvenerParams: function(userId) {
         var params = this.params;
@@ -15,6 +31,10 @@ type("SessionModificationControlManager", ["ModificationControlManager"], {
         params['userId'] = userId;
         params['kindOfUser'] = kindOfUser;
         return params;
+    },
+
+    updateUserList: function(result) {
+        this._updateUserList(result)
     },
 
 	_updateUserList: function(result) {
@@ -111,12 +131,12 @@ type("SessionModificationControlManager", ["ModificationControlManager"], {
 
             if (!user['isConvener']) {
                 menuItems[$T('Add as convener')] = function() {
-                    self._manageUserList(self.methods["addAsConvener"], self._getModifyAsConvenerParams(user['id']), false);
+                    self._manageBothUserList(self.methods["addAsConvener"], self._getModifyAsConvenerParams(user['id']));
                     menu.close();
                 };
             } else {
                 menuItems[$T('Remove as convener')] = function() {
-                    self._manageUserList(self.methods["removeAsConvener"], self._getModifyAsConvenerParams(user['id']), false);
+                    self._manageBothUserList(self.methods["removeAsConvener"], self._getModifyAsConvenerParams(user['id']));
                     menu.close();
                 };
             }

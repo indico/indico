@@ -2008,10 +2008,6 @@ class WSessionModifAC(wcomponents.WTemplated):
     def __init__(self,session):
         self._session=session
 
-    def _getCoordinatorsHTML(self):
-        res = wcomponents.WPrincipalTable().getHTML( list(self._session.getCoordinatorList()), self._session, str(urlHandlers.UHSessionModCoordinatorsSel.getURL()), str(urlHandlers.UHSessionModCoordinatorsRem.getURL()), pendings=self._session.getCoordinatorEmailList(), selectable=False )
-        return res
-
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         wc=wcomponents.WAccessControlFrame()
@@ -2025,7 +2021,7 @@ class WSessionModifAC(wcomponents.WTemplated):
                                     urlHandlers.UHSessionRemoveDomains.getURL())
         wc=wcomponents.WModificationControlFrame()
         vars["modifyControlFrame"] = wc.getHTML(self._session)
-        vars["coordinators"]=self._getCoordinatorsHTML()
+
         vars["confId"] = self._session.getConference().getId()
         vars["sessionId"] = self._session.getId()
         return vars
@@ -2051,21 +2047,6 @@ class WPSessionSelectAllowed( WPSessionModifAC ):
             searchLocal = True
         wc = wcomponents.WPrincipalSelection( urlHandlers.UHSessionSelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
         params["addURL"] = urlHandlers.UHSessionAddAllowed.getURL()
-        return wc.getHTML( params )
-
-
-class WPModCoordinatorsSel(WPSessionModifAC):
-
-    def _getTabContent(self,params):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        url=urlHandlers.UHSessionModCoordinatorsSel.getURL()
-        wc =wcomponents.WPrincipalSelection(url, addTo=3,forceWithoutExtAuth=searchLocal)
-        wc.setTitle( _("Selecting session coordinators") )
-        params["addURL"]=urlHandlers.UHSessionModCoordinatorsAdd.getURL()
         return wc.getHTML( params )
 
 
