@@ -134,6 +134,10 @@ type("ExclusivePopup", ["Printable"], {
 
     _onClose: function(e, ui) {
         this.isopen = false;
+        this.canvas.dialog('destroy');
+        this.canvas.remove();
+        this.canvas = this.dialogElement = null;
+        this.buttons = [];
     }
 
 }, function(title, closeButtonHandler, printable, showPrintButton, noCanvas) {
@@ -160,6 +164,7 @@ type("ExclusivePopup", ["Printable"], {
     // and is printable.
     this.showPrintButton = any(showPrintButton && title && printable, false);
 
+    this.buttons = $();
     if(!noCanvas) {
         this._makeCanvas();
     }
