@@ -115,33 +115,35 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
 
          draw: function() {
              var self = this;
-             var email = new WatchObject();
+             this.email = new WatchObject();
 
              // TODO: force unidirectional binding?
-             $B(email.accessor(), indicoSource('user.data.email.get', {}));
+             $B(this.email.accessor(), indicoSource('user.data.email.get', {}));
 
-             var content = Html.div({style:{paddingLeft:pixels(10), paddingRight: pixels(10), paddingBottom:pixels(10)}},
-                     Html.div({style:{marginBottom: pixels(10), width:'300px', textAlign: 'center'}}, $T('An error has occurred while processing your request. We advise you to submit an error report, by clicking "Send report".')),
-                     Html.unescaped.div({style:{color: 'red', marginBottom: pixels(10), width: '300px', maxHeight: '75px', textAlign: 'center', overflow: 'auto'}},
-                              this.error.message),
-                     Html.div({style:{marginBottom: pixels(10), textAlign: 'center'}},
-                              Html.label({},"Your e-mail: "),
-                              $B(Html.input("text",{}), email.accessor())));
+             var content = $('<div/>').css({
+                 textAlign: 'center',
+                 width: '300px'
+             });
+             $('<p/>').text($T('An error has occurred while processing your request. We advise you to submit an error report, by clicking "Send report".')).appendTo(content);
+             $('<p/>').css('color', 'red').text(this.error.message).appendTo(content);
+             var emailBlock = $('<div/>').appendTo(content);
+             emailBlock.append($('<label/>').text($T('Your e-mail: ')));
+             var emailInput = $B(Html.input('text', {}), this.email.accessor());
+             emailBlock.append(emailInput.dom);
 
-             var buttons = Html.div({},
-                     Widget.link(command(
-                         function() {
-                             self._sendReport(email);
-                         },
-                         Html.input('button', {}, $T('Send report')))),
-                     Widget.link(command(
-                         function() {
-                             self.close();
-                         },
-                         Html.input('button', {style:{marginLeft: pixels(5)}}, $T('Do not send report'))
-                     )));
+             return this.ServiceDialogWithButtons.prototype.draw.call(this, content);
+         },
 
-             return this.ServiceDialogWithButtons.prototype.draw.call(this, content, buttons);
+         _getButtons: function() {
+             var self = this;
+             return [
+                 [$T('Send report'), function() {
+                     self._sendReport(self.email);
+                 }],
+                 [$T('Do not send report'), function() {
+                     self.close();
+                 }]
+             ];
          }
      },
      function(error) {

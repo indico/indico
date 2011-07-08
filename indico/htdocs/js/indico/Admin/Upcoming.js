@@ -74,7 +74,7 @@ type("UpcomingEventFavoritesList", ["RemoteListWidget"],
          this.RemoteListWidget("CategoryList", 'upcomingEvents.admin.getEventCategoryList', {});
      });
 
-type("CategoryEventAddDialog", ["ExclusivePopup"],
+type("CategoryEventAddDialog", ["ExclusivePopupWithButtons"],
      {
          draw: function() {
              var self = this;
@@ -83,34 +83,39 @@ type("CategoryEventAddDialog", ["ExclusivePopup"],
                  Html.option({value: 'category'}, "Category"),
                  Html.option({value: 'event'}, "Event"));
 
-             var info = new WatchObject();
-             info.set('type','category');
+             this.info = new WatchObject();
+             this.info.set('type', 'category');
 
              var form = IndicoUtil.createFormFromMap([
-                 ["Type", $B(selection, info.accessor('type'))],
-                 ["Id", $B(Html.edit(), info.accessor('id'))],
-                 ["Weight (float)", $B(Html.edit(), info.accessor('weight'))],
-                 ["Advertisement time (days)", $B(Html.edit(), info.accessor('delta'))]]);
+                 ["Type", $B(selection, this.info.accessor('type'))],
+                 ["Id", $B(Html.edit(), this.info.accessor('id'))],
+                 ["Weight (float)", $B(Html.edit(), this.info.accessor('weight'))],
+                 ["Advertisement time (days)", $B(Html.edit(), this.info.accessor('delta'))]]);
 
-             var button = Widget.button(command(
-                 function() {
+             return this.ExclusivePopup.prototype.draw.call(this, Html.div({}, form));
+         },
+
+         _getButtons: function() {
+             var self = this;
+             return [
+                 [$T('Add'), function() {
                      var killProgress = IndicoUI.Dialogs.Util.progress();
-                     indicoRequest('upcomingEvents.admin.addObservedObject', info,
-                                   function(result, error) {
-                                       if (!error) {
-                                           self.targetList._addElement(result);
-                                           self.close();
-                                           killProgress();
-                                       } else {
-                                           IndicoUtil.errorReport(error);
-                                           killProgress();
-                                       }
-                                   });
-                 }, "Add"));
-
-             return this.ExclusivePopup.prototype.draw.call(this, Html.div({},
-                                                                           form,
-                                                                           button));
+                     indicoRequest('upcomingEvents.admin.addObservedObject', self.info, function(result, error) {
+                         if (!error) {
+                             self.targetList._addElement(result);
+                             self.close();
+                             killProgress();
+                         }
+                         else {
+                             IndicoUtil.errorReport(error);
+                             killProgress();
+                         }
+                     });
+                 }],
+                 [$T('Cancel'), function() {
+                     self.close();
+                 }]
+             ];
          }
      },
      function(targetList) {

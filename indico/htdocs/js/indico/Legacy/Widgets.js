@@ -318,7 +318,7 @@ IndicoUI.Widgets = {
                 marginTop: pixels(10),
                 marginLeft: pixels(10),
                 position:'fixed',
-                zIndex: IndicoUI.__globalLayerLevel + 1}},
+                zIndex: IndicoUI.__globalLayerLevel + 2000}},
                 content);
 
             if (!klass) {

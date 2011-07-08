@@ -5103,7 +5103,6 @@ span.sessionRenameEntry, span.sessionRenameValue {
 
 div.exclusivePopup {
     background-color: white;
-    position: absolute;
     display: inline;
     border: 1px solid black;
     -moz-border-radius: 10px;

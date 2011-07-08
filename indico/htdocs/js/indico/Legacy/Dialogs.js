@@ -646,7 +646,7 @@ extend(IndicoUI.Dialogs,
                        $T('My minutes'),
                        function() {
                            popup.closeMinutesPopup();
-                       });
+                       }, true, false, true);
 
                var closeMinutes = function(){
                    popup.close();
@@ -686,7 +686,7 @@ extend(IndicoUI.Dialogs,
                            killProgress();
                            changedText.set(false);
                            wasChanged = true;
-                           saveButton.dom.disabled = true;
+                           saveButton.button('disable');
                            if (saveAndClose) {
                                closeMinutes();
                            }
@@ -697,64 +697,68 @@ extend(IndicoUI.Dialogs,
                changedText.observe(
                    function(value) {
                        if (value) {
-                           saveButton.dom.disabled = false;
+                           saveButton.button('enable');
                        }
                    });
 
+               popup.commitChanges = function() {
+                   killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+                   if(rtWidget.clean()){
+                       changedText.set(false);
+                       wasChanged = true;
+                       saveButton.button('disable');
+                       req.set(rtWidget.get());
+                   }
+                   killProgress();
+               }
 
-               popup.draw = function() {
+               popup.commitChangesAndClose = function() {
+                   saveAndClose = true;
+                   this.commitChanges();
+               };
+
+               popup.closeMinutesPopup = function(){
                    var self = this;
-                   var content = Html.div({}, rtWidget.draw());
-
-                   var commitChanges = function() {
-                       killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
-                       if(rtWidget.clean()){
-                           changedText.set(false);
-                           wasChanged = true;
-                           saveButton.dom.disabled = true;
-                           req.set(rtWidget.get());
+                   var confirmation = function(confirmed){
+                       if (confirmed == 1){
+                           self.commitChangesAndClose();
                        }
-                       killProgress();
-                   };
-
-                   var commitChangesAndClose = function() {
-                       saveAndClose = true;
-                       commitChanges();
-                   };
-
-                   self.closeMinutesPopup = function(){
-                       var confirmation = function(confirmed){
-                           if (confirmed == 1){
-                               commitChangesAndClose();
-                           }
-                           else if (confirmed == 2){
-                               closeMinutes();
-                           }
-                       };
-
-                       if (changedText.get()){
-                           var popupConfirm = new SaveConfirmPopup( $T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}},
-                                                                    $T("You have modified your text since you last saved.")),
-                                                                    Html.div({}, $T("Do you want to save your changes?"))), confirmation);
-                           popupConfirm.open();
-                       } else {
+                       else if (confirmed == 2){
                            closeMinutes();
                        }
                    };
 
-                   saveButton = Widget.button(command(commitChanges, $T("Save")));
-                   saveButton.dom.disabled = !compileMinutes;
+                   if (changedText.get()){
+                       var popupConfirm = new SaveConfirmPopup($T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}},
+                                                                $T("You have modified your text since you last saved.")),
+                                                                Html.div({}, $T("Do you want to save your changes?"))), confirmation);
+                       popupConfirm.open();
+                   } else {
+                       closeMinutes();
+                   }
+               };
 
-                   return this.ExclusivePopupWithButtons.prototype.draw.call(
-                       this,
-                       content,
-                       Html.div({style:{marginTop: pixels(20)}},
-                                 saveButton,
-                                 Widget.button(command(self.closeMinutesPopup, $T("Close")))));
+               popup.draw = function() {
+                   var content = Html.div({}, rtWidget.draw());
+                   return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
+               };
+
+               popup._getButtons = function() {
+                   return [
+                       [$T('Save'), function() {
+                           popup.commitChanges();
+                       }],
+                       [$T('Close'), function() {
+                           popup.closeMinutesPopup();
+                       }]
+                   ];
                };
 
                popup.open();
-
+               saveButton = popup.buttons.eq(0);
+               if(!compileMinutes) {
+                   saveButton.button('disable');
+               }
            },
            __addSessionSlot: function(slotId, sessionId, confId){
                var slot = undefined;

@@ -645,26 +645,26 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 this.searchPanel.clearSelection();
             }
             if (selectedList.isEmpty()) {
-                this.saveButton.disable();
+                this._toggleSaveButton(false);
             } else {
-                this.saveButton.enable();
+                this._toggleSaveButton(true);
             }
 
         } else {
 
             if (!selectedList.isEmpty()) {
-                this.saveButton.enable();
+                this._toggleSaveButton(true);
             } else {
                 var twoPanels = this.allowSearch && (this.includeFavourites || exists(this.suggestedUsers));
                 if (twoPanels) {
-                    var otherSelectedList = (panel === "searchUsers") ? this.suggestedUsersPanel.getSelection() : this.searchPanel.getSelection();
+                    var otherSelectedList = (panel === "searchUsers") ? this.suggestedUsersPanel.getSelectedList() : this.searchPanel.getSelectedList();
                     if (otherSelectedList.isEmpty()) {
-                        this.saveButton.disable();
+                        this._toggleSaveButton(false);
                     } else {
-                        this.saveButton.enable();
+                        this._toggleSaveButton(true);
                     }
                 } else {
-                    this.saveButton.disable();
+                    this._toggleSaveButton(false);
                 }
             }
         }
@@ -692,6 +692,10 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         }
     },
 
+    _toggleSaveButton: function(enabled) {
+        this.saveButton.disabledButtonWithTooltip(enabled ? 'enable' : 'disable');
+    },
+
     /**
      * Returns the dialog's DOM
      */
@@ -699,31 +703,13 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 
         var self = this;
 
-        // We construct the "save" button and what happens when it's pressed
-        self.saveButton = new DisabledButton(Html.input("button", {disabled:true}, self.onlyOne? $T("Choose") : $T("Add") ));
-        var saveButtonTooltip;
-        self.saveButton.observeEvent('mouseover', function(event){
-            if (!self.saveButton.isEnabled()) {
-                saveButtonTooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("Please select at least one item"), "tooltipError");
-            }
-        });
-        self.saveButton.observeEvent('mouseout', function(event){
-            Dom.List.remove(document.body, saveButtonTooltip);
-        });
-
-        self.saveButton.observeClick(function(){
-            self.__save();
-            self.close();
-        });
-
-        // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-        var cancelButton = Html.input("button", {style:{marginLeft:pixels(5)}}, "Cancel");
-        cancelButton.observeClick(function(){
-            self.close();
+        this.saveButton = self.buttons.eq(0);
+        this.saveButton.disabledButtonWithTooltip({
+            tooltip: $T('Please select at least one item'),
+            disabled: true
         });
 
         var mainContent = Html.tr();
-
         if (self.allowSearch) {
             this.cellSearch = Html.td("searchUsersGroupsPanel");
             self.__buildSearchPanel(this.cellSearch);
@@ -737,11 +723,21 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         }
 
         mainContent = Html.table({cellpadding: 0, cellPadding: 0, cellspacing: 0, cellSpacing: 0}, Html.tbody({}, mainContent));
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, mainContent);
 
-        this.buttonDiv = Html.div({}, self.saveButton.draw(), cancelButton);
+    },
 
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this, mainContent, this.buttonDiv, {}, {padding:pixels(0)});
-
+    _getButtons: function() {
+        var self = this;
+        return [
+            [(self.onlyOne ? $T('Choose') : $T('Add')), function() {
+                self.__save();
+                self.close();
+            }],
+            [$T('Cancel'), function() {
+                self.close();
+            }]
+        ];
     },
 
     postDraw: function() {
