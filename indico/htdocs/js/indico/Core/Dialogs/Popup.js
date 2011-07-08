@@ -77,7 +77,9 @@ type("ExclusivePopup", ["Printable"], {
     },
 
     close: function() {
-        this.canvas.dialog('close');
+        if(this.isopen) {
+            this.canvas.dialog('close');
+        }
     },
 
     _getDialogOptions: function() {

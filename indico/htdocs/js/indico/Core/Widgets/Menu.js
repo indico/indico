@@ -98,7 +98,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
                 }
             }
             else {
-                link.observeClick(pair.get().PopupWidget?
+                link.observeClick((pair.get().PopupWidget || pair.get().ExclusivePopup)?
                                   function(e) {
 
                                       if (self.selected) {
@@ -120,6 +120,9 @@ type("PopupMenu", ["ChainedPopupWidget"],
                                       var target = pair.get();
                                       target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 
+                                      if(self.closeOnClick) {
+                                          self.close();
+                                      }
                                       return false;
                                   }:
                                   function() {
