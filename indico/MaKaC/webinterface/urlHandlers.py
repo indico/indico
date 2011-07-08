@@ -1387,18 +1387,8 @@ class UHConfAddDomain( URLHandler ):
 class UHConfRemoveDomain( URLHandler ):
     _relativeURL = "confModifAC.py/removeDomains"
 
-
-class UHConfSelectManagers( URLHandler ):
-    _relativeURL = "confModifAC.py/selectManagers"
-
-class UHConfAddManagers( URLHandler ):
-    _relativeURL = "confModifAC.py/addManagers"
-
 class UHConfGrantSubmissionToAllSpeakers( URLHandler ):
     _relativeURL = "confModifAC.py/grantSubmissionToAllSpeakers"
-
-class UHConfRemoveManagers( URLHandler ):
-    _relativeURL = "confModifAC.py/removeManagers"
 
 class UHConfRemoveAllSubmissionRights( URLHandler ):
     _relativeURL = "confModifAC.py/removeAllSubmissionRights"

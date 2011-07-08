@@ -3163,10 +3163,7 @@ class WConfModifAC:
                                                     params["addDomainURL"], \
                                                     params["removeDomainURL"] )
 
-
         mc = wcomponents.WConfModificationControlFrame().getHTML( self.__conf,
-                                                  params["addManagersURL"],
-                                                  params["removeManagersURL"],
                                                   params["setModifKeyURL"] ) + "<br>"
 
         if self._eventType == "conference":
@@ -3209,8 +3206,6 @@ class WPConfModifAC( WPConferenceModifBase ):
             "removeAllowedURL": urlHandlers.UHConfRemoveAllowed.getURL(),
             "addDomainURL": urlHandlers.UHConfAddDomain.getURL(),
             "removeDomainURL": urlHandlers.UHConfRemoveDomain.getURL(),
-            "addManagersURL": urlHandlers.UHConfSelectManagers.getURL(),
-            "removeManagersURL": urlHandlers.UHConfRemoveManagers.getURL(),
             "addRegistrarsURL": conferenceModif.RHConfSelectRegistrars._uh.getURL(),
             "removeRegistrarsURL": conferenceModif.RHConfRemoveRegistrars._uh.getURL()
         }
@@ -3234,18 +3229,6 @@ class WPConfSelectAllowed( WPConfModifAC ):
         params["addURL"] = urlHandlers.UHConfAddAllowed.getURL()
         return wc.getHTML( params )
 
-
-class WPConfSelectManagers( WPConfModifAC ):
-
-    def _getPageContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHConfSelectManagers.getURL(), forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHConfAddManagers.getURL()
-        return wc.getHTML( params )
 
 class WPConfSelectRegistrars( WPConfModifAC ):
 

@@ -5,7 +5,19 @@
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Managers")}<br><font size="-2">(${ _("users allowed to modify")})</font></span></td>
-        <td class="blacktext">${ principalTable }</td>
+        <td bgcolor="white" width="80%">
+            <table width="100%">
+                <tr>
+                    <td><ul id="inPlaceManagers" class="UIPeopleList"></ul></td>
+                </tr>
+                <tr>
+                    <td nowrap style="width:80%">
+                        <input type="button" id="inPlaceAddManagerButton" onclick="modificationControlManager.addExistingUser();" value='${ _("Add manager") }'></input>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Modification key")}</span></td>
@@ -47,3 +59,15 @@
        </td>
     </tr>
 </table>
+
+<script>
+
+var methods = {'addExisting': 'event.protection.addExistingManager',
+                    'remove': 'event.protection.removeManager',
+               'getUserList': 'event.protection.getManagerList'};
+
+var params = {confId: '${ confId }'};
+
+var modificationControlManager = new ModificationControlManager('${ confId }', methods, params, $E('inPlaceManagers'), "manager");
+
+</script>

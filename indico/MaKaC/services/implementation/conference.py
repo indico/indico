@@ -1103,6 +1103,56 @@ class ConferenceParticipantAddNew(ConferenceAddParticipantBase):
         return fossilize(self._conf.getParticipation().getParticipantList())
 
 
+class ConferenceManagerListBase(ConferenceModifBase):
+
+    def _getManagersList(self):
+        result = fossilize(self._conf.getManagerList())
+        # get pending users
+        for email in self._conf.getAccessController().getModificationEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
+
+class ConferenceProtectionGetManagerList(ConferenceManagerListBase):
+
+    def _getAnswer(self):
+        return self._getManagersList()
+
+
+class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
+
+    def _checkParams(self):
+        ConferenceManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+
+    def _getAnswer(self):
+        ph = PrincipalHolder()
+        for user in self._userList:
+            self._conf.grantModification(ph.getById(user["id"]))
+        return self._getManagersList()
+
+
+class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
+
+    def _checkParams(self):
+        ConferenceManagerListBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._managerId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._kindOfUser = pm.extract("kindOfUser", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        if self._kindOfUser == "pending":
+            # remove pending email, self._submitterId is an email address
+            self._conf.getAccessController().revokeModificationEmail(self._managerId)
+        elif self._kindOfUser == "principal":
+            ph = PrincipalHolder()
+            self._conf.revokeModification(ph.getById(self._managerId))
+        return self._getManagersList()
+
 
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
@@ -1145,6 +1195,9 @@ methodMap = {
     "protection.setModifKey": ConferenceProtectionSetModifKey,
     "protection.changeContactInfo": ConferenceContactInfoModification,
     "alarm.sendTestNow": ConferenceAlarmSendTestNow,
+    "protection.addExistingManager": ConferenceProtectionAddExistingManager,
+    "protection.removeManager": ConferenceProtectionRemoveManager,
+    "protection.getManagerList": ConferenceProtectionGetManagerList,
     "participant.addExistingParticipant": ConferenceParticipantAddExisting,
     "participant.addNewParticipant": ConferenceParticipantAddNew
     }

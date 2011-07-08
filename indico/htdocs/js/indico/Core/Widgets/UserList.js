@@ -634,9 +634,10 @@ type("ModificationControlManager", ["ListOfUsersManager"], {
         return params;
     },
 
-    _getRemoveParams: function(userId) {
+    _getRemoveParams: function(userId, kindOfUser) {
         var params = this.params;
         params['userId'] = userId;
+        params['kindOfUser'] = kindOfUser;
         return params;
     },
 
@@ -651,6 +652,8 @@ type("ModificationControlManager", ["ListOfUsersManager"], {
         for (var i=0; i<result.length; i++) {
             var userRowElements = [];
 
+            var kindOfUser = "principal";
+            var userIdentifier = result[i]['id'];
             if (result[i]['_type'] == "Avatar") {
                 if (!result[i]['firstName']) {
                     var fullName = result[i]['familyName'].toUpperCase();
@@ -662,6 +665,8 @@ type("ModificationControlManager", ["ListOfUsersManager"], {
                 var fullName = result[i]['name'];
                 var elementStyle = "UIGroup";
             } else if (result[i]['pending']) {
+                kindOfUser = "pending";
+                userIdentifier = result[i]['email'];
                 var fullName = $T('Non-registered-user');
                 var elementStyle = "UIPerson";
             }
@@ -682,18 +687,20 @@ type("ModificationControlManager", ["ListOfUsersManager"], {
                 alt: $T('Remove ') + this.userCaption,
                 title: $T('Remove this ') + this.userCaption + $T(' from the list'),
                 className: 'UIRowButton2',
-                id: 'remove_'+result[i]['id'],
+                id: 'r_' + kindOfUser + '_' + userIdentifier,
                 style:{marginRight:'10px', cssFloat:'right', cursor:'pointer'}
             });
 
             imageRemove.observeClick(function(event) {
                 if (event.target) { // Firefox
-                    var userId = event.target.id.split('_')[1];
+                    var kindOfUser = event.target.id.split('_')[1];
+                    var userId = event.target.id.split('r_'+kindOfUser+'_')[1];
                 } else { // IE
-                    var userId = event.srcElement.id.split('_')[1];
+                    var kindOfUser = event.srcElement.id.split('_')[1];
+                    var userId = event.srcElement.id.split('r_'+kindOfUser+'_')[1];
                 }
-                    self._manageUserList(self.methods["remove"], self._getRemoveParams(userId), false);
-                });
+                self._manageUserList(self.methods["remove"], self._getRemoveParams(userId, kindOfUser), false);
+            });
             userRowElements.push(imageRemove);
 
             var row = Html.li({className: elementStyle, onmouseover: "this.style.backgroundColor = '#ECECEC';",

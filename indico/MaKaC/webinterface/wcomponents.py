@@ -2137,22 +2137,16 @@ class WModificationControlFrame(WTemplated):
 
 class WConfModificationControlFrame(WTemplated):
 
-    def getHTML( self, target, addManagersURL, removeManagersURL, setModifKeyURL ):
+    def getHTML( self, target, setModifKeyURL ):
         self.__target = target
-        params = { "addManagersURL": addManagersURL, \
-                   "removeManagersURL": removeManagersURL, \
-                   "setModifKeyURL": setModifKeyURL,
+        params = { "setModifKeyURL": setModifKeyURL,
                    "target": target }
         return  WTemplated.getHTML( self, params )
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
         vars["locator"] = self.__target.getLocator().getWebForm()
-        vars["principalTable"] = WPrincipalTable().getHTML( self.__target.getManagerList(),
-                                                            self.__target, vars["addManagersURL"],
-                                                            vars["removeManagersURL"],
-                                                            pendings=self.__target.getAccessController().getModificationEmail(),
-                                                            selectable=False)
+        vars["confId"] = self.__target.getId()
         vars["modifKey"] = self.__target.getModifKey()
         return vars
 
