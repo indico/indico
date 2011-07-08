@@ -12,6 +12,14 @@
     width: auto !important;
 }
 
+.ui-widget-content a {
+    color: #0b63a5;
+}
+
+.ui-widget-content a:hover {
+    color: #e25300;
+}
+
 /* Indico styled tooltips USED WITH qTip2 */
 
 .ui-tooltip-default .ui-tooltip-content {
@@ -21,4 +29,3 @@
     font-size: 11px;
     padding: 2px;
 }
-

@@ -53,18 +53,17 @@ type("AddEditMaterialDialog", [],{
     }
 });
 
-type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGrowing"], {
-
-    _drawButtons: function() {
-
+type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"], {
+    _getButtons: function() {
         var self = this;
-
-        var buttonDiv = Html.div({},
-            Widget.button(command(function() {
+        return [
+            [$T("Create Resource"), function() {
                 self._upload();
-            }, "Create Resource")));
-
-        return buttonDiv;
+            }],
+            [$T("Cancel"), function() {
+                self.close();
+            }]
+        ];
     },
 
     /*
@@ -75,7 +74,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
      */
     _drawResourcePathPane: function(locationSelector) {
         var MAX_MATERIAL_FIELDS = 5;
-        var MAX_GROW_MATERIAL_FIELDS = 3;
         var files = [Html.input('file', {name: 'file'})];
         var urlBoxes = [Html.edit({name: 'url'})];
         var toPDFCheckbox = Html.checkbox({style: {verticalAlign: 'middle'}}, true);
@@ -85,10 +83,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
         var self = this;
 
         var addInputLink = Widget.link(command(function() {
-            if(files.length == MAX_GROW_MATERIAL_FIELDS || urlBoxes.length == MAX_GROW_MATERIAL_FIELDS) {
-                self.lockHeight();
-            }
-
             self.tabWidget.disableTab(2);
             if(currentResourceLocation == 'local') {
                 files.push(Html.input('file', {name: 'file', style: {display: 'block'}}));
@@ -506,11 +500,11 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
 
         // We're not sure that the type "Slides"
         // will have a "standard" id
-        for (i in this.types) {
-            if (this.types[i][1] == "Slides") {
-                selection = this.types[i][0];
+        $.each(this.types, function(i, t) {
+            if (t[1] == "Slides") {
+                selection = t[0];
             }
-        }
+        });
 
         this.typeSelector.set(selection);
         this.ExclusivePopupWithButtons.prototype.postDraw.call(this);
@@ -568,9 +562,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
                                         [$T('Advanced'), this._drawAdvanced()]],
                                        400, 300);
 
-        return this.ExclusivePopupWithButtons.prototype.draw.call(this,
-                                                                  this._drawWidget(),
-                                                                  this._drawButtons(), {backgroundColor: 'white'}, {backgroundColor: 'white'});
+        return this.ExclusivePopupWithButtons.prototype.draw.call(this, this._drawWidget(), null, {backgroundColor: 'white'});
     }
 
 
@@ -589,10 +581,9 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtonsGro
 
     this.protectionStatus = $O();
     this.uploadType = new WatchValue();
-    this.ExclusivePopupWithButtons(this.forReviewing?[$T("Upload Paper")]:[$T("Upload Material")],
+    this.ExclusivePopupWithButtons(this.forReviewing?$T("Upload Paper"):$T("Upload Material"),
                         function() {
                             self.close();
-
                         });
 
     this.pm = new IndicoUtil.parameterManager();
