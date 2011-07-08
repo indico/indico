@@ -1,5 +1,5 @@
 (function($, undefined) {
-    $.widget('ui.daterange', {
+    $.widget('cern.daterange', {
         // Default options
         options: {
             disabled: false,
