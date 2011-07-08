@@ -89,7 +89,7 @@ var IndicoUI = {
 
         var level = ++this.__globalLayerLevel;
         this.__globalLayerLevels[level] = true;
-        element.setStyle('zIndex', this.__globalLayerLevel);
+        element.setStyle('zIndex', this.__globalLayerLevel + 3000);
     },
     /**
      * Marks a layer level as unused, call this funtion
@@ -102,7 +102,7 @@ var IndicoUI = {
         if (level == '') {
             return;
         }
-        this.__globalLayerLevels[parseInt(level)] = false;
+        this.__globalLayerLevels[parseInt(level) - 3000] = false;
     },
     __loadCount : 0,
     __unloadCount : 0,
