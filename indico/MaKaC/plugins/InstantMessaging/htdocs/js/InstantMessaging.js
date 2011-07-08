@@ -140,9 +140,9 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
 
              existingSelectionObserver: function(selectedList) {
                  if(selectedList.isEmpty()){
-                     this.button.disable();
+                     this.saveButton.disabledButtonWithTooltip('disable');
                  } else {
-                     this.button.enable();
+                     this.saveButton.disabledButtonWithTooltip('enable');
                  }
              },
 
@@ -189,7 +189,7 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              draw: function() {
                  var self = this;
 
-                 var chatroomList = new ExistingChatroomsList(self.chatrooms, function(selectedList) {
+                 this.chatroomList = new ExistingChatroomsList(self.chatrooms, function(selectedList) {
                      self.existingSelectionObserver(selectedList);
                  });
                  var content = Html.div({},
@@ -205,28 +205,27 @@ type("AddChatroomDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                              Html.li({},
                                  $T("Re-use one (or more) created by you"),
                                  Html.div("chatListDiv",
-                                 chatroomList.draw()))));
+                                 this.chatroomList.draw()))));
 
-                 this.button = new DisabledButton(Html.input("button", {disabled:true}, $T("Add selected")));
-                 var tooltip;
-                 this.button.observeEvent('mouseover', function(event){
-                     if (!self.button.isEnabled()) {
-                         tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("To add a chat room, please select at least one"), "tooltipError");
-                     }
-                 });
-                 this.button.observeEvent('mouseout', function(event){
-                     Dom.List.remove(document.body, tooltip);
+                 this.saveButton = self.buttons.eq(0);
+                 this.saveButton.disabledButtonWithTooltip({
+                     tooltip: $T('To add a chat room, please select at least one'),
+                     disabled: true
                  });
 
-                 this.button.observeClick(function(){
-                         var ids = translate(chatroomList.getList().getAll(),
-                                             function(chatroom) {
-                                                 return chatroom.getAll().id;
-                                              });
+                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
+             },
+
+             _getButtons: function() {
+                 var self = this;
+                 return [
+                     [$T('Add selected'), function() {
+                         var ids = translate(self.chatroomList.getList().getAll(), function(chatroom) {
+                             return chatroom.getAll().id;
+                         });
                          self.addExisting(ids);
-                 });
-
-                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, content, this.button.draw());
+                     }]
+                 ];
              }
          },
          function(conferenceId) {
@@ -264,8 +263,7 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
         },
 
         open: function() {
-            $E(document.body).append(this.draw());
-            this.isopen = true;
+            this.ExclusivePopupWithButtons.prototype.open.call(this);
             disableCustomId(defaultHost);
         },
 
@@ -350,27 +348,23 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
                 ])
             );
 
-            // We construct the "save" button and what happens when it's pressed
-            var saveButton = Html.input('button', null, $T("Save"));
-            saveButton.observeClick(function(){
-                self.__save();
-            });
-
-            // We construct the "cancel" button and what happens when it's pressed (which is: just close the dialog)
-            var cancelButton = Html.input('button', {style:{marginLeft:pixels(5)}}, $T("Cancel"));
-            cancelButton.observeClick(function(){
-                self.close();
-            });
-
-            var buttonDiv = Html.div({}, saveButton, cancelButton);
-
             var width = 600;
             var height = 200
 
             this.tabControl = new TabWidget([[$T("Basic"), this.basicTabForm], [$T("Advanced"), this.advancedTabForm]], width, height);
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), {backgroundColor: "#FFFFFF"});
+        },
 
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.tabControl.draw(), buttonDiv,
-                    {backgroundColor: "#FFFFFF"});
+        _getButtons: function() {
+            var self = this;
+            return [
+                [$T('Save'), function() {
+                    self.__save();
+                }],
+                [$T('Cancel'), function() {
+                    self.close();
+                }]
+            ];
         },
 
         postDraw: function() {
@@ -507,38 +501,27 @@ type ("ChatroomPopup", ["ExclusivePopupWithButtons"],
 );
 
 
-/**
- * Utility function to display a simple alert popup.
- * You can think of it as an "confirm" replacement.
- * It will have a title, a close button, an OK button and a Cancel button.
- * @param {Html or String} title The title of the error popup.
- * @param {Element} content Anything you want to put inside.
- * @param {function} handler A function that will be called with a boolean as argument:
- *                   true if the user pressers "ok", or false if the user presses "cancel"
- */
 type("LogPopup", ["ExclusivePopupWithButtons"],
     {
          draw: function() {
+             return this.ExclusivePopupWithButtons.prototype.draw.call(this, this.content);
+         },
+
+         _getButtons: function() {
              var self = this;
-
-             var okButton = Html.input('button', {style:{marginRight: pixels(3)}}, $T('OK'));
-             okButton.observeClick(function(){
-                 var result = self.handler(true);
-                 if (result){
-                     window.location = result;
+             return [
+                 [$T('OK'), function() {
+                     var result = self.handler(true);
+                     if (result){
+                         window.location = result;
+                         self.close();
+                     }
+                 }],
+                 [$T('Cancel'), function() {
+                     self.handler(false);
                      self.close();
-                 }
-             });
-
-             var cancelButton = Html.input('button', {style:{marginLeft: pixels(3)}}, $T('Cancel'));
-             cancelButton.observeClick(function(){
-                 self.handler(false);
-                 self.close();
-             });
-
-             return this.ExclusivePopupWithButtons.prototype.draw.call(this,
-                     this.content,
-                     Html.div({}, okButton, cancelButton));
+                 }]
+             ];
          }
     },
 
@@ -547,7 +530,7 @@ type("LogPopup", ["ExclusivePopupWithButtons"],
 
         this.content = content;
         this.handler = handler;
-        this.ExclusivePopupWithButtons(Html.div({style:{textAlign: 'center'}}, title), function(){
+        this.ExclusivePopupWithButtons(title, function(){
             self.handler(false);
             return true;
         });
@@ -798,7 +781,7 @@ var showLinkMenu = function(element, chatroom){
             each(links.get(chatroom.id).custom, function(linkType){
                 menuItems['Using ' + linkType.name] = linkType.link;
             });
-            joinMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList',true, false, null, null,true);
+            joinMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList', true, false, null, null, true);
             var pos = element.getAbsolutePosition();
             joinMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);
             return false;
@@ -928,7 +911,7 @@ var showLogOptions = function(element, chatroom){
                                                                               else return false;
                                                                            }
                                                                       });
-            logsMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList');
+            logsMenu = new PopupMenu(menuItems, [element], 'categoryDisplayPopupList', true);
             var pos = element.getAbsolutePosition();
             logsMenu.open(pos.x - 5, pos.y + element.dom.offsetHeight + 2);
             return false;
